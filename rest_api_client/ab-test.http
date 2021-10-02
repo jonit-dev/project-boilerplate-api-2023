@@ -1,0 +1,41 @@
+# ABTest :: Create
+POST {{baseUrl}}/ab-tests HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Order flow button test",
+  "slug": "order-flow-button-tst",
+  "description": "Test if we should use a button or a slider to confirm the order"
+}
+
+### 
+
+# ABTest :: Read
+GET {{baseUrl}}/ab-tests/6133c06ba8c477005a2a40a0 HTTP/1.1
+Content-Type: application/json
+
+### 
+
+# ABTest :: Read All
+GET {{baseUrl}}/ab-tests?enabled=true HTTP/1.1
+Content-Type: application/json
+
+### 
+
+# ABTest :: Update
+PATCH {{baseUrl}}/ab-tests/6133c06ba8c477005a2a40a0 HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Updated name",
+  "slug": "new-ab-test-updated",
+  "description": "This is a new A/B test updated"
+}
+
+###
+
+# ABTest :: Delete
+DELETE {{baseUrl}}/ab-tests/6133c06ba8c477005a2a40a0 HTTP/1.1
+Content-Type: application/json
+ 
+###

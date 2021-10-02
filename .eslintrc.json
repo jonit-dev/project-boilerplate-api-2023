@@ -1,0 +1,47 @@
+{
+  "env": {
+    "es2021": true,
+    "es6": true,
+    "node": true
+  },
+  "extends": ["standard", "plugin:promise/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint", "unused-imports", "promise"],
+  "rules": {
+    "semi": ["warn", "always"],
+    "quotes": ["warn", "double", { "avoidEscape": true }],
+    "comma-dangle": "off",
+    "no-trailing-spaces": "off",
+    "no-multiple-empty-lines": "off",
+    "no-unused-expressions": "off",
+    "padded-blocks": "off",
+    "keyword-spacing": "off",
+    "camelcase": "off",
+    "require-await": "error",
+    "no-case-declarations": "off",
+    "object-curly-spacing": "off",
+    "space-before-function-paren": "off",
+    "no-useless-constructor": "off",
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "eslint-no-use-before-defining": "off",
+    "no-use-before-define": "off",
+    "no-var": "error",
+    "no-unused-vars": "warn",
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "custom": {
+          "regex": "^I[A-Z]",
+          "match": true
+        }
+      }
+    ],
+    "indent": "off"
+  }
+}

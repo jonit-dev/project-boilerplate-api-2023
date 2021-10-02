@@ -1,0 +1,13 @@
+###
+
+# DB Tasks :: Portfolio > link performance 
+GET {{baseUrl}}/db-tasks/portfolios/update/performance HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+# DB Tasks :: Portfolio > update followers
+GET {{baseUrl}}/db-tasks/portfolios/update/followers HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json

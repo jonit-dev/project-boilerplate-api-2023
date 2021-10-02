@@ -1,0 +1,9 @@
+[Product Name] 
+
+{{notification}}
+
+[Company Name, LLC]
+
+1234 Street Rd.
+
+Suite 1234

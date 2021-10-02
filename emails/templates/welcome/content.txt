@@ -1,0 +1,7 @@
+{{newAccountEmailTitle}}
+{{newAccountEmailFirstParagraph}}
+
+{{newAccountEmailForReference}}
+
+Login: {{userEmail}}
+{{newAccountEmailBottom}}

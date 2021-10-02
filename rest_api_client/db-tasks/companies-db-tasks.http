@@ -1,0 +1,22 @@
+###
+
+# DB Tasks :: Company Update 
+GET {{baseUrl}}/db-tasks/companies/update/Brazil/Stocks HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+# DB Tasks :: Company Delete old data
+GET {{baseUrl}}/db-tasks/companies/delete/old-data HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+ 
+
+###
+
+# DB Tasks :: Company Sync cash flow
+GET {{baseUrl}}/db-tasks/companies/sync/cash-flows HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json

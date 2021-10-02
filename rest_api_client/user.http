@@ -1,0 +1,110 @@
+
+
+# User :: Create (Sign Up)
+POST {{baseUrl}}/auth/signup HTTP/1.1
+content-type: application/json
+
+{
+    "email": "joaopaulofurtado@live.com",
+    "password": "123",
+    "passwordConfirmation": "123",
+    "name": "Null Pointer Dev"
+}
+
+###
+
+# User :: Login 
+POST {{baseUrl}}/auth/login HTTP/1.1
+content-type: application/json
+
+{
+    "email": "joaopaulofurtado@live.com",
+    "password": "123"
+}
+
+###
+
+# User :: Read (own info) 
+GET {{baseUrl}}/users/self HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+# User :: Update
+PATCH {{baseUrl}}/users HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "name": "Joao Silva",
+    "preferences": {
+        "experience": "Beginner",
+        "goal": "LearnMore"
+    }
+}
+
+### 
+
+# User :: Google OAuth :: Generate Url
+GET {{baseUrl}}/auth/google/url HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+### 
+
+# User :: Apple OAuth : Sign Up
+## This is the first apple response only. On subsequent front-end requests, it will only send the identityToken, user and authorizationCode
+POST {{baseUrl}}/auth/apple HTTP/1.1
+Content-Type: application/json
+
+{
+   "user": "000286.ac9dab65b8f34adeb20aef408f653199.0418",
+  "identityToken": "eyJraWQiOiJlWGF1bm1MIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoiY29tLmJsdWVzaGlwLm1vYmlsZSIsImV4cCI6MTYzMDYzNzU4NSwiaWF0IjoxNjMwNTUxMTg1LCJzdWIiOiIwMDAyODYuYWM5ZGFiNjViOGYzNGFkZWIyMGFlZjQwOGY2NTMxOTkuMDQxOCIsImNfaGFzaCI6IjNyTl82djRCMmk1SlE3djNLQXE2UkEiLCJlbWFpbCI6ImRlcmNpbGlvYWZvbnRlc0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6InRydWUiLCJhdXRoX3RpbWUiOjE2MzA1NTExODUsIm5vbmNlX3N1cHBvcnRlZCI6dHJ1ZSwicmVhbF91c2VyX3N0YXR1cyI6Mn0.yQBwfuVb8aL80qWVt7x18xSE0eUmp7X30t_M0vqMRyVyLJgMnc-XD7b0R4nnsCVtczdHP1jAAiCRmksO1dpelpo0w6ZyugsMB-0ibC5r24uoesPS5nCfJexc-p7JRqkcR3EAoILfJrkGY_iEW8TGQIVg8CYJud-ao63mqPLMzAsEOpNSKQtFnv3h7wVDx7bKCXB3dhBnWErg9IhDADWE-_7k7o8A_QeucQeWr81B2_9v_vcTdUafhUhepd9hSu6LIxQWZBAGgRdk1n7-MxYGvwBkpz5pd9io7OdIgY4Euys-Yv8EroYOY8lN-5gUmNwTVATYYhmOD4o3Juh2VFq_Ow",
+  "authorizationCode": "c0e4298a8fad6486c93666d7effdccf53.0.ssyw.Cv_Ks2wKqL08TWVNS2dMIQ",
+  "email": "dercilioafontes@gmail.com",
+  "givenName": "Dercilio",
+  "familyName": "Fontes"
+}
+
+### 
+
+# User :: Apple OAuth : Sign In / Sign In
+POST {{baseUrl}}/auth/apple HTTP/1.1
+Content-Type: application/json 
+
+{
+    "identityToken": "eyJraWQiOiI4NkQ4OEtmIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoiY29tLmJsdWVzaGlwLm1vYmlsZSIsImV4cCI6MTYyNjQxMjIxNywiaWF0IjoxNjI2MzI1ODE3LCJzdWIiOiIwMDAyODYuYWM5ZGFiNjViOGYzNGFkZWIyMGFlZjQwOGY2NTMxOTkuMDQxOCIsIm5vbmNlIjoibm9uY2UiLCJjX2hhc2giOiJ6MzByRnQzSFdVVGs4OFZVekVfLVFRIiwiZW1haWwiOiJkZXJjaWxpb2Fmb250ZXNAbWUuY29tIiwiZW1haWxfdmVyaWZpZWQiOiJ0cnVlIiwiYXV0aF90aW1lIjoxNjI2MzI1ODE3LCJub25jZV9zdXBwb3J0ZWQiOnRydWUsInJlYWxfdXNlcl9zdGF0dXMiOjJ9.gM2HZTTnvoGk_4Eem7MR4qhnKJZ4sRiZnQhdZ6SHz2w2qDCcvQw2cNhkHP9QRFkONJQCxuGn4WubN5wvrJm5SCOxeMKMnCFX73-0k6zABuS_dU7n6yWd7-fn5BpiUC1GyvAKauId_Pwm6_jb-pBvjrNnEag8X1Ytb7jgrm0GgT9Btk2GXaOVokAoptZPMDt8MjR5HcVhyUb4PBTQBSn2m3JViBpDTHwF93GxDKS_L4dzimzhFB9BtqVbjM8LpLFqOEBkHx2RXZwt1P1BjKsIF1ZTclKa28rxx8O3-w-esCAeUUWGWFmlgLaLJlNgW-95vSLomQcLRINC8zYhpGNwWQ"
+}
+
+###
+
+
+# User :: Google OAuth :: Mobile login
+POST {{baseUrl}}/auth/google/mobile HTTP/1.1
+Content-Type: application/json
+
+{
+    "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3NDU3MzIxOGM2ZjZhMmZlNTBlMjlhY2JjNjg2NDMyODYzZmM5YzMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiMTY0NzAyMjI0NDI3LTAxMzRrcGlwa2JsMWZhNmQzY2xydnRscm4xcG1ydWhiLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiMTY0NzAyMjI0NDI3LTAxMzRrcGlwa2JsMWZhNmQzY2xydnRscm4xcG1ydWhiLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTA3MjIzNDQ3NDA2NDE5NzcxNjkyIiwiZW1haWwiOiJqZnVydGFkbzE0MUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6Il9IUFFxbUpZQVByNGk3Mjl1dnpST3ciLCJuYW1lIjoiSm9hbyBQYXVsbyBGdXJ0YWRvIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hLS9BT2gxNEdpeDRTeXlNMTA3V2dkQ2ROWnZFQTlfd0hCd2ljWFA0Sm5IMW1TUmRRPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkpvYW8gUGF1bG8iLCJmYW1pbHlfbmFtZSI6IkZ1cnRhZG8iLCJsb2NhbGUiOiJlbiIsImlhdCI6MTYxODc4OTYxMCwiZXhwIjoxNjE4NzkzMjEwLCJqdGkiOiJmYTRhZjEwNjkxMzZlMzQ2YzQ2NzJiYTkzMzE2ZTAxNWQxYjhlZDlhIn0.LwuZDRwZIkoA1N3zpcorgbTY0PEQkcV3sim-4PlW5cdEuFY9ylvLSXOBA8yYEYd23h88M--WAiHWLvE0q2MQXgz5zhpw02Xjccsf3fi5Tp7g7zrX2Y2NREKf4lPHbfFLbfREDWCniepP5ezImr36kKUzK6oEMqb7lAyyEC5mqg72zhqL-5vnGNCHHkqQU0WoHvt827He2EUvDMjm8wUk63aKf5V01UdqceO1_MdKthj677fALA5ycrvxbPlu7ShHuifoMCpa9HgU6zJySPDRD1XGX55gqzu_rTBgN3zpIeQQOvH1T_3OLAAw_yCB90ELWIE0CUkWlFQXxfRD8zgX0w"
+}
+### 
+
+# User :: Forgot Password
+POST {{baseUrl}}/auth/forgot-password HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "email": "br.developer@gmail.com"
+}
+
+### 
+
+# User :: Change Password
+POST {{baseUrl}}/auth/change-password HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "currentPassword": "cc0cfa806f",
+    "newPassword": "123"
+}

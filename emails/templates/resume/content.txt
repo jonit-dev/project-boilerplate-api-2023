@@ -1,0 +1,20 @@
+{{jobsEmailTitle}}
+
+{{jobsEmailDearHiringManager}}
+
+{{jobsEmailMyNameIs}}
+
+{{jobsEmailHeresMyResume}}
+
+{{resumeEducations}} {{resumeExperiences}} {{resumeAwards}} {{resumeAdditionalInfos}}
+{{jobsEmailHighlights}}: {{resumeHighlights}}
+{{jobsEmailLocation}}: {{resumeCity}}, {{resumeStateCode}}
+{{jobsEmailAddress}}: {{resumeAddress}}
+{{jobsEmailPhone}}: {{resumePhone}}
+E-mail: {{resumeEmail}}
+{{jobsEmailEducation}}
+{{jobsEmailExperiences}}
+{{jobsEmailAwards}}
+{{jobsEmailAdditionalInfos}}
+
+ 

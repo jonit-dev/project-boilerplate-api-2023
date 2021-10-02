@@ -1,0 +1,41 @@
+###
+
+# DB Tasks :: Seed/Update bovespa (b3) tickers
+GET {{baseUrl}}/db-tasks/tickers/seed/b3 HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+# DB Tasks :: Seed/Update bovespa (b3) FII
+GET {{baseUrl}}/db-tasks/tickers/seed/b3fii HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+# DB Tasks :: Seed/Update crypto tickers
+GET {{baseUrl}}/db-tasks/tickers/seed/crypto HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+# DB Tasks :: Seed/Update Nasdaq/NYSE
+GET {{baseUrl}}/db-tasks/tickers/seed/nasdaqnyse HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+# DB Tasks :: Company Update 
+GET {{baseUrl}}/db-tasks/companies/update/Brazil/Stocks HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+# DB Tasks :: Portfolio > link performance 
+GET {{baseUrl}}/db-tasks/portfolios/update/performance HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json

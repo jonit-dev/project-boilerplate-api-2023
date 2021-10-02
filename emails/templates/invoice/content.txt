@@ -1,0 +1,10 @@
+{{invoiceNotificationGreetings}}
+{{invoiceNotificationFirstPhrase}}
+
+{{invoiceItemTitle}} {{invoiteItem}}
+{{invoiceAmountDueTitle}} {{invoiceAmount}}
+{{invoiceDueByTitle}} {{invoiceDueBy}}
+{{invoicePayCTA}}
+{{invoiceEndPhrase}}
+
+[Unsubscribe Link]

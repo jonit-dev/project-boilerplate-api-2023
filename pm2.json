@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "name": "v8-api",
+      "script": "./dist/src/server.js",
+      "merge_logs": true,
+      "max_restarts": 20,
+      "instances": 4,
+      "node_args": "-r dotenv/config -r ./register-paths.js"
+    }
+  ]
+}
