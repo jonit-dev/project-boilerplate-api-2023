@@ -1,4 +1,4 @@
-# Stock Alarm App
+# V8 Api Engine
 
-[To get started, please check our Notion documentation.
-](https://www.notion.so/projectstockalert/Getting-Started-5dfbc33f8c5d418bb64f2b9b21f095d5)
+[To get started, please check our documentation.
+](https://v8team-docs.atlassian.net/)
