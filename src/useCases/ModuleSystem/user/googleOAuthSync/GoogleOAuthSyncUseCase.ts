@@ -1,5 +1,5 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { IAuthResponse, IGoogleOAuthUserInfoResponse, UserAuthFlow } from "@project-stock-alarm/shared";
+import { IAuthResponse, IGoogleOAuthUserInfoResponse, UserAuthFlow } from "@project-remote-job-board/shared";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { TS } from "@providers/translation/TranslationHelper";
 import { UserRepository } from "@repositories/ModuleSystem/user/UserRepository";

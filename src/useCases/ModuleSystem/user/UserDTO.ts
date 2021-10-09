@@ -1,4 +1,4 @@
-import { UserExperience, UserGoal } from "@project-stock-alarm/shared/dist";
+import { UserExperience, UserGoal } from "@project-remote-job-board/shared/dist";
 import { Type } from "class-transformer";
 import { IsEnum, IsOptional, IsString, ValidateNested } from "class-validator";
 

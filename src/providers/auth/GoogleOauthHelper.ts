@@ -3,7 +3,7 @@ import {
   IGoogleConfig,
   IGoogleOAuthIdTokenResponse,
   IGoogleOAuthTokenPayload,
-} from "@project-stock-alarm/shared";
+} from "@project-remote-job-board/shared";
 import axios from "axios";
 import { OAuth2Client } from "google-auth-library";
 import { google } from "googleapis";

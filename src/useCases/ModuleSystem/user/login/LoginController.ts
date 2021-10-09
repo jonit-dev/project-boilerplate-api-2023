@@ -1,4 +1,4 @@
-import { IAuthResponse } from "@project-stock-alarm/shared";
+import { IAuthResponse } from "@project-remote-job-board/shared";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import { controller, httpPost, interfaces, request, requestBody } from "inversify-express-utils";
 

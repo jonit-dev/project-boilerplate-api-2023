@@ -1,5 +1,5 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { IAuthResponse, UserAuthFlow } from "@project-stock-alarm/shared";
+import { IAuthResponse, UserAuthFlow } from "@project-remote-job-board/shared";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import { TS } from "@providers/translation/TranslationHelper";

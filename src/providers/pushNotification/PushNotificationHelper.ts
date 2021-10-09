@@ -1,5 +1,5 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { EnvType } from "@project-stock-alarm/shared/dist";
+import { EnvType } from "@project-remote-job-board/shared/dist";
 import firebaseAdmin from "firebase-admin";
 import { provide } from "inversify-binding-decorators";
 

@@ -1,4 +1,4 @@
-import { UserTypes } from "@project-stock-alarm/shared";
+import { UserTypes } from "@project-remote-job-board/shared";
 
 import { IUser } from "../../entities/ModuleSystem/UserModel";
 import { UnauthorizedError } from "../errors/UnauthorizedError";

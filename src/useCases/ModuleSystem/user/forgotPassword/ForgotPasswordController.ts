@@ -1,8 +1,8 @@
-import { HttpStatus } from "@project-stock-alarm/shared";
+import { HttpStatus } from "@project-remote-job-board/shared";
+import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import { Request, Response } from "express";
 import { controller, httpPost, interfaces, JsonContent, requestBody } from "inversify-express-utils";
 
-import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import { AuthForgotPasswordDTO } from "../AuthDTO";
 import { ForgotPasswordUseCase } from "./ForgotPasswordUseCase";
 

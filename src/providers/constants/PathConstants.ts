@@ -1,4 +1,4 @@
-import { EnvType } from "@project-stock-alarm/shared/dist";
+import { EnvType } from "@project-remote-job-board/shared/dist";
 import path from "path";
 
 import { appEnv } from "../config/env";

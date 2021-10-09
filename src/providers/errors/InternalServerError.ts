@@ -1,4 +1,4 @@
-import { HttpStatus } from "@project-stock-alarm/shared";
+import { HttpStatus } from "@project-remote-job-board/shared";
 
 import { ApplicationError } from "./ApplicationError";
 

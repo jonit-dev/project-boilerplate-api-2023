@@ -1,5 +1,5 @@
 import { IUser } from "@entities/ModuleSystem/UserModel";
-import { HttpStatus } from "@project-stock-alarm/shared";
+import { HttpStatus } from "@project-remote-job-board/shared";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import rateLimit from "express-rate-limit";

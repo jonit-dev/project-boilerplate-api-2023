@@ -1,5 +1,5 @@
 import { Identify } from "@amplitude/identify";
-import { EnvType } from "@project-stock-alarm/shared/dist";
+import { EnvType } from "@project-remote-job-board/shared/dist";
 import { DEFAULT_DATE_FORMAT } from "@providers/constants/DateConstants";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";

@@ -1,4 +1,4 @@
-import { IAuthResponse, UserAuthFlow, UserExperience, UserGoal, UserTypes } from "@project-stock-alarm/shared";
+import { IAuthResponse, UserAuthFlow, UserExperience, UserGoal, UserTypes } from "@project-remote-job-board/shared";
 import { appEnv } from "@providers/config/env";
 import { InternalServerError } from "@providers/errors/InternalServerError";
 import { NotFoundError } from "@providers/errors/NotFoundError";

@@ -1,4 +1,4 @@
-import { TranslationTypes } from "@project-stock-alarm/shared/dist";
+import { TranslationTypes } from "@project-remote-job-board/shared/dist";
 import { ValidationArguments } from "class-validator";
 
 import { TS } from "../translation/TranslationHelper";

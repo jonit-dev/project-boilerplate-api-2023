@@ -1,4 +1,4 @@
-import { HttpStatus, IValidationError } from "@project-stock-alarm/shared";
+import { HttpStatus, IValidationError } from "@project-remote-job-board/shared";
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
 import { NextFunction, Request, Response } from "express";

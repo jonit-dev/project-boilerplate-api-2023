@@ -1,10 +1,10 @@
-import { HttpStatus, IAuthRefreshTokenResponse } from "@project-stock-alarm/shared";
-import { controller, httpPost, interfaces } from "inversify-express-utils";
-
-import { InternalServerError } from "../../../../providers/errors/InternalServerError";
+import { HttpStatus, IAuthRefreshTokenResponse } from "@project-remote-job-board/shared";
 import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import { TS } from "@providers/translation/TranslationHelper";
+import { controller, httpPost, interfaces } from "inversify-express-utils";
+
+import { InternalServerError } from "../../../../providers/errors/InternalServerError";
 import { IAuthenticatedRequest } from "../../../../providers/types/ExpressTypes";
 import { AuthRefreshTokenDTO } from "../AuthDTO";
 import { RefreshUseCase } from "./RefreshUseCase";

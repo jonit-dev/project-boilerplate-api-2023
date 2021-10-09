@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { EnvType } from "@project-stock-alarm/shared/dist";
+import { EnvType } from "@project-remote-job-board/shared/dist";
 import { appEnv } from "@providers/config/env";
 import { cronJobs, db, seeds, server } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";

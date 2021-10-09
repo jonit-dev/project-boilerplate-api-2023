@@ -1,5 +1,5 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { IAuthResponse, UserAuthFlow } from "@project-stock-alarm/shared";
+import { IAuthResponse, UserAuthFlow } from "@project-remote-job-board/shared";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { AppleOAuthHelper } from "@providers/auth/AppleOAuthHelper";
 import { BadRequestError } from "@providers/errors/BadRequestError";

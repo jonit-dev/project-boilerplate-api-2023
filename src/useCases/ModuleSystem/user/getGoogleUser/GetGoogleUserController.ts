@@ -1,8 +1,8 @@
-import { IGoogleOAuthUserInfoResponse, UserAuthFlow } from "@project-stock-alarm/shared";
+import { User } from "@entities/ModuleSystem/UserModel";
+import { IGoogleOAuthUserInfoResponse, UserAuthFlow } from "@project-remote-job-board/shared";
 import { Request, Response } from "express";
 import { controller, httpGet, interfaces } from "inversify-express-utils";
 
-import { User } from "@entities/ModuleSystem/UserModel";
 import { appEnv } from "../../../../providers/config/env";
 import { GoogleOAuthSyncUseCase } from "../googleOAuthSync/GoogleOAuthSyncUseCase";
 import { GetGoogleUserUseCase } from "./GetGoogleUserUseCase";

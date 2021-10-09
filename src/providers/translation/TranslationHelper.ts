@@ -1,4 +1,4 @@
-import { TranslationTypes } from "@project-stock-alarm/shared";
+import { TranslationTypes } from "@project-remote-job-board/shared";
 import _ from "lodash";
 
 import { appEnv } from "../config/env";
@@ -17,7 +17,7 @@ export class TS {
   ): string {
     const envLang = appEnv.general.LANGUAGE!;
 
-    const jsonFile = require(`${ROOT_PATH}node_modules/@project-stock-alarm/shared/src/translations/${context}.lang.json`);
+    const jsonFile = require(`${ROOT_PATH}node_modules/@project-remote-job-board/shared/src/translations/${context}.lang.json`);
 
     let translatedString: string;
 

@@ -1,4 +1,4 @@
-import { IGoogleOAuthUrlResponse } from "@project-stock-alarm/shared";
+import { IGoogleOAuthUrlResponse } from "@project-remote-job-board/shared";
 import { Request, Response } from "express";
 import { controller, httpGet, interfaces } from "inversify-express-utils";
 

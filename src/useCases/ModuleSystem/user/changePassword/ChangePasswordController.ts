@@ -1,9 +1,9 @@
-import { HttpStatus } from "@project-stock-alarm/shared";
+import { HttpStatus } from "@project-remote-job-board/shared";
+import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
+import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import { Response } from "express";
 import { controller, httpPost, interfaces, JsonContent, requestBody } from "inversify-express-utils";
 
-import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
-import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import { IAuthenticatedRequest } from "../../../../providers/types/ExpressTypes";
 import { AuthChangePasswordDTO } from "../AuthDTO";
 import { ChangePasswordUseCase } from "./ChangePasswordUseCase";

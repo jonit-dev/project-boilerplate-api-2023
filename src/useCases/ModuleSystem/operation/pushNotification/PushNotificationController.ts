@@ -1,14 +1,14 @@
-import { HttpStatus } from "@project-stock-alarm/shared";
-import { Request, Response } from "express";
-import { controller, httpGet, interfaces, request, requestParam, response } from "inversify-express-utils";
-
 import { User } from "@entities/ModuleSystem/UserModel";
+import { HttpStatus } from "@project-remote-job-board/shared";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { NotFoundError } from "@providers/errors/NotFoundError";
 import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
+import { TS } from "@providers/translation/TranslationHelper";
+import { Request, Response } from "express";
+import { controller, httpGet, interfaces, request, requestParam, response } from "inversify-express-utils";
+
 import { isAdminMiddleware } from "../../../../providers/middlewares/IsAdminMiddleware";
 import { PushNotificationHelper } from "../../../../providers/pushNotification/PushNotificationHelper";
-import { TS } from "@providers/translation/TranslationHelper";
 
 @controller("/operations", AuthMiddleware, isAdminMiddleware)
 export class PushNotificationController implements interfaces.Controller {

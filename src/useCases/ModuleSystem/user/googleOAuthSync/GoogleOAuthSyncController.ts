@@ -1,5 +1,9 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { IGoogleOAuthIdTokenResponse, IGoogleOAuthUserInfoResponse, UserAuthFlow } from "@project-stock-alarm/shared";
+import {
+  IGoogleOAuthIdTokenResponse,
+  IGoogleOAuthUserInfoResponse,
+  UserAuthFlow,
+} from "@project-remote-job-board/shared";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { TS } from "@providers/translation/TranslationHelper";
@@ -66,9 +70,8 @@ export class GoogleOAuthSyncController implements interfaces.Controller {
       );
     }
 
-    const googleUserInfo:
-      | IGoogleOAuthIdTokenResponse
-      | undefined = await this.googleOAuthHelper.getGoogleUserFromIdToken(idToken);
+    const googleUserInfo: IGoogleOAuthIdTokenResponse | undefined =
+      await this.googleOAuthHelper.getGoogleUserFromIdToken(idToken);
 
     if (!googleUserInfo) {
       console.log("Failed to fetch user information from IDToken");

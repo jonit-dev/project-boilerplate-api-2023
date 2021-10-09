@@ -1,4 +1,4 @@
-import { IGoogleOAuthUserInfoResponse } from "@project-stock-alarm/shared";
+import { IGoogleOAuthUserInfoResponse } from "@project-remote-job-board/shared";
 import { provide } from "inversify-binding-decorators";
 
 import { GoogleOAuthHelper } from "../../../../providers/auth/GoogleOauthHelper";
