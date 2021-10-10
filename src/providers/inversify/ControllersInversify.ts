@@ -1,3 +1,4 @@
+import { JobPostController } from "@useCases/ModuleJob/jobPost/JobPostController";
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
 import { IndustriesController } from "@useCases/ModuleSystem/industries/IndustriesController";
 import { PushNotificationController } from "@useCases/ModuleSystem/operation/pushNotification/PushNotificationController";
@@ -42,6 +43,10 @@ export const placesControllerContainer = new ContainerModule((bind: interfaces.B
 
 export const industriesControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<IndustriesController>(IndustriesController).toSelf();
+});
+
+export const jobPostControllerContianer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
+  bind<JobPostController>(JobPostController).toSelf();
 });
 
 export const abTestsControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {

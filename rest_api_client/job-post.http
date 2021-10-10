@@ -1,0 +1,44 @@
+# Job Post :: Create 
+POST {{baseUrl}}/job-posts HTTP/1.1
+content-type: application/json
+
+{
+    "email": "testingpost@gmail.com",
+    "title": "Hiring Senior Front-end developers",
+    "jobRole": "Senior React Developer",
+    "industry": "Healthcare",
+    "description": "This is a sample job post only",
+    "workSchedule": "FullTime",
+    "country": "United States",
+    "city": "California",
+    "isFeatured": false,
+    "salary": 200000,
+    "currency": "USD",
+    "skills": ["React", "Redux", "Typescript"],
+    "benefits": ["Flexible vacation", "Stock Bonus", "Health Insurance"],
+    "workplaceValues": ["Diversity"]
+
+}
+
+###
+
+# Job Post :: Read One
+GET {{baseUrl}}/job-posts/61635667001dad00b176eb26 HTTP/1.1
+Content-Type: application/json
+
+###
+
+# Job Post :: Update 
+PATCH {{baseUrl}}/job-posts/61635667001dad00b176eb26 HTTP/1.1
+content-type: application/json
+
+{
+    "email": "updatedpostemail@gmail.com",
+    "workSchedule": "Contract"
+}
+
+###
+
+# Job Post :: Delete
+DELETE {{baseUrl}}/job-posts/61635667001dad00b176eb26 HTTP/1.1
+Content-Type: application/json
