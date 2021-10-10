@@ -1,4 +1,5 @@
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
+import { IndustriesController } from "@useCases/ModuleSystem/industries/IndustriesController";
 import { PushNotificationController } from "@useCases/ModuleSystem/operation/pushNotification/PushNotificationController";
 import { PlacesController } from "@useCases/ModuleSystem/places/PlacesController";
 import { AppleOAuthController } from "@useCases/ModuleSystem/user/appleOAuth/AppleOAuthController";
@@ -37,6 +38,10 @@ export const dbTasksControllerContainer = new ContainerModule((bind: interfaces.
 
 export const placesControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<PlacesController>(PlacesController).toSelf();
+});
+
+export const industriesControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
+  bind<IndustriesController>(IndustriesController).toSelf();
 });
 
 export const abTestsControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
