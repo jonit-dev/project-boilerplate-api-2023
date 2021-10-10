@@ -17,6 +17,3 @@ environment/keys/**
 !environment/backups
 environment/backups/**
 
-
-
-src/providers/data/**
