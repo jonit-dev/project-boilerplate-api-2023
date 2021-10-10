@@ -1,0 +1,13 @@
+###
+
+# Places :: Read all countries
+GET {{baseUrl}}/places/countries HTTP/1.1
+Content-Type: application/json
+
+###
+
+# Places :: Read cities from country
+GET {{baseUrl}}/places/Brazil/cities HTTP/1.1
+Content-Type: application/json
+
+###
