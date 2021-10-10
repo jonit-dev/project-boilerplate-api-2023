@@ -1,11 +1,11 @@
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
+import { IndustriesController } from "@useCases/ModuleSystem/industries/IndustriesController";
 import { PushNotificationController } from "@useCases/ModuleSystem/operation/pushNotification/PushNotificationController";
+import { PlacesController } from "@useCases/ModuleSystem/places/PlacesController";
 import { AppleOAuthController } from "@useCases/ModuleSystem/user/appleOAuth/AppleOAuthController";
 import { ChangePasswordController } from "@useCases/ModuleSystem/user/changePassword/ChangePasswordController";
 import { ForgotPasswordController } from "@useCases/ModuleSystem/user/forgotPassword/ForgotPasswordController";
-import {
-  GenerateGoogleOAuthUrlController,
-} from "@useCases/ModuleSystem/user/generateGoogleOAuthUrl/GenerateGoogleOAuthUrlController";
+import { GenerateGoogleOAuthUrlController } from "@useCases/ModuleSystem/user/generateGoogleOAuthUrl/GenerateGoogleOAuthUrlController";
 import { GetGoogleUserController } from "@useCases/ModuleSystem/user/getGoogleUser/GetGoogleUserController";
 import { GoogleOAuthSyncController } from "@useCases/ModuleSystem/user/googleOAuthSync/GoogleOAuthSyncController";
 import { BasicEmailPwLoginController } from "@useCases/ModuleSystem/user/login/LoginController";
@@ -35,6 +35,14 @@ export const userControllerContainer = new ContainerModule((bind: interfaces.Bin
 });
 
 export const dbTasksControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {});
+
+export const placesControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
+  bind<PlacesController>(PlacesController).toSelf();
+});
+
+export const industriesControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
+  bind<IndustriesController>(IndustriesController).toSelf();
+});
 
 export const abTestsControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<ABTestController>(ABTestController).toSelf();
