@@ -19,6 +19,30 @@ const sendInBlueAPIInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 export const emailProviders: IEmailProvider[] = [
   {
+    key: "SENDINBLUE",
+    credits: 300,
+    emailSendingFunction: async (to, from, subject, html, text): Promise<boolean> => {
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+      sendSmtpEmail.to = [{ email: to }];
+      sendSmtpEmail.sender = { email: from, name: process.env.APP_NAME };
+      sendSmtpEmail.htmlContent = html;
+      sendSmtpEmail.textContent = text;
+      sendSmtpEmail.subject = subject;
+
+      try {
+        const sendInBlueRequest = await sendInBlueAPIInstance.sendTransacEmail(sendSmtpEmail);
+        console.log("SendInBlue: API called successfully. Returned data: ");
+        console.log(JSON.stringify(sendInBlueRequest, null, 2));
+        return true;
+      } catch (error) {
+        console.log("Error in SendInBlue request!");
+        console.error(error);
+        return false;
+      }
+    },
+  },
+  {
     // TODO: SENDGRID Free tier is 100 only. More info about their free plan is described here: https://sendgrid.com/pricing/
     key: "SENDGRID",
     credits: 100,
@@ -41,28 +65,4 @@ export const emailProviders: IEmailProvider[] = [
       }
     },
   },
-  // {
-  //   key: "SENDINBLUE",
-  //   credits: 300,
-  //   emailSendingFunction: async (to, from, subject, html, text): Promise<boolean> => {
-  //     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
-  //     sendSmtpEmail.to = [{ email: to }];
-  //     sendSmtpEmail.sender = { email: from, name: process.env.APP_NAME };
-  //     sendSmtpEmail.htmlContent = html;
-  //     sendSmtpEmail.textContent = text;
-  //     sendSmtpEmail.subject = subject;
-
-  //     try {
-  //       const sendInBlueRequest = await sendInBlueAPIInstance.sendTransacEmail(sendSmtpEmail);
-  //       console.log("SendInBlue: API called successfully. Returned data: ");
-  //       console.log(JSON.stringify(sendInBlueRequest, null, 2));
-  //       return true;
-  //     } catch (error) {
-  //       console.log("Error in SendInBlue request!");
-  //       console.error(error);
-  //       return false;
-  //     }
-  //   },
-  // },
 ];
