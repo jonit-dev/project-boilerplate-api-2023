@@ -65,7 +65,7 @@ export class GoogleOAuthHelper {
       },
     });
     // { access_token, expires_in, token_type, refresh_token }
-    return data;
+    return data as IGoogleOAuthTokenPayload;
   }
 
   /**
@@ -123,7 +123,7 @@ export class GoogleOAuthHelper {
       const response = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${idToken}`);
 
       if (response.status === HttpStatus.OK) {
-        return response.data;
+        return response.data as IGoogleOAuthIdTokenResponse;
       }
     } catch (error) {
       console.error(error);

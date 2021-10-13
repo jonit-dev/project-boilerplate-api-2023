@@ -1,4 +1,4 @@
-import { WorkSchedule } from "@entities/ModuleJob/JobPostTypes";
+import { WorkSchedule } from "@project-remote-job-board/shared/dist";
 import { tsDefaultDecorator, tsEnumDecorator } from "@providers/constants/ValidationConstants";
 import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
 
