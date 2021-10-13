@@ -3,9 +3,9 @@ POST {{baseUrl}}/job-posts HTTP/1.1
 content-type: application/json
 
 {
-    "email": "testingpost@gmail.com",
-    "title": "Hiring Senior Back-end developers",
-    "jobRole": "Senior React Developer",
+    "email": "test@gmail.com",
+    "title": "Hiring Java Developer ASAP",
+    "jobRole": "Senior Java Developer",
     "industry": "Healthcare",
     "description": "This is a sample job post only",
     "workSchedule": "FullTime",

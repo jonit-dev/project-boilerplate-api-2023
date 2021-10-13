@@ -1,10 +1,9 @@
-import { WorkSchedule } from "@entities/ModuleJob/JobPostTypes";
+import { WorkSchedule } from "@project-remote-job-board/shared/dist";
 import { tsDefaultDecorator, tsEnumDecorator } from "@providers/constants/ValidationConstants";
 import { IsBoolean, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateJobPostDTO {
-  @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
-  @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
+  @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   email: string;
 
@@ -75,14 +74,14 @@ export class CreateJobPostDTO {
   })
   skills: string;
 
-  @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
+  @IsOptional()
   @IsString({
     each: true,
     ...tsDefaultDecorator("validation", "allArrayFields", { type: "string" }),
   })
   benefits: string;
 
-  @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
+  @IsOptional()
   @IsString({
     each: true,
     ...tsDefaultDecorator("validation", "allArrayFields", { type: "string" }),
