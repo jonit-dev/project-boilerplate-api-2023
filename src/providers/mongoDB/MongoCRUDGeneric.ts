@@ -39,9 +39,9 @@ export class CRUD {
       let uniqueQuery;
 
       if (user && user._id) {
-        uniqueQuery = ({
+        uniqueQuery = {
           owner: user._id,
-        } as unknown) as FilterQuery<T>;
+        } as unknown as FilterQuery<T>;
       }
 
       for (const field of uniqueBy) {
@@ -110,6 +110,8 @@ export class CRUD {
         this.isObjectIdValid(filters._id, Model.modelName);
       }
 
+      filters = this.getRegexFilters(filters);
+
       // @ts-ignore
       const record = await Model.findOne(filters);
 
@@ -145,11 +147,9 @@ export class CRUD {
     user?: IUser | null
   ): Promise<T[]> {
     try {
-      if (filters._id) {
-        this.isObjectIdValid(filters._id, Model.modelName);
-      }
-
       let records;
+
+      filters = this.getRegexFilters(filters);
 
       if (limit) {
         records = Model.find(filters).limit(limit);
@@ -395,5 +395,20 @@ export class CRUD {
     );
 
     return newReferenceModel;
+  }
+
+  private getRegexFilters(filters: Record<string, unknown>): Record<string, unknown> {
+    const regexFilters: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (key === "_id") {
+        regexFilters[key] = value as string;
+        continue;
+      }
+
+      regexFilters[key] = { $regex: new RegExp(value as string), $options: "i" };
+    }
+
+    return regexFilters;
   }
 }

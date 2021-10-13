@@ -16,6 +16,7 @@ import { CreateJobPostDTO } from "./create/CreateJobPostDTO";
 import { CreateJobPostUseCase } from "./create/CreateJobPostUseCase";
 import { DeleteJobPostUseCase } from "./delete/DeleteJobPostUseCase";
 import { ReadJobPostUseCase } from "./read/ReadJobPostUseCase";
+import { ReadAllJobPostUseCase } from "./readall/ReadAllJobPostUseCase";
 import { UpdateJobPostDTO } from "./update/UpdateJobPostDTO";
 import { UpdateJobPostUseCase } from "./update/UpdateJobPostUseCase";
 
@@ -23,7 +24,8 @@ import { UpdateJobPostUseCase } from "./update/UpdateJobPostUseCase";
 export class JobPostController implements interfaces.Controller {
   constructor(
     private createJobPostUseCase: CreateJobPostUseCase,
-    private readJobPostUseCase: ReadJobPostUseCase,
+    private readOneJobPostUseCase: ReadJobPostUseCase,
+    private readAllJobPostUseCase: ReadAllJobPostUseCase,
     private updateJobPostUseCase: UpdateJobPostUseCase,
     private deleteJobPostUseCase: DeleteJobPostUseCase
   ) {}
@@ -36,7 +38,12 @@ export class JobPostController implements interfaces.Controller {
   @httpGet("/:id")
   public async readOne(@requestParam() params, @queryParam() query): Promise<IJobPost> {
     const { id } = params;
-    return await this.readJobPostUseCase.readOne(id, query);
+    return await this.readOneJobPostUseCase.readOne(id, query);
+  }
+
+  @httpGet("/")
+  public async readAll(@queryParam() query): Promise<IJobPost[]> {
+    return await this.readAllJobPostUseCase.readAll(query);
   }
 
   @httpPatch("/:id", DTOValidatorMiddleware(UpdateJobPostDTO))
