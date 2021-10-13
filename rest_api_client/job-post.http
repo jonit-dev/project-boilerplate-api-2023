@@ -4,7 +4,7 @@ content-type: application/json
 
 {
     "email": "testingpost@gmail.com",
-    "title": "Hiring Senior Front-end developers",
+    "title": "Hiring Senior Back-end developers",
     "jobRole": "Senior React Developer",
     "industry": "Healthcare",
     "description": "This is a sample job post only",
@@ -22,8 +22,14 @@ content-type: application/json
 
 ###
 
+# Job Post :: Read All
+GET {{baseUrl}}/job-posts?city=Calif HTTP/1.1
+Content-Type: application/json
+
+###
+
 # Job Post :: Read One
-GET {{baseUrl}}/job-posts/61635667001dad00b176eb26 HTTP/1.1
+GET {{baseUrl}}/job-posts/6166508f80bdd2002f0c0b55 HTTP/1.1
 Content-Type: application/json
 
 ###
