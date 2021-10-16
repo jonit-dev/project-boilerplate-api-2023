@@ -19,7 +19,8 @@
       "@entities/*": ["entities/*"],
       "@providers/*": ["providers/*"],
       "@repositories/*": ["repositories/*"],
-      "@useCases/*": ["useCases/*"]
+      "@useCases/*": ["useCases/*"],
+      "@data/*": ["providers/data/*"]
     },
     "types": ["reflect-metadata", "jest"],
     "esModuleInterop": true,
