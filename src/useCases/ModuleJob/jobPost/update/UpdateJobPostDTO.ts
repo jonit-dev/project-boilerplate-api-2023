@@ -32,7 +32,7 @@ export class UpdateJobPostDTO extends CreateJobPostDTO {
 
   @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
-  country: string;
+  countryCode: string;
 
   @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))

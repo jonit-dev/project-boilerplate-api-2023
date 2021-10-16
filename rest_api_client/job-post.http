@@ -9,7 +9,7 @@ content-type: application/json
     "industry": "Healthcare",
     "description": "This is a sample job post only",
     "workSchedule": "FullTime",
-    "country": "United States",
+    "countryCode": "US",
     "city": "California",
     "isFeatured": false,
     "salary": 200000,
@@ -35,12 +35,12 @@ Content-Type: application/json
 ###
 
 # Job Post :: Update 
-PATCH {{baseUrl}}/job-posts/61635667001dad00b176eb26 HTTP/1.1
+PATCH {{baseUrl}}/job-posts/616b599a9c3a0d01036934ad HTTP/1.1
 content-type: application/json
 
 {
     "email": "updatedpostemail@gmail.com",
-    "workSchedule": "Contract"
+    "countryCode": "CA"
 }
 
 ###

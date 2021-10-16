@@ -22,7 +22,7 @@ const jobPostSchema = createSchema(
       default: WorkSchedule.FullTime,
       enum: TypeHelper.enumToStringArray(WorkSchedule),
     }),
-    country: Type.string({
+    countryCode: Type.string({
       required: true,
     }),
     city: Type.string({

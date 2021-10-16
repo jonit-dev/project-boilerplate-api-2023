@@ -36,7 +36,7 @@ export class CreateJobPostDTO {
   @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
-  country: string;
+  countryCode: string;
 
   @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))

@@ -1,3 +1,7 @@
+# Places :: Read all country and city information about a specific country code
+GET {{baseUrl}}/places/country/BR HTTP/1.1
+Content-Type: application/json
+
 ###
 
 # Places :: Read all countries
@@ -6,7 +10,8 @@ Content-Type: application/json
 
 ###
 
-# Places :: Read cities from country
+# Places :: Read cities from country or countryCode
+## Valid requests example: /places/Brazil/cities, /places/BR/cities
 GET {{baseUrl}}/places/Brazil/cities HTTP/1.1
 Content-Type: application/json
 
