@@ -1,5 +1,4 @@
 import { ICountry, ICountryCity } from "@project-remote-job-board/shared/dist";
-import { BadRequestError } from "@providers/errors/BadRequestError";
 import { NotFoundError } from "@providers/errors/NotFoundError";
 import { PlaceHelper } from "@providers/places/PlaceHelper";
 import { provide } from "inversify-binding-decorators";
@@ -12,23 +11,13 @@ export class ReadPlaceUseCase {
     return this.placeHelper.getCountries();
   }
 
-  public readCities(country?: string | null, countryCode?: string): any {
-    if (!country && !countryCode) {
-      throw new BadRequestError("You must provide a country or a country code.");
+  public readCities(countryNameOrCode: string): string[] {
+    if (countryNameOrCode.length === 2) {
+      // it's a country code
+      return this.readCitiesByCountryCode(countryNameOrCode);
     }
 
-    if (country) {
-      return this.placeHelper.getCities(country);
-    }
-    if (countryCode) {
-      const country = this.placeHelper.getCountry(countryCode);
-
-      if (!country) {
-        throw new NotFoundError("Country not found");
-      }
-
-      return this.placeHelper.getCities(country.name);
-    }
+    return this.readCitiesByCountryName(countryNameOrCode);
   }
 
   public readCountry(countryCode: string): ICountryCity {
@@ -47,5 +36,19 @@ export class ReadPlaceUseCase {
       country,
       cities,
     };
+  }
+
+  private readCitiesByCountryName(countryName: string): string[] {
+    return this.placeHelper.getCities(countryName);
+  }
+
+  private readCitiesByCountryCode(countryCode: string): string[] {
+    const country = this.placeHelper.getCountry(countryCode);
+
+    if (!country) {
+      throw new NotFoundError("Country not found");
+    }
+
+    return this.placeHelper.getCities(country.name);
   }
 }

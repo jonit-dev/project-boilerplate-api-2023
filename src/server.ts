@@ -1,3 +1,4 @@
+import "express-async-errors";
 import "reflect-metadata";
 
 import { EnvType } from "@project-remote-job-board/shared/dist";

@@ -1,5 +1,5 @@
 import { ICountry, ICountryCity } from "@project-remote-job-board/shared/dist";
-import { controller, httpGet, interfaces, request, requestParam } from "inversify-express-utils";
+import { controller, httpGet, interfaces, requestParam } from "inversify-express-utils";
 
 import { ReadPlaceUseCase } from "./read/ReadPlaceUseCase";
 
@@ -15,19 +15,14 @@ export class PlacesController implements interfaces.Controller {
   }
 
   @httpGet("/countries")
-  public countries(@request() req): ICountry[] {
+  public countries(): ICountry[] {
     return this.readPlaceUseCase.readCountries();
   }
 
-  @httpGet("/:country/cities")
-  public cities(@requestParam() params): Promise<string[]> {
-    const { country } = params;
+  @httpGet("/:countryNameOrCode/cities")
+  public cities(@requestParam() params): string[] {
+    const { countryNameOrCode } = params;
 
-    if (country.length === 2) {
-      // it's a country code
-      return this.readPlaceUseCase.readCities(null, country);
-    }
-
-    return this.readPlaceUseCase.readCities(country);
+    return this.readPlaceUseCase.readCities(countryNameOrCode);
   }
 }
