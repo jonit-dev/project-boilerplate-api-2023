@@ -141,7 +141,7 @@ export class CRUD {
     Model: Model<T>,
     filters,
     populateKeys?: string[] | false,
-    sort?: string | null,
+    sort?: Record<string, unknown> | null,
     isLean: boolean = true,
     limit?: number | null,
     user?: IUser | null
