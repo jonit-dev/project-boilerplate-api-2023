@@ -7,6 +7,10 @@ export class ReadAllJobPostUseCase {
   constructor(private jobPostRepository: JobPostRepository) {}
 
   public async readAll(filter: Record<string, unknown>): Promise<IJobPost[]> {
-    return await this.jobPostRepository.readAll(JobPost, filter, false, null, true, 20);
+    // return await this.jobPostRepository.readAll(JobPost, filter, false, null, true, 20);
+
+    const results = await this.jobPostRepository.readAllPaginated(JobPost, filter, null, null, true);
+
+    return results;
   }
 }

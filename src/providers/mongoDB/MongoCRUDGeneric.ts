@@ -192,6 +192,31 @@ export class CRUD {
     }
   }
 
+  public async readAllPaginated<T extends Document>(
+    Model: Model<T>,
+    filters,
+    populateKeys?: string[] | null,
+    sort?: Record<string, unknown> | null,
+    isLean: boolean = true,
+    offset?: number | null,
+    limit?: number | null,
+    page?: number | null
+  ): Promise<any> {
+    //! Note that to use this method the Model must have a plugin called mongoose-paginate-v2 enabled. See JobPostModel.ts for an example.
+
+    // @ts-ignore
+    const results = await Model.paginate(filters, {
+      sort,
+      populate: populateKeys,
+      lean: isLean,
+      offset: offset ?? 0,
+      limit: limit ?? 10,
+      page: page ?? 1,
+    });
+
+    return results;
+  }
+
   public async update<T extends Document>(
     Model: Model<T>,
     id,

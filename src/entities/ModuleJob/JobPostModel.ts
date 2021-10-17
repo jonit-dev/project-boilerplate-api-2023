@@ -1,5 +1,6 @@
 import { Currency, WorkSchedule } from "@project-remote-job-board/shared/dist";
 import { TypeHelper } from "@providers/types/TypeHelper";
+import mongoosePaginate from "mongoose-paginate-v2";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const jobPostSchema = createSchema(
@@ -47,6 +48,8 @@ const jobPostSchema = createSchema(
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
+
+jobPostSchema.plugin(mongoosePaginate);
 
 export type IJobPost = ExtractDoc<typeof jobPostSchema>;
 
