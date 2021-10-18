@@ -1,4 +1,5 @@
 import { IJobPost } from "@entities/ModuleJob/JobPostModel";
+import { IPaginationResponse } from "@project-remote-job-board/shared/dist";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import {
   controller,
@@ -42,7 +43,7 @@ export class JobPostController implements interfaces.Controller {
   }
 
   @httpGet("/")
-  public async readAll(@queryParam() query): Promise<IJobPost[]> {
+  public async readAll(@queryParam() query): Promise<IPaginationResponse<IJobPost>> {
     return await this.readAllJobPostUseCase.readAll(query);
   }
 
