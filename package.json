@@ -70,6 +70,7 @@
     "@types/jsonwebtoken": "^8.5.0",
     "@types/lodash": "^4.14.165",
     "@types/mongoose": "^5.10.0",
+    "@types/mongoose-paginate-v2": "^1.4.0",
     "@types/morgan": "^1.9.2",
     "@types/node": "^14.11.5",
     "@types/swagger-jsdoc": "^6.0.0",

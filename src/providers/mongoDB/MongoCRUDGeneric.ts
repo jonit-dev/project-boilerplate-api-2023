@@ -3,7 +3,7 @@ import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { NotFoundError } from "@providers/errors/NotFoundError";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { Document, FilterQuery, Model } from "mongoose";
+import { Document, FilterQuery, Model, PaginateResult } from "mongoose";
 import pluralize from "pluralize";
 
 import { ConflictError } from "../errors/ConflictError";
@@ -193,7 +193,7 @@ export class CRUD {
   }
 
   public async readAllPaginated<T extends Document>(
-    Model: Model<T>,
+    Model: Model<any>,
     filters,
     populateKeys?: string[] | null,
     sort?: Record<string, unknown> | null,
@@ -201,18 +201,28 @@ export class CRUD {
     offset?: number | null,
     limit?: number | null,
     page?: number | null
-  ): Promise<any> {
+  ): Promise<PaginateResult<T>> {
     //! Note that to use this method the Model must have a plugin called mongoose-paginate-v2 enabled. See JobPostModel.ts for an example.
 
-    // @ts-ignore
-    const results = await Model.paginate(filters, {
+    console.log(`looking page ${page}`);
+
+    console.log(filters);
+
+    let options = {
       sort,
       populate: populateKeys,
       lean: isLean,
       offset: offset ?? 0,
       limit: limit ?? 10,
       page: page ?? 1,
-    });
+    } as Record<string, unknown>;
+
+    options = _.omitBy(options, _.isNil); // remove null or undefined values
+
+    console.log(options);
+
+    // @ts-ignore
+    const results = await Model.paginate(filters, options);
 
     return results;
   }

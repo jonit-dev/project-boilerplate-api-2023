@@ -1245,6 +1245,13 @@
     "@types/bson" "*"
     "@types/node" "*"
 
+"@types/mongoose-paginate-v2@^1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@types/mongoose-paginate-v2/-/mongoose-paginate-v2-1.4.0.tgz#154503707b8e43065e66b5ed415a6d6f818136af"
+  integrity sha512-SzhQNVPI6YdY3MNgSuE+ZJfRRcwMgGOIV3n84gakBo6quPyBxui/XNX3zzzESxfGXkcljxuNWfIFGvLHTc+uIQ==
+  dependencies:
+    mongoose "^6.0.8"
+
 "@types/mongoose@^5.10.0":
   version "5.11.97"
   resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.11.97.tgz#80b0357f3de6807eb597262f52e49c3e13ee14d8"
@@ -5438,6 +5445,21 @@ mongoose@^5.12.3:
     optional-require "1.0.x"
     regexp-clone "1.0.0"
     safe-buffer "5.2.1"
+    sift "13.5.2"
+    sliced "1.0.1"
+
+mongoose@^6.0.8:
+  version "6.0.11"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-6.0.11.tgz#579cda5157a58b155812974567d7a9a92b26a118"
+  integrity sha512-ESLnGIZB15xpqAbtjL/wcx+NEmzewlNuST/Dp/md4eqirVGTuEeN+IhS4qr3D5GFhnQAGdadpGlTfrWj5Ggykw==
+  dependencies:
+    bson "^4.2.2"
+    kareem "2.3.2"
+    mongodb "4.1.2"
+    mpath "0.8.4"
+    mquery "4.0.0"
+    ms "2.1.2"
+    regexp-clone "1.0.0"
     sift "13.5.2"
     sliced "1.0.1"
 
