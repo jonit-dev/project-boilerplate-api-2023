@@ -1,9 +1,10 @@
 import { IUser } from "@entities/ModuleSystem/UserModel";
+import { IPaginationResponse } from "@project-remote-job-board/shared/dist";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { NotFoundError } from "@providers/errors/NotFoundError";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { Document, FilterQuery, Model, PaginateResult } from "mongoose";
+import { Document, FilterQuery, Model } from "mongoose";
 import pluralize from "pluralize";
 
 import { ConflictError } from "../errors/ConflictError";
@@ -201,12 +202,8 @@ export class CRUD {
     offset?: number | null,
     limit?: number | null,
     page?: number | null
-  ): Promise<PaginateResult<T>> {
+  ): Promise<IPaginationResponse<T>> {
     //! Note that to use this method the Model must have a plugin called mongoose-paginate-v2 enabled. See JobPostModel.ts for an example.
-
-    console.log(`looking page ${page}`);
-
-    console.log(filters);
 
     let options = {
       sort,
@@ -218,8 +215,6 @@ export class CRUD {
     } as Record<string, unknown>;
 
     options = _.omitBy(options, _.isNil); // remove null or undefined values
-
-    console.log(options);
 
     // @ts-ignore
     const results = await Model.paginate(filters, options);

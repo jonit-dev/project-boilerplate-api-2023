@@ -59,7 +59,7 @@
     "utf8": "^3.0.0"
   },
   "devDependencies": {
-    "@project-remote-job-board/shared": "^1.0.10",
+    "@project-remote-job-board/shared": "^1.0.12",
     "@types/axios": "^0.14.0",
     "@types/bcrypt": "^3.0.0",
     "@types/chalk": "^2.2.0",
@@ -70,7 +70,6 @@
     "@types/jsonwebtoken": "^8.5.0",
     "@types/lodash": "^4.14.165",
     "@types/mongoose": "^5.10.0",
-    "@types/mongoose-paginate-v2": "^1.4.0",
     "@types/morgan": "^1.9.2",
     "@types/node": "^14.11.5",
     "@types/swagger-jsdoc": "^6.0.0",
