@@ -53,6 +53,7 @@
     "mixpanel": "^0.13.0",
     "mongoose": "^5.12.3",
     "mongoose-paginate-v2": "^1.4.2",
+    "mongoose-query-parser": "^1.2.1",
     "node-fetch": "^2.6.1",
     "number-string": "^1.1.5",
     "rss-parser": "^3.12.0",
