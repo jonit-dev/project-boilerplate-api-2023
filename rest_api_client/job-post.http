@@ -23,7 +23,7 @@ content-type: application/json
 ###
 
 # Job Post :: Read All
-GET {{baseUrl}}/job-posts?offset=0 HTTP/1.1
+GET {{baseUrl}}/job-posts?offset=0&salary>4000 HTTP/1.1
 Content-Type: application/json
 
 ###

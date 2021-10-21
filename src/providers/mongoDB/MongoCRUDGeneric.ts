@@ -1,7 +1,9 @@
 import { IUser } from "@entities/ModuleSystem/UserModel";
 import { IPaginationResponse } from "@project-remote-job-board/shared/dist";
+import { MongooseQueryParserHelper } from "@providers/adapters/MongooseQueryParserHelper";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { NotFoundError } from "@providers/errors/NotFoundError";
+import chalk from "chalk";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Document, FilterQuery, Model } from "mongoose";
@@ -150,12 +152,13 @@ export class CRUD {
     try {
       let records;
 
-      filters = this.getRegexFilters(filters);
+      const parser = new MongooseQueryParserHelper();
+      const parsedFilter: any = parser.queryParser(filters);
 
       if (limit) {
-        records = Model.find(filters).limit(limit);
+        records = Model.find(parsedFilter).limit(limit);
       } else {
-        records = Model.find(filters);
+        records = Model.find(parsedFilter);
       }
 
       if (sort) {
@@ -204,6 +207,8 @@ export class CRUD {
     page?: number | null
   ): Promise<IPaginationResponse<T>> {
     //! Note that to use this method the Model must have a plugin called mongoose-paginate-v2 enabled. See JobPostModel.ts for an example.
+    const parser = new MongooseQueryParserHelper();
+    const parsedFilter = parser.queryParser(filters);
 
     let options = {
       sort,
@@ -217,7 +222,7 @@ export class CRUD {
     options = _.omitBy(options, _.isNil); // remove null or undefined values
 
     // @ts-ignore
-    const results = await Model.paginate(filters, options);
+    const results = await Model.paginate(parsedFilter, options);
 
     return results;
   }
@@ -438,7 +443,6 @@ export class CRUD {
 
       regexFilters[key] = { $regex: new RegExp(value as string), $options: "i" };
     }
-
     return regexFilters;
   }
 }
