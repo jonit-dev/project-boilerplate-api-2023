@@ -3,7 +3,6 @@ import { IPaginationResponse } from "@project-remote-job-board/shared/dist";
 import { MongooseQueryParserHelper } from "@providers/adapters/MongooseQueryParserHelper";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { NotFoundError } from "@providers/errors/NotFoundError";
-import chalk from "chalk";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Document, FilterQuery, Model } from "mongoose";
