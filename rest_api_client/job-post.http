@@ -5,7 +5,6 @@ content-type: application/json
 {
     "email": "test@gmail.com",
     "title": "Hiring Java Developer ASAP",
-    "jobRole": "Senior Java Developer",
     "industry": "Healthcare",
     "description": "This is a sample job post only",
     "workSchedule": "FullTime",

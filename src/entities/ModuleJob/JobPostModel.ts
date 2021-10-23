@@ -9,9 +9,6 @@ const jobPostSchema = createSchema(
     title: Type.string({
       required: true,
     }),
-    jobRole: Type.string({
-      required: true,
-    }),
     industry: Type.string({
       required: true,
     }),

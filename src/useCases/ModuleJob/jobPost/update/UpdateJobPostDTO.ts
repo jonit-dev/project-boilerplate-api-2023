@@ -15,10 +15,6 @@ export class UpdateJobPostDTO extends CreateJobPostDTO {
 
   @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
-  jobRole: string;
-
-  @IsOptional()
-  @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   industry: string;
 
   @IsOptional()
