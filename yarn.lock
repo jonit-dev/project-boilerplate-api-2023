@@ -859,10 +859,10 @@
   dependencies:
     debug "^4.3.1"
 
-"@project-remote-job-board/shared@^1.0.12":
-  version "1.0.12"
-  resolved "https://registry.yarnpkg.com/@project-remote-job-board/shared/-/shared-1.0.12.tgz#0e94e71707101aee3a3e3a094eb53d5810f63614"
-  integrity sha512-JQBxSWU04SacWhClHLYK1vTUe5HKA/hKBUKJmxUNJRzEyGgpnv4Yf88UVcxuRKkwjuFRq6LLYORDFfdN8c4DrQ==
+"@project-remote-job-board/shared@^1.0.16":
+  version "1.0.16"
+  resolved "https://registry.yarnpkg.com/@project-remote-job-board/shared/-/shared-1.0.16.tgz#6843cb4a0cdbf8c6e4b2cd911df06bd05bc01c26"
+  integrity sha512-HX7JP9vA7rFU8NVK0sGElwnOkZKzQOw2Ma4qhtwxnCJWsvFrznKAmvbHUUETDaLkO2D4R/m7OePhDxb5fQloUg==
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"

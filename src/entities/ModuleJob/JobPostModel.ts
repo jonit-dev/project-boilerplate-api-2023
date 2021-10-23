@@ -9,14 +9,11 @@ const jobPostSchema = createSchema(
     title: Type.string({
       required: true,
     }),
-    industry: Type.string({
-      required: true,
-    }),
+    industry: Type.string(),
     description: Type.string({
       required: true,
     }),
     workSchedule: Type.string({
-      required: true,
       default: WorkSchedule.FullTime,
       enum: TypeHelper.enumToStringArray(WorkSchedule),
     }),
@@ -24,19 +21,16 @@ const jobPostSchema = createSchema(
       name: Type.string(),
       code: Type.string(),
     },
-    city: Type.string({
-      required: true,
-    }),
+    city: Type.string(),
     isFeatured: Type.boolean({
-      required: true,
       default: false,
     }),
     company: Type.objectId({ ref: "Company" }),
     tags: Type.array().of(Type.string()),
-    views: Type.number({ default: 0, required: true }),
+    views: Type.number({ default: 0 }),
     votes: Type.array().of(Type.objectId()),
     salary: Type.number(),
-    currency: Type.string({ default: Currency.USD, required: true }),
+    currency: Type.string({ default: Currency.USD }),
     salaryRange: Type.array().of(Type.number()),
     skills: Type.array().of(Type.string()),
     benefits: Type.array().of(Type.string()),

@@ -12,8 +12,7 @@ export class CreateJobPostDTO {
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   title: string;
 
-  @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
-  @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
+  @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   industry: string;
 
@@ -22,24 +21,19 @@ export class CreateJobPostDTO {
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   description: string;
 
-  @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
-  @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
-  @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
+  @IsOptional()
   @IsEnum(WorkSchedule, tsEnumDecorator("validation", "isEnum", WorkSchedule))
   workSchedule: WorkSchedule;
 
-  @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
-  @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
+  @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   countryCode: string;
 
-  @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
-  @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
+  @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   city: string;
 
-  @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
-  @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
+  @IsOptional()
   @IsBoolean(tsDefaultDecorator("validation", "isType", { type: "boolean" }))
   isFeatured: boolean;
 

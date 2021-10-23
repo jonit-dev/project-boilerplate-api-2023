@@ -7,7 +7,7 @@ content-type: application/json
     "title": "Hiring Java Developer ASAP",
     "industry": "Healthcare",
     "description": "This is a sample job post only",
-    "workSchedule": "FullTime",
+    "workSchedule": "Full-Time",
     "countryCode": "US",
     "city": "California",
     "isFeatured": false,
