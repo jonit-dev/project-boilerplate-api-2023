@@ -60,7 +60,7 @@
     "utf8": "^3.0.0"
   },
   "devDependencies": {
-    "@project-remote-job-board/shared": "^1.0.16",
+    "@project-remote-job-board/shared": "^1.0.19",
     "@types/axios": "^0.14.0",
     "@types/bcrypt": "^3.0.0",
     "@types/chalk": "^2.2.0",

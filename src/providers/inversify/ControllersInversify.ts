@@ -1,4 +1,5 @@
 import { JobPostController } from "@useCases/ModuleJob/jobPost/JobPostController";
+import { ScrappersController } from "@useCases/ModuleJob/scrappers/ScrappersController";
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
 import { IndustriesController } from "@useCases/ModuleSystem/industries/IndustriesController";
 import { PushNotificationController } from "@useCases/ModuleSystem/operation/pushNotification/PushNotificationController";
@@ -45,10 +46,14 @@ export const industriesControllerContainer = new ContainerModule((bind: interfac
   bind<IndustriesController>(IndustriesController).toSelf();
 });
 
-export const jobPostControllerContianer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
+export const jobPostControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<JobPostController>(JobPostController).toSelf();
 });
 
 export const abTestsControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<ABTestController>(ABTestController).toSelf();
+});
+
+export const scrappersControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
+  bind<ScrappersController>(ScrappersController).toSelf();
 });

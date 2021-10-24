@@ -1,0 +1,19 @@
+ 
+# Scrappers :: Check if url was already scrapped
+GET {{baseUrl}}/scrappers/check-urls?url1=https://weworkremotely.com/remote-jobs/govalo-full-stack-engineer&url2=https://google.com HTTP/1.1
+Content-Type: application/json
+
+###
+ 
+ 
+# Scrappers :: Check URLS scrapping status
+POST {{baseUrl}}/scrappers/check-urls HTTP/1.1
+Content-Type: application/json
+
+{
+  "urls": ["https://google.com", "https://weworkremotely.com/remote-jobs/govalo-full-stack-engineer"]
+}
+
+
+###
+ 
