@@ -7,6 +7,6 @@ export class ReadJobPostUseCase {
   constructor(private jobPostRepository: JobPostRepository) {}
 
   public async readOne(id: string, filter: Record<string, unknown>): Promise<IJobPost> {
-    return await this.jobPostRepository.readOne(JobPost, { _id: id, ...filter }, null, null);
+    return await this.jobPostRepository.readOne(JobPost, { _id: id, ...filter }, ["company"], null);
   }
 }

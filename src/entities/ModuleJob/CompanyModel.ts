@@ -2,7 +2,7 @@ import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const companySchema = createSchema(
   {
-    user: Type.objectId({ ref: "User", required: true }),
+    user: Type.objectId({ ref: "User" }),
     countryCode: Type.string(),
     city: Type.string(),
     name: Type.string({ required: true }),

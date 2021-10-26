@@ -14,7 +14,7 @@ export class ReadAllJobPostUseCase {
     const results = await this.jobPostRepository.readAllPaginated<IJobPost>(
       JobPost,
       filter,
-      null,
+      ["company"],
       null,
       true,
       offset,

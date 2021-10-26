@@ -1,6 +1,6 @@
 import { WorkSchedule } from "@project-remote-job-board/shared/dist";
 import { tsDefaultDecorator, tsEnumDecorator } from "@providers/constants/ValidationConstants";
-import { IsBoolean, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
 
 export class CreateJobPostDTO {
   @IsOptional()
@@ -30,6 +30,10 @@ export class CreateJobPostDTO {
   countryCode: string;
 
   @IsOptional()
+  @IsObject(tsDefaultDecorator("validation", "isType", { type: "object" }))
+  country: object;
+
+  @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   city: string;
 
@@ -38,7 +42,7 @@ export class CreateJobPostDTO {
   isFeatured: boolean;
 
   @IsOptional()
-  @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
+  @IsObject(tsDefaultDecorator("validation", "isType", { type: "object" }))
   company: string;
 
   @IsOptional()
@@ -51,6 +55,16 @@ export class CreateJobPostDTO {
   @IsOptional()
   @IsNumber({}, tsDefaultDecorator("validation", "isType", { type: "number" }))
   salary: number;
+
+  @IsOptional()
+  @IsNumber(
+    {},
+    {
+      each: true,
+      ...tsDefaultDecorator("validation", "allArrayFields", { type: "number" }),
+    }
+  )
+  salaryRange: number;
 
   @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
