@@ -1,6 +1,6 @@
+import { EnvType } from "@project-remote-job-board/shared/dist";
 import { readFileSync } from "fs";
 import moment from "moment-timezone";
-
 import { Log } from "../src/entities/ModuleSystem/LogModel";
 import { IUser, User } from "../src/entities/ModuleSystem/UserModel";
 import { EncryptionHelper } from "../src/providers/auth/EncryptionHelper";
@@ -25,10 +25,10 @@ export class TransactionalEmail {
     customVars?: object,
     from: string | undefined = appEnv.general.ADMIN_EMAIL
   ): Promise<boolean> {
-    // if (appEnv.general.ENV === EnvType.Development) {
-    //   console.log("Skipping e-mail submission, since you cannot submit e-mails on Development");
-    //   return false;
-    // }
+    if (appEnv.general.ENV === EnvType.Development) {
+      console.log("Skipping e-mail submission, since you cannot submit e-mails on Development");
+      return false;
+    }
 
     const html = this.loadEmailTemplate(EmailType.Html, template, customVars);
     const text = this.loadEmailTemplate(EmailType.Text, template, customVars);

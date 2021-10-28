@@ -1,5 +1,5 @@
 {
-  "name": "stock-alarm",
+  "name": "RJB",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -107,7 +107,7 @@
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.32",
     "mongoose-hidden": "^1.9.0",
-    "mongoose-unique-validator": "^2.0.3",
+    "mongoose-unique-validator": "2.0.3",
     "morgan": "^1.10.0",
     "node-cron": "^2.0.3",
     "pluralize": "^8.0.0",
