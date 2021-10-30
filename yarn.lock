@@ -5410,14 +5410,13 @@ mongoose-query-parser@^1.2.1:
     lodash "^4.17.21"
     luxon "^1.27.0"
 
-mongoose-unique-validator@^2.0.3:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/mongoose-unique-validator/-/mongoose-unique-validator-2.0.4.tgz#4992faf78dda11acaa778212266bf5c653c8a1b6"
-  integrity sha512-bxcmbi0dYNVbRH7JgNXhGqg/zCit0B++X1YAhzh96B+JlxiLfZuEe3zBTETKCWBP7ZpOe37zZusfcv+B2oF4fg==
+mongoose-unique-validator@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/mongoose-unique-validator/-/mongoose-unique-validator-2.0.3.tgz#247adbcda391bf5bc63fc3dcd43286a9ec833fa4"
+  integrity sha512-3/8pmvAC1acBZS6eWKAWQUiZBlARE1wyWtjga4iQ2wDJeOfRlIKmAvTNHSZXKaAf7RCRUd7wh7as6yWAOrjpQg==
   dependencies:
     lodash.foreach "^4.1.0"
     lodash.get "^4.0.2"
-    lodash.merge "^4.6.2"
 
 mongoose@*:
   version "6.0.10"
