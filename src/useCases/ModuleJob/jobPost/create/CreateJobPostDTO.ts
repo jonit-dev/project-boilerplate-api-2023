@@ -1,4 +1,4 @@
-import { WorkSchedule } from "@project-remote-job-board/shared/dist";
+import { SeniorityLevel, WorkSchedule } from "@project-remote-job-board/shared/dist";
 import { tsDefaultDecorator, tsEnumDecorator } from "@providers/constants/ValidationConstants";
 import { IsBoolean, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
 
@@ -26,6 +26,10 @@ export class CreateJobPostDTO {
   workSchedule: WorkSchedule;
 
   @IsOptional()
+  @IsEnum(SeniorityLevel, tsEnumDecorator("validation", "isEnum", SeniorityLevel))
+  seniorityLevel: SeniorityLevel;
+
+  @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   countryCode: string;
 
@@ -40,6 +44,10 @@ export class CreateJobPostDTO {
   @IsOptional()
   @IsBoolean(tsDefaultDecorator("validation", "isType", { type: "boolean" }))
   isFeatured: boolean;
+
+  @IsOptional()
+  @IsBoolean(tsDefaultDecorator("validation", "isType", { type: "boolean" }))
+  workFromAnywhere: boolean;
 
   @IsOptional()
   @IsObject(tsDefaultDecorator("validation", "isType", { type: "object" }))

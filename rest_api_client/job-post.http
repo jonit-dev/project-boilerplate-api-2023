@@ -15,7 +15,9 @@ content-type: application/json
     "currency": "USD",
     "skills": ["React", "Redux", "Typescript"],
     "benefits": ["Flexible vacation", "Stock Bonus", "Health Insurance"],
-    "workplaceValues": ["Diversity"]
+    "workplaceValues": ["Diversity"],
+    "workFromAnywhere": true,
+    "seniorityLevel": "Intermediate"
 }
 
 ###

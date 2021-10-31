@@ -1,4 +1,4 @@
-import { Currency, WorkSchedule } from "@project-remote-job-board/shared/dist";
+import { Currency, SeniorityLevel, WorkSchedule } from "@project-remote-job-board/shared/dist";
 import { TypeHelper } from "@providers/types/TypeHelper";
 import mongoosePaginate from "mongoose-paginate-v2";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
@@ -17,6 +17,11 @@ const jobPostSchema = createSchema(
       default: WorkSchedule.FullTime,
       enum: TypeHelper.enumToStringArray(WorkSchedule),
     }),
+    seniorityLevel: Type.string({
+      enum: TypeHelper.enumToStringArray(SeniorityLevel),
+    }),
+    workFromAnywhere: Type.boolean(),
+    externalSourceUrl: Type.string(),
     country: {
       name: Type.string(),
       code: Type.string(),
