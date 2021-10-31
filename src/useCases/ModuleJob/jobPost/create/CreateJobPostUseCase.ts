@@ -1,5 +1,5 @@
 import { Company } from "@entities/ModuleJob/CompanyModel";
-import { JobPost } from "@entities/ModuleJob/JobPostModel";
+import { IJobPost as JobPostEntity, JobPost } from "@entities/ModuleJob/JobPostModel";
 import { ICompany, IJobPost } from "@project-remote-job-board/shared/dist";
 import { NotFoundError } from "@providers/errors/NotFoundError";
 import { PlaceHelper } from "@providers/places/PlaceHelper";
@@ -11,7 +11,7 @@ import { CreateJobPostDTO } from "./CreateJobPostDTO";
 export class CreateJobPostUseCase {
   constructor(private jobPostRepository: JobPostRepository, private placeHelper: PlaceHelper) {}
 
-  public async create(createJobPostDTO: CreateJobPostDTO): Promise<IJobPost> {
+  public async create(createJobPostDTO: CreateJobPostDTO): Promise<JobPostEntity> {
     let country;
 
     if (createJobPostDTO.countryCode) {
