@@ -21,7 +21,6 @@ const jobPostSchema = createSchema(
       enum: TypeHelper.enumToStringArray(SeniorityLevel),
     }),
     workFromAnywhere: Type.boolean(),
-    externalSourceUrl: Type.string(),
     country: {
       name: Type.string(),
       code: Type.string(),
