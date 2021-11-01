@@ -1,4 +1,4 @@
-import { Currency, SeniorityLevel, WorkSchedule } from "@project-remote-job-board/shared/dist";
+import { SeniorityLevel, WorkSchedule } from "@project-remote-job-board/shared/dist";
 import { TypeHelper } from "@providers/types/TypeHelper";
 import mongoosePaginate from "mongoose-paginate-v2";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
@@ -34,7 +34,7 @@ const jobPostSchema = createSchema(
     views: Type.number({ default: 0 }),
     votes: Type.array().of(Type.objectId()),
     salary: Type.number(),
-    currency: Type.string({ default: Currency.USD }),
+    currency: Type.string({}),
     salaryRange: Type.array().of(Type.number()),
     skills: Type.array().of(Type.string()),
     benefits: Type.array().of(Type.string()),
