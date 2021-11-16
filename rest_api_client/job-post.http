@@ -17,7 +17,9 @@ content-type: application/json
     "benefits": ["Flexible vacation", "Stock Bonus", "Health Insurance"],
     "workplaceValues": ["Diversity"],
     "workFromAnywhere": true,
-    "seniorityLevel": "Intermediate"
+    "seniorityLevel": "Intermediate",
+    "isVisaRequired": true,
+    "isVisaSponsor": false
 }
 
 ###
