@@ -26,6 +26,8 @@ const jobPostSchema = createSchema(
       code: Type.string(),
     },
     city: Type.string(),
+    isVisaRequired: Type.boolean(),
+    isVisaSponsor: Type.boolean(),
     isFeatured: Type.boolean({
       default: false,
     }),

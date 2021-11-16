@@ -3,23 +3,23 @@ import { tsDefaultDecorator, tsEnumDecorator } from "@providers/constants/Valida
 import { IsBoolean, IsDefined, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
 
 export class CreateJobPostDTO {
-  @IsOptional()
-  @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
-  email: string;
-
   @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   title: string;
 
-  @IsOptional()
-  @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
-  industry: string;
-
   @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   description: string;
+
+  @IsOptional()
+  @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
+  email: string;
+
+  @IsOptional()
+  @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
+  industry: string;
 
   @IsOptional()
   @IsEnum(WorkSchedule, tsEnumDecorator("validation", "isEnum", WorkSchedule))
@@ -44,6 +44,14 @@ export class CreateJobPostDTO {
   @IsOptional()
   @IsBoolean(tsDefaultDecorator("validation", "isType", { type: "boolean" }))
   isFeatured: boolean;
+
+  @IsOptional()
+  @IsBoolean(tsDefaultDecorator("validation", "isType", { type: "boolean" }))
+  isVisaRequired: boolean;
+
+  @IsOptional()
+  @IsBoolean(tsDefaultDecorator("validation", "isType", { type: "boolean" }))
+  isVisaSponsor: boolean;
 
   @IsOptional()
   @IsBoolean(tsDefaultDecorator("validation", "isType", { type: "boolean" }))
