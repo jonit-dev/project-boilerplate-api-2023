@@ -2,6 +2,7 @@ import { Company } from "@entities/ModuleJob/CompanyModel";
 import { IJobPost as IJobPostEntity, JobPost } from "@entities/ModuleJob/JobPostModel";
 import { IJobPost } from "@project-remote-job-board/shared/dist";
 import { NotFoundError } from "@providers/errors/NotFoundError";
+import { JobPostHelper } from "@providers/jobPost/JobPostHelper";
 import { PlaceHelper } from "@providers/places/PlaceHelper";
 import { JobPostRepository } from "@repositories/ModuleJob/jobPost/JobPostRepository";
 import { provide } from "inversify-binding-decorators";
@@ -9,7 +10,11 @@ import { CreateJobPostDTO } from "./CreateJobPostDTO";
 
 @provide(CreateJobPostUseCase)
 export class CreateJobPostUseCase {
-  constructor(private jobPostRepository: JobPostRepository, private placeHelper: PlaceHelper) {}
+  constructor(
+    private jobPostHelper: JobPostHelper,
+    private jobPostRepository: JobPostRepository,
+    private placeHelper: PlaceHelper
+  ) {}
 
   public async create(createJobPostDTO: CreateJobPostDTO): Promise<IJobPostEntity> {
     let country;
@@ -24,9 +29,14 @@ export class CreateJobPostUseCase {
       country = createJobPostDTO.country;
     }
 
+    // add slug
+
+    const slug = this.jobPostHelper.generateSlug(createJobPostDTO.title);
+
     let jobPostData = {
       ...createJobPostDTO,
       country,
+      slug,
     } as unknown as IJobPost;
 
     jobPostData = await this.createOrAttachCompany(jobPostData);
