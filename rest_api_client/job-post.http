@@ -31,7 +31,7 @@ Content-Type: application/json
 ###
 
 # Job Post :: Read One
-GET {{baseUrl}}/job-posts/6166508f80bdd2002f0c0b55 HTTP/1.1
+GET {{baseUrl}}/job-posts/?slug=hiring-java-developer-asap-krzlf HTTP/1.1
 Content-Type: application/json
 
 ###

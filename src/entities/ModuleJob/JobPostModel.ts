@@ -1,6 +1,8 @@
 import { SeniorityLevel, WorkSchedule } from "@project-remote-job-board/shared/dist";
 import { TypeHelper } from "@providers/types/TypeHelper";
 import mongoosePaginate from "mongoose-paginate-v2";
+import randomstring from "randomstring";
+import getSlug from "speakingurl";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const jobPostSchema = createSchema(
@@ -42,11 +44,27 @@ const jobPostSchema = createSchema(
     benefits: Type.array().of(Type.string()),
     workplaceValues: Type.array().of(Type.string()),
     sourceUrl: Type.string(),
+    slug: Type.string(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
 jobPostSchema.plugin(mongoosePaginate);
+
+jobPostSchema.pre("save", function (next) {
+  const jobPost = this as ExtractDoc<typeof jobPostSchema>;
+
+  const randomString = randomstring.generate({
+    length: 5,
+    charset: "alphabetic",
+  });
+
+  const slug = getSlug(`${jobPost.title}-${randomString}`, { lang: "pt" });
+
+  jobPost.slug = slug;
+
+  next();
+});
 
 export type IJobPost = ExtractDoc<typeof jobPostSchema>;
 

@@ -57,7 +57,9 @@
     "mongoose-query-parser": "^1.2.1",
     "node-fetch": "^2.6.1",
     "number-string": "^1.1.5",
+    "randomstring": "^1.2.1",
     "rss-parser": "^3.12.0",
+    "speakingurl": "^14.0.1",
     "utf8": "^3.0.0"
   },
   "devDependencies": {
