@@ -7,17 +7,31 @@ import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { JobPostRepository } from "@repositories/ModuleJob/jobPost/JobPostRepository";
 import axios from "axios";
 import { provide } from "inversify-binding-decorators";
+import cron from "node-cron";
 import { EnumChangefreq, simpleSitemapAndIndex } from "sitemap";
 
 @provide(SitemapHelper)
 export class SitemapHelper {
   constructor(private jobPostRepository: JobPostRepository) {}
 
+  public scheduleSitemapCron(): void {
+    console.log("Scheduling sitemap cron...");
+    cron.schedule(
+      "0 1 * * *",
+      () => {
+        this.generateSitemap();
+      },
+      {
+        timezone: "America/New_York",
+      }
+    );
+  }
+
   public async generateSitemap(): Promise<void> {
     const sitemapPath = `${STATIC_PATH}/sitemaps/posts`;
 
     // Fetch posts and create links data array
-    const jobPosts: IJobPost[] = await this.jobPostRepository.readAll(JobPost, null);
+    const jobPosts: IJobPost[] = await this.jobPostRepository.readAll(JobPost);
 
     const links = jobPosts.map((jobPost) => {
       // set priority according to date diff
@@ -43,6 +57,8 @@ export class SitemapHelper {
       gzip: false,
     }).then(async () => {
       // loop through all generated sitemap files, and ping google about them!
+
+      console.log("🤖 Sitemap generated successfully. Pinging Google to update index...");
       if (process.env.ENV === EnvType.Production) {
         // ping google to index our new sitemap files!
         await axios.get(

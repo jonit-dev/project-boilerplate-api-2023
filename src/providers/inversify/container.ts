@@ -1,6 +1,5 @@
 import { Container } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
-
 import { Cronjob } from "../cronjobs/CronJobs";
 import { Seeder } from "../seeds/Seeder";
 import { Database } from "../server/Database";
@@ -9,6 +8,7 @@ import {
   abTestsControllerContainer,
   dbTasksControllerContainer,
   industriesControllerContainer,
+  operationsControllerContainer,
   placesControllerContainer,
   scrappersControllerContainer,
   userControllerContainer,
@@ -23,7 +23,8 @@ container.load(
   abTestsControllerContainer,
   placesControllerContainer,
   industriesControllerContainer,
-  scrappersControllerContainer
+  scrappersControllerContainer,
+  operationsControllerContainer
 );
 
 export const db = container.get<Database>(Database);
