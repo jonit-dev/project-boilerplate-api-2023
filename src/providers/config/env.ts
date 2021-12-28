@@ -1,6 +1,8 @@
 export const appEnv = {
   general: {
     APP_NAME: process.env.APP_NAME,
+    API_SUBDOMAIN: process.env.API_SUBDOMAIN,
+    WEB_APP_URL: process.env.WEB_APP_URL,
     TIMEZONE: process.env.TIMEZONE,
     SUPPORT_EMAIL: process.env.SUPPORT_EMAIL,
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,

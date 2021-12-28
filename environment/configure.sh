@@ -2,8 +2,8 @@
 
 tput setaf 3;  echo "⚙️ Downloading .env files (dev and prod)"
 tput setaf 2;
-wget -O environment/dev.env "https://www.dropbox.com/s/78cn4tazj0nxd81/dev.env?dl=1"
-wget -O environment/prod.env "https://www.dropbox.com/s/l4hevxf00bvqhb4/prod.env?dl=1"
+wget -O environment/dev.env "https://www.dropbox.com/s/1bbmva58ryl76up/dev.env?dl=1"
+wget -O environment/prod.env "https://www.dropbox.com/s/rnyvhtl7vr2hs67/prod.env?dl=1"
 
 tput setaf 3;  echo "⚙️ Downloading firebase-admin-keyfile.json"
 tput setaf 2;

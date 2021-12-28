@@ -7,7 +7,6 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Document, FilterQuery, Model } from "mongoose";
 import pluralize from "pluralize";
-
 import { ConflictError } from "../errors/ConflictError";
 import { InternalServerError } from "../errors/InternalServerError";
 import { TS } from "../translation/TranslationHelper";
@@ -141,7 +140,7 @@ export class CRUD {
 
   public async readAll<T extends Document>(
     Model: Model<T>,
-    filters,
+    filters = {},
     populateKeys?: string[] | false,
     sort?: Record<string, unknown> | null,
     isLean: boolean = true,
