@@ -11,6 +11,7 @@ const jobPostSchema = createSchema(
     title: Type.string({
       required: true,
     }),
+    slug: Type.string(),
     industry: Type.string(),
     description: Type.string({
       required: true,
