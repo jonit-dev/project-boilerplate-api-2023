@@ -45,7 +45,6 @@ const jobPostSchema = createSchema(
     benefits: Type.array().of(Type.string()),
     workplaceValues: Type.array().of(Type.string()),
     sourceUrl: Type.string(),
-    slug: Type.string(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

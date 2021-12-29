@@ -9,4 +9,8 @@ export class ReadJobPostUseCase {
   public async readOne(id: string, filter: Record<string, unknown>): Promise<IJobPost> {
     return await this.jobPostRepository.readOne(JobPost, { _id: id, ...filter }, ["company"], null);
   }
+
+  public async readOneBySlug(slug: string, filter: Record<string, unknown>): Promise<IJobPost> {
+    return await this.jobPostRepository.readOne(JobPost, { slug, ...filter }, ["company"], null);
+  }
 }

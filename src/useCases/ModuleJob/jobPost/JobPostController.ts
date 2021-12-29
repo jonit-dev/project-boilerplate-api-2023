@@ -12,7 +12,6 @@ import {
   requestBody,
   requestParam,
 } from "inversify-express-utils";
-
 import { CreateJobPostDTO } from "./create/CreateJobPostDTO";
 import { CreateJobPostUseCase } from "./create/CreateJobPostUseCase";
 import { DeleteJobPostUseCase } from "./delete/DeleteJobPostUseCase";
@@ -40,6 +39,13 @@ export class JobPostController implements interfaces.Controller {
   public async readOne(@requestParam() params, @queryParam() query): Promise<IJobPost> {
     const { id } = params;
     return await this.readOneJobPostUseCase.readOne(id, query);
+  }
+
+  @httpGet("/slug/:slug")
+  public async readOneBySlug(@requestParam() params, @queryParam() queryParams): Promise<IJobPost> {
+    const { slug } = params;
+
+    return await this.readOneJobPostUseCase.readOneBySlug(slug, queryParams);
   }
 
   @httpGet("/")
