@@ -1,11 +1,11 @@
 import { IUser } from "@entities/ModuleSystem/UserModel";
 import { IPaginationResponse } from "@project-remote-job-board/shared/dist";
-import { MongooseQueryParserHelper } from "@providers/adapters/MongooseQueryParserHelper";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { NotFoundError } from "@providers/errors/NotFoundError";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Document, FilterQuery, Model } from "mongoose";
+import { MongooseQueryParser } from "mongoose-query-parser";
 import pluralize from "pluralize";
 import { ConflictError } from "../errors/ConflictError";
 import { InternalServerError } from "../errors/InternalServerError";
@@ -14,20 +14,6 @@ import { TS } from "../translation/TranslationHelper";
 @provide(CRUD)
 export class CRUD {
   constructor(private analytics: AnalyticsHelper) {}
-
-  public isObjectIdValid(_id: string, modelName: string): boolean | Error {
-    const id = String(_id); // just to guarantee that the string is actually an Id! If not done, sometimes it's being passed as ObjectID and causing issues with the verification below
-
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-      throw new InternalServerError(
-        TS.translate("validation", "requiredResourceCreate", {
-          field: modelName,
-        })
-      );
-    }
-
-    return true;
-  }
 
   public async create<T extends Document>(
     Model: Model<T>,
@@ -150,8 +136,7 @@ export class CRUD {
     try {
       let records;
 
-      const parser = new MongooseQueryParserHelper();
-      const parsedFilter: any = parser.queryParser(filters);
+      const parsedFilter: any = this.mongooseQueryParser(filters);
 
       if (limit) {
         records = Model.find(parsedFilter).limit(limit);
@@ -194,6 +179,8 @@ export class CRUD {
     }
   }
 
+  //! Note that to use this method the Model must have a plugin called mongoose-paginate-v2 enabled. See JobPostModel.ts for an example.
+
   public async readAllPaginated<T extends Document>(
     Model: Model<any>,
     filters,
@@ -204,11 +191,9 @@ export class CRUD {
     limit?: number | null,
     page?: number | null
   ): Promise<IPaginationResponse<T>> {
-    //! Note that to use this method the Model must have a plugin called mongoose-paginate-v2 enabled. See JobPostModel.ts for an example.
-    const parser = new MongooseQueryParserHelper();
-    const parsedFilter = parser.queryParser(filters);
+    const { parsedQuery, parsedOptions } = this.mongooseQueryParser(filters);
 
-    let options = {
+    let defaultOptions = {
       sort,
       populate: populateKeys,
       lean: isLean,
@@ -217,10 +202,10 @@ export class CRUD {
       page: page ?? 1,
     } as Record<string, unknown>;
 
-    options = _.omitBy(options, _.isNil); // remove null or undefined values
+    defaultOptions = _.omitBy(defaultOptions, _.isNil); // remove null or undefined values
 
     // @ts-ignore
-    const results = await Model.paginate(parsedFilter, options);
+    const results = await Model.paginate(parsedQuery, { ...defaultOptions, ...parsedOptions });
 
     return results;
   }
@@ -406,6 +391,33 @@ export class CRUD {
       console.error(error);
       throw error;
     }
+  }
+
+  private mongooseQueryParser(query: Record<string, unknown>): {
+    parsedQuery: Record<string, unknown>;
+    parsedOptions: Record<string, unknown>;
+  } {
+    const parser = new MongooseQueryParser();
+    const parsed = parser.parse(query);
+
+    const parsedQuery = parsed.filter;
+    const parsedOptions = _.omit(parsed, "filter");
+
+    return { parsedQuery, parsedOptions };
+  }
+
+  private isObjectIdValid(_id: string, modelName: string): boolean | Error {
+    const id = String(_id); // just to guarantee that the string is actually an Id! If not done, sometimes it's being passed as ObjectID and causing issues with the verification below
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      throw new InternalServerError(
+        TS.translate("validation", "requiredResourceCreate", {
+          field: modelName,
+        })
+      );
+    }
+
+    return true;
   }
 
   private async createAndUpdateReference<R extends Document>(

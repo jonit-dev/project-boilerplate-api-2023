@@ -40,6 +40,13 @@ Content-Type: application/json
 GET {{baseUrl}}/job-posts/slug/hiring-java-developer-asap-krzlf HTTP/1.1
 Content-Type: application/json
 
+### 
+
+# Job Post :: Job query example
+# For more details check https://www.npmjs.com/package/mongoose-query-parser
+GET {{baseUrl}}/job-posts?sort=-createdAt&title=/UX/i HTTP/1.1
+Content-Type: application/json
+
 ###
 
 # Job Post :: Update 
