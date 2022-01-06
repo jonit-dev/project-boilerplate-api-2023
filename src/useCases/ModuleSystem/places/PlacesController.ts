@@ -1,9 +1,9 @@
 import { ICountry, ICountryCity } from "@project-remote-job-board/shared/dist";
-import { cacheWithRedis } from "@providers/constants/CacheConstants";
+import { cache } from "@providers/constants/CacheConstants";
 import { controller, httpGet, interfaces, requestParam } from "inversify-express-utils";
 import { ReadPlaceUseCase } from "./read/ReadPlaceUseCase";
 
-@controller("/places", cacheWithRedis("24 hours"))
+@controller("/places", cache("24 hours"))
 export class PlacesController implements interfaces.Controller {
   constructor(private readPlaceUseCase: ReadPlaceUseCase) {}
 

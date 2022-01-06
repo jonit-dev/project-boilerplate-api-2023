@@ -1,3 +1,5 @@
+import { EnvType } from "@project-remote-job-board/shared/dist";
+import { appEnv } from "@providers/config/env";
 import apicache from "apicache-plus";
 import Redis from "ioredis";
 
@@ -7,12 +9,22 @@ export const MEDIUM_CACHE_DURATION = 1000 * 60 * 60 * 12; // 12 hours
 
 export const SHORT_CACHE_DURATION = 1000 * 60 * 20; // 20 min;
 
-const cacheWithRedis = apicache.options({
-  redisClient: new Redis({
-    host: process.env.REDIS_CONTAINER,
-    port: process.env.REDIS_PORT,
-  }),
-  // enabled: process.env.ENV === "Production",
-});
+let cache;
 
-export { cacheWithRedis };
+switch (appEnv.general.ENV) {
+  case EnvType.Development:
+    cache = apicache.options({
+      enabled: false,
+    });
+    break;
+  case EnvType.Production:
+    cache = apicache.options({
+      redisClient: new Redis({
+        host: appEnv.database.REDIS_CONTAINER,
+        port: appEnv.database.REDIS_PORT,
+      }),
+    });
+    break;
+}
+
+export { cache };

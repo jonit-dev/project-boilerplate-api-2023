@@ -2,8 +2,8 @@
 
 tput setaf 3;  echo "⚙️ Downloading .env files (dev and prod)"
 tput setaf 2;
-wget -O environment/dev.env "https://www.dropbox.com/s/qyhj298bux640ew/dev.env?dl=1"
-wget -O environment/prod.env "https://www.dropbox.com/s/3otu7offwcsxhcm/prod.env?dl=1"
+wget -O environment/dev.env "https://www.dropbox.com/s/fg0rl0rv077frkr/dev.env?dl=1"
+wget -O environment/prod.env "https://www.dropbox.com/s/vjz98tfnhe8axen/prod.env?dl=1"
 
 tput setaf 3;  echo "⚙️ Downloading firebase-admin-keyfile.json"
 tput setaf 2;
@@ -14,8 +14,8 @@ wget -O environment/keys/firebase-admin-keyfile.json "https://www.dropbox.com/s/
 
 tput setaf 3;  echo "⚙️ Downloading docker-compose.yml files (dev and prod)"
 tput setaf 2;
-wget -O environment/docker-compose.dev.yml "https://www.dropbox.com/s/g08nsynjk465kd0/docker-compose.dev.yml?dl=1"
-wget -O environment/docker-compose.prod.yml "https://www.dropbox.com/s/4qlq6l6xatnztyg/docker-compose.prod.yml?dl=1"
+wget -O environment/docker-compose.dev.yml "https://www.dropbox.com/s/bnhwj70mbhfrczh/docker-compose.dev.yml?dl=1"
+wget -O environment/docker-compose.prod.yml "https://www.dropbox.com/s/nfr0ns2q7dffnni/docker-compose.prod.yml?dl=1"
 
 tput setaf 3;  echo "⚙️ Downloading Dockerfiles (dev and prod)"
 tput setaf 2;

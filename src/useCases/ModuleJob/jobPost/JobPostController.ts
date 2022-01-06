@@ -1,6 +1,6 @@
 import { IJobPost } from "@entities/ModuleJob/JobPostModel";
 import { IPaginationResponse } from "@project-remote-job-board/shared/dist";
-import { cacheWithRedis } from "@providers/constants/CacheConstants";
+import { cache } from "@providers/constants/CacheConstants";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import {
   controller,
@@ -21,7 +21,7 @@ import { ReadAllJobPostUseCase } from "./readall/ReadAllJobPostUseCase";
 import { UpdateJobPostDTO } from "./update/UpdateJobPostDTO";
 import { UpdateJobPostUseCase } from "./update/UpdateJobPostUseCase";
 
-@controller("/job-posts", cacheWithRedis("24 hours"))
+@controller("/job-posts")
 export class JobPostController implements interfaces.Controller {
   constructor(
     private createJobPostUseCase: CreateJobPostUseCase,
@@ -36,20 +36,20 @@ export class JobPostController implements interfaces.Controller {
     return await this.createJobPostUseCase.create(createJobPostDTO);
   }
 
-  @httpGet("/:id")
+  @httpGet("/:id", cache("24 hours"))
   public async readOne(@requestParam() params, @queryParam() query): Promise<IJobPost> {
     const { id } = params;
     return await this.readOneJobPostUseCase.readOne(id, query);
   }
 
-  @httpGet("/slug/:slug")
+  @httpGet("/slug/:slug", cache("24 hours"))
   public async readOneBySlug(@requestParam() params, @queryParam() queryParams): Promise<IJobPost> {
     const { slug } = params;
 
     return await this.readOneJobPostUseCase.readOneBySlug(slug, queryParams);
   }
 
-  @httpGet("/")
+  @httpGet("/", cache("24 hours"))
   public async readAll(@queryParam() query): Promise<IPaginationResponse<IJobPost>> {
     return await this.readAllJobPostUseCase.readAll(query);
   }
