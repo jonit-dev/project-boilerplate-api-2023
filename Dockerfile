@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 4002
 
 # This will run our npm run dev command under package.json
-CMD ["npm","run","dev"]
+CMD ["npm","run","start:prod"]
