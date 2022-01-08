@@ -12,8 +12,8 @@ RUN npm install
 # Copy our current root to the docker root
 COPY . .
 
-# Expose port 3002, so we can access our server.
-EXPOSE 3002
+# Expose port, so we can access our server.
+EXPOSE 4002
 
 # This will run our npm run dev command under package.json
 CMD ["npm","run","dev"]
