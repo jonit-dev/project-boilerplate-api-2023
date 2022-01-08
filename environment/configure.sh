@@ -14,8 +14,8 @@ wget -O environment/keys/firebase-admin-keyfile.json "https://www.dropbox.com/s/
 
 tput setaf 3;  echo "⚙️ Downloading docker-compose.yml files (dev and prod)"
 tput setaf 2;
-wget -O environment/docker-compose.dev.yml "https://www.dropbox.com/s/02tookztnae43xw/docker-compose.dev.yml?dl=1"
-wget -O environment/docker-compose.prod.yml "https://www.dropbox.com/s/vln50hhvf3mexes/docker-compose.prod.yml?dl=1"
+wget -O environment/docker-compose.dev.yml "https://www.dropbox.com/s/cim1wi8mu5afvp7/docker-compose.dev.yml?dl=1"
+wget -O environment/docker-compose.prod.yml "https://www.dropbox.com/s/sxlzej878bg5uko/docker-compose.prod.yml?dl=1"
 
 tput setaf 3;  echo "⚙️ Downloading Dockerfiles (dev and prod)"
 tput setaf 2;
