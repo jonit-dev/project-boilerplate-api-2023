@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Environment files download
+
 tput setaf 3;  echo "⚙️ Downloading .env files (dev and prod)"
 tput setaf 2;
 wget -O environment/dev.env "https://www.dropbox.com/s/flkri6m1lj5dk9q/dev.env?dl=1"
