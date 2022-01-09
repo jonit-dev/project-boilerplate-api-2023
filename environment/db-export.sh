@@ -15,9 +15,10 @@ echo "Loading production .env from ${PROD_ENV}"
 # Fetch mongodb username and password, so we can dump our data into a file
 USERNAME=$(awk -F'=' '/^MONGO_INITDB_ROOT_USERNAME/ { print $2}'  "$PROD_ENV")
 PASSWORD=$(awk -F'=' '/^MONGO_INITDB_ROOT_PASSWORD/ { print $2}' "$PROD_ENV")
+PORT=$(awk -F'=' '/^MONGO_PORT/ { print $2}' "$PROD_ENV")
 
 # Execute dump command to export db files to mongo container
-docker-compose exec "$DB_CONTAINER" mongodump -u ${USERNAME} -p ${PASSWORD}  -o /db-dump/
+docker-compose exec "$DB_CONTAINER" mongodump -u ${USERNAME} -p ${PASSWORD} --port ${PORT}  -o /db-dump/
 
 # then we copy these files (under dump folder) to our host
 
