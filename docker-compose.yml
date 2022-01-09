@@ -1,5 +1,4 @@
 version: "3"
-
 services:
   v8-api:
     container_name: v8-api
@@ -10,25 +9,20 @@ services:
         max-size: "10m"
         max-file: "3"
     env_file: .env
+    ports:
+      - "$SERVER_PORT:$SERVER_PORT"
+      - "9229:9229" # debugging port
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    links:
-      - v8-db
-      - v8-redis
-    depends_on:
-      - v8-db
-      - v8-redis
-    network_mode: bridge
-    ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
     environment:
       FORCE_COLOR: "true"
-      VIRTUAL_HOST: ${API_SUBDOMAIN}
-      LETSENCRYPT_HOST: ${API_SUBDOMAIN}
-      LETSENCRYPT_EMAIL: ${ADMIN_EMAIL}
-      VIRTUAL_PORT: ${SERVER_PORT}
-
+    links:
+      - v8-db
+    depends_on:
+      - v8-db
+    networks:
+      - v8-network
   v8-db:
     container_name: v8-db
     image: mongo
@@ -47,18 +41,10 @@ services:
       MONGO_PORT: ${MONGO_PORT}
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-    network_mode: bridge
+    networks:
+      - v8-network
 
-  v8-redis:
-    container_name: v8-redis
-    restart: always
-    image: redis:latest
-    ports:
-      - "$REDIS_PORT:$REDIS_PORT"
-    expose:
-      - "$REDIS_PORT"
-    env_file: .env
-    volumes:
-      - ./config/redis.conf:/redis.conf
-    command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
-    network_mode: bridge
+networks:
+  v8-network:
+    driver: bridge
+    external: true
