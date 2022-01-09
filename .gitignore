@@ -16,5 +16,5 @@ environment/keys/**
 !environment/backups
 environment/backups/**
 
-./docker-compose.yml
+docker-compose.yml
 Dockerfile
