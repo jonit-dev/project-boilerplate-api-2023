@@ -31,20 +31,20 @@ Content-Type: application/json
 ###
 
 # Job Post :: Read One
-GET {{baseUrl}}/job-posts/?slug=hiring-java-developer-asap-krzlf HTTP/1.1
+GET {{baseUrl}}/job-posts/?slug=product-manager-fully-remote-lwecm HTTP/1.1
 Content-Type: application/json
 
 ###
 
 # Job Post :: Read One by Slug
-GET {{baseUrl}}/job-posts/slug/hiring-java-developer-asap-krzlf HTTP/1.1
+GET {{baseUrl}}/job-posts/slug/product-manager-fully-remote-lwecm HTTP/1.1
 Content-Type: application/json
 
 ### 
 
 # Job Post :: Job query example
 # For more details check https://www.npmjs.com/package/mongoose-query-parser
-GET {{baseUrl}}/job-posts?sort=-createdAt HTTP/1.1
+GET {{baseUrl}}/job-posts?industry=Real estate HTTP/1.1
 Content-Type: application/json
 
 ###

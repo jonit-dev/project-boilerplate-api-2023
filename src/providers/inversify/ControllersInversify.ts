@@ -1,6 +1,7 @@
 import { JobPostController } from "@useCases/ModuleJob/jobPost/JobPostController";
 import { ScrappersController } from "@useCases/ModuleJob/scrappers/ScrappersController";
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
+import { CurrenciesController } from "@useCases/ModuleSystem/currencies/CurrenciesController";
 import { IndustriesController } from "@useCases/ModuleSystem/industries/IndustriesController";
 import { PushNotificationController } from "@useCases/ModuleSystem/operation/pushNotification/PushNotificationController";
 import { SystemTestController } from "@useCases/ModuleSystem/operation/systemTest/SystemTestController";
@@ -39,12 +40,10 @@ export const userControllerContainer = new ContainerModule((bind: interfaces.Bin
 
 export const dbTasksControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {});
 
-export const placesControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
-  bind<PlacesController>(PlacesController).toSelf();
-});
-
-export const industriesControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
+export const formControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<IndustriesController>(IndustriesController).toSelf();
+  bind<CurrenciesController>(CurrenciesController).toSelf();
+  bind<PlacesController>(PlacesController).toSelf();
 });
 
 export const jobPostControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {

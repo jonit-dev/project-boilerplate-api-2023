@@ -7,9 +7,8 @@ import { ServerHelper } from "../server/ServerHelper";
 import {
   abTestsControllerContainer,
   dbTasksControllerContainer,
-  industriesControllerContainer,
+  formControllerContainer,
   operationsControllerContainer,
-  placesControllerContainer,
   scrappersControllerContainer,
   userControllerContainer,
 } from "./ControllersInversify";
@@ -21,8 +20,7 @@ container.load(
   userControllerContainer,
   dbTasksControllerContainer,
   abTestsControllerContainer,
-  placesControllerContainer,
-  industriesControllerContainer,
+  formControllerContainer,
   scrappersControllerContainer,
   operationsControllerContainer
 );
