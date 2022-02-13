@@ -136,6 +136,8 @@ export class CRUD {
     try {
       let records;
 
+      filters = this.parseSalaryFilters(filters);
+
       const parsedFilter: any = this.mongooseQueryParser(filters);
 
       if (limit) {
@@ -191,6 +193,8 @@ export class CRUD {
     limit?: number | null,
     page?: number | null
   ): Promise<IPaginationResponse<T>> {
+    filters = this.parseSalaryFilters(filters);
+
     const { parsedQuery, parsedOptions } = this.mongooseQueryParser(filters);
 
     let defaultOptions = {
@@ -454,5 +458,22 @@ export class CRUD {
       regexFilters[key] = { $regex: new RegExp(value as string), $options: "i" };
     }
     return regexFilters;
+  }
+
+  private parseSalaryFilters(filters: Record<string, unknown>): Record<string, unknown> {
+    let updatedFilters = filters;
+
+    if (filters.salaryFrom || filters.salaryTo) {
+      if (filters.salaryFrom) {
+        updatedFilters = _.omit(updatedFilters, "salaryFrom");
+        // first element of salaryRange array should be higher than the salaryFrom
+        updatedFilters[`salaryRange.0>${filters.salaryFrom}`] = "";
+      }
+      if (filters.salaryTo) {
+        updatedFilters = _.omit(updatedFilters, "salaryTo");
+        updatedFilters[`salaryRange.1<${filters.salaryTo}`] = "";
+      }
+    }
+    return updatedFilters;
   }
 }

@@ -4,19 +4,21 @@ content-type: application/json
 
 {
     "email": "test@gmail.com",
-    "title": "Hiring Java Developer ASAP",
+    "title": "Hiring Java Developer ASAP US ONLY",
     "industry": "Healthcare",
     "description": "This is a sample job post only",
     "workSchedule": "Full-Time",
-    "countryCode": "US",
-    "city": "California",
+    "country": {
+        "name": "United States",
+        "code": "US"
+    },
     "isFeatured": false,
     "salary": 200000,
     "currency": "USD",
     "skills": ["React", "Redux", "Typescript"],
     "benefits": ["Flexible vacation", "Stock Bonus", "Health Insurance"],
     "workplaceValues": ["Diversity"],
-    "workFromAnywhere": true,
+    "workFromAnywhere": false,
     "seniorityLevel": "Intermediate",
     "isVisaRequired": true,
     "isVisaSponsor": false
@@ -25,7 +27,7 @@ content-type: application/json
 ###
 
 # Job Post :: Read All
-GET {{baseUrl}}/job-posts HTTP/1.1
+GET {{baseUrl}}/job-posts?salaryFrom=50000&salaryTo=120000 HTTP/1.1
 Content-Type: application/json
 
 ###
