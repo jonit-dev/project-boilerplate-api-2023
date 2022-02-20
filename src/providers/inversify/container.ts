@@ -8,8 +8,6 @@ import {
   abTestsControllerContainer,
   dbTasksControllerContainer,
   formControllerContainer,
-  operationsControllerContainer,
-  scrappersControllerContainer,
   userControllerContainer,
 } from "./ControllersInversify";
 
@@ -20,9 +18,7 @@ container.load(
   userControllerContainer,
   dbTasksControllerContainer,
   abTestsControllerContainer,
-  formControllerContainer,
-  scrappersControllerContainer,
-  operationsControllerContainer
+  formControllerContainer
 );
 
 export const db = container.get<Database>(Database);

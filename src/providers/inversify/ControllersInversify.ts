@@ -1,10 +1,6 @@
-import { JobPostController } from "@useCases/ModuleJob/jobPost/JobPostController";
-import { ScrappersController } from "@useCases/ModuleJob/scrappers/ScrappersController";
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
-import { CurrenciesController } from "@useCases/ModuleSystem/currencies/CurrenciesController";
 import { IndustriesController } from "@useCases/ModuleSystem/industries/IndustriesController";
 import { PushNotificationController } from "@useCases/ModuleSystem/operation/pushNotification/PushNotificationController";
-import { SystemTestController } from "@useCases/ModuleSystem/operation/systemTest/SystemTestController";
 import { PlacesController } from "@useCases/ModuleSystem/places/PlacesController";
 import { AppleOAuthController } from "@useCases/ModuleSystem/user/appleOAuth/AppleOAuthController";
 import { ChangePasswordController } from "@useCases/ModuleSystem/user/changePassword/ChangePasswordController";
@@ -42,22 +38,9 @@ export const dbTasksControllerContainer = new ContainerModule((bind: interfaces.
 
 export const formControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<IndustriesController>(IndustriesController).toSelf();
-  bind<CurrenciesController>(CurrenciesController).toSelf();
   bind<PlacesController>(PlacesController).toSelf();
-});
-
-export const jobPostControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
-  bind<JobPostController>(JobPostController).toSelf();
 });
 
 export const abTestsControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<ABTestController>(ABTestController).toSelf();
-});
-
-export const scrappersControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
-  bind<ScrappersController>(ScrappersController).toSelf();
-});
-
-export const operationsControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
-  bind<SystemTestController>(SystemTestController).toSelf();
 });
