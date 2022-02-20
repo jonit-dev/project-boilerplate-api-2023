@@ -35,6 +35,7 @@
   "dependencies": {
     "@amplitude/identify": "^1.8.2",
     "@amplitude/node": "^1.8.3",
+    "@rpg-engine/shared": "^0.0.5",
     "@sendgrid/mail": "^7.4.0",
     "@sentry/node": "^6.13.2",
     "@sentry/tracing": "^6.13.2",

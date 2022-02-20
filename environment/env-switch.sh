@@ -15,4 +15,4 @@ case $1 in
   ;;
 esac
 
-echo "✅ Done! Note that you should run 'docker-compose build v8-api' to rebuild your container with the new changes applied.'"
+echo "✅ Done! Note that you should run 'docker-compose build rpg-api' to rebuild your container with the new changes applied.'"
