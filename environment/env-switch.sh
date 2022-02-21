@@ -6,12 +6,15 @@ case $1 in
   cp -fr ./environment/dev.env .env
   cp -fr ./environment/docker-compose.dev.yml docker-compose.yml
   cp -fr ./environment/Dockerfile.dev Dockerfile
+  cp -fr ./environment/Dockerfile.socket.dev ./rpg-socket/Dockerfile
   ;;
 "prod")
   echo "Generating Production environment .env files"
   cp -fr ./environment/prod.env .env
   cp -fr ./environment/docker-compose.prod.yml docker-compose.yml
   cp -fr ./environment/Dockerfile.prod Dockerfile
+  cp -fr ./environment/Dockerfile.socket.prod ./rpg-socket/Dockerfile
+
   ;;
 esac
 

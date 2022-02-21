@@ -24,6 +24,18 @@ tput setaf 2;
 wget -O environment/Dockerfile.dev "https://www.dropbox.com/s/qjryqbvzpnskry7/Dockerfile.dev?dl=1"
 wget -O environment/Dockerfile.prod "https://www.dropbox.com/s/jyp1nc1xmkpf23w/Dockerfile.prod?dl=1"
 
+
+tput setaf 3;  echo "⚙️ Downloading socket files"
+tput setaf 2;
+wget -O environment/Dockerfile.socket.dev "https://www.dropbox.com/s/vt490fpuelxhexi/Dockerfile.socket.dev?dl=1"
+wget -O environment/Dockerfile.socket.prod "https://www.dropbox.com/s/0xn0ias6zq786aa/Dockerfile.socket.prod?dl=1"
+wget -O environment/socket.env "https://www.dropbox.com/s/hc4nhyp74x83f6a/socket.env?dl=1"
+
+
+
+
+
+
 tput setaf 3;  echo "⚙️ Switching env to dev..."
 tput setaf 2;
 yarn env:switch:dev

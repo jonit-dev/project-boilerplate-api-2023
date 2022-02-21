@@ -40,7 +40,7 @@
     "@sentry/node": "^6.13.2",
     "@sentry/tracing": "^6.13.2",
     "@types/apicache": "^1.6.1",
-    "axios": "^0.23.0",
+    "axios": "^0.21.0",
     "axios-cache-adapter": "^2.7.3",
     "cachegoose": "^8.0.0",
     "cheerio": "^1.0.0-rc.5",
