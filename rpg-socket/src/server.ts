@@ -18,7 +18,7 @@ app.use(cors());
 app.use(express.static("public"));
 
 const server = app.listen(appEnv.port.server, () => {
-  console.log(`⚙️ Express Port: ${appEnv.port.server} - Socket(Geckos) Port: ${appEnv.port.socket}`);
+  console.log(`⚙️ Geckos Express Port: ${appEnv.port.server} - UDP Port: ${appEnv.port.socket}`);
 
   const geckosServer = container.get<GeckosServerHelper>(GeckosServerHelper);
   geckosServer.init(server);
