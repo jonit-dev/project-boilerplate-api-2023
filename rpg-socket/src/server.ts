@@ -1,6 +1,6 @@
+import "reflect-metadata";
 import cors from "cors";
 import express from "express";
-import "reflect-metadata";
 import { appEnv } from "./providers/constants/env";
 import { GeckosServerHelper } from "./providers/geckos/GeckosServerHelper";
 import { container, cronsManager } from "./providers/inversify/inversify";

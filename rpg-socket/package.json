@@ -29,6 +29,7 @@
   "dependencies": {
     "@geckos.io/server": "^2.1.6",
     "@rpg-engine/shared": "^0.0.5",
+    "axios": "^0.26.0",
     "babel-jest": "^27.5.1",
     "cors": "^2.8.5",
     "dayjs": "^1.10.7",
