@@ -15,6 +15,24 @@ Content-Type: application/json
 ###
 
 # Character :: Read
-GET {{baseUrl}}/characters/621440404c5f5200416fad9c HTTP/1.1
+GET {{baseUrl}}/characters/6214645e4cca02007d8e5aa0 HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+# Character :: Update
+PATCH {{baseUrl}}/characters/621465b7f8d01300b156bf22 HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Jonit"
+}
+
+###
+
+# Character :: Delete
+DELETE {{baseUrl}}/characters/6214648d4cca02007d8e5aa6 HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json

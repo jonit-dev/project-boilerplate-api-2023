@@ -8,6 +8,7 @@ const characterSchema = createSchema(
       required: true,
     }),
     owner: Type.objectId({
+      required: true,
       ref: "User",
     }),
     health: Type.number({
@@ -38,6 +39,10 @@ const characterSchema = createSchema(
     totalWeightCapacity: Type.number({
       required: true,
       default: 100,
+    }),
+    isOnline: Type.boolean({
+      default: false,
+      required: true,
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }

@@ -5,7 +5,7 @@ POST {{baseUrl}}/auth/signup HTTP/1.1
 content-type: application/json
 
 {
-    "email": "joaopaulofurtado@live.com",
+    "email": "jfurtado@live.com",
     "password": "123",
     "passwordConfirmation": "123",
     "name": "Null Pointer Dev"
@@ -18,7 +18,7 @@ POST {{baseUrl}}/auth/login HTTP/1.1
 content-type: application/json
 
 {
-    "email": "joaopaulofurtado@live.com",
+    "email": "jfurtado@live.com",
     "password": "123"
 }
 
