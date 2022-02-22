@@ -1,4 +1,4 @@
-//@ts-ignore
+// @ts-ignore
 import { Data, ServerChannel } from "@geckos.io/server";
 import {
   GRID_HEIGHT,
@@ -8,7 +8,7 @@ import {
   PlayerGeckosEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { DataRetransmission } from "../abstractions/DataRetransmission";
+import { DataRetransmission } from "../geckos/DataRetransmission";
 import { GeckosMessaging } from "../geckos/GeckosMessaging";
 import { GeckosServerHelper } from "../geckos/GeckosServerHelper";
 
@@ -24,7 +24,7 @@ export class PlayerUpdate {
 
   constructor(private geckosMessagingHelper: GeckosMessaging, private dataRetransmission: DataRetransmission) {}
 
-  public onPlayerUpdatePosition(channel: ServerChannel) {
+  public onPlayerUpdatePosition(channel: ServerChannel): void {
     channel.on(PlayerGeckosEvents.PlayerPositionUpdate, (d: Data) => {
       const data = d as IConnectedPlayer;
 
@@ -72,7 +72,7 @@ export class PlayerUpdate {
     });
   }
 
-  private checkIfValidPositionUpdate(data: IConnectedPlayer) {
+  private checkIfValidPositionUpdate(data: IConnectedPlayer): boolean {
     //! always return false for now
     console.log("checking if requested position update is valid...");
 
@@ -85,8 +85,8 @@ export class PlayerUpdate {
     return false;
   }
 
-  private updateServerSideEmitterInfo(data: IConnectedPlayer) {
-    let updatedData = data;
+  private updateServerSideEmitterInfo(data: IConnectedPlayer): void {
+    const updatedData = data;
 
     if (data.isMoving) {
       // if player is moving, update the position

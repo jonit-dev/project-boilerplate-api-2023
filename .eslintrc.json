@@ -2,7 +2,8 @@
   "env": {
     "es2021": true,
     "es6": true,
-    "node": true
+    "node": true,
+    "jest": true
   },
   "extends": ["standard", "plugin:promise/recommended"],
   "parser": "@typescript-eslint/parser",
@@ -10,6 +11,7 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
+
   "plugins": ["@typescript-eslint", "unused-imports", "promise"],
   "rules": {
     "semi": ["warn", "always"],

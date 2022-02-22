@@ -1,4 +1,4 @@
-//@ts-ignore
+// @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
 import { provide } from "inversify-binding-decorators";
 import { PlayerCreate } from "./PlayerCreate";
@@ -15,7 +15,7 @@ export class Player {
     private playerPing: PlayerPing
   ) {}
 
-  public onAddEventListeners(channel: ServerChannel) {
+  public onAddEventListeners(channel: ServerChannel): void {
     this.playerCreate.onPlayerCreate(channel);
     this.playerLogout.onPlayerLogout(channel);
     this.playerUpdate.onPlayerUpdatePosition(channel);

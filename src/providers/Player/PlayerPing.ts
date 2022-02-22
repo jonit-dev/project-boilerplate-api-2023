@@ -1,4 +1,4 @@
-//@ts-ignore
+// @ts-ignore
 import { Data, ServerChannel } from "@geckos.io/server";
 import { IPlayerPing, PlayerGeckosEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -6,7 +6,7 @@ import { GeckosServerHelper } from "../geckos/GeckosServerHelper";
 
 @provide(PlayerPing)
 export class PlayerPing {
-  public onPlayerPing(channel: ServerChannel) {
+  public onPlayerPing(channel: ServerChannel): void {
     channel.on(PlayerGeckosEvents.PlayerPing, (d: Data) => {
       const payload = d as IPlayerPing;
 

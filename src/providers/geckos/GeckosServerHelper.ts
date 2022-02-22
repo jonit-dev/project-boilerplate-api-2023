@@ -1,9 +1,10 @@
 // @ts-ignore
 import { GeckosServer } from "@geckos.io/server";
+import { EnvType } from "@project-remote-job-board/shared/dist";
+import { appEnv } from "@providers/config/env";
 import { IConnectedPlayers } from "@rpg-engine/shared";
 import { Server } from "http";
 import { provide } from "inversify-binding-decorators";
-import { appEnv } from "../constants/env";
 import { Player } from "../Player/Player";
 
 @provide(GeckosServerHelper)
@@ -18,27 +19,31 @@ export class GeckosServerHelper {
     // import geckos as ESM
     const { geckos } = await import("@geckos.io/server");
 
-    switch (appEnv.ENV) {
-      case "Development":
+    switch (appEnv.general.ENV) {
+      case EnvType.Development:
         GeckosServerHelper.io = geckos({
           portRange: {
             min: 20000,
             max: 20005,
           },
         });
+        GeckosServerHelper.io.addServer(httpServer);
+        GeckosServerHelper.io.listen(appEnv.port.SOCKET);
+
         break;
-      case "Production":
+      case EnvType.Staging:
+      case EnvType.Production:
         GeckosServerHelper.io = geckos({
           portRange: {
             min: 20000,
             max: 20100,
           },
         });
+        GeckosServerHelper.io.addServer(httpServer);
+        GeckosServerHelper.io.listen(appEnv.port.SOCKET + Number(process.env.NODE_APP_INSTANCE));
         break;
     }
 
-    GeckosServerHelper.io.addServer(httpServer);
-    GeckosServerHelper.io.listen(appEnv.port.socket);
     GeckosServerHelper.io.onConnection((channel) => {
       this.geckosPlayerHelper.onAddEventListeners(channel);
     });

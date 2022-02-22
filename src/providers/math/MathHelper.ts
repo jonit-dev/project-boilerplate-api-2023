@@ -2,6 +2,18 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import numberString from "number-string";
 
+interface IPoint {
+  x: number;
+  y: number;
+}
+
+interface IRect {
+  bottom: number;
+  left: number;
+  top: number;
+  right: number;
+}
+
 @provide(MathHelper)
 export class MathHelper {
   public addMultiplier(n: string): number {
@@ -42,5 +54,16 @@ export class MathHelper {
       );
 
     return result[0] / result[1];
+  }
+
+  public getDistanceBetweenPoints(x1: number, y1: number, x2: number, y2: number): number {
+    const y = x2 - x1;
+    const x = y2 - y1;
+
+    return Math.sqrt(x * x + y * y);
+  }
+
+  public isXYInsideRectangle(point: IPoint, rect: IRect): boolean {
+    return point.x > rect.left && point.x < rect.right && point.y > rect.top && point.y < rect.bottom;
   }
 }

@@ -1,9 +1,11 @@
 import { EnvType } from "@project-remote-job-board/shared/dist";
 import { appEnv } from "@providers/config/env";
 import { provide } from "inversify-binding-decorators";
-
+import { PlayerCrons } from "./PlayerCrons";
 @provide(Cronjob)
 class Cronjob {
+  constructor(private playerCron: PlayerCrons) {}
+
   public start(): void {
     this.scheduleCrons();
   }
@@ -14,6 +16,7 @@ class Cronjob {
     if (appEnv.general.ENV === EnvType.Production) {
       switch (process.env.pm_id) {
         case "0":
+          this.playerCron.schedule();
           break;
         case "1":
           break;
@@ -22,6 +25,8 @@ class Cronjob {
         case "3":
           break;
       }
+    } else {
+      this.playerCron.schedule();
     }
   }
 }

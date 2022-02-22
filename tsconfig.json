@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "commonjs",
+    "target": "ES2020",
+    "module": "Node12",
     "lib": ["ES6"],
     "allowJs": true,
     "sourceMap": true,
@@ -13,7 +13,6 @@
     "strictBindCallApply": false,
     "strictPropertyInitialization": false,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
     "baseUrl": "./src",
     "paths": {
       "@entities/*": ["entities/*"],

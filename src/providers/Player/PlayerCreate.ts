@@ -1,4 +1,4 @@
-//@ts-ignore
+// @ts-ignore
 import { Data, ServerChannel } from "@geckos.io/server";
 import { IConnectedPlayer, PlayerGeckosEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -9,7 +9,7 @@ import { GeckosServerHelper } from "../geckos/GeckosServerHelper";
 export class PlayerCreate {
   constructor(private geckosMessagingHelper: GeckosMessaging) {}
 
-  public onPlayerCreate(channel: ServerChannel) {
+  public onPlayerCreate(channel: ServerChannel): void {
     channel.on(PlayerGeckosEvents.PlayerCreate, (d: Data) => {
       const data = d as IConnectedPlayer;
 
@@ -31,7 +31,7 @@ export class PlayerCreate {
     });
   }
 
-  public sendCreationMessageToPlayers(emitterChannelId: string, emitterId: string, data: IConnectedPlayer) {
+  public sendCreationMessageToPlayers(emitterChannelId: string, emitterId: string, data: IConnectedPlayer): void {
     const nearbyPlayers = this.geckosMessagingHelper.getPlayersOnCameraView(emitterId);
 
     console.log("warning nearby players...");

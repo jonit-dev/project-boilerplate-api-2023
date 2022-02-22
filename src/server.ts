@@ -3,7 +3,8 @@ import "reflect-metadata";
 
 import { EnvType } from "@project-remote-job-board/shared/dist";
 import { appEnv } from "@providers/config/env";
-import { cronJobs, db, seeds, server } from "@providers/inversify/container";
+import { GeckosServerHelper } from "@providers/geckos/GeckosServerHelper";
+import { container, cronJobs, db, seeds, server } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { app } from "@providers/server/app";
@@ -13,7 +14,7 @@ import * as Tracing from "@sentry/tracing";
 
 const port = appEnv.general.SERVER_PORT || 3002;
 
-app.listen(port, async () => {
+const expressServer = app.listen(port, async () => {
   server.showBootstrapMessage({
     appName: appEnv.general.APP_NAME!,
     port: appEnv.general.SERVER_PORT!,
@@ -37,6 +38,10 @@ app.listen(port, async () => {
   PushNotificationHelper.initialize();
 
   await seeds.start();
+
+  const geckosServerHelper = container.get<GeckosServerHelper>(GeckosServerHelper);
+
+  await geckosServerHelper.init(expressServer);
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({

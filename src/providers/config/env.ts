@@ -60,4 +60,8 @@ export const appEnv = {
       SENDINBLUE_API_KEY: process.env.SENDINBLUE_API_KEY,
     },
   },
+  port: {
+    SOCKET_SERVER: Number(process.env.SOCKET_SERVER_PORT),
+    SOCKET: Number(process.env.SOCKET_PORT),
+  },
 };

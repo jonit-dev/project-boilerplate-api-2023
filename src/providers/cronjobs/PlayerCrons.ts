@@ -1,24 +1,24 @@
+import { GeckosMessaging } from "@providers/geckos/GeckosMessaging";
+import { GeckosServerHelper } from "@providers/geckos/GeckosServerHelper";
 import { PlayerGeckosEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import nodeCron from "node-cron";
-import { GeckosMessaging } from "../geckos/GeckosMessaging";
-import { GeckosServerHelper } from "../geckos/GeckosServerHelper";
 
 @provide(PlayerCrons)
 export class PlayerCrons {
   constructor(private geckosMessaging: GeckosMessaging) {}
 
-  public schedule() {
+  public schedule(): void {
     nodeCron.schedule("*/10 * * * *", () => {
       console.log("Checking inactive players...");
       this.logoutInactivePlayers();
     });
   }
 
-  private logoutInactivePlayers() {
-    for (const [id, playerData] of Object.entries(GeckosServerHelper.connectedPlayers)) {
+  private logoutInactivePlayers(): void {
+    for (const [, playerData] of Object.entries(GeckosServerHelper.connectedPlayers)) {
       const lastActivity = dayjs(playerData.lastActivity);
       const now = dayjs();
       const diff = now.diff(lastActivity, "minute");

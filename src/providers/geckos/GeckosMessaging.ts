@@ -1,22 +1,22 @@
-//@ts-ignore
+// @ts-ignore
+import { MathHelper } from "@providers/math/MathHelper";
 import { CAMERA_VIEWPORT_WIDTH, GRID_WIDTH, ICameraCoordinates, IConnectedPlayer } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { MathHelper } from "../MathHelper";
 import { GeckosServerHelper } from "./GeckosServerHelper";
 
 @provide(GeckosMessaging)
 export class GeckosMessaging {
   constructor(private mathHelper: MathHelper) {}
 
-  public sendEventToUser<T>(userChannel: string, eventName: string, data?: T) {
+  public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
     GeckosServerHelper.io.room(userChannel).emit(eventName, data || {});
   }
 
-  public sendEventToAllUsers<T>(eventName: string, data?: T) {
+  public sendEventToAllUsers<T>(eventName: string, data?: T): void {
     GeckosServerHelper.io.emit(eventName, data || {});
   }
 
-  public sendMessageToClosePlayers<T>(emitterId: any, eventName: string, data?: T) {
+  public sendMessageToClosePlayers<T>(emitterId: any, eventName: string, data?: T): void {
     const playersNearby = this.getPlayersOnCameraView(emitterId);
 
     if (playersNearby) {

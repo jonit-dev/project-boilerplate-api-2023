@@ -1,4 +1,4 @@
-//@ts-ignore
+// @ts-ignore
 import { Data, ServerChannel } from "@geckos.io/server";
 import { IConnectedPlayer, PlayerGeckosEvents, PlayerLogoutPayload } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -10,7 +10,7 @@ import { GeckosServerHelper } from "../geckos/GeckosServerHelper";
 export class PlayerLogout {
   constructor(private geckosMessagingHelper: GeckosMessaging) {}
 
-  public onPlayerLogout(channel: ServerChannel) {
+  public onPlayerLogout(channel: ServerChannel): void {
     channel.on(PlayerGeckosEvents.PlayerLogout, (d: Data) => {
       const data = d as PlayerLogoutPayload;
 
@@ -37,16 +37,16 @@ export class PlayerLogout {
       GeckosServerHelper.connectedPlayers = _.omit(GeckosServerHelper.connectedPlayers, data.id);
 
       // remove the player from all connected players otherPlayersInView
-      for (const [key, value] of Object.entries(GeckosServerHelper.connectedPlayers)) {
+      for (const [, value] of Object.entries(GeckosServerHelper.connectedPlayers)) {
         const player = value as IConnectedPlayer;
         if (player.otherPlayersInView[data.id]) {
           player.otherPlayersInView = _.omit(player.otherPlayersInView, data.id);
 
-          GeckosServerHelper.connectedPlayers[player.id] = player; //update player info
+          GeckosServerHelper.connectedPlayers[player.id] = player; // update player info
         }
       }
 
-      console.log(`- Total players connected:`, Object.entries(GeckosServerHelper.connectedPlayers).length);
+      console.log("- Total players connected:", Object.entries(GeckosServerHelper.connectedPlayers).length);
     });
   }
 }
