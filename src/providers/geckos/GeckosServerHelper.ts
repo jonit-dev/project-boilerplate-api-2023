@@ -40,6 +40,9 @@ export class GeckosServerHelper {
           },
         });
         GeckosServerHelper.io.addServer(httpServer);
+
+        // This will make sure geckos listen on multiple ports, according to the number of pm2 instances.
+        //! Regardless, it will only listen on the first port (5101), since Geckos does not have support for clusters yet! This hack is only made to make it work.
         GeckosServerHelper.io.listen(appEnv.port.SOCKET + Number(process.env.NODE_APP_INSTANCE));
         break;
     }
