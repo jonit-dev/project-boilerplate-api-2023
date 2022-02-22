@@ -1,3 +1,4 @@
+import { CharacterController } from "@useCases/ModuleCharacter/character/CharacterController";
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
 import { IndustriesController } from "@useCases/ModuleSystem/industries/IndustriesController";
 import { PushNotificationController } from "@useCases/ModuleSystem/operation/pushNotification/PushNotificationController";
@@ -43,4 +44,8 @@ export const formControllerContainer = new ContainerModule((bind: interfaces.Bin
 
 export const abTestsControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<ABTestController>(ABTestController).toSelf();
+});
+
+export const useCasesControllers = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
+  bind<CharacterController>(CharacterController).toSelf();
 });

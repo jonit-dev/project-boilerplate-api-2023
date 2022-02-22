@@ -1,4 +1,4 @@
-import { IAuthResponse, UserAuthFlow, UserExperience, UserGoal, UserTypes } from "@project-remote-job-board/shared";
+import { IAuthResponse, UserAuthFlow, UserTypes } from "@project-remote-job-board/shared";
 import { appEnv } from "@providers/config/env";
 import { InternalServerError } from "@providers/errors/InternalServerError";
 import { NotFoundError } from "@providers/errors/NotFoundError";
@@ -33,14 +33,13 @@ const userSchema = createSchema(
     refreshTokens: Type.array().of({
       token: Type.string(),
     }),
-    preferences: {
-      experience: Type.string({
-        enum: TypeHelper.enumToStringArray(UserExperience),
-      }),
-      goal: Type.string({
-        enum: TypeHelper.enumToStringArray(UserGoal),
-      }),
-    },
+
+    characters: Type.array().of(
+      Type.objectId({
+        ref: "Character",
+      })
+    ),
+
     // Static method types
     ...({} as {
       isValidPassword: (password: string) => Promise<boolean>;
