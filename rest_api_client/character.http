@@ -11,3 +11,10 @@ Content-Type: application/json
   "name": "Jonit",
   "gender": "Male"
 }
+
+###
+
+# Character :: Read
+GET {{baseUrl}}/characters/621440404c5f5200416fad9c HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
