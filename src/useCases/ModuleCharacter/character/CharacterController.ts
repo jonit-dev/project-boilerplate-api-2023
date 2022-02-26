@@ -44,6 +44,13 @@ export class CharacterController implements interfaces.Controller {
     return await this.readCharacterUseCase.read(id);
   }
 
+  @httpGet("/")
+  private async readAllCharacters(@request() req): Promise<ICharacter[]> {
+    const ownerId = req.user.id;
+
+    return await this.readCharacterUseCase.readAll(ownerId);
+  }
+
   @httpPatch("/:id", DTOValidatorMiddleware(UpdateCharacterDTO))
   private async updateCharacter(
     @requestParam("id") id: string,

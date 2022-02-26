@@ -15,4 +15,14 @@ export class ReadCharacterUseCase {
       ["owner"]
     );
   }
+
+  public async readAll(ownerId: string): Promise<ICharacter[]> {
+    return await this.characterRepository.readAll(
+      Character,
+      {
+        owner: ownerId,
+      },
+      ["owner"]
+    );
+  }
 }
