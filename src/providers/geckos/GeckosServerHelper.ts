@@ -1,8 +1,7 @@
 // @ts-ignore
 import { GeckosServer } from "@geckos.io/server";
 import { appEnv } from "@providers/config/env";
-import { IConnectedPlayers } from "@rpg-engine/shared";
-import { EnvType } from "@rpg-engine/shared/dist";
+import { IConnectedPlayers, EnvType } from "@rpg-engine/shared";
 import { Server } from "http";
 import { provide } from "inversify-binding-decorators";
 import { Player } from "../Player/Player";
