@@ -141,9 +141,15 @@ export class CRUD {
       const parsedFilter: any = this.mongooseQueryParser(filters);
 
       if (limit) {
-        records = Model.find(parsedFilter).limit(limit);
+        records = Model.find({
+          ...parsedFilter.parsedQuery,
+          ...parsedFilter.parsedOptions,
+        }).limit(limit);
       } else {
-        records = Model.find(parsedFilter);
+        records = Model.find({
+          ...parsedFilter.parsedQuery,
+          ...parsedFilter.parsedOptions,
+        });
       }
 
       if (sort) {

@@ -1,7 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { provide } from "inversify-binding-decorators";
-
 @provide(ReadCharacterUseCase)
 export class ReadCharacterUseCase {
   constructor(private characterRepository: CharacterRepository) {}
@@ -17,12 +16,16 @@ export class ReadCharacterUseCase {
   }
 
   public async readAll(ownerId: string): Promise<ICharacter[]> {
+    console.log("readAll characters");
+
     return await this.characterRepository.readAll(
       Character,
       {
         owner: ownerId,
       },
-      ["owner"]
+      false,
+      null,
+      true
     );
   }
 }
