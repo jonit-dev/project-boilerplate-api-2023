@@ -1,7 +1,6 @@
-import { IAuthResponse } from "@project-remote-job-board/shared";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
+import { IAuthResponse } from "@rpg-engine/shared";
 import { controller, httpPost, interfaces, request, requestBody } from "inversify-express-utils";
-
 import { AuthLoginDTO } from "../AuthDTO";
 import { LoginUseCase } from "./LoginUseCase";
 

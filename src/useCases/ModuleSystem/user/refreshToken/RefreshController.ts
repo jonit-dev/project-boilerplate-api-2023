@@ -1,9 +1,8 @@
-import { HttpStatus, IAuthRefreshTokenResponse } from "@project-remote-job-board/shared";
 import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import { TS } from "@providers/translation/TranslationHelper";
+import { HttpStatus, IAuthRefreshTokenResponse } from "@rpg-engine/shared";
 import { controller, httpPost, interfaces } from "inversify-express-utils";
-
 import { InternalServerError } from "../../../../providers/errors/InternalServerError";
 import { IAuthenticatedRequest } from "../../../../providers/types/ExpressTypes";
 import { AuthRefreshTokenDTO } from "../AuthDTO";

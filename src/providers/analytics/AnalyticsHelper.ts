@@ -1,9 +1,8 @@
 import { Identify } from "@amplitude/identify";
-import { EnvType } from "@project-remote-job-board/shared/dist";
 import { DEFAULT_DATE_FORMAT } from "@providers/constants/DateConstants";
+import { EnvType } from "@rpg-engine/shared/dist";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
-
 import { IUser } from "../../entities/ModuleSystem/UserModel";
 import { appEnv } from "../config/env";
 import { amplitudeClient, mixpanel } from "../constants/AnalyticsConstants";

@@ -1,6 +1,5 @@
-import { EnvType } from "@project-remote-job-board/shared/dist";
+import { EnvType } from "@rpg-engine/shared/dist";
 import { provide } from "inversify-binding-decorators";
-
 import { IUser } from "../../entities/ModuleSystem/UserModel";
 import { appEnv } from "../config/env";
 import { mixpanel } from "../constants/AnalyticsConstants";

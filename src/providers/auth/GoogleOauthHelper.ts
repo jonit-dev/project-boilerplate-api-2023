@@ -1,14 +1,8 @@
-import {
-  HttpStatus,
-  IGoogleConfig,
-  IGoogleOAuthIdTokenResponse,
-  IGoogleOAuthTokenPayload,
-} from "@project-remote-job-board/shared";
+import { HttpStatus, IGoogleConfig, IGoogleOAuthIdTokenResponse, IGoogleOAuthTokenPayload } from "@rpg-engine/shared";
 import axios from "axios";
 import { OAuth2Client } from "google-auth-library";
 import { google } from "googleapis";
 import { provide } from "inversify-binding-decorators";
-
 import { appEnv } from "../config/env";
 import { InternalServerError } from "../errors/InternalServerError";
 

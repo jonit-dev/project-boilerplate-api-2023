@@ -1,5 +1,5 @@
 import { TypeHelper } from "@providers/types/TypeHelper";
-import { CharacterClass, CharacterGender } from "tempTypes/CharacterTypes";
+import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const characterSchema = createSchema(

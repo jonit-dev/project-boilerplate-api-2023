@@ -1,6 +1,5 @@
-import { TranslationTypes } from "@project-remote-job-board/shared";
+import { TranslationTypes } from "@rpg-engine/shared";
 import _ from "lodash";
-
 import { appEnv } from "../config/env";
 import { ROOT_PATH } from "../constants/PathConstants";
 
@@ -17,7 +16,7 @@ export class TS {
   ): string {
     const envLang = appEnv.general.LANGUAGE!;
 
-    const jsonFile = require(`${ROOT_PATH}node_modules/@project-remote-job-board/shared/src/translations/${context}.lang.json`);
+    const jsonFile = require(`${ROOT_PATH}node_modules/@rpg-engine/shared/dist/translations/${context}.lang.json`);
 
     let translatedString: string;
 

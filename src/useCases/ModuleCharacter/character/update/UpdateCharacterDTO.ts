@@ -1,6 +1,6 @@
 import { tsDefaultDecorator, tsEnumDecorator } from "@providers/constants/ValidationConstants";
+import { CharacterGender } from "@rpg-engine/shared";
 import { IsEnum, IsOptional, IsString } from "class-validator";
-import { CharacterGender } from "tempTypes/CharacterTypes";
 import { CreateCharacterDTO } from "../create/CreateCharacterDTO";
 
 export class UpdateCharacterDTO implements CreateCharacterDTO {

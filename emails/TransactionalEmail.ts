@@ -1,4 +1,4 @@
-import { EnvType } from "@project-remote-job-board/shared/dist";
+import { EnvType } from "@rpg-engine/shared/dist";
 import { readFileSync } from "fs";
 import moment from "moment-timezone";
 import { Log } from "../src/entities/ModuleSystem/LogModel";

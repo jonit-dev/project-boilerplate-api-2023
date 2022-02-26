@@ -1,5 +1,5 @@
-import { ICountry, ICountryCity } from "@project-remote-job-board/shared/dist";
 import { cache } from "@providers/constants/CacheConstants";
+import { ICountry, ICountryCity } from "@rpg-engine/shared/dist";
 import { controller, httpGet, interfaces, requestParam } from "inversify-express-utils";
 import { ReadPlaceUseCase } from "./read/ReadPlaceUseCase";
 

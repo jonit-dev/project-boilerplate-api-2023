@@ -1,6 +1,5 @@
-import { IGoogleOAuthUserInfoResponse } from "@project-remote-job-board/shared";
+import { IGoogleOAuthUserInfoResponse } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-
 import { GoogleOAuthHelper } from "../../../../providers/auth/GoogleOauthHelper";
 
 @provide(GetGoogleUserUseCase)

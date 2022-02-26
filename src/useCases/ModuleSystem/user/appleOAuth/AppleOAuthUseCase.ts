@@ -1,11 +1,10 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { IAuthResponse, UserAuthFlow } from "@project-remote-job-board/shared";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { AppleOAuthHelper } from "@providers/auth/AppleOAuthHelper";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { UserRepository } from "@repositories/ModuleSystem/user/UserRepository";
+import { IAuthResponse, UserAuthFlow } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-
 import { AppleOAuthDTO } from "../AuthDTO";
 
 @provide(AppleOAuthUseCase)

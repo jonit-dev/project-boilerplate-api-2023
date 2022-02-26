@@ -1,5 +1,4 @@
-import { UserTypes } from "@project-remote-job-board/shared";
-
+import { UserTypes } from "@rpg-engine/shared";
 import { IUser } from "../../entities/ModuleSystem/UserModel";
 import { UnauthorizedError } from "../errors/UnauthorizedError";
 import { TS } from "../translation/TranslationHelper";

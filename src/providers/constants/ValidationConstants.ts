@@ -1,6 +1,5 @@
-import { TranslationTypes } from "@project-remote-job-board/shared/dist";
+import { TranslationTypes } from "@rpg-engine/shared/dist";
 import { ValidationArguments } from "class-validator";
-
 import { TS } from "../translation/TranslationHelper";
 import { TypeHelper } from "../types/TypeHelper";
 import { IValidationTranslation } from "../types/ValidationTypes";

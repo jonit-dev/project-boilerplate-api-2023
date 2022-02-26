@@ -1,8 +1,7 @@
-import { HttpStatus, IValidationError } from "@project-remote-job-board/shared";
+import { HttpStatus, IValidationError } from "@rpg-engine/shared";
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
 import { NextFunction, Request, Response } from "express";
-
 import { BadRequestError } from "../errors/BadRequestError";
 
 export const DTOValidatorMiddleware = (dtoClass: any) => {

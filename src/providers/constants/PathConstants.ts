@@ -1,6 +1,5 @@
-import { EnvType } from "@project-remote-job-board/shared/dist";
+import { EnvType } from "@rpg-engine/shared/dist";
 import path from "path";
-
 import { appEnv } from "../config/env";
 
 let ROOT_PATH;

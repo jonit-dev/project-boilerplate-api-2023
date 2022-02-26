@@ -1,15 +1,10 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import {
-  IGoogleOAuthIdTokenResponse,
-  IGoogleOAuthUserInfoResponse,
-  UserAuthFlow,
-} from "@project-remote-job-board/shared";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { TS } from "@providers/translation/TranslationHelper";
+import { IGoogleOAuthIdTokenResponse, IGoogleOAuthUserInfoResponse, UserAuthFlow } from "@rpg-engine/shared";
 import { Request, Response } from "express";
 import { controller, httpGet, httpPost, interfaces } from "inversify-express-utils";
-
 import { GoogleOAuthHelper } from "../../../../providers/auth/GoogleOauthHelper";
 import { appEnv } from "../../../../providers/config/env";
 import { GetGoogleUserUseCase } from "../getGoogleUser/GetGoogleUserUseCase";

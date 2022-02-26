@@ -1,8 +1,7 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { IGoogleOAuthUserInfoResponse, UserAuthFlow } from "@project-remote-job-board/shared";
+import { IGoogleOAuthUserInfoResponse, UserAuthFlow } from "@rpg-engine/shared";
 import { Request, Response } from "express";
 import { controller, httpGet, interfaces } from "inversify-express-utils";
-
 import { appEnv } from "../../../../providers/config/env";
 import { GoogleOAuthSyncUseCase } from "../googleOAuthSync/GoogleOAuthSyncUseCase";
 import { GetGoogleUserUseCase } from "./GetGoogleUserUseCase";

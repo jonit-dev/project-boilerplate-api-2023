@@ -1,5 +1,5 @@
-import { EnvType } from "@project-remote-job-board/shared/dist";
 import { appEnv } from "@providers/config/env";
+import { EnvType } from "@rpg-engine/shared/dist";
 import apicache from "apicache-plus";
 import Redis from "ioredis";
 

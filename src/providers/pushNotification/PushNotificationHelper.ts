@@ -1,8 +1,7 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { EnvType } from "@project-remote-job-board/shared/dist";
+import { EnvType } from "@rpg-engine/shared/dist";
 import firebaseAdmin from "firebase-admin";
 import { provide } from "inversify-binding-decorators";
-
 import { appEnv } from "../config/env";
 import { ENV_KEYS_PATH } from "../constants/PathConstants";
 

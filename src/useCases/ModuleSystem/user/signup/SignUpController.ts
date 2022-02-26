@@ -1,10 +1,9 @@
 import { IUser } from "@entities/ModuleSystem/UserModel";
-import { HttpStatus } from "@project-remote-job-board/shared";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
+import { HttpStatus } from "@rpg-engine/shared";
 import rateLimit from "express-rate-limit";
 import { controller, httpPost, interfaces, request, requestBody, response } from "inversify-express-utils";
-
 import { AuthSignUpDTO } from "../AuthDTO";
 import { SignUpUseCase } from "./SignUpUseCase";
 

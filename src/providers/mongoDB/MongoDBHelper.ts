@@ -1,8 +1,7 @@
-import { EnvType } from "@project-remote-job-board/shared/dist";
+import { EnvType } from "@rpg-engine/shared/dist";
 import cachegoose from "cachegoose";
 import dayjs from "dayjs";
 import mongoose from "mongoose";
-
 import { appEnv } from "../config/env";
 import { LONG_CACHE_DURATION } from "../constants/CacheConstants";
 import { DEFAULT_DATE_FORMAT } from "../constants/DateConstants";

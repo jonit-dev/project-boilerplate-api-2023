@@ -1,10 +1,9 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { IAuthResponse, IGoogleOAuthUserInfoResponse, UserAuthFlow } from "@project-remote-job-board/shared";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { TS } from "@providers/translation/TranslationHelper";
 import { UserRepository } from "@repositories/ModuleSystem/user/UserRepository";
+import { IAuthResponse, IGoogleOAuthUserInfoResponse, UserAuthFlow } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-
 import { InternalServerError } from "../../../../providers/errors/InternalServerError";
 
 @provide(GoogleOAuthSyncUseCase)

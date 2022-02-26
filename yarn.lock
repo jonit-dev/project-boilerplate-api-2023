@@ -1716,11 +1716,6 @@
   dependencies:
     debug "^4.3.1"
 
-"@project-remote-job-board/shared@^1.0.26":
-  version "1.0.26"
-  resolved "https://registry.yarnpkg.com/@project-remote-job-board/shared/-/shared-1.0.26.tgz#0a8c694c239bd622665672efce5e9ceb3858359a"
-  integrity sha512-vW9sDJ3C7q3cFeOBnADIWrjVXA+Hw6I/oLYO5pF+QnljbLvgxoiHH6TvGtk8yAZsRchr/ougq33sjEGbZQmFsw==
-
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"
@@ -1774,10 +1769,10 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@rpg-engine/shared@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.0.5.tgz#6635005117ca56578d10e67b9752f84677eeaf03"
-  integrity sha512-drKx3N1+YaooRxOUqyVWEquivLCjTPMFLFRdDirZbuQ1JcnNYNjYHE8WXn+OeP2+P+0eEhQSCdXpejfOG2QtWQ==
+"@rpg-engine/shared@0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.0.8.tgz#c17ac6584d0fc5d77a6dbb909f137315f06ddb80"
+  integrity sha512-0YwgJr85/ycc/uru38/i/lT9KkCw4apTbTEbssXnC4xAIt4VON/WIpSInBCM/mvk90EKjMfpPGVwONX0WDd58A==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"

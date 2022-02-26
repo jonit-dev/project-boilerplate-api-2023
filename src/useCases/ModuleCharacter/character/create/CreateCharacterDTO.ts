@@ -1,6 +1,6 @@
 import { tsDefaultDecorator, tsEnumDecorator } from "@providers/constants/ValidationConstants";
+import { CharacterGender } from "@rpg-engine/shared";
 import { IsDefined, IsEnum, IsNotEmpty, IsString } from "class-validator";
-import { CharacterGender } from "tempTypes/CharacterTypes";
 
 export class CreateCharacterDTO {
   @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))

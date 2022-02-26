@@ -1,11 +1,10 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { UserAuthFlow } from "@project-remote-job-board/shared";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { NotFoundError } from "@providers/errors/NotFoundError";
 import { TS } from "@providers/translation/TranslationHelper";
+import { UserAuthFlow } from "@rpg-engine/shared";
 import randomString from "crypto-random-string";
 import { provide } from "inversify-binding-decorators";
-
 import { TransactionalEmail } from "../../../../../emails/TransactionalEmail";
 import { appEnv } from "../../../../providers/config/env";
 import { InternalServerError } from "../../../../providers/errors/InternalServerError";

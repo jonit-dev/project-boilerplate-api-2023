@@ -1,10 +1,9 @@
 import { User } from "@entities/ModuleSystem/UserModel";
-import { IAuthResponse, UserAuthFlow } from "@project-remote-job-board/shared";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import { TS } from "@providers/translation/TranslationHelper";
+import { IAuthResponse, UserAuthFlow } from "@rpg-engine/shared";
 import { controller, httpPost, interfaces, request, requestBody } from "inversify-express-utils";
-
 import { AppleOAuthDTO } from "../AuthDTO";
 import { AppleOAuthUseCase } from "./AppleOAuthUseCase";
 

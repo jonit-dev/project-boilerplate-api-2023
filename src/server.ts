@@ -1,7 +1,6 @@
 import "express-async-errors";
 import "reflect-metadata";
 
-import { EnvType } from "@project-remote-job-board/shared/dist";
 import { appEnv } from "@providers/config/env";
 import { GeckosServerHelper } from "@providers/geckos/GeckosServerHelper";
 import { container, cronJobs, db, seeds, server } from "@providers/inversify/container";
@@ -9,6 +8,7 @@ import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddl
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { app } from "@providers/server/app";
 import { router } from "@providers/server/Router";
+import { EnvType } from "@rpg-engine/shared/dist";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
 

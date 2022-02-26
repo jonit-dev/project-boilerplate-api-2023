@@ -1,6 +1,6 @@
-import { ICountry, ICountryCity } from "@project-remote-job-board/shared/dist";
 import { NotFoundError } from "@providers/errors/NotFoundError";
 import { PlaceHelper } from "@providers/places/PlaceHelper";
+import { ICountry, ICountryCity } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ReadPlaceUseCase)

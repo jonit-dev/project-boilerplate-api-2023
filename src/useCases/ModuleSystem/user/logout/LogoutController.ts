@@ -1,9 +1,8 @@
-import { HttpStatus } from "@project-remote-job-board/shared";
 import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
+import { HttpStatus } from "@rpg-engine/shared";
 import { Response } from "express";
 import { controller, httpPost, interfaces, requestBody } from "inversify-express-utils";
-
 import { IAuthenticatedRequest } from "../../../../providers/types/ExpressTypes";
 import { AuthRefreshTokenDTO } from "../AuthDTO";
 import { LogoutUseCase } from "./LogoutUseCase";

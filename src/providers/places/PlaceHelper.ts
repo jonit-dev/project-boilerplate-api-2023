@@ -1,6 +1,6 @@
 import countries from "@data/countries.json";
-import { ICountry } from "@project-remote-job-board/shared/dist";
 import { NotFoundError } from "@providers/errors/NotFoundError";
+import { ICountry } from "@rpg-engine/shared/dist";
 import * as Places from "countries-cities";
 import { provide } from "inversify-binding-decorators";
 

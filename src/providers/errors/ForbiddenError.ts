@@ -1,5 +1,4 @@
-import { HttpStatus } from "@project-remote-job-board/shared";
-
+import { HttpStatus } from "@rpg-engine/shared";
 import { ApplicationError } from "./ApplicationError";
 
 export class ForbiddenError extends ApplicationError {

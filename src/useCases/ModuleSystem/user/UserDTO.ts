@@ -1,7 +1,6 @@
-import { UserExperience, UserGoal } from "@project-remote-job-board/shared/dist";
+import { UserExperience, UserGoal } from "@rpg-engine/shared/dist";
 import { Type } from "class-transformer";
 import { IsEnum, IsOptional, IsString, ValidateNested } from "class-validator";
-
 import { tsDefaultDecorator, tsEnumDecorator } from "../../../providers/constants/ValidationConstants";
 
 class UserPreferencesDTO {
