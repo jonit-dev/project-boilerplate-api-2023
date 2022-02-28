@@ -16,8 +16,6 @@ export class ReadCharacterUseCase {
   }
 
   public async readAll(ownerId: string): Promise<ICharacter[]> {
-    console.log("readAll characters");
-
     return await this.characterRepository.readAll(
       Character,
       {
