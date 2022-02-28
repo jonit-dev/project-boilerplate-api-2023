@@ -11,6 +11,8 @@ export class PlayerCreate {
 
   public onPlayerCreate(channel: ServerChannel): void {
     channel.on(PlayerGeckosEvents.PlayerCreate, (d: Data) => {
+      console.log(channel.userData);
+
       const data = d as IConnectedPlayer;
 
       if (!GeckosServerHelper.connectedPlayers[data.id]) {

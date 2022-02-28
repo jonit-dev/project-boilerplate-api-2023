@@ -1,7 +1,11 @@
+import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { IUser } from "@entities/ModuleSystem/UserModel";
 // @ts-ignore
-import { GeckosServer } from "@geckos.io/server";
+import { GeckosServer, ServerChannel } from "@geckos.io/server";
 import { appEnv } from "@providers/config/env";
-import { IConnectedPlayers, EnvType } from "@rpg-engine/shared";
+import { UnauthorizedError } from "@providers/errors/UnauthorizedError";
+import { GeckosAuthMiddleware } from "@providers/middlewares/GeckosAuthMiddleware";
+import { EnvType, IConnectedPlayers } from "@rpg-engine/shared";
 import { Server } from "http";
 import { provide } from "inversify-binding-decorators";
 import { Player } from "../Player/Player";
@@ -25,6 +29,11 @@ export class GeckosServerHelper {
             min: 20000,
             max: 20005,
           },
+          authorization: GeckosAuthMiddleware,
+          cors: {
+            origin: "*",
+            allowAuthorization: true,
+          }, // required if the client and server are on separate domains
         });
         GeckosServerHelper.io.addServer(httpServer);
         GeckosServerHelper.io.listen(appEnv.port.SOCKET);
@@ -37,6 +46,11 @@ export class GeckosServerHelper {
             min: 20000,
             max: 20100,
           },
+          authorization: GeckosAuthMiddleware,
+          cors: {
+            origin: "*",
+            allowAuthorization: true,
+          }, // required if the client and server are on separate domains
         });
         GeckosServerHelper.io.addServer(httpServer);
 
@@ -49,6 +63,22 @@ export class GeckosServerHelper {
 
     GeckosServerHelper.io.onConnection((channel) => {
       this.geckosPlayerHelper.onAddEventListeners(channel);
+    });
+  }
+
+  public authChannelOn<T>(channel: ServerChannel, event: string, callback: (data: T) => void): void {
+    channel.on(event, async (data: any) => {
+      // check if authenticated user actually owns the character (we'll fetch it from the payload id);
+      const user = channel.userData as IUser;
+      const character = (await Character.findOne({
+        id: data.id,
+      })) as ICharacter;
+
+      if (!user.characters?.includes(character.id)) {
+        throw new UnauthorizedError("You don't own this character!");
+      }
+
+      callback(data);
     });
   }
 }
