@@ -1,5 +1,6 @@
 // @ts-ignore
 import { Data, ServerChannel } from "@geckos.io/server";
+import { GeckosAuth } from "@providers/geckos/GeckosAuth";
 import {
   GRID_HEIGHT,
   GRID_WIDTH,
@@ -22,10 +23,14 @@ interface INextMovements {
 export class PlayerUpdate {
   private nextMovements: INextMovements = {};
 
-  constructor(private geckosMessagingHelper: GeckosMessaging, private dataRetransmission: DataRetransmission) {}
+  constructor(
+    private geckosMessagingHelper: GeckosMessaging,
+    private dataRetransmission: DataRetransmission,
+    private geckosAuth: GeckosAuth
+  ) {}
 
   public onPlayerUpdatePosition(channel: ServerChannel): void {
-    channel.on(PlayerGeckosEvents.PlayerPositionUpdate, (d: Data) => {
+    this.geckosAuth.authCharacterOn(channel, PlayerGeckosEvents.PlayerPositionUpdate, (d: Data) => {
       const data = d as IConnectedPlayer;
 
       if (data) {

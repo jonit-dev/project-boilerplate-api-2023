@@ -1,5 +1,6 @@
 // @ts-ignore
 import { Data, ServerChannel } from "@geckos.io/server";
+import { GeckosAuth } from "@providers/geckos/GeckosAuth";
 import { IConnectedPlayer, PlayerGeckosEvents, PlayerLogoutPayload } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -8,10 +9,10 @@ import { GeckosServerHelper } from "../geckos/GeckosServerHelper";
 
 @provide(PlayerLogout)
 export class PlayerLogout {
-  constructor(private geckosMessagingHelper: GeckosMessaging) {}
+  constructor(private geckosMessagingHelper: GeckosMessaging, private geckosAuth: GeckosAuth) {}
 
   public onPlayerLogout(channel: ServerChannel): void {
-    channel.on(PlayerGeckosEvents.PlayerLogout, (d: Data) => {
+    this.geckosAuth.authCharacterOn(channel, PlayerGeckosEvents.PlayerLogout, (d: Data) => {
       const data = d as PlayerLogoutPayload;
 
       // warn nearby players that the emitter logged out
