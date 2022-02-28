@@ -1,9 +1,6 @@
-import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
-import { IUser } from "@entities/ModuleSystem/UserModel";
 // @ts-ignore
-import { GeckosServer, ServerChannel } from "@geckos.io/server";
+import { GeckosServer } from "@geckos.io/server";
 import { appEnv } from "@providers/config/env";
-import { UnauthorizedError } from "@providers/errors/UnauthorizedError";
 import { GeckosAuthMiddleware } from "@providers/middlewares/GeckosAuthMiddleware";
 import { EnvType, IConnectedPlayers } from "@rpg-engine/shared";
 import { Server } from "http";
@@ -63,22 +60,6 @@ export class GeckosServerHelper {
 
     GeckosServerHelper.io.onConnection((channel) => {
       this.geckosPlayerHelper.onAddEventListeners(channel);
-    });
-  }
-
-  public authChannelOn<T>(channel: ServerChannel, event: string, callback: (data: T) => void): void {
-    channel.on(event, async (data: any) => {
-      // check if authenticated user actually owns the character (we'll fetch it from the payload id);
-      const user = channel.userData as IUser;
-      const character = (await Character.findOne({
-        id: data.id,
-      })) as ICharacter;
-
-      if (!user.characters?.includes(character.id)) {
-        throw new UnauthorizedError("You don't own this character!");
-      }
-
-      callback(data);
     });
   }
 }

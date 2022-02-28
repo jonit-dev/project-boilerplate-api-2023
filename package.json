@@ -67,7 +67,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
-    "@rpg-engine/shared": "0.0.8",
+    "@rpg-engine/shared": "^0.1.6",
     "@types/bcrypt": "^3.0.0",
     "@types/cheerio": "^0.22.23",
     "@types/express": "^4.17.8",

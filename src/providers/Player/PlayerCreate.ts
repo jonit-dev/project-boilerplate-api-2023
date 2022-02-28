@@ -1,5 +1,6 @@
 // @ts-ignore
-import { Data, ServerChannel } from "@geckos.io/server";
+import { ServerChannel } from "@geckos.io/server";
+import { GeckosAuth } from "@providers/geckos/GeckosAuth";
 import { IConnectedPlayer, PlayerGeckosEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { GeckosMessaging } from "../geckos/GeckosMessaging";
@@ -7,14 +8,10 @@ import { GeckosServerHelper } from "../geckos/GeckosServerHelper";
 
 @provide(PlayerCreate)
 export class PlayerCreate {
-  constructor(private geckosMessagingHelper: GeckosMessaging) {}
+  constructor(private geckosMessagingHelper: GeckosMessaging, private geckosAuth: GeckosAuth) {}
 
   public onPlayerCreate(channel: ServerChannel): void {
-    channel.on(PlayerGeckosEvents.PlayerCreate, (d: Data) => {
-      console.log(channel.userData);
-
-      const data = d as IConnectedPlayer;
-
+    this.geckosAuth.authCharacterOn(channel, PlayerGeckosEvents.PlayerCreate, (data: IConnectedPlayer) => {
       if (!GeckosServerHelper.connectedPlayers[data.id]) {
         // if there's no player with this id connected, add it.
         console.log(`💡: Player ${data.name} has connected!`);
