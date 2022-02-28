@@ -44,6 +44,29 @@ const characterSchema = createSchema(
       default: false,
       required: true,
     }),
+    cameraCoordinates: {
+      x: Type.number({
+        default: 0,
+        required: true,
+      }),
+      y: Type.number({
+        default: 0,
+        required: true,
+      }),
+      width: Type.number({
+        default: 0,
+        required: true,
+      }),
+      height: Type.number({
+        default: 0,
+        required: true,
+      }),
+    },
+    otherPlayersInView: Type.array().of(Type.string()),
+    scene: Type.string({
+      required: true,
+      default: "MainScene",
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

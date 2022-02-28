@@ -5,7 +5,7 @@ import { GeckosAuthMiddleware } from "@providers/middlewares/GeckosAuthMiddlewar
 import { EnvType, IConnectedPlayers } from "@rpg-engine/shared";
 import { Server } from "http";
 import { provide } from "inversify-binding-decorators";
-import { Player } from "../Player/Player";
+import { Player } from "../player/Player";
 
 @provide(GeckosServerHelper)
 export class GeckosServerHelper {
