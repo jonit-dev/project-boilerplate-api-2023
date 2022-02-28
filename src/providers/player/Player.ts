@@ -31,6 +31,7 @@ export class Player {
       {
         $set: {
           isOnline: false,
+          otherPlayersInView: [],
         },
       }
     );

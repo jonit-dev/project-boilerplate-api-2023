@@ -1,5 +1,6 @@
+import { Character } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
-import { Data, ServerChannel } from "@geckos.io/server";
+import { ServerChannel } from "@geckos.io/server";
 import { GeckosAuth } from "@providers/geckos/GeckosAuth";
 import { IConnectedPlayer, PlayerGeckosEvents, PlayerLogoutPayload } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -12,8 +13,10 @@ export class PlayerLogout {
   constructor(private geckosMessagingHelper: GeckosMessaging, private geckosAuth: GeckosAuth) {}
 
   public onPlayerLogout(channel: ServerChannel): void {
-    this.geckosAuth.authCharacterOn(channel, PlayerGeckosEvents.PlayerLogout, (d: Data) => {
+    this.geckosAuth.authCharacterOn(channel, PlayerGeckosEvents.PlayerLogout, async (d) => {
       const data = d as PlayerLogoutPayload;
+
+      const character = d.character;
 
       // warn nearby players that the emitter logged out
 
@@ -35,6 +38,24 @@ export class PlayerLogout {
       }
 
       console.log(`🚪: Player id ${data.id} has disconnected`);
+
+      character.isOnline = false;
+      character.otherPlayersInView = [];
+      await character.save();
+
+      await Character.updateMany(
+        {
+          otherPlayersInView: {
+            $in: [data.id],
+          },
+        },
+        {
+          $pull: {
+            otherPlayersInView: data.id,
+          },
+        }
+      );
+
       GeckosServerHelper.connectedPlayers = _.omit(GeckosServerHelper.connectedPlayers, data.id);
 
       // remove the player from all connected players otherPlayersInView

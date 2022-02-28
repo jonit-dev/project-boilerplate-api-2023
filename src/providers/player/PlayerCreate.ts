@@ -51,6 +51,7 @@ export class PlayerCreate {
       console.log(`💡: Player ${data.name} has connected!`);
       console.log(data);
 
+      //! REMOVE
       GeckosServerHelper.connectedPlayers[data.id] = {
         ...data,
         lastActivity: Date.now(),

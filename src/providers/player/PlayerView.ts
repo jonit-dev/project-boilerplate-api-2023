@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 
 @provide(PlayerView)
 export class PlayerView {
@@ -10,8 +11,14 @@ export class PlayerView {
     for (const otherCharIds of otherCharactersIds) {
       const otherCharacter = await Character.findById(otherCharIds);
 
-      if (otherCharacter) {
+      if (
+        otherCharacter &&
+        otherCharacter._id !== originCharacter._id &&
+        !otherCharacter.otherPlayersInView?.includes(originCharacter._id)
+      ) {
         otherCharacter.otherPlayersInView?.push(originCharacter._id);
+        otherCharacter.otherPlayersInView = _.uniq(otherCharacter.otherPlayersInView);
+
         await otherCharacter.save();
       }
     }

@@ -7,7 +7,6 @@ export class GeckosConnection {
   public async getConnectedCharacters(): Promise<ICharacter[]> {
     return await Character.find({
       isOnline: true,
-      otherPlayersInView: [],
     }).lean();
   }
 }
