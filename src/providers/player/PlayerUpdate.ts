@@ -1,3 +1,4 @@
+import { Character } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
 import { Data, ServerChannel } from "@geckos.io/server";
 import { GeckosAuth } from "@providers/geckos/GeckosAuth";
@@ -13,16 +14,8 @@ import { DataRetransmission } from "../geckos/DataRetransmission";
 import { GeckosMessaging } from "../geckos/GeckosMessaging";
 import { GeckosServerHelper } from "../geckos/GeckosServerHelper";
 
-interface INextMovements {
-  [direction: string]: {
-    x: number;
-    y: number;
-  };
-}
 @provide(PlayerUpdate)
 export class PlayerUpdate {
-  private nextMovements: INextMovements = {};
-
   constructor(
     private geckosMessagingHelper: GeckosMessaging,
     private dataRetransmission: DataRetransmission,
@@ -32,9 +25,10 @@ export class PlayerUpdate {
   public onPlayerUpdatePosition(channel: ServerChannel): void {
     this.geckosAuth.authCharacterOn(channel, PlayerGeckosEvents.PlayerPositionUpdate, (d: Data) => {
       const data = d as IConnectedPlayer;
+      const character = data.character;
 
       if (data) {
-        const player = GeckosServerHelper.connectedPlayers[data.id];
+        const player = character;
 
         console.log(`📨 Received ${PlayerGeckosEvents.PlayerPositionUpdate}(${player?.name}): ${JSON.stringify(data)}`);
 
@@ -68,10 +62,8 @@ export class PlayerUpdate {
         // update emitter position from connectedPlayers
         this.updateServerSideEmitterInfo(data);
 
-        const updated = GeckosServerHelper.connectedPlayers[data.id];
-
         console.log(
-          `🆕 Updated ${updated.name} data: x: ${updated.x}, y: ${updated.y} direction: ${updated.direction}`
+          `🆕 Updated ${character.name} data: x: ${character.x}, y: ${character.y} direction: ${character.direction}`
         );
       }
     });
@@ -81,7 +73,7 @@ export class PlayerUpdate {
     //! always return false for now
     console.log("checking if requested position update is valid...");
 
-    const player = GeckosServerHelper.connectedPlayers[data.id];
+    const player = data.character;
 
     if (Math.round(player.x) === Math.round(data.x) && Math.round(player.y) === Math.round(data.y)) {
       return true; // initial movement origin is the same as our server representation. It means it's valid!
@@ -90,7 +82,7 @@ export class PlayerUpdate {
     return false;
   }
 
-  private updateServerSideEmitterInfo(data: IConnectedPlayer): void {
+  private async updateServerSideEmitterInfo(data: IConnectedPlayer): Promise<void> {
     const updatedData = data;
 
     if (data.isMoving) {
@@ -110,6 +102,8 @@ export class PlayerUpdate {
           break;
       }
     }
+
+    await Character.updateOne({ _id: data.character._id }, { $set: { x: updatedData.x, y: updatedData.y } });
 
     GeckosServerHelper.connectedPlayers[data.id] = {
       ...updatedData,
