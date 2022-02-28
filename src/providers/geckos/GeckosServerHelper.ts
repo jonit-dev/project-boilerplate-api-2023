@@ -58,8 +58,10 @@ export class GeckosServerHelper {
         break;
     }
 
-    GeckosServerHelper.io.onConnection((channel) => {
-      this.geckosPlayerHelper.onAddEventListeners(channel);
+    await this.geckosPlayerHelper.setAllCharactersAsOffline();
+
+    GeckosServerHelper.io.onConnection(async (channel) => {
+      await this.geckosPlayerHelper.onAddEventListeners(channel);
     });
   }
 }

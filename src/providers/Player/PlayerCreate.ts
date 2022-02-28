@@ -11,7 +11,11 @@ export class PlayerCreate {
   constructor(private geckosMessagingHelper: GeckosMessaging, private geckosAuth: GeckosAuth) {}
 
   public onPlayerCreate(channel: ServerChannel): void {
-    this.geckosAuth.authCharacterOn(channel, PlayerGeckosEvents.PlayerCreate, (data: IConnectedPlayer) => {
+    this.geckosAuth.authCharacterOn(channel, PlayerGeckosEvents.PlayerCreate, async (data: IConnectedPlayer) => {
+      const character = data.character;
+      character.isOnline = true;
+      await character.save();
+
       if (!GeckosServerHelper.connectedPlayers[data.id]) {
         // if there's no player with this id connected, add it.
         console.log(`💡: Player ${data.name} has connected!`);
