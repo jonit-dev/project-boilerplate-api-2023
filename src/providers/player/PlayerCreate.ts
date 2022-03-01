@@ -37,10 +37,6 @@ export class PlayerCreate {
           isMoving: false,
         };
 
-        const otherPlayersInView = await this.playerView.getCharactersInView(character);
-
-        await this.playerView.bidirectionalUpdateCharactersInView(character, otherPlayersInView);
-
         // update server camera coordinates and other players in view
         //! Refactor once client is refactored!
         //! Warning: this is being passed by the client, so it can't be trusted! Refactor later to calculate this on server side!
@@ -93,7 +89,6 @@ export class PlayerCreate {
           direction: nearbyPlayer.direction,
           isMoving: false,
           cameraCoordinates: nearbyPlayer.cameraCoordinates,
-          otherPlayersInView: {},
         };
 
         // tell the emitter about these other players too

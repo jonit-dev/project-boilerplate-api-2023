@@ -67,13 +67,6 @@ const characterSchema = createSchema(
         required: true,
       }),
     },
-    otherPlayersInView: Type.array().of({
-      id: Type.string(),
-      name: Type.string(),
-      x: Type.number(),
-      y: Type.number(),
-      direction: Type.string(),
-    }),
     scene: Type.string({
       required: true,
       default: "MainScene",
