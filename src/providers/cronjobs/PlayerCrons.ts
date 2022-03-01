@@ -34,7 +34,6 @@ export class PlayerCrons {
         });
 
         player.isOnline = false;
-        player.otherPlayersInView = [];
         await player.save();
       }
     }
