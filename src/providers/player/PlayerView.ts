@@ -1,33 +1,41 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { IOtherPlayer } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
 
 @provide(PlayerView)
 export class PlayerView {
   public async bidirectionalUpdateCharactersInView(
     originCharacter: ICharacter,
-    otherCharactersIds: string[]
+    otherCharacters: ICharacter[]
   ): Promise<void> {
-    for (const otherCharIds of otherCharactersIds) {
-      const otherCharacter = await Character.findById(otherCharIds);
+    for (const otherChars of otherCharacters) {
+      const otherCharacter = await Character.findById(otherChars);
 
-      if (
-        otherCharacter &&
-        otherCharacter._id !== originCharacter._id &&
-        !otherCharacter.otherPlayersInView?.includes(originCharacter._id)
-      ) {
-        otherCharacter.otherPlayersInView?.push(originCharacter._id);
-        otherCharacter.otherPlayersInView = _.uniq(otherCharacter.otherPlayersInView);
+      if (!otherCharacter) {
+        continue;
+      }
 
+      //! Update on other character
+      const otherCharacterHasOriginCharacter = otherCharacter.otherPlayersInView?.some(
+        (p: IOtherPlayer) => p.id === originCharacter._id
+      );
+      if (!otherCharacterHasOriginCharacter) {
+        otherCharacter.otherPlayersInView?.push(originCharacter);
         await otherCharacter.save();
       }
-    }
+      //! Update on origin player
 
-    originCharacter.otherPlayersInView = otherCharactersIds;
-    await originCharacter.save();
+      const originCharacterHasOtherCharacter = originCharacter.otherPlayersInView?.some(
+        (p) => p.id === otherCharacter._id
+      );
+      if (!originCharacterHasOtherCharacter) {
+        originCharacter.otherPlayersInView?.push(otherCharacter);
+        await originCharacter.save();
+      }
+    }
   }
 
-  public async getCharactersInView(character: ICharacter, idsOnly: boolean = true): Promise<ICharacter[] | string[]> {
+  public async getCharactersInView(character: ICharacter): Promise<ICharacter[]> {
     if (!character.cameraCoordinates) {
       console.log("Error: character has no camera coordinates");
       return [];
@@ -58,11 +66,6 @@ export class PlayerView {
         },
       ],
     });
-
-    if (idsOnly) {
-      return otherCharactersInView.map((character) => character._id);
-    }
-
     return otherCharactersInView as unknown as ICharacter[];
   }
 }

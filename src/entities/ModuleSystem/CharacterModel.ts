@@ -13,18 +13,23 @@ const characterSchema = createSchema(
     }),
     health: Type.number({
       default: 100,
+      required: true,
     }),
     mana: Type.number({
       default: 100,
+      required: true,
     }),
     x: Type.number({
       default: 160,
+      required: true,
     }),
     y: Type.number({
       default: 192,
+      required: true,
     }),
     direction: Type.string({
       default: "down",
+      required: true,
     }),
     class: Type.string({
       required: true,
@@ -62,11 +67,18 @@ const characterSchema = createSchema(
         required: true,
       }),
     },
-    otherPlayersInView: Type.array().of(Type.string()),
+    otherPlayersInView: Type.array().of({
+      id: Type.string(),
+      name: Type.string(),
+      x: Type.number(),
+      y: Type.number(),
+      direction: Type.string(),
+    }),
     scene: Type.string({
       required: true,
       default: "MainScene",
     }),
+    channelId: Type.string(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

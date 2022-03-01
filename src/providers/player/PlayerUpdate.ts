@@ -1,6 +1,6 @@
-import { Character } from "@entities/ModuleSystem/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
-import { Data, ServerChannel } from "@geckos.io/server";
+import { ServerChannel } from "@geckos.io/server";
 import { GeckosAuth } from "@providers/geckos/GeckosAuth";
 import {
   GRID_HEIGHT,
@@ -12,7 +12,6 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { DataRetransmission } from "../geckos/DataRetransmission";
 import { GeckosMessaging } from "../geckos/GeckosMessaging";
-import { GeckosServerHelper } from "../geckos/GeckosServerHelper";
 
 @provide(PlayerUpdate)
 export class PlayerUpdate {
@@ -23,66 +22,64 @@ export class PlayerUpdate {
   ) {}
 
   public onPlayerUpdatePosition(channel: ServerChannel): void {
-    this.geckosAuth.authCharacterOn(channel, PlayerGeckosEvents.PlayerPositionUpdate, (d: Data) => {
-      const data = d as IConnectedPlayer;
-      const character = data.character;
+    this.geckosAuth.authCharacterOn(
+      channel,
+      PlayerGeckosEvents.PlayerPositionUpdate,
+      async (data: IConnectedPlayer, character: ICharacter) => {
+        if (data) {
+          const player = character;
 
-      if (data) {
-        const player = character;
+          console.log(
+            `📨 Received ${PlayerGeckosEvents.PlayerPositionUpdate}(${player?.name}): ${JSON.stringify(data)}`
+          );
 
-        console.log(`📨 Received ${PlayerGeckosEvents.PlayerPositionUpdate}(${player?.name}): ${JSON.stringify(data)}`);
+          // send message back to the user telling that the requested position update is not valid!
 
-        // send message back to the user telling that the requested position update is not valid!
+          const isPositionUpdateValid = this.checkIfValidPositionUpdate(data, character);
 
-        const isPositionUpdateValid = this.checkIfValidPositionUpdate(data);
+          this.geckosMessagingHelper.sendEventToUser<IPlayerPositionUpdateConfirm>(
+            data.channelId,
+            PlayerGeckosEvents.PlayerPositionUpdateConfirm,
+            {
+              id: data.id,
+              isValid: isPositionUpdateValid,
+              direction: data.direction!,
+            }
+          );
 
-        this.geckosMessagingHelper.sendEventToUser<IPlayerPositionUpdateConfirm>(
-          data.channelId,
-          PlayerGeckosEvents.PlayerPositionUpdateConfirm,
-          {
-            id: data.id,
-            isValid: isPositionUpdateValid,
-            direction: data.direction!,
+          if (!isPositionUpdateValid) {
+            return;
           }
-        );
 
-        if (!isPositionUpdateValid) {
-          return;
+          await this.dataRetransmission.bidirectionalDataRetransmission(
+            character,
+            data,
+            PlayerGeckosEvents.PlayerPositionUpdate,
+            ["x", "y", "direction"],
+            {
+              isMoving: false,
+            }
+          );
+
+          // update emitter position from connectedPlayers
+          await this.updateServerSideEmitterInfo(data, character);
         }
-
-        this.dataRetransmission.bidirectionalDataRetransmission(
-          data,
-          PlayerGeckosEvents.PlayerPositionUpdate,
-          ["x", "y", "direction"],
-          {
-            isMoving: false,
-          }
-        );
-
-        // update emitter position from connectedPlayers
-        this.updateServerSideEmitterInfo(data);
-
-        console.log(
-          `🆕 Updated ${character.name} data: x: ${character.x}, y: ${character.y} direction: ${character.direction}`
-        );
       }
-    });
+    );
   }
 
-  private checkIfValidPositionUpdate(data: IConnectedPlayer): boolean {
+  private checkIfValidPositionUpdate(data: IConnectedPlayer, character: ICharacter): boolean {
     //! always return false for now
     console.log("checking if requested position update is valid...");
 
-    const player = data.character;
-
-    if (Math.round(player.x) === Math.round(data.x) && Math.round(player.y) === Math.round(data.y)) {
+    if (Math.round(character.x) === Math.round(data.x) && Math.round(character.y) === Math.round(data.y)) {
       return true; // initial movement origin is the same as our server representation. It means it's valid!
     }
 
     return false;
   }
 
-  private async updateServerSideEmitterInfo(data: IConnectedPlayer): Promise<void> {
+  private async updateServerSideEmitterInfo(data: IConnectedPlayer, character: ICharacter): Promise<void> {
     const updatedData = data;
 
     if (data.isMoving) {
@@ -103,11 +100,16 @@ export class PlayerUpdate {
       }
     }
 
-    await Character.updateOne({ _id: data.character._id }, { $set: { x: updatedData.x, y: updatedData.y } });
-
-    GeckosServerHelper.connectedPlayers[data.id] = {
-      ...updatedData,
-      lastActivity: Date.now(),
-    };
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        $set: {
+          x: updatedData.x,
+          y: updatedData.y,
+          direction: data.direction,
+          cameraCoordinates: data.cameraCoordinates,
+        },
+      }
+    );
   }
 }

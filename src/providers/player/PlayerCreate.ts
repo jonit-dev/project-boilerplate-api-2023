@@ -3,7 +3,6 @@ import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { ServerChannel } from "@geckos.io/server";
 import { GeckosAuth } from "@providers/geckos/GeckosAuth";
 import { GeckosConnection } from "@providers/geckos/GeckosConnection";
-import { GeckosServerHelper } from "@providers/geckos/GeckosServerHelper";
 import { IConnectedPlayer, PlayerGeckosEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { GeckosMessaging } from "../geckos/GeckosMessaging";
@@ -19,75 +18,91 @@ export class PlayerCreate {
   ) {}
 
   public onPlayerCreate(channel: ServerChannel): void {
-    this.geckosAuth.authCharacterOn(channel, PlayerGeckosEvents.PlayerCreate, async (data: IConnectedPlayer) => {
-      const character = data.character;
-      character.isOnline = true;
-      await character.save();
+    this.geckosAuth.authCharacterOn(
+      channel,
+      PlayerGeckosEvents.PlayerCreate,
+      async (data: IConnectedPlayer, character: ICharacter) => {
+        character.isOnline = true;
+        character.channelId = data.channelId;
+        await character.save();
 
-      // here we inject our server side character properties, to make sure the client is not hacking anything!
-      data = {
-        ...data,
-        name: character.name,
-        x: character.x,
-        y: character.y,
-        direction: character.direction,
-        isMoving: false,
-      };
+        // here we inject our server side character properties, to make sure the client is not hacking anything!
+        data = {
+          ...data,
+          id: character._id,
+          name: character.name,
+          x: character.x!,
+          y: character.y!,
+          direction: character.direction,
+          isMoving: false,
+        };
 
-      const otherPlayersInViewIds = await this.playerView.getCharactersInView(character as unknown as ICharacter);
+        const otherPlayersInView = await this.playerView.getCharactersInView(character);
 
-      await this.playerView.bidirectionalUpdateCharactersInView(
-        character as unknown as ICharacter,
-        otherPlayersInViewIds as string[]
-      );
+        await this.playerView.bidirectionalUpdateCharactersInView(character, otherPlayersInView);
 
-      // update server camera coordinates and other players in view
-      //! Refactor once client is refactored!
-      //! Warning: this is being passed by the client, so it can't be trusted! Refactor later to calculate this on server side!
-      character.cameraCoordinates = data.cameraCoordinates;
-      await character.save();
+        // update server camera coordinates and other players in view
+        //! Refactor once client is refactored!
+        //! Warning: this is being passed by the client, so it can't be trusted! Refactor later to calculate this on server side!
+        character.cameraCoordinates = data.cameraCoordinates;
+        await character.save();
 
-      // if there's no player with this id connected, add it.
-      console.log(`💡: Player ${data.name} has connected!`);
-      console.log(data);
+        // if there's no player with this id connected, add it.
+        console.log(`💡: Player ${data.name} has connected!`);
+        console.log(data);
 
-      //! REMOVE
-      GeckosServerHelper.connectedPlayers[data.id] = {
-        ...data,
-        lastActivity: Date.now(),
-      };
+        channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
 
-      channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
+        const connectedCharacters = await this.geckosConnection.getConnectedCharacters();
 
-      const connectedCharacters = await this.geckosConnection.getConnectedCharacters();
+        console.log("- Total players connected:", connectedCharacters.length);
 
-      console.log("- Total players connected:", connectedCharacters.length);
-
-      this.sendCreationMessageToPlayers(data.channelId, data.id, data);
-    });
+        this.sendCreationMessageToPlayers(data.channelId, data.id, data, character);
+      }
+    );
   }
 
-  public sendCreationMessageToPlayers(emitterChannelId: string, emitterId: string, data: IConnectedPlayer): void {
-    const nearbyPlayers = this.geckosMessagingHelper.getPlayersOnCameraView(emitterId);
+  public async sendCreationMessageToPlayers(
+    emitterChannelId: string,
+    emitterId: string,
+    data: IConnectedPlayer,
+    character: ICharacter
+  ): Promise<void> {
+    const nearbyPlayers = await this.playerView.getCharactersInView(character);
 
     console.log("warning nearby players...");
     console.log(nearbyPlayers.map((p) => p.name).join(", "));
 
     if (nearbyPlayers.length > 0) {
-      for (const player of nearbyPlayers) {
+      for (const nearbyPlayer of nearbyPlayers) {
         // tell other player that we exist, so it can create a new instance of us
         this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
-          player.channelId,
+          nearbyPlayer.channelId!,
           PlayerGeckosEvents.PlayerCreate,
           data
         );
+
+        //! Refactor this!
+
+        const nearbyPlayerPayload = {
+          id: nearbyPlayer._id,
+          name: nearbyPlayer.name,
+          x: nearbyPlayer.x,
+          y: nearbyPlayer.y,
+          channelId: nearbyPlayer.channelId!,
+          direction: nearbyPlayer.direction,
+          isMoving: false,
+          cameraCoordinates: nearbyPlayer.cameraCoordinates,
+          otherPlayersInView: {},
+        };
 
         // tell the emitter about these other players too
 
         this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
           emitterChannelId,
           PlayerGeckosEvents.PlayerCreate,
-          player
+          // @ts-ignore
+          nearbyPlayerPayload
         );
       }
     }

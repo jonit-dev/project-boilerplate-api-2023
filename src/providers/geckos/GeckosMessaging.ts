@@ -1,12 +1,14 @@
 // @ts-ignore
+import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { MathHelper } from "@providers/math/MathHelper";
-import { CAMERA_VIEWPORT_WIDTH, GRID_WIDTH, ICameraCoordinates, IConnectedPlayer } from "@rpg-engine/shared";
+import { PlayerView } from "@providers/player/PlayerView";
+import { CAMERA_VIEWPORT_WIDTH, GRID_WIDTH, ICameraCoordinates } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { GeckosServerHelper } from "./GeckosServerHelper";
 
 @provide(GeckosMessaging)
 export class GeckosMessaging {
-  constructor(private mathHelper: MathHelper) {}
+  constructor(private mathHelper: MathHelper, private playerView: PlayerView) {}
 
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
     GeckosServerHelper.io.room(userChannel).emit(eventName, data || {});
@@ -16,47 +18,15 @@ export class GeckosMessaging {
     GeckosServerHelper.io.emit(eventName, data || {});
   }
 
-  public sendMessageToClosePlayers<T>(emitterId: any, eventName: string, data?: T): void {
-    const playersNearby = this.getPlayersOnCameraView(emitterId);
+  public async sendMessageToClosePlayers(character: ICharacter, eventName: string, data?: any): Promise<void> {
+    const playersNearby = await this.playerView.getCharactersInView(character);
 
     if (playersNearby) {
       for (const player of playersNearby) {
         console.log(`📨 Sending ${eventName} to ${player.name} (channel: ${player.channelId})`);
-        this.sendEventToUser(player.channelId, eventName, data || {});
+        this.sendEventToUser(player.channelId!, eventName, data || {});
       }
     }
-  }
-
-  public getPlayersOnCameraView(emitterId: string): IConnectedPlayer[] {
-    const otherPlayers = GeckosServerHelper.connectedPlayers;
-
-    const emitterPlayer = otherPlayers[emitterId];
-
-    if (!emitterPlayer) {
-      console.log("Error: emitter player not found to calculate distance");
-      return [];
-    }
-
-    const playersUnderRange: IConnectedPlayer[] = [];
-
-    for (const [playerId, player] of Object.entries(otherPlayers)) {
-      if (playerId === emitterPlayer.id) {
-        continue; // avoid sending to self
-      }
-
-      if (
-        this.isUnderPlayerCamera(
-          player.x, // we have to multiply because emitter x,y is on grid format
-          player.y,
-          emitterPlayer.cameraCoordinates
-        ) ||
-        this.isUnderPlayerCamera(emitterPlayer.x, emitterPlayer.y, player.cameraCoordinates)
-      ) {
-        playersUnderRange.push(player);
-      }
-    }
-
-    return playersUnderRange;
   }
 
   private isUnderPlayerCamera(x: number, y: number, camera: ICameraCoordinates): boolean {

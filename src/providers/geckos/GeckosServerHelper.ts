@@ -2,7 +2,7 @@
 import { GeckosServer } from "@geckos.io/server";
 import { appEnv } from "@providers/config/env";
 import { GeckosAuthMiddleware } from "@providers/middlewares/GeckosAuthMiddleware";
-import { EnvType, IConnectedPlayers } from "@rpg-engine/shared";
+import { EnvType } from "@rpg-engine/shared";
 import { Server } from "http";
 import { provide } from "inversify-binding-decorators";
 import { Player } from "../player/Player";
@@ -12,8 +12,6 @@ export class GeckosServerHelper {
   public static io: GeckosServer;
 
   constructor(private geckosPlayerHelper: Player) {}
-
-  public static connectedPlayers: IConnectedPlayers = {};
 
   public async init(httpServer: Server): Promise<void> {
     // import geckos as ESM

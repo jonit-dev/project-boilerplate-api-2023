@@ -1,11 +1,13 @@
-import { Events } from "@rpg-engine/shared";
+import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { PlayerView } from "@providers/player/PlayerView";
+import { Events, IOtherPlayerInView } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { GeckosMessaging } from "../geckos/GeckosMessaging";
 
 export interface IBaseData {
   id: string;
   channelId: string;
-  otherPlayersInView: IAbstractPlayerData;
+  otherPlayersInView: IOtherPlayerInView;
 }
 
 export interface IAbstractPlayerData {
@@ -14,22 +16,23 @@ export interface IAbstractPlayerData {
 
 @provide(DataRetransmission)
 export class DataRetransmission {
-  constructor(private geckosMessagingHelper: GeckosMessaging) {}
+  constructor(private geckosMessagingHelper: GeckosMessaging, private playerView: PlayerView) {}
 
-  public bidirectionalDataRetransmission<DataType extends IBaseData>(
+  public async bidirectionalDataRetransmission<DataType extends IBaseData>(
+    originCharacter: ICharacter,
     data: DataType,
     event: Events,
     checkKeysForChangeToUpdateEmitter: string[],
     sendAdditionalDataToEmitter?: Record<string, unknown>
-  ): void {
+  ): Promise<void> {
     //! Case 1: Warn close players about my data update!
 
-    this.geckosMessagingHelper.sendMessageToClosePlayers(data.id, event, data);
+    await this.geckosMessagingHelper.sendMessageToClosePlayers(originCharacter, event, data);
 
     //! Case 2: Warn emitter about other players data
 
     // update the emitter nearby players positions
-    const nearbyPlayers = this.geckosMessagingHelper.getPlayersOnCameraView(data.id) as IAbstractPlayerData[];
+    const nearbyPlayers = await this.playerView.getCharactersInView(originCharacter);
 
     if (nearbyPlayers) {
       for (const nearbyPlayer of nearbyPlayers) {
@@ -37,7 +40,7 @@ export class DataRetransmission {
         // if we dont have this player in our emitter view
         // if we have this player in our view, BUT the data representation we have on the server is different than the data representation we have on the client
 
-        if (this.emitterHasAlreadyPlayerData(data, nearbyPlayer, checkKeysForChangeToUpdateEmitter)) {
+        if (await this.emitterHasAlreadyPlayerData(data, nearbyPlayer, checkKeysForChangeToUpdateEmitter)) {
           console.log(
             `Emitter ${data.id} already has player ${nearbyPlayer.name} position data updated. Skipping sending package.`
           );
@@ -57,28 +60,31 @@ export class DataRetransmission {
             dataToSubmit[key] = nearbyPlayer[key];
           }
 
-          console.log("submitting data to emitter ", dataToSubmit);
-
-          this.geckosMessagingHelper.sendEventToUser<any>(data.channelId, event, {
+          const payload = {
             ...dataToSubmit,
             ...sendAdditionalDataToEmitter,
-          });
+          };
+
+          console.log("submitting data to emitter ", payload);
+
+          this.geckosMessagingHelper.sendEventToUser<any>(data.channelId, event, payload);
         }
       }
     }
   }
 
   private emitterHasAlreadyPlayerData(
-    emitterData: IBaseData,
-    nearbyPlayer: IAbstractPlayerData,
+    clientEmitterData: IBaseData, // what's coming from the client
+    serverNearbyPlayer: IAbstractPlayerData, // what we have on the server
     checkKeysToUpdate: string[]
   ): boolean {
-    const emitterInfoAboutNearbyPlayer = emitterData.otherPlayersInView[nearbyPlayer.id];
+    const emitterInfoAboutNearbyPlayer = clientEmitterData.otherPlayersInView[serverNearbyPlayer.id];
 
     if (!emitterInfoAboutNearbyPlayer) return false;
 
+    // Compares nearbyPlayer server side data with the data that the client has (if it matches, we dont need to update them!)
     for (const key of checkKeysToUpdate) {
-      if (nearbyPlayer[key] !== emitterInfoAboutNearbyPlayer[key]) {
+      if (serverNearbyPlayer[key] !== emitterInfoAboutNearbyPlayer[key]) {
         return false;
       }
     }
