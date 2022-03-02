@@ -10,7 +10,7 @@ export class CreateCharacterUseCase {
   constructor(private characterRepository: CharacterRepository) {}
 
   public async create(newCharacter: CreateCharacterDTO, ownerId: string): Promise<ICharacter> {
-    // add character to user
+    // assign character to user
     const user = await User.findOne({ _id: ownerId });
     if (!user) {
       throw new BadRequestError("Character creation error: User not found!");

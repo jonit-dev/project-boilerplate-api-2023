@@ -1,0 +1,52 @@
+version: "3"
+services:
+  rpg-api:
+    container_name: rpg-api
+    restart: always
+    build: .
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    env_file: .env
+    ports:
+      - "$SERVER_PORT:$SERVER_PORT"
+      - "9229:9229" # debugging port
+      - "$SOCKET_PORT:$SOCKET_PORT"
+      - "$SOCKET_UDP_RANGE"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      FORCE_COLOR: "true"
+    links:
+      - rpg-db
+    depends_on:
+      - rpg-db
+    networks:
+      - rpg-network
+  rpg-db:
+    container_name: rpg-db
+    image: mongo
+    restart: always
+    command: mongod --port ${MONGO_PORT}
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - ./docker_scripts/:/docker-entrypoint-initdb.d
+    ports:
+      - "$MONGO_PORT:$MONGO_PORT"
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - rpg-network
+
+networks:
+  rpg-network:
+    driver: bridge
+    external: true

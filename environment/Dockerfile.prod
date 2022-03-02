@@ -1,0 +1,25 @@
+FROM node:16-slim
+
+RUN apt-get update
+
+RUN apt-get install g++ -y
+
+# Where our app will live in the container
+WORKDIR /usr/src/app
+
+# Move package.json and package.lock.json into our container root path (./). It will be used to install all of them later, with npm install
+COPY package.json yarn.lock ./
+
+# Install dependencies
+RUN yarn --frozen-lockfile
+
+# Copy our current root to the docker root
+COPY . .
+
+# Expose port, so we can access our server.
+EXPOSE 5002
+EXPOSE 5100
+EXPOSE 5101
+
+# This will run our npm run dev command under package.json
+CMD ["yarn","start:prod"]
