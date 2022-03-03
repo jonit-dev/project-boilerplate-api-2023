@@ -19,6 +19,7 @@ services:
       - /usr/src/app/node_modules
     environment:
       FORCE_COLOR: "true"
+      CHOKIDAR_USEPOLLING: "true" # enables hot-reloading on windows host
     links:
       - rpg-db
     depends_on:
