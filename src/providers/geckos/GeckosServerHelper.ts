@@ -20,6 +20,7 @@ export class GeckosServerHelper {
     switch (appEnv.general.ENV) {
       case EnvType.Development:
         GeckosServerHelper.io = geckos({
+          iceServers: [],
           portRange: {
             min: 20000,
             max: 20005,
