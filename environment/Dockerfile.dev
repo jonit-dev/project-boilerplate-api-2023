@@ -17,7 +17,7 @@ RUN yarn --frozen-lockfile
 COPY . .
 
 # Expose port, so we can access our server.
-EXPOSE 4002
+EXPOSE 5002
 EXPOSE 5100
 EXPOSE 5101
 
