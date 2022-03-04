@@ -1,4 +1,4 @@
-import { SocketTypes } from "@providers/sockets/SocketsTypes";
+import { SocketTypes } from "@rpg-engine/shared";
 
 export const appEnv = {
   general: {
