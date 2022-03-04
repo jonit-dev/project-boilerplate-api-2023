@@ -1,8 +1,8 @@
 import { appEnv } from "@providers/config/env";
 import { SOCKET_IO_CONFIG } from "@providers/constants/SocketsConstants";
+import { ISocket } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Server as SocketIOServer, Socket } from "socket.io";
-import { ISocket } from "./SocketsTypes";
 
 @provide(SocketIO)
 export class SocketIO implements ISocket {

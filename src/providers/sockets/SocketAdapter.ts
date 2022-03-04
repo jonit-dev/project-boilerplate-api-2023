@@ -1,9 +1,10 @@
 // @ts-ignore
 import { player } from "@providers/inversify/container";
+import { ISocket, SocketTypes } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { GeckosIO } from "./GeckosIO";
 import { SocketIO } from "./SocketIO";
-import { ISocket, SocketClasses, SocketTypes } from "./SocketsTypes";
+import { SocketClasses } from "./SocketsTypes";
 
 @provide(SocketAdapter)
 export class SocketAdapter implements ISocket {
