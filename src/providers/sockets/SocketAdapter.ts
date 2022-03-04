@@ -7,7 +7,7 @@ import { ISocket, SocketClasses, SocketTypes } from "./SocketsTypes";
 
 @provide(SocketAdapter)
 export class SocketAdapter implements ISocket {
-  public static socketClass: SocketClasses;
+  public static socketClass: SocketClasses; // Setting this method as static is necessary, otherwise it will be undefined after every injection (state does not persist!);
 
   constructor(private socketIO: SocketIO, private geckosIO: GeckosIO) {}
 

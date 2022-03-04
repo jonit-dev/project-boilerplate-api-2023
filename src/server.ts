@@ -13,7 +13,7 @@ import * as Tracing from "@sentry/tracing";
 
 const port = appEnv.general.SERVER_PORT || 3002;
 
-const expressServer = app.listen(port, async () => {
+app.listen(port, async () => {
   server.showBootstrapMessage({
     appName: appEnv.general.APP_NAME!,
     port: appEnv.general.SERVER_PORT!,

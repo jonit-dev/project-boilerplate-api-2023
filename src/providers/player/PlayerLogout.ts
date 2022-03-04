@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
-import { GeckosConnection } from "@providers/geckos/GeckosConnection";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
+import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { PlayerGeckosEvents, PlayerLogoutPayload } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SocketMessaging } from "../sockets/SocketMessaging";
@@ -13,7 +13,7 @@ export class PlayerLogout {
   constructor(
     private geckosMessagingHelper: SocketMessaging,
     private socketAuth: SocketAuth,
-    private geckosConnection: GeckosConnection,
+    private socketConnection: SocketConnection,
     private playerView: PlayerView
   ) {}
 
@@ -37,7 +37,7 @@ export class PlayerLogout {
         character.isOnline = false;
         await character.save();
 
-        const connectedPlayers = await this.geckosConnection.getConnectedCharacters();
+        const connectedPlayers = await this.socketConnection.getConnectedCharacters();
 
         console.log("- Total players connected:", connectedPlayers.length);
       }

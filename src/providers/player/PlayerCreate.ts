@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
-import { GeckosConnection } from "@providers/geckos/GeckosConnection";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
+import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { IConnectedPlayer, PlayerGeckosEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SocketMessaging } from "../sockets/SocketMessaging";
@@ -13,7 +13,7 @@ export class PlayerCreate {
   constructor(
     private geckosMessagingHelper: SocketMessaging,
     private socketAuth: SocketAuth,
-    private geckosConnection: GeckosConnection,
+    private geckosConnection: SocketConnection,
     private playerView: PlayerView
   ) {}
 

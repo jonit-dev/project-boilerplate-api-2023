@@ -11,13 +11,13 @@ import {
   PlayerGeckosEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { DataRetransmission } from "../geckos/DataRetransmission";
+import { SocketRetransmission } from "../sockets/SocketRetransmission";
 
 @provide(PlayerUpdate)
 export class PlayerUpdate {
   constructor(
     private socketMessaging: SocketMessaging,
-    private dataRetransmission: DataRetransmission,
+    private dataRetransmission: SocketRetransmission,
     private socketAuth: SocketAuth
   ) {}
 
