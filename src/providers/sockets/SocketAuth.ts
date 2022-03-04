@@ -8,8 +8,10 @@ export class SocketAuth {
   public authCharacterOn(channel, event: string, callback: (data, character: ICharacter, owner: IUser) => void): void {
     try {
       channel.on(event, async (data: any) => {
+        console.log("AUTHDATA", channel.handshake.query);
+
         // check if authenticated user actually owns the character (we'll fetch it from the payload id);
-        const owner = channel.userData || (channel.handshake.userData as IUser);
+        const owner = channel.userData || (channel.handshake.query.userData as IUser);
         const character = await Character.findOne({
           _id: data.id,
           owner: owner.id,

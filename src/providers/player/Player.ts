@@ -17,8 +17,6 @@ export class Player {
   ) {}
 
   public onAddEventListeners(channel: ServerChannel): void {
-    console.log("player listeners added");
-
     this.playerCreate.onPlayerCreate(channel);
     this.playerLogout.onPlayerLogout(channel);
     this.playerUpdate.onPlayerUpdatePosition(channel);

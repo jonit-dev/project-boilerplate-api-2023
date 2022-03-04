@@ -1,5 +1,6 @@
 import { appEnv } from "@providers/config/env";
 import { SOCKET_IO_CONFIG } from "@providers/constants/SocketsConstants";
+import { SocketIOAuthMiddleware } from "@providers/middlewares/SocketIOAuthMiddleware";
 import { ISocket } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Server as SocketIOServer, Socket } from "socket.io";
@@ -13,6 +14,7 @@ export class SocketIO implements ISocket {
 
   public init(): void {
     this.socket = new SocketIOServer(SOCKET_IO_CONFIG);
+    this.socket.use(SocketIOAuthMiddleware);
     this.socket.listen(appEnv.socket.port.SOCKET);
   }
 
