@@ -31,7 +31,7 @@ export class GeckosServerHelper {
             allowAuthorization: true,
           }, // required if the client and server are on separate domains
         });
-        GeckosServerHelper.io.listen(appEnv.port.SOCKET);
+        GeckosServerHelper.io.listen(appEnv.socket.port.SOCKET);
 
         break;
       case EnvType.Staging:
@@ -51,7 +51,7 @@ export class GeckosServerHelper {
         // This will make sure geckos listen on multiple ports, according to the number of pm2 instances.
         //! Regardless, it will only listen on the first port (5101), since Geckos does not have support for clusters yet! This hack is only made to make it work.
         //! Discussion: https://github.com/geckosio/geckos.io/discussions/178
-        GeckosServerHelper.io.listen(appEnv.port.SOCKET + Number(process.env.NODE_APP_INSTANCE));
+        GeckosServerHelper.io.listen(appEnv.socket.port.SOCKET + Number(process.env.NODE_APP_INSTANCE));
         break;
     }
 

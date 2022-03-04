@@ -2,20 +2,20 @@
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { PlayerView } from "@providers/player/PlayerView";
+import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { CAMERA_VIEWPORT_WIDTH, GRID_WIDTH, ICameraCoordinates } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { GeckosServerHelper } from "./GeckosServerHelper";
 
 @provide(GeckosMessaging)
 export class GeckosMessaging {
-  constructor(private mathHelper: MathHelper, private playerView: PlayerView) {}
+  constructor(private mathHelper: MathHelper, private playerView: PlayerView, private socketAdapter: SocketAdapter) {}
 
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
-    GeckosServerHelper.io.room(userChannel).emit(eventName, data || {});
+    this.socketAdapter.emitToUser(userChannel, eventName, data || {});
   }
 
   public sendEventToAllUsers<T>(eventName: string, data?: T): void {
-    GeckosServerHelper.io.emit(eventName, data || {});
+    this.socketAdapter.emitToAllUsers(eventName, data || {});
   }
 
   public async sendMessageToClosePlayers(character: ICharacter, eventName: string, data?: any): Promise<void> {

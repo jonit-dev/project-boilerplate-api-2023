@@ -1,3 +1,4 @@
+import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { Container } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
 import { Cronjob } from "../cronjobs/CronJobs";
@@ -27,5 +28,6 @@ export const db = container.get<Database>(Database);
 export const cronJobs = container.get<Cronjob>(Cronjob);
 export const seeds = container.get<Seeder>(Seeder);
 export const server = container.get<ServerHelper>(ServerHelper);
+export const socketAdapter = container.get<SocketAdapter>(SocketAdapter);
 
 export { container };

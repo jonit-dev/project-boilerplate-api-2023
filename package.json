@@ -59,6 +59,7 @@
     "number-string": "^1.1.5",
     "randomstring": "^1.2.1",
     "rss-parser": "^3.12.0",
+    "socket.io": "^4.4.1",
     "speakingurl": "^14.0.1",
     "utf8": "^3.0.0"
   },
