@@ -6,8 +6,8 @@ import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { CAMERA_VIEWPORT_WIDTH, GRID_WIDTH, ICameraCoordinates } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-@provide(GeckosMessaging)
-export class GeckosMessaging {
+@provide(SocketMessaging)
+export class SocketMessaging {
   constructor(private mathHelper: MathHelper, private playerView: PlayerView, private socketAdapter: SocketAdapter) {}
 
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {

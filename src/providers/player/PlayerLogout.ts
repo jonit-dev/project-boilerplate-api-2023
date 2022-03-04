@@ -1,24 +1,24 @@
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
-import { GeckosAuth } from "@providers/geckos/GeckosAuth";
 import { GeckosConnection } from "@providers/geckos/GeckosConnection";
+import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { PlayerGeckosEvents, PlayerLogoutPayload } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { GeckosMessaging } from "../geckos/GeckosMessaging";
+import { SocketMessaging } from "../sockets/SocketMessaging";
 import { PlayerView } from "./PlayerView";
 
 @provide(PlayerLogout)
 export class PlayerLogout {
   constructor(
-    private geckosMessagingHelper: GeckosMessaging,
-    private geckosAuth: GeckosAuth,
+    private geckosMessagingHelper: SocketMessaging,
+    private socketAuth: SocketAuth,
     private geckosConnection: GeckosConnection,
     private playerView: PlayerView
   ) {}
 
   public onPlayerLogout(channel: ServerChannel): void {
-    this.geckosAuth.authCharacterOn(
+    this.socketAuth.authCharacterOn(
       channel,
       PlayerGeckosEvents.PlayerLogout,
       async (data: PlayerLogoutPayload, character: ICharacter) => {

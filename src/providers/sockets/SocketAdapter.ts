@@ -1,14 +1,13 @@
 // @ts-ignore
-import { ServerChannel } from "@geckos.io/server";
+import { player } from "@providers/inversify/container";
 import { provide } from "inversify-binding-decorators";
-import { Socket } from "socket.io";
 import { GeckosIO } from "./GeckosIO";
 import { SocketIO } from "./SocketIO";
 import { ISocket, SocketClasses, SocketTypes } from "./SocketsTypes";
 
 @provide(SocketAdapter)
 export class SocketAdapter implements ISocket {
-  public socket: SocketClasses;
+  public static socketClass: SocketClasses;
 
   constructor(private socketIO: SocketIO, private geckosIO: GeckosIO) {}
 
@@ -17,25 +16,31 @@ export class SocketAdapter implements ISocket {
       case SocketTypes.TCP:
         console.log("🔌 Initializing TCP socket...");
         this.socketIO.init();
-        this.socket = this.socketIO;
+        SocketAdapter.socketClass = this.socketIO;
         break;
       case SocketTypes.UDP:
         console.log("🔌 Initializing UDP socket...");
         await this.geckosIO.init();
-        this.socket = this.geckosIO;
+        SocketAdapter.socketClass = this.geckosIO;
         break;
     }
+
+    this.onConnect();
+
+    await player.setAllCharactersAsOffline();
   }
 
   public emitToUser<T>(channel: string, eventName: string, data?: T): void {
-    this.socket.emitToUser(channel, eventName, data);
+    SocketAdapter.socketClass.emitToUser(channel, eventName, data);
   }
 
   public emitToAllUsers<T>(eventName: string, data?: T): void {
-    this.socket.emitToAllUsers(eventName, data);
+    SocketAdapter.socketClass.emitToAllUsers(eventName, data);
   }
 
-  public getChannel(): Socket | ServerChannel {
-    return this.socket.channel;
+  public onConnect(): void {
+    SocketAdapter.socketClass.onConnect((channel) => {
+      player.onAddEventListeners(channel);
+    });
   }
 }

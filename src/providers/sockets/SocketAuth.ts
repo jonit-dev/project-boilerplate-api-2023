@@ -4,8 +4,8 @@ import { IUser } from "@entities/ModuleSystem/UserModel";
 import { ServerChannel } from "@geckos.io/server";
 import { provide } from "inversify-binding-decorators";
 
-@provide(GeckosAuth)
-export class GeckosAuth {
+@provide(SocketAuth)
+export class SocketAuth {
   // this event makes sure that the user who's triggering the request actually owns the character!
   public authCharacterOn(
     channel: ServerChannel,

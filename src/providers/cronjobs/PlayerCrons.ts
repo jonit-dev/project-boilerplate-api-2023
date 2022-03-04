@@ -1,5 +1,5 @@
 import { Character } from "@entities/ModuleSystem/CharacterModel";
-import { GeckosMessaging } from "@providers/geckos/GeckosMessaging";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { PlayerGeckosEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
@@ -7,7 +7,7 @@ import nodeCron from "node-cron";
 
 @provide(PlayerCrons)
 export class PlayerCrons {
-  constructor(private geckosMessaging: GeckosMessaging) {}
+  constructor(private socketMessaging: SocketMessaging) {}
 
   public schedule(): void {
     nodeCron.schedule("*/10 * * * *", async () => {
@@ -28,8 +28,8 @@ export class PlayerCrons {
 
       if (diff >= 10) {
         console.log(`🚪: Player id ${player.id} has disconnected due to inactivity...`);
-        this.geckosMessaging.sendEventToUser(player.channelId!, PlayerGeckosEvents.PlayerForceDisconnect);
-        this.geckosMessaging.sendMessageToClosePlayers(player, PlayerGeckosEvents.PlayerLogout, {
+        this.socketMessaging.sendEventToUser(player.channelId!, PlayerGeckosEvents.PlayerForceDisconnect);
+        this.socketMessaging.sendMessageToClosePlayers(player, PlayerGeckosEvents.PlayerLogout, {
           id: player.id,
         });
 

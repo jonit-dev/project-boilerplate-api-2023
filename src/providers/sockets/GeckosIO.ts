@@ -1,5 +1,5 @@
 // @ts-ignore
-import { GeckosServer, ServerChannel } from "@geckos.io/server";
+import { GeckosServer } from "@geckos.io/server";
 import { appEnv } from "@providers/config/env";
 import { GECKOS_CONFIG } from "@providers/constants/SocketsConstants";
 import { EnvType } from "@rpg-engine/shared";
@@ -9,7 +9,6 @@ import { ISocket } from "./SocketsTypes";
 @provide(GeckosIO)
 export class GeckosIO implements ISocket {
   private socket: GeckosServer;
-  public channel: ServerChannel;
 
   constructor() {}
 
@@ -37,7 +36,7 @@ export class GeckosIO implements ISocket {
     return this.socket.emit(eventName, data || {});
   }
 
-  public onConnect(onConnectFn: (channel: ServerChannel) => void): void {
+  public onConnect(onConnectFn: (channel) => void): void {
     this.socket.onConnection((channel) => {
       onConnectFn(channel);
     });

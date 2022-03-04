@@ -1,4 +1,5 @@
 import { appEnv } from "@providers/config/env";
+import { SOCKET_IO_CONFIG } from "@providers/constants/SocketsConstants";
 import { provide } from "inversify-binding-decorators";
 import { Server as SocketIOServer, Socket } from "socket.io";
 import { ISocket } from "./SocketsTypes";
@@ -11,7 +12,7 @@ export class SocketIO implements ISocket {
   public channel: Socket;
 
   public init(): void {
-    this.socket = new SocketIOServer();
+    this.socket = new SocketIOServer(SOCKET_IO_CONFIG);
     this.socket.listen(appEnv.socket.port.SOCKET);
   }
 
@@ -21,5 +22,11 @@ export class SocketIO implements ISocket {
 
   public emitToAllUsers<T>(eventName: string, data?: T): void {
     this.socket.emit(eventName, data || {});
+  }
+
+  public onConnect(onConnectFn: (channel) => void): void {
+    this.socket.on("connection", (channel) => {
+      onConnectFn(channel);
+    });
   }
 }

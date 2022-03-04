@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { PlayerView } from "@providers/player/PlayerView";
 import { Events, IOtherPlayerInView } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { GeckosMessaging } from "../geckos/GeckosMessaging";
+import { SocketMessaging } from "../sockets/SocketMessaging";
 
 export interface IBaseData {
   id: string;
@@ -16,7 +16,7 @@ export interface IAbstractPlayerData {
 
 @provide(DataRetransmission)
 export class DataRetransmission {
-  constructor(private geckosMessagingHelper: GeckosMessaging, private playerView: PlayerView) {}
+  constructor(private socketMessaging: SocketMessaging, private playerView: PlayerView) {}
 
   public async bidirectionalDataRetransmission<DataType extends IBaseData>(
     originCharacter: ICharacter,
@@ -27,7 +27,7 @@ export class DataRetransmission {
   ): Promise<void> {
     //! Case 1: Warn close players about my data update!
 
-    await this.geckosMessagingHelper.sendMessageToClosePlayers(originCharacter, event, data);
+    await this.socketMessaging.sendMessageToClosePlayers(originCharacter, event, data);
 
     //! Case 2: Warn emitter about other players data
 
@@ -67,7 +67,7 @@ export class DataRetransmission {
 
           console.log("submitting data to emitter ", payload);
 
-          this.geckosMessagingHelper.sendEventToUser<any>(data.channelId, event, payload);
+          this.socketMessaging.sendEventToUser<any>(data.channelId, event, payload);
         }
       }
     }
