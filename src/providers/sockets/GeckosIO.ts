@@ -2,9 +2,8 @@
 import { GeckosServer } from "@geckos.io/server";
 import { appEnv } from "@providers/config/env";
 import { GECKOS_CONFIG } from "@providers/constants/SocketsConstants";
-import { EnvType } from "@rpg-engine/shared";
+import { EnvType, ISocket } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ISocket } from "./SocketsTypes";
 
 @provide(GeckosIO)
 export class GeckosIO implements ISocket {
