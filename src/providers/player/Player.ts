@@ -17,8 +17,6 @@ export class Player {
   ) {}
 
   public onAddEventListeners(channel: ServerChannel): void {
-    // This runs once the server is fully started and ready to accept connections.
-
     this.playerCreate.onPlayerCreate(channel);
     this.playerLogout.onPlayerLogout(channel);
     this.playerUpdate.onPlayerUpdatePosition(channel);

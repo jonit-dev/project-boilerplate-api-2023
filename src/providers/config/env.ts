@@ -1,3 +1,5 @@
+import { SocketTypes } from "@rpg-engine/shared";
+
 export const appEnv = {
   general: {
     APP_NAME: process.env.APP_NAME,
@@ -60,8 +62,11 @@ export const appEnv = {
       SENDINBLUE_API_KEY: process.env.SENDINBLUE_API_KEY,
     },
   },
-  port: {
-    SOCKET_SERVER: Number(process.env.SOCKET_SERVER_PORT),
-    SOCKET: Number(process.env.SOCKET_PORT),
+
+  socket: {
+    type: process.env.SOCKET_TYPE as unknown as SocketTypes,
+    port: {
+      SOCKET: Number(process.env.SOCKET_PORT),
+    },
   },
 };

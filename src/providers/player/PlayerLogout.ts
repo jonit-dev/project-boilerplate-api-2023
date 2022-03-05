@@ -1,24 +1,24 @@
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
-import { GeckosAuth } from "@providers/geckos/GeckosAuth";
-import { GeckosConnection } from "@providers/geckos/GeckosConnection";
+import { SocketAuth } from "@providers/sockets/SocketAuth";
+import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { PlayerGeckosEvents, PlayerLogoutPayload } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { GeckosMessaging } from "../geckos/GeckosMessaging";
+import { SocketMessaging } from "../sockets/SocketMessaging";
 import { PlayerView } from "./PlayerView";
 
 @provide(PlayerLogout)
 export class PlayerLogout {
   constructor(
-    private geckosMessagingHelper: GeckosMessaging,
-    private geckosAuth: GeckosAuth,
-    private geckosConnection: GeckosConnection,
+    private geckosMessagingHelper: SocketMessaging,
+    private socketAuth: SocketAuth,
+    private socketConnection: SocketConnection,
     private playerView: PlayerView
   ) {}
 
   public onPlayerLogout(channel: ServerChannel): void {
-    this.geckosAuth.authCharacterOn(
+    this.socketAuth.authCharacterOn(
       channel,
       PlayerGeckosEvents.PlayerLogout,
       async (data: PlayerLogoutPayload, character: ICharacter) => {
@@ -37,7 +37,7 @@ export class PlayerLogout {
         character.isOnline = false;
         await character.save();
 
-        const connectedPlayers = await this.geckosConnection.getConnectedCharacters();
+        const connectedPlayers = await this.socketConnection.getConnectedCharacters();
 
         console.log("- Total players connected:", connectedPlayers.length);
       }

@@ -1,7 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
-import { GeckosAuth } from "@providers/geckos/GeckosAuth";
+import { SocketAuth } from "@providers/sockets/SocketAuth";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   GRID_HEIGHT,
   GRID_WIDTH,
@@ -10,19 +11,18 @@ import {
   PlayerGeckosEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { DataRetransmission } from "../geckos/DataRetransmission";
-import { GeckosMessaging } from "../geckos/GeckosMessaging";
+import { SocketRetransmission } from "../sockets/SocketRetransmission";
 
 @provide(PlayerUpdate)
 export class PlayerUpdate {
   constructor(
-    private geckosMessagingHelper: GeckosMessaging,
-    private dataRetransmission: DataRetransmission,
-    private geckosAuth: GeckosAuth
+    private socketMessaging: SocketMessaging,
+    private dataRetransmission: SocketRetransmission,
+    private socketAuth: SocketAuth
   ) {}
 
   public onPlayerUpdatePosition(channel: ServerChannel): void {
-    this.geckosAuth.authCharacterOn(
+    this.socketAuth.authCharacterOn(
       channel,
       PlayerGeckosEvents.PlayerPositionUpdate,
       async (data: IConnectedPlayer, character: ICharacter) => {
@@ -37,7 +37,7 @@ export class PlayerUpdate {
 
           const isPositionUpdateValid = this.checkIfValidPositionUpdate(data, character);
 
-          this.geckosMessagingHelper.sendEventToUser<IPlayerPositionUpdateConfirm>(
+          this.socketMessaging.sendEventToUser<IPlayerPositionUpdateConfirm>(
             data.channelId,
             PlayerGeckosEvents.PlayerPositionUpdateConfirm,
             {

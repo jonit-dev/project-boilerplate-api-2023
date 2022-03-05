@@ -2,8 +2,7 @@ import "express-async-errors";
 import "reflect-metadata";
 
 import { appEnv } from "@providers/config/env";
-import { GeckosServerHelper } from "@providers/geckos/GeckosServerHelper";
-import { container, cronJobs, db, seeds, server } from "@providers/inversify/container";
+import { cronJobs, db, seeds, server, socketAdapter } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { app } from "@providers/server/app";
@@ -14,7 +13,7 @@ import * as Tracing from "@sentry/tracing";
 
 const port = appEnv.general.SERVER_PORT || 3002;
 
-const expressServer = app.listen(port, async () => {
+app.listen(port, async () => {
   server.showBootstrapMessage({
     appName: appEnv.general.APP_NAME!,
     port: appEnv.general.SERVER_PORT!,
@@ -39,9 +38,7 @@ const expressServer = app.listen(port, async () => {
 
   await seeds.start();
 
-  const geckosServerHelper = container.get<GeckosServerHelper>(GeckosServerHelper);
-
-  await geckosServerHelper.init(expressServer);
+  await socketAdapter.init(appEnv.socket.type);
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({

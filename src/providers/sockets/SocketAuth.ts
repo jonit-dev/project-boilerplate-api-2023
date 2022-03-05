@@ -1,21 +1,17 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { IUser } from "@entities/ModuleSystem/UserModel";
-// @ts-ignore
-import { ServerChannel } from "@geckos.io/server";
 import { provide } from "inversify-binding-decorators";
 
-@provide(GeckosAuth)
-export class GeckosAuth {
+@provide(SocketAuth)
+export class SocketAuth {
   // this event makes sure that the user who's triggering the request actually owns the character!
-  public authCharacterOn(
-    channel: ServerChannel,
-    event: string,
-    callback: (data, character: ICharacter, owner: IUser) => void
-  ): void {
+  public authCharacterOn(channel, event: string, callback: (data, character: ICharacter, owner: IUser) => void): void {
     try {
       channel.on(event, async (data: any) => {
+        console.log("AUTHDATA", channel.handshake.query);
+
         // check if authenticated user actually owns the character (we'll fetch it from the payload id);
-        const owner = channel.userData as IUser;
+        const owner = channel.userData || (channel.handshake.query.userData as IUser);
         const character = await Character.findOne({
           _id: data.id,
           owner: owner.id,
