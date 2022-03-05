@@ -1,6 +1,6 @@
 import { Character } from "@entities/ModuleSystem/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { PlayerGeckosEvents } from "@rpg-engine/shared";
+import { PlayerSocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
@@ -28,8 +28,10 @@ export class PlayerCrons {
 
       if (diff >= 10) {
         console.log(`🚪: Player id ${player.id} has disconnected due to inactivity...`);
-        this.socketMessaging.sendEventToUser(player.channelId!, PlayerGeckosEvents.PlayerForceDisconnect);
-        this.socketMessaging.sendMessageToClosePlayers(player, PlayerGeckosEvents.PlayerLogout, {
+        this.socketMessaging.sendEventToUser(player.channelId!, PlayerSocketEvents.PlayerForceDisconnect, {
+          reason: "You have were disconnected due to inactivity!",
+        });
+        this.socketMessaging.sendMessageToClosePlayers(player, PlayerSocketEvents.PlayerLogout, {
           id: player.id,
         });
 

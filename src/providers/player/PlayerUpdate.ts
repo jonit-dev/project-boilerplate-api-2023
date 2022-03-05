@@ -8,7 +8,7 @@ import {
   GRID_WIDTH,
   IConnectedPlayer,
   IPlayerPositionUpdateConfirm,
-  PlayerGeckosEvents,
+  PlayerSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SocketRetransmission } from "../sockets/SocketRetransmission";
@@ -24,13 +24,13 @@ export class PlayerUpdate {
   public onPlayerUpdatePosition(channel: ServerChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      PlayerGeckosEvents.PlayerPositionUpdate,
+      PlayerSocketEvents.PlayerPositionUpdate,
       async (data: IConnectedPlayer, character: ICharacter) => {
         if (data) {
           const player = character;
 
           console.log(
-            `📨 Received ${PlayerGeckosEvents.PlayerPositionUpdate}(${player?.name}): ${JSON.stringify(data)}`
+            `📨 Received ${PlayerSocketEvents.PlayerPositionUpdate}(${player?.name}): ${JSON.stringify(data)}`
           );
 
           // send message back to the user telling that the requested position update is not valid!
@@ -39,7 +39,7 @@ export class PlayerUpdate {
 
           this.socketMessaging.sendEventToUser<IPlayerPositionUpdateConfirm>(
             data.channelId,
-            PlayerGeckosEvents.PlayerPositionUpdateConfirm,
+            PlayerSocketEvents.PlayerPositionUpdateConfirm,
             {
               id: data.id,
               isValid: isPositionUpdateValid,
@@ -54,7 +54,7 @@ export class PlayerUpdate {
           await this.dataRetransmission.bidirectionalDataRetransmission(
             character,
             data,
-            PlayerGeckosEvents.PlayerPositionUpdate,
+            PlayerSocketEvents.PlayerPositionUpdate,
             ["x", "y", "direction"],
             {
               isMoving: false,

@@ -3,7 +3,7 @@ import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { ServerChannel } from "@geckos.io/server";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
-import { PlayerGeckosEvents, PlayerLogoutPayload } from "@rpg-engine/shared";
+import { PlayerLogoutPayload, PlayerSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SocketMessaging } from "../sockets/SocketMessaging";
 import { PlayerView } from "./PlayerView";
@@ -20,14 +20,14 @@ export class PlayerLogout {
   public onPlayerLogout(channel: ServerChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      PlayerGeckosEvents.PlayerLogout,
+      PlayerSocketEvents.PlayerLogout,
       async (data: PlayerLogoutPayload, character: ICharacter) => {
         const nearbyPlayers = await this.playerView.getCharactersInView(character);
 
         for (const player of nearbyPlayers) {
           this.geckosMessagingHelper.sendEventToUser<PlayerLogoutPayload>(
             player.channelId!,
-            PlayerGeckosEvents.PlayerLogout,
+            PlayerSocketEvents.PlayerLogout,
             data
           );
         }

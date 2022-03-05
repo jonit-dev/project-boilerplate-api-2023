@@ -3,7 +3,7 @@ import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { ServerChannel } from "@geckos.io/server";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
-import { IConnectedPlayer, PlayerGeckosEvents } from "@rpg-engine/shared";
+import { IConnectedPlayer, PlayerSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SocketMessaging } from "../sockets/SocketMessaging";
 import { PlayerView } from "./PlayerView";
@@ -14,14 +14,24 @@ export class PlayerCreate {
     private geckosMessagingHelper: SocketMessaging,
     private socketAuth: SocketAuth,
     private geckosConnection: SocketConnection,
-    private playerView: PlayerView
+    private playerView: PlayerView,
+    private socketMessaging: SocketMessaging
   ) {}
 
   public onPlayerCreate(channel: ServerChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      PlayerGeckosEvents.PlayerCreate,
+      PlayerSocketEvents.PlayerCreate,
       async (data: IConnectedPlayer, character: ICharacter) => {
+        // check if player is already logged in
+
+        if (character.isOnline) {
+          // then force logout the current associated client
+          this.socketMessaging.sendEventToUser(character.channelId!, PlayerSocketEvents.PlayerForceDisconnect, {
+            reason: "You've been disconnected because you logged in from another location!",
+          });
+        }
+
         character.isOnline = true;
         character.channelId = data.channelId;
         await character.save();
@@ -74,7 +84,7 @@ export class PlayerCreate {
         // tell other player that we exist, so it can create a new instance of us
         this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
           nearbyPlayer.channelId!,
-          PlayerGeckosEvents.PlayerCreate,
+          PlayerSocketEvents.PlayerCreate,
           data
         );
 
@@ -95,7 +105,7 @@ export class PlayerCreate {
 
         this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
           emitterChannelId,
-          PlayerGeckosEvents.PlayerCreate,
+          PlayerSocketEvents.PlayerCreate,
           // @ts-ignore
           nearbyPlayerPayload
         );
