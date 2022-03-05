@@ -1,8 +1,11 @@
 import { provide } from "inversify-binding-decorators";
+import { NPCSeeder } from "./NPCSeeder";
 
 @provide(Seeder)
 export class Seeder {
-  constructor() {}
+  constructor(private npcSeeder: NPCSeeder) {}
 
-  public async start(): Promise<void> {}
+  public async start(): Promise<void> {
+    await this.npcSeeder.seed();
+  }
 }
