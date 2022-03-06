@@ -1,5 +1,5 @@
 import { INPC } from "@entities/ModuleSystem/NPCModel";
-import { GridHelper } from "@providers/map/GridHelper";
+import { ToGridX, ToGridY } from "@providers/map/GridHelper";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { GRID_HEIGHT, GRID_WIDTH, ScenesMetaData } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -14,7 +14,7 @@ interface IPosition {
 
 @provide(NPCManager)
 export class NPCManager {
-  constructor(private tilemapParser: TilemapParser, private gridHelper: GridHelper) {}
+  constructor(private tilemapParser: TilemapParser) {}
 
   public init(NPCs: INPC[]): void {
     const availableDirections = ["down", "up", "right", "left"] as unknown as NPCMovementDirection;
@@ -25,7 +25,8 @@ export class NPCManager {
 
         const { x: newX, y: newY } = this.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
 
-        const { gridX: newGridX, gridY: newGridY } = this.gridHelper.getGridXY(newX, newY);
+        const newGridX = ToGridX(newX);
+        const newGridY = ToGridY(newY);
 
         const isNewXYSolid = this.tilemapParser.isSolid(ScenesMetaData[npc.scene].map, newGridX, newGridY, npc.layer);
 

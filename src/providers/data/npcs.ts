@@ -1,3 +1,4 @@
+import { FromGridX, FromGridY } from "@providers/map/GridHelper";
 import { CharacterClass, CharacterGender, INPC, MapLayers } from "@rpg-engine/shared";
 
 interface INPCMetaData extends Omit<INPC, "_id"> {
@@ -8,8 +9,8 @@ export const NPCMetaData: INPCMetaData[] = [
   {
     key: "npc-alice",
     name: "Alice",
-    x: 22 * 16,
-    y: 12 * 16,
+    x: FromGridX(22),
+    y: FromGridY(12),
     direction: "down",
     scene: "MainScene",
     class: CharacterClass.None,
