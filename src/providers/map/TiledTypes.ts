@@ -76,13 +76,9 @@ export interface IAnimation {
 }
 
 export interface ITileProperty {
-  name: Name;
+  name: string;
   type: Type;
   value: boolean;
-}
-
-export enum Name {
-  GeCollide = "ge_collide",
 }
 
 export enum Type {
@@ -119,9 +115,9 @@ export interface ITiledTile {
   properties: ITileProperty[];
 }
 
-export const LayerNames = {
-  [MapLayers.Ground]: "Ground",
-  [MapLayers.OverGround]: "OverGround",
-  [MapLayers.Player]: "Player",
-  [MapLayers.OverPlayer]: "OverPlayer",
+export const TiledLayerNames = {
+  [MapLayers.Ground]: "ground",
+  [MapLayers.OverGround]: "over-ground",
+  [MapLayers.Player]: "player",
+  [MapLayers.OverPlayer]: "over-player",
 };

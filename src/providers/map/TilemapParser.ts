@@ -2,87 +2,124 @@ import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { MapLayers } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
-import { IGetTileXYResult, ITiled, LayerNames } from "./TiledTypes";
+import { ITiled, ITileset, TiledLayerNames } from "./TiledTypes";
 
 @provide(TilemapParser)
 export class TilemapParser {
-  private tileWidth = 32;
-  private tileHeight = 32;
-  private tileCount = 740;
-  private columns = 20;
-  private imageWidth = 671;
-  private imageHeight = 1203;
-  private worldWidth = 3200;
-  private worldHeight = 3200;
-  private tilesPerRow = this.worldWidth / this.tileWidth;
-
-  private map: ITiled;
+  public static maps: Map<string, ITiled> = new Map();
 
   constructor() {}
 
-  public init(mapName: string, tilesetName: string): void {
-    const mapPath = `${STATIC_PATH}/maps/${mapName}.json`;
+  public init(): void {
+    // get all map names
 
-    const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
+    const mapNames = fs.readdirSync(STATIC_PATH + "/maps");
 
-    this.map = currentMap;
+    for (const mapName of mapNames) {
+      if (!mapName.endsWith(".json")) {
+        continue;
+      }
+      const mapPath = `${STATIC_PATH}/maps/${mapName}`;
 
-    const tileset = currentMap.tilesets.find((tileset) => tileset.name === tilesetName);
+      const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
 
-    if (!tileset) {
-      throw new Error(`Failed to load tilet ${tilesetName} on ${mapName}.json`);
+      TilemapParser.maps.set(mapName.replace(".json", ""), currentMap);
     }
   }
 
-  public isSolid(x: number, y: number, layer: MapLayers): boolean {
-    // TODO: Implement this
-    return true;
-  }
-
-  private getTileXY(index: number): IGetTileXYResult {
-    //! this is not working properly yet
-    const x = Math.floor(index % this.tilesPerRow) - 1;
-    const y = Math.floor(index / this.tilesPerRow);
-
-    return { x, y };
-  }
-
-  private getTileId(x: number, y: number, layerData: number[]): number {
-    // slice the sample array into a multidimensional array, each row containing maximum of tilesPerRow
-    const slicedTiles = layerData.reduce((acc: number[][], cur, index) => {
-      const row = Math.floor(index / this.tilesPerRow);
-
-      if (!acc[row]) {
-        acc[row] = [];
+  public isSolid(
+    map: string,
+    gridX: number,
+    gridY: number,
+    layer: MapLayers,
+    checkAllLayersBelow: boolean = true
+  ): boolean {
+    if (checkAllLayersBelow) {
+      for (let i = MapLayers.Player; i >= MapLayers.Ground; i--) {
+        const isSolid = this.tileSolidCheck(map, gridX, gridY, i);
+        if (isSolid) {
+          return true;
+        }
       }
-
-      acc[row].push(cur);
-
-      return acc;
-    }, []);
-
-    const tileId = slicedTiles[y][x] - 1;
-
-    console.log(`TileId: ${tileId} - X: ${x} - Y: ${y}`);
-
-    return tileId;
+      return false;
+    } else {
+      return this.tileSolidCheck(map, gridX, gridY, layer);
+    }
   }
 
-  private getLayerData(layer: MapLayers): number[] {
-    const layerName = LayerNames[layer];
+  private tileSolidCheck(map: string, gridX: number, gridY: number, layer: MapLayers): boolean {
+    const tileId = this.getTileId(map, gridX, gridY, layer);
 
-    const layerInfo = this.map.layers.find((layer) => layer.name.toLowerCase() === layerName.toLowerCase());
+    if (tileId === 0 || !tileId) {
+      return false; // 0 means it's empty
+    }
 
-    if (!layerInfo) {
+    const mapData = TilemapParser.maps.get(map);
+
+    if (!mapData) {
+      throw new Error(`Failed to find map ${map}`);
+    }
+
+    const tileset = mapData.tilesets.find((tileset) => tileId <= tileset.tilecount);
+
+    if (!tileset) {
+      throw new Error(`Failed to find tileset for tile ${tileId}`);
+    }
+
+    const isTileSolid = this.getTileProperty<boolean>(tileset, tileId, "ge_collide");
+
+    if (!isTileSolid) {
+      return false;
+    }
+
+    return isTileSolid;
+  }
+
+  private getTileProperty<T>(tileset: ITileset, tileId: number, tileProperty: string): T | undefined {
+    const tileInfo = tileset.tiles.find((tile) => tile.id === tileId);
+
+    if (!tileInfo) {
+      throw new Error(`Failed to find tile ${tileId}`);
+    }
+
+    const property = tileInfo.properties.find((property) => property.name === tileProperty);
+
+    if (!property) {
+      return undefined;
+    }
+
+    return property.value as unknown as T;
+  }
+
+  private getTileId(map: string, gridX: number, gridY: number, mapLayer: MapLayers): number | undefined {
+    const layerName = TiledLayerNames[mapLayer];
+
+    const mapData = TilemapParser.maps.get(map);
+
+    if (!mapData) {
+      throw new Error(`Failed to find map ${map}`);
+    }
+
+    const layer = mapData.layers.find((layer) => layer.name.toLowerCase() === layerName.toLowerCase());
+
+    if (!layer) {
       throw new Error(`Failed to find layer ${layerName}`);
     }
 
-    const layerData: number[] = [];
+    const targetChunk = layer.chunks.find(
+      (chunk) => chunk.x <= gridX && chunk.x + chunk.width > gridX && chunk.y <= gridY && chunk.y + chunk.height > gridY
+    );
 
-    for (const chunk of layerInfo.chunks) {
-      layerData.push(...chunk.data);
+    // get tile at position x and y
+
+    if (targetChunk) {
+      const tileId = targetChunk.data[(gridY - targetChunk.y) * targetChunk.width + (gridX - targetChunk.x)];
+
+      if (tileId) {
+        return tileId - 1;
+      } else {
+        return 0;
+      }
     }
-
-    return layerData;
   }
 }

@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleSystem/NPCModel";
+import { GridHelper } from "@providers/map/GridHelper";
 import { TilemapParser } from "@providers/map/TilemapParser";
-import { GRID_HEIGHT, GRID_WIDTH } from "@rpg-engine/shared";
+import { GRID_HEIGHT, GRID_WIDTH, ScenesMetaData } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 
@@ -13,26 +14,29 @@ interface IPosition {
 
 @provide(NPCManager)
 export class NPCManager {
-  constructor(private tilemapParser: TilemapParser) {}
+  constructor(private tilemapParser: TilemapParser, private gridHelper: GridHelper) {}
 
   public init(NPCs: INPC[]): void {
-    const availableDirections = ["up", "down", "left", "right"] as unknown as NPCMovementDirection;
-
-    this.tilemapParser.init("another_map", "forest");
+    const availableDirections = ["down", "up", "right", "left"] as unknown as NPCMovementDirection;
 
     setInterval(async () => {
       for (const npc of NPCs) {
         const chosenMovementDirection = _.shuffle(availableDirections)[0] as NPCMovementDirection;
 
         const { x: newX, y: newY } = this.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
-        console.log(`Moving NPC ${npc.name} ${chosenMovementDirection} x=${newX} y=${newY}`);
 
-        //! TODO: Verify if this position has a solid tile.
+        const { gridX: newGridX, gridY: newGridY } = this.gridHelper.getGridXY(newX, newY);
 
-        npc.x = newX;
-        npc.y = newY;
+        const isNewXYSolid = this.tilemapParser.isSolid(ScenesMetaData[npc.scene].map, newGridX, newGridY, npc.layer);
 
-        await npc.save();
+        if (!isNewXYSolid) {
+          console.log(`${npc.name} moved to ${newGridX}, ${newGridY}`);
+          npc.x = newX;
+          npc.y = newY;
+          await npc.save();
+        } else {
+          console.log(`${npc.name} tried to move to ${newGridX}, ${newGridY} but it's solid`);
+        }
       }
     }, 3000);
   }

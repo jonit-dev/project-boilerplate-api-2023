@@ -10,12 +10,15 @@ export class NPCSeeder {
     if (!npcs.length || NPCMetaData.length !== npcs.length) {
       console.log("🌱 Seeding database with NPC data...");
 
-      for (const npc of NPCMetaData) {
-        const npcExists = await NPC.exists({ name: npc.name });
+      for (const npcMetaData of NPCMetaData) {
+        const npcExists = await NPC.find({ name: npcMetaData.key });
 
         if (!npcExists) {
-          const newNPC = new NPC(npc);
+          const newNPC = new NPC(npcMetaData);
           await newNPC.save();
+        } else {
+          // if npc already exists, restart initial position
+          await NPC.updateOne({ name: npcMetaData.key }, { x: npcMetaData.x, y: npcMetaData.y });
         }
       }
     }

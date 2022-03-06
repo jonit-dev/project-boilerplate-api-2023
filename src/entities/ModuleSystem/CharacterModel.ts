@@ -1,3 +1,4 @@
+import { FromGridX, FromGridY } from "@providers/map/GridHelper";
 import { TypeHelper } from "@providers/types/TypeHelper";
 import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
@@ -20,11 +21,11 @@ const characterSchema = createSchema(
       required: true,
     }),
     x: Type.number({
-      default: 160,
+      default: FromGridX(13),
       required: true,
     }),
     y: Type.number({
-      default: 192,
+      default: FromGridY(12),
       required: true,
     }),
     direction: Type.string({
