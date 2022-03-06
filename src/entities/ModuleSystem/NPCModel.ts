@@ -1,5 +1,5 @@
 import { TypeHelper } from "@providers/types/TypeHelper";
-import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
+import { CharacterClass, CharacterGender, MapLayers } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const npcSchema = createSchema(
@@ -32,6 +32,10 @@ const npcSchema = createSchema(
     }),
     texture: Type.string({
       required: true,
+    }),
+    layer: Type.number({
+      required: true,
+      default: MapLayers.Player,
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }

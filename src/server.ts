@@ -1,8 +1,9 @@
 import "express-async-errors";
 import "reflect-metadata";
 
+import { NPC } from "@entities/ModuleSystem/NPCModel";
 import { appEnv } from "@providers/config/env";
-import { cronJobs, db, seeds, server, socketAdapter } from "@providers/inversify/container";
+import { cronJobs, db, npcManager, seeds, server, socketAdapter } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { app } from "@providers/server/app";
@@ -37,6 +38,8 @@ app.listen(port, async () => {
   PushNotificationHelper.initialize();
 
   await seeds.start();
+
+  await npcManager.init(await NPC.find());
 
   await socketAdapter.init(appEnv.socket.type);
 

@@ -1,6 +1,8 @@
-import { CharacterClass, CharacterGender, INPC } from "@rpg-engine/shared";
+import { CharacterClass, CharacterGender, INPC, MapLayers } from "@rpg-engine/shared";
 
-export const NPCMetaData: INPC[] = [
+interface INPCMetaData extends Omit<INPC, "_id"> {}
+
+export const NPCMetaData: INPCMetaData[] = [
   {
     name: "Alice",
     x: 160,
@@ -10,5 +12,6 @@ export const NPCMetaData: INPC[] = [
     class: CharacterClass.None,
     gender: CharacterGender.Female,
     texture: "npc-alice",
+    layer: MapLayers.Player,
   },
 ];

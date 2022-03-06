@@ -1,3 +1,4 @@
+import { NPCManager } from "@providers/npc/NPCManager";
 import { Player } from "@providers/player/Player";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { Container } from "inversify";
@@ -31,5 +32,6 @@ export const seeds = container.get<Seeder>(Seeder);
 export const server = container.get<ServerHelper>(ServerHelper);
 export const socketAdapter = container.get<SocketAdapter>(SocketAdapter);
 export const player = container.get<Player>(Player);
+export const npcManager = container.get<NPCManager>(NPCManager);
 
 export { container };

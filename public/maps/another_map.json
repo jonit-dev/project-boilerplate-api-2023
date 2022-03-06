@@ -609,7 +609,7 @@
     {
       "columns": 65,
       "firstgid": 1,
-      "image": "../../../rpg-engine/src/assets/tilesets/forest/forest.png",
+      "image": "../../../rpg-client/public/assets/tilesets/forest/forest.png",
       "imageheight": 868,
       "imagewidth": 1040,
       "margin": 0,

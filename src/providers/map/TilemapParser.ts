@@ -1,9 +1,8 @@
+import { STATIC_PATH } from "@providers/constants/PathConstants";
+import { MapLayers } from "@rpg-engine/shared";
+import fs from "fs";
 import { provide } from "inversify-binding-decorators";
-
-interface IGetTileXYResult {
-  x: number;
-  y: number;
-}
+import { IGetTileXYResult, ITiled, LayerNames } from "./TiledTypes";
 
 @provide(TilemapParser)
 export class TilemapParser {
@@ -17,7 +16,30 @@ export class TilemapParser {
   private worldHeight = 3200;
   private tilesPerRow = this.worldWidth / this.tileWidth;
 
-  public getTileXY(index: number): IGetTileXYResult {
+  private map: ITiled;
+
+  constructor() {}
+
+  public init(mapName: string, tilesetName: string): void {
+    const mapPath = `${STATIC_PATH}/maps/${mapName}.json`;
+
+    const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
+
+    this.map = currentMap;
+
+    const tileset = currentMap.tilesets.find((tileset) => tileset.name === tilesetName);
+
+    if (!tileset) {
+      throw new Error(`Failed to load tilet ${tilesetName} on ${mapName}.json`);
+    }
+  }
+
+  public isSolid(x: number, y: number, layer: MapLayers): boolean {
+    // TODO: Implement this
+    return true;
+  }
+
+  private getTileXY(index: number): IGetTileXYResult {
     //! this is not working properly yet
     const x = Math.floor(index % this.tilesPerRow) - 1;
     const y = Math.floor(index / this.tilesPerRow);
@@ -25,7 +47,7 @@ export class TilemapParser {
     return { x, y };
   }
 
-  public getTileId(x: number, y: number, layerData: number[]): number {
+  private getTileId(x: number, y: number, layerData: number[]): number {
     // slice the sample array into a multidimensional array, each row containing maximum of tilesPerRow
     const slicedTiles = layerData.reduce((acc: number[][], cur, index) => {
       const row = Math.floor(index / this.tilesPerRow);
@@ -44,5 +66,23 @@ export class TilemapParser {
     console.log(`TileId: ${tileId} - X: ${x} - Y: ${y}`);
 
     return tileId;
+  }
+
+  private getLayerData(layer: MapLayers): number[] {
+    const layerName = LayerNames[layer];
+
+    const layerInfo = this.map.layers.find((layer) => layer.name.toLowerCase() === layerName.toLowerCase());
+
+    if (!layerInfo) {
+      throw new Error(`Failed to find layer ${layerName}`);
+    }
+
+    const layerData: number[] = [];
+
+    for (const chunk of layerInfo.chunks) {
+      layerData.push(...chunk.data);
+    }
+
+    return layerData;
   }
 }
