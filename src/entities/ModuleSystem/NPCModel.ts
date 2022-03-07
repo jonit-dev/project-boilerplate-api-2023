@@ -37,6 +37,9 @@ const npcSchema = createSchema(
       required: true,
       default: MapLayers.Player,
     }),
+    key: Type.string({
+      required: true,
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

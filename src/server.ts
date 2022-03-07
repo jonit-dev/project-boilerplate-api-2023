@@ -1,3 +1,6 @@
+import "express-async-errors";
+import "reflect-metadata";
+
 import { NPC } from "@entities/ModuleSystem/NPCModel";
 import { appEnv } from "@providers/config/env";
 import { cronJobs, db, npcManager, seeds, server, socketAdapter, tilemapParser } from "@providers/inversify/container";
@@ -8,8 +11,6 @@ import { router } from "@providers/server/Router";
 import { EnvType } from "@rpg-engine/shared/dist";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
-import "express-async-errors";
-import "reflect-metadata";
 
 const port = appEnv.general.SERVER_PORT || 3002;
 

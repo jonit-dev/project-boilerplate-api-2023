@@ -6,7 +6,7 @@ import { provide } from "inversify-binding-decorators";
 export class NPCSeeder {
   public async seed(): Promise<void> {
     for (const npcData of NPCMetaData) {
-      const npcFound = await NPC.exists({ name: npcData.key });
+      const npcFound = await NPC.exists({ key: npcData.key });
 
       if (!npcFound) {
         console.log("🌱 Seeding database with NPC data...");
