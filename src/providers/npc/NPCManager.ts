@@ -53,6 +53,8 @@ export class NPCManager {
               player.channelId!,
               NPCSocketEvents.NPCPositionUpdate,
               {
+                id: npc._id,
+                name: npc.name,
                 x: npc.x,
                 y: npc.y,
                 direction: chosenMovementDirection,
@@ -64,6 +66,7 @@ export class NPCManager {
           console.log(`${npc.name} moved to ${newGridX}, ${newGridY}`);
           npc.x = newX;
           npc.y = newY;
+          npc.direction = chosenMovementDirection;
           await npc.save();
         } else {
           console.log(`${npc.name} tried to move to ${newGridX}, ${newGridY} but it's solid`);

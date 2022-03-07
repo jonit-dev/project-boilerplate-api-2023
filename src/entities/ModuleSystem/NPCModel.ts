@@ -30,9 +30,6 @@ const npcSchema = createSchema(
       default: CharacterGender.Male,
       enum: TypeHelper.enumToStringArray(CharacterGender),
     }),
-    texture: Type.string({
-      required: true,
-    }),
     layer: Type.number({
       required: true,
       default: MapLayers.Player,
