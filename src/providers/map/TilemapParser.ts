@@ -1,8 +1,7 @@
 import { STATIC_PATH } from "@providers/constants/PathConstants";
-import { MapLayers } from "@rpg-engine/shared";
+import { ITiled, ITileset, MapLayers, TiledLayerNames } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
-import { ITiled, ITileset, TiledLayerNames } from "./TiledTypes";
 
 @provide(TilemapParser)
 export class TilemapParser {

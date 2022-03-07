@@ -3,6 +3,33 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(PlayerView)
 export class PlayerView {
+  public async getCharactersWithXYPositionInView(x: number, y: number, scene: string): Promise<ICharacter[]> {
+    // fetch characters that have a X,Y position under their cameraCoordinates
+
+    //! TODO: Refactor to mongoose query (more performant)
+    const characters = await Character.find({
+      isOnline: true,
+      scene: scene,
+    }).lean();
+
+    const output: ICharacter[] = [];
+
+    for (const character of characters) {
+      const { cameraCoordinates } = character;
+
+      if (
+        x >= cameraCoordinates.x &&
+        x <= cameraCoordinates.x + cameraCoordinates.width &&
+        y >= cameraCoordinates.y &&
+        y <= cameraCoordinates.y + cameraCoordinates.height
+      ) {
+        output.push(character as ICharacter);
+      }
+    }
+
+    return output;
+  }
+
   public async getCharactersInView(character: ICharacter): Promise<ICharacter[]> {
     if (!character.cameraCoordinates) {
       console.log("Error: character has no camera coordinates");

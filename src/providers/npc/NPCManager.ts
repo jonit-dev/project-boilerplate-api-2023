@@ -1,7 +1,16 @@
 import { INPC } from "@entities/ModuleSystem/NPCModel";
-import { ToGridX, ToGridY } from "@providers/map/GridHelper";
 import { TilemapParser } from "@providers/map/TilemapParser";
-import { GRID_HEIGHT, GRID_WIDTH, ScenesMetaData } from "@rpg-engine/shared";
+import { PlayerView } from "@providers/player/PlayerView";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import {
+  GRID_HEIGHT,
+  GRID_WIDTH,
+  INPCPositionUpdatePayload,
+  NPCSocketEvents,
+  ScenesMetaData,
+  ToGridX,
+  ToGridY,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 
@@ -14,7 +23,11 @@ interface IPosition {
 
 @provide(NPCManager)
 export class NPCManager {
-  constructor(private tilemapParser: TilemapParser) {}
+  constructor(
+    private tilemapParser: TilemapParser,
+    private playerView: PlayerView,
+    private socketMessaging: SocketMessaging
+  ) {}
 
   public init(NPCs: INPC[]): void {
     const availableDirections = ["down", "up", "right", "left"] as unknown as NPCMovementDirection;
@@ -31,6 +44,23 @@ export class NPCManager {
         const isNewXYSolid = this.tilemapParser.isSolid(ScenesMetaData[npc.scene].map, newGridX, newGridY, npc.layer);
 
         if (!isNewXYSolid) {
+          // warn nearby players that the NPC moved;
+
+          const nearbyPlayers = await this.playerView.getCharactersWithXYPositionInView(newX, newY, npc.scene);
+
+          for (const player of nearbyPlayers) {
+            this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
+              player.channelId!,
+              NPCSocketEvents.NPCPositionUpdate,
+              {
+                x: npc.x,
+                y: npc.y,
+                direction: chosenMovementDirection,
+                key: npc.key,
+              }
+            );
+          }
+
           console.log(`${npc.name} moved to ${newGridX}, ${newGridY}`);
           npc.x = newX;
           npc.y = newY;
