@@ -1,4 +1,5 @@
-import { INPC } from "@entities/ModuleSystem/NPCModel";
+import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { PlayerView } from "@providers/player/PlayerView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -73,6 +74,31 @@ export class NPCManager {
         }
       }
     }, 3000);
+  }
+
+  public async warnUserAboutNPCsInView(character: ICharacter): Promise<void> {
+    const npcsInView = await this.getNPCsInView(character);
+
+    for (const npc of npcsInView) {
+      this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
+        character.channelId!,
+        NPCSocketEvents.NPCPositionUpdate,
+        {
+          id: npc._id,
+          name: npc.name,
+          x: npc.x,
+          y: npc.y,
+          direction: npc.direction,
+          key: npc.key,
+        }
+      );
+    }
+  }
+
+  public async getNPCsInView(character: ICharacter): Promise<INPC[]> {
+    const npcsInView = await this.playerView.getElementsInCharView<INPC>(NPC, character);
+
+    return npcsInView;
   }
 
   private calculateNewPositionXY(x: number, y: number, moveToDirection: NPCMovementDirection): IPosition {

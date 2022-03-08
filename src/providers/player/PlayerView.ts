@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { provide } from "inversify-binding-decorators";
+import { Model } from "mongoose";
 
 @provide(PlayerView)
 export class PlayerView {
@@ -28,6 +29,37 @@ export class PlayerView {
     }
 
     return output;
+  }
+
+  public async getElementsInCharView<T>(Element: Model<T>, character: ICharacter): Promise<T[]> {
+    if (!character.cameraCoordinates) {
+      console.log("Error: character has no camera coordinates");
+      return [];
+    }
+
+    const { cameraCoordinates } = character;
+
+    // @ts-ignore
+    const otherCharactersInView = await Element.find({
+      $and: [
+        {
+          x: {
+            $gte: cameraCoordinates.x,
+            $lte: cameraCoordinates.x + cameraCoordinates.width,
+          },
+        },
+        {
+          y: {
+            $gte: cameraCoordinates.y,
+            $lte: cameraCoordinates.y + cameraCoordinates.height,
+          },
+        },
+        {
+          scene: character.scene,
+        },
+      ],
+    });
+    return otherCharactersInView as unknown as T[];
   }
 
   public async getCharactersInView(character: ICharacter): Promise<ICharacter[]> {

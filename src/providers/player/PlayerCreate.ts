@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
+import { NPCManager } from "@providers/npc/NPCManager";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { IConnectedPlayer, PlayerSocketEvents } from "@rpg-engine/shared";
@@ -15,7 +16,8 @@ export class PlayerCreate {
     private socketAuth: SocketAuth,
     private geckosConnection: SocketConnection,
     private playerView: PlayerView,
-    private socketMessaging: SocketMessaging
+    private socketMessaging: SocketMessaging,
+    private npcManager: NPCManager
   ) {}
 
   public onPlayerCreate(channel: ServerChannel): void {
@@ -35,6 +37,8 @@ export class PlayerCreate {
         character.isOnline = true;
         character.channelId = data.channelId;
         await character.save();
+
+        await this.npcManager.warnUserAboutNPCsInView(character);
 
         // here we inject our server side character properties, to make sure the client is not hacking anything!
         data = {
