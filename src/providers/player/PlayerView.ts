@@ -68,31 +68,6 @@ export class PlayerView {
       return [];
     }
 
-    const { cameraCoordinates } = character;
-
-    const otherCharactersInView = await Character.find({
-      $and: [
-        {
-          x: {
-            $gte: cameraCoordinates.x,
-            $lte: cameraCoordinates.x + cameraCoordinates.width,
-          },
-        },
-        {
-          y: {
-            $gte: cameraCoordinates.y,
-            $lte: cameraCoordinates.y + cameraCoordinates.height,
-          },
-        },
-        {
-          isOnline: true,
-          _id: {
-            $ne: character._id,
-          },
-          scene: character.scene,
-        },
-      ],
-    });
-    return otherCharactersInView as unknown as ICharacter[];
+    return await this.getElementsInCharView(Character, character);
   }
 }
