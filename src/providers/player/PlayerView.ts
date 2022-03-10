@@ -31,7 +31,11 @@ export class PlayerView {
     return output;
   }
 
-  public async getElementsInCharView<T>(Element: Model<T>, character: ICharacter): Promise<T[]> {
+  public async getElementsInCharView<T>(
+    Element: Model<T>,
+    character: ICharacter,
+    filter?: Record<string, unknown>
+  ): Promise<T[]> {
     if (!character.cameraCoordinates) {
       console.log("Error: character has no camera coordinates");
       return [];
@@ -56,6 +60,7 @@ export class PlayerView {
         },
         {
           scene: character.scene,
+          ...filter,
         },
       ],
     });
@@ -68,6 +73,11 @@ export class PlayerView {
       return [];
     }
 
-    return await this.getElementsInCharView(Character, character);
+    return await this.getElementsInCharView(Character, character, {
+      isOnline: true,
+      _id: {
+        $ne: character._id,
+      },
+    });
   }
 }

@@ -90,6 +90,7 @@ export class NPCManager {
           y: npc.y,
           direction: npc.direction,
           key: npc.key,
+          layer: npc.layer,
         }
       );
     }
