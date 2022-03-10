@@ -60,6 +60,7 @@ export class NPCManager {
                 y: npc.y,
                 direction: chosenMovementDirection,
                 key: npc.key,
+                layer: npc.layer,
               }
             );
           }
