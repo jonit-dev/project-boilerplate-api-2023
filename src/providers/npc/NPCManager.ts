@@ -4,7 +4,16 @@ import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { PlayerView } from "@providers/player/PlayerView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { INPCPositionUpdatePayload, NPCSocketEvents, ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
+import {
+  AnimationDirection,
+  FixedPathOrientation,
+  INPCPositionUpdatePayload,
+  NPCMovementType,
+  NPCSocketEvents,
+  ScenesMetaData,
+  ToGridX,
+  ToGridY,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCMetaData } from "./NPCMetaData";
@@ -23,38 +32,44 @@ export class NPCManager {
   public init(NPCs: INPC[]): void {
     setInterval(async () => {
       for (const npc of NPCs) {
-        const npcMetaData = NPCMetaData.get(npc.key);
+        switch (npc.movementType) {
+          case NPCMovementType.Random:
+            await this.startRandomMovement(npc);
+            break;
+          case NPCMovementType.FixedPath:
+            let endGridX = npc.fixedPath.endGridX as unknown as number;
+            let endGridY = npc.fixedPath.endGridY as unknown as number;
+            const npcData = NPCMetaData.get(npc.key);
 
-        if (!npcMetaData) {
-          console.log(`NPCMetaData for ${npc.name} not found!`);
-          continue;
-        }
+            if (!npcData) {
+              console.log(`Failed to find NPC data for ${npc.key}`);
 
-        let chosenMovementDirection = this.pickRandomDirectionToMove();
+              continue;
+            }
 
-        const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
+            // if NPC is at the initial position, move forward to end position.
+            if (this.isNPCAtPathPosition(npc, ToGridX(npcData.x!), ToGridY(npcData.y!))) {
+              npc.fixedPathOrientation = FixedPathOrientation.Forward;
+              await npc.save();
+            }
 
-        // npcMetaData stores the initial X and Y! That's why we don't use the npc.x and npc.y as initial args
-        const isMovementUnderRange = npc.maxRangeInGridCells
-          ? this.movementHelper.isMovementUnderRange(npcMetaData.x, npcMetaData.y, newX, newY, npc.maxRangeInGridCells)
-          : true;
+            // if NPC is at the end of the path, move backwards to initial position.
+            if (this.isNPCAtPathPosition(npc, endGridX, endGridY)) {
+              npc.fixedPathOrientation = FixedPathOrientation.Backward;
+              await npc.save();
+            }
 
-        if (!isMovementUnderRange) {
-          console.log("Movement is out of range. Going back!");
-          chosenMovementDirection = this.movementHelper.getOppositeDirection(chosenMovementDirection);
-          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
-            npc.x,
-            npc.y,
-            chosenMovementDirection
-          );
-          await this.moveNPC(npc, newX, newY, chosenMovementDirection);
+            if (npc.fixedPathOrientation === FixedPathOrientation.Backward) {
+              endGridX = ToGridX(npcData?.x!);
+              endGridY = ToGridY(npcData?.y!);
+            }
 
-          continue;
-        } else {
-          await this.moveNPC(npc, newX, newY, chosenMovementDirection);
+            await this.startFixedPathMovement(npc, endGridX, endGridY);
+
+            break;
         }
       }
-    }, 3000);
+    }, 1000);
   }
 
   public async warnUserAboutNPCsInView(character: ICharacter): Promise<void> {
@@ -81,6 +96,100 @@ export class NPCManager {
     const npcsInView = await this.playerView.getElementsInCharView(NPC, character);
 
     return npcsInView;
+  }
+
+  private isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
+    if (ToGridX(npc.x) === gridX && ToGridY(npc.y) === gridY) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private async startFixedPathMovement(npc: INPC, endGridX: number, endGridY: number): Promise<void> {
+    if (endGridX && endGridY) {
+      const npcPath = this.movementHelper.findShortestPath(
+        ScenesMetaData[npc.scene].map,
+        ToGridX(npc.x),
+        ToGridY(npc.y),
+        endGridX,
+        endGridY
+      );
+
+      if (!npcPath) {
+        console.log("Failed to calculated fixed path. NPC is stopped");
+        return;
+      }
+
+      const [newGridX, newGridY] = npcPath[1];
+
+      const nextMovementDirection = this.getGridMovementDirection(ToGridX(npc.x), ToGridY(npc.y), newGridX, newGridY);
+
+      if (nextMovementDirection) {
+        const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, nextMovementDirection);
+
+        await this.moveNPC(npc, newX, newY, nextMovementDirection);
+      } else {
+        console.log("Failed to calculate fixed path. nextMovementDirection is undefined");
+      }
+    } else {
+      console.log(
+        "Failed to calculate fixed path. You must have a endGridX and endGridY position set in your NPC model"
+      );
+    }
+  }
+
+  private getGridMovementDirection(
+    startGridX: number,
+    startGridY: number,
+    endGridX: number,
+    endGridY: number
+  ): AnimationDirection | undefined {
+    const Xdiff = endGridX - startGridX;
+    const Ydiff = endGridY - startGridY;
+
+    if (Xdiff < 0 && Ydiff === 0) {
+      return "left";
+    }
+
+    if (Xdiff > 0 && Ydiff === 0) {
+      return "right";
+    }
+
+    if (Xdiff === 0 && Ydiff < 0) {
+      return "up";
+    }
+
+    if (Xdiff === 0 && Ydiff > 0) {
+      return "down";
+    }
+  }
+
+  private async startRandomMovement(npc: INPC): Promise<void> {
+    const npcMetaData = NPCMetaData.get(npc.key);
+
+    if (!npcMetaData) {
+      console.log(`NPCMetaData for ${npc.name} not found!`);
+      return;
+    }
+
+    let chosenMovementDirection = this.pickRandomDirectionToMove();
+
+    const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
+
+    // npcMetaData stores the initial X and Y! That's why we don't use the npc.x and npc.y as initial args
+    const isMovementUnderRange = npc.maxRangeInGridCells
+      ? this.movementHelper.isMovementUnderRange(npcMetaData.x, npcMetaData.y, newX, newY, npc.maxRangeInGridCells)
+      : true;
+
+    if (!isMovementUnderRange) {
+      console.log("Movement is out of range. Going back!");
+      chosenMovementDirection = this.movementHelper.getOppositeDirection(chosenMovementDirection);
+      const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
+      await this.moveNPC(npc, newX, newY, chosenMovementDirection);
+    } else {
+      await this.moveNPC(npc, newX, newY, chosenMovementDirection);
+    }
   }
 
   private pickRandomDirectionToMove(): NPCMovementDirection {

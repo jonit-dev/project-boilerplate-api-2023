@@ -1,5 +1,12 @@
 import { TypeHelper } from "@providers/types/TypeHelper";
-import { CharacterClass, CharacterGender, GRID_WIDTH, MapLayers } from "@rpg-engine/shared";
+import {
+  CharacterClass,
+  CharacterGender,
+  FixedPathOrientation,
+  GRID_WIDTH,
+  MapLayers,
+  NPCMovementType,
+} from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const npcSchema = createSchema(
@@ -37,10 +44,22 @@ const npcSchema = createSchema(
     key: Type.string({
       required: true,
     }),
+    movementType: Type.string({
+      required: true,
+      default: NPCMovementType.Random,
+      enum: TypeHelper.enumToStringArray(NPCMovementType),
+    }),
     maxRangeInGridCells: Type.number({
       required: true,
       default: GRID_WIDTH * 3,
     }),
+    fixedPathOrientation: Type.string({
+      enum: TypeHelper.enumToStringArray(FixedPathOrientation),
+    }),
+    fixedPath: {
+      endGridX: Type.number(),
+      endGridY: Type.number(),
+    },
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

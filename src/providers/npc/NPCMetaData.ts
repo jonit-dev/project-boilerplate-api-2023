@@ -1,4 +1,13 @@
-import { CharacterClass, CharacterGender, FromGridX, FromGridY, GRID_WIDTH, INPC, MapLayers } from "@rpg-engine/shared";
+import {
+  CharacterClass,
+  CharacterGender,
+  FixedPathOrientation,
+  FromGridX,
+  FromGridY,
+  INPC,
+  MapLayers,
+  NPCMovementType,
+} from "@rpg-engine/shared";
 
 interface INPCMetaData extends Omit<INPC, "_id"> {
   key: string;
@@ -17,7 +26,13 @@ NPCMetaData.set("alice", {
   class: CharacterClass.None,
   gender: CharacterGender.Female,
   layer: MapLayers.Player,
-  maxRangeInGridCells: GRID_WIDTH * 5,
+  movementType: NPCMovementType.FixedPath,
+  // maxRangeInGridCells: GRID_WIDTH * 5,
+  fixedPathOrientation: FixedPathOrientation.Forward, // must be forward!
+  fixedPath: {
+    endGridX: 7,
+    endGridY: 5,
+  },
 });
 
 export { NPCMetaData };
