@@ -13,7 +13,7 @@
     "start:prod": "yarn install && yarn build && pm2 start pm2.json --no-daemon",
     "format": "prettier --write . --loglevel silent",
     "check-formatting": "prettier --check 'src/**/*.ts'",
-    "bootstrap": "yarn update:shared-deps && git pull origin master && yarn install && yarn configure",
+    "bootstrap": "git pull origin master && yarn install && yarn configure",
     "env:switch:dev": "./environment/env-switch.sh dev",
     "env:switch:prod": "./environment/env-switch.sh prod",
     "configure:first-time": "./environment/first-time-setup.sh",
