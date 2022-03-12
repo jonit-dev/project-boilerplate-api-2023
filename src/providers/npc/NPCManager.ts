@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -98,6 +98,39 @@ export class NPCManager {
     return _.shuffle(availableDirections)[0] as NPCMovementDirection;
   }
 
+  private async hasSolid(npc: INPC, newX: number, newY: number): Promise<boolean> {
+    const hasSolidTile = this.tilemapParser.isSolid(
+      ScenesMetaData[npc.scene].map,
+      ToGridX(newX),
+      ToGridY(newY),
+      npc.layer
+    );
+
+    if (hasSolidTile) {
+      console.log(`${npc.name} tried to move, but was blocked by a solid tile!`);
+      return true;
+    }
+
+    // check for other Characters
+    const hasPlayer = await Character.exists({ x: newX, y: newY, scene: npc.scene });
+
+    if (hasPlayer) {
+      console.log(`${npc.name} tried to move, but was blocked by a player!`);
+      return true;
+    }
+
+    // and also for other NPCs!
+    const hasNPC = await NPC.exists({ x: newX, y: newY, scene: npc.scene });
+
+    if (hasNPC) {
+      console.log(`${npc.name} tried to move, but was blocked by another NPC!`);
+
+      return true;
+    }
+
+    return false;
+  }
+
   private async moveNPC(
     npc: INPC,
     newX: number,
@@ -109,9 +142,8 @@ export class NPCManager {
 
     // check if max range is reached
 
-    const isNewXYSolid = this.tilemapParser.isSolid(ScenesMetaData[npc.scene].map, newGridX, newGridY, npc.layer);
-
-    if (isNewXYSolid) {
+    const hasSolid = await this.hasSolid(npc, newX, newY);
+    if (hasSolid) {
       console.log(`${npc.name} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
       return;
     }

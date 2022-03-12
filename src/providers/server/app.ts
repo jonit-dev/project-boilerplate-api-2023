@@ -5,11 +5,11 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 import { InversifyExpressServer } from "inversify-express-utils";
 import morgan from "morgan";
-
-import { container } from "../inversify/container";
+import { container } from "@providers/inversify/container";
 
 const compression = require("compression");
 
+// @ts-ignore
 const expressServer = new InversifyExpressServer(container);
 
 // Global rate limiter
