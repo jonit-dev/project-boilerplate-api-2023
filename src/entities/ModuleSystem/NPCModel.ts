@@ -1,5 +1,5 @@
 import { TypeHelper } from "@providers/types/TypeHelper";
-import { CharacterClass, CharacterGender, MapLayers } from "@rpg-engine/shared";
+import { CharacterClass, CharacterGender, GRID_WIDTH, MapLayers } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const npcSchema = createSchema(
@@ -37,7 +37,10 @@ const npcSchema = createSchema(
     key: Type.string({
       required: true,
     }),
-    maxRangeInGridCells: Type.number(),
+    maxRangeInGridCells: Type.number({
+      required: true,
+      default: GRID_WIDTH * 3,
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

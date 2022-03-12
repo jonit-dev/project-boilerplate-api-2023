@@ -16,6 +16,6 @@ export const NPCMetaData: INPCMetaData[] = [
     class: CharacterClass.None,
     gender: CharacterGender.Female,
     layer: MapLayers.Player,
-    maxRangeInGridCells: GRID_WIDTH * 3,
+    maxRangeInGridCells: GRID_WIDTH * 5,
   },
 ];
