@@ -23,45 +23,35 @@ export class NPCManager {
   public init(NPCs: INPC[]): void {
     setInterval(async () => {
       for (const npc of NPCs) {
-        if (npc.maxRangeInGridCells) {
-          const npcMetaData = NPCMetaData.find((npcMetaData) => npcMetaData.key === npc.key);
+        const npcMetaData = NPCMetaData.get(npc.key);
 
-          if (!npcMetaData) {
-            console.log(`NPCMetaData for ${npc.name} not found!`);
-            continue;
-          }
+        if (!npcMetaData) {
+          console.log(`NPCMetaData for ${npc.name} not found!`);
+          continue;
+        }
 
-          let chosenMovementDirection = this.pickRandomDirectionToMove();
+        let chosenMovementDirection = this.pickRandomDirectionToMove();
 
+        const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
+
+        // npcMetaData stores the initial X and Y! That's why we don't use the npc.x and npc.y as initial args
+        const isMovementUnderRange = npc.maxRangeInGridCells
+          ? this.movementHelper.isMovementUnderRange(npcMetaData.x, npcMetaData.y, newX, newY, npc.maxRangeInGridCells)
+          : true;
+
+        if (!isMovementUnderRange) {
+          console.log("Movement is out of range. Going back!");
+          chosenMovementDirection = this.movementHelper.getOppositeDirection(chosenMovementDirection);
           const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
             npc.x,
             npc.y,
             chosenMovementDirection
           );
+          await this.moveNPC(npc, newX, newY, chosenMovementDirection);
 
-          // npcMetaData stores the initial X and Y! That's why we don't use the npc.x and npc.y as initial args
-          const isMovementUnderRange = this.movementHelper.isMovementUnderRange(
-            npcMetaData.x,
-            npcMetaData.y,
-            newX,
-            newY,
-            npc.maxRangeInGridCells
-          );
-
-          if (!isMovementUnderRange) {
-            console.log("Movement is out of range. Going back!");
-            chosenMovementDirection = this.movementHelper.getOppositeDirection(chosenMovementDirection);
-            const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
-              npc.x,
-              npc.y,
-              chosenMovementDirection
-            );
-            await this.moveNPC(npc, newX, newY, chosenMovementDirection);
-
-            continue;
-          } else {
-            await this.moveNPC(npc, newX, newY, chosenMovementDirection);
-          }
+          continue;
+        } else {
+          await this.moveNPC(npc, newX, newY, chosenMovementDirection);
         }
       }
     }, 3000);
