@@ -2,10 +2,12 @@ import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { ITiled, ITileset, MapLayers, TiledLayerNames } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
+import PF from "pathfinding";
 
 @provide(TilemapParser)
 export class TilemapParser {
   public static maps: Map<string, ITiled> = new Map();
+  public static grids: Map<string, PF.Grid> = new Map();
 
   constructor() {}
 
@@ -22,7 +24,50 @@ export class TilemapParser {
 
       const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
 
-      TilemapParser.maps.set(mapName.replace(".json", ""), currentMap);
+      const key = mapName.replace(".json", "");
+
+      TilemapParser.maps.set(key, currentMap);
+
+      TilemapParser.grids.set(key, new PF.Grid(currentMap.width, currentMap.height));
+
+      this.insertSolidsIntoGrid(key, currentMap);
+    }
+
+    console.log("📦 Maps and grids are loaded!");
+  }
+
+  public findShortestPath(
+    map: string,
+    startGridX: number,
+    startGridY: number,
+    endGridX: number,
+    endGridY: number
+  ): number[][] | undefined {
+    if (!TilemapParser.grids.has(map)) {
+      console.log(`Failed to find grid for ${map}`);
+    } else {
+      const tempGrid = TilemapParser.grids.get(map)!.clone(); // should be cloned, otherwise it will be modified by the finder!
+
+      const finder = new PF.AStarFinder();
+      const path = finder.findPath(startGridX, startGridY, endGridX, endGridY, tempGrid!);
+
+      return path;
+    }
+  }
+
+  public insertSolidsIntoGrid(map: string, currentMap: ITiled): void {
+    const gridMap = TilemapParser.grids.get(map);
+
+    if (!gridMap) {
+      console.log(`Failed to create grid for ${map}`);
+      return;
+    }
+
+    for (let gridX = 0; gridX < currentMap.width; gridX++) {
+      for (let gridY = 0; gridY < currentMap.height; gridY++) {
+        const isSolid = this.isSolid(map, gridX, gridY, MapLayers.Player);
+        gridMap.setWalkableAt(gridX, gridY, !isSolid);
+      }
     }
   }
 
@@ -34,7 +79,7 @@ export class TilemapParser {
     checkAllLayersBelow: boolean = true
   ): boolean {
     if (checkAllLayersBelow) {
-      for (let i = MapLayers.Player; i >= MapLayers.Ground; i--) {
+      for (let i = layer; i >= MapLayers.Ground; i--) {
         const isSolid = this.tileSolidCheck(map, gridX, gridY, i);
         if (isSolid) {
           return true;
