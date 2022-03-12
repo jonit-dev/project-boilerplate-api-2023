@@ -8570,10 +8570,10 @@ typescript@^4.5.5:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.5.tgz#d8c953832d28924a9e3d37c73d729c846c5896f3"
   integrity sha512-TCTIul70LyWe6IJWT8QSYeA54WQe8EjQFU4wY52Fasj5UKx88LNYKCgBEHcOMOrFF1rKGbD8v/xcNWVUq9SymA==
 
-typescript@^4.6.0-dev.20220116:
-  version "4.6.0-dev.20220211"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.0-dev.20220211.tgz#0b5eb36bf5d9aef424a4ec56e9b64cb91080ca78"
-  integrity sha512-wMVJ7QGajX2OXpGrX8cphiTsyab79JS88F00azUMgO65ooUFgyFFQaXn2zOO8h8RluD6kHWzCM3WTa0Tc0Ui+g==
+typescript@^4.7.0-dev.20220311:
+  version "4.7.0-dev.20220311"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.0-dev.20220311.tgz#4c9798bdef10d2a84e3793da81e584a898f16526"
+  integrity sha512-ZNMv/ta7e5SqRO591yC36VBmsM4+S6u60MFW3xOwKrrm/RbPCNJjwS+lmSY57avA0VIAUnokWlm+ThWBNo0awQ==
 
 tz-offset@0.0.1:
   version "0.0.1"
