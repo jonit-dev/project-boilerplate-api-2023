@@ -1,33 +1,22 @@
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { PlayerView } from "@providers/player/PlayerView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  GRID_HEIGHT,
-  GRID_WIDTH,
-  INPCPositionUpdatePayload,
-  NPCSocketEvents,
-  ScenesMetaData,
-  ToGridX,
-  ToGridY,
-} from "@rpg-engine/shared";
+import { INPCPositionUpdatePayload, NPCSocketEvents, ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 
 type NPCMovementDirection = "up" | "down" | "left" | "right";
-
-interface IPosition {
-  x: number;
-  y: number;
-}
 
 @provide(NPCManager)
 export class NPCManager {
   constructor(
     private tilemapParser: TilemapParser,
     private playerView: PlayerView,
-    private socketMessaging: SocketMessaging
+    private socketMessaging: SocketMessaging,
+    private movementHelper: MovementHelper
   ) {}
 
   public init(NPCs: INPC[]): void {
@@ -37,7 +26,7 @@ export class NPCManager {
       for (const npc of NPCs) {
         const chosenMovementDirection = _.shuffle(availableDirections)[0] as NPCMovementDirection;
 
-        const { x: newX, y: newY } = this.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
+        const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
 
         const newGridX = ToGridX(newX);
         const newGridY = ToGridY(newY);
@@ -101,30 +90,5 @@ export class NPCManager {
     const npcsInView = await this.playerView.getElementsInCharView<INPC>(NPC, character);
 
     return npcsInView;
-  }
-
-  private calculateNewPositionXY(x: number, y: number, moveToDirection: NPCMovementDirection): IPosition {
-    switch (moveToDirection) {
-      case "down":
-        return {
-          x,
-          y: y + GRID_HEIGHT,
-        };
-      case "up":
-        return {
-          x,
-          y: y - GRID_HEIGHT,
-        };
-      case "left":
-        return {
-          x: x - GRID_WIDTH,
-          y,
-        };
-      case "right":
-        return {
-          x: x + GRID_WIDTH,
-          y,
-        };
-    }
   }
 }

@@ -1,11 +1,11 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
-  GRID_HEIGHT,
-  GRID_WIDTH,
+  AnimationDirection,
   IConnectedPlayer,
   IPlayerPositionUpdateConfirm,
   PlayerSocketEvents,
@@ -18,7 +18,8 @@ export class PlayerUpdate {
   constructor(
     private socketMessaging: SocketMessaging,
     private dataRetransmission: SocketRetransmission,
-    private socketAuth: SocketAuth
+    private socketAuth: SocketAuth,
+    private movementHelper: MovementHelper
   ) {}
 
   public onPlayerUpdatePosition(channel: ServerChannel): void {
@@ -84,20 +85,14 @@ export class PlayerUpdate {
 
     if (data.isMoving) {
       // if player is moving, update the position
-      switch (data.direction) {
-        case "up":
-          updatedData.y = data.y - GRID_HEIGHT;
-          break;
-        case "down":
-          updatedData.y = data.y + GRID_HEIGHT;
-          break;
-        case "left":
-          updatedData.x = data.x - GRID_WIDTH;
-          break;
-        case "right":
-          updatedData.x = data.x + GRID_WIDTH;
-          break;
-      }
+      const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
+        data.x,
+        data.y,
+        data.direction! as AnimationDirection
+      );
+
+      updatedData.x = newX;
+      updatedData.y = newY;
     }
 
     await Character.updateOne(
