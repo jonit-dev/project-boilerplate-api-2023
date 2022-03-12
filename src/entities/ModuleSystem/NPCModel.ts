@@ -37,6 +37,7 @@ const npcSchema = createSchema(
     key: Type.string({
       required: true,
     }),
+    maxRangeInGridCells: Type.number(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
