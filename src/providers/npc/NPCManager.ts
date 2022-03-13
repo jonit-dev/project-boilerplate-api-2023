@@ -32,41 +32,47 @@ export class NPCManager {
   public init(NPCs: INPC[]): void {
     setInterval(async () => {
       for (const npc of NPCs) {
-        switch (npc.movementType) {
-          case NPCMovementType.Random:
-            await this.startRandomMovement(npc);
-            break;
-          case NPCMovementType.FixedPath:
-            let endGridX = npc.fixedPath.endGridX as unknown as number;
-            let endGridY = npc.fixedPath.endGridY as unknown as number;
-            const npcData = NPCMetaData.get(npc.key);
+        try {
+          switch (npc.movementType) {
+            case NPCMovementType.Random:
+              await this.startRandomMovement(npc);
+              break;
+            case NPCMovementType.FixedPath:
+              let endGridX = npc.fixedPath.endGridX as unknown as number;
+              let endGridY = npc.fixedPath.endGridY as unknown as number;
+              const npcData = NPCMetaData.get(npc.key);
 
-            if (!npcData) {
-              console.log(`Failed to find NPC data for ${npc.key}`);
+              if (!npcData) {
+                console.log(`Failed to find NPC data for ${npc.key}`);
 
-              continue;
-            }
+                continue;
+              }
 
-            // if NPC is at the initial position, move forward to end position.
-            if (this.isNPCAtPathPosition(npc, ToGridX(npcData.x!), ToGridY(npcData.y!))) {
-              npc.fixedPathOrientation = FixedPathOrientation.Forward;
-              await npc.save();
-            }
+              // if NPC is at the initial position, move forward to end position.
+              if (this.isNPCAtPathPosition(npc, ToGridX(npcData.x!), ToGridY(npcData.y!))) {
+                npc.fixedPathOrientation = FixedPathOrientation.Forward;
+                await npc.save();
+              }
 
-            // if NPC is at the end of the path, move backwards to initial position.
-            if (this.isNPCAtPathPosition(npc, endGridX, endGridY)) {
-              npc.fixedPathOrientation = FixedPathOrientation.Backward;
-              await npc.save();
-            }
+              // if NPC is at the end of the path, move backwards to initial position.
+              if (this.isNPCAtPathPosition(npc, endGridX, endGridY)) {
+                npc.fixedPathOrientation = FixedPathOrientation.Backward;
+                await npc.save();
+              }
 
-            if (npc.fixedPathOrientation === FixedPathOrientation.Backward) {
-              endGridX = ToGridX(npcData?.x!);
-              endGridY = ToGridY(npcData?.y!);
-            }
+              if (npc.fixedPathOrientation === FixedPathOrientation.Backward) {
+                endGridX = ToGridX(npcData?.x!);
+                endGridY = ToGridY(npcData?.y!);
+              }
 
-            await this.startFixedPathMovement(npc, endGridX, endGridY);
+              await this.startFixedPathMovement(npc, endGridX, endGridY);
 
-            break;
+              break;
+          }
+        } catch (err) {
+          console.log(`Error in ${npc.key}`);
+          console.log(err);
+          continue;
         }
       }
     }, 1000);
@@ -116,7 +122,7 @@ export class NPCManager {
         endGridY
       );
 
-      if (!npcPath) {
+      if (!npcPath || npcPath.length <= 1) {
         console.log("Failed to calculated fixed path. NPC is stopped");
         return;
       }

@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
+import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -9,6 +10,9 @@ import {
   IConnectedPlayer,
   IPlayerPositionUpdateConfirm,
   PlayerSocketEvents,
+  ScenesMetaData,
+  ToGridX,
+  ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SocketRetransmission } from "../sockets/SocketRetransmission";
@@ -82,6 +86,7 @@ export class PlayerUpdate {
 
   private async updateServerSideEmitterInfo(data: IConnectedPlayer, character: ICharacter): Promise<void> {
     const updatedData = data;
+    const map = ScenesMetaData[character.scene].map;
 
     if (data.isMoving) {
       // if player is moving, update the position
@@ -90,6 +95,8 @@ export class PlayerUpdate {
         data.y,
         data.direction! as AnimationDirection
       );
+
+      TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(data.x), ToGridY(data.y), true);
 
       updatedData.x = newX;
       updatedData.y = newY;
@@ -106,5 +113,9 @@ export class PlayerUpdate {
         },
       }
     );
+
+    // update our grid with solid information
+
+    TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(updatedData.x), ToGridY(updatedData.y), false);
   }
 }
