@@ -1590,10 +1590,10 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@rpg-engine/shared@^0.1.42":
-  version "0.1.42"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.1.42.tgz#968bab85f0b9860948f38c4c7fabafe79192d0cb"
-  integrity sha512-GAJOkcBBnjUq01nVTnD/Dh6J9e9fat2SYl+KFQRD6Anck4KFrfeHDUWCrk/wZMYTCSS75Fyh19qwk9ihJO+dKw==
+"@rpg-engine/shared@^0.1.44":
+  version "0.1.44"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.1.44.tgz#86c21a6c68cc4429189dfcc3fd0d3351999fe6c7"
+  integrity sha512-MUL1v/lpEjbLyYhNBSMYIqwjWOwwdiaT360OIOukgZicMEWDJz7wLwYmQLytOCsx7qxoIqMfTNy1bv1ybuMrQA==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
@@ -7258,6 +7258,11 @@ slash@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
+
+sleep-promise@^9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/sleep-promise/-/sleep-promise-9.1.0.tgz#101ebe65700bcd184709da95d960967b02b79d03"
+  integrity sha512-UHYzVpz9Xn8b+jikYSD6bqvf754xL2uBUzDFwiU6NcdZeifPr6UfgU43xpkPu67VMS88+TI2PSI7Eohgqf2fKA==
 
 slice-ansi@^4.0.0:
   version "4.0.0"

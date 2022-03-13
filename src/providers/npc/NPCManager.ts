@@ -16,6 +16,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import sleep from "sleep-promise";
 import { NPCMetaData } from "./NPCMetaData";
 
 type NPCMovementDirection = "up" | "down" | "left" | "right";
@@ -74,8 +75,9 @@ export class NPCManager {
           console.log(err);
           continue;
         }
+        await sleep(_.random(250, 500));
       }
-    }, 1000);
+    }, 1500);
   }
 
   public async warnUserAboutNPCsInView(character: ICharacter): Promise<void> {
@@ -93,6 +95,7 @@ export class NPCManager {
           direction: npc.direction,
           key: npc.key,
           layer: npc.layer,
+          textureKey: npc.textureKey,
         }
       );
     }
@@ -134,7 +137,7 @@ export class NPCManager {
       if (nextMovementDirection) {
         const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, nextMovementDirection);
 
-        await this.moveNPC(npc, newX, newY, nextMovementDirection);
+        await this.moveNPC(npc, npc.x, npc.y, newX, newY, nextMovementDirection);
       } else {
         console.log("Failed to calculate fixed path. nextMovementDirection is undefined");
       }
@@ -192,9 +195,9 @@ export class NPCManager {
       console.log("Movement is out of range. Going back!");
       chosenMovementDirection = this.movementHelper.getOppositeDirection(chosenMovementDirection);
       const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
-      await this.moveNPC(npc, newX, newY, chosenMovementDirection);
+      await this.moveNPC(npc, npc.x, npc.y, newX, newY, chosenMovementDirection);
     } else {
-      await this.moveNPC(npc, newX, newY, chosenMovementDirection);
+      await this.moveNPC(npc, npc.x, npc.y, newX, newY, chosenMovementDirection);
     }
   }
 
@@ -238,10 +241,17 @@ export class NPCManager {
 
   private async moveNPC(
     npc: INPC,
+    oldX: number,
+    oldY: number,
     newX: number,
     newY: number,
     chosenMovementDirection: NPCMovementDirection
   ): Promise<void> {
+    const map = ScenesMetaData[npc.scene].map;
+
+    TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
+    TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(newX), ToGridY(newY), true);
+
     const newGridX = ToGridX(newX);
     const newGridY = ToGridY(newY);
 
@@ -269,6 +279,7 @@ export class NPCManager {
           direction: chosenMovementDirection,
           key: npc.key,
           layer: npc.layer,
+          textureKey: npc.textureKey,
         }
       );
     }

@@ -44,6 +44,9 @@ const npcSchema = createSchema(
     key: Type.string({
       required: true,
     }),
+    textureKey: Type.string({
+      required: true,
+    }),
     movementType: Type.string({
       required: true,
       default: NPCMovementType.Random,
