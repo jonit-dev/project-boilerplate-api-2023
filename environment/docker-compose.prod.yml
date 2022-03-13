@@ -30,6 +30,7 @@ services:
       LETSENCRYPT_HOST: ${API_SUBDOMAIN}
       LETSENCRYPT_EMAIL: ${ADMIN_EMAIL}
       VIRTUAL_PORT: ${SERVER_PORT}
+      CHOKIDAR_USEPOLLING: "true" # enables hot-reloading on windows host
 
   rpg-db:
     container_name: rpg-db

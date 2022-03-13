@@ -63,6 +63,9 @@ const npcSchema = createSchema(
       endGridX: Type.number(),
       endGridY: Type.number(),
     },
+    pm2InstanceManager: Type.number({
+      required: true,
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

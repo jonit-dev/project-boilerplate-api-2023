@@ -1,22 +1,24 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
+import { appEnv } from "@providers/config/env";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { PlayerView } from "@providers/player/PlayerView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   AnimationDirection,
+  EnvType,
   FixedPathOrientation,
   INPCPositionUpdatePayload,
   NPCMovementType,
   NPCSocketEvents,
   ScenesMetaData,
+  SocketTypes,
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import sleep from "sleep-promise";
 import { NPCMetaData } from "./NPCMetaData";
 
 type NPCMovementDirection = "up" | "down" | "left" | "right";
@@ -30,54 +32,81 @@ export class NPCManager {
     private movementHelper: MovementHelper
   ) {}
 
-  public init(NPCs: INPC[]): void {
-    setInterval(async () => {
-      for (const npc of NPCs) {
-        try {
-          switch (npc.movementType) {
-            case NPCMovementType.Random:
-              await this.startRandomMovement(npc);
-              break;
-            case NPCMovementType.FixedPath:
-              let endGridX = npc.fixedPath.endGridX as unknown as number;
-              let endGridY = npc.fixedPath.endGridY as unknown as number;
-              const npcData = NPCMetaData.get(npc.key);
-
-              if (!npcData) {
-                console.log(`Failed to find NPC data for ${npc.key}`);
-
-                continue;
-              }
-
-              // if NPC is at the initial position, move forward to end position.
-              if (this.isNPCAtPathPosition(npc, ToGridX(npcData.x!), ToGridY(npcData.y!))) {
-                npc.fixedPathOrientation = FixedPathOrientation.Forward;
-                await npc.save();
-              }
-
-              // if NPC is at the end of the path, move backwards to initial position.
-              if (this.isNPCAtPathPosition(npc, endGridX, endGridY)) {
-                npc.fixedPathOrientation = FixedPathOrientation.Backward;
-                await npc.save();
-              }
-
-              if (npc.fixedPathOrientation === FixedPathOrientation.Backward) {
-                endGridX = ToGridX(npcData?.x!);
-                endGridY = ToGridY(npcData?.y!);
-              }
-
-              await this.startFixedPathMovement(npc, endGridX, endGridY);
-
-              break;
-          }
-        } catch (err) {
-          console.log(`Error in ${npc.key}`);
-          console.log(err);
-          continue;
+  public async init(): Promise<void> {
+    const npcs = await NPC.find({});
+    switch (appEnv.general.ENV) {
+      case EnvType.Development: // on development, start all NPCs at once.
+        for (const npc of npcs) {
+          this.startBehaviorLoop(npc);
         }
-        await sleep(_.random(250, 500));
+        break;
+
+      case EnvType.Production: // on production, spread NPCs over pm2 instances.
+        switch (appEnv.socket.type) {
+          case SocketTypes.TCP:
+            for (const npc of npcs) {
+              if (process.env.NODE_APP_INSTANCE === npc.pm2InstanceManager.toString()) {
+                this.startBehaviorLoop(npc);
+              }
+            }
+            break;
+
+          case SocketTypes.UDP:
+            if (process.env.NODE_APP_INSTANCE === "0") {
+              for (const npc of npcs) {
+                this.startBehaviorLoop(npc);
+              }
+            }
+            break;
+        }
+
+        break;
+    }
+  }
+
+  public startBehaviorLoop(npc: INPC): void {
+    setInterval(async () => {
+      try {
+        switch (npc.movementType) {
+          case NPCMovementType.Random:
+            await this.startRandomMovement(npc);
+            break;
+          case NPCMovementType.FixedPath:
+            let endGridX = npc.fixedPath.endGridX as unknown as number;
+            let endGridY = npc.fixedPath.endGridY as unknown as number;
+            const npcData = NPCMetaData.get(npc.key);
+
+            if (!npcData) {
+              console.log(`Failed to find NPC data for ${npc.key}`);
+              return;
+            }
+
+            // if NPC is at the initial position, move forward to end position.
+            if (this.isNPCAtPathPosition(npc, ToGridX(npcData.x!), ToGridY(npcData.y!))) {
+              npc.fixedPathOrientation = FixedPathOrientation.Forward;
+              await npc.save();
+            }
+
+            // if NPC is at the end of the path, move backwards to initial position.
+            if (this.isNPCAtPathPosition(npc, endGridX, endGridY)) {
+              npc.fixedPathOrientation = FixedPathOrientation.Backward;
+              await npc.save();
+            }
+
+            if (npc.fixedPathOrientation === FixedPathOrientation.Backward) {
+              endGridX = ToGridX(npcData?.x!);
+              endGridY = ToGridY(npcData?.y!);
+            }
+
+            await this.startFixedPathMovement(npc, endGridX, endGridY);
+
+            break;
+        }
+      } catch (err) {
+        console.log(`Error in ${npc.key}`);
+        console.log(err);
       }
-    }, 1500);
+    }, _.random(1000, 2000));
   }
 
   public async warnUserAboutNPCsInView(character: ICharacter): Promise<void> {
@@ -88,7 +117,7 @@ export class NPCManager {
         character.channelId!,
         NPCSocketEvents.NPCPositionUpdate,
         {
-          id: npc._id,
+          id: npc.id,
           name: npc.name,
           x: npc.x,
           y: npc.y,
@@ -272,7 +301,7 @@ export class NPCManager {
         player.channelId!,
         NPCSocketEvents.NPCPositionUpdate,
         {
-          id: npc._id,
+          id: npc.id,
           name: npc.name,
           x: npc.x,
           y: npc.y,

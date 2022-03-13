@@ -17,6 +17,7 @@ export const appEnv = {
     SWAGGER_AUTH_TOKEN: process.env.SWAGGER_AUTH_TOKEN,
     FMP_API_KEY: process.env.FMP_API_KEY,
     SENTRY_DNS_URL: process.env.SENTRY_DNS_URL,
+    MAX_PM2_INSTANCES: Number(process.env.MAX_PM2_INSTANCES)!,
   },
   analytics: {
     mixpanelToken: process.env.MIXPANEL_TOKEN,

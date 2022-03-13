@@ -43,7 +43,7 @@ app.listen(port, async () => {
   await socketAdapter.init(appEnv.socket.type);
 
   //! TODO: Allocate according to pm2 instances
-  await npcManager.init(await NPC.find());
+  await npcManager.init();
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({

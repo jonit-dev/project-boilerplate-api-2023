@@ -1,3 +1,4 @@
+import { appEnv } from "@providers/config/env";
 import {
   CharacterClass,
   CharacterGender,
@@ -9,6 +10,7 @@ import {
   MapLayers,
   NPCMovementType,
 } from "@rpg-engine/shared";
+import _ from "lodash";
 
 interface INPCMetaData extends Omit<INPC, "_id"> {
   key: string;
@@ -35,6 +37,7 @@ NPCMetaData.set("alice", {
     endGridX: 7,
     endGridY: 5,
   },
+  pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
 });
 
 NPCMetaData.set("maria", {
@@ -50,6 +53,7 @@ NPCMetaData.set("maria", {
   layer: MapLayers.Player,
   movementType: NPCMovementType.Random,
   maxRangeInGridCells: GRID_WIDTH * 5,
+  pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
 });
 
 export { NPCMetaData };
