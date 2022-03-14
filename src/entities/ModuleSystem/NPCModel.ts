@@ -5,12 +5,35 @@ import {
   FixedPathOrientation,
   GRID_WIDTH,
   MapLayers,
+  NPCAlignment,
   NPCMovementType,
 } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const npcSchema = createSchema(
   {
+    key: Type.string({
+      required: true,
+    }),
+    textureKey: Type.string({
+      required: true,
+    }),
+    health: Type.number({
+      default: 100,
+      required: true,
+    }),
+    mana: Type.number({
+      default: 0,
+      required: true,
+    }),
+    alignment: Type.string({
+      required: true,
+      default: NPCAlignment.Neutral,
+      enum: TypeHelper.enumToStringArray(NPCAlignment),
+    }),
+    targetCharacter: Type.string({
+      ref: "Character",
+    }),
     name: Type.string({
       required: true,
     }),
@@ -41,12 +64,7 @@ const npcSchema = createSchema(
       required: true,
       default: MapLayers.Player,
     }),
-    key: Type.string({
-      required: true,
-    }),
-    textureKey: Type.string({
-      required: true,
-    }),
+
     movementType: Type.string({
       required: true,
       default: NPCMovementType.Random,
@@ -62,6 +80,12 @@ const npcSchema = createSchema(
     fixedPath: {
       endGridX: Type.number(),
       endGridY: Type.number(),
+    },
+    socketTransmissionZone: {
+      x: Type.number(),
+      y: Type.number(),
+      width: Type.number(),
+      height: Type.number(),
     },
     pm2InstanceManager: Type.number({
       required: true,

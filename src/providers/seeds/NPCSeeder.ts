@@ -9,7 +9,7 @@ export class NPCSeeder {
       const npcFound = await NPC.exists({ key: key });
 
       if (!npcFound) {
-        console.log("🌱 Seeding database with NPC data...");
+        console.log(`🌱 Seeding database with NPC data for NPC with key: ${key}`);
         const newNPC = new NPC(NPCData);
         await newNPC.save();
       } else {
