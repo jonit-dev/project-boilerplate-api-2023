@@ -19,7 +19,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { NPCMetaData } from "./NPCMetaData";
+import { NPCMetaData } from "./npcs/NPCMetaData";
 
 type NPCMovementDirection = "up" | "down" | "left" | "right";
 

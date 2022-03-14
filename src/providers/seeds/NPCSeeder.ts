@@ -1,5 +1,5 @@
 import { NPC } from "@entities/ModuleSystem/NPCModel";
-import { NPCMetaData } from "@providers/npc/NPCMetaData";
+import { NPCMetaData } from "@providers/npc/npcs/NPCMetaData";
 import { provide } from "inversify-binding-decorators";
 
 @provide(NPCSeeder)

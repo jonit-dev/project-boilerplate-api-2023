@@ -3,7 +3,6 @@ import {
   CharacterClass,
   CharacterGender,
   FixedPathOrientation,
-  GRID_WIDTH,
   MapLayers,
   NPCAlignment,
   NPCMovementType,
@@ -70,10 +69,7 @@ const npcSchema = createSchema(
       default: NPCMovementType.Random,
       enum: TypeHelper.enumToStringArray(NPCMovementType),
     }),
-    maxRangeInGridCells: Type.number({
-      required: true,
-      default: GRID_WIDTH * 3,
-    }),
+    maxRangeInGridCells: Type.number(),
     fixedPathOrientation: Type.string({
       enum: TypeHelper.enumToStringArray(FixedPathOrientation),
     }),
