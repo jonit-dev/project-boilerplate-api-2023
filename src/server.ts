@@ -31,7 +31,7 @@ app.listen(port, async () => {
     language: appEnv.general.LANGUAGE!,
     phoneLocale: appEnv.general.PHONE_LOCALE!,
   });
-  npcLoader.init();
+  npcLoader.init(); //! This must come before our seeds.start(), otherwise it won't have the data to create our NPCs.
 
   tilemapParser.init();
   await db.init();
