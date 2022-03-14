@@ -1,8 +1,8 @@
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { NPCManager } from "@providers/npc/NPCManager";
+import { NPCLoader } from "@providers/npc/npcs/NPCLoader";
 import { Player } from "@providers/player/Player";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
-import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { Container } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
 import { Cronjob } from "../cronjobs/CronJobs";
@@ -35,7 +35,7 @@ export const server = container.get<ServerHelper>(ServerHelper);
 export const socketAdapter = container.get<SocketAdapter>(SocketAdapter);
 export const player = container.get<Player>(Player);
 export const tilemapParser = container.get<TilemapParser>(TilemapParser);
-export const socketTransmissionZone = container.get<SocketTransmissionZone>(SocketTransmissionZone);
 export const npcManager = container.get<NPCManager>(NPCManager);
+export const npcLoader = container.get<NPCLoader>(NPCLoader);
 
 export { container };

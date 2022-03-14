@@ -9,7 +9,7 @@ export interface ISocketTransmissionZone {
 
 @provide(SocketTransmissionZone)
 export class SocketTransmissionZone {
-  public static calculateSocketTransmissionZone(
+  public calculateSocketTransmissionZone(
     entityX: number,
     entityY: number,
     entityWidth: number,

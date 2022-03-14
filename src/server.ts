@@ -2,7 +2,16 @@ import "express-async-errors";
 import "reflect-metadata";
 
 import { appEnv } from "@providers/config/env";
-import { cronJobs, db, npcManager, seeds, server, socketAdapter, tilemapParser } from "@providers/inversify/container";
+import {
+  cronJobs,
+  db,
+  npcLoader,
+  npcManager,
+  seeds,
+  server,
+  socketAdapter,
+  tilemapParser,
+} from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { app } from "@providers/server/app";
@@ -22,6 +31,7 @@ app.listen(port, async () => {
     language: appEnv.general.LANGUAGE!,
     phoneLocale: appEnv.general.PHONE_LOCALE!,
   });
+  npcLoader.init();
 
   tilemapParser.init();
   await db.init();
@@ -42,6 +52,7 @@ app.listen(port, async () => {
   await socketAdapter.init(appEnv.socket.type);
 
   //! TODO: Allocate according to pm2 instances
+
   await npcManager.init();
 
   if (appEnv.general.ENV === EnvType.Production) {

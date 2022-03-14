@@ -19,7 +19,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { NPCMetaData } from "./npcs/NPCMetaData";
+import { NPCLoader } from "./npcs/NPCLoader";
 
 type NPCMovementDirection = "up" | "down" | "left" | "right";
 
@@ -74,7 +74,7 @@ export class NPCManager {
           case NPCMovementType.FixedPath:
             let endGridX = npc.fixedPath.endGridX as unknown as number;
             let endGridY = npc.fixedPath.endGridY as unknown as number;
-            const npcData = NPCMetaData.get(npc.key);
+            const npcData = NPCLoader.NPCMetaData.get(npc.key);
 
             if (!npcData) {
               console.log(`Failed to find NPC data for ${npc.key}`);
@@ -204,7 +204,7 @@ export class NPCManager {
   }
 
   private async startRandomMovement(npc: INPC): Promise<void> {
-    const npcMetaData = NPCMetaData.get(npc.key);
+    const npcMetaData = NPCLoader.NPCMetaData.get(npc.key);
 
     if (!npcMetaData) {
       console.log(`NPCMetaData for ${npc.name} not found!`);
