@@ -4,6 +4,7 @@ import { Model } from "mongoose";
 
 @provide(PlayerView)
 export class PlayerView {
+  //! Avoid using this method. I assume it's not very performant!
   public async getCharactersWithXYPositionInView(x: number, y: number, scene: string): Promise<ICharacter[]> {
     // fetch characters that have a X,Y position under their cameraCoordinates
 

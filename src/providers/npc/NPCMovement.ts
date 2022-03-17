@@ -4,17 +4,22 @@ import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { PlayerView } from "@providers/player/PlayerView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
   AnimationDirection,
+  GRID_HEIGHT,
+  GRID_WIDTH,
   INPCPositionUpdatePayload,
   NPCSocketEvents,
   ScenesMetaData,
+  SOCKET_TRANSMISSION_ZONE_WIDTH,
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCLoader } from "./npcs/NPCLoader";
+import { NPCView } from "./NPCView";
 
 type NPCMovementDirection = "up" | "down" | "left" | "right";
 
@@ -24,7 +29,9 @@ export class NPCMovement {
     private movementHelper: MovementHelper,
     private tilemapParser: TilemapParser,
     private playerView: PlayerView,
-    private socketMessaging: SocketMessaging
+    private socketMessaging: SocketMessaging,
+    private npcView: NPCView,
+    private socketTransmissionZone: SocketTransmissionZone
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -185,7 +192,9 @@ export class NPCMovement {
 
     // warn nearby players that the NPC moved;
 
-    const nearbyPlayers = await this.playerView.getCharactersWithXYPositionInView(newX, newY, npc.scene);
+    // const nearbyPlayers = await this.playerView.getCharactersWithXYPositionInView(newX, newY, npc.scene);
+
+    const nearbyPlayers = await this.npcView.getElementsInNPCView(Character, npc);
 
     for (const player of nearbyPlayers) {
       this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
@@ -208,6 +217,22 @@ export class NPCMovement {
     npc.x = newX;
     npc.y = newY;
     npc.direction = chosenMovementDirection;
+
+    const { x, y, width, height } = this.socketTransmissionZone.calculateSocketTransmissionZone(
+      npc.x,
+      npc.y,
+      GRID_WIDTH,
+      GRID_HEIGHT,
+      SOCKET_TRANSMISSION_ZONE_WIDTH,
+      SOCKET_TRANSMISSION_ZONE_WIDTH
+    );
+
+    npc.socketTransmissionZone = {
+      x,
+      y,
+      width,
+      height,
+    };
     await npc.save();
   }
 }

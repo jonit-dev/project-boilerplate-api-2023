@@ -78,10 +78,18 @@ const npcSchema = createSchema(
       endGridY: Type.number(),
     },
     socketTransmissionZone: {
-      x: Type.number(),
-      y: Type.number(),
-      width: Type.number(),
-      height: Type.number(),
+      x: Type.number({
+        required: true,
+      }),
+      y: Type.number({
+        required: true,
+      }),
+      width: Type.number({
+        required: true,
+      }),
+      height: Type.number({
+        required: true,
+      }),
     },
     pm2InstanceManager: Type.number({
       required: true,

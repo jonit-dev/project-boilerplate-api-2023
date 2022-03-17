@@ -12,16 +12,16 @@ export class NPCSeeder {
     for (const [key, NPCData] of NPCLoader.NPCMetaData.entries()) {
       const npcFound = await NPC.exists({ key: key });
 
-      const { left, top, right, bottom } = this.getSocketTransmissionZone(NPCData.x, NPCData.y);
+      const { x, y, width, height } = this.getSocketTransmissionZone(NPCData.x, NPCData.y);
 
       if (!npcFound) {
         console.log(`🌱 Seeding database with NPC data for NPC with key: ${key}`);
 
         NPCData.socketTransmissionZone = {
-          x: left,
-          y: top,
-          width: right,
-          height: bottom,
+          x,
+          y,
+          width,
+          height,
         };
 
         const newNPC = new NPC(NPCData);
@@ -36,10 +36,10 @@ export class NPCSeeder {
               x: NPCData.x,
               y: NPCData.y,
               socketTransmissionZone: {
-                x: left,
-                y: top,
-                width: right,
-                height: bottom,
+                x,
+                y,
+                width,
+                height,
               },
             },
           }

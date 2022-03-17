@@ -2,12 +2,54 @@ import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { PlayerView } from "@providers/player/PlayerView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { ISocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { INPCPositionUpdatePayload, NPCSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { Model } from "mongoose";
 
+interface IElementWithPosition {
+  x: number;
+  y: number;
+}
 @provide(NPCView)
 export class NPCView {
   constructor(private socketMessaging: SocketMessaging, private playerView: PlayerView) {}
+
+  public async getElementsInNPCView<T extends IElementWithPosition>(
+    Element: Model<T>,
+    npc: INPC,
+    filter?: Record<string, unknown>
+  ): Promise<T[]> {
+    if (!npc.socketTransmissionZone) {
+      console.log(`Error: npc ${npc.key} has no defined socket transmission zone!`);
+      return [];
+    }
+
+    const socketTransmissionZone = npc.socketTransmissionZone as unknown as ISocketTransmissionZone;
+
+    // @ts-ignore
+    const otherCharactersInView = await Element.find({
+      $and: [
+        {
+          x: {
+            $gte: socketTransmissionZone.x,
+            $lte: socketTransmissionZone.x + socketTransmissionZone.width,
+          },
+        },
+        {
+          y: {
+            $gte: socketTransmissionZone.y,
+            $lte: socketTransmissionZone.y + socketTransmissionZone.height,
+          },
+        },
+        {
+          scene: npc.scene,
+          ...filter,
+        },
+      ],
+    });
+    return otherCharactersInView as unknown as T[];
+  }
 
   public async warnUserAboutNPCsInView(character: ICharacter): Promise<void> {
     const npcsInView = await this.getNPCsInView(character);
