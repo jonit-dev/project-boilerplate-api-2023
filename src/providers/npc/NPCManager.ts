@@ -1,18 +1,6 @@
-import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { appEnv } from "@providers/config/env";
-import { PlayerView } from "@providers/player/PlayerView";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  EnvType,
-  FixedPathOrientation,
-  INPCPositionUpdatePayload,
-  NPCMovementType,
-  NPCSocketEvents,
-  SocketTypes,
-  ToGridX,
-  ToGridY,
-} from "@rpg-engine/shared";
+import { EnvType, FixedPathOrientation, NPCMovementType, SocketTypes, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCMovement } from "./NPCMovement";
@@ -20,11 +8,7 @@ import { NPCLoader } from "./npcs/NPCLoader";
 
 @provide(NPCManager)
 export class NPCManager {
-  constructor(
-    private socketMessaging: SocketMessaging,
-    private npcMovement: NPCMovement,
-    private playerView: PlayerView
-  ) {}
+  constructor(private npcMovement: NPCMovement) {}
 
   public async init(): Promise<void> {
     const npcs = await NPC.find({});
@@ -101,32 +85,5 @@ export class NPCManager {
         console.log(err);
       }
     }, _.random(1000, 2000));
-  }
-
-  public async warnUserAboutNPCsInView(character: ICharacter): Promise<void> {
-    const npcsInView = await this.getNPCsInView(character);
-
-    for (const npc of npcsInView) {
-      this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
-        character.channelId!,
-        NPCSocketEvents.NPCPositionUpdate,
-        {
-          id: npc.id,
-          name: npc.name,
-          x: npc.x,
-          y: npc.y,
-          direction: npc.direction,
-          key: npc.key,
-          layer: npc.layer,
-          textureKey: npc.textureKey,
-        }
-      );
-    }
-  }
-
-  public async getNPCsInView(character: ICharacter): Promise<INPC[]> {
-    const npcsInView = await this.playerView.getElementsInCharView(NPC, character);
-
-    return npcsInView;
   }
 }
