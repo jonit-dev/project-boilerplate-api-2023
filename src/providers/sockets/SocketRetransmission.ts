@@ -1,13 +1,13 @@
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { PlayerView } from "@providers/player/PlayerView";
-import { Events, IOtherPlayerInView } from "@rpg-engine/shared";
+import { Events, IEntitiesInView } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SocketMessaging } from "./SocketMessaging";
 
 export interface IBaseData {
   id: string;
   channelId: string;
-  otherPlayersInView: IOtherPlayerInView;
+  otherEntitiesInView: IEntitiesInView;
 }
 
 export interface IAbstractPlayerData {
@@ -78,7 +78,7 @@ export class SocketRetransmission {
     serverNearbyPlayer: IAbstractPlayerData, // what we have on the server
     checkKeysToUpdate: string[]
   ): boolean {
-    const emitterInfoAboutNearbyPlayer = clientEmitterData.otherPlayersInView[serverNearbyPlayer.id];
+    const emitterInfoAboutNearbyPlayer = clientEmitterData.otherEntitiesInView[serverNearbyPlayer.id];
 
     if (!emitterInfoAboutNearbyPlayer) return false;
 

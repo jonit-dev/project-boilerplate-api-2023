@@ -3,6 +3,7 @@ import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { ServerChannel } from "@geckos.io/server";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -23,7 +24,8 @@ export class PlayerUpdate {
     private socketMessaging: SocketMessaging,
     private dataRetransmission: SocketRetransmission,
     private socketAuth: SocketAuth,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private npcView: NPCView
   ) {}
 
   public onPlayerUpdatePosition(channel: ServerChannel): void {
@@ -65,6 +67,8 @@ export class PlayerUpdate {
               isMoving: false,
             }
           );
+
+          // await this.npcView.warnUserAboutNPCsInView(character);
 
           // update emitter position from connectedPlayers
           await this.updateServerSideEmitterInfo(data, character);
