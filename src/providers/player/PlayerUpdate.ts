@@ -68,7 +68,7 @@ export class PlayerUpdate {
             }
           );
 
-          // await this.npcView.warnUserAboutNPCsInView(character);
+          await this.npcView.warnUserAboutNPCsInView(character, data.otherEntitiesInView);
 
           // update emitter position from connectedPlayers
           await this.updateServerSideEmitterInfo(data, character);

@@ -147,7 +147,7 @@ export class NPCMovement {
     }
 
     // check for other Characters
-    const hasPlayer = await Character.exists({ x: newX, y: newY, scene: npc.scene });
+    const hasPlayer = await Character.exists({ x: newX, y: newY, scene: npc.scene, isOnline: true });
 
     if (hasPlayer) {
       console.log(`${npc.name} tried to move, but was blocked by a player!`);
@@ -176,6 +176,7 @@ export class NPCMovement {
   ): Promise<void> {
     const map = ScenesMetaData[npc.scene].map;
 
+    // update grid solids
     TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
     TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(newX), ToGridY(newY), true);
 
@@ -187,6 +188,7 @@ export class NPCMovement {
     const hasSolid = await this.hasSolid(npc, newX, newY);
     if (hasSolid) {
       console.log(`${npc.name} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
+
       return;
     }
 

@@ -3,7 +3,8 @@ import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { PlayerView } from "@providers/player/PlayerView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ISocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import { INPCPositionUpdatePayload, NPCSocketEvents } from "@rpg-engine/shared";
+import { IEntitiesInView, INPCPositionUpdatePayload, NPCSocketEvents } from "@rpg-engine/shared";
+import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
 
@@ -51,10 +52,14 @@ export class NPCView {
     return otherCharactersInView as unknown as T[];
   }
 
-  public async warnUserAboutNPCsInView(character: ICharacter): Promise<void> {
+  public async warnUserAboutNPCsInView(character: ICharacter, otherEntitiesInView?: IEntitiesInView): Promise<void> {
     const npcsInView = await this.getNPCsInView(character);
 
     for (const npc of npcsInView) {
+      if (otherEntitiesInView && otherEntitiesInView[npc.id] && otherEntitiesInView[npc.id].type === EntityType.NPC) {
+        continue; // we dont need to warn the user about the npc, since it already has it on his view
+      }
+
       this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
         character.channelId!,
         NPCSocketEvents.NPCPositionUpdate,
