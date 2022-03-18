@@ -1617,10 +1617,10 @@
     rollup-plugin-image-files "^1.4.2"
     rpgui "^1.0.3"
 
-"@rpg-engine/shared@^0.1.52":
-  version "0.1.52"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.1.52.tgz#c4f8368724b730aae52730ef28308c7e44cedf9f"
-  integrity sha512-LX+mHumyMZmZjwalOOWzgv9TAaXDawQgrE48FJN+L4Ze9xpvIt7/R1NV2CSzOjFLx1TfNrjk7CvnWJSBTtkA0Q==
+"@rpg-engine/shared@^0.1.53":
+  version "0.1.53"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.1.53.tgz#17ba9bbc99a951b52276c17aad524d4b05d5480d"
+  integrity sha512-q4vM7sCw5xogBFtUfCYUmu2W3xYV7zaWrmYA25grnq0FX+l45gtUAteig+Bc1/qf3KgEl6IHsG6CnWX8ewgteQ==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
