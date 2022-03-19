@@ -23,8 +23,6 @@ import * as Tracing from "@sentry/tracing";
 const port = appEnv.general.SERVER_PORT || 3002;
 
 app.listen(port, async () => {
-  tilemapParser.init();
-
   server.showBootstrapMessage({
     appName: appEnv.general.APP_NAME!,
     port: appEnv.general.SERVER_PORT!,
@@ -33,6 +31,7 @@ app.listen(port, async () => {
     language: appEnv.general.LANGUAGE!,
     phoneLocale: appEnv.general.PHONE_LOCALE!,
   });
+  tilemapParser.init(); // must be the first thing loaded!
   npcLoader.init(); //! This must come before our seeds.start(), otherwise it won't have the data to create our NPCs.
 
   await db.init();

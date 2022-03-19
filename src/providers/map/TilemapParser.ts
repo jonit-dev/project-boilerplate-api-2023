@@ -1,6 +1,7 @@
 import { MapSolid } from "@entities/ModuleSystem/MapSolid";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { ITiled, ITileset, MapLayers, TiledLayerNames } from "@rpg-engine/shared";
+import crypto from "crypto";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
 import PF from "pathfinding";
@@ -17,21 +18,30 @@ export class TilemapParser {
 
     const mapNames = fs.readdirSync(STATIC_PATH + "/maps");
 
-    for (const mapName of mapNames) {
-      if (!mapName.endsWith(".json")) {
+    for (const mapFileName of mapNames) {
+      if (mapFileName.includes("_hash")) {
+        continue; // just cache files, skip!
+      }
+
+      if (!mapFileName.endsWith(".json")) {
         continue;
       }
-      const mapPath = `${STATIC_PATH}/maps/${mapName}`;
+      const mapPath = `${STATIC_PATH}/maps/${mapFileName}`;
 
       const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
+      const mapName = mapFileName.replace(".json", "");
 
-      const key = mapName.replace(".json", "");
+      TilemapParser.maps.set(mapName, currentMap);
 
-      TilemapParser.maps.set(key, currentMap);
+      TilemapParser.grids.set(mapName, new PF.Grid(currentMap.width, currentMap.height));
 
-      TilemapParser.grids.set(key, new PF.Grid(currentMap.width, currentMap.height));
-
-      this.generateSolidsMapAndGrid(key, currentMap);
+      if (this.wasMapModified(mapName, currentMap)) {
+        console.log(`⚙️ The map ${mapName} was modified. Regenerating solids into our database... ✅`);
+        // only generate solids again in the database, if there was a map change!
+        this.generateSolidsMapAndGrid(mapName, currentMap);
+      } else {
+        console.log(`⚙️ The map ${mapName} is already updated in our database. Skipping solids generation...`);
+      }
     }
 
     console.log("📦 Maps and grids are loaded!");
@@ -40,7 +50,7 @@ export class TilemapParser {
   public async generateSolidsMapAndGrid(map: string, currentMap: ITiled): Promise<void> {
     const gridMap = TilemapParser.grids.get(map);
     if (!gridMap) {
-      console.log(`Failed to create grid for ${map}`);
+      console.log(`❌ Failed to create grid for ${map}`);
       return;
     }
 
@@ -92,6 +102,37 @@ export class TilemapParser {
         }
       }
     }
+  }
+
+  private wasMapModified(mapName: string, currentMap: ITiled): boolean {
+    if (!fs.existsSync(`${STATIC_PATH}/maps/${mapName}_hash.json`)) {
+      const mapHash = crypto.createHash("sha256").update(JSON.stringify(currentMap)).digest("hex");
+      fs.writeFileSync(
+        `${STATIC_PATH}/maps/${mapName}_hash.json`,
+        JSON.stringify({
+          hash: mapHash,
+        })
+      );
+    } else {
+      // if file exists, lets check if there was some map change!
+      const mapHash = crypto.createHash("sha256").update(JSON.stringify(currentMap)).digest("hex");
+      const savedHash = fs.readFileSync(`${STATIC_PATH}/maps/${mapName}_hash.json`, "utf8");
+
+      const { hash: parsedHash } = JSON.parse(savedHash);
+
+      if (mapHash !== parsedHash) {
+        fs.writeFileSync(
+          `${STATIC_PATH}/maps/${mapName}_hash.json`,
+          JSON.stringify({
+            hash: mapHash,
+          })
+        ); // update to our current hash
+
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private isSolid(
