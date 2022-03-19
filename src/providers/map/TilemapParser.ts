@@ -35,13 +35,7 @@ export class TilemapParser {
 
       TilemapParser.grids.set(mapName, new PF.Grid(currentMap.width, currentMap.height));
 
-      if (this.wasMapModified(mapName, currentMap)) {
-        console.log(`⚙️ The map ${mapName} was modified. Regenerating solids into our database... ✅`);
-        // only generate solids again in the database, if there was a map change!
-        this.generateSolidsMapAndGrid(mapName, currentMap);
-      } else {
-        console.log(`⚙️ The map ${mapName} is already updated in our database. Skipping solids generation...`);
-      }
+      this.generateSolidsMapAndGrid(mapName, currentMap);
     }
 
     console.log("📦 Maps and grids are loaded!");
@@ -61,6 +55,17 @@ export class TilemapParser {
       "over-player": 3,
     };
 
+    let shouldGenerateSolids;
+
+    if (this.wasMapModified(map, currentMap)) {
+      console.log(`⚙️ The map ${map} was modified. Regenerating solids into our database... ✅`);
+      // only generate solids again in the database, if there was a map change!
+      shouldGenerateSolids = true;
+    } else {
+      console.log(`⚙️ The map ${map} is already updated in our database. Skipping solids generation...`);
+      shouldGenerateSolids = false;
+    }
+
     for (let gridX = 0; gridX < currentMap.width; gridX++) {
       for (let gridY = 0; gridY < currentMap.height; gridY++) {
         const layers = currentMap.layers;
@@ -75,29 +80,31 @@ export class TilemapParser {
 
           // create solids map for quick access
 
-          const hasStoredSolid = await MapSolid.exists({ map, layer: mapLayerParser[layer.name], gridX, gridY });
+          if (shouldGenerateSolids) {
+            const hasStoredSolid = await MapSolid.exists({ map, layer: mapLayerParser[layer.name], gridX, gridY });
 
-          if (hasStoredSolid) {
-            await MapSolid.updateOne(
-              { map, layer: mapLayerParser[layer.name], gridX, gridY },
-              {
-                $set: {
-                  isSolidThisLayerAndBelow: isSolid,
-                  isSolidOnlyThisLayer: isSolidOnlyThisLayer,
-                },
-              }
-            );
-          } else {
-            const solid = new MapSolid({
-              map,
-              layer: mapLayerParser[layer.name],
-              gridX,
-              gridY,
-              isSolidThisLayerAndBelow: isSolid,
-              isSolidOnlyThisLayer,
-            });
+            if (hasStoredSolid) {
+              await MapSolid.updateOne(
+                { map, layer: mapLayerParser[layer.name], gridX, gridY },
+                {
+                  $set: {
+                    isSolidThisLayerAndBelow: isSolid,
+                    isSolidOnlyThisLayer: isSolidOnlyThisLayer,
+                  },
+                }
+              );
+            } else {
+              const solid = new MapSolid({
+                map,
+                layer: mapLayerParser[layer.name],
+                gridX,
+                gridY,
+                isSolidThisLayerAndBelow: isSolid,
+                isSolidOnlyThisLayer,
+              });
 
-            await solid.save();
+              await solid.save();
+            }
           }
         }
       }
