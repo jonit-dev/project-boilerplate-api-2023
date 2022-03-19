@@ -1,3 +1,4 @@
+import { MapSolid } from "@entities/ModuleSystem/MapSolid";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { ITiled, ITileset, MapLayers, TiledLayerNames } from "@rpg-engine/shared";
 import fs from "fs";
@@ -30,29 +31,70 @@ export class TilemapParser {
 
       TilemapParser.grids.set(key, new PF.Grid(currentMap.width, currentMap.height));
 
-      this.insertSolidsIntoGrid(key, currentMap);
+      this.generateSolidsMapAndGrid(key, currentMap);
     }
 
     console.log("📦 Maps and grids are loaded!");
   }
 
-  public insertSolidsIntoGrid(map: string, currentMap: ITiled): void {
+  public async generateSolidsMapAndGrid(map: string, currentMap: ITiled): Promise<void> {
     const gridMap = TilemapParser.grids.get(map);
-
     if (!gridMap) {
       console.log(`Failed to create grid for ${map}`);
       return;
     }
 
+    const mapLayerParser = {
+      ground: 0,
+      "over-ground": 1,
+      player: 2,
+      "over-player": 3,
+    };
+
     for (let gridX = 0; gridX < currentMap.width; gridX++) {
       for (let gridY = 0; gridY < currentMap.height; gridY++) {
-        const isSolid = this.isSolid(map, gridX, gridY, MapLayers.Player);
-        gridMap.setWalkableAt(gridX, gridY, !isSolid);
+        const layers = currentMap.layers;
+
+        for (const layer of layers) {
+          const isSolid = this.isSolid(map, gridX, gridY, mapLayerParser[layer.name]);
+          const isSolidOnlyThisLayer = this.isSolid(map, gridX, gridY, mapLayerParser[layer.name], false);
+
+          if (mapLayerParser[layer.name] === MapLayers.Player) {
+            gridMap.setWalkableAt(gridX, gridY, !isSolid);
+          }
+
+          // create solids map for quick access
+
+          const hasStoredSolid = await MapSolid.exists({ map, layer: mapLayerParser[layer.name], gridX, gridY });
+
+          if (hasStoredSolid) {
+            await MapSolid.updateOne(
+              { map, layer: mapLayerParser[layer.name], gridX, gridY },
+              {
+                $set: {
+                  isSolidThisLayerAndBelow: isSolid,
+                  isSolidOnlyThisLayer: isSolidOnlyThisLayer,
+                },
+              }
+            );
+          } else {
+            const solid = new MapSolid({
+              map,
+              layer: mapLayerParser[layer.name],
+              gridX,
+              gridY,
+              isSolidThisLayerAndBelow: isSolid,
+              isSolidOnlyThisLayer,
+            });
+
+            await solid.save();
+          }
+        }
       }
     }
   }
 
-  public isSolid(
+  private isSolid(
     map: string,
     gridX: number,
     gridY: number,

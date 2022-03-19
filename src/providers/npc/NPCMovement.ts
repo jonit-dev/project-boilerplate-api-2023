@@ -1,4 +1,5 @@
 import { Character } from "@entities/ModuleSystem/CharacterModel";
+import { MapSolid } from "@entities/ModuleSystem/MapSolid";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -134,14 +135,16 @@ export class NPCMovement {
   }
 
   private async hasSolid(npc: INPC, newX: number, newY: number): Promise<boolean> {
-    const hasSolidTile = this.tilemapParser.isSolid(
-      ScenesMetaData[npc.scene].map,
-      ToGridX(newX),
-      ToGridY(newY),
-      npc.layer
-    );
+    const mapSolid = await MapSolid.findOne({
+      map: ScenesMetaData[npc.scene].map,
+      gridX: ToGridX(newX),
+      gridY: ToGridY(newY),
+      layer: npc.layer,
+    });
 
-    if (hasSolidTile) {
+    const isSolid = mapSolid?.isSolidThisLayerAndBelow;
+
+    if (isSolid) {
       console.log(`${npc.name} tried to move, but was blocked by a solid tile!`);
       return true;
     }
