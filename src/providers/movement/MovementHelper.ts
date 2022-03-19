@@ -66,7 +66,12 @@ export class MovementHelper {
   ): boolean {
     const distance = this.mathHelper.getDistanceBetweenPoints(initialX, initialY, newX, newY);
 
-    return distance < maxRangeInGridCells;
+    // convert distance to abs value
+    const distanceInGridCells = Math.round(Math.abs(distance / GRID_WIDTH));
+
+    console.log(distanceInGridCells, maxRangeInGridCells);
+
+    return distanceInGridCells < maxRangeInGridCells;
   }
 
   public calculateNewPositionXY(x: number, y: number, moveToDirection: AnimationDirection): IPosition {

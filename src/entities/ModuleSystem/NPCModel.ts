@@ -30,7 +30,7 @@ const npcSchema = createSchema(
       default: NPCAlignment.Neutral,
       enum: TypeHelper.enumToStringArray(NPCAlignment),
     }),
-    targetCharacter: Type.string({
+    targetCharacter: Type.objectId({
       ref: "Character",
     }),
     name: Type.string({

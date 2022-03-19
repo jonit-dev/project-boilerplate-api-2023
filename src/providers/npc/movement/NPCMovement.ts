@@ -100,7 +100,7 @@ export class NPCMovement {
 
     // const nearbyPlayers = await this.playerView.getCharactersWithXYPositionInView(newX, newY, npc.scene);
 
-    const nearbyPlayers = await this.npcView.getElementsInNPCView(Character, npc);
+    const nearbyPlayers = await this.npcView.getCharactersInView(npc);
 
     for (const player of nearbyPlayers) {
       this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(

@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { PlayerView } from "@providers/player/PlayerView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -50,6 +50,12 @@ export class NPCView {
       ],
     });
     return otherCharactersInView as unknown as T[];
+  }
+
+  public async getCharactersInView(npc: INPC): Promise<ICharacter[]> {
+    return await this.getElementsInNPCView(Character, npc, {
+      isOnline: true,
+    });
   }
 
   public async warnUserAboutNPCsInView(character: ICharacter, otherEntitiesInView?: IEntitiesInView): Promise<void> {

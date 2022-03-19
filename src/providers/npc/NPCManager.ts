@@ -5,6 +5,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCMovement } from "./movement/NPCMovement";
 import { NPCMovementFixedPath } from "./movement/NPCMovementFixedPath";
+import { NPCMovementMoveTowards } from "./movement/NPCMovementMoveTowards";
 import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCLoader } from "./npcs/NPCLoader";
 
@@ -13,11 +14,12 @@ export class NPCManager {
   constructor(
     private npcMovement: NPCMovement,
     private npcMovementFixedPath: NPCMovementFixedPath,
-    private npcMovementRandom: NPCMovementRandomPath
+    private npcMovementRandom: NPCMovementRandomPath,
+    private npcMovementMoveTowards: NPCMovementMoveTowards
   ) {}
 
   public async init(): Promise<void> {
-    const npcs = await NPC.find({});
+    const npcs = await NPC.find({}).populate(["targetCharacter"]).exec();
     switch (appEnv.general.ENV) {
       case EnvType.Development: // on development, start all NPCs at once.
         for (const npc of npcs) {
@@ -52,6 +54,11 @@ export class NPCManager {
     setInterval(async () => {
       try {
         switch (npc.movementType) {
+          case NPCMovementType.MoveTowards:
+            await this.npcMovementMoveTowards.startMoveTowardsMovement(npc);
+
+            break;
+
           case NPCMovementType.Random:
             await this.npcMovementRandom.startRandomMovement(npc);
             break;

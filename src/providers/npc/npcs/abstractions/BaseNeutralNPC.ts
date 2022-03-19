@@ -5,14 +5,13 @@ import {
   FixedPathOrientation,
   FromGridX,
   FromGridY,
-  GRID_WIDTH,
   MapLayers,
   NPCAlignment,
   NPCMovementType,
 } from "@rpg-engine/shared";
 import _ from "lodash";
 
-export const generateRandomMovementNPC = (initialGridX: number, initialGridY: number): any => {
+export const generateRandomMovement = (initialGridX: number, initialGridY: number): any => {
   return {
     x: FromGridX(initialGridX),
     y: FromGridY(initialGridY),
@@ -21,12 +20,26 @@ export const generateRandomMovementNPC = (initialGridX: number, initialGridY: nu
     class: CharacterClass.None,
     layer: MapLayers.Player,
     movementType: NPCMovementType.Random,
-    maxRangeInGridCells: GRID_WIDTH * 5,
+    maxRangeInGridCells: 5,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
 };
 
-export const generateFixedPathMovementNPC = (
+export const generateMoveTowardsMovement = (initialGridX: number, initialGridY: number): any => {
+  return {
+    x: FromGridX(initialGridX),
+    y: FromGridY(initialGridY),
+    direction: "down" as AnimationDirection,
+    alignment: NPCAlignment.Neutral,
+    class: CharacterClass.None,
+    layer: MapLayers.Player,
+    movementType: NPCMovementType.MoveTowards,
+    maxRangeInGridCells: 20,
+    pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
+  };
+};
+
+export const generateFixedPathMovement = (
   initialGridX: number,
   initialGridY: number,
   endGridX: number,
