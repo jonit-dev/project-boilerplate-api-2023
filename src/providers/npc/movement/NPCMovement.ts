@@ -2,7 +2,6 @@ import { Character } from "@entities/ModuleSystem/CharacterModel";
 import { MapSolid } from "@entities/ModuleSystem/MapSolid";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
-import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
@@ -23,7 +22,6 @@ export type NPCMovementDirection = "up" | "down" | "left" | "right";
 @provide(NPCMovement)
 export class NPCMovement {
   constructor(
-    private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
     private socketTransmissionZone: SocketTransmissionZone
@@ -84,7 +82,7 @@ export class NPCMovement {
 
     // update grid solids
     TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
-    TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(newX), ToGridY(newY), true);
+    TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(newX), ToGridY(newY), false);
 
     const newGridX = ToGridX(newX);
     const newGridY = ToGridY(newY);

@@ -1,7 +1,7 @@
 import { NPC } from "@entities/ModuleSystem/NPCModel";
 import { NPCLoader } from "@providers/npc/npcs/NPCLoader";
 import { ISocketTransmissionZone, SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import { GRID_HEIGHT, GRID_WIDTH, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
+import { GRID_HEIGHT, GRID_WIDTH, NPCMovementType, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(NPCSeeder)
@@ -29,18 +29,24 @@ export class NPCSeeder {
         await newNPC.save();
       } else {
         // if npc already exists, restart initial position
+
+        console.log(`Updating NPC ${NPCData.key} metadata...`);
+
+        let initialFixedPath;
+        if (NPCData.movementType === NPCMovementType.FixedPath) {
+          const { endGridX, endGridY } = NPCData?.fixedPath!;
+          initialFixedPath = {
+            endGridX,
+            endGridY,
+          };
+        }
+        console.log(initialFixedPath);
+
         await NPC.updateOne(
-          { name: key },
+          { key: key },
           {
             $set: {
-              x: NPCData.x,
-              y: NPCData.y,
-              socketTransmissionZone: {
-                x,
-                y,
-                width,
-                height,
-              },
+              ...NPCData,
             },
           }
         );
