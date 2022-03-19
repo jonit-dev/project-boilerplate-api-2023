@@ -3,11 +3,9 @@ import { MapSolid } from "@entities/ModuleSystem/MapSolid";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { PlayerView } from "@providers/player/PlayerView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
-  AnimationDirection,
   GRID_HEIGHT,
   GRID_WIDTH,
   INPCPositionUpdatePayload,
@@ -18,18 +16,14 @@ import {
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
-import { NPCLoader } from "./npcs/NPCLoader";
-import { NPCView } from "./NPCView";
+import { NPCView } from "../NPCView";
 
-type NPCMovementDirection = "up" | "down" | "left" | "right";
+export type NPCMovementDirection = "up" | "down" | "left" | "right";
 
 @provide(NPCMovement)
 export class NPCMovement {
   constructor(
     private movementHelper: MovementHelper,
-    private tilemapParser: TilemapParser,
-    private playerView: PlayerView,
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
     private socketTransmissionZone: SocketTransmissionZone
@@ -41,97 +35,6 @@ export class NPCMovement {
     }
 
     return false;
-  }
-
-  public async startFixedPathMovement(npc: INPC, endGridX: number, endGridY: number): Promise<void> {
-    if (endGridX && endGridY) {
-      const npcPath = this.movementHelper.findShortestPath(
-        ScenesMetaData[npc.scene].map,
-        ToGridX(npc.x),
-        ToGridY(npc.y),
-        endGridX,
-        endGridY
-      );
-
-      if (!npcPath || npcPath.length <= 1) {
-        console.log("Failed to calculated fixed path. NPC is stopped");
-        return;
-      }
-
-      const [newGridX, newGridY] = npcPath[1];
-
-      const nextMovementDirection = this.getGridMovementDirection(ToGridX(npc.x), ToGridY(npc.y), newGridX, newGridY);
-
-      if (nextMovementDirection) {
-        const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, nextMovementDirection);
-
-        await this.moveNPC(npc, npc.x, npc.y, newX, newY, nextMovementDirection);
-      } else {
-        console.log("Failed to calculate fixed path. nextMovementDirection is undefined");
-      }
-    } else {
-      console.log(
-        "Failed to calculate fixed path. You must have a endGridX and endGridY position set in your NPC model"
-      );
-    }
-  }
-
-  public getGridMovementDirection(
-    startGridX: number,
-    startGridY: number,
-    endGridX: number,
-    endGridY: number
-  ): AnimationDirection | undefined {
-    const Xdiff = endGridX - startGridX;
-    const Ydiff = endGridY - startGridY;
-
-    if (Xdiff < 0 && Ydiff === 0) {
-      return "left";
-    }
-
-    if (Xdiff > 0 && Ydiff === 0) {
-      return "right";
-    }
-
-    if (Xdiff === 0 && Ydiff < 0) {
-      return "up";
-    }
-
-    if (Xdiff === 0 && Ydiff > 0) {
-      return "down";
-    }
-  }
-
-  public async startRandomMovement(npc: INPC): Promise<void> {
-    const npcMetaData = NPCLoader.NPCMetaData.get(npc.key);
-
-    if (!npcMetaData) {
-      console.log(`NPCMetaData for ${npc.name} not found!`);
-      return;
-    }
-
-    let chosenMovementDirection = this.pickRandomDirectionToMove();
-
-    const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
-
-    // npcMetaData stores the initial X and Y! That's why we don't use the npc.x and npc.y as initial args
-    const isMovementUnderRange = npc.maxRangeInGridCells
-      ? this.movementHelper.isMovementUnderRange(npcMetaData.x, npcMetaData.y, newX, newY, npc.maxRangeInGridCells)
-      : true;
-
-    if (!isMovementUnderRange) {
-      console.log("Movement is out of range. Going back!");
-      chosenMovementDirection = this.movementHelper.getOppositeDirection(chosenMovementDirection);
-      const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
-      await this.moveNPC(npc, npc.x, npc.y, newX, newY, chosenMovementDirection);
-    } else {
-      await this.moveNPC(npc, npc.x, npc.y, newX, newY, chosenMovementDirection);
-    }
-  }
-
-  private pickRandomDirectionToMove(): NPCMovementDirection {
-    const availableDirections = ["down", "up", "right", "left"] as unknown as NPCMovementDirection;
-    return _.shuffle(availableDirections)[0] as NPCMovementDirection;
   }
 
   private async hasSolid(npc: INPC, newX: number, newY: number): Promise<boolean> {
@@ -169,7 +72,7 @@ export class NPCMovement {
     return false;
   }
 
-  private async moveNPC(
+  public async moveNPC(
     npc: INPC,
     oldX: number,
     oldY: number,

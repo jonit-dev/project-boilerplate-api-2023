@@ -31,6 +31,32 @@ export class MovementHelper {
     }
   }
 
+  public getGridMovementDirection(
+    startGridX: number,
+    startGridY: number,
+    endGridX: number,
+    endGridY: number
+  ): AnimationDirection | undefined {
+    const Xdiff = endGridX - startGridX;
+    const Ydiff = endGridY - startGridY;
+
+    if (Xdiff < 0 && Ydiff === 0) {
+      return "left";
+    }
+
+    if (Xdiff > 0 && Ydiff === 0) {
+      return "right";
+    }
+
+    if (Xdiff === 0 && Ydiff < 0) {
+      return "up";
+    }
+
+    if (Xdiff === 0 && Ydiff > 0) {
+      return "down";
+    }
+  }
+
   public isMovementUnderRange(
     initialX: number,
     initialY: number,

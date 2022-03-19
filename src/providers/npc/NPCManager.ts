@@ -3,12 +3,18 @@ import { appEnv } from "@providers/config/env";
 import { EnvType, FixedPathOrientation, NPCMovementType, SocketTypes, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { NPCMovement } from "./NPCMovement";
+import { NPCMovement } from "./movement/NPCMovement";
+import { NPCMovementFixedPath } from "./movement/NPCMovementFixedPath";
+import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCLoader } from "./npcs/NPCLoader";
 
 @provide(NPCManager)
 export class NPCManager {
-  constructor(private npcMovement: NPCMovement) {}
+  constructor(
+    private npcMovement: NPCMovement,
+    private npcMovementFixedPath: NPCMovementFixedPath,
+    private npcMovementRandom: NPCMovementRandomPath
+  ) {}
 
   public async init(): Promise<void> {
     const npcs = await NPC.find({});
@@ -47,7 +53,7 @@ export class NPCManager {
       try {
         switch (npc.movementType) {
           case NPCMovementType.Random:
-            await this.npcMovement.startRandomMovement(npc);
+            await this.npcMovementRandom.startRandomMovement(npc);
             break;
           case NPCMovementType.FixedPath:
             let endGridX = npc.fixedPath.endGridX as unknown as number;
@@ -76,7 +82,7 @@ export class NPCManager {
               endGridY = ToGridY(npcData?.y!);
             }
 
-            await this.npcMovement.startFixedPathMovement(npc, endGridX, endGridY);
+            await this.npcMovementFixedPath.startFixedPathMovement(npc, endGridX, endGridY);
 
             break;
         }
