@@ -18,12 +18,12 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { NPCView } from "../NPCView";
 
-export type NPCMovementDirection = "up" | "down" | "left" | "right";
+export type NPCDirection = "up" | "down" | "left" | "right";
 
 interface IShortestPathPositionResult {
   newGridX: number;
   newGridY: number;
-  nextMovementDirection: NPCMovementDirection;
+  nextMovementDirection: NPCDirection;
 }
 
 @provide(NPCMovement)
@@ -84,7 +84,7 @@ export class NPCMovement {
     oldY: number,
     newX: number,
     newY: number,
-    chosenMovementDirection: NPCMovementDirection
+    chosenMovementDirection: NPCDirection
   ): Promise<void> {
     const map = ScenesMetaData[npc.scene].map;
 

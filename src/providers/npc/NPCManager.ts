@@ -7,6 +7,7 @@ import { NPCMovement } from "./movement/NPCMovement";
 import { NPCMovementFixedPath } from "./movement/NPCMovementFixedPath";
 import { NPCMovementMoveTowards } from "./movement/NPCMovementMoveTowards";
 import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
+import { NPCMovementStopped } from "./movement/NPCMovementStopped";
 import { NPCLoader } from "./npcs/NPCLoader";
 import { NPCView } from "./NPCView";
 
@@ -17,6 +18,7 @@ export class NPCManager {
     private npcMovementFixedPath: NPCMovementFixedPath,
     private npcMovementRandom: NPCMovementRandomPath,
     private npcMovementMoveTowards: NPCMovementMoveTowards,
+    private npcMovementStopped: NPCMovementStopped,
     private npcView: NPCView
   ) {}
 
@@ -60,13 +62,16 @@ export class NPCManager {
         const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
         if (!nearbyCharacters.length) {
-          return; // no player in view, no need to move.
+          return; // no player in view, no need to waste resources!
         }
 
         switch (npc.movementType) {
+          case NPCMovementType.Stopped:
+            await this.npcMovementStopped.startMovementStopped(npc);
+            break;
+
           case NPCMovementType.MoveTowards:
             await this.npcMovementMoveTowards.startMoveTowardsMovement(npc);
-
             break;
 
           case NPCMovementType.Random:

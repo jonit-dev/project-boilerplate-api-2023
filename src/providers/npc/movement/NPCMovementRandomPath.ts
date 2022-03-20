@@ -3,7 +3,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCLoader } from "../npcs/NPCLoader";
-import { NPCMovement, NPCMovementDirection } from "./NPCMovement";
+import { NPCDirection, NPCMovement } from "./NPCMovement";
 
 @provide(NPCMovementRandomPath)
 export class NPCMovementRandomPath {
@@ -36,8 +36,8 @@ export class NPCMovementRandomPath {
     }
   }
 
-  private pickRandomDirectionToMove(): NPCMovementDirection {
-    const availableDirections = ["down", "up", "right", "left"] as unknown as NPCMovementDirection;
-    return _.shuffle(availableDirections)[0] as NPCMovementDirection;
+  private pickRandomDirectionToMove(): NPCDirection {
+    const availableDirections = ["down", "up", "right", "left"] as unknown as NPCDirection;
+    return _.shuffle(availableDirections)[0] as NPCDirection;
   }
 }

@@ -39,6 +39,20 @@ export const generateMoveTowardsMovement = (initialGridX: number, initialGridY: 
   };
 };
 
+export const generateStoppedMovement = (initialGridX: number, initialGridY: number): any => {
+  return {
+    x: FromGridX(initialGridX),
+    y: FromGridY(initialGridY),
+    direction: "down" as AnimationDirection,
+    alignment: NPCAlignment.Neutral,
+    class: CharacterClass.None,
+    layer: MapLayers.Player,
+    movementType: NPCMovementType.Stopped,
+    maxRangeInGridCells: 20,
+    pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
+  };
+};
+
 export const generateFixedPathMovement = (
   initialGridX: number,
   initialGridY: number,

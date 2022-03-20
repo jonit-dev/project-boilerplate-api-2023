@@ -62,8 +62,12 @@ export class NPCView {
     const npcsInView = await this.getNPCsInView(character);
 
     for (const npc of npcsInView) {
-      if (otherEntitiesInView && otherEntitiesInView[npc.id] && otherEntitiesInView[npc.id].type === EntityType.NPC) {
-        continue; // we dont need to warn the user about the npc, since it already has it on his view
+      if (otherEntitiesInView && otherEntitiesInView[npc.id]) {
+        const clientNPC = otherEntitiesInView[npc.id];
+
+        if (clientNPC.type === EntityType.NPC && clientNPC.direction === npc.direction) {
+          continue; // we dont need to warn the user about the npc, since it already has it on his view
+        }
       }
 
       this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
