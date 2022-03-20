@@ -23,7 +23,7 @@ export class NPCMovementRandomPath {
 
     // npcMetaData stores the initial X and Y! That's why we don't use the npc.x and npc.y as initial args
     const isMovementUnderRange = npc.maxRangeInGridCells
-      ? this.movementHelper.isMovementUnderRange(npcMetaData.x, npcMetaData.y, newX, newY, npc.maxRangeInGridCells)
+      ? this.movementHelper.isUnderRange(npcMetaData.x, npcMetaData.y, newX, newY, npc.maxRangeInGridCells)
       : true;
 
     if (!isMovementUnderRange) {

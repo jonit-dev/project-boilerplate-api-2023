@@ -8,6 +8,7 @@ import { NPCMovementFixedPath } from "./movement/NPCMovementFixedPath";
 import { NPCMovementMoveTowards } from "./movement/NPCMovementMoveTowards";
 import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCLoader } from "./npcs/NPCLoader";
+import { NPCView } from "./NPCView";
 
 @provide(NPCManager)
 export class NPCManager {
@@ -15,11 +16,12 @@ export class NPCManager {
     private npcMovement: NPCMovement,
     private npcMovementFixedPath: NPCMovementFixedPath,
     private npcMovementRandom: NPCMovementRandomPath,
-    private npcMovementMoveTowards: NPCMovementMoveTowards
+    private npcMovementMoveTowards: NPCMovementMoveTowards,
+    private npcView: NPCView
   ) {}
 
   public async init(): Promise<void> {
-    const npcs = await NPC.find({}).populate(["targetCharacter"]).exec();
+    const npcs = await NPC.find({});
     switch (appEnv.general.ENV) {
       case EnvType.Development: // on development, start all NPCs at once.
         for (const npc of npcs) {
@@ -53,6 +55,14 @@ export class NPCManager {
   public startBehaviorLoop(npc: INPC): void {
     setInterval(async () => {
       try {
+        // check if actually there's a player near. If not, let's not waste server resources!
+
+        const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+
+        if (!nearbyCharacters.length) {
+          return; // no player in view, no need to move.
+        }
+
         switch (npc.movementType) {
           case NPCMovementType.MoveTowards:
             await this.npcMovementMoveTowards.startMoveTowardsMovement(npc);

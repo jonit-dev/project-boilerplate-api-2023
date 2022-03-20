@@ -33,13 +33,7 @@ export class NPCMovementMoveTowards {
     if (targetCharacter) {
       await this.checkTargetOutOfRangeOrLoggedOut(npc);
 
-      const reachedTarget = this.movementHelper.isMovementUnderRange(
-        npc.x,
-        npc.y,
-        targetCharacter.x,
-        targetCharacter.y,
-        1
-      );
+      const reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, targetCharacter.x, targetCharacter.y, 1);
 
       if (reachedTarget) {
         console.log("Reached target. Nothing to do here!");
@@ -101,7 +95,7 @@ export class NPCMovementMoveTowards {
       }
 
       // check if player is under range
-      const isMovementUnderRange = this.movementHelper.isMovementUnderRange(
+      const isMovementUnderRange = this.movementHelper.isUnderRange(
         npc.x,
         npc.y,
         minDistancePlayer.x,
@@ -144,7 +138,7 @@ export class NPCMovementMoveTowards {
       return;
     }
 
-    const isMovementUnderRange = this.movementHelper.isMovementUnderRange(
+    const isMovementUnderRange = this.movementHelper.isUnderRange(
       npc.x,
       npc.y,
       targetCharacter.x,

@@ -66,7 +66,7 @@ export class MovementHelper {
     }
   }
 
-  public isMovementUnderRange(
+  public isUnderRange(
     initialX: number,
     initialY: number,
     newX: number,
