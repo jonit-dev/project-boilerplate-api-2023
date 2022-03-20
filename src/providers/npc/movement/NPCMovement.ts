@@ -166,7 +166,7 @@ export class NPCMovement {
     );
 
     if (!npcPath || npcPath.length <= 1) {
-      console.log("Failed to calculated fixed path. NPC is stopped");
+      console.log("Failed to calculated shortest path! No output!");
       return;
     }
 

@@ -2,9 +2,11 @@ import { Character } from "@entities/ModuleSystem/CharacterModel";
 import { INPC } from "@entities/ModuleSystem/NPCModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCView } from "../NPCView";
+import { NPCMovement } from "./NPCMovement";
 
 interface IPlayerDistance {
   id: string;
@@ -15,16 +17,59 @@ interface IPlayerDistance {
 
 @provide(NPCMovementMoveTowards)
 export class NPCMovementMoveTowards {
-  constructor(private npcView: NPCView, private mathHelper: MathHelper, private movementHelper: MovementHelper) {}
+  constructor(
+    private npcView: NPCView,
+    private mathHelper: MathHelper,
+    private movementHelper: MovementHelper,
+    private npcMovement: NPCMovement
+  ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
     // first step is setting a target
     // for this, get all players nearby and set the target to the closest one
 
-    if (!npc.targetCharacter) {
-      await this.tryToSetTarget(npc);
+    const targetCharacter = await Character.findById(npc.targetCharacter);
+
+    if (targetCharacter) {
+      await this.checkTargetOutOfRangeOrLoggedOut(npc);
+
+      const reachedTarget = this.movementHelper.isMovementUnderRange(
+        npc.x,
+        npc.y,
+        targetCharacter.x,
+        targetCharacter.y,
+        1
+      );
+
+      if (reachedTarget) {
+        console.log("Reached target. Nothing to do here!");
+        return;
+      }
+
+      try {
+        const { newGridX, newGridY, nextMovementDirection } = this.npcMovement.getShortestPathNextPosition(
+          npc,
+          ToGridX(npc.x),
+          ToGridY(npc.y),
+          ToGridX(targetCharacter.x),
+          ToGridY(targetCharacter.y)
+        )!;
+
+        if (newGridX && newGridY && nextMovementDirection) {
+          await this.npcMovement.moveNPC(
+            npc,
+            npc.x,
+            npc.y,
+            FromGridX(newGridX),
+            FromGridY(newGridY),
+            nextMovementDirection
+          );
+        }
+      } catch (error) {
+        console.error(error);
+      }
     } else {
-      await this.checkTargetOutOfRange(npc);
+      await this.tryToSetTarget(npc);
     }
   }
 
@@ -80,7 +125,8 @@ export class NPCMovementMoveTowards {
     }
   }
 
-  private async checkTargetOutOfRange(npc: INPC): Promise<void> {
+  private async checkTargetOutOfRangeOrLoggedOut(npc: INPC): Promise<void> {
+    console.log("Checking if target is out of range...");
     if (!npc.targetCharacter) {
       // no target set, nothing to remove here!
       return;
@@ -106,8 +152,8 @@ export class NPCMovementMoveTowards {
       npc.maxRangeInGridCells
     );
 
-    // if target is out of range, lets remove it
-    if (targetCharacter && !isMovementUnderRange) {
+    // if target is out of range or not online, lets remove it
+    if ((targetCharacter && !isMovementUnderRange) || !targetCharacter.isOnline) {
       // remove npc.targetCharacter
       npc.targetCharacter = undefined;
       await npc.save();

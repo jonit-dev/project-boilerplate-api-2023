@@ -55,15 +55,15 @@ export class TilemapParser {
       "over-player": 3,
     };
 
-    let shouldGenerateSolids;
+    let shouldGenerateSolidsInDatabase;
 
     if (this.wasMapModified(map, currentMap)) {
       console.log(`⚙️ The map ${map} was modified. Regenerating solids into our database... ✅`);
       // only generate solids again in the database, if there was a map change!
-      shouldGenerateSolids = true;
+      shouldGenerateSolidsInDatabase = true;
     } else {
       console.log(`⚙️ The map ${map} is already updated in our database. Skipping solids generation...`);
-      shouldGenerateSolids = false;
+      shouldGenerateSolidsInDatabase = false;
     }
 
     for (let gridX = 0; gridX < currentMap.width; gridX++) {
@@ -80,7 +80,7 @@ export class TilemapParser {
 
           // create solids map for quick access
 
-          if (shouldGenerateSolids) {
+          if (shouldGenerateSolidsInDatabase) {
             const hasStoredSolid = await MapSolid.exists({ map, layer: mapLayerParser[layer.name], gridX, gridY });
 
             if (hasStoredSolid) {
