@@ -1,4 +1,4 @@
-import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { Character } from "@entities/ModuleSystem/CharacterModel";
 import { INPC } from "@entities/ModuleSystem/NPCModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -20,66 +20,63 @@ export class NPCMovementMoveTowards {
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
     // first step is setting a target
     // for this, get all players nearby and set the target to the closest one
-    await this.tryToSetTarget(npc);
 
-    await this.checkTargetOutOfRange(npc);
+    if (!npc.targetCharacter) {
+      await this.tryToSetTarget(npc);
+    } else {
+      await this.checkTargetOutOfRange(npc);
+    }
   }
 
   private async tryToSetTarget(npc: INPC): Promise<void> {
-    const targetCharacter = npc.targetCharacter as unknown as ICharacter;
+    console.log(`${npc.key} trying to set target...`);
 
-    if (!targetCharacter) {
-      console.log(`${npc.key} trying to set target...`);
+    const nearbyPlayers = await this.npcView.getCharactersInView(npc);
 
-      const nearbyPlayers = await this.npcView.getCharactersInView(npc);
+    const playersDistance: IPlayerDistance[] = [];
 
-      const playersDistance: IPlayerDistance[] = [];
+    for (const nearbyPlayer of nearbyPlayers) {
+      const distance = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, nearbyPlayer.x, nearbyPlayer.y);
 
-      for (const nearbyPlayer of nearbyPlayers) {
-        const distance = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, nearbyPlayer.x, nearbyPlayer.y);
+      playersDistance.push({
+        id: nearbyPlayer.id,
+        distance: distance,
+        x: nearbyPlayer.x,
+        y: nearbyPlayer.y,
+      });
+    }
 
-        playersDistance.push({
-          id: nearbyPlayer.id,
-          distance: distance,
-          x: nearbyPlayer.x,
-          y: nearbyPlayer.y,
-        });
+    // get the player with minimum distance
+    const minDistancePlayer = _.minBy(playersDistance, "distance");
+
+    if (minDistancePlayer) {
+      if (!npc.maxRangeInGridCells) {
+        console.log(`NPC ${npc.key} has MoveTowards MovementType, but no maxRangeInGridCells is specified!`);
+        return;
       }
 
-      // get the player with minimum distance
-      const minDistancePlayer = _.minBy(playersDistance, "distance");
+      // check if player is under range
+      const isMovementUnderRange = this.movementHelper.isMovementUnderRange(
+        npc.x,
+        npc.y,
+        minDistancePlayer.x,
+        minDistancePlayer.y,
+        npc.maxRangeInGridCells
+      );
 
-      console.log(minDistancePlayer);
-
-      if (minDistancePlayer) {
-        if (!npc.maxRangeInGridCells) {
-          console.log(`NPC ${npc.key} has MoveTowards MovementType, but no maxRangeInGridCells is specified!`);
-          return;
-        }
-
-        // check if player is under range
-        const isMovementUnderRange = this.movementHelper.isMovementUnderRange(
-          npc.x,
-          npc.y,
-          minDistancePlayer.x,
-          minDistancePlayer.y,
-          npc.maxRangeInGridCells
-        );
-
-        if (!isMovementUnderRange) {
-          return;
-        }
-
-        const character = await Character.findById(minDistancePlayer.id);
-
-        if (!character) {
-          console.log(`Error in ${npc.key}: Failed to find character to set as target!`);
-          return;
-        }
-
-        npc.targetCharacter = character._id;
-        await npc.save();
+      if (!isMovementUnderRange) {
+        return;
       }
+
+      const character = await Character.findById(minDistancePlayer.id);
+
+      if (!character) {
+        console.log(`Error in ${npc.key}: Failed to find character to set as target!`);
+        return;
+      }
+
+      npc.targetCharacter = character._id;
+      await npc.save();
     }
   }
 

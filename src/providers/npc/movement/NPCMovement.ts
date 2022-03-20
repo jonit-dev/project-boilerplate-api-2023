@@ -2,6 +2,7 @@ import { Character } from "@entities/ModuleSystem/CharacterModel";
 import { MapSolid } from "@entities/ModuleSystem/MapSolid";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
@@ -19,12 +20,19 @@ import { NPCView } from "../NPCView";
 
 export type NPCMovementDirection = "up" | "down" | "left" | "right";
 
+interface IShortestPathPositionResult {
+  newGridX: number;
+  newGridY: number;
+  nextMovementDirection: NPCMovementDirection;
+}
+
 @provide(NPCMovement)
 export class NPCMovement {
   constructor(
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
-    private socketTransmissionZone: SocketTransmissionZone
+    private socketTransmissionZone: SocketTransmissionZone,
+    private movementHelper: MovementHelper
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -140,5 +148,46 @@ export class NPCMovement {
       height,
     };
     await npc.save();
+  }
+
+  public getShortestPathNextPosition(
+    npc: INPC,
+    startGridX: number,
+    startGridY: number,
+    endGridX: number,
+    endGridY: number
+  ): IShortestPathPositionResult | undefined {
+    const npcPath = this.movementHelper.findShortestPath(
+      ScenesMetaData[npc.scene].map,
+      startGridX,
+      startGridY,
+      endGridX,
+      endGridY
+    );
+
+    if (!npcPath || npcPath.length <= 1) {
+      console.log("Failed to calculated fixed path. NPC is stopped");
+      return;
+    }
+
+    const [newGridX, newGridY] = npcPath[1];
+
+    const nextMovementDirection = this.movementHelper.getGridMovementDirection(
+      ToGridX(npc.x),
+      ToGridY(npc.y),
+      newGridX,
+      newGridY
+    );
+
+    if (!nextMovementDirection) {
+      console.log(`Failed to calculated nextMovementDirection for NPC ${npc.key}`);
+      return;
+    }
+
+    return {
+      newGridX,
+      newGridY,
+      nextMovementDirection,
+    };
   }
 }
