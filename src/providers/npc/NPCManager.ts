@@ -5,6 +5,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCMovement } from "./movement/NPCMovement";
 import { NPCMovementFixedPath } from "./movement/NPCMovementFixedPath";
+import { NPCMovementMoveAway } from "./movement/NPCMovementMoveAway";
 import { NPCMovementMoveTowards } from "./movement/NPCMovementMoveTowards";
 import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCMovementStopped } from "./movement/NPCMovementStopped";
@@ -19,6 +20,7 @@ export class NPCManager {
     private npcMovementRandom: NPCMovementRandomPath,
     private npcMovementMoveTowards: NPCMovementMoveTowards,
     private npcMovementStopped: NPCMovementStopped,
+    private npcMovementMoveAway: NPCMovementMoveAway,
     private npcView: NPCView
   ) {}
 
@@ -66,6 +68,10 @@ export class NPCManager {
         }
 
         switch (npc.movementType) {
+          case NPCMovementType.MoveAway:
+            await this.npcMovementMoveAway.startMovementMoveAway(npc);
+            break;
+
           case NPCMovementType.Stopped:
             await this.npcMovementStopped.startMovementStopped(npc);
             break;

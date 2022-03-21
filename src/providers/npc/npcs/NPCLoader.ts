@@ -2,6 +2,7 @@ import { INPC } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { agathaMetaData } from "./NPCAgatha";
 import { aliceMetaData } from "./NPCAlice";
+import { annieMetaData } from "./NPCAnnie";
 import { feliciaMetaData } from "./NPCFelicia";
 import { mariaNPCMetaData } from "./NPCMaria";
 
@@ -16,5 +17,6 @@ export class NPCLoader {
     NPCLoader.NPCMetaData.set("maria", mariaNPCMetaData);
     NPCLoader.NPCMetaData.set("felicia", feliciaMetaData);
     NPCLoader.NPCMetaData.set("agatha", agathaMetaData);
+    NPCLoader.NPCMetaData.set("annie", annieMetaData);
   }
 }
