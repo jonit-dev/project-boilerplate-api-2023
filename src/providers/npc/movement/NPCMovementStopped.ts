@@ -14,6 +14,8 @@ export class NPCMovementStopped {
     const targetCharacter = await Character.findById(npc.targetCharacter);
 
     if (targetCharacter) {
+      await this.npcTarget.checkTargetOutOfRangeOrLoggedOut(npc);
+
       const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
 
       npc.direction = facingDirection;
@@ -22,10 +24,18 @@ export class NPCMovementStopped {
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
       for (const nearbyCharacter of nearbyCharacters) {
-        this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, NPCSocketEvents.NPCDataUpdate, {
-          id: npc.id,
-          direction: npc.direction,
-        });
+        // client representation of the NPC
+        const clientNPC = nearbyCharacter.otherEntitiesInView?.[npc._id];
+        if (clientNPC && clientNPC.direction !== facingDirection) {
+          // update serverside info (to avoid submitting the same package all the time!)
+          nearbyCharacter.otherEntitiesInView[npc._id].direction = facingDirection;
+          await nearbyCharacter.save();
+
+          this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, NPCSocketEvents.NPCDataUpdate, {
+            id: npc.id,
+            direction: npc.direction,
+          });
+        }
       }
     } else {
       await this.npcTarget.tryToSetTarget(npc);

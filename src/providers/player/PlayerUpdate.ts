@@ -16,8 +16,8 @@ import {
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 import { SocketRetransmission } from "../sockets/SocketRetransmission";
-
 @provide(PlayerUpdate)
 export class PlayerUpdate {
   constructor(
@@ -57,6 +57,11 @@ export class PlayerUpdate {
           if (!isPositionUpdateValid) {
             return;
           }
+
+          // remove self, if present
+          data.otherEntitiesInView = _.omit(data.otherEntitiesInView, [character._id]);
+          character.otherEntitiesInView = data.otherEntitiesInView;
+          await character.save();
 
           await this.dataRetransmission.bidirectionalDataRetransmission(
             character,

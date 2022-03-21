@@ -65,7 +65,7 @@ export class NPCView {
       if (otherEntitiesInView && otherEntitiesInView[npc.id]) {
         const clientNPC = otherEntitiesInView[npc.id];
 
-        if (clientNPC.type === EntityType.NPC && clientNPC.direction === npc.direction) {
+        if (clientNPC.type === EntityType.NPC) {
           continue; // we dont need to warn the user about the npc, since it already has it on his view
         }
       }

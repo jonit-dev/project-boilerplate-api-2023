@@ -72,6 +72,7 @@ const characterSchema = createSchema(
       default: "MainScene",
     }),
     channelId: Type.string(),
+    otherEntitiesInView: Type.mixed(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

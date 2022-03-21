@@ -48,7 +48,7 @@ export const generateStoppedMovement = (initialGridX: number, initialGridY: numb
     class: CharacterClass.None,
     layer: MapLayers.Player,
     movementType: NPCMovementType.Stopped,
-    maxRangeInGridCells: 20,
+    maxRangeInGridCells: 5,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
 };
