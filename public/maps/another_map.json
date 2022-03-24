@@ -588,7 +588,7 @@
           "y": 16
         }
       ],
-      "height": 64,
+      "height": 32,
       "id": 9,
       "name": "over-ground",
       "opacity": 1,
@@ -1030,6 +1030,36 @@
       "y": 0
     },
     {
+      "draworder": "topdown",
+      "id": 12,
+      "name": "NPCs",
+      "objects": [
+        {
+          "height": 16,
+          "id": 1,
+          "name": "Maria",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-maria"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 320,
+          "y": 192
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
       "chunks": [
         {
           "data": [
@@ -1084,8 +1114,8 @@
       "y": 0
     }
   ],
-  "nextlayerid": 12,
-  "nextobjectid": 1,
+  "nextlayerid": 13,
+  "nextobjectid": 2,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",

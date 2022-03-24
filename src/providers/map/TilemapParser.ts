@@ -10,7 +10,7 @@ import PF from "pathfinding";
 export class TilemapParser {
   public static maps: Map<string, ITiled> = new Map();
   public static grids: Map<string, PF.Grid> = new Map();
-
+  public static npcs: Map<string, Record<string, any>> = new Map();
   constructor() {}
 
   public init(): void {
@@ -32,13 +32,28 @@ export class TilemapParser {
       const mapName = mapFileName.replace(".json", "");
 
       TilemapParser.maps.set(mapName, currentMap);
-
       TilemapParser.grids.set(mapName, new PF.Grid(currentMap.width, currentMap.height));
 
       this.generateSolidsMapAndGrid(mapName, currentMap);
+
+      this.loadNPCsData(mapName, currentMap);
     }
 
     console.log("📦 Maps and grids are loaded!");
+  }
+
+  public loadNPCsData(mapName: string, currentMap: ITiled): void {
+    const npcsLayer = currentMap.layers.find((layer) => layer.name === "NPCs");
+
+    if (!npcsLayer) {
+      console.log('❌ Failed to load NPCs data, because there is no "NPCs" layer!');
+      return;
+    }
+
+    // @ts-ignore
+    const npcsData = npcsLayer.objects;
+
+    TilemapParser.npcs.set(mapName, npcsData);
   }
 
   public async generateSolidsMapAndGrid(map: string, currentMap: ITiled): Promise<void> {
@@ -71,6 +86,10 @@ export class TilemapParser {
         const layers = currentMap.layers;
 
         for (const layer of layers) {
+          if (layer.name === "NPCs") {
+            continue;
+          }
+
           const isSolid = this.isSolid(map, gridX, gridY, mapLayerParser[layer.name]);
           const isSolidOnlyThisLayer = this.isSolid(map, gridX, gridY, mapLayerParser[layer.name], false);
 
