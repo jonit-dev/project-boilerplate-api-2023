@@ -3,8 +3,6 @@ import {
   AnimationDirection,
   CharacterClass,
   FixedPathOrientation,
-  FromGridX,
-  FromGridY,
   MapLayers,
   NPCAlignment,
   NPCMovementType,
@@ -23,10 +21,8 @@ export const generateRandomMovement = (): any => {
   };
 };
 
-export const generateMoveTowardsMovement = (initialGridX: number, initialGridY: number): any => {
+export const generateMoveTowardsMovement = (): any => {
   return {
-    x: FromGridX(initialGridX),
-    y: FromGridY(initialGridY),
     direction: "down" as AnimationDirection,
     alignment: NPCAlignment.Neutral,
     class: CharacterClass.None,
@@ -49,10 +45,8 @@ export const generateStoppedMovement = (): any => {
   };
 };
 
-export const generateMoveAwayMovement = (initialGridX: number, initialGridY: number): any => {
+export const generateMoveAwayMovement = (): any => {
   return {
-    x: FromGridX(initialGridX),
-    y: FromGridY(initialGridY),
     direction: "down" as AnimationDirection,
     alignment: NPCAlignment.Neutral,
     class: CharacterClass.None,
@@ -63,26 +57,14 @@ export const generateMoveAwayMovement = (initialGridX: number, initialGridY: num
   };
 };
 
-export const generateFixedPathMovement = (
-  initialGridX: number,
-  initialGridY: number,
-  endGridX: number,
-  endGridY: number
-): any => {
+export const generateFixedPathMovement = (): any => {
   return {
-    x: FromGridX(initialGridX),
-    y: FromGridX(initialGridY),
     direction: "down" as AnimationDirection,
     alignment: NPCAlignment.Neutral,
     class: CharacterClass.None,
     layer: MapLayers.Player,
     movementType: NPCMovementType.FixedPath,
     fixedPathOrientation: FixedPathOrientation.Forward, // must be forward!
-    fixedPath: {
-      endGridX: endGridX,
-      endGridY: endGridY,
-    },
-
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
 };

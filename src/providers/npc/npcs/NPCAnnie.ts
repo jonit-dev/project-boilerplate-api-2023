@@ -2,7 +2,7 @@ import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
 import { generateMoveAwayMovement } from "./abstractions/BaseNeutralNPC";
 
 export const npcAnnieMetaData = {
-  ...generateMoveAwayMovement(36, 9),
+  ...generateMoveAwayMovement(),
   key: "annie",
   name: "Annie",
   textureKey: "female-npc",

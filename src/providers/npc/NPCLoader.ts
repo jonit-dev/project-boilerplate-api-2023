@@ -1,5 +1,5 @@
 import { TilemapParser } from "@providers/map/TilemapParser";
-import { INPC } from "@rpg-engine/shared";
+import { INPC, NPCMovementType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { npcsMetadataIndex } from "./npcs/index";
@@ -15,14 +15,26 @@ export class NPCMetaDataLoader {
   public loadNPCMetaData(): void {
     for (const [, npcs] of TilemapParser.npcs.entries()) {
       for (const npc of npcs) {
-        let customProperties: any = {};
+        let tiledProperties: any = {};
 
         npc.properties.forEach((property) => {
-          customProperties[property.name] = property.value;
+          tiledProperties[property.name] = property.value;
         });
 
-        const baseKey = `${customProperties.key.replace("npc-", "")}`;
-        customProperties = _.omit(customProperties, "key");
+        if (tiledProperties.movementType === NPCMovementType.FixedPath) {
+          const { endGridX, endGridY } = tiledProperties;
+
+          tiledProperties = {
+            ...tiledProperties,
+            fixedPath: {
+              endGridX: Number(endGridX),
+              endGridY: Number(endGridY),
+            },
+          };
+        }
+
+        const baseKey = `${tiledProperties.key.replace("npc-", "")}`;
+        tiledProperties = _.omit(tiledProperties, "key");
 
         let baseMetaData = npcsMetadataIndex[baseKey];
 
@@ -37,7 +49,7 @@ export class NPCMetaDataLoader {
 
         baseMetaData = {
           ...baseMetaData,
-          ...customProperties,
+          ...tiledProperties,
           ...additionalProperties,
         };
 

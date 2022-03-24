@@ -1102,6 +1102,90 @@
           "width": 16,
           "x": 272,
           "y": 112
+        },
+        {
+          "height": 16,
+          "id": 6,
+          "name": "Alice",
+          "properties": [
+            {
+              "name": "endGridX",
+              "type": "string",
+              "value": "24"
+            },
+            {
+              "name": "endGridY",
+              "type": "string",
+              "value": "9"
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-alice"
+            },
+            {
+              "name": "movementType",
+              "type": "string",
+              "value": "FixedPath"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": -90,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 128,
+          "y": 160
+        },
+        {
+          "height": 16,
+          "id": 9,
+          "name": "Annie",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-annie"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 448,
+          "y": 144
+        },
+        {
+          "height": 16,
+          "id": 20,
+          "name": "Felicia",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-felicia"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 224,
+          "y": 736
         }
       ],
       "opacity": 1,
@@ -1166,7 +1250,7 @@
     }
   ],
   "nextlayerid": 13,
-  "nextobjectid": 6,
+  "nextobjectid": 23,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",
