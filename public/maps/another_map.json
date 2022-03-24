@@ -1059,7 +1059,30 @@
         },
         {
           "height": 16,
-          "id": 3,
+          "id": 4,
+          "name": "Agatha",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-agatha"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 224,
+          "y": 464
+        },
+        {
+          "height": 16,
+          "id": 5,
           "name": "Maria",
           "properties": [
             {
@@ -1077,8 +1100,8 @@
           "type": "NPC",
           "visible": true,
           "width": 16,
-          "x": 320,
-          "y": 96
+          "x": 272,
+          "y": 112
         }
       ],
       "opacity": 1,
@@ -1143,7 +1166,7 @@
     }
   ],
   "nextlayerid": 13,
-  "nextobjectid": 4,
+  "nextobjectid": 6,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",

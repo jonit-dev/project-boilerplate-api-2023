@@ -54,7 +54,7 @@ export class NPCMovement {
     const isSolid = mapSolid?.isSolidThisLayerAndBelow;
 
     if (isSolid) {
-      console.log(`${npc.name} tried to move, but was blocked by a solid tile!`);
+      console.log(`${npc.key} tried to move, but was blocked by a solid tile!`);
       return true;
     }
 
@@ -62,7 +62,7 @@ export class NPCMovement {
     const hasPlayer = await Character.exists({ x: newX, y: newY, scene: npc.scene, isOnline: true });
 
     if (hasPlayer) {
-      console.log(`${npc.name} tried to move, but was blocked by a player!`);
+      console.log(`${npc.key} tried to move, but was blocked by a player!`);
       return true;
     }
 
@@ -70,7 +70,7 @@ export class NPCMovement {
     const hasNPC = await NPC.exists({ x: newX, y: newY, scene: npc.scene });
 
     if (hasNPC) {
-      console.log(`${npc.name} tried to move, but was blocked by another NPC!`);
+      console.log(`${npc.key} tried to move, but was blocked by another NPC!`);
 
       return true;
     }
@@ -99,7 +99,7 @@ export class NPCMovement {
 
     const hasSolid = await this.hasSolid(npc, newX, newY);
     if (hasSolid) {
-      console.log(`${npc.name} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
+      console.log(`${npc.key} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
 
       return;
     }
@@ -127,7 +127,7 @@ export class NPCMovement {
       );
     }
 
-    console.log(`${npc.name} moved to ${ToGridX(newX)}, ${ToGridY(newY)}`);
+    console.log(`${npc.key} moved to ${ToGridX(newX)}, ${ToGridY(newY)}`);
     npc.x = newX;
     npc.y = newY;
     npc.direction = chosenMovementDirection;

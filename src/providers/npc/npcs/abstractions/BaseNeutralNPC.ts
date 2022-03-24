@@ -37,10 +37,8 @@ export const generateMoveTowardsMovement = (initialGridX: number, initialGridY: 
   };
 };
 
-export const generateStoppedMovement = (initialGridX: number, initialGridY: number): any => {
+export const generateStoppedMovement = (): any => {
   return {
-    x: FromGridX(initialGridX),
-    y: FromGridY(initialGridY),
     direction: "down" as AnimationDirection,
     alignment: NPCAlignment.Neutral,
     class: CharacterClass.None,

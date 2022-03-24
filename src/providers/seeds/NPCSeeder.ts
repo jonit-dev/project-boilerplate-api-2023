@@ -10,7 +10,7 @@ export class NPCSeeder {
 
   public async seed(): Promise<void> {
     for (const [key, NPCData] of NPCMetaDataLoader.NPCMetaData.entries()) {
-      const npcFound = await NPC.exists({ key: key, x: NPCData.x, y: NPCData.y });
+      const npcFound = await NPC.exists({ tiledId: NPCData.tiledId });
 
       const { x, y, width, height } = this.getSocketTransmissionZone(NPCData.x, NPCData.y);
 
@@ -24,7 +24,9 @@ export class NPCSeeder {
       NPCData.targetCharacter = undefined; // reset any targets
 
       if (!npcFound) {
-        console.log(`🌱 Seeding database with NPC data for NPC with key: ${key}`);
+        console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
+
+        console.log(NPCData);
 
         const newNPC = new NPC(NPCData);
 

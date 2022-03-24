@@ -4,13 +4,15 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { npcsMetadataIndex } from "./npcs/index";
 
-interface INPCMetaData extends Omit<INPC, "_id"> {}
+interface INPCMetaData extends Omit<INPC, "_id"> {
+  tiledId: number;
+}
 
 @provide(NPCMetaDataLoader)
 export class NPCMetaDataLoader {
   public static NPCMetaData = new Map<string, INPCMetaData>();
 
-  public init(): void {
+  public loadNPCMetaData(): void {
     for (const [, npcs] of TilemapParser.npcs.entries()) {
       for (const npc of npcs) {
         let customProperties: any = {};
@@ -19,14 +21,18 @@ export class NPCMetaDataLoader {
           customProperties[property.name] = property.value;
         });
 
-        const key = customProperties.key.replace("npc-", "");
+        const baseKey = `${customProperties.key.replace("npc-", "")}`;
         customProperties = _.omit(customProperties, "key");
 
-        let baseMetaData = npcsMetadataIndex[key];
+        let baseMetaData = npcsMetadataIndex[baseKey];
+
+        const key = `${baseKey}-${npc.id}`;
 
         const additionalProperties = {
           x: npc.x,
           y: npc.y,
+          tiledId: npc.id,
+          key,
         };
 
         baseMetaData = {
@@ -34,8 +40,6 @@ export class NPCMetaDataLoader {
           ...customProperties,
           ...additionalProperties,
         };
-
-        console.log(baseMetaData);
 
         NPCMetaDataLoader.NPCMetaData.set(key, baseMetaData);
       }
