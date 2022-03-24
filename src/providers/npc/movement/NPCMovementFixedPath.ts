@@ -8,13 +8,20 @@ export class NPCMovementFixedPath {
   constructor(private NPCMovement: NPCMovement) {}
 
   public async startFixedPathMovement(npc: INPC, endGridX: number, endGridY: number): Promise<void> {
-    const { newGridX, newGridY, nextMovementDirection } = this.NPCMovement.getShortestPathNextPosition(
+    const shortestPath = this.NPCMovement.getShortestPathNextPosition(
       npc,
       ToGridX(npc.x),
       ToGridY(npc.y),
       endGridX,
       endGridY
     )!;
+
+    if (!shortestPath) {
+      console.log("No shortest path found!");
+      return;
+    }
+
+    const { newGridX, newGridY, nextMovementDirection } = shortestPath;
 
     if (newGridX && newGridY && nextMovementDirection) {
       await this.NPCMovement.moveNPC(

@@ -1166,7 +1166,7 @@
         },
         {
           "height": 16,
-          "id": 20,
+          "id": 24,
           "name": "Felicia",
           "properties": [
             {
@@ -1184,7 +1184,7 @@
           "type": "NPC",
           "visible": true,
           "width": 16,
-          "x": 224,
+          "x": 240,
           "y": 736
         }
       ],
@@ -1250,7 +1250,7 @@
     }
   ],
   "nextlayerid": 13,
-  "nextobjectid": 23,
+  "nextobjectid": 30,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",

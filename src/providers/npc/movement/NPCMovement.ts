@@ -88,10 +88,6 @@ export class NPCMovement {
   ): Promise<void> {
     const map = ScenesMetaData[npc.scene].map;
 
-    // update grid solids
-    TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
-    TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(newX), ToGridY(newY), false);
-
     const newGridX = ToGridX(newX);
     const newGridY = ToGridY(newY);
 
@@ -103,6 +99,10 @@ export class NPCMovement {
 
       return;
     }
+
+    // update grid solids
+    TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
+    TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(newX), ToGridY(newY), false);
 
     // warn nearby players that the NPC moved;
 

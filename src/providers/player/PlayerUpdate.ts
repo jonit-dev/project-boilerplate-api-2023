@@ -105,6 +105,7 @@ export class PlayerUpdate {
         data.direction! as AnimationDirection
       );
 
+      // old position is now walkable
       TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(data.x), ToGridY(data.y), true);
 
       updatedData.x = newX;

@@ -27,13 +27,20 @@ export class NPCMovementMoveTowards {
       }
 
       try {
-        const { newGridX, newGridY, nextMovementDirection } = this.npcMovement.getShortestPathNextPosition(
+        const shortestPath = this.npcMovement.getShortestPathNextPosition(
           npc,
           ToGridX(npc.x),
           ToGridY(npc.y),
           ToGridX(targetCharacter.x),
           ToGridY(targetCharacter.y)
-        )!;
+        );
+
+        if (!shortestPath) {
+          console.log("No shortest path found!");
+          return;
+        }
+
+        const { newGridX, newGridY, nextMovementDirection } = shortestPath;
 
         if (newGridX && newGridY && nextMovementDirection) {
           await this.npcMovement.moveNPC(
