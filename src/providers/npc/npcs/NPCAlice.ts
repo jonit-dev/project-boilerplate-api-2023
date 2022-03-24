@@ -1,7 +1,7 @@
 import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
 import { generateFixedPathMovement } from "./abstractions/BaseNeutralNPC";
 
-export const aliceMetaData = {
+export const npcAliceMetaData = {
   ...generateFixedPathMovement(8, 10, 24, 9),
   key: "alice",
   name: "Alice",

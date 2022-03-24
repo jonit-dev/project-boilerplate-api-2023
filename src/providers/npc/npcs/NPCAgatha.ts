@@ -1,7 +1,7 @@
 import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
 import { generateStoppedMovement } from "./abstractions/BaseNeutralNPC";
 
-export const agathaMetaData = {
+export const npcAgathaMetaData = {
   ...generateStoppedMovement(14, 27),
   key: "agatha",
   name: "Agatha",

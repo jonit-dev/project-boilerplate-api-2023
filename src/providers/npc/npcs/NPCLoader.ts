@@ -1,10 +1,10 @@
 import { INPC } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { agathaMetaData } from "./NPCAgatha";
-import { aliceMetaData } from "./NPCAlice";
-import { annieMetaData } from "./NPCAnnie";
-import { feliciaMetaData } from "./NPCFelicia";
-import { mariaNPCMetaData } from "./NPCMaria";
+import { npcAgathaMetaData } from "./NPCAgatha";
+import { npcAliceMetaData } from "./NPCAlice";
+import { npcAnnieMetaData } from "./NPCAnnie";
+import { npcFeliciaMetaData } from "./NPCFelicia";
+import { npcMariaMetaData } from "./NPCMaria";
 
 interface INPCMetaData extends Omit<INPC, "_id"> {}
 
@@ -13,10 +13,10 @@ export class NPCLoader {
   public static NPCMetaData = new Map<string, INPCMetaData>();
 
   public init(): void {
-    NPCLoader.NPCMetaData.set("alice", aliceMetaData);
-    NPCLoader.NPCMetaData.set("maria", mariaNPCMetaData);
-    NPCLoader.NPCMetaData.set("felicia", feliciaMetaData);
-    NPCLoader.NPCMetaData.set("agatha", agathaMetaData);
-    NPCLoader.NPCMetaData.set("annie", annieMetaData);
+    NPCLoader.NPCMetaData.set("alice", npcAliceMetaData);
+    NPCLoader.NPCMetaData.set("maria", npcMariaMetaData);
+    NPCLoader.NPCMetaData.set("felicia", npcFeliciaMetaData);
+    NPCLoader.NPCMetaData.set("agatha", npcAgathaMetaData);
+    NPCLoader.NPCMetaData.set("annie", npcAnnieMetaData);
   }
 }
