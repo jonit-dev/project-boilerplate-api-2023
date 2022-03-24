@@ -10,7 +10,7 @@ import PF from "pathfinding";
 export class TilemapParser {
   public static maps: Map<string, ITiled> = new Map();
   public static grids: Map<string, PF.Grid> = new Map();
-  public static npcs: Map<string, Record<string, any>> = new Map();
+  public static npcs: Map<string, any[]> = new Map();
   constructor() {}
 
   public init(): void {

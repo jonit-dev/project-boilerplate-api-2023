@@ -1,6 +1,6 @@
 import { TilemapParser } from "@providers/map/TilemapParser";
+import { NPCMetaDataLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
-import { NPCLoader } from "@providers/npc/npcs/NPCLoader";
 import { Player } from "@providers/player/Player";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { Container } from "inversify";
@@ -36,6 +36,6 @@ export const socketAdapter = container.get<SocketAdapter>(SocketAdapter);
 export const player = container.get<Player>(Player);
 export const tilemapParser = container.get<TilemapParser>(TilemapParser);
 export const npcManager = container.get<NPCManager>(NPCManager);
-export const npcLoader = container.get<NPCLoader>(NPCLoader);
+export const npcMetaDataLoader = container.get<NPCMetaDataLoader>(NPCMetaDataLoader);
 
 export { container };

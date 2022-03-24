@@ -5,7 +5,7 @@ import { appEnv } from "@providers/config/env";
 import {
   cronJobs,
   db,
-  npcLoader,
+  npcMetaDataLoader,
   npcManager,
   seeds,
   server,
@@ -32,7 +32,7 @@ app.listen(port, async () => {
     phoneLocale: appEnv.general.PHONE_LOCALE!,
   });
   tilemapParser.init(); // must be the first thing loaded!
-  npcLoader.init(); //! This must come before our seeds.start(), otherwise it won't have the data to create our NPCs.
+  npcMetaDataLoader.init(); //! This must come before our seeds.start(), otherwise it won't have the data to create our NPCs.
 
   await db.init();
   await cronJobs.start();

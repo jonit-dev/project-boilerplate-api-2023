@@ -11,10 +11,8 @@ import {
 } from "@rpg-engine/shared";
 import _ from "lodash";
 
-export const generateRandomMovement = (initialGridX: number, initialGridY: number): any => {
+export const generateRandomMovement = (): any => {
   return {
-    x: FromGridX(initialGridX),
-    y: FromGridY(initialGridY),
     direction: "down" as AnimationDirection,
     alignment: NPCAlignment.Neutral,
     class: CharacterClass.None,

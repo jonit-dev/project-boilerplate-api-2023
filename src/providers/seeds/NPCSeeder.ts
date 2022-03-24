@@ -1,5 +1,5 @@
 import { NPC } from "@entities/ModuleSystem/NPCModel";
-import { NPCLoader } from "@providers/npc/npcs/NPCLoader";
+import { NPCMetaDataLoader } from "@providers/npc/NPCLoader";
 import { ISocketTransmissionZone, SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { GRID_HEIGHT, GRID_WIDTH, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -9,8 +9,8 @@ export class NPCSeeder {
   constructor(private socketTransmissionZone: SocketTransmissionZone) {}
 
   public async seed(): Promise<void> {
-    for (const [key, NPCData] of NPCLoader.NPCMetaData.entries()) {
-      const npcFound = await NPC.exists({ key: key });
+    for (const [key, NPCData] of NPCMetaDataLoader.NPCMetaData.entries()) {
+      const npcFound = await NPC.exists({ key: key, x: NPCData.x, y: NPCData.y });
 
       const { x, y, width, height } = this.getSocketTransmissionZone(NPCData.x, NPCData.y);
 
