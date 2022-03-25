@@ -1,7 +1,9 @@
+import { Character } from "@entities/ModuleSystem/CharacterModel";
 import { MapSolid } from "@entities/ModuleSystem/MapSolid";
+import { NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MathHelper } from "@providers/math/MathHelper";
-import { AnimationDirection, GRID_HEIGHT, GRID_WIDTH, MapLayers } from "@rpg-engine/shared";
+import { AnimationDirection, FromGridX, FromGridY, GRID_HEIGHT, GRID_WIDTH, MapLayers } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import PF from "pathfinding";
 interface IPosition {
@@ -21,6 +23,28 @@ export class MovementHelper {
     layer: MapLayers,
     checkType: IsSolidCheckType = "isSolidThisLayerAndBelow"
   ): Promise<boolean> => {
+    // check for players and NPCs
+
+    const hasNPC = await NPC.exists({
+      x: FromGridX(gridX),
+      y: FromGridY(gridY),
+      layer,
+    });
+
+    if (hasNPC) {
+      return true;
+    }
+
+    const hasPlayer = await Character.exists({
+      x: FromGridX(gridX),
+      y: FromGridY(gridY),
+      layer,
+    });
+
+    if (hasPlayer) {
+      return true;
+    }
+
     const mapSolid = await MapSolid.findOne({
       map,
       gridX,

@@ -10,6 +10,7 @@ import {
   AnimationDirection,
   IConnectedPlayer,
   IPlayerPositionUpdateConfirm,
+  MapLayers,
   PlayerSocketEvents,
   ScenesMetaData,
   ToGridX,
@@ -42,7 +43,13 @@ export class PlayerUpdate {
 
           // send message back to the user telling that the requested position update is not valid!
 
-          const isPositionUpdateValid = this.checkIfValidPositionUpdate(data, character);
+          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
+            data.x,
+            data.y,
+            data.direction! as AnimationDirection
+          );
+
+          const isPositionUpdateValid = await this.checkIfValidPositionUpdate(data, character, newX, newY);
 
           this.socketMessaging.sendEventToUser<IPlayerPositionUpdateConfirm>(
             data.channelId,
@@ -76,15 +83,28 @@ export class PlayerUpdate {
           await this.npcView.warnUserAboutNPCsInView(character, data.otherEntitiesInView);
 
           // update emitter position from connectedPlayers
-          await this.updateServerSideEmitterInfo(data, character);
+          await this.updateServerSideEmitterInfo(data, character, newX, newY);
         }
       }
     );
   }
 
-  private checkIfValidPositionUpdate(data: IConnectedPlayer, character: ICharacter): boolean {
-    //! always return false for now
-    console.log("checking if requested position update is valid...");
+  private async checkIfValidPositionUpdate(
+    data: IConnectedPlayer,
+    character: ICharacter,
+    newX: number,
+    newY: number
+  ): Promise<boolean> {
+    const isSolid = await this.movementHelper.isSolid(
+      ScenesMetaData[character.scene].map,
+      ToGridX(newX),
+      ToGridY(newY),
+      MapLayers.Player
+    );
+
+    if (isSolid) {
+      return false;
+    }
 
     if (Math.round(character.x) === Math.round(data.x) && Math.round(character.y) === Math.round(data.y)) {
       return true; // initial movement origin is the same as our server representation. It means it's valid!
@@ -93,17 +113,17 @@ export class PlayerUpdate {
     return false;
   }
 
-  private async updateServerSideEmitterInfo(data: IConnectedPlayer, character: ICharacter): Promise<void> {
+  private async updateServerSideEmitterInfo(
+    data: IConnectedPlayer,
+    character: ICharacter,
+    newX: number,
+    newY: number
+  ): Promise<void> {
     const updatedData = data;
     const map = ScenesMetaData[character.scene].map;
 
     if (data.isMoving) {
       // if player is moving, update the position
-      const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
-        data.x,
-        data.y,
-        data.direction! as AnimationDirection
-      );
 
       // old position is now walkable
       TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(data.x), ToGridY(data.y), true);
