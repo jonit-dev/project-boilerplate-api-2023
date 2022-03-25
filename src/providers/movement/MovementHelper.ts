@@ -1,6 +1,7 @@
+import { MapSolid } from "@entities/ModuleSystem/MapSolid";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MathHelper } from "@providers/math/MathHelper";
-import { AnimationDirection, GRID_HEIGHT, GRID_WIDTH } from "@rpg-engine/shared";
+import { AnimationDirection, GRID_HEIGHT, GRID_WIDTH, MapLayers } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import PF from "pathfinding";
 interface IPosition {
@@ -8,9 +9,35 @@ interface IPosition {
   y: number;
 }
 
+type IsSolidCheckType = "isSolidThisLayerAndBelow" | "isSolidThisLayerOnly";
 @provide(MovementHelper)
 export class MovementHelper {
   constructor(private mathHelper: MathHelper) {}
+
+  public isSolid = async (
+    map: string,
+    gridX: number,
+    gridY: number,
+    layer: MapLayers,
+    checkType: IsSolidCheckType = "isSolidThisLayerAndBelow"
+  ): Promise<boolean> => {
+    const mapSolid = await MapSolid.findOne({
+      map,
+      gridX,
+      gridY,
+      layer,
+    });
+
+    if (!mapSolid) {
+      return false;
+    }
+
+    if (checkType === "isSolidThisLayerOnly") {
+      return mapSolid.isSolidOnlyThisLayer;
+    } else {
+      return mapSolid.isSolidThisLayerAndBelow;
+    }
+  };
 
   public findShortestPath(
     map: string,

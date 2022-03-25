@@ -1,7 +1,15 @@
 import { NPC } from "@entities/ModuleSystem/NPCModel";
+import { TilemapParser } from "@providers/map/TilemapParser";
 import { NPCMetaDataLoader } from "@providers/npc/NPCLoader";
 import { ISocketTransmissionZone, SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import { GRID_HEIGHT, GRID_WIDTH, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
+import {
+  GRID_HEIGHT,
+  GRID_WIDTH,
+  ScenesMetaData,
+  SOCKET_TRANSMISSION_ZONE_WIDTH,
+  ToGridX,
+  ToGridY,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(NPCSeeder)
@@ -23,13 +31,17 @@ export class NPCSeeder {
 
       NPCData.targetCharacter = undefined; // reset any targets
 
+      // mark NPC initial position as solid on the map (pathfinding)
+      TilemapParser.grids
+        .get(ScenesMetaData[NPCData.scene].map)!
+        .setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
+
       if (!npcFound) {
         console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
 
         console.log(NPCData);
 
         const newNPC = new NPC(NPCData);
-
         await newNPC.save();
       } else {
         // if npc already exists, restart initial position
