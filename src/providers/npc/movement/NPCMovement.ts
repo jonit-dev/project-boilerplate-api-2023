@@ -120,6 +120,7 @@ export class NPCMovement {
           key: npc.key,
           layer: npc.layer,
           textureKey: npc.textureKey,
+          scene: npc.scene,
         }
       );
     }
