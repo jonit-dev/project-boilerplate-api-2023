@@ -1036,7 +1036,7 @@
       "objects": [
         {
           "height": 16,
-          "id": 1,
+          "id": 34,
           "name": "Maria",
           "properties": [
             {
@@ -1055,34 +1055,11 @@
           "visible": true,
           "width": 16,
           "x": 320,
-          "y": 192
+          "y": 208
         },
         {
           "height": 16,
-          "id": 4,
-          "name": "Agatha",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "npc-agatha"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
-            }
-          ],
-          "rotation": 0,
-          "type": "NPC",
-          "visible": true,
-          "width": 16,
-          "x": 224,
-          "y": 464
-        },
-        {
-          "height": 16,
-          "id": 5,
+          "id": 41,
           "name": "Maria",
           "properties": [
             {
@@ -1100,23 +1077,23 @@
           "type": "NPC",
           "visible": true,
           "width": 16,
-          "x": 272,
-          "y": 112
+          "x": 352,
+          "y": 160
         },
         {
           "height": 16,
-          "id": 6,
+          "id": 56,
           "name": "Alice",
           "properties": [
             {
               "name": "endGridX",
               "type": "string",
-              "value": "24"
+              "value": "14"
             },
             {
               "name": "endGridY",
               "type": "string",
-              "value": "9"
+              "value": "14"
             },
             {
               "name": "key",
@@ -1134,16 +1111,82 @@
               "value": "MainScene"
             }
           ],
-          "rotation": -90,
+          "rotation": 0,
           "type": "NPC",
           "visible": true,
           "width": 16,
           "x": 128,
-          "y": 160
+          "y": 112
         },
         {
           "height": 16,
-          "id": 9,
+          "id": 57,
+          "name": "Agatha",
+          "properties": [
+            {
+              "name": "endGridX",
+              "type": "string",
+              "value": "14"
+            },
+            {
+              "name": "endGridY",
+              "type": "string",
+              "value": "14"
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-agatha"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 224,
+          "y": 432
+        },
+        {
+          "height": 16,
+          "id": 58,
+          "name": "Felicia",
+          "properties": [
+            {
+              "name": "endGridX",
+              "type": "string",
+              "value": "14"
+            },
+            {
+              "name": "endGridY",
+              "type": "string",
+              "value": "14"
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-felicia"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 224,
+          "y": 752
+        },
+        {
+          "height": 16,
+          "id": 59,
           "name": "Annie",
           "properties": [
             {
@@ -1161,31 +1204,8 @@
           "type": "NPC",
           "visible": true,
           "width": 16,
-          "x": 448,
-          "y": 144
-        },
-        {
-          "height": 16,
-          "id": 24,
-          "name": "Felicia",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "npc-felicia"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
-            }
-          ],
-          "rotation": 0,
-          "type": "NPC",
-          "visible": true,
-          "width": 16,
-          "x": 240,
-          "y": 736
+          "x": 304,
+          "y": 96
         }
       ],
       "opacity": 1,
@@ -1250,7 +1270,7 @@
     }
   ],
   "nextlayerid": 13,
-  "nextobjectid": 30,
+  "nextobjectid": 60,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",
