@@ -66,8 +66,8 @@ export class TilemapParser {
     const mapLayerParser = {
       ground: 0,
       "over-ground": 1,
-      player: 2,
-      "over-player": 3,
+      character: 2,
+      "over-character": 3,
     };
 
     let shouldGenerateSolidsInDatabase;

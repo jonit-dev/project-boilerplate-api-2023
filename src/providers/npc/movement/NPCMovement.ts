@@ -45,10 +45,10 @@ export class NPCMovement {
     }
 
     // check for other Characters
-    const hasPlayer = await Character.exists({ x: newX, y: newY, scene: npc.scene, isOnline: true });
+    const hasCharacter = await Character.exists({ x: newX, y: newY, scene: npc.scene, isOnline: true });
 
-    if (hasPlayer) {
-      console.log(`${npc.key} tried to move, but was blocked by a player!`);
+    if (hasCharacter) {
+      console.log(`${npc.key} tried to move, but was blocked by a character!`);
       return true;
     }
 
@@ -90,15 +90,13 @@ export class NPCMovement {
     TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
     TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(newX), ToGridY(newY), false);
 
-    // warn nearby players that the NPC moved;
+    // warn nearby characters that the NPC moved;
 
-    // const nearbyPlayers = await this.playerView.getCharactersWithXYPositionInView(newX, newY, npc.scene);
+    const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
-    const nearbyPlayers = await this.npcView.getCharactersInView(npc);
-
-    for (const player of nearbyPlayers) {
+    for (const character of nearbyCharacters) {
       this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
-        player.channelId!,
+        character.channelId!,
         NPCSocketEvents.NPCPositionUpdate,
         {
           id: npc.id,

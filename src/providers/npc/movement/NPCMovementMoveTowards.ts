@@ -12,7 +12,7 @@ export class NPCMovementMoveTowards {
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
     // first step is setting a target
-    // for this, get all players nearby and set the target to the closest one
+    // for this, get all characters nearby and set the target to the closest one
 
     const targetCharacter = await Character.findById(npc.targetCharacter);
 

@@ -5,38 +5,38 @@ import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 
-@provide(PlayerCrons)
-export class PlayerCrons {
+@provide(CharacterCrons)
+export class CharacterCrons {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public schedule(): void {
     nodeCron.schedule("*/10 * * * *", async () => {
       console.log("Checking inactive players...");
-      await this.logoutInactivePlayers();
+      await this.logoutInactiveCharacters();
     });
   }
 
-  private async logoutInactivePlayers(): Promise<void> {
-    const onlinePlayers = await Character.find({
+  private async logoutInactiveCharacters(): Promise<void> {
+    const onlineCharacters = await Character.find({
       isOnline: true,
     });
 
-    for (const player of onlinePlayers) {
-      const lastActivity = dayjs(player.updatedAt);
+    for (const character of onlineCharacters) {
+      const lastActivity = dayjs(character.updatedAt);
       const now = dayjs();
       const diff = now.diff(lastActivity, "minute");
 
       if (diff >= 10) {
-        console.log(`🚪: Player id ${player.id} has disconnected due to inactivity...`);
-        this.socketMessaging.sendEventToUser(player.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+        console.log(`🚪: Character id ${character.id} has disconnected due to inactivity...`);
+        this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
           reason: "You have were disconnected due to inactivity!",
         });
-        this.socketMessaging.sendMessageToClosePlayers(player, CharacterSocketEvents.CharacterLogout, {
-          id: player.id,
+        this.socketMessaging.sendMessageToCloseCharacters(character, CharacterSocketEvents.CharacterLogout, {
+          id: character.id,
         });
 
-        player.isOnline = false;
-        await player.save();
+        character.isOnline = false;
+        await character.save();
       }
     }
   }

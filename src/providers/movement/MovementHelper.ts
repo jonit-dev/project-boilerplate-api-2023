@@ -23,7 +23,7 @@ export class MovementHelper {
     layer: MapLayers,
     checkType: IsSolidCheckType = "isSolidThisLayerAndBelow"
   ): Promise<boolean> => {
-    // check for players and NPCs
+    // check for characters and NPCs
 
     const hasNPC = await NPC.exists({
       x: FromGridX(gridX),

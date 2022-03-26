@@ -1012,13 +1012,13 @@
       ],
       "height": 96,
       "id": 10,
-      "name": "player",
+      "name": "character",
       "opacity": 1,
       "properties": [
         {
           "name": "ge_charLayer",
           "type": "string",
-          "value": "player"
+          "value": "character"
         }
       ],
       "startx": 0,
@@ -1116,13 +1116,13 @@
       ],
       "height": 16,
       "id": 11,
-      "name": "over-player",
+      "name": "over-character",
       "opacity": 1,
       "properties": [
         {
           "name": "ge_charLayer",
           "type": "string",
-          "value": "over-player"
+          "value": "over-character"
         }
       ],
       "startx": 0,

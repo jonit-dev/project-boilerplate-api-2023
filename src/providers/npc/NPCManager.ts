@@ -59,12 +59,12 @@ export class NPCManager {
   public startBehaviorLoop(npc: INPC): void {
     setInterval(async () => {
       try {
-        // check if actually there's a player near. If not, let's not waste server resources!
+        // check if actually there's a character near. If not, let's not waste server resources!
 
         const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
         if (!nearbyCharacters.length) {
-          return; // no player in view, no need to waste resources!
+          return; // no character in view, no need to waste resources!
         }
 
         switch (npc.movementType) {

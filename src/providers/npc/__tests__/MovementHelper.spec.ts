@@ -42,7 +42,7 @@ describe("NPCMovement.ts", () => {
     expect(hasSolidNPC).toBeFalsy();
   });
 
-  it("should properly detect a solid player", async () => {
+  it("should properly detect a solid character", async () => {
     const character = await unitTestHelper.createMockCharacter();
 
     const hasSolidCharacter = await movementHelper.isSolid(

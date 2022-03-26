@@ -25,7 +25,7 @@ export class CharacterNetworkCreate {
       channel,
       CharacterSocketEvents.CharacterCreate,
       async (data: ICharacterPositionUpdatePayload, character: ICharacter) => {
-        // check if player is already logged in
+        // check if character is already logged in
 
         if (character.isOnline) {
           // then force logout the current associated client
@@ -51,21 +51,21 @@ export class CharacterNetworkCreate {
           isMoving: false,
         };
 
-        // update server camera coordinates and other players in view
+        // update server camera coordinates and other characters in view
         //! Refactor once client is refactored!
         //! Warning: this is being passed by the client, so it can't be trusted! Refactor later to calculate this on server side!
         character.cameraCoordinates = data.cameraCoordinates;
         await character.save();
 
-        // if there's no player with this id connected, add it.
-        console.log(`💡: Player ${data.name} has connected!`);
+        // if there's no character with this id connected, add it.
+        console.log(`💡: Character ${data.name} has connected!`);
         console.log(data);
 
         channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
 
         const connectedCharacters = await this.geckosConnection.getConnectedCharacters();
 
-        console.log("- Total players connected:", connectedCharacters.length);
+        console.log("- Total characters connected:", connectedCharacters.length);
 
         this.sendCreationMessageToCharacters(data.channelId, data.id, data, character);
       }
@@ -80,12 +80,12 @@ export class CharacterNetworkCreate {
   ): Promise<void> {
     const nearbyCharacters = await this.playerView.getCharactersInView(character);
 
-    console.log("warning nearby players...");
+    console.log("warning nearby characters...");
     console.log(nearbyCharacters.map((p) => p.name).join(", "));
 
     if (nearbyCharacters.length > 0) {
       for (const nearbyCharacter of nearbyCharacters) {
-        // tell other player that we exist, so it can create a new instance of us
+        // tell other character that we exist, so it can create a new instance of us
         this.geckosMessagingHelper.sendEventToUser<ICharacterPositionUpdatePayload>(
           nearbyCharacter.channelId!,
           CharacterSocketEvents.CharacterCreate,
@@ -105,7 +105,7 @@ export class CharacterNetworkCreate {
           cameraCoordinates: nearbyCharacter.cameraCoordinates,
         };
 
-        // tell the emitter about these other players too
+        // tell the emitter about these other characters too
 
         this.geckosMessagingHelper.sendEventToUser<ICharacterPositionUpdatePayload>(
           emitterChannelId,

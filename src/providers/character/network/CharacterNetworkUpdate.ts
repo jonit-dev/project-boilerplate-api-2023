@@ -121,7 +121,7 @@ export class CharacterNetworkUpdate {
     const map = ScenesMetaData[character.scene].map;
 
     if (data.isMoving) {
-      // if player is moving, update the position
+      // if character is moving, update the position
 
       // old position is now walkable
       TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(data.x), ToGridY(data.y), true);

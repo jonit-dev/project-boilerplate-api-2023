@@ -1,10 +1,11 @@
 import { appEnv } from "@providers/config/env";
 import { EnvType } from "@rpg-engine/shared/dist";
 import { provide } from "inversify-binding-decorators";
-import { PlayerCrons } from "./PlayerCrons";
+import { CharacterCrons } from "./CharacterCrons";
+
 @provide(Cronjob)
 class Cronjob {
-  constructor(private playerCron: PlayerCrons) {}
+  constructor(private characterCron: CharacterCrons) {}
 
   public start(): void {
     this.scheduleCrons();
@@ -16,7 +17,7 @@ class Cronjob {
     if (appEnv.general.ENV === EnvType.Production) {
       switch (process.env.pm_id) {
         case "0":
-          this.playerCron.schedule();
+          this.characterCron.schedule();
           break;
         case "1":
           break;
@@ -26,7 +27,7 @@ class Cronjob {
           break;
       }
     } else {
-      this.playerCron.schedule();
+      this.characterCron.schedule();
     }
   }
 }

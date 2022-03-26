@@ -32,14 +32,14 @@ export class CharacterNetworkLogout {
           );
         }
 
-        console.log(`🚪: Player id ${data.id} has disconnected`);
+        console.log(`🚪: Character id ${data.id} has disconnected`);
 
         character.isOnline = false;
         await character.save();
 
         const connectedCharacters = await this.socketConnection.getConnectedCharacters();
 
-        console.log("- Total players connected:", connectedCharacters.length);
+        console.log("- Total characters connected:", connectedCharacters.length);
       }
     );
   }

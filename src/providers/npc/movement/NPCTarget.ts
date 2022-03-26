@@ -7,7 +7,7 @@ import _ from "lodash";
 import { NPCView } from "../NPCView";
 import { NPCDirection } from "./NPCMovement";
 
-interface IPlayerDistance {
+interface ICharacterDistance {
   id: string;
   distance: number;
   x: number;
@@ -41,14 +41,14 @@ export class NPCTarget {
   public async tryToSetTarget(npc: INPC): Promise<void> {
     console.log(`${npc.key} trying to set target...`);
 
-    const nearbyPlayers = await this.npcView.getCharactersInView(npc);
+    const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
-    const playersDistance: IPlayerDistance[] = [];
+    const charactersDistance: ICharacterDistance[] = [];
 
-    for (const nearbyPlayer of nearbyPlayers) {
+    for (const nearbyPlayer of nearbyCharacters) {
       const distance = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, nearbyPlayer.x, nearbyPlayer.y);
 
-      playersDistance.push({
+      charactersDistance.push({
         id: nearbyPlayer.id,
         distance: distance,
         x: nearbyPlayer.x,
@@ -56,21 +56,21 @@ export class NPCTarget {
       });
     }
 
-    // get the player with minimum distance
-    const minDistancePlayer = _.minBy(playersDistance, "distance");
+    // get the character with minimum distance
+    const minDistanceCharacter = _.minBy(charactersDistance, "distance");
 
-    if (minDistancePlayer) {
+    if (minDistanceCharacter) {
       if (!npc.maxRangeInGridCells) {
         console.log(`NPC ${npc.key} has MoveTowards MovementType, but no maxRangeInGridCells is specified!`);
         return;
       }
 
-      // check if player is under range
+      // check if character is under range
       const isMovementUnderRange = this.movementHelper.isUnderRange(
         npc.x,
         npc.y,
-        minDistancePlayer.x,
-        minDistancePlayer.y,
+        minDistanceCharacter.x,
+        minDistanceCharacter.y,
         npc.maxRangeInGridCells
       );
 
@@ -78,7 +78,7 @@ export class NPCTarget {
         return;
       }
 
-      const character = await Character.findById(minDistancePlayer.id);
+      const character = await Character.findById(minDistanceCharacter.id);
 
       if (!character) {
         console.log(`Error in ${npc.key}: Failed to find character to set as target!`);

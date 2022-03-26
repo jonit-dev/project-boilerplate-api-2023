@@ -10,13 +10,13 @@ export interface IBaseData {
   otherEntitiesInView: IEntitiesInView;
 }
 
-export interface IAbstractPlayerData {
+export interface IAbstractCharacterData {
   [key: string]: any;
 }
 
 @provide(SocketRetransmission)
 export class SocketRetransmission {
-  constructor(private socketMessaging: SocketMessaging, private playerView: CharacterView) {}
+  constructor(private socketMessaging: SocketMessaging, private characterView: CharacterView) {}
 
   public async bidirectionalDataRetransmission<DataType extends IBaseData>(
     originCharacter: ICharacter,
@@ -25,39 +25,39 @@ export class SocketRetransmission {
     checkKeysForChangeToUpdateEmitter: string[],
     sendAdditionalDataToEmitter?: Record<string, unknown>
   ): Promise<void> {
-    //! Case 1: Warn close players about my data update!
+    //! Case 1: Warn close characters about my data update!
 
-    await this.socketMessaging.sendMessageToClosePlayers(originCharacter, event, data);
+    await this.socketMessaging.sendMessageToCloseCharacters(originCharacter, event, data);
 
-    //! Case 2: Warn emitter about other players data
+    //! Case 2: Warn emitter about other characters data
 
-    // update the emitter nearby players positions
-    const nearbyPlayers = await this.playerView.getCharactersInView(originCharacter);
+    // update the emitter nearby characters positions
+    const nearbyCharacters = await this.characterView.getCharactersInView(originCharacter);
 
-    if (nearbyPlayers) {
-      for (const nearbyPlayer of nearbyPlayers) {
+    if (nearbyCharacters) {
+      for (const nearbyCharacter of nearbyCharacters) {
         // we want to warn the emitter in 2 situations:
-        // if we dont have this player in our emitter view
-        // if we have this player in our view, BUT the data representation we have on the server is different than the data representation we have on the client
+        // if we dont have this character in our emitter view
+        // if we have this character in our view, BUT the data representation we have on the server is different than the data representation we have on the client
 
-        if (await this.emitterHasAlreadyPlayerData(data, nearbyPlayer, checkKeysForChangeToUpdateEmitter)) {
+        if (await this.emitterHasAlreadyCharacterData(data, nearbyCharacter, checkKeysForChangeToUpdateEmitter)) {
           console.log(
-            `Emitter ${data.id} already has player ${nearbyPlayer.name} position data updated. Skipping sending package.`
+            `Emitter ${data.id} already has character ${nearbyCharacter.name} position data updated. Skipping sending package.`
           );
           continue;
         }
 
-        if (nearbyPlayer.id !== data.id) {
-          // send nearbyPlayer info to emitter!
+        if (nearbyCharacter.id !== data.id) {
+          // send nearbyCharacter info to emitter!
 
           const emitterDataKeys = Object.keys(data);
 
-          // create new object from nearbyPlayer, based on emitterDataKeys
+          // create new object from nearbyCharacter, based on emitterDataKeys
 
-          const dataToSubmit = {} as IAbstractPlayerData;
+          const dataToSubmit = {} as IAbstractCharacterData;
 
           for (const key of emitterDataKeys) {
-            dataToSubmit[key] = nearbyPlayer[key];
+            dataToSubmit[key] = nearbyCharacter[key];
           }
 
           const payload = {
@@ -73,18 +73,18 @@ export class SocketRetransmission {
     }
   }
 
-  private emitterHasAlreadyPlayerData(
+  private emitterHasAlreadyCharacterData(
     clientEmitterData: IBaseData, // what's coming from the client
-    serverNearbyPlayer: IAbstractPlayerData, // what we have on the server
+    serverNearbyCharacter: IAbstractCharacterData, // what we have on the server
     checkKeysToUpdate: string[]
   ): boolean {
-    const emitterInfoAboutNearbyPlayer = clientEmitterData.otherEntitiesInView[serverNearbyPlayer.id];
+    const emitterInfoAboutNearbyCharacter = clientEmitterData.otherEntitiesInView[serverNearbyCharacter.id];
 
-    if (!emitterInfoAboutNearbyPlayer) return false;
+    if (!emitterInfoAboutNearbyCharacter) return false;
 
-    // Compares nearbyPlayer server side data with the data that the client has (if it matches, we dont need to update them!)
+    // Compares nearbyCharacter server side data with the data that the client has (if it matches, we dont need to update them!)
     for (const key of checkKeysToUpdate) {
-      if (serverNearbyPlayer[key] !== emitterInfoAboutNearbyPlayer[key]) {
+      if (serverNearbyCharacter[key] !== emitterInfoAboutNearbyCharacter[key]) {
         return false;
       }
     }
