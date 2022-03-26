@@ -34,7 +34,6 @@
     "@amplitude/identify": "^1.8.2",
     "@amplitude/node": "^1.8.3",
     "@geckos.io/server": "^2.1.8",
-    "@rpg-engine/long-bow": "^0.1.23",
     "@sendgrid/mail": "^7.4.0",
     "@sentry/node": "^6.13.2",
     "@sentry/tracing": "^6.13.2",
@@ -61,7 +60,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
-    "@rpg-engine/shared": "^0.1.73",
+    "@rpg-engine/shared": "^0.1.74",
     "@shelf/jest-mongodb": "^2.2.1",
     "@types/bcrypt": "^3.0.0",
     "@types/express": "^4.17.8",

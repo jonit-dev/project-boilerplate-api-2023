@@ -97,7 +97,7 @@ export class CharacterNetworkUpdate {
       ScenesMetaData[character.scene].map,
       ToGridX(newX),
       ToGridY(newY),
-      MapLayers.Player
+      MapLayers.Character
     );
 
     if (isSolid) {

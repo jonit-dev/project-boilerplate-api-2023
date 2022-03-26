@@ -50,7 +50,7 @@ const characterSchema = createSchema(
       required: true,
     }),
     layer: Type.number({
-      default: MapLayers.Player,
+      default: MapLayers.Character,
       required: true,
     }),
     cameraCoordinates: {

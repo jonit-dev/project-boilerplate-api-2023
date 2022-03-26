@@ -93,7 +93,7 @@ export class TilemapParser {
           const isSolid = this.isSolid(map, gridX, gridY, mapLayerParser[layer.name]);
           const isSolidOnlyThisLayer = this.isSolid(map, gridX, gridY, mapLayerParser[layer.name], false);
 
-          if (mapLayerParser[layer.name] === MapLayers.Player) {
+          if (mapLayerParser[layer.name] === MapLayers.Character) {
             gridMap.setWalkableAt(gridX, gridY, !isSolid);
           }
 

@@ -62,7 +62,7 @@ const npcSchema = createSchema(
     }),
     layer: Type.number({
       required: true,
-      default: MapLayers.Player,
+      default: MapLayers.Character,
     }),
 
     movementType: Type.string({
