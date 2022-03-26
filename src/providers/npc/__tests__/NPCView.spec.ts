@@ -13,8 +13,7 @@ describe("NPCView.ts", () => {
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook();
-
+    await unitTestHelper.beforeEachJestHook(true);
     npcView = container.get<NPCView>(NPCView);
   });
 

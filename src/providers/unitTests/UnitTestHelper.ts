@@ -35,8 +35,10 @@ export class UnitTestHelper {
     await mongoose.connect(this.mongoServer.getUri(), { dbName: "test-database" });
   }
 
-  public async beforeEachJestHook(): Promise<void> {
-    await mongoose.connection.dropDatabase();
+  public async beforeEachJestHook(dropDatabase?: boolean): Promise<void> {
+    if (dropDatabase) {
+      await mongoose.connection.dropDatabase();
+    }
   }
 
   public async afterAllJestHook(): Promise<void> {

@@ -20,15 +20,6 @@ export class NPCSeeder {
     for (const [key, NPCData] of NPCMetaDataLoader.NPCMetaData.entries()) {
       const npcFound = await NPC.exists({ tiledId: NPCData.tiledId });
 
-      const { x, y, width, height } = this.getSocketTransmissionZone(NPCData.x, NPCData.y);
-
-      NPCData.socketTransmissionZone = {
-        x,
-        y,
-        width,
-        height,
-      };
-
       NPCData.targetCharacter = undefined; // reset any targets
 
       // mark NPC initial position as solid on the map (pathfinding)
