@@ -1,0 +1,31 @@
+export const characterMock = {
+  cameraCoordinates: {
+    x: -43.0000000000007,
+    y: -141.75,
+    width: 566,
+    height: 827.5,
+  },
+  health: 100,
+  mana: 100,
+  x: 304,
+  y: 112,
+  direction: "left",
+  class: "None",
+  gender: "Male",
+  totalWeightCapacity: 100,
+  isOnline: false,
+  scene: "MainScene",
+  name: "Test Character",
+  owner: "6233ff328f3b09002fe32f9b",
+  channelId: "zgDZM1Z4dKBHmr93AAAB",
+  otherEntitiesInView: {
+    "623e5048818c41002f6bcbd7": {
+      type: "Npc",
+      id: "623e5048818c41002f6bcbd7",
+      name: "Alice",
+      x: 144,
+      y: 144,
+      direction: "up",
+    },
+  },
+};

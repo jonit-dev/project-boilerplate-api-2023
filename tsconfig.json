@@ -28,6 +28,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "test/*.ts", "src/providers/npc/__tests__/NPCView.spec.tsx"],
+  "include": ["src/**/*.ts", "test/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

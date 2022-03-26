@@ -1,5 +1,5 @@
 import { CharacterGender } from "@rpg-engine/shared";
-import { generateRandomMovement } from "../../npcs/abstractions/BaseNeutralNPC";
+import { generateRandomMovement } from "../../npc/npcs/abstractions/BaseNeutralNPC";
 
 export const mockNPC = {
   ...generateRandomMovement(),
