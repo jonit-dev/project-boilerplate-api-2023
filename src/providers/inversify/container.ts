@@ -1,3 +1,6 @@
+import "express-async-errors";
+import "reflect-metadata";
+
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { NPCMetaDataLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";

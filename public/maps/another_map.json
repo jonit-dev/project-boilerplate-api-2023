@@ -1036,64 +1036,18 @@
       "objects": [
         {
           "height": 16,
-          "id": 34,
-          "name": "Maria",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "npc-maria"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
-            }
-          ],
-          "rotation": 0,
-          "type": "NPC",
-          "visible": true,
-          "width": 16,
-          "x": 320,
-          "y": 208
-        },
-        {
-          "height": 16,
-          "id": 41,
-          "name": "Maria",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "npc-maria"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
-            }
-          ],
-          "rotation": 0,
-          "type": "NPC",
-          "visible": true,
-          "width": 16,
-          "x": 352,
-          "y": 160
-        },
-        {
-          "height": 16,
           "id": 56,
           "name": "Alice",
           "properties": [
             {
               "name": "endGridX",
               "type": "string",
-              "value": "14"
+              "value": "9"
             },
             {
               "name": "endGridY",
               "type": "string",
-              "value": "14"
+              "value": "11"
             },
             {
               "name": "key",
@@ -1117,95 +1071,6 @@
           "width": 16,
           "x": 128,
           "y": 112
-        },
-        {
-          "height": 16,
-          "id": 57,
-          "name": "Agatha",
-          "properties": [
-            {
-              "name": "endGridX",
-              "type": "string",
-              "value": "14"
-            },
-            {
-              "name": "endGridY",
-              "type": "string",
-              "value": "14"
-            },
-            {
-              "name": "key",
-              "type": "string",
-              "value": "npc-agatha"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
-            }
-          ],
-          "rotation": 0,
-          "type": "NPC",
-          "visible": true,
-          "width": 16,
-          "x": 224,
-          "y": 432
-        },
-        {
-          "height": 16,
-          "id": 58,
-          "name": "Felicia",
-          "properties": [
-            {
-              "name": "endGridX",
-              "type": "string",
-              "value": "14"
-            },
-            {
-              "name": "endGridY",
-              "type": "string",
-              "value": "14"
-            },
-            {
-              "name": "key",
-              "type": "string",
-              "value": "npc-felicia"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
-            }
-          ],
-          "rotation": 0,
-          "type": "NPC",
-          "visible": true,
-          "width": 16,
-          "x": 224,
-          "y": 752
-        },
-        {
-          "height": 16,
-          "id": 59,
-          "name": "Annie",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "npc-annie"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
-            }
-          ],
-          "rotation": 0,
-          "type": "NPC",
-          "visible": true,
-          "width": 16,
-          "x": 304,
-          "y": 96
         }
       ],
       "opacity": 1,

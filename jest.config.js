@@ -1,26 +1,25 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 
 module.exports = {
-  preset: "ts-jest/presets/default-esm",
-  injectGlobals: true,
+  preset: "@shelf/jest-mongodb",
+  testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(ts)?$",
   transform: {
     "^.+\\.(ts|tsx)?$": "ts-jest",
   },
-  globals: {
-    "ts-jest": {
-      useESM: true,
-    },
-  },
-  extensionsToTreatAsEsm: [".tsx"],
   testEnvironment: "node",
   setupFiles: ["dotenv/config"],
-  modulePathIgnorePatterns: ["dist"],
+  modulePathIgnorePatterns: ["dist", "__tests__/mock"],
   moduleNameMapper: {
     "^@providers/(.*)$": "<rootDir>/src/providers/$1",
     "^@entities/(.*)$": "<rootDir>/src/entities/$1",
     "^@repositories/(.*)$": "<rootDir>/src/repositories/$1",
     "^@useCases/(.*)$": "<rootDir>/src/useCases/$1",
-    "^@data/(.*)$": "<rootDir>/src/data/$1",
+    "^@data/(.*)$": "<rootDir>/src/providers/data/$1",
     "^(\\.{1,2}/.*)\\.js$": "$1",
+  },
+  globals: {
+    "ts-jest": {
+      isolatedModules: true,
+    },
   },
 };

@@ -63,6 +63,8 @@ export class NPCManager {
 
         const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
+        console.log(nearbyCharacters);
+
         if (!nearbyCharacters.length) {
           return; // no player in view, no need to waste resources!
         }
