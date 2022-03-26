@@ -1,37 +1,53 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { INPC } from "@entities/ModuleSystem/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { MongoMemoryServer } from "mongodb-memory-server";
-import mongoose from "mongoose";
 import { NPCView } from "../NPCView";
 
-describe("NPCVIew", () => {
-  let mongoServer: MongoMemoryServer;
-
+describe("NPCView.ts", () => {
   let npcView: NPCView;
+  let testNPC: INPC;
 
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    await mongoose.connect(mongoServer.getUri(), { dbName: "test-database" });
+    await unitTestHelper.beforeAllJestHook();
+    testNPC = await unitTestHelper.createMockNPC();
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await unitTestHelper.beforeEachJestHook();
+
     npcView = container.get<NPCView>(NPCView);
   });
 
-  it("should return a test NPC and Character", async () => {
-    const testNPC = await unitTestHelper.getMockNPC();
-    const testCharacter = await unitTestHelper.getMockCharacter();
+  it("should characters that are inside the NPC socket transmission zone", async () => {
+    const testCharInsideView = await unitTestHelper.createMockCharacter();
 
-    expect(testNPC).toBeDefined();
-    expect(testCharacter).toBeDefined();
+    const charactersInView = await npcView.getCharactersInView(testNPC);
+
+    const hasTestCharacter = charactersInView.some((character) => {
+      return character.name === testCharInsideView.name;
+    });
+
+    expect(hasTestCharacter).toBeTruthy();
+  });
+
+  it("should not fetch any character if its X and Y position is outside socket transmission zone", async () => {
+    const charOutsideView = await unitTestHelper.createMockCharacter({
+      x: 240,
+      y: 1000,
+    });
+
+    const charactersInView = await npcView.getCharactersInView(testNPC);
+
+    const hasCharacter = charactersInView.some((character) => {
+      return character.name === charOutsideView.name;
+    });
+
+    expect(hasCharacter).toBeFalsy();
+    expect(charactersInView).toHaveLength(0); // only test character is inside view, not this one we just created now
   });
 
   afterAll(async () => {
-    await mongoose.connection.dropDatabase();
-    await mongoose.connection.close();
-    if (mongoServer) {
-      await mongoServer.stop();
-    }
+    await unitTestHelper.afterAllJestHook();
   });
 });
 

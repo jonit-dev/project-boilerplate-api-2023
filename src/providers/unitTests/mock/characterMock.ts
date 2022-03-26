@@ -13,7 +13,7 @@ export const characterMock = {
   class: "None",
   gender: "Male",
   totalWeightCapacity: 100,
-  isOnline: false,
+  isOnline: true,
   scene: "MainScene",
   name: "Test Character",
   owner: "6233ff328f3b09002fe32f9b",

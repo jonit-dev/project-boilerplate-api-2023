@@ -4,16 +4,7 @@ import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import {
-  GRID_HEIGHT,
-  GRID_WIDTH,
-  INPCPositionUpdatePayload,
-  NPCSocketEvents,
-  ScenesMetaData,
-  SOCKET_TRANSMISSION_ZONE_WIDTH,
-  ToGridX,
-  ToGridY,
-} from "@rpg-engine/shared";
+import { INPCPositionUpdatePayload, NPCSocketEvents, ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCView } from "../NPCView";
 
@@ -130,21 +121,6 @@ export class NPCMovement {
     npc.y = newY;
     npc.direction = chosenMovementDirection;
 
-    const { x, y, width, height } = this.socketTransmissionZone.calculateSocketTransmissionZone(
-      npc.x,
-      npc.y,
-      GRID_WIDTH,
-      GRID_HEIGHT,
-      SOCKET_TRANSMISSION_ZONE_WIDTH,
-      SOCKET_TRANSMISSION_ZONE_WIDTH
-    );
-
-    npc.socketTransmissionZone = {
-      x,
-      y,
-      width,
-      height,
-    };
     await npc.save();
   }
 

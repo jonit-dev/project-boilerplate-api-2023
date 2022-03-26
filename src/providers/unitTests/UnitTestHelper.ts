@@ -3,28 +3,47 @@ import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import { mockNPC } from "@providers/unitTests/mock/NPCMock";
 import { provide } from "inversify-binding-decorators";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import mongoose from "mongoose";
 
 @provide(UnitTestHelper)
 export class UnitTestHelper {
-  public async getMockNPC(): Promise<INPC> {
-    let testNPC = await NPC.findOne({ key: mockNPC.key });
+  private mongoServer: MongoMemoryServer;
 
-    if (!testNPC) {
-      testNPC = new NPC(mockNPC);
-      await testNPC.save();
-    }
+  public async createMockNPC(extraProps?: Record<string, unknown>): Promise<INPC> {
+    const testNPC = new NPC({
+      ...mockNPC,
+      ...extraProps,
+    });
+    await testNPC.save();
 
     return testNPC;
   }
 
-  public async getMockCharacter(): Promise<ICharacter> {
-    let testCharacter = await Character.findOne({ name: "Test Character" });
-
-    if (!testCharacter) {
-      testCharacter = new Character(characterMock);
-      await testCharacter.save();
-    }
+  public async createMockCharacter(extraProps?: Record<string, unknown>): Promise<ICharacter> {
+    const testCharacter = new Character({
+      ...characterMock,
+      ...extraProps,
+    });
+    await testCharacter.save();
 
     return testCharacter;
+  }
+
+  public async beforeAllJestHook(): Promise<void> {
+    this.mongoServer = await MongoMemoryServer.create();
+    await mongoose.connect(this.mongoServer.getUri(), { dbName: "test-database" });
+  }
+
+  public async beforeEachJestHook(): Promise<void> {
+    await mongoose.connection.dropDatabase();
+  }
+
+  public async afterAllJestHook(): Promise<void> {
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
+    if (this.mongoServer) {
+      await this.mongoServer.stop();
+    }
   }
 }

@@ -2,8 +2,15 @@ import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { PlayerView } from "@providers/player/PlayerView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ISocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import { IEntitiesInView, INPCPositionUpdatePayload, NPCSocketEvents } from "@rpg-engine/shared";
+import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
+import {
+  GRID_HEIGHT,
+  GRID_WIDTH,
+  IEntitiesInView,
+  INPCPositionUpdatePayload,
+  NPCSocketEvents,
+  SOCKET_TRANSMISSION_ZONE_WIDTH,
+} from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
@@ -14,19 +21,25 @@ interface IElementWithPosition {
 }
 @provide(NPCView)
 export class NPCView {
-  constructor(private socketMessaging: SocketMessaging, private playerView: PlayerView) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private playerView: PlayerView,
+    private socketTransmissionZone: SocketTransmissionZone
+  ) {}
 
   public async getElementsInNPCView<T extends IElementWithPosition>(
     Element: Model<T>,
     npc: INPC,
     filter?: Record<string, unknown>
   ): Promise<T[]> {
-    if (!npc.socketTransmissionZone) {
-      console.log(`Error: npc ${npc.key} has no defined socket transmission zone!`);
-      return [];
-    }
-
-    const socketTransmissionZone = npc.socketTransmissionZone as unknown as ISocketTransmissionZone;
+    const socketTransmissionZone = this.socketTransmissionZone.calculateSocketTransmissionZone(
+      npc.x,
+      npc.y,
+      GRID_WIDTH,
+      GRID_HEIGHT,
+      SOCKET_TRANSMISSION_ZONE_WIDTH,
+      SOCKET_TRANSMISSION_ZONE_WIDTH
+    );
 
     // @ts-ignore
     const otherCharactersInView = await Element.find({
@@ -34,13 +47,13 @@ export class NPCView {
         {
           x: {
             $gte: socketTransmissionZone.x,
-            $lte: socketTransmissionZone.x + socketTransmissionZone.width,
+            $lte: socketTransmissionZone.width,
           },
         },
         {
           y: {
             $gte: socketTransmissionZone.y,
-            $lte: socketTransmissionZone.y + socketTransmissionZone.height,
+            $lte: socketTransmissionZone.height,
           },
         },
         {
