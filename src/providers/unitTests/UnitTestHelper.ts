@@ -32,7 +32,12 @@ export class UnitTestHelper {
 
   public async beforeAllJestHook(): Promise<void> {
     this.mongoServer = await MongoMemoryServer.create();
-    await mongoose.connect(this.mongoServer.getUri(), { dbName: "test-database" });
+    await mongoose.connect(this.mongoServer.getUri(), {
+      dbName: "test-database",
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    });
   }
 
   public async beforeEachJestHook(dropDatabase?: boolean): Promise<void> {
