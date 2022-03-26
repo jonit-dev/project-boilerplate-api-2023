@@ -15,3 +15,5 @@ environment/backups/**
 
 docker-compose.yml
 Dockerfile
+
+globalConfig.json
