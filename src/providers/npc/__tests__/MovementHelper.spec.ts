@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { MapLayers, ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
 
 describe("NPCMovement.ts", () => {
   let movementHelper: MovementHelper;
@@ -49,7 +49,7 @@ describe("NPCMovement.ts", () => {
       ScenesMetaData[character.scene].map,
       ToGridX(character.x),
       ToGridY(character.y),
-      MapLayers.Player
+      character.layer
     );
 
     expect(hasSolidCharacter).toBeTruthy();

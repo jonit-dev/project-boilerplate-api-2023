@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
-import { PlayerView } from "@providers/player/PlayerView";
+import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
@@ -23,7 +23,7 @@ interface IElementWithPosition {
 export class NPCView {
   constructor(
     private socketMessaging: SocketMessaging,
-    private playerView: PlayerView,
+    private playerView: CharacterView,
     private socketTransmissionZone: SocketTransmissionZone
   ) {}
 

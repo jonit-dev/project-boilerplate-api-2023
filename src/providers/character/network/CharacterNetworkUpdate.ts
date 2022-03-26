@@ -6,21 +6,21 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SocketRetransmission } from "@providers/sockets/SocketRetransmission";
 import {
   AnimationDirection,
-  IConnectedPlayer,
-  IPlayerPositionUpdateConfirm,
+  CharacterSocketEvents,
+  ICharacterPositionUpdateConfirm,
+  ICharacterPositionUpdatePayload,
   MapLayers,
-  PlayerSocketEvents,
   ScenesMetaData,
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { SocketRetransmission } from "../sockets/SocketRetransmission";
-@provide(PlayerUpdate)
-export class PlayerUpdate {
+@provide(CharacterNetworkUpdate)
+export class CharacterNetworkUpdate {
   constructor(
     private socketMessaging: SocketMessaging,
     private dataRetransmission: SocketRetransmission,
@@ -29,16 +29,14 @@ export class PlayerUpdate {
     private npcView: NPCView
   ) {}
 
-  public onPlayerUpdatePosition(channel: ServerChannel): void {
+  public onCharacterUpdatePosition(channel: ServerChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      PlayerSocketEvents.PlayerPositionUpdate,
-      async (data: IConnectedPlayer, character: ICharacter) => {
+      CharacterSocketEvents.CharacterPositionUpdate,
+      async (data: ICharacterPositionUpdatePayload, character: ICharacter) => {
         if (data) {
-          const player = character;
-
           console.log(
-            `📨 Received ${PlayerSocketEvents.PlayerPositionUpdate}(${player?.name}): ${JSON.stringify(data)}`
+            `📨 Received ${CharacterSocketEvents.CharacterPositionUpdate}(${character?.name}): ${JSON.stringify(data)}`
           );
 
           // send message back to the user telling that the requested position update is not valid!
@@ -51,9 +49,9 @@ export class PlayerUpdate {
 
           const isPositionUpdateValid = await this.checkIfValidPositionUpdate(data, character, newX, newY);
 
-          this.socketMessaging.sendEventToUser<IPlayerPositionUpdateConfirm>(
+          this.socketMessaging.sendEventToUser<ICharacterPositionUpdateConfirm>(
             data.channelId,
-            PlayerSocketEvents.PlayerPositionUpdateConfirm,
+            CharacterSocketEvents.CharacterPositionUpdateConfirm,
             {
               id: data.id,
               isValid: isPositionUpdateValid,
@@ -73,7 +71,7 @@ export class PlayerUpdate {
           await this.dataRetransmission.bidirectionalDataRetransmission(
             character,
             data,
-            PlayerSocketEvents.PlayerPositionUpdate,
+            CharacterSocketEvents.CharacterPositionUpdate,
             ["x", "y", "direction"],
             {
               isMoving: false,
@@ -90,7 +88,7 @@ export class PlayerUpdate {
   }
 
   private async checkIfValidPositionUpdate(
-    data: IConnectedPlayer,
+    data: ICharacterPositionUpdatePayload,
     character: ICharacter,
     newX: number,
     newY: number
@@ -114,7 +112,7 @@ export class PlayerUpdate {
   }
 
   private async updateServerSideEmitterInfo(
-    data: IConnectedPlayer,
+    data: ICharacterPositionUpdatePayload,
     character: ICharacter,
     newX: number,
     newY: number

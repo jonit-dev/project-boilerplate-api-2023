@@ -1,5 +1,5 @@
 import { TypeHelper } from "@providers/types/TypeHelper";
-import { CharacterClass, CharacterGender, FromGridX, FromGridY } from "@rpg-engine/shared";
+import { CharacterClass, CharacterGender, FromGridX, FromGridY, MapLayers } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const characterSchema = createSchema(
@@ -47,6 +47,10 @@ const characterSchema = createSchema(
     }),
     isOnline: Type.boolean({
       default: false,
+      required: true,
+    }),
+    layer: Type.number({
+      default: MapLayers.Player,
       required: true,
     }),
     cameraCoordinates: {

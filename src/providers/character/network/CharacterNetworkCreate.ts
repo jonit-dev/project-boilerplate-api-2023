@@ -1,37 +1,35 @@
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
-import { NPCManager } from "@providers/npc/NPCManager";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
-import { IConnectedPlayer, PlayerSocketEvents } from "@rpg-engine/shared";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterSocketEvents, ICharacterPositionUpdatePayload } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { SocketMessaging } from "../sockets/SocketMessaging";
-import { PlayerView } from "./PlayerView";
+import { CharacterView } from "../CharacterView";
 
-@provide(PlayerCreate)
-export class PlayerCreate {
+@provide(CharacterNetworkCreate)
+export class CharacterNetworkCreate {
   constructor(
     private geckosMessagingHelper: SocketMessaging,
     private socketAuth: SocketAuth,
     private geckosConnection: SocketConnection,
-    private playerView: PlayerView,
+    private playerView: CharacterView,
     private socketMessaging: SocketMessaging,
-    private npcManager: NPCManager,
     private npcView: NPCView
   ) {}
 
-  public onPlayerCreate(channel: ServerChannel): void {
+  public onCharacterCreate(channel: ServerChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      PlayerSocketEvents.PlayerCreate,
-      async (data: IConnectedPlayer, character: ICharacter) => {
+      CharacterSocketEvents.CharacterCreate,
+      async (data: ICharacterPositionUpdatePayload, character: ICharacter) => {
         // check if player is already logged in
 
         if (character.isOnline) {
           // then force logout the current associated client
-          this.socketMessaging.sendEventToUser(character.channelId!, PlayerSocketEvents.PlayerForceDisconnect, {
+          this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
             reason: "You've been disconnected because you logged in from another location!",
           });
         }
@@ -69,51 +67,51 @@ export class PlayerCreate {
 
         console.log("- Total players connected:", connectedCharacters.length);
 
-        this.sendCreationMessageToPlayers(data.channelId, data.id, data, character);
+        this.sendCreationMessageToCharacters(data.channelId, data.id, data, character);
       }
     );
   }
 
-  public async sendCreationMessageToPlayers(
+  public async sendCreationMessageToCharacters(
     emitterChannelId: string,
     emitterId: string,
-    data: IConnectedPlayer,
+    data: ICharacterPositionUpdatePayload,
     character: ICharacter
   ): Promise<void> {
-    const nearbyPlayers = await this.playerView.getCharactersInView(character);
+    const nearbyCharacters = await this.playerView.getCharactersInView(character);
 
     console.log("warning nearby players...");
-    console.log(nearbyPlayers.map((p) => p.name).join(", "));
+    console.log(nearbyCharacters.map((p) => p.name).join(", "));
 
-    if (nearbyPlayers.length > 0) {
-      for (const nearbyPlayer of nearbyPlayers) {
+    if (nearbyCharacters.length > 0) {
+      for (const nearbyCharacter of nearbyCharacters) {
         // tell other player that we exist, so it can create a new instance of us
-        this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
-          nearbyPlayer.channelId!,
-          PlayerSocketEvents.PlayerCreate,
+        this.geckosMessagingHelper.sendEventToUser<ICharacterPositionUpdatePayload>(
+          nearbyCharacter.channelId!,
+          CharacterSocketEvents.CharacterCreate,
           data
         );
 
         //! Refactor this!
 
-        const nearbyPlayerPayload = {
-          id: nearbyPlayer._id,
-          name: nearbyPlayer.name,
-          x: nearbyPlayer.x,
-          y: nearbyPlayer.y,
-          channelId: nearbyPlayer.channelId!,
-          direction: nearbyPlayer.direction,
+        const nearbyCharacterPayload = {
+          id: nearbyCharacter._id,
+          name: nearbyCharacter.name,
+          x: nearbyCharacter.x,
+          y: nearbyCharacter.y,
+          channelId: nearbyCharacter.channelId!,
+          direction: nearbyCharacter.direction,
           isMoving: false,
-          cameraCoordinates: nearbyPlayer.cameraCoordinates,
+          cameraCoordinates: nearbyCharacter.cameraCoordinates,
         };
 
         // tell the emitter about these other players too
 
-        this.geckosMessagingHelper.sendEventToUser<IConnectedPlayer>(
+        this.geckosMessagingHelper.sendEventToUser<ICharacterPositionUpdatePayload>(
           emitterChannelId,
-          PlayerSocketEvents.PlayerCreate,
+          CharacterSocketEvents.CharacterCreate,
           // @ts-ignore
-          nearbyPlayerPayload
+          nearbyCharacterPayload
         );
       }
     }

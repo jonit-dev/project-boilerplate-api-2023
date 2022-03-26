@@ -2,8 +2,8 @@ import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
 
-@provide(PlayerView)
-export class PlayerView {
+@provide(CharacterView)
+export class CharacterView {
   //! Avoid using this method. I assume it's not very performant!
   public async getCharactersWithXYPositionInView(x: number, y: number, scene: string): Promise<ICharacter[]> {
     // fetch characters that have a X,Y position under their cameraCoordinates

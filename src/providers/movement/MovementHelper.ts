@@ -39,6 +39,7 @@ export class MovementHelper {
       x: FromGridX(gridX),
       y: FromGridY(gridY),
       isOnline: true,
+      layer,
     });
 
     if (hasPlayer) {

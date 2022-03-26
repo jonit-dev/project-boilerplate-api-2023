@@ -1,14 +1,18 @@
 // @ts-ignore
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { CharacterView } from "@providers/character/CharacterView";
 import { MathHelper } from "@providers/math/MathHelper";
-import { PlayerView } from "@providers/player/PlayerView";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { CAMERA_VIEWPORT_WIDTH, GRID_WIDTH, ICameraCoordinates } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(SocketMessaging)
 export class SocketMessaging {
-  constructor(private mathHelper: MathHelper, private playerView: PlayerView, private socketAdapter: SocketAdapter) {}
+  constructor(
+    private mathHelper: MathHelper,
+    private playerView: CharacterView,
+    private socketAdapter: SocketAdapter
+  ) {}
 
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
     this.socketAdapter.emitToUser(userChannel, eventName, data || {});

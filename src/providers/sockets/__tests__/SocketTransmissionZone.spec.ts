@@ -19,9 +19,9 @@ describe("SocketTransmissionZone", () => {
       SOCKET_TRANSMISSION_ZONE_WIDTH
     );
 
-    expect(x).toBe(-648);
-    expect(y).toBe(-664);
-    expect(width).toBe(936);
-    expect(height).toBe(920);
+    expect(x).toBe(-328);
+    expect(y).toBe(-344);
+    expect(width).toBe(616);
+    expect(height).toBe(600);
   });
 });

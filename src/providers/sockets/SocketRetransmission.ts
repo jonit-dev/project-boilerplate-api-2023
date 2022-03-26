@@ -1,5 +1,5 @@
 import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
-import { PlayerView } from "@providers/player/PlayerView";
+import { CharacterView } from "@providers/character/CharacterView";
 import { Events, IEntitiesInView } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SocketMessaging } from "./SocketMessaging";
@@ -16,7 +16,7 @@ export interface IAbstractPlayerData {
 
 @provide(SocketRetransmission)
 export class SocketRetransmission {
-  constructor(private socketMessaging: SocketMessaging, private playerView: PlayerView) {}
+  constructor(private socketMessaging: SocketMessaging, private playerView: CharacterView) {}
 
   public async bidirectionalDataRetransmission<DataType extends IBaseData>(
     originCharacter: ICharacter,
