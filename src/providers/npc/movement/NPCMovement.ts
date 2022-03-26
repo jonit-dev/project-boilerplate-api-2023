@@ -3,7 +3,6 @@ import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { INPCPositionUpdatePayload, NPCSocketEvents, ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCView } from "../NPCView";
@@ -21,7 +20,6 @@ export class NPCMovement {
   constructor(
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
-    private socketTransmissionZone: SocketTransmissionZone,
     private movementHelper: MovementHelper
   ) {}
 

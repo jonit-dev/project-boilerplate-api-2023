@@ -38,7 +38,7 @@ export class MovementHelper {
     const hasPlayer = await Character.exists({
       x: FromGridX(gridX),
       y: FromGridY(gridY),
-      layer,
+      isOnline: true,
     });
 
     if (hasPlayer) {

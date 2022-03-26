@@ -10,11 +10,11 @@ describe("NPCView.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     testNPC = await unitTestHelper.createMockNPC();
+    npcView = container.get<NPCView>(NPCView);
   });
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
-    npcView = container.get<NPCView>(NPCView);
   });
 
   it("should characters that are inside the NPC socket transmission zone", async () => {

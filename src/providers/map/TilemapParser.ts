@@ -13,7 +13,7 @@ export class TilemapParser {
   public static npcs: Map<string, any[]> = new Map();
   constructor() {}
 
-  public init(): void {
+  public async init(): Promise<void> {
     // get all map names
 
     const mapNames = fs.readdirSync(STATIC_PATH + "/maps");
@@ -34,7 +34,7 @@ export class TilemapParser {
       TilemapParser.maps.set(mapName, currentMap);
       TilemapParser.grids.set(mapName, new PF.Grid(currentMap.width, currentMap.height));
 
-      this.generateSolidsMapAndGrid(mapName, currentMap);
+      await this.generateSolidsMapAndGrid(mapName, currentMap);
 
       this.loadNPCsData(mapName, currentMap);
     }
