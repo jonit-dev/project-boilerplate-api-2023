@@ -33,7 +33,6 @@ export class SocketRetransmission {
 
     // update the emitter nearby characters positions
     const nearbyCharacters = await this.characterView.getCharactersInView(originCharacter);
-
     if (nearbyCharacters) {
       for (const nearbyCharacter of nearbyCharacters) {
         // we want to warn the emitter in 2 situations:

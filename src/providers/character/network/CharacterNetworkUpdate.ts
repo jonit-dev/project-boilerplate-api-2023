@@ -47,7 +47,13 @@ export class CharacterNetworkUpdate {
             data.direction! as AnimationDirection
           );
 
-          const isPositionUpdateValid = await this.checkIfValidPositionUpdate(data, character, newX, newY);
+          const isPositionUpdateValid = await this.checkIfValidPositionUpdate(
+            data,
+            character,
+            newX,
+            newY,
+            data.isMoving
+          );
 
           this.socketMessaging.sendEventToUser<ICharacterPositionUpdateConfirm>(
             data.channelId,
@@ -91,8 +97,13 @@ export class CharacterNetworkUpdate {
     data: ICharacterPositionUpdatePayload,
     character: ICharacter,
     newX: number,
-    newY: number
+    newY: number,
+    isMoving: boolean
   ): Promise<boolean> {
+    if (!isMoving) {
+      return true; // if character is not moving, we dont need to check anything else!
+    }
+
     const isSolid = await this.movementHelper.isSolid(
       ScenesMetaData[character.scene].map,
       ToGridX(newX),
@@ -128,22 +139,22 @@ export class CharacterNetworkUpdate {
 
       updatedData.x = newX;
       updatedData.y = newY;
+
+      await Character.updateOne(
+        { _id: character._id },
+        {
+          $set: {
+            x: updatedData.x,
+            y: updatedData.y,
+            direction: data.direction,
+            cameraCoordinates: data.cameraCoordinates,
+          },
+        }
+      );
+
+      // update our grid with solid information
+
+      TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(updatedData.x), ToGridY(updatedData.y), false);
     }
-
-    await Character.updateOne(
-      { _id: character._id },
-      {
-        $set: {
-          x: updatedData.x,
-          y: updatedData.y,
-          direction: data.direction,
-          cameraCoordinates: data.cameraCoordinates,
-        },
-      }
-    );
-
-    // update our grid with solid information
-
-    TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(updatedData.x), ToGridY(updatedData.y), false);
   }
 }
