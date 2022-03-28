@@ -53,24 +53,6 @@ const characterSchema = createSchema(
       default: MapLayers.Character,
       required: true,
     }),
-    cameraCoordinates: {
-      x: Type.number({
-        default: 0,
-        required: true,
-      }),
-      y: Type.number({
-        default: 0,
-        required: true,
-      }),
-      width: Type.number({
-        default: 0,
-        required: true,
-      }),
-      height: Type.number({
-        default: 0,
-        required: true,
-      }),
-    },
     scene: Type.string({
       required: true,
       default: "MainScene",

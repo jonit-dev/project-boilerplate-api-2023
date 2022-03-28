@@ -3,7 +3,14 @@ import { MapSolid } from "@entities/ModuleSystem/MapSolid";
 import { NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MathHelper } from "@providers/math/MathHelper";
-import { AnimationDirection, FromGridX, FromGridY, GRID_HEIGHT, GRID_WIDTH, MapLayers } from "@rpg-engine/shared";
+import {
+  AnimationDirection,
+  calculateNewPositionXY,
+  FromGridX,
+  FromGridY,
+  GRID_WIDTH,
+  MapLayers,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import PF from "pathfinding";
 interface IPosition {
@@ -134,28 +141,11 @@ export class MovementHelper {
   }
 
   public calculateNewPositionXY(x: number, y: number, moveToDirection: AnimationDirection): IPosition {
-    switch (moveToDirection) {
-      case "down":
-        return {
-          x,
-          y: y + GRID_HEIGHT,
-        };
-      case "up":
-        return {
-          x,
-          y: y - GRID_HEIGHT,
-        };
-      case "left":
-        return {
-          x: x - GRID_WIDTH,
-          y,
-        };
-      case "right":
-        return {
-          x: x + GRID_WIDTH,
-          y,
-        };
+    if (!moveToDirection) {
+      return { x, y };
     }
+
+    return calculateNewPositionXY(x, y, moveToDirection);
   }
 
   public getOppositeDirection(direction: AnimationDirection): AnimationDirection {

@@ -4,7 +4,7 @@ import { ServerChannel } from "@geckos.io/server";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterLogoutPayload, CharacterSocketEvents } from "@rpg-engine/shared";
+import { CharacterSocketEvents, ICharacterLogout } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
 
@@ -21,11 +21,11 @@ export class CharacterNetworkLogout {
     this.socketAuth.authCharacterOn(
       channel,
       CharacterSocketEvents.CharacterLogout,
-      async (data: CharacterLogoutPayload, character: ICharacter) => {
+      async (data: ICharacterLogout, character: ICharacter) => {
         const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
         for (const character of nearbyCharacters) {
-          this.geckosMessagingHelper.sendEventToUser<CharacterLogoutPayload>(
+          this.geckosMessagingHelper.sendEventToUser<ICharacterLogout>(
             character.channelId!,
             CharacterSocketEvents.CharacterLogout,
             data

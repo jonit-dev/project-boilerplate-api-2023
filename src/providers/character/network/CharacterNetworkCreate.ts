@@ -5,7 +5,12 @@ import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, ICharacterPositionUpdatePayload } from "@rpg-engine/shared";
+import {
+  AnimationDirection,
+  CharacterSocketEvents,
+  ICharacterCreateFromClient,
+  ICharacterCreateFromServer,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
 
@@ -24,7 +29,7 @@ export class CharacterNetworkCreate {
     this.socketAuth.authCharacterOn(
       channel,
       CharacterSocketEvents.CharacterCreate,
-      async (data: ICharacterPositionUpdatePayload, character: ICharacter) => {
+      async (data: ICharacterCreateFromClient, character: ICharacter) => {
         // check if character is already logged in
 
         if (character.isOnline) {
@@ -41,24 +46,18 @@ export class CharacterNetworkCreate {
         await this.npcView.warnUserAboutNPCsInView(character);
 
         // here we inject our server side character properties, to make sure the client is not hacking anything!
-        data = {
+        const dataFromServer: ICharacterCreateFromServer = {
           ...data,
           id: character._id,
           name: character.name,
           x: character.x!,
           y: character.y!,
-          direction: character.direction,
-          isMoving: false,
+          direction: character.direction as AnimationDirection,
+          layer: character.layer,
         };
 
-        // update server camera coordinates and other characters in view
-        //! Refactor once client is refactored!
-        //! Warning: this is being passed by the client, so it can't be trusted! Refactor later to calculate this on server side!
-        character.cameraCoordinates = data.cameraCoordinates;
-        await character.save();
-
         // if there's no character with this id connected, add it.
-        console.log(`💡: Character ${data.name} has connected!`);
+        console.log(`💡: Character ${character.name} has connected!`);
         console.log(data);
 
         channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
@@ -67,15 +66,15 @@ export class CharacterNetworkCreate {
 
         console.log("- Total characters connected:", connectedCharacters.length);
 
-        this.sendCreationMessageToCharacters(data.channelId, data.id, data, character);
+        this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
       }
     );
   }
 
   public async sendCreationMessageToCharacters(
     emitterChannelId: string,
-    emitterId: string,
-    data: ICharacterPositionUpdatePayload,
+
+    dataFromServer: ICharacterCreateFromServer,
     character: ICharacter
   ): Promise<void> {
     const nearbyCharacters = await this.playerView.getCharactersInView(character);
@@ -86,13 +85,11 @@ export class CharacterNetworkCreate {
     if (nearbyCharacters.length > 0) {
       for (const nearbyCharacter of nearbyCharacters) {
         // tell other character that we exist, so it can create a new instance of us
-        this.geckosMessagingHelper.sendEventToUser<ICharacterPositionUpdatePayload>(
+        this.geckosMessagingHelper.sendEventToUser<ICharacterCreateFromServer>(
           nearbyCharacter.channelId!,
           CharacterSocketEvents.CharacterCreate,
-          data
+          dataFromServer
         );
-
-        //! Refactor this!
 
         const nearbyCharacterPayload = {
           id: nearbyCharacter._id,
@@ -100,17 +97,16 @@ export class CharacterNetworkCreate {
           x: nearbyCharacter.x,
           y: nearbyCharacter.y,
           channelId: nearbyCharacter.channelId!,
-          direction: nearbyCharacter.direction,
+          direction: nearbyCharacter.direction as AnimationDirection,
           isMoving: false,
-          cameraCoordinates: nearbyCharacter.cameraCoordinates,
+          layer: nearbyCharacter.layer,
         };
 
         // tell the emitter about these other characters too
 
-        this.geckosMessagingHelper.sendEventToUser<ICharacterPositionUpdatePayload>(
+        this.geckosMessagingHelper.sendEventToUser<ICharacterCreateFromServer>(
           emitterChannelId,
           CharacterSocketEvents.CharacterCreate,
-          // @ts-ignore
           nearbyCharacterPayload
         );
       }

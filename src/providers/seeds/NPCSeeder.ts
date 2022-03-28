@@ -1,10 +1,11 @@
 import { NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { NPCMetaDataLoader } from "@providers/npc/NPCLoader";
-import { ISocketTransmissionZone, SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
+import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
   GRID_HEIGHT,
   GRID_WIDTH,
+  ISocketTransmissionZone,
   ScenesMetaData,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
   ToGridX,

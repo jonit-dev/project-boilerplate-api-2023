@@ -1,62 +1,40 @@
 import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
+import { GRID_HEIGHT, GRID_WIDTH, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
 
 @provide(CharacterView)
 export class CharacterView {
-  //! Avoid using this method. I assume it's not very performant!
-  public async getCharactersWithXYPositionInView(x: number, y: number, scene: string): Promise<ICharacter[]> {
-    // fetch characters that have a X,Y position under their cameraCoordinates
-
-    //! TODO: Refactor to mongoose query (more performant)
-    const characters = await Character.find({
-      isOnline: true,
-      scene: scene,
-    }).lean();
-
-    const output: ICharacter[] = [];
-
-    for (const character of characters) {
-      const { cameraCoordinates } = character;
-
-      if (
-        x >= cameraCoordinates.x &&
-        x <= cameraCoordinates.x + cameraCoordinates.width &&
-        y >= cameraCoordinates.y &&
-        y <= cameraCoordinates.y + cameraCoordinates.height
-      ) {
-        output.push(character as ICharacter);
-      }
-    }
-
-    return output;
-  }
+  constructor(private socketTransmissionZone: SocketTransmissionZone) {}
 
   public async getElementsInCharView<T>(
     Element: Model<T>,
     character: ICharacter,
     filter?: Record<string, unknown>
   ): Promise<T[]> {
-    if (!character.cameraCoordinates) {
-      console.log("Error: character has no camera coordinates");
-      return [];
-    }
-
-    const { cameraCoordinates } = character;
+    const socketTransmissionZone = this.socketTransmissionZone.calculateSocketTransmissionZone(
+      character.x,
+      character.y,
+      GRID_WIDTH,
+      GRID_HEIGHT,
+      SOCKET_TRANSMISSION_ZONE_WIDTH,
+      SOCKET_TRANSMISSION_ZONE_WIDTH
+    );
 
     // @ts-ignore
     const otherCharactersInView = await Element.find({
       $and: [
         {
           x: {
-            $gte: cameraCoordinates.x,
-            $lte: cameraCoordinates.x + cameraCoordinates.width,
+            $gte: socketTransmissionZone.x,
+            $lte: socketTransmissionZone.width,
           },
         },
         {
           y: {
-            $gte: cameraCoordinates.y,
-            $lte: cameraCoordinates.y + cameraCoordinates.height,
+            $gte: socketTransmissionZone.y,
+            $lte: socketTransmissionZone.height,
           },
         },
         {
@@ -69,11 +47,6 @@ export class CharacterView {
   }
 
   public async getCharactersInView(character: ICharacter): Promise<ICharacter[]> {
-    if (!character.cameraCoordinates) {
-      console.log("Error: character has no camera coordinates");
-      return [];
-    }
-
     return await this.getElementsInCharView(Character, character, {
       isOnline: true,
       _id: {

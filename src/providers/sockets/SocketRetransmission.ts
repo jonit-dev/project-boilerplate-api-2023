@@ -5,8 +5,6 @@ import { provide } from "inversify-binding-decorators";
 import { SocketMessaging } from "./SocketMessaging";
 
 export interface IBaseData {
-  id: string;
-  channelId: string;
   otherEntitiesInView: IEntitiesInView;
 }
 
@@ -41,12 +39,12 @@ export class SocketRetransmission {
 
         if (await this.emitterHasAlreadyCharacterData(data, nearbyCharacter, checkKeysForChangeToUpdateEmitter)) {
           console.log(
-            `Emitter ${data.id} already has character ${nearbyCharacter.name} position data updated. Skipping sending package.`
+            `Emitter ${originCharacter.id} already has character ${nearbyCharacter.name} position data updated. Skipping sending package.`
           );
           continue;
         }
 
-        if (nearbyCharacter.id !== data.id) {
+        if (nearbyCharacter.id !== originCharacter.id) {
           // send nearbyCharacter info to emitter!
 
           const emitterDataKeys = Object.keys(data);
@@ -66,7 +64,7 @@ export class SocketRetransmission {
 
           console.log("submitting data to emitter ", payload);
 
-          this.socketMessaging.sendEventToUser<any>(data.channelId, event, payload);
+          this.socketMessaging.sendEventToUser<any>(originCharacter.channelId!, event, payload);
         }
       }
     }
