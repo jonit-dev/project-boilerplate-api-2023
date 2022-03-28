@@ -94,30 +94,48 @@ export class CharacterNetworkUpdate {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
-      let shouldWarnEmitter = false;
-
-      const emitterEntityInClientView = character.otherEntitiesInView[nearbyCharacter.id];
-
-      if (!emitterEntityInClientView) {
-        shouldWarnEmitter = true;
-      }
-
-      for (const key of keysToTriggerSync) {
-        if (emitterEntityInClientView?.[key] && emitterEntityInClientView[key] !== nearbyCharacter[key]) {
-          shouldWarnEmitter = true;
-        }
-      }
-
-      if (shouldWarnEmitter) {
-        const dataFromServer = this.generateDataPayloadFromServer(dataFromClient, character);
+      if (this.shouldEmitterBeUpdatedAboutCharacterNearby(dataFromClient, nearbyCharacter, keysToTriggerSync)) {
+        const nearbyCharacterData: ICharacterPositionUpdateFromServer = {
+          id: nearbyCharacter.id,
+          name: nearbyCharacter.name,
+          x: nearbyCharacter.x,
+          y: nearbyCharacter.y,
+          newX: nearbyCharacter.x,
+          newY: nearbyCharacter.y,
+          channelId: nearbyCharacter.channelId!,
+          direction: nearbyCharacter.direction as AnimationDirection,
+          layer: nearbyCharacter.layer,
+          otherEntitiesInView: nearbyCharacter.otherEntitiesInView,
+          isMoving: false,
+        };
 
         this.socketMessaging.sendEventToUser<ICharacterPositionUpdateFromServer>(
           character.channelId!,
           CharacterSocketEvents.CharacterPositionUpdate,
-          dataFromServer
+          nearbyCharacterData
         );
       }
     }
+  }
+
+  private shouldEmitterBeUpdatedAboutCharacterNearby(
+    dataFromClient: ICharacterPositionUpdateFromClient,
+    nearbyCharacter: ICharacter,
+    keysToTriggerSync: string[]
+  ): boolean {
+    const emitterHasNearbyCharacterInView = dataFromClient.otherEntitiesInView?.[nearbyCharacter.id] || false;
+
+    if (!emitterHasNearbyCharacterInView) {
+      return true;
+    }
+
+    for (const key of keysToTriggerSync) {
+      if (emitterHasNearbyCharacterInView?.[key] && emitterHasNearbyCharacterInView[key] !== nearbyCharacter[key]) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private async warnUsersAroundAboutEmitterPositionUpdate(
