@@ -6,8 +6,6 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { SocketRetransmission } from "@providers/sockets/SocketRetransmission";
-import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
   AnimationDirection,
   CharacterSocketEvents,
@@ -26,11 +24,9 @@ import { CharacterView } from "../CharacterView";
 export class CharacterNetworkUpdate {
   constructor(
     private socketMessaging: SocketMessaging,
-    private dataRetransmission: SocketRetransmission,
     private socketAuth: SocketAuth,
     private movementHelper: MovementHelper,
     private npcView: NPCView,
-    private socketTransmissionZone: SocketTransmissionZone,
     private characterView: CharacterView
   ) {}
 
