@@ -40,27 +40,23 @@ export class CharacterNetworkUpdate {
             `📨 Received ${CharacterSocketEvents.CharacterPositionUpdate}(${character?.name}): ${JSON.stringify(data)}`
           );
 
-          const direction = this.movementHelper.getGridMovementDirection(
-            ToGridX(data.x),
-            ToGridY(data.y),
-            ToGridX(data.newX),
-            ToGridY(data.newY)
-          );
-
-          const isMoving = direction !== undefined;
+          const isMoving = this.movementHelper.isMoving(data.x, data.y, data.newX, data.newY);
 
           // send message back to the user telling that the requested position update is not valid!
 
           let isPositionUpdateValid = true;
 
-          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
-            data.x,
-            data.y,
-            direction as AnimationDirection
-          );
+          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(data.x, data.y, data.direction);
 
           if (isMoving) {
-            isPositionUpdateValid = await this.checkIfValidPositionUpdate(data, character, newX, newY, isMoving);
+            isPositionUpdateValid = await this.checkIfValidPositionUpdate(
+              data,
+              character,
+              newX,
+              newY,
+              isMoving,
+              data.direction
+            );
           }
 
           this.socketMessaging.sendEventToUser<ICharacterPositionUpdateConfirm>(
@@ -69,7 +65,7 @@ export class CharacterNetworkUpdate {
             {
               id: character.id,
               isValid: isPositionUpdateValid,
-              direction: direction!,
+              direction: data.direction,
             }
           );
 
@@ -78,13 +74,13 @@ export class CharacterNetworkUpdate {
           }
 
           // bidirectional data retransmission
-          await this.warnUsersAroundAboutEmitterPositionUpdate(character, data, direction!, isMoving);
-          await this.warnEmitterAboutUsersAround(character, data, ["x", "y", "direction"], direction!, isMoving);
+          await this.warnUsersAroundAboutEmitterPositionUpdate(character, data);
+          await this.warnEmitterAboutUsersAround(character, data, ["x", "y", "direction"]);
 
           await this.npcView.warnUserAboutNPCsInView(character, data.otherEntitiesInView);
 
           // update emitter position from connectedPlayers
-          await this.updateServerSideEmitterInfo(data, character, newX, newY, isMoving, direction!);
+          await this.updateServerSideEmitterInfo(data, character, newX, newY, isMoving, data.direction);
         }
       }
     );
@@ -93,9 +89,7 @@ export class CharacterNetworkUpdate {
   private async warnEmitterAboutUsersAround(
     character: ICharacter,
     dataFromClient: ICharacterPositionUpdateFromClient,
-    keysToTriggerSync: string[],
-    direction: AnimationDirection,
-    isMoving: boolean
+    keysToTriggerSync: string[]
   ): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
@@ -109,24 +103,13 @@ export class CharacterNetworkUpdate {
       }
 
       for (const key of keysToTriggerSync) {
-        if (emitterEntityInClientView[key] !== nearbyCharacter[key]) {
+        if (emitterEntityInClientView?.[key] && emitterEntityInClientView[key] !== nearbyCharacter[key]) {
           shouldWarnEmitter = true;
-        } else {
-          console.log("representation in sync, skipping");
         }
       }
 
       if (shouldWarnEmitter) {
-        const dataFromServer = {
-          ...dataFromClient,
-          x: character.x,
-          y: character.y,
-          name: character.name,
-          direction,
-          isMoving,
-          layer: character.layer,
-          channelId: character.channelId!,
-        };
+        const dataFromServer = this.generateDataPayloadFromServer(dataFromClient, character);
 
         this.socketMessaging.sendEventToUser<ICharacterPositionUpdateFromServer>(
           character.channelId!,
@@ -139,23 +122,12 @@ export class CharacterNetworkUpdate {
 
   private async warnUsersAroundAboutEmitterPositionUpdate(
     character: ICharacter,
-    data: ICharacterPositionUpdateFromClient,
-    direction: AnimationDirection,
-    isMoving: boolean
+    data: ICharacterPositionUpdateFromClient
   ): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
-      const dataFromServer = {
-        ...data,
-        x: character.x,
-        y: character.y,
-        name: character.name,
-        direction,
-        isMoving,
-        layer: character.layer,
-        channelId: character.channelId!,
-      };
+      const dataFromServer = this.generateDataPayloadFromServer(data, character);
 
       this.socketMessaging.sendEventToUser<ICharacterPositionUpdateFromServer>(
         nearbyCharacter.channelId!,
@@ -165,12 +137,36 @@ export class CharacterNetworkUpdate {
     }
   }
 
+  private generateDataPayloadFromServer(
+    dataFromClient: ICharacterPositionUpdateFromClient,
+    character: ICharacter
+  ): ICharacterPositionUpdateFromServer {
+    const isMoving = this.movementHelper.isMoving(
+      dataFromClient.x,
+      dataFromClient.y,
+      dataFromClient.newX,
+      dataFromClient.newY
+    );
+
+    return {
+      ...dataFromClient,
+      x: character.x,
+      y: character.y,
+      name: character.name,
+      direction: dataFromClient.direction,
+      isMoving,
+      layer: character.layer,
+      channelId: character.channelId!,
+    };
+  }
+
   private async checkIfValidPositionUpdate(
     data: ICharacterPositionUpdateFromClient,
     character: ICharacter,
     newX: number,
     newY: number,
-    isMoving: boolean
+    isMoving: boolean,
+    clientDirection: AnimationDirection
   ): Promise<boolean> {
     if (!isMoving) {
       return true; // if character is not moving, we dont need to check anything else!
@@ -189,6 +185,19 @@ export class CharacterNetworkUpdate {
 
     if (Math.round(character.x) === Math.round(data.x) && Math.round(character.y) === Math.round(data.y)) {
       return true; // initial movement origin is the same as our server representation. It means it's valid!
+    }
+
+    const serverCalculatedDirection = this.movementHelper.getGridMovementDirection(
+      ToGridX(data.x),
+      ToGridY(data.y),
+      ToGridX(data.newX),
+      ToGridY(data.newY)
+    );
+
+    console.log(isMoving, clientDirection, serverCalculatedDirection);
+
+    if (isMoving && clientDirection !== serverCalculatedDirection) {
+      return false;
     }
 
     return false;

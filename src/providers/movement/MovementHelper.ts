@@ -99,6 +99,17 @@ export class MovementHelper {
     }
   }
 
+  public isMoving(startX: number, startY: number, endX: number, endY: number): boolean {
+    const xDiff = endX - startX;
+    const yDiff = endY - startY;
+
+    if (xDiff === 0 && yDiff === 0) {
+      return false;
+    }
+
+    return true;
+  }
+
   public getGridMovementDirection(
     startGridX: number,
     startGridY: number,
@@ -141,10 +152,6 @@ export class MovementHelper {
   }
 
   public calculateNewPositionXY(x: number, y: number, moveToDirection: AnimationDirection): IPosition {
-    if (!moveToDirection) {
-      return { x, y };
-    }
-
     return calculateNewPositionXY(x, y, moveToDirection);
   }
 
