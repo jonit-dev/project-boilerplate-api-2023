@@ -1591,11 +1591,21 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@rpg-engine/shared@^0.1.93":
-  version "0.1.93"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.1.93.tgz#1d29706de3f1d0a2c229ff16bd000710be09066c"
-  integrity sha512-cTcTWx+kwPOz5pZ7ytnlCwg4NOJvv8A0p5dfKuhoII+CHxIizT2t+Jyzd/XH/llzLzrvvnDESwLYMDzzv4/Meg==
+"@rpg-engine/shared@^0.2.5":
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.2.5.tgz#59f9c1c90e36730b1f7e62a467abc8dc525172ef"
+  integrity sha512-5ndyPeVpYMBJLlSi90acy5k6Hwl7/Ol/W2ckw36RQGnrchRNPDZmSjC/ZkDbKJFoN4l9UJIc4Ruxr1R6hP8Xgw==
   dependencies:
+    husky "^4.3.0"
+    prettier "^2.2.1"
+    typescript "^4.5.5"
+
+"@rpg-engine/shared@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.2.6.tgz#a277c46844b091333c735821346b3056b33c43d4"
+  integrity sha512-P3kuemRHiDI8QfSgYkD8CPeWq0jvnE6TLXzvjbuk3odhdCuzFW9G4A9Eo7/sFhEcJh/9WXOK/2AEemYVAhkE+A==
+  dependencies:
+    "@rpg-engine/shared" "^0.2.5"
     husky "^4.3.0"
     prettier "^2.2.1"
     typescript "^4.5.5"

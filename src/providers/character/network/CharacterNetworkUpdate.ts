@@ -17,8 +17,10 @@ import {
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
+import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { CharacterBan } from "../CharacterBan";
 import { CharacterView } from "../CharacterView";
 @provide(CharacterNetworkUpdate)
 export class CharacterNetworkUpdate {
@@ -27,7 +29,8 @@ export class CharacterNetworkUpdate {
     private socketAuth: SocketAuth,
     private movementHelper: MovementHelper,
     private npcView: NPCView,
-    private characterView: CharacterView
+    private characterView: CharacterView,
+    private characterBan: CharacterBan
   ) {}
 
   public onCharacterUpdatePosition(channel: ServerChannel): void {
@@ -107,6 +110,8 @@ export class CharacterNetworkUpdate {
           layer: nearbyCharacter.layer,
           otherEntitiesInView: nearbyCharacter.otherEntitiesInView,
           isMoving: false,
+          speed: nearbyCharacter.speed,
+          movementIntervalMs: nearbyCharacter.movementIntervalMs,
         };
 
         this.socketMessaging.sendEventToUser<ICharacterPositionUpdateFromServer>(
@@ -175,6 +180,8 @@ export class CharacterNetworkUpdate {
       isMoving,
       layer: character.layer,
       channelId: character.channelId!,
+      speed: character.speed,
+      movementIntervalMs: character.movementIntervalMs,
     };
   }
 
@@ -198,11 +205,25 @@ export class CharacterNetworkUpdate {
     );
 
     if (isSolid) {
+      console.log(`🚫 ${character.name} tried to move to a solid position!`);
+      await this.characterBan.addPenalty(character);
+
       return false;
     }
 
-    if (Math.round(character.x) === Math.round(data.x) && Math.round(character.y) === Math.round(data.y)) {
-      return true; // initial movement origin is the same as our server representation. It means it's valid!
+    if (!character.isOnline) {
+      console.log(`🚫 ${character.name} tried to move while offline!`);
+      return false;
+    }
+
+    if (character.isBanned) {
+      console.log(`🚫 ${character.name} tried to move while banned!`);
+
+      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+        reason: "You cannot use this character while banned.",
+      });
+
+      return false;
     }
 
     const serverCalculatedDirection = this.movementHelper.getGridMovementDirection(
@@ -212,13 +233,31 @@ export class CharacterNetworkUpdate {
       ToGridY(data.newY)
     );
 
-    console.log(isMoving, clientDirection, serverCalculatedDirection);
-
-    if (isMoving && clientDirection !== serverCalculatedDirection) {
+    if (clientDirection !== serverCalculatedDirection) {
+      console.log(`🚫 ${character.name} tried to move in a wrong facing direction!`);
       return false;
     }
 
-    return false;
+    if (character.lastMovement) {
+      const now = dayjs(new Date());
+      const lastMovement = dayjs(character.lastMovement);
+      const movementDiff = now.diff(lastMovement, "millisecond");
+
+      if (movementDiff < character.movementIntervalMs) {
+        console.log(`🚫 ${character.name} tried to move too fast!`);
+        await this.characterBan.addPenalty(character);
+        return false;
+      }
+    }
+
+    if (Math.round(character.x) !== Math.round(data.x) && Math.round(character.y) !== Math.round(data.y)) {
+      console.log(`🚫 ${character.name} tried to move from a different origin position`);
+      await this.characterBan.addPenalty(character);
+
+      return false; // mismatch between client and server position
+    }
+
+    return true;
   }
 
   private async updateServerSideEmitterInfo(
@@ -252,6 +291,7 @@ export class CharacterNetworkUpdate {
             y: updatedData.y,
             direction: direction,
             otherEntitiesInView: data.otherEntitiesInView,
+            lastMovement: new Date(),
           },
         }
       );

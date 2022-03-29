@@ -14,6 +14,28 @@ export class CharacterCrons {
       console.log("Checking inactive players...");
       await this.logoutInactiveCharacters();
     });
+
+    // check banned characters every day
+    nodeCron.schedule("0 0 * * *", async () => {
+      console.log("Checking banned characters...");
+      await this.unbanCharacters();
+    });
+  }
+
+  private async unbanCharacters(): Promise<void> {
+    const bannedCharacters = await Character.find({
+      isBanned: true,
+      hasPermanentBan: false,
+      banRemovalDate: {
+        $lte: new Date(),
+      },
+    });
+
+    for (const bannedCharacter of bannedCharacters) {
+      console.log(`💡 Character id ${bannedCharacter.id} has been unbanned...`);
+      bannedCharacter.isBanned = false;
+      await bannedCharacter.save();
+    }
   }
 
   private async logoutInactiveCharacters(): Promise<void> {

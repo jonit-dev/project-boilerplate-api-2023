@@ -81,6 +81,10 @@ const npcSchema = createSchema(
     pm2InstanceManager: Type.number({
       required: true,
     }),
+    speed: Type.number({
+      default: 2.5,
+      required: true,
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

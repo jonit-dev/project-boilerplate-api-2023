@@ -43,6 +43,16 @@ export class CharacterNetworkCreate {
         character.channelId = data.channelId;
         await character.save();
 
+        if (character.isBanned) {
+          console.log(`🚫 ${character.name} tried to create its instance while banned!`);
+
+          this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+            reason: "You cannot use this character while banned.",
+          });
+
+          return;
+        }
+
         await this.npcView.warnUserAboutNPCsInView(character);
 
         // here we inject our server side character properties, to make sure the client is not hacking anything!
@@ -54,6 +64,8 @@ export class CharacterNetworkCreate {
           y: character.y!,
           direction: character.direction as AnimationDirection,
           layer: character.layer,
+          speed: character.speed,
+          movementIntervalMs: character.movementIntervalMs,
         };
 
         // if there's no character with this id connected, add it.
@@ -100,6 +112,8 @@ export class CharacterNetworkCreate {
           direction: nearbyCharacter.direction as AnimationDirection,
           isMoving: false,
           layer: nearbyCharacter.layer,
+          speed: nearbyCharacter.speed,
+          movementIntervalMs: nearbyCharacter.movementIntervalMs,
         };
 
         // tell the emitter about these other characters too

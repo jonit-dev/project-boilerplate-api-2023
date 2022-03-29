@@ -59,6 +59,25 @@ const characterSchema = createSchema(
     }),
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),
+    speed: Type.number({
+      default: 2,
+      required: true,
+    }),
+    movementIntervalMs: Type.number({
+      default: 150,
+      required: true,
+    }),
+    isBanned: Type.boolean({
+      default: false,
+      required: true,
+    }),
+    penalty: Type.number({
+      default: 0,
+      required: true,
+    }),
+    banRemovalDate: Type.date(),
+    hasPermanentBan: Type.boolean(),
+    lastMovement: Type.date(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

@@ -108,6 +108,7 @@ export class NPCMovement {
           layer: npc.layer,
           textureKey: npc.textureKey,
           scene: npc.scene,
+          speed: npc.speed,
         }
       );
     }
