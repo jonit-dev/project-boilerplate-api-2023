@@ -60,7 +60,7 @@ const characterSchema = createSchema(
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),
     speed: Type.number({
-      default: 2,
+      default: 2.5,
       required: true,
     }),
     movementIntervalMs: Type.number({

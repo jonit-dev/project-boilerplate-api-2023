@@ -25,7 +25,9 @@ export class CharacterCrons {
   private async unbanCharacters(): Promise<void> {
     const bannedCharacters = await Character.find({
       isBanned: true,
-      hasPermanentBan: false,
+      hasPermanentBan: {
+        $ne: true,
+      },
       banRemovalDate: {
         $lte: new Date(),
       },
