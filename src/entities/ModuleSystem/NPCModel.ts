@@ -85,6 +85,7 @@ const npcSchema = createSchema(
       default: 2.5,
       required: true,
     }),
+    dialogText: Type.string(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

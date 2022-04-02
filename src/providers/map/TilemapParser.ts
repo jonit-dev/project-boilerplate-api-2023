@@ -6,11 +6,23 @@ import fs from "fs";
 import { provide } from "inversify-binding-decorators";
 import PF from "pathfinding";
 
+export interface ITiledNPCProperty {
+  name: string;
+  value: string;
+}
+
+export interface ITiledNPC {
+  id: string;
+  x: number;
+  y: number;
+  properties: ITiledNPCProperty[];
+}
+
 @provide(TilemapParser)
 export class TilemapParser {
   public static maps: Map<string, ITiled> = new Map();
   public static grids: Map<string, PF.Grid> = new Map();
-  public static npcs: Map<string, any[]> = new Map();
+  public static npcs: Map<string, ITiledNPC[]> = new Map();
   constructor() {}
 
   public async init(): Promise<void> {

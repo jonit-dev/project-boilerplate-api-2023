@@ -1040,6 +1040,11 @@
           "name": "Alice",
           "properties": [
             {
+              "name": "dialogText",
+              "type": "string",
+              "value": "Hello {{charName}} how are you doing today? Nice weather, uh?"
+            },
+            {
               "name": "endGridX",
               "type": "string",
               "value": "9"

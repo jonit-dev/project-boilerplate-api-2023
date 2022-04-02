@@ -1,16 +1,8 @@
 import { NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
-import { NPCMetaDataLoader } from "@providers/npc/NPCLoader";
+import { INPCMetaData, NPCMetaDataLoader } from "@providers/npc/NPCLoader";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import {
-  GRID_HEIGHT,
-  GRID_WIDTH,
-  ISocketTransmissionZone,
-  ScenesMetaData,
-  SOCKET_TRANSMISSION_ZONE_WIDTH,
-  ToGridX,
-  ToGridY,
-} from "@rpg-engine/shared";
+import { ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(NPCSeeder)
@@ -23,10 +15,7 @@ export class NPCSeeder {
 
       NPCData.targetCharacter = undefined; // reset any targets
 
-      // mark NPC initial position as solid on the map (pathfinding)
-      TilemapParser.grids
-        .get(ScenesMetaData[NPCData.scene].map)!
-        .setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
+      this.setInitialNPCPositionAsSolid(NPCData);
 
       if (!npcFound) {
         console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
@@ -50,14 +39,10 @@ export class NPCSeeder {
     }
   }
 
-  private getSocketTransmissionZone(initialX: number, initialY: number): ISocketTransmissionZone {
-    return this.socketTransmissionZone.calculateSocketTransmissionZone(
-      initialX,
-      initialY,
-      GRID_WIDTH,
-      GRID_HEIGHT,
-      SOCKET_TRANSMISSION_ZONE_WIDTH,
-      SOCKET_TRANSMISSION_ZONE_WIDTH
-    );
+  private setInitialNPCPositionAsSolid(NPCData: INPCMetaData): void {
+    // mark NPC initial position as solid on the map (pathfinding)
+    TilemapParser.grids
+      .get(ScenesMetaData[NPCData.scene].map)!
+      .setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
   }
 }
