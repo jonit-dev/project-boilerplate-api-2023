@@ -1600,10 +1600,10 @@
     prettier "^2.2.1"
     typescript "^4.5.5"
 
-"@rpg-engine/shared@^0.2.6":
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.2.6.tgz#a277c46844b091333c735821346b3056b33c43d4"
-  integrity sha512-P3kuemRHiDI8QfSgYkD8CPeWq0jvnE6TLXzvjbuk3odhdCuzFW9G4A9Eo7/sFhEcJh/9WXOK/2AEemYVAhkE+A==
+"@rpg-engine/shared@^0.2.8":
+  version "0.2.8"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.2.8.tgz#2f199b246631f82c20e805298dc5be04d1476f33"
+  integrity sha512-oIDgl/GUR9Bc8/26igw9+yEYy60SS6kXcdH8wE9eDjcpwSpE+O8LeZRJCwGRSdGUW81nOIUU8VqKYKD8fKKpkA==
   dependencies:
     "@rpg-engine/shared" "^0.2.5"
     husky "^4.3.0"

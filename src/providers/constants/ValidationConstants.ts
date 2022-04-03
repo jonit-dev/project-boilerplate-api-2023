@@ -1,7 +1,6 @@
-import { TranslationTypes } from "@rpg-engine/shared/dist";
+import { TranslationTypes, TypeHelper } from "@rpg-engine/shared/dist";
 import { ValidationArguments } from "class-validator";
 import { TS } from "../translation/TranslationHelper";
-import { TypeHelper } from "../types/TypeHelper";
 import { IValidationTranslation } from "../types/ValidationTypes";
 
 interface IEnum {

@@ -9,7 +9,7 @@ import { NPCMovementMoveAway } from "./movement/NPCMovementMoveAway";
 import { NPCMovementMoveTowards } from "./movement/NPCMovementMoveTowards";
 import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCMovementStopped } from "./movement/NPCMovementStopped";
-import { NPCMetaDataLoader } from "./NPCLoader";
+import { NPCLoader } from "./NPCLoader";
 import { NPCView } from "./NPCView";
 
 @provide(NPCManager)
@@ -86,7 +86,7 @@ export class NPCManager {
           case NPCMovementType.FixedPath:
             let endGridX = npc.fixedPath.endGridX as unknown as number;
             let endGridY = npc.fixedPath.endGridY as unknown as number;
-            const npcData = NPCMetaDataLoader.NPCMetaData.get(npc.key);
+            const npcData = NPCLoader.NPCMetaData.get(npc.key);
 
             if (!npcData) {
               console.log(`Failed to find NPC data for ${npc.key}`);

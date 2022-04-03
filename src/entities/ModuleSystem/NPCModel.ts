@@ -1,4 +1,3 @@
-import { TypeHelper } from "@providers/types/TypeHelper";
 import {
   CharacterClass,
   CharacterGender,
@@ -6,6 +5,7 @@ import {
   MapLayers,
   NPCAlignment,
   NPCMovementType,
+  TypeHelper,
 } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 

@@ -2,7 +2,7 @@ import { INPC } from "@entities/ModuleSystem/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { NPCMetaDataLoader } from "../NPCLoader";
+import { NPCLoader } from "../NPCLoader";
 import { NPCDirection, NPCMovement } from "./NPCMovement";
 
 @provide(NPCMovementRandomPath)
@@ -10,7 +10,7 @@ export class NPCMovementRandomPath {
   constructor(private movementHelper: MovementHelper, private NPCMovement: NPCMovement) {}
 
   public async startRandomMovement(npc: INPC): Promise<void> {
-    const npcMetaData = NPCMetaDataLoader.NPCMetaData.get(npc.key);
+    const npcMetaData = NPCLoader.NPCMetaData.get(npc.key);
 
     if (!npcMetaData) {
       console.log(`NPCMetaData for ${npc.name} not found!`);

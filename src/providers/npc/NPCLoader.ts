@@ -7,8 +7,8 @@ export interface INPCMetaData extends Omit<INPC, "_id"> {
   tiledId: number;
 }
 
-@provide(NPCMetaDataLoader)
-export class NPCMetaDataLoader {
+@provide(NPCLoader)
+export class NPCLoader {
   public static NPCMetaData = new Map<string, INPCMetaData>();
 
   public loadNPCMetaData(): void {
@@ -16,7 +16,7 @@ export class NPCMetaDataLoader {
       for (const tiledNPCData of npcs) {
         const { key, baseNPCMetaData } = this.loadTiledNPCMetadata(tiledNPCData);
 
-        NPCMetaDataLoader.NPCMetaData.set(key, baseNPCMetaData);
+        NPCLoader.NPCMetaData.set(key, baseNPCMetaData);
       }
     }
   }

@@ -1,9 +1,9 @@
-import "reflect-metadata";
 import "express-async-errors";
+import "reflect-metadata";
 
 import { CharacterNetwork } from "@providers/character/network/CharacterNetwork";
 import { TilemapParser } from "@providers/map/TilemapParser";
-import { NPCMetaDataLoader } from "@providers/npc/NPCLoader";
+import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
@@ -40,7 +40,7 @@ export const socketAdapter = container.get<SocketAdapter>(SocketAdapter);
 export const characterNetwork = container.get<CharacterNetwork>(CharacterNetwork);
 export const tilemapParser = container.get<TilemapParser>(TilemapParser);
 export const npcManager = container.get<NPCManager>(NPCManager);
-export const npcMetaDataLoader = container.get<NPCMetaDataLoader>(NPCMetaDataLoader);
+export const npcMetaDataLoader = container.get<NPCLoader>(NPCLoader);
 export const unitTestHelper = container.get<UnitTestHelper>(UnitTestHelper);
 
 export { container };

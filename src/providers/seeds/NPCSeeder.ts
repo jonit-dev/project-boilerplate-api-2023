@@ -1,16 +1,13 @@
 import { NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
-import { INPCMetaData, NPCMetaDataLoader } from "@providers/npc/NPCLoader";
-import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
+import { INPCMetaData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(NPCSeeder)
 export class NPCSeeder {
-  constructor(private socketTransmissionZone: SocketTransmissionZone) {}
-
   public async seed(): Promise<void> {
-    for (const [key, NPCData] of NPCMetaDataLoader.NPCMetaData.entries()) {
+    for (const [key, NPCData] of NPCLoader.NPCMetaData.entries()) {
       const npcFound = await NPC.exists({ tiledId: NPCData.tiledId });
 
       NPCData.targetCharacter = undefined; // reset any targets
