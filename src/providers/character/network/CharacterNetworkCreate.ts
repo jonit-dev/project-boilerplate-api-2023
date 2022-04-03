@@ -1,10 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-// @ts-ignore
-import { ServerChannel } from "@geckos.io/server";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   AnimationDirection,
   CharacterSocketEvents,
@@ -25,7 +24,7 @@ export class CharacterNetworkCreate {
     private npcView: NPCView
   ) {}
 
-  public onCharacterCreate(channel: ServerChannel): void {
+  public onCharacterCreate(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
       CharacterSocketEvents.CharacterCreate,

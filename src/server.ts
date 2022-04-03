@@ -3,6 +3,7 @@ import "reflect-metadata";
 
 import { appEnv } from "@providers/config/env";
 import {
+  characterConnection,
   cronJobs,
   db,
   npcManager,
@@ -55,6 +56,8 @@ app.listen(port, async () => {
   //! TODO: Allocate according to pm2 instances
 
   await npcManager.init();
+
+  await characterConnection.setAllCharactersAsOffline();
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({

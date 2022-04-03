@@ -1,9 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-// @ts-ignore
-import { ServerChannel } from "@geckos.io/server";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { CharacterSocketEvents, ICharacterLogout } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
@@ -17,7 +16,7 @@ export class CharacterNetworkLogout {
     private characterView: CharacterView
   ) {}
 
-  public onCharacterLogout(channel: ServerChannel): void {
+  public onCharacterLogout(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
       CharacterSocketEvents.CharacterLogout,

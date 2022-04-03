@@ -1,11 +1,11 @@
-import "express-async-errors";
 import "reflect-metadata";
-
-import { CharacterNetwork } from "@providers/character/network/CharacterNetwork";
+import "express-async-errors";
+import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
+import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
 import { Container } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
@@ -37,10 +37,13 @@ export const cronJobs = container.get<Cronjob>(Cronjob);
 export const seeds = container.get<Seeder>(Seeder);
 export const server = container.get<ServerHelper>(ServerHelper);
 export const socketAdapter = container.get<SocketAdapter>(SocketAdapter);
-export const characterNetwork = container.get<CharacterNetwork>(CharacterNetwork);
+
 export const tilemapParser = container.get<TilemapParser>(TilemapParser);
 export const npcManager = container.get<NPCManager>(NPCManager);
 export const npcMetaDataLoader = container.get<NPCLoader>(NPCLoader);
 export const unitTestHelper = container.get<UnitTestHelper>(UnitTestHelper);
+export const socketEventsBinder = container.get<SocketEventsBinder>(SocketEventsBinder);
+
+export const characterConnection = container.get<CharacterConnection>(CharacterConnection);
 
 export { container };

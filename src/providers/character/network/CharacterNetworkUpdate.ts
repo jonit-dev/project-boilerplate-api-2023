@@ -1,11 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-// @ts-ignore
-import { ServerChannel } from "@geckos.io/server";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   AnimationDirection,
   CharacterSocketEvents,
@@ -22,6 +21,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { CharacterBan } from "../CharacterBan";
 import { CharacterView } from "../CharacterView";
+
 @provide(CharacterNetworkUpdate)
 export class CharacterNetworkUpdate {
   constructor(
@@ -33,7 +33,7 @@ export class CharacterNetworkUpdate {
     private characterBan: CharacterBan
   ) {}
 
-  public onCharacterUpdatePosition(channel: ServerChannel): void {
+  public onCharacterUpdatePosition(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
       CharacterSocketEvents.CharacterPositionUpdate,

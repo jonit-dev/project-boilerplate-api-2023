@@ -1,7 +1,6 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
-// @ts-ignore
-import { ServerChannel } from "@geckos.io/server";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
+import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { CharacterSocketEvents, ICharacterPing } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
@@ -9,7 +8,7 @@ import { provide } from "inversify-binding-decorators";
 export class CharacterNetworkPing {
   constructor(private socketAuth: SocketAuth) {}
 
-  public onCharacterPing(channel: ServerChannel): void {
+  public onCharacterPing(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, CharacterSocketEvents.CharacterPing, async (data: ICharacterPing) => {
       console.log(`📨 Received ${CharacterSocketEvents.CharacterPing}: ${JSON.stringify(data)}`);
 

@@ -1,5 +1,4 @@
-// @ts-ignore
-import { characterNetwork } from "@providers/inversify/container";
+import { socketEventsBinder } from "@providers/inversify/container";
 import { ISocket, SocketTypes } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { GeckosIO } from "./GeckosIO";
@@ -27,8 +26,6 @@ export class SocketAdapter implements ISocket {
     }
 
     this.onConnect();
-
-    await characterNetwork.setAllCharactersAsOffline();
   }
 
   public emitToUser<T>(channel: string, eventName: string, data?: T): void {
@@ -41,7 +38,7 @@ export class SocketAdapter implements ISocket {
 
   public onConnect(): void {
     SocketAdapter.socketClass.onConnect((channel) => {
-      characterNetwork.onAddEventListeners(channel);
+      socketEventsBinder.bindEvents(channel);
     });
   }
 }

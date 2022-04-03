@@ -1,6 +1,4 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
-// @ts-ignore
-import { ServerChannel } from "@geckos.io/server";
+import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { provide } from "inversify-binding-decorators";
 import { CharacterNetworkCreate } from "./CharacterNetworkCreate";
 import { CharacterNetworkLogout } from "./CharacterNetworkLogout";
@@ -16,21 +14,10 @@ export class CharacterNetwork {
     private characterPing: CharacterNetworkPing
   ) {}
 
-  public onAddEventListeners(channel: ServerChannel): void {
+  public onAddEventListeners(channel: SocketChannel): void {
     this.characterCreate.onCharacterCreate(channel);
     this.characterLogout.onCharacterLogout(channel);
     this.characterUpdate.onCharacterUpdatePosition(channel);
     this.characterPing.onCharacterPing(channel);
-  }
-
-  public async setAllCharactersAsOffline(): Promise<void> {
-    await Character.updateMany(
-      {},
-      {
-        $set: {
-          isOnline: false,
-        },
-      }
-    );
   }
 }
