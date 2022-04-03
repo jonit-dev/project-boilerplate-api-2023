@@ -1,4 +1,4 @@
-import { NPC } from "@entities/ModuleSystem/NPCModel";
+import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { INPCMetaData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";

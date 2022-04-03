@@ -1,4 +1,4 @@
-import { INPC } from "@entities/ModuleSystem/NPCModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCMovement } from "./NPCMovement";

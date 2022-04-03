@@ -1,4 +1,4 @@
-import { INPC } from "@entities/ModuleSystem/NPCModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";

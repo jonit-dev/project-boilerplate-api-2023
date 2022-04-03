@@ -1,4 +1,4 @@
-import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";

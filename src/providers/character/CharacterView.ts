@@ -1,4 +1,4 @@
-import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { GRID_HEIGHT, GRID_WIDTH, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";

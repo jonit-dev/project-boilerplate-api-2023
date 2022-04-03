@@ -1,4 +1,4 @@
-import { Character } from "@entities/ModuleSystem/CharacterModel";
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
 import { provide } from "inversify-binding-decorators";

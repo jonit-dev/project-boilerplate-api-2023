@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
 import { NPCView } from "@providers/npc/NPCView";

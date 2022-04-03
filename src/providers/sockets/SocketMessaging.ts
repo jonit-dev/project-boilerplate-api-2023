@@ -1,5 +1,5 @@
 // @ts-ignore
-import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";

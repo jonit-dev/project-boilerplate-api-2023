@@ -1,0 +1,6 @@
+# NPC :: Read
+GET {{baseUrl}}/npcs/6248c7f24ba9cd0030f2b643 HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###

@@ -1,5 +1,5 @@
-import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
-import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";

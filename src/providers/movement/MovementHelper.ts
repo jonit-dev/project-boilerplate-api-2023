@@ -1,6 +1,6 @@
-import { Character } from "@entities/ModuleSystem/CharacterModel";
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { MapSolid } from "@entities/ModuleSystem/MapSolid";
-import { NPC } from "@entities/ModuleSystem/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MathHelper } from "@providers/math/MathHelper";
 import {

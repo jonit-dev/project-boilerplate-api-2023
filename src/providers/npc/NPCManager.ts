@@ -1,4 +1,4 @@
-import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { appEnv } from "@providers/config/env";
 import { EnvType, FixedPathOrientation, NPCMovementType, SocketTypes, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";

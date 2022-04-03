@@ -1,5 +1,5 @@
-import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
-import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import { mockNPC } from "@providers/unitTests/mock/NPCMock";
 import { provide } from "inversify-binding-decorators";

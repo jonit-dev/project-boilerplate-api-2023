@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { User } from "@entities/ModuleSystem/UserModel";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";

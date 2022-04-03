@@ -1,4 +1,4 @@
-import { Character } from "@entities/ModuleSystem/CharacterModel";
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { ICharacter } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 

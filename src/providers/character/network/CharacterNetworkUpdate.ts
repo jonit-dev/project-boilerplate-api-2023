@@ -1,4 +1,4 @@
-import { Character, ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 // @ts-ignore
 import { ServerChannel } from "@geckos.io/server";
 import { TilemapParser } from "@providers/map/TilemapParser";

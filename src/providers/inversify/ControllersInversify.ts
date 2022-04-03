@@ -1,4 +1,5 @@
 import { CharacterController } from "@useCases/ModuleCharacter/character/CharacterController";
+import { NPCController } from "@useCases/ModuleNPC/NPCController";
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
 import { IndustriesController } from "@useCases/ModuleSystem/industries/IndustriesController";
 import { PushNotificationController } from "@useCases/ModuleSystem/operation/pushNotification/PushNotificationController";
@@ -48,4 +49,5 @@ export const abTestsControllerContainer = new ContainerModule((bind: interfaces.
 
 export const useCasesControllers = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<CharacterController>(CharacterController).toSelf();
+  bind<NPCController>(NPCController).toSelf();
 });

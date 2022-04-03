@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleSystem/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";

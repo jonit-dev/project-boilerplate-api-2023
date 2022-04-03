@@ -1,5 +1,5 @@
-import { Character } from "@entities/ModuleSystem/CharacterModel";
-import { INPC } from "@entities/ModuleSystem/NPCModel";
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";

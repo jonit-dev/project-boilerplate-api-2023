@@ -1,5 +1,5 @@
-import { Character } from "@entities/ModuleSystem/CharacterModel";
-import { INPC, NPC } from "@entities/ModuleSystem/NPCModel";
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TilemapParser } from "@providers/map/TilemapParser";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";

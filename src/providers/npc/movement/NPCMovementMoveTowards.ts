@@ -1,5 +1,5 @@
-import { Character } from "@entities/ModuleSystem/CharacterModel";
-import { INPC } from "@entities/ModuleSystem/NPCModel";
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
