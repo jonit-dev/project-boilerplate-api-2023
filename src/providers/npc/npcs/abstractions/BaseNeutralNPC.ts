@@ -15,7 +15,8 @@ export const generateRandomMovement = (): any => {
     alignment: NPCAlignment.Neutral,
     class: CharacterClass.None,
     layer: MapLayers.Character,
-    movementType: NPCMovementType.Random,
+    originalMovementType: NPCMovementType.Random,
+    currentMovementType: NPCMovementType.Random,
     maxRangeInGridCells: 5,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
@@ -27,7 +28,8 @@ export const generateMoveTowardsMovement = (): any => {
     alignment: NPCAlignment.Neutral,
     class: CharacterClass.None,
     layer: MapLayers.Character,
-    movementType: NPCMovementType.MoveTowards,
+    originalMovementType: NPCMovementType.MoveTowards,
+    currentMovementType: NPCMovementType.MoveTowards,
     maxRangeInGridCells: 20,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
@@ -39,7 +41,8 @@ export const generateStoppedMovement = (): any => {
     alignment: NPCAlignment.Neutral,
     class: CharacterClass.None,
     layer: MapLayers.Character,
-    movementType: NPCMovementType.Stopped,
+    currentMovementType: NPCMovementType.Stopped,
+    originalMovementType: NPCMovementType.Stopped,
     maxRangeInGridCells: 5,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
@@ -51,7 +54,8 @@ export const generateMoveAwayMovement = (): any => {
     alignment: NPCAlignment.Neutral,
     class: CharacterClass.None,
     layer: MapLayers.Character,
-    movementType: NPCMovementType.MoveAway,
+    currentMovementType: NPCMovementType.MoveAway,
+    originalMovementType: NPCMovementType.MoveAway,
     maxRangeInGridCells: 20,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
@@ -63,8 +67,10 @@ export const generateFixedPathMovement = (): any => {
     alignment: NPCAlignment.Neutral,
     class: CharacterClass.None,
     layer: MapLayers.Character,
-    movementType: NPCMovementType.FixedPath,
+    currentMovementType: NPCMovementType.FixedPath,
+    originalMovementType: NPCMovementType.FixedPath,
     fixedPathOrientation: FixedPathOrientation.Forward, // must be forward!
+    maxRangeInGridCells: 20,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
 };

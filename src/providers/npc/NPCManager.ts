@@ -56,18 +56,22 @@ export class NPCManager {
     }
   }
 
-  public startBehaviorLoop(npc: INPC): void {
+  public startBehaviorLoop(initialNPC: INPC): void {
+    let npc = initialNPC;
+
     setInterval(async () => {
       try {
         // check if actually there's a character near. If not, let's not waste server resources!
 
-        const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+        const nearbyCharacters = await this.npcView.getCharactersInView(initialNPC);
 
         if (!nearbyCharacters.length) {
           return; // no character in view, no need to waste resources!
         }
 
-        switch (npc.movementType) {
+        npc = (await NPC.findById(initialNPC._id)) || initialNPC; // update npc instance on each behavior loop!
+
+        switch (npc.currentMovementType) {
           case NPCMovementType.MoveAway:
             await this.npcMovementMoveAway.startMovementMoveAway(npc);
             break;

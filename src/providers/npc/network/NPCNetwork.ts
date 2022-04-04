@@ -1,12 +1,14 @@
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { provide } from "inversify-binding-decorators";
-import { NPCNetworkInfo } from "./NPCNetworkInfo";
+import { NPCNetworkDialogStart } from "./dialog/NPCNetworkDialogStart";
+import { NPCNetworkDialogStop } from "./dialog/NPCNetworkDialogStop";
 
 @provide(NPCNetwork)
 export class NPCNetwork {
-  constructor(private npcInfo: NPCNetworkInfo) {}
+  constructor(private npcDialogStart: NPCNetworkDialogStart, private npcDialogStop: NPCNetworkDialogStop) {}
 
   public onAddEventListeners(channel: SocketChannel): void {
-    this.npcInfo.onNPCInfo(channel);
+    this.npcDialogStart.onDialogStart(channel);
+    this.npcDialogStop.onDialogStop(channel);
   }
 }

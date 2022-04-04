@@ -2,6 +2,7 @@ import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { NPCTargetType, NPC_TALKING_DISTANCE } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCView } from "../NPCView";
@@ -61,7 +62,16 @@ export class NPCTarget {
 
     if (minDistanceCharacter) {
       if (!npc.maxRangeInGridCells) {
-        console.log(`NPC ${npc.key} has MoveTowards MovementType, but no maxRangeInGridCells is specified!`);
+        console.log(
+          `NPC ${npc.key} is trying to set target, but no maxRangeInGridCells is specified (required for range)!`
+        );
+        return;
+      }
+
+      const rangeThresholdDefinition = this.getRangeThreshold(npc);
+
+      if (!rangeThresholdDefinition) {
+        console.log(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
         return;
       }
 
@@ -71,7 +81,7 @@ export class NPCTarget {
         npc.y,
         minDistanceCharacter.x,
         minDistanceCharacter.y,
-        npc.maxRangeInGridCells
+        rangeThresholdDefinition
       );
 
       if (!isMovementUnderRange) {
@@ -91,14 +101,13 @@ export class NPCTarget {
   }
 
   public async checkTargetOutOfRangeOrLoggedOut(npc: INPC): Promise<void> {
-    console.log("Checking if target is out of range...");
     if (!npc.targetCharacter) {
       // no target set, nothing to remove here!
       return;
     }
 
     if (!npc.maxRangeInGridCells) {
-      console.log(`NPC ${npc.key} has MoveTowards MovementType, but no maxRangeInGridCells is specified!`);
+      console.log(`NPC ${npc.key} is trying to verify target, but no maxRangeInGridCells is specified!`);
       return;
     }
 
@@ -109,13 +118,22 @@ export class NPCTarget {
       return;
     }
 
+    const rangeThresholdDefinition = this.getRangeThreshold(npc);
+
+    if (!rangeThresholdDefinition) {
+      console.log(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
+      return;
+    }
+
     const isMovementUnderRange = this.movementHelper.isUnderRange(
       npc.x,
       npc.y,
       targetCharacter.x,
       targetCharacter.y,
-      npc.maxRangeInGridCells
+      rangeThresholdDefinition
     );
+
+    console.log("charUnderRange", isMovementUnderRange);
 
     // if target is out of range or not online, lets remove it
     if ((targetCharacter && !isMovementUnderRange) || !targetCharacter.isOnline) {
@@ -123,5 +141,17 @@ export class NPCTarget {
       npc.targetCharacter = undefined;
       await npc.save();
     }
+  }
+
+  private getRangeThreshold(npc: INPC): number | undefined {
+    switch (npc.targetType) {
+      case NPCTargetType.Default:
+        return npc.maxRangeInGridCells;
+
+      case NPCTargetType.Talking:
+        return NPC_TALKING_DISTANCE;
+    }
+
+    return npc.maxRangeInGridCells;
   }
 }

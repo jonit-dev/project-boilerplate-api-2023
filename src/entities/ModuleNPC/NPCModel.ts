@@ -5,6 +5,7 @@ import {
   MapLayers,
   NPCAlignment,
   NPCMovementType,
+  NPCTargetType,
   TypeHelper,
 } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
@@ -30,6 +31,11 @@ const npcSchema = createSchema(
       required: true,
       default: NPCAlignment.Neutral,
       enum: TypeHelper.enumToStringArray(NPCAlignment),
+    }),
+    targetType: Type.string({
+      required: true,
+      default: NPCTargetType.Default,
+      enum: TypeHelper.enumToStringArray(NPCTargetType),
     }),
     targetCharacter: Type.objectId({
       ref: "Character",
@@ -65,7 +71,12 @@ const npcSchema = createSchema(
       default: MapLayers.Character,
     }),
 
-    movementType: Type.string({
+    originalMovementType: Type.string({
+      required: true,
+      enum: TypeHelper.enumToStringArray(NPCMovementType),
+    }),
+
+    currentMovementType: Type.string({
       required: true,
       default: NPCMovementType.Random,
       enum: TypeHelper.enumToStringArray(NPCMovementType),
@@ -85,7 +96,10 @@ const npcSchema = createSchema(
       default: 2.5,
       required: true,
     }),
-    dialogText: Type.string(),
+    dialogText: Type.string({
+      required: true,
+      default: "Hmm!?...",
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

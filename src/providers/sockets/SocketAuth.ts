@@ -11,7 +11,7 @@ export class SocketAuth {
         // check if authenticated user actually owns the character (we'll fetch it from the payload id);
         const owner = channel.userData || (channel.handshake.query.userData as IUser);
         const character = await Character.findOne({
-          _id: data.id,
+          _id: data.socketCharId,
           owner: owner.id,
         });
 
