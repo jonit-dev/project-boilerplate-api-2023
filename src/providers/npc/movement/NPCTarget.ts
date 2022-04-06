@@ -40,8 +40,6 @@ export class NPCTarget {
   }
 
   public async tryToSetTarget(npc: INPC): Promise<void> {
-    console.log(`${npc.key} trying to set target...`);
-
     const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
     const charactersDistance: ICharacterDistance[] = [];
@@ -132,8 +130,6 @@ export class NPCTarget {
       targetCharacter.y,
       rangeThresholdDefinition
     );
-
-    console.log("charUnderRange", isCharacterUnderRange);
 
     // if target is out of range or not online, lets remove it
     if ((targetCharacter && !isCharacterUnderRange) || !targetCharacter.isOnline) {
