@@ -17,7 +17,7 @@ describe("NPCView.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
   });
 
-  it("should characters that are inside the NPC socket transmission zone", async () => {
+  it("should include characters that are inside the NPC socket transmission zone", async () => {
     const testCharInsideView = await unitTestHelper.createMockCharacter();
 
     const charactersInView = await npcView.getCharactersInView(testNPC);
