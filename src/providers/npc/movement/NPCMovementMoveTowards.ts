@@ -17,7 +17,7 @@ export class NPCMovementMoveTowards {
     const targetCharacter = await Character.findById(npc.targetCharacter);
 
     if (targetCharacter) {
-      await this.npcTarget.checkTargetOutOfRangeOrLoggedOut(npc);
+      await this.npcTarget.clearTarget(npc);
 
       const reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, targetCharacter.x, targetCharacter.y, 1);
 

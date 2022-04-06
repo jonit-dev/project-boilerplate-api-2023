@@ -35,7 +35,7 @@ describe("NPCTarget.ts", () => {
     expect(targetDirection).toBe("right");
   });
 
-  it("should properly set a target to the closest player, if inside the NPC range", async () => {
+  it("should properly set a target to the closest character, if inside the NPC range", async () => {
     const maxGridRange = testNPC.maxRangeInGridCells!;
 
     testCharacter = await unitTestHelper.createMockCharacter({
@@ -56,13 +56,50 @@ describe("NPCTarget.ts", () => {
     expect(testNPC.targetCharacter?.toString()).not.toEqual(anotherCharacter.id.toString());
   });
 
-  it("should not set a target, if player is out of range", async () => {
+  it("should not set a target, if character is out of range", async () => {
     await unitTestHelper.createMockCharacter({
       x: FromGridX(999),
       y: FromGridY(999),
     });
 
     await npcTarget.tryToSetTarget(testNPC);
+
+    expect(testNPC.targetCharacter).toBeUndefined();
+  });
+
+  it("should clear the target if character is out of range", async () => {
+    testCharacter = await unitTestHelper.createMockCharacter({
+      x: FromGridX(0),
+      y: FromGridY(0),
+    });
+
+    await npcTarget.tryToSetTarget(testNPC);
+
+    expect(testNPC.targetCharacter).toBeDefined();
+
+    testCharacter.x = 999;
+    testCharacter.y = 999;
+    await testCharacter.save();
+
+    await npcTarget.clearTarget(testNPC);
+
+    expect(testNPC.targetCharacter).toBeUndefined();
+  });
+
+  it("should clear the target if character logs out", async () => {
+    testCharacter = await unitTestHelper.createMockCharacter({
+      x: FromGridX(0),
+      y: FromGridY(0),
+    });
+
+    await npcTarget.tryToSetTarget(testNPC);
+
+    expect(testNPC.targetCharacter).toBeDefined();
+
+    testCharacter.isOnline = false;
+    await testCharacter.save();
+
+    await npcTarget.clearTarget(testNPC);
 
     expect(testNPC.targetCharacter).toBeUndefined();
   });

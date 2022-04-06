@@ -100,7 +100,7 @@ export class NPCTarget {
     }
   }
 
-  public async checkTargetOutOfRangeOrLoggedOut(npc: INPC): Promise<void> {
+  public async clearTarget(npc: INPC): Promise<void> {
     if (!npc.targetCharacter) {
       // no target set, nothing to remove here!
       return;

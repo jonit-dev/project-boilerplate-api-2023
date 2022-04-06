@@ -14,7 +14,7 @@ export class NPCMovementStopped {
     const targetCharacter = await Character.findById(npc.targetCharacter);
 
     if (targetCharacter) {
-      await this.npcTarget.checkTargetOutOfRangeOrLoggedOut(npc);
+      await this.npcTarget.clearTarget(npc);
 
       const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
 
