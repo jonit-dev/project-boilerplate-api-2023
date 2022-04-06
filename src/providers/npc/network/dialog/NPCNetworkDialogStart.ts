@@ -51,8 +51,6 @@ export class NPCNetworkDialogStart {
 
           const dialogText = this.interpolationParser.parse(npc.dialogText, character);
 
-          console.log(dialogText);
-
           if (dialogText) {
             this.socketMessaging.sendEventToUser<INPCStartDialog>(
               character.channelId!,
