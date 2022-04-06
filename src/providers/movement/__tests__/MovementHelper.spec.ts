@@ -3,7 +3,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { FromGridX, FromGridY, ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
 
-describe("NPCMovement.ts", () => {
+describe("MovementHelper.ts", () => {
   let movementHelper: MovementHelper;
 
   beforeAll(async () => {
