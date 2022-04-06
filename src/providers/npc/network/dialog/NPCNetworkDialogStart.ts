@@ -10,7 +10,7 @@ import {
   NPCMovementType,
   NPCSocketEvents,
   NPCTargetType,
-  NPC_TALKING_DISTANCE,
+  NPC_MAX_TALKING_DISTANCE_IN_GRID,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
@@ -41,7 +41,7 @@ export class NPCNetworkDialogStart {
 
         const distanceCharNPC = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, character.x, character.y);
 
-        const isUnderRange = distanceCharNPC <= NPC_TALKING_DISTANCE;
+        const isUnderRange = distanceCharNPC <= NPC_MAX_TALKING_DISTANCE_IN_GRID;
         if (isUnderRange) {
           npc.currentMovementType = NPCMovementType.Stopped;
           npc.targetType = NPCTargetType.Talking;

@@ -2,7 +2,7 @@ import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { INPCStopDialog, NPCSocketEvents, NPCTargetType, NPC_TALKING_DISTANCE } from "@rpg-engine/shared";
+import { INPCStopDialog, NPCSocketEvents, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(NPCNetworkDialogStop)
@@ -30,7 +30,7 @@ export class NPCNetworkDialogStop {
 
           const distanceCharNPC = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, character.x, character.y);
 
-          const isUnderRange = distanceCharNPC <= NPC_TALKING_DISTANCE * 2; // a little more distance to be sure
+          const isUnderRange = distanceCharNPC <= NPC_MAX_TALKING_DISTANCE_IN_GRID * 2; // a little more distance to be sure
 
           if (isUnderRange) {
             npc.currentMovementType = npc.originalMovementType;
