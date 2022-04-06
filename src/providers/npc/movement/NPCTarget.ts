@@ -99,6 +99,8 @@ export class NPCTarget {
   }
 
   public async clearTarget(npc: INPC): Promise<void> {
+    console.log("trying to clear target...");
+
     if (!npc.targetCharacter) {
       // no target set, nothing to remove here!
       return;
@@ -133,8 +135,11 @@ export class NPCTarget {
 
     // if target is out of range or not online, lets remove it
     if ((targetCharacter && !isCharacterUnderRange) || !targetCharacter.isOnline) {
+      console.log("clearing target!");
       // remove npc.targetCharacter
       npc.targetCharacter = undefined;
+      npc.currentMovementType = npc.originalMovementType;
+      npc.targetType = NPCTargetType.Default;
       await npc.save();
     }
   }

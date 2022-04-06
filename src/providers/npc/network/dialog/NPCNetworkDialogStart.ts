@@ -5,6 +5,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { InterpolationParser } from "@providers/text/InterpolationParser";
 import {
+  GRID_WIDTH,
   INPCGetInfoEmitterClient,
   INPCStartDialog,
   NPCMovementType,
@@ -41,7 +42,7 @@ export class NPCNetworkDialogStart {
 
         const distanceCharNPC = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, character.x, character.y);
 
-        const isUnderRange = distanceCharNPC <= NPC_MAX_TALKING_DISTANCE_IN_GRID;
+        const isUnderRange = distanceCharNPC <= NPC_MAX_TALKING_DISTANCE_IN_GRID * GRID_WIDTH;
         if (isUnderRange) {
           npc.currentMovementType = NPCMovementType.Stopped;
           npc.targetType = NPCTargetType.Talking;

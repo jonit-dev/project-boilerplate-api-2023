@@ -21,6 +21,10 @@ export class NPCNetworkDialogStop {
         });
 
         if (npc) {
+          if (!npc.targetCharacter) {
+            return;
+          }
+
           if (character.id.toString() !== npc.targetCharacter?.toString()) {
             console.log("Character trying to stop NPC dialog is not the same that originated it.");
             return;
