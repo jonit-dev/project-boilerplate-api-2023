@@ -1,6 +1,3 @@
-import "express-async-errors";
-import "reflect-metadata";
-
 import { appEnv } from "@providers/config/env";
 import {
   characterConnection,
@@ -20,6 +17,8 @@ import { router } from "@providers/server/Router";
 import { EnvType } from "@rpg-engine/shared/dist";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
+import "express-async-errors";
+import "reflect-metadata";
 
 const port = appEnv.general.SERVER_PORT || 3002;
 
@@ -35,6 +34,7 @@ app.listen(port, async () => {
 
   await db.init();
   await cronJobs.start();
+  await socketAdapter.init(appEnv.socket.type);
 
   await tilemapParser.init(); // must be the first thing loaded!
   npcMetaDataLoader.loadNPCMetaData(); //! This must come before our seeds.start(), otherwise it won't have the data to create our NPCs.
@@ -50,8 +50,6 @@ app.listen(port, async () => {
   PushNotificationHelper.initialize();
 
   await seeds.start();
-
-  await socketAdapter.init(appEnv.socket.type);
 
   //! TODO: Allocate according to pm2 instances
 

@@ -49,7 +49,7 @@ export class NPCNetworkDialogStart {
           npc.targetCharacter = character._id;
           await npc.save();
 
-          const dialogText = this.interpolationParser.parse(npc.dialogText, character);
+          const dialogText = this.interpolationParser.parseDialog(npc.dialogText, character, npc);
 
           if (dialogText) {
             this.socketMessaging.sendEventToUser<INPCStartDialog>(

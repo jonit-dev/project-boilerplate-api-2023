@@ -588,7 +588,7 @@
           "y": 16
         }
       ],
-      "height": 64,
+      "height": 32,
       "id": 9,
       "name": "over-ground",
       "opacity": 1,
@@ -600,7 +600,7 @@
         }
       ],
       "startx": 0,
-      "starty": -32,
+      "starty": 0,
       "type": "tilelayer",
       "visible": true,
       "width": 32,
@@ -1122,7 +1122,7 @@
             {
               "name": "dialogText",
               "type": "string",
-              "value": "Hello {{charName}}, how are you doing today? Nice weather, uh?!"
+              "value": "Hello {{char.name}}, my name is {{npc.name}}. How are you doing today? I'm just a demonstration of my own movement type, {{npc.originalMovementType}}."
             },
             {
               "name": "endGridX",

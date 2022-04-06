@@ -99,8 +99,6 @@ export class NPCTarget {
   }
 
   public async clearTarget(npc: INPC): Promise<void> {
-    console.log("trying to clear target...");
-
     if (!npc.targetCharacter) {
       // no target set, nothing to remove here!
       return;
