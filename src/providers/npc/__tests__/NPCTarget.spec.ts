@@ -118,7 +118,7 @@ describe("NPCTarget.ts", () => {
     testNPC.targetType = NPCTargetType.Talking;
     await testNPC.save();
 
-    testCharacter.x = FromGridX(NPC_MAX_TALKING_DISTANCE_IN_GRID + 1);
+    testCharacter.x = FromGridX(NPC_MAX_TALKING_DISTANCE_IN_GRID - 1);
     testCharacter.y = FromGridY(0);
     await testCharacter.save();
 
