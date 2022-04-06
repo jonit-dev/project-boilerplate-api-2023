@@ -2,7 +2,7 @@ import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { NPCTargetType, NPC_TALKING_DISTANCE } from "@rpg-engine/shared";
+import { NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCView } from "../NPCView";
@@ -125,7 +125,7 @@ export class NPCTarget {
       return;
     }
 
-    const isMovementUnderRange = this.movementHelper.isUnderRange(
+    const isCharacterUnderRange = this.movementHelper.isUnderRange(
       npc.x,
       npc.y,
       targetCharacter.x,
@@ -133,10 +133,10 @@ export class NPCTarget {
       rangeThresholdDefinition
     );
 
-    console.log("charUnderRange", isMovementUnderRange);
+    console.log("charUnderRange", isCharacterUnderRange);
 
     // if target is out of range or not online, lets remove it
-    if ((targetCharacter && !isMovementUnderRange) || !targetCharacter.isOnline) {
+    if ((targetCharacter && !isCharacterUnderRange) || !targetCharacter.isOnline) {
       // remove npc.targetCharacter
       npc.targetCharacter = undefined;
       await npc.save();
@@ -149,7 +149,7 @@ export class NPCTarget {
         return npc.maxRangeInGridCells;
 
       case NPCTargetType.Talking:
-        return NPC_TALKING_DISTANCE;
+        return NPC_MAX_TALKING_DISTANCE_IN_GRID;
     }
 
     return npc.maxRangeInGridCells;

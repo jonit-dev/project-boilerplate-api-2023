@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { FromGridX, FromGridY, ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
 
 describe("NPCMovement.ts", () => {
   let movementHelper: MovementHelper;
@@ -53,6 +53,17 @@ describe("NPCMovement.ts", () => {
     );
 
     expect(hasSolidCharacter).toBeTruthy();
+  });
+
+  it("should properly detect if a position is under range", () => {
+    const isUnderRange = movementHelper.isUnderRange(FromGridX(0), FromGridY(0), FromGridX(10), FromGridY(0), 10);
+
+    expect(isUnderRange).toBeTruthy();
+  });
+
+  it("should properly detect if position is out of range", () => {
+    const isUnderRange = movementHelper.isUnderRange(FromGridX(0), FromGridY(0), FromGridX(11), FromGridY(0), 10);
+    expect(isUnderRange).toBeFalsy();
   });
 
   afterAll(async () => {
