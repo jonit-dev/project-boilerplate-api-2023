@@ -38,4 +38,11 @@ export class SocketIO implements ISocket {
       onConnectFn(channel);
     });
   }
+
+  public disconnect(): void {
+    console.log("🔌 Shutting down TCP socket connections...");
+
+    this.socket.disconnectSockets();
+    this.socket.close();
+  }
 }

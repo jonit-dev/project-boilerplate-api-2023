@@ -10,8 +10,6 @@ export class InterpolationParser {
 
     const matches = text.match(regex);
 
-    console.log(matches);
-
     if (!matches) {
       return text;
     }

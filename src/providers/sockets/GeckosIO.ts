@@ -1,5 +1,5 @@
 // @ts-ignore
-import { GeckosServer } from "@geckos.io/server";
+import { Data, GeckosServer } from "@geckos.io/server";
 import { appEnv } from "@providers/config/env";
 import { GECKOS_CONFIG } from "@providers/constants/SocketsConstants";
 import { EnvType, ISocket } from "@rpg-engine/shared";
@@ -12,6 +12,7 @@ export class GeckosIO implements ISocket {
   constructor() {}
 
   public async init(): Promise<void> {
+    // @ts-ignore
     const { geckos } = await import("@geckos.io/server");
 
     this.socket = geckos(GECKOS_CONFIG);
@@ -28,16 +29,26 @@ export class GeckosIO implements ISocket {
   }
 
   public emitToUser<T>(channel: string, eventName: string, data?: T): void {
-    return this.socket.room(channel).emit(eventName, data || {});
+    return this.socket.room(channel).emit(eventName, (data || {}) as Data);
   }
 
   public emitToAllUsers<T>(eventName: string, data?: T): void {
-    return this.socket.emit(eventName, data || {});
+    return this.socket.emit(eventName, (data || {}) as Data);
   }
 
   public onConnect(onConnectFn: (channel) => void): void {
     this.socket.onConnection((channel) => {
       onConnectFn(channel);
     });
+  }
+
+  public disconnect(): void {
+    console.log("🔌 Shutting down UDP socket connections...");
+
+    const connections = this.socket.connectionsManager.getConnections();
+
+    for (const [channelId, webRTCConnection] of connections) {
+      this.socket.connectionsManager.deleteConnection(webRTCConnection, channelId!);
+    }
   }
 }

@@ -17,7 +17,7 @@ export const characterMock = {
   scene: "MainScene",
   name: "Test Character",
   owner: "6233ff328f3b09002fe32f9b",
-  channelId: "zgDZM1Z4dKBHmr93AAAB",
+  channelId: "mock-inexistent-channel-id",
   otherEntitiesInView: {
     "623e5048818c41002f6bcbd7": {
       type: "Npc",

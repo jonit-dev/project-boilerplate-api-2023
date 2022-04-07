@@ -13,15 +13,16 @@ export class SocketAdapter implements ISocket {
 
   public async init(socketType: SocketTypes): Promise<void> {
     switch (socketType as SocketTypes) {
-      case SocketTypes.TCP:
-        console.log("🔌 Initializing TCP socket...");
-        this.socketIO.init();
-        SocketAdapter.socketClass = this.socketIO;
-        break;
       case SocketTypes.UDP:
         console.log("🔌 Initializing UDP socket...");
         await this.geckosIO.init();
         SocketAdapter.socketClass = this.geckosIO;
+        break;
+      case SocketTypes.TCP:
+      default:
+        console.log("🔌 Initializing TCP socket...");
+        this.socketIO.init();
+        SocketAdapter.socketClass = this.socketIO;
         break;
     }
 
@@ -40,5 +41,9 @@ export class SocketAdapter implements ISocket {
     SocketAdapter.socketClass.onConnect((channel) => {
       socketEventsBinder.bindEvents(channel);
     });
+  }
+
+  public disconnect(): void {
+    SocketAdapter.socketClass?.disconnect();
   }
 }

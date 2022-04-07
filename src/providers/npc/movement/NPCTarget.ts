@@ -133,7 +133,6 @@ export class NPCTarget {
 
     // if target is out of range or not online, lets remove it
     if ((targetCharacter && !isCharacterUnderRange) || !targetCharacter.isOnline) {
-      console.log("clearing target!");
       // remove npc.targetCharacter
       npc.targetCharacter = undefined;
       npc.currentMovementType = npc.originalMovementType;
