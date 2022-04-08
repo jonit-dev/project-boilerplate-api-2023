@@ -39,10 +39,6 @@ export class CharacterNetworkUpdate {
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
         if (data) {
-          console.log(
-            `📨 Received ${CharacterSocketEvents.CharacterPositionUpdate}(${character?.name}): ${JSON.stringify(data)}`
-          );
-
           const isMoving = this.movementHelper.isMoving(data.x, data.y, data.newX, data.newY);
 
           // send message back to the user telling that the requested position update is not valid!

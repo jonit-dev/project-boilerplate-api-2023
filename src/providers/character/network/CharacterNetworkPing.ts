@@ -10,8 +10,6 @@ export class CharacterNetworkPing {
 
   public onCharacterPing(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, CharacterSocketEvents.CharacterPing, async (data: ICharacterPing) => {
-      console.log(`📨 Received ${CharacterSocketEvents.CharacterPing}: ${JSON.stringify(data)}`);
-
       await Character.updateOne(
         {
           _id: data.id,

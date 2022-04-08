@@ -19,6 +19,8 @@ export class SocketAuth {
           throw new Error("You don't own this character!");
         }
 
+        console.log(`📨 Received ${event} from ${character.name}(${character._id}): ${JSON.stringify(data)}`);
+
         callback(data, character, owner);
       });
     } catch (error) {

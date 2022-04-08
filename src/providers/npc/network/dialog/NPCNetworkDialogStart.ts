@@ -29,50 +29,50 @@ export class NPCNetworkDialogStart {
       channel,
       NPCSocketEvents.NPCTalkToNPC,
       async (data: INPCGetInfoEmitterClient, character) => {
-        console.log(`📨 Received ${NPCSocketEvents.NPCTalkToNPC}: ${JSON.stringify(data)}`);
+        try {
+          const npc = await NPC.findOne({
+            _id: data.npcId,
+          });
 
-        const npc = await NPC.findOne({
-          _id: data.npcId,
-        });
-
-        if (!npc) {
-          console.log(`NPCTalkToNPC > NPC not found: ${data.npcId}`);
-          return;
-        }
-
-        const distanceCharNPC = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, character.x, character.y);
-
-        const isUnderRange = distanceCharNPC <= NPC_MAX_TALKING_DISTANCE_IN_GRID * GRID_WIDTH;
-        if (isUnderRange) {
-          npc.currentMovementType = NPCMovementType.Stopped;
-          npc.targetType = NPCTargetType.Talking;
-          npc.targetCharacter = character._id;
-          await npc.save();
-
-          const dialogText = this.interpolationParser.parseDialog(npc.dialogText, character, npc);
-
-          if (dialogText) {
-            this.socketMessaging.sendEventToUser<INPCStartDialog>(
-              character.channelId!,
-              NPCSocketEvents.NPCStartDialogNPC,
-              {
-                npcId: npc._id,
-                dialogText,
-              }
-            );
-          } else {
-            console.log(`NPCTalkToNPC > NPC dialogText is empty: ${npc._id}`);
+          if (!npc) {
+            throw new Error(`NPCTalkToNPC > NPC not found: ${data.npcId}`);
           }
 
-          setTimeout(() => {
-            // clear target and rollback movement type
-            npc.currentMovementType = npc.originalMovementType;
-            npc.targetCharacter = undefined;
-            npc.targetType = NPCTargetType.Default;
-            npc.save();
-          }, 60 * 1000);
-        } else {
-          console.log(`NPC ${npc.name} out of range to start dialog..`);
+          const distanceCharNPC = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, character.x, character.y);
+
+          const isUnderRange = distanceCharNPC <= NPC_MAX_TALKING_DISTANCE_IN_GRID * GRID_WIDTH;
+          if (isUnderRange) {
+            npc.currentMovementType = NPCMovementType.Stopped;
+            npc.targetType = NPCTargetType.Talking;
+            npc.targetCharacter = character._id;
+            await npc.save();
+
+            const dialogText = this.interpolationParser.parseDialog(npc.dialogText, character, npc);
+
+            if (dialogText) {
+              this.socketMessaging.sendEventToUser<INPCStartDialog>(
+                character.channelId!,
+                NPCSocketEvents.NPCStartDialogNPC,
+                {
+                  npcId: npc._id,
+                  dialogText,
+                }
+              );
+              setTimeout(() => {
+                // clear target and rollback movement type
+                npc.currentMovementType = npc.originalMovementType;
+                npc.targetCharacter = undefined;
+                npc.targetType = NPCTargetType.Default;
+                npc.save();
+              }, 60 * 1000);
+            } else {
+              throw new Error(`NPCTalkToNPC > NPC dialogText is empty: ${npc._id}`);
+            }
+          } else {
+            throw new Error(`NPC ${npc.name} out of range to start dialog..`);
+          }
+        } catch (error) {
+          console.error(error);
         }
       }
     );

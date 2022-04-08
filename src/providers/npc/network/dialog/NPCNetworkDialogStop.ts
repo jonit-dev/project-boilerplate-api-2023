@@ -27,8 +27,6 @@ export class NPCNetworkDialogStop {
             _id: npcId,
           });
 
-          console.log(npc);
-
           if (npc) {
             if (!npc.targetCharacter) {
               throw new Error("NPC has no target character!");
