@@ -113,7 +113,6 @@ export class NPCMovement {
       );
     }
 
-    // console.log(`${npc.key} moved to ${ToGridX(newX)}, ${ToGridY(newY)}`);
     npc.x = newX;
     npc.y = newY;
     npc.direction = chosenMovementDirection;
