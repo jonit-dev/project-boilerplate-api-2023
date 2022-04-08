@@ -148,6 +148,7 @@ export class NPCMovement {
         throw new Error("Failed to calculate shortest path! No output!");
       }
 
+      // get first next available position
       const [newGridX, newGridY] = npcPath[1];
 
       const nextMovementDirection = this.movementHelper.getGridMovementDirection(

@@ -1,8 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { socketAdapter } from "@providers/inversify/container";
+import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
-import { mockNPC } from "@providers/unitTests/mock/NPCMock";
+import { fixedPathMockNPC, randomMovementMockNPC } from "@providers/unitTests/mock/NPCMock";
+import { NPCMovementType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
@@ -11,11 +13,28 @@ import mongoose from "mongoose";
 export class UnitTestHelper {
   private mongoServer: MongoMemoryServer;
 
-  public async createMockNPC(extraProps?: Record<string, unknown>): Promise<INPC> {
-    const testNPC = new NPC({
-      ...mockNPC,
-      ...extraProps,
-    });
+  public async createMockNPC(
+    extraProps?: Record<string, unknown>,
+    movementType: NPCMovementType = NPCMovementType.Random
+  ): Promise<INPC> {
+    let npcProps;
+
+    switch (movementType) {
+      case NPCMovementType.Random:
+        npcProps = {
+          ...randomMovementMockNPC,
+          ...extraProps,
+        };
+        break;
+      case NPCMovementType.FixedPath:
+        npcProps = {
+          ...fixedPathMockNPC,
+          ...extraProps,
+        };
+        break;
+    }
+    const testNPC = new NPC(npcProps);
+
     await testNPC.save();
 
     return testNPC;
@@ -48,7 +67,9 @@ export class UnitTestHelper {
   }
 
   public async afterAllJestHook(): Promise<void> {
-    socketAdapter.disconnect();
+    if (SocketAdapter.socketClass) {
+      socketAdapter.disconnect();
+    }
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close();
     if (this.mongoServer) {

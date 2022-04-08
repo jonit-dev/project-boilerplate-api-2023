@@ -78,24 +78,28 @@ export class MovementHelper {
     endGridX: number,
     endGridY: number
   ): number[][] | undefined {
-    const gridMap = TilemapParser.grids.get(map);
+    try {
+      const gridMap = TilemapParser.grids.get(map);
 
-    if (!gridMap) {
-      console.log(`Failed to find grid for ${map}`);
-    } else {
-      const tempGrid = gridMap.clone(); // should be cloned, otherwise it will be modified by the finder!
+      if (!gridMap) {
+        throw new Error(`Failed to find grid for ${map}`);
+      } else {
+        const tempGrid = gridMap.clone(); // should be cloned, otherwise it will be modified by the finder!
 
-      const finder = new PF.AStarFinder();
+        const finder = new PF.AStarFinder();
 
-      //! According to the docs, both start and end point MUST be walkable, otherwise it will return [] and crash the pathfinding!
-      //! To avoid any issues in the main grid we'll just set this walkable in the tempGrid!
+        //! According to the docs, both start and end point MUST be walkable, otherwise it will return [] and crash the pathfinding!
+        //! To avoid any issues in the main grid we'll just set this walkable in the tempGrid!
 
-      tempGrid.setWalkableAt(startGridX, startGridY, true);
-      tempGrid.setWalkableAt(endGridX, endGridY, true);
+        tempGrid.setWalkableAt(startGridX, startGridY, true);
+        tempGrid.setWalkableAt(endGridX, endGridY, true);
 
-      const path = finder.findPath(startGridX, startGridY, endGridX, endGridY, tempGrid!);
+        const path = finder.findPath(startGridX, startGridY, endGridX, endGridY, tempGrid!);
 
-      return path;
+        return path;
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
