@@ -36,8 +36,7 @@ export class NPCMovementMoveTowards {
         );
 
         if (!shortestPath) {
-          console.log("No shortest path found!");
-          return;
+          throw new Error("No shortest path found!");
         }
 
         const { newGridX, newGridY, nextMovementDirection } = shortestPath;

@@ -40,104 +40,106 @@ export class NPCTarget {
   }
 
   public async tryToSetTarget(npc: INPC): Promise<void> {
-    const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+    try {
+      const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
-    const charactersDistance: ICharacterDistance[] = [];
+      const charactersDistance: ICharacterDistance[] = [];
 
-    for (const nearbyPlayer of nearbyCharacters) {
-      const distance = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, nearbyPlayer.x, nearbyPlayer.y);
+      for (const nearbyPlayer of nearbyCharacters) {
+        const distance = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, nearbyPlayer.x, nearbyPlayer.y);
 
-      charactersDistance.push({
-        id: nearbyPlayer.id,
-        distance: distance,
-        x: nearbyPlayer.x,
-        y: nearbyPlayer.y,
-      });
-    }
+        charactersDistance.push({
+          id: nearbyPlayer.id,
+          distance: distance,
+          x: nearbyPlayer.x,
+          y: nearbyPlayer.y,
+        });
+      }
 
-    // get the character with minimum distance
-    const minDistanceCharacter = _.minBy(charactersDistance, "distance");
+      // get the character with minimum distance
+      const minDistanceCharacter = _.minBy(charactersDistance, "distance");
 
-    if (minDistanceCharacter) {
-      if (!npc.maxRangeInGridCells) {
-        console.log(
-          `NPC ${npc.key} is trying to set target, but no maxRangeInGridCells is specified (required for range)!`
+      if (minDistanceCharacter) {
+        if (!npc.maxRangeInGridCells) {
+          throw new Error(
+            `NPC ${npc.key} is trying to set target, but no maxRangeInGridCells is specified (required for range)!`
+          );
+        }
+
+        const rangeThresholdDefinition = this.getRangeThreshold(npc);
+
+        if (!rangeThresholdDefinition) {
+          throw new Error(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
+        }
+
+        // check if character is under range
+        const isMovementUnderRange = this.movementHelper.isUnderRange(
+          npc.x,
+          npc.y,
+          minDistanceCharacter.x,
+          minDistanceCharacter.y,
+          rangeThresholdDefinition
         );
+
+        if (!isMovementUnderRange) {
+          return;
+        }
+
+        const character = await Character.findById(minDistanceCharacter.id);
+
+        if (!character) {
+          throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
+        }
+
+        npc.targetCharacter = character._id;
+        await npc.save();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  public async clearTarget(npc: INPC): Promise<void> {
+    try {
+      if (!npc.targetCharacter) {
+        // no target set, nothing to remove here!
         return;
+      }
+
+      if (!npc.maxRangeInGridCells) {
+        throw new Error(`NPC ${npc.key} is trying to verify target, but no maxRangeInGridCells is specified!`);
+      }
+
+      const targetCharacter = await Character.findById(npc.targetCharacter);
+
+      if (!targetCharacter) {
+        throw new Error(`Error in ${npc.key}: Failed to find targetCharacter!`);
       }
 
       const rangeThresholdDefinition = this.getRangeThreshold(npc);
 
       if (!rangeThresholdDefinition) {
-        console.log(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
-        return;
+        throw new Error(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
       }
 
-      // check if character is under range
-      const isMovementUnderRange = this.movementHelper.isUnderRange(
+      const isCharacterUnderRange = this.movementHelper.isUnderRange(
         npc.x,
         npc.y,
-        minDistanceCharacter.x,
-        minDistanceCharacter.y,
+        targetCharacter.x,
+        targetCharacter.y,
         rangeThresholdDefinition
       );
 
-      if (!isMovementUnderRange) {
-        return;
+      // if target is out of range or not online, lets remove it
+      if ((targetCharacter && !isCharacterUnderRange) || !targetCharacter.isOnline) {
+        // remove npc.targetCharacter
+        npc.targetCharacter = undefined;
+        npc.currentMovementType = npc.originalMovementType;
+        npc.targetType = NPCTargetType.Default;
+        await npc.save();
       }
-
-      const character = await Character.findById(minDistanceCharacter.id);
-
-      if (!character) {
-        console.log(`Error in ${npc.key}: Failed to find character to set as target!`);
-        return;
-      }
-
-      npc.targetCharacter = character._id;
-      await npc.save();
-    }
-  }
-
-  public async clearTarget(npc: INPC): Promise<void> {
-    if (!npc.targetCharacter) {
-      // no target set, nothing to remove here!
-      return;
-    }
-
-    if (!npc.maxRangeInGridCells) {
-      console.log(`NPC ${npc.key} is trying to verify target, but no maxRangeInGridCells is specified!`);
-      return;
-    }
-
-    const targetCharacter = await Character.findById(npc.targetCharacter);
-
-    if (!targetCharacter) {
-      console.log(`Error in ${npc.key}: Failed to find targetCharacter!`);
-      return;
-    }
-
-    const rangeThresholdDefinition = this.getRangeThreshold(npc);
-
-    if (!rangeThresholdDefinition) {
-      console.log(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
-      return;
-    }
-
-    const isCharacterUnderRange = this.movementHelper.isUnderRange(
-      npc.x,
-      npc.y,
-      targetCharacter.x,
-      targetCharacter.y,
-      rangeThresholdDefinition
-    );
-
-    // if target is out of range or not online, lets remove it
-    if ((targetCharacter && !isCharacterUnderRange) || !targetCharacter.isOnline) {
-      // remove npc.targetCharacter
-      npc.targetCharacter = undefined;
-      npc.currentMovementType = npc.originalMovementType;
-      npc.targetType = NPCTargetType.Default;
-      await npc.save();
+    } catch (error) {
+      console.error(error);
     }
   }
 

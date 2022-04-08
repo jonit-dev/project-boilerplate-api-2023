@@ -16,14 +16,13 @@ export class SocketAuth {
         });
 
         if (!character) {
-          console.log("You don't own this character!");
-          return;
+          throw new Error("You don't own this character!");
         }
 
         callback(data, character, owner);
       });
     } catch (error) {
-      console.error(error);
+      console.error(`${event}, channel ${channel} failed with error: ${error}`);
     }
   }
 }

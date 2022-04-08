@@ -8,32 +8,35 @@ export class NPCMovementFixedPath {
   constructor(private NPCMovement: NPCMovement) {}
 
   public async startFixedPathMovement(npc: INPC, endGridX: number, endGridY: number): Promise<void> {
-    const shortestPath = this.NPCMovement.getShortestPathNextPosition(
-      npc,
-      ToGridX(npc.x),
-      ToGridY(npc.y),
-      endGridX,
-      endGridY
-    )!;
-
-    if (!shortestPath) {
-      console.log("No shortest path found!");
-      return;
-    }
-
-    const { newGridX, newGridY, nextMovementDirection } = shortestPath;
-
-    if (newGridX && newGridY && nextMovementDirection) {
-      await this.NPCMovement.moveNPC(
+    try {
+      const shortestPath = this.NPCMovement.getShortestPathNextPosition(
         npc,
-        npc.x,
-        npc.y,
-        FromGridX(newGridX),
-        FromGridY(newGridY),
-        nextMovementDirection
-      );
-    } else {
-      console.log("Error: Missing newGridX, newGridY or nextMovementDirection while trying to move NPC");
+        ToGridX(npc.x),
+        ToGridY(npc.y),
+        endGridX,
+        endGridY
+      )!;
+
+      if (!shortestPath) {
+        throw new Error("No shortest path found!");
+      }
+
+      const { newGridX, newGridY, nextMovementDirection } = shortestPath;
+
+      if (newGridX && newGridY && nextMovementDirection) {
+        await this.NPCMovement.moveNPC(
+          npc,
+          npc.x,
+          npc.y,
+          FromGridX(newGridX),
+          FromGridY(newGridY),
+          nextMovementDirection
+        );
+      } else {
+        throw new Error("Error: Missing newGridX, newGridY or nextMovementDirection while trying to move NPC");
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 }

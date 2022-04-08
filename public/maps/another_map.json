@@ -1156,6 +1156,118 @@
           "width": 16,
           "x": 128,
           "y": 112
+        },
+        {
+          "height": 16,
+          "id": 60,
+          "name": "Agatha",
+          "properties": [
+            {
+              "name": "dialogText",
+              "type": "string",
+              "value": "Hello! I'm {{npc.name}}. I'm lazy, that's why I'm stopped."
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-agatha"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 224,
+          "y": 496
+        },
+        {
+          "height": 16,
+          "id": 61,
+          "name": "Annie",
+          "properties": [
+            {
+              "name": "dialogText",
+              "type": "string",
+              "value": "Hello! I'm {{npc.name}}. I'm afraid of you, that's why I'm moving away!"
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-annie"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 448,
+          "y": 144
+        },
+        {
+          "height": 16,
+          "id": 63,
+          "name": "Felicia",
+          "properties": [
+            {
+              "name": "dialogText",
+              "type": "string",
+              "value": "Hey {{char.name}}. You look cute! Wanna be friends? FOREVER?!?!"
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-felicia"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 224,
+          "y": 736
+        },
+        {
+          "height": 16,
+          "id": 64,
+          "name": "Maria",
+          "properties": [
+            {
+              "name": "dialogText",
+              "type": "string",
+              "value": "Hi {{char.name}}. I'm {{npc.name}} and my movement is completely random"
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-maria"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 80,
+          "y": 224
         }
       ],
       "opacity": 1,
@@ -1220,7 +1332,7 @@
     }
   ],
   "nextlayerid": 13,
-  "nextobjectid": 60,
+  "nextobjectid": 65,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",

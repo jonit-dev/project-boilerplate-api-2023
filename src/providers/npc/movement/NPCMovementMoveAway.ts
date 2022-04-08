@@ -10,22 +10,26 @@ export class NPCMovementMoveAway {
   constructor(private npcMovement: NPCMovement, private npcTarget: NPCTarget, private movementHelper: MovementHelper) {}
 
   public async startMovementMoveAway(npc: INPC): Promise<void> {
-    const targetCharacter = await Character.findById(npc.targetCharacter);
+    try {
+      const targetCharacter = await Character.findById(npc.targetCharacter);
 
-    if (targetCharacter) {
-      await this.npcTarget.clearTarget(npc);
+      if (targetCharacter) {
+        await this.npcTarget.clearTarget(npc);
 
-      const targetDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
+        const targetDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
 
-      const oppositeTargetDirection = this.movementHelper.getOppositeDirection(targetDirection);
+        const oppositeTargetDirection = this.movementHelper.getOppositeDirection(targetDirection);
 
-      const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, oppositeTargetDirection);
+        const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, oppositeTargetDirection);
 
-      if (this.movementHelper.isUnderRange(npc.x, npc.y, newX, newY, npc.maxRangeInGridCells!)) {
-        await this.npcMovement.moveNPC(npc, npc.x, npc.y, newX, newY, oppositeTargetDirection);
+        if (this.movementHelper.isUnderRange(npc.x, npc.y, newX, newY, npc.maxRangeInGridCells!)) {
+          await this.npcMovement.moveNPC(npc, npc.x, npc.y, newX, newY, oppositeTargetDirection);
+        }
+      } else {
+        await this.npcTarget.tryToSetTarget(npc);
       }
-    } else {
-      await this.npcTarget.tryToSetTarget(npc);
+    } catch (error) {
+      console.error(error);
     }
   }
 }
