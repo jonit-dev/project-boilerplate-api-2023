@@ -3,7 +3,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { socketAdapter } from "@providers/inversify/container";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
-import { fixedPathMockNPC, randomMovementMockNPC } from "@providers/unitTests/mock/NPCMock";
+import { fixedPathMockNPC, randomMovementMockNPC, stoppedMovementMockNPC } from "@providers/unitTests/mock/NPCMock";
 import { NPCMovementType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
@@ -29,6 +29,12 @@ export class UnitTestHelper {
       case NPCMovementType.FixedPath:
         npcProps = {
           ...fixedPathMockNPC,
+          ...extraProps,
+        };
+        break;
+      case NPCMovementType.Stopped:
+        npcProps = {
+          ...stoppedMovementMockNPC,
           ...extraProps,
         };
         break;
