@@ -1,6 +1,6 @@
-/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
+import type { Config } from "@jest/types";
 
-module.exports = {
+const config: Config.InitialOptions = {
   preset: "@shelf/jest-mongodb",
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(ts)?$",
   transform: {
@@ -23,3 +23,5 @@ module.exports = {
     },
   },
 };
+
+export default config;

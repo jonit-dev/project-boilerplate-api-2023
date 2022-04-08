@@ -1,20 +1,9 @@
-import { EnvType } from "@rpg-engine/shared/dist";
 import path from "path";
-import { appEnv } from "../config/env";
+import root from "root-path";
 
-let ROOT_PATH;
+const rootStr = root();
 
-switch (appEnv.general.ENV) {
-  case EnvType.Development:
-    ROOT_PATH = path.join(path.dirname(require.main!.filename || process.mainModule!.filename), "../"); // regular project folder... we're not inside dist here!
-    break;
-  case EnvType.Production:
-  default:
-    ROOT_PATH = path.join(path.dirname(require.main!.filename || process.mainModule!.filename), "../../"); // we add up an extra folder to get out of ./dist folder (no json files there, so it will break many of our ts script)
-    break;
-}
-
-export { ROOT_PATH };
+export const ROOT_PATH = `${rootStr}/`;
 
 // Paths
 export const STATIC_PATH = path.join(ROOT_PATH, "./public");
