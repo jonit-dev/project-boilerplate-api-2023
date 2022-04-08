@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "tsc": "tsc",
-    "test": "yarn jest test",
+    "test": "yarn jest --silent test",
     "test:config": "yarn jest --showConfig test",
     "dev": "yarn install && ts-node-dev --transpile-only --inspect=0.0.0.0:9229 --respawn -r tsconfig-paths/register ./src/server.ts",
     "build": "tsc -p .",
