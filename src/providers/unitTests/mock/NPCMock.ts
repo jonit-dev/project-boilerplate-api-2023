@@ -13,6 +13,8 @@ export const randomMovementMockNPC = {
   gender: CharacterGender.Female,
   x: 144,
   y: 128,
+  initialX: 144,
+  initialY: 128,
   socketTransmissionZone: {
     x: -648,
     y: -664,
@@ -31,6 +33,8 @@ export const stoppedMovementMockNPC = {
   gender: CharacterGender.Female,
   x: 0,
   y: 0,
+  initialX: 0,
+  initialY: 0,
   socketTransmissionZone: {
     x: -648,
     y: -664,
@@ -49,6 +53,8 @@ export const fixedPathMockNPC = {
   gender: CharacterGender.Female,
   x: 144,
   y: 128,
+  initialX: 144,
+  initialY: 128,
   socketTransmissionZone: {
     x: -648,
     y: -664,

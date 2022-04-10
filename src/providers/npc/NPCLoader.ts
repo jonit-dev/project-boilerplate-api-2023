@@ -51,6 +51,8 @@ export class NPCLoader {
       y: tiledNPCData.y,
       tiledId: tiledNPCData.id,
       key,
+      initialX: tiledNPCData.x,
+      initialY: tiledNPCData.y,
     };
 
     const baseNPCMetaData = {

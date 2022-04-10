@@ -63,7 +63,6 @@
     "ts-node": "^10.7.0"
   },
   "devDependencies": {
-    "root-path": "^0.2.1",
     "@babel/preset-env": "^7.16.11",
     "@rpg-engine/shared": "^0.2.18",
     "@shelf/jest-mongodb": "^2.2.1",
@@ -115,6 +114,7 @@
     "prettier": "^2.2.1",
     "pretty-quick": "^3.1.0",
     "reflect-metadata": "^0.1.13",
+    "root-path": "^0.2.1",
     "route-cache": "^0.4.5",
     "sib-api-v3-sdk": "^8.0.2",
     "ts-jest": "^27.1.3",

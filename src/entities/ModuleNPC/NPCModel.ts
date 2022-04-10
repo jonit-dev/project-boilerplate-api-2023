@@ -49,6 +49,12 @@ const npcSchema = createSchema(
     y: Type.number({
       required: true,
     }),
+    initialX: Type.number({
+      required: true,
+    }),
+    initialY: Type.number({
+      required: true,
+    }),
     direction: Type.string({
       required: true,
       default: "down",
