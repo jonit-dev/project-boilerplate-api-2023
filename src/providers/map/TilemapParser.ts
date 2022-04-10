@@ -84,7 +84,9 @@ export class TilemapParser {
 
     let shouldGenerateSolidsInDatabase;
 
-    if (this.wasMapModified(map, currentMap)) {
+    const areMapSolidsInDb = await MapSolid.exists({});
+
+    if (this.wasMapModified(map, currentMap) || !areMapSolidsInDb) {
       console.log(`⚙️ The map ${map} was modified. Regenerating solids into our database... ✅`);
       // only generate solids again in the database, if there was a map change!
       shouldGenerateSolidsInDatabase = true;
