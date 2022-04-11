@@ -4,7 +4,6 @@ import { container, mapLoader, unitTestHelper } from "@providers/inversify/conta
 import { FromGridX, FromGridY, NPCMovementType } from "@rpg-engine/shared";
 import { NPCMovementMoveAway } from "../NPCMovementMoveAway";
 import { NPCTarget } from "../NPCTarget";
-
 describe("NPCMovementMoveAway.ts", () => {
   let npcMovementMoveAway: NPCMovementMoveAway;
   let testNPC: INPC;

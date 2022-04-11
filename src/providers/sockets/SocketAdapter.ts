@@ -30,15 +30,15 @@ export class SocketAdapter implements ISocket {
   }
 
   public emitToUser<T>(channel: string, eventName: string, data?: T): void {
-    SocketAdapter.socketClass.emitToUser(channel, eventName, data);
+    SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
   }
 
   public emitToAllUsers<T>(eventName: string, data?: T): void {
-    SocketAdapter.socketClass.emitToAllUsers(eventName, data);
+    SocketAdapter.socketClass?.emitToAllUsers(eventName, data);
   }
 
   public onConnect(): void {
-    SocketAdapter.socketClass.onConnect((channel) => {
+    SocketAdapter.socketClass?.onConnect((channel) => {
       socketEventsBinder.bindEvents(channel);
     });
   }
