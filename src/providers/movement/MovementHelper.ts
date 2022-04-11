@@ -1,7 +1,7 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { MapSolid } from "@entities/ModuleSystem/MapSolid";
-import { TilemapParser } from "@providers/map/TilemapParser";
+import { MapLoader } from "@providers/map/MapLoader";
+import { MapSolids } from "@providers/map/MapSolids";
 import { MathHelper } from "@providers/math/MathHelper";
 import {
   AnimationDirection,
@@ -18,17 +18,16 @@ interface IPosition {
   y: number;
 }
 
-type IsSolidCheckType = "isSolidThisLayerAndBelow" | "isSolidThisLayerOnly";
 @provide(MovementHelper)
 export class MovementHelper {
-  constructor(private mathHelper: MathHelper) {}
+  constructor(private mathHelper: MathHelper, private mapSolids: MapSolids) {}
 
   public isSolid = async (
     map: string,
     gridX: number,
     gridY: number,
     layer: MapLayers,
-    checkType: IsSolidCheckType = "isSolidThisLayerAndBelow"
+    checkAllLayersBelow: boolean = true
   ): Promise<boolean> => {
     // check for characters and NPCs
 
@@ -42,33 +41,24 @@ export class MovementHelper {
       return true;
     }
 
-    const hasPlayer = await Character.exists({
+    const hasCharacter = await Character.exists({
       x: FromGridX(gridX),
       y: FromGridY(gridY),
       isOnline: true,
       layer,
     });
 
-    if (hasPlayer) {
+    if (hasCharacter) {
       return true;
     }
 
-    const mapSolid = await MapSolid.findOne({
-      map,
-      gridX,
-      gridY,
-      layer,
-    });
+    const hasSolid = await this.mapSolids.isTileSolid(map, gridX, gridY, layer, checkAllLayersBelow);
 
-    if (!mapSolid) {
-      return false;
+    if (hasSolid) {
+      return true;
     }
 
-    if (checkType === "isSolidThisLayerOnly") {
-      return mapSolid.isSolidOnlyThisLayer;
-    } else {
-      return mapSolid.isSolidThisLayerAndBelow;
-    }
+    return false;
   };
 
   public findShortestPath(
@@ -79,7 +69,7 @@ export class MovementHelper {
     endGridY: number
   ): number[][] | undefined {
     try {
-      const gridMap = TilemapParser.grids.get(map);
+      const gridMap = MapLoader.grids.get(map);
 
       if (!gridMap) {
         throw new Error(`Failed to find grid for ${map}`);

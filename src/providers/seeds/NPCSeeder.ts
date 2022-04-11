@@ -1,5 +1,5 @@
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { TilemapParser } from "@providers/map/TilemapParser";
+import { MapLoader } from "@providers/map/MapLoader";
 import { INPCMetaData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -38,7 +38,7 @@ export class NPCSeeder {
 
   private setInitialNPCPositionAsSolid(NPCData: INPCMetaData): void {
     // mark NPC initial position as solid on the map (pathfinding)
-    TilemapParser.grids
+    MapLoader.grids
       .get(ScenesMetaData[NPCData.scene].map)!
       .setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
   }

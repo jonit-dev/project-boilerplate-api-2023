@@ -1,5 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, tilemapParser, unitTestHelper } from "@providers/inversify/container";
+import { container, mapLoader, unitTestHelper } from "@providers/inversify/container";
 import { NPCMovementType } from "@rpg-engine/shared";
 import { NPCMovementRandomPath } from "../NPCMovementRandomPath";
 
@@ -11,7 +11,7 @@ describe("NPCMovementRandom.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     npcMovementRandom = container.get<NPCMovementRandomPath>(NPCMovementRandomPath);
-    await tilemapParser.init();
+    mapLoader.init();
   });
 
   beforeEach(async () => {

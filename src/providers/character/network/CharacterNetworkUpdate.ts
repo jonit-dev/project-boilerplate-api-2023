@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { TilemapParser } from "@providers/map/TilemapParser";
+import { MapLoader } from "@providers/map/MapLoader";
+
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -271,7 +272,7 @@ export class CharacterNetworkUpdate {
       // if character is moving, update the position
 
       // old position is now walkable
-      TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(data.x), ToGridY(data.y), true);
+      MapLoader.grids.get(map)!.setWalkableAt(ToGridX(data.x), ToGridY(data.y), true);
 
       updatedData.x = newX;
       updatedData.y = newY;
@@ -294,7 +295,7 @@ export class CharacterNetworkUpdate {
 
       // update our grid with solid information
 
-      TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(updatedData.x), ToGridY(updatedData.y), false);
+      MapLoader.grids.get(map)!.setWalkableAt(ToGridX(updatedData.x), ToGridY(updatedData.y), false);
     }
   }
 }

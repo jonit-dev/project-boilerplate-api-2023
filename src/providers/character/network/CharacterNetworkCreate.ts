@@ -1,4 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { MapLoader } from "@providers/map/MapLoader";
+
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
@@ -9,6 +11,9 @@ import {
   CharacterSocketEvents,
   ICharacterCreateFromClient,
   ICharacterCreateFromServer,
+  ScenesMetaData,
+  ToGridX,
+  ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
@@ -40,6 +45,9 @@ export class CharacterNetworkCreate {
 
         character.isOnline = true;
         character.channelId = data.channelId;
+        const map = ScenesMetaData[character.scene].map;
+        MapLoader.grids.get(map)!.setWalkableAt(ToGridX(character.x), ToGridY(character.y), false);
+
         await character.save();
 
         if (character.isBanned) {

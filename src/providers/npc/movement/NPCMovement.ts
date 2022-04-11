@@ -1,6 +1,6 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { TilemapParser } from "@providers/map/TilemapParser";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MapLoader } from "@providers/map/MapLoader";
+import { MapSolids } from "@providers/map/MapSolids";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { INPCPositionUpdatePayload, NPCSocketEvents, ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
@@ -20,7 +20,8 @@ export class NPCMovement {
   constructor(
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private mapSolids: MapSolids
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -29,43 +30,6 @@ export class NPCMovement {
     }
 
     return false;
-  }
-
-  private async hasSolid(npc: INPC, newX: number, newY: number): Promise<boolean | undefined> {
-    try {
-      const isSolid = await this.movementHelper.isSolid(
-        ScenesMetaData[npc.scene].map,
-        ToGridX(newX),
-        ToGridY(newY),
-        npc.layer
-      );
-
-      if (isSolid) {
-        console.log(`${npc.key} tried to move, but was blocked by a solid tile!`);
-        return true;
-      }
-
-      // check for other Characters
-      const hasCharacter = await Character.exists({ x: newX, y: newY, scene: npc.scene, isOnline: true });
-
-      if (hasCharacter) {
-        console.log(`${npc.key} tried to move, but was blocked by a character!`);
-        return true;
-      }
-
-      // and also for other NPCs!
-      const hasNPC = await NPC.exists({ x: newX, y: newY, scene: npc.scene });
-
-      if (hasNPC) {
-        console.log(`${npc.key} tried to move, but was blocked by another NPC!`);
-
-        return true;
-      }
-
-      return false;
-    } catch (error) {
-      console.error(error);
-    }
   }
 
   public async moveNPC(
@@ -84,16 +48,15 @@ export class NPCMovement {
 
       // check if max range is reached
 
-      const hasSolid = await this.hasSolid(npc, newX, newY);
+      const hasSolid = await this.mapSolids.isTileSolid(map, newGridX, newGridY, npc.layer);
       if (hasSolid) {
         console.log(`${npc.key} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
-
         return;
       }
 
       // update grid solids
-      TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
-      TilemapParser.grids.get(map)!.setWalkableAt(ToGridX(newX), ToGridY(newY), false);
+      MapLoader.grids.get(map)!.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
+      MapLoader.grids.get(map)!.setWalkableAt(ToGridX(newX), ToGridY(newY), false);
 
       // warn nearby characters that the NPC moved;
 

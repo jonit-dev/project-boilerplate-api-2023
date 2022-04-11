@@ -1,4 +1,4 @@
-import { ITiledNPC, TilemapParser } from "@providers/map/TilemapParser";
+import { ITiledNPC, MapLoader } from "@providers/map/MapLoader";
 import { INPC, NPCMovementType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { npcsMetadataIndex } from "./npcs/index";
@@ -12,7 +12,7 @@ export class NPCLoader {
   public static NPCMetaData = new Map<string, INPCMetaData>();
 
   public loadNPCMetaData(): void {
-    for (const [, npcs] of TilemapParser.npcs.entries()) {
+    for (const [, npcs] of MapLoader.npcs.entries()) {
       for (const tiledNPCData of npcs) {
         const { key, baseNPCMetaData } = this.loadTiledNPCMetadata(tiledNPCData);
 
