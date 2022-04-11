@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, mapLoader, socketAdapter, unitTestHelper } from "@providers/inversify/container";
-import { FromGridX, FromGridY, NPCMovementType, SocketTypes } from "@rpg-engine/shared";
+import { container, mapLoader, unitTestHelper } from "@providers/inversify/container";
+import { FromGridX, FromGridY, NPCMovementType } from "@rpg-engine/shared";
 import { NPCMovementMoveAway } from "../NPCMovementMoveAway";
 import { NPCTarget } from "../NPCTarget";
 
@@ -17,8 +17,6 @@ describe("NPCMovementMoveAway.ts", () => {
     npcMovementMoveAway = container.get<NPCMovementMoveAway>(NPCMovementMoveAway);
     npcTarget = container.get<NPCTarget>(NPCTarget);
     mapLoader.init();
-
-    await socketAdapter.init(SocketTypes.TCP);
   });
 
   beforeEach(async () => {

@@ -1,6 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { socketAdapter } from "@providers/inversify/container";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
   fixedPathMockNPC,
@@ -83,8 +82,6 @@ export class UnitTestHelper {
   }
 
   public async afterAllJestHook(): Promise<void> {
-    socketAdapter.disconnect();
-
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close();
     if (this.mongoServer) {

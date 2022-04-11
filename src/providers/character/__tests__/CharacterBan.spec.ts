@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { container, socketAdapter, unitTestHelper } from "@providers/inversify/container";
-import { SocketTypes } from "@rpg-engine/shared";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import dayjs from "dayjs";
 import { CharacterBan } from "../CharacterBan";
 
@@ -13,8 +12,6 @@ describe("CharacterBan.ts", () => {
     await unitTestHelper.beforeAllJestHook();
 
     characterBan = container.get<CharacterBan>(CharacterBan);
-
-    await socketAdapter.init(SocketTypes.TCP);
   });
 
   beforeEach(async () => {
