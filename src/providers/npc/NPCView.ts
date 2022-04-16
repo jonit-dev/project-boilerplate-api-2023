@@ -42,7 +42,7 @@ export class NPCView {
     );
 
     // @ts-ignore
-    const otherCharactersInView = await Element.find({
+    const otherElementsInView = await Element.find({
       $and: [
         {
           x: {
@@ -62,7 +62,7 @@ export class NPCView {
         },
       ],
     });
-    return otherCharactersInView as unknown as T[];
+    return otherElementsInView as unknown as T[];
   }
 
   public async getCharactersInView(npc: INPC): Promise<ICharacter[]> {

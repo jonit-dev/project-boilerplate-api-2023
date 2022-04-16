@@ -63,13 +63,13 @@ export class NPCManager {
       try {
         // check if actually there's a character near. If not, let's not waste server resources!
 
-        const nearbyCharacters = await this.npcView.getCharactersInView(initialNPC);
+        npc = (await NPC.findById(initialNPC._id)) || initialNPC; // update npc instance on each behavior loop!
+
+        const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
         if (!nearbyCharacters.length) {
           return; // no character in view, no need to waste resources!
         }
-
-        npc = (await NPC.findById(initialNPC._id)) || initialNPC; // update npc instance on each behavior loop!
 
         switch (npc.currentMovementType) {
           case NPCMovementType.MoveAway:
