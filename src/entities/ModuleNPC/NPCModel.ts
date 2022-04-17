@@ -1,10 +1,10 @@
 import {
   CharacterClass,
   CharacterGender,
-  FixedPathOrientation,
   MapLayers,
   NPCAlignment,
   NPCMovementType,
+  NPCPathOrientation,
   NPCTargetType,
   TypeHelper,
 } from "@rpg-engine/shared";
@@ -88,8 +88,8 @@ const npcSchema = createSchema(
       enum: TypeHelper.enumToStringArray(NPCMovementType),
     }),
     maxRangeInGridCells: Type.number(),
-    fixedPathOrientation: Type.string({
-      enum: TypeHelper.enumToStringArray(FixedPathOrientation),
+    pathOrientation: Type.string({
+      enum: TypeHelper.enumToStringArray(NPCPathOrientation),
     }),
     fixedPath: {
       endGridX: Type.number(),

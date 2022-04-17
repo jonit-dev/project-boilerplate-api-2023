@@ -1,7 +1,7 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { FixedPathOrientation, FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { FromGridX, FromGridY, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
@@ -21,19 +21,19 @@ export class NPCMovementMoveTowards {
     if (targetCharacter) {
       await this.npcTarget.clearTarget(npc);
 
-      switch (npc.fixedPathOrientation) {
-        case FixedPathOrientation.Forward:
+      switch (npc.pathOrientation) {
+        case NPCPathOrientation.Forward:
           reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, targetCharacter.x, targetCharacter.y, 1);
           break;
-        case FixedPathOrientation.Backward:
+        case NPCPathOrientation.Backward:
           reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, npc.initialX, npc.initialY, 1);
           break;
       }
 
       if (reachedTarget) {
-        if (npc.fixedPathOrientation === FixedPathOrientation.Backward) {
+        if (npc.pathOrientation === NPCPathOrientation.Backward) {
           // if NPC is coming back from being lured, reset its orientation to Forward
-          npc.fixedPathOrientation = FixedPathOrientation.Forward;
+          npc.pathOrientation = NPCPathOrientation.Forward;
           npc.targetCharacter = undefined;
           await npc.save();
         }
@@ -48,8 +48,8 @@ export class NPCMovementMoveTowards {
           throw new Error(`NPC ${npc.id} has no maxRangeInGridCells set!`);
         }
 
-        switch (npc.fixedPathOrientation) {
-          case FixedPathOrientation.Forward:
+        switch (npc.pathOrientation) {
+          case NPCPathOrientation.Forward:
             const isUnderOriginalPositionRange = this.movementHelper.isUnderRange(
               npc.x,
               npc.y,
@@ -61,11 +61,11 @@ export class NPCMovementMoveTowards {
             if (isUnderOriginalPositionRange) {
               await this.moveTowardsPosition(npc, targetCharacter.x, targetCharacter.y);
             } else {
-              npc.fixedPathOrientation = FixedPathOrientation.Backward;
+              npc.pathOrientation = NPCPathOrientation.Backward;
               await npc.save();
             }
             break;
-          case FixedPathOrientation.Backward:
+          case NPCPathOrientation.Backward:
             await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
 
             break;

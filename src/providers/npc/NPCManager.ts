@@ -1,6 +1,6 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { appEnv } from "@providers/config/env";
-import { EnvType, FixedPathOrientation, NPCMovementType, SocketTypes, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { EnvType, NPCMovementType, NPCPathOrientation, SocketTypes, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCMovement } from "./movement/NPCMovement";
@@ -99,17 +99,17 @@ export class NPCManager {
 
             // if NPC is at the initial position, move forward to end position.
             if (this.npcMovement.isNPCAtPathPosition(npc, ToGridX(npcData.x!), ToGridY(npcData.y!))) {
-              npc.fixedPathOrientation = FixedPathOrientation.Forward;
+              npc.pathOrientation = NPCPathOrientation.Forward;
               await npc.save();
             }
 
             // if NPC is at the end of the path, move backwards to initial position.
             if (this.npcMovement.isNPCAtPathPosition(npc, endGridX, endGridY)) {
-              npc.fixedPathOrientation = FixedPathOrientation.Backward;
+              npc.pathOrientation = NPCPathOrientation.Backward;
               await npc.save();
             }
 
-            if (npc.fixedPathOrientation === FixedPathOrientation.Backward) {
+            if (npc.pathOrientation === NPCPathOrientation.Backward) {
               endGridX = ToGridX(npcData?.x!);
               endGridY = ToGridY(npcData?.y!);
             }

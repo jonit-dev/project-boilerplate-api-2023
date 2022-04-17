@@ -2,10 +2,10 @@ import { appEnv } from "@providers/config/env";
 import {
   AnimationDirection,
   CharacterClass,
-  FixedPathOrientation,
   MapLayers,
   NPCAlignment,
   NPCMovementType,
+  NPCPathOrientation,
 } from "@rpg-engine/shared";
 import _ from "lodash";
 
@@ -32,7 +32,7 @@ export const generateMoveTowardsMovement = (): any => {
     currentMovementType: NPCMovementType.MoveTowards,
     maxRangeInGridCells: 20,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
-    fixedPathOrientation: FixedPathOrientation.Forward, // must be forward!
+    pathOrientation: NPCPathOrientation.Forward, // must be forward!
   };
 };
 
@@ -70,7 +70,7 @@ export const generateFixedPathMovement = (): any => {
     layer: MapLayers.Character,
     currentMovementType: NPCMovementType.FixedPath,
     originalMovementType: NPCMovementType.FixedPath,
-    fixedPathOrientation: FixedPathOrientation.Forward, // must be forward!
+    pathOrientation: NPCPathOrientation.Forward, // must be forward!
     maxRangeInGridCells: 20,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };

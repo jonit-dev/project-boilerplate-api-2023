@@ -1,4 +1,4 @@
-import { CharacterGender, FixedPathOrientation, NPCMovementType } from "@rpg-engine/shared";
+import { CharacterGender, NPCMovementType, NPCPathOrientation } from "@rpg-engine/shared";
 import {
   generateFixedPathMovement,
   generateMoveAwayMovement,
@@ -90,6 +90,6 @@ export const fixedPathMockNPC = {
     endGridX: 9,
     endGridY: 11,
   },
-  fixedPathOrientation: FixedPathOrientation.Forward, // must be forward!
+  pathOrientation: NPCPathOrientation.Forward, // must be forward!
   maxRangeInGridCells: 20,
 };
