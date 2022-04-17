@@ -4,6 +4,7 @@ import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
   fixedPathMockNPC,
   moveAwayMockNPC,
+  moveTowardsMockNPC,
   randomMovementMockNPC,
   stoppedMovementMockNPC,
 } from "@providers/unitTests/mock/NPCMock";
@@ -20,34 +21,19 @@ export class UnitTestHelper {
     extraProps?: Record<string, unknown>,
     movementType: NPCMovementType = NPCMovementType.Random
   ): Promise<INPC> {
-    let npcProps;
+    const movementTypeMock = {
+      [NPCMovementType.FixedPath]: fixedPathMockNPC,
+      [NPCMovementType.MoveAway]: moveAwayMockNPC,
+      [NPCMovementType.MoveTowards]: moveTowardsMockNPC,
+      [NPCMovementType.Random]: randomMovementMockNPC,
+      [NPCMovementType.Stopped]: stoppedMovementMockNPC,
+    };
 
-    switch (movementType) {
-      case NPCMovementType.Random:
-        npcProps = {
-          ...randomMovementMockNPC,
-          ...extraProps,
-        };
-        break;
-      case NPCMovementType.FixedPath:
-        npcProps = {
-          ...fixedPathMockNPC,
-          ...extraProps,
-        };
-        break;
-      case NPCMovementType.Stopped:
-        npcProps = {
-          ...stoppedMovementMockNPC,
-          ...extraProps,
-        };
-        break;
-      case NPCMovementType.MoveAway:
-        npcProps = {
-          ...moveAwayMockNPC,
-          ...extraProps,
-        };
-        break;
-    }
+    const npcProps = {
+      ...movementTypeMock[movementType],
+      ...extraProps,
+    };
+
     const testNPC = new NPC(npcProps);
 
     await testNPC.save();

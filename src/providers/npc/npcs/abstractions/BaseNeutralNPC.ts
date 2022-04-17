@@ -30,7 +30,7 @@ export const generateMoveTowardsMovement = (): any => {
     layer: MapLayers.Character,
     originalMovementType: NPCMovementType.MoveTowards,
     currentMovementType: NPCMovementType.MoveTowards,
-    maxRangeInGridCells: 20,
+    maxRangeInGridCells: 10,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
     pathOrientation: NPCPathOrientation.Forward, // must be forward!
   };

@@ -17,6 +17,7 @@ export class NPCMovementMoveTowards {
     const targetCharacter = await Character.findById(npc.targetCharacter);
 
     let reachedTarget;
+    const reachedInitialPosition = npc.x === npc.initialX && npc.y === npc.initialY;
 
     if (targetCharacter) {
       await this.npcTarget.clearTarget(npc);
@@ -26,7 +27,7 @@ export class NPCMovementMoveTowards {
           reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, targetCharacter.x, targetCharacter.y, 1);
           break;
         case NPCPathOrientation.Backward:
-          reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, npc.initialX, npc.initialY, 1);
+          reachedTarget = reachedInitialPosition;
           break;
       }
 
@@ -77,7 +78,7 @@ export class NPCMovementMoveTowards {
       await this.npcTarget.tryToSetTarget(npc);
 
       // if not target is set and we're out of X and Y position, just move back
-      if (!npc.targetCharacter) {
+      if (!npc.targetCharacter && !reachedInitialPosition && npc.pathOrientation === NPCPathOrientation.Backward) {
         await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
       }
     }

@@ -2,6 +2,7 @@ import { CharacterGender, NPCMovementType, NPCPathOrientation } from "@rpg-engin
 import {
   generateFixedPathMovement,
   generateMoveAwayMovement,
+  generateMoveTowardsMovement,
   generateRandomMovement,
   generateStoppedMovement,
 } from "../../npc/npcs/abstractions/BaseNeutralNPC";
@@ -62,6 +63,27 @@ export const moveAwayMockNPC = {
     width: 936,
     height: 920,
   },
+  scene: "MainScene",
+  tiledId: 0,
+};
+
+export const moveTowardsMockNPC = {
+  ...generateMoveTowardsMovement(),
+  key: "test-npc",
+  name: "Test NPC",
+  textureKey: "female-npc",
+  gender: CharacterGender.Female,
+  x: 0,
+  y: 0,
+  initialX: 0,
+  initialY: 0,
+  socketTransmissionZone: {
+    x: -648,
+    y: -664,
+    width: 936,
+    height: 920,
+  },
+  maxRangeInGridCells: 10,
   scene: "MainScene",
   tiledId: 0,
 };
