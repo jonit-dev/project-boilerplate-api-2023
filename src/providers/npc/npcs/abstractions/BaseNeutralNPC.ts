@@ -32,6 +32,7 @@ export const generateMoveTowardsMovement = (): any => {
     currentMovementType: NPCMovementType.MoveTowards,
     maxRangeInGridCells: 20,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
+    fixedPathOrientation: FixedPathOrientation.Forward, // must be forward!
   };
 };
 

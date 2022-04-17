@@ -1,7 +1,7 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { FixedPathOrientation, FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
@@ -16,46 +16,101 @@ export class NPCMovementMoveTowards {
 
     const targetCharacter = await Character.findById(npc.targetCharacter);
 
+    let reachedTarget;
+
     if (targetCharacter) {
       await this.npcTarget.clearTarget(npc);
 
-      const reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, targetCharacter.x, targetCharacter.y, 1);
+      switch (npc.fixedPathOrientation) {
+        case FixedPathOrientation.Forward:
+          reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, targetCharacter.x, targetCharacter.y, 1);
+          break;
+        case FixedPathOrientation.Backward:
+          reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, npc.initialX, npc.initialY, 1);
+          break;
+      }
 
       if (reachedTarget) {
+        if (npc.fixedPathOrientation === FixedPathOrientation.Backward) {
+          // if NPC is coming back from being lured, reset its orientation to Forward
+          npc.fixedPathOrientation = FixedPathOrientation.Forward;
+          npc.targetCharacter = undefined;
+          await npc.save();
+        }
+
         console.log("Reached target. Nothing to do here!");
         return;
       }
 
       try {
-        const shortestPath = this.npcMovement.getShortestPathNextPosition(
-          npc,
-          ToGridX(npc.x),
-          ToGridY(npc.y),
-          ToGridX(targetCharacter.x),
-          ToGridY(targetCharacter.y)
-        );
-
-        if (!shortestPath) {
-          throw new Error("No shortest path found!");
+        // calculate distance to original position
+        if (!npc.maxRangeInGridCells) {
+          throw new Error(`NPC ${npc.id} has no maxRangeInGridCells set!`);
         }
 
-        const { newGridX, newGridY, nextMovementDirection } = shortestPath;
+        switch (npc.fixedPathOrientation) {
+          case FixedPathOrientation.Forward:
+            const isUnderOriginalPositionRange = this.movementHelper.isUnderRange(
+              npc.x,
+              npc.y,
+              npc.initialX,
+              npc.initialY,
+              npc.maxRangeInGridCells
+            );
 
-        if (newGridX && newGridY && nextMovementDirection) {
-          await this.npcMovement.moveNPC(
-            npc,
-            npc.x,
-            npc.y,
-            FromGridX(newGridX),
-            FromGridY(newGridY),
-            nextMovementDirection
-          );
+            if (isUnderOriginalPositionRange) {
+              await this.moveTowardsPosition(npc, targetCharacter.x, targetCharacter.y);
+            } else {
+              npc.fixedPathOrientation = FixedPathOrientation.Backward;
+              await npc.save();
+            }
+            break;
+          case FixedPathOrientation.Backward:
+            await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
+
+            break;
         }
       } catch (error) {
         console.error(error);
       }
     } else {
       await this.npcTarget.tryToSetTarget(npc);
+
+      // if not target is set and we're out of X and Y position, just move back
+      if (!npc.targetCharacter) {
+        await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
+      }
+    }
+  }
+
+  private async moveTowardsPosition(npc: INPC, x: number, y: number): Promise<void> {
+    try {
+      const shortestPath = this.npcMovement.getShortestPathNextPosition(
+        npc,
+        ToGridX(npc.x),
+        ToGridY(npc.y),
+        ToGridX(x),
+        ToGridY(y)
+      );
+
+      if (!shortestPath) {
+        throw new Error("No shortest path found!");
+      }
+
+      const { newGridX, newGridY, nextMovementDirection } = shortestPath;
+
+      if (newGridX && newGridY && nextMovementDirection) {
+        await this.npcMovement.moveNPC(
+          npc,
+          npc.x,
+          npc.y,
+          FromGridX(newGridX),
+          FromGridY(newGridY),
+          nextMovementDirection
+        );
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 }
