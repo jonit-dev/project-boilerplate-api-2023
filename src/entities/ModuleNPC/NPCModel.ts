@@ -3,6 +3,7 @@ import {
   CharacterGender,
   MapLayers,
   NPCAlignment,
+  NPCAttackType,
   NPCMovementType,
   NPCPathOrientation,
   NPCTargetType,
@@ -76,7 +77,11 @@ const npcSchema = createSchema(
       required: true,
       default: MapLayers.Character,
     }),
-
+    attackType: Type.string({
+      required: true,
+      enum: TypeHelper.enumToStringArray(NPCAttackType),
+      default: NPCAttackType.None,
+    }),
     originalMovementType: Type.string({
       required: true,
       enum: TypeHelper.enumToStringArray(NPCMovementType),
@@ -88,6 +93,7 @@ const npcSchema = createSchema(
       enum: TypeHelper.enumToStringArray(NPCMovementType),
     }),
     maxRangeInGridCells: Type.number(),
+    maxRangedDistanceInGridCells: Type.number(),
     pathOrientation: Type.string({
       enum: TypeHelper.enumToStringArray(NPCPathOrientation),
     }),
@@ -102,10 +108,7 @@ const npcSchema = createSchema(
       default: 2.5,
       required: true,
     }),
-    dialogText: Type.string({
-      required: true,
-      default: "Hmm!?...",
-    }),
+    dialogText: Type.string(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

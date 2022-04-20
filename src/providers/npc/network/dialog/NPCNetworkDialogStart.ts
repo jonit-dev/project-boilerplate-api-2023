@@ -38,6 +38,10 @@ export class NPCNetworkDialogStart {
             throw new Error(`NPCTalkToNPC > NPC not found: ${data.npcId}`);
           }
 
+          if (!npc.dialogText) {
+            throw new Error(`NPCTalkToNPC > NPC has no dialog: ${data.npcId}`);
+          }
+
           const distanceCharNPC = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, character.x, character.y);
 
           const isUnderRange = distanceCharNPC <= NPC_MAX_TALKING_DISTANCE_IN_GRID * GRID_WIDTH;
