@@ -10,7 +10,7 @@ import { CharacterView } from "../CharacterView";
 @provide(CharacterNetworkLogout)
 export class CharacterNetworkLogout {
   constructor(
-    private geckosMessagingHelper: SocketMessaging,
+    private socketMessagingHelper: SocketMessaging,
     private socketAuth: SocketAuth,
     private socketConnection: SocketConnection,
     private characterView: CharacterView
@@ -24,7 +24,7 @@ export class CharacterNetworkLogout {
         const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
         for (const character of nearbyCharacters) {
-          this.geckosMessagingHelper.sendEventToUser<ICharacterLogout>(
+          this.socketMessagingHelper.sendEventToUser<ICharacterLogout>(
             character.channelId!,
             CharacterSocketEvents.CharacterLogout,
             data

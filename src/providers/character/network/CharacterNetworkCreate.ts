@@ -21,7 +21,6 @@ import { CharacterView } from "../CharacterView";
 @provide(CharacterNetworkCreate)
 export class CharacterNetworkCreate {
   constructor(
-    private geckosMessagingHelper: SocketMessaging,
     private socketAuth: SocketAuth,
     private geckosConnection: SocketConnection,
     private playerView: CharacterView,
@@ -104,7 +103,7 @@ export class CharacterNetworkCreate {
     if (nearbyCharacters.length > 0) {
       for (const nearbyCharacter of nearbyCharacters) {
         // tell other character that we exist, so it can create a new instance of us
-        this.geckosMessagingHelper.sendEventToUser<ICharacterCreateFromServer>(
+        this.socketMessaging.sendEventToUser<ICharacterCreateFromServer>(
           nearbyCharacter.channelId!,
           CharacterSocketEvents.CharacterCreate,
           dataFromServer
@@ -125,7 +124,7 @@ export class CharacterNetworkCreate {
 
         // tell the emitter about these other characters too
 
-        this.geckosMessagingHelper.sendEventToUser<ICharacterCreateFromServer>(
+        this.socketMessaging.sendEventToUser<ICharacterCreateFromServer>(
           emitterChannelId,
           CharacterSocketEvents.CharacterCreate,
           nearbyCharacterPayload
