@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "Node12",
+    "module": "NodeNext",
     "lib": ["ES6"],
     "allowJs": true,
     "sourceMap": true,
