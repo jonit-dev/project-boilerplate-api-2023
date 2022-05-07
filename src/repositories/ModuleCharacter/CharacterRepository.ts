@@ -30,8 +30,6 @@ export class CharacterRepository extends CRUD {
 
     createdCharacter.skills = skills._id;
 
-    console.log(createdCharacter.skills);
-
     await createdCharacter.save();
 
     return createdCharacter;
