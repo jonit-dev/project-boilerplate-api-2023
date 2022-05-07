@@ -99,7 +99,7 @@ export class NPCTarget {
     }
   }
 
-  public async clearTarget(npc: INPC): Promise<void> {
+  public async tryToClearOutOfRangeTargets(npc: INPC): Promise<void> {
     try {
       if (!npc.targetCharacter) {
         // no target set, nothing to remove here!

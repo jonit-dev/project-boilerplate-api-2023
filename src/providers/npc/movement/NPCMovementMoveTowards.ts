@@ -20,7 +20,7 @@ export class NPCMovementMoveTowards {
     const reachedInitialPosition = npc.x === npc.initialX && npc.y === npc.initialY;
 
     if (targetCharacter) {
-      await this.npcTarget.clearTarget(npc);
+      await this.npcTarget.tryToClearOutOfRangeTargets(npc);
 
       switch (npc.pathOrientation) {
         case NPCPathOrientation.Forward:
