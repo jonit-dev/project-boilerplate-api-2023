@@ -1,14 +1,20 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { BattleManager } from "@providers/battle/BattleManager";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { FromGridX, FromGridY, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { FromGridX, FromGridY, NPCAlignment, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
 
 @provide(NPCMovementMoveTowards)
 export class NPCMovementMoveTowards {
-  constructor(private movementHelper: MovementHelper, private npcMovement: NPCMovement, private npcTarget: NPCTarget) {}
+  constructor(
+    private movementHelper: MovementHelper,
+    private npcMovement: NPCMovement,
+    private npcTarget: NPCTarget,
+    private battleManager: BattleManager
+  ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
     // first step is setting a target
@@ -32,6 +38,11 @@ export class NPCMovementMoveTowards {
       }
 
       if (reachedTarget) {
+        // if reached target and alignment is enemy, lets hit it
+
+        if (npc.alignment === NPCAlignment.Hostile) {
+        }
+
         if (npc.pathOrientation === NPCPathOrientation.Backward) {
           // if NPC is coming back from being lured, reset its orientation to Forward
           npc.pathOrientation = NPCPathOrientation.Forward;
@@ -75,6 +86,7 @@ export class NPCMovementMoveTowards {
         console.error(error);
       }
     } else {
+      // no target character
       await this.npcTarget.tryToSetTarget(npc);
 
       // if not target is set and we're out of X and Y position, just move back

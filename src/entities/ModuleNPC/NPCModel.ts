@@ -109,6 +109,9 @@ const npcSchema = createSchema(
       required: true,
     }),
     dialogText: Type.string(),
+    skills: Type.objectId({
+      ref: "Skill",
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

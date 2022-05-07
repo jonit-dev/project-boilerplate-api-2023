@@ -77,6 +77,9 @@ const characterSchema = createSchema(
     banRemovalDate: Type.date(),
     hasPermanentBan: Type.boolean(),
     lastMovement: Type.date(),
+    skills: Type.objectId({
+      ref: "Skill",
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

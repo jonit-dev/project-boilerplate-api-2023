@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleSkills/SkillsModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
@@ -21,6 +22,17 @@ export class CharacterRepository extends CRUD {
       null,
       ["name"]
     );
+
+    const skills = new Skill({
+      owner: createdCharacter._id,
+    });
+    await skills.save();
+
+    createdCharacter.skills = skills._id;
+
+    console.log(createdCharacter.skills);
+
+    await createdCharacter.save();
 
     return createdCharacter;
   }

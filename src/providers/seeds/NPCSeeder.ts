@@ -1,4 +1,5 @@
 import { NPC } from "@entities/ModuleNPC/NPCModel";
+import { Skill } from "@entities/ModuleSkills/SkillsModel";
 import { MapLoader } from "@providers/map/MapLoader";
 import { INPCMetaData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
@@ -18,6 +19,13 @@ export class NPCSeeder {
         console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
 
         const newNPC = new NPC(NPCData);
+
+        const skills = new Skill({
+          owner: newNPC._id,
+        });
+        await skills.save();
+
+        newNPC.skills = skills._id;
         await newNPC.save();
       } else {
         // if npc already exists, restart initial position
