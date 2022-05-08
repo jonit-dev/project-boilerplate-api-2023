@@ -24,8 +24,16 @@ const npcSchema = createSchema(
       default: 100,
       required: true,
     }),
+    maxHealth: Type.number({
+      default: 100,
+      required: true,
+    }),
     mana: Type.number({
       default: 0,
+      required: true,
+    }),
+    maxMana: Type.number({
+      default: 100,
       required: true,
     }),
     alignment: Type.string({
@@ -111,6 +119,7 @@ const npcSchema = createSchema(
     dialogText: Type.string(),
     skills: Type.objectId({
       ref: "Skill",
+      required: true,
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }

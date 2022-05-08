@@ -1268,6 +1268,34 @@
           "width": 16,
           "x": 80,
           "y": 224
+        },
+        {
+          "height": 16,
+          "id": 65,
+          "name": "Monster",
+          "properties": [
+            {
+              "name": "dialogText",
+              "type": "string",
+              "value": "Hey {{char.name}}. Let's battle!"
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "value": "npc-monster"
+            },
+            {
+              "name": "scene",
+              "type": "string",
+              "value": "MainScene"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 304,
+          "y": 80
         }
       ],
       "opacity": 1,
@@ -1332,7 +1360,7 @@
     }
   ],
   "nextlayerid": 13,
-  "nextobjectid": 65,
+  "nextobjectid": 66,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",

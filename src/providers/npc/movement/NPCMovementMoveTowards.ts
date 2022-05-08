@@ -2,7 +2,7 @@ import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleManager } from "@providers/battle/BattleManager";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { FromGridX, FromGridY, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { FromGridX, FromGridY, NPCAlignment, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
@@ -20,7 +20,7 @@ export class NPCMovementMoveTowards {
     // first step is setting a target
     // for this, get all characters nearby and set the target to the closest one
 
-    const targetCharacter = await Character.findById(npc.targetCharacter);
+    const targetCharacter = await Character.findById(npc.targetCharacter).populate("skills");
 
     let reachedTarget;
     const reachedInitialPosition = npc.x === npc.initialX && npc.y === npc.initialY;
@@ -38,7 +38,10 @@ export class NPCMovementMoveTowards {
       }
 
       if (reachedTarget) {
-        // if reached target and alignment is enemy, lets hit it
+        if (npc.alignment === NPCAlignment.Hostile && targetCharacter.isAlive) {
+          // if reached target and alignment is enemy, lets hit it
+          await this.battleManager.attackCharacter(npc, targetCharacter);
+        }
 
         if (npc.pathOrientation === NPCPathOrientation.Backward) {
           // if NPC is coming back from being lured, reset its orientation to Forward
@@ -47,7 +50,6 @@ export class NPCMovementMoveTowards {
           await npc.save();
         }
 
-        console.log("Reached target. Nothing to do here!");
         return;
       }
 

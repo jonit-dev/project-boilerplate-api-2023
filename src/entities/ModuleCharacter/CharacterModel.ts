@@ -14,7 +14,15 @@ const characterSchema = createSchema(
       default: 100,
       required: true,
     }),
+    maxHealth: Type.number({
+      default: 100,
+      required: true,
+    }),
     mana: Type.number({
+      default: 100,
+      required: true,
+    }),
+    maxMana: Type.number({
       default: 100,
       required: true,
     }),
@@ -79,10 +87,18 @@ const characterSchema = createSchema(
     lastMovement: Type.date(),
     skills: Type.objectId({
       ref: "Skill",
+      required: true,
+    }),
+    ...({} as {
+      isAlive: boolean;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
+
+characterSchema.virtual("isAlive").get(function (this: ICharacter) {
+  return this.health > 0;
+});
 
 export type ICharacter = ExtractDoc<typeof characterSchema>;
 
