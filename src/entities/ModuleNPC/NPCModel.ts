@@ -3,12 +3,12 @@ import {
   CharacterGender,
   MapLayers,
   NPCAlignment,
-  NPCAttackType,
   NPCMovementType,
   NPCPathOrientation,
   NPCTargetType,
   TypeHelper,
 } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const npcSchema = createSchema(
@@ -87,8 +87,8 @@ const npcSchema = createSchema(
     }),
     attackType: Type.string({
       required: true,
-      enum: TypeHelper.enumToStringArray(NPCAttackType),
-      default: NPCAttackType.None,
+      enum: TypeHelper.enumToStringArray(EntityAttackType),
+      default: EntityAttackType.Melee,
     }),
     originalMovementType: Type.string({
       required: true,

@@ -55,7 +55,7 @@ app.listen(port, async () => {
 
   await npcManager.init();
 
-  await characterConnection.setAllCharactersAsOffline();
+  await characterConnection.resetCharacterAttributes();
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({

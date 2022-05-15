@@ -1,5 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { CharacterClass, CharacterGender, NPCAlignment, NPCAttackType } from "@rpg-engine/shared";
+import { CharacterClass, CharacterGender, NPCAlignment } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "./abstractions/BaseNeutralNPC";
 
 export const npcMonsterMetaData = {
@@ -11,7 +12,7 @@ export const npcMonsterMetaData = {
   class: CharacterClass.None,
   gender: CharacterGender.Female,
   alignment: NPCAlignment.Hostile,
-  attackType: NPCAttackType.Melee,
+  attackType: EntityAttackType.Melee,
   skills: {
     level: 1,
     strength: 1,

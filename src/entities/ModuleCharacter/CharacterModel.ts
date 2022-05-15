@@ -1,4 +1,5 @@
 import { CharacterClass, CharacterGender, FromGridX, FromGridY, MapLayers, TypeHelper } from "@rpg-engine/shared";
+import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const characterSchema = createSchema(
@@ -88,6 +89,17 @@ const characterSchema = createSchema(
     skills: Type.objectId({
       ref: "Skill",
       required: true,
+    }),
+    target: {
+      id: Type.objectId(),
+      type: Type.string({
+        enum: TypeHelper.enumToStringArray(EntityType),
+      }),
+    },
+    attackType: Type.string({
+      required: true,
+      enum: TypeHelper.enumToStringArray(EntityAttackType),
+      default: EntityAttackType.Melee,
     }),
     ...({} as {
       isAlive: boolean;
