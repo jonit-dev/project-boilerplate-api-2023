@@ -9,6 +9,7 @@ import {
   GRID_WIDTH,
   IBattleCancelTargeting,
   IBattleInitTargeting,
+  NPCAlignment,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -87,8 +88,36 @@ export class BattleNetworkInitTargeting {
     );
   }
 
-  private isValidNPCTarget(target: INPC, character): ITargetValidation {
+  private isValidNPCTarget(target: INPC, character: ICharacter): ITargetValidation {
     // check if target is within character range.
+
+    if (target.health === 0) {
+      return {
+        isValid: false,
+        reason: "You cannot attack a target that's already dead.",
+      };
+    }
+
+    if (character.health === 0) {
+      return {
+        isValid: false,
+        reason: "You cannot attack when you're dead.",
+      };
+    }
+
+    if (target.scene !== character.scene) {
+      return {
+        isValid: false,
+        reason: "Your target is not on the same scene.",
+      };
+    }
+
+    if (target.alignment === NPCAlignment.Neutral || target.alignment === NPCAlignment.Friendly) {
+      return {
+        isValid: false,
+        reason: "You cannot attack this entity.",
+      };
+    }
 
     const isCharacterOnline = character.isOnline;
 
