@@ -15,6 +15,7 @@ import {
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { Optional } from "ts-mongoose";
+import { BattleCharacterManager } from "../BattleCharacterManager";
 
 interface ITargetValidation {
   isValid: boolean;
@@ -26,7 +27,8 @@ export class BattleNetworkInitTargeting {
   constructor(
     private socketAuth: SocketAuth,
     private socketMessaging: SocketMessaging,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private battleCharacterManager: BattleCharacterManager
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
@@ -70,14 +72,9 @@ export class BattleNetworkInitTargeting {
                   reason: isValidNPCTarget.reason,
                 }
               );
+            } else {
+              await this.characterSetTargeting(character, target, data.type);
             }
-
-            // if everything is all right, set target.
-
-            character.target.id = target._id;
-            character.target.type = data.type as unknown as Optional<string>;
-
-            await character.save();
           }
 
           // validate if character actually can set this target
@@ -86,6 +83,17 @@ export class BattleNetworkInitTargeting {
         }
       }
     );
+  }
+
+  private async characterSetTargeting(
+    character: ICharacter,
+    target: ICharacter | INPC,
+    targetType: EntityType
+  ): Promise<void> {
+    character.target.id = target._id;
+    character.target.type = targetType as unknown as Optional<string>;
+    await character.save();
+    this.battleCharacterManager.onHandleCharacterBattleLoop(character, target);
   }
 
   private isValidNPCTarget(target: INPC, character: ICharacter): ITargetValidation {

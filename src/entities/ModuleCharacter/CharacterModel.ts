@@ -101,6 +101,10 @@ const characterSchema = createSchema(
       enum: TypeHelper.enumToStringArray(EntityAttackType),
       default: EntityAttackType.Melee,
     }),
+    attackIntervalSpeed: Type.number({
+      required: true,
+      default: 1000,
+    }),
     ...({} as {
       isAlive: boolean;
     }),

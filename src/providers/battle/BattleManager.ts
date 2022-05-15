@@ -64,7 +64,6 @@ export class BattleManager {
             }
           }
 
-          console.log(battleEventPayload);
           // send battleHitPayload to players around
           await this.socketMessaging.sendMessageToCloseCharacters(
             target,
