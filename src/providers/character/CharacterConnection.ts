@@ -9,7 +9,9 @@ export class CharacterConnection {
       {
         $set: {
           isOnline: false,
-          target: null,
+        },
+        $unset: {
+          target: 1,
         },
       }
     );
