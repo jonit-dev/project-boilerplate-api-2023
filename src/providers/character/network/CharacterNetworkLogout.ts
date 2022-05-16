@@ -1,5 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { BattleCharacterManager } from "@providers/battle/BattleCharacterManager";
+import { BattleCycle } from "@providers/battle/BattleCycle";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -36,7 +36,7 @@ export class CharacterNetworkLogout {
 
         await Character.updateOne({ _id: data.id }, { isOnline: false });
 
-        const battleCycle = BattleCharacterManager.battleCycles.get(data.id);
+        const battleCycle = BattleCycle.battleCycles.get(data.id);
 
         if (battleCycle) {
           await battleCycle.clear();

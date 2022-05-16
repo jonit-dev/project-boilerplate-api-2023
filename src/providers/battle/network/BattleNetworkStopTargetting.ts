@@ -3,7 +3,7 @@ import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { BattleSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { BattleCharacterManager } from "../BattleCharacterManager";
+import { BattleCycle } from "../BattleCycle";
 
 @provide(BattleNetworkStopTargeting)
 export class BattleNetworkStopTargeting {
@@ -18,7 +18,7 @@ export class BattleNetworkStopTargeting {
   private async stopTargeting(character: ICharacter): Promise<void> {
     try {
       if (character) {
-        const battleCycle = BattleCharacterManager.battleCycles.get(character.id);
+        const battleCycle = BattleCycle.battleCycles.get(character.id);
 
         if (battleCycle) {
           await battleCycle.clear();

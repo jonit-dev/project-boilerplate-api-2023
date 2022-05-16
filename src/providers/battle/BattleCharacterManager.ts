@@ -8,8 +8,6 @@ import { BattleCycle } from "./BattleCycle";
 
 @provide(BattleCharacterManager)
 export class BattleCharacterManager {
-  public static battleCycles: Map<string, BattleCycle> = new Map<string, BattleCycle>(); // create a map to store character intervals.
-
   constructor(private battleAttackTarget: BattleAttackTarget, private movementHelper: MovementHelper) {}
 
   public onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): void {
