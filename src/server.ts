@@ -1,6 +1,3 @@
-import "express-async-errors";
-import "reflect-metadata";
-
 import { appEnv } from "@providers/config/env";
 import {
   characterConnection,
@@ -20,6 +17,8 @@ import { router } from "@providers/server/Router";
 import { EnvType } from "@rpg-engine/shared/dist";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
+import "express-async-errors";
+import "reflect-metadata";
 
 const port = appEnv.general.SERVER_PORT || 3002;
 
@@ -56,7 +55,7 @@ app.listen(port, async () => {
 
   await npcManager.init();
 
-  await characterConnection.setAllCharactersAsOffline();
+  await characterConnection.resetCharacterAttributes();
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({

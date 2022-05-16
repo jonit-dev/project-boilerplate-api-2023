@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleSkills/SkillsModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
@@ -12,15 +13,25 @@ export class CharacterRepository extends CRUD {
   }
 
   public async createCharacter(newCharacter: CreateCharacterDTO, ownerId: string): Promise<ICharacter> {
+    const skills = new Skill({
+      dexterity: 2,
+    });
+    await skills.save();
+
     const createdCharacter = await this.create(
       Character,
       {
         ...newCharacter,
         owner: ownerId,
+        skills: skills._id,
       },
       null,
       ["name"]
     );
+    await createdCharacter.save();
+
+    skills.owner = createdCharacter._id;
+    await skills.save();
 
     return createdCharacter;
   }

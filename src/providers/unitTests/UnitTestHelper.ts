@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { Skill } from "@entities/ModuleSkills/SkillsModel";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
   fixedPathMockNPC,
@@ -29,24 +30,37 @@ export class UnitTestHelper {
       [NPCMovementType.Stopped]: stoppedMovementMockNPC,
     };
 
-    const npcProps = {
+    const npcSkills = new Skill();
+    await npcSkills.save();
+
+    const testNPC = new NPC({
       ...movementTypeMock[movementType],
       ...extraProps,
-    };
-
-    const testNPC = new NPC(npcProps);
+      skills: npcSkills._id,
+    });
 
     await testNPC.save();
+
+    npcSkills.owner = testNPC._id;
+    await npcSkills.save();
 
     return testNPC;
   }
 
   public async createMockCharacter(extraProps?: Record<string, unknown>): Promise<ICharacter> {
+    const charSkills = new Skill();
+    await charSkills.save();
+
     const testCharacter = new Character({
       ...characterMock,
       ...extraProps,
+      skills: charSkills._id,
     });
+
     await testCharacter.save();
+
+    charSkills.owner = testCharacter._id;
+    await charSkills.save();
 
     return testCharacter;
   }

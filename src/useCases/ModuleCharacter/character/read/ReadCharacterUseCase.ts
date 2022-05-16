@@ -11,7 +11,7 @@ export class ReadCharacterUseCase {
       {
         _id: id,
       },
-      ["owner"]
+      ["owner", "skills"]
     );
   }
 

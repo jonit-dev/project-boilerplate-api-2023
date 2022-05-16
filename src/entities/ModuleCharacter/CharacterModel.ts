@@ -1,4 +1,5 @@
 import { CharacterClass, CharacterGender, FromGridX, FromGridY, MapLayers, TypeHelper } from "@rpg-engine/shared";
+import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const characterSchema = createSchema(
@@ -14,7 +15,15 @@ const characterSchema = createSchema(
       default: 100,
       required: true,
     }),
+    maxHealth: Type.number({
+      default: 100,
+      required: true,
+    }),
     mana: Type.number({
+      default: 100,
+      required: true,
+    }),
+    maxMana: Type.number({
       default: 100,
       required: true,
     }),
@@ -77,9 +86,40 @@ const characterSchema = createSchema(
     banRemovalDate: Type.date(),
     hasPermanentBan: Type.boolean(),
     lastMovement: Type.date(),
+    skills: Type.objectId({
+      ref: "Skill",
+      required: true,
+    }),
+    target: {
+      id: Type.objectId(),
+      type: Type.string({
+        enum: TypeHelper.enumToStringArray(EntityType),
+      }),
+    },
+    attackType: Type.string({
+      required: true,
+      enum: TypeHelper.enumToStringArray(EntityAttackType),
+      default: EntityAttackType.Melee,
+    }),
+    attackIntervalSpeed: Type.number({
+      required: true,
+      default: 1000,
+    }),
+    ...({} as {
+      isAlive: boolean;
+      type: string;
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
+
+characterSchema.virtual("isAlive").get(function (this: ICharacter) {
+  return this.health > 0;
+});
+
+characterSchema.virtual("type").get(function (this: ICharacter) {
+  return "Character";
+});
 
 export type ICharacter = ExtractDoc<typeof characterSchema>;
 

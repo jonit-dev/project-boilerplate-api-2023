@@ -24,13 +24,13 @@ export class SocketMessaging {
     }
   }
 
-  public async sendMessageToCloseCharacters(character: ICharacter, eventName: string, data?: any): Promise<void> {
+  public async sendMessageToCloseCharacters<T>(character: ICharacter, eventName: string, data?: T): Promise<void> {
     const charactersNearby = await this.characterView.getCharactersInView(character);
 
     if (charactersNearby) {
       for (const character of charactersNearby) {
         console.log(`📨 Sending ${eventName} to ${character.name} (channel: ${character.channelId})`);
-        this.sendEventToUser(character.channelId!, eventName, data || {});
+        this.sendEventToUser<T>(character.channelId!, eventName, data || ({} as T));
       }
     }
   }

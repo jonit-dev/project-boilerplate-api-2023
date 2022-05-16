@@ -3,12 +3,12 @@ import {
   CharacterGender,
   MapLayers,
   NPCAlignment,
-  NPCAttackType,
   NPCMovementType,
   NPCPathOrientation,
   NPCTargetType,
   TypeHelper,
 } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const npcSchema = createSchema(
@@ -24,8 +24,16 @@ const npcSchema = createSchema(
       default: 100,
       required: true,
     }),
+    maxHealth: Type.number({
+      default: 100,
+      required: true,
+    }),
     mana: Type.number({
       default: 0,
+      required: true,
+    }),
+    maxMana: Type.number({
+      default: 100,
       required: true,
     }),
     alignment: Type.string({
@@ -79,8 +87,8 @@ const npcSchema = createSchema(
     }),
     attackType: Type.string({
       required: true,
-      enum: TypeHelper.enumToStringArray(NPCAttackType),
-      default: NPCAttackType.None,
+      enum: TypeHelper.enumToStringArray(EntityAttackType),
+      default: EntityAttackType.Melee,
     }),
     originalMovementType: Type.string({
       required: true,
@@ -109,10 +117,26 @@ const npcSchema = createSchema(
       required: true,
     }),
     dialogText: Type.string(),
+    skills: Type.objectId({
+      ref: "Skill",
+      required: true,
+    }),
+    ...({} as {
+      isAlive: boolean;
+      type: string;
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
 export type INPC = ExtractDoc<typeof npcSchema>;
+
+npcSchema.virtual("isAlive").get(function (this: INPC) {
+  return this.health > 0;
+});
+
+npcSchema.virtual("type").get(function (this: INPC) {
+  return "NPC";
+});
 
 export const NPC = typedModel("NPC", npcSchema);

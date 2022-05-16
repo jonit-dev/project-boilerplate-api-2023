@@ -81,7 +81,7 @@ describe("NPCTarget.ts", () => {
     testCharacter.y = 999;
     await testCharacter.save();
 
-    await npcTarget.clearTarget(testNPC);
+    await npcTarget.tryToClearOutOfRangeTargets(testNPC);
 
     expect(testNPC.targetCharacter).toBeUndefined();
   });
@@ -99,7 +99,7 @@ describe("NPCTarget.ts", () => {
     testCharacter.isOnline = false;
     await testCharacter.save();
 
-    await npcTarget.clearTarget(testNPC);
+    await npcTarget.tryToClearOutOfRangeTargets(testNPC);
 
     expect(testNPC.targetCharacter).toBeUndefined();
   });
@@ -122,7 +122,7 @@ describe("NPCTarget.ts", () => {
     testCharacter.y = FromGridY(0);
     await testCharacter.save();
 
-    await npcTarget.clearTarget(testNPC);
+    await npcTarget.tryToClearOutOfRangeTargets(testNPC);
 
     expect(testNPC.targetCharacter).toBeDefined();
 
@@ -130,7 +130,7 @@ describe("NPCTarget.ts", () => {
     testCharacter.y = FromGridY(0);
     await testCharacter.save();
 
-    await npcTarget.clearTarget(testNPC);
+    await npcTarget.tryToClearOutOfRangeTargets(testNPC);
 
     expect(testNPC.targetCharacter).toBeUndefined();
   });

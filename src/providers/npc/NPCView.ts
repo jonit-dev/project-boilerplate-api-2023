@@ -8,6 +8,7 @@ import {
   GRID_WIDTH,
   IEntitiesInView,
   INPCPositionUpdatePayload,
+  NPCAlignment,
   NPCSocketEvents,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
@@ -97,6 +98,11 @@ export class NPCView {
           textureKey: npc.textureKey,
           scene: npc.scene,
           speed: npc.speed,
+          alignment: npc.alignment as NPCAlignment,
+          health: npc.health,
+          maxHealth: npc.maxHealth,
+          mana: npc.mana,
+          maxMana: npc.maxMana,
         }
       );
     }

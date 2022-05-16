@@ -3,7 +3,14 @@ import { MapLoader } from "@providers/map/MapLoader";
 import { MapSolids } from "@providers/map/MapSolids";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { INPCPositionUpdatePayload, NPCSocketEvents, ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
+import {
+  INPCPositionUpdatePayload,
+  NPCAlignment,
+  NPCSocketEvents,
+  ScenesMetaData,
+  ToGridX,
+  ToGridY,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCView } from "../NPCView";
 
@@ -50,7 +57,7 @@ export class NPCMovement {
 
       const hasSolid = await this.mapSolids.isTileSolid(map, newGridX, newGridY, npc.layer);
       if (hasSolid) {
-        console.log(`${npc.key} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
+        // console.log(`${npc.key} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
         return;
       }
 
@@ -77,6 +84,11 @@ export class NPCMovement {
             textureKey: npc.textureKey,
             scene: npc.scene,
             speed: npc.speed,
+            alignment: npc.alignment as NPCAlignment,
+            health: npc.health,
+            maxHealth: npc.maxHealth,
+            mana: npc.mana,
+            maxMana: npc.maxMana,
           }
         );
       }

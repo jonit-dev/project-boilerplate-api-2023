@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MapLoader } from "@providers/map/MapLoader";
-
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
@@ -72,6 +71,10 @@ export class CharacterNetworkCreate {
           layer: character.layer,
           speed: character.speed,
           movementIntervalMs: character.movementIntervalMs,
+          health: character.health,
+          maxHealth: character.maxHealth,
+          mana: character.mana,
+          maxMana: character.maxMana,
         };
 
         // if there's no character with this id connected, add it.
@@ -120,6 +123,10 @@ export class CharacterNetworkCreate {
           layer: nearbyCharacter.layer,
           speed: nearbyCharacter.speed,
           movementIntervalMs: nearbyCharacter.movementIntervalMs,
+          health: nearbyCharacter.health,
+          maxHealth: nearbyCharacter.maxHealth,
+          mana: nearbyCharacter.mana,
+          maxMana: nearbyCharacter.maxMana,
         };
 
         // tell the emitter about these other characters too

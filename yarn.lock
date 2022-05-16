@@ -1603,10 +1603,10 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@rpg-engine/shared@^0.2.21":
-  version "0.2.21"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.2.21.tgz#488af177b49b6952faed14211556511fe58b8eec"
-  integrity sha512-qLfRt9/gYEZ6dkZMl/dlymq6em+RYQ8V+gmKTjgOd5wnQscLa50+t0V5q6GdQqY426dQVT2g8NbY/txosyRjbQ==
+"@rpg-engine/shared@^0.2.41":
+  version "0.2.41"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.2.41.tgz#8649aa1acadef9f2d844ad1635fed4a0f152945b"
+  integrity sha512-kBZiIKygWadDmFfAbTJMPU6nShCvDEhqpc9Dz002TDWxykioCc7lXPF6ud8cDNgpd3brYltpFvDNaIfEXKZA/A==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
