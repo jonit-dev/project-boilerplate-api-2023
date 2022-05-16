@@ -2,12 +2,21 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BattleEventType, BattleSocketEvents, IBattleEventFromServer } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import {
+  BattleEventType,
+  BattleSocketEvents,
+  GRID_WIDTH,
+  IBattleCancelTargeting,
+  IBattleEventFromServer,
+  SOCKET_TRANSMISSION_ZONE_WIDTH,
+} from "@rpg-engine/shared";
+import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { BattleDeathManager } from "./BattleDeathManager";
 import { BattleEvent } from "./BattleEvent";
+import { BattleNetworkStopTargeting } from "./network/BattleNetworkStopTargetting";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -16,7 +25,9 @@ export class BattleAttackTarget {
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
     private battleDeathManager: BattleDeathManager,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting,
+    private npcTarget: NPCTarget
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
@@ -29,6 +40,35 @@ export class BattleAttackTarget {
         }
 
         break;
+    }
+
+    const isTargetClose = this.movementHelper.isUnderRange(
+      attacker.x,
+      attacker.y,
+      target.x,
+      target.y,
+      SOCKET_TRANSMISSION_ZONE_WIDTH / GRID_WIDTH / 2
+    );
+
+    if (!isTargetClose) {
+      if (attacker.type === "Character") {
+        const character = attacker as ICharacter;
+        this.battleNetworkStopTargeting.stopTargeting(character);
+        this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+          character.channelId!,
+          BattleSocketEvents.CancelTargeting,
+          {
+            targetId: target.id,
+            type: target.type as EntityType,
+            reason: "Battle target cancelled because target is too distant",
+          }
+        );
+      }
+
+      if (attacker.type === "NPC") {
+        const npc = attacker as INPC;
+        await this.npcTarget.tryToClearOutOfRangeTargets(npc);
+      }
     }
   }
 

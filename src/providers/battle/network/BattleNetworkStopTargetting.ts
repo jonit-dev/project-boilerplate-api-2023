@@ -15,7 +15,7 @@ export class BattleNetworkStopTargeting {
     });
   }
 
-  private async stopTargeting(character: ICharacter): Promise<void> {
+  public async stopTargeting(character: ICharacter): Promise<void> {
     try {
       if (character) {
         const battleCycle = BattleCycle.battleCycles.get(character.id);
