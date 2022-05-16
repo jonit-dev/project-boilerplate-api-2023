@@ -9,65 +9,42 @@ import { provide } from "inversify-binding-decorators";
 import { BattleDeathManager } from "./BattleDeathManager";
 import { BattleEvent } from "./BattleEvent";
 
-@provide(BattleCharacterAttackTarget)
-export class BattleCharacterAttackTarget {
+@provide(BattleAttackTarget)
+export class BattleAttackTarget {
   constructor(
     private battleEvent: BattleEvent,
-    private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
-    private battleDeathManager: BattleDeathManager
+    private battleDeathManager: BattleDeathManager,
+    private movementHelper: MovementHelper
   ) {}
 
-  public async attackTarget(character: ICharacter, target: ICharacter | INPC): Promise<void> {
-    try {
-      const canAttack = this.canAttack(character, target);
+  public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
+    switch (attacker?.attackType) {
+      case EntityAttackType.Melee:
+        const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1);
 
-      if (!canAttack) {
-        return;
-      }
+        if (isUnderMeleeRange) {
+          await this.hitTarget(attacker, target);
+        }
 
-      // check if target is under range
-      switch (character?.attackType) {
-        case EntityAttackType.Melee:
-          const isUnderMeleeRange = this.movementHelper.isUnderRange(character.x, character.y, target.x, target.y, 1);
-
-          if (isUnderMeleeRange) {
-            await this.hitTarget(character, target, target.type);
-          }
-
-          break;
-      }
-    } catch (err) {
-      console.error(err);
+        break;
     }
   }
 
-  private canAttack(character: ICharacter, target: ICharacter | INPC): boolean {
-    if (!target.isAlive) {
-      return false;
-    }
-
-    if (!character.isAlive) {
-      return false;
-    }
-
-    return true;
-  }
-
-  private async hitTarget(character: ICharacter, target: ICharacter | INPC, targetType: string): Promise<void> {
+  private async hitTarget(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
     // calculate battle event...
 
-    const battleEvent = this.battleEvent.calculateEvent(character, target);
+    const battleEvent = this.battleEvent.calculateEvent(attacker, target);
 
     let battleEventPayload: Partial<IBattleEventFromServer> = {
       targetId: target.id,
-      targetType: targetType as "Character" | "NPC",
+      targetType: target.type as "Character" | "NPC",
       eventType: battleEvent,
     };
 
     if (battleEvent === BattleEventType.Hit) {
-      const damage = this.battleEvent.calculateHitDamage(character, target);
+      const damage = this.battleEvent.calculateHitDamage(attacker, target);
 
       if (damage > 0) {
         const newTargetHealth = target.health - damage;
@@ -89,10 +66,10 @@ export class BattleCharacterAttackTarget {
 
         // check if character is dead after damage calculation. If so, send death event to client and characters around
         if (!target.isAlive) {
-          if (targetType === "Character") {
+          if (target.type === "Character") {
             await this.battleDeathManager.handleCharacterDeath(target as ICharacter);
           }
-          if (targetType === "NPC") {
+          if (target.type === "NPC") {
             this.battleDeathManager.handleNPCDeath(target as INPC);
           }
         }
@@ -104,7 +81,7 @@ export class BattleCharacterAttackTarget {
 
     // send battleHitPayload to characters around
 
-    const nearbyCharacters = await this.characterView.getCharactersInView(character);
+    const nearbyCharacters = await this.characterView.getCharactersInView(attacker as ICharacter);
 
     for (const nearbyCharacter of nearbyCharacters) {
       this.socketMessaging.sendEventToUser(
@@ -116,6 +93,10 @@ export class BattleCharacterAttackTarget {
 
     // send battleEvent payload to player as well
 
-    this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.CharacterEvent, battleEventPayload);
+    const entity = attacker as ICharacter;
+
+    if (entity.channelId) {
+      this.socketMessaging.sendEventToUser(entity.channelId, BattleSocketEvents.CharacterEvent, battleEventPayload);
+    }
   }
 }
