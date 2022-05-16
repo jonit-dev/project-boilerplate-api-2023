@@ -33,8 +33,6 @@ export class BattleAttackTarget {
   }
 
   private async hitTarget(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
-    // calculate battle event...
-
     const battleEvent = this.battleEvent.calculateEvent(attacker, target);
 
     let battleEventPayload: Partial<IBattleEventFromServer> = {
@@ -79,7 +77,7 @@ export class BattleAttackTarget {
       }
     }
 
-    // send battleHitPayload to characters around
+    // finally, send battleHitPayload to characters around
 
     const nearbyCharacters = await this.characterView.getCharactersInView(attacker as ICharacter);
 
@@ -91,7 +89,7 @@ export class BattleAttackTarget {
       );
     }
 
-    // send battleEvent payload to player as well
+    // send battleEvent payload to origin character as well
 
     const entity = attacker as ICharacter;
 

@@ -1,4 +1,4 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { BattleSocketEvents } from "@rpg-engine/shared";
@@ -21,17 +21,7 @@ export class BattleNetworkStopTargeting {
         const battleCycle = BattleCharacterManager.battleCycles.get(character.id);
 
         if (battleCycle) {
-          battleCycle.clear();
-          BattleCharacterManager.battleCycles.delete(character.id);
-
-          await Character.updateOne(
-            { _id: character._id },
-            {
-              $unset: {
-                target: 1,
-              },
-            }
-          );
+          await battleCycle.clear();
         }
       }
     } catch (error) {

@@ -34,13 +34,12 @@ export class CharacterNetworkLogout {
 
         console.log(`🚪: Character id ${data.id} has disconnected`);
 
-        await Character.updateOne({ _id: data.id }, { isOnline: false, $unset: { target: 1 } });
+        await Character.updateOne({ _id: data.id }, { isOnline: false });
 
         const battleCycle = BattleCharacterManager.battleCycles.get(data.id);
 
         if (battleCycle) {
-          battleCycle.clear();
-          BattleCharacterManager.battleCycles.delete(data.id);
+          await battleCycle.clear();
         }
 
         const connectedCharacters = await this.socketConnection.getConnectedCharacters();

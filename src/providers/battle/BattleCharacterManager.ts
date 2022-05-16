@@ -1,27 +1,22 @@
+/* eslint-disable no-new */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
-import { EntityBehavioralLoop } from "../entities/EntityBehavioralLoop";
 import { BattleAttackTarget } from "./BattleAttackTarget";
+import { BattleCycle } from "./BattleCycle";
 
 @provide(BattleCharacterManager)
 export class BattleCharacterManager {
-  public static battleCycles: Map<string, EntityBehavioralLoop> = new Map<string, EntityBehavioralLoop>(); // create a map to store character intervals.
+  public static battleCycles: Map<string, BattleCycle> = new Map<string, BattleCycle>(); // create a map to store character intervals.
 
   constructor(private battleAttackTarget: BattleAttackTarget, private movementHelper: MovementHelper) {}
 
   public onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): void {
-    // make sure we always have only one battle cycle per character.
-    if (BattleCharacterManager.battleCycles.has(character._id)) {
-      const battleCycle = BattleCharacterManager.battleCycles.get(character.id);
-      if (battleCycle) {
-        battleCycle.clear();
-        BattleCharacterManager.battleCycles.delete(character.id);
-      }
-    } else {
-      const charBattleCycle = new EntityBehavioralLoop(async () => {
-        // get an updated version of the character
+    new BattleCycle(
+      character.id,
+      async () => {
+        // get an updated version of the character and target.
         const updatedCharacter = await Character.findOne({ _id: character._id }).populate("skills");
         let updatedTarget;
 
@@ -36,11 +31,10 @@ export class BattleCharacterManager {
           throw new Error("Failed to get updated required elements for attacking target.");
         }
 
-        this.attackTarget(updatedCharacter, updatedTarget);
-      }, character.attackIntervalSpeed);
-
-      BattleCharacterManager.battleCycles.set(character.id, charBattleCycle);
-    }
+        await this.attackTarget(updatedCharacter, updatedTarget);
+      },
+      character.attackIntervalSpeed
+    );
   }
 
   public async attackTarget(character: ICharacter, target: ICharacter | INPC): Promise<void> {
