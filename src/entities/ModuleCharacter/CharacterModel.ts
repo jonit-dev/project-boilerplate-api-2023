@@ -107,6 +107,7 @@ const characterSchema = createSchema(
     }),
     ...({} as {
       isAlive: boolean;
+      type: string;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
@@ -114,6 +115,10 @@ const characterSchema = createSchema(
 
 characterSchema.virtual("isAlive").get(function (this: ICharacter) {
   return this.health > 0;
+});
+
+characterSchema.virtual("type").get(function (this: ICharacter) {
+  return "Character";
 });
 
 export type ICharacter = ExtractDoc<typeof characterSchema>;

@@ -85,6 +85,10 @@ export class NPCMovement {
             scene: npc.scene,
             speed: npc.speed,
             alignment: npc.alignment as NPCAlignment,
+            health: npc.health,
+            maxHealth: npc.maxHealth,
+            mana: npc.mana,
+            maxMana: npc.maxMana,
           }
         );
       }

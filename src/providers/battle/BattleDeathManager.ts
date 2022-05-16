@@ -1,10 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleCharacterDeath } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-@provide(BattleDeath)
-export class BattleDeath {
+@provide(BattleDeathManager)
+export class BattleDeathManager {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public async handleCharacterDeath(character: ICharacter): Promise<void> {
@@ -28,4 +29,6 @@ export class BattleDeath {
       }
     );
   }
+
+  public async handleNPCDeath(npc: INPC): Promise<void> {}
 }

@@ -1,12 +1,12 @@
 type SetInterval = ReturnType<typeof setInterval>;
 
-export class CharacterBattleCycle {
+export class EntityBehavioralLoop {
   public interval: SetInterval;
 
-  constructor(fn: Function, attackIntervalSpeed: number) {
+  constructor(fn: Function, intervalSpeed: number) {
     this.interval = setInterval(() => {
       fn();
-    }, attackIntervalSpeed);
+    }, intervalSpeed);
   }
 
   public clear(): void {

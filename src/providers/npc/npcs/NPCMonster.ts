@@ -16,5 +16,6 @@ export const npcMonsterMetaData = {
   skills: {
     level: 1,
     strength: 1,
+    dexterity: 1,
   },
 } as Partial<INPC>;

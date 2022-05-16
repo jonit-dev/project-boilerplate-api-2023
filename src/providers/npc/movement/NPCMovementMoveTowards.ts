@@ -1,6 +1,6 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { BattleManager } from "@providers/battle/BattleManager";
+import { BattleNPCManager } from "@providers/battle/BattleNPCManager";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { FromGridX, FromGridY, NPCAlignment, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -13,7 +13,7 @@ export class NPCMovementMoveTowards {
     private movementHelper: MovementHelper,
     private npcMovement: NPCMovement,
     private npcTarget: NPCTarget,
-    private battleManager: BattleManager
+    private battleManager: BattleNPCManager
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {

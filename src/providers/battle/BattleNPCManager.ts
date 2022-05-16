@@ -5,16 +5,16 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleEventType, BattleSocketEvents, IBattleEventFromServer } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
-import { BattleDeath } from "./BattleDeathManager";
+import { BattleDeathManager } from "./BattleDeathManager";
 import { BattleEvent } from "./BattleEvent";
 
-@provide(BattleManager)
-export class BattleManager {
+@provide(BattleNPCManager)
+export class BattleNPCManager {
   constructor(
     private movementHelper: MovementHelper,
     private battleEvent: BattleEvent,
     private socketMessaging: SocketMessaging,
-    private battleDeath: BattleDeath
+    private battleDeath: BattleDeathManager
   ) {}
 
   public async attackCharacter(npc: INPC, target: ICharacter): Promise<void> {
@@ -80,6 +80,9 @@ export class BattleManager {
           );
         }
 
+        break;
+      case EntityAttackType.Ranged:
+        // TODO: Implement ranged attack
         break;
       case EntityAttackType.None:
       default:

@@ -1,6 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MapLoader } from "@providers/map/MapLoader";
-
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -109,6 +108,10 @@ export class CharacterNetworkUpdate {
           isMoving: false,
           speed: nearbyCharacter.speed,
           movementIntervalMs: nearbyCharacter.movementIntervalMs,
+          health: nearbyCharacter.health,
+          maxHealth: nearbyCharacter.maxHealth,
+          mana: nearbyCharacter.mana,
+          maxMana: nearbyCharacter.maxMana,
         };
 
         this.socketMessaging.sendEventToUser<ICharacterPositionUpdateFromServer>(
@@ -179,6 +182,10 @@ export class CharacterNetworkUpdate {
       channelId: character.channelId!,
       speed: character.speed,
       movementIntervalMs: character.movementIntervalMs,
+      health: character.health,
+      maxHealth: character.maxHealth,
+      mana: character.mana,
+      maxMana: character.maxMana,
     };
   }
 

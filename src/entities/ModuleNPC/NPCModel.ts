@@ -121,10 +121,22 @@ const npcSchema = createSchema(
       ref: "Skill",
       required: true,
     }),
+    ...({} as {
+      isAlive: boolean;
+      type: string;
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
 export type INPC = ExtractDoc<typeof npcSchema>;
+
+npcSchema.virtual("isAlive").get(function (this: INPC) {
+  return this.health > 0;
+});
+
+npcSchema.virtual("type").get(function (this: INPC) {
+  return "NPC";
+});
 
 export const NPC = typedModel("NPC", npcSchema);
