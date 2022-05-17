@@ -6,7 +6,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { ChatMessageType, IChatMessage } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ChatSocketEvents } from "shared/SocketEvents/ChatSocketEvents";
+import { ChatSocketEvents } from "@providers/shared/SocketEvents/ChatSocketEvents";
 
 interface ITargetValidation {
   isValid: boolean;
