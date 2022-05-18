@@ -20,7 +20,7 @@ export class ReadChatLogUseCase {
     );
 
     // @ts-ignore
-    const otherCharactersInView = await (ChatLog as Model).find({
+    const chatLogsInView = await (ChatLog as Model).find({
       $and: [
         {
           x: {
@@ -39,6 +39,6 @@ export class ReadChatLogUseCase {
         },
       ],
     });
-    return otherCharactersInView as unknown as IChatLog[];
+    return chatLogsInView as unknown as IChatLog[];
   }
 }
