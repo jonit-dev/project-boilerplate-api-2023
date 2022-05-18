@@ -22,30 +22,22 @@ export class ChatNetworkGlobalMessaging {
       ChatSocketEvents.GlobalChatMessage,
       async (data: IChatMessage, character: ICharacter) => {
         try {
-          const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
+          if (this.canCharacterSendMessage(character)) {
+            const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
-          await this.saveChatLog(data, character);
+            await this.saveChatLog(data, character);
 
-          for (const nearbyCharacter of nearbyCharacters) {
-            const isValidCharacterTarget = this.shouldCharacterReceiveMessage(nearbyCharacter, character);
-
-            if (isValidCharacterTarget && data.message) {
-              this.socketMessaging.sendEventToUser<IChatMessage>(
-                character.channelId!,
-                ChatSocketEvents.GlobalChatMessage,
-                {
-                  charId: data.charId,
-                  message: data.message,
-                  type: data.type,
-                }
-              );
-            }
+            this.sendMessageToNearbyCharacters(data, nearbyCharacters, character);
           }
         } catch (error) {
           console.error(error);
         }
       }
     );
+  }
+
+  private canCharacterSendMessage(character: ICharacter): Boolean {
+    return character.isOnline && !character.isBanned;
   }
 
   private async saveChatLog(data: IChatMessage, character: ICharacter): Promise<void> {
@@ -57,6 +49,24 @@ export class ChatNetworkGlobalMessaging {
       y: character.y,
       scene: character.scene,
     });
+  }
+
+  private sendMessageToNearbyCharacters(data: IChatMessage, nearbyCharacters: ICharacter[], emitter: ICharacter): void {
+    for (const nearbyCharacter of nearbyCharacters) {
+      const isValidCharacterTarget = this.shouldCharacterReceiveMessage(nearbyCharacter, emitter);
+
+      if (isValidCharacterTarget && data.message) {
+        this.socketMessaging.sendEventToUser<IChatMessage>(
+          nearbyCharacter.channelId!,
+          ChatSocketEvents.GlobalChatMessage,
+          {
+            charId: data.charId,
+            message: data.message,
+            type: data.type,
+          }
+        );
+      }
+    }
   }
 
   private shouldCharacterReceiveMessage(target: ICharacter, emitter: ICharacter): Boolean {

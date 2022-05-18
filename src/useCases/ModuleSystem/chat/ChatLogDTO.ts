@@ -1,5 +1,4 @@
-import { IsDefined, IsNotEmpty, IsString } from "class-validator";
-
+import { IsDefined, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { tsDefaultDecorator } from "../../../providers/constants/ValidationConstants";
 
 export class ChatLogDTO {
@@ -17,4 +16,7 @@ export class ChatLogDTO {
   @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   scene: string;
+
+  @IsOptional()
+  limit: number = 30;
 }

@@ -20,25 +20,28 @@ export class ReadChatLogUseCase {
     );
 
     // @ts-ignore
-    const chatLogsInView = await (ChatLog as Model).find({
-      $and: [
-        {
-          x: {
-            $gte: socketTransmissionZone.x,
-            $lte: socketTransmissionZone.width,
+    const chatLogsInView = await (ChatLog as Model)
+      .find({
+        $and: [
+          {
+            x: {
+              $gte: socketTransmissionZone.x,
+              $lte: socketTransmissionZone.width,
+            },
           },
-        },
-        {
-          y: {
-            $gte: socketTransmissionZone.y,
-            $lte: socketTransmissionZone.height,
+          {
+            y: {
+              $gte: socketTransmissionZone.y,
+              $lte: socketTransmissionZone.height,
+            },
           },
-        },
-        {
-          scene: chatLogDTO.scene,
-        },
-      ],
-    });
+          {
+            scene: chatLogDTO.scene,
+          },
+        ],
+      })
+      .sort({ createdAt: -1 })
+      .limit(chatLogDTO.limit);
     return chatLogsInView as unknown as IChatLog[];
   }
 }

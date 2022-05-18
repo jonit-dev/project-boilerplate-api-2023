@@ -6,5 +6,6 @@ Content-Type: application/json
 {
   "x": "80",
   "y": "20",
-  "scene": "Teste"
+  "scene": "Teste",
+  "limit": 5
 }
