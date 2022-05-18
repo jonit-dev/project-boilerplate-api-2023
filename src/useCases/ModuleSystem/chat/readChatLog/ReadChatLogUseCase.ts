@@ -1,7 +1,7 @@
-import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import { provide } from "inversify-binding-decorators";
 import { ChatLog, IChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { GRID_HEIGHT, GRID_WIDTH, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
 import { ChatLogDTO } from "../ChatLogDTO";
 

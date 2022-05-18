@@ -1,12 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { ChatSocketEvents } from "@providers/shared/SocketEvents/ChatSocketEvents";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IChatMessage } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ChatSocketEvents } from "@providers/shared/SocketEvents/ChatSocketEvents";
 
 @provide(ChatNetworkGlobalMessaging)
 export class ChatNetworkGlobalMessaging {
