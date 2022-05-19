@@ -1603,14 +1603,14 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@rpg-engine/shared@^0.2.41":
-  version "0.2.41"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.2.41.tgz#8649aa1acadef9f2d844ad1635fed4a0f152945b"
-  integrity sha512-kBZiIKygWadDmFfAbTJMPU6nShCvDEhqpc9Dz002TDWxykioCc7lXPF6ud8cDNgpd3brYltpFvDNaIfEXKZA/A==
+"@rpg-engine/shared@^0.2.44":
+  version "0.2.44"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.2.44.tgz#1a4879baed23518b7b655dabd4a29807287519c8"
+  integrity sha512-jIxMnnL0bJRPT92wUCauPAjBmcyqREpc9VaLqBZMikzm5gtTsavRN6fG8vUEdTj31ecRZCOR4TIlKiN/b3tOPA==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
-    typescript "^4.5.5"
+    typescript "^4.6.4"
 
 "@sendgrid/client@^7.6.2":
   version "7.6.2"
@@ -8194,10 +8194,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@^4.5.5:
-  version "4.6.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.2.tgz#fe12d2727b708f4eef40f51598b3398baa9611d4"
-  integrity sha512-HM/hFigTBHZhLXshn9sN37H085+hQGeJHJ/X7LpBWLID/fbc2acUMfU+lGD98X81sKP+pFa9f0DZmCwB9GnbAg==
+typescript@^4.6.4:
+  version "4.6.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.4.tgz#caa78bbc3a59e6a5c510d35703f6a09877ce45e9"
+  integrity sha512-9ia/jWHIEbo49HfjrLGfKbZSuWo9iTMwXO+Ca3pRsSpbsMbc7/IU8NKdCZVRRBafVPGnoJeFL76ZOAA84I9fEg==
 
 typescript@^4.7.0-dev.20220311:
   version "4.7.0-dev.20220311"

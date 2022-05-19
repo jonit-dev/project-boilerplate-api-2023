@@ -124,7 +124,7 @@ export class BattleAttackTarget {
     for (const nearbyCharacter of nearbyCharacters) {
       this.socketMessaging.sendEventToUser(
         nearbyCharacter.channelId!,
-        BattleSocketEvents.CharacterEvent,
+        BattleSocketEvents.BattleEvent,
         battleEventPayload
       );
     }
@@ -134,7 +134,7 @@ export class BattleAttackTarget {
     const entity = attacker as ICharacter;
 
     if (entity.channelId) {
-      this.socketMessaging.sendEventToUser(entity.channelId, BattleSocketEvents.CharacterEvent, battleEventPayload);
+      this.socketMessaging.sendEventToUser(entity.channelId, BattleSocketEvents.BattleEvent, battleEventPayload);
     }
   }
 }
