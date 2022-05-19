@@ -25,7 +25,6 @@ export class ChatNetworkGlobalMessaging {
             const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
             const savedChatLog = await this.saveChatLog(data, character);
-
             this.sendMessageToNearbyCharacters(data, savedChatLog, nearbyCharacters, character);
           }
         } catch (error) {
@@ -65,8 +64,11 @@ export class ChatNetworkGlobalMessaging {
           ChatSocketEvents.GlobalChatMessage,
           {
             _id: savedChatLog._id,
-            charId: data.charId,
             message: data.message,
+            emitter: {
+              _id: emitter._id,
+              name: emitter.name,
+            },
             type: data.type,
           }
         );

@@ -44,7 +44,9 @@ export class ReadChatLogUseCase {
         ],
       })
       .sort({ createdAt: -1 })
+      .populate("emitter", "name")
       .limit(Number(chatLogZone.limit));
+
     chatLogsInView.reverse();
     return chatLogsInView as unknown as IChatLog[];
   }
