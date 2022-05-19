@@ -1,11 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { ChatLog, IChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { CharacterView } from "@providers/character/CharacterView";
-import { ChatSocketEvents } from "@providers/shared/SocketEvents/ChatSocketEvents";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IChatMessage } from "@rpg-engine/shared";
+import { ChatSocketEvents, IChatMessage } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ChatNetworkGlobalMessaging)
@@ -25,9 +24,9 @@ export class ChatNetworkGlobalMessaging {
           if (this.canCharacterSendMessage(character)) {
             const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
-            await this.saveChatLog(data, character);
+            const savedChatLog = await this.saveChatLog(data, character);
 
-            this.sendMessageToNearbyCharacters(data, nearbyCharacters, character);
+            this.sendMessageToNearbyCharacters(data, savedChatLog, nearbyCharacters, character);
           }
         } catch (error) {
           console.error(error);
@@ -40,8 +39,8 @@ export class ChatNetworkGlobalMessaging {
     return character.isOnline && !character.isBanned;
   }
 
-  private async saveChatLog(data: IChatMessage, character: ICharacter): Promise<void> {
-    await ChatLog.create({
+  private async saveChatLog(data: IChatMessage, character: ICharacter): Promise<IChatLog> {
+    return await ChatLog.create({
       message: data.message,
       emitter: character._id,
       type: data.type,
@@ -51,7 +50,12 @@ export class ChatNetworkGlobalMessaging {
     });
   }
 
-  private sendMessageToNearbyCharacters(data: IChatMessage, nearbyCharacters: ICharacter[], emitter: ICharacter): void {
+  private sendMessageToNearbyCharacters(
+    data: IChatMessage,
+    savedChatLog: IChatLog,
+    nearbyCharacters: ICharacter[],
+    emitter: ICharacter
+  ): void {
     for (const nearbyCharacter of nearbyCharacters) {
       const isValidCharacterTarget = this.shouldCharacterReceiveMessage(nearbyCharacter, emitter);
 
@@ -60,6 +64,7 @@ export class ChatNetworkGlobalMessaging {
           nearbyCharacter.channelId!,
           ChatSocketEvents.GlobalChatMessage,
           {
+            _id: savedChatLog._id,
             charId: data.charId,
             message: data.message,
             type: data.type,

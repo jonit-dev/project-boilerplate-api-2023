@@ -42,6 +42,7 @@ export class ReadChatLogUseCase {
       })
       .sort({ createdAt: -1 })
       .limit(chatLogDTO.limit);
+    chatLogsInView.reverse();
     return chatLogsInView as unknown as IChatLog[];
   }
 }
