@@ -99,7 +99,7 @@ describe("ReadChatLogUseCase.ts", () => {
     expect(chatLogs.length).toBe(5);
     expect(lastResultReceived.type).toBe(lastResultExpected.type);
     expect(lastResultReceived.message).toBe(lastResultExpected.message);
-    expect(lastResultReceived.emitter.name).toBe(lastResultExpected.emitter.name);
+    expect(lastResultReceived["emitter"]["name"]).toBe(lastResultExpected.emitter.name);
     expect(lastResultReceived.x).toBe(lastResultExpected.x);
     expect(lastResultReceived.y).toBe(lastResultExpected.y);
     expect(lastResultReceived.scene).toBe(lastResultExpected.scene);
