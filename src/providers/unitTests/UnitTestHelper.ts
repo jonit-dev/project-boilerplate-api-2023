@@ -1,6 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { Skill } from "@entities/ModuleSkills/SkillsModel";
+import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
   fixedPathMockNPC,
@@ -9,10 +11,11 @@ import {
   randomMovementMockNPC,
   stoppedMovementMockNPC,
 } from "@providers/unitTests/mock/NPCMock";
-import { NPCMovementType } from "@rpg-engine/shared";
+import { ISocketTransmissionZone, NPCMovementType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
+import { chatLogsMock } from "./mock/chatLogsMock";
 
 @provide(UnitTestHelper)
 export class UnitTestHelper {
@@ -63,6 +66,28 @@ export class UnitTestHelper {
     await charSkills.save();
 
     return testCharacter;
+  }
+
+  public async createMockChatLogs(emitter: ICharacter): Promise<void> {
+    for (const chatLogMock of chatLogsMock) {
+      chatLogMock.emitter = emitter._id;
+      const chatLog = new ChatLog(chatLogMock);
+      await chatLog.save();
+    }
+  }
+
+  public createMockSocketTransmissionZone(x: number, y: number, width: number, height: number): SocketTransmissionZone {
+    const socketTransmissionZone = new SocketTransmissionZone();
+    jest.spyOn(socketTransmissionZone, "calculateSocketTransmissionZone").mockImplementation(
+      () =>
+        ({
+          x,
+          y,
+          width,
+          height,
+        } as ISocketTransmissionZone)
+    );
+    return socketTransmissionZone;
   }
 
   public async beforeAllJestHook(): Promise<void> {

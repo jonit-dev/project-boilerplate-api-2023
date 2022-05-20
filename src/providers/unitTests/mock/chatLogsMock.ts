@@ -1,0 +1,81 @@
+import { ChatMessageType } from "@rpg-engine/shared";
+
+export const chatLogsMock = [
+  {
+    _id: "628595f979ba73002f95b31d",
+    type: ChatMessageType.Global,
+    message: "Mensagem 1",
+    emitter: "628595d079ba73002f95aef5",
+    x: 150,
+    y: 400,
+    scene: "MainScene",
+    createdAt: "2022-05-19T00:57:29.153Z",
+    updatedAt: "2022-05-19T00:57:29.153Z",
+    __v: 0,
+  },
+
+  {
+    _id: "6285977c79ba73002f95d2e8",
+    type: ChatMessageType.Global,
+    message: "Mensagem 2",
+    emitter: "628595d079ba73002f95aef5",
+    x: 150,
+    y: 400,
+    scene: "MainScene",
+    createdAt: "2022-05-19T01:03:56.808Z",
+    updatedAt: "2022-05-19T01:03:56.808Z",
+    __v: 0,
+  },
+
+  {
+    _id: "6285977c79ba73002f95d2ec",
+    type: ChatMessageType.Global,
+    message: "Mensagem 3",
+    emitter: "628595d079ba73002f95aef5",
+    x: 150,
+    y: 400,
+    scene: "MainScene",
+    createdAt: "2022-05-19T01:03:56.952Z",
+    updatedAt: "2022-05-19T01:03:56.952Z",
+    __v: 0,
+  },
+
+  {
+    _id: "6285977d79ba73002f95d2f0",
+    type: ChatMessageType.Global,
+    message: "Mensagem 4",
+    emitter: "628595d079ba73002f95aef5",
+    x: 150,
+    y: 400,
+    scene: "MainScene",
+    createdAt: "2022-05-19T01:03:57.135Z",
+    updatedAt: "2022-05-19T01:03:57.135Z",
+    __v: 0,
+  },
+
+  {
+    _id: "6285979e79ba73002f95d517",
+    type: ChatMessageType.Global,
+    message: "Mensagem 5",
+    emitter: "628595d079ba73002f95aef5",
+    x: 150,
+    y: 400,
+    scene: "MainScene",
+    createdAt: "2022-05-19T01:04:30.511Z",
+    updatedAt: "2022-05-19T01:04:30.511Z",
+    __v: 0,
+  },
+
+  {
+    _id: "6285a2cc487abf002f1bb1ec",
+    type: ChatMessageType.Global,
+    message: "Mensagem 6",
+    emitter: "628595d079ba73002f95aef5",
+    x: 150,
+    y: 400,
+    scene: "MainScene",
+    createdAt: "2022-05-19T01:52:12.156Z",
+    updatedAt: "2022-05-19T01:52:12.156Z",
+    __v: 0,
+  },
+];
