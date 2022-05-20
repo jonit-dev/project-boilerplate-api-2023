@@ -1,3 +1,4 @@
+import { ITSDecorator, TsDefaultDecorator } from "@providers/constants/ValidationConstants";
 import { CharacterController } from "@useCases/ModuleCharacter/character/CharacterController";
 import { NPCController } from "@useCases/ModuleNPC/NPCController";
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
@@ -49,6 +50,7 @@ export const abTestsControllerContainer = new ContainerModule((bind: interfaces.
 });
 
 export const useCasesControllers = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
+  bind<ITSDecorator>("ITSDecorator").to(TsDefaultDecorator);
   bind<CharacterController>(CharacterController).toSelf();
   bind<NPCController>(NPCController).toSelf();
   bind<ReadChatLogController>(ReadChatLogController).toSelf();
