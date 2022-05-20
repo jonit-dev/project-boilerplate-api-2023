@@ -68,25 +68,23 @@ export class UnitTestHelper {
     return testCharacter;
   }
 
-  public async createMockChatLogs(): Promise<void> {
+  public async createMockChatLogs(emitter: ICharacter): Promise<void> {
     for (const chatLogMock of chatLogsMock) {
-      const savedCharacter = await this.createMockCharacter();
-
-      chatLogMock.emitter = savedCharacter._id;
+      chatLogMock.emitter = emitter._id;
       const chatLog = new ChatLog(chatLogMock);
       await chatLog.save();
     }
   }
 
-  public createMockSocketTransmissionZone(): SocketTransmissionZone {
+  public createMockSocketTransmissionZone(x: number, y: number, width: number, height: number): SocketTransmissionZone {
     const socketTransmissionZone = new SocketTransmissionZone();
     jest.spyOn(socketTransmissionZone, "calculateSocketTransmissionZone").mockImplementation(
       () =>
         ({
-          x: 100,
-          y: 100,
-          width: 600,
-          height: 600,
+          x,
+          y,
+          width,
+          height,
         } as ISocketTransmissionZone)
     );
     return socketTransmissionZone;
