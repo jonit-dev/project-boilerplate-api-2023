@@ -1,8 +1,8 @@
-import { ChatLog, IChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { ITSDecorator } from "@providers/constants/ValidationConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import { GRID_HEIGHT, GRID_WIDTH, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
+import { GRID_HEIGHT, GRID_WIDTH, IChatMessage, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { ValidationArguments } from "class-validator";
 import { inject } from "inversify";
 import { provide } from "inversify-binding-decorators";
@@ -15,7 +15,7 @@ export class ReadChatLogUseCase {
     @inject("ITSDecorator") private tsDecorator: ITSDecorator
   ) {}
 
-  public async getChatLogInZone(chatLogZone): Promise<IChatLog[]> {
+  public async getChatLogInZone(chatLogZone): Promise<IChatMessage[]> {
     this.validateProperties(chatLogZone);
     const socketTransmissionZone = this.socketTransmissionZone.calculateSocketTransmissionZone(
       chatLogZone.x,
@@ -52,7 +52,7 @@ export class ReadChatLogUseCase {
       .limit(Number(chatLogZone.limit));
 
     chatLogsInView.reverse();
-    return chatLogsInView as unknown as IChatLog[];
+    return chatLogsInView as unknown as IChatMessage[];
   }
 
   private validateProperties(chatLogZone): void {
