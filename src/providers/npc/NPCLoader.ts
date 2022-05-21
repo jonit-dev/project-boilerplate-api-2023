@@ -10,11 +10,11 @@ export interface INPCSeedData extends Omit<INPC, "_id"> {
 
 @provide(NPCLoader)
 export class NPCLoader {
-  public static NPCSeedData = new Map<string, INPCSeedData>();
-
   constructor(private mapHelper: MapHelper) {}
 
-  public loadNPCSeedData(): void {
+  public loadNPCSeedData(): Map<string, INPCSeedData> {
+    const npcSeedData = new Map<string, INPCSeedData>();
+
     for (const [mapName, npcs] of MapLoader.tiledNPCs.entries()) {
       for (const tiledNPCData of npcs) {
         const sceneName = this.mapHelper.getSceneNameFromMapName(mapName);
@@ -49,8 +49,10 @@ export class NPCLoader {
           "npc"
         );
 
-        NPCLoader.NPCSeedData.set(key, data);
+        npcSeedData.set(key, data);
       }
     }
+
+    return npcSeedData;
   }
 }

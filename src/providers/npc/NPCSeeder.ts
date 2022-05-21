@@ -8,8 +8,12 @@ import _ from "lodash";
 
 @provide(NPCSeeder)
 export class NPCSeeder {
+  constructor(private npcLoader: NPCLoader) {}
+
   public async seed(): Promise<void> {
-    for (const [key, NPCData] of NPCLoader.NPCSeedData.entries()) {
+    const npcSeedData = this.npcLoader.loadNPCSeedData();
+
+    for (const [key, NPCData] of npcSeedData.entries()) {
       const npcFound = (await NPC.findOne({ tiledId: NPCData.tiledId })) as unknown as INPC;
 
       NPCData.targetCharacter = undefined; // reset any targets
