@@ -1,5 +1,5 @@
-import { IChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
+import { IChatMessage } from "@rpg-engine/shared";
 import { Response } from "express";
 import { controller, httpGet, interfaces, queryParam } from "inversify-express-utils";
 import { IAuthenticatedRequest } from "../../../../providers/types/ExpressTypes";
@@ -14,7 +14,7 @@ export class ReadChatLogController implements interfaces.Controller {
     @queryParam() chatLogZone,
     req: IAuthenticatedRequest,
     res: Response
-  ): Promise<IChatLog[]> {
+  ): Promise<IChatMessage[]> {
     return await this.readChatLogUseCase.getChatLogInZone(chatLogZone);
   }
 }
