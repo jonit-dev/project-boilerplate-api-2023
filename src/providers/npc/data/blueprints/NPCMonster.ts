@@ -8,7 +8,6 @@ export const npcMonster = {
   key: "monster",
   name: "Monster",
   textureKey: "female-npc",
-  scene: "MainScene",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
   alignment: NPCAlignment.Hostile,

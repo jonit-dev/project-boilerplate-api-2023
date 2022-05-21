@@ -1173,11 +1173,6 @@
               "name": "movementType",
               "type": "string",
               "value": "FixedPath"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
             }
           ],
           "rotation": 0,
@@ -1201,11 +1196,6 @@
               "name": "key",
               "type": "string",
               "value": "npc-agatha"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
             }
           ],
           "rotation": 0,
@@ -1229,11 +1219,6 @@
               "name": "key",
               "type": "string",
               "value": "npc-annie"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
             }
           ],
           "rotation": 0,
@@ -1257,11 +1242,6 @@
               "name": "key",
               "type": "string",
               "value": "npc-felicia"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
             }
           ],
           "rotation": 0,
@@ -1285,11 +1265,6 @@
               "name": "key",
               "type": "string",
               "value": "npc-maria"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
             }
           ],
           "rotation": 0,

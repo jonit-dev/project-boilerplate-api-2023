@@ -1,5 +1,5 @@
 import { ITiledObject, MapLoader } from "@providers/map/MapLoader";
-import { INPC, NPCMovementType } from "@rpg-engine/shared";
+import { INPC, NPCMovementType, ScenesMetaData } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { npcsBlueprintIndex } from "./data/index";
 
@@ -12,16 +12,19 @@ export class NPCLoader {
   public static NPCSeedData = new Map<string, INPCSeedData>();
 
   public loadNPCSeedData(): void {
-    for (const [, npcs] of MapLoader.tiledNPCs.entries()) {
+    for (const [mapName, npcs] of MapLoader.tiledNPCs.entries()) {
       for (const tiledNPCData of npcs) {
-        const { key, data } = this.mergeBaseNPCMetaDataWithTiledProps(tiledNPCData);
+        const { key, data } = this.mergeBaseNPCMetaDataWithTiledProps(tiledNPCData, mapName);
 
         NPCLoader.NPCSeedData.set(key, data);
       }
     }
   }
 
-  private mergeBaseNPCMetaDataWithTiledProps(tiledNPCData: ITiledObject): { key: string; data: INPCSeedData } {
+  private mergeBaseNPCMetaDataWithTiledProps(
+    tiledNPCData: ITiledObject,
+    mapName: string
+  ): { key: string; data: INPCSeedData } {
     let tiledProperties: Record<string, any> = {};
 
     tiledNPCData.properties.forEach((property) => {
@@ -46,6 +49,15 @@ export class NPCLoader {
 
     tiledProperties.key = key;
 
+    let sceneName;
+
+    for (const [scene, data] of Object.entries(ScenesMetaData)) {
+      if (data.map === mapName) {
+        sceneName = scene;
+        break;
+      }
+    }
+
     const additionalProperties = {
       x: tiledNPCData.x,
       y: tiledNPCData.y,
@@ -53,6 +65,7 @@ export class NPCLoader {
       key,
       initialX: tiledNPCData.x,
       initialY: tiledNPCData.y,
+      scene: sceneName,
     };
 
     const data = {
