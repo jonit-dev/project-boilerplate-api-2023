@@ -3,7 +3,7 @@ import { CharacterClass, CharacterGender, NPCAlignment } from "@rpg-engine/share
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
 
-export const npcMonsterMetaData = {
+export const npcMonster = {
   ...generateMoveTowardsMovement(),
   key: "monster",
   name: "Monster",

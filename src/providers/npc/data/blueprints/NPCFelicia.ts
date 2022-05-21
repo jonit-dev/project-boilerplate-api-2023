@@ -2,7 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
 import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
 
-export const npcFeliciaMetaData = {
+export const npcFelicia = {
   ...generateMoveTowardsMovement(),
   key: "felicia",
   name: "Felicia",
