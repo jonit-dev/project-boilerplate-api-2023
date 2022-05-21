@@ -7,6 +7,7 @@ import { MapObjectsLoader } from "./MapObjectsLoader";
 import { MapSolids } from "./MapSolids";
 
 export interface ITiledObjectProps {
+  [str: string]: any;
   name: string;
   value: string;
 }
