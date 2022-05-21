@@ -106,6 +106,7 @@ export class BattleAttackTarget {
         if (!target.isAlive) {
           if (target.type === "Character") {
             await this.battleDeathManager.handleCharacterDeath(target as ICharacter);
+            this.npcTarget.tryToSetTarget(attacker as INPC);
           }
           if (target.type === "NPC") {
             this.battleDeathManager.handleNPCDeath(target as INPC);

@@ -35,10 +35,15 @@ export class CharacterNetworkCreate {
         // check if character is already logged in
 
         if (character.isOnline) {
-          // then force logout the current associated client
+          // then force logout the previous associated client
           this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
             reason: "You've been disconnected because you logged in from another location!",
           });
+          // and then logout also the client that just connected
+          this.socketMessaging.sendEventToUser(String(channel.id), CharacterSocketEvents.CharacterForceDisconnect, {
+            reason: "You've been disconnected because you logged in from another location!",
+          });
+          return;
         }
 
         character.isOnline = true;
