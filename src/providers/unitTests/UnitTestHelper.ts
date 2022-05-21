@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { Skill } from "@entities/ModuleSkills/SkillsModel";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
   fixedPathMockNPC,

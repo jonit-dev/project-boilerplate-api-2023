@@ -1,5 +1,5 @@
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { Skill } from "@entities/ModuleSkills/SkillsModel";
 import { MapLoader } from "@providers/map/MapLoader";
 import { INPCMetaData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
