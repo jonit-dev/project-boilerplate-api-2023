@@ -1,3 +1,6 @@
+import { IBlueprint } from "@providers/types/temp/BlueprintTypes";
 import { itemShortSword } from "./blueprints/ItemShortSword";
 
-export const itemsMetaData = [itemShortSword];
+export const itemsBlueprintIndex: IBlueprint = {
+  "short-sword": itemShortSword,
+};

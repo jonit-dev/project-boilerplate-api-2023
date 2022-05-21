@@ -21,7 +21,8 @@ export class NPCManager {
     private npcMovementMoveTowards: NPCMovementMoveTowards,
     private npcMovementStopped: NPCMovementStopped,
     private npcMovementMoveAway: NPCMovementMoveAway,
-    private npcView: NPCView
+    private npcView: NPCView,
+    private npcLoader: NPCLoader
   ) {}
 
   public async init(): Promise<void> {
@@ -90,7 +91,10 @@ export class NPCManager {
           case NPCMovementType.FixedPath:
             let endGridX = npc.fixedPath.endGridX as unknown as number;
             let endGridY = npc.fixedPath.endGridY as unknown as number;
-            const npcData = NPCLoader.NPCSeedData.get(npc.key);
+
+            const npcSeedData = this.npcLoader.loadNPCSeedData();
+
+            const npcData = npcSeedData[npc.key];
 
             if (!npcData) {
               console.log(`Failed to find NPC data for ${npc.key}`);

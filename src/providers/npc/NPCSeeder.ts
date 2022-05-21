@@ -37,7 +37,7 @@ export class NPCSeeder {
       } else {
         // if npc already exists, restart initial position
 
-        console.log(`Updating NPC ${NPCData.key} metadata...`);
+        console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
 
         const skills = NPCData.skills as any;
 

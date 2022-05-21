@@ -3,6 +3,7 @@ import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const itemSchema = createSchema(
   {
+    tiledId: Type.number({ required: true }),
     type: Type.string({
       required: true,
       default: ItemType.Other,

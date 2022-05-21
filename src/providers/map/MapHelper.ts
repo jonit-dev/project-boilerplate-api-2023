@@ -16,7 +16,7 @@ export class MapHelper {
     tiledData: ITiledObject,
     mapName: string,
     blueprintIndex: Record<string, any>,
-    additionalProperties: Record<string, any>,
+    additionalProperties: Record<string, any> | null,
     elementType: "npc" | "item"
   ): { key: string; data: T } {
     const tiledProperties: Record<string, any> = {};
@@ -38,6 +38,7 @@ export class MapHelper {
     }
 
     const data = {
+      tiledId: tiledData.id,
       key,
       ...blueprint,
       ...tiledProperties,
