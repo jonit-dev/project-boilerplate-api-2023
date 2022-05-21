@@ -41,18 +41,26 @@ export class NPCTarget {
 
   public async tryToSetTarget(npc: INPC): Promise<void> {
     try {
+      if (!npc.isAlive) {
+        throw new Error(`NPC ${npc.key} is trying to set target, but is not alive!`);
+      }
+
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
       const charactersDistance: ICharacterDistance[] = [];
 
-      for (const nearbyPlayer of nearbyCharacters) {
-        const distance = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, nearbyPlayer.x, nearbyPlayer.y);
+      for (const nearbyCharacter of nearbyCharacters) {
+        if (!nearbyCharacter.isAlive) {
+          continue;
+        }
+
+        const distance = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, nearbyCharacter.x, nearbyCharacter.y);
 
         charactersDistance.push({
-          id: nearbyPlayer.id,
+          id: nearbyCharacter.id,
           distance: distance,
-          x: nearbyPlayer.x,
-          y: nearbyPlayer.y,
+          x: nearbyCharacter.x,
+          y: nearbyCharacter.y,
         });
       }
 
