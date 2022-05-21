@@ -1,7 +1,7 @@
-import { ITiledNPC, MapLoader } from "@providers/map/MapLoader";
+import { ITiledObject, MapLoader } from "@providers/map/MapLoader";
 import { INPC, NPCMovementType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { npcsMetadataIndex } from "./data/index";
+import { npcsBlueprintIndex } from "./data/index";
 
 export interface INPCMetaData extends Omit<INPC, "_id"> {
   tiledId: number;
@@ -14,14 +14,14 @@ export class NPCLoader {
   public loadNPCMetaData(): void {
     for (const [, npcs] of MapLoader.npcs.entries()) {
       for (const tiledNPCData of npcs) {
-        const { key, baseNPCMetaData } = this.loadTiledNPCMetadata(tiledNPCData);
+        const { key, data } = this.mergeBaseNPCMetaDataWithTiledProps(tiledNPCData);
 
-        NPCLoader.NPCMetaData.set(key, baseNPCMetaData);
+        NPCLoader.NPCMetaData.set(key, data);
       }
     }
   }
 
-  private loadTiledNPCMetadata(tiledNPCData: ITiledNPC): { key: string; baseNPCMetaData: INPCMetaData } {
+  private mergeBaseNPCMetaDataWithTiledProps(tiledNPCData: ITiledObject): { key: string; data: INPCMetaData } {
     let tiledProperties: Record<string, any> = {};
 
     tiledNPCData.properties.forEach((property) => {
@@ -41,7 +41,7 @@ export class NPCLoader {
     }
 
     const baseKey = `${tiledProperties.key.replace("npc-", "")}`;
-    const baseMetaData = npcsMetadataIndex[baseKey];
+    const baseMetaData = npcsBlueprintIndex[baseKey];
     const key = `${baseKey}-${tiledNPCData.id}`;
 
     tiledProperties.key = key;
@@ -55,12 +55,12 @@ export class NPCLoader {
       initialY: tiledNPCData.y,
     };
 
-    const baseNPCMetaData = {
+    const data = {
       ...baseMetaData,
       ...tiledProperties,
       ...additionalProperties,
     };
 
-    return { key, baseNPCMetaData };
+    return { key, data };
   }
 }

@@ -10,14 +10,12 @@ const itemSchema = createSchema(
     }),
     name: Type.string({ required: true }),
     description: Type.string({ required: true }),
-    textureKey: Type.string({ required: true }),
+    key: Type.string({ required: true }),
     attack: Type.number(),
     defense: Type.number(),
     weight: Type.number({ required: true }),
-    equipSlotType: Type.string({
-      enum: TypeHelper.enumToStringArray(ItemSlotType),
-    }),
-    maxStackSize: Type.number(),
+    allowedEquipSlotType: Type.array().of(Type.string({ enum: TypeHelper.enumToStringArray(ItemSlotType) })),
+    maxStackSize: Type.number({ required: true, default: 1 }),
     isUsable: Type.boolean({ required: true, default: false }),
     usableEffect: Type.string(),
     isStorable: Type.boolean({ required: true, default: true }),
@@ -30,7 +28,9 @@ const itemSchema = createSchema(
     itemContainer: Type.objectId({
       ref: "ItemContainer",
     }),
+    isSolid: Type.boolean({ required: true, default: false }),
     ...({} as {
+      isEquipable: boolean;
       isStackable: boolean;
       isItemContainer: boolean;
       fullDescription: string;
@@ -40,11 +40,11 @@ const itemSchema = createSchema(
 );
 
 itemSchema.virtual("isEquipable").get(function (this: IItem) {
-  return !!this.equipSlotType;
+  return this.allowedEquipSlotType && this.allowedEquipSlotType.length > 0;
 });
 
 itemSchema.virtual("isStackable").get(function (this: IItem) {
-  return !!this.maxStackSize;
+  return this.maxStackSize > 1;
 });
 
 itemSchema.virtual("isItemContainer").get(function (this: IItem) {

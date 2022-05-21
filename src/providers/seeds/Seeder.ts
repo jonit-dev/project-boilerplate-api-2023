@@ -1,5 +1,5 @@
 import { provide } from "inversify-binding-decorators";
-import { NPCSeeder } from "./NPCSeeder";
+import { NPCSeeder } from "../npc/NPCSeeder";
 
 @provide(Seeder)
 export class Seeder {

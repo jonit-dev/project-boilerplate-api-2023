@@ -3,27 +3,28 @@ import { ITiled } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
 import PF from "pathfinding";
-import { MapNPCLoader } from "./MapNPCLoader";
+import { MapObjectsLoader } from "./MapObjectsLoader";
 import { MapSolids } from "./MapSolids";
 
-export interface ITiledNPCProperty {
+export interface ITiledObjectProps {
   name: string;
   value: string;
 }
 
-export interface ITiledNPC {
+export interface ITiledObject {
   id: string;
   x: number;
   y: number;
-  properties: ITiledNPCProperty[];
+  properties: ITiledObjectProps[];
 }
 
 @provide(MapLoader)
 export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
   public static grids: Map<string, PF.Grid> = new Map();
-  public static npcs: Map<string, ITiledNPC[]> = new Map();
-  constructor(private mapSolidsManager: MapSolids, private mapNPCLoader: MapNPCLoader) {}
+  public static npcs: Map<string, ITiledObject[]> = new Map();
+  public static items: Map<string, ITiledObject[]> = new Map();
+  constructor(private mapSolidsManager: MapSolids, private mapNPCLoader: MapObjectsLoader) {}
 
   public init(): void {
     // get all map names
@@ -49,6 +50,7 @@ export class MapLoader {
       this.mapSolidsManager.generateGridSolids(mapName, currentMap);
 
       this.mapNPCLoader.loadNPCsData(mapName, currentMap);
+      this.mapNPCLoader.loadItemsData(mapName, currentMap);
     }
 
     console.log("📦 Maps and grids are loaded!");

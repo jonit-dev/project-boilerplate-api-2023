@@ -5,7 +5,7 @@ import { npcFeliciaMetaData } from "./blueprints/NPCFelicia";
 import { npcMariaMetaData } from "./blueprints/NPCMaria";
 import { npcMonsterMetaData } from "./blueprints/NPCMonster";
 
-export const npcsMetadataIndex = {
+export const npcsBlueprintIndex = {
   agatha: npcAgathaMetaData,
   alice: npcAliceMetaData,
   annie: npcAnnieMetaData,
