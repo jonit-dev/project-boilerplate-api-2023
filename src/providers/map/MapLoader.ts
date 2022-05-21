@@ -22,8 +22,8 @@ export interface ITiledObject {
 export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
   public static grids: Map<string, PF.Grid> = new Map();
-  public static npcs: Map<string, ITiledObject[]> = new Map();
-  public static items: Map<string, ITiledObject[]> = new Map();
+  public static tiledNPCs: Map<string, ITiledObject[]> = new Map();
+  public static tiledItems: Map<string, ITiledObject[]> = new Map();
   constructor(private mapSolidsManager: MapSolids, private mapNPCLoader: MapObjectsLoader) {}
 
   public init(): void {
@@ -49,8 +49,8 @@ export class MapLoader {
 
       this.mapSolidsManager.generateGridSolids(mapName, currentMap);
 
-      this.mapNPCLoader.loadNPCsData(mapName, currentMap);
-      this.mapNPCLoader.loadItemsData(mapName, currentMap);
+      this.mapNPCLoader.loadNPCsTiledData(mapName, currentMap);
+      this.mapNPCLoader.loadItemsTiledData(mapName, currentMap);
     }
 
     console.log("📦 Maps and grids are loaded!");

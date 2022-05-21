@@ -4,7 +4,7 @@ import { MapLoader } from "./MapLoader";
 
 @provide(MapObjectsLoader)
 export class MapObjectsLoader {
-  public loadNPCsData(mapName: string, currentMap: ITiled): void {
+  public loadNPCsTiledData(mapName: string, currentMap: ITiled): void {
     // find npc layer from Tiled Map
     const npcsLayer = currentMap.layers.find((layer) => layer.name === "NPCs");
 
@@ -16,11 +16,11 @@ export class MapObjectsLoader {
     // @ts-ignore
     const npcsData = npcsLayer.objects;
 
-    MapLoader.npcs.set(mapName, npcsData);
+    MapLoader.tiledNPCs.set(mapName, npcsData);
     console.log("📦 NPCs metadata was loaded from Tiled!");
   }
 
-  public loadItemsData(mapName: string, currentMap: ITiled): void {
+  public loadItemsTiledData(mapName: string, currentMap: ITiled): void {
     // find npc layer from Tiled Map
     const itemsLayer = currentMap.layers.find((layer) => layer.name === "Items");
 
@@ -32,7 +32,7 @@ export class MapObjectsLoader {
     // @ts-ignore
     const itemsData = itemsLayer.objects;
 
-    MapLoader.items.set(mapName, itemsData);
+    MapLoader.tiledItems.set(mapName, itemsData);
     console.log("📦 Items metadata was loaded from Tiled!");
   }
 }

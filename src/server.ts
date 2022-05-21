@@ -37,7 +37,7 @@ app.listen(port, async () => {
   await socketAdapter.init(appEnv.socket.type);
 
   mapLoader.init(); // must be the first thing loaded!
-  npcMetaDataLoader.loadNPCMetaData(); //! This must come before our seeds.start(), otherwise it won't have the data to create our NPCs.
+  npcMetaDataLoader.loadNPCSeedData(); //! This must come before our seeds.start(), otherwise it won't have the data to create our NPCs.
 
   app.use(Sentry.Handlers.requestHandler());
   app.use(Sentry.Handlers.tracingHandler());

@@ -90,7 +90,7 @@ export class NPCManager {
           case NPCMovementType.FixedPath:
             let endGridX = npc.fixedPath.endGridX as unknown as number;
             let endGridY = npc.fixedPath.endGridY as unknown as number;
-            const npcData = NPCLoader.NPCMetaData.get(npc.key);
+            const npcData = NPCLoader.NPCSeedData.get(npc.key);
 
             if (!npcData) {
               console.log(`Failed to find NPC data for ${npc.key}`);
