@@ -5,7 +5,7 @@ import {
   generateMoveTowardsMovement,
   generateRandomMovement,
   generateStoppedMovement,
-} from "../../npc/npcs/abstractions/BaseNeutralNPC";
+} from "../../npc/data/abstractions/BaseNeutralNPC";
 
 export const randomMovementMockNPC = {
   ...generateRandomMovement(),

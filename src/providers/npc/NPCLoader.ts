@@ -1,7 +1,7 @@
 import { ITiledNPC, MapLoader } from "@providers/map/MapLoader";
 import { INPC, NPCMovementType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { npcsMetadataIndex } from "./npcs/index";
+import { npcsMetadataIndex } from "./data/index";
 
 export interface INPCMetaData extends Omit<INPC, "_id"> {
   tiledId: number;
