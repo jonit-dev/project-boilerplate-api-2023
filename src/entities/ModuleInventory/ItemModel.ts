@@ -27,12 +27,12 @@ const itemSchema = createSchema(
     layer: Type.number({
       default: MapLayers.OverGround,
     }),
-    container: Type.objectId({
-      ref: "Container",
+    itemContainer: Type.objectId({
+      ref: "ItemContainer",
     }),
     ...({} as {
       isStackable: boolean;
-      isContainer: boolean;
+      isItemContainer: boolean;
       fullDescription: string;
     }),
   },
@@ -47,8 +47,8 @@ itemSchema.virtual("isStackable").get(function (this: IItem) {
   return !!this.maxStackSize;
 });
 
-itemSchema.virtual("isContainer").get(function (this: IItem) {
-  return !!this.container;
+itemSchema.virtual("isItemContainer").get(function (this: IItem) {
+  return !!this.itemContainer;
 });
 
 itemSchema.virtual("fullDescription").get(function (this: IItem) {
