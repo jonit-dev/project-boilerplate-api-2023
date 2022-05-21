@@ -1,9 +1,9 @@
-import { npcAgathaMetaData } from "./NPCAgatha";
-import { npcAliceMetaData } from "./NPCAlice";
-import { npcAnnieMetaData } from "./NPCAnnie";
-import { npcFeliciaMetaData } from "./NPCFelicia";
-import { npcMariaMetaData } from "./NPCMaria";
-import { npcMonsterMetaData } from "./NPCMonster";
+import { npcAgathaMetaData } from "./blueprints/NPCAgatha";
+import { npcAliceMetaData } from "./blueprints/NPCAlice";
+import { npcAnnieMetaData } from "./blueprints/NPCAnnie";
+import { npcFeliciaMetaData } from "./blueprints/NPCFelicia";
+import { npcMariaMetaData } from "./blueprints/NPCMaria";
+import { npcMonsterMetaData } from "./blueprints/NPCMonster";
 
 export const npcsMetadataIndex = {
   agatha: npcAgathaMetaData,

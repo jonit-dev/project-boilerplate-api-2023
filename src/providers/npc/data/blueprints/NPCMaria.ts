@@ -1,6 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterGender } from "@rpg-engine/shared";
-import { generateRandomMovement } from "./abstractions/BaseNeutralNPC";
+import { generateRandomMovement } from "../abstractions/BaseNeutralNPC";
 
 export const npcMariaMetaData = {
   ...generateRandomMovement(),

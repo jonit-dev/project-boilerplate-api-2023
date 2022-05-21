@@ -1,6 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
-import { generateStoppedMovement } from "./abstractions/BaseNeutralNPC";
+import { generateStoppedMovement } from "../abstractions/BaseNeutralNPC";
 
 export const npcAgathaMetaData = {
   ...generateStoppedMovement(),
