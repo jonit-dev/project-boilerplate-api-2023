@@ -24,12 +24,8 @@ export class NPCLoader {
         }
 
         const additionalProps: Record<string, any> = {
-          x: tiledNPCData.x,
-          y: tiledNPCData.y,
-          tiledId: tiledNPCData.id,
           initialX: tiledNPCData.x,
           initialY: tiledNPCData.y,
-          scene: sceneName,
         };
 
         for (const prop of tiledNPCData.properties) {

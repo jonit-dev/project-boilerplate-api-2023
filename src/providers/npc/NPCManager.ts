@@ -94,7 +94,7 @@ export class NPCManager {
 
             const npcSeedData = this.npcLoader.loadNPCSeedData();
 
-            const npcData = npcSeedData[npc.key];
+            const npcData = npcSeedData.get(npc.key);
 
             if (!npcData) {
               console.log(`Failed to find NPC data for ${npc.key}`);

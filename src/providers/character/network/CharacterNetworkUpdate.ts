@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ItemView } from "@providers/item/ItemView";
 import { MapLoader } from "@providers/map/MapLoader";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCView } from "@providers/npc/NPCView";
@@ -29,6 +30,7 @@ export class CharacterNetworkUpdate {
     private socketAuth: SocketAuth,
     private movementHelper: MovementHelper,
     private npcView: NPCView,
+    private itemView: ItemView,
     private characterView: CharacterView,
     private characterBan: CharacterBan
   ) {}
@@ -77,6 +79,9 @@ export class CharacterNetworkUpdate {
           await this.warnEmitterAboutUsersAround(character, data, ["x", "y", "direction"]);
 
           await this.npcView.warnUserAboutNPCsInView(character, data.otherEntitiesInView);
+
+          //! TODO: Implement data.otherItemsInView here
+          await this.itemView.warnCharacterAboutItemsInView(character);
 
           // update emitter position from connectedPlayers
           await this.updateServerSideEmitterInfo(data, character, newX, newY, isMoving, data.direction);

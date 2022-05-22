@@ -12,6 +12,7 @@ const itemSchema = createSchema(
     name: Type.string({ required: true }),
     description: Type.string({ required: true }),
     key: Type.string({ required: true }),
+    blueprintIndex: Type.string({ required: true }),
     attack: Type.number(),
     defense: Type.number(),
     weight: Type.number({ required: true }),

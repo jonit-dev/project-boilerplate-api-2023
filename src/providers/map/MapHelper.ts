@@ -29,8 +29,6 @@ export class MapHelper {
     const blueprint = blueprintIndex[baseKey];
     const key = `${baseKey}-${tiledData.id}`;
 
-    tiledProperties.key = key;
-
     const sceneName = this.getSceneNameFromMapName(mapName);
 
     if (!sceneName) {
@@ -38,11 +36,15 @@ export class MapHelper {
     }
 
     const data = {
-      tiledId: tiledData.id,
-      key,
       ...blueprint,
       ...tiledProperties,
       ...additionalProperties,
+      tiledId: tiledData.id,
+      blueprintIndex: baseKey,
+      x: tiledData.x,
+      y: tiledData.y,
+      scene: sceneName,
+      key,
     };
 
     return { key, data };
