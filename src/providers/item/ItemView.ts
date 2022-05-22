@@ -27,6 +27,7 @@ export class ItemView {
       this.socketMessaging.sendEventToUser<IItemUpdate>(character.channelId!, ItemSocketEvents.Update, {
         id: item.id,
         key: item.key,
+        textureKey: item.textureKey,
         name: item.name,
         x: item.x,
         y: item.y,

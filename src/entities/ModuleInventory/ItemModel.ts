@@ -36,6 +36,7 @@ const itemSchema = createSchema(
       isStackable: boolean;
       isItemContainer: boolean;
       fullDescription: string;
+      textureKey: string;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
@@ -43,6 +44,9 @@ const itemSchema = createSchema(
 
 itemSchema.virtual("isEquipable").get(function (this: IItem) {
   return this.allowedEquipSlotType && this.allowedEquipSlotType.length > 0;
+});
+itemSchema.virtual("textureKey").get(function (this: IItem) {
+  return this.blueprintIndex;
 });
 
 itemSchema.virtual("isStackable").get(function (this: IItem) {

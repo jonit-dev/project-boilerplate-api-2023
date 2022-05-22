@@ -36,15 +36,16 @@ export class MapHelper {
     }
 
     const data = {
-      ...blueprint,
       ...tiledProperties,
       ...additionalProperties,
+      key,
+      textureKey: baseKey,
       tiledId: tiledData.id,
       blueprintIndex: baseKey,
       x: tiledData.x,
       y: tiledData.y,
       scene: sceneName,
-      key,
+      ...blueprint,
     };
 
     return { key, data };
