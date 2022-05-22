@@ -10,9 +10,9 @@ export class ItemView {
   constructor(private characterView: CharacterView, private socketMessaging: SocketMessaging) {}
 
   public async warnCharacterAboutItemsInView(character: ICharacter, otherItemsInView?: IItemsInView): Promise<void> {
-    const itemsInView = await this.getItemsInCharacterView(character);
+    const itemsNearby = await this.getItemsInCharacterView(character);
 
-    for (const item of itemsInView) {
+    for (const item of itemsNearby) {
       // if we already have this item in the character view, with an updated payload, just skip it!
       if (otherItemsInView && otherItemsInView[item.id]) {
         if (otherItemsInView[item.id].x === item.x && otherItemsInView[item.id].y === item.y) {

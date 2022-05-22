@@ -11,7 +11,7 @@ export class ItemSeeder {
     const itemSeedData = this.itemLoader.loadItemSeedData();
 
     for (const [key, itemData] of itemSeedData) {
-      const itemFound = (await Item.findOne({ tiledId: itemData.tiledId })) as unknown as IItem;
+      const itemFound = (await Item.findOne({ key: itemData.key })) as unknown as IItem;
 
       if (!itemFound) {
         console.log(`🌱 Seeding database with Item data for Item with key: ${itemData.key}`);
