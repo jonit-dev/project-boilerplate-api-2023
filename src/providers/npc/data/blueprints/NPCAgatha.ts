@@ -4,7 +4,6 @@ import { generateStoppedMovement } from "../abstractions/BaseNeutralNPC";
 
 export const npcAgatha = {
   ...generateStoppedMovement(),
-  key: "agatha",
   name: "Agatha",
   textureKey: "female-npc",
   class: CharacterClass.None,

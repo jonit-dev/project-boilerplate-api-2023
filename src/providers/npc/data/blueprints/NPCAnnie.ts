@@ -4,7 +4,6 @@ import { generateMoveAwayMovement } from "../abstractions/BaseNeutralNPC";
 
 export const npcAnnie = {
   ...generateMoveAwayMovement(),
-  key: "annie",
   name: "Annie",
   textureKey: "female-npc",
   scene: "MainScene",
