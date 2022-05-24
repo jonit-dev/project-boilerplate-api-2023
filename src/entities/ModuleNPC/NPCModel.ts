@@ -14,9 +14,6 @@ import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 const npcSchema = createSchema(
   {
     tiledId: Type.number({ required: true }),
-    blueprintIndex: Type.string({
-      required: true,
-    }),
     key: Type.string({
       required: true,
     }),

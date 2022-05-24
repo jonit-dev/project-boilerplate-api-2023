@@ -10,7 +10,6 @@ import {
 export const randomMovementMockNPC = {
   ...generateRandomMovement(),
   key: "test-npc-22",
-  blueprintIndex: "test-npc",
   name: "Test NPC",
   textureKey: "female-npc",
   gender: CharacterGender.Female,
@@ -31,7 +30,6 @@ export const randomMovementMockNPC = {
 export const stoppedMovementMockNPC = {
   ...generateStoppedMovement(),
   key: "test-npc-22",
-  blueprintIndex: "test-npc",
   name: "Test NPC",
   textureKey: "female-npc",
   gender: CharacterGender.Female,
@@ -52,7 +50,6 @@ export const stoppedMovementMockNPC = {
 export const moveAwayMockNPC = {
   ...generateMoveAwayMovement(),
   key: "test-npc-22",
-  blueprintIndex: "test-npc",
   name: "Test NPC",
   textureKey: "female-npc",
   gender: CharacterGender.Female,
@@ -73,7 +70,6 @@ export const moveAwayMockNPC = {
 export const moveTowardsMockNPC = {
   ...generateMoveTowardsMovement(),
   key: "test-npc-22",
-  blueprintIndex: "test-npc",
   name: "Test NPC",
   textureKey: "female-npc",
   gender: CharacterGender.Female,
@@ -95,7 +91,6 @@ export const moveTowardsMockNPC = {
 export const fixedPathMockNPC = {
   ...generateFixedPathMovement(),
   key: "test-npc-22",
-  blueprintIndex: "test-npc",
   name: "Test NPC",
   textureKey: "female-npc",
   gender: CharacterGender.Female,

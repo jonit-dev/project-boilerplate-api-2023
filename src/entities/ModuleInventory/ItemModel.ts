@@ -1,4 +1,4 @@
-import { ItemSlotType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const itemSchema = createSchema(
@@ -9,10 +9,15 @@ const itemSchema = createSchema(
       default: ItemType.Other,
       enum: TypeHelper.enumToStringArray(ItemType),
     }),
+    subType: Type.string({
+      required: true,
+      default: ItemSubType.Other,
+      enum: TypeHelper.enumToStringArray(ItemSubType),
+    }),
     name: Type.string({ required: true }),
     description: Type.string({ required: true }),
     key: Type.string({ required: true }),
-    blueprintIndex: Type.string({ required: true }),
+    textureKey: Type.string({ required: true }),
     attack: Type.number(),
     defense: Type.number(),
     weight: Type.number({ required: true }),
@@ -36,7 +41,6 @@ const itemSchema = createSchema(
       isStackable: boolean;
       isItemContainer: boolean;
       fullDescription: string;
-      textureKey: string;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
@@ -44,9 +48,6 @@ const itemSchema = createSchema(
 
 itemSchema.virtual("isEquipable").get(function (this: IItem) {
   return this.allowedEquipSlotType && this.allowedEquipSlotType.length > 0;
-});
-itemSchema.virtual("textureKey").get(function (this: IItem) {
-  return this.blueprintIndex;
 });
 
 itemSchema.virtual("isStackable").get(function (this: IItem) {

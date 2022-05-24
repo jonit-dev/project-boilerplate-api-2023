@@ -41,7 +41,6 @@ export class MapHelper {
       key,
       textureKey: baseKey,
       tiledId: tiledData.id,
-      blueprintIndex: baseKey,
       x: tiledData.x,
       y: tiledData.y,
       scene: sceneName,
