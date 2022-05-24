@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IItemsInView, IItemUpdate, ItemSocketEvents } from "@rpg-engine/shared";
+import { IItemsInView, IItemUpdate, ItemSocketEvents, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ItemView)
@@ -27,8 +27,8 @@ export class ItemView {
       this.socketMessaging.sendEventToUser<IItemUpdate>(character.channelId!, ItemSocketEvents.Update, {
         id: item.id,
         textureKey: item.textureKey,
-        type: item.type,
-        subType: item.subType,
+        type: item.type as ItemType,
+        subType: item.subType as ItemSubType,
         name: item.name,
         x: item.x,
         y: item.y,
