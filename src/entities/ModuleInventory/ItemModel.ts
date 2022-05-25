@@ -1,3 +1,6 @@
+import { CharacterView } from "@providers/character/CharacterView";
+import { container } from "@providers/inversify/container";
+import { ItemView } from "@providers/item/ItemView";
 import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
@@ -64,6 +67,27 @@ itemSchema.virtual("fullDescription").get(function (this: IItem) {
     this.defense &&
     `Attack: ${this.attack}. Defense: ${this.defense}.` + (this.weight && `Weight: ${this.weight}.`)
   }`;
+});
+
+const warnAboutItemChanges = async (item: IItem): Promise<void> => {
+  if (item.x && item.y && item.scene) {
+    const characterView = container.get<CharacterView>(CharacterView);
+    const itemView = container.get<ItemView>(ItemView);
+
+    const nearbyCharacters = await characterView.getCharactersAroundXYPosition(item.x, item.y, item.scene);
+
+    for (const character of nearbyCharacters) {
+      await itemView.warnCharacterAboutItemsInView(character);
+    }
+  }
+};
+
+itemSchema.post("updateOne", async function (this: IItem) {
+  await warnAboutItemChanges(this);
+});
+
+itemSchema.post("save", async function (this: IItem) {
+  await warnAboutItemChanges(this);
 });
 
 export type IItem = ExtractDoc<typeof itemSchema>;

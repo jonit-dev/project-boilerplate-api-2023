@@ -22,7 +22,7 @@ import { CharacterView } from "../CharacterView";
 export class CharacterNetworkCreate {
   constructor(
     private socketAuth: SocketAuth,
-    private geckosConnection: SocketConnection,
+    private socketConnection: SocketConnection,
     private playerView: CharacterView,
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
@@ -92,7 +92,7 @@ export class CharacterNetworkCreate {
 
         channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
 
-        const connectedCharacters = await this.geckosConnection.getConnectedCharacters();
+        const connectedCharacters = await this.socketConnection.getConnectedCharacters();
 
         console.log("- Total characters connected:", connectedCharacters.length);
 
