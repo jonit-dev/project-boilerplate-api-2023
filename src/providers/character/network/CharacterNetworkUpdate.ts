@@ -80,7 +80,6 @@ export class CharacterNetworkUpdate {
 
           await this.npcView.warnUserAboutNPCsInView(character, data.otherEntitiesInView);
 
-          //! TODO: Implement data.otherItemsInView here
           await this.itemView.warnCharacterAboutItemsInView(character);
 
           // update emitter position from connectedPlayers
