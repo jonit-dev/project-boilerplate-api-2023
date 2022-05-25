@@ -608,6 +608,36 @@
       "y": 0
     },
     {
+      "draworder": "topdown",
+      "id": 13,
+      "name": "Items",
+      "objects": [
+        {
+          "height": 16,
+          "id": 66,
+          "name": "Short Sword",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "item-short-sword"
+            }
+          ],
+          "rotation": 0,
+          "type": "Item",
+          "visible": true,
+          "width": 16,
+          "x": 320,
+          "y": 144
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    },
+    {
       "chunks": [
         {
           "data": [
@@ -1143,11 +1173,6 @@
               "name": "movementType",
               "type": "string",
               "value": "FixedPath"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
             }
           ],
           "rotation": 0,
@@ -1171,11 +1196,6 @@
               "name": "key",
               "type": "string",
               "value": "npc-agatha"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
             }
           ],
           "rotation": 0,
@@ -1199,11 +1219,6 @@
               "name": "key",
               "type": "string",
               "value": "npc-annie"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
             }
           ],
           "rotation": 0,
@@ -1227,11 +1242,6 @@
               "name": "key",
               "type": "string",
               "value": "npc-felicia"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
             }
           ],
           "rotation": 0,
@@ -1255,11 +1265,6 @@
               "name": "key",
               "type": "string",
               "value": "npc-maria"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
             }
           ],
           "rotation": 0,
@@ -1359,8 +1364,8 @@
       "y": 0
     }
   ],
-  "nextlayerid": 13,
-  "nextobjectid": 66,
+  "nextlayerid": 14,
+  "nextobjectid": 68,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",

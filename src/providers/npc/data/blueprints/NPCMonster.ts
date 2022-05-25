@@ -1,14 +1,12 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterClass, CharacterGender, NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { generateMoveTowardsMovement } from "./abstractions/BaseNeutralNPC";
+import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
 
-export const npcMonsterMetaData = {
+export const npcMonster = {
   ...generateMoveTowardsMovement(),
-  key: "monster",
   name: "Monster",
   textureKey: "female-npc",
-  scene: "MainScene",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
   alignment: NPCAlignment.Hostile,

@@ -1,66 +1,54 @@
-import { ITiledNPC, MapLoader } from "@providers/map/MapLoader";
-import { INPC, NPCMovementType } from "@rpg-engine/shared";
+import { MapHelper } from "@providers/map/MapHelper";
+import { MapLoader } from "@providers/map/MapLoader";
+import { INPC } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { npcsMetadataIndex } from "./npcs/index";
+import { npcsBlueprintIndex } from "./data/index";
 
-export interface INPCMetaData extends Omit<INPC, "_id"> {
+export interface INPCSeedData extends Omit<INPC, "_id"> {
   tiledId: number;
 }
 
 @provide(NPCLoader)
 export class NPCLoader {
-  public static NPCMetaData = new Map<string, INPCMetaData>();
+  constructor(private mapHelper: MapHelper) {}
 
-  public loadNPCMetaData(): void {
-    for (const [, npcs] of MapLoader.npcs.entries()) {
+  public loadNPCSeedData(): Map<string, INPCSeedData> {
+    const npcSeedData = new Map<string, INPCSeedData>();
+
+    for (const [mapName, npcs] of MapLoader.tiledNPCs.entries()) {
       for (const tiledNPCData of npcs) {
-        const { key, baseNPCMetaData } = this.loadTiledNPCMetadata(tiledNPCData);
+        const sceneName = this.mapHelper.getSceneNameFromMapName(mapName);
 
-        NPCLoader.NPCMetaData.set(key, baseNPCMetaData);
+        if (!sceneName) {
+          throw new Error(`NPCLoader: Scene name is not found for map ${mapName}`);
+        }
+
+        const additionalProps: Record<string, any> = {
+          initialX: tiledNPCData.x,
+          initialY: tiledNPCData.y,
+        };
+
+        for (const prop of tiledNPCData.properties) {
+          if (prop.name === "movementType" && prop.value === "FixedPath") {
+            additionalProps.fixedPath = {
+              endGridX: tiledNPCData.properties.find((p) => p.name === "endGridX")?.value,
+              endGridY: tiledNPCData.properties.find((p) => p.name === "endGridY")?.value,
+            };
+          }
+        }
+
+        const { key, data } = this.mapHelper.mergeBlueprintWithTiledProps<INPCSeedData>(
+          tiledNPCData,
+          mapName,
+          npcsBlueprintIndex,
+          additionalProps,
+          "npc"
+        );
+
+        npcSeedData.set(key, data);
       }
     }
-  }
 
-  private loadTiledNPCMetadata(tiledNPCData: ITiledNPC): { key: string; baseNPCMetaData: INPCMetaData } {
-    let tiledProperties: Record<string, any> = {};
-
-    tiledNPCData.properties.forEach((property) => {
-      tiledProperties[property.name] = property.value;
-    });
-
-    if (tiledProperties.movementType === NPCMovementType.FixedPath) {
-      const { endGridX, endGridY } = tiledProperties;
-
-      tiledProperties = {
-        ...tiledProperties,
-        fixedPath: {
-          endGridX: Number(endGridX),
-          endGridY: Number(endGridY),
-        },
-      };
-    }
-
-    const baseKey = `${tiledProperties.key.replace("npc-", "")}`;
-    const baseMetaData = npcsMetadataIndex[baseKey];
-    const key = `${baseKey}-${tiledNPCData.id}`;
-
-    tiledProperties.key = key;
-
-    const additionalProperties = {
-      x: tiledNPCData.x,
-      y: tiledNPCData.y,
-      tiledId: tiledNPCData.id,
-      key,
-      initialX: tiledNPCData.x,
-      initialY: tiledNPCData.y,
-    };
-
-    const baseNPCMetaData = {
-      ...baseMetaData,
-      ...tiledProperties,
-      ...additionalProperties,
-    };
-
-    return { key, baseNPCMetaData };
+    return npcSeedData;
   }
 }

@@ -1,15 +1,19 @@
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { Skill } from "@entities/ModuleSkills/SkillsModel";
 import { MapLoader } from "@providers/map/MapLoader";
-import { INPCMetaData, NPCLoader } from "@providers/npc/NPCLoader";
+import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 
 @provide(NPCSeeder)
 export class NPCSeeder {
+  constructor(private npcLoader: NPCLoader) {}
+
   public async seed(): Promise<void> {
-    for (const [key, NPCData] of NPCLoader.NPCMetaData.entries()) {
+    const npcSeedData = this.npcLoader.loadNPCSeedData();
+
+    for (const [key, NPCData] of npcSeedData.entries()) {
       const npcFound = (await NPC.findOne({ tiledId: NPCData.tiledId })) as unknown as INPC;
 
       NPCData.targetCharacter = undefined; // reset any targets
@@ -33,7 +37,7 @@ export class NPCSeeder {
       } else {
         // if npc already exists, restart initial position
 
-        console.log(`Updating NPC ${NPCData.key} metadata...`);
+        console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
 
         const skills = NPCData.skills as any;
 
@@ -65,7 +69,7 @@ export class NPCSeeder {
     }
   }
 
-  private setInitialNPCPositionAsSolid(NPCData: INPCMetaData): void {
+  private setInitialNPCPositionAsSolid(NPCData: INPCSeedData): void {
     // mark NPC initial position as solid on the map (pathfinding)
     MapLoader.grids
       .get(ScenesMetaData[NPCData.scene].map)!

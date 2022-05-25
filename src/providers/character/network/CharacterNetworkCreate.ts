@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ItemView } from "@providers/item/ItemView";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -24,7 +25,8 @@ export class CharacterNetworkCreate {
     private geckosConnection: SocketConnection,
     private playerView: CharacterView,
     private socketMessaging: SocketMessaging,
-    private npcView: NPCView
+    private npcView: NPCView,
+    private itemView: ItemView
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -64,6 +66,8 @@ export class CharacterNetworkCreate {
         }
 
         await this.npcView.warnUserAboutNPCsInView(character);
+
+        await this.itemView.warnCharacterAboutItemsInView(character);
 
         // here we inject our server side character properties, to make sure the client is not hacking anything!
         const dataFromServer: ICharacterCreateFromServer = {

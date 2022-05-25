@@ -1,12 +1,12 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
-import { generateFixedPathMovement } from "./abstractions/BaseNeutralNPC";
+import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
 
-export const npcAliceMetaData = {
-  ...generateFixedPathMovement(),
-  key: "alice",
-  name: "Alice",
+export const npcFelicia = {
+  ...generateMoveTowardsMovement(),
+  name: "Felicia",
   textureKey: "female-npc",
+  scene: "MainScene",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
 } as Partial<INPC>;

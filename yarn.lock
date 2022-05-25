@@ -1603,10 +1603,17 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
+<<<<<<< HEAD
 "@rpg-engine/shared@^0.2.70":
   version "0.2.70"
   resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.2.70.tgz#6fe2d96238b88cfa3b0aba8d76228a87532c9aa1"
   integrity sha512-mqEAzMgIEpo7mDPRAzoCqamiKDOtTgVFlTODl9bAv6fQgHw7q/8xMdczWhIf2162A387ssFiOQ0wg9K7zZ80CQ==
+=======
+"@rpg-engine/shared@^0.2.69":
+  version "0.2.69"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.2.69.tgz#82f429b6c4315c1c7b130e957a526f76f8a54638"
+  integrity sha512-+FTU6DEKMDMV1LYA3kF8y+9yvq8KTkcYN/6PlvUdCNtoEWh9L3hrmOIaVVqsD2ASKiOD3OKWWpZ0FVGqVNVXzQ==
+>>>>>>> RPG-266-basic-item-behavior
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"

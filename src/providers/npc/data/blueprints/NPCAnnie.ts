@@ -1,12 +1,12 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
-import { generateStoppedMovement } from "./abstractions/BaseNeutralNPC";
+import { generateMoveAwayMovement } from "../abstractions/BaseNeutralNPC";
 
-export const npcAgathaMetaData = {
-  ...generateStoppedMovement(),
-  key: "agatha",
-  name: "Agatha",
+export const npcAnnie = {
+  ...generateMoveAwayMovement(),
+  name: "Annie",
   textureKey: "female-npc",
+  scene: "MainScene",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
 } as Partial<INPC>;
