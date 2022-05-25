@@ -4,28 +4,38 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { ChatSocketEvents, IChatMessage } from "@rpg-engine/shared";
+import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
+import {
+  ChatSocketEvents,
+  GRID_HEIGHT,
+  GRID_WIDTH,
+  IChatMessageCreatePayload,
+  IChatMessageReadPayload,
+  SOCKET_TRANSMISSION_ZONE_WIDTH,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { Model } from "mongoose";
 
 @provide(ChatNetworkGlobalMessaging)
 export class ChatNetworkGlobalMessaging {
   constructor(
     private socketAuth: SocketAuth,
     private socketMessaging: SocketMessaging,
-    private characterView: CharacterView
+    private characterView: CharacterView,
+    private socketTransmissionZone: SocketTransmissionZone
   ) {}
 
   public onGlobalMessaging(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      ChatSocketEvents.GlobalChatMessage,
-      async (data: IChatMessage, character: ICharacter) => {
+      ChatSocketEvents.GlobalChatMessageCreate,
+      async (data: IChatMessageCreatePayload, character: ICharacter) => {
         try {
           if (this.canCharacterSendMessage(character)) {
             const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
-            const savedChatLog = await this.saveChatLog(data, character);
-            this.sendMessageToNearbyCharacters(data, savedChatLog, nearbyCharacters, character);
+            await this.saveChatLog(data, character);
+            this.sendMessagesToNearbyCharacters(data, character, nearbyCharacters);
           }
         } catch (error) {
           console.error(error);
@@ -38,7 +48,7 @@ export class ChatNetworkGlobalMessaging {
     return character.isOnline && !character.isBanned;
   }
 
-  private async saveChatLog(data: IChatMessage, character: ICharacter): Promise<IChatLog> {
+  private async saveChatLog(data: IChatMessageCreatePayload, character: ICharacter): Promise<IChatLog> {
     return await ChatLog.create({
       message: data.message,
       emitter: character._id,
@@ -49,38 +59,71 @@ export class ChatNetworkGlobalMessaging {
     });
   }
 
-  private sendMessageToNearbyCharacters(
-    data: IChatMessage,
-    savedChatLog: IChatLog,
-    nearbyCharacters: ICharacter[],
-    emitter: ICharacter
-  ): void {
+  private async sendMessagesToNearbyCharacters(
+    data: IChatMessageCreatePayload,
+    character: ICharacter,
+    nearbyCharacters: ICharacter[]
+  ): Promise<void> {
+    const chatLogs = await this.getChatLogsInZone(character, data.limit);
+
     for (const nearbyCharacter of nearbyCharacters) {
-      const isValidCharacterTarget = this.shouldCharacterReceiveMessage(nearbyCharacter, emitter);
+      const isValidCharacterTarget = this.shouldCharacterReceiveMessage(nearbyCharacter);
 
       if (isValidCharacterTarget && data.message) {
-        this.socketMessaging.sendEventToUser<IChatMessage>(
+        this.socketMessaging.sendEventToUser<IChatMessageReadPayload>(
           nearbyCharacter.channelId!,
-          ChatSocketEvents.GlobalChatMessage,
-          {
-            _id: savedChatLog._id,
-            message: data.message,
-            emitter: {
-              _id: emitter._id,
-              name: emitter.name,
-            },
-            type: data.type,
-          }
+          ChatSocketEvents.GlobalChatMessageRead,
+          chatLogs
         );
       }
     }
   }
 
-  private shouldCharacterReceiveMessage(target: ICharacter, emitter: ICharacter): Boolean {
-    if (target.scene !== emitter.scene) {
-      return false;
-    }
+  public async getChatLogsInZone(character: ICharacter, limit: number = 20): Promise<IChatMessageReadPayload> {
+    const socketTransmissionZone = this.socketTransmissionZone.calculateSocketTransmissionZone(
+      character.x,
+      character.y,
+      GRID_WIDTH,
+      GRID_HEIGHT,
+      SOCKET_TRANSMISSION_ZONE_WIDTH,
+      SOCKET_TRANSMISSION_ZONE_WIDTH
+    );
 
+    // @ts-ignore
+    const chatLogsInView = await (ChatLog as Model)
+      .find({
+        $and: [
+          {
+            x: {
+              $gte: socketTransmissionZone.x,
+              $lte: socketTransmissionZone.width,
+            },
+          },
+          {
+            y: {
+              $gte: socketTransmissionZone.y,
+              $lte: socketTransmissionZone.height,
+            },
+          },
+          {
+            scene: character.scene,
+          },
+        ],
+      })
+      .sort({ createdAt: -1 })
+      .populate("emitter", "name")
+      .limit(limit);
+
+    chatLogsInView.reverse();
+
+    const chatMessageReadPayload: IChatMessageReadPayload = {
+      messages: chatLogsInView,
+    };
+
+    return chatMessageReadPayload;
+  }
+
+  private shouldCharacterReceiveMessage(target: ICharacter): Boolean {
     return target.isOnline && !target.isBanned;
   }
 }

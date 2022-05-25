@@ -6,13 +6,12 @@ import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZon
 import {
   GRID_HEIGHT,
   GRID_WIDTH,
-  IEntitiesInView,
   INPCPositionUpdatePayload,
   NPCAlignment,
   NPCSocketEvents,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
-import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
+import { EntityType, IEntitiesInView } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
 
