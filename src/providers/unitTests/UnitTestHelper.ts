@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { container } from "@providers/inversify/container";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
@@ -77,7 +78,8 @@ export class UnitTestHelper {
   }
 
   public createMockSocketTransmissionZone(x: number, y: number, width: number, height: number): SocketTransmissionZone {
-    const socketTransmissionZone = new SocketTransmissionZone();
+    const socketTransmissionZone = container.get<SocketTransmissionZone>(SocketTransmissionZone);
+
     jest.spyOn(socketTransmissionZone, "calculateSocketTransmissionZone").mockImplementation(
       () =>
         ({
