@@ -32,8 +32,6 @@ export class CharacterView {
     elementId: string,
     type: "npcs" | "items" | "characters"
   ): Promise<void> {
-    console.log("removing from character view");
-
     const updatedCharView = _.omit(character.view[type], elementId);
 
     await Character.updateOne(

@@ -69,7 +69,7 @@ itemSchema.virtual("fullDescription").get(function (this: IItem) {
   }`;
 });
 
-const warnAboutItemChanges = async (item: IItem): Promise<void> => {
+const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"): Promise<void> => {
   if (item.x && item.y && item.scene) {
     const characterView = container.get<CharacterView>(CharacterView);
     const itemView = container.get<ItemView>(ItemView);
@@ -77,17 +77,27 @@ const warnAboutItemChanges = async (item: IItem): Promise<void> => {
     const nearbyCharacters = await characterView.getCharactersAroundXYPosition(item.x, item.y, item.scene);
 
     for (const character of nearbyCharacters) {
-      await itemView.warnCharacterAboutItemsInView(character);
+      if (warnType === "changes") {
+        await itemView.warnCharacterAboutItemsInView(character);
+      }
+
+      if (warnType === "removal") {
+        await itemView.warnCharacterAboutItemRemovalInView(item);
+      }
     }
   }
 };
 
 itemSchema.post("updateOne", async function (this: IItem) {
-  await warnAboutItemChanges(this);
+  await warnAboutItemChanges(this, "changes");
 });
 
 itemSchema.post("save", async function (this: IItem) {
-  await warnAboutItemChanges(this);
+  await warnAboutItemChanges(this, "changes");
+});
+
+itemSchema.post("remove", async function (this: IItem) {
+  await warnAboutItemChanges(this, "removal");
 });
 
 export type IItem = ExtractDoc<typeof itemSchema>;

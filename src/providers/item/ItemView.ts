@@ -3,8 +3,14 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import { IItemsInView, IItemUpdate, ItemSocketEvents, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  IItemUpdate,
+  ItemSocketEvents,
+  ItemSubType,
+  ItemType,
+  IViewDestroyElementPayload,
+  ViewSocketEvents,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ItemView)
@@ -12,11 +18,29 @@ export class ItemView {
   constructor(
     private characterView: CharacterView,
     private socketMessaging: SocketMessaging,
-    private objectHelper: DataStructureHelper,
-    private socketTransmissionZone: SocketTransmissionZone
+    private objectHelper: DataStructureHelper
   ) {}
 
-  public async warnCharacterAboutItemsInView(character: ICharacter, otherItemsInView?: IItemsInView): Promise<void> {
+  public async warnCharacterAboutItemRemovalInView(item: IItem): Promise<void> {
+    if (item.x && item.y && item.scene) {
+      const charactersNearby = await this.characterView.getCharactersAroundXYPosition(item.x, item.y, item.scene);
+
+      for (const character of charactersNearby) {
+        this.socketMessaging.sendEventToUser<IViewDestroyElementPayload>(
+          character.channelId!,
+          ViewSocketEvents.Destroy,
+          {
+            id: item.id,
+            type: "items",
+          }
+        );
+
+        await this.characterView.removeFromCharacterView(character, item.id, "items");
+      }
+    }
+  }
+
+  public async warnCharacterAboutItemsInView(character: ICharacter): Promise<void> {
     const itemsNearby = await this.getItemsInCharacterView(character);
 
     for (const item of itemsNearby) {
