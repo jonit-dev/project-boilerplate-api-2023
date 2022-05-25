@@ -20,6 +20,7 @@ export class SocketIO implements ISocket {
     this.socket.listen(appEnv.socket.port.SOCKET);
 
     if (appEnv.general.ENV === EnvType.Production) {
+      // @ts-ignore
       this.socket.adapter(createAdapter());
       setupWorker(this.socket);
     }

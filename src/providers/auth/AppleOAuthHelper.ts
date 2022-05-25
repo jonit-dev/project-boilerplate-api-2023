@@ -55,9 +55,9 @@ export class AppleOAuthHelper {
           reject(null);
         }
 
-        const signingKey = key.getPublicKey();
+        const signingKey = key?.getPublicKey();
 
-        resolve(signingKey);
+        resolve(signingKey!);
       });
     });
   }
