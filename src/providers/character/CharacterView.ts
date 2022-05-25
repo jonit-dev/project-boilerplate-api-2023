@@ -1,12 +1,51 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import { GRID_HEIGHT, GRID_WIDTH, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
+import { GRID_HEIGHT, GRID_WIDTH, IViewElement, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 import { Model } from "mongoose";
 
 @provide(CharacterView)
 export class CharacterView {
   constructor(private socketTransmissionZone: SocketTransmissionZone) {}
+
+  public async addToCharacterView(
+    character: ICharacter,
+    viewElement: IViewElement,
+    type: "npcs" | "items" | "characters"
+  ): Promise<void> {
+    console.log("adding to character view...");
+    const updatedElementView = Object.assign(character.view[type], {
+      [viewElement.id]: viewElement,
+    });
+
+    character.view = {
+      ...character.view,
+      [type]: updatedElementView,
+    };
+
+    await Character.updateOne({ _id: character._id }, { view: character.view });
+  }
+
+  public async removeFromCharacterView(
+    character: ICharacter,
+    elementId: string,
+    type: "npcs" | "items" | "characters"
+  ): Promise<void> {
+    console.log("removing from character view");
+
+    const updatedCharView = _.omit(character.view[type], elementId);
+
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        view: {
+          ...character.view,
+          [type]: updatedCharView,
+        },
+      }
+    );
+  }
 
   public async getCharactersAroundXYPosition(
     x: number,

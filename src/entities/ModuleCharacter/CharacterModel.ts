@@ -105,6 +105,13 @@ const characterSchema = createSchema(
       required: true,
       default: 1000,
     }),
+    view: Type.mixed({
+      default: {
+        items: {},
+        characters: {},
+        npcs: {},
+      },
+    }),
     ...({} as {
       isAlive: boolean;
       type: string;

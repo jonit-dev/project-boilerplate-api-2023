@@ -3,6 +3,7 @@ import { CharacterNetwork } from "@providers/character/network/CharacterNetwork"
 import { ChatNetwork } from "@providers/chat/network/ChatNetwork";
 import { ItemNetwork } from "@providers/item/network/ItemNetwork";
 import { NPCNetwork } from "@providers/npc/network/NPCNetwork";
+import { ViewNetwork } from "@providers/view/network/ViewNetwork";
 import { provide } from "inversify-binding-decorators";
 import { SocketChannel } from "./SocketsTypes";
 
@@ -13,7 +14,8 @@ export class SocketEventsBinder {
     private npcNetwork: NPCNetwork,
     private battleNetwork: BattleNetwork,
     private chatNetwork: ChatNetwork,
-    private itemNetwork: ItemNetwork
+    private itemNetwork: ItemNetwork,
+    private viewNetwork: ViewNetwork
   ) {}
 
   public bindEvents(channel: SocketChannel): void {
@@ -22,5 +24,6 @@ export class SocketEventsBinder {
     this.battleNetwork.onAddEventListeners(channel);
     this.chatNetwork.onAddEventListeners(channel);
     this.itemNetwork.onAddEventListeners(channel);
+    this.viewNetwork.onAddEventListeners(channel);
   }
 }

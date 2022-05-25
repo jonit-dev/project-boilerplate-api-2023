@@ -3,6 +3,15 @@ import { URLSearchParams } from "url";
 
 @provide(DataStructureHelper)
 export class DataStructureHelper {
+  public doesObjectAttrMatches(obj1: Record<string, any>, obj2: Record<string, any>, fields: string[]): boolean {
+    for (const field of fields) {
+      if (obj1[field] !== obj2[field]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public queryStringToObject(queryString: string): object {
     const params = new URLSearchParams(queryString);
 

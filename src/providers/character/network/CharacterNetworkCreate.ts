@@ -50,6 +50,11 @@ export class CharacterNetworkCreate {
 
         character.isOnline = true;
         character.channelId = data.channelId;
+        character.view = {
+          items: {},
+          npcs: {},
+          characters: {},
+        };
         const map = ScenesMetaData[character.scene].map;
         MapLoader.grids.get(map)!.setWalkableAt(ToGridX(character.x), ToGridY(character.y), false);
 
