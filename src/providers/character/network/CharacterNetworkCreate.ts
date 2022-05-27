@@ -70,7 +70,7 @@ export class CharacterNetworkCreate {
           return;
         }
 
-        await this.npcView.warnUserAboutNPCsInView(character);
+        await this.npcView.warnCharacterAboutNPCsInView(character);
 
         await this.itemView.warnCharacterAboutItemsInView(character);
 

@@ -14,7 +14,6 @@ export class CharacterView {
     viewElement: IViewElement,
     type: "npcs" | "items" | "characters"
   ): Promise<void> {
-    console.log("adding to character view...");
     const updatedElementView = Object.assign(character.view[type], {
       [viewElement.id]: viewElement,
     });

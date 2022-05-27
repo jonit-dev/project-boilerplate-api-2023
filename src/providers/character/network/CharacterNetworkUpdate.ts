@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { ItemView } from "@providers/item/ItemView";
 import { MapLoader } from "@providers/map/MapLoader";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -32,7 +33,8 @@ export class CharacterNetworkUpdate {
     private npcView: NPCView,
     private itemView: ItemView,
     private characterView: CharacterView,
-    private characterBan: CharacterBan
+    private characterBan: CharacterBan,
+    private objectHelper: DataStructureHelper
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -75,8 +77,8 @@ export class CharacterNetworkUpdate {
           }
 
           // bidirectional data retransmission
-          await this.warnUsersAroundAboutEmitterPositionUpdate(character, data);
-          await this.warnEmitterAboutUsersAround(character, data, ["x", "y", "direction"]);
+          await this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
+          await this.warnEmitterAboutCharactersAround(character);
 
           await this.npcView.warnCharacterAboutNPCsInView(character);
 
@@ -89,65 +91,74 @@ export class CharacterNetworkUpdate {
     );
   }
 
-  private async warnEmitterAboutUsersAround(
-    character: ICharacter,
-    dataFromClient: ICharacterPositionUpdateFromClient,
-    keysToTriggerSync: string[]
-  ): Promise<void> {
+  private async warnEmitterAboutCharactersAround(character: ICharacter): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
-      if (this.shouldEmitterBeUpdatedAboutCharacterNearby(dataFromClient, nearbyCharacter, keysToTriggerSync)) {
-        const nearbyCharacterData: ICharacterPositionUpdateFromServer = {
+      if (!this.shouldWarnCharacter(character, nearbyCharacter)) {
+        continue;
+      }
+
+      this.characterView.addToCharacterView(
+        character,
+        {
           id: nearbyCharacter.id,
-          name: nearbyCharacter.name,
           x: nearbyCharacter.x,
           y: nearbyCharacter.y,
-          newX: nearbyCharacter.x,
-          newY: nearbyCharacter.y,
-          channelId: nearbyCharacter.channelId!,
-          direction: nearbyCharacter.direction as AnimationDirection,
-          layer: nearbyCharacter.layer,
-          otherEntitiesInView: nearbyCharacter.otherEntitiesInView,
-          isMoving: false,
-          speed: nearbyCharacter.speed,
-          movementIntervalMs: nearbyCharacter.movementIntervalMs,
-          health: nearbyCharacter.health,
-          maxHealth: nearbyCharacter.maxHealth,
-          mana: nearbyCharacter.mana,
-          maxMana: nearbyCharacter.maxMana,
-        };
+          direction: nearbyCharacter.direction,
+          scene: nearbyCharacter.scene,
+        },
+        "characters"
+      );
 
-        this.socketMessaging.sendEventToUser<ICharacterPositionUpdateFromServer>(
-          character.channelId!,
-          CharacterSocketEvents.CharacterPositionUpdate,
-          nearbyCharacterData
-        );
-      }
+      const nearbyCharacterData: ICharacterPositionUpdateFromServer = {
+        id: nearbyCharacter.id,
+        name: nearbyCharacter.name,
+        x: nearbyCharacter.x,
+        y: nearbyCharacter.y,
+        newX: nearbyCharacter.x,
+        newY: nearbyCharacter.y,
+        channelId: nearbyCharacter.channelId!,
+        direction: nearbyCharacter.direction as AnimationDirection,
+        layer: nearbyCharacter.layer,
+        otherEntitiesInView: nearbyCharacter.otherEntitiesInView,
+        isMoving: false,
+        speed: nearbyCharacter.speed,
+        movementIntervalMs: nearbyCharacter.movementIntervalMs,
+        health: nearbyCharacter.health,
+        maxHealth: nearbyCharacter.maxHealth,
+        mana: nearbyCharacter.mana,
+        maxMana: nearbyCharacter.maxMana,
+      };
+
+      this.socketMessaging.sendEventToUser<ICharacterPositionUpdateFromServer>(
+        character.channelId!,
+        CharacterSocketEvents.CharacterPositionUpdate,
+        nearbyCharacterData
+      );
     }
   }
 
-  private shouldEmitterBeUpdatedAboutCharacterNearby(
-    dataFromClient: ICharacterPositionUpdateFromClient,
-    nearbyCharacter: ICharacter,
-    keysToTriggerSync: string[]
-  ): boolean {
-    const emitterHasNearbyCharacterInView = dataFromClient.otherEntitiesInView?.[nearbyCharacter.id] || false;
+  private shouldWarnCharacter(emitter: ICharacter, nearbyCharacter: ICharacter): boolean {
+    const charOnCharView = emitter.view.characters[nearbyCharacter.id];
 
-    if (!emitterHasNearbyCharacterInView) {
-      return true;
-    }
+    // if we already have a representation there, just skip!
+    if (charOnCharView) {
+      const doesServerCharMatchesClientChar = this.objectHelper.doesObjectAttrMatches(charOnCharView, nearbyCharacter, [
+        "id",
+        "direction",
+        "scene",
+      ]);
 
-    for (const key of keysToTriggerSync) {
-      if (emitterHasNearbyCharacterInView?.[key] && emitterHasNearbyCharacterInView[key] !== nearbyCharacter[key]) {
-        return true;
+      if (doesServerCharMatchesClientChar) {
+        return false;
       }
     }
 
-    return false;
+    return true;
   }
 
-  private async warnUsersAroundAboutEmitterPositionUpdate(
+  private async warnCharactersAroundAboutEmitterPositionUpdate(
     character: ICharacter,
     data: ICharacterPositionUpdateFromClient
   ): Promise<void> {
@@ -155,6 +166,18 @@ export class CharacterNetworkUpdate {
 
     for (const nearbyCharacter of nearbyCharacters) {
       const dataFromServer = this.generateDataPayloadFromServer(data, character);
+
+      this.characterView.addToCharacterView(
+        nearbyCharacter,
+        {
+          id: character.id,
+          x: character.x,
+          y: character.y,
+          direction: character.direction,
+          scene: character.scene,
+        },
+        "characters"
+      );
 
       this.socketMessaging.sendEventToUser<ICharacterPositionUpdateFromServer>(
         nearbyCharacter.channelId!,
