@@ -99,7 +99,7 @@ export class CharacterNetworkUpdate {
         continue;
       }
 
-      this.characterView.addToCharacterView(
+      await this.characterView.addToCharacterView(
         character,
         {
           id: nearbyCharacter.id,
@@ -139,13 +139,18 @@ export class CharacterNetworkUpdate {
     }
   }
 
-  private shouldWarnCharacter(emitter: ICharacter, nearbyCharacter: ICharacter): boolean {
+  private shouldWarnCharacter(
+    emitter: ICharacter,
+    nearbyCharacter: ICharacter | ICharacterPositionUpdateFromClient
+  ): boolean {
     const charOnCharView = emitter.view.characters[nearbyCharacter.id];
 
     // if we already have a representation there, just skip!
     if (charOnCharView) {
       const doesServerCharMatchesClientChar = this.objectHelper.doesObjectAttrMatches(charOnCharView, nearbyCharacter, [
         "id",
+        "x",
+        "y",
         "direction",
         "scene",
       ]);
@@ -160,20 +165,32 @@ export class CharacterNetworkUpdate {
 
   private async warnCharactersAroundAboutEmitterPositionUpdate(
     character: ICharacter,
-    data: ICharacterPositionUpdateFromClient
+    clientPosUpdateData: ICharacterPositionUpdateFromClient
   ): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
-      const dataFromServer = this.generateDataPayloadFromServer(data, character);
+      // we should only warn the nearby char, if there's a mismatch between what he's actually seeing (nearbyCharacter) vs clientPosUpdateData (latest emitter update). This is needed to avoid sending unnecessary data to the client.
+      const nearbyCharEmitterRepresentation = nearbyCharacter.view.characters[character.id];
+      if (nearbyCharEmitterRepresentation) {
+        if (
+          clientPosUpdateData.x === nearbyCharEmitterRepresentation.x &&
+          clientPosUpdateData.y === nearbyCharEmitterRepresentation.y &&
+          clientPosUpdateData.direction === nearbyCharEmitterRepresentation.direction
+        ) {
+          continue;
+        }
+      }
 
-      this.characterView.addToCharacterView(
+      const dataFromServer = this.generateDataPayloadFromServer(clientPosUpdateData, character);
+
+      await this.characterView.addToCharacterView(
         nearbyCharacter,
         {
-          id: character.id,
-          x: character.x,
-          y: character.y,
-          direction: character.direction,
+          id: clientPosUpdateData.id,
+          x: clientPosUpdateData.x,
+          y: clientPosUpdateData.y,
+          direction: clientPosUpdateData.direction,
           scene: character.scene,
         },
         "characters"

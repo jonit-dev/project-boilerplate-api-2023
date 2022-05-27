@@ -22,7 +22,6 @@ export class CharacterView {
       ...character.view,
       [type]: updatedElementView,
     };
-
     await Character.updateOne({ _id: character._id }, { view: character.view });
   }
 
