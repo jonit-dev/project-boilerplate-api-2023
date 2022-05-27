@@ -78,7 +78,7 @@ export class CharacterNetworkUpdate {
           await this.warnUsersAroundAboutEmitterPositionUpdate(character, data);
           await this.warnEmitterAboutUsersAround(character, data, ["x", "y", "direction"]);
 
-          await this.npcView.warnUserAboutNPCsInView(character, data.otherEntitiesInView);
+          await this.npcView.warnCharacterAboutNPCsInView(character);
 
           await this.itemView.warnCharacterAboutItemsInView(character);
 
