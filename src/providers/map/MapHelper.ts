@@ -36,15 +36,14 @@ export class MapHelper {
     }
 
     const data = {
+      ...blueprint, // blueprint provides the "basic" properties for ths object
       ...tiledProperties,
       ...additionalProperties,
       key,
-      textureKey: tiledKey,
       tiledId: tiledData.id,
       x: tiledData.x,
       y: tiledData.y,
       scene: sceneName,
-      ...blueprint,
     };
 
     return { key, data };
