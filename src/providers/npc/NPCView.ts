@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
@@ -11,7 +12,6 @@ import {
   NPCSocketEvents,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
-import { EntityType, IEntitiesInView } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
 
@@ -24,7 +24,9 @@ export class NPCView {
   constructor(
     private socketMessaging: SocketMessaging,
     private playerView: CharacterView,
-    private socketTransmissionZone: SocketTransmissionZone
+    private socketTransmissionZone: SocketTransmissionZone,
+    private characterView: CharacterView,
+    private objectHelper: DataStructureHelper
   ) {}
 
   public async getElementsInNPCView<T extends IElementWithPosition>(
@@ -71,17 +73,34 @@ export class NPCView {
     });
   }
 
-  public async warnUserAboutNPCsInView(character: ICharacter, otherEntitiesInView?: IEntitiesInView): Promise<void> {
+  public async warnCharacterAboutNPCsInView(character: ICharacter): Promise<void> {
     const npcsInView = await this.getNPCsInView(character);
 
     for (const npc of npcsInView) {
-      if (otherEntitiesInView && otherEntitiesInView[npc.id]) {
-        const clientNPC = otherEntitiesInView[npc.id];
+      const npcOnCharView = character.view.npcs[npc.id];
 
-        if (clientNPC.type === EntityType.NPC) {
-          continue; // we dont need to warn the user about the npc, since it already has it on his view
+      // if we already have a representation there, just skip!
+      if (npcOnCharView) {
+        const doesServerNPCMatchesClientNPC = this.objectHelper.doesObjectAttrMatches(npcOnCharView, npc, [
+          "id",
+          "scene",
+        ]);
+
+        if (doesServerNPCMatchesClientNPC) {
+          continue;
         }
       }
+
+      await this.characterView.addToCharacterView(
+        character,
+        {
+          id: npc.id,
+          x: npc.x,
+          y: npc.y,
+          scene: npc.scene,
+        },
+        "npcs"
+      );
 
       this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
         character.channelId!,
