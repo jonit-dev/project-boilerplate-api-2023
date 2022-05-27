@@ -35,7 +35,9 @@ export class ChatNetworkGlobalMessaging {
             const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
             await this.saveChatLog(data, character);
-            this.sendMessagesToNearbyCharacters(data, character, nearbyCharacters);
+            const chatLogs = await this.getChatLogsInZone(character, data.limit);
+            this.sendMessagesToNearbyCharacters(chatLogs, nearbyCharacters);
+            this.sendMessagesToCharacter(chatLogs, character);
           }
         } catch (error) {
           console.error(error);
@@ -59,23 +61,28 @@ export class ChatNetworkGlobalMessaging {
     });
   }
 
-  private async sendMessagesToNearbyCharacters(
-    data: IChatMessageCreatePayload,
-    character: ICharacter,
-    nearbyCharacters: ICharacter[]
-  ): Promise<void> {
-    const chatLogs = await this.getChatLogsInZone(character, data.limit);
-
+  private sendMessagesToNearbyCharacters(chatLogs: IChatMessageReadPayload, nearbyCharacters: ICharacter[]): void {
     for (const nearbyCharacter of nearbyCharacters) {
       const isValidCharacterTarget = this.shouldCharacterReceiveMessage(nearbyCharacter);
-
-      if (isValidCharacterTarget && data.message) {
+      if (isValidCharacterTarget) {
         this.socketMessaging.sendEventToUser<IChatMessageReadPayload>(
           nearbyCharacter.channelId!,
           ChatSocketEvents.GlobalChatMessageRead,
           chatLogs
         );
       }
+    }
+  }
+
+  private sendMessagesToCharacter(chatLogs: IChatMessageReadPayload, character: ICharacter): void {
+    const isValidCharacterTarget = this.shouldCharacterReceiveMessage(character);
+
+    if (isValidCharacterTarget) {
+      this.socketMessaging.sendEventToUser<IChatMessageReadPayload>(
+        character.channelId!,
+        ChatSocketEvents.GlobalChatMessageRead,
+        chatLogs
+      );
     }
   }
 
