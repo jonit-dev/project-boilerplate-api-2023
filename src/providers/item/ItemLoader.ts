@@ -28,8 +28,7 @@ export class ItemLoader {
           tiledItemData,
           mapName,
           itemsBlueprintIndex,
-          null,
-          "item"
+          null
         );
 
         itemSeedData.set(key, data);

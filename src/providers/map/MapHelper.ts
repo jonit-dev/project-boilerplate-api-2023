@@ -16,8 +16,7 @@ export class MapHelper {
     tiledData: ITiledObject,
     mapName: string,
     blueprintIndex: Record<string, any>,
-    additionalProperties: Record<string, any> | null,
-    elementType: "npc" | "item"
+    additionalProperties: Record<string, any> | null
   ): { key: string; data: T } {
     const tiledProperties: Record<string, any> = {};
 
@@ -25,9 +24,10 @@ export class MapHelper {
       tiledProperties[property.name] = property.value;
     });
 
-    const baseKey = `${tiledProperties.key.replace(`${elementType}-`, "")}`;
-    const blueprint = blueprintIndex[baseKey];
-    const key = `${baseKey}-${tiledData.id}`;
+    const tiledKey = tiledProperties.key;
+
+    const blueprint = blueprintIndex[tiledKey];
+    const key = `${tiledKey}-${tiledData.id}`;
 
     const sceneName = this.getSceneNameFromMapName(mapName);
 
@@ -39,7 +39,7 @@ export class MapHelper {
       ...tiledProperties,
       ...additionalProperties,
       key,
-      textureKey: baseKey,
+      textureKey: tiledKey,
       tiledId: tiledData.id,
       x: tiledData.x,
       y: tiledData.y,

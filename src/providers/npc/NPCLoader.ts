@@ -41,8 +41,7 @@ export class NPCLoader {
           tiledNPCData,
           mapName,
           npcsBlueprintIndex,
-          additionalProps,
-          "npc"
+          additionalProps
         );
 
         npcSeedData.set(key, data);

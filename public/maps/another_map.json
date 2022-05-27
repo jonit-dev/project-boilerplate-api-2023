@@ -620,7 +620,7 @@
             {
               "name": "key",
               "type": "string",
-              "value": "item-short-sword"
+              "value": "short-sword"
             }
           ],
           "rotation": 0,
@@ -1167,7 +1167,7 @@
             {
               "name": "key",
               "type": "string",
-              "value": "npc-alice"
+              "value": "alice"
             },
             {
               "name": "movementType",
@@ -1195,7 +1195,7 @@
             {
               "name": "key",
               "type": "string",
-              "value": "npc-agatha"
+              "value": "agatha"
             }
           ],
           "rotation": 0,
@@ -1218,7 +1218,7 @@
             {
               "name": "key",
               "type": "string",
-              "value": "npc-annie"
+              "value": "annie"
             }
           ],
           "rotation": 0,
@@ -1241,7 +1241,7 @@
             {
               "name": "key",
               "type": "string",
-              "value": "npc-felicia"
+              "value": "felicia"
             }
           ],
           "rotation": 0,
@@ -1264,7 +1264,7 @@
             {
               "name": "key",
               "type": "string",
-              "value": "npc-maria"
+              "value": "maria"
             }
           ],
           "rotation": 0,
@@ -1287,12 +1287,7 @@
             {
               "name": "key",
               "type": "string",
-              "value": "npc-monster"
-            },
-            {
-              "name": "scene",
-              "type": "string",
-              "value": "MainScene"
+              "value": "monster"
             }
           ],
           "rotation": 0,
