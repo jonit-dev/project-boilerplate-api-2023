@@ -120,6 +120,8 @@ export class BattleAttackTarget {
             this.npcTarget.tryToSetTarget(attacker as INPC);
           }
           if (target.type === "NPC") {
+            await this.battleEffects.generateBloodOnGround(target);
+
             this.battleDeathManager.handleNPCDeath(target as INPC);
           }
         }
