@@ -54,6 +54,7 @@ const itemSchema = createSchema(
       isStackable: boolean;
       fullDescription: string;
     }),
+    decayTime: Type.date(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

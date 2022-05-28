@@ -1,5 +1,6 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import dayjs from "dayjs";
 
 export const itemCharacterBody: Partial<IItem> = {
   key: "character-body",
@@ -13,4 +14,5 @@ export const itemCharacterBody: Partial<IItem> = {
   weight: 100,
   isStorable: false,
   isItemContainer: true, // this will automatically create a container once an this is spawned
+  decayTime: dayjs(new Date()).add(1, "hour").toDate(),
 };

@@ -1,6 +1,6 @@
 import { ItemType, TypeHelper } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
-import { IItem } from "./ItemModel";
+import { IItem, Item } from "./ItemModel";
 
 const itemContainerSchema = createSchema(
   {
@@ -34,6 +34,20 @@ itemContainerSchema.virtual("isEmpty").get(function (this: IItemContainer) {
   const items = this.items as unknown as IItem[];
 
   return !items || items.length === 0;
+});
+
+itemContainerSchema.post("remove", async function (this: IItemContainer) {
+  if (this.items) {
+    for (const itemId of this.items) {
+      const item = await Item.findById(itemId);
+
+      if (item) {
+        await item.remove();
+      } else {
+        throw new Error(`Item Container error: Failed to remove ${itemId} after container destruction.`);
+      }
+    }
+  }
 });
 
 export type IItemContainer = ExtractDoc<typeof itemContainerSchema>;

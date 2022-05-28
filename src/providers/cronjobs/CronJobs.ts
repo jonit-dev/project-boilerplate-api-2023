@@ -2,10 +2,11 @@ import { appEnv } from "@providers/config/env";
 import { EnvType } from "@rpg-engine/shared/dist";
 import { provide } from "inversify-binding-decorators";
 import { CharacterCrons } from "./CharacterCrons";
+import { ItemCrons } from "./ItemCrons";
 
 @provide(Cronjob)
 class Cronjob {
-  constructor(private characterCron: CharacterCrons) {}
+  constructor(private characterCron: CharacterCrons, private itemCrons: ItemCrons) {}
 
   public start(): void {
     this.scheduleCrons();
@@ -22,12 +23,14 @@ class Cronjob {
         case "1":
           break;
         case "2":
+          this.itemCrons.schedule();
           break;
         case "3":
           break;
       }
     } else {
       this.characterCron.schedule();
+      this.itemCrons.schedule();
     }
   }
 }

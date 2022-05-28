@@ -14,7 +14,9 @@ import {
 } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 import { BattleDeathManager } from "./BattleDeathManager";
+import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
 import { BattleNetworkStopTargeting } from "./network/BattleNetworkStopTargetting";
 
@@ -27,7 +29,8 @@ export class BattleAttackTarget {
     private battleDeathManager: BattleDeathManager,
     private movementHelper: MovementHelper,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
-    private npcTarget: NPCTarget
+    private npcTarget: NPCTarget,
+    private battleEffects: BattleEffects
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
@@ -94,6 +97,12 @@ export class BattleAttackTarget {
         }
         await target.save();
 
+        const n = _.random(0, 100);
+
+        if (n <= 30) {
+          await this.battleEffects.generateBloodOnGround(target);
+        }
+
         battleEventPayload = {
           ...battleEventPayload,
           totalDamage: damage,
@@ -105,6 +114,8 @@ export class BattleAttackTarget {
         // check if character is dead after damage calculation. If so, send death event to client and characters around
         if (!target.isAlive) {
           if (target.type === "Character") {
+            await this.battleEffects.generateBloodOnGround(target);
+
             await this.battleDeathManager.handleCharacterDeath(target as ICharacter);
             this.npcTarget.tryToSetTarget(attacker as INPC);
           }
