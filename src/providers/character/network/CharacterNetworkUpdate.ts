@@ -262,6 +262,11 @@ export class CharacterNetworkUpdate {
       return false;
     }
 
+    if (!character.isAlive) {
+      console.log(`🚫 ${character.name} tried to move while dead!`);
+      return false;
+    }
+
     if (character.isBanned) {
       console.log(`🚫 ${character.name} tried to move while banned!`);
 
