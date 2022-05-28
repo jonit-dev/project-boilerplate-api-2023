@@ -20,7 +20,6 @@ import {
 } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
 import { CharacterBan } from "../CharacterBan";
 import { CharacterView } from "../CharacterView";
 
@@ -121,7 +120,6 @@ export class CharacterNetworkUpdate {
         channelId: nearbyCharacter.channelId!,
         direction: nearbyCharacter.direction as AnimationDirection,
         layer: nearbyCharacter.layer,
-        otherEntitiesInView: nearbyCharacter.otherEntitiesInView,
         isMoving: false,
         speed: nearbyCharacter.speed,
         movementIntervalMs: nearbyCharacter.movementIntervalMs,
@@ -328,9 +326,6 @@ export class CharacterNetworkUpdate {
       updatedData.x = newX;
       updatedData.y = newY;
 
-      // remove self, if present
-      data.otherEntitiesInView = _.omit(data.otherEntitiesInView, [character._id]);
-
       await Character.updateOne(
         { _id: character._id },
         {
@@ -338,7 +333,6 @@ export class CharacterNetworkUpdate {
             x: updatedData.x,
             y: updatedData.y,
             direction: direction,
-            otherEntitiesInView: data.otherEntitiesInView,
             lastMovement: new Date(),
           },
         }
