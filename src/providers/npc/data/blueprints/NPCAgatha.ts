@@ -6,6 +6,7 @@ export const npcAgatha = {
   ...generateStoppedMovement(),
   name: "Agatha",
   textureKey: "female-npc",
+  key: "agatha",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
 } as Partial<INPC>;

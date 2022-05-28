@@ -7,6 +7,7 @@ export const npcFelicia = {
   name: "Felicia",
   textureKey: "female-npc",
   scene: "MainScene",
+  key: "felicia",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
 } as Partial<INPC>;

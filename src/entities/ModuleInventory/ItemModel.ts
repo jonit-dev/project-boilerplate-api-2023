@@ -3,10 +3,14 @@ import { container } from "@providers/inversify/container";
 import { ItemView } from "@providers/item/ItemView";
 import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ItemContainer } from "./ItemContainerModel";
 
 const itemSchema = createSchema(
   {
-    tiledId: Type.number({ required: true }),
+    tiledId: Type.number(),
+    owner: Type.objectId({
+      ref: "Character",
+    }),
     type: Type.string({
       required: true,
       default: ItemType.Other,
@@ -20,6 +24,8 @@ const itemSchema = createSchema(
     name: Type.string({ required: true }),
     description: Type.string({ required: true }),
     key: Type.string({ required: true }),
+    hasTextureFolder: Type.boolean({ required: true, default: false }),
+    textureAtlas: Type.string({ required: true, default: "items" }),
     textureKey: Type.string({ required: true }),
     attack: Type.number(),
     defense: Type.number(),
@@ -35,6 +41,10 @@ const itemSchema = createSchema(
     layer: Type.number({
       default: MapLayers.OverGround,
     }),
+    isItemContainer: Type.boolean({
+      default: false,
+      required: true,
+    }),
     itemContainer: Type.objectId({
       ref: "ItemContainer",
     }),
@@ -42,7 +52,6 @@ const itemSchema = createSchema(
     ...({} as {
       isEquipable: boolean;
       isStackable: boolean;
-      isItemContainer: boolean;
       fullDescription: string;
     }),
   },
@@ -55,10 +64,6 @@ itemSchema.virtual("isEquipable").get(function (this: IItem) {
 
 itemSchema.virtual("isStackable").get(function (this: IItem) {
   return this.maxStackSize > 1;
-});
-
-itemSchema.virtual("isItemContainer").get(function (this: IItem) {
-  return !!this.itemContainer;
 });
 
 itemSchema.virtual("fullDescription").get(function (this: IItem) {
@@ -93,11 +98,22 @@ itemSchema.post("updateOne", async function (this: IItem) {
 });
 
 itemSchema.post("save", async function (this: IItem) {
+  if (this.isItemContainer) {
+    const newContainer = new ItemContainer({
+      parentItem: this._id,
+    });
+    await newContainer.save();
+  }
+
   await warnAboutItemChanges(this, "changes");
 });
 
 itemSchema.post("remove", async function (this: IItem) {
   await warnAboutItemChanges(this, "removal");
+
+  if (this.isItemContainer) {
+    await ItemContainer.deleteOne({ parentItem: this._id });
+  }
 });
 
 export type IItem = ExtractDoc<typeof itemSchema>;

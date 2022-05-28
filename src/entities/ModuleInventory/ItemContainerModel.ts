@@ -7,13 +7,17 @@ const itemContainerSchema = createSchema(
     owner: Type.objectId({
       ref: "Character",
     }),
-    name: Type.string(),
-    slotQty: Type.number({ required: true }),
-    items: Type.array({
-      items: Type.objectId({
-        ref: "Item",
-      }),
+    parentItem: Type.objectId({
+      ref: "Item",
+      required: true,
     }),
+    name: Type.string({}),
+    slotQty: Type.number({ required: true, default: 20 }),
+    items: Type.array().of(
+      Type.objectId({
+        ref: "Item",
+      })
+    ),
     allowedItemTypes: Type.array().of(
       Type.string({
         enum: TypeHelper.enumToStringArray(ItemType),

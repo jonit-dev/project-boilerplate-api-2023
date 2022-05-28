@@ -2,8 +2,10 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 
 export const itemShortSword: Partial<IItem> = {
+  key: "short-sword",
   type: ItemType.Weapon,
   subType: ItemSubType.Sword,
+  hasTextureFolder: true,
   textureKey: "short-sword",
   name: "Short Sword",
   description: "You see a short sword. It is a single-handed sword with a handle that just features a grip.",

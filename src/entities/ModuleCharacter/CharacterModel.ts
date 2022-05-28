@@ -35,6 +35,14 @@ const characterSchema = createSchema(
       default: FromGridY(12),
       required: true,
     }),
+    initialX: Type.number({
+      default: FromGridX(13),
+      required: true,
+    }),
+    initialY: Type.number({
+      default: FromGridY(12),
+      required: true,
+    }),
     direction: Type.string({
       default: "down",
       required: true,

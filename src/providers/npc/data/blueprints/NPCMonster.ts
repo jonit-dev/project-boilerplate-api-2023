@@ -6,6 +6,7 @@ import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
 export const npcMonster = {
   ...generateMoveTowardsMovement(),
   name: "Monster",
+  key: "monster",
   textureKey: "female-npc",
   class: CharacterClass.None,
   gender: CharacterGender.Female,

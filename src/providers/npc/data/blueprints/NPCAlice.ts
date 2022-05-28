@@ -6,6 +6,7 @@ export const npcAlice = {
   ...generateFixedPathMovement(),
   name: "Alice",
   textureKey: "female-npc",
+  key: "alice",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
 } as Partial<INPC>;

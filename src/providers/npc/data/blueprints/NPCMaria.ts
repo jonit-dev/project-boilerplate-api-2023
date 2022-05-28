@@ -5,6 +5,7 @@ import { generateRandomMovement } from "../abstractions/BaseNeutralNPC";
 export const npcMaria = {
   ...generateRandomMovement(),
   name: "Maria",
+  key: "maria",
   textureKey: "female-npc",
   gender: CharacterGender.Female,
 } as Partial<INPC>;
