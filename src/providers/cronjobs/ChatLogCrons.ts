@@ -1,4 +1,5 @@
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 
@@ -14,7 +15,7 @@ export class ChatLogCrons {
   private async deleteOldMessages(): Promise<void> {
     await ChatLog.find({
       createdAt: {
-        $lt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30 * 6),
+        $lt: dayjs(new Date()).subtract(6, "months").toDate(),
       },
     }).deleteMany();
   }
