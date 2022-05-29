@@ -6,7 +6,7 @@ import { ChatLogCrons } from "./ChatLogCrons";
 import { ItemCrons } from "./ItemCrons";
 
 @provide(Cronjob)
-class Cronjob {
+export class Cronjob {
   constructor(private characterCron: CharacterCrons, private itemCrons: ItemCrons, private chatLogCron: ChatLogCrons) {}
 
   public start(): void {
@@ -44,5 +44,3 @@ class Cronjob {
     }
   }
 }
-
-export { Cronjob };
