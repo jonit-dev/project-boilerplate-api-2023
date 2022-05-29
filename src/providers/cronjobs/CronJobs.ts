@@ -16,24 +16,31 @@ class Cronjob {
   private scheduleCrons(): void {
     console.log("🕒 Start cronjob scheduling...");
 
-    if (appEnv.general.ENV === EnvType.Production) {
-      switch (process.env.pm_id) {
-        case "0":
-          this.characterCron.schedule();
-          break;
-        case "1":
-          this.chatLogCron.schedule();
-          break;
-        case "2":
-          this.itemCrons.schedule();
-          break;
-        case "3":
-          break;
-      }
-    } else {
-      this.characterCron.schedule();
-      this.itemCrons.schedule();
-      this.chatLogCron.schedule();
+    switch (appEnv.general.ENV) {
+      case EnvType.Production:
+      case EnvType.Staging:
+        switch (
+          process.env.pm_id // spread across pm2 clusters to balance workload
+        ) {
+          case "0":
+            this.characterCron.schedule();
+            break;
+          case "1":
+            this.chatLogCron.schedule();
+            break;
+          case "2":
+            this.itemCrons.schedule();
+            break;
+          case "3":
+            break;
+        }
+        break;
+      case EnvType.Development:
+      default:
+        this.characterCron.schedule();
+        this.itemCrons.schedule();
+        this.chatLogCron.schedule();
+        break;
     }
   }
 }
