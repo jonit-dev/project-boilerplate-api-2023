@@ -22,6 +22,7 @@ class Cronjob {
           this.characterCron.schedule();
           break;
         case "1":
+          this.chatLogCron.schedule();
           break;
         case "2":
           this.itemCrons.schedule();
