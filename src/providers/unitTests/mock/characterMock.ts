@@ -15,6 +15,7 @@ export const characterMock = {
   totalWeightCapacity: 100,
   isOnline: true,
   scene: "MainScene",
+  initialScene: "MainScene",
   name: "Test Character",
   owner: "6233ff328f3b09002fe32f9b",
   channelId: "mock-inexistent-channel-id",

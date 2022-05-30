@@ -57,8 +57,10 @@ export class CharacterDeath {
 
   public async respawnCharacter(character: ICharacter): Promise<void> {
     character.health = character.maxHealth;
+    character.mana = character.maxMana;
     character.x = character.initialX;
     character.y = character.initialY;
+    character.scene = character.initialScene;
     await character.save();
   }
 }

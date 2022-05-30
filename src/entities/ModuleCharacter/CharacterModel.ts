@@ -74,6 +74,10 @@ const characterSchema = createSchema(
       required: true,
       default: "MainScene",
     }),
+    initialScene: Type.string({
+      required: true,
+      default: "MainScene",
+    }),
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),
     speed: Type.number({
