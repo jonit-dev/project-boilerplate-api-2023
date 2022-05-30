@@ -38,8 +38,7 @@ describe("NPCMovementMoveTowards.ts", () => {
   });
 
   afterEach(async () => {
-    testNPC.targetCharacter = undefined;
-    await testNPC.save();
+    await npcTarget.clearTarget(testNPC);
 
     // reset NPC and character positions
     testNPC.x = FromGridX(14);

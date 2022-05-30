@@ -22,8 +22,6 @@ export class NPCTarget {
 
     if (npcBattleCycle) {
       npcBattleCycle.clear();
-    } else {
-      throw new Error(`NPC ${npc.id} has no battle cycle!`);
     }
   }
 
