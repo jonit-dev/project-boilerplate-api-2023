@@ -1,4 +1,4 @@
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MapLoader } from "@providers/map/MapLoader";
 import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
@@ -23,7 +23,7 @@ export class NPCSeeder {
       if (!npcFound) {
         console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
 
-        const skills = new Skill({ ...NPCData.skills }); // pre-populate skills, if present in metadata
+        const skills = new Skill({ ...(NPCData.skills as unknown as ISkill) }); // pre-populate skills, if present in metadata
 
         const newNPC = new NPC({
           ...NPCData,
