@@ -50,9 +50,11 @@ export class NPCMovementMoveTowards {
 
       // change movement to MoveWay (flee) if health is low!
 
-      if (npc.health <= npc.maxHealth / 4) {
-        npc.currentMovementType = NPCMovementType.MoveAway;
-        await npc.save();
+      if (npc.fleeOnLowHealth) {
+        if (npc.health <= npc.maxHealth / 4) {
+          npc.currentMovementType = NPCMovementType.MoveAway;
+          await npc.save();
+        }
       }
 
       if (reachedTarget) {

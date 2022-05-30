@@ -18,4 +18,5 @@ export const npcMonster = {
     strength: 1,
     dexterity: 1,
   },
+  fleeOnLowHealth: true,
 } as Partial<INPC>;

@@ -126,6 +126,10 @@ const npcSchema = createSchema(
       default: 1,
     }),
     nextSpawnTime: Type.date(),
+    fleeOnLowHealth: Type.boolean({
+      default: false,
+      required: true,
+    }),
     ...({} as {
       isAlive: boolean;
       type: string;
