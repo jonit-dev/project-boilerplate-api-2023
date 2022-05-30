@@ -61,7 +61,6 @@ export class NPCSpawn {
       nearestCharacter.y
     );
 
-    console.log(distanceToNearChar);
     const distanceInGrid = Math.floor(distanceToNearChar / GRID_WIDTH);
 
     if (distanceInGrid < 20) {
