@@ -4,10 +4,16 @@ import { provide } from "inversify-binding-decorators";
 import { CharacterCrons } from "./CharacterCrons";
 import { ChatLogCrons } from "./ChatLogCrons";
 import { ItemCrons } from "./ItemCrons";
+import { NPCCrons } from "./NPCCrons";
 
 @provide(Cronjob)
 export class Cronjob {
-  constructor(private characterCron: CharacterCrons, private itemCrons: ItemCrons, private chatLogCron: ChatLogCrons) {}
+  constructor(
+    private characterCron: CharacterCrons,
+    private itemCrons: ItemCrons,
+    private chatLogCron: ChatLogCrons,
+    private npcCron: NPCCrons
+  ) {}
 
   public start(): void {
     this.scheduleCrons();
@@ -32,6 +38,7 @@ export class Cronjob {
             this.itemCrons.schedule();
             break;
           case "3":
+            this.npcCron.schedule();
             break;
         }
         break;
@@ -40,6 +47,7 @@ export class Cronjob {
         this.characterCron.schedule();
         this.itemCrons.schedule();
         this.chatLogCron.schedule();
+        this.npcCron.schedule();
         break;
     }
   }

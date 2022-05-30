@@ -4,16 +4,8 @@ import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
 import { NPCView } from "../NPCView";
 import { NPCDirection } from "./NPCMovement";
-
-interface ICharacterDistance {
-  id: string;
-  distance: number;
-  x: number;
-  y: number;
-}
 
 @provide(NPCTarget)
 export class NPCTarget {
@@ -42,30 +34,10 @@ export class NPCTarget {
   public async tryToSetTarget(npc: INPC): Promise<void> {
     try {
       if (!npc.isAlive) {
-        throw new Error(`NPC ${npc.key} is trying to set target, but is not alive!`);
+        return;
       }
 
-      const nearbyCharacters = await this.npcView.getCharactersInView(npc);
-
-      const charactersDistance: ICharacterDistance[] = [];
-
-      for (const nearbyCharacter of nearbyCharacters) {
-        if (!nearbyCharacter.isAlive) {
-          continue;
-        }
-
-        const distance = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, nearbyCharacter.x, nearbyCharacter.y);
-
-        charactersDistance.push({
-          id: nearbyCharacter.id,
-          distance: distance,
-          x: nearbyCharacter.x,
-          y: nearbyCharacter.y,
-        });
-      }
-
-      // get the character with minimum distance
-      const minDistanceCharacter = _.minBy(charactersDistance, "distance");
+      const minDistanceCharacter = await this.npcView.getNearestCharacter(npc);
 
       if (minDistanceCharacter) {
         if (!npc.maxRangeInGridCells) {

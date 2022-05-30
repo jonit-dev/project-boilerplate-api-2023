@@ -38,7 +38,7 @@ export class NPCMovementMoveTowards {
       }
 
       if (reachedTarget) {
-        if (npc.alignment === NPCAlignment.Hostile && targetCharacter.isAlive) {
+        if (npc.alignment === NPCAlignment.Hostile && targetCharacter.isAlive && npc.isAlive) {
           // if reached target and alignment is enemy, lets hit it
           await this.battleManager.attackCharacter(npc, targetCharacter);
         }

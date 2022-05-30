@@ -2,9 +2,11 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
+import { NPCCycle } from "@providers/npc/NPCCycle";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, CharacterSocketEvents, IBattleDeath } from "@rpg-engine/shared";
+import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 
 @provide(BattleDeathManager)
@@ -61,8 +63,21 @@ export class BattleDeathManager {
     // create NPC body instance
     await this.npcDeath.generateNPCBody(npc);
 
+    // disable NPC behavior
+
+    const npcCycle = NPCCycle.npcCycles.get(npc.id);
+
+    if (npcCycle) {
+      npcCycle.clear();
+    } else {
+      throw new Error("NPC behavior cycle not found in npcCycles");
+    }
+
     // clear npc target
     npc.targetCharacter = undefined;
+
+    npc.nextSpawnTime = dayjs(new Date()).add(npc.spawnIntervalMin, "minutes").toDate();
+
     await npc.save();
   }
 }

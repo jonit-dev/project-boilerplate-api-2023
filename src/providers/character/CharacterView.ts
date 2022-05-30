@@ -1,13 +1,20 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { MathHelper } from "@providers/math/MathHelper";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { GRID_HEIGHT, GRID_WIDTH, IViewElement, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Model } from "mongoose";
 
+export interface ICharacterDistance {
+  id: string;
+  distance: number;
+  x: number;
+  y: number;
+}
 @provide(CharacterView)
 export class CharacterView {
-  constructor(private socketTransmissionZone: SocketTransmissionZone) {}
+  constructor(private socketTransmissionZone: SocketTransmissionZone, private mathHelper: MathHelper) {}
 
   public async addToCharacterView(
     character: ICharacter,
@@ -60,6 +67,38 @@ export class CharacterView {
     }
 
     return await this.getOtherElementsInView<ICharacter>(Character, x, y, scene, charFilter);
+  }
+
+  public async getNearestCharactersFromXYPoint(
+    x: number,
+    y: number,
+    scene: string
+  ): Promise<ICharacter | undefined | null> {
+    const nearbyCharacters = await this.getCharactersAroundXYPosition(x, y, scene);
+
+    const charactersDistance: ICharacterDistance[] = [];
+
+    for (const nearbyCharacter of nearbyCharacters) {
+      if (!nearbyCharacter.isAlive) {
+        continue;
+      }
+
+      const distance = this.mathHelper.getDistanceBetweenPoints(x, y, nearbyCharacter.x, nearbyCharacter.y);
+
+      charactersDistance.push({
+        id: nearbyCharacter.id,
+        distance: distance,
+        x: nearbyCharacter.x,
+        y: nearbyCharacter.y,
+      });
+    }
+
+    // get the character with minimum distance
+    const minDistanceCharacterInfo = _.minBy(charactersDistance, "distance");
+
+    const minDistanceChar = await Character.findById(minDistanceCharacterInfo?.id);
+
+    return minDistanceChar;
   }
 
   public async getElementsInCharView<T>(

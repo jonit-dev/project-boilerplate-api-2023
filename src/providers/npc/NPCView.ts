@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
+import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
@@ -19,6 +20,7 @@ interface IElementWithPosition {
   x: number;
   y: number;
 }
+
 @provide(NPCView)
 export class NPCView {
   constructor(
@@ -26,7 +28,8 @@ export class NPCView {
     private playerView: CharacterView,
     private socketTransmissionZone: SocketTransmissionZone,
     private characterView: CharacterView,
-    private objectHelper: DataStructureHelper
+    private objectHelper: DataStructureHelper,
+    private mathHelper: MathHelper
   ) {}
 
   public async getElementsInNPCView<T extends IElementWithPosition>(
@@ -71,6 +74,10 @@ export class NPCView {
     return await this.getElementsInNPCView(Character, npc, {
       isOnline: true,
     });
+  }
+
+  public async getNearestCharacter(npc: INPC): Promise<ICharacter | undefined | null> {
+    return await this.characterView.getNearestCharactersFromXYPoint(npc.x, npc.y, npc.scene);
   }
 
   public async warnCharacterAboutNPCsInView(character: ICharacter): Promise<void> {
@@ -128,7 +135,7 @@ export class NPCView {
 
   public async getNPCsInView(character: ICharacter): Promise<INPC[]> {
     const npcsInView = await this.playerView.getElementsInCharView(NPC, character, {
-      health: { $gt: 0 }, // only npcs that are alive!
+      health: { $gt: 0 },
     });
 
     return npcsInView;

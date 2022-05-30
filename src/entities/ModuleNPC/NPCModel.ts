@@ -95,7 +95,6 @@ const npcSchema = createSchema(
       required: true,
       enum: TypeHelper.enumToStringArray(NPCMovementType),
     }),
-
     currentMovementType: Type.string({
       required: true,
       default: NPCMovementType.Random,
@@ -114,7 +113,7 @@ const npcSchema = createSchema(
       required: true,
     }),
     speed: Type.number({
-      default: 2.5,
+      default: 1.5,
       required: true,
     }),
     dialogText: Type.string(),
