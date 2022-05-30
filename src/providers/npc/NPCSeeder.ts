@@ -23,37 +23,15 @@ export class NPCSeeder {
       if (!npcFound) {
         console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
 
-        const skills = new Skill({ ...(NPCData.skills as unknown as ISkill) }); // pre-populate skills, if present in metadata
-
-        const newNPC = new NPC({
-          ...NPCData,
-          skills: skills._id,
-        });
-        await newNPC.save();
-
-        skills.owner = newNPC._id;
-
-        await skills.save();
+        await this.createNewNPCWithSkills(NPCData);
       } else {
         // if npc already exists, restart initial position
 
         console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
 
-        const skills = NPCData.skills as any;
+        await this.resetNPC(npcFound);
 
-        if (NPCData.skills) {
-          await Skill.updateOne(
-            {
-              owner: npcFound._id,
-            },
-            {
-              ...skills,
-            },
-            {
-              upsert: true,
-            }
-          );
-        }
+        await this.updateNPCSkills(NPCData, npcFound);
 
         const updateData = _.omit(NPCData, ["skills"]);
 
@@ -63,10 +41,53 @@ export class NPCSeeder {
             $set: {
               ...updateData,
             },
+          },
+          {
+            upsert: true,
           }
         );
       }
     }
+  }
+
+  private async resetNPC(npc: INPC): Promise<void> {
+    npc.health = npc.maxHealth;
+    npc.mana = npc.maxMana;
+    npc.x = npc.initialX;
+    npc.y = npc.initialY;
+    npc.targetCharacter = undefined;
+    npc.currentMovementType = npc.originalMovementType;
+
+    await npc.save();
+  }
+
+  private async updateNPCSkills(NPCData: INPCSeedData, npc: INPC): Promise<void> {
+    const skills = NPCData.skills as any;
+
+    if (NPCData.skills) {
+      await Skill.updateOne(
+        {
+          owner: npc._id,
+        },
+        {
+          ...skills,
+        }
+      );
+    }
+  }
+
+  private async createNewNPCWithSkills(NPCData: INPCSeedData): Promise<void> {
+    const skills = new Skill({ ...(NPCData.skills as unknown as ISkill) }); // pre-populate skills, if present in metadata
+
+    const newNPC = new NPC({
+      ...NPCData,
+      skills: skills._id,
+    });
+    await newNPC.save();
+
+    skills.owner = newNPC._id;
+
+    await skills.save();
   }
 
   private setInitialNPCPositionAsSolid(NPCData: INPCSeedData): void {
