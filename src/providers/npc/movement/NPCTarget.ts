@@ -1,15 +1,31 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { NPCBattleCycle } from "../NPCBattleCycle";
 import { NPCView } from "../NPCView";
 import { NPCDirection } from "./NPCMovement";
 
 @provide(NPCTarget)
 export class NPCTarget {
-  constructor(private npcView: NPCView, private mathHelper: MathHelper, private movementHelper: MovementHelper) {}
+  constructor(private npcView: NPCView, private movementHelper: MovementHelper) {}
+
+  public async clearTarget(npc: INPC): Promise<void> {
+    npc.targetCharacter = undefined;
+    npc.targetType = NPCTargetType.Default;
+    npc.currentMovementType = npc.originalMovementType;
+
+    await npc.save();
+
+    const npcBattleCycle = NPCBattleCycle.npcBattleCycles.get(npc.id);
+
+    if (npcBattleCycle) {
+      npcBattleCycle.clear();
+    } else {
+      throw new Error(`NPC ${npc.id} has no battle cycle!`);
+    }
+  }
 
   public getTargetDirection(npc: INPC, targetX: number, targetY: number): NPCDirection {
     if (npc.y < targetY) {
@@ -113,10 +129,7 @@ export class NPCTarget {
       // if target is out of range or not online, lets remove it
       if ((targetCharacter && !isCharacterUnderRange) || !targetCharacter.isOnline) {
         // remove npc.targetCharacter
-        npc.targetCharacter = undefined;
-        npc.currentMovementType = npc.originalMovementType;
-        npc.targetType = NPCTargetType.Default;
-        await npc.save();
+        await this.clearTarget(npc);
       }
     } catch (error) {
       console.error(error);

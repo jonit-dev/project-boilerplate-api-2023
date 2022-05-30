@@ -2,7 +2,15 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleNPCManager } from "@providers/battle/BattleNPCManager";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { FromGridX, FromGridY, NPCAlignment, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
+import {
+  FromGridX,
+  FromGridY,
+  NPCAlignment,
+  NPCMovementType,
+  NPCPathOrientation,
+  ToGridX,
+  ToGridY,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCBattleCycle } from "../NPCBattleCycle";
 import { NPCMovement } from "./NPCMovement";
@@ -39,6 +47,13 @@ export class NPCMovementMoveTowards {
       }
 
       this.initBattleCycle(npc);
+
+      // change movement to MoveWay (flee) if health is low!
+
+      if (npc.health <= npc.maxHealth / 4) {
+        npc.currentMovementType = NPCMovementType.MoveAway;
+        await npc.save();
+      }
 
       if (reachedTarget) {
         if (npc.pathOrientation === NPCPathOrientation.Backward) {
@@ -100,8 +115,6 @@ export class NPCMovementMoveTowards {
       new NPCBattleCycle(
         npc.id,
         async () => {
-          console.log(`Running NPC attack loop for ${npc.key}`);
-
           const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
           const updatedNPC = await NPC.findById(npc.id).populate("skills");
 

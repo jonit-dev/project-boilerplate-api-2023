@@ -34,7 +34,7 @@ export class NPCManager {
     switch (appEnv.general.ENV) {
       case EnvType.Development: // on development, start all NPCs at once.
         for (const npc of npcs) {
-          this.startNPCLoop(npc);
+          this.startBehaviorLoop(npc);
         }
         break;
 
@@ -43,7 +43,7 @@ export class NPCManager {
           case SocketTypes.TCP:
             for (const npc of npcs) {
               if (process.env.NODE_APP_INSTANCE === npc.pm2InstanceManager.toString()) {
-                this.startNPCLoop(npc);
+                this.startBehaviorLoop(npc);
               }
             }
             break;
@@ -51,7 +51,7 @@ export class NPCManager {
           case SocketTypes.UDP:
             if (process.env.NODE_APP_INSTANCE === "0") {
               for (const npc of npcs) {
-                this.startNPCLoop(npc);
+                this.startBehaviorLoop(npc);
               }
             }
             break;
@@ -61,11 +61,7 @@ export class NPCManager {
     }
   }
 
-  public startNPCLoop(npc: INPC): void {
-    this.startBehaviorLoop(npc);
-  }
-
-  private startBehaviorLoop(initialNPC: INPC): void {
+  public startBehaviorLoop(initialNPC: INPC): void {
     let npc = initialNPC;
 
     new NPCCycle(

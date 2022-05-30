@@ -1,8 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
+import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   BattleEventType,
@@ -15,7 +17,6 @@ import {
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { BattleDeathManager } from "./BattleDeathManager";
 import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
 import { BattleNetworkStopTargeting } from "./network/BattleNetworkStopTargetting";
@@ -26,11 +27,12 @@ export class BattleAttackTarget {
     private battleEvent: BattleEvent,
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
-    private battleDeathManager: BattleDeathManager,
     private movementHelper: MovementHelper,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private npcTarget: NPCTarget,
-    private battleEffects: BattleEffects
+    private battleEffects: BattleEffects,
+    private characterDeath: CharacterDeath,
+    private npcDeath: NPCDeath
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
@@ -116,13 +118,13 @@ export class BattleAttackTarget {
           if (target.type === "Character") {
             await this.battleEffects.generateBloodOnGround(target);
 
-            await this.battleDeathManager.handleCharacterDeath(target as ICharacter);
+            await this.characterDeath.handleCharacterDeath(target as ICharacter);
             this.npcTarget.tryToSetTarget(attacker as INPC);
           }
           if (target.type === "NPC") {
             await this.battleEffects.generateBloodOnGround(target);
 
-            this.battleDeathManager.handleNPCDeath(target as INPC);
+            this.npcDeath.handleNPCDeath(target as INPC);
           }
         }
       } else {

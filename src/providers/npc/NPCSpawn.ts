@@ -3,6 +3,7 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { NPCTarget } from "./movement/NPCTarget";
 import { NPCManager } from "./NPCManager";
 import { NPCView } from "./NPCView";
 
@@ -12,7 +13,8 @@ export class NPCSpawn {
     private npcManager: NPCManager,
     private npcView: NPCView,
     private characterView: CharacterView,
-    private mathHelper: MathHelper
+    private mathHelper: MathHelper,
+    private npcTarget: NPCTarget
   ) {}
 
   public async spawn(npc: INPC): Promise<void> {
@@ -25,7 +27,7 @@ export class NPCSpawn {
 
     npc.health = npc.maxHealth;
     npc.mana = npc.maxMana;
-    npc.targetCharacter = undefined;
+    await this.npcTarget.clearTarget(npc);
     npc.x = npc.initialX;
     npc.y = npc.initialY;
     await npc.save();
