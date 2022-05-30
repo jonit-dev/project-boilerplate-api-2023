@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "tsc": "tsc",
-    "test": "yarn jest --silent --detectOpenHandles test",
+    "test": "yarn jest --silent test",
     "test:debug": "yarn jest test",
     "test:coverage": "yarn jest --silent --coverage",
     "test:config": "yarn jest --showConfig test",
