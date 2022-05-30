@@ -35,6 +35,9 @@ export class MovementHelper {
       x: FromGridX(gridX),
       y: FromGridY(gridY),
       layer,
+      health: {
+        $gt: 0,
+      },
     });
 
     if (hasNPC) {

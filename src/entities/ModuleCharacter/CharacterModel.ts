@@ -1,6 +1,7 @@
 import { CharacterClass, CharacterGender, FromGridX, FromGridY, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { Skill } from "./SkillsModel";
 
 const characterSchema = createSchema(
   {
@@ -134,6 +135,14 @@ characterSchema.virtual("isAlive").get(function (this: ICharacter) {
 
 characterSchema.virtual("type").get(function (this: ICharacter) {
   return "Character";
+});
+
+characterSchema.post("remove", async function (this: ICharacter) {
+  const skill = await Skill.findOne({ _id: this.skills });
+
+  if (skill) {
+    await skill.remove();
+  }
 });
 
 export type ICharacter = ExtractDoc<typeof characterSchema>;

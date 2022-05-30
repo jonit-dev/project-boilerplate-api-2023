@@ -26,7 +26,9 @@ export class NPCManager {
   ) {}
 
   public async init(): Promise<void> {
-    const npcs = await NPC.find({}).populate("skills");
+    const npcs = await NPC.find({
+      health: { $gt: 0 }, // only alive NPCs!
+    }).populate("skills");
     switch (appEnv.general.ENV) {
       case EnvType.Development: // on development, start all NPCs at once.
         for (const npc of npcs) {
@@ -64,7 +66,11 @@ export class NPCManager {
       try {
         // check if actually there's a character near. If not, let's not waste server resources!
 
-        npc = (await NPC.findById(initialNPC._id).populate("skills")) || initialNPC; // update npc instance on each behavior loop!
+        npc =
+          (await NPC.findOne({
+            id: initialNPC._id,
+            health: { $gt: 0 }, // only alive NPCs!
+          }).populate("skills")) || initialNPC; // update npc instance on each behavior loop!
 
         const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 

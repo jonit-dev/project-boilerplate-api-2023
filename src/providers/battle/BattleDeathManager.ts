@@ -1,13 +1,20 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
+import { CharacterView } from "@providers/character/CharacterView";
+import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, CharacterSocketEvents, IBattleDeath } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(BattleDeathManager)
 export class BattleDeathManager {
-  constructor(private socketMessaging: SocketMessaging, private characterDeath: CharacterDeath) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterDeath: CharacterDeath,
+    private npcDeath: NPCDeath,
+    private characterView: CharacterView
+  ) {}
 
   public async handleCharacterDeath(character: ICharacter): Promise<void> {
     console.log(`Character ${character.name} is dead`);
@@ -40,5 +47,22 @@ export class BattleDeathManager {
     // TODO: Add death penalty here.
   }
 
-  public async handleNPCDeath(npc: INPC): Promise<void> {}
+  public async handleNPCDeath(npc: INPC): Promise<void> {
+    // warn characters around about the NPC's death
+    const nearbyCharacters = await this.characterView.getCharactersAroundXYPosition(npc.x, npc.y, npc.scene);
+
+    for (const nearbyCharacter of nearbyCharacters) {
+      this.socketMessaging.sendEventToUser<IBattleDeath>(nearbyCharacter.channelId!, BattleSocketEvents.BattleDeath, {
+        id: npc.id,
+        type: "NPC",
+      });
+    }
+
+    // create NPC body instance
+    await this.npcDeath.generateNPCBody(npc);
+
+    // clear npc target
+    npc.targetCharacter = undefined;
+    await npc.save();
+  }
 }
