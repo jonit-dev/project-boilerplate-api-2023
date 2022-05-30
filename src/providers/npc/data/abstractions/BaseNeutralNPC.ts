@@ -1,3 +1,4 @@
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { appEnv } from "@providers/config/env";
 import {
   AnimationDirection,
@@ -9,12 +10,17 @@ import {
 } from "@rpg-engine/shared";
 import _ from "lodash";
 
+const baseNPCProperties: Partial<INPC> = {
+  direction: "down" as AnimationDirection,
+  alignment: NPCAlignment.Neutral,
+  class: CharacterClass.None,
+  layer: MapLayers.Character,
+  spawnIntervalMin: 1,
+};
+
 export const generateRandomMovement = (): any => {
   return {
-    direction: "down" as AnimationDirection,
-    alignment: NPCAlignment.Neutral,
-    class: CharacterClass.None,
-    layer: MapLayers.Character,
+    ...baseNPCProperties,
     originalMovementType: NPCMovementType.Random,
     currentMovementType: NPCMovementType.Random,
     maxRangeInGridCells: 5,
@@ -24,10 +30,7 @@ export const generateRandomMovement = (): any => {
 
 export const generateMoveTowardsMovement = (): any => {
   return {
-    direction: "down" as AnimationDirection,
-    alignment: NPCAlignment.Neutral,
-    class: CharacterClass.None,
-    layer: MapLayers.Character,
+    ...baseNPCProperties,
     originalMovementType: NPCMovementType.MoveTowards,
     currentMovementType: NPCMovementType.MoveTowards,
     maxRangeInGridCells: 10,
@@ -38,10 +41,7 @@ export const generateMoveTowardsMovement = (): any => {
 
 export const generateStoppedMovement = (): any => {
   return {
-    direction: "down" as AnimationDirection,
-    alignment: NPCAlignment.Neutral,
-    class: CharacterClass.None,
-    layer: MapLayers.Character,
+    ...baseNPCProperties,
     currentMovementType: NPCMovementType.Stopped,
     originalMovementType: NPCMovementType.Stopped,
     maxRangeInGridCells: 5,
@@ -51,10 +51,7 @@ export const generateStoppedMovement = (): any => {
 
 export const generateMoveAwayMovement = (): any => {
   return {
-    direction: "down" as AnimationDirection,
-    alignment: NPCAlignment.Neutral,
-    class: CharacterClass.None,
-    layer: MapLayers.Character,
+    ...baseNPCProperties,
     currentMovementType: NPCMovementType.MoveAway,
     originalMovementType: NPCMovementType.MoveAway,
     maxRangeInGridCells: 20,
@@ -64,10 +61,7 @@ export const generateMoveAwayMovement = (): any => {
 
 export const generateFixedPathMovement = (): any => {
   return {
-    direction: "down" as AnimationDirection,
-    alignment: NPCAlignment.Neutral,
-    class: CharacterClass.None,
-    layer: MapLayers.Character,
+    ...baseNPCProperties,
     currentMovementType: NPCMovementType.FixedPath,
     originalMovementType: NPCMovementType.FixedPath,
     pathOrientation: NPCPathOrientation.Forward, // must be forward!

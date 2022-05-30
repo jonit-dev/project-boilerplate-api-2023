@@ -121,6 +121,11 @@ const npcSchema = createSchema(
       ref: "Skill",
       required: true,
     }),
+    spawnIntervalMin: Type.number({
+      required: true,
+      default: 1,
+    }),
+    nextSpawnTime: Type.date(),
     ...({} as {
       isAlive: boolean;
       type: string;

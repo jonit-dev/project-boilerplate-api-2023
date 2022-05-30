@@ -25,6 +25,7 @@ export const randomMovementMockNPC = {
   },
   scene: "MainScene",
   tiledId: 0,
+  spawnIntervalMin: 1,
 };
 
 export const stoppedMovementMockNPC = {
@@ -45,6 +46,7 @@ export const stoppedMovementMockNPC = {
   },
   scene: "MainScene",
   tiledId: 0,
+  spawnIntervalMin: 1,
 };
 
 export const moveAwayMockNPC = {
@@ -65,6 +67,7 @@ export const moveAwayMockNPC = {
   },
   scene: "MainScene",
   tiledId: 0,
+  spawnIntervalMin: 1,
 };
 
 export const moveTowardsMockNPC = {
@@ -86,6 +89,7 @@ export const moveTowardsMockNPC = {
   maxRangeInGridCells: 10,
   scene: "MainScene",
   tiledId: 0,
+  spawnIntervalMin: 1,
 };
 
 export const fixedPathMockNPC = {
@@ -114,4 +118,5 @@ export const fixedPathMockNPC = {
   },
   pathOrientation: NPCPathOrientation.Forward, // must be forward!
   maxRangeInGridCells: 20,
+  spawnIntervalMin: 1,
 };
