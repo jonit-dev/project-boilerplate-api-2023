@@ -12,6 +12,7 @@ export const npcMonster = {
   gender: CharacterGender.Female,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
+  speed: 2.5,
   skills: {
     level: 1,
     strength: 1,

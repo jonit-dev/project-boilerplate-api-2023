@@ -2,13 +2,13 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { appEnv } from "@providers/config/env";
 import { EnvType, NPCMovementType, NPCPathOrientation, SocketTypes, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
 import { NPCMovement } from "./movement/NPCMovement";
 import { NPCMovementFixedPath } from "./movement/NPCMovementFixedPath";
 import { NPCMovementMoveAway } from "./movement/NPCMovementMoveAway";
 import { NPCMovementMoveTowards } from "./movement/NPCMovementMoveTowards";
 import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCMovementStopped } from "./movement/NPCMovementStopped";
+import { NPCCycle } from "./NPCCycle";
 import { NPCLoader } from "./NPCLoader";
 import { NPCView } from "./NPCView";
 
@@ -60,72 +60,76 @@ export class NPCManager {
   public startBehaviorLoop(initialNPC: INPC): void {
     let npc = initialNPC;
 
-    setInterval(async () => {
-      try {
-        // check if actually there's a character near. If not, let's not waste server resources!
+    new NPCCycle(
+      npc.id,
+      async () => {
+        try {
+          // check if actually there's a character near. If not, let's not waste server resources!
 
-        npc = (await NPC.findById(initialNPC._id).populate("skills")) || initialNPC; // update npc instance on each behavior loop!
+          npc = (await NPC.findById(initialNPC._id).populate("skills")) || initialNPC; // update npc instance on each behavior loop!
 
-        const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+          const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
-        if (!nearbyCharacters.length) {
-          return; // no character in view, no need to waste resources!
+          if (!nearbyCharacters.length) {
+            return; // no character in view, no need to waste resources!
+          }
+
+          switch (npc.currentMovementType) {
+            case NPCMovementType.MoveAway:
+              await this.npcMovementMoveAway.startMovementMoveAway(npc);
+              break;
+
+            case NPCMovementType.Stopped:
+              await this.npcMovementStopped.startMovementStopped(npc);
+              break;
+
+            case NPCMovementType.MoveTowards:
+              await this.npcMovementMoveTowards.startMoveTowardsMovement(npc);
+              break;
+
+            case NPCMovementType.Random:
+              await this.npcMovementRandom.startRandomMovement(npc);
+              break;
+            case NPCMovementType.FixedPath:
+              let endGridX = npc.fixedPath.endGridX as unknown as number;
+              let endGridY = npc.fixedPath.endGridY as unknown as number;
+
+              const npcSeedData = this.npcLoader.loadNPCSeedData();
+
+              const npcData = npcSeedData.get(npc.key);
+
+              if (!npcData) {
+                console.log(`Failed to find NPC data for ${npc.key}`);
+                return;
+              }
+
+              // if NPC is at the initial position, move forward to end position.
+              if (this.npcMovement.isNPCAtPathPosition(npc, ToGridX(npcData.x!), ToGridY(npcData.y!))) {
+                npc.pathOrientation = NPCPathOrientation.Forward;
+                await npc.save();
+              }
+
+              // if NPC is at the end of the path, move backwards to initial position.
+              if (this.npcMovement.isNPCAtPathPosition(npc, endGridX, endGridY)) {
+                npc.pathOrientation = NPCPathOrientation.Backward;
+                await npc.save();
+              }
+
+              if (npc.pathOrientation === NPCPathOrientation.Backward) {
+                endGridX = ToGridX(npcData?.x!);
+                endGridY = ToGridY(npcData?.y!);
+              }
+
+              await this.npcMovementFixedPath.startFixedPathMovement(npc, endGridX, endGridY);
+
+              break;
+          }
+        } catch (err) {
+          console.log(`Error in ${npc.key}`);
+          console.log(err);
         }
-
-        switch (npc.currentMovementType) {
-          case NPCMovementType.MoveAway:
-            await this.npcMovementMoveAway.startMovementMoveAway(npc);
-            break;
-
-          case NPCMovementType.Stopped:
-            await this.npcMovementStopped.startMovementStopped(npc);
-            break;
-
-          case NPCMovementType.MoveTowards:
-            await this.npcMovementMoveTowards.startMoveTowardsMovement(npc);
-            break;
-
-          case NPCMovementType.Random:
-            await this.npcMovementRandom.startRandomMovement(npc);
-            break;
-          case NPCMovementType.FixedPath:
-            let endGridX = npc.fixedPath.endGridX as unknown as number;
-            let endGridY = npc.fixedPath.endGridY as unknown as number;
-
-            const npcSeedData = this.npcLoader.loadNPCSeedData();
-
-            const npcData = npcSeedData.get(npc.key);
-
-            if (!npcData) {
-              console.log(`Failed to find NPC data for ${npc.key}`);
-              return;
-            }
-
-            // if NPC is at the initial position, move forward to end position.
-            if (this.npcMovement.isNPCAtPathPosition(npc, ToGridX(npcData.x!), ToGridY(npcData.y!))) {
-              npc.pathOrientation = NPCPathOrientation.Forward;
-              await npc.save();
-            }
-
-            // if NPC is at the end of the path, move backwards to initial position.
-            if (this.npcMovement.isNPCAtPathPosition(npc, endGridX, endGridY)) {
-              npc.pathOrientation = NPCPathOrientation.Backward;
-              await npc.save();
-            }
-
-            if (npc.pathOrientation === NPCPathOrientation.Backward) {
-              endGridX = ToGridX(npcData?.x!);
-              endGridY = ToGridY(npcData?.y!);
-            }
-
-            await this.npcMovementFixedPath.startFixedPathMovement(npc, endGridX, endGridY);
-
-            break;
-        }
-      } catch (err) {
-        console.log(`Error in ${npc.key}`);
-        console.log(err);
-      }
-    }, _.random(1000, 2000));
+      },
+      2500 / npc.speed
+    );
   }
 }

@@ -42,7 +42,7 @@ export class NPCTarget {
   public async tryToSetTarget(npc: INPC): Promise<void> {
     try {
       if (!npc.isAlive) {
-        throw new Error(`NPC ${npc.key} is trying to set target, but is not alive!`);
+        return;
       }
 
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);

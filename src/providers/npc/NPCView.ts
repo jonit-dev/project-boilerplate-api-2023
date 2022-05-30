@@ -127,7 +127,9 @@ export class NPCView {
   }
 
   public async getNPCsInView(character: ICharacter): Promise<INPC[]> {
-    const npcsInView = await this.playerView.getElementsInCharView(NPC, character);
+    const npcsInView = await this.playerView.getElementsInCharView(NPC, character, {
+      health: { $gt: 0 },
+    });
 
     return npcsInView;
   }
