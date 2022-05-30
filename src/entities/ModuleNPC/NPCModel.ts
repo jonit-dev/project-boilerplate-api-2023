@@ -1,3 +1,4 @@
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import {
   CharacterClass,
   CharacterGender,
@@ -13,6 +14,9 @@ import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const npcSchema = createSchema(
   {
+    name: Type.string({
+      required: true,
+    }),
     tiledId: Type.number({ required: true }),
     key: Type.string({
       required: true,
@@ -48,9 +52,6 @@ const npcSchema = createSchema(
     }),
     targetCharacter: Type.objectId({
       ref: "Character",
-    }),
-    name: Type.string({
-      required: true,
     }),
     x: Type.number({
       required: true,
@@ -142,6 +143,16 @@ npcSchema.virtual("isAlive").get(function (this: INPC) {
 
 npcSchema.virtual("type").get(function (this: INPC) {
   return "NPC";
+});
+
+npcSchema.post("remove", async function (this: INPC) {
+  // remove associated skill model
+
+  const skill = await Skill.findOne({ _id: this.skills });
+
+  if (skill) {
+    await skill.remove();
+  }
 });
 
 export const NPC = typedModel("NPC", npcSchema);
