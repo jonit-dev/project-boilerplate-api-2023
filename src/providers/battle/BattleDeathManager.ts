@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
+import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
 import { NPCCycle } from "@providers/npc/NPCCycle";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -66,6 +67,13 @@ export class BattleDeathManager {
     // disable NPC behavior
 
     const npcCycle = NPCCycle.npcCycles.get(npc.id);
+    const npcBattleCycle = NPCBattleCycle.npcBattleCycles.get(npc.id);
+
+    if (npcBattleCycle) {
+      npcBattleCycle.clear();
+    } else {
+      throw new Error(`NPC ${npc.id} has no battle cycle!`);
+    }
 
     if (npcCycle) {
       npcCycle.clear();

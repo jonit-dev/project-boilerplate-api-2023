@@ -1,4 +1,5 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { BattleNPCManager } from "@providers/battle/BattleNPCManager";
 import { appEnv } from "@providers/config/env";
 import { EnvType, NPCMovementType, NPCPathOrientation, SocketTypes, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -22,7 +23,8 @@ export class NPCManager {
     private npcMovementStopped: NPCMovementStopped,
     private npcMovementMoveAway: NPCMovementMoveAway,
     private npcView: NPCView,
-    private npcLoader: NPCLoader
+    private npcLoader: NPCLoader,
+    private npcBattleManager: BattleNPCManager
   ) {}
 
   public async init(): Promise<void> {
@@ -32,7 +34,7 @@ export class NPCManager {
     switch (appEnv.general.ENV) {
       case EnvType.Development: // on development, start all NPCs at once.
         for (const npc of npcs) {
-          this.startBehaviorLoop(npc);
+          this.startNPCLoop(npc);
         }
         break;
 
@@ -41,7 +43,7 @@ export class NPCManager {
           case SocketTypes.TCP:
             for (const npc of npcs) {
               if (process.env.NODE_APP_INSTANCE === npc.pm2InstanceManager.toString()) {
-                this.startBehaviorLoop(npc);
+                this.startNPCLoop(npc);
               }
             }
             break;
@@ -49,7 +51,7 @@ export class NPCManager {
           case SocketTypes.UDP:
             if (process.env.NODE_APP_INSTANCE === "0") {
               for (const npc of npcs) {
-                this.startBehaviorLoop(npc);
+                this.startNPCLoop(npc);
               }
             }
             break;
@@ -59,7 +61,11 @@ export class NPCManager {
     }
   }
 
-  public startBehaviorLoop(initialNPC: INPC): void {
+  public startNPCLoop(npc: INPC): void {
+    this.startBehaviorLoop(npc);
+  }
+
+  private startBehaviorLoop(initialNPC: INPC): void {
     let npc = initialNPC;
 
     new NPCCycle(

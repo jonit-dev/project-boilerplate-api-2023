@@ -1,9 +1,10 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleNPCManager } from "@providers/battle/BattleNPCManager";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { FromGridX, FromGridY, NPCAlignment, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { NPCBattleCycle } from "../NPCBattleCycle";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
 
@@ -37,10 +38,7 @@ export class NPCMovementMoveTowards {
           break;
       }
 
-      if (npc.alignment === NPCAlignment.Hostile && targetCharacter.isAlive && npc.isAlive) {
-        // if reached target and alignment is enemy, lets hit it
-        await this.battleManager.attackCharacter(npc, targetCharacter);
-      }
+      this.initBattleCycle(npc);
 
       if (reachedTarget) {
         if (npc.pathOrientation === NPCPathOrientation.Backward) {
@@ -92,6 +90,28 @@ export class NPCMovementMoveTowards {
       if (!npc.targetCharacter && !reachedInitialPosition && npc.pathOrientation === NPCPathOrientation.Backward) {
         await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
       }
+    }
+  }
+
+  private initBattleCycle(npc: INPC): void {
+    const hasBattleCycle = NPCBattleCycle.npcBattleCycles.has(npc.id);
+
+    if (!hasBattleCycle) {
+      new NPCBattleCycle(
+        npc.id,
+        async () => {
+          console.log(`Running NPC attack loop for ${npc.key}`);
+
+          const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
+          const updatedNPC = await NPC.findById(npc.id).populate("skills");
+
+          if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
+            // if reached target and alignment is enemy, lets hit it
+            await this.battleManager.attackCharacter(updatedNPC, targetCharacter);
+          }
+        },
+        1000
+      );
     }
   }
 
