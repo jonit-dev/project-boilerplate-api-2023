@@ -1,12 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { BattleAttackTarget } from "../BattleAttackTarget";
 import { BattleCharacterManager } from "../BattleCharacterManager";
 
 describe("BattleCharacterManager.spec.ts", () => {
   let battleCharacterManager: BattleCharacterManager;
-  let battleAttackTarget: BattleAttackTarget;
 
   let testNPC: INPC;
   let testCharacter: ICharacter;
@@ -14,7 +12,6 @@ describe("BattleCharacterManager.spec.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     battleCharacterManager = container.get<BattleCharacterManager>(BattleCharacterManager);
-    battleAttackTarget = container.get<BattleAttackTarget>(BattleAttackTarget);
   });
 
   beforeEach(async () => {
