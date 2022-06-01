@@ -1,3 +1,5 @@
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+
 export const characterMock = {
   cameraCoordinates: {
     x: -43.0000000000007,
@@ -14,6 +16,7 @@ export const characterMock = {
   gender: "Male",
   totalWeightCapacity: 100,
   isOnline: true,
+  attackType: EntityAttackType.Melee,
   scene: "MainScene",
   initialScene: "MainScene",
   name: "Test Character",
