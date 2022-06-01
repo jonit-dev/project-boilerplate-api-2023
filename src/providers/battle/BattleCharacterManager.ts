@@ -35,12 +35,12 @@ export class BattleCharacterManager {
     );
   }
 
-  public async attackTarget(character: ICharacter, target: ICharacter | INPC): Promise<void> {
+  public async attackTarget(character: ICharacter, target: ICharacter | INPC): Promise<boolean | undefined> {
     try {
       const canAttack = this.canAttack(character, target);
 
       if (!canAttack) {
-        return;
+        return false;
       }
 
       if (!character) {
@@ -48,6 +48,8 @@ export class BattleCharacterManager {
       }
 
       await this.battleAttackTarget.checkRangeAndAttack(character, target);
+
+      return true;
     } catch (err) {
       console.error(err);
     }
