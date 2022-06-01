@@ -1,11 +1,9 @@
-import "reflect-metadata";
-
+import { container } from "@providers/inversify/container";
 import cors from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import { InversifyExpressServer } from "inversify-express-utils";
 import morgan from "morgan";
-import { container } from "@providers/inversify/container";
 
 const compression = require("compression");
 

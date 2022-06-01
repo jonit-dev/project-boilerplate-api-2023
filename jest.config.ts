@@ -7,7 +7,7 @@ const config: Config.InitialOptions = {
     "^.+\\.(ts|tsx)?$": "ts-jest",
   },
   testEnvironment: "node",
-  setupFiles: ["dotenv/config"],
+  setupFiles: ["dotenv/config", "./jestInitialSetup.ts"],
   modulePathIgnorePatterns: ["dist", "__tests__/mock"],
   moduleNameMapper: {
     "^@providers/(.*)$": "<rootDir>/src/providers/$1",

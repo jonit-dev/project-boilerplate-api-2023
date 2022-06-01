@@ -1,6 +1,3 @@
-import "express-async-errors";
-import "reflect-metadata";
-
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCLoader } from "@providers/npc/NPCLoader";
