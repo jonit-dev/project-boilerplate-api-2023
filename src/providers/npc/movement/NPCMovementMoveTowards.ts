@@ -37,6 +37,10 @@ export class NPCMovementMoveTowards {
     if (targetCharacter) {
       await this.npcTarget.tryToClearOutOfRangeTargets(npc);
 
+      if (npc.alignment === NPCAlignment.Hostile) {
+        this.initBattleCycle(npc);
+      }
+
       switch (npc.pathOrientation) {
         case NPCPathOrientation.Forward:
           reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, targetCharacter.x, targetCharacter.y, 1);
@@ -45,8 +49,6 @@ export class NPCMovementMoveTowards {
           reachedTarget = reachedInitialPosition;
           break;
       }
-
-      this.initBattleCycle(npc);
 
       // change movement to MoveWay (flee) if health is low!
 
@@ -60,8 +62,8 @@ export class NPCMovementMoveTowards {
       if (reachedTarget) {
         if (npc.pathOrientation === NPCPathOrientation.Backward) {
           // if NPC is coming back from being lured, reset its orientation to Forward
+
           npc.pathOrientation = NPCPathOrientation.Forward;
-          npc.targetCharacter = undefined;
           await npc.save();
         }
 
@@ -117,8 +119,13 @@ export class NPCMovementMoveTowards {
       new NPCBattleCycle(
         npc.id,
         async () => {
+          if (!npc.targetCharacter) {
+            // try to reset target, if somehow its lost
+            await this.npcTarget.tryToSetTarget(npc);
+          }
+
           const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
-          const updatedNPC = await NPC.findById(npc.id).populate("skills");
+          const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
 
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
             // if reached target and alignment is enemy, lets hit it
