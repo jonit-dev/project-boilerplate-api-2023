@@ -1,9 +1,13 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IUser } from "@entities/ModuleSystem/UserModel";
+import { CharacterSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { SocketMessaging } from "./SocketMessaging";
 
 @provide(SocketAuth)
 export class SocketAuth {
+  constructor(private socketMessaging: SocketMessaging) {}
+
   // this event makes sure that the user who's triggering the request actually owns the character!
   public authCharacterOn(channel, event: string, callback: (data, character: ICharacter, owner: IUser) => void): void {
     try {
@@ -16,7 +20,10 @@ export class SocketAuth {
         });
 
         if (!character) {
-          throw new Error("You don't own this character!");
+          this.socketMessaging.sendEventToUser(channel.id!, CharacterSocketEvents.CharacterForceDisconnect, {
+            reason: "You don't own this character!",
+          });
+          return;
         }
 
         console.log(`📨 Received ${event} from ${character.name}(${character._id}): ${JSON.stringify(data)}`);
