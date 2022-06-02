@@ -1,5 +1,4 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { BattleNPCManager } from "@providers/battle/BattleNPCManager";
 import { appEnv } from "@providers/config/env";
 import { EnvType, NPCMovementType, NPCPathOrientation, SocketTypes, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -23,8 +22,7 @@ export class NPCManager {
     private npcMovementStopped: NPCMovementStopped,
     private npcMovementMoveAway: NPCMovementMoveAway,
     private npcView: NPCView,
-    private npcLoader: NPCLoader,
-    private npcBattleManager: BattleNPCManager
+    private npcLoader: NPCLoader
   ) {}
 
   public async init(): Promise<void> {
