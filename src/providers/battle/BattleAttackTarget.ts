@@ -111,20 +111,18 @@ export class BattleAttackTarget {
           postDamageTargetHP: target.health,
         };
 
-        console.log(battleEventPayload);
-
         // check if character is dead after damage calculation. If so, send death event to client and characters around
         if (!target.isAlive) {
           if (target.type === "Character") {
             await this.battleEffects.generateBloodOnGround(target);
 
             await this.characterDeath.handleCharacterDeath(target as ICharacter);
-            this.npcTarget.tryToSetTarget(attacker as INPC);
+            await this.npcTarget.tryToSetTarget(attacker as INPC);
           }
           if (target.type === "NPC") {
             await this.battleEffects.generateBloodOnGround(target);
 
-            this.npcDeath.handleNPCDeath(target as INPC);
+            await this.npcDeath.handleNPCDeath(target as INPC);
           }
         }
       } else {

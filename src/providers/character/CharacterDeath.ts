@@ -10,7 +10,7 @@ export class CharacterDeath {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public async handleCharacterDeath(character: ICharacter): Promise<void> {
-    console.log(`Character ${character.name} is dead`);
+    console.log(`💀 Character ${character.name} is dead 💀`);
 
     // send event to the character that is dead
 

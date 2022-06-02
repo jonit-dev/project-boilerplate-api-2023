@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { BattleNPCManager } from "@providers/battle/BattleNPCManager";
+import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import {
   FromGridX,
@@ -22,7 +22,7 @@ export class NPCMovementMoveTowards {
     private movementHelper: MovementHelper,
     private npcMovement: NPCMovement,
     private npcTarget: NPCTarget,
-    private battleManager: BattleNPCManager
+    private battleAttackTarget: BattleAttackTarget
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
@@ -129,7 +129,8 @@ export class NPCMovementMoveTowards {
 
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
             // if reached target and alignment is enemy, lets hit it
-            await this.battleManager.attackCharacter(updatedNPC, targetCharacter);
+
+            await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
           }
         },
         1000

@@ -37,7 +37,9 @@ export class CharacterView {
     elementId: string,
     type: "npcs" | "items" | "characters"
   ): Promise<void> {
-    const updatedCharView = _.omit(character.view[type], elementId);
+    const updatedCharView = character.view[type];
+
+    delete updatedCharView[elementId];
 
     await Character.updateOne(
       { _id: character._id },
