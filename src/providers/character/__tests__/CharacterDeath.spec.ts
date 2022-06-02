@@ -40,6 +40,15 @@ describe("CharacterDeath.ts", () => {
     expect(testCharacter.scene === testCharacter.initialScene).toBeTruthy();
   });
 
+  it("should properly warn characters around, about character's death", async () => {
+    // @ts-ignore
+    const spySocketMessaging = jest.spyOn(characterDeath.socketMessaging, "sendEventToUser");
+
+    await characterDeath.handleCharacterDeath(testCharacter);
+
+    expect(spySocketMessaging).toHaveBeenCalled();
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
