@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { BattleEventType, FromGridX } from "@rpg-engine/shared";
+import { BattleEventType, FromGridX, FromGridY } from "@rpg-engine/shared";
 import { BattleAttackTarget } from "../BattleAttackTarget";
 
 describe("BattleAttackTarget.spec.ts", () => {
@@ -33,12 +33,12 @@ describe("BattleAttackTarget.spec.ts", () => {
   it("should NOT hit a target if attacker has melee attack type and target is out of range", async () => {
     const attacker = testCharacter;
     attacker.x = FromGridX(0);
-    attacker.y = FromGridX(0);
+    attacker.y = FromGridY(0);
     await attacker.save();
 
     const defender = testNPC;
     defender.x = FromGridX(5);
-    defender.y = FromGridX(5);
+    defender.y = FromGridY(5);
     await defender.save();
 
     await battleAttackTarget.checkRangeAndAttack(attacker, defender);
