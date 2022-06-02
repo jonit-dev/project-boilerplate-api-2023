@@ -5,8 +5,8 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IGetItemInfo, IReadItemInfo, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-@provide(ItemNetworkGetInfo)
-export class ItemNetworkGetInfo {
+@provide(ItemNetworkInfo)
+export class ItemNetworkInfo {
   constructor(private socketAuth: SocketAuth, private socketMessaging: SocketMessaging) {}
 
   public onGetItemInfo(channel: SocketChannel): void {
