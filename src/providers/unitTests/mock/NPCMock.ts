@@ -1,4 +1,5 @@
 import { CharacterGender, NPCMovementType, NPCPathOrientation } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import {
   generateFixedPathMovement,
   generateMoveAwayMovement,
@@ -6,6 +7,8 @@ import {
   generateRandomMovement,
   generateStoppedMovement,
 } from "../../npc/data/abstractions/BaseNeutralNPC";
+
+// TODO: Refactor to use common baseNPCMock (avoid repetitive props)
 
 export const randomMovementMockNPC = {
   ...generateRandomMovement(),
@@ -26,6 +29,7 @@ export const randomMovementMockNPC = {
   scene: "MainScene",
   tiledId: 0,
   spawnIntervalMin: 1,
+  attackType: EntityAttackType.Melee,
 };
 
 export const stoppedMovementMockNPC = {
@@ -47,6 +51,7 @@ export const stoppedMovementMockNPC = {
   scene: "MainScene",
   tiledId: 0,
   spawnIntervalMin: 1,
+  attackType: EntityAttackType.Melee,
 };
 
 export const moveAwayMockNPC = {
@@ -68,6 +73,7 @@ export const moveAwayMockNPC = {
   scene: "MainScene",
   tiledId: 0,
   spawnIntervalMin: 1,
+  attackType: EntityAttackType.Melee,
 };
 
 export const moveTowardsMockNPC = {
@@ -90,6 +96,7 @@ export const moveTowardsMockNPC = {
   scene: "MainScene",
   tiledId: 0,
   spawnIntervalMin: 1,
+  attackType: EntityAttackType.Melee,
 };
 
 export const fixedPathMockNPC = {
@@ -119,4 +126,5 @@ export const fixedPathMockNPC = {
   pathOrientation: NPCPathOrientation.Forward, // must be forward!
   maxRangeInGridCells: 20,
   spawnIntervalMin: 1,
+  attackType: EntityAttackType.Melee,
 };

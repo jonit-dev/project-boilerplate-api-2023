@@ -13,7 +13,10 @@ export class BattleEvent {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
 
-    if (attackerSkills.dexterity + _.random(0, 100) > defenderSkills.dexterity + _.random(0, 100)) {
+    const attackersCalculatedDexterity = attackerSkills.dexterity + _.random(0, 100);
+    const defendersCalculatedDexterity = defenderSkills.dexterity + _.random(0, 100);
+
+    if (attackersCalculatedDexterity > defendersCalculatedDexterity) {
       return BattleEventType.Hit;
     } else {
       return BattleEventType.Miss;
