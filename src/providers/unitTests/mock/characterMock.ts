@@ -22,14 +22,9 @@ export const characterMock = {
   name: "Test Character",
   owner: "6233ff328f3b09002fe32f9b",
   channelId: "mock-inexistent-channel-id",
-  otherEntitiesInView: {
-    "623e5048818c41002f6bcbd7": {
-      type: "Npc",
-      id: "623e5048818c41002f6bcbd7",
-      name: "Alice",
-      x: 144,
-      y: 144,
-      direction: "up",
-    },
+  view: {
+    characters: {},
+    npcs: {},
+    items: {},
   },
 };
