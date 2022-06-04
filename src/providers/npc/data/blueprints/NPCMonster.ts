@@ -7,7 +7,7 @@ export const npcMonster = {
   ...generateMoveTowardsMovement(),
   name: "Monster",
   key: "monster",
-  textureKey: "female-npc",
+  textureKey: "woman-1",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
   alignment: NPCAlignment.Hostile,

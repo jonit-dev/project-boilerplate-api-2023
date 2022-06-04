@@ -6,6 +6,6 @@ export const npcMaria = {
   ...generateRandomMovement(),
   name: "Maria",
   key: "maria",
-  textureKey: "female-npc",
+  textureKey: "woman-1",
   gender: CharacterGender.Female,
 } as Partial<INPC>;

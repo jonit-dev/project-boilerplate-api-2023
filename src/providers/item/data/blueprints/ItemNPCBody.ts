@@ -3,11 +3,11 @@ import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 
 export const itemNPCBody: Partial<IItem> = {
-  key: "female-npc-body",
+  key: "woman-1-body",
   type: ItemType.Container,
   subType: ItemSubType.Body,
-  textureAtlas: "death",
-  texturePath: "woman.png",
+  textureAtlas: "entities",
+  texturePath: "woman-1/death/woman-1.png",
   textureKey: "woman",
   name: "Woman's Body",
   description: "You see a female's body.",
