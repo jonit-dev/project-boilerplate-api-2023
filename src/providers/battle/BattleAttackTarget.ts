@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
@@ -117,12 +117,17 @@ export class BattleAttackTarget {
             await this.battleEffects.generateBloodOnGround(target);
 
             await this.characterDeath.handleCharacterDeath(target as ICharacter);
+            await this.npcTarget.clearTarget(attacker as INPC);
             await this.npcTarget.tryToSetTarget(attacker as INPC);
           }
           if (target.type === "NPC") {
             await this.battleEffects.generateBloodOnGround(target);
-
             await this.npcDeath.handleNPCDeath(target as INPC);
+
+            // clear attacker target
+            if (attacker instanceof Character) {
+              await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
+            }
           }
         }
       } else {

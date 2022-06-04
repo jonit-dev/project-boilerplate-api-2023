@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BattleSocketEvents, CharacterSocketEvents, IBattleDeath } from "@rpg-engine/shared";
+import { BattleSocketEvents, IBattleDeath } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterDeath)
@@ -33,8 +33,9 @@ export class CharacterDeath {
     await this.respawnCharacter(character);
 
     // finally, force disconnect character that is dead.
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
-      reason: "💀 You're dead 💀",
+    this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, {
+      id: character.id,
+      type: "Character",
     });
 
     // TODO: Add death penalty here.

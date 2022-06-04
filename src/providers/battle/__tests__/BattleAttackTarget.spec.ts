@@ -82,6 +82,26 @@ describe("BattleAttackTarget.spec.ts", () => {
     expect(testNPC.health).toBe(testNPC.maxHealth);
   });
 
+  it("NPC should clear its target, after killing a character", async () => {
+    // @ts-ignore
+    jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
+    // @ts-ignore
+    jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 200);
+
+    // @ts-ignore
+    const charDeath = jest.spyOn(battleAttackTarget.characterDeath, "handleCharacterDeath");
+
+    testCharacter.health = 1;
+    await testCharacter.save();
+
+    // @ts-ignore
+    await battleAttackTarget.hitTarget(testNPC, testCharacter);
+
+    expect(charDeath).toHaveBeenCalled();
+
+    expect(testNPC.targetCharacter).toBe(undefined);
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
