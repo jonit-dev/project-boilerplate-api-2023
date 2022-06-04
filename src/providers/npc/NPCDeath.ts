@@ -55,12 +55,16 @@ export class NPCDeath {
   }
 
   public async generateNPCBody(npc: INPC): Promise<void> {
-    const blueprintData = itemsBlueprintIndex["female-npc-body"];
+    const blueprintData = itemsBlueprintIndex["npc-body"];
 
     const npcBody = new Item({
-      ...blueprintData,
+      ...blueprintData, // base body props
       owner: npc._id,
+      key: `${npc.key}-body`,
+      texturePath: `${npc.textureKey}/death/${npc.textureKey}.png`,
+      textureKey: npc.textureKey,
       name: `${npc.name}'s body`,
+      description: `You see ${npc.name}'s body.`,
       scene: npc.scene,
       x: npc.x,
       y: npc.y,

@@ -8,5 +8,5 @@ export const itemsBlueprintIndex: IBlueprint = {
   "short-sword": itemShortSword,
   "character-body": itemCharacterBody,
   "ground-blood": itemGroundBlood,
-  "female-npc-body": itemNPCBody,
+  "npc-body": itemNPCBody,
 };

@@ -1,22 +1,20 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { CharacterClass, CharacterGender, NPCAlignment } from "@rpg-engine/shared";
+import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
 
-export const npcMonster = {
+export const npcOrc = {
   ...generateMoveTowardsMovement(),
-  name: "Monster",
-  key: "monster",
-  textureKey: "woman-1",
-  class: CharacterClass.None,
-  gender: CharacterGender.Female,
+  name: "Orc",
+  key: "orc",
+  textureKey: "orc",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 2.5,
+  speed: 3,
   skills: {
     level: 1,
-    strength: 1,
-    dexterity: 1,
+    strength: 2,
+    dexterity: 3,
   },
   fleeOnLowHealth: true,
 } as Partial<INPC>;
