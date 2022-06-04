@@ -1,7 +1,11 @@
+import { MapModel } from "@entities/ModuleSystem/MapModel";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { ITiled } from "@rpg-engine/shared";
+import { compress, decompress } from "compress-json";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
+import JSZip from "jszip";
+import md5File from "md5-file";
 import PF from "pathfinding";
 import { MapObjectsLoader } from "./MapObjectsLoader";
 import { MapSolids } from "./MapSolids";
@@ -41,8 +45,10 @@ export class MapLoader {
         continue;
       }
       const mapPath = `${STATIC_PATH}/maps/${mapFileName}`;
-
       const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
+
+      this.checkMapUpdated(mapPath, mapFileName, currentMap);
+
       const mapName = mapFileName.replace(".json", "");
 
       MapLoader.maps.set(mapName, currentMap);
@@ -56,4 +62,56 @@ export class MapLoader {
 
     console.log("📦 Maps and grids are loaded!");
   }
+
+  private async checkMapUpdated(mapPath: string, mapFileName: string, mapObject: object): Promise<void> {
+    const mapChecksum = this.checksum(mapPath);
+    const fileName = mapFileName.replace(".json", "");
+    const mapData = await MapModel.find({ name: fileName });
+
+    if (mapData.length !== 0) {
+      const map = mapData[0];
+      if (map.checksum !== mapChecksum) {
+        console.log(`📦 Map ${fileName} is updated!`);
+        map.checksum = mapChecksum;
+        await map.save();
+
+        // create zip
+        await createZip(fileName, mapObject);
+      }
+    } else {
+      console.log(`📦 Map ${fileName} is created!`);
+      await MapModel.create({ name: fileName, checksum: mapChecksum });
+
+      // create zip
+      await createZip(fileName, mapObject);
+    }
+
+    await readZip(fileName);
+  }
+
+  public checksum(path): string {
+    return md5File.sync(path);
+  }
+}
+
+async function createZip(fileName: string, mapObject: object): Promise<void> {
+  const data = compress(mapObject);
+  const zip = new JSZip();
+  zip.file(`${fileName}.txt`, JSON.stringify(data));
+  const buffer = await zip.generateAsync({ type: "nodebuffer" });
+  await fs.createWriteStream(`${STATIC_PATH}/maps/${fileName}.zip`).write(buffer);
+}
+
+async function readZip(fileName): Promise<void> {
+  const data = await fs.readFileSync(`${STATIC_PATH}/maps/${fileName}.zip`);
+
+  const zipRead = new JSZip();
+
+  // eslint-disable-next-line promise/no-promise-in-callback
+  const content = await zipRead.loadAsync(data);
+  const fileBuffer = await content.file(`${fileName}.txt`)!.async("uint8array");
+  const bufferedString = Buffer.from(fileBuffer.buffer).toString();
+  const fileContent = decompress(JSON.parse(bufferedString));
+
+  console.log(fileContent);
 }
