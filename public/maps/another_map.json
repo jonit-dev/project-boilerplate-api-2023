@@ -1277,17 +1277,12 @@
         {
           "height": 16,
           "id": 65,
-          "name": "Monster",
+          "name": "Orc",
           "properties": [
-            {
-              "name": "dialogText",
-              "type": "string",
-              "value": "Hey {{char.name}}. Let's battle!"
-            },
             {
               "name": "key",
               "type": "string",
-              "value": "monster"
+              "value": "orc"
             }
           ],
           "rotation": 0,
@@ -1296,6 +1291,42 @@
           "width": 16,
           "x": 304,
           "y": 80
+        },
+        {
+          "height": 16,
+          "id": 72,
+          "name": "Orc",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "orc"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 640,
+          "y": 128
+        },
+        {
+          "height": 16,
+          "id": 74,
+          "name": "Skeleton",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "skeleton"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 640,
+          "y": 160
         }
       ],
       "opacity": 1,
@@ -1360,7 +1391,7 @@
     }
   ],
   "nextlayerid": 14,
-  "nextobjectid": 72,
+  "nextobjectid": 75,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",

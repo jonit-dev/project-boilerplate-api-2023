@@ -18,6 +18,10 @@ export class BattleNetworkStopTargeting {
   public async stopTargeting(character: ICharacter): Promise<void> {
     try {
       if (character) {
+        // @ts-ignore
+        character.target = undefined;
+        await character.save();
+
         const battleCycle = BattleCycle.battleCycles.get(character.id);
 
         if (battleCycle) {

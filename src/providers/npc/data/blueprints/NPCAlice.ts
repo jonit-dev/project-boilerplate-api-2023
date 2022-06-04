@@ -5,7 +5,7 @@ import { generateFixedPathMovement } from "../abstractions/BaseNeutralNPC";
 export const npcAlice = {
   ...generateFixedPathMovement(),
   name: "Alice",
-  textureKey: "female-npc",
+  textureKey: "woman-1",
   key: "alice",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
