@@ -1,14 +1,13 @@
 /* eslint-disable no-new */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "./BattleAttackTarget";
 import { BattleCycle } from "./BattleCycle";
 
 @provide(BattleCharacterManager)
 export class BattleCharacterManager {
-  constructor(private battleAttackTarget: BattleAttackTarget, private movementHelper: MovementHelper) {}
+  constructor(private battleAttackTarget: BattleAttackTarget) {}
 
   public onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): void {
     new BattleCycle(
