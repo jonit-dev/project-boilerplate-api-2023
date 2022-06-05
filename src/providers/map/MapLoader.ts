@@ -1,10 +1,8 @@
 import { MapModel } from "@entities/ModuleSystem/MapModel";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
-import { ITiled } from "@rpg-engine/shared";
-import { compress, decompress } from "compress-json";
+import { createZipMap, ITiled } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
-import JSZip from "jszip";
 import md5File from "md5-file";
 import PF from "pathfinding";
 import { MapObjectsLoader } from "./MapObjectsLoader";
@@ -76,14 +74,16 @@ export class MapLoader {
         await map.save();
 
         // create zip
-        await createZip(fileName, mapObject);
+        const pathToSave = `${STATIC_PATH}/maps`;
+        await createZipMap(fileName, mapObject, pathToSave);
       }
     } else {
       console.log(`📦 Map ${fileName} is created!`);
       await MapModel.create({ name: fileName, checksum: mapChecksum });
 
       // create zip
-      await createZip(fileName, mapObject);
+      const pathToSave = `${STATIC_PATH}/maps`;
+      await createZipMap(fileName, mapObject, pathToSave);
     }
 
     // await readZip(fileName);
@@ -92,25 +92,4 @@ export class MapLoader {
   public checksum(path): string {
     return md5File.sync(path);
   }
-}
-
-async function createZip(fileName: string, mapObject: object): Promise<void> {
-  const data = compress(mapObject);
-  const zip = new JSZip();
-  zip.file(`${fileName}.txt`, JSON.stringify(data));
-  const buffer = await zip.generateAsync({ type: "nodebuffer" });
-  await fs.createWriteStream(`${STATIC_PATH}/maps/${fileName}.zip`).write(buffer);
-}
-
-async function readZip(fileName): Promise<void> {
-  const data = await fs.readFileSync(`${STATIC_PATH}/maps/${fileName}.zip`);
-
-  const zipRead = new JSZip();
-
-  const content = await zipRead.loadAsync(data);
-  const fileBuffer = await content.file(`${fileName}.txt`)!.async("uint8array");
-  const bufferedString = Buffer.from(fileBuffer.buffer).toString();
-  const fileContent = decompress(JSON.parse(bufferedString));
-
-  console.log(fileContent);
 }

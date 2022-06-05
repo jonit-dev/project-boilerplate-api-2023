@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
-    "@rpg-engine/shared": "^0.2.85",
+    "@rpg-engine/shared": "^0.2.100",
     "@shelf/jest-mongodb": "^2.2.1",
     "@types/bcrypt": "^3.0.0",
     "@types/express": "^4.17.8",
