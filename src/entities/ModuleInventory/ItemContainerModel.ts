@@ -11,7 +11,7 @@ const itemContainerSchema = createSchema(
       ref: "Item",
       required: true,
     }),
-    name: Type.string({}),
+    name: Type.string(),
     slotQty: Type.number({ required: true, default: 20 }),
     items: Type.array().of(
       Type.objectId({

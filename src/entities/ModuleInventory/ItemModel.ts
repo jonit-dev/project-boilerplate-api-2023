@@ -32,6 +32,7 @@ const itemSchema = createSchema(
     weight: Type.number({ required: true }),
     allowedEquipSlotType: Type.array().of(Type.string({ enum: TypeHelper.enumToStringArray(ItemSlotType) })),
     maxStackSize: Type.number({ required: true, default: 1 }),
+    stackQty: Type.number(),
     isUsable: Type.boolean({ required: true, default: false }),
     usableEffect: Type.string(),
     isStorable: Type.boolean({ required: true, default: true }),
