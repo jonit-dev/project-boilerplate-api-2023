@@ -107,7 +107,6 @@ async function readZip(fileName): Promise<void> {
 
   const zipRead = new JSZip();
 
-  // eslint-disable-next-line promise/no-promise-in-callback
   const content = await zipRead.loadAsync(data);
   const fileBuffer = await content.file(`${fileName}.txt`)!.async("uint8array");
   const bufferedString = Buffer.from(fileBuffer.buffer).toString();
