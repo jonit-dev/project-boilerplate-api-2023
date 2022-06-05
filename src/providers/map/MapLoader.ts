@@ -86,7 +86,7 @@ export class MapLoader {
       await createZip(fileName, mapObject);
     }
 
-    await readZip(fileName);
+    // await readZip(fileName);
   }
 
   public checksum(path): string {
