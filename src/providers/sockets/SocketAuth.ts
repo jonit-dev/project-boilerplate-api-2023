@@ -26,7 +26,7 @@ export class SocketAuth {
           return;
         }
 
-        console.log(`📨 Received ${event} from ${character.name}(${character._id}): ${JSON.stringify(data)}`);
+        // console.log(`📨 Received ${event} from ${character.name}(${character._id}): ${JSON.stringify(data)}`);
 
         callback(data, character, owner);
       });
