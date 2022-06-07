@@ -1,7 +1,9 @@
+import { MapModel } from "@entities/ModuleSystem/MapModel";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
-import { ITiled } from "@rpg-engine/shared";
+import { createZipMap, ITiled } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
+import md5File from "md5-file";
 import PF from "pathfinding";
 import { MapObjectsLoader } from "./MapObjectsLoader";
 import { MapSolids } from "./MapSolids";
@@ -41,8 +43,10 @@ export class MapLoader {
         continue;
       }
       const mapPath = `${STATIC_PATH}/maps/${mapFileName}`;
-
       const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
+
+      this.checkMapUpdated(mapPath, mapFileName, currentMap);
+
       const mapName = mapFileName.replace(".json", "");
 
       MapLoader.maps.set(mapName, currentMap);
@@ -55,5 +59,37 @@ export class MapLoader {
     }
 
     console.log("📦 Maps and grids are loaded!");
+  }
+
+  private async checkMapUpdated(mapPath: string, mapFileName: string, mapObject: object): Promise<void> {
+    const mapChecksum = this.checksum(mapPath);
+    const fileName = mapFileName.replace(".json", "");
+    const mapData = await MapModel.find({ name: fileName });
+
+    if (mapData.length !== 0) {
+      const map = mapData[0];
+      if (map.checksum !== mapChecksum) {
+        console.log(`📦 Map ${fileName} is updated!`);
+        map.checksum = mapChecksum;
+        await map.save();
+
+        // create zip
+        const pathToSave = `${STATIC_PATH}/maps`;
+        await createZipMap(fileName, mapObject, pathToSave);
+      }
+    } else {
+      console.log(`📦 Map ${fileName} is created!`);
+      await MapModel.create({ name: fileName, checksum: mapChecksum });
+
+      // create zip
+      const pathToSave = `${STATIC_PATH}/maps`;
+      await createZipMap(fileName, mapObject, pathToSave);
+    }
+
+    // await readZip(fileName);
+  }
+
+  public checksum(path): string {
+    return md5File.sync(path);
   }
 }
