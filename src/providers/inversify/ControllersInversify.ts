@@ -4,6 +4,7 @@ import { NPCController } from "@useCases/ModuleNPC/NPCController";
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
 import { ReadChatLogController } from "@useCases/ModuleSystem/chat/readChatLog/ReadChatLogController";
 import { IndustriesController } from "@useCases/ModuleSystem/industries/IndustriesController";
+import { MapController } from "@useCases/ModuleSystem/map/MapController";
 import { PushNotificationController } from "@useCases/ModuleSystem/operation/pushNotification/PushNotificationController";
 import { PlacesController } from "@useCases/ModuleSystem/places/PlacesController";
 import { AppleOAuthController } from "@useCases/ModuleSystem/user/appleOAuth/AppleOAuthController";
@@ -54,4 +55,5 @@ export const useCasesControllers = new ContainerModule((bind: interfaces.Bind, u
   bind<CharacterController>(CharacterController).toSelf();
   bind<NPCController>(NPCController).toSelf();
   bind<ReadChatLogController>(ReadChatLogController).toSelf();
+  bind<MapController>(MapController).toSelf();
 });
