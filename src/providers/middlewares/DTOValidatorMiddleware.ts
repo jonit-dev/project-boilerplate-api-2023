@@ -13,27 +13,31 @@ export const DTOValidatorMiddleware = (dtoClass: any) => {
       skipMissingProperties: true,
       whitelist: true,
       forbidNonWhitelisted: true,
-    }).then((errors: IValidationError[]) => {
-      // errors is an array of validation errors
-      // eslint-disable-next-line promise/always-return
-      if (errors.length > 0) {
-        const errorList: string[] = [];
-        for (const validationError of errors) {
-          console.log(validationError);
+    })
+      .then((errors: IValidationError[]) => {
+        // errors is an array of validation errors
+        // eslint-disable-next-line promise/always-return
+        if (errors.length > 0) {
+          const errorList: string[] = [];
+          for (const validationError of errors) {
+            console.log(validationError);
 
-          const constraintsKv = Object.entries(validationError.constraints!).map(([key, value]) => ({ key, value }));
+            const constraintsKv = Object.entries(validationError.constraints!).map(([key, value]) => ({ key, value }));
 
-          for (const item of constraintsKv) {
-            errorList.push(item.value);
+            for (const item of constraintsKv) {
+              errorList.push(item.value);
+            }
           }
-        }
 
-        return res.status(HttpStatus.BadRequest).send(new BadRequestError(errorList));
-      } else {
-        res.locals.input = output;
-        // eslint-disable-next-line promise/no-callback-in-promise
-        next();
-      }
-    });
+          return res.status(HttpStatus.BadRequest).send(new BadRequestError(errorList));
+        } else {
+          res.locals.input = output;
+          // eslint-disable-next-line promise/no-callback-in-promise
+          next();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 };
