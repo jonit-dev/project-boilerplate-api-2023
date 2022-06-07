@@ -1,6 +1,6 @@
 import { UserExperience, UserGoal } from "@rpg-engine/shared/dist";
 import { Type } from "class-transformer";
-import { IsEnum, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsEnum, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
 import { tsDefaultDecorator, tsEnumDecorator } from "../../../providers/constants/ValidationConstants";
 
 class UserPreferencesDTO {
@@ -11,6 +11,14 @@ class UserPreferencesDTO {
   @IsOptional()
   @IsEnum(UserGoal, tsEnumDecorator("validation", "isEnum", UserGoal))
   goal: UserGoal;
+}
+
+class UserWalletDTO {
+  @IsString()
+  publicAddress: string;
+
+  @IsNumber()
+  networkId: number;
 }
 
 export class UserUpdateDTO {
@@ -38,4 +46,9 @@ export class UserUpdateDTO {
   @ValidateNested()
   @Type(() => UserPreferencesDTO)
   preferences: UserPreferencesDTO;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => UserWalletDTO)
+  wallet: UserWalletDTO;
 }
