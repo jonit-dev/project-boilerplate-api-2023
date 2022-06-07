@@ -38,6 +38,8 @@ export const DTOValidatorMiddleware = (dtoClass: any) => {
       })
       .catch((err) => {
         console.log(err);
+
+        return res.status(HttpStatus.BadRequest).send(new BadRequestError(err.message));
       });
   };
 };
