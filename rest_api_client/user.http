@@ -44,6 +44,21 @@ Content-Type: application/json
     }
 }
 
+###
+
+# User :: Update Wallet
+
+PATCH {{baseUrl}}/users HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "wallet": {
+        "publicAddress": "0x372A535759C63866aEC0aB7A058ed778430075EC",
+        "networkId": 1337
+    }
+}
+
 ### 
 
 # User :: Google OAuth :: Generate Url

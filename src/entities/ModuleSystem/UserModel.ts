@@ -32,7 +32,10 @@ const userSchema = createSchema(
     refreshTokens: Type.array().of({
       token: Type.string(),
     }),
-
+    wallet: {
+      publicAddress: Type.string(),
+      networkId: Type.number(),
+    },
     characters: Type.array().of(
       Type.objectId({
         ref: "Character",
