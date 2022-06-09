@@ -19,3 +19,6 @@ Dockerfile
 globalConfig.json
 
 coverage
+
+
+public/maps/**.zip
