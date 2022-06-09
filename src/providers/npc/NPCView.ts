@@ -2,7 +2,6 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
-import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
@@ -28,8 +27,7 @@ export class NPCView {
     private playerView: CharacterView,
     private socketTransmissionZone: SocketTransmissionZone,
     private characterView: CharacterView,
-    private objectHelper: DataStructureHelper,
-    private mathHelper: MathHelper
+    private objectHelper: DataStructureHelper
   ) {}
 
   public async getElementsInNPCView<T extends IElementWithPosition>(

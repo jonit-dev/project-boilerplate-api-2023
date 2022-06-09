@@ -1,5 +1,6 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NPCSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -8,7 +9,12 @@ import { NPCTarget } from "./NPCTarget";
 
 @provide(NPCMovementStopped)
 export class NPCMovementStopped {
-  constructor(private npcTarget: NPCTarget, private socketMessaging: SocketMessaging, private npcView: NPCView) {}
+  constructor(
+    private npcTarget: NPCTarget,
+    private socketMessaging: SocketMessaging,
+    private npcView: NPCView,
+    private characterView: CharacterView
+  ) {}
 
   public async startMovementStopped(npc: INPC): Promise<void> {
     try {
@@ -26,11 +32,21 @@ export class NPCMovementStopped {
 
         for (const nearbyCharacter of nearbyCharacters) {
           // client representation of the NPC
-          const clientNPC = nearbyCharacter.otherEntitiesInView?.[npc._id];
-          if (clientNPC && clientNPC.direction !== facingDirection) {
+          const clientNPC = nearbyCharacter.view.npcs?.[npc.id];
+          if (clientNPC?.direction !== facingDirection) {
             // update serverside info (to avoid submitting the same package all the time!)
-            nearbyCharacter.otherEntitiesInView[npc._id].direction = facingDirection;
-            await nearbyCharacter.save();
+
+            await this.characterView.addToCharacterView(
+              nearbyCharacter,
+              {
+                id: npc.id,
+                x: npc.x,
+                y: npc.y,
+                scene: npc.scene,
+                direction: facingDirection,
+              },
+              "npcs"
+            );
 
             this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, NPCSocketEvents.NPCDataUpdate, {
               id: npc.id,
