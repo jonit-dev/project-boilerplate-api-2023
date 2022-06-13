@@ -629,6 +629,24 @@
           "width": 16,
           "x": 320,
           "y": 144
+        },
+        {
+          "height": 16,
+          "id": 75,
+          "name": "Wing Helmet",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "wing-helmet"
+            }
+          ],
+          "rotation": 0,
+          "type": "Item",
+          "visible": true,
+          "width": 16,
+          "x": 352,
+          "y": 160
         }
       ],
       "opacity": 1,
@@ -1391,7 +1409,7 @@
     }
   ],
   "nextlayerid": 14,
-  "nextobjectid": 75,
+  "nextobjectid": 76,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",
