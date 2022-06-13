@@ -5,6 +5,7 @@ import { npcAnnie } from "./blueprints/NPCAnnie";
 import { npcFelicia } from "./blueprints/NPCFelicia";
 import { npcMaria } from "./blueprints/NPCMaria";
 import { npcOrc } from "./blueprints/NPCOrc";
+import { npcRat } from "./blueprints/NPCRat";
 import { npcSkeleton } from "./blueprints/NPCSkeleton";
 
 export const npcsBlueprintIndex: IBlueprint = {
@@ -15,4 +16,5 @@ export const npcsBlueprintIndex: IBlueprint = {
   maria: npcMaria,
   orc: npcOrc,
   skeleton: npcSkeleton,
+  rat: npcRat,
 };

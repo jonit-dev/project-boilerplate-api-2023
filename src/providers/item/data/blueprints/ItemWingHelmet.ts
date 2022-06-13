@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 
 export const itemWingHelmet: Partial<IItem> = {
   key: "wing-helmet",
@@ -13,5 +13,5 @@ export const itemWingHelmet: Partial<IItem> = {
     "You see a wing helmet. It's decorated with wings and ancient depictions of the god Hermes, Mercury and of Roma.",
   defense: 5,
   weight: 12,
-  allowedEquipSlotType: [ItemSubType.Helmet],
+  allowedEquipSlotType: [ItemSlotType.Head],
 };

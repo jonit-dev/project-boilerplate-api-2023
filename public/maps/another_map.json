@@ -1345,6 +1345,42 @@
           "width": 16,
           "x": 640,
           "y": 160
+        },
+        {
+          "height": 16,
+          "id": 76,
+          "name": "Rat",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "rat"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 208,
+          "y": 352
+        },
+        {
+          "height": 16,
+          "id": 79,
+          "name": "Rat",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "rat"
+            }
+          ],
+          "rotation": 0,
+          "type": "NPC",
+          "visible": true,
+          "width": 16,
+          "x": 240,
+          "y": 352
         }
       ],
       "opacity": 1,
@@ -1409,7 +1445,7 @@
     }
   ],
   "nextlayerid": 14,
-  "nextobjectid": 76,
+  "nextobjectid": 80,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",
