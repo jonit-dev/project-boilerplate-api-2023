@@ -13,8 +13,12 @@ export const npcSkeleton = {
   speed: 3,
   skills: {
     level: 1,
-    strength: 2,
-    dexterity: 1,
+    strength: {
+      level: 2,
+    },
+    dexterity: {
+      level: 1,
+    },
   },
   fleeOnLowHealth: true,
 } as Partial<INPC>;

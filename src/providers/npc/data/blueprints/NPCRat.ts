@@ -13,8 +13,12 @@ export const npcRat = {
   speed: 2,
   skills: {
     level: 1,
-    strength: 1,
-    dexterity: 3,
+    strength: {
+      level: 1,
+    },
+    dexterity: {
+      level: 3,
+    },
   },
   fleeOnLowHealth: true,
 } as Partial<INPC>;

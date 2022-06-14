@@ -13,8 +13,12 @@ export const npcOrc = {
   speed: 3,
   skills: {
     level: 1,
-    strength: 2,
-    dexterity: 3,
+    strength: {
+      level: 2,
+    },
+    dexterity: {
+      level: 3,
+    },
   },
   fleeOnLowHealth: true,
 } as Partial<INPC>;

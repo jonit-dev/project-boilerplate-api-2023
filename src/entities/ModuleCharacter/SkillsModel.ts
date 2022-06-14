@@ -1,4 +1,28 @@
+import { calculateSPToNextLevel, calculateXPToNextLevel } from "@providers/skill/SkillCalculator";
+import { SkillType, TypeHelper } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+
+const skillDetails = (type: SkillType): Record<string, any> => {
+  return {
+    type: Type.string({
+      required: true,
+      default: type,
+      enum: TypeHelper.enumToStringArray(SkillType),
+    }),
+    level: Type.number({
+      required: true,
+      default: 1,
+    }),
+    skillPoints: Type.number({
+      required: true,
+      default: 0,
+    }),
+    skillPointsToNextLevel: Type.number({
+      required: true,
+      default: calculateSPToNextLevel(0, 1),
+    }),
+  };
+};
 
 export const skillsSchema = createSchema(
   {
@@ -20,74 +44,36 @@ export const skillsSchema = createSchema(
       required: true,
       default: 0,
     }),
-    stamina: Type.number({
+    xpToNextLevel: Type.number({
       required: true,
-      default: 1,
+      default: calculateXPToNextLevel(0, 1),
     }),
-    magic: Type.number({
-      required: true,
-      default: 1,
-    }),
-    strength: Type.number({
-      required: true,
-      default: 1,
-    }),
-    resistance: Type.number({
-      required: true,
-      default: 1,
-    }),
-    dexterity: Type.number({
-      required: true,
-      default: 1,
-    }),
-    first: Type.number({
-      required: true,
-      default: 1,
-    }),
-    club: Type.number({
-      required: true,
-      default: 1,
-    }),
-    sword: Type.number({
-      required: true,
-      default: 1,
-    }),
-    axe: Type.number({
-      required: true,
-      default: 1,
-    }),
-    distance: Type.number({
-      required: true,
-      default: 1,
-    }),
-    shielding: Type.number({
-      required: true,
-      default: 1,
-    }),
-    fishing: Type.number({
-      required: true,
-      default: 1,
-    }),
-    mining: Type.number({
-      required: true,
-      default: 1,
-    }),
-    lumberjacking: Type.number({
-      required: true,
-      default: 1,
-    }),
-    cooking: Type.number({
-      required: true,
-      default: 1,
-    }),
-    alchemy: Type.number({
-      required: true,
-      default: 1,
-    }),
-    magicResistance: Type.number({
-      required: true,
-      default: 1,
-    }),
+
+    // Basic attributes
+
+    stamina: skillDetails(SkillType.BasicAttributes),
+    magic: skillDetails(SkillType.BasicAttributes),
+    magicResistance: skillDetails(SkillType.BasicAttributes),
+    strength: skillDetails(SkillType.BasicAttributes),
+    resistance: skillDetails(SkillType.BasicAttributes),
+    dexterity: skillDetails(SkillType.BasicAttributes),
+
+    // Combat skills
+
+    first: skillDetails(SkillType.Combat),
+    club: skillDetails(SkillType.Combat),
+    sword: skillDetails(SkillType.Combat),
+    axe: skillDetails(SkillType.Combat),
+    distance: skillDetails(SkillType.Combat),
+    shielding: skillDetails(SkillType.Combat),
+
+    // Crafting/Gathering Skills
+
+    fishing: skillDetails(SkillType.Gathering),
+    mining: skillDetails(SkillType.Crafting),
+    lumberjacking: skillDetails(SkillType.Crafting),
+    cooking: skillDetails(SkillType.Crafting),
+    alchemy: skillDetails(SkillType.Crafting),
     ...({} as {
       attack: number;
       defense: number;
@@ -98,11 +84,11 @@ export const skillsSchema = createSchema(
 
 //! TODO: This should take into consideration the skill involving the weapon that's being used by the character!
 skillsSchema.virtual("attack").get(function (this: ISkill) {
-  return this.strength * this.level;
+  return this.strength.level * this.level;
 });
 
 skillsSchema.virtual("defense").get(function (this: ISkill) {
-  return this.resistance * this.level;
+  return this.resistance.level * this.level;
 });
 
 export type ISkill = ExtractDoc<typeof skillsSchema>;

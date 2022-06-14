@@ -36,7 +36,7 @@ describe("BattleEvents.spec.ts", () => {
     const defenderSkills = await Skill.findOne({ owner: testCharacter._id });
 
     if (defenderSkills) {
-      defenderSkills.dexterity = 100;
+      defenderSkills.dexterity.level = 100;
       await defenderSkills.save();
 
       await testCharacter.populate("skills").execPopulate(); // refresh skills data
@@ -52,8 +52,8 @@ describe("BattleEvents.spec.ts", () => {
     const defenderSkills = await Skill.findOne({ owner: testNPC._id });
 
     if (attackerSkills && defenderSkills) {
-      attackerSkills.dexterity = 10000;
-      defenderSkills.dexterity = 0;
+      attackerSkills.dexterity.level = 10000;
+      defenderSkills.dexterity.level = 0;
       await attackerSkills.save();
       await defenderSkills.save();
 
