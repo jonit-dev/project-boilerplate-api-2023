@@ -9,19 +9,37 @@ export class SkillCalculator {
   public calculateSPToNextLevel(currentSP: number, level: number): number {
     return calculateSPToNextLevel(currentSP, level);
   }
+
+  public getSPForLevel = (level: number): number => {
+    return getSPForLevel(level);
+  };
+
+  public getXPForLevel = (level: number): number => {
+    return getXPForLevel(level);
+  };
 }
 
 // functions exported separately because they need to be used in our skill schema, and the container is not accessible there.
 
+export const getSPForLevel = (level: number): number => {
+  const totalSPOnLevel = Math.pow(level, 3) * 10;
+  return totalSPOnLevel;
+};
+
+export const getXPForLevel = (level: number): number => {
+  const totalXPOnLevel = Math.pow(level, 3) * 5;
+  return totalXPOnLevel;
+};
+
 export const calculateXPToNextLevel = (currentXP: number, level: number): number => {
-  const xpToNextLevel = Math.pow(level, 3) * 30;
+  const xpToNextLevel = getXPForLevel(level);
   const xpToNextLevelDiff = xpToNextLevel - currentXP;
 
   return xpToNextLevelDiff;
 };
 
 export const calculateSPToNextLevel = (currentSP: number, level: number): number => {
-  const spToNextLevel = Math.pow(level, 3) * 60;
+  const spToNextLevel = getSPForLevel(level);
   const spToNextLevelDiff = spToNextLevel - currentSP;
 
   return spToNextLevelDiff;

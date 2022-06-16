@@ -1,6 +1,6 @@
 import { ItemType, TypeHelper } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
-import { IItem, Item } from "./ItemModel";
+import { Item } from "./ItemModel";
 
 const itemContainerSchema = createSchema(
   {
@@ -13,32 +13,37 @@ const itemContainerSchema = createSchema(
     }),
     name: Type.string(),
     slotQty: Type.number({ required: true, default: 20 }),
-    items: Type.array().of(
-      Type.objectId({
-        ref: "Item",
-      })
-    ),
+    slots: Type.mixed(),
     allowedItemTypes: Type.array().of(
       Type.string({
         enum: TypeHelper.enumToStringArray(ItemType),
       })
     ),
     ...({} as {
+      totalItemsQty: number;
       isEmpty: boolean;
+      itemIds: string[];
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
-itemContainerSchema.virtual("isEmpty").get(function (this: IItemContainer) {
-  const items = this.items as unknown as IItem[];
+itemContainerSchema.virtual("itemIds").get(function (this: IItemContainer) {
+  return Object.values<string>(this.slots);
+});
 
-  return !items || items.length === 0;
+itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer) {
+  return Object.values(this.slots).length;
+});
+
+itemContainerSchema.virtual("isEmpty").get(function (this: IItemContainer) {
+  const items = this.totalItemsQty;
+  return !items;
 });
 
 itemContainerSchema.post("remove", async function (this: IItemContainer) {
-  if (this.items) {
-    for (const itemId of this.items) {
+  if (this.itemIds) {
+    for (const itemId of this.itemIds) {
       const item = await Item.findById(itemId);
 
       if (item) {
