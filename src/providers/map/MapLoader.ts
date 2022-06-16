@@ -1,10 +1,11 @@
 import { MapModel } from "@entities/ModuleSystem/MapModel";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
-import { createZipMap, ITiled } from "@rpg-engine/shared";
+import { ITiled } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
 import md5File from "md5-file";
 import PF from "pathfinding";
+import { createZipMap } from "./MapCompressionHelper";
 import { MapObjectsLoader } from "./MapObjectsLoader";
 import { MapSolids } from "./MapSolids";
 
