@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { EquipementSet } from "@entities/ModuleCharacter/EquipmentModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
@@ -16,12 +17,16 @@ export class CharacterRepository extends CRUD {
     const skills = new Skill();
     await skills.save();
 
+    const equipmentSet = new EquipementSet();
+    await equipmentSet.save();
+
     const createdCharacter = await this.create(
       Character,
       {
         ...newCharacter,
         owner: ownerId,
         skills: skills._id,
+        equipmentSet: equipmentSet._id,
       },
       null,
       ["name"]
@@ -30,6 +35,9 @@ export class CharacterRepository extends CRUD {
 
     skills.owner = createdCharacter._id;
     await skills.save();
+
+    equipmentSet.owner = createdCharacter._id;
+    await equipmentSet.save();
 
     return createdCharacter;
   }
