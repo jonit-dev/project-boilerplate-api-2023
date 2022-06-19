@@ -68,6 +68,7 @@ export class NPCSeeder {
       await Skill.updateOne(
         {
           owner: npc._id,
+          ownerType: "NPC",
         },
         {
           ...skills,
@@ -77,7 +78,7 @@ export class NPCSeeder {
   }
 
   private async createNewNPCWithSkills(NPCData: INPCSeedData): Promise<void> {
-    const skills = new Skill({ ...(NPCData.skills as unknown as ISkill) }); // pre-populate skills, if present in metadata
+    const skills = new Skill({ ...(NPCData.skills as unknown as ISkill), ownerType: "NPC" }); // pre-populate skills, if present in metadata
 
     const newNPC = new NPC({
       ...NPCData,

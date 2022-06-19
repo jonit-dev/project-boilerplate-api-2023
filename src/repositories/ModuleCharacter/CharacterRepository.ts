@@ -23,7 +23,7 @@ export class CharacterRepository extends CRUD {
   }
 
   public async createCharacter(newCharacter: CreateCharacterDTO, ownerId: string): Promise<ICharacter> {
-    const skills = new Skill();
+    const skills = new Skill({ ownerType: "Character" });
     await skills.save();
 
     const { inventory, armor, leftHand } = await this.generateInitialItems(ownerId);

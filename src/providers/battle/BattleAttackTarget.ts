@@ -78,7 +78,7 @@ export class BattleAttackTarget {
   }
 
   private async hitTarget(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
-    const battleEvent = this.battleEvent.calculateEvent(attacker, target);
+    const battleEvent = await this.battleEvent.calculateEvent(attacker, target);
 
     let battleEventPayload: Partial<IBattleEventFromServer> = {
       targetId: target.id,
@@ -87,7 +87,7 @@ export class BattleAttackTarget {
     };
 
     if (battleEvent === BattleEventType.Hit) {
-      const damage = this.battleEvent.calculateHitDamage(attacker, target);
+      const damage = await this.battleEvent.calculateHitDamage(attacker, target);
 
       if (damage > 0) {
         const newTargetHealth = target.health - damage;

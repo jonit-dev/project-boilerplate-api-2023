@@ -20,6 +20,8 @@ describe("BattleAttackTarget.spec.ts", () => {
 
     testNPC = await unitTestHelper.createMockNPC();
     testCharacter = await unitTestHelper.createMockCharacter();
+    await testNPC.populate("skills").execPopulate();
+    await testCharacter.populate("skills").execPopulate();
 
     testCharacter.x = FromGridX(0);
     testCharacter.y = FromGridX(0);

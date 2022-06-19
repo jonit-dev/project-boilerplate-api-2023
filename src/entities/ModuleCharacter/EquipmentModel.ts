@@ -1,6 +1,7 @@
+import { getTotalEquipmentStats } from "@providers/equipment/EquipmentStatsCalculator";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
-export const equipmentSetSchema = createSchema(
+export const equipmentSchema = createSchema(
   {
     owner: Type.objectId({
       refPath: "ownerRef", // ownerRef can be a Character or NPC!
@@ -9,99 +10,51 @@ export const equipmentSetSchema = createSchema(
       enum: ["Character", "NPC"],
     }),
     head: Type.objectId({
-      required: false,
       ref: "Item",
     }),
     neck: Type.objectId({
-      required: false,
       ref: "Item",
     }),
     leftHand: Type.objectId({
-      required: false,
       ref: "Item",
     }),
     rightHand: Type.objectId({
-      required: false,
       ref: "Item",
     }),
     ring: Type.objectId({
-      required: false,
       ref: "Item",
     }),
     legs: Type.objectId({
-      required: false,
       ref: "Item",
     }),
     boot: Type.objectId({
-      required: false,
       ref: "Item",
     }),
     accessory: Type.objectId({
-      required: false,
       ref: "Item",
     }),
     armor: Type.objectId({
-      required: false,
       ref: "Item",
     }),
     inventory: Type.objectId({
-      required: false,
       ref: "Item",
+    }),
+    ...({} as {
+      totalEquippedAttack: Promise<number>;
+      totalEquippedDefense: Promise<number>;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
-equipmentSetSchema.virtual("totalEquippedAttack").get(function (this: IEquipmentSet) {
-  let items;
-  items = this.populate("head");
-  items = this.populate("neck");
-  items = this.populate("leftHand");
-  items = this.populate("rightHand");
-  items = this.populate("ring");
-  items = this.populate("legs");
-  items = this.populate("boot");
-  items = this.populate("accessory");
-  items = this.populate("inventory");
-
-  return (
-    items.head.attack +
-    items.neck.attack +
-    items.leftHand.attack +
-    items.rightHand.attack +
-    items.ring.attack +
-    items.legs.attack +
-    items.boot.attack +
-    items.accessory.attack +
-    items.inventory.attack
-  );
+equipmentSchema.virtual("totalEquippedAttack").get(async function (this: IEquipment) {
+  return (await getTotalEquipmentStats(this._id, "attack")) || 0;
 });
 
-equipmentSetSchema.virtual("totalEquippedDefense").get(function (this: IEquipmentSet) {
-  let items;
-  items = this.populate("head");
-  items = this.populate("neck");
-  items = this.populate("leftHand");
-  items = this.populate("rightHand");
-  items = this.populate("ring");
-  items = this.populate("legs");
-  items = this.populate("boot");
-  items = this.populate("accessory");
-  items = this.populate("inventory");
-
-  return (
-    items.head.defense +
-    items.neck.defense +
-    items.leftHand.defense +
-    items.rightHand.defense +
-    items.ring.defense +
-    items.legs.defense +
-    items.boot.defense +
-    items.accessory.defense +
-    items.inventory.defense
-  );
+equipmentSchema.virtual("totalEquippedDefense").get(async function (this: IEquipment) {
+  return (await getTotalEquipmentStats(this._id, "defense")) || 0;
 });
 
-export type IEquipmentSet = ExtractDoc<typeof equipmentSetSchema>;
+export type IEquipment = ExtractDoc<typeof equipmentSchema>;
 
-export const EquipmentSet = typedModel("EquipmentSet", equipmentSetSchema);
+export const Equipment = typedModel("Equipment", equipmentSchema);

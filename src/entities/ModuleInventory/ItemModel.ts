@@ -102,15 +102,16 @@ itemSchema.post("updateOne", async function (this: IItem) {
 
 itemSchema.post("save", async function (this: IItem) {
   if (this.isItemContainer) {
-    let slots: number = 20;
+    let slotQty: number = 20;
 
     if (this.generateContainerSlots) {
-      slots = this.generateContainerSlots;
+      slotQty = this.generateContainerSlots;
     }
 
     const newContainer = new ItemContainer({
       parentItem: this._id,
-      slots,
+      slotQty,
+      owner: this.owner,
     });
     await newContainer.save();
   }

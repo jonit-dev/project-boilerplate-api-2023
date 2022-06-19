@@ -17,7 +17,7 @@ export const npcRat = {
       level: 1,
     },
     dexterity: {
-      level: 3,
+      level: 1,
     },
   },
   fleeOnLowHealth: true,
