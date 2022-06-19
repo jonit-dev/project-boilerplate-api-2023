@@ -8,49 +8,99 @@ export const equipmentSetSchema = createSchema(
     ownerRef: Type.string({
       enum: ["Character", "NPC"],
     }),
-    head: Type.number({
+    head: Type.objectId({
       required: false,
-      default: 0,
+      ref: "Item",
     }),
-    neck: Type.number({
+    neck: Type.objectId({
       required: false,
-      default: 0,
+      ref: "Item",
     }),
-    leftHand: Type.number({
+    leftHand: Type.objectId({
       required: false,
-      default: 0,
+      ref: "Item",
     }),
-    rightHand: Type.number({
+    rightHand: Type.objectId({
       required: false,
-      default: 0,
+      ref: "Item",
     }),
-    ring: Type.number({
+    ring: Type.objectId({
       required: false,
-      default: 0,
+      ref: "Item",
     }),
-    legs: Type.number({
+    legs: Type.objectId({
       required: false,
-      default: 0,
+      ref: "Item",
     }),
-    boot: Type.number({
+    boot: Type.objectId({
       required: false,
-      default: 0,
+      ref: "Item",
     }),
-    accessory: Type.number({
+    accessory: Type.objectId({
       required: false,
-      default: 0,
+      ref: "Item",
     }),
-    armor: Type.number({
+    armor: Type.objectId({
       required: false,
-      default: 0,
+      ref: "Item",
     }),
-    inventory: Type.number({
+    inventory: Type.objectId({
       required: false,
-      default: 1,
+      ref: "Item",
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
+
+equipmentSetSchema.virtual("totalEquippedAttack").get(function (this: IEquipementSet) {
+  let items;
+  items = this.populate("head");
+  items = this.populate("neck");
+  items = this.populate("leftHand");
+  items = this.populate("rightHand");
+  items = this.populate("ring");
+  items = this.populate("legs");
+  items = this.populate("boot");
+  items = this.populate("accessory");
+  items = this.populate("inventory");
+
+  return (
+    items.head.attack +
+    items.neck.attack +
+    items.leftHand.attack +
+    items.rightHand.attack +
+    items.ring.attack +
+    items.legs.attack +
+    items.boot.attack +
+    items.accessory.attack +
+    items.inventory.attack
+  );
+});
+
+equipmentSetSchema.virtual("totalEquippedDefense").get(function (this: IEquipementSet) {
+  let items;
+  items = this.populate("head");
+  items = this.populate("neck");
+  items = this.populate("leftHand");
+  items = this.populate("rightHand");
+  items = this.populate("ring");
+  items = this.populate("legs");
+  items = this.populate("boot");
+  items = this.populate("accessory");
+  items = this.populate("inventory");
+
+  return (
+    items.head.defense +
+    items.neck.defense +
+    items.leftHand.defense +
+    items.rightHand.defense +
+    items.ring.defense +
+    items.legs.defense +
+    items.boot.defense +
+    items.accessory.defense +
+    items.inventory.defense
+  );
+});
 
 export type IEquipementSet = ExtractDoc<typeof equipmentSetSchema>;
 

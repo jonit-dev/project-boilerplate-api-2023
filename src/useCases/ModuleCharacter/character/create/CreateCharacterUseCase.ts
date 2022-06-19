@@ -16,6 +16,17 @@ export class CreateCharacterUseCase {
       throw new BadRequestError("Character creation error: User not found!");
     }
 
+    // const blueprintData = itemsBlueprintIndex[SwordBlueprint.ShortSword];
+
+    // const shortSword = new Item({
+    //   ...blueprintData,
+    //   x: testCharacter.x,
+    //   y: testCharacter.y,
+    //   scene: testCharacter.scene,
+    // });
+
+    // await shortSword.save();
+
     const createdCharacter = await this.characterRepository.createCharacter(newCharacter, ownerId);
 
     user.characters?.push(createdCharacter._id);

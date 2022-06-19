@@ -125,6 +125,10 @@ const characterSchema = createSchema(
         npcs: {},
       },
     }),
+    equipamentSet: Type.objectId({
+      required: true,
+      ref: "EquipmentSet",
+    }),
     ...({} as {
       isAlive: boolean;
       type: string;
