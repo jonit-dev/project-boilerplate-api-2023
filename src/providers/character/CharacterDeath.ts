@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { BodiesBlueprint } from "@providers/item/data/types/blueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -42,7 +43,7 @@ export class CharacterDeath {
   }
 
   public async generateCharacterBody(character: ICharacter): Promise<void> {
-    const blueprintData = itemsBlueprintIndex["character-body"];
+    const blueprintData = itemsBlueprintIndex[BodiesBlueprint.CharacterBody];
 
     const charBody = new Item({
       ...blueprintData,
