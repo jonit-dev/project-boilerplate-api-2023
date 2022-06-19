@@ -125,7 +125,7 @@ const characterSchema = createSchema(
         npcs: {},
       },
     }),
-    equipamentSet: Type.objectId({
+    equipmentSet: Type.objectId({
       required: true,
       ref: "EquipmentSet",
     }),
