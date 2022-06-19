@@ -102,6 +102,6 @@ equipmentSetSchema.virtual("totalEquippedDefense").get(function (this: IEquipeme
   );
 });
 
-export type IEquipementSet = ExtractDoc<typeof equipmentSetSchema>;
+export type IEquipmentSet = ExtractDoc<typeof equipmentSetSchema>;
 
-export const EquipementSet = typedModel("EquipementSet", equipmentSetSchema);
+export const EquipmentSet = typedModel("EquipmentSet", equipmentSetSchema);

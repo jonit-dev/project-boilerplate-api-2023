@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { EquipmentSet } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
@@ -55,10 +56,14 @@ export class UnitTestHelper {
     const charSkills = new Skill();
     await charSkills.save();
 
+    const charEquipmentSet = new EquipmentSet();
+    await charEquipmentSet.save();
+
     const testCharacter = new Character({
       ...characterMock,
       ...extraProps,
       skills: charSkills._id,
+      equipmentSet: charEquipmentSet._id,
     });
 
     await testCharacter.save();
