@@ -19,3 +19,11 @@ export enum BodiesBlueprint {
   CharacterBody = "character-body",
   NPCBody = "npc-body",
 }
+
+export enum DaggersBluePrint {
+  Dagger = "dagger",
+}
+
+export enum ArmorsBlueprint {
+  Jacket = "jacket",
+}
