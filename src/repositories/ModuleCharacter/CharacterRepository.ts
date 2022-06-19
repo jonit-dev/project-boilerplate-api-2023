@@ -1,5 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { EquipementSet } from "@entities/ModuleCharacter/EquipmentModel";
+import { EquipmentSet } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
@@ -23,7 +23,7 @@ export class CharacterRepository extends CRUD {
     const bagItem = await createBagItem();
     const backPackItem = await createBackPackItem();
 
-    let equipmentSet = new EquipementSet();
+    let equipmentSet = new EquipmentSet();
     equipmentSet.inventory = bagItem._id;
     equipmentSet = await equipmentSet.save();
 

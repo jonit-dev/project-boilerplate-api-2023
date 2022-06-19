@@ -52,7 +52,7 @@ export const equipmentSetSchema = createSchema(
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
-equipmentSetSchema.virtual("totalEquippedAttack").get(function (this: IEquipementSet) {
+equipmentSetSchema.virtual("totalEquippedAttack").get(function (this: IEquipmentSet) {
   let items;
   items = this.populate("head");
   items = this.populate("neck");
@@ -77,7 +77,7 @@ equipmentSetSchema.virtual("totalEquippedAttack").get(function (this: IEquipemen
   );
 });
 
-equipmentSetSchema.virtual("totalEquippedDefense").get(function (this: IEquipementSet) {
+equipmentSetSchema.virtual("totalEquippedDefense").get(function (this: IEquipmentSet) {
   let items;
   items = this.populate("head");
   items = this.populate("neck");
