@@ -3,6 +3,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { SwordBlueprint } from "@providers/item/data/types/blueprintTypes";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { CharacterView } from "../CharacterView";
 
@@ -24,7 +25,7 @@ describe("CharacterView.ts", () => {
   });
 
   it("should properly get elements in char view", async () => {
-    const blueprintData = itemsBlueprintIndex["short-sword"];
+    const blueprintData = itemsBlueprintIndex[SwordBlueprint.ShortSword];
 
     const shortSword = new Item({
       ...blueprintData,
