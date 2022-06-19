@@ -49,6 +49,7 @@ const itemSchema = createSchema(
     itemContainer: Type.objectId({
       ref: "ItemContainer",
     }),
+    generateContainerSlots: Type.number(),
     isSolid: Type.boolean({ required: true, default: false }),
     ...({} as {
       isEquipable: boolean;
@@ -101,8 +102,15 @@ itemSchema.post("updateOne", async function (this: IItem) {
 
 itemSchema.post("save", async function (this: IItem) {
   if (this.isItemContainer) {
+    let slots: number = 20;
+
+    if (this.generateContainerSlots) {
+      slots = this.generateContainerSlots;
+    }
+
     const newContainer = new ItemContainer({
       parentItem: this._id,
+      slots,
     });
     await newContainer.save();
   }

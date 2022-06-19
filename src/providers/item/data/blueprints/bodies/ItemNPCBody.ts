@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 
 export const itemNPCBody: Partial<IItem> = {
   type: ItemType.Container,
-  subType: ItemSubType.Body,
+  subType: ItemSubType.Other,
   textureAtlas: "entities",
   weight: 100,
   isStorable: false,
