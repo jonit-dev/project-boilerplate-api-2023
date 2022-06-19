@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 export const itemCharacterBody: Partial<IItem> = {
   key: "character-body",
   type: ItemType.Container,
-  subType: ItemSubType.Body,
+  subType: ItemSubType.Other,
   textureAtlas: "entities",
   texturePath: "kid-1/death/kid-1.png",
   textureKey: "character",
