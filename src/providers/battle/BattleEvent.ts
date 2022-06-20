@@ -19,24 +19,26 @@ export class BattleEvent {
     const defenderModifiers = defenderDefense + defenderSkills.dexterity.level;
     const attackerModifiers = attackerAttack + attackerSkills.dexterity.level;
 
-    const hitChance = 21 - ((defenderModifiers - attackerModifiers) / 20) * 100;
+    const hasHitSucceeded = this.hasBattleEventSucceeded(attackerModifiers, defenderModifiers);
 
+    if (hasHitSucceeded) {
+      return BattleEventType.Hit;
+    }
+
+    const hasBlockSucceeded = this.hasBattleEventSucceeded(attackerModifiers, defenderModifiers);
+
+    if (hasBlockSucceeded) {
+      return BattleEventType.Block;
+    }
+
+    return BattleEventType.Miss;
+  }
+
+  private hasBattleEventSucceeded(attackerModifiers: number, defenderModifiers: number): boolean {
+    const chance = 21 - ((defenderModifiers - attackerModifiers) / 20) * 100;
     const n = _.random(0, 100);
 
-    if (n <= hitChance) {
-      return BattleEventType.Hit;
-    } else {
-      // calculate miss or block chance
-
-      const blockChance = 21 + ((defenderModifiers - attackerModifiers) / 20) * 100;
-      const b = _.random(0, 100);
-
-      if (b <= blockChance) {
-        return BattleEventType.Block;
-      }
-
-      return BattleEventType.Miss;
-    }
+    return n <= chance;
   }
 
   public async calculateHitDamage(attacker: BattleParticipant, target: BattleParticipant): Promise<number> {
