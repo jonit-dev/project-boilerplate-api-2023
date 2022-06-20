@@ -10,7 +10,7 @@ export const npcRat = {
   textureKey: "rat",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 2,
+  speed: 1.5,
   skills: {
     level: 1,
     strength: {
@@ -18,6 +18,9 @@ export const npcRat = {
     },
     dexterity: {
       level: 1,
+    },
+    resistance: {
+      level: 2,
     },
   },
   fleeOnLowHealth: true,

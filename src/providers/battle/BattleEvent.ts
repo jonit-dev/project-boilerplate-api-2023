@@ -13,8 +13,11 @@ export class BattleEvent {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
 
-    const defenderModifiers = (await defenderSkills.defense) + defenderSkills.dexterity.level;
-    const attackerModifiers = (await attackerSkills.attack) + attackerSkills.dexterity.level;
+    const defenderDefense = await defenderSkills.defense;
+    const attackerAttack = await attackerSkills.attack;
+
+    const defenderModifiers = defenderDefense + defenderSkills.dexterity.level;
+    const attackerModifiers = attackerAttack + attackerSkills.dexterity.level;
 
     const hitChance = 21 - ((defenderModifiers - attackerModifiers) / 20) * 100;
 
@@ -23,6 +26,15 @@ export class BattleEvent {
     if (n <= hitChance) {
       return BattleEventType.Hit;
     } else {
+      // calculate miss or block chance
+
+      const blockChance = 21 + ((defenderModifiers - attackerModifiers) / 20) * 100;
+      const b = _.random(0, 100);
+
+      if (b <= blockChance) {
+        return BattleEventType.Block;
+      }
+
       return BattleEventType.Miss;
     }
   }
@@ -33,6 +45,8 @@ export class BattleEvent {
 
     const totalPotentialAttackerDamage = (await attackerSkills.attack) * (100 / 100 + (await defenderSkills.defense));
 
-    return Math.round(_.random(0, totalPotentialAttackerDamage));
+    const damage = Math.round(_.random(0, totalPotentialAttackerDamage));
+
+    return damage;
   }
 }

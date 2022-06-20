@@ -96,6 +96,8 @@ skillsSchema.virtual("attack").get(async function (this: ISkill) {
     if (equipment) {
       const totalEquippedAttack = await equipment?.totalEquippedAttack;
 
+      // TODO: This should also take into consideration the weapon proficiency of the character.
+
       return this.strength.level + this.level + totalEquippedAttack || 0;
     }
   }

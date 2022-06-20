@@ -645,8 +645,8 @@
           "type": "Item",
           "visible": true,
           "width": 16,
-          "x": 352,
-          "y": 160
+          "x": 224,
+          "y": 624
         },
         {
           "height": 16,
@@ -663,8 +663,8 @@
           "type": "Item",
           "visible": true,
           "width": 16,
-          "x": 304,
-          "y": 192
+          "x": 224,
+          "y": 592
         }
       ],
       "opacity": 1,
