@@ -1,13 +1,6 @@
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import {
-  CharacterClass,
-  CharacterGender,
-  FromGridX,
-  FromGridY,
-  IItem,
-  MapLayers,
-  TypeHelper,
-} from "@rpg-engine/shared";
+import { CharacterClass, CharacterGender, FromGridX, FromGridY, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Equipment } from "./EquipmentModel";
