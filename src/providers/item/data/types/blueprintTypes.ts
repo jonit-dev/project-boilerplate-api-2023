@@ -27,3 +27,7 @@ export enum DaggersBluePrint {
 export enum ArmorsBlueprint {
   Jacket = "jacket",
 }
+
+export enum SpearsBlueprint {
+  RoyalSpear = "royal-spear",
+}

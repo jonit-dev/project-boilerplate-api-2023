@@ -5,6 +5,7 @@ import { containersBlueprintIndex } from "./blueprints/containers/index";
 import { daggersBlueprintsIndex } from "./blueprints/daggers/index";
 import { effectsBlueprintsIndex } from "./blueprints/effects/index";
 import { helmetsBlueprintsIndex } from "./blueprints/helmets/index";
+import { spearsBlueprintsIndex } from "./blueprints/spears/index";
 import { swordBlueprintIndex } from "./blueprints/swords/index";
 
 export const itemsBlueprintIndex: IBlueprint = {
@@ -15,4 +16,5 @@ export const itemsBlueprintIndex: IBlueprint = {
   ...swordBlueprintIndex,
   ...daggersBlueprintsIndex,
   ...armorsBlueprintsIndex,
+  ...spearsBlueprintsIndex,
 };

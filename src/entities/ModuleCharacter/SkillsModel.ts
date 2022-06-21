@@ -1,6 +1,7 @@
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { calculateSPToNextLevel, calculateXPToNextLevel } from "@providers/skill/SkillCalculator";
 import { SkillType, TypeHelper } from "@rpg-engine/shared";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Equipment } from "./EquipmentModel";
 
 const skillDetails = (type: SkillType): Record<string, any> => {
@@ -25,7 +26,7 @@ const skillDetails = (type: SkillType): Record<string, any> => {
   };
 };
 
-export const skillsSchema = createSchema(
+export const skillsSchema = createLeanSchema(
   {
     owner: Type.objectId({
       refPath: "ownerRef", // ownerRef can be a Character or NPC!
@@ -95,6 +96,8 @@ skillsSchema.virtual("attack").get(async function (this: ISkill) {
 
     if (equipment) {
       const totalEquippedAttack = await equipment?.totalEquippedAttack;
+
+      // TODO: This should also take into consideration the weapon proficiency of the character.
 
       return this.strength.level + this.level + totalEquippedAttack || 0;
     }

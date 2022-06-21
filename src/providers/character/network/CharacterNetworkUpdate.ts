@@ -251,9 +251,6 @@ export class CharacterNetworkUpdate {
     );
 
     if (isSolid) {
-      console.log(`🚫 ${character.name} tried to move to a solid position!`);
-      await this.characterBan.addPenalty(character);
-
       return false;
     }
 
@@ -303,7 +300,6 @@ export class CharacterNetworkUpdate {
 
     if (Math.round(character.x) !== Math.round(data.x) && Math.round(character.y) !== Math.round(data.y)) {
       console.log(`🚫 ${character.name} tried to move from a different origin position`);
-      await this.characterBan.addPenalty(character);
 
       return false; // mismatch between client and server position
     }

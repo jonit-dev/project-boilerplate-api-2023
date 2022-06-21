@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SwordBlueprint } from "@providers/item/data/types/blueprintTypes";
@@ -36,11 +36,11 @@ describe("CharacterView.ts", () => {
 
     await shortSword.save();
 
-    const itemsInCharView = await characterView.getElementsInCharView(Item, testCharacter);
+    const itemsInCharView: IItem[] = await characterView.getElementsInCharView(Item, testCharacter);
 
     expect(itemsInCharView.length).toBe(1);
 
-    expect(itemsInCharView[0].id).toBe(shortSword.id);
+    expect(itemsInCharView[0]._id).toEqual(shortSword._id);
   });
 
   it("should properly add a view element to the character view", async () => {

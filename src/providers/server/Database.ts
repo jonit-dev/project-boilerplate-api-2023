@@ -1,7 +1,7 @@
 import { provide } from "inversify-binding-decorators";
 import mongoose from "mongoose";
-import { appEnv } from "../../providers/config/env";
 
+import { appEnv } from "../../providers/config/env";
 @provide(Database)
 export class Database {
   public async init(): Promise<void> {

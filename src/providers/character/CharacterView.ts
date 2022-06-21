@@ -156,7 +156,8 @@ export class CharacterView {
           ...filter,
         },
       ],
-    });
+    }).lean({ virtuals: true, defaults: true });
+
     return otherCharactersInView as unknown as T[];
   }
 }
