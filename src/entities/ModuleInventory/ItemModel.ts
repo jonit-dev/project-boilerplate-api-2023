@@ -1,11 +1,12 @@
 import { CharacterView } from "@providers/character/CharacterView";
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { container } from "@providers/inversify/container";
 import { ItemView } from "@providers/item/ItemView";
 import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { ItemContainer } from "./ItemContainerModel";
 
-const itemSchema = createSchema(
+const itemSchema = createLeanSchema(
   {
     tiledId: Type.number(),
     owner: Type.objectId({

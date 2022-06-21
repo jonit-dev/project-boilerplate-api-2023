@@ -1,9 +1,11 @@
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { CharacterClass, CharacterGender, FromGridX, FromGridY, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Skill } from "./SkillsModel";
 
-const characterSchema = createSchema(
+const characterSchema = createLeanSchema(
   {
     name: Type.string({
       required: true,

@@ -1,6 +1,7 @@
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { calculateSPToNextLevel, calculateXPToNextLevel } from "@providers/skill/SkillCalculator";
 import { SkillType, TypeHelper } from "@rpg-engine/shared";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Equipment } from "./EquipmentModel";
 
 const skillDetails = (type: SkillType): Record<string, any> => {
@@ -25,7 +26,7 @@ const skillDetails = (type: SkillType): Record<string, any> => {
   };
 };
 
-export const skillsSchema = createSchema(
+export const skillsSchema = createLeanSchema(
   {
     owner: Type.objectId({
       refPath: "ownerRef", // ownerRef can be a Character or NPC!
