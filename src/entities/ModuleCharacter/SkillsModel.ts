@@ -1,6 +1,8 @@
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { calculateSPToNextLevel, calculateXPToNextLevel } from "@providers/skill/SkillCalculator";
 import { SkillType, TypeHelper } from "@rpg-engine/shared";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { Equipment } from "./EquipmentModel";
 
 const skillDetails = (type: SkillType): Record<string, any> => {
   return {
@@ -19,17 +21,21 @@ const skillDetails = (type: SkillType): Record<string, any> => {
     }),
     skillPointsToNextLevel: Type.number({
       required: true,
-      default: calculateSPToNextLevel(0, 1),
+      default: calculateSPToNextLevel(0, 2),
     }),
   };
 };
 
-export const skillsSchema = createSchema(
+export const skillsSchema = createLeanSchema(
   {
     owner: Type.objectId({
       refPath: "ownerRef", // ownerRef can be a Character or NPC!
     }),
     ownerRef: Type.string({
+      enum: ["Character", "NPC"],
+    }),
+    ownerType: Type.string({
+      required: true,
       enum: ["Character", "NPC"],
     }),
     level: Type.number({
@@ -46,7 +52,7 @@ export const skillsSchema = createSchema(
     }),
     xpToNextLevel: Type.number({
       required: true,
-      default: calculateXPToNextLevel(0, 1),
+      default: calculateXPToNextLevel(0, 2),
     }),
 
     // Basic attributes
@@ -75,20 +81,45 @@ export const skillsSchema = createSchema(
     cooking: skillDetails(SkillType.Crafting),
     alchemy: skillDetails(SkillType.Crafting),
     ...({} as {
-      attack: number;
-      defense: number;
+      attack: Promise<number>;
+      defense: Promise<number>;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
-//! TODO: This should take into consideration the skill involving the weapon that's being used by the character!
-skillsSchema.virtual("attack").get(function (this: ISkill) {
-  return this.strength.level * this.level;
+skillsSchema.virtual("attack").get(async function (this: ISkill) {
+  if (this.ownerType === "Character") {
+    const equipment = await Equipment.findOne({
+      owner: this.owner,
+    });
+
+    if (equipment) {
+      const totalEquippedAttack = await equipment?.totalEquippedAttack;
+
+      // TODO: This should also take into consideration the weapon proficiency of the character.
+
+      return this.strength.level + this.level + totalEquippedAttack || 0;
+    }
+  }
+
+  // for regular NPCs
+  return this.strength.level + this.level;
 });
 
-skillsSchema.virtual("defense").get(function (this: ISkill) {
-  return this.resistance.level * this.level;
+skillsSchema.virtual("defense").get(async function (this: ISkill) {
+  if (this.ownerType === "Character") {
+    const equipment = await Equipment.findOne({
+      owner: this.owner,
+    });
+    if (equipment) {
+      const totalEquippedDefense = await equipment?.totalEquippedDefense;
+
+      return this.resistance.level + this.level + totalEquippedDefense || 0;
+    }
+  }
+  // for regular NPCs
+  return this.resistance.level + this.level;
 });
 
 export type ISkill = ExtractDoc<typeof skillsSchema>;

@@ -1,4 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
@@ -34,7 +36,9 @@ export class UnitTestHelper {
       [NPCMovementType.Stopped]: stoppedMovementMockNPC,
     };
 
-    const npcSkills = new Skill();
+    const npcSkills = new Skill({
+      ownerType: "NPC",
+    });
     await npcSkills.save();
 
     const testNPC = new NPC({
@@ -52,13 +56,19 @@ export class UnitTestHelper {
   }
 
   public async createMockCharacter(extraProps?: Record<string, unknown>): Promise<ICharacter> {
-    const charSkills = new Skill();
+    const charSkills = new Skill({
+      ownerType: "Character",
+    });
     await charSkills.save();
+
+    const equipment = new Equipment();
+    await equipment.save();
 
     const testCharacter = new Character({
       ...characterMock,
       ...extraProps,
       skills: charSkills._id,
+      equipment: equipment._id,
     });
 
     await testCharacter.save();

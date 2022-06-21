@@ -23,7 +23,9 @@ describe("BattleEvents.spec.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
 
     testNPC = await unitTestHelper.createMockNPC();
+    await testNPC.populate("skills").execPopulate();
     testCharacter = await unitTestHelper.createMockCharacter();
+    await testCharacter.populate("skills").execPopulate();
   });
 
   it("should properly calculate a hit or miss event", async () => {
@@ -41,7 +43,7 @@ describe("BattleEvents.spec.ts", () => {
 
       await testCharacter.populate("skills").execPopulate(); // refresh skills data
 
-      const event = battleEvents.calculateEvent(testNPC, testCharacter);
+      const event = await battleEvents.calculateEvent(testNPC, testCharacter);
 
       expect(event).toBe(BattleEventType.Miss);
     }
@@ -61,7 +63,7 @@ describe("BattleEvents.spec.ts", () => {
       await testNPC.populate("skills").execPopulate();
       await testCharacter.populate("skills").execPopulate();
 
-      const event = battleEvents.calculateEvent(testCharacter, testNPC);
+      const event = await battleEvents.calculateEvent(testCharacter, testNPC);
 
       expect(event).toBe(BattleEventType.Hit);
     }
@@ -73,7 +75,7 @@ describe("BattleEvents.spec.ts", () => {
 
     jest.spyOn(_, "random").mockImplementation(() => 10);
 
-    const hit = battleEvents.calculateHitDamage(testCharacter, testNPC);
+    const hit = await battleEvents.calculateHitDamage(testCharacter, testNPC);
 
     expect(hit).toBe(10);
   });

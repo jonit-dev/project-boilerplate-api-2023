@@ -119,7 +119,8 @@ export class ChatNetworkGlobalMessaging {
       })
       .sort({ createdAt: -1 })
       .populate("emitter", "name")
-      .limit(limit);
+      .limit(limit)
+      .lean({ virtuals: true, defaults: true });
 
     chatLogsInView.reverse();
 

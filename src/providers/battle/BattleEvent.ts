@@ -9,26 +9,46 @@ type BattleParticipant = ICharacter | INPC;
 
 @provide(BattleEvent)
 export class BattleEvent {
-  public calculateEvent(attacker: BattleParticipant, target: BattleParticipant): BattleEventType {
+  public async calculateEvent(attacker: BattleParticipant, target: BattleParticipant): Promise<BattleEventType> {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
 
-    const attackersCalculatedDexterity = attackerSkills.dexterity + _.random(0, 100);
-    const defendersCalculatedDexterity = defenderSkills.dexterity + _.random(0, 100);
+    const defenderDefense = await defenderSkills.defense;
+    const attackerAttack = await attackerSkills.attack;
 
-    if (attackersCalculatedDexterity > defendersCalculatedDexterity) {
+    const defenderModifiers = defenderDefense + defenderSkills.dexterity.level;
+    const attackerModifiers = attackerAttack + attackerSkills.dexterity.level;
+
+    const hasHitSucceeded = this.hasBattleEventSucceeded(attackerModifiers, defenderModifiers);
+
+    if (hasHitSucceeded) {
       return BattleEventType.Hit;
-    } else {
-      return BattleEventType.Miss;
     }
+
+    const hasBlockSucceeded = this.hasBattleEventSucceeded(attackerModifiers, defenderModifiers);
+
+    if (hasBlockSucceeded) {
+      return BattleEventType.Block;
+    }
+
+    return BattleEventType.Miss;
   }
 
-  public calculateHitDamage(attacker: BattleParticipant, target: BattleParticipant): number {
+  private hasBattleEventSucceeded(attackerModifiers: number, defenderModifiers: number): boolean {
+    const chance = 21 - ((defenderModifiers - attackerModifiers) / 20) * 100;
+    const n = _.random(0, 100);
+
+    return n <= chance;
+  }
+
+  public async calculateHitDamage(attacker: BattleParticipant, target: BattleParticipant): Promise<number> {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
 
-    const totalPotentialAttackerDamage = attackerSkills.attack * (100 / 100 + defenderSkills.defense);
+    const totalPotentialAttackerDamage = (await attackerSkills.attack) * (100 / 100 + (await defenderSkills.defense));
 
-    return _.random(0, totalPotentialAttackerDamage);
+    const damage = Math.round(_.random(0, totalPotentialAttackerDamage));
+
+    return damage;
   }
 }

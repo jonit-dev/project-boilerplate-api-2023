@@ -1,11 +1,12 @@
 import { CharacterView } from "@providers/character/CharacterView";
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { container } from "@providers/inversify/container";
 import { ItemView } from "@providers/item/ItemView";
 import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { ItemContainer } from "./ItemContainerModel";
 
-const itemSchema = createSchema(
+const itemSchema = createLeanSchema(
   {
     tiledId: Type.number(),
     owner: Type.objectId({
@@ -49,6 +50,7 @@ const itemSchema = createSchema(
     itemContainer: Type.objectId({
       ref: "ItemContainer",
     }),
+    generateContainerSlots: Type.number(),
     isSolid: Type.boolean({ required: true, default: false }),
     ...({} as {
       isEquipable: boolean;
@@ -101,8 +103,16 @@ itemSchema.post("updateOne", async function (this: IItem) {
 
 itemSchema.post("save", async function (this: IItem) {
   if (this.isItemContainer) {
+    let slotQty: number = 20;
+
+    if (this.generateContainerSlots) {
+      slotQty = this.generateContainerSlots;
+    }
+
     const newContainer = new ItemContainer({
       parentItem: this._id,
+      slotQty,
+      owner: this.owner,
     });
     await newContainer.save();
   }

@@ -1,6 +1,7 @@
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
-const MapSchema = createSchema(
+const MapSchema = createLeanSchema(
   {
     name: Type.string({ required: true }),
     checksum: Type.string({ required: true }),
