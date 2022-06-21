@@ -5,7 +5,13 @@ import { Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IEquipItemPayload, IEquipmentAndInventoryUpdatePayload, IItem, ItemSocketEvents } from "@rpg-engine/shared";
+import {
+  IEquipItemPayload,
+  IEquipmentAndInventoryUpdatePayload,
+  IItem,
+  ItemSocketEvents,
+  ItemType,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(EquipmentEquipNetwork)
@@ -23,7 +29,7 @@ export class EquipmentEquipNetwork {
 
         const inventory = await character.inventory;
 
-        const itemContainer = await ItemContainer.find({
+        const itemContainer = await ItemContainer.findOne({
           owner: character.id,
         });
 
@@ -66,6 +72,12 @@ export class EquipmentEquipNetwork {
               itemContainer.slots[index] = null;
               await itemContainer.save();
 
+              const allowedItemTypes: ItemType[] = [];
+
+              for (const allowedItemType in Object.keys(ItemType)) {
+                allowedItemTypes.push(ItemType[allowedItemType]);
+              }
+
               const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
                 equipment: {
                   _id: equipment._id,
@@ -82,12 +94,12 @@ export class EquipmentEquipNetwork {
                 },
                 inventory: {
                   _id: inventory._id,
-                  parentItem: itemContainer.parentItem,
-                  owner: itemContainer.owner,
+                  parentItem: itemContainer.parentItem.toString(),
+                  owner: itemContainer?.owner?.toString(),
                   name: itemContainer.name,
                   slotQty: itemContainer.slotQty,
                   slots: itemContainer.slots,
-                  allowedItemTypes: itemContainer.allowedItemTypes,
+                  allowedItemTypes: allowedItemTypes,
                   isEmpty: itemContainer.isEmpty,
                 },
               };
