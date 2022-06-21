@@ -5,13 +5,7 @@ import { Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import {
-  IEquipItemPayload,
-  IEquipmentAndInventoryUpdatePayload,
-  IItem,
-  IItemContainer,
-  ItemSocketEvents,
-} from "@rpg-engine/shared";
+import { IEquipItemPayload, IEquipmentAndInventoryUpdatePayload, IItem, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(EquipmentEquipNetwork)
@@ -28,6 +22,10 @@ export class EquipmentEquipNetwork {
         const item = await Item.findById(itemId);
 
         const inventory = await character.inventory;
+
+        const itemContainer = await ItemContainer.find({
+          owner: character.id,
+        });
 
         if (
           inventory &&
@@ -52,43 +50,50 @@ export class EquipmentEquipNetwork {
             const armor = equipment.armor! as unknown as IItem;
 
             equipment[itemType.toLowerCase()] = itemId;
-            equipment.inventory = "";
+            // equipment.inventory = "";
             equipment.save();
 
-            const inventoryUser = await ItemContainer.find({
-              owner: character.id,
-            });
-
-            let index = 0;
-            for (let slot in inventoryUser.slots) {
-              if (slot === itemId) {
-                slot = "";
-                break;
+            if (itemContainer) {
+              let index = 0;
+              for (let slot in itemContainer.slots) {
+                if (slot === itemId) {
+                  slot = "";
+                  break;
+                }
+                index++;
               }
-              index++;
+
+              itemContainer.slots[index] = null;
+              await itemContainer.save();
+
+              const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+                equipment: {
+                  _id: equipment._id,
+                  head,
+                  neck,
+                  leftHand,
+                  rightHand,
+                  ring,
+                  legs,
+                  boot,
+                  armor,
+                  accessory,
+                  inventory: {} as IItem,
+                },
+                inventory: {
+                  _id: inventory._id,
+                  parentItem: itemContainer.parentItem,
+                  owner: itemContainer.owner,
+                  name: itemContainer.name,
+                  slotQty: itemContainer.slotQty,
+                  slots: itemContainer.slots,
+                  allowedItemTypes: itemContainer.allowedItemTypes,
+                  isEmpty: itemContainer.isEmpty,
+                },
+              };
+
+              this.updateItemInventoryCharacter(payloadUpdate, character);
             }
-
-            inventoryUser.slots[index] = null;
-            await inventoryUser.save();
-
-            const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-              equipment: {
-                _id: equipment._id,
-                head,
-                neck,
-                leftHand,
-                rightHand,
-                ring,
-                legs,
-                boot,
-                armor,
-                accessory,
-                inventory: {} as IItem,
-              },
-              inventory: inventoryUser as unknown | IItemContainer,
-            };
-
-            this.updateItemInventoryCharacter(payloadUpdate, character);
           }
         }
       }
