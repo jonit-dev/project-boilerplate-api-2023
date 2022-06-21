@@ -18,7 +18,8 @@ export class NPCMovementFixedPath {
       )!;
 
       if (!shortestPath) {
-        throw new Error("No shortest path found!");
+        // throw new Error("No shortest path found!");
+        return;
       }
 
       const { newGridX, newGridY, nextMovementDirection } = shortestPath;

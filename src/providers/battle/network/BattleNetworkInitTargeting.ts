@@ -16,6 +16,7 @@ import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { Optional } from "ts-mongoose";
 import { BattleCharacterManager } from "../BattleCharacterManager";
+import { BattleNetworkStopTargeting } from "./BattleNetworkStopTargetting";
 
 interface ITargetValidation {
   isValid: boolean;
@@ -28,7 +29,8 @@ export class BattleNetworkInitTargeting {
     private socketAuth: SocketAuth,
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
-    private battleCharacterManager: BattleCharacterManager
+    private battleCharacterManager: BattleCharacterManager,
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
@@ -90,6 +92,7 @@ export class BattleNetworkInitTargeting {
     target: ICharacter | INPC,
     targetType: EntityType
   ): Promise<void> {
+    await this.battleNetworkStopTargeting.stopTargeting(character);
     character.target.id = target._id;
     character.target.type = targetType as unknown as Optional<string>;
     await character.save();
