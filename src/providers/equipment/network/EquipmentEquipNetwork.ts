@@ -87,7 +87,7 @@ export class EquipmentEquipNetwork {
         if (equipment) {
           equipment[targetSlot.toLowerCase()] = itemId;
           equipment.inventory = undefined;
-          equipment.save();
+          await equipment.save();
 
           await this.removeItemFromInventory(itemId, itemContainer);
 
@@ -142,6 +142,7 @@ export class EquipmentEquipNetwork {
     const boot = equipment?.boot! as unknown as IItem;
     const accessory = equipment?.accessory! as unknown as IItem;
     const armor = equipment?.armor! as unknown as IItem;
+    const inventory = equipment?.inventory as unknown as IItem;
 
     return {
       head,
@@ -153,6 +154,7 @@ export class EquipmentEquipNetwork {
       boot,
       accessory,
       armor,
+      inventory,
     };
   }
 
