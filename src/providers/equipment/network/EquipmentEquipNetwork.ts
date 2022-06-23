@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -11,6 +11,8 @@ import {
   IItem,
   ItemSocketEvents,
   ItemType,
+  IUIShowMessage,
+  UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
@@ -24,7 +26,7 @@ export class EquipmentEquipNetwork {
       ItemSocketEvents.Equip,
       async (data: IEquipItemPayload, character: ICharacter) => {
         const itemId = data.itemId;
-        const itemType = data.targetSlot;
+        const targetSlot = data.targetSlot;
         const item = await Item.findById(itemId);
 
         const inventory = await character.inventory;
@@ -33,80 +35,83 @@ export class EquipmentEquipNetwork {
           owner: character.id,
         });
 
-        if (
-          inventory &&
-          inventory.id === itemId &&
-          !character.isBanned &&
-          character.isAlive &&
-          item?.allowedEquipSlotType?.includes(itemType)
-        ) {
-          const equipment = await Equipment.findById(character.equipment)
-            .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
-            .exec();
+        if (!itemContainer) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "Container not found.",
+            type: "error",
+          });
+          return;
+        }
 
-          if (equipment) {
-            const head = equipment.head! as unknown as IItem;
-            const neck = equipment.neck! as unknown as IItem;
-            const leftHand = equipment.leftHand! as unknown as IItem;
-            const rightHand = equipment.rightHand! as unknown as IItem;
-            const ring = equipment.ring! as unknown as IItem;
-            const legs = equipment.legs! as unknown as IItem;
-            const boot = equipment.boot! as unknown as IItem;
-            const accessory = equipment.accessory! as unknown as IItem;
-            const armor = equipment.armor! as unknown as IItem;
+        if (!inventory) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "Inventory is empty.",
+            type: "error",
+          });
+          return;
+        }
 
-            equipment[itemType.toLowerCase()] = itemId;
-            // equipment.inventory = "";
-            equipment.save();
+        if (inventory.id !== itemId) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "User doesn't have this item",
+            type: "error",
+          });
+          return;
+        }
 
-            if (itemContainer) {
-              let index = 0;
-              for (let slot in itemContainer.slots) {
-                if (slot === itemId) {
-                  slot = "";
-                  break;
-                }
-                index++;
-              }
+        if (character.isBanned) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "User has been banned!",
+            type: "error",
+          });
+          return;
+        }
 
-              itemContainer.slots[index] = null;
-              await itemContainer.save();
+        if (!character.isAlive) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "User is dead!",
+            type: "error",
+          });
+          return;
+        }
 
-              const allowedItemTypes: ItemType[] = [];
+        if (!item?.allowedEquipSlotType?.includes(targetSlot)) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "Item cannot be equipped in this slot",
+            type: "error",
+          });
+          return;
+        }
 
-              for (const allowedItemType in Object.keys(ItemType)) {
-                allowedItemTypes.push(ItemType[allowedItemType]);
-              }
+        const equipment = await Equipment.findById(character.equipment);
+        if (equipment) {
+          equipment[targetSlot.toLowerCase()] = itemId;
+          equipment.inventory = undefined;
+          equipment.save();
 
-              const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-                equipment: {
-                  _id: equipment._id,
-                  head,
-                  neck,
-                  leftHand,
-                  rightHand,
-                  ring,
-                  legs,
-                  boot,
-                  armor,
-                  accessory,
-                  inventory: {} as IItem,
-                },
-                inventory: {
-                  _id: inventory._id,
-                  parentItem: itemContainer.parentItem.toString(),
-                  owner: itemContainer?.owner?.toString(),
-                  name: itemContainer.name,
-                  slotQty: itemContainer.slotQty,
-                  slots: itemContainer.slots,
-                  allowedItemTypes: allowedItemTypes,
-                  isEmpty: itemContainer.isEmpty,
-                },
-              };
+          await this.removeItemFromInventory(itemId, itemContainer);
 
-              this.updateItemInventoryCharacter(payloadUpdate, character);
-            }
-          }
+          const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+
+          const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+            equipment: {
+              _id: equipment._id,
+              ...equipmentSlots,
+              inventory: {} as IItem,
+            },
+            inventory: {
+              _id: inventory._id,
+              parentItem: itemContainer.parentItem.toString(),
+              owner: itemContainer?.owner?.toString(),
+              name: itemContainer.name,
+              slotQty: itemContainer.slotQty,
+              slots: itemContainer.slots,
+              allowedItemTypes: this.getAllowedItemTypes(),
+              isEmpty: itemContainer.isEmpty,
+            },
+          };
+
+          this.updateItemInventoryCharacter(payloadUpdate, character);
         }
       }
     );
@@ -121,5 +126,57 @@ export class EquipmentEquipNetwork {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       equipmentAndInventoryUpdate
     );
+  }
+
+  private async getEquipmentSlots(equipmentId: string): Promise<object> {
+    const equipment = await Equipment.findById(equipmentId)
+      .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
+      .exec();
+
+    const head = equipment?.head! as unknown as IItem;
+    const neck = equipment?.neck! as unknown as IItem;
+    const leftHand = equipment?.leftHand! as unknown as IItem;
+    const rightHand = equipment?.rightHand! as unknown as IItem;
+    const ring = equipment?.ring! as unknown as IItem;
+    const legs = equipment?.legs! as unknown as IItem;
+    const boot = equipment?.boot! as unknown as IItem;
+    const accessory = equipment?.accessory! as unknown as IItem;
+    const armor = equipment?.armor! as unknown as IItem;
+
+    return {
+      head,
+      neck,
+      leftHand,
+      rightHand,
+      ring,
+      legs,
+      boot,
+      accessory,
+      armor,
+    };
+  }
+
+  private async removeItemFromInventory(itemId: string, itemContainer: IItemContainer): Promise<void> {
+    let index = 0;
+    for (let slot in itemContainer.slots) {
+      if (slot === itemId) {
+        slot = "";
+        break;
+      }
+      index++;
+    }
+
+    itemContainer.slots[index] = null;
+    await itemContainer.save();
+  }
+
+  private getAllowedItemTypes(): ItemType[] {
+    const allowedItemTypes: ItemType[] = [];
+
+    for (const allowedItemType in Object.keys(ItemType)) {
+      allowedItemTypes.push(ItemType[allowedItemType]);
+    }
+
+    return allowedItemTypes;
   }
 }
