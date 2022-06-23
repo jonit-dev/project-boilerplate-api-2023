@@ -13,7 +13,7 @@ const itemContainerSchema = createSchema(
     }),
     name: Type.string(),
     slotQty: Type.number({ required: true, default: 20 }),
-    slots: Type.mixed(),
+    slots: Type.mixed({}),
     allowedItemTypes: Type.array().of(
       Type.string({
         enum: TypeHelper.enumToStringArray(ItemType),
