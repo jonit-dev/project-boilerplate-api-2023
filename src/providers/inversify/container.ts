@@ -1,4 +1,5 @@
 import { CharacterConnection } from "@providers/character/CharacterConnection";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -43,5 +44,6 @@ export const unitTestHelper = container.get<UnitTestHelper>(UnitTestHelper);
 export const socketEventsBinder = container.get<SocketEventsBinder>(SocketEventsBinder);
 
 export const characterConnection = container.get<CharacterConnection>(CharacterConnection);
+export const characterInventory = container.get<CharacterInventory>(CharacterInventory);
 
 export { container };
