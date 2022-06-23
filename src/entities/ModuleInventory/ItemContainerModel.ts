@@ -41,6 +41,20 @@ itemContainerSchema.virtual("isEmpty").get(function (this: IItemContainer) {
   return !items;
 });
 
+itemContainerSchema.post("save", async function (this: IItemContainer) {
+  await Item.updateOne(
+    {
+      _id: this.parentItem,
+    },
+    {
+      $set: {
+        isItemContainer: true,
+        itemContainer: this._id,
+      },
+    }
+  );
+});
+
 itemContainerSchema.post("remove", async function (this: IItemContainer) {
   if (this.itemIds) {
     for (const itemId of this.itemIds) {
