@@ -1,14 +1,14 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   IEquipItemPayload,
   IEquipmentAndInventoryUpdatePayload,
-  IItem,
   ItemSocketEvents,
   ItemType,
   IUIShowMessage,
@@ -18,7 +18,11 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(EquipmentEquipNetwork)
 export class EquipmentEquipNetwork {
-  constructor(private socketAuth: SocketAuth, private socketMessaging: SocketMessaging) {}
+  constructor(
+    private movementHelper: MovementHelper,
+    private socketAuth: SocketAuth,
+    private socketMessaging: SocketMessaging
+  ) {}
 
   public onItemEquip(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
@@ -27,7 +31,8 @@ export class EquipmentEquipNetwork {
       async (data: IEquipItemPayload, character: ICharacter) => {
         const itemId = data.itemId;
         const targetSlot = data.targetSlot;
-        const item = await Item.findById(itemId);
+        const item = (await Item.findById(itemId)) as unknown as IItem;
+        let equipItemFromMap = false;
 
         const inventory = await character.inventory;
 
@@ -35,7 +40,21 @@ export class EquipmentEquipNetwork {
           owner: character.id,
         });
 
-        if (!itemContainer) {
+        if (!item) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "Item not found.",
+            type: "error",
+          });
+          return;
+        }
+
+        const itemIsOnRange = this.isItemOnRange(character, item);
+
+        if (itemIsOnRange) {
+          equipItemFromMap = true;
+        }
+
+        if (!equipItemFromMap && !itemContainer) {
           this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
             message: "Container not found.",
             type: "error",
@@ -43,7 +62,7 @@ export class EquipmentEquipNetwork {
           return;
         }
 
-        if (!inventory) {
+        if (!equipItemFromMap && !inventory) {
           this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
             message: "Inventory is empty.",
             type: "error",
@@ -51,7 +70,15 @@ export class EquipmentEquipNetwork {
           return;
         }
 
-        if (inventory.id !== itemId) {
+        if (equipItemFromMap && inventory.id !== itemId) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "Item is out of range!",
+            type: "error",
+          });
+          return;
+        }
+
+        if (!equipItemFromMap && inventory.id !== itemId) {
           this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
             message: "User doesn't have this item",
             type: "error",
@@ -85,11 +112,15 @@ export class EquipmentEquipNetwork {
 
         const equipment = await Equipment.findById(character.equipment);
         if (equipment) {
-          equipment[targetSlot.toLowerCase()] = itemId;
-          equipment.inventory = undefined;
+          equipment[targetSlot.toLowerCase()] = await this.getItemId(equipItemFromMap, item);
+          equipment.inventory = equipItemFromMap === false ? undefined : equipment.inventory;
           await equipment.save();
 
-          await this.removeItemFromInventory(itemId, itemContainer);
+          if (!equipItemFromMap) {
+            await this.removeItemFromInventory(itemId, itemContainer!);
+          } else {
+            await this.removeItemFromMap(item);
+          }
 
           const equipmentSlots = await this.getEquipmentSlots(equipment._id);
 
@@ -97,17 +128,17 @@ export class EquipmentEquipNetwork {
             equipment: {
               _id: equipment._id,
               ...equipmentSlots,
-              inventory: {} as IItem,
+              inventory: "",
             },
             inventory: {
               _id: inventory._id,
-              parentItem: itemContainer.parentItem.toString(),
-              owner: itemContainer?.owner?.toString(),
-              name: itemContainer.name,
-              slotQty: itemContainer.slotQty,
-              slots: itemContainer.slots,
+              parentItem: itemContainer?.parentItem.toString() || "",
+              owner: itemContainer?.owner?.toString() || character.name,
+              name: itemContainer?.name,
+              slotQty: itemContainer?.slotQty || 0,
+              slots: itemContainer?.slots,
               allowedItemTypes: this.getAllowedItemTypes(),
-              isEmpty: itemContainer.isEmpty,
+              isEmpty: itemContainer?.isEmpty || true,
             },
           };
 
@@ -126,6 +157,29 @@ export class EquipmentEquipNetwork {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       equipmentAndInventoryUpdate
     );
+  }
+
+  private isItemOnRange(character: ICharacter, item: IItem): boolean {
+    return this.movementHelper.isUnderRange(character.x, character.y, item.x || 0, item.y || 0, 1);
+  }
+
+  private async getItemId(equipItemFromMap: boolean, item: IItem): Promise<void> {
+    if (!equipItemFromMap) {
+      return item._id;
+    }
+
+    let newItem = new Item({
+      ...item,
+      _id: undefined,
+    });
+
+    newItem = await newItem.save();
+
+    return newItem._id;
+  }
+
+  private async removeItemFromMap(item: IItem): Promise<void> {
+    await item.remove();
   }
 
   private async getEquipmentSlots(equipmentId: string): Promise<object> {
