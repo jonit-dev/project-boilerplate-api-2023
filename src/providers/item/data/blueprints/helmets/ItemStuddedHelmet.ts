@@ -1,16 +1,16 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 
-export const itemCap: Partial<IItem> = {
-  key: "cap",
+export const itemStuddedHelmet: Partial<IItem> = {
+  key: "studded-helmet",
   type: ItemType.Armor,
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
-  texturePath: "helmets/cap.png",
-  textureKey: "cap",
-  name: "Cap",
-  description: "Simple cap.",
-  defense: 2,
-  weight: 0.3,
+  texturePath: "helmets/studded-helmet.png",
+  textureKey: "studded-helmet",
+  name: "Studded Helmet",
+  description: "Simple cap with metal studs.",
+  defense: 4,
+  weight: 0.6,
   allowedEquipSlotType: [ItemSlotType.Head],
 };
