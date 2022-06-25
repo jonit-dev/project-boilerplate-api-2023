@@ -29,4 +29,7 @@ export enum DaggersBluePrint {
 
 export enum ArmorsBlueprint {
   Jacket = "jacket",
+  Coat = "coat",
+  LeatherJacket = "leather-jacket",
+  StuddedArmor = "studded-armor",
 }
