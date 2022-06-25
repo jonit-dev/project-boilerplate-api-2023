@@ -33,3 +33,7 @@ export enum ArmorsBlueprint {
   LeatherJacket = "leather-jacket",
   StuddedArmor = "studded-armor",
 }
+
+export enum AxesBlueprint {
+  Axe = "axe",
+}
