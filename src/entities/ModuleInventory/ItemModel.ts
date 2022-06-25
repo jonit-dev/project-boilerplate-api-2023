@@ -108,6 +108,7 @@ itemSchema.post("save", async function (this: IItem) {
     }
 
     const newContainer = new ItemContainer({
+      name: this.name,
       parentItem: this._id,
       slotQty,
       owner: this.owner,
