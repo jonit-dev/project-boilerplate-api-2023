@@ -9,7 +9,7 @@ export const itemStuddedHelmet: Partial<IItem> = {
   texturePath: "helmets/studded-helmet.png",
   textureKey: "studded-helmet",
   name: "Studded Helmet",
-  description: "Simple cap with metal studs.",
+  description: "Common and practical, a studded is an adequate protection against battlefield conditions.",
   defense: 4,
   weight: 0.6,
   allowedEquipSlotType: [ItemSlotType.Head],
