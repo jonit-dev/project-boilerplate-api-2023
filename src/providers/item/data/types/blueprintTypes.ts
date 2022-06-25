@@ -43,3 +43,16 @@ export enum BootsBlueprint {
   CopperBoots = "copper-boots",
   Sandals = "sandals",
 }
+
+export enum FoodsBlueprint {
+  Apple = "apple",
+  BananaBunch = "banana-bunch",
+  Banana = "banana",
+  Bread = "bread",
+  CheeseSlice = "cheese-slice",
+  Cheese = "cheese",
+  Cookie = "cookie",
+  Egg = "egg",
+  Fish = "fish",
+  Salmon = "salmon",
+}
