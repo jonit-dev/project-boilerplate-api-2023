@@ -29,6 +29,32 @@ export enum DaggersBluePrint {
 
 export enum ArmorsBlueprint {
   Jacket = "jacket",
+  Coat = "coat",
+  LeatherJacket = "leather-jacket",
+  StuddedArmor = "studded-armor",
+}
+
+export enum AxesBlueprint {
+  Axe = "axe",
+}
+
+export enum BootsBlueprint {
+  Boots = "boots",
+  CopperBoots = "copper-boots",
+  Sandals = "sandals",
+}
+
+export enum FoodsBlueprint {
+  Apple = "apple",
+  BananaBunch = "banana-bunch",
+  Banana = "banana",
+  Bread = "bread",
+  CheeseSlice = "cheese-slice",
+  Cheese = "cheese",
+  Cookie = "cookie",
+  Egg = "egg",
+  Fish = "fish",
+  Salmon = "salmon",
 }
 
 export enum SpearsBlueprint {
