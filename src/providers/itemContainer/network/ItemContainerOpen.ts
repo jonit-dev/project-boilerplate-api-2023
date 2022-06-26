@@ -28,7 +28,17 @@ export class ItemContainerOpen {
       channel,
       ItemSocketEvents.ContainerOpen,
       async (data: IItemContainerOpen, character) => {
-        const itemContainer = (await ItemContainer.findOne({ id: data.containerId })) as unknown as IItemContainer;
+        const item = await Item.findById(data.itemId);
+
+        if (!item) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "Sorry, this item is not accessible.",
+            type: "error",
+          });
+          return;
+        }
+
+        const itemContainer = (await ItemContainer.findById(item.itemContainer)) as unknown as IItemContainer;
 
         if (!itemContainer) {
           this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -77,22 +87,19 @@ export class ItemContainerOpen {
       });
       return false;
     }
-    if (!parentItem.x || !parentItem.y) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Sorry, this container origin item position is not accessible.",
-        type: "error",
-      });
-      return false;
-    }
 
-    const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, parentItem.x, parentItem.y, 3);
+    if (parentItem.x && parentItem.y) {
+      // this range check is only valid if the container is on the map!
 
-    if (!isUnderRange) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Sorry, you are too far away to open this container.",
-        type: "error",
-      });
-      return false;
+      const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, parentItem.x, parentItem.y, 1);
+
+      if (!isUnderRange) {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "Sorry, you are too far away to open this container.",
+          type: "error",
+        });
+        return false;
+      }
     }
 
     if (!character.isOnline) {

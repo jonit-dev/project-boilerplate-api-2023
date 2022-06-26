@@ -72,10 +72,8 @@ itemSchema.virtual("isStackable").get(function (this: IItem) {
 
 itemSchema.virtual("fullDescription").get(function (this: IItem) {
   return `${
-    this.attack && this.defense
-      ? `Attack: ${this.attack}. Defense: ${this.defense}.` + (this.weight && `Weight: ${this.weight}.`)
-      : this.description
-  }`;
+    this.name
+  }: ${this.attack && this.defense ? `Attack: ${this.attack}. Defense: ${this.defense}.` + (this.weight && `Weight: ${this.weight}.`) : this.description}`;
 });
 
 const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"): Promise<void> => {
@@ -110,6 +108,7 @@ itemSchema.post("save", async function (this: IItem) {
     }
 
     const newContainer = new ItemContainer({
+      name: this.name,
       parentItem: this._id,
       slotQty,
       owner: this.owner,
