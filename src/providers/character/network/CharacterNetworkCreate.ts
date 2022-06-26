@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { ItemView } from "@providers/item/ItemView";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCView } from "@providers/npc/NPCView";
@@ -26,7 +27,8 @@ export class CharacterNetworkCreate {
     private playerView: CharacterView,
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
-    private itemView: ItemView
+    private itemView: ItemView,
+    private BattleNetworkStopTargeting: BattleNetworkStopTargeting
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -55,6 +57,8 @@ export class CharacterNetworkCreate {
           npcs: {},
           characters: {},
         };
+        await this.BattleNetworkStopTargeting.stopTargeting(character);
+
         const map = ScenesMetaData[character.scene].map;
         MapLoader.grids.get(map)!.setWalkableAt(ToGridX(character.x), ToGridY(character.y), false);
 

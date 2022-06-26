@@ -64,7 +64,7 @@ export class NPCView {
           ...filter,
         },
       ],
-    });
+    }).lean({ virtuals: true, defaults: true });
     return otherElementsInView as unknown as T[];
   }
 

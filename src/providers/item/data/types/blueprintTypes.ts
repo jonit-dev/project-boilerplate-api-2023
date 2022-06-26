@@ -56,3 +56,7 @@ export enum FoodsBlueprint {
   Fish = "fish",
   Salmon = "salmon",
 }
+
+export enum SpearsBlueprint {
+  RoyalSpear = "royal-spear",
+}

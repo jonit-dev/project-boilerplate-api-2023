@@ -1,4 +1,5 @@
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import {
   CharacterClass,
   CharacterGender,
@@ -10,9 +11,9 @@ import {
   TypeHelper,
 } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
-const npcSchema = createSchema(
+const npcSchema = createLeanSchema(
   {
     name: Type.string({
       required: true,

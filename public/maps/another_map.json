@@ -645,8 +645,44 @@
           "type": "Item",
           "visible": true,
           "width": 16,
-          "x": 352,
-          "y": 160
+          "x": 224,
+          "y": 624
+        },
+        {
+          "height": 16,
+          "id": 80,
+          "name": "Royal spear",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "royal-spear"
+            }
+          ],
+          "rotation": 0,
+          "type": "Item",
+          "visible": true,
+          "width": 16,
+          "x": 224,
+          "y": 592
+        },
+        {
+          "height": 16,
+          "id": 81,
+          "name": "Backpack",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "backpack"
+            }
+          ],
+          "rotation": 0,
+          "type": "Item",
+          "visible": true,
+          "width": 16,
+          "x": 256,
+          "y": 592
         }
       ],
       "opacity": 1,
@@ -1445,7 +1481,7 @@
     }
   ],
   "nextlayerid": 14,
-  "nextobjectid": 80,
+  "nextobjectid": 82,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",

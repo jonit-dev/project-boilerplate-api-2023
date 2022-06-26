@@ -13,7 +13,7 @@ const itemContainerSchema = createSchema(
     }),
     name: Type.string(),
     slotQty: Type.number({ required: true, default: 20 }),
-    slots: Type.mixed(),
+    slots: Type.mixed({}),
     allowedItemTypes: Type.array().of(
       Type.string({
         enum: TypeHelper.enumToStringArray(ItemType),
@@ -39,6 +39,20 @@ itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer)
 itemContainerSchema.virtual("isEmpty").get(function (this: IItemContainer) {
   const items = this.totalItemsQty;
   return !items;
+});
+
+itemContainerSchema.post("save", async function (this: IItemContainer) {
+  await Item.updateOne(
+    {
+      _id: this.parentItem,
+    },
+    {
+      $set: {
+        isItemContainer: true,
+        itemContainer: this._id,
+      },
+    }
+  );
 });
 
 itemContainerSchema.post("remove", async function (this: IItemContainer) {

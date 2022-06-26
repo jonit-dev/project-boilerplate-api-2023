@@ -1,7 +1,8 @@
-import { TypeHelper, ChatMessageType } from "@rpg-engine/shared";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
+import { ChatMessageType, TypeHelper } from "@rpg-engine/shared";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
-const chatLogSchema = createSchema(
+const chatLogSchema = createLeanSchema(
   {
     message: Type.string({ required: true }),
     emitter: Type.objectId({

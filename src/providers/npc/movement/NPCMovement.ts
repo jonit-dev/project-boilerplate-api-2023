@@ -120,7 +120,8 @@ export class NPCMovement {
       );
 
       if (!npcPath || npcPath.length <= 1) {
-        throw new Error("Failed to calculate shortest path! No output!");
+        return;
+        // throw new Error("Failed to calculate shortest path! No output!");
       }
 
       // get first next available position
@@ -134,7 +135,8 @@ export class NPCMovement {
       );
 
       if (!nextMovementDirection) {
-        throw new Error(`Failed to calculate nextMovement for NPC ${npc.key}`);
+        return;
+        // throw new Error(`Failed to calculate nextMovement for NPC ${npc.key}`);
       }
 
       return {

@@ -1,7 +1,8 @@
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { getTotalEquipmentStats } from "@providers/equipment/EquipmentStatsCalculator";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
-export const equipmentSchema = createSchema(
+export const equipmentSchema = createLeanSchema(
   {
     owner: Type.objectId({
       refPath: "ownerRef", // ownerRef can be a Character or NPC!

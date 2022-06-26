@@ -1,9 +1,12 @@
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { CharacterClass, CharacterGender, FromGridX, FromGridY, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { Equipment } from "./EquipmentModel";
 import { Skill } from "./SkillsModel";
 
-const characterSchema = createSchema(
+const characterSchema = createLeanSchema(
   {
     name: Type.string({
       required: true,
@@ -132,6 +135,7 @@ const characterSchema = createSchema(
     ...({} as {
       isAlive: boolean;
       type: string;
+      inventory: Promise<IItem>;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
@@ -143,6 +147,20 @@ characterSchema.virtual("isAlive").get(function (this: ICharacter) {
 
 characterSchema.virtual("type").get(function (this: ICharacter) {
   return "Character";
+});
+
+characterSchema.virtual("inventory").get(async function (this: ICharacter) {
+  const equipment = await Equipment.findById(this.equipment).populate("inventory").exec();
+
+  if (equipment) {
+    const inventory = equipment.inventory! as unknown as IItem;
+
+    if (inventory) {
+      return inventory;
+    }
+  }
+
+  return null;
 });
 
 characterSchema.post("remove", async function (this: ICharacter) {
