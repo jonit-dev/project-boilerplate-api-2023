@@ -1,14 +1,16 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { Item } from "@entities/ModuleInventory/ItemModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
+  IEquipementSet,
   IEquipItemPayload,
   IEquipmentAndInventoryUpdatePayload,
+  IItem,
   ItemSocketEvents,
   ItemType,
   IUIShowMessage,
@@ -31,7 +33,7 @@ export class EquipmentEquipNetwork {
       async (data: IEquipItemPayload, character: ICharacter) => {
         const itemId = data.itemId;
         const targetSlot = data.targetSlot;
-        const item = (await Item.findById(itemId)) as unknown as IItem;
+        const item = await Item.findById(itemId);
         let equipItemFromMap = false;
 
         const inventory = await character.inventory;
@@ -48,7 +50,23 @@ export class EquipmentEquipNetwork {
           return;
         }
 
-        const itemIsOnRange = this.isItemOnRange(character, item);
+        if (!item.x) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "Invalid item coordinates",
+            type: "error",
+          });
+          return;
+        }
+
+        if (!item.y) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "Invalid item coordinates",
+            type: "error",
+          });
+          return;
+        }
+
+        const itemIsOnRange = this.isItemOnRange(character, item as unknown as IItem);
 
         if (itemIsOnRange) {
           equipItemFromMap = true;
@@ -112,33 +130,29 @@ export class EquipmentEquipNetwork {
 
         const equipment = await Equipment.findById(character.equipment);
         if (equipment) {
-          equipment[targetSlot.toLowerCase()] = await this.getItemId(equipItemFromMap, item);
+          equipment[targetSlot.toLowerCase()] = await this.getItemId(equipItemFromMap, item as unknown as IItem);
           equipment.inventory = equipItemFromMap === false ? undefined : equipment.inventory;
           await equipment.save();
 
           if (!equipItemFromMap) {
             await this.removeItemFromInventory(itemId, itemContainer!);
           } else {
-            await this.removeItemFromMap(item);
+            await this.removeItemFromMap(itemId);
           }
 
           const equipmentSlots = await this.getEquipmentSlots(equipment._id);
 
           const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-            equipment: {
-              _id: equipment._id,
-              ...equipmentSlots,
-              inventory: "",
-            },
+            equipment: equipmentSlots,
             inventory: {
               _id: inventory._id,
-              parentItem: itemContainer?.parentItem.toString() || "",
+              parentItem: itemContainer!.parentItem.toString(),
               owner: itemContainer?.owner?.toString() || character.name,
               name: itemContainer?.name,
-              slotQty: itemContainer?.slotQty || 0,
+              slotQty: itemContainer!.slotQty,
               slots: itemContainer?.slots,
               allowedItemTypes: this.getAllowedItemTypes(),
-              isEmpty: itemContainer?.isEmpty || true,
+              isEmpty: itemContainer!.isEmpty,
             },
           };
 
@@ -160,17 +174,16 @@ export class EquipmentEquipNetwork {
   }
 
   private isItemOnRange(character: ICharacter, item: IItem): boolean {
-    return this.movementHelper.isUnderRange(character.x, character.y, item.x || 0, item.y || 0, 1);
+    return this.movementHelper.isUnderRange(character.x, character.y, item.x!, item.y!, 1);
   }
 
-  private async getItemId(equipItemFromMap: boolean, item: IItem): Promise<void> {
+  private async getItemId(equipItemFromMap: boolean, item: IItem): Promise<string> {
     if (!equipItemFromMap) {
       return item._id;
     }
 
     let newItem = new Item({
       ...item,
-      _id: undefined,
     });
 
     newItem = await newItem.save();
@@ -178,11 +191,11 @@ export class EquipmentEquipNetwork {
     return newItem._id;
   }
 
-  private async removeItemFromMap(item: IItem): Promise<void> {
-    await item.remove();
+  private async removeItemFromMap(itemId: string): Promise<void> {
+    await Item.deleteOne({ _id: itemId });
   }
 
-  private async getEquipmentSlots(equipmentId: string): Promise<object> {
+  private async getEquipmentSlots(equipmentId: string): Promise<IEquipementSet> {
     const equipment = await Equipment.findById(equipmentId)
       .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
       .exec();
@@ -196,9 +209,10 @@ export class EquipmentEquipNetwork {
     const boot = equipment?.boot! as unknown as IItem;
     const accessory = equipment?.accessory! as unknown as IItem;
     const armor = equipment?.armor! as unknown as IItem;
-    const inventory = equipment?.inventory as unknown as IItem;
+    const inventory = equipment?.inventory! as unknown as IItem;
 
     return {
+      _id: equipment!._id,
       head,
       neck,
       leftHand,
@@ -209,7 +223,7 @@ export class EquipmentEquipNetwork {
       accessory,
       armor,
       inventory,
-    };
+    } as IEquipementSet;
   }
 
   private async removeItemFromInventory(itemId: string, itemContainer: IItemContainer): Promise<void> {
