@@ -4,6 +4,9 @@ export enum SwordBlueprint {
 
 export enum HelmetBlueprint {
   WingHelmet = "wing-helmet",
+  Cap = "cap",
+  StuddedHelmet = "studded-helmet",
+  Turban = "turban",
 }
 
 export enum EffectsBlueprint {
