@@ -62,7 +62,21 @@ export class SkillIncrease {
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
-    return this.increaseItemSP(skills, { subType: ItemSubType.Shield } as IItem);
+    const equipment = await Equipment.findById(character.equipment);
+    if (!equipment) {
+      throw new Error(`equipment not found for character ${character.id}`);
+    }
+
+    const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
+    const leftHandItem = equipment.leftHand ? await Item.findById(equipment.leftHand) : undefined;
+
+    if (rightHandItem?.subType === ItemSubType.Shield) {
+      return this.increaseItemSP(skills, rightHandItem);
+    }
+
+    if (leftHandItem?.subType === ItemSubType.Shield) {
+      return this.increaseItemSP(skills, leftHandItem);
+    }
   }
 
   public async increaseItemSP(skills: ISkill, item: IItem): Promise<void> {
