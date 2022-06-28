@@ -3,7 +3,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { UISocketEvents } from "@rpg-engine/shared";
+import { ToGridX, UISocketEvents } from "@rpg-engine/shared";
 import { ItemContainerOpen } from "../network/ItemContainerOpen";
 
 describe("ItemContainerOpen.ts", () => {
@@ -87,6 +87,100 @@ describe("ItemContainerOpen.ts", () => {
         }
       );
     }
+  });
+
+  it("should throw an error if he tries to open a container that's not his", async () => {
+    // @ts-ignore
+    jest.spyOn(itemContainerOpen.socketMessaging, "sendEventToUser" as any);
+
+    const item = await unitTestHelper.createMockItemContainer(testCharacter);
+
+    const itemContainer = await ItemContainer.findOne({
+      parentItem: item._id,
+    });
+
+    if (itemContainer) {
+      const otherCharacter = await unitTestHelper.createMockCharacter();
+
+      await itemContainerOpen.openContainer({ itemId: item._id }, otherCharacter);
+
+      // @ts-ignore
+      expect(itemContainerOpen.socketMessaging.sendEventToUser).toHaveBeenCalledWith(
+        otherCharacter.channelId!,
+        UISocketEvents.ShowMessage,
+        {
+          message: "You can't open this container because it's not yours.",
+          type: "error",
+        }
+      );
+    }
+  });
+
+  it("should throw an error if the character trying to open the container is too far away", async () => {
+    // @ts-ignore
+    jest.spyOn(itemContainerOpen.socketMessaging, "sendEventToUser" as any);
+
+    const item = await unitTestHelper.createMockItemContainer(testCharacter);
+
+    testCharacter.x = ToGridX(999);
+    testCharacter.y = ToGridX(999);
+    await testCharacter.save();
+
+    await itemContainerOpen.openContainer({ itemId: item._id }, testCharacter);
+
+    // @ts-ignore
+    expect(itemContainerOpen.socketMessaging.sendEventToUser).toHaveBeenCalledWith(
+      testCharacter.channelId!,
+      UISocketEvents.ShowMessage,
+      {
+        message: "Sorry, you are too far away to open this container.",
+        type: "error",
+      }
+    );
+  });
+
+  it("should throw an error if the character trying to open the container is not online", async () => {
+    // @ts-ignore
+    jest.spyOn(itemContainerOpen.socketMessaging, "sendEventToUser" as any);
+
+    const item = await unitTestHelper.createMockItemContainer(testCharacter);
+
+    testCharacter.isOnline = false;
+    await testCharacter.save();
+
+    await itemContainerOpen.openContainer({ itemId: item._id }, testCharacter);
+
+    // @ts-ignore
+    expect(itemContainerOpen.socketMessaging.sendEventToUser).toHaveBeenCalledWith(
+      testCharacter.channelId!,
+      UISocketEvents.ShowMessage,
+      {
+        message: "Sorry, you must be online to open this container.",
+        type: "error",
+      }
+    );
+  });
+
+  it("should throw an error if the character trying to open a container is banned", async () => {
+    // @ts-ignore
+    jest.spyOn(itemContainerOpen.socketMessaging, "sendEventToUser" as any);
+
+    const item = await unitTestHelper.createMockItemContainer(testCharacter);
+
+    testCharacter.isBanned = true;
+    await testCharacter.save();
+
+    await itemContainerOpen.openContainer({ itemId: item._id }, testCharacter);
+
+    // @ts-ignore
+    expect(itemContainerOpen.socketMessaging.sendEventToUser).toHaveBeenCalledWith(
+      testCharacter.channelId!,
+      UISocketEvents.ShowMessage,
+      {
+        message: "Sorry, you are banned and can't open this container.",
+        type: "error",
+      }
+    );
   });
 
   afterAll(async () => {
