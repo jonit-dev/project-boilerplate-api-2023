@@ -7,7 +7,6 @@ import { ISkillDetails } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import { SkillCalculator } from "./SkillCalculator";
 
-// QUESTION: what about other weapons - ex: Dagger, Club (there's club skill but not weapon)
 const ItemSkill = new Map<ItemSubType | string, string>([
   ["unarmed", "first"],
   [ItemSubType.Sword, "sword"],
