@@ -19,7 +19,7 @@ const simpleTestCases: TestCase[] = [
   },
   {
     item: ItemSubType.Dagger,
-    skill: "sword",
+    skill: "dagger",
   },
   {
     item: ItemSubType.Axe,
@@ -36,6 +36,10 @@ const simpleTestCases: TestCase[] = [
   {
     item: ItemSubType.Shield,
     skill: "shielding",
+  },
+  {
+    item: ItemSubType.Mace,
+    skill: "club",
   },
 ];
 

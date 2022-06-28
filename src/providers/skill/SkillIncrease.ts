@@ -11,11 +11,12 @@ import { SkillCalculator } from "./SkillCalculator";
 const ItemSkill = new Map<ItemSubType | string, string>([
   ["unarmed", "first"],
   [ItemSubType.Sword, "sword"],
-  [ItemSubType.Dagger, "sword"],
+  [ItemSubType.Dagger, "dagger"],
   [ItemSubType.Axe, "axe"],
   [ItemSubType.Bow, "distance"],
   [ItemSubType.Spear, "distance"],
   [ItemSubType.Shield, "shielding"],
+  [ItemSubType.Mace, "club"],
 ]);
 
 @provide(SkillIncrease)

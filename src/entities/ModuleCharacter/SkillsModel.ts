@@ -72,6 +72,7 @@ export const skillsSchema = createLeanSchema(
     axe: skillDetails(SkillType.Combat),
     distance: skillDetails(SkillType.Combat),
     shielding: skillDetails(SkillType.Combat),
+    dagger: skillDetails(SkillType.Combat),
 
     // Crafting/Gathering Skills
 
