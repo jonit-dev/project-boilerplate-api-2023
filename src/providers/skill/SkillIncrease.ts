@@ -43,20 +43,18 @@ export class SkillIncrease {
     let foundWeapon = false;
     if (rightHandItem?.type === ItemType.Weapon && rightHandItem?.subType !== ItemSubType.Shield) {
       foundWeapon = true;
-      this.increaseItemSP(skills, rightHandItem);
+      return this.increaseItemSP(skills, rightHandItem);
     }
 
     if (leftHandItem?.type === ItemType.Weapon && leftHandItem?.subType !== ItemSubType.Shield) {
       foundWeapon = true;
-      this.increaseItemSP(skills, leftHandItem);
+      return this.increaseItemSP(skills, leftHandItem);
     }
 
     // If user has no weapons (unarmed), then update 'first' skill
     if (!foundWeapon) {
-      this.increaseItemSP(skills, { subType: "unarmed" } as IItem);
+      return this.increaseItemSP(skills, { subType: "unarmed" } as IItem);
     }
-
-    await skills.save();
   }
 
   public async increaseShieldingSP(character: ICharacter): Promise<void> {
@@ -64,12 +62,10 @@ export class SkillIncrease {
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
-
-    this.increaseItemSP(skills, { subType: ItemSubType.Shield } as IItem);
-    await skills.save();
+    return this.increaseItemSP(skills, { subType: ItemSubType.Shield } as IItem);
   }
 
-  public increaseItemSP(skills: ISkill, item: IItem): void {
+  public async increaseItemSP(skills: ISkill, item: IItem): Promise<void> {
     const skillToUpdate = ItemSkill.get(item.subType);
 
     if (!skillToUpdate) {
@@ -92,5 +88,6 @@ export class SkillIncrease {
     }
 
     skills[skillToUpdate] = updatedSkillDetails;
+    await skills.save();
   }
 }

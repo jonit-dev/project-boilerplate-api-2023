@@ -71,7 +71,7 @@ describe("SkillIncrease.spec.ts", () => {
   it("should throw error when passing not a weapon item", async () => {
     const characterSkills = (await Skill.findById(testCharacter.skills)) as ISkill;
     try {
-      skillIncrease.increaseItemSP(characterSkills, { subType: ItemSubType.Potion } as IItem);
+      await skillIncrease.increaseItemSP(characterSkills, { subType: ItemSubType.Potion } as IItem);
       throw new Error("this should have failed");
     } catch (error: any | Error) {
       expect(error.message).toBe(`skill not found for item subtype ${ItemSubType.Potion}`);
@@ -86,7 +86,7 @@ describe("SkillIncrease.spec.ts", () => {
       expect(characterSkills[test.skill].skillPoints).toBe(0);
 
       for (let i = 0; i < spToLvl2; i++) {
-        skillIncrease.increaseItemSP(characterSkills, { subType: test.item } as IItem);
+        await skillIncrease.increaseItemSP(characterSkills, { subType: test.item } as IItem);
       }
 
       expect(characterSkills[test.skill].level).toBe(initialLevel + 1);
