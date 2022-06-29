@@ -5,6 +5,7 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { NPCDeath } from "@providers/npc/NPCDeath";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   BattleEventType,
@@ -32,7 +33,8 @@ export class BattleAttackTarget {
     private npcTarget: NPCTarget,
     private battleEffects: BattleEffects,
     private characterDeath: CharacterDeath,
-    private npcDeath: NPCDeath
+    private npcDeath: NPCDeath,
+    private skillIncrease: SkillIncrease
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
@@ -90,6 +92,12 @@ export class BattleAttackTarget {
       const damage = await this.battleEvent.calculateHitDamage(attacker, target);
 
       if (damage > 0) {
+        // Increase attacker SP for weapon used (if is character)
+        if (attacker.type === "Character") {
+          await this.skillIncrease.increaseWeaponSP(attacker as ICharacter);
+        }
+
+        // Update target health
         const newTargetHealth = target.health - damage;
 
         if (newTargetHealth <= 0) {
@@ -133,6 +141,11 @@ export class BattleAttackTarget {
       } else {
         // if damage is 0, then the attack was blocked
         battleEventPayload.eventType = BattleEventType.Block;
+
+        // Increase shielding SP in target (if is Character)
+        if (target.type === "Character") {
+          await this.skillIncrease.increaseShieldingSP(target as ICharacter);
+        }
       }
     }
 

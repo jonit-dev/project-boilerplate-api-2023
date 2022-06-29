@@ -683,6 +683,24 @@
           "width": 16,
           "x": 256,
           "y": 592
+        },
+        {
+          "height": 16,
+          "id": 82,
+          "name": "Basilisk Sword",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "basilisk-sword"
+            }
+          ],
+          "rotation": 0,
+          "type": "Item",
+          "visible": true,
+          "width": 16,
+          "x": 224,
+          "y": 256
         }
       ],
       "opacity": 1,
@@ -1481,7 +1499,7 @@
     }
   ],
   "nextlayerid": 14,
-  "nextobjectid": 82,
+  "nextobjectid": 83,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.7.2",

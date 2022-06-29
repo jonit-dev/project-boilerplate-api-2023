@@ -29,10 +29,18 @@ const itemContainerSchema = createSchema(
 );
 
 itemContainerSchema.virtual("itemIds").get(function (this: IItemContainer) {
-  return Object.values<string>(this.slots);
+  if (!this.slots) {
+    return [];
+  }
+
+  return Object.values(this.slots);
 });
 
 itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer) {
+  if (!this.slots) {
+    return 0;
+  }
+
   return Object.values(this.slots).length;
 });
 

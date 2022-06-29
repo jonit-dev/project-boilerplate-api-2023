@@ -1,5 +1,6 @@
 export enum SwordBlueprint {
   ShortSword = "short-sword",
+  BasiliskSword = "basilisk-sword",
 }
 
 export enum HelmetBlueprint {

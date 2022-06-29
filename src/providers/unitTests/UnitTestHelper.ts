@@ -2,9 +2,12 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { container } from "@providers/inversify/container";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { BodiesBlueprint } from "@providers/item/data/types/blueprintTypes";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
@@ -19,6 +22,7 @@ import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
+import { itemMock } from "./mock/itemMock";
 
 @provide(UnitTestHelper)
 export class UnitTestHelper {
@@ -53,6 +57,36 @@ export class UnitTestHelper {
     await npcSkills.save();
 
     return testNPC;
+  }
+
+  public async createMockItemContainer(character: ICharacter): Promise<IItem> {
+    const blueprintData = itemsBlueprintIndex[BodiesBlueprint.CharacterBody];
+
+    const charBody = new Item({
+      ...blueprintData,
+      owner: character.id,
+      name: `${character.name}'s body`,
+      scene: character.scene,
+      x: character.x,
+      y: character.y,
+      generateContainerSlots: 20,
+      isItemContainer: true,
+    });
+
+    await charBody.save();
+
+    return charBody;
+  }
+
+  public async createMockItem(extraProps?: Partial<IItem>): Promise<IItem> {
+    const newItem = new Item({
+      ...itemMock,
+      ...extraProps,
+    });
+
+    await newItem.save();
+
+    return newItem;
   }
 
   public async createMockCharacter(extraProps?: Record<string, unknown>): Promise<ICharacter> {
