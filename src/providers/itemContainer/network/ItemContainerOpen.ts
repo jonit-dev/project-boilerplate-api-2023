@@ -28,41 +28,41 @@ export class ItemContainerOpen {
       channel,
       ItemSocketEvents.ContainerOpen,
       async (data: IItemContainerOpen, character) => {
-        const item = await Item.findById(data.itemId);
-
-        if (!item) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Sorry, this item is not accessible.",
-            type: "error",
-          });
-          return;
-        }
-
-        const itemContainer = (await ItemContainer.findById(item.itemContainer)) as unknown as IItemContainer;
-
-        if (!itemContainer) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Container not found.",
-            type: "error",
-          });
-          return;
-        }
-
-        const isContainerOpenValid = await this.isContainerOpenValid(itemContainer, character);
-
-        if (isContainerOpenValid) {
-          // if container opening is valid, send back container information
-
-          this.socketMessaging.sendEventToUser<IItemContainerRead>(
-            character.channelId!,
-            ItemSocketEvents.ContainerRead,
-            {
-              itemContainer,
-            }
-          );
-        }
+        await this.openContainer(data, character);
       }
     );
+  }
+
+  public async openContainer(data: IItemContainerOpen, character: ICharacter): Promise<void> {
+    const item = await Item.findById(data.itemId);
+
+    if (!item) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Sorry, this item is not accessible.",
+        type: "error",
+      });
+      return;
+    }
+
+    const itemContainer = (await ItemContainer.findById(item.itemContainer)) as unknown as IItemContainer;
+
+    if (!itemContainer) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Container not found.",
+        type: "error",
+      });
+      return;
+    }
+
+    const isContainerOpenValid = await this.isContainerOpenValid(itemContainer, character);
+
+    if (isContainerOpenValid) {
+      // if container opening is valid, send back container information
+
+      this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
+        itemContainer,
+      });
+    }
   }
 
   private async isContainerOpenValid(itemContainer: IItemContainer, character: ICharacter): Promise<boolean> {
