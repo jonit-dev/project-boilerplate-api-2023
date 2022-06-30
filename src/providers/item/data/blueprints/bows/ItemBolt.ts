@@ -4,13 +4,13 @@ import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 export const itemBolt: Partial<IItem> = {
   key: "bolt",
   type: ItemType.Weapon,
-  subType: ItemSubType.Bow,
+  subType: ItemSubType.Accessory,
   textureAtlas: "items",
   texturePath: "bows/bolt.png",
   textureKey: "bolt",
   name: "Bolt",
   description: "A crossbow bolt.",
-  attack: 1,
+  attack: 2,
   weight: 0.02,
-  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  allowedEquipSlotType: [ItemSlotType.Accessory],
 };

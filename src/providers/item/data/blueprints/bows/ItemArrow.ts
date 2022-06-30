@@ -4,7 +4,7 @@ import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 export const itemArrow: Partial<IItem> = {
   key: "arrow",
   type: ItemType.Weapon,
-  subType: ItemSubType.Bow,
+  subType: ItemSubType.Accessory,
   textureAtlas: "items",
   texturePath: "bows/arrow.png",
   textureKey: "arrow",
@@ -12,5 +12,5 @@ export const itemArrow: Partial<IItem> = {
   description: "An iron head arrow.",
   attack: 1,
   weight: 0.01,
-  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  allowedEquipSlotType: [ItemSlotType.Accessory],
 };
