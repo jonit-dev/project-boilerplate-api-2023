@@ -24,5 +24,5 @@ export const npcRat = {
     },
   },
   fleeOnLowHealth: true,
-  xpPerDamage: 0.15,
+  experience: 15,
 } as Partial<INPC>;

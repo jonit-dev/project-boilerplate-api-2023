@@ -92,9 +92,39 @@ export class BattleAttackTarget {
       const damage = await this.battleEvent.calculateHitDamage(attacker, target);
 
       if (damage > 0) {
-        // Increase attacker SP for weapon used (if is character)
+        // Increase attacker SP for weapon used and XP (if is character)
         if (attacker.type === "Character") {
-          await this.skillIncrease.increaseWeaponSP(attacker as ICharacter);
+          const character = attacker as ICharacter;
+          const increasedSkills = await this.skillIncrease.increaseSkillsOnBattle(character, target, damage);
+
+          // If character level increased, send level up event
+          if (increasedSkills.levelUp && character.channelId) {
+            const levelUpEventPayload: Partial<IBattleEventFromServer> = {
+              ...battleEventPayload,
+              eventType: BattleEventType.LevelUp,
+              level: increasedSkills.level,
+            };
+            this.socketMessaging.sendEventToUser(
+              character.channelId,
+              BattleSocketEvents.BattleEvent,
+              levelUpEventPayload
+            );
+          }
+
+          // If character skill level increased, send level up event specifying the skill that upgraded
+          if (increasedSkills.skillLevelUp && character.channelId) {
+            const levelUpEventPayload: Partial<IBattleEventFromServer> = {
+              ...battleEventPayload,
+              eventType: BattleEventType.LevelUp,
+              level: increasedSkills.skillLevel,
+              skill: increasedSkills.skillName,
+            };
+            this.socketMessaging.sendEventToUser(
+              character.channelId,
+              BattleSocketEvents.BattleEvent,
+              levelUpEventPayload
+            );
+          }
         }
 
         // Update target health
@@ -144,7 +174,23 @@ export class BattleAttackTarget {
 
         // Increase shielding SP in target (if is Character)
         if (target.type === "Character") {
-          await this.skillIncrease.increaseShieldingSP(target as ICharacter);
+          const character = target as ICharacter;
+          const increasedSkills = await this.skillIncrease.increaseShieldingSP(character);
+
+          // If shielding skills level up, send level up event
+          if (increasedSkills.skillLevelUp && character.channelId) {
+            const levelUpEventPayload: Partial<IBattleEventFromServer> = {
+              ...battleEventPayload,
+              eventType: BattleEventType.LevelUp,
+              level: increasedSkills.skillLevel,
+              skill: increasedSkills.skillName,
+            };
+            this.socketMessaging.sendEventToUser(
+              character.channelId,
+              BattleSocketEvents.BattleEvent,
+              levelUpEventPayload
+            );
+          }
         }
       }
     }

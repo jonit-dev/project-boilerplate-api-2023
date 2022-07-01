@@ -1,11 +1,13 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill, ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { ItemType, ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import { ISkillDetails } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import { SkillCalculator } from "./SkillCalculator";
+import _ from "lodash";
 
 const ItemSkill = new Map<ItemSubType | string, string>([
   ["unarmed", "first"],
@@ -18,22 +20,55 @@ const ItemSkill = new Map<ItemSubType | string, string>([
   [ItemSubType.Mace, "club"],
 ]);
 
+interface IIncreaseSPResult {
+  skillLevelUp: boolean;
+  skillLevel: number;
+  skillName: string;
+}
+
+interface IIncreaseSkillsResult extends IIncreaseSPResult {
+  levelUp: boolean;
+  level: number;
+}
+
 @provide(SkillIncrease)
 export class SkillIncrease {
   constructor(private skillCalculator: SkillCalculator) {}
 
-  public async increaseWeaponSP(character: ICharacter): Promise<void> {
-    // Get character skills
-    const skills = (await Skill.findById(character.skills)) as ISkill;
+  /**
+   * Calculates the sp gained according to weapons used and the xp gained by a character every time it causes damage in battle.
+   * Returns the new level number if the attacker level increased or 0 if did not change.
+   *
+   */
+  public async increaseSkillsOnBattle(
+    attacker: ICharacter,
+    target: ICharacter | INPC,
+    damage: number
+  ): Promise<IIncreaseSkillsResult> {
+    // Get character skills and equipment to upgrade them
+    const skills = await Skill.findById(attacker.skills);
     if (!skills) {
-      throw new Error(`skills not found for character ${character.id}`);
+      throw new Error(`skills not found for character ${attacker.id}`);
     }
 
-    const equipment = await Equipment.findById(character.equipment);
+    const equipment = await Equipment.findById(attacker.equipment);
     if (!equipment) {
-      throw new Error(`equipment not found for character ${character.id}`);
+      throw new Error(`equipment not found for character ${attacker.id}`);
     }
 
+    const increasedSP = await this.increaseWeaponSP(skills, equipment);
+    const newLevel = this.increaseXPinBattle(skills, target, damage);
+
+    await skills.save();
+
+    return {
+      levelUp: newLevel,
+      level: skills.level,
+      ...increasedSP,
+    };
+  }
+
+  private async increaseWeaponSP(skills: ISkill, equipment: IEquipment): Promise<IIncreaseSPResult> {
     // Get right and left hand items
     // What if has weapons on both hands? for now, only one weapon per character is allowed
     const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
@@ -55,9 +90,11 @@ export class SkillIncrease {
     if (!foundWeapon) {
       return this.increaseItemSP(skills, { subType: "unarmed" } as IItem);
     }
+
+    return {} as IIncreaseSPResult;
   }
 
-  public async increaseShieldingSP(character: ICharacter): Promise<void> {
+  public async increaseShieldingSP(character: ICharacter): Promise<IIncreaseSPResult> {
     const skills = (await Skill.findById(character.skills)) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
@@ -70,16 +107,24 @@ export class SkillIncrease {
     const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
     const leftHandItem = equipment.leftHand ? await Item.findById(equipment.leftHand) : undefined;
 
+    let result = {} as IIncreaseSPResult;
     if (rightHandItem?.subType === ItemSubType.Shield) {
-      return this.increaseItemSP(skills, rightHandItem);
+      result = this.increaseItemSP(skills, rightHandItem);
     }
 
     if (leftHandItem?.subType === ItemSubType.Shield) {
-      return this.increaseItemSP(skills, leftHandItem);
+      result = this.increaseItemSP(skills, leftHandItem);
     }
+
+    if (!_.isEmpty(result)) {
+      await skills.save();
+    }
+
+    return result;
   }
 
-  public async increaseItemSP(skills: ISkill, item: IItem): Promise<void> {
+  private increaseItemSP(skills: ISkill, item: IItem): IIncreaseSPResult {
+    let skillLevelUp = false;
     const skillToUpdate = ItemSkill.get(item.subType);
 
     if (!skillToUpdate) {
@@ -94,6 +139,7 @@ export class SkillIncrease {
     );
 
     if (updatedSkillDetails.skillPointsToNextLevel <= 0) {
+      skillLevelUp = true;
       updatedSkillDetails.level++;
       updatedSkillDetails.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(
         updatedSkillDetails.skillPoints,
@@ -102,6 +148,38 @@ export class SkillIncrease {
     }
 
     skills[skillToUpdate] = updatedSkillDetails;
-    await skills.save();
+
+    return {
+      skillName: skillToUpdate,
+      skillLevel: updatedSkillDetails.level,
+      skillLevelUp,
+    };
+  }
+
+  /**
+   * Calculates the xp gained by a character every time it causes damage in battle
+   * Returns true if the attacker level increased or false if did not change.
+   */
+  private increaseXPinBattle(attackerSkills: ISkill, target: ICharacter | INPC, damage: number): boolean {
+    let newLevel = false;
+    // For now, only supported increasing XP when target is NPC
+    if (target.type === "NPC") {
+      target = target as INPC;
+      attackerSkills.experience += target.xpPerDamage * damage;
+      attackerSkills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(
+        attackerSkills.experience,
+        attackerSkills.level + 1
+      );
+
+      if (attackerSkills.xpToNextLevel <= 0) {
+        attackerSkills.level++;
+        attackerSkills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(
+          attackerSkills.experience,
+          attackerSkills.level + 1
+        );
+        newLevel = true;
+      }
+    }
+    return newLevel;
   }
 }

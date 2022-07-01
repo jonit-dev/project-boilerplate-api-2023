@@ -49,6 +49,7 @@ export class UnitTestHelper {
       ...movementTypeMock[movementType],
       ...extraProps,
       skills: npcSkills._id,
+      experience: 100,
     });
 
     await testNPC.save();
