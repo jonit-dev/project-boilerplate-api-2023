@@ -1,10 +1,8 @@
-import { MAP_LAYERS } from "@providers/constants/MapConstants";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
-import { ITiled } from "@rpg-engine/shared";
+import { IMapMetaData, ITiled, MAP_LAYERS } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import md5File from "md5-file";
-import { IMapMetaData } from "./MapMetadataTypes";
 
 @provide(GetMapMetadataUseCase)
 export class GetMapMetadataUseCase {
