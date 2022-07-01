@@ -135,6 +135,9 @@ const npcSchema = createLeanSchema(
       isAlive: boolean;
       type: string;
     }),
+    xpPerDamage: Type.number({
+      required: false,
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

@@ -21,4 +21,5 @@ export const npcSkeleton = {
     },
   },
   fleeOnLowHealth: true,
+  xpPerDamage: 0.5,
 } as Partial<INPC>;
