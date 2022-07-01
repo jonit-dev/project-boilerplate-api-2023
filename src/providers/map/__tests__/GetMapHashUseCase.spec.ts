@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { container } from "@providers/inversify/container";
-import { GetMapHashUseCase } from "@useCases/ModuleSystem/map/GetMapHashUseCase";
+import { GetMapMetadataUseCase } from "@useCases/ModuleSystem/map/GetMapMetadataUseCase";
 
 describe("MapLoader.ts", () => {
-  let getMapHashUseCase: GetMapHashUseCase;
+  let getMapHashUseCase: GetMapMetadataUseCase;
 
   beforeEach(() => {
-    getMapHashUseCase = container.get<GetMapHashUseCase>(GetMapHashUseCase);
+    getMapHashUseCase = container.get<GetMapMetadataUseCase>(GetMapMetadataUseCase);
   });
 
   it("should return the map hash", () => {
