@@ -1,3 +1,4 @@
+import { MAP_LAYERS } from "@providers/constants/MapConstants";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { ITiled } from "@rpg-engine/shared";
@@ -13,12 +14,14 @@ export class GetMapMetadataUseCase {
 
       const map: ITiled = require(`${STATIC_PATH}/maps/${mapName}.json`);
 
-      const layers = map.layers.map((layer) => layer.name);
+      const layers = MAP_LAYERS;
 
       const tilesets = map.tilesets.map((tileset) => {
+        const imgPath = tileset.image.split("/public")[1];
+
         return {
           name: tileset.name,
-          imagePath: tileset.image,
+          imagePath: imgPath,
         };
       });
 
