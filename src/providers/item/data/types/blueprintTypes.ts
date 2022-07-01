@@ -61,3 +61,21 @@ export enum FoodsBlueprint {
 export enum SpearsBlueprint {
   RoyalSpear = "royal-spear",
 }
+
+export enum PotionsBlueprint {
+  GreaterLifePotion = "greater-life-potion",
+  LightEndurancePotion = "light-endurance-potion",
+  LightLifePotion = "light-life-potion",
+  ManaPotion = "mana-potion",
+}
+
+export enum BowsBlueprint {
+  Arrow = "arrow",
+  Bolt = "bolt",
+  Bow = "bow",
+}
+
+export enum GlovesBlueprint {
+  LeatherGloves = "leather-gloves",
+  StuddedGloves = "studded-gloves",
+}
