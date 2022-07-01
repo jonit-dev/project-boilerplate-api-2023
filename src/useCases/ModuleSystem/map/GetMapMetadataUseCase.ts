@@ -24,6 +24,7 @@ export class GetMapMetadataUseCase {
       });
 
       const mapMetadata: IMapMetaData = {
+        name: mapName,
         hash,
         layers,
         tilesets,
