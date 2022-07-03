@@ -1,6 +1,9 @@
 export enum SwordBlueprint {
   ShortSword = "short-sword",
   BasiliskSword = "basilisk-sword",
+  DragonsSword = "dragon's-sword",
+  DoubleEdgedSword = "double-edged-sword",
+  BroadSword = "broad-sword",
 }
 
 export enum HelmetBlueprint {

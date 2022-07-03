@@ -1,17 +1,17 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 
-export const itemBasiliskSword: Partial<IItem> = {
-  key: "basilisk-sword",
+export const itemBroadSword: Partial<IItem> = {
+  key: "broad-sword",
   type: ItemType.Weapon,
   subType: ItemSubType.Sword,
   textureAtlas: "items",
-  texturePath: "swords/basilisk-sword.png",
-  textureKey: "basilisk-sword",
-  name: "Basilisk Sword",
-  description: "A sword crafted from the remains of a basilisk.",
-  attack: 10,
-  defense: 3,
-  weight: 1,
+  texturePath: "swords/broad-sword.png",
+  textureKey: "broad-sword",
+  name: "Broad Sword",
+  description: "A towering two-handed iron sword.",
+  attack: 6,
+  defense: 0,
+  weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };
