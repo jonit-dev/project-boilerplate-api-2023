@@ -79,3 +79,9 @@ export enum GlovesBlueprint {
   LeatherGloves = "leather-gloves",
   StuddedGloves = "studded-gloves",
 }
+
+export enum MacesBlueprint {
+  Club = "club",
+  Mace = "mace",
+  SpikedClub = "spiked-club",
+}
