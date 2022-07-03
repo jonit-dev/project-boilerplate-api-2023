@@ -85,3 +85,7 @@ export enum MacesBlueprint {
   Mace = "mace",
   SpikedClub = "spiked-club",
 }
+
+export enum MagicsBlueprint {
+  Rune = "rune",
+}
