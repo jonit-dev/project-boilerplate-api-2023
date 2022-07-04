@@ -23,7 +23,7 @@ export class CharacterInventory {
       ...blueprintData,
       x: 10,
       y: 20,
-      scene: "MainScene",
+      scene: "Ilya",
     });
     await shortSword.save();
 

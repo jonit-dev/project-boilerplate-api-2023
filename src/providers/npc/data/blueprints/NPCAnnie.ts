@@ -6,7 +6,7 @@ export const npcAnnie = {
   ...generateMoveAwayMovement(),
   name: "Annie",
   textureKey: "woman-1",
-  scene: "MainScene",
+  scene: "Ilya",
   key: "annie",
   class: CharacterClass.None,
   gender: CharacterGender.Female,

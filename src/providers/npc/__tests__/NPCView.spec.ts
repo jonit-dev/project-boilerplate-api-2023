@@ -24,7 +24,7 @@ describe("NPCView.ts", () => {
       x: FromGridX(0),
       y: FromGridY(0),
       health: 100,
-      scene: "MainScene",
+      scene: "Ilya",
     });
   });
 
@@ -83,7 +83,7 @@ describe("NPCView.ts", () => {
       x: FromGridX(1),
       y: FromGridY(0),
       health: 100,
-      scene: "MainScene",
+      scene: "Ilya",
     });
 
     // @ts-ignore

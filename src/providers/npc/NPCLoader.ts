@@ -17,9 +17,7 @@ export class NPCLoader {
 
     for (const [mapName, npcs] of MapLoader.tiledNPCs.entries()) {
       for (const tiledNPCData of npcs) {
-        const sceneName = this.mapHelper.getSceneNameFromMapName(mapName);
-
-        if (!sceneName) {
+        if (!mapName) {
           throw new Error(`NPCLoader: Scene name is not found for map ${mapName}`);
         }
 
