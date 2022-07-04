@@ -134,6 +134,12 @@ const npcSchema = createLeanSchema(
     experience: Type.number({
       required: false,
     }),
+    xpToRelease: Type.array().of({
+      charId: Type.objectId({
+        ref: "Character",
+      }),
+      xp: Type.number(),
+    }),
     ...({} as {
       isAlive: boolean;
       type: string;

@@ -1,13 +1,20 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill, ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { ItemType, ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
-import { ISkillDetails } from "@rpg-engine/shared/dist/types/skills.types";
+import {
+  ISkillDetails,
+  ISkillEventFromServer,
+  SkillEventType,
+  SkillSocketEvents,
+} from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import { SkillCalculator } from "./SkillCalculator";
 import _ from "lodash";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 
 const ItemSkill = new Map<ItemSubType | string, string>([
   ["unarmed", "first"],
@@ -26,14 +33,14 @@ interface IIncreaseSPResult {
   skillName: string;
 }
 
-interface IIncreaseSkillsResult extends IIncreaseSPResult {
-  levelUp: boolean;
+interface IIncreaseXPResult {
   level: number;
+  previousLevel: number;
 }
 
 @provide(SkillIncrease)
 export class SkillIncrease {
-  constructor(private skillCalculator: SkillCalculator) {}
+  constructor(private skillCalculator: SkillCalculator, private socketMessaging: SocketMessaging) {}
 
   /**
    * Calculates the sp gained according to weapons used and the xp gained by a character every time it causes damage in battle.
@@ -44,7 +51,7 @@ export class SkillIncrease {
     attacker: ICharacter,
     target: ICharacter | INPC,
     damage: number
-  ): Promise<IIncreaseSkillsResult> {
+  ): Promise<IIncreaseSPResult> {
     // Get character skills and equipment to upgrade them
     const skills = await Skill.findById(attacker.skills);
     if (!skills) {
@@ -57,41 +64,11 @@ export class SkillIncrease {
     }
 
     const increasedSP = await this.increaseWeaponSP(skills, equipment);
-    const newLevel = this.increaseXPinBattle(skills, target, damage);
-
     await skills.save();
 
-    return {
-      levelUp: newLevel,
-      level: skills.level,
-      ...increasedSP,
-    };
-  }
+    await this.recordXPinBattle(attacker, target, damage);
 
-  private async increaseWeaponSP(skills: ISkill, equipment: IEquipment): Promise<IIncreaseSPResult> {
-    // Get right and left hand items
-    // What if has weapons on both hands? for now, only one weapon per character is allowed
-    const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
-    const leftHandItem = equipment.leftHand ? await Item.findById(equipment.leftHand) : undefined;
-
-    // ItemSubType Shield is of type Weapon, so check that the weapon is not subType Shield (because cannot attack with Shield)
-    let foundWeapon = false;
-    if (rightHandItem?.type === ItemType.Weapon && rightHandItem?.subType !== ItemSubType.Shield) {
-      foundWeapon = true;
-      return this.increaseItemSP(skills, rightHandItem);
-    }
-
-    if (leftHandItem?.type === ItemType.Weapon && leftHandItem?.subType !== ItemSubType.Shield) {
-      foundWeapon = true;
-      return this.increaseItemSP(skills, leftHandItem);
-    }
-
-    // If user has no weapons (unarmed), then update 'first' skill
-    if (!foundWeapon) {
-      return this.increaseItemSP(skills, { subType: "unarmed" } as IItem);
-    }
-
-    return {} as IIncreaseSPResult;
+    return increasedSP;
   }
 
   public async increaseShieldingSP(character: ICharacter): Promise<IIncreaseSPResult> {
@@ -121,6 +98,119 @@ export class SkillIncrease {
     }
 
     return result;
+  }
+
+  /**
+   * This function distributes
+   * the xp stored in the xpToRelease array to the corresponding
+   * characters and notifies them if leveled up
+   */
+  public async releaseXP(target: INPC): Promise<void> {
+    let levelUp = false;
+    let previousLevel = 0;
+    // The xp gained is released once the NPC dies.
+    // Store the xp in the xpToRelease array
+    // before adding the character to the array, check if the character already caused some damage
+    while (target.xpToRelease && target.xpToRelease.length) {
+      const record = target.xpToRelease.shift();
+
+      // Get attacker character data
+      const character = await Character.findById(record!.charId);
+      if (!character) {
+        // if attacker does not exist anymore
+        // call again the function without this record
+        return this.releaseXP(target);
+      }
+
+      // Get character skills
+      const skills = await Skill.findById(character.skills);
+      if (!skills) {
+        // if attacker skills does not exist anymore
+        // call again the function without this record
+        return this.releaseXP(target);
+      }
+
+      skills.experience += record!.xp!;
+      skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
+
+      while (skills.xpToNextLevel <= 0) {
+        if (previousLevel === 0) {
+          previousLevel = skills.level;
+        }
+        skills.level++;
+        skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
+        levelUp = true;
+      }
+
+      await skills.save();
+
+      if (levelUp) {
+        this.sendExpLevelUpEvents({ level: skills.level, previousLevel }, character, target);
+      }
+    }
+
+    await target.save();
+  }
+
+  public sendSkillLevelUpEvents(skillData: IIncreaseSPResult, character: ICharacter, target: INPC | ICharacter): void {
+    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+      message: `You advanced from level ${skillData.skillLevel - 1} to ${skillData.skillLevel} in ${
+        skillData.skillName
+      }`,
+      type: "info",
+    });
+
+    const levelUpEventPayload: Partial<ISkillEventFromServer> = {
+      targetId: target.id,
+      targetType: target.type as "Character" | "NPC",
+      eventType: SkillEventType.SkillLevelUp,
+      level: skillData.skillLevel,
+      skill: skillData.skillName,
+    };
+
+    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
+  }
+
+  private sendExpLevelUpEvents(expData: IIncreaseXPResult, character: ICharacter, target: INPC | ICharacter): void {
+    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+      message: `You advanced from level ${expData.previousLevel} to ${expData.level}`,
+      type: "info",
+    });
+
+    const levelUpEventPayload: Partial<ISkillEventFromServer> = {
+      targetId: target.id,
+      targetType: target.type as "Character" | "NPC",
+      eventType: SkillEventType.LevelUp,
+      level: expData.level,
+    };
+
+    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ExperienceGain, levelUpEventPayload);
+  }
+
+  private async increaseWeaponSP(skills: ISkill, equipment: IEquipment): Promise<IIncreaseSPResult> {
+    // Get right and left hand items
+    // What if has weapons on both hands? for now, only one weapon per character is allowed
+    const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
+    const leftHandItem = equipment.leftHand ? await Item.findById(equipment.leftHand) : undefined;
+
+    // ItemSubType Shield is of type Weapon, so check that the weapon is not subType Shield (because cannot attack with Shield)
+    let foundWeapon = false;
+    if (rightHandItem?.type === ItemType.Weapon && rightHandItem?.subType !== ItemSubType.Shield) {
+      foundWeapon = true;
+      return this.increaseItemSP(skills, rightHandItem);
+    }
+
+    if (leftHandItem?.type === ItemType.Weapon && leftHandItem?.subType !== ItemSubType.Shield) {
+      foundWeapon = true;
+      return this.increaseItemSP(skills, leftHandItem);
+    }
+
+    // If user has no weapons (unarmed), then update 'first' skill
+    if (!foundWeapon) {
+      return this.increaseItemSP(skills, { subType: "unarmed" } as IItem);
+    }
+
+    return {} as IIncreaseSPResult;
   }
 
   private increaseItemSP(skills: ISkill, item: IItem): IIncreaseSPResult {
@@ -158,28 +248,32 @@ export class SkillIncrease {
 
   /**
    * Calculates the xp gained by a character every time it causes damage in battle
-   * Returns true if the attacker level increased or false if did not change.
+   * In case the target is NPC, it stores the character's xp gained in the xpToRelease array
    */
-  private increaseXPinBattle(attackerSkills: ISkill, target: ICharacter | INPC, damage: number): boolean {
-    let newLevel = false;
+  private async recordXPinBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // For now, only supported increasing XP when target is NPC
-    if (target.type === "NPC") {
+    if (target.type === "NPC" && damage > 0) {
       target = target as INPC;
-      attackerSkills.experience += target.xpPerDamage * damage;
-      attackerSkills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(
-        attackerSkills.experience,
-        attackerSkills.level + 1
-      );
 
-      if (attackerSkills.xpToNextLevel <= 0) {
-        attackerSkills.level++;
-        attackerSkills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(
-          attackerSkills.experience,
-          attackerSkills.level + 1
-        );
-        newLevel = true;
+      // Store the xp in the xpToRelease array
+      // before adding the character to the array, check if the character already caused some damage
+      if (typeof target.xpToRelease !== "undefined") {
+        let found = false;
+        for (const i in target.xpToRelease) {
+          if (target.xpToRelease[i].charId?.toString() === attacker.id) {
+            found = true;
+            target.xpToRelease[i].xp! += target.xpPerDamage * damage;
+            break;
+          }
+        }
+        if (!found) {
+          target.xpToRelease.push({ charId: attacker.id, xp: target.xpPerDamage * damage });
+        }
+      } else {
+        target.xpToRelease = [{ charId: attacker.id, xp: target.xpPerDamage * damage }];
       }
+
+      await target.save();
     }
-    return newLevel;
   }
 }

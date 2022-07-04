@@ -115,20 +115,16 @@ describe("SkillIncrease.spec.ts", () => {
   }
 
   it("should increase character's 'first' skill points (SP for next level - 1) and should not increase xp (damage 0)", async () => {
-    let newLevel = 0;
     let increasedSkills;
     for (let i = 1; i < spToLvl2; i++) {
       increasedSkills = await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 0);
-      if (increasedSkills.levelUp) {
-        newLevel = increasedSkills.level;
-      }
     }
+    expect(testNPC.xpToRelease?.length).toBe(0);
+
+    await skillIncrease.releaseXP(testNPC);
 
     const updatedSkills = await Skill.findById(testCharacter.skills);
 
-    expect(newLevel).toBe(0);
-    expect(increasedSkills.levelUp).toBe(false);
-    expect(increasedSkills.level).toBe(initialLevel);
     expect(increasedSkills.skillLevelUp).toBe(false);
     expect(increasedSkills.skillName).toBe("first");
     expect(increasedSkills.skillLevel).toBe(initialLevel);
@@ -139,48 +135,67 @@ describe("SkillIncrease.spec.ts", () => {
     expect(updatedSkills?.level).toBe(initialLevel);
     expect(updatedSkills?.experience).toBe(initialSkills.experience);
     expect(updatedSkills?.xpToNextLevel).toBe(xpToLvl2);
+    expect(testNPC.xpToRelease?.length).toBe(0);
   });
 
   it("should increase character's 'first' skill level and skill points (exact SP for next level). Should increase experience and level up", async () => {
     // increase skill level to level 2 and xp level to level 2
-    let newLevel = 0;
     for (let i = 0; i < spToLvl2; i++) {
-      const increasedSkills = await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 1);
-      if (increasedSkills.levelUp) {
-        newLevel = increasedSkills.level;
-      }
+      await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 1);
     }
 
-    const updatedSkills = await Skill.findById(testCharacter.skills);
+    let updatedSkills = await Skill.findById(testCharacter.skills);
 
-    expect(newLevel).toBe(initialLevel + 1);
     expect(updatedSkills?.first.level).toBe(initialLevel + 1);
     expect(updatedSkills?.first.skillPoints).toBe(spToLvl2);
     expect(updatedSkills?.first.skillPointsToNextLevel).toBe(calculateSPToNextLevel(spToLvl2, initialLevel + 2));
+
+    // Before releasing the XP, experience values should be same as initial values
+    // and NPC's xpToRelease array should have a length == 1
+    expect(updatedSkills?.level).toBe(initialLevel);
+    expect(updatedSkills?.experience).toBe(initialSkills.experience);
+    expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(initialSkills.experience, initialLevel + 1));
+    expect(testNPC.xpToRelease?.length).toBe(1);
+
+    // Release XP
+    await skillIncrease.releaseXP(testNPC);
+    updatedSkills = await Skill.findById(testCharacter.skills);
+
     expect(updatedSkills?.level).toBe(initialLevel + 1);
     expect(updatedSkills?.experience).toBe(spToLvl2);
     expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(updatedSkills?.experience!, initialLevel + 2));
+    expect(testNPC.xpToRelease?.length).toBe(0);
   });
 
   it("should increase character's 'first' skill level and skill points. Should increase experience and level up to level 3", async () => {
     const spToAdd = spToLvl2 + 5;
-    let newLevel = 0;
+    let increasedSkills;
     for (let i = 0; i < spToAdd; i++) {
-      const increasedSkills = await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 2);
-      if (increasedSkills.levelUp) {
-        newLevel = increasedSkills.level;
-      }
+      increasedSkills = await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 2);
     }
 
-    const updatedSkills = await Skill.findById(testCharacter.skills);
+    let updatedSkills = await Skill.findById(testCharacter.skills);
 
-    expect(newLevel).toBe(initialLevel + 2);
+    expect(increasedSkills.skillName).toBe("first");
+    expect(increasedSkills.skillLevel).toBe(initialLevel + 1);
     expect(updatedSkills?.first.level).toBe(initialLevel + 1);
     expect(updatedSkills?.first.skillPoints).toBe(spToAdd);
     expect(updatedSkills?.first.skillPointsToNextLevel).toBe(calculateSPToNextLevel(spToLvl2, initialLevel + 2) - 5);
+
+    // Before releasing the XP, experience values should be same as initial values
+    expect(updatedSkills?.level).toBe(initialLevel);
+    expect(updatedSkills?.experience).toBe(initialSkills.experience);
+    expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(initialSkills.experience, initialLevel + 1));
+    expect(testNPC.xpToRelease?.length).toBe(1);
+
+    // Release XP
+    await skillIncrease.releaseXP(testNPC);
+    updatedSkills = await Skill.findById(testCharacter.skills);
+
     expect(updatedSkills?.level).toBe(initialLevel + 2);
     expect(updatedSkills?.experience).toBe(spToAdd * 2);
     expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(updatedSkills?.experience!, initialLevel + 3));
+    expect(testNPC.xpToRelease?.length).toBe(0);
 
     // Check that other skills remained unchanged
     expect(updatedSkills?.axe.level).toBe(initialSkills?.axe.level);
