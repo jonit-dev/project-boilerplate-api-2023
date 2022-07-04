@@ -95,12 +95,7 @@ export class BattleAttackTarget {
         // Increase attacker SP for weapon used and XP (if is character)
         if (attacker.type === "Character") {
           const character = attacker as ICharacter;
-          const increasedSkills = await this.skillIncrease.increaseSkillsOnBattle(character, target, damage);
-
-          // If character skill level increased, send level up event specifying the skill that upgraded
-          if (increasedSkills.skillLevelUp && character.channelId) {
-            this.skillIncrease.sendSkillLevelUpEvents(increasedSkills, character, target);
-          }
+          await this.skillIncrease.increaseSkillsOnBattle(character, target, damage);
         }
 
         // Update target health
@@ -152,12 +147,7 @@ export class BattleAttackTarget {
         // Increase shielding SP in target (if is Character)
         if (target.type === "Character") {
           const character = target as ICharacter;
-          const increasedSkills = await this.skillIncrease.increaseShieldingSP(character);
-
-          // If shielding skills level up, send level up event
-          if (increasedSkills.skillLevelUp && character.channelId) {
-            this.skillIncrease.sendSkillLevelUpEvents(increasedSkills, character, attacker);
-          }
+          await this.skillIncrease.increaseShieldingSP(character);
         }
       }
     }

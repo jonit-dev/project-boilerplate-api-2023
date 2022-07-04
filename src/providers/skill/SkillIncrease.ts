@@ -45,14 +45,10 @@ export class SkillIncrease {
 
   /**
    * Calculates the sp gained according to weapons used and the xp gained by a character every time it causes damage in battle.
-   * Returns the new level number if the attacker level increased or 0 if did not change.
+   * If new skill level is reached, sends the corresponding event to the character
    *
    */
-  public async increaseSkillsOnBattle(
-    attacker: ICharacter,
-    target: ICharacter | INPC,
-    damage: number
-  ): Promise<IIncreaseSPResult> {
+  public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // Get character skills and equipment to upgrade them
     const skills = await Skill.findById(attacker.skills);
     if (!skills) {
@@ -67,12 +63,15 @@ export class SkillIncrease {
     const increasedSP = await this.increaseWeaponSP(skills, equipment);
     await skills.save();
 
-    await this.recordXPinBattle(attacker, target, damage);
+    // If character skill level increased, send level up event specifying the skill that upgraded
+    if (increasedSP.skillLevelUp && attacker.channelId) {
+      this.sendSkillLevelUpEvents(increasedSP, attacker, target);
+    }
 
-    return increasedSP;
+    await this.recordXPinBattle(attacker, target, damage);
   }
 
-  public async increaseShieldingSP(character: ICharacter): Promise<IIncreaseSPResult> {
+  public async increaseShieldingSP(character: ICharacter): Promise<void> {
     const skills = (await Skill.findById(character.skills)) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
@@ -96,9 +95,10 @@ export class SkillIncrease {
 
     if (!_.isEmpty(result)) {
       await skills.save();
+      if (result.skillLevelUp && character.channelId) {
+        this.sendSkillLevelUpEvents(result, character);
+      }
     }
-
-    return result;
   }
 
   /**
@@ -153,7 +153,11 @@ export class SkillIncrease {
     await target.save();
   }
 
-  public sendSkillLevelUpEvents(skillData: IIncreaseSPResult, character: ICharacter, target: INPC | ICharacter): void {
+  private sendSkillLevelUpEvents(
+    skillData: IIncreaseSPResult,
+    character: ICharacter,
+    target?: INPC | ICharacter
+  ): void {
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
       message: `You advanced from level ${skillData.skillLevel - 1} to ${skillData.skillLevel} in ${
         skillData.skillName
@@ -163,8 +167,8 @@ export class SkillIncrease {
 
     const levelUpEventPayload: ISkillEventFromServer = {
       characterId: character.id,
-      targetId: target.id,
-      targetType: target.type as "Character" | "NPC",
+      targetId: target?.id,
+      targetType: target?.type as "Character" | "NPC",
       eventType: SkillEventType.SkillLevelUp,
       level: skillData.skillLevel,
       skill: skillData.skillName,
