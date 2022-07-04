@@ -1,12 +1,13 @@
+import { cache } from "@providers/constants/CacheConstants";
 import { controller, httpGet, interfaces, requestParam } from "inversify-express-utils";
-import { GetMapHashUseCase } from "./GetMapHashUseCase";
+import { GetMapMetadataUseCase } from "./GetMapMetadataUseCase";
 
 @controller("/maps")
 export class MapController implements interfaces.Controller {
-  constructor(private getMapHashUseCase: GetMapHashUseCase) {}
+  constructor(private getMapMetadata: GetMapMetadataUseCase) {}
 
-  @httpGet("/:mapName/hash")
-  public mapHash(@requestParam() params): object {
-    return this.getMapHashUseCase.execute(params.mapName);
+  @httpGet("/:mapName/metadata", cache("24 hours"))
+  public mapMetadata(@requestParam() params): object {
+    return this.getMapMetadata.execute(params.mapName);
   }
 }
