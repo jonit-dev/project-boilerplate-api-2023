@@ -51,7 +51,9 @@ describe("SkillIncrease.spec.ts", () => {
     initialSkills: ISkill,
     initialLevel: number,
     spToLvl2: number,
-    xpToLvl2: number;
+    xpToLvl2: number,
+    sendSkillLevelUpEvents: any,
+    sendExpLevelUpEvents: any;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -60,10 +62,15 @@ describe("SkillIncrease.spec.ts", () => {
       ownerType: "Character",
     }) as ISkill;
     initialLevel = initialSkills?.first.level;
+
     spToLvl2 = calculateSPToNextLevel(initialSkills?.first.skillPoints, initialLevel + 1);
     xpToLvl2 = calculateXPToNextLevel(initialSkills.experience, initialSkills.level + 1);
+
     expect(spToLvl2).toBeGreaterThan(0);
     expect(xpToLvl2).toBeGreaterThan(0);
+
+    sendSkillLevelUpEvents = jest.spyOn(skillIncrease, "sendSkillLevelUpEvents" as any);
+    sendExpLevelUpEvents = jest.spyOn(skillIncrease, "sendExpLevelUpEvents" as any);
   });
 
   beforeEach(async () => {
@@ -114,6 +121,30 @@ describe("SkillIncrease.spec.ts", () => {
     });
   }
 
+  it("should not increase character's 'shielding' skill | Character without Shield", async () => {
+    for (let i = 0; i < spToLvl2; i++) {
+      await skillIncrease.increaseShieldingSP(testCharacter);
+    }
+
+    const updatedSkills = await Skill.findById(testCharacter.skills);
+
+    // Check that skills remained unchanged
+    expect(updatedSkills?.shielding.level).toBe(initialLevel);
+    expect(updatedSkills?.shielding.skillPoints).toBe(initialSkills?.shielding.skillPoints);
+    expect(updatedSkills?.shielding.skillPointsToNextLevel).toBe(spToLvl2);
+    expect(updatedSkills?.axe.level).toBe(initialLevel);
+    expect(updatedSkills?.axe.skillPoints).toBe(initialSkills?.axe.skillPoints);
+    expect(updatedSkills?.distance.level).toBe(initialLevel);
+    expect(updatedSkills?.distance.skillPoints).toBe(initialSkills?.distance.skillPoints);
+    expect(updatedSkills?.sword.level).toBe(initialLevel);
+    expect(updatedSkills?.sword.skillPoints).toBe(initialSkills?.sword.skillPoints);
+    expect(updatedSkills?.first.level).toBe(initialLevel);
+    expect(updatedSkills?.first.skillPoints).toBe(initialSkills?.first.skillPoints);
+
+    expect(sendSkillLevelUpEvents).not.toHaveBeenCalled();
+    expect(sendExpLevelUpEvents).not.toHaveBeenCalled();
+  });
+
   it("should increase character's 'first' skill points (SP for next level - 1) and should not increase xp (damage 0)", async () => {
     for (let i = 1; i < spToLvl2; i++) {
       await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 0);
@@ -131,6 +162,9 @@ describe("SkillIncrease.spec.ts", () => {
     expect(updatedSkills?.experience).toBe(initialSkills.experience);
     expect(updatedSkills?.xpToNextLevel).toBe(xpToLvl2);
     expect(testNPC.xpToRelease?.length).toBe(0);
+
+    expect(sendSkillLevelUpEvents).not.toHaveBeenCalled();
+    expect(sendExpLevelUpEvents).not.toHaveBeenCalled();
   });
 
   it("should increase character's 'first' skill level and skill points (exact SP for next level). Should increase experience and level up", async () => {
@@ -160,6 +194,9 @@ describe("SkillIncrease.spec.ts", () => {
     expect(updatedSkills?.experience).toBe(spToLvl2);
     expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(updatedSkills?.experience!, initialLevel + 2));
     expect(testNPC.xpToRelease?.length).toBe(0);
+
+    expect(sendSkillLevelUpEvents).toHaveBeenCalled();
+    expect(sendExpLevelUpEvents).toHaveBeenCalled();
   });
 
   it("should increase character's 'first' skill level and skill points. Should increase experience and level up to level 3", async () => {
@@ -190,6 +227,9 @@ describe("SkillIncrease.spec.ts", () => {
     expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(updatedSkills?.experience!, initialLevel + 3));
     expect(testNPC.xpToRelease?.length).toBe(0);
 
+    expect(sendSkillLevelUpEvents).toBeCalledTimes(2);
+    expect(sendExpLevelUpEvents).toBeCalledTimes(2);
+
     // Check that other skills remained unchanged
     expect(updatedSkills?.axe.level).toBe(initialSkills?.axe.level);
     expect(updatedSkills?.axe.skillPoints).toBe(initialSkills?.axe.skillPoints);
@@ -199,27 +239,6 @@ describe("SkillIncrease.spec.ts", () => {
     expect(updatedSkills?.sword.skillPoints).toBe(initialSkills?.sword.skillPoints);
     expect(updatedSkills?.shielding.level).toBe(initialSkills?.shielding.level);
     expect(updatedSkills?.shielding.skillPoints).toBe(initialSkills?.shielding.skillPoints);
-  });
-
-  it("should not increase character's 'shielding' skill | Character without Shield", async () => {
-    for (let i = 0; i < spToLvl2; i++) {
-      await skillIncrease.increaseShieldingSP(testCharacter);
-    }
-
-    const updatedSkills = await Skill.findById(testCharacter.skills);
-
-    // Check that skills remained unchanged
-    expect(updatedSkills?.shielding.level).toBe(initialLevel);
-    expect(updatedSkills?.shielding.skillPoints).toBe(initialSkills?.shielding.skillPoints);
-    expect(updatedSkills?.shielding.skillPointsToNextLevel).toBe(spToLvl2);
-    expect(updatedSkills?.axe.level).toBe(initialLevel);
-    expect(updatedSkills?.axe.skillPoints).toBe(initialSkills?.axe.skillPoints);
-    expect(updatedSkills?.distance.level).toBe(initialLevel);
-    expect(updatedSkills?.distance.skillPoints).toBe(initialSkills?.distance.skillPoints);
-    expect(updatedSkills?.sword.level).toBe(initialLevel);
-    expect(updatedSkills?.sword.skillPoints).toBe(initialSkills?.sword.skillPoints);
-    expect(updatedSkills?.first.level).toBe(initialLevel);
-    expect(updatedSkills?.first.skillPoints).toBe(initialSkills?.first.skillPoints);
   });
 
   afterAll(async () => {
