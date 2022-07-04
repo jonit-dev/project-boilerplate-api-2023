@@ -36,6 +36,7 @@ interface IIncreaseSPResult {
 interface IIncreaseXPResult {
   level: number;
   previousLevel: number;
+  exp: number;
 }
 
 @provide(SkillIncrease)
@@ -145,7 +146,7 @@ export class SkillIncrease {
       await skills.save();
 
       if (levelUp) {
-        this.sendExpLevelUpEvents({ level: skills.level, previousLevel }, character, target);
+        this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp: record!.xp! }, character, target);
       }
     }
 
@@ -160,7 +161,8 @@ export class SkillIncrease {
       type: "info",
     });
 
-    const levelUpEventPayload: Partial<ISkillEventFromServer> = {
+    const levelUpEventPayload: ISkillEventFromServer = {
+      characterId: character.id,
       targetId: target.id,
       targetType: target.type as "Character" | "NPC",
       eventType: SkillEventType.SkillLevelUp,
@@ -177,11 +179,13 @@ export class SkillIncrease {
       type: "info",
     });
 
-    const levelUpEventPayload: Partial<ISkillEventFromServer> = {
+    const levelUpEventPayload: ISkillEventFromServer = {
+      characterId: character.id,
       targetId: target.id,
       targetType: target.type as "Character" | "NPC",
       eventType: SkillEventType.LevelUp,
       level: expData.level,
+      exp: expData.exp,
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ExperienceGain, levelUpEventPayload);
