@@ -1,6 +1,9 @@
 export enum SwordBlueprint {
   ShortSword = "short-sword",
   BasiliskSword = "basilisk-sword",
+  DragonsSword = "dragon's-sword",
+  DoubleEdgedSword = "double-edged-sword",
+  BroadSword = "broad-sword",
 }
 
 export enum HelmetBlueprint {
@@ -78,4 +81,14 @@ export enum BowsBlueprint {
 export enum GlovesBlueprint {
   LeatherGloves = "leather-gloves",
   StuddedGloves = "studded-gloves",
+}
+
+export enum MacesBlueprint {
+  Club = "club",
+  Mace = "mace",
+  SpikedClub = "spiked-club",
+}
+
+export enum MagicsBlueprint {
+  Rune = "rune",
 }
