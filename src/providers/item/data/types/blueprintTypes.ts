@@ -92,3 +92,7 @@ export enum MacesBlueprint {
 export enum MagicsBlueprint {
   Rune = "rune",
 }
+
+export enum OthersBlueprint {
+  Candle = "candle",
+}
