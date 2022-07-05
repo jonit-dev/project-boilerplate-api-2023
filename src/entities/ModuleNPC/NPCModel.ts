@@ -131,9 +131,19 @@ const npcSchema = createLeanSchema(
       default: false,
       required: true,
     }),
+    experience: Type.number({
+      required: false,
+    }),
+    xpToRelease: Type.array().of({
+      charId: Type.objectId({
+        ref: "Character",
+      }),
+      xp: Type.number(),
+    }),
     ...({} as {
       isAlive: boolean;
       type: string;
+      xpPerDamage: number;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
@@ -147,6 +157,11 @@ npcSchema.virtual("isAlive").get(function (this: INPC) {
 
 npcSchema.virtual("type").get(function (this: INPC) {
   return "NPC";
+});
+
+npcSchema.virtual("xpPerDamage").get(function (this: INPC) {
+  // initial health = 100, xpPerDamage = experience / initial health
+  return this.experience ? this.experience / 100 : 0;
 });
 
 npcSchema.post("remove", async function (this: INPC) {

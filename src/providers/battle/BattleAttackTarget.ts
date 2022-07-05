@@ -92,9 +92,10 @@ export class BattleAttackTarget {
       const damage = await this.battleEvent.calculateHitDamage(attacker, target);
 
       if (damage > 0) {
-        // Increase attacker SP for weapon used (if is character)
+        // Increase attacker SP for weapon used and XP (if is character)
         if (attacker.type === "Character") {
-          await this.skillIncrease.increaseWeaponSP(attacker as ICharacter);
+          const character = attacker as ICharacter;
+          await this.skillIncrease.increaseSkillsOnBattle(character, target, damage);
         }
 
         // Update target health
@@ -131,6 +132,7 @@ export class BattleAttackTarget {
           if (target.type === "NPC") {
             await this.battleEffects.generateBloodOnGround(target);
             await this.npcDeath.handleNPCDeath(target as INPC);
+            await this.skillIncrease.releaseXP(target as INPC);
 
             // clear attacker target
             if (attacker instanceof Character) {
@@ -144,7 +146,8 @@ export class BattleAttackTarget {
 
         // Increase shielding SP in target (if is Character)
         if (target.type === "Character") {
-          await this.skillIncrease.increaseShieldingSP(target as ICharacter);
+          const character = target as ICharacter;
+          await this.skillIncrease.increaseShieldingSP(character);
         }
       }
     }

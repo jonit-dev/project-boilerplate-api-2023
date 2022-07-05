@@ -21,4 +21,5 @@ export const npcSkeleton = {
     },
   },
   fleeOnLowHealth: true,
+  experience: 45,
 } as Partial<INPC>;
