@@ -63,6 +63,7 @@ export enum FoodsBlueprint {
 
 export enum SpearsBlueprint {
   RoyalSpear = "royal-spear",
+  Spear = "spear",
 }
 
 export enum PotionsBlueprint {
