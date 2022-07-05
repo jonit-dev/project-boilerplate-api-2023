@@ -101,3 +101,8 @@ export enum OthersBlueprint {
 export enum StaffsBlueprint {
   AppendicesStaff = "appendice's-staff",
 }
+
+export enum ShieldsBlueprint {
+  WoodenShield = "wooden-shield",
+  StuddedShield = "studded-shield",
+}
