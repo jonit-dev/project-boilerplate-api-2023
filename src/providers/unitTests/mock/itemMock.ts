@@ -23,7 +23,7 @@ export const itemMock = {
   tiledId: 66,
   x: 320,
   y: 144,
-  scene: "MainScene",
+  scene: "Ilya",
   createdAt: "2022-06-25T22:53:55.579Z",
   updatedAt: "2022-06-28T04:42:21.409Z",
   __v: 0,

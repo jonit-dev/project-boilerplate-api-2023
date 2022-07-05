@@ -2,7 +2,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MapLoader } from "@providers/map/MapLoader";
 import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
-import { ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 
@@ -93,8 +93,6 @@ export class NPCSeeder {
 
   private setInitialNPCPositionAsSolid(NPCData: INPCSeedData): void {
     // mark NPC initial position as solid on the map (pathfinding)
-    MapLoader.grids
-      .get(ScenesMetaData[NPCData.scene].map)!
-      .setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
+    MapLoader.grids.get(NPCData.scene)!.setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
   }
 }

@@ -1,17 +1,8 @@
-import { ScenesMetaData } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ITiledObject } from "./MapLoader";
 
 @provide(MapHelper)
 export class MapHelper {
-  public getSceneNameFromMapName(mapName: string): string | undefined {
-    for (const [scene, data] of Object.entries(ScenesMetaData)) {
-      if (data.map === mapName) {
-        return scene;
-      }
-    }
-  }
-
   public mergeBlueprintWithTiledProps<T>(
     tiledData: ITiledObject,
     mapName: string,
@@ -29,10 +20,8 @@ export class MapHelper {
     const blueprint = blueprintIndex[tiledKey];
     const key = `${tiledKey}-${tiledData.id}`;
 
-    const sceneName = this.getSceneNameFromMapName(mapName);
-
-    if (!sceneName) {
-      throw new Error(`NPCLoader: Scene name is not found for map ${mapName}`);
+    if (!mapName) {
+      throw new Error(`NPCLoader: Map name is for map ${mapName}`);
     }
 
     const data = {
@@ -43,7 +32,7 @@ export class MapHelper {
       tiledId: tiledData.id,
       x: tiledData.x,
       y: tiledData.y,
-      scene: sceneName,
+      scene: mapName,
     };
 
     return { key, data };

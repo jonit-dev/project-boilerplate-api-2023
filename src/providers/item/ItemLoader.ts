@@ -18,10 +18,8 @@ export class ItemLoader {
 
     for (const [mapName, items] of MapLoader.tiledItems.entries()) {
       for (const tiledItemData of items) {
-        const sceneName = this.mapHelper.getSceneNameFromMapName(mapName);
-
-        if (!sceneName) {
-          throw new Error(`ItemLoader: Scene name is not found for map ${mapName}`);
+        if (!mapName) {
+          throw new Error(`ItemLoader: Map name is not found for ${mapName}`);
         }
 
         const { key, data } = this.mapHelper.mergeBlueprintWithTiledProps<IItemSeedData>(

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { container, mapLoader, unitTestHelper } from "@providers/inversify/container";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { FromGridX, FromGridY, ScenesMetaData, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 
 describe("MovementHelper.ts", () => {
   let movementHelper: MovementHelper;
@@ -19,12 +19,7 @@ describe("MovementHelper.ts", () => {
   it("should properly detect a solid NPC", async () => {
     const npc = await unitTestHelper.createMockNPC();
 
-    const hasSolidNPC = await movementHelper.isSolid(
-      ScenesMetaData[npc.scene].map,
-      ToGridX(npc.x),
-      ToGridY(npc.y),
-      npc.layer
-    );
+    const hasSolidNPC = await movementHelper.isSolid(npc.scene, ToGridX(npc.x), ToGridY(npc.y), npc.layer);
 
     expect(hasSolidNPC).toBeTruthy();
   });
@@ -32,12 +27,7 @@ describe("MovementHelper.ts", () => {
   it("should properly detect an empty tile near a NPC", async () => {
     const npc = await unitTestHelper.createMockNPC();
 
-    const hasSolidNPC = await movementHelper.isSolid(
-      ScenesMetaData[npc.scene].map,
-      ToGridX(npc.x) + 16,
-      ToGridY(npc.y),
-      npc.layer
-    );
+    const hasSolidNPC = await movementHelper.isSolid(npc.scene, ToGridX(npc.x) + 16, ToGridY(npc.y), npc.layer);
 
     expect(hasSolidNPC).toBeFalsy();
   });
@@ -46,7 +36,7 @@ describe("MovementHelper.ts", () => {
     const character = await unitTestHelper.createMockCharacter();
 
     const hasSolidCharacter = await movementHelper.isSolid(
-      ScenesMetaData[character.scene].map,
+      character.scene,
       ToGridX(character.x),
       ToGridY(character.y),
       character.layer

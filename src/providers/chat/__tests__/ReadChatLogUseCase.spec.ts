@@ -73,9 +73,9 @@ describe("ReadChatLogUseCase.ts", () => {
     const tsDecoratorTest = new TsDefaultDecoratorMockTest();
     readChatLogUseCase = new ReadChatLogUseCase(socketTransmissionZone, tsDecoratorTest);
 
-    await expect(
-      readChatLogUseCase.getChatLogInZone({ x: 10, y: 20, scene: "MainScene", limit: "s" })
-    ).rejects.toThrowError("error LIMIT");
+    await expect(readChatLogUseCase.getChatLogInZone({ x: 10, y: 20, scene: "Ilya", limit: "s" })).rejects.toThrowError(
+      "error LIMIT"
+    );
   });
 
   it("should return the last 5 chat Logs in Zone", async () => {
@@ -83,7 +83,7 @@ describe("ReadChatLogUseCase.ts", () => {
     const tsDecoratorTest = new TsDefaultDecoratorMockTest();
     readChatLogUseCase = new ReadChatLogUseCase(socketTransmissionZone, tsDecoratorTest);
 
-    const chatLogs = await readChatLogUseCase.getChatLogInZone({ x: 10, y: 20, scene: "MainScene", limit: 5 });
+    const chatLogs = await readChatLogUseCase.getChatLogInZone({ x: 10, y: 20, scene: "Ilya", limit: 5 });
 
     const lastResultExpected = {
       _id: "6285a2cc487abf002f1bb1ec",
@@ -95,7 +95,7 @@ describe("ReadChatLogUseCase.ts", () => {
       },
       x: 150,
       y: 400,
-      scene: "MainScene",
+      scene: "Ilya",
       createdAt: new Date("2022-05-19T01:52:12.156Z"),
       updatedAt: new Date("2022-05-19T01:52:12.156Z"),
       __v: 0,
@@ -127,7 +127,7 @@ describe("ReadChatLogUseCase.ts", () => {
     const tsDecoratorTest = new TsDefaultDecoratorMockTest();
     readChatLogUseCase = new ReadChatLogUseCase(socketTransmissionZone, tsDecoratorTest);
 
-    const chatLogs = await readChatLogUseCase.getChatLogInZone({ x: 300, y: 200, scene: "MainScene", limit: 5 });
+    const chatLogs = await readChatLogUseCase.getChatLogInZone({ x: 300, y: 200, scene: "Ilya", limit: 5 });
 
     expect(chatLogs.length).toBe(0);
   });

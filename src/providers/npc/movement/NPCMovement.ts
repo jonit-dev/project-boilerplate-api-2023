@@ -3,14 +3,7 @@ import { MapLoader } from "@providers/map/MapLoader";
 import { MapSolids } from "@providers/map/MapSolids";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  INPCPositionUpdatePayload,
-  NPCAlignment,
-  NPCSocketEvents,
-  ScenesMetaData,
-  ToGridX,
-  ToGridY,
-} from "@rpg-engine/shared";
+import { INPCPositionUpdatePayload, NPCAlignment, NPCSocketEvents, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCView } from "../NPCView";
 
@@ -48,7 +41,7 @@ export class NPCMovement {
     chosenMovementDirection: NPCDirection
   ): Promise<void> {
     try {
-      const map = ScenesMetaData[npc.scene].map;
+      const map = npc.scene;
 
       const newGridX = ToGridX(newX);
       const newGridY = ToGridY(newY);
@@ -111,13 +104,7 @@ export class NPCMovement {
     endGridY: number
   ): IShortestPathPositionResult | undefined {
     try {
-      const npcPath = this.movementHelper.findShortestPath(
-        ScenesMetaData[npc.scene].map,
-        startGridX,
-        startGridY,
-        endGridX,
-        endGridY
-      );
+      const npcPath = this.movementHelper.findShortestPath(npc.scene, startGridX, startGridY, endGridX, endGridY);
 
       if (!npcPath || npcPath.length <= 1) {
         return;
