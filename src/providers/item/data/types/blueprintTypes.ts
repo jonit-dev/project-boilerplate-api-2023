@@ -97,3 +97,7 @@ export enum MagicsBlueprint {
 export enum OthersBlueprint {
   Candle = "candle",
 }
+
+export enum StaffsBlueprint {
+  AppendicesStaff = "appendice's-staff",
+}
