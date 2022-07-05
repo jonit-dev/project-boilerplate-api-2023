@@ -6,7 +6,7 @@
   "scripts": {
     "tsc": "tsc",
     "test": "yarn jest --silent test",
-    "test:debug": "yarn jest test",
+    "test:debug": "yarn jest test --detectOpenHandles",
     "test:coverage": "yarn jest --silent --coverage",
     "test:config": "yarn jest --showConfig test",
     "dev": "yarn install && ts-node-dev --transpile-only --inspect=0.0.0.0:9229 --respawn -r tsconfig-paths/register ./src/server.ts",
