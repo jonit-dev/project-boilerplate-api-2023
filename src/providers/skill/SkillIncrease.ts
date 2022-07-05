@@ -1,9 +1,11 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { Skill, ISkill } from "@entities/ModuleCharacter/SkillsModel";
-import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { ItemType, ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import { ItemSubType, ItemType } from "@rpg-engine/shared/dist/types/item.types";
 import {
   ISkillDetails,
   ISkillEventFromServer,
@@ -11,10 +13,8 @@ import {
   SkillSocketEvents,
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
-import { SkillCalculator } from "./SkillCalculator";
 import _ from "lodash";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import { SkillCalculator } from "./SkillCalculator";
 
 const ItemSkill = new Map<ItemSubType | string, string>([
   ["unarmed", "first"],
@@ -159,9 +159,9 @@ export class SkillIncrease {
     target?: INPC | ICharacter
   ): void {
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You advanced from level ${skillData.skillLevel - 1} to ${skillData.skillLevel} in ${
-        skillData.skillName
-      }`,
+      message: `You advanced from level ${skillData.skillLevel - 1} to ${skillData.skillLevel} in ${_.startCase(
+        _.toLower(skillData.skillName)
+      )} fighting.`,
       type: "info",
     });
 
@@ -179,7 +179,7 @@ export class SkillIncrease {
 
   private sendExpLevelUpEvents(expData: IIncreaseXPResult, character: ICharacter, target: INPC | ICharacter): void {
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You advanced from level ${expData.previousLevel} to ${expData.level}`,
+      message: `You advanced from level ${expData.previousLevel} to level ${expData.level}.`,
       type: "info",
     });
 
