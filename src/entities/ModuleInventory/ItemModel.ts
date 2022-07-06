@@ -113,7 +113,8 @@ itemSchema.post("save", async function (this: IItem) {
       slotQty,
       owner: this.owner,
     });
-    await newContainer.save();
+    const result = await newContainer.save();
+    this.itemContainer = result._id;
   }
 
   await warnAboutItemChanges(this, "changes");

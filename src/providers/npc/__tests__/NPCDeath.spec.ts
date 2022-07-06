@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -61,10 +62,37 @@ describe("NPCDeath.ts", () => {
     });
 
     expect(npcBody).toBeDefined();
+    expect(npcBody).not.toBeNull();
 
     expect(!testNPC.isAlive).toBeTruthy();
 
     expect(testNPC.nextSpawnTime).toBeDefined();
+  });
+
+  it("on NPC death, make sure loot is added to NPC body", async () => {
+    // @ts-ignore
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+
+    await npcDeath.handleNPCDeath(testNPC);
+
+    expect(spyAddLootInNPCBody).toHaveBeenCalled();
+
+    const npcBody = await Item.findOne({
+      owner: testNPC._id,
+      name: `${testNPC.name}'s body`,
+      x: testNPC.x,
+      y: testNPC.y,
+      scene: testNPC.scene,
+    });
+
+    expect(npcBody).not.toBeNull();
+    expect(npcBody!.itemContainer).toBeDefined();
+
+    const bodyItemContainer = await ItemContainer.findById(npcBody!.itemContainer);
+
+    expect(bodyItemContainer).not.toBeNull();
+    expect(bodyItemContainer!.slots).toBeDefined();
+    expect(bodyItemContainer!.slots.length).toBe(1);
   });
 
   afterAll(async () => {

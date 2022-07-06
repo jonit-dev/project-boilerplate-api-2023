@@ -50,6 +50,12 @@ export class UnitTestHelper {
       ...extraProps,
       skills: npcSkills._id,
       experience: 100,
+      loots: [
+        {
+          itemBlueprintKey: "cheese",
+          chance: 100,
+        },
+      ],
     });
 
     await testNPC.save();

@@ -137,8 +137,13 @@ const npcSchema = createLeanSchema(
     xpToRelease: Type.array().of({
       charId: Type.objectId({
         ref: "Character",
+        required: true,
       }),
-      xp: Type.number(),
+      xp: Type.number({ required: true }),
+    }),
+    loots: Type.array().of({
+      itemBlueprintKey: Type.string({ required: true }),
+      chance: Type.number({ required: true, min: 0, max: 100 }),
     }),
     ...({} as {
       isAlive: boolean;

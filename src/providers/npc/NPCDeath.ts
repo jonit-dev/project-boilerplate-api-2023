@@ -1,4 +1,4 @@
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -8,6 +8,8 @@ import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import { NPCTarget } from "./movement/NPCTarget";
 import { NPCCycle } from "./NPCCycle";
+import _ from "lodash";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 
 @provide(NPCDeath)
 export class NPCDeath {
@@ -30,7 +32,12 @@ export class NPCDeath {
       }
 
       // create NPC body instance
-      await this.generateNPCBody(npc);
+      const npcBody = await this.generateNPCBody(npc);
+
+      // add loot in NPC dead body container
+      if (npc.loots) {
+        await this.addLootToNPCBody(npc, npcBody);
+      }
 
       // disable NPC behavior
 
@@ -54,11 +61,12 @@ export class NPCDeath {
     }
   }
 
-  public async generateNPCBody(npc: INPC): Promise<void> {
+  public generateNPCBody(npc: INPC): Promise<IItem> {
     const blueprintData = itemsBlueprintIndex["npc-body"];
 
     const npcBody = new Item({
       ...blueprintData, // base body props
+      owner: npc._id,
       key: `${npc.key}-body`,
       texturePath: `${npc.textureKey}/death/0.png`,
       textureKey: npc.textureKey,
@@ -69,6 +77,33 @@ export class NPCDeath {
       y: npc.y,
     });
 
-    await npcBody.save();
+    return npcBody.save();
+  }
+
+  private async addLootToNPCBody(npc: INPC, npcBody: IItem): Promise<void> {
+    // get item container associated with npcBody
+    const itemContainer = await ItemContainer.findById(npcBody.itemContainer);
+    if (!itemContainer) {
+      throw new Error(`Error fetching itemContainer for Item with key ${npcBody.key}`);
+    }
+
+    for (const loot of npc.loots!) {
+      const rand = Math.round(_.random(0, 100));
+      if (rand <= loot.chance) {
+        const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+        const lootItem = new Item({ ...blueprintData });
+        await lootItem.save();
+
+        if (typeof itemContainer.slots === "undefined") {
+          itemContainer.slots = [];
+        }
+
+        if (itemContainer.slots.length < itemContainer.slotQty) {
+          itemContainer.slots.push(lootItem);
+        }
+      }
+    }
+
+    await itemContainer.save();
   }
 }
