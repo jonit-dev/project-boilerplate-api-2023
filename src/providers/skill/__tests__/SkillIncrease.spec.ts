@@ -77,7 +77,7 @@ describe("SkillIncrease.spec.ts", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
-    testCharacter = await unitTestHelper.createMockCharacter();
+    testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true, hasEquipment: true });
     await testCharacter.populate("skills").execPopulate();
 
     testNPC = await unitTestHelper.createMockNPC();

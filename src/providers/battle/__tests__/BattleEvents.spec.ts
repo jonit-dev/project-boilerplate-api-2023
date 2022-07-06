@@ -24,7 +24,7 @@ describe("BattleEvents.spec.ts", () => {
 
     testNPC = await unitTestHelper.createMockNPC();
     await testNPC.populate("skills").execPopulate();
-    testCharacter = await unitTestHelper.createMockCharacter();
+    testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true, hasEquipment: true });
     await testCharacter.populate("skills").execPopulate();
   });
 

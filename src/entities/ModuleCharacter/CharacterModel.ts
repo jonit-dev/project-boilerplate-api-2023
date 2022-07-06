@@ -104,7 +104,6 @@ const characterSchema = createLeanSchema(
     lastMovement: Type.date(),
     skills: Type.objectId({
       ref: "Skill",
-      required: true,
     }),
     target: {
       id: Type.objectId(),
@@ -129,7 +128,6 @@ const characterSchema = createLeanSchema(
       },
     }),
     equipment: Type.objectId({
-      required: true,
       ref: "Equipment",
     }),
     ...({} as {
