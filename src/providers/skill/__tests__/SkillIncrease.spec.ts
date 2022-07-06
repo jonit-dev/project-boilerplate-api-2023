@@ -1,12 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { SkillIncrease } from "../SkillIncrease";
-import { calculateSPToNextLevel, calculateXPToNextLevel } from "../SkillCalculator";
 import { ItemSubType } from "@rpg-engine/shared";
 import { Error } from "mongoose";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { calculateSPToNextLevel, calculateXPToNextLevel } from "../SkillCalculator";
+import { SkillIncrease } from "../SkillIncrease";
 
 type TestCase = {
   item: ItemSubType;
@@ -61,6 +61,7 @@ describe("SkillIncrease.spec.ts", () => {
     initialSkills = new Skill({
       ownerType: "Character",
     }) as ISkill;
+    await initialSkills.save();
     initialLevel = initialSkills?.first.level;
 
     spToLvl2 = calculateSPToNextLevel(initialSkills?.first.skillPoints, initialLevel + 1);
