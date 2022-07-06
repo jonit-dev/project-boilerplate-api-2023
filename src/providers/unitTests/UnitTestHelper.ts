@@ -127,6 +127,7 @@ export class UnitTestHelper {
     const itemHead = new Item({
       ...itemMock,
       ...extraProps,
+      _id: undefined,
       defense: 10,
       attack: 8,
     });
