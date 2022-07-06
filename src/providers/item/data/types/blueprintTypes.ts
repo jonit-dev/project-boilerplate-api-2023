@@ -63,6 +63,7 @@ export enum FoodsBlueprint {
 
 export enum SpearsBlueprint {
   RoyalSpear = "royal-spear",
+  Spear = "spear",
 }
 
 export enum PotionsBlueprint {
@@ -91,4 +92,17 @@ export enum MacesBlueprint {
 
 export enum MagicsBlueprint {
   Rune = "rune",
+}
+
+export enum OthersBlueprint {
+  Candle = "candle",
+}
+
+export enum StaffsBlueprint {
+  AppendicesStaff = "appendice's-staff",
+}
+
+export enum ShieldsBlueprint {
+  WoodenShield = "wooden-shield",
+  StuddedShield = "studded-shield",
 }

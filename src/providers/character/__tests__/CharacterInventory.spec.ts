@@ -20,11 +20,11 @@ describe("CharacterInventory.ts", () => {
   });
 
   it("should properly get the item in the inventory slot", async () => {
-    await characterInventory.addEquipmentCharacter(testCharacter);
+    await characterInventory.addEquipmentToCharacter(testCharacter);
 
     const inventory = await testCharacter.inventory;
 
-    expect(inventory.name).toBe("Short Sword");
+    expect(inventory.name).toBe("Backpack");
   });
 
   afterAll(async () => {

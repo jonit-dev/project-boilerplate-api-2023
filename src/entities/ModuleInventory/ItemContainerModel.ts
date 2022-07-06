@@ -70,8 +70,6 @@ itemContainerSchema.post("remove", async function (this: IItemContainer) {
 
       if (item) {
         await item.remove();
-      } else {
-        throw new Error(`Item Container error: Failed to remove ${itemId} after container destruction.`);
       }
     }
   }

@@ -4,6 +4,7 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { container } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint } from "@providers/item/data/types/blueprintTypes";
@@ -22,6 +23,12 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
 import { itemMock } from "./mock/itemMock";
+
+interface IMockCharacterOptions {
+  hasEquipment?: boolean;
+  hasInventory?: boolean;
+  hasSkills?: boolean;
+}
 
 @provide(UnitTestHelper)
 export class UnitTestHelper {
@@ -89,28 +96,46 @@ export class UnitTestHelper {
     return newItem;
   }
 
-  public async createMockCharacter(extraProps?: Record<string, unknown>): Promise<ICharacter> {
-    const charSkills = new Skill({
-      ownerType: "Character",
-    });
-    await charSkills.save();
-
-    const equipment = new Equipment();
-    await equipment.save();
-
+  public async createMockCharacter(
+    extraProps?: Record<string, unknown> | null,
+    options?: IMockCharacterOptions
+  ): Promise<ICharacter> {
     const testCharacter = new Character({
       ...characterMock,
       ...extraProps,
-      skills: charSkills._id,
-      equipment: equipment._id,
     });
-
     await testCharacter.save();
 
-    charSkills.owner = testCharacter._id;
-    await charSkills.save();
+    if (options?.hasSkills) {
+      const charSkills = new Skill({
+        ownerType: "Character",
+      });
+      charSkills.owner = testCharacter._id;
+      testCharacter.skills = charSkills._id;
+      await charSkills.save();
+      await testCharacter.save();
+    }
 
+    if (options?.hasEquipment) {
+      let equipment;
+      if (options?.hasInventory) {
+        equipment = await this.addInventoryToCharacter(testCharacter);
+      } else {
+        equipment = new Equipment();
+      }
+      await equipment.save();
+      testCharacter.equipment = equipment._id;
+      await testCharacter.save();
+    }
     return testCharacter;
+  }
+
+  public async addInventoryToCharacter(character: ICharacter): Promise<IEquipment> {
+    const characterInventory = container.get<CharacterInventory>(CharacterInventory);
+
+    const equipment = await characterInventory.createEquipmentWithInventory();
+
+    return equipment;
   }
 
   public async createMockChatLogs(emitter: ICharacter): Promise<void> {
