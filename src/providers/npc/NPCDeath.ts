@@ -3,7 +3,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BattleSocketEvents, IBattleDeath } from "@rpg-engine/shared";
+import { BattleSocketEvents, IBattleDeath, INPCLoot } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import { NPCTarget } from "./movement/NPCTarget";
@@ -36,7 +36,7 @@ export class NPCDeath {
 
       // add loot in NPC dead body container
       if (npc.loots) {
-        await this.addLootToNPCBody(npc, npcBody);
+        await this.addLootToNPCBody(npcBody, npc.loots);
       }
 
       // disable NPC behavior
@@ -80,14 +80,14 @@ export class NPCDeath {
     return npcBody.save();
   }
 
-  private async addLootToNPCBody(npc: INPC, npcBody: IItem): Promise<void> {
+  private async addLootToNPCBody(npcBody: IItem, loots: INPCLoot[]): Promise<void> {
     // get item container associated with npcBody
     const itemContainer = await ItemContainer.findById(npcBody.itemContainer);
     if (!itemContainer) {
       throw new Error(`Error fetching itemContainer for Item with key ${npcBody.key}`);
     }
 
-    for (const loot of npc.loots!) {
+    for (const loot of loots) {
       const rand = Math.round(_.random(0, 100));
       if (rand <= loot.chance) {
         const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
