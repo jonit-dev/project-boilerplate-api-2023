@@ -1,6 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
@@ -88,7 +87,9 @@ export class UnitTestHelper {
 
     await charBody.save();
 
-    return charBody;
+    const item = await Item.findById(charBody._id).populate("itemContainer").exec();
+
+    return item as IItem;
   }
 
   public async createMockItem(extraProps?: Partial<IItem>): Promise<IItem> {
@@ -150,6 +151,34 @@ export class UnitTestHelper {
       const chatLog = new ChatLog(chatLogMock);
       await chatLog.save();
     }
+  }
+
+  public async createEquipment(extraProps?: Partial<IItem>): Promise<IEquipment> {
+    const equipment = new Equipment();
+
+    const itemHead = new Item({
+      ...itemMock,
+      ...extraProps,
+      _id: undefined,
+      defense: 10,
+      attack: 8,
+    });
+
+    const itemNeck = new Item({
+      ...itemMock,
+      ...extraProps,
+      _id: undefined,
+      defense: 4,
+      attack: 5,
+    });
+
+    await itemHead.save();
+    await itemNeck.save();
+
+    equipment.head = itemHead._id;
+    equipment.neck = itemNeck._id;
+
+    return await equipment.save();
   }
 
   public createMockSocketTransmissionZone(x: number, y: number, width: number, height: number): SocketTransmissionZone {

@@ -173,11 +173,11 @@ export class EquipmentEquipNetwork {
     );
   }
 
-  private isItemOnRange(character: ICharacter, item: IItem): boolean {
+  public isItemOnRange(character: ICharacter, item: IItem): boolean {
     return this.movementHelper.isUnderRange(character.x, character.y, item.x!, item.y!, 1);
   }
 
-  private async getItemId(equipItemFromMap: boolean, item: IItem): Promise<string> {
+  public async getItemId(equipItemFromMap: boolean, item: IItem): Promise<string> {
     if (!equipItemFromMap) {
       return item._id;
     }
@@ -185,6 +185,13 @@ export class EquipmentEquipNetwork {
     let newItem = new Item({
       ...item,
     });
+
+    newItem.name = item.name;
+    newItem.weight = item.weight;
+    newItem.textureKey = item.textureKey;
+    newItem.texturePath = item.texturePath;
+    newItem.key = item.key;
+    newItem.description = item.description;
 
     newItem = await newItem.save();
 
@@ -195,7 +202,7 @@ export class EquipmentEquipNetwork {
     await Item.deleteOne({ _id: itemId });
   }
 
-  private async getEquipmentSlots(equipmentId: string): Promise<IEquipementSet> {
+  public async getEquipmentSlots(equipmentId: string): Promise<IEquipementSet> {
     const equipment = await Equipment.findById(equipmentId)
       .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
       .exec();
@@ -226,10 +233,10 @@ export class EquipmentEquipNetwork {
     } as IEquipementSet;
   }
 
-  private async removeItemFromInventory(itemId: string, itemContainer: IItemContainer): Promise<void> {
+  public async removeItemFromInventory(itemId: string, itemContainer: IItemContainer): Promise<void> {
     let index = 0;
     for (let slot in itemContainer.slots) {
-      if (slot === itemId) {
+      if (itemContainer.slots[slot] && itemContainer.slots[slot]._id === itemId) {
         slot = "";
         break;
       }
@@ -240,10 +247,10 @@ export class EquipmentEquipNetwork {
     await itemContainer.save();
   }
 
-  private getAllowedItemTypes(): ItemType[] {
+  public getAllowedItemTypes(): ItemType[] {
     const allowedItemTypes: ItemType[] = [];
 
-    for (const allowedItemType in Object.keys(ItemType)) {
+    for (const allowedItemType of Object.keys(ItemType)) {
       allowedItemTypes.push(ItemType[allowedItemType]);
     }
 
