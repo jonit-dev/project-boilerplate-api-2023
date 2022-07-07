@@ -74,7 +74,7 @@ export class ItemPickup {
     const pickupItem = (await Item.findById(item.itemId)) as unknown as IItem;
 
     if (pickupItem) {
-      const isItemAdded = await this.addItemToInventory(pickupItem, character);
+      const isItemAdded = await this.addItemToInventory(pickupItem, character, item.toContainerId);
       if (!isItemAdded) return false;
 
       // Perform item deletion on map after item added
@@ -94,10 +94,9 @@ export class ItemPickup {
   /**
    * This method will add or stack a item to the character inventory
    */
-  public async addItemToInventory(item: IItem, character: ICharacter): Promise<Boolean> {
+  private async addItemToInventory(item: IItem, character: ICharacter, toContainerId: string): Promise<Boolean> {
     const selectedItem = await Item.findById(item.id);
-    const charInventory = await character.inventory;
-    const characterContainer = (await ItemContainer.findById(charInventory.itemContainer)) as unknown as IItemContainer;
+    const targetContainer = (await ItemContainer.findById(toContainerId)) as unknown as IItemContainer;
 
     if (!selectedItem) {
       console.log("addItemToInventory: Item not found");
@@ -105,23 +104,17 @@ export class ItemPickup {
       return false;
     }
 
-    if (!characterContainer) {
+    if (!targetContainer) {
       console.log("addItemToInventory: Character container not found");
       this.sendGenericErrorMessage(character);
       return false;
     }
 
-    if (!charInventory) {
-      console.log("addItemToInventory: Character inventory not found");
-      this.sendGenericErrorMessage(character);
-      return false;
-    }
-
-    if (characterContainer) {
+    if (targetContainer) {
       let isNewItem = true;
 
       // Item Type is valid to add to a container?
-      const isItemTypeValid = characterContainer.allowedItemTypes?.filter((entry) => {
+      const isItemTypeValid = targetContainer.allowedItemTypes?.filter((entry) => {
         return entry === selectedItem?.type;
       });
       if (!isItemTypeValid) {
@@ -130,9 +123,9 @@ export class ItemPickup {
       }
 
       // Inventory is empty, slot checking not needed
-      if (characterContainer.isEmpty) isNewItem = true;
+      if (targetContainer.isEmpty) isNewItem = true;
 
-      const itemStacked = await this.tryAddingItemToStack(characterContainer, selectedItem);
+      const itemStacked = await this.tryAddingItemToStack(targetContainer, selectedItem);
 
       if (itemStacked) {
         isNewItem = false;
@@ -140,13 +133,13 @@ export class ItemPickup {
 
       // Check's done, need to create new item on char inventory
       if (isNewItem) {
-        const availableSlot = Object.keys(characterContainer.slots).filter(
-          (e) => characterContainer.slots[e] === null
-        )[0];
+        const availableSlot = Object.keys(targetContainer.slots).filter((e) => targetContainer.slots[e] === null)[0];
 
         if (availableSlot) {
-          characterContainer.slots[availableSlot] = selectedItem;
-          await characterContainer.save();
+          targetContainer.slots[availableSlot] = selectedItem;
+
+          await targetContainer.save();
+
           return true;
         } else {
           this.sendCustomErrorMessage(character, "Sorry, your inventory is full.");
@@ -160,6 +153,7 @@ export class ItemPickup {
   }
 
   private async tryAddingItemToStack(characterContainer: IItemContainer, selectedItem: IItem): Promise<boolean> {
+    // loop through all inventory container slots, checking to see if selectedItem can be stackable
     for (const [, item] of Object.entries(characterContainer.slots as Record<string, IItem>)) {
       if (!item) {
         continue;
@@ -167,15 +161,12 @@ export class ItemPickup {
 
       const slotItem = await Item.findById(item.id);
       if (slotItem && selectedItem) {
-        if (
-          slotItem.type === selectedItem.type &&
-          slotItem?.subType === selectedItem?.subType &&
-          slotItem.isStackable
-        ) {
+        if (slotItem.key === selectedItem.key && slotItem.isStackable) {
           if (slotItem.stackQty) {
             // Check if item can be stacked
             if (slotItem.stackQty < slotItem.maxStackSize) {
               slotItem.stackQty++;
+              await slotItem.save();
 
               // All done, let's save and return;
               await characterContainer.save();

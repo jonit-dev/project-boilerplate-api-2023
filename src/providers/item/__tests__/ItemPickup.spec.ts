@@ -42,7 +42,7 @@ describe("ItemPickup.ts", () => {
         x: testCharacter.x,
         y: testCharacter.y,
         scene: testCharacter.scene,
-        toContainerId: inventory.id,
+        toContainerId: inventory.itemContainer as unknown as string,
         ...extraProps,
       },
       testCharacter
@@ -55,6 +55,23 @@ describe("ItemPickup.ts", () => {
 
     expect(itemAdded).toBeTruthy();
   });
+
+  // it("should stack an item, if item isStackable", async () => {
+
+  //   //! TODO: This is not working
+  //   const tryAddingItemToStack = jest.spyOn(itemPickup, "tryAddingItemToStack" as any);
+
+  //   const stackableItem = new Item(stackableItemMock);
+  //   await stackableItem.save();
+
+  //   const firstAdd = await pickupItem({ itemId: stackableItem.id });
+  //   expect(firstAdd).toBeTruthy();
+
+  //   const secondAdd = await pickupItem({ itemId: stackableItem.id });
+  //   expect(secondAdd).toBeTruthy();
+
+  //   expect(tryAddingItemToStack).toHaveBeenCalledTimes(2);
+  // });
 
   describe("Item pickup validation", () => {
     it("should throw an error if container is not accessible", async () => {
@@ -119,13 +136,9 @@ describe("ItemPickup.ts", () => {
     it("should throw an error if the user tries to pickup an item, without an inventory", async () => {
       const charEquip = await Equipment.findOne({ _id: testCharacter.equipment });
 
-      console.log(charEquip);
-
       if (charEquip) {
         charEquip.inventory = undefined;
         await charEquip.save();
-
-        console.log("inventory", await testCharacter.inventory);
 
         const pickup = await pickupItem();
         expect(pickup).toBeFalsy();

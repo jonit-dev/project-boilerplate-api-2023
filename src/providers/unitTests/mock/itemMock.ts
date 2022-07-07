@@ -1,6 +1,6 @@
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IItem, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 
-export const itemMock = {
+export const itemMock: Partial<IItem> = {
   _id: "62b792030c3f470048787736",
   type: ItemType.Weapon,
   subType: ItemSubType.Sword,
@@ -26,5 +26,28 @@ export const itemMock = {
   scene: "Ilya",
   createdAt: "2022-06-25T22:53:55.579Z",
   updatedAt: "2022-06-28T04:42:21.409Z",
-  __v: 0,
+};
+
+export const stackableItemMock: Partial<IItem> = {
+  _id: "62b792030c3f470048787735",
+  type: ItemType.Consumable,
+  subType: ItemSubType.Food,
+  textureAtlas: "items",
+  isUsable: true,
+  isStorable: true,
+  isItemContainer: false,
+  isSolid: false,
+  key: "apple",
+  texturePath: "foods/apple.png",
+  textureKey: "apple",
+  name: "Apple",
+  description: "A red apple.",
+  weight: 0.05,
+  allowedEquipSlotType: [ItemSlotType.Inventory],
+  scene: "Ilya",
+  createdAt: "2022-06-25T22:53:55.579Z",
+  updatedAt: "2022-06-28T04:42:21.409Z",
+  stackQty: 1,
+  maxStackSize: 10,
+  isStackable: true,
 };

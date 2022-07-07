@@ -41,12 +41,12 @@ itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer)
     return 0;
   }
 
-  return Object.values(this.slots).length;
+  // return the qty os this.slots that are not null
+  return Object.values(this.slots).filter((slot) => slot).length;
 });
 
 itemContainerSchema.virtual("isEmpty").get(function (this: IItemContainer) {
-  const items = this.totalItemsQty;
-  return !items;
+  return this.totalItemsQty === 0;
 });
 
 itemContainerSchema.post("save", async function (this: IItemContainer) {
