@@ -60,7 +60,7 @@ export class NPCDeath {
     const npcBody = new Item({
       ...blueprintData, // base body props
       key: `${npc.key}-body`,
-      texturePath: `${npc.textureKey}/death/${npc.textureKey}.png`,
+      texturePath: `${npc.textureKey}/death/0.png`,
       textureKey: npc.textureKey,
       name: `${npc.name}'s body`,
       description: `You see ${npc.name}'s body.`,

@@ -14,7 +14,6 @@ import {
   ICharacterPositionUpdateFromClient,
   ICharacterPositionUpdateFromServer,
   MapLayers,
-  ScenesMetaData,
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
@@ -244,7 +243,7 @@ export class CharacterNetworkUpdate {
     }
 
     const isSolid = await this.movementHelper.isSolid(
-      ScenesMetaData[character.scene].map,
+      character.scene,
       ToGridX(newX),
       ToGridY(newY),
       MapLayers.Character
@@ -316,7 +315,7 @@ export class CharacterNetworkUpdate {
     direction: AnimationDirection
   ): Promise<void> {
     const updatedData = data;
-    const map = ScenesMetaData[character.scene].map;
+    const map = character.scene;
 
     if (isMoving) {
       // if character is moving, update the position

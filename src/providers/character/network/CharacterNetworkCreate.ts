@@ -12,7 +12,6 @@ import {
   CharacterSocketEvents,
   ICharacterCreateFromClient,
   ICharacterCreateFromServer,
-  ScenesMetaData,
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
@@ -59,7 +58,7 @@ export class CharacterNetworkCreate {
         };
         await this.BattleNetworkStopTargeting.stopTargeting(character);
 
-        const map = ScenesMetaData[character.scene].map;
+        const map = character.scene;
         MapLoader.grids.get(map)!.setWalkableAt(ToGridX(character.x), ToGridY(character.y), false);
 
         await character.save();

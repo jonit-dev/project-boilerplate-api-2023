@@ -69,9 +69,13 @@ describe("BattleAttackTarget.spec.ts", () => {
     jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
 
     // @ts-ignore
+    const increaseSkillsOnBattle = jest.spyOn(battleAttackTarget.skillIncrease, "increaseSkillsOnBattle" as any);
+
+    // @ts-ignore
     await battleAttackTarget.hitTarget(testCharacter, testNPC);
 
     expect(testNPC.health).toBeLessThan(testNPC.maxHealth);
+    expect(increaseSkillsOnBattle).toHaveBeenCalled();
   });
 
   it("when battle event is a miss, it should not decrease the target's health", async () => {

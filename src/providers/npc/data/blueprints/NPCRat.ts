@@ -24,4 +24,5 @@ export const npcRat = {
     },
   },
   fleeOnLowHealth: true,
+  experience: 15,
 } as Partial<INPC>;

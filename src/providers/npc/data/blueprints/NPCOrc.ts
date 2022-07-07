@@ -21,4 +21,5 @@ export const npcOrc = {
     },
   },
   fleeOnLowHealth: true,
+  experience: 70,
 } as Partial<INPC>;
