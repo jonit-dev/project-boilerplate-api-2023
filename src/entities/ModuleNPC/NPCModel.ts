@@ -120,7 +120,6 @@ const npcSchema = createLeanSchema(
     dialogText: Type.string(),
     skills: Type.objectId({
       ref: "Skill",
-      required: true,
     }),
     spawnIntervalMin: Type.number({
       required: true,

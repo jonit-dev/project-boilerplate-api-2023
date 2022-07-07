@@ -31,12 +31,17 @@ interface IMockCharacterOptions {
   hasSkills?: boolean;
 }
 
+interface IMockNPCOptions {
+  hasSkills?: boolean;
+}
+
 @provide(UnitTestHelper)
 export class UnitTestHelper {
   private mongoServer: MongoMemoryServer;
 
   public async createMockNPC(
-    extraProps?: Record<string, unknown>,
+    extraProps: Record<string, unknown> | null = null,
+    options: IMockNPCOptions | null = null,
     movementType: NPCMovementType = NPCMovementType.Random
   ): Promise<INPC> {
     const movementTypeMock = {
@@ -46,23 +51,23 @@ export class UnitTestHelper {
       [NPCMovementType.Random]: randomMovementMockNPC,
       [NPCMovementType.Stopped]: stoppedMovementMockNPC,
     };
-
-    const npcSkills = new Skill({
-      ownerType: "NPC",
-    });
-    await npcSkills.save();
-
     const testNPC = new NPC({
       ...movementTypeMock[movementType],
       ...extraProps,
-      skills: npcSkills._id,
       experience: 100,
     });
 
-    await testNPC.save();
+    if (options?.hasSkills) {
+      const npcSkills = new Skill({
+        ownerType: "NPC",
+      });
 
-    npcSkills.owner = testNPC._id;
-    await npcSkills.save();
+      npcSkills.owner = testNPC._id;
+      testNPC.skills = npcSkills._id;
+      await npcSkills.save();
+    }
+
+    await testNPC.save();
 
     return testNPC;
   }

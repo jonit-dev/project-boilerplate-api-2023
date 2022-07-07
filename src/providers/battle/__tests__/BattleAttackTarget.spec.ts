@@ -18,7 +18,7 @@ describe("BattleAttackTarget.spec.ts", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
-    testNPC = await unitTestHelper.createMockNPC();
+    testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasSkills: true,

@@ -33,6 +33,7 @@ describe("NPCMovementMoveAway.ts", () => {
         initialX: FromGridX(28),
         initialY: FromGridY(9),
       },
+      { hasSkills: true },
       NPCMovementType.MoveAway
     );
     await npcTarget.tryToSetTarget(testNPC);
