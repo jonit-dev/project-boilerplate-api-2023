@@ -1,38 +1,30 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IEquipementSet, IItem, ItemSocketEvents, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import {
+  IEquipementSet,
+  IItem,
+  IUIShowMessage,
+  UISocketEvents,
+  IEquipmentRead,
+  EquipmentSocketEvents,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-
-export interface IEquipmentPayload {
-  equipment: IEquipementSet;
-}
-
-export interface IEquipmentRead {
-  equipment: IEquipementSet;
-}
 
 @provide(EquipmentRead)
 export class EquipmentRead {
   constructor(private socketAuth: SocketAuth, private socketMessaging: SocketMessaging) {}
 
   public onRead(channel: SocketChannel): void {
-    this.socketAuth.authCharacterOn(
-      channel,
-      ItemSocketEvents.ContainerRead,
-      async (data: IEquipmentPayload, character) => {
-        await this.onEquipmentRead(data, character);
-      }
-    );
+    this.socketAuth.authCharacterOn(channel, EquipmentSocketEvents.ContainerRead, async (data: any, character) => {
+      await this.onEquipmentRead(character);
+    });
   }
 
-  public async onEquipmentRead(data: IEquipmentRead, character: ICharacter): Promise<void> {
-    const equipmentId = data.equipment?._id;
-    const equipmentSet = await Equipment.findById(equipmentId);
-    const equipmentCharacter = await Equipment.findById(character.equipment);
+  public async onEquipmentRead(character: ICharacter): Promise<void> {
+    const equipmentSet = await Equipment.findById(character.equipment);
 
     if (!equipmentSet) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -44,7 +36,7 @@ export class EquipmentRead {
 
     const equipment = await this.getEquipmentSlots(equipmentSet._id);
 
-    this.socketMessaging.sendEventToUser<IEquipmentRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
+    this.socketMessaging.sendEventToUser<IEquipmentRead>(character.channelId!, EquipmentSocketEvents.ContainerRead, {
       equipment,
     });
   }

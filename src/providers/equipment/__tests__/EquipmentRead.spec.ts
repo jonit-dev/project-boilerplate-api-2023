@@ -37,7 +37,7 @@ describe("EquipmentRead.ts", () => {
       expect(fetchEquipment).toBeNull();
       expect(fetchEquipment).toBeDefined();
 
-      await equipmentSetRead.onEquipmentRead({ equipment: fetchEquipment as unknown as IEquipementSet }, testCharacter);
+      await equipmentSetRead.onEquipmentRead(testCharacter);
 
       // @ts-ignore
       expect(equipmentSetRead.socketMessaging.sendEventToUser).toHaveBeenCalledWith(
@@ -55,9 +55,7 @@ describe("EquipmentRead.ts", () => {
     // @ts-ignore
     jest.spyOn(equipmentSetRead.socketMessaging, "sendEventToUser" as any);
 
-    const equipmentSet = await Equipment.findById(testCharacter.equipment);
-
-    await equipmentSetRead.onEquipmentRead({ equipment: equipmentSet as unknown as IEquipementSet }, testCharacter);
+    await equipmentSetRead.onEquipmentRead(testCharacter);
 
     // @ts-ignore
     expect(equipmentSetRead.socketMessaging.sendEventToUser).toHaveReturnedWith(IEquipementSet);
