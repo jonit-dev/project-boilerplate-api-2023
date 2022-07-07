@@ -82,7 +82,9 @@ export class UnitTestHelper {
 
     await charBody.save();
 
-    return charBody;
+    const item = await Item.findById(charBody._id).populate("itemContainer").exec();
+
+    return item as IItem;
   }
 
   public async createMockItem(extraProps?: Partial<IItem>): Promise<IItem> {

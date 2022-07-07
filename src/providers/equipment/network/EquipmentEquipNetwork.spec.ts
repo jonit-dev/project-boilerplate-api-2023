@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { IItem, ItemType } from "@rpg-engine/shared";
 import { EquipmentEquipNetwork } from "./EquipmentEquipNetwork";
@@ -9,6 +10,7 @@ describe("EquipmentEquipNetwork.spec.ts", () => {
   let equipment: IEquipment;
   let item: IItem;
   let character: ICharacter;
+  let charBody: IItem;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -20,6 +22,7 @@ describe("EquipmentEquipNetwork.spec.ts", () => {
     equipment = await unitTestHelper.createEquipment();
     item = (await unitTestHelper.createMockItem({ x: 10, y: 10 })) as unknown as IItem;
     character = await unitTestHelper.createMockCharacter({ x: 10, y: 20 });
+    charBody = (await unitTestHelper.createMockItemContainer(character)) as unknown as IItem;
   });
 
   it("Returns true if item is on range", () => {
@@ -62,6 +65,17 @@ describe("EquipmentEquipNetwork.spec.ts", () => {
     const allowedItemTypes = await equipmentEquipNetwork.getAllowedItemTypes();
 
     expect(allowedItemTypes).toEqual(Object.keys(ItemType));
+  });
+
+  it("Should remove item from item container", async () => {
+    const itemContainer = charBody!.itemContainer as unknown as IItemContainer;
+    itemContainer.slots[2] = item;
+    itemContainer.slots[3] = item;
+
+    await equipmentEquipNetwork.removeItemFromInventory(item._id, itemContainer);
+
+    expect(itemContainer.slots[2]).toBeNull();
+    expect(itemContainer.slots[3]).not.toBeNull();
   });
 
   afterAll(async () => {

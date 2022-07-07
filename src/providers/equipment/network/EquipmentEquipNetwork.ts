@@ -233,10 +233,10 @@ export class EquipmentEquipNetwork {
     } as IEquipementSet;
   }
 
-  private async removeItemFromInventory(itemId: string, itemContainer: IItemContainer): Promise<void> {
+  public async removeItemFromInventory(itemId: string, itemContainer: IItemContainer): Promise<void> {
     let index = 0;
     for (let slot in itemContainer.slots) {
-      if (slot === itemId) {
+      if (itemContainer.slots[slot] && itemContainer.slots[slot]._id === itemId) {
         slot = "";
         break;
       }
