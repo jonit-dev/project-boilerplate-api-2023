@@ -18,10 +18,15 @@ describe("NPCTarget.ts", () => {
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
-    testNPC = await unitTestHelper.createMockNPC({
-      x: FromGridX(0),
-      y: FromGridY(0),
-    });
+    testNPC = await unitTestHelper.createMockNPC(
+      {
+        x: FromGridX(0),
+        y: FromGridY(0),
+      },
+      {
+        hasSkills: true,
+      }
+    );
   });
 
   it("should properly get target direction", async () => {

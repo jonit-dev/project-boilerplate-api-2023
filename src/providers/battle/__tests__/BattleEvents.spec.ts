@@ -22,7 +22,7 @@ describe("BattleEvents.spec.ts", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
-    testNPC = await unitTestHelper.createMockNPC();
+    testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
     await testNPC.populate("skills").execPopulate();
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true, hasEquipment: true });
     await testCharacter.populate("skills").execPopulate();

@@ -33,6 +33,7 @@ describe("NPCMovementMoveTowards.ts", () => {
         initialX: FromGridX(14),
         initialY: FromGridY(16),
       },
+      { hasSkills: true },
       NPCMovementType.MoveTowards
     );
   });
