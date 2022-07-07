@@ -41,7 +41,7 @@ itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer)
     return 0;
   }
 
-  return Object.values(this.slots).length;
+  return Object.values(this.slots).filter((x) => x !== null).length;
 });
 
 itemContainerSchema.virtual("isEmpty").get(function (this: IItemContainer) {

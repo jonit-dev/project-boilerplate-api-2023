@@ -132,11 +132,11 @@ export class EquipmentUnequipNetwork {
     );
   }
 
-  private unEquipItemFromEquipmentSlot(slots: IItem[], item: IItem, equipment: IEquipment, targetSlot: string): IItem {
+  public unEquipItemFromEquipmentSlot(slots: IItem[], item: IItem, equipment: IEquipment, targetSlot: string): IItem {
     let itemSlot: IItem;
-    for (const slot of slots) {
-      if (slot.tiledId === item.tiledId) {
-        itemSlot = slot;
+    for (const slot in slots) {
+      if (slots[slot] && slots[slot].tiledId === item.tiledId) {
+        itemSlot = slots[slot];
         equipment[targetSlot.toLowerCase()] = undefined;
         break;
       }
@@ -144,7 +144,7 @@ export class EquipmentUnequipNetwork {
     return itemSlot!;
   }
 
-  private async manageItemContainerSlots(
+  public async manageItemContainerSlots(
     itemAlreadyInSlot: boolean,
     character: ICharacter,
     itemContainer: IItemContainer,
@@ -163,7 +163,12 @@ export class EquipmentUnequipNetwork {
       }
     } else {
       if (itemContainer.totalItemsQty < itemContainer.slotQty) {
-        itemContainer.slots.push(item);
+        for (const index in itemContainer.slots) {
+          if (itemContainer.slots[index] === null) {
+            itemContainer.slots[index] = item;
+            break;
+          }
+        }
       } else {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
           message: "There aren't slots available",
@@ -173,10 +178,16 @@ export class EquipmentUnequipNetwork {
       }
     }
 
-    await itemContainer.save();
+    const itemContainerModel = await ItemContainer.findById(itemContainer._id).populate("slots").exec();
+
+    if (itemContainerModel) {
+      itemContainerModel.slots = itemContainer.slots;
+
+      await itemContainerModel!.save();
+    }
   }
 
-  private async getEquipmentSlots(equipmentId: string): Promise<IEquipementSet> {
+  public async getEquipmentSlots(equipmentId: string): Promise<IEquipementSet> {
     const equipment = await Equipment.findById(equipmentId)
       .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
       .exec();
@@ -207,10 +218,10 @@ export class EquipmentUnequipNetwork {
     } as IEquipementSet;
   }
 
-  private getAllowedItemTypes(): ItemType[] {
+  public getAllowedItemTypes(): ItemType[] {
     const allowedItemTypes: ItemType[] = [];
 
-    for (const allowedItemType in Object.keys(ItemType)) {
+    for (const allowedItemType of Object.keys(ItemType)) {
       allowedItemTypes.push(ItemType[allowedItemType]);
     }
 
