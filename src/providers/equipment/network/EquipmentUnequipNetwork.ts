@@ -1,8 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
-import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -22,11 +21,7 @@ import { Types } from "mongoose";
 
 @provide(EquipmentUnequipNetwork)
 export class EquipmentUnequipNetwork {
-  constructor(
-    private movementHelper: MovementHelper,
-    private socketAuth: SocketAuth,
-    private socketMessaging: SocketMessaging
-  ) {}
+  constructor(private socketAuth: SocketAuth, private socketMessaging: SocketMessaging) {}
 
   public onItemUnequip(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
@@ -78,7 +73,6 @@ export class EquipmentUnequipNetwork {
         const slots: IItem[] = itemContainer.slots;
 
         let itemAlreadyInSlot = false;
-        let itemSlot: IItem;
 
         const equipment = await Equipment.findById(character.equipment);
 
@@ -90,43 +84,21 @@ export class EquipmentUnequipNetwork {
           return;
         }
 
-        equipment[targetSlot.toLowerCase()] = undefined;
+        const itemSlot = this.unEquipItemFromEquipmentSlot(
+          slots,
+          item,
+          equipment as IEquipment,
+          targetSlot.toLowerCase()
+        );
+
+        if (itemSlot) {
+          itemAlreadyInSlot = true;
+        }
 
         equipment.inventory = new ObjectId(item._id) as unknown as Types.ObjectId;
         await equipment.save();
 
-        for (const slot of slots) {
-          if (slot.tiledId === item.tiledId) {
-            itemAlreadyInSlot = true;
-            itemSlot = slot;
-            equipment[targetSlot.toLowerCase()] = undefined;
-            break;
-          }
-        }
-
-        if (itemAlreadyInSlot) {
-          if (itemSlot!.stackQty! < itemSlot!.maxStackSize) {
-            itemSlot!.stackQty!++;
-          } else {
-            this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-              message: "There aren't slots available",
-              type: "error",
-            });
-            return;
-          }
-        } else {
-          if (itemContainer.totalItemsQty < itemContainer.slotQty) {
-            itemContainer.slots.push(item);
-          } else {
-            this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-              message: "There aren't slots available",
-              type: "error",
-            });
-            return;
-          }
-        }
-
-        await itemContainer.save();
+        this.manageItemContainerSlots(itemAlreadyInSlot, character, itemContainer, itemSlot!, item);
 
         const equipmentSlots = await this.getEquipmentSlots(equipment._id);
 
@@ -158,6 +130,50 @@ export class EquipmentUnequipNetwork {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       equipmentAndInventoryUpdate
     );
+  }
+
+  private unEquipItemFromEquipmentSlot(slots: IItem[], item: IItem, equipment: IEquipment, targetSlot: string): IItem {
+    let itemSlot: IItem;
+    for (const slot of slots) {
+      if (slot.tiledId === item.tiledId) {
+        itemSlot = slot;
+        equipment[targetSlot.toLowerCase()] = undefined;
+        break;
+      }
+    }
+    return itemSlot!;
+  }
+
+  private async manageItemContainerSlots(
+    itemAlreadyInSlot: boolean,
+    character: ICharacter,
+    itemContainer: IItemContainer,
+    itemSlot: IItem,
+    item: IItem
+  ): Promise<void> {
+    if (itemAlreadyInSlot) {
+      if (itemSlot!.stackQty! < itemSlot!.maxStackSize) {
+        itemSlot!.stackQty!++;
+      } else {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "There aren't slots available",
+          type: "error",
+        });
+        return;
+      }
+    } else {
+      if (itemContainer.totalItemsQty < itemContainer.slotQty) {
+        itemContainer.slots.push(item);
+      } else {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "There aren't slots available",
+          type: "error",
+        });
+        return;
+      }
+    }
+
+    await itemContainer.save();
   }
 
   private async getEquipmentSlots(equipmentId: string): Promise<IEquipementSet> {
