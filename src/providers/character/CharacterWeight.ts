@@ -17,9 +17,9 @@ export class CharacterWeight {
   }
 
   public async getWeight(character: ICharacter): Promise<number> {
-    const equipment = await Equipment.findById(character.equipment).lean();
+    const equipment = await Equipment.findById(character.equipment);
     const inventory = await character.inventory;
-    const itemContainer = await ItemContainer.findById(inventory?.itemContainer).lean();
+    const itemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     let totalWeight = 0;
     if (equipment) {
