@@ -133,20 +133,19 @@ export class ItemPickup {
 
       // Check's done, need to create new item on char inventory
       if (isNewItem) {
-        const availableSlot = Object.keys(targetContainer.slots).filter((e) => targetContainer.slots[e] === null)[0];
+        const firstAvailableSlotIndex = targetContainer.firstAvailableSlotId;
 
-        if (availableSlot) {
-          targetContainer.slots[availableSlot] = selectedItem;
+        if (firstAvailableSlotIndex === null) {
+          this.sendCustomErrorMessage(character, "Sorry, your inventory is full.");
+          return false;
+        }
 
-          console.log(`Saving item ${selectedItem.id} to container ${targetContainer.name}`);
+        if (firstAvailableSlotIndex >= 0) {
+          targetContainer.slots[firstAvailableSlotIndex] = selectedItem;
 
           await targetContainer.save();
 
           return true;
-        } else {
-          this.sendCustomErrorMessage(character, "Sorry, your inventory is full.");
-
-          return false;
         }
       }
     }
@@ -156,6 +155,7 @@ export class ItemPickup {
 
   private async tryAddingItemToStack(characterContainer: IItemContainer, selectedItem: IItem): Promise<boolean> {
     // loop through all inventory container slots, checking to see if selectedItem can be stackable
+
     for (const [, item] of Object.entries(characterContainer.slots as Record<string, IItem>)) {
       if (!item) {
         continue;

@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { stackableItemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { Types } from "mongoose";
 import { ItemPickup } from "../ItemPickup";
@@ -13,6 +15,7 @@ describe("ItemPickup.ts", () => {
   let testItem: IItem;
   let inventory: IItem;
   let sendCustomErrorMessage: jest.SpyInstance;
+  let inventoryItemContainerId: string;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -26,6 +29,7 @@ describe("ItemPickup.ts", () => {
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     testItem = await unitTestHelper.createMockItem();
     inventory = await testCharacter.inventory;
+    inventoryItemContainerId = inventory.itemContainer as unknown as string;
 
     testCharacter.x = FromGridX(1);
     testCharacter.y = FromGridY(0);
@@ -35,14 +39,14 @@ describe("ItemPickup.ts", () => {
     sendCustomErrorMessage = jest.spyOn(itemPickup, "sendCustomErrorMessage" as any);
   });
 
-  const pickupItem = async (extraProps?: Record<string, unknown>) => {
+  const pickupItem = async (toContainerId: string, extraProps?: Record<string, unknown>) => {
     const itemAdded = await itemPickup.performItemPickup(
       {
         itemId: testItem.id,
         x: testCharacter.x,
         y: testCharacter.y,
         scene: testCharacter.scene,
-        toContainerId: inventory.itemContainer as unknown as string,
+        toContainerId,
         ...extraProps,
       },
       testCharacter
@@ -51,31 +55,47 @@ describe("ItemPickup.ts", () => {
   };
 
   it("should add item to character inventory", async () => {
-    const itemAdded = await pickupItem();
+    const itemAdded = await pickupItem(inventoryItemContainerId);
 
     expect(itemAdded).toBeTruthy();
   });
 
-  // it("should stack an item, if item isStackable", async () => {
+  it("shouldn't add more items, if your inventory is full", async () => {
+    const inventoryContainer = new ItemContainer({
+      id: inventoryItemContainerId,
+      parentItem: inventory.id,
+    });
+    inventoryContainer.slotQty = 1;
+    inventoryContainer.slots = {
+      0: testItem,
+    };
+    await inventoryContainer.save();
 
-  //   //! TODO: This is not working
-  //   const tryAddingItemToStack = jest.spyOn(itemPickup, "tryAddingItemToStack" as any);
+    const pickup = await pickupItem(inventoryContainer.id);
+    expect(pickup).toBeFalsy();
 
-  //   const stackableItem = new Item(stackableItemMock);
-  //   await stackableItem.save();
+    expect(sendCustomErrorMessage).toHaveBeenCalled();
+    expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, your inventory is full.");
+  });
 
-  //   const firstAdd = await pickupItem({ itemId: stackableItem.id });
-  //   expect(firstAdd).toBeTruthy();
+  it("should stack an item, if item isStackable", async () => {
+    const tryAddingItemToStack = jest.spyOn(itemPickup, "tryAddingItemToStack" as any);
 
-  //   const secondAdd = await pickupItem({ itemId: stackableItem.id });
-  //   expect(secondAdd).toBeTruthy();
+    const stackableItem = new Item(stackableItemMock);
+    await stackableItem.save();
 
-  //   expect(tryAddingItemToStack).toHaveBeenCalledTimes(2);
-  // });
+    const firstAdd = await pickupItem(inventoryItemContainerId, { itemId: stackableItem.id });
+    expect(firstAdd).toBeTruthy();
+
+    const secondAdd = await pickupItem(inventoryItemContainerId, { itemId: stackableItem.id });
+    expect(secondAdd).toBeTruthy();
+
+    expect(tryAddingItemToStack).toHaveBeenCalledTimes(2);
+  });
 
   describe("Item pickup validation", () => {
     it("should throw an error if container is not accessible", async () => {
-      const pickup = await pickupItem({
+      const pickup = await pickupItem(inventoryItemContainerId, {
         itemId: "62b792030c3f470048781135", // inexistent item
       });
       expect(pickup).toBeFalsy();
@@ -84,7 +104,7 @@ describe("ItemPickup.ts", () => {
     });
 
     it("should throw an error if item is too far away", async () => {
-      const pickup = await pickupItem({
+      const pickup = await pickupItem(inventoryItemContainerId, {
         x: FromGridX(999),
         y: FromGridY(999),
       });
@@ -102,7 +122,7 @@ describe("ItemPickup.ts", () => {
       testItem.y = testCharacter.y;
       await testItem.save();
 
-      const pickup = await pickupItem();
+      const pickup = await pickupItem(inventoryItemContainerId);
       expect(pickup).toBeFalsy();
 
       expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not yours.");
@@ -112,7 +132,7 @@ describe("ItemPickup.ts", () => {
       testCharacter.isBanned = true;
       await testCharacter.save();
 
-      const pickup = await pickupItem();
+      const pickup = await pickupItem(inventoryItemContainerId);
       expect(pickup).toBeFalsy();
 
       expect(sendCustomErrorMessage).toHaveBeenCalledWith(
@@ -124,7 +144,7 @@ describe("ItemPickup.ts", () => {
       testCharacter.isOnline = false;
       await testCharacter.save();
 
-      const pickup2 = await pickupItem();
+      const pickup2 = await pickupItem(inventoryItemContainerId);
       expect(pickup2).toBeFalsy();
 
       expect(sendCustomErrorMessage).toHaveBeenCalledWith(
@@ -140,7 +160,7 @@ describe("ItemPickup.ts", () => {
         charEquip.inventory = undefined;
         await charEquip.save();
 
-        const pickup = await pickupItem();
+        const pickup = await pickupItem(inventoryItemContainerId);
         expect(pickup).toBeFalsy();
 
         expect(sendCustomErrorMessage).toHaveBeenCalledWith(
