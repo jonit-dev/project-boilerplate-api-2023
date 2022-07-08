@@ -78,19 +78,56 @@ describe("ItemPickup.ts", () => {
     expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, your inventory is full.");
   });
 
-  it("should stack an item, if item isStackable", async () => {
-    const tryAddingItemToStack = jest.spyOn(itemPickup, "tryAddingItemToStack" as any);
+  it("should not stack an item, if its not stackable", async () => {
+    const nonStackContainer = new ItemContainer({
+      id: inventoryItemContainerId,
+      parentItem: inventory.id,
+      slots: {
+        0: null,
+        1: null,
+      },
+      slotQty: 2,
+    });
+    await nonStackContainer.save();
 
+    // remember, we already added a stackable item above!
+    const secondAdd = await pickupItem(nonStackContainer.id);
+    const thirdAdd = await pickupItem(nonStackContainer.id);
+
+    expect(secondAdd).toBeTruthy();
+    expect(thirdAdd).toBeTruthy();
+
+    const updatedContainer = await ItemContainer.findById(nonStackContainer.id);
+
+    expect(updatedContainer?.totalItemsQty).toBe(2);
+  });
+
+  it("should stack an item, if item isStackable", async () => {
     const stackableItem = new Item(stackableItemMock);
     await stackableItem.save();
 
-    const firstAdd = await pickupItem(inventoryItemContainerId, { itemId: stackableItem.id });
-    expect(firstAdd).toBeTruthy();
+    const stackContainer = new ItemContainer({
+      id: inventoryItemContainerId,
+      parentItem: inventory.id,
+      slots: {
+        0: stackableItem,
+      },
+      slotQty: 1,
+    });
 
-    const secondAdd = await pickupItem(inventoryItemContainerId, { itemId: stackableItem.id });
+    await stackContainer.save();
+
+    // remember, we already added a stackable item above!
+    const secondAdd = await pickupItem(stackContainer.id, { itemId: stackableItem.id });
+    const thirdAdd = await pickupItem(stackContainer.id, { itemId: stackableItem.id });
+
     expect(secondAdd).toBeTruthy();
+    expect(thirdAdd).toBeTruthy();
 
-    expect(tryAddingItemToStack).toHaveBeenCalledTimes(2);
+    const updatedStackContainer = await ItemContainer.findById(stackContainer.id);
+
+    expect(updatedStackContainer?.slots[0].stackQty).toBe(3);
+    expect(updatedStackContainer?.slots[0].maxStackSize).toBe(10);
   });
 
   describe("Item pickup validation", () => {

@@ -122,6 +122,8 @@ itemSchema.post("save", async function (this: IItem) {
       owner: this.owner,
     });
     await newContainer.save();
+
+    this.itemContainer = newContainer._id;
   }
 
   await warnAboutItemChanges(this, "changes");
