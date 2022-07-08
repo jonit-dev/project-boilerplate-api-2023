@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -19,7 +20,8 @@ export class ItemPickup {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private characterWeight: CharacterWeight
   ) {}
 
   public async performItemPickup(itemPickup: IItemPickup, character: ICharacter): Promise<Boolean> {
