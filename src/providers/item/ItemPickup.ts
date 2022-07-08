@@ -138,6 +138,8 @@ export class ItemPickup {
         if (availableSlot) {
           targetContainer.slots[availableSlot] = selectedItem;
 
+          console.log(`Saving item ${selectedItem.id} to container ${targetContainer.name}`);
+
           await targetContainer.save();
 
           return true;

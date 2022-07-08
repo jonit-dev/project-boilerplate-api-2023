@@ -1,6 +1,6 @@
 import { ItemType, TypeHelper } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
-import { Item } from "./ItemModel";
+import { IItem, Item } from "./ItemModel";
 
 const itemContainerSchema = createSchema(
   {
@@ -33,7 +33,9 @@ itemContainerSchema.virtual("itemIds").get(function (this: IItemContainer) {
     return [];
   }
 
-  return Object.values(this.slots);
+  return Object.values(this.slots)
+    .filter((x) => x !== null)
+    .map((item: IItem) => item.id);
 });
 
 itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer) {
