@@ -18,6 +18,7 @@ describe("CharacterView.ts", () => {
   });
 
   beforeEach(async () => {
+    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter({
       x: FromGridX(0),
       y: FromGridY(0),
@@ -100,12 +101,6 @@ describe("CharacterView.ts", () => {
     expect(charactersAround.find((c) => c.id === char3.id)).toBeTruthy();
 
     expect(charactersAround.find((c) => c.id === char4.id)).toBeFalsy();
-  });
-
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
-    testCharacter = await unitTestHelper.createMockCharacter();
   });
 
   afterAll(async () => {
