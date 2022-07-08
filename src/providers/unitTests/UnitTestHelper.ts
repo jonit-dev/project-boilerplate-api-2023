@@ -140,7 +140,7 @@ export class UnitTestHelper {
   public async addInventoryToCharacter(character: ICharacter): Promise<IEquipment> {
     const characterInventory = container.get<CharacterInventory>(CharacterInventory);
 
-    const equipment = await characterInventory.createEquipmentWithInventory();
+    const equipment = await characterInventory.createEquipmentWithInventory(character);
 
     return equipment;
   }

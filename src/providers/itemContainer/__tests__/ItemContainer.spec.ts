@@ -73,6 +73,19 @@ describe("ItemContainer.ts", () => {
     expect(testContainer.emptySlotsQty).toBe(19);
   });
 
+  it("should properly get the first available slot content", () => {
+    expect(testContainer.firstAvailableSlot).toBeNull();
+  });
+
+  it("should properly get the first available slot ID", async () => {
+    expect(testContainer.firstAvailableSlotId).toBe(0);
+
+    testContainer.slots[0] = testItem;
+    await testContainer.save();
+
+    expect(testContainer.firstAvailableSlotId).toBe(1);
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });

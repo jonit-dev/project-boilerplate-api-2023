@@ -8,19 +8,21 @@ import { provide } from "inversify-binding-decorators";
 @provide(CharacterInventory)
 export class CharacterInventory {
   public async addEquipmentToCharacter(character: ICharacter): Promise<void> {
-    const equipment = await this.createEquipmentWithInventory();
+    const equipment = await this.createEquipmentWithInventory(character);
 
     character.equipment = equipment._id;
     await character.save();
   }
 
-  public async createEquipmentWithInventory(): Promise<IEquipment> {
+  public async createEquipmentWithInventory(character: ICharacter): Promise<IEquipment> {
     const equipment = new Equipment();
+    equipment.owner = character._id;
 
     const blueprintData = itemsBlueprintIndex[ContainersBlueprint.Backpack];
 
     const backpack = new Item({
       ...blueprintData,
+      owner: equipment.owner,
     });
     await backpack.save();
 
