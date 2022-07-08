@@ -7,19 +7,11 @@ import { FromGridX, FromGridY } from "@rpg-engine/shared";
 describe("ItemContainer.ts", () => {
   let testCharacter: ICharacter;
   let testItem: IItem;
-  let inventoryContainer: IItemContainer;
+  let testContainer: IItemContainer;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
   });
-
-  const getInventoryContainer = async (): Promise<IItemContainer> => {
-    const inventory = await testCharacter.inventory;
-    const itemContainer = await ItemContainer.findOne({
-      parentItem: inventory.id,
-    });
-    return itemContainer as unknown as IItemContainer;
-  };
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
@@ -34,37 +26,51 @@ describe("ItemContainer.ts", () => {
     await testCharacter.save();
     await testItem.save();
 
-    inventoryContainer = await getInventoryContainer();
+    const inventory = await testCharacter.inventory;
+
+    testContainer = new ItemContainer({
+      parentItem: inventory.id,
+      slotQty: 20,
+    });
+    await testContainer.save();
   });
 
   it("should properly return the itemContainer totalItemsQty", async () => {
-    expect(inventoryContainer.totalItemsQty).toBe(0);
+    expect(testContainer.totalItemsQty).toBe(0);
 
     // add new item to inventoryContainer
 
-    inventoryContainer.slots[0] = testItem;
-    await inventoryContainer.save();
+    testContainer.slots[0] = testItem;
+    await testContainer.save();
 
-    expect(inventoryContainer.totalItemsQty).toBe(1);
+    expect(testContainer.totalItemsQty).toBe(1);
   });
 
   it("should properly tell if a container is empty or not", async () => {
-    expect(inventoryContainer.isEmpty).toBe(true);
+    expect(testContainer.isEmpty).toBe(true);
 
-    inventoryContainer.slots[0] = testItem;
-    await inventoryContainer.save();
+    testContainer.slots[0] = testItem;
+    await testContainer.save();
 
-    expect(inventoryContainer.isEmpty).toBe(false);
-    expect(inventoryContainer.totalItemsQty).toBe(1);
+    expect(testContainer.isEmpty).toBe(false);
+    expect(testContainer.totalItemsQty).toBe(1);
   });
 
   it("should return all itemIds stored properly", async () => {
-    inventoryContainer.slots[0] = testItem;
-    await inventoryContainer.save();
+    testContainer.slots[0] = testItem;
+    await testContainer.save();
 
-    const itemIds = await inventoryContainer.itemIds;
+    const itemIds = await testContainer.itemIds;
     expect(itemIds.length).toBe(1);
     expect(itemIds[0]).toBe(testItem.id);
+  });
+
+  it("should properly generate the slots, after its created", async () => {
+    expect(testContainer.emptySlotsQty).toBe(20);
+
+    testContainer.slots[0] = testItem;
+    await testContainer.save();
+    expect(testContainer.emptySlotsQty).toBe(19);
   });
 
   afterAll(async () => {
