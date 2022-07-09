@@ -3,10 +3,10 @@ import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { IItem, ItemType } from "@rpg-engine/shared";
-import { EquipmentEquipNetwork } from "../network/EquipmentEquipNetwork";
+import { EquipmentEquip } from "../EquipmentEquip";
 
 describe("EquipmentEquipNetwork.spec.ts", () => {
-  let equipmentEquipNetwork: EquipmentEquipNetwork;
+  let equipmentEquip: EquipmentEquip;
   let equipment: IEquipment;
   let item: IItem;
   let character: ICharacter;
@@ -14,7 +14,7 @@ describe("EquipmentEquipNetwork.spec.ts", () => {
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
-    equipmentEquipNetwork = container.get<EquipmentEquipNetwork>(EquipmentEquipNetwork);
+    equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
   });
 
   beforeEach(async () => {
@@ -26,30 +26,30 @@ describe("EquipmentEquipNetwork.spec.ts", () => {
   });
 
   it("Returns true if item is on range", () => {
-    const result = equipmentEquipNetwork.isItemOnRange(character, item);
+    const result = equipmentEquip.isItemOnRange(character, item);
 
     expect(result).toBe(true);
   });
 
   it("Returns false if item is out of range", () => {
     character.x = 200;
-    const result = equipmentEquipNetwork.isItemOnRange(character, item);
+    const result = equipmentEquip.isItemOnRange(character, item);
 
     expect(result).toBe(false);
   });
 
   it("Returns the same item id if equip item from inventory", async () => {
-    const result = await equipmentEquipNetwork.getItemId(false, item);
+    const result = await equipmentEquip.getItemId(false, item);
     expect(result).toBe(item._id);
   });
 
   it("Returns new item id if equip item from map", async () => {
-    const result = await equipmentEquipNetwork.getItemId(true, item);
+    const result = await equipmentEquip.getItemId(true, item);
     expect(result).not.toBe(item._id);
   });
 
   it("Should get the equipment slots", async () => {
-    const result = await equipmentEquipNetwork.getEquipmentSlots(equipment._id);
+    const result = await equipmentEquip.getEquipmentSlots(equipment._id);
 
     const itemHead = result.head as IItem;
     const itemNeck = result.neck as IItem;
@@ -62,7 +62,7 @@ describe("EquipmentEquipNetwork.spec.ts", () => {
   });
 
   it("Should get allowed item types", async () => {
-    const allowedItemTypes = await equipmentEquipNetwork.getAllowedItemTypes();
+    const allowedItemTypes = await equipmentEquip.getAllowedItemTypes();
 
     expect(allowedItemTypes).toEqual(Object.keys(ItemType));
   });
@@ -72,7 +72,7 @@ describe("EquipmentEquipNetwork.spec.ts", () => {
     itemContainer.slots[2] = item;
     itemContainer.slots[3] = item;
 
-    await equipmentEquipNetwork.removeItemFromInventory(item._id, itemContainer);
+    await equipmentEquip.removeItemFromInventory(item._id, itemContainer);
 
     expect(itemContainer.slots[2]).toBeNull();
     expect(itemContainer.slots[3]).not.toBeNull();
