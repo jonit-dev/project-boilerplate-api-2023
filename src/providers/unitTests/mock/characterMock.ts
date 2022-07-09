@@ -11,6 +11,8 @@ export const characterMock = {
   mana: 100,
   x: 304,
   y: 112,
+  weight: 8.5,
+  maxWeight: 15,
   direction: "left",
   class: "None",
   gender: "Male",

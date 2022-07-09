@@ -83,11 +83,19 @@ const characterSchema = createLeanSchema(
     }),
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),
-    speed: Type.number({
+    baseSpeed: Type.number({
       default: 2.5,
       required: true,
     }),
-    movementIntervalMs: Type.number({
+    weight: Type.number({
+      default: 8.5,
+      required: true,
+    }),
+    maxWeight: Type.number({
+      default: 15,
+      required: true,
+    }),
+    baseMovementIntervalMs: Type.number({
       default: 150,
       required: true,
     }),
@@ -134,10 +142,56 @@ const characterSchema = createLeanSchema(
       isAlive: boolean;
       type: string;
       inventory: Promise<IItem>;
+      speed: number;
+      movementIntervalMs: number;
     }),
   },
-  { timestamps: { createdAt: true, updatedAt: true } }
+  {
+    timestamps: { createdAt: true, updatedAt: true },
+    toObject: { virtuals: true, getters: true },
+    toJSON: { virtuals: true, getters: true },
+  }
 );
+
+characterSchema.virtual("movementIntervalMs").get(function (this: ICharacter) {
+  const ratio = this.weight / this.maxWeight;
+
+  if (ratio <= 1) {
+    return this.baseMovementIntervalMs;
+  }
+
+  if (ratio > 1 && ratio <= 2) {
+    return this.baseMovementIntervalMs * 0.8;
+  }
+
+  if (ratio > 2 && ratio <= 4) {
+    return this.baseMovementIntervalMs * 0.6;
+  }
+
+  if (ratio > 4) {
+    return 0;
+  }
+});
+
+characterSchema.virtual("speed").get(function (this: ICharacter) {
+  const ratio = this.weight / this.maxWeight;
+
+  if (ratio <= 1) {
+    return this.baseSpeed;
+  }
+
+  if (ratio > 1 && ratio <= 2) {
+    return this.baseSpeed * 0.8;
+  }
+
+  if (ratio > 2 && ratio <= 4) {
+    return this.baseSpeed * 0.6;
+  }
+
+  if (ratio > 4) {
+    return 0;
+  }
+});
 
 characterSchema.virtual("isAlive").get(function (this: ICharacter) {
   return this.health > 0;

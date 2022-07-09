@@ -37,6 +37,9 @@ export class ItemPickup {
       const isItemAdded = await this.addItemToInventory(pickupItem, character, itemPickup.toContainerId);
       if (!isItemAdded) return false;
 
+      // whenever a new item is added, we need to update the character weight
+      await this.characterWeight.updateCharacterWeight(character);
+
       // Perform item deletion on map after item added
       this.socketMessaging.sendEventToUser<IViewDestroyElementPayload>(character.channelId!, ViewSocketEvents.Destroy, {
         id: pickupItem.id,
@@ -174,6 +177,16 @@ export class ItemPickup {
     const item = await Item.findById(itemPickup.itemId);
 
     const inventory = await character.inventory;
+
+    const weight = await this.characterWeight.getWeight(character);
+    const maxWeight = await this.characterWeight.getMaxWeight(character);
+
+    const ratio = weight / maxWeight;
+
+    if (ratio > 4) {
+      this.sendCustomErrorMessage(character, "Sorry, you are already carrying too much weight!");
+      return false;
+    }
 
     if (!item) {
       this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");

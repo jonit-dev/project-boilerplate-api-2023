@@ -158,7 +158,7 @@ export class CRUD {
 
       if (isLean && !populateKeys) {
         // we cannot use .lean() if we're going to populate later, because to do so we need a mongoose Document, not a plain obj.
-        records.lean();
+        records.lean({ virtuals: true });
       }
 
       const results = await records.exec();

@@ -3,6 +3,7 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ArmorsBlueprint, ContainersBlueprint, DaggersBluePrint } from "@providers/item/data/types/blueprintTypes";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
@@ -18,7 +19,7 @@ interface IInitialItems {
 }
 @provide(CharacterRepository)
 export class CharacterRepository extends CRUD {
-  constructor(private analyticsHelper: AnalyticsHelper) {
+  constructor(private analyticsHelper: AnalyticsHelper, private characterWeight: CharacterWeight) {
     super(analyticsHelper);
   }
 
@@ -45,6 +46,13 @@ export class CharacterRepository extends CRUD {
       null,
       ["name"]
     );
+
+    const weight = await this.characterWeight.getWeight(createdCharacter);
+    const maxWeight = await this.characterWeight.getMaxWeight(createdCharacter);
+
+    createdCharacter.weight = weight;
+    createdCharacter.maxWeight = maxWeight;
+
     await createdCharacter.save();
 
     skills.owner = createdCharacter._id;

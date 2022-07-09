@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
@@ -9,6 +9,23 @@ import { Types } from "mongoose";
 
 @provide(CharacterWeight)
 export class CharacterWeight {
+  public async updateCharacterWeight(character: ICharacter): Promise<void> {
+    const weight = await this.getWeight(character);
+    const maxWeight = await this.getMaxWeight(character);
+
+    await Character.updateOne(
+      {
+        _id: character._id,
+      },
+      {
+        $set: {
+          weight,
+          maxWeight,
+        },
+      }
+    );
+  }
+
   public async getMaxWeight(character: ICharacter): Promise<number> {
     const skill = await Skill.findById(character.skills).lean();
     const maxWeight = skill?.strength.level * 15;
