@@ -3,7 +3,7 @@ import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { IItem, ItemType } from "@rpg-engine/shared";
-import { EquipmentEquipNetwork } from "./EquipmentEquipNetwork";
+import { EquipmentEquipNetwork } from "../network/EquipmentEquipNetwork";
 
 describe("EquipmentEquipNetwork.spec.ts", () => {
   let equipmentEquipNetwork: EquipmentEquipNetwork;

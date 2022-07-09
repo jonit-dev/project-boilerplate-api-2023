@@ -11,6 +11,7 @@ import {
   IEquipItemPayload,
   IEquipmentAndInventoryUpdatePayload,
   IItem,
+  ItemSlotType,
   ItemSocketEvents,
   ItemType,
   IUIShowMessage,
@@ -33,98 +34,26 @@ export class EquipmentEquipNetwork {
       async (data: IEquipItemPayload, character: ICharacter) => {
         const itemId = data.itemId;
         const targetSlot = data.targetSlot;
-        const item = await Item.findById(itemId);
-        let equipItemFromMap = false;
+        const item = (await Item.findById(itemId)) as unknown as IItem;
+        const equipItemFromMap = false;
 
-        const inventory = await character.inventory;
+        const inventory = (await character.inventory) as unknown as IItem;
 
-        const itemContainer = await ItemContainer.findOne({
+        const itemContainer = (await ItemContainer.findOne({
           owner: character.id,
-        });
+        })) as IItemContainer;
 
-        if (!item) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Item not found.",
-            type: "error",
-          });
-          return;
-        }
+        const isEquipValid = this.validateEquip(
+          item,
+          character,
+          itemContainer,
+          inventory,
+          equipItemFromMap,
+          itemId,
+          targetSlot
+        );
 
-        if (!item.x) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Invalid item coordinates",
-            type: "error",
-          });
-          return;
-        }
-
-        if (!item.y) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Invalid item coordinates",
-            type: "error",
-          });
-          return;
-        }
-
-        const itemIsOnRange = this.isItemOnRange(character, item as unknown as IItem);
-
-        if (itemIsOnRange) {
-          equipItemFromMap = true;
-        }
-
-        if (!equipItemFromMap && !itemContainer) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Container not found.",
-            type: "error",
-          });
-          return;
-        }
-
-        if (!equipItemFromMap && !inventory) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Inventory is empty.",
-            type: "error",
-          });
-          return;
-        }
-
-        if (equipItemFromMap && inventory.id !== itemId) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Item is out of range!",
-            type: "error",
-          });
-          return;
-        }
-
-        if (!equipItemFromMap && inventory.id !== itemId) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "User doesn't have this item",
-            type: "error",
-          });
-          return;
-        }
-
-        if (character.isBanned) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "User has been banned!",
-            type: "error",
-          });
-          return;
-        }
-
-        if (!character.isAlive) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "User is dead!",
-            type: "error",
-          });
-          return;
-        }
-
-        if (!item?.allowedEquipSlotType?.includes(targetSlot)) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Item cannot be equipped in this slot",
-            type: "error",
-          });
+        if (!isEquipValid) {
           return;
         }
 
@@ -160,6 +89,103 @@ export class EquipmentEquipNetwork {
         }
       }
     );
+  }
+
+  private validateEquip(
+    item: IItem,
+    character: ICharacter,
+    itemContainer: IItemContainer,
+    inventory: IItem,
+    equipItemFromMap: boolean,
+    itemId: string,
+    targetSlot: ItemSlotType
+  ): boolean {
+    if (!item) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Item not found.",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (!item.x) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Invalid item coordinates",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (!item.y) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Invalid item coordinates",
+        type: "error",
+      });
+      return false;
+    }
+
+    const itemIsOnRange = this.isItemOnRange(character, item as unknown as IItem);
+
+    if (itemIsOnRange) {
+      equipItemFromMap = true;
+    }
+
+    if (!equipItemFromMap && !itemContainer) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Container not found.",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (!equipItemFromMap && !inventory) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Inventory is empty.",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (equipItemFromMap && inventory._id !== itemId) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Item is out of range!",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (!equipItemFromMap && inventory._id !== itemId) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "User doesn't have this item",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (character.isBanned) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "User has been banned!",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (!character.isAlive) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "User is dead!",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (!item?.allowedEquipSlotType?.includes(targetSlot)) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Item cannot be equipped in this slot",
+        type: "error",
+      });
+      return false;
+    }
+    return true;
   }
 
   private updateItemInventoryCharacter(
@@ -230,7 +256,7 @@ export class EquipmentEquipNetwork {
       accessory,
       armor,
       inventory,
-    } as IEquipementSet;
+    };
   }
 
   public async removeItemFromInventory(itemId: string, itemContainer: IItemContainer): Promise<void> {
