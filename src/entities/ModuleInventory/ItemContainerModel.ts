@@ -38,7 +38,7 @@ itemContainerSchema.virtual("itemIds").get(function (this: IItemContainer) {
 
   return Object.values(this.slots)
     .filter((x) => x !== null)
-    .map((item: IItem) => item.id);
+    .map((item: IItem) => item.id || item._id);
 });
 
 itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer) {

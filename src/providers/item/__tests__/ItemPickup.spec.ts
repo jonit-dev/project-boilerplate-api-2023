@@ -3,7 +3,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { characterWeight, container, unitTestHelper } from "@providers/inversify/container";
 import { itemMock, stackableItemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { Types } from "mongoose";
@@ -64,6 +64,23 @@ describe("ItemPickup.ts", () => {
     expect(itemAdded).toBeTruthy();
   });
 
+  it("should increase character weight, after items are picked up", async () => {
+    const currentWeight = await characterWeight.getWeight(testCharacter);
+    const maxWeight = await characterWeight.getMaxWeight(testCharacter);
+
+    expect(currentWeight).toBe(3);
+    expect(maxWeight).toBe(15);
+
+    const addedItem = await pickupItem(inventoryItemContainerId);
+    expect(addedItem).toBeTruthy();
+
+    const newWeight = await characterWeight.getWeight(testCharacter!);
+    expect(newWeight).toBe(4);
+
+    const newMaxWeight = await characterWeight.getMaxWeight(testCharacter!);
+    expect(newMaxWeight).toBe(15);
+  });
+
   it("should block the item pickup, if the item is too heavy", async () => {
     const heavyItem = await unitTestHelper.createMockItem({
       weight: 999,
@@ -81,17 +98,17 @@ describe("ItemPickup.ts", () => {
   });
 
   it("shouldn't add more items, if your inventory is full", async () => {
-    const inventoryContainer = new ItemContainer({
+    const smallContainer = new ItemContainer({
       id: inventoryItemContainerId,
       parentItem: inventory.id,
     });
-    inventoryContainer.slotQty = 1;
-    inventoryContainer.slots = {
+    smallContainer.slotQty = 1;
+    smallContainer.slots = {
       0: testItem,
     };
-    await inventoryContainer.save();
+    await smallContainer.save();
 
-    const pickup = await pickupItem(inventoryContainer.id);
+    const pickup = await pickupItem(smallContainer.id);
     expect(pickup).toBeFalsy();
 
     expect(sendCustomErrorMessage).toHaveBeenCalled();

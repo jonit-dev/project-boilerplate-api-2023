@@ -18,7 +18,7 @@ export const itemMock: Partial<IItem> = {
   description: "You see a short sword. It is a single-handed sword with a handle that just features a grip.",
   attack: 5,
   defense: 0,
-  weight: 10,
+  weight: 1,
   tiledId: 66,
   x: 320,
   y: 144,
