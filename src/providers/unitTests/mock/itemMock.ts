@@ -1,7 +1,6 @@
 import { IItem, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 
 export const itemMock: Partial<IItem> = {
-  _id: "62b792030c3f470048787736",
   type: ItemType.Weapon,
   subType: ItemSubType.Sword,
   textureAtlas: "items",
@@ -29,7 +28,6 @@ export const itemMock: Partial<IItem> = {
 };
 
 export const stackableItemMock: Partial<IItem> = {
-  _id: "62b792030c3f470048787735",
   type: ItemType.Consumable,
   subType: ItemSubType.Food,
   textureAtlas: "items",

@@ -170,24 +170,29 @@ export class ItemPickup {
     return false;
   }
 
-  private async isItemPickupValid(item: IItemPickup, character: ICharacter): Promise<Boolean> {
-    const pickupItem = await Item.findById(item.itemId);
+  private async isItemPickupValid(itemPickup: IItemPickup, character: ICharacter): Promise<Boolean> {
+    const item = await Item.findById(itemPickup.itemId);
 
     const inventory = await character.inventory;
 
-    if (!pickupItem) {
+    if (!item) {
       this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
 
       return false;
     }
 
-    const underRange = this.movementHelper.isUnderRange(character.x, character.y, item.x, item.y, 1);
+    if (!item.isStorable) {
+      this.sendCustomErrorMessage(character, "Sorry, you cannot store this item.");
+      return false;
+    }
+
+    const underRange = this.movementHelper.isUnderRange(character.x, character.y, itemPickup.x, itemPickup.y, 1);
     if (!underRange) {
       this.sendCustomErrorMessage(character, "Sorry, you are too far away to pick up this item.");
       return false;
     }
 
-    if (pickupItem.owner && pickupItem.owner !== character.owner) {
+    if (item.owner && item.owner !== character.owner) {
       this.sendCustomErrorMessage(character, "Sorry, this item is not yours.");
       return false;
     }

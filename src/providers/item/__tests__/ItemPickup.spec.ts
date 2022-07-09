@@ -4,7 +4,7 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { stackableItemMock } from "@providers/unitTests/mock/itemMock";
+import { itemMock, stackableItemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { Types } from "mongoose";
 import { ItemPickup } from "../ItemPickup";
@@ -138,6 +138,19 @@ describe("ItemPickup.ts", () => {
       expect(pickup).toBeFalsy();
 
       expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not accessible.");
+    });
+
+    it("should throw an error if you try to pickup an item that is not storable", async () => {
+      const notStorableItem = new Item({
+        ...itemMock,
+        isStorable: false,
+      });
+      await notStorableItem.save();
+      const pickup = await pickupItem(inventoryItemContainerId, {
+        itemId: notStorableItem.id,
+      });
+      expect(pickup).toBeFalsy();
+      expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, you cannot store this item.");
     });
 
     it("should throw an error if item is too far away", async () => {
