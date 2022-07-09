@@ -71,6 +71,7 @@ export enum PotionsBlueprint {
   LightEndurancePotion = "light-endurance-potion",
   LightLifePotion = "light-life-potion",
   ManaPotion = "mana-potion",
+  LightAntidote = "light-antidote",
 }
 
 export enum BowsBlueprint {
@@ -105,4 +106,9 @@ export enum StaffsBlueprint {
 export enum ShieldsBlueprint {
   WoodenShield = "wooden-shield",
   StuddedShield = "studded-shield",
+}
+
+export enum LegsBlueprint {
+  LeatherLegs = "leather-legs",
+  StuddedLegs = "studded-legs",
 }
