@@ -1,4 +1,5 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { Item } from "@entities/ModuleInventory/ItemModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { MapLoader } from "@providers/map/MapLoader";
 import { MapSolids } from "@providers/map/MapSolids";
@@ -56,6 +57,16 @@ export class MovementHelper {
     const hasSolid = await this.mapSolids.isTileSolid(map, gridX, gridY, layer, checkAllLayersBelow);
 
     if (hasSolid) {
+      return true;
+    }
+
+    const hasItem = await Item.exists({
+      x: FromGridX(gridX),
+      y: FromGridY(gridY),
+      isSolid: true,
+    });
+
+    if (hasItem) {
       return true;
     }
 
