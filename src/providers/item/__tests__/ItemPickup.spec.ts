@@ -64,6 +64,22 @@ describe("ItemPickup.ts", () => {
     expect(itemAdded).toBeTruthy();
   });
 
+  it("should block the item pickup, if the item is too heavy", async () => {
+    const heavyItem = await unitTestHelper.createMockItem({
+      weight: 999,
+    });
+
+    const pickupHeavyItem = await pickupItem(inventoryItemContainerId, {
+      itemId: heavyItem.id,
+    });
+
+    expect(pickupHeavyItem).toBeFalsy();
+    expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+      testCharacter,
+      "Sorry, you are already carrying too much weight!"
+    );
+  });
+
   it("shouldn't add more items, if your inventory is full", async () => {
     const inventoryContainer = new ItemContainer({
       id: inventoryItemContainerId,

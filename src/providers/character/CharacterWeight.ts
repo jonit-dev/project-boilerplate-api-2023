@@ -57,6 +57,7 @@ export class CharacterWeight {
       for (const slot of slots) {
         const item = await Item.findById(slot).lean();
         if (item) {
+          console.log(item.name, item.weight);
           totalWeight += item.weight;
         }
       }
@@ -66,6 +67,8 @@ export class CharacterWeight {
       for (const bagItem of itemContainer.itemIds) {
         const item = await Item.findById(bagItem).lean();
         if (item) {
+          console.log(item.name, item.weight);
+
           totalWeight += item.weight;
         }
       }

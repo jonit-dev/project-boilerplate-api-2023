@@ -178,19 +178,19 @@ export class ItemPickup {
 
     const inventory = await character.inventory;
 
-    const weight = await this.characterWeight.getWeight(character);
-    const maxWeight = await this.characterWeight.getMaxWeight(character);
-
-    const ratio = weight / maxWeight;
-
-    if (ratio > 4) {
-      this.sendCustomErrorMessage(character, "Sorry, you are already carrying too much weight!");
-      return false;
-    }
-
     if (!item) {
       this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
 
+      return false;
+    }
+
+    const weight = await this.characterWeight.getWeight(character);
+    const maxWeight = await this.characterWeight.getMaxWeight(character);
+
+    const ratio = weight + item.weight / maxWeight;
+
+    if (ratio > 4) {
+      this.sendCustomErrorMessage(character, "Sorry, you are already carrying too much weight!");
       return false;
     }
 
@@ -224,8 +224,6 @@ export class ItemPickup {
       this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to pick up this item.");
       return false;
     }
-
-    // TODO: Character weight is valid for this item?
 
     return true;
   }
