@@ -18,6 +18,7 @@ import { magicsBlueprintIndex } from "./blueprints/magics/index";
 import { othersBlueprintIndex } from "./blueprints/others/index";
 import { staffsBlueprintIndex } from "./blueprints/staffs/index";
 import { shieldsBlueprintIndex } from "./blueprints/shields/index";
+import { legsBlueprintIndex } from "./blueprints/legs/index";
 
 export const itemsBlueprintIndex: IBlueprint = {
   ...bodiesBlueprintsIndex,

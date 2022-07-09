@@ -107,3 +107,8 @@ export enum ShieldsBlueprint {
   WoodenShield = "wooden-shield",
   StuddedShield = "studded-shield",
 }
+
+export enum LegsBlueprint {
+  LeatherLegs = "leather-legs",
+  StuddedLegs = "studded-legs",
+}
