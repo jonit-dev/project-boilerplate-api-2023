@@ -95,6 +95,65 @@ describe("NPCDeath.ts", () => {
     expect(bodyItemContainer!.slots.length).toBe(1);
   });
 
+  it("on NPC death, make sure loot is added to NPC body | 20 items max", async () => {
+    // @ts-ignore
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+
+    for (let i = 0; i <= 25; i++) {
+      testNPC.loots?.push({ itemBlueprintKey: "jacket", chance: 50 });
+    }
+
+    await npcDeath.handleNPCDeath(testNPC);
+
+    expect(spyAddLootInNPCBody).toHaveBeenCalled();
+
+    const npcBody = await Item.findOne({
+      owner: testNPC._id,
+      name: `${testNPC.name}'s body`,
+      x: testNPC.x,
+      y: testNPC.y,
+      scene: testNPC.scene,
+    });
+
+    expect(npcBody).not.toBeNull();
+    expect(npcBody!.itemContainer).toBeDefined();
+
+    const bodyItemContainer = await ItemContainer.findById(npcBody!.itemContainer);
+
+    expect(bodyItemContainer).not.toBeNull();
+    expect(bodyItemContainer!.slots).toBeDefined();
+    expect(bodyItemContainer!.slots.length).toBeGreaterThan(1);
+    expect(bodyItemContainer!.slots.length).toBeLessThanOrEqual(20);
+  });
+
+  it("on NPC death no loot is added to NPC body | NPC without loots", async () => {
+    // @ts-ignore
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+
+    // remove NPC loots
+    testNPC.loots = undefined;
+
+    await npcDeath.handleNPCDeath(testNPC);
+
+    expect(spyAddLootInNPCBody).toHaveBeenCalled();
+
+    const npcBody = await Item.findOne({
+      owner: testNPC._id,
+      name: `${testNPC.name}'s body`,
+      x: testNPC.x,
+      y: testNPC.y,
+      scene: testNPC.scene,
+    });
+
+    expect(npcBody).not.toBeNull();
+    expect(npcBody!.itemContainer).not.toBeNull();
+
+    const bodyItemContainer = await ItemContainer.findById(npcBody!.itemContainer);
+
+    expect(bodyItemContainer).not.toBeNull();
+    expect(bodyItemContainer!.slots).not.toBeDefined();
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
