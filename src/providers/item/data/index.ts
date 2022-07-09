@@ -40,4 +40,5 @@ export const itemsBlueprintIndex: IBlueprint = {
   ...othersBlueprintIndex,
   ...staffsBlueprintIndex,
   ...shieldsBlueprintIndex,
+  ...legsBlueprintIndex,
 };
