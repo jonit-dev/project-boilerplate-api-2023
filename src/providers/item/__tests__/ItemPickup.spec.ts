@@ -64,6 +64,32 @@ describe("ItemPickup.ts", () => {
     expect(itemAdded).toBeTruthy();
   });
 
+  it("item should be deleted on the map after being picked up to the inventory", async () => {
+    const mapItem = await unitTestHelper.createMockItem({
+      x: testCharacter.x,
+      y: testCharacter.y,
+      scene: testCharacter.scene,
+    });
+
+    const pickup = await pickupItem(inventoryItemContainerId, { itemId: mapItem.id });
+
+    expect(pickup).toBeTruthy();
+
+    const item = await Item.findById(mapItem.id);
+
+    if (!item) {
+      throw new Error("Failed to find item after pickup!");
+    }
+
+    expect(item.x).toBeUndefined();
+    expect(item.y).toBeUndefined();
+    expect(item.scene).toBeUndefined();
+
+    const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
+
+    expect(String(itemContainer?.itemIds[0]) === String(mapItem._id)).toBeTruthy();
+  });
+
   it("should increase character weight, after items are picked up", async () => {
     const currentWeight = await characterWeight.getWeight(testCharacter);
     const maxWeight = await characterWeight.getMaxWeight(testCharacter);

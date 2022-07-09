@@ -89,7 +89,7 @@ const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"
       }
 
       if (warnType === "removal") {
-        await itemView.warnCharacterAboutItemRemovalInView(item);
+        await itemView.warnCharactersAboutItemRemovalInView(item, item.x, item.y, item.scene);
       }
     }
   }

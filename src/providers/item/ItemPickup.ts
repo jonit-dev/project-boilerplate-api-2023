@@ -1,27 +1,20 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  IItemPickup,
-  IUIShowMessage,
-  IViewDestroyElementPayload,
-  UIMessageType,
-  UISocketEvents,
-  ViewSocketEvents,
-} from "@rpg-engine/shared";
+import { IItemPickup, IUIShowMessage, UIMessageType, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { ItemView } from "./ItemView";
 
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(
     private socketMessaging: SocketMessaging,
-    private characterView: CharacterView,
     private movementHelper: MovementHelper,
-    private characterWeight: CharacterWeight
+    private characterWeight: CharacterWeight,
+    private itemView: ItemView
   ) {}
 
   public async performItemPickup(itemPickup: IItemPickup, character: ICharacter): Promise<Boolean> {
@@ -40,13 +33,11 @@ export class ItemPickup {
       // whenever a new item is added, we need to update the character weight
       await this.characterWeight.updateCharacterWeight(character);
 
-      // Perform item deletion on map after item added
-      this.socketMessaging.sendEventToUser<IViewDestroyElementPayload>(character.channelId!, ViewSocketEvents.Destroy, {
-        id: pickupItem.id,
-        type: "items",
-      });
-
-      await this.characterView.removeFromCharacterView(character, pickupItem.id, "items");
+      // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
+      if (pickupItem.x !== undefined && pickupItem.y !== undefined && pickupItem.scene !== undefined) {
+        // If an item has a x, y and scene, it means its coming from a map pickup. So we should destroy its representation and warn other characters nearby.
+        await this.itemView.removeItemFromMap(pickupItem);
+      }
 
       return true;
     }
