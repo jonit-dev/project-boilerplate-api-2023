@@ -66,7 +66,7 @@ export class CharacterWeight {
       for (const bagItem of itemContainer.itemIds) {
         const item = await Item.findById(bagItem).lean();
         if (item) {
-          totalWeight = totalWeight + item.weight;
+          totalWeight += item.weight;
         }
       }
     }
