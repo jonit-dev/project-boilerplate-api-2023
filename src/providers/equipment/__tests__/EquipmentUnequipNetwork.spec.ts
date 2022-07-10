@@ -3,10 +3,10 @@ import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { IItem, ItemType } from "@rpg-engine/shared";
-import { EquipmentUnequipNetwork } from "../network/EquipmentUnequipNetwork";
+import { EquipmentUnequip } from "../EquipmentUnequip";
 
 describe("EquipmentUnequipNetwork.spec.ts", () => {
-  let equipmentUnequipNetwork: EquipmentUnequipNetwork;
+  let equipmentUnequip: EquipmentUnequip;
   let equipment: IEquipment;
   let item: IItem;
   let character: ICharacter;
@@ -14,7 +14,7 @@ describe("EquipmentUnequipNetwork.spec.ts", () => {
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
-    equipmentUnequipNetwork = container.get<EquipmentUnequipNetwork>(EquipmentUnequipNetwork);
+    equipmentUnequip = container.get<EquipmentUnequip>(EquipmentUnequip);
   });
 
   beforeEach(async () => {
@@ -29,7 +29,7 @@ describe("EquipmentUnequipNetwork.spec.ts", () => {
     const itemContainer = charBody!.itemContainer as unknown as IItemContainer;
     itemContainer.slots[2] = item;
 
-    const slot = equipmentUnequipNetwork.unEquipItemFromEquipmentSlot(itemContainer.slots, item, equipment, "NECK");
+    const slot = equipmentUnequip.unEquipItemFromEquipmentSlot(itemContainer.slots, item, equipment, "NECK");
 
     expect(slot).toEqual(item);
   });
@@ -37,7 +37,7 @@ describe("EquipmentUnequipNetwork.spec.ts", () => {
   it("Should return undefined if item not equipped", () => {
     const itemContainer = charBody!.itemContainer as unknown as IItemContainer;
 
-    const slot = equipmentUnequipNetwork.unEquipItemFromEquipmentSlot(itemContainer.slots, item, equipment, "NECK");
+    const slot = equipmentUnequip.unEquipItemFromEquipmentSlot(itemContainer.slots, item, equipment, "NECK");
 
     expect(slot).toEqual(undefined);
   });
@@ -48,7 +48,7 @@ describe("EquipmentUnequipNetwork.spec.ts", () => {
     itemContainer.slots[2].stackQty = 1;
     itemContainer.slots[2].maxStackSize = 10;
 
-    equipmentUnequipNetwork.manageItemContainerSlots(true, character, itemContainer, itemContainer.slots[2], item);
+    equipmentUnequip.manageItemContainerSlots(true, character, itemContainer, itemContainer.slots[2], item);
 
     expect(itemContainer.slots[2].stackQty).toBe(2);
   });
@@ -59,7 +59,7 @@ describe("EquipmentUnequipNetwork.spec.ts", () => {
     itemContainer.slots[2].stackQty = 1;
     itemContainer.slots[2].maxStackSize = 1;
 
-    equipmentUnequipNetwork.manageItemContainerSlots(true, character, itemContainer, itemContainer.slots[2], item);
+    equipmentUnequip.manageItemContainerSlots(true, character, itemContainer, itemContainer.slots[2], item);
 
     expect(itemContainer.slots[2].stackQty).toBe(1);
   });
@@ -67,13 +67,13 @@ describe("EquipmentUnequipNetwork.spec.ts", () => {
   it("Should increase total item quantity if item not in slot, but max quantity not reached", () => {
     const itemContainer = charBody!.itemContainer as unknown as IItemContainer;
 
-    equipmentUnequipNetwork.manageItemContainerSlots(false, character, itemContainer, itemContainer.slots[2], item);
+    equipmentUnequip.manageItemContainerSlots(false, character, itemContainer, itemContainer.slots[2], item);
 
     expect(itemContainer.totalItemsQty).toBe(1);
   });
 
   it("Should get the equipment slots", async () => {
-    const result = await equipmentUnequipNetwork.getEquipmentSlots(equipment._id);
+    const result = await equipmentUnequip.getEquipmentSlots(equipment._id);
 
     const itemHead = result.head as IItem;
     const itemNeck = result.neck as IItem;
@@ -86,7 +86,7 @@ describe("EquipmentUnequipNetwork.spec.ts", () => {
   });
 
   it("Should get allowed item types", async () => {
-    const allowedItemTypes = await equipmentUnequipNetwork.getAllowedItemTypes();
+    const allowedItemTypes = await equipmentUnequip.getAllowedItemTypes();
 
     expect(allowedItemTypes).toEqual(Object.keys(ItemType));
   });
