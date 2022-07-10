@@ -4,7 +4,6 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { characterWeight, container, unitTestHelper } from "@providers/inversify/container";
-import { characterMock } from "@providers/unitTests/mock/characterMock";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { ItemDrop } from "../ItemDrop";
 import { ItemView } from "../ItemView";
