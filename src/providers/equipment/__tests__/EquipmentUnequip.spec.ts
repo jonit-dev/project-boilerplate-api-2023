@@ -5,7 +5,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { IItem, ItemType } from "@rpg-engine/shared";
 import { EquipmentUnequip } from "../EquipmentUnequip";
 
-describe("EquipmentUnequipNetwork.spec.ts", () => {
+describe("EquipmentUnequip.spec.ts", () => {
   let equipmentUnequip: EquipmentUnequip;
   let equipment: IEquipment;
   let item: IItem;
