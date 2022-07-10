@@ -1,6 +1,9 @@
 export enum SwordBlueprint {
   ShortSword = "short-sword",
   BasiliskSword = "basilisk-sword",
+  DragonsSword = "dragon's-sword",
+  DoubleEdgedSword = "double-edged-sword",
+  BroadSword = "broad-sword",
 }
 
 export enum HelmetBlueprint {
@@ -60,6 +63,7 @@ export enum FoodsBlueprint {
 
 export enum SpearsBlueprint {
   RoyalSpear = "royal-spear",
+  Spear = "spear",
 }
 
 export enum PotionsBlueprint {
@@ -67,6 +71,7 @@ export enum PotionsBlueprint {
   LightEndurancePotion = "light-endurance-potion",
   LightLifePotion = "light-life-potion",
   ManaPotion = "mana-potion",
+  LightAntidote = "light-antidote",
 }
 
 export enum BowsBlueprint {
@@ -78,4 +83,32 @@ export enum BowsBlueprint {
 export enum GlovesBlueprint {
   LeatherGloves = "leather-gloves",
   StuddedGloves = "studded-gloves",
+}
+
+export enum MacesBlueprint {
+  Club = "club",
+  Mace = "mace",
+  SpikedClub = "spiked-club",
+}
+
+export enum MagicsBlueprint {
+  Rune = "rune",
+}
+
+export enum OthersBlueprint {
+  Candle = "candle",
+}
+
+export enum StaffsBlueprint {
+  AppendicesStaff = "appendice's-staff",
+}
+
+export enum ShieldsBlueprint {
+  WoodenShield = "wooden-shield",
+  StuddedShield = "studded-shield",
+}
+
+export enum LegsBlueprint {
+  LeatherLegs = "leather-legs",
+  StuddedLegs = "studded-legs",
 }

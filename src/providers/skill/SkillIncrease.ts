@@ -1,9 +1,12 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { Skill, ISkill } from "@entities/ModuleCharacter/SkillsModel";
-import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { ItemType, ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
+import { CharacterView } from "@providers/character/CharacterView";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import { ItemSubType, ItemType } from "@rpg-engine/shared/dist/types/item.types";
 import {
   ISkillDetails,
   ISkillEventFromServer,
@@ -11,10 +14,8 @@ import {
   SkillSocketEvents,
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
-import { SkillCalculator } from "./SkillCalculator";
 import _ from "lodash";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import { SkillCalculator } from "./SkillCalculator";
 
 const ItemSkill = new Map<ItemSubType | string, string>([
   ["unarmed", "first"],
@@ -41,7 +42,11 @@ interface IIncreaseXPResult {
 
 @provide(SkillIncrease)
 export class SkillIncrease {
-  constructor(private skillCalculator: SkillCalculator, private socketMessaging: SocketMessaging) {}
+  constructor(
+    private skillCalculator: SkillCalculator,
+    private socketMessaging: SocketMessaging,
+    private characterView: CharacterView
+  ) {}
 
   /**
    * Calculates the sp gained according to weapons used and the xp gained by a character every time it causes damage in battle.
@@ -148,6 +153,8 @@ export class SkillIncrease {
       if (levelUp) {
         this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp: record!.xp! }, character, target);
       }
+
+      await this.warnCharactersAroundAboutExpGains(character, record!.xp!);
     }
 
     await target.save();
@@ -159,9 +166,9 @@ export class SkillIncrease {
     target?: INPC | ICharacter
   ): void {
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You advanced from level ${skillData.skillLevel - 1} to ${skillData.skillLevel} in ${
-        skillData.skillName
-      }`,
+      message: `You advanced from level ${skillData.skillLevel - 1} to ${skillData.skillLevel} in ${_.startCase(
+        _.toLower(skillData.skillName)
+      )} fighting.`,
       type: "info",
     });
 
@@ -179,19 +186,28 @@ export class SkillIncrease {
 
   private sendExpLevelUpEvents(expData: IIncreaseXPResult, character: ICharacter, target: INPC | ICharacter): void {
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You advanced from level ${expData.previousLevel} to ${expData.level}`,
+      message: `You advanced from level ${expData.previousLevel} to level ${expData.level}.`,
       type: "info",
     });
+  }
 
-    const levelUpEventPayload: ISkillEventFromServer = {
+  private async warnCharactersAroundAboutExpGains(character: ICharacter, exp: number): Promise<void> {
+    const levelUpEventPayload: Partial<ISkillEventFromServer> = {
       characterId: character.id,
-      targetId: target.id,
-      targetType: target.type as "Character" | "NPC",
-      eventType: SkillEventType.LevelUp,
-      level: expData.level,
-      exp: expData.exp,
+      exp,
     };
 
+    const nearbyCharacters = await this.characterView.getCharactersInView(character);
+
+    for (const nearbyCharacter of nearbyCharacters) {
+      this.socketMessaging.sendEventToUser(
+        nearbyCharacter.channelId!,
+        SkillSocketEvents.ExperienceGain,
+        levelUpEventPayload
+      );
+    }
+
+    // warn character about his experience gain
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ExperienceGain, levelUpEventPayload);
   }
 

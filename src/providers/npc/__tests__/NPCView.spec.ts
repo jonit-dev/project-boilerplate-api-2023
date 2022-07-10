@@ -20,12 +20,15 @@ describe("NPCView.ts", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
-    testNPC = await unitTestHelper.createMockNPC({
-      x: FromGridX(0),
-      y: FromGridY(0),
-      health: 100,
-      scene: "Ilya",
-    });
+    testNPC = await unitTestHelper.createMockNPC(
+      {
+        x: FromGridX(0),
+        y: FromGridY(0),
+        health: 100,
+        scene: "Ilya",
+      },
+      { hasSkills: true }
+    );
   });
 
   it("should include characters that are inside the NPC socket transmission zone", async () => {

@@ -89,7 +89,7 @@ const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"
       }
 
       if (warnType === "removal") {
-        await itemView.warnCharacterAboutItemRemovalInView(item);
+        await itemView.warnCharactersAboutItemRemovalInView(item, item.x, item.y, item.scene);
       }
     }
   }
@@ -107,13 +107,23 @@ itemSchema.post("save", async function (this: IItem) {
       slotQty = this.generateContainerSlots;
     }
 
+    // generate slots object
+    const slots = {};
+
+    for (let i = 0; i < slotQty; i++) {
+      slots[Number(i)] = null;
+    }
+
     const newContainer = new ItemContainer({
       name: this.name,
       parentItem: this._id,
       slotQty,
+      slots,
       owner: this.owner,
     });
     await newContainer.save();
+
+    this.itemContainer = newContainer._id;
   }
 
   await warnAboutItemChanges(this, "changes");

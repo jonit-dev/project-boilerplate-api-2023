@@ -20,6 +20,7 @@ describe("NPCMovementFixedPath.ts", () => {
         x: FromGridX(8),
         y: FromGridY(7),
       },
+      null,
       NPCMovementType.FixedPath
     );
   });

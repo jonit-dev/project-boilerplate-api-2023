@@ -24,6 +24,7 @@ describe("NPCMovementStopped.ts", () => {
         x: FromGridX(0),
         y: FromGridY(0),
       },
+      null,
       NPCMovementType.Stopped
     );
     testCharacter = await unitTestHelper.createMockCharacter({

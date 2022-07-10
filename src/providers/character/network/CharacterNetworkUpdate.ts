@@ -13,9 +13,11 @@ import {
   ICharacterPositionUpdateConfirm,
   ICharacterPositionUpdateFromClient,
   ICharacterPositionUpdateFromServer,
+  IUIShowMessage,
   MapLayers,
   ToGridX,
   ToGridY,
+  UISocketEvents,
 } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
@@ -250,6 +252,14 @@ export class CharacterNetworkUpdate {
     );
 
     if (isSolid) {
+      return false;
+    }
+
+    if (character.speed === 0) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Sorry, you're too heavy to move. Please drop something from your inventory.",
+        type: "error",
+      });
       return false;
     }
 

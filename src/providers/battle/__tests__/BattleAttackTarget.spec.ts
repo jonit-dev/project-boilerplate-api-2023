@@ -18,8 +18,11 @@ describe("BattleAttackTarget.spec.ts", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
-    testNPC = await unitTestHelper.createMockNPC();
-    testCharacter = await unitTestHelper.createMockCharacter();
+    testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasSkills: true,
+    });
     await testNPC.populate("skills").execPopulate();
     await testCharacter.populate("skills").execPopulate();
 

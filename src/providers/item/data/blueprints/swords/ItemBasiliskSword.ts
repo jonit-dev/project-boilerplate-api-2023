@@ -9,8 +9,7 @@ export const itemBasiliskSword: Partial<IItem> = {
   texturePath: "swords/basilisk-sword.png",
   textureKey: "basilisk-sword",
   name: "Basilisk Sword",
-  description:
-    "You see a basilisk sword. It's used by a reptile reputed to be a serpent king, who can cause death with a single glance.",
+  description: "A sword crafted from the remains of a basilisk.",
   attack: 10,
   defense: 3,
   weight: 1,
