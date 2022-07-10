@@ -4,7 +4,7 @@ import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 export const itemLeatherLegs: Partial<IItem> = {
   key: "leather-legs",
   type: ItemType.Armor,
-  subType: ItemSubType.Leg,
+  subType: ItemSubType.Legs,
   textureAtlas: "items",
   texturePath: "legs/leather-legs.png",
   textureKey: "leather-legs",
