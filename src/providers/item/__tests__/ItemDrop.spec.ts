@@ -3,7 +3,8 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { characterWeight, container, unitTestHelper } from "@providers/inversify/container";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { ItemDrop } from "../ItemDrop";
 import { ItemView } from "../ItemView";
@@ -16,12 +17,14 @@ describe("ItemDrop.ts", () => {
   let inventory: IItem;
   let sendCustomErrorMessage: jest.SpyInstance;
   let inventoryItemContainerId: string;
+  let characterWeight: CharacterWeight;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
 
     itemDrop = container.get<ItemDrop>(ItemDrop);
     itemView = container.get<ItemView>(ItemView);
+    characterWeight = container.get<CharacterWeight>(CharacterWeight);
   });
 
   beforeEach(async () => {
