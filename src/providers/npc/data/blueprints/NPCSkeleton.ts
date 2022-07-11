@@ -22,4 +22,10 @@ export const npcSkeleton = {
   },
   fleeOnLowHealth: true,
   experience: 45,
+  loots: [
+    {
+      itemBlueprintKey: "jacket",
+      chance: 30,
+    },
+  ],
 } as Partial<INPC>;

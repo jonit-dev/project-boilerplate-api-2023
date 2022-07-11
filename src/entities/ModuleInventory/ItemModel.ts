@@ -121,6 +121,7 @@ itemSchema.post("save", async function (this: IItem) {
       slots,
       owner: this.owner,
     });
+
     await newContainer.save();
 
     this.itemContainer = newContainer._id;

@@ -22,4 +22,10 @@ export const npcOrc = {
   },
   fleeOnLowHealth: true,
   experience: 70,
+  loots: [
+    {
+      itemBlueprintKey: "boots",
+      chance: 30,
+    },
+  ],
 } as Partial<INPC>;

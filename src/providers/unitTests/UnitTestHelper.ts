@@ -54,6 +54,12 @@ export class UnitTestHelper {
       ...movementTypeMock[movementType],
       ...extraProps,
       experience: 100,
+      loots: [
+        {
+          itemBlueprintKey: "cheese",
+          chance: 100,
+        },
+      ],
     });
 
     if (options?.hasSkills) {
