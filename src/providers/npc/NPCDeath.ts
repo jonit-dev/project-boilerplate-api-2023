@@ -94,16 +94,16 @@ export class NPCDeath {
         const lootItem = new Item({ ...blueprintData });
         await lootItem.save();
 
-        if (typeof itemContainer.slots === "undefined") {
-          itemContainer.slots = [];
-        }
-
-        if (itemContainer.slots.length < itemContainer.slotQty) {
-          itemContainer.slots.push(lootItem);
+        for (let i = 0; i < itemContainer.slotQty; i++) {
+          if (itemContainer.slots[Number(i)] == null) {
+            itemContainer.slots[Number(i)] = lootItem;
+            break;
+          }
         }
       }
     }
 
+    itemContainer.markModified("slots");
     await itemContainer.save();
   }
 }

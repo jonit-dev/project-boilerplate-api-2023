@@ -92,14 +92,14 @@ describe("NPCDeath.ts", () => {
 
     expect(bodyItemContainer).not.toBeNull();
     expect(bodyItemContainer!.slots).toBeDefined();
-    expect(bodyItemContainer!.slots.length).toBe(1);
+    expect(bodyItemContainer!.slots[0]).not.toBeNull();
   });
 
-  it("on NPC death, make sure loot is added to NPC body | 20 items max", async () => {
+  it("on NPC death, make sure many loot items are added to NPC body", async () => {
     // @ts-ignore
     const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
 
-    for (let i = 0; i <= 25; i++) {
+    for (let i = 0; i <= 15; i++) {
       testNPC.loots?.push({ itemBlueprintKey: "jacket", chance: 50 });
     }
 
@@ -122,8 +122,10 @@ describe("NPCDeath.ts", () => {
 
     expect(bodyItemContainer).not.toBeNull();
     expect(bodyItemContainer!.slots).toBeDefined();
-    expect(bodyItemContainer!.slots.length).toBeGreaterThan(1);
-    expect(bodyItemContainer!.slots.length).toBeLessThanOrEqual(20);
+    expect(bodyItemContainer!.slots[19]).toBeNull();
+    for (let i = 0; i <= 5; i++) {
+      expect(bodyItemContainer!.slots[Number(i)]).not.toBeNull();
+    }
   });
 
   it("on NPC death no loot is added to NPC body | NPC without loots", async () => {
@@ -151,7 +153,8 @@ describe("NPCDeath.ts", () => {
     const bodyItemContainer = await ItemContainer.findById(npcBody!.itemContainer);
 
     expect(bodyItemContainer).not.toBeNull();
-    expect(bodyItemContainer!.slots).not.toBeDefined();
+    expect(bodyItemContainer!.slots).toBeDefined();
+    expect(bodyItemContainer!.slots[Number(0)]).toBeNull();
   });
 
   afterAll(async () => {
