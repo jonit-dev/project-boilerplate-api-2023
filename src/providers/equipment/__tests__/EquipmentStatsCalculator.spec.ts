@@ -1,6 +1,6 @@
 import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { EquipmentStatsCalculator } from "./EquipmentStatsCalculator";
+import { EquipmentStatsCalculator } from "../EquipmentStatsCalculator";
 
 describe("EquipmentStatsCalculator.spec.ts", () => {
   let equipmentStatsCalculator: EquipmentStatsCalculator;
