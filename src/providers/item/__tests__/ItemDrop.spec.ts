@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
@@ -35,11 +35,21 @@ describe("ItemDrop.ts", () => {
     testItem = await unitTestHelper.createMockItem();
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;
-    const bag = await ItemContainer.findById(inventoryItemContainerId);
 
-    // Adding item to inventory in order to drop it
+    await addItemToInventory(testItem);
+
+    testCharacter.x = FromGridX(1);
+    testCharacter.y = FromGridY(0);
+    await testCharacter.save();
+    await testItem.save();
+
+    sendCustomErrorMessage = jest.spyOn(itemDrop, "sendCustomErrorMessage" as any);
+  });
+
+  const addItemToInventory = async (item: IItem): Promise<IItem> => {
+    const bag = await ItemContainer.findById(inventoryItemContainerId);
     if (bag) {
-      bag.slots[0] = testItem;
+      bag.slots[0] = item;
       await ItemContainer.updateOne(
         {
           _id: bag.id,
@@ -51,14 +61,8 @@ describe("ItemDrop.ts", () => {
         }
       );
     }
-
-    testCharacter.x = FromGridX(1);
-    testCharacter.y = FromGridY(0);
-    await testCharacter.save();
-    await testItem.save();
-
-    sendCustomErrorMessage = jest.spyOn(itemDrop, "sendCustomErrorMessage" as any);
-  });
+    return item;
+  };
 
   const dropItem = async (fromContainerId: string, extraProps?: Record<string, unknown>) => {
     const itemDropped = await itemDrop.performItemDrop(
@@ -89,6 +93,8 @@ describe("ItemDrop.ts", () => {
       scene: testCharacter.scene,
     });
 
+    await addItemToInventory(mapItem);
+
     const drop = await dropItem(inventoryItemContainerId, { itemId: mapItem.id });
 
     expect(drop).toBeTruthy();
@@ -105,7 +111,7 @@ describe("ItemDrop.ts", () => {
     expect(droppedItem).toBeDefined();
   });
 
-  it("should decrease character weight, after items are picked up", async () => {
+  it("should decrease character weight, after an item is dropped", async () => {
     const currentWeight = await characterWeight.getWeight(testCharacter);
     const maxWeight = await characterWeight.getMaxWeight(testCharacter);
     expect(currentWeight).toBe(4);
@@ -120,6 +126,18 @@ describe("ItemDrop.ts", () => {
     expect(newMaxWeight).toBe(15);
   });
 
+  it("should have item in character view, after its successfully dropped", async () => {
+    const itemDropped = await dropItem(inventoryItemContainerId);
+
+    expect(itemDropped).toBeTruthy();
+
+    const updatedChar = await Character.findOne({ _id: testCharacter.id });
+
+    const droppedItemsInView = Object.keys(updatedChar?.view.items);
+
+    expect(droppedItemsInView).toContain(testItem.id);
+  });
+
   describe("Item drop validation", () => {
     it("should throw an error if container is not accessible", async () => {
       const drop = await dropItem(inventoryItemContainerId, {
@@ -128,6 +146,29 @@ describe("ItemDrop.ts", () => {
       expect(drop).toBeFalsy();
 
       expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not accessible.");
+    });
+
+    it("should throw an error if trying to drop an item that don't exist", async () => {
+      const drop = await dropItem(inventoryItemContainerId, {
+        itemId: "62b792030c3f470048781135", // inexistent item
+      });
+      expect(drop).toBeFalsy();
+
+      expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not accessible.");
+    });
+
+    it("should throw an error if trying to drop an item that you don't have in your inventory", async () => {
+      const unknownItem = await unitTestHelper.createMockItem();
+
+      const drop = await dropItem(inventoryItemContainerId, {
+        itemId: unknownItem.id,
+      });
+      expect(drop).toBeFalsy();
+
+      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+        testCharacter,
+        "Sorry, you do not have this item in your inventory."
+      );
     });
 
     it("should throw an error if the user tries to drop an item and is banned or not online", async () => {

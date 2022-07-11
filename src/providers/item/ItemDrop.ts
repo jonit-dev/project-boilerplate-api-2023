@@ -1,21 +1,14 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItemDrop, IUIShowMessage, UIMessageType, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ItemView } from "./ItemView";
 
 @provide(ItemDrop)
 export class ItemDrop {
-  constructor(
-    private socketMessaging: SocketMessaging,
-    private characterWeight: CharacterWeight,
-    private itemView: ItemView,
-    private characterView: CharacterView
-  ) {}
+  constructor(private socketMessaging: SocketMessaging, private characterWeight: CharacterWeight) {}
 
   public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<Boolean> {
     const isDropValid = await this.isItemDropValid(itemDrop, character);
@@ -30,33 +23,12 @@ export class ItemDrop {
       const isItemRemoved = await this.removeItemFromInventory(dropItem, character, itemDrop.fromContainerId);
       if (!isItemRemoved) return false;
 
-      await this.updateItemInViewAndCharWeight(character, itemDrop);
+      await this.characterWeight.updateCharacterWeight(character);
+
       return true;
     }
 
     return false;
-  }
-
-  private async updateItemInViewAndCharWeight(character: ICharacter, itemDrop: IItemDrop): Promise<Boolean> {
-    // whenever a item is dropped, we need to update the character weight
-    await this.characterWeight.updateCharacterWeight(character);
-
-    // After removing item from character and updating it's weigth, let's create the item on the map
-    await this.characterView.addToCharacterView(
-      character,
-      {
-        id: itemDrop.itemId,
-        x: itemDrop.x,
-        y: itemDrop.y,
-        scene: itemDrop.scene,
-      },
-      "items"
-    );
-
-    // Should we warn the nearby characters about new items in view?
-    await this.itemView.warnCharacterAboutItemsInView(character);
-
-    return true;
   }
 
   /**
@@ -115,14 +87,26 @@ export class ItemDrop {
       return false;
     }
 
-    const container = await ItemContainer.findById(inventory.itemContainer);
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+
+    if (!inventoryContainer) {
+      this.sendCustomErrorMessage(character, "Sorry, inventory container not found.");
+      return false;
+    }
 
     if (!item) {
       this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
       return false;
     }
 
-    if (itemDrop.fromContainerId.toString() !== container?.id.toString()) {
+    const hasItemInInventory = inventoryContainer?.itemIds?.find((itemId) => String(itemId) === String(item.id));
+
+    if (!hasItemInInventory) {
+      this.sendCustomErrorMessage(character, "Sorry, you do not have this item in your inventory.");
+      return false;
+    }
+
+    if (itemDrop.fromContainerId.toString() !== inventoryContainer?.id.toString()) {
       this.sendCustomErrorMessage(character, "Sorry, this item does not belong to your inventory.");
       return false;
     }
@@ -137,7 +121,7 @@ export class ItemDrop {
       return false;
     }
 
-    if (!container) {
+    if (!inventoryContainer) {
       this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to drop this item.");
       return false;
     }
