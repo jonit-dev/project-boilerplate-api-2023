@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { EquipmentRead } from "../network/EquipmentRead";
+import { EquipmentRead } from "../EquipmentRead";
 import { IEquipementSet, ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 
@@ -20,7 +20,8 @@ describe("EquipmentRead.ts", () => {
   });
 
   it("should automatically create an equipment set", async () => {
-    expect(testCharacter.equipment).toBeDefined();
+    const equipmentSet = await Equipment.findById(testCharacter.equipment);
+    expect(equipmentSet).toBeDefined();
   });
 
   it("should throw an error if equipment set is not found", async () => {

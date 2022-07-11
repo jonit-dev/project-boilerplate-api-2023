@@ -17,12 +17,6 @@ import { provide } from "inversify-binding-decorators";
 export class EquipmentRead {
   constructor(private socketAuth: SocketAuth, private socketMessaging: SocketMessaging) {}
 
-  public onRead(channel: SocketChannel): void {
-    this.socketAuth.authCharacterOn(channel, EquipmentSocketEvents.ContainerRead, async (data: any, character) => {
-      await this.onEquipmentRead(character);
-    });
-  }
-
   public async onEquipmentRead(character: ICharacter): Promise<void> {
     const equipmentSet = await Equipment.findById(character.equipment);
 
