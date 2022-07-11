@@ -3,7 +3,8 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { characterWeight, container, unitTestHelper } from "@providers/inversify/container";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemMock, stackableItemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { Types } from "mongoose";
@@ -16,11 +17,13 @@ describe("ItemPickup.ts", () => {
   let inventory: IItem;
   let sendCustomErrorMessage: jest.SpyInstance;
   let inventoryItemContainerId: string;
+  let characterWeight: CharacterWeight;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
 
     itemPickup = container.get<ItemPickup>(ItemPickup);
+    characterWeight = container.get<CharacterWeight>(CharacterWeight);
   });
 
   beforeEach(async () => {
