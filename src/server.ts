@@ -1,5 +1,6 @@
-import "express-async-errors";
 import "reflect-metadata";
+
+import "express-async-errors";
 
 import { appEnv } from "@providers/config/env";
 import {

@@ -1,10 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { container } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint } from "@providers/item/data/types/blueprintTypes";
@@ -24,12 +24,23 @@ import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
 import { itemMock } from "./mock/itemMock";
 
+interface IMockCharacterOptions {
+  hasEquipment?: boolean;
+  hasInventory?: boolean;
+  hasSkills?: boolean;
+}
+
+interface IMockNPCOptions {
+  hasSkills?: boolean;
+}
+
 @provide(UnitTestHelper)
 export class UnitTestHelper {
   private mongoServer: MongoMemoryServer;
 
   public async createMockNPC(
-    extraProps?: Record<string, unknown>,
+    extraProps: Record<string, unknown> | null = null,
+    options: IMockNPCOptions | null = null,
     movementType: NPCMovementType = NPCMovementType.Random
   ): Promise<INPC> {
     const movementTypeMock = {
@@ -39,16 +50,9 @@ export class UnitTestHelper {
       [NPCMovementType.Random]: randomMovementMockNPC,
       [NPCMovementType.Stopped]: stoppedMovementMockNPC,
     };
-
-    const npcSkills = new Skill({
-      ownerType: "NPC",
-    });
-    await npcSkills.save();
-
     const testNPC = new NPC({
       ...movementTypeMock[movementType],
       ...extraProps,
-      skills: npcSkills._id,
       experience: 100,
       loots: [
         {
@@ -58,10 +62,17 @@ export class UnitTestHelper {
       ],
     });
 
-    await testNPC.save();
+    if (options?.hasSkills) {
+      const npcSkills = new Skill({
+        ownerType: "NPC",
+      });
 
-    npcSkills.owner = testNPC._id;
-    await npcSkills.save();
+      npcSkills.owner = testNPC._id;
+      testNPC.skills = npcSkills._id;
+      await npcSkills.save();
+    }
+
+    await testNPC.save();
 
     return testNPC;
   }
@@ -82,7 +93,9 @@ export class UnitTestHelper {
 
     await charBody.save();
 
-    return charBody;
+    const item = await Item.findById(charBody._id).populate("itemContainer").exec();
+
+    return item as IItem;
   }
 
   public async createMockItem(extraProps?: Partial<IItem>): Promise<IItem> {
@@ -96,28 +109,46 @@ export class UnitTestHelper {
     return newItem;
   }
 
-  public async createMockCharacter(extraProps?: Record<string, unknown>): Promise<ICharacter> {
-    const charSkills = new Skill({
-      ownerType: "Character",
-    });
-    await charSkills.save();
-
-    const equipment = new Equipment();
-    await equipment.save();
-
+  public async createMockCharacter(
+    extraProps?: Record<string, unknown> | null,
+    options?: IMockCharacterOptions
+  ): Promise<ICharacter> {
     const testCharacter = new Character({
       ...characterMock,
       ...extraProps,
-      skills: charSkills._id,
-      equipment: equipment._id,
     });
-
     await testCharacter.save();
 
-    charSkills.owner = testCharacter._id;
-    await charSkills.save();
+    if (options?.hasSkills) {
+      const charSkills = new Skill({
+        ownerType: "Character",
+      });
+      charSkills.owner = testCharacter._id;
+      testCharacter.skills = charSkills._id;
+      await charSkills.save();
+      await testCharacter.save();
+    }
 
+    if (options?.hasEquipment) {
+      let equipment;
+      if (options?.hasInventory) {
+        equipment = await this.addInventoryToCharacter(testCharacter);
+      } else {
+        equipment = new Equipment();
+      }
+      await equipment.save();
+      testCharacter.equipment = equipment._id;
+      await testCharacter.save();
+    }
     return testCharacter;
+  }
+
+  public async addInventoryToCharacter(character: ICharacter): Promise<IEquipment> {
+    const characterInventory = container.get<CharacterInventory>(CharacterInventory);
+
+    const equipment = await characterInventory.createEquipmentWithInventory(character);
+
+    return equipment;
   }
 
   public async createMockChatLogs(emitter: ICharacter): Promise<void> {
@@ -126,6 +157,34 @@ export class UnitTestHelper {
       const chatLog = new ChatLog(chatLogMock);
       await chatLog.save();
     }
+  }
+
+  public async createEquipment(extraProps?: Partial<IItem>): Promise<IEquipment> {
+    const equipment = new Equipment();
+
+    const itemHead = new Item({
+      ...itemMock,
+      ...extraProps,
+      _id: undefined,
+      defense: 10,
+      attack: 8,
+    });
+
+    const itemNeck = new Item({
+      ...itemMock,
+      ...extraProps,
+      _id: undefined,
+      defense: 4,
+      attack: 5,
+    });
+
+    await itemHead.save();
+    await itemNeck.save();
+
+    equipment.head = itemHead._id;
+    equipment.neck = itemNeck._id;
+
+    return await equipment.save();
   }
 
   public createMockSocketTransmissionZone(x: number, y: number, width: number, height: number): SocketTransmissionZone {

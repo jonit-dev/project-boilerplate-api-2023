@@ -1,6 +1,6 @@
 import { ItemType, TypeHelper } from "@rpg-engine/shared";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
-import { Item } from "./ItemModel";
+import { IItem, Item } from "./ItemModel";
 
 const itemContainerSchema = createSchema(
   {
@@ -23,6 +23,9 @@ const itemContainerSchema = createSchema(
       totalItemsQty: number;
       isEmpty: boolean;
       itemIds: string[];
+      emptySlotsQty: number;
+      firstAvailableSlot: IItem | null;
+      firstAvailableSlotId: number | null;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
@@ -33,7 +36,9 @@ itemContainerSchema.virtual("itemIds").get(function (this: IItemContainer) {
     return [];
   }
 
-  return Object.values(this.slots);
+  return Object.values(this.slots)
+    .filter((x) => x !== null)
+    .map((item: IItem) => item.id || item._id);
 });
 
 itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer) {
@@ -41,15 +46,60 @@ itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer)
     return 0;
   }
 
-  return Object.values(this.slots).length;
+  return Object.values(this.slots).filter((x) => x !== null).length;
+});
+
+itemContainerSchema.virtual("firstAvailableSlotId").get(function (this: IItemContainer) {
+  if (!this.slots) {
+    return null;
+  }
+
+  for (let i = 0; i < this.slotQty; i++) {
+    if (this.slots[i] === null) {
+      return i;
+    }
+  }
+
+  return null;
+});
+
+itemContainerSchema.virtual("firstAvailableSlot").get(function (this: IItemContainer) {
+  if (!this.slots) {
+    return null;
+  }
+
+  const slots = Object.values(this.slots);
+  const emptySlots = slots.filter((x) => x === null) as IItem[];
+  if (emptySlots.length === 0) {
+    return null;
+  }
+
+  return emptySlots[0];
+});
+
+itemContainerSchema.virtual("emptySlotsQty").get(function (this: IItemContainer) {
+  if (!this.slots) {
+    return this.slotQty;
+  }
+
+  return Object.values(this.slots).filter((x) => x === null).length;
 });
 
 itemContainerSchema.virtual("isEmpty").get(function (this: IItemContainer) {
-  const items = this.totalItemsQty;
-  return !items;
+  return this.totalItemsQty === 0;
 });
 
 itemContainerSchema.post("save", async function (this: IItemContainer) {
+  if (!this.slots) {
+    const slots = {};
+
+    for (let i = 0; i < 20; i++) {
+      slots[Number(i)] = null;
+    }
+
+    this.slots = slots;
+  }
+
   await Item.updateOne(
     {
       _id: this.parentItem,
@@ -70,8 +120,6 @@ itemContainerSchema.post("remove", async function (this: IItemContainer) {
 
       if (item) {
         await item.remove();
-      } else {
-        throw new Error(`Item Container error: Failed to remove ${itemId} after container destruction.`);
       }
     }
   }

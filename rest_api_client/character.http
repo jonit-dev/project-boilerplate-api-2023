@@ -11,7 +11,7 @@ Content-Type: application/json
 ###
 
 # Character :: Read
-GET {{baseUrl}}/characters/6276f908ffd7e0004d861992 HTTP/1.1
+GET {{baseUrl}}/characters/62c901d0ac77200070a997f7 HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 

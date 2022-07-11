@@ -2,34 +2,31 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { SwordBlueprint } from "@providers/item/data/types/blueprintTypes";
+import { ContainersBlueprint } from "@providers/item/data/types/blueprintTypes";
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterInventory)
 export class CharacterInventory {
-  public async addEquipmentCharacter(character: ICharacter): Promise<void> {
-    const equipment = await this.generateEquipment();
+  public async addEquipmentToCharacter(character: ICharacter): Promise<void> {
+    const equipment = await this.createEquipmentWithInventory(character);
 
     character.equipment = equipment._id;
     await character.save();
   }
 
-  public async generateEquipment(): Promise<IEquipment> {
+  public async createEquipmentWithInventory(character: ICharacter): Promise<IEquipment> {
     const equipment = new Equipment();
+    equipment.owner = character._id;
 
-    const blueprintData = itemsBlueprintIndex[SwordBlueprint.ShortSword];
+    const blueprintData = itemsBlueprintIndex[ContainersBlueprint.Backpack];
 
-    const shortSword = new Item({
+    const backpack = new Item({
       ...blueprintData,
-      x: 10,
-      y: 20,
-      scene: "Ilya",
+      owner: equipment.owner,
     });
-    await shortSword.save();
+    await backpack.save();
 
-    const inventory = shortSword;
-
-    equipment.inventory = inventory._id;
+    equipment.inventory = backpack._id;
     await equipment.save();
 
     return equipment;

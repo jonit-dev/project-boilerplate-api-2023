@@ -16,7 +16,7 @@ describe("NPCMovementRandom.ts", () => {
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
-    testNPC = await unitTestHelper.createMockNPC({}, NPCMovementType.Random);
+    testNPC = await unitTestHelper.createMockNPC(null, null, NPCMovementType.Random);
   });
 
   it("should properly move to a random square", async () => {
@@ -33,6 +33,7 @@ describe("NPCMovementRandom.ts", () => {
         initialX: 0,
         initialY: 0,
       },
+      null,
       NPCMovementType.Random
     );
 

@@ -21,9 +21,23 @@ export class ItemView {
     private objectHelper: DataStructureHelper
   ) {}
 
-  public async warnCharacterAboutItemRemovalInView(item: IItem): Promise<void> {
-    if (item.x && item.y && item.scene) {
-      const charactersNearby = await this.characterView.getCharactersAroundXYPosition(item.x, item.y, item.scene);
+  public async removeItemFromMap(item: IItem): Promise<void> {
+    if (item.x === undefined || item.y === undefined || item.scene === undefined) {
+      throw new Error("You cannot call this method without an item x, y and scene.");
+    }
+
+    await this.warnCharactersAboutItemRemovalInView(item, item.x, item.y, item.scene);
+
+    // unset x, y, and scene from item model
+    item.x = undefined;
+    item.y = undefined;
+    item.scene = undefined;
+    await item.save();
+  }
+
+  public async warnCharactersAboutItemRemovalInView(item: IItem, x: number, y: number, scene: string): Promise<void> {
+    if (x !== undefined && y !== undefined && scene !== undefined) {
+      const charactersNearby = await this.characterView.getCharactersAroundXYPosition(x, y, scene);
 
       for (const character of charactersNearby) {
         this.socketMessaging.sendEventToUser<IViewDestroyElementPayload>(
@@ -37,6 +51,8 @@ export class ItemView {
 
         await this.characterView.removeFromCharacterView(character, item.id, "items");
       }
+    } else {
+      throw new Error("You cannot call this method without x, y and scene");
     }
   }
 
