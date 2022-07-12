@@ -25,4 +25,10 @@ export const npcRat = {
   },
   fleeOnLowHealth: true,
   experience: 15,
+  loots: [
+    {
+      itemBlueprintKey: "cheese",
+      chance: 30,
+    },
+  ],
 } as Partial<INPC>;

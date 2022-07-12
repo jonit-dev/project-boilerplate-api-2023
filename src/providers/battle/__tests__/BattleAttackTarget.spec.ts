@@ -36,6 +36,8 @@ describe("BattleAttackTarget.spec.ts", () => {
   });
 
   it("should NOT hit a target if attacker has melee attack type and target is out of range", async () => {
+    const hitTarget = jest.spyOn(battleAttackTarget, "hitTarget" as any);
+
     const attacker = testCharacter;
     attacker.x = FromGridX(0);
     attacker.y = FromGridY(0);
@@ -49,8 +51,6 @@ describe("BattleAttackTarget.spec.ts", () => {
     await battleAttackTarget.checkRangeAndAttack(attacker, defender);
 
     // expect battleAttackTarget to not have been called
-
-    const hitTarget = jest.spyOn(battleAttackTarget, "hitTarget" as any);
 
     expect(hitTarget).not.toHaveBeenCalled();
   });
