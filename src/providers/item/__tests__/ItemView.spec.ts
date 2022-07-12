@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { ItemView } from "../ItemView";
@@ -44,50 +43,25 @@ describe("ItemView.ts", () => {
     expect(testItem.scene).toBe(undefined);
   });
 
-  it("validate isEquipable, isStackable and fullDescription Item fields", () => {
-    expect(testItem.isEquipable).toBeTruthy();
-    expect(testItem.isStackable).toBeFalsy();
-    expect(testItem.fullDescription).toBe(
-      `${testItem.name}: Attack: ${testItem.attack}. Defense: ${testItem.defense}. Weight: ${testItem.weight}.`
-    );
+  it("should get one item after calling the method getItemsInCharacterView", async () => {
+    const items = await itemView.getItemsInCharacterView(testCharacter);
+
+    expect(items).toBeDefined();
+    expect(items.length).toBe(1);
+    expect(items[0]._id.toString()).toBe(testItem._id.toString());
+    expect(items[0].description).toBe(testItem.description);
   });
 
-  it("validate isEquipable, isStackable and fullDescription Item fields | stackable item", async () => {
-    testItem = await unitTestHelper.createStackableMockItem({
-      x: FromGridX(0),
-      y: FromGridY(0),
-      scene: testCharacter.scene,
-    });
+  it("should add item in character's view when calling warnCharacterAboutItemsInView and remove it when calling the method warnCharactersAboutItemRemovalInView", async () => {
+    await itemView.warnCharacterAboutItemsInView(testCharacter);
 
-    expect(testItem.isEquipable).toBeTruthy();
-    expect(testItem.isStackable).toBeTruthy();
-    expect(testItem.fullDescription).toBe(`${testItem.name}: ${testItem.description}`);
-  });
+    expect(testCharacter.view.items[testItem._id]).toBeDefined();
 
-  it("validate post save() Item methods are properly executed | add itemContainer and slots ", async () => {
-    expect(testItem.itemContainer).toBeDefined();
+    await itemView.warnCharactersAboutItemRemovalInView(testItem, testItem.x!, testItem.y!, testItem.scene!);
 
-    const itemContainer = await ItemContainer.findById(testItem.itemContainer);
+    const character = await Character.findById(testCharacter._id);
 
-    expect(itemContainer).toBeDefined();
-    expect(itemContainer!.slotQty).toBe(20);
-    expect(itemContainer!.name).toBe(testItem.name);
-    expect(itemContainer!.parentItem.toString()).toBe(testItem._id.toString());
-    expect(itemContainer!.slots).toBeDefined();
-  });
-
-  it("validate post remove() Item methods are properly executed | call warnAboutItemChanges and remove itemContainer ", async () => {
-    await testItem.remove();
-
-    expect(spyWarnCharactersAboutItemRemovalInView).toHaveBeenCalled();
-
-    expect(testItem.itemContainer).toBeDefined();
-
-    const itemContainer = await ItemContainer.findById(testItem.itemContainer);
-    const item = await Item.findById(testItem._id);
-
-    expect(item).toBeNull();
-    expect(itemContainer).toBeNull();
+    expect(character!.view.items[testItem._id]).not.toBeDefined();
   });
 
   afterAll(async () => {
