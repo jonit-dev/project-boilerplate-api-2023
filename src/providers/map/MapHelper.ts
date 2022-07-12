@@ -1,5 +1,5 @@
+import { ITiledObject } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ITiledObject } from "./MapLoader";
 
 @provide(MapHelper)
 export class MapHelper {

@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { ItemView } from "@providers/item/ItemView";
 import { MapLoader } from "@providers/map/MapLoader";
+import { MapTransition } from "@providers/map/MapTransition";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -34,7 +35,8 @@ export class CharacterNetworkUpdate {
     private itemView: ItemView,
     private characterView: CharacterView,
     private characterBan: CharacterBan,
-    private objectHelper: DataStructureHelper
+    private objectHelper: DataStructureHelper,
+    private mapTransition: MapTransition
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -86,6 +88,15 @@ export class CharacterNetworkUpdate {
 
           // update emitter position from connectedPlayers
           await this.updateServerSideEmitterInfo(data, character, newX, newY, isMoving, data.direction);
+
+          // verify if we're in a map transition. If so, we need to trigger a scene transition
+
+          const isTransition = this.mapTransition.getTransitionAtXY(character.scene, newX, newY);
+
+          if (isTransition) {
+            console.log(isTransition);
+            // TODO: Stopped here. Trigger a scene transition!
+          }
         }
       }
     );

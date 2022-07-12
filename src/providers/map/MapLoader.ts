@@ -9,26 +9,11 @@ import { createZipMap } from "./MapCompressionHelper";
 import { MapObjectsLoader } from "./MapObjectsLoader";
 import { MapSolids } from "./MapSolids";
 
-export interface ITiledObjectProps {
-  [str: string]: any;
-  name: string;
-  value: string;
-}
-
-export interface ITiledObject {
-  id: string;
-  x: number;
-  y: number;
-  properties: ITiledObjectProps[];
-}
-
 @provide(MapLoader)
 export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
   public static grids: Map<string, PF.Grid> = new Map();
-  public static tiledNPCs: Map<string, ITiledObject[]> = new Map();
-  public static tiledItems: Map<string, ITiledObject[]> = new Map();
-  constructor(private mapSolidsManager: MapSolids, private mapNPCLoader: MapObjectsLoader) {}
+  constructor(private mapSolidsManager: MapSolids, private mapObjectsLoader: MapObjectsLoader) {}
 
   public init(): void {
     // get all map names
@@ -54,9 +39,6 @@ export class MapLoader {
       MapLoader.grids.set(mapName, new PF.Grid(currentMap.width, currentMap.height));
 
       this.mapSolidsManager.generateGridSolids(mapName, currentMap);
-
-      this.mapNPCLoader.loadNPCsTiledData(mapName, currentMap);
-      this.mapNPCLoader.loadItemsTiledData(mapName, currentMap);
     }
 
     console.log("📦 Maps and grids are loaded!");
