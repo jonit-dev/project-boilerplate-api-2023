@@ -1,12 +1,16 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
-import { characterWeight, unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { CharacterWeight } from "../CharacterWeight";
 
 describe("CharacterWeight.ts", () => {
   let testCharacter: ICharacter;
+  let characterWeight: CharacterWeight;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
+
+    characterWeight = container.get<CharacterWeight>(CharacterWeight);
   });
 
   beforeEach(async () => {
