@@ -73,11 +73,11 @@ itemSchema.virtual("isStackable").get(function (this: IItem) {
 itemSchema.virtual("fullDescription").get(function (this: IItem) {
   return `${
     this.name
-  }: ${this.attack && this.defense ? `Attack: ${this.attack}. Defense: ${this.defense}.` + (this.weight && `Weight: ${this.weight}.`) : this.description}`;
+  }: ${this.attack !== undefined && this.defense !== undefined ? `Attack: ${this.attack}. Defense: ${this.defense}.` + (this.weight && ` Weight: ${this.weight}.`) : this.description}`;
 });
 
 const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"): Promise<void> => {
-  if (item.x && item.y && item.scene) {
+  if (item.x !== undefined && item.y !== undefined && item.scene) {
     const characterView = container.get<CharacterView>(CharacterView);
     const itemView = container.get<ItemView>(ItemView);
 
