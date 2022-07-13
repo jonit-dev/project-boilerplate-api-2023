@@ -3,6 +3,7 @@ import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { IItem, ItemType } from "@rpg-engine/shared";
+import { EquipmentSlots } from "../EquipmentSlots";
 import { EquipmentUnequip } from "../EquipmentUnequip";
 
 describe("EquipmentUnequip.spec.ts", () => {
@@ -11,10 +12,12 @@ describe("EquipmentUnequip.spec.ts", () => {
   let item: IItem;
   let character: ICharacter;
   let charBody: IItem;
+  let equipmentSlots: EquipmentSlots;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     equipmentUnequip = container.get<EquipmentUnequip>(EquipmentUnequip);
+    equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
 
   beforeEach(async () => {
@@ -73,7 +76,7 @@ describe("EquipmentUnequip.spec.ts", () => {
   });
 
   it("Should get the equipment slots", async () => {
-    const result = await equipmentUnequip.getEquipmentSlots(equipment._id);
+    const result = await equipmentSlots.getEquipmentSlots(equipment._id);
 
     const itemHead = result.head as IItem;
     const itemNeck = result.neck as IItem;
