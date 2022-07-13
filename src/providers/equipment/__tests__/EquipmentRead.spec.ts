@@ -1,8 +1,8 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { EquipmentRead } from "../EquipmentRead";
-import { IEquipementSet, ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { UISocketEvents } from "@rpg-engine/shared";
+import { EquipmentRead } from "../EquipmentRead";
 
 describe("EquipmentRead.ts", () => {
   let equipmentSetRead: EquipmentRead;
@@ -59,7 +59,7 @@ describe("EquipmentRead.ts", () => {
     await equipmentSetRead.onEquipmentRead(testCharacter);
 
     // @ts-ignore
-    expect(equipmentSetRead.socketMessaging.sendEventToUser).toHaveReturnedWith(IEquipementSet);
+    expect(equipmentSetRead.socketMessaging.sendEventToUser).toHaveReturnedWith(IEquipmentSet);
   });
 
   afterAll(async () => {

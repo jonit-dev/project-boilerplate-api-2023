@@ -1,10 +1,10 @@
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IEquipementSet, IItem } from "@rpg-engine/shared";
+import { IEquipmentSet, IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(EquipmentSlots)
 export class EquipmentSlots {
-  public async getEquipmentSlots(equipmentId: string): Promise<IEquipementSet> {
+  public async getEquipmentSlots(equipmentId: string): Promise<IEquipmentSet> {
     const equipment = await Equipment.findById(equipmentId)
       .lean()
       .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
@@ -33,6 +33,6 @@ export class EquipmentSlots {
       accessory,
       armor,
       inventory,
-    } as IEquipementSet;
+    } as IEquipmentSet;
   }
 }
