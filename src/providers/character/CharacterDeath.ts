@@ -107,31 +107,31 @@ export class CharacterDeath {
   }
 
   private async dropBackpackItemsOnBody(bodyContainer: IItemContainer, backpack: IItem): Promise<void> {
-    const backPackContainer = await ItemContainer.findById(backpack.itemContainer);
+    const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
 
-    if (!backPackContainer) {
+    if (!backpackContainer) {
       throw new Error(`Backpack without item container. Item id ${backpack._id}`);
     }
 
-    if (backPackContainer.emptySlotsQty === backPackContainer.slotQty) {
+    if (backpackContainer.emptySlotsQty === backpackContainer.slotQty) {
       return;
     }
 
-    for (const i in backPackContainer.slots) {
-      if (backPackContainer.slots[i] !== null) {
+    for (const i in backpackContainer.slots) {
+      if (backpackContainer.slots[i] !== null) {
         const freeSlotId = bodyContainer.firstAvailableSlotId;
         // if there's space in body item container, then add the backpack item
         // otherwise, leave the for loop
         if (freeSlotId === null) {
           break;
         }
-        bodyContainer.slots[Number(freeSlotId)] = backPackContainer.slots[i];
-        backPackContainer.slots[Number(i)] = null;
+        bodyContainer.slots[Number(freeSlotId)] = backpackContainer.slots[i];
+        backpackContainer.slots[Number(i)] = null;
       }
     }
 
-    backPackContainer.markModified("slots");
-    await backPackContainer.save();
+    backpackContainer.markModified("slots");
+    await backpackContainer.save();
   }
 
   private async dropEquippedItemOnBody(
