@@ -3,7 +3,6 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
-  IEquipementSet,
   IEquipmentAndInventoryUpdatePayload,
   IItem,
   ItemSlotType,
@@ -14,10 +13,11 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
+import { EquipmentSlots } from "./EquipmentSlots";
 
 @provide(EquipmentUnequip)
 export class EquipmentUnequip {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging, private equipmentSlots: EquipmentSlots) {}
 
   public async unequip(
     character: ICharacter,
@@ -83,7 +83,7 @@ export class EquipmentUnequip {
 
     this.manageItemContainerSlots(itemAlreadyInSlot, character, itemContainer, itemSlot!, item);
 
-    const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,
@@ -166,37 +166,6 @@ export class EquipmentUnequip {
 
       await itemContainerModel!.save();
     }
-  }
-
-  public async getEquipmentSlots(equipmentId: string): Promise<IEquipementSet> {
-    const equipment = await Equipment.findById(equipmentId)
-      .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
-      .exec();
-
-    const head = equipment?.head! as unknown as IItem;
-    const neck = equipment?.neck! as unknown as IItem;
-    const leftHand = equipment?.leftHand! as unknown as IItem;
-    const rightHand = equipment?.rightHand! as unknown as IItem;
-    const ring = equipment?.ring! as unknown as IItem;
-    const legs = equipment?.legs! as unknown as IItem;
-    const boot = equipment?.boot! as unknown as IItem;
-    const accessory = equipment?.accessory! as unknown as IItem;
-    const armor = equipment?.armor! as unknown as IItem;
-    const inventory = equipment?.inventory! as unknown as IItem;
-
-    return {
-      _id: equipment!._id,
-      head,
-      neck,
-      leftHand,
-      rightHand,
-      ring,
-      legs,
-      boot,
-      accessory,
-      armor,
-      inventory,
-    } as IEquipementSet;
   }
 
   public getAllowedItemTypes(): ItemType[] {
