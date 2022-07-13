@@ -22,7 +22,7 @@ import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
-import { itemMock } from "./mock/itemMock";
+import { itemMock, stackableItemMock } from "./mock/itemMock";
 
 interface IMockCharacterOptions {
   hasEquipment?: boolean;
@@ -101,6 +101,17 @@ export class UnitTestHelper {
   public async createMockItem(extraProps?: Partial<IItem>): Promise<IItem> {
     const newItem = new Item({
       ...itemMock,
+      ...extraProps,
+    });
+
+    await newItem.save();
+
+    return newItem;
+  }
+
+  public async createStackableMockItem(extraProps?: Partial<IItem>): Promise<IItem> {
+    const newItem = new Item({
+      ...stackableItemMock,
       ...extraProps,
     });
 

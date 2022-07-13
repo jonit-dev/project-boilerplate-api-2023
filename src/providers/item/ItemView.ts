@@ -69,7 +69,7 @@ export class ItemView {
         continue;
       }
 
-      if (!item.x || !item.y || !item.scene || !item.layer) {
+      if (item.x === undefined || item.y === undefined || !item.scene || !item.layer) {
         continue;
       }
 

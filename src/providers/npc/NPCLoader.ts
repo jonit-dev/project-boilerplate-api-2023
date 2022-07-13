@@ -1,5 +1,6 @@
 import { MapHelper } from "@providers/map/MapHelper";
 import { MapLoader } from "@providers/map/MapLoader";
+import { MapObjectsLoader } from "@providers/map/MapObjectsLoader";
 import { INPC } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { npcsBlueprintIndex } from "./data/index";
@@ -10,33 +11,39 @@ export interface INPCSeedData extends Omit<INPC, "_id"> {
 
 @provide(NPCLoader)
 export class NPCLoader {
-  constructor(private mapHelper: MapHelper) {}
+  constructor(private mapHelper: MapHelper, private mapObjectsLoader: MapObjectsLoader) {}
 
   public loadNPCSeedData(): Map<string, INPCSeedData> {
     const npcSeedData = new Map<string, INPCSeedData>();
 
-    for (const [mapName, npcs] of MapLoader.tiledNPCs.entries()) {
-      for (const tiledNPCData of npcs) {
+    for (const [mapName, mapData] of MapLoader.maps.entries()) {
+      const NPCs = this.mapObjectsLoader.getObjectLayerData("NPCs", mapData);
+
+      if (!NPCs) {
+        continue;
+      }
+
+      for (const tiledNPC of NPCs) {
         if (!mapName) {
           throw new Error(`NPCLoader: Scene name is not found for map ${mapName}`);
         }
 
         const additionalProps: Record<string, any> = {
-          initialX: tiledNPCData.x,
-          initialY: tiledNPCData.y,
+          initialX: tiledNPC.x,
+          initialY: tiledNPC.y,
         };
 
-        for (const prop of tiledNPCData.properties) {
+        for (const prop of tiledNPC.properties) {
           if (prop.name === "movementType" && prop.value === "FixedPath") {
             additionalProps.fixedPath = {
-              endGridX: tiledNPCData.properties.find((p) => p.name === "endGridX")?.value,
-              endGridY: tiledNPCData.properties.find((p) => p.name === "endGridY")?.value,
+              endGridX: tiledNPC.properties.find((p) => p.name === "endGridX")?.value,
+              endGridY: tiledNPC.properties.find((p) => p.name === "endGridY")?.value,
             };
           }
         }
 
         const { key, data } = this.mapHelper.mergeBlueprintWithTiledProps<INPCSeedData>(
-          tiledNPCData,
+          tiledNPC,
           mapName,
           npcsBlueprintIndex,
           additionalProps
