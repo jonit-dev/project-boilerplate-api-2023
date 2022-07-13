@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
@@ -211,6 +212,44 @@ export class UnitTestHelper {
         } as ISocketTransmissionZone)
     );
     return socketTransmissionZone;
+  }
+
+  public async createMockBackpackItemContainer(parent: IItem, extraProps?: Partial<IItem>): Promise<IItemContainer> {
+    const slotQty: number = 20;
+
+    const backpackContainer = new ItemContainer({
+      name: parent.name,
+      parentItem: parent._id,
+      owner: parent.owner,
+    });
+
+    const weaponItem = new Item({
+      ...itemMock,
+      ...extraProps,
+      defense: 10,
+      attack: 8,
+    });
+
+    const foodItem = new Item({
+      ...stackableItemMock,
+      ...extraProps,
+    });
+
+    await foodItem.save();
+    await weaponItem.save();
+
+    const slots = {};
+
+    for (let i = 0; i < slotQty; i++) {
+      slots[Number(i)] = null;
+    }
+
+    slots[0] = foodItem._id;
+    slots[1] = weaponItem._id;
+
+    backpackContainer.slots = slots;
+
+    return backpackContainer.save();
   }
 
   public async beforeAllJestHook(): Promise<void> {

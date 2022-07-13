@@ -96,7 +96,7 @@ export class NPCDeath {
 
         for (let i = 0; i < itemContainer.slotQty; i++) {
           if (itemContainer.slots[Number(i)] == null) {
-            itemContainer.slots[Number(i)] = lootItem;
+            itemContainer.slots[Number(i)] = lootItem._id;
             break;
           }
         }
