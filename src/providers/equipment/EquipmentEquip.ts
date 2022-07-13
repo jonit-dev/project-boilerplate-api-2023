@@ -5,8 +5,8 @@ import { Item } from "@entities/ModuleInventory/ItemModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
-  IEquipementSet,
   IEquipmentAndInventoryUpdatePayload,
+  IEquipmentSet,
   IItem,
   ItemSlotType,
   ItemSocketEvents,
@@ -217,7 +217,7 @@ export class EquipmentEquip {
     await Item.deleteOne({ _id: itemId });
   }
 
-  public async getEquipmentSlots(equipmentId: string): Promise<IEquipementSet> {
+  public async getEquipmentSlots(equipmentId: string): Promise<IEquipmentSet> {
     const equipment = await Equipment.findById(equipmentId)
       .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
       .exec();

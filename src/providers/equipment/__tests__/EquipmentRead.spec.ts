@@ -1,26 +1,30 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { UISocketEvents } from "@rpg-engine/shared";
+import { EquipmentSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { EquipmentRead } from "../EquipmentRead";
+import { EquipmentSlots } from "../EquipmentSlots";
 
 describe("EquipmentRead.ts", () => {
   let equipmentSetRead: EquipmentRead;
 
   let testCharacter: ICharacter;
+  let equipmentSlots: EquipmentSlots;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     equipmentSetRead = container.get<EquipmentRead>(EquipmentRead);
+    equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
-    testCharacter = await unitTestHelper.createMockCharacter();
+    testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true });
   });
 
   it("should automatically create an equipment set", async () => {
     const equipmentSet = await Equipment.findById(testCharacter.equipment);
+
     expect(equipmentSet).toBeDefined();
   });
 
@@ -58,8 +62,22 @@ describe("EquipmentRead.ts", () => {
 
     await equipmentSetRead.onEquipmentRead(testCharacter);
 
+    const fetchEquipment = await Equipment.findById(testCharacter.equipment);
+
+    if (!fetchEquipment) {
+      throw new Error("Equipment set not found.");
+    }
+
+    const slots = await equipmentSlots.getEquipmentSlots(fetchEquipment?._id);
+
     // @ts-ignore
-    expect(equipmentSetRead.socketMessaging.sendEventToUser).toHaveReturnedWith(IEquipmentSet);
+    expect(equipmentSetRead.socketMessaging.sendEventToUser).toHaveBeenCalledWith(
+      testCharacter.channelId!,
+      EquipmentSocketEvents.ContainerRead,
+      {
+        equipment: slots,
+      }
+    );
   });
 
   afterAll(async () => {
