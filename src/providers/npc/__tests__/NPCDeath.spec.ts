@@ -39,7 +39,7 @@ describe("NPCDeath.ts", () => {
     // @ts-ignore
     const spySocketMessaging = jest.spyOn(npcDeath.socketMessaging, "sendEventToUser");
 
-    await npcDeath.handleNPCDeath(testNPC);
+    await npcDeath.handleNPCDeath(testNPC, testCharacter);
 
     expect(spyOnNearbyCharacters).toHaveBeenCalledWith(testNPC.x, testNPC.y, testNPC.scene);
 
@@ -51,10 +51,10 @@ describe("NPCDeath.ts", () => {
   });
 
   it("on NPC death, make sure we generate a body and add nextSpawnTime to its payload", async () => {
-    await npcDeath.handleNPCDeath(testNPC);
+    await npcDeath.handleNPCDeath(testNPC, testCharacter);
 
     const npcBody = await Item.findOne({
-      owner: testNPC._id,
+      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
@@ -73,12 +73,12 @@ describe("NPCDeath.ts", () => {
     // @ts-ignore
     const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
 
-    await npcDeath.handleNPCDeath(testNPC);
+    await npcDeath.handleNPCDeath(testNPC, testCharacter);
 
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
     const npcBody = await Item.findOne({
-      owner: testNPC._id,
+      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
@@ -103,12 +103,12 @@ describe("NPCDeath.ts", () => {
       testNPC.loots?.push({ itemBlueprintKey: "jacket", chance: 50 });
     }
 
-    await npcDeath.handleNPCDeath(testNPC);
+    await npcDeath.handleNPCDeath(testNPC, testCharacter);
 
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
     const npcBody = await Item.findOne({
-      owner: testNPC._id,
+      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
@@ -135,12 +135,12 @@ describe("NPCDeath.ts", () => {
     // remove NPC loots
     testNPC.loots = undefined;
 
-    await npcDeath.handleNPCDeath(testNPC);
+    await npcDeath.handleNPCDeath(testNPC, testCharacter);
 
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
     const npcBody = await Item.findOne({
-      owner: testNPC._id,
+      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
