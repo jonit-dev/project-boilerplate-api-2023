@@ -1,4 +1,5 @@
-import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -6,10 +7,9 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, INPCLoot } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 import { NPCTarget } from "./movement/NPCTarget";
 import { NPCCycle } from "./NPCCycle";
-import _ from "lodash";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 
 @provide(NPCDeath)
 export class NPCDeath {
@@ -66,7 +66,6 @@ export class NPCDeath {
 
     const npcBody = new Item({
       ...blueprintData, // base body props
-      owner: npc._id,
       key: `${npc.key}-body`,
       texturePath: `${npc.textureKey}/death/0.png`,
       textureKey: npc.textureKey,
