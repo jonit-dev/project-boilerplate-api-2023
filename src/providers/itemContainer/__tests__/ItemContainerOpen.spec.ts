@@ -121,7 +121,7 @@ describe("ItemContainerOpen.ts", () => {
       }
     });
 
-    it("should throw an error if he tries to open a container that's not his", async () => {
+    it("should throw an error if he tries to open a container that's not his and its isOwnerRestricted", async () => {
       // @ts-ignore
       jest.spyOn(itemContainerOpen.socketMessaging, "sendEventToUser" as any);
 
@@ -129,6 +129,7 @@ describe("ItemContainerOpen.ts", () => {
 
       const itemContainer = await ItemContainer.findOne({
         parentItem: item._id,
+        isOwnerRestricted: true,
       });
 
       if (itemContainer) {

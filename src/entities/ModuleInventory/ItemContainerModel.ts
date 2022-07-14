@@ -7,6 +7,7 @@ const itemContainerSchema = createSchema(
     owner: Type.objectId({
       ref: "Character",
     }),
+    isOwnerRestricted: Type.boolean(),
     parentItem: Type.objectId({
       ref: "Item",
       required: true,

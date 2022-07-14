@@ -1,3 +1,4 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
@@ -19,7 +20,7 @@ export class NPCDeath {
     private npcTarget: NPCTarget
   ) {}
 
-  public async handleNPCDeath(npc: INPC): Promise<void> {
+  public async handleNPCDeath(npc: INPC, character: ICharacter): Promise<void> {
     try {
       // warn characters around about the NPC's death
       const nearbyCharacters = await this.characterView.getCharactersAroundXYPosition(npc.x, npc.y, npc.scene);
@@ -32,7 +33,7 @@ export class NPCDeath {
       }
 
       // create NPC body instance
-      const npcBody = await this.generateNPCBody(npc);
+      const npcBody = await this.generateNPCBody(npc, character);
 
       // add loot in NPC dead body container
       if (npc.loots) {
@@ -61,12 +62,13 @@ export class NPCDeath {
     }
   }
 
-  public generateNPCBody(npc: INPC): Promise<IItem> {
+  public generateNPCBody(npc: INPC, character: ICharacter): Promise<IItem> {
     const blueprintData = itemsBlueprintIndex["npc-body"];
 
     const npcBody = new Item({
       ...blueprintData, // base body props
       key: `${npc.key}-body`,
+      owner: character.id,
       texturePath: `${npc.textureKey}/death/0.png`,
       textureKey: npc.textureKey,
       name: `${npc.name}'s body`,
