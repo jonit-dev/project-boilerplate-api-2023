@@ -143,6 +143,7 @@ const npcSchema = createLeanSchema(
     loots: Type.array().of({
       itemBlueprintKey: Type.string({ required: true }),
       chance: Type.number({ required: true, min: 0, max: 100 }),
+      quantityRange: Type.array({ required: false, minItems: 2, maxItems: 2 }).of(Type.number()),
     }),
     ...({} as {
       isAlive: boolean;

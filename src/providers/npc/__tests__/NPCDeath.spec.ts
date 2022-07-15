@@ -93,6 +93,7 @@ describe("NPCDeath.ts", () => {
     expect(bodyItemContainer).not.toBeNull();
     expect(bodyItemContainer!.slots).toBeDefined();
     expect(bodyItemContainer!.slots[0]).not.toBeNull();
+    expect(bodyItemContainer!.slots[2]).toBeNull();
   });
 
   it("on NPC death, make sure many loot items are added to NPC body", async () => {

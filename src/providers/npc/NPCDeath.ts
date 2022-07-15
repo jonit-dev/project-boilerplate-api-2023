@@ -88,18 +88,36 @@ export class NPCDeath {
       throw new Error(`Error fetching itemContainer for Item with key ${npcBody.key}`);
     }
 
+    let freeSlotAvailable = true;
     for (const loot of loots) {
+      if (!freeSlotAvailable) {
+        break;
+      }
+
       const rand = Math.round(_.random(0, 100));
       if (rand <= loot.chance) {
         const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
-        const lootItem = new Item({ ...blueprintData });
-        await lootItem.save();
 
-        for (let i = 0; i < itemContainer.slotQty; i++) {
-          if (itemContainer.slots[Number(i)] == null) {
-            itemContainer.slots[Number(i)] = lootItem._id;
+        let lootQuantity = 1;
+        // can specify a loot quantity range, e.g. 5-10 coins.
+        // So need to add that quantity to the body container
+        if (loot.quantityRange && loot.quantityRange.length === 2) {
+          lootQuantity = Math.round(_.random(loot.quantityRange[0], loot.quantityRange[1]));
+        }
+        while (lootQuantity > 0) {
+          const lootItem = new Item({ ...blueprintData });
+          await lootItem.save();
+
+          const freeSlotId = itemContainer.firstAvailableSlotId;
+          freeSlotAvailable = freeSlotId !== null;
+
+          if (!freeSlotAvailable) {
             break;
           }
+
+          itemContainer.slots[freeSlotId!] = lootItem._id;
+
+          lootQuantity--;
         }
       }
     }

@@ -29,6 +29,7 @@ export const npcRat = {
     {
       itemBlueprintKey: "cheese",
       chance: 30,
+      quantityRange: [1, 3],
     },
   ],
 } as Partial<INPC>;

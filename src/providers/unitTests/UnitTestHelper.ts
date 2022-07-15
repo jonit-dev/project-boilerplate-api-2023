@@ -59,6 +59,7 @@ export class UnitTestHelper {
         {
           itemBlueprintKey: "cheese",
           chance: 100,
+          quantityRange: [1, 2],
         },
       ],
     });
