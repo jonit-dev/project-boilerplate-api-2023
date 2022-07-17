@@ -15,11 +15,8 @@ export class GetMapMetadataUseCase {
       const layers = MAP_LAYERS;
 
       const tilesets = map.tilesets.map((tileset) => {
-        const imgPath = tileset.image.split("/public")[1];
-
         return {
           name: tileset.name,
-          imagePath: imgPath,
         };
       });
 
@@ -30,6 +27,8 @@ export class GetMapMetadataUseCase {
         tilesets,
         tileWidth: map.tilewidth,
         tileHeight: map.tileheight,
+        width: map.width,
+        height: map.height,
       };
 
       return mapMetadata;
