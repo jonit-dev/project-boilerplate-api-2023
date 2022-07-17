@@ -8,6 +8,7 @@ import { npcOrc } from "./blueprints/NPCOrc";
 import { npcRat } from "./blueprints/NPCRat";
 import { npcSkeleton } from "./blueprints/NPCSkeleton";
 import { npcSkeletonKnight } from "./blueprints/NPCSkeletonKnight";
+import { npcBat } from "./blueprints/NPCBat";
 
 export const npcsBlueprintIndex: IBlueprint = {
   agatha: npcAgatha,
@@ -19,4 +20,5 @@ export const npcsBlueprintIndex: IBlueprint = {
   skeleton: npcSkeleton,
   rat: npcRat,
   skeletonKnight: npcSkeletonKnight,
+  bat: npcBat,
 };
