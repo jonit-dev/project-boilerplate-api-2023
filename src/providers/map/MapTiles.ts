@@ -1,4 +1,4 @@
-import { ITiledChunk, ITileset, MapLayers, TiledLayerNames } from "@rpg-engine/shared";
+import { ITiledChunk, ITiledLayer, ITileset, MapLayers, TiledLayerNames } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MapLoader } from "./MapLoader";
 
@@ -32,16 +32,20 @@ export class MapTiles {
     );
   }
 
-  public getTileId(map: string, gridX: number, gridY: number, mapLayer: MapLayers): number | undefined {
-    const layerName = TiledLayerNames[mapLayer];
-
+  public getLayer(map: string, layerName: MapLayers): ITiledLayer | undefined {
     const mapData = MapLoader.maps.get(map);
 
     if (!mapData) {
       throw new Error(`Failed to find map ${map}`);
     }
 
-    const layer = mapData.layers.find((layer) => layer.name.toLowerCase() === layerName.toLowerCase());
+    return mapData.layers.find((layer) => layer.name.toLowerCase() === TiledLayerNames[layerName].toLowerCase());
+  }
+
+  public getTileId(map: string, gridX: number, gridY: number, mapLayer: MapLayers): number | undefined {
+    const layerName = TiledLayerNames[mapLayer];
+
+    const layer = this.getLayer(map, mapLayer);
 
     if (!layer) {
       throw new Error(`Failed to find layer ${layerName}`);
