@@ -4,11 +4,47 @@ import { MapLoader } from "./MapLoader";
 
 @provide(MapTiles)
 export class MapTiles {
+  public isSolid(map: string, gridX: number, gridY: number, mapLayer: MapLayers): boolean {
+    const layerName = TiledLayerNames[mapLayer];
+
+    const layer = this.getLayer(map, mapLayer);
+
+    if (!layer) {
+      throw new Error(`Failed to find layer ${layerName}`);
+    }
+
+    const rawTileId = this.getRawTileId(layer, gridX, gridY);
+
+    if (!rawTileId) {
+      return false;
+    }
+
+    const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
+
+    if (!targetTileset) {
+      return false;
+    }
+
+    if (rawTileId) {
+      const tileId = rawTileId - targetTileset.firstgid;
+
+      const tileProperty = this.getTileProperty<boolean>(targetTileset!, tileId!, "ge_collide") || false;
+
+      if (tileProperty) {
+        return tileProperty;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   public getTileProperty<T>(tileset: ITileset, tileId: number, tileProperty: string): T | undefined {
-    const tileInfo = tileset.tiles.find((tile) => tile.id === tileId);
+    const tileInfo = tileset?.tiles?.find((tile) => tile.id === tileId);
 
     if (!tileInfo) {
-      throw new Error(`Failed to find tile ${tileId}`);
+      return undefined;
     }
 
     const property = tileInfo.properties.find((property) => property.name === tileProperty);
@@ -32,16 +68,6 @@ export class MapTiles {
     );
   }
 
-  public getLayer(map: string, layerName: MapLayers): ITiledLayer | undefined {
-    const mapData = MapLoader.maps.get(map);
-
-    if (!mapData) {
-      throw new Error(`Failed to find map ${map}`);
-    }
-
-    return mapData.layers.find((layer) => layer.name.toLowerCase() === TiledLayerNames[layerName].toLowerCase());
-  }
-
   public getTileId(map: string, gridX: number, gridY: number, mapLayer: MapLayers): number | undefined {
     const layerName = TiledLayerNames[mapLayer];
 
@@ -51,20 +77,16 @@ export class MapTiles {
       throw new Error(`Failed to find layer ${layerName}`);
     }
 
-    const targetChunk = this.getTargetChunk(layer.chunks, gridX, gridY);
-
     // get tile at position x and y
 
-    if (targetChunk) {
-      const rawTileId = this.getRawTileId(targetChunk, gridX, gridY);
+    const rawTileId = this.getRawTileId(layer, gridX, gridY);
+    const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
+    const tileId = rawTileId! - targetTileset!.firstgid;
 
-      const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
-
-      if (rawTileId) {
-        return rawTileId - targetTileset?.firstgid!;
-      } else {
-        return 0;
-      }
+    if (rawTileId) {
+      return tileId;
+    } else {
+      return 0;
     }
   }
 
@@ -74,7 +96,23 @@ export class MapTiles {
     );
   }
 
-  private getRawTileId(chunk: ITiledChunk, gridX: number, gridY: number): number | undefined {
+  private getRawTileId(layer: ITiledLayer, gridX: number, gridY: number): number | undefined {
+    const chunk = this.getTargetChunk(layer.chunks, gridX, gridY);
+
+    if (!chunk) {
+      return undefined;
+    }
+
     return chunk.data[(gridY - chunk.y) * chunk.width + (gridX - chunk.x)];
+  }
+
+  private getLayer(map: string, layerName: MapLayers): ITiledLayer | undefined {
+    const mapData = MapLoader.maps.get(map);
+
+    if (!mapData) {
+      throw new Error(`Failed to find map ${map}`);
+    }
+
+    return mapData.layers.find((layer) => layer.name.toLowerCase() === TiledLayerNames[layerName].toLowerCase());
   }
 }

@@ -77,6 +77,15 @@ describe("MapTiles.ts", () => {
     expect(tileset2.name).toBe("Village_Tileset");
   });
 
+  it("should properly check if a tile is solid or not", () => {
+    const forestSolidTile = mapTiles.isSolid(mapName, 17, 13, MapLayers.OverGround);
+    const villageSolidTile = mapTiles.isSolid(mapName, 16, 11, MapLayers.OverGround);
+    const emptyTile = mapTiles.isSolid(mapName, 18, 16, MapLayers.OverGround);
+    expect(forestSolidTile).toBeTruthy();
+    expect(villageSolidTile).toBeTruthy();
+    expect(emptyTile).toBeFalsy();
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });

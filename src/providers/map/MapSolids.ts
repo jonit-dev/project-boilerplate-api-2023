@@ -61,30 +61,6 @@ export class MapSolids {
   }
 
   private tileSolidCheck(map: string, gridX: number, gridY: number, layer: MapLayers): boolean {
-    const tileId = this.mapTiles.getTileId(map, gridX, gridY, layer);
-
-    if (tileId === 0 || !tileId) {
-      return false; // 0 means it's empty
-    }
-
-    const mapData = MapLoader.maps.get(map);
-
-    if (!mapData) {
-      throw new Error(`Failed to find map ${map}`);
-    }
-
-    const tileset = mapData.tilesets.find((tileset) => tileId <= tileset.tilecount);
-
-    if (!tileset) {
-      throw new Error(`Failed to find tileset for tile ${tileId}`);
-    }
-
-    const isTileSolid = this.mapTiles.getTileProperty<boolean>(tileset, tileId, "ge_collide");
-
-    if (!isTileSolid) {
-      return false;
-    }
-
-    return isTileSolid;
+    return this.mapTiles.isSolid(map, gridX, gridY, layer);
   }
 }
