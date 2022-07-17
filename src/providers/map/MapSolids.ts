@@ -1,3 +1,4 @@
+import { MAP_LAYERS_TO_ID, MAP_OBJECT_LAYERS } from "@providers/constants/MapConstants";
 import { ITiled, MapLayers } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MapLoader } from "./MapLoader";
@@ -10,7 +11,7 @@ export interface ILayersSolidData {
 
 @provide(MapSolids)
 export class MapSolids {
-  constructor(private mapTilesManager: MapTiles) {}
+  constructor(private mapTiles: MapTiles) {}
 
   public generateGridSolids(map: string, currentMap: ITiled): void {
     const gridMap = MapLoader.grids.get(map);
@@ -19,26 +20,19 @@ export class MapSolids {
       return;
     }
 
-    const mapLayerParser = {
-      ground: 0,
-      "over-ground": 1,
-      character: 2,
-      "over-character": 3,
-    };
-
     for (let gridX = 0; gridX < currentMap.width; gridX++) {
       for (let gridY = 0; gridY < currentMap.height; gridY++) {
         const layers = currentMap.layers;
 
         for (const layer of layers) {
-          if (layer.name === "NPCs") {
-            // skip NPCs layer, because this is just for solid generation
+          if (MAP_OBJECT_LAYERS.includes(layer.name)) {
+            // skip object layers, because this is just for solid generation
             continue;
           }
 
-          const isSolid = this.isTileSolid(map, gridX, gridY, mapLayerParser[layer.name]);
+          const isSolid = this.isTileSolid(map, gridX, gridY, MAP_LAYERS_TO_ID[layer.name]);
 
-          if (mapLayerParser[layer.name] === MapLayers.Character) {
+          if (MAP_LAYERS_TO_ID[layer.name] === MapLayers.Character) {
             gridMap.setWalkableAt(gridX, gridY, !isSolid);
           }
         }
@@ -67,7 +61,7 @@ export class MapSolids {
   }
 
   private tileSolidCheck(map: string, gridX: number, gridY: number, layer: MapLayers): boolean {
-    const tileId = this.mapTilesManager.getTileId(map, gridX, gridY, layer);
+    const tileId = this.mapTiles.getTileId(map, gridX, gridY, layer);
 
     if (tileId === 0 || !tileId) {
       return false; // 0 means it's empty
@@ -85,7 +79,7 @@ export class MapSolids {
       throw new Error(`Failed to find tileset for tile ${tileId}`);
     }
 
-    const isTileSolid = this.mapTilesManager.getTileProperty<boolean>(tileset, tileId, "ge_collide");
+    const isTileSolid = this.mapTiles.getTileProperty<boolean>(tileset, tileId, "ge_collide");
 
     if (!isTileSolid) {
       return false;
