@@ -15,7 +15,7 @@ export class MapLoader {
   public static grids: Map<string, PF.Grid> = new Map();
   constructor(private mapSolidsManager: MapSolids, private mapObjectsLoader: MapObjectsLoader) {}
 
-  public init(): void {
+  public async init(): Promise<void> {
     // get all map names
 
     const mapNames = fs.readdirSync(STATIC_PATH + "/maps");
@@ -31,7 +31,7 @@ export class MapLoader {
       const mapPath = `${STATIC_PATH}/maps/${mapFileName}`;
       const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
 
-      this.checkMapUpdated(mapPath, mapFileName, currentMap);
+      await this.checkMapUpdated(mapPath, mapFileName, currentMap);
 
       const mapName = mapFileName.replace(".json", "");
 

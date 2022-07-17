@@ -14,7 +14,7 @@ describe("NPCMovementMoveTowards.ts", () => {
     await unitTestHelper.beforeAllJestHook();
 
     npcMovementMoveTowards = container.get<NPCMovementMoveTowards>(NPCMovementMoveTowards);
-    mapLoader.init();
+    await mapLoader.init();
     npcTarget = container.get<NPCTarget>(NPCTarget);
   });
 

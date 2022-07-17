@@ -10,7 +10,7 @@ describe("NPCMovementFixedPath.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     npcMovementFixedPath = container.get<NPCMovementFixedPath>(NPCMovementFixedPath);
-    mapLoader.init();
+    await mapLoader.init();
   });
 
   beforeEach(async () => {

@@ -11,7 +11,7 @@ describe("NPCMovementRandom.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     npcMovementRandom = container.get<NPCMovementRandomPath>(NPCMovementRandomPath);
-    mapLoader.init();
+    await mapLoader.init();
   });
 
   beforeEach(async () => {

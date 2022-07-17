@@ -8,8 +8,8 @@ describe("MovementHelper.ts", () => {
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
+    await mapLoader.init();
     movementHelper = container.get<MovementHelper>(MovementHelper);
-    mapLoader.init();
   });
 
   beforeEach(async () => {

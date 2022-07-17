@@ -1,4 +1,4 @@
-import { ITileset, MapLayers, TiledLayerNames } from "@rpg-engine/shared";
+import { ITiledChunk, ITileset, MapLayers, TiledLayerNames } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MapLoader } from "./MapLoader";
 
@@ -20,6 +20,18 @@ export class MapTiles {
     return property.value as unknown as T;
   }
 
+  public getTilesetFromTileId(map: string, rawTileId: number): ITileset | undefined {
+    const mapData = MapLoader.maps.get(map);
+
+    if (!mapData) {
+      throw new Error(`Failed to find map ${map}`);
+    }
+
+    return mapData.tilesets.find(
+      (tileset) => tileset.firstgid <= rawTileId && tileset.firstgid + tileset.tilecount > rawTileId
+    );
+  }
+
   public getTileId(map: string, gridX: number, gridY: number, mapLayer: MapLayers): number | undefined {
     const layerName = TiledLayerNames[mapLayer];
 
@@ -35,20 +47,30 @@ export class MapTiles {
       throw new Error(`Failed to find layer ${layerName}`);
     }
 
-    const targetChunk = layer.chunks.find(
-      (chunk) => chunk.x <= gridX && chunk.x + chunk.width > gridX && chunk.y <= gridY && chunk.y + chunk.height > gridY
-    );
+    const targetChunk = this.getTargetChunk(layer.chunks, gridX, gridY);
 
     // get tile at position x and y
 
     if (targetChunk) {
-      const tileId = targetChunk.data[(gridY - targetChunk.y) * targetChunk.width + (gridX - targetChunk.x)];
+      const rawTileId = this.getRawTileId(targetChunk, gridX, gridY);
 
-      if (tileId) {
-        return tileId - 1;
+      const targetTileset = this.getTilesetFromTileId(map, rawTileId!);
+
+      if (rawTileId) {
+        return rawTileId - targetTileset?.firstgid!;
       } else {
         return 0;
       }
     }
+  }
+
+  private getTargetChunk(chunks: ITiledChunk[], gridX: number, gridY: number): ITiledChunk | undefined {
+    return chunks.find(
+      (chunk) => chunk.x <= gridX && chunk.x + chunk.width > gridX && chunk.y <= gridY && chunk.y + chunk.height > gridY
+    );
+  }
+
+  private getRawTileId(chunk: ITiledChunk, gridX: number, gridY: number): number | undefined {
+    return chunk.data[(gridY - chunk.y) * chunk.width + (gridX - chunk.x)];
   }
 }
