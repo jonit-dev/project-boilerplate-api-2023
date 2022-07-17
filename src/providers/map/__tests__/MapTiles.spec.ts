@@ -34,7 +34,7 @@ describe("MapTiles.ts", () => {
       throw new Error("Failed to get tileId");
     }
 
-    const tileset = mapTiles.getTilesetFromTileId(mapName, tileId);
+    const tileset = mapTiles.getTilesetFromRawTileId(mapName, tileId);
 
     if (!tileset) {
       throw new Error("Failed to get tileset");
@@ -53,7 +53,7 @@ describe("MapTiles.ts", () => {
       throw new Error("Failed to get tileId");
     }
 
-    const tileset = mapTiles.getTilesetFromTileId(mapName, tileId);
+    const tileset = mapTiles.getTilesetFromRawTileId(mapName, tileId);
 
     if (!tileset) {
       throw new Error("Failed to get tileset");
@@ -66,8 +66,8 @@ describe("MapTiles.ts", () => {
   });
 
   it("should return the proper tileset, given a tileId", () => {
-    const tileset = mapTiles.getTilesetFromTileId(mapName, 827);
-    const tileset2 = mapTiles.getTilesetFromTileId(mapName, 3730);
+    const tileset = mapTiles.getTilesetFromRawTileId(mapName, 827);
+    const tileset2 = mapTiles.getTilesetFromRawTileId(mapName, 3730);
 
     if (!tileset || !tileset2) {
       throw new Error("Failed to get tileset");

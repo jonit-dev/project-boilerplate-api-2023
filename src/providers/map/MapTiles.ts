@@ -20,7 +20,7 @@ export class MapTiles {
     return property.value as unknown as T;
   }
 
-  public getTilesetFromTileId(map: string, rawTileId: number): ITileset | undefined {
+  public getTilesetFromRawTileId(map: string, rawTileId: number): ITileset | undefined {
     const mapData = MapLoader.maps.get(map);
 
     if (!mapData) {
@@ -58,7 +58,7 @@ export class MapTiles {
     if (targetChunk) {
       const rawTileId = this.getRawTileId(targetChunk, gridX, gridY);
 
-      const targetTileset = this.getTilesetFromTileId(map, rawTileId!);
+      const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
 
       if (rawTileId) {
         return rawTileId - targetTileset?.firstgid!;
