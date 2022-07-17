@@ -15,7 +15,7 @@ describe("NPCMovementMoveAway.ts", () => {
 
     npcMovementMoveAway = container.get<NPCMovementMoveAway>(NPCMovementMoveAway);
     npcTarget = container.get<NPCTarget>(NPCTarget);
-    mapLoader.init();
+    await mapLoader.init();
   });
 
   beforeEach(async () => {

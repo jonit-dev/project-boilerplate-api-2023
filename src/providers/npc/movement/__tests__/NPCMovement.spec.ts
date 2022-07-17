@@ -10,7 +10,7 @@ describe("NPCMovement.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     npcMovement = container.get<NPCMovement>(NPCMovement);
-    mapLoader.init();
+    await mapLoader.init();
   });
 
   beforeEach(async () => {

@@ -22,3 +22,5 @@ coverage
 
 
 public/maps/**.zip
+
+pulbic/maps/unit-test-map.json

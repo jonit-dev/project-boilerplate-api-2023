@@ -49,7 +49,7 @@ describe("CharacterView.ts", () => {
       id: "testId",
       x: 1,
       y: 1,
-      scene: "Ilya",
+      scene: "Example",
     };
 
     await characterView.addToCharacterView(testCharacter, viewElement, "items");
@@ -64,7 +64,7 @@ describe("CharacterView.ts", () => {
       id: "testId",
       x: 1,
       y: 1,
-      scene: "Ilya",
+      scene: "Example",
     };
 
     await characterView.addToCharacterView(testCharacter, viewElement, "items");
@@ -91,7 +91,7 @@ describe("CharacterView.ts", () => {
       y: FromGridY(999),
     });
 
-    const charactersAround = await characterView.getCharactersAroundXYPosition(FromGridX(0), FromGridY(0), "Ilya");
+    const charactersAround = await characterView.getCharactersAroundXYPosition(FromGridX(0), FromGridY(0), "Example");
 
     expect(charactersAround).toHaveLength(3);
 

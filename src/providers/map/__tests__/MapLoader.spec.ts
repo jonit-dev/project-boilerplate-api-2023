@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { mapLoader, unitTestHelper } from "@providers/inversify/container";
-import { MapLoader } from "../MapLoader";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
+import { mapLoader, unitTestHelper } from "@providers/inversify/container";
 import fs from "fs";
+import { MapLoader } from "../MapLoader";
 
 describe("MapLoader.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
-    mapLoader.init();
+    await mapLoader.init();
   });
 
   beforeEach(async () => {

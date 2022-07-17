@@ -6,7 +6,7 @@ export const npcFelicia = {
   ...generateMoveTowardsMovement(),
   name: "Felicia",
   textureKey: "woman-1",
-  scene: "Ilya",
+  scene: "Example",
   key: "felicia",
   class: CharacterClass.None,
   gender: CharacterGender.Female,

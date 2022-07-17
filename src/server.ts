@@ -37,7 +37,7 @@ app.listen(port, async () => {
   await cronJobs.start();
   await socketAdapter.init(appEnv.socket.type);
 
-  mapLoader.init(); // must be the first thing loaded!
+  await mapLoader.init(); // must be the first thing loaded!
 
   app.use(Sentry.Handlers.requestHandler());
   app.use(Sentry.Handlers.tracingHandler());
