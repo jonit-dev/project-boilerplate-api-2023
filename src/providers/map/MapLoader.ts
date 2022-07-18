@@ -1,4 +1,5 @@
 import { MapModel } from "@entities/ModuleSystem/MapModel";
+import { MAP_REQUIRED_LAYERS } from "@providers/constants/MapConstants";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { InternalServerError } from "@providers/errors/InternalServerError";
 import { ITiled } from "@rpg-engine/shared";
@@ -33,7 +34,7 @@ export class MapLoader {
       const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
 
       if (currentMap) {
-        this.hasMapRequiredLayers(currentMap as ITiled);
+        this.hasMapRequiredLayers(mapFileName, currentMap as ITiled);
       }
 
       await this.checkMapUpdated(mapPath, mapFileName, currentMap);
@@ -49,24 +50,14 @@ export class MapLoader {
     console.log("📦 Maps and grids are loaded!");
   }
 
-  private hasMapRequiredLayers(mapObject: ITiled): void {
-    const requiredLayer = [
-      "Roofs",
-      "roof",
-      "over-character",
-      "NPCs",
-      "Transitions",
-      "character",
-      "Items",
-      "over-ground",
-      "ground",
-    ];
+  private hasMapRequiredLayers(mapName: string, map: ITiled): void {
+    const requiredLayers = MAP_REQUIRED_LAYERS;
 
-    const mapLayers = mapObject.layers.map((layer) => layer.name);
+    const mapLayers = map.layers.map((layer) => layer.name);
 
-    for (const layer of requiredLayer) {
+    for (const layer of requiredLayers) {
       if (!mapLayers.includes(layer)) {
-        throw new InternalServerError(`Map doesn't have required layer: ${layer}`);
+        throw new InternalServerError(`❌ Map ${mapName} doesn't have required layer: ${layer}`);
       }
     }
   }

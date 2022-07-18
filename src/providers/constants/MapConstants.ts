@@ -6,4 +6,16 @@ export const MAP_LAYERS_TO_ID = {
   roof: 4,
 };
 
+export const MAP_REQUIRED_LAYERS = [
+  "Roofs",
+  "roof",
+  "over-character",
+  "NPCs",
+  "Transitions",
+  "character",
+  "Items",
+  "over-ground",
+  "ground",
+];
+
 export const MAP_OBJECT_LAYERS = ["NPCs", "Transitions", "Items"];
