@@ -9,4 +9,5 @@ export const npcAgatha = {
   key: "agatha",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
+  scene: "Ilya",
 } as Partial<INPC>;
