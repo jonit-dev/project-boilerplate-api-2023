@@ -32,7 +32,9 @@ export class MapLoader {
       const mapPath = `${STATIC_PATH}/maps/${mapFileName}`;
       const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
 
-      this.hasMapRequiredLayers(currentMap);
+      if (currentMap) {
+        this.hasMapRequiredLayers(currentMap as ITiled);
+      }
 
       await this.checkMapUpdated(mapPath, mapFileName, currentMap);
 
@@ -47,11 +49,25 @@ export class MapLoader {
     console.log("📦 Maps and grids are loaded!");
   }
 
-  private hasMapRequiredLayers(mapObject: object): void {
-    const requiredLayer = ["roof", "over-character", "character", "over-ground", "ground"];
+  private hasMapRequiredLayers(mapObject: ITiled): void {
+    const requiredLayer = [
+      "roofs",
+      "roof",
+      "over-character",
+      "npcs",
+      "transitions",
+      "character",
+      "items",
+      "over-ground",
+      "ground",
+    ];
+
+    const mapLayers = mapObject.layers.map((layer) => layer.name.toLowerCase());
+
+    console.log(mapLayers);
 
     for (const layer of requiredLayer) {
-      if (!(layer in mapObject)) {
+      if (!mapLayers.includes(layer)) {
         throw new InternalServerError(`Map doesn't have required layer: ${layer}`);
       }
     }
