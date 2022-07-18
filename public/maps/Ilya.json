@@ -3140,12 +3140,12 @@
           "class": "",
           "height": 16,
           "id": 56,
-          "name": "Alice",
+          "name": "Linda",
           "properties": [
             {
               "name": "dialogText",
               "type": "string",
-              "value": "Hello {{char.name}}, my name is {{npc.name}}. How are you doing today? I'm just a demonstration of my own movement type, {{npc.originalMovementType}}."
+              "value": "Hello {{char.name}}, how are you doing? It's a beautiful day today, uh?"
             },
             {
               "name": "endGridX",
@@ -3160,7 +3160,7 @@
             {
               "name": "key",
               "type": "string",
-              "value": "alice"
+              "value": "woman-blue-hair"
             },
             {
               "name": "movementType",
@@ -3171,8 +3171,8 @@
           "rotation": 0,
           "visible": true,
           "width": 16,
-          "x": 576,
-          "y": 720
+          "x": 592,
+          "y": 736
         },
         {
           "class": "",
@@ -3337,6 +3337,44 @@
           "width": 16,
           "x": 544,
           "y": 1136
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 95,
+          "name": "Knight 1",
+          "properties": [
+            {
+              "name": "dialogText",
+              "type": "string",
+              "value": "Hi {{char.name}}, did you hear about the corruption? Some animals are behaving aggressively since a fireball hit the forest near our village, a few days ago."
+            },
+            {
+              "name": "endGridX",
+              "type": "string",
+              "value": "81"
+            },
+            {
+              "name": "endGridY",
+              "type": "string",
+              "value": "57"
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "value": "knight-1"
+            },
+            {
+              "name": "movementType",
+              "type": "string",
+              "value": "FixedPath"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 1008,
+          "y": 960
         }
       ],
       "opacity": 1,
@@ -4214,7 +4252,7 @@
     }
   ],
   "nextlayerid": 21,
-  "nextobjectid": 94,
+  "nextobjectid": 96,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.9.0",
@@ -4223,7 +4261,7 @@
     {
       "columns": 65,
       "firstgid": 1,
-      "image": "../../assets/tilesets/forest/forest.png",
+      "image": "../../assets/tilesets/forest/output/forest.png",
       "imageheight": 768,
       "imagewidth": 1040,
       "margin": 0,
@@ -48964,7 +49002,7 @@
     {
       "columns": 32,
       "firstgid": 3486,
-      "image": "../../assets/tilesets/village/wonderdot/Village_Tileset.png",
+      "image": "../../assets/tilesets/village/wonderdot/output/Village_Tileset.png",
       "imageheight": 512,
       "imagewidth": 512,
       "margin": 0,
@@ -64935,7 +64973,7 @@
     {
       "columns": 30,
       "firstgid": 4510,
-      "image": "../../assets/tilesets/village/wonderdot/AltRoofs_Tileset.png",
+      "image": "../../assets/tilesets/village/wonderdot/output/AltRoofs_Tileset.png",
       "imageheight": 640,
       "imagewidth": 480,
       "margin": 0,
