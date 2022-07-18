@@ -51,20 +51,18 @@ export class MapLoader {
 
   private hasMapRequiredLayers(mapObject: ITiled): void {
     const requiredLayer = [
-      "roofs",
+      "Roofs",
       "roof",
       "over-character",
-      "npcs",
-      "transitions",
+      "NPCs",
+      "Transitions",
       "character",
-      "items",
+      "Items",
       "over-ground",
       "ground",
     ];
 
-    const mapLayers = mapObject.layers.map((layer) => layer.name.toLowerCase());
-
-    console.log(mapLayers);
+    const mapLayers = mapObject.layers.map((layer) => layer.name);
 
     for (const layer of requiredLayer) {
       if (!mapLayers.includes(layer)) {
