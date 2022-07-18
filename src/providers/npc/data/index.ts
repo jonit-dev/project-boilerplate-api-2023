@@ -9,6 +9,11 @@ import { npcRat } from "./blueprints/NPCRat";
 import { npcSkeleton } from "./blueprints/NPCSkeleton";
 import { npcSkeletonKnight } from "./blueprints/NPCSkeletonKnight";
 import { npcBat } from "./blueprints/NPCBat";
+import { npcDeer } from "./blueprints/NPCDeer";
+import { npcGhost } from "./blueprints/NPCGhost";
+import { npcMinotaur } from "./blueprints/NPCMinotaur";
+import { npcSlime } from "./blueprints/NPCSlime";
+import { npcWolf } from "./blueprints/NPCWolf";
 
 export const npcsBlueprintIndex: IBlueprint = {
   agatha: npcAgatha,
@@ -21,4 +26,9 @@ export const npcsBlueprintIndex: IBlueprint = {
   rat: npcRat,
   skeletonKnight: npcSkeletonKnight,
   bat: npcBat,
+  deer: npcDeer,
+  ghost: npcGhost,
+  minotaur: npcMinotaur,
+  slime: npcSlime,
+  Wolf: npcWolf,
 };
