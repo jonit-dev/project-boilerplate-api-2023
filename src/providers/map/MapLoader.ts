@@ -1,5 +1,6 @@
 import { MapModel } from "@entities/ModuleSystem/MapModel";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
+import { InternalServerError } from "@providers/errors/InternalServerError";
 import { ITiled } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
@@ -31,6 +32,8 @@ export class MapLoader {
       const mapPath = `${STATIC_PATH}/maps/${mapFileName}`;
       const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
 
+      this.hasMapRequiredLayers(currentMap);
+
       await this.checkMapUpdated(mapPath, mapFileName, currentMap);
 
       const mapName = mapFileName.replace(".json", "");
@@ -42,6 +45,16 @@ export class MapLoader {
     }
 
     console.log("📦 Maps and grids are loaded!");
+  }
+
+  private hasMapRequiredLayers(mapObject: object): void {
+    const requiredLayer = ["roof", "over-character", "character", "over-ground", "ground"];
+
+    for (const layer of requiredLayer) {
+      if (!(layer in mapObject)) {
+        throw new InternalServerError(`Map doesn't have required layer: ${layer}`);
+      }
+    }
   }
 
   private async checkMapUpdated(mapPath: string, mapFileName: string, mapObject: object): Promise<void> {
