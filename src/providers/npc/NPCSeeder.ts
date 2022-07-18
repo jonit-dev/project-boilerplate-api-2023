@@ -14,7 +14,7 @@ export class NPCSeeder {
     const npcSeedData = this.npcLoader.loadNPCSeedData();
 
     for (const [key, NPCData] of npcSeedData.entries()) {
-      const npcFound = (await NPC.findOne({ tiledId: NPCData.tiledId })) as unknown as INPC;
+      const npcFound = (await NPC.findOne({ tiledId: NPCData.tiledId, scene: NPCData.scene })) as unknown as INPC;
 
       NPCData.targetCharacter = undefined; // reset any targets
 
