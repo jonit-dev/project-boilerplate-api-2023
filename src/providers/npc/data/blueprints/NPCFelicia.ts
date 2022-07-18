@@ -6,8 +6,8 @@ export const npcFelicia = {
   ...generateMoveTowardsMovement(),
   name: "Felicia",
   textureKey: "woman-1",
-  scene: "Example",
   key: "felicia",
   class: CharacterClass.None,
   gender: CharacterGender.Female,
+  scene: "Ilya",
 } as Partial<INPC>;
