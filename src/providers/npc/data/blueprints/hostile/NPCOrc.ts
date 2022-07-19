@@ -1,13 +1,13 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
+import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcSkeleton = {
+export const npcOrc = {
   ...generateMoveTowardsMovement(),
-  name: "Skeleton",
-  key: "skeleton",
-  textureKey: "skeleton",
+  name: "Orc",
+  key: "orc",
+  textureKey: "orc",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: 3,
@@ -17,14 +17,14 @@ export const npcSkeleton = {
       level: 2,
     },
     dexterity: {
-      level: 1,
+      level: 3,
     },
   },
   fleeOnLowHealth: true,
-  experience: 45,
+  experience: 70,
   loots: [
     {
-      itemBlueprintKey: "jacket",
+      itemBlueprintKey: "boots",
       chance: 30,
     },
   ],

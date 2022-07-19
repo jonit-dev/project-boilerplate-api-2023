@@ -1,35 +1,34 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
+import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcRat = {
+export const npcSkeletonKnight = {
   ...generateMoveTowardsMovement(),
-  name: "Rat",
-  key: "rat",
-  textureKey: "rat",
+  name: "Skeleton Knight",
+  key: "skeleton-knight",
+  textureKey: "skeleton-knight",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 1.5,
+  speed: 5,
   skills: {
-    level: 1,
+    level: 2,
     strength: {
-      level: 1,
+      level: 2,
     },
     dexterity: {
-      level: 1,
-    },
-    resistance: {
       level: 2,
+    },
+    resistence: {
+      level: 3,
     },
   },
   fleeOnLowHealth: true,
-  experience: 15,
+  experience: 60,
   loots: [
     {
-      itemBlueprintKey: "cheese",
-      chance: 30,
-      quantityRange: [1, 3],
+      itemBlueprintKey: "studded-armor",
+      chance: 25,
     },
   ],
 } as Partial<INPC>;

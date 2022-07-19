@@ -1,16 +1,19 @@
 import { IBlueprint } from "@providers/types/temp/BlueprintTypes";
-import { npcAgatha } from "./blueprints/NPCAgatha";
-import { npcAlice } from "./blueprints/NPCAlice";
-import { npcAnnie } from "./blueprints/NPCAnnie";
-import { npcBat } from "./blueprints/NPCBat";
-import { npcFelicia } from "./blueprints/NPCFelicia";
-import { npcKnight1 } from "./blueprints/NPCKnight1";
-import { npcMaria } from "./blueprints/NPCMaria";
-import { npcOrc } from "./blueprints/NPCOrc";
-import { npcRat } from "./blueprints/NPCRat";
-import { npcSkeleton } from "./blueprints/NPCSkeleton";
-import { npcSkeletonKnight } from "./blueprints/NPCSkeletonKnight";
-import { npcWomanBlueHair } from "./blueprints/NPCWomanBlueHair";
+import { npcAgatha } from "./blueprints/friendly/NPCAgatha";
+import { npcAlice } from "./blueprints/friendly/NPCAlice";
+import { npcAnnie } from "./blueprints/friendly/NPCAnnie";
+import { npcFatBaldMan } from "./blueprints/friendly/NPCFatBaldMan";
+import { npcFelicia } from "./blueprints/friendly/NPCFelicia";
+import { npcKnight1 } from "./blueprints/friendly/NPCKnight1";
+import { npcMaleNobleBlackHair } from "./blueprints/friendly/NPCMaleNobleBlackHair";
+import { npcMaria } from "./blueprints/friendly/NPCMaria";
+import { npcTrader } from "./blueprints/friendly/NPCTrader";
+import { npcWomanBlueHair } from "./blueprints/friendly/NPCWomanBlueHair";
+import { npcBat } from "./blueprints/hostile/NPCBat";
+import { npcOrc } from "./blueprints/hostile/NPCOrc";
+import { npcRat } from "./blueprints/hostile/NPCRat";
+import { npcSkeleton } from "./blueprints/hostile/NPCSkeleton";
+import { npcSkeletonKnight } from "./blueprints/hostile/NPCSkeletonKnight";
 
 export const npcsBlueprintIndex: IBlueprint = {
   agatha: npcAgatha,
@@ -25,4 +28,7 @@ export const npcsBlueprintIndex: IBlueprint = {
   bat: npcBat,
   "knight-1": npcKnight1,
   "woman-blue-hair": npcWomanBlueHair,
+  trader: npcTrader,
+  "fat-bald-man": npcFatBaldMan,
+  "male-noble-black-hair": npcMaleNobleBlackHair,
 };

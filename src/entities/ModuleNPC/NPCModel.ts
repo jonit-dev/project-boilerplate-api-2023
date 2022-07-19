@@ -43,7 +43,7 @@ const npcSchema = createLeanSchema(
     }),
     alignment: Type.string({
       required: true,
-      default: NPCAlignment.Neutral,
+      default: NPCAlignment.Friendly,
       enum: TypeHelper.enumToStringArray(NPCAlignment),
     }),
     targetType: Type.string({
