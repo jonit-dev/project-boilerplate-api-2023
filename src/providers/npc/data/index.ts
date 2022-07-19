@@ -9,6 +9,7 @@ import { npcMaleNobleBlackHair } from "./blueprints/friendly/NPCMaleNobleBlackHa
 import { npcMaria } from "./blueprints/friendly/NPCMaria";
 import { npcTrader } from "./blueprints/friendly/NPCTrader";
 import { npcWomanBlueHair } from "./blueprints/friendly/NPCWomanBlueHair";
+import { npcWomanGreenHair } from "./blueprints/friendly/NPCWomanGreenHair";
 import { npcBat } from "./blueprints/hostile/NPCBat";
 import { npcOrc } from "./blueprints/hostile/NPCOrc";
 import { npcRat } from "./blueprints/hostile/NPCRat";
@@ -31,4 +32,5 @@ export const npcsBlueprintIndex: IBlueprint = {
   trader: npcTrader,
   "fat-bald-man": npcFatBaldMan,
   "male-noble-black-hair": npcMaleNobleBlackHair,
+  "woman-green-hair": npcWomanGreenHair,
 };
