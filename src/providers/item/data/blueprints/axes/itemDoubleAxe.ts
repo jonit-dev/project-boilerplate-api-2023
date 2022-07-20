@@ -6,7 +6,7 @@ export const itemDoubleAxe: Partial<IItem> = {
   type: ItemType.Weapon,
   subType: ItemSubType.Axe,
   textureAtlas: "items",
-  texturePath: "axes/axe.png",
+  texturePath: "axes/double-axe.png",
   textureKey: "axe",
   name: "Double Axe",
   description: "An doubled headed axe.",
