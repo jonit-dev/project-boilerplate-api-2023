@@ -1,4 +1,4 @@
-import { AxesBlueprint } from "../../types/blueprintTypes";
+import { AxesBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemAxe } from "./ItemAxe";
 import { itemBardiche } from "./itemBardiche";
 import { itemDoubleAxe } from "./itemDoubleAxe";

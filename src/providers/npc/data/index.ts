@@ -11,10 +11,15 @@ import { npcTrader } from "./blueprints/friendly/NPCTrader";
 import { npcWomanBlueHair } from "./blueprints/friendly/NPCWomanBlueHair";
 import { npcWomanGreenHair } from "./blueprints/friendly/NPCWomanGreenHair";
 import { npcBat } from "./blueprints/hostile/NPCBat";
+import { npcGhost } from "./blueprints/hostile/NPCGhost";
+import { npcMinotaur } from "./blueprints/hostile/NPCMinotaur";
 import { npcOrc } from "./blueprints/hostile/NPCOrc";
 import { npcRat } from "./blueprints/hostile/NPCRat";
 import { npcSkeleton } from "./blueprints/hostile/NPCSkeleton";
 import { npcSkeletonKnight } from "./blueprints/hostile/NPCSkeletonKnight";
+import { npcSlime } from "./blueprints/hostile/NPCSlime";
+import { npcWolf } from "./blueprints/hostile/NPCWolf";
+import { npcDeer } from "./blueprints/neutral/NPCDeer";
 
 export const npcsBlueprintIndex: IBlueprint = {
   agatha: npcAgatha,
@@ -27,6 +32,11 @@ export const npcsBlueprintIndex: IBlueprint = {
   rat: npcRat,
   skeletonKnight: npcSkeletonKnight,
   bat: npcBat,
+  deer: npcDeer,
+  ghost: npcGhost,
+  minotaur: npcMinotaur,
+  slime: npcSlime,
+  Wolf: npcWolf,
   "knight-1": npcKnight1,
   "woman-blue-hair": npcWomanBlueHair,
   trader: npcTrader,

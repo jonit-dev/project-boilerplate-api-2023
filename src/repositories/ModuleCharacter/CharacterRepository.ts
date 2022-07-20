@@ -5,7 +5,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { ArmorsBlueprint, ContainersBlueprint, DaggersBluePrint } from "@providers/item/data/types/blueprintTypes";
+import { ArmorsBlueprint, ContainersBlueprint, DaggersBluePrint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
 import { UpdateCharacterDTO } from "@useCases/ModuleCharacter/character/update/UpdateCharacterDTO";

@@ -1,4 +1,4 @@
-import { ArmorsBlueprint } from "../../types/blueprintTypes";
+import { ArmorsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemBronzeArmor } from "./ItemBronzeArmor";
 import { itemCoat } from "./ItemCoat";
 import { itemIronArmor } from "./ItemIronArmor";

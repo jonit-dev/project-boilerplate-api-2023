@@ -1,47 +1,44 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { ArmorsBlueprint, ShieldsBlueprint, SwordBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { BootsBlueprint, SpearsBlueprint, SwordBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcSkeletonKnight = {
+export const npcMinotaur = {
   ...generateMoveTowardsMovement(),
-  name: "Skeleton Knight",
-  key: "skeleton-knight",
-  textureKey: "skeleton-knight",
+  name: "Minotaur",
+  key: "minotaur",
+  textureKey: "minotaur",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: 5,
   skills: {
-    level: 2,
+    level: 3,
     strength: {
-      level: 2,
+      level: 3,
     },
     dexterity: {
       level: 2,
     },
-    resistence: {
+    resistance: {
       level: 3,
     },
   },
   fleeOnLowHealth: true,
-  experience: 60,
+  experience: 80,
   loots: [
     {
-      itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
-      chance: 25,
-    },
-    {
-      itemBlueprintKey: ShieldsBlueprint.StuddedShield,
-      chance: 30,
-    },
-    {
-      itemBlueprintKey: SwordBlueprint.DoubleEdgedSword,
-      chance: 5,
-    },
-    {
       itemBlueprintKey: SwordBlueprint.DragonsSword,
-      chance: 1,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.CopperBoots,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
+      chance: 5,
     },
   ],
 } as Partial<INPC>;

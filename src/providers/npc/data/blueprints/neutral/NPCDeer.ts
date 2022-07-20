@@ -1,17 +1,16 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { FoodsBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcBat = {
+export const npcDeer = {
   ...generateMoveTowardsMovement(),
-  name: "Bat",
-  key: "bat",
-  textureKey: "bat",
-  alignment: NPCAlignment.Hostile,
+  name: "Deer",
+  key: "deer",
+  textureKey: "deer",
+  alignment: NPCAlignment.Neutral,
   attackType: EntityAttackType.Melee,
-  speed: 4,
+  speed: 6,
   skills: {
     level: 1,
     strength: {
@@ -21,18 +20,15 @@ export const npcBat = {
       level: 1,
     },
     resistance: {
-      level: 1,
+      level: 2,
     },
   },
-  experience: 15,
+  fleeOnLowHealth: true,
+  experience: 20,
   loots: [
     {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: FoodsBlueprint.Banana,
-      chance: 30,
+      itemBlueprintKey: "bread",
+      chance: 60,
     },
   ],
 } as Partial<INPC>;

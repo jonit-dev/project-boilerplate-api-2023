@@ -1,4 +1,4 @@
-import { StaffsBlueprint } from "../../types/blueprintTypes";
+import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemAppendicesStaff } from "./ItemAppendicesStaff";
 
 export const staffsBlueprintIndex = {

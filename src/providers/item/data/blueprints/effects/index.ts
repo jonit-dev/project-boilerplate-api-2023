@@ -1,4 +1,4 @@
-import { EffectsBlueprint } from "../../types/blueprintTypes";
+import { EffectsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemGroundBlood } from "./ItemGroundBlood";
 
 export const effectsBlueprintsIndex = {

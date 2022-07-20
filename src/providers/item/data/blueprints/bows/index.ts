@@ -1,4 +1,4 @@
-import { BowsBlueprint } from "../../types/blueprintTypes";
+import { BowsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemArrow } from "./ItemArrow";
 import { itemBolt } from "./ItemBolt";
 import { itemBow } from "./ItemBow";

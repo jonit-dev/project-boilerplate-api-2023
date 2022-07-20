@@ -1,9 +1,9 @@
-import { SwordBlueprint } from "../../types/blueprintTypes";
+import { SwordBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemBasiliskSword } from "./ItemBasiliskSword";
-import { itemShortSword } from "./ItemShortSword";
-import { itemDragonsSword } from "./ItemDragonsSword";
-import { itemDoubleEdgedSword } from "./ItemDoubleEdgedSword";
 import { itemBroadSword } from "./ItemBroadSword";
+import { itemDoubleEdgedSword } from "./ItemDoubleEdgedSword";
+import { itemDragonsSword } from "./ItemDragonsSword";
+import { itemShortSword } from "./ItemShortSword";
 
 export const swordBlueprintIndex = {
   [SwordBlueprint.ShortSword]: itemShortSword,

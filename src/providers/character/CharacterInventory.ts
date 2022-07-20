@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { ContainersBlueprint } from "@providers/item/data/types/blueprintTypes";
+import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterInventory)

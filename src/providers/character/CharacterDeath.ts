@@ -1,14 +1,14 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { BodiesBlueprint } from "@providers/item/data/types/blueprintTypes";
+import { BodiesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { Types } from "mongoose";
-import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import _ from "lodash";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { Types } from "mongoose";
 
 const DROP_EQUIPMENT_CHANCE = 30; // there's a 30% chance of dropping any of the equipped items
 const DROPPABLE_EQUIPMENT = ["head", "neck", "leftHand", "rightHand", "ring", "legs", "boot", "accessory", "armor"];
