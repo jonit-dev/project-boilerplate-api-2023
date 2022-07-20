@@ -1,4 +1,4 @@
-import { AccessoriesBlueprint } from "../../types/blueprintTypes";
+import { AccessoriesBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemSilverKey } from "./itemSilverKey";
 
 export const accessoriesBlueprintsIndex = {
