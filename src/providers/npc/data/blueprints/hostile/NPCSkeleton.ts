@@ -1,5 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { ArmorsBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
@@ -7,8 +8,8 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 export const npcSkeleton = {
   ...generateMoveTowardsMovement(),
   name: "Skeleton",
-  key: "skeleton",
-  textureKey: "skeleton",
+  key: HostileNPCsBlueprint.Skeleton,
+  textureKey: HostileNPCsBlueprint.Skeleton,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: 3,

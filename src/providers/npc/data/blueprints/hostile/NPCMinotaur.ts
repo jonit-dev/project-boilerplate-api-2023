@@ -1,5 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { BootsBlueprint, SpearsBlueprint, SwordBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -8,8 +9,8 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 export const npcMinotaur = {
   ...generateMoveTowardsMovement(),
   name: "Minotaur",
-  key: "minotaur",
-  textureKey: "minotaur",
+  key: HostileNPCsBlueprint.Minotaur,
+  textureKey: HostileNPCsBlueprint.Minotaur,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: 5,

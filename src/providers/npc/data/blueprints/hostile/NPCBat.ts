@@ -1,5 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { FoodsBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
@@ -7,8 +8,8 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 export const npcBat = {
   ...generateMoveTowardsMovement(),
   name: "Bat",
-  key: "bat",
-  textureKey: "bat",
+  key: HostileNPCsBlueprint.Bat,
+  textureKey: HostileNPCsBlueprint.Bat,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: 4,

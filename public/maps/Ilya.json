@@ -3184,7 +3184,7 @@
           "class": "",
           "height": 16,
           "id": 95,
-          "name": "Knight 1",
+          "name": "Black Knight",
           "properties": [
             {
               "name": "dialogText",
@@ -3194,17 +3194,17 @@
             {
               "name": "endGridX",
               "type": "string",
-              "value": "81"
+              "value": "55"
             },
             {
               "name": "endGridY",
               "type": "string",
-              "value": "57"
+              "value": "69"
             },
             {
               "name": "key",
               "type": "string",
-              "value": "knight-1"
+              "value": "black-knight"
             },
             {
               "name": "movementType",
@@ -3215,8 +3215,8 @@
           "rotation": 0,
           "visible": true,
           "width": 16,
-          "x": 1008,
-          "y": 960
+          "x": 800,
+          "y": 1008
         },
         {
           "class": "",

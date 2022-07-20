@@ -1,12 +1,13 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { FriendlyNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
 import { generateFixedPathMovement } from "../../abstractions/BaseNeutralNPC";
 
 export const npcMaleNobleBlackHair = {
   ...generateFixedPathMovement(),
   name: "Gabriel",
-  textureKey: "male-noble-black-hair",
-  key: "male-noble-black-hair",
+  textureKey: FriendlyNPCsBlueprint.MaleNobleBlackHair,
+  key: FriendlyNPCsBlueprint.MaleNobleBlackHair,
   class: CharacterClass.None,
   gender: CharacterGender.Male,
 } as Partial<INPC>;

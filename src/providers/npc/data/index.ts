@@ -2,9 +2,9 @@ import { IBlueprint } from "@providers/types/temp/BlueprintTypes";
 import { npcAgatha } from "./blueprints/friendly/NPCAgatha";
 import { npcAlice } from "./blueprints/friendly/NPCAlice";
 import { npcAnnie } from "./blueprints/friendly/NPCAnnie";
+import { npcBlackKnight } from "./blueprints/friendly/NPCBlackKnight";
 import { npcFatBaldMan } from "./blueprints/friendly/NPCFatBaldMan";
 import { npcFelicia } from "./blueprints/friendly/NPCFelicia";
-import { npcKnight1 } from "./blueprints/friendly/NPCKnight1";
 import { npcMaleNobleBlackHair } from "./blueprints/friendly/NPCMaleNobleBlackHair";
 import { npcMaria } from "./blueprints/friendly/NPCMaria";
 import { npcTrader } from "./blueprints/friendly/NPCTrader";
@@ -37,7 +37,7 @@ export const npcsBlueprintIndex: IBlueprint = {
   minotaur: npcMinotaur,
   slime: npcSlime,
   Wolf: npcWolf,
-  "knight-1": npcKnight1,
+  "black-knight": npcBlackKnight,
   "woman-blue-hair": npcWomanBlueHair,
   trader: npcTrader,
   "fat-bald-man": npcFatBaldMan,
