@@ -1,16 +1,16 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
+import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcSlime = {
+export const npcDeer = {
   ...generateMoveTowardsMovement(),
-  name: "Slime",
-  key: "slime",
-  textureKey: "slime",
-  alignment: NPCAlignment.Hostile,
+  name: "Deer",
+  key: "deer",
+  textureKey: "deer",
+  alignment: NPCAlignment.Neutral,
   attackType: EntityAttackType.Melee,
-  speed: 3,
+  speed: 6,
   skills: {
     level: 1,
     strength: {
@@ -20,15 +20,15 @@ export const npcSlime = {
       level: 1,
     },
     resistance: {
-      level: 1,
+      level: 2,
     },
   },
   fleeOnLowHealth: true,
-  experience: 15,
+  experience: 20,
   loots: [
     {
-      itemBlueprintKey: "leather-gloves",
-      chance: 30,
+      itemBlueprintKey: "bread",
+      chance: 60,
     },
   ],
 } as Partial<INPC>;

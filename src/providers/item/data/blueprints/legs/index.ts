@@ -1,4 +1,4 @@
-import { LegsBlueprint } from "../../types/blueprintTypes";
+import { LegsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemLeatherLegs } from "./ItemLeatherLegs";
 import { itemStuddedLegs } from "./ItemStuddedLegs";
 

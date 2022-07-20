@@ -1,4 +1,4 @@
-import { GlovesBlueprint } from "../../types/blueprintTypes";
+import { GlovesBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemLeatherGloves } from "./ItemLeatherGloves";
 import { itemStuddedGloves } from "./ItemStuddedGloves";
 

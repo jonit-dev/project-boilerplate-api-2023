@@ -1,34 +1,35 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { BowsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
+import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcMinotaur = {
+export const npcGhost = {
   ...generateMoveTowardsMovement(),
-  name: "Minotaur",
-  key: "minotaur",
-  textureKey: "minotaur",
+  name: "Ghost",
+  key: "ghost",
+  textureKey: "ghost",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: 5,
   skills: {
-    level: 3,
+    level: 1,
     strength: {
-      level: 3,
+      level: 1,
     },
     dexterity: {
-      level: 2,
+      level: 1,
     },
     resistance: {
-      level: 3,
+      level: 1,
     },
   },
   fleeOnLowHealth: true,
-  experience: 80,
+  experience: 50,
   loots: [
     {
-      itemBlueprintKey: "dragon's-sword",
-      chance: 35,
+      itemBlueprintKey: BowsBlueprint.Arrow,
+      chance: 45,
     },
   ],
 } as Partial<INPC>;

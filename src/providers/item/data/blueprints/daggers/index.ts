@@ -1,4 +1,4 @@
-import { DaggersBluePrint } from "../../types/blueprintTypes";
+import { DaggersBluePrint } from "../../types/itemsBlueprintTypes";
 import { itemDagger } from "./ItemDagger";
 
 export const daggersBlueprintsIndex = {

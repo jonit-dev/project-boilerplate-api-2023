@@ -1,4 +1,10 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import {
+  ArmorsBlueprint,
+  AxesBlueprint,
+  BootsBlueprint,
+  HelmetBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
@@ -10,11 +16,11 @@ export const npcOrc = {
   textureKey: "orc",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 3,
+  speed: 2,
   skills: {
-    level: 1,
+    level: 3,
     strength: {
-      level: 2,
+      level: 3,
     },
     dexterity: {
       level: 3,
@@ -24,8 +30,20 @@ export const npcOrc = {
   experience: 70,
   loots: [
     {
-      itemBlueprintKey: "boots",
+      itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.Axe,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: HelmetBlueprint.StuddedHelmet,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
+      chance: 15,
     },
   ],
 } as Partial<INPC>;

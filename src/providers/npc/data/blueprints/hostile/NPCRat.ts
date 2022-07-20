@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
@@ -27,7 +28,7 @@ export const npcRat = {
   experience: 15,
   loots: [
     {
-      itemBlueprintKey: "cheese",
+      itemBlueprintKey: FoodsBlueprint.Cheese,
       chance: 30,
       quantityRange: [1, 3],
     },

@@ -1,17 +1,17 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { FoodsBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { GlovesBlueprint, HelmetBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcBat = {
+export const npcSlime = {
   ...generateMoveTowardsMovement(),
-  name: "Bat",
-  key: "bat",
-  textureKey: "bat",
+  name: "Slime",
+  key: "slime",
+  textureKey: "slime",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 4,
+  speed: 3,
   skills: {
     level: 1,
     strength: {
@@ -24,15 +24,20 @@ export const npcBat = {
       level: 1,
     },
   },
+  fleeOnLowHealth: true,
   experience: 15,
   loots: [
     {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 15,
+      itemBlueprintKey: GlovesBlueprint.LeatherGloves,
+      chance: 10,
     },
     {
-      itemBlueprintKey: FoodsBlueprint.Banana,
-      chance: 30,
+      itemBlueprintKey: PotionsBlueprint.LightLifePotion,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: HelmetBlueprint.WingHelmet,
+      chance: 5,
     },
   ],
 } as Partial<INPC>;

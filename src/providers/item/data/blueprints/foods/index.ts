@@ -1,10 +1,10 @@
-import { FoodsBlueprint } from "../../types/blueprintTypes";
+import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemApple } from "./ItemApple";
-import { itemBananaBunch } from "./ItemBananaBunch";
 import { itemBanana } from "./ItemBanana";
+import { itemBananaBunch } from "./ItemBananaBunch";
 import { itemBread } from "./ItemBread";
-import { itemCheeseSlice } from "./ItemCheeseSlice";
 import { itemCheese } from "./ItemCheese";
+import { itemCheeseSlice } from "./ItemCheeseSlice";
 import { itemCookie } from "./ItemCookie";
 import { itemEgg } from "./ItemEgg";
 import { itemFish } from "./ItemFish";

@@ -11,15 +11,15 @@ import { npcTrader } from "./blueprints/friendly/NPCTrader";
 import { npcWomanBlueHair } from "./blueprints/friendly/NPCWomanBlueHair";
 import { npcWomanGreenHair } from "./blueprints/friendly/NPCWomanGreenHair";
 import { npcBat } from "./blueprints/hostile/NPCBat";
+import { npcGhost } from "./blueprints/hostile/NPCGhost";
+import { npcMinotaur } from "./blueprints/hostile/NPCMinotaur";
 import { npcOrc } from "./blueprints/hostile/NPCOrc";
 import { npcRat } from "./blueprints/hostile/NPCRat";
 import { npcSkeleton } from "./blueprints/hostile/NPCSkeleton";
 import { npcSkeletonKnight } from "./blueprints/hostile/NPCSkeletonKnight";
-import { npcDeer } from "./blueprints/NPCDeer";
-import { npcGhost } from "./blueprints/NPCGhost";
-import { npcMinotaur } from "./blueprints/NPCMinotaur";
-import { npcSlime } from "./blueprints/NPCSlime";
-import { npcWolf } from "./blueprints/NPCWolf";
+import { npcSlime } from "./blueprints/hostile/NPCSlime";
+import { npcWolf } from "./blueprints/hostile/NPCWolf";
+import { npcDeer } from "./blueprints/neutral/NPCDeer";
 
 export const npcsBlueprintIndex: IBlueprint = {
   agatha: npcAgatha,

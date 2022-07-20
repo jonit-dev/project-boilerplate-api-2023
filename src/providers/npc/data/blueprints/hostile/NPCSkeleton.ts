@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { ArmorsBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
@@ -24,8 +25,16 @@ export const npcSkeleton = {
   experience: 45,
   loots: [
     {
-      itemBlueprintKey: "jacket",
+      itemBlueprintKey: ArmorsBlueprint.Jacket,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.Coat,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: MacesBlueprint.SpikedClub,
+      chance: 20,
     },
   ],
 } as Partial<INPC>;

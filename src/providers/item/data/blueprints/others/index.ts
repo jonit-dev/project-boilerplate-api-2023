@@ -1,4 +1,4 @@
-import { OthersBlueprint } from "../../types/blueprintTypes";
+import { OthersBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemCandle } from "./ItemCandle";
 
 export const othersBlueprintIndex = {

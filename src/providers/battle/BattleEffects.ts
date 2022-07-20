@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { EffectsBlueprint } from "@providers/item/data/types/blueprintTypes";
+import { EffectsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 

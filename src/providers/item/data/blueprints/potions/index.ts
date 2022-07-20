@@ -1,9 +1,9 @@
-import { PotionsBlueprint } from "../../types/blueprintTypes";
+import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemGreaterLifePotion } from "./ItemGreaterLifePotion";
-import { itemLightLifePotion } from "./ItemLightLifePotion";
-import { itemLightEndurancePotion } from "./ItemLightEndurancePotion";
-import { itemManaPotion } from "./ItemManaPotion";
 import { itemLightAntidote } from "./ItemLightAntidote";
+import { itemLightEndurancePotion } from "./ItemLightEndurancePotion";
+import { itemLightLifePotion } from "./ItemLightLifePotion";
+import { itemManaPotion } from "./ItemManaPotion";
 
 export const potionsBlueprintsIndex = {
   [PotionsBlueprint.GreaterLifePotion]: itemGreaterLifePotion,

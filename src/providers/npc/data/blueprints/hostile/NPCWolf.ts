@@ -1,7 +1,8 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { generateMoveTowardsMovement } from "../abstractions/BaseNeutralNPC";
+import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 export const npcWolf = {
   ...generateMoveTowardsMovement(),
@@ -10,7 +11,7 @@ export const npcWolf = {
   textureKey: "wolf",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 6,
+  speed: 3,
   skills: {
     level: 1,
     strength: {
@@ -27,7 +28,11 @@ export const npcWolf = {
   experience: 40,
   loots: [
     {
-      itemBlueprintKey: "dagger",
+      itemBlueprintKey: FoodsBlueprint.Salmon,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.Bread,
       chance: 30,
     },
   ],

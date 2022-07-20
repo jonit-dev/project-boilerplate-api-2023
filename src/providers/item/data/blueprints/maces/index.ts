@@ -1,4 +1,4 @@
-import { MacesBlueprint } from "../../types/blueprintTypes";
+import { MacesBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemClub } from "./ItemClub";
 import { itemMace } from "./ItemMace";
 import { itemSpikedClub } from "./ItemSpikedClub";

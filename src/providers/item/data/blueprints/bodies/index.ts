@@ -1,4 +1,4 @@
-import { BodiesBlueprint } from "../../types/blueprintTypes";
+import { BodiesBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemCharacterBody } from "./ItemCharacterBody";
 import { itemNPCBody } from "./ItemNPCBody";
 

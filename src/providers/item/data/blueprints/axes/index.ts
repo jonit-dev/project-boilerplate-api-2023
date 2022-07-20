@@ -1,4 +1,4 @@
-import { AxesBlueprint } from "../../types/blueprintTypes";
+import { AxesBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemAxe } from "./ItemAxe";
 
 export const axeBlueprintIndex = {

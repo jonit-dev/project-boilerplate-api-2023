@@ -1,4 +1,4 @@
-import { SpearsBlueprint } from "../../types/blueprintTypes";
+import { SpearsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemRoyalSpear } from "./ItemRoyalSpear";
 import { itemSpear } from "./ItemSpear";
 

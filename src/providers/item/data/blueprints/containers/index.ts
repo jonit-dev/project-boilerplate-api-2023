@@ -1,4 +1,4 @@
-import { ContainersBlueprint } from "../../types/blueprintTypes";
+import { ContainersBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemBackpack } from "./ItemBackpack";
 import { itemBag } from "./ItemBag";
 

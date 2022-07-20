@@ -1,6 +1,6 @@
-import { ArmorsBlueprint } from "../../types/blueprintTypes";
-import { itemJacket } from "./ItemJacket";
+import { ArmorsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemCoat } from "./ItemCoat";
+import { itemJacket } from "./ItemJacket";
 import { itemLeatherJacket } from "./ItemLeatherJacket";
 import { itemStuddedArmor } from "./ItemStuddedArmor";
 

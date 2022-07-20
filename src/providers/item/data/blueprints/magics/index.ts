@@ -1,4 +1,4 @@
-import { MagicsBlueprint } from "../../types/blueprintTypes";
+import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemRune } from "./ItemRune";
 
 export const magicsBlueprintIndex = {
