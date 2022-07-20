@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { BootsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemSandals: Partial<IItem> = {
-  key: "sandals",
+  key: BootsBlueprint.Sandals,
   type: ItemType.Armor,
   subType: ItemSubType.Boot,
   textureAtlas: "items",

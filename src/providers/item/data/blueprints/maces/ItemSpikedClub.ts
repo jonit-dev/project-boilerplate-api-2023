@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { MacesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemSpikedClub: Partial<IItem> = {
-  key: "spiked-club",
+  key: MacesBlueprint.SpikedClub,
   type: ItemType.Weapon,
   subType: ItemSubType.Mace,
   textureAtlas: "items",

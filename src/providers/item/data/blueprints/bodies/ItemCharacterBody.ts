@@ -1,9 +1,10 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import dayjs from "dayjs";
+import { BodiesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemCharacterBody: Partial<IItem> = {
-  key: "character-body",
+  key: BodiesBlueprint.CharacterBody,
   type: ItemType.Container,
   subType: ItemSubType.DeadBody,
   textureAtlas: "entities",

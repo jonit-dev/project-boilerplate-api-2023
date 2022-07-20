@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemCheeseSlice: Partial<IItem> = {
-  key: "cheese-slice",
+  key: FoodsBlueprint.CheeseSlice,
   type: ItemType.Consumable,
   subType: ItemSubType.Food,
   textureAtlas: "items",

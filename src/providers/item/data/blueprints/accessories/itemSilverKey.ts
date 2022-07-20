@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { AccessoriesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemSilverKey: Partial<IItem> = {
-  key: "silver-key",
+  key: AccessoriesBlueprint.SilverKey,
   type: ItemType.Accessory,
   subType: ItemSubType.Accessory,
   textureAtlas: "items",

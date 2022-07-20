@@ -1,7 +1,8 @@
 import { IItem, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { DaggersBluePrint } from "../../types/itemsBlueprintTypes";
 
 export const itemDagger: Partial<IItem> = {
-  key: "dagger",
+  key: DaggersBluePrint.Dagger,
   type: ItemType.Weapon,
   subType: ItemSubType.Dagger,
   textureAtlas: "items",

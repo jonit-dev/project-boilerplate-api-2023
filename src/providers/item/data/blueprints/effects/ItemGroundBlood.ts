@@ -1,9 +1,10 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSubType, ItemType, MapLayers } from "@rpg-engine/shared";
 import dayjs from "dayjs";
+import { EffectsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemGroundBlood: Partial<IItem> = {
-  key: "ground-blood",
+  key: EffectsBlueprint.GroundBlood,
   type: ItemType.Other,
   subType: ItemSubType.Other,
   decayTime: dayjs(new Date()).add(10, "minute").toDate(),

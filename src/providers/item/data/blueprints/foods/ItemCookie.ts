@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemCookie: Partial<IItem> = {
-  key: "cookie",
+  key: FoodsBlueprint.Cookie,
   type: ItemType.Consumable,
   subType: ItemSubType.Food,
   textureAtlas: "items",

@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ContainersBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemBag: Partial<IItem> = {
-  key: "bag",
+  key: ContainersBlueprint.Bag,
   type: ItemType.Container,
   subType: ItemSubType.Other,
   textureAtlas: "items",

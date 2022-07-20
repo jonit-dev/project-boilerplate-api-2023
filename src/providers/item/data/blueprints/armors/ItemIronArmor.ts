@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ArmorsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemIronArmor: Partial<IItem> = {
-  key: "iron-armor",
+  key: ArmorsBlueprint.IronArmor,
   type: ItemType.Armor,
   subType: ItemSubType.Armor,
   textureAtlas: "items",
