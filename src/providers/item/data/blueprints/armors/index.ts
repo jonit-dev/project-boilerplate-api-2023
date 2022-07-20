@@ -1,5 +1,7 @@
 import { ArmorsBlueprint } from "../../types/itemsBlueprintTypes";
+import { itemBronzeArmor } from "./ItemBronzeArmor";
 import { itemCoat } from "./ItemCoat";
+import { itemIronArmor } from "./ItemIronArmor";
 import { itemJacket } from "./ItemJacket";
 import { itemLeatherJacket } from "./ItemLeatherJacket";
 import { itemStuddedArmor } from "./ItemStuddedArmor";
@@ -9,4 +11,6 @@ export const armorsBlueprintsIndex = {
   [ArmorsBlueprint.Coat]: itemCoat,
   [ArmorsBlueprint.LeatherJacket]: itemLeatherJacket,
   [ArmorsBlueprint.StuddedArmor]: itemStuddedArmor,
+  [ArmorsBlueprint.BronzeArmor]: itemBronzeArmor,
+  [ArmorsBlueprint.IronArmor]: itemIronArmor,
 };
