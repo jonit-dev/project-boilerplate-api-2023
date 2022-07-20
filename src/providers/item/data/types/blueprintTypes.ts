@@ -36,10 +36,14 @@ export enum ArmorsBlueprint {
   Coat = "coat",
   LeatherJacket = "leather-jacket",
   StuddedArmor = "studded-armor",
+  BronzeArmor = "bronze-armor",
+  IronArmor = "iron-armor",
 }
 
 export enum AxesBlueprint {
   Axe = "axe",
+  Bardiche = "bardiche",
+  DoubleAxe = "double-axe",
 }
 
 export enum BootsBlueprint {
@@ -111,4 +115,8 @@ export enum ShieldsBlueprint {
 export enum LegsBlueprint {
   LeatherLegs = "leather-legs",
   StuddedLegs = "studded-legs",
+}
+
+export enum AccessoriesBlueprint {
+  SilverKey = "silver-key",
 }
