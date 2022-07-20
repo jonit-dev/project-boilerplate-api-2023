@@ -80,14 +80,34 @@ export class MapTiles {
     // get tile at position x and y
 
     const rawTileId = this.getRawTileId(layer, gridX, gridY);
+
     const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
-    const tileId = rawTileId! - targetTileset!.firstgid;
 
     if (rawTileId) {
+      const tileId = rawTileId! - targetTileset!.firstgid;
+
       return tileId;
     } else {
       return 0;
     }
+  }
+
+  private isBitwise = (n: number): boolean => {
+    return (n & 0x80000000) !== 0;
+  };
+
+  private convertBitewiseToTileId(bitewise: number): number {
+    // more info here: https://discourse.mapeditor.org/t/need-help-understanding-exported-flipped-tiles/5383/3
+    // and convert it to binary, where it returns this 30 bit binary number
+
+    const binary = bitewise.toString(2);
+
+    const clearedBinary = "0".repeat(4) + binary.substring(4, binary.length);
+
+    // use cleared binary to get the tile id
+    const tileId = parseInt(clearedBinary, 2);
+
+    return tileId;
   }
 
   private getTargetChunk(chunks: ITiledChunk[], gridX: number, gridY: number): ITiledChunk | undefined {
@@ -103,7 +123,13 @@ export class MapTiles {
       return undefined;
     }
 
-    return chunk.data[(gridY - chunk.y) * chunk.width + (gridX - chunk.x)];
+    let rawTileId = chunk.data[(gridY - chunk.y) * chunk.width + (gridX - chunk.x)];
+
+    if (this.isBitwise(rawTileId)) {
+      rawTileId = this.convertBitewiseToTileId(rawTileId);
+    }
+
+    return rawTileId;
   }
 
   private getLayer(map: string, layerName: MapLayers): ITiledLayer | undefined {

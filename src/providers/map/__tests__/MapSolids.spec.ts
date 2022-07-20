@@ -57,6 +57,10 @@ describe("MapSolids.ts", () => {
         [22, 11],
         [13, 20],
         [22, 20],
+        [17, 15],
+        [16, 16],
+        [19, 17], // flipped tile
+        [18, 18], // flipped tile
       ];
 
       const emptyPoints = [
@@ -65,6 +69,8 @@ describe("MapSolids.ts", () => {
         [23, 18],
         [12, 18],
         [28, 28],
+        [17, 16],
+        [18, 17],
       ];
 
       for (const [gridX, gridY] of solidPoints) {

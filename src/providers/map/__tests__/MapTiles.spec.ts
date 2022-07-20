@@ -86,6 +86,14 @@ describe("MapTiles.ts", () => {
     expect(emptyTile).toBeFalsy();
   });
 
+  it("should properly get the tileId and solid status of a flipped tile", () => {
+    const flippedTileId = mapTiles.getTileId(mapName, 19, 16, MapLayers.OverGround);
+    const solidFlippedTile = mapTiles.isSolid(mapName, 19, 16, MapLayers.OverGround);
+
+    expect(flippedTileId).toBe(35);
+    expect(solidFlippedTile).toBeTruthy();
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });

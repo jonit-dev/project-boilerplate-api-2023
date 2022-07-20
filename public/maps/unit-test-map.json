@@ -137,7 +137,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 3325, 3326, 3325, 3326, 3325, 3326, 3324, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3353, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 829, 830, 0, 0, 0, 3353, 0, 0, 0, 0, 829, 830, 0, 0, 0, 0, 894, 895, 0, 0, 0, 3353, 0,
-            0, 0, 0, 894, 895, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3353, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            0, 0, 0, 894, 895, 0, 0, 0, 4166, 4167, 4168, 4169, 0, 0, 3353, 0, 0, 0, 0, 0, 0, 0, 0, 0
           ],
           "height": 16,
           "width": 16,
@@ -162,15 +162,15 @@
         },
         {
           "data": [
-            0, 0, 0, 0, 0, 0, 3353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 3353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3419, 3419,
-            3419, 3419, 3419, 3419, 3388, 0, 0, 0, 0, 0, 0, 0, 0, 0, 831, 832, 833, 834, 0, 0, 0, 0, 0, 0, 831, 832,
-            833, 834, 0, 0, 896, 897, 898, 899, 0, 0, 0, 0, 0, 0, 896, 897, 898, 899, 0, 0, 961, 962, 963, 964, 0, 0, 0,
-            0, 0, 0, 961, 962, 963, 964, 0, 0, 1026, 1027, 1028, 1029, 0, 0, 0, 0, 0, 0, 1026, 1027, 1028, 1029, 0, 0,
+            4173, 0, 0, 2147487828, 0, 0, 3353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4180, 0, 0, 2147487828, 0, 0, 3353, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 4187, 4188, 4189, 4190, 0, 0, 3353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3353, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 3419, 3419, 3419, 3419, 3419, 3419, 3388, 0, 0, 0, 0, 0, 0, 0, 0, 0, 831, 832, 833,
+            834, 0, 0, 0, 0, 0, 0, 831, 832, 833, 834, 0, 0, 896, 897, 898, 899, 0, 0, 0, 0, 0, 0, 896, 897, 898, 899,
+            0, 0, 961, 962, 963, 964, 0, 0, 0, 0, 0, 0, 961, 962, 963, 964, 0, 0, 1026, 1027, 1028, 1029, 0, 0, 0, 0, 0,
+            0, 1026, 1027, 1028, 1029, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
           ],
           "height": 16,
           "width": 16,
@@ -62831,6 +62831,514 @@
               "type": "string",
               "value": "some test tiles."
             },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        }
+      ],
+      "tilewidth": 16
+    },
+    {
+      "columns": 7,
+      "firstgid": 4145,
+      "image": "../../assets/tilesets/graveyard/output/graveyard.png",
+      "imageheight": 112,
+      "imagewidth": 112,
+      "margin": 0,
+      "name": "graveyard",
+      "spacing": 0,
+      "tilecount": 49,
+      "tileheight": 16,
+      "tiles": [
+        {
+          "id": 0,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 1,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+
+        {
+          "id": 16,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 18,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 26,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 27,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 28,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 29,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 30,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 31,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+
+        {
+          "id": 32,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 33,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 34,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 35,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 36,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 37,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 38,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 39,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 40,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 41,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 42,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 43,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 44,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 45,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 46,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": 47,
+          "properties": [
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
+            }
+          ]
+        },
+
+        {
+          "id": 48,
+          "properties": [
             {
               "name": "ge_collide",
               "type": "bool",
