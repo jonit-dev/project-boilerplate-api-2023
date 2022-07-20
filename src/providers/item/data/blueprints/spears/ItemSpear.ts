@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { SpearsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemSpear: Partial<IItem> = {
-  key: "spear",
+  key: SpearsBlueprint.Spear,
   type: ItemType.Weapon,
   subType: ItemSubType.Spear,
   textureAtlas: "items",

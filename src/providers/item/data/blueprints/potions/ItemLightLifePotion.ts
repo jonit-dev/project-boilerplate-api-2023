@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemLightLifePotion: Partial<IItem> = {
-  key: "light-life-potion",
+  key: PotionsBlueprint.LightLifePotion,
   type: ItemType.Consumable,
   subType: ItemSubType.Magic,
   textureAtlas: "items",

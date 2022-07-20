@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemRune: Partial<IItem> = {
-  key: "rune",
+  key: MagicsBlueprint.Rune,
   type: ItemType.Accessory,
   subType: ItemSubType.Magic,
   textureAtlas: "items",

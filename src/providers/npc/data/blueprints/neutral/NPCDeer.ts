@@ -1,10 +1,10 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
+import { generateMoveAwayMovement } from "../../abstractions/BaseNeutralNPC";
 
 export const npcDeer = {
-  ...generateMoveTowardsMovement(),
+  ...generateMoveAwayMovement(),
   name: "Deer",
   key: "deer",
   textureKey: "deer",
@@ -23,7 +23,6 @@ export const npcDeer = {
       level: 2,
     },
   },
-  fleeOnLowHealth: true,
   experience: 20,
   loots: [
     {

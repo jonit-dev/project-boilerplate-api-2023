@@ -1,8 +1,9 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemAppendicesStaff: Partial<IItem> = {
-  key: "appendice's-staff",
+  key: StaffsBlueprint.AppendicesStaff,
   type: ItemType.Weapon,
   subType: ItemSubType.Sword,
   textureAtlas: "items",
