@@ -3312,6 +3312,42 @@
           "width": 16,
           "x": 1568,
           "y": 1200
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 100,
+          "name": "Rat",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "rat"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 1200,
+          "y": 752
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 101,
+          "name": "Rat",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "rat"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 1248,
+          "y": 736
         }
       ],
       "opacity": 1,
@@ -4238,7 +4274,7 @@
     }
   ],
   "nextlayerid": 21,
-  "nextobjectid": 99,
+  "nextobjectid": 102,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.9.0",
