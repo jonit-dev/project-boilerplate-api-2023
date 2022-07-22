@@ -49,6 +49,9 @@ export enum AxesBlueprint {
 export enum BootsBlueprint {
   Boots = "boots",
   CopperBoots = "copper-boots",
+  IronBoots = "iron-boots",
+  ReforcedBoots = "reforced-boots",
+  StuddedBoots = "studded-boots",
   Sandals = "sandals",
 }
 
