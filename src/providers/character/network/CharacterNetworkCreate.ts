@@ -59,7 +59,8 @@ export class CharacterNetworkCreate {
         await this.BattleNetworkStopTargeting.stopTargeting(character);
 
         const map = character.scene;
-        MapLoader.grids.get(map)!.setWalkableAt(ToGridX(character.x), ToGridY(character.y), false);
+
+        MapLoader.grids.get(map)?.setWalkableAt(ToGridX(character.x), ToGridY(character.y), false);
 
         await character.save();
 

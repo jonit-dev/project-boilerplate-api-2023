@@ -93,6 +93,6 @@ export class NPCSeeder {
 
   private setInitialNPCPositionAsSolid(NPCData: INPCSeedData): void {
     // mark NPC initial position as solid on the map (pathfinding)
-    MapLoader.grids.get(NPCData.scene)!.setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
+    MapLoader.grids.get(NPCData.scene)?.setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
   }
 }

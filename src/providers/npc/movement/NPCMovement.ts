@@ -55,8 +55,8 @@ export class NPCMovement {
       }
 
       // update grid solids
-      MapLoader.grids.get(map)!.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
-      MapLoader.grids.get(map)!.setWalkableAt(ToGridX(newX), ToGridY(newY), false);
+      MapLoader.grids.get(map)?.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
+      MapLoader.grids.get(map)?.setWalkableAt(ToGridX(newX), ToGridY(newY), false);
 
       // warn nearby characters that the NPC moved;
 
