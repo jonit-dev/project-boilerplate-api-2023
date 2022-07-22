@@ -10,7 +10,7 @@ export const itemReforcedBoots: Partial<IItem> = {
   texturePath: "boots/reforced-boots.png",
   textureKey: "reforced-boots",
   name: "Reforced Boots",
-  description: "A boots made with reinforced leather.",
+  description: "A boot made with reinforced leather.",
   defense: 6,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Feet],

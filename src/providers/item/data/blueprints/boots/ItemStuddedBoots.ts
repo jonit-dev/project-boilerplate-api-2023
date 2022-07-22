@@ -10,7 +10,7 @@ export const itemStuddedBoots: Partial<IItem> = {
   texturePath: "boots/studded-boots.png",
   textureKey: "studded-boots",
   name: "Studded Boots",
-  description: "A boots made with leather and metal studs.",
+  description: "A boot made with leather and metal studs.",
   defense: 4,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Feet],
