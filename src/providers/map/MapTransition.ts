@@ -1,13 +1,24 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { FromGridX, ITiledObject, MapSocketEvents } from "@rpg-engine/shared";
+import {
+  FromGridX,
+  ITiledObject,
+  IViewDestroyElementPayload,
+  MapSocketEvents,
+  ViewSocketEvents,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MapLoader } from "./MapLoader";
 import { MapObjectsLoader } from "./MapObjectsLoader";
 
 @provide(MapTransition)
 export class MapTransition {
-  constructor(private mapObjectsLoader: MapObjectsLoader, private socketMessaging: SocketMessaging) {}
+  constructor(
+    private mapObjectsLoader: MapObjectsLoader,
+    private socketMessaging: SocketMessaging,
+    private characterView: CharacterView
+  ) {}
 
   public async changeCharacterScene(character: ICharacter, transition: ITiledObject): Promise<void> {
     try {
@@ -36,6 +47,15 @@ export class MapTransition {
 
       // send event to client telling it to restart the map. We don't need to specify which, because it will trigger a character refresh and scene reload on the client side.
       this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.ChangeMap);
+
+      this.socketMessaging.sendMessageToCloseCharacters<IViewDestroyElementPayload>(
+        character,
+        ViewSocketEvents.Destroy,
+        {
+          type: "characters",
+          id: character._id,
+        }
+      );
     } catch (error) {
       console.error(error);
     }
