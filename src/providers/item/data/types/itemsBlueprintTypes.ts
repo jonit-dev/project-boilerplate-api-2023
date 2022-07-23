@@ -90,6 +90,8 @@ export enum BowsBlueprint {
 export enum GlovesBlueprint {
   LeatherGloves = "leather-gloves",
   StuddedGloves = "studded-gloves",
+  ChainGloves = "chain-gloves",
+  PlateGloves = "plate-gloves",
 }
 
 export enum MacesBlueprint {
