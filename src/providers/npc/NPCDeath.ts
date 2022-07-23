@@ -115,7 +115,7 @@ export class NPCDeath {
             break;
           }
 
-          itemContainer.slots[freeSlotId!] = lootItem._id;
+          itemContainer.slots[freeSlotId!] = lootItem;
 
           lootQuantity--;
         }
