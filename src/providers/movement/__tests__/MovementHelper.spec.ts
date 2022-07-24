@@ -29,9 +29,9 @@ describe("MovementHelper.ts", () => {
 
     expect(isSnappedToGrid).toBeTruthy();
 
-    const isntSnappedToGrid = movementHelper.isSnappedToGrid(15, 15);
+    const isNotSnappedToGrid = movementHelper.isSnappedToGrid(15, 15);
 
-    expect(isntSnappedToGrid).toBeFalsy();
+    expect(isNotSnappedToGrid).toBeFalsy();
   });
 
   it("should properly detect an empty tile near a NPC", async () => {
