@@ -91,11 +91,10 @@ export class CharacterNetworkUpdate {
 
           // verify if we're in a map transition. If so, we need to trigger a scene transition
 
-          const isTransition = this.mapTransition.getTransitionAtXY(character.scene, newX, newY);
+          const transition = this.mapTransition.getTransitionAtXY(character.scene, newX, newY);
 
-          if (isTransition) {
-            console.log(isTransition);
-            // TODO: Stopped here. Trigger a scene transition!
+          if (transition) {
+            await this.mapTransition.changeCharacterScene(character, transition);
           }
         }
       }
@@ -263,6 +262,8 @@ export class CharacterNetworkUpdate {
     );
 
     if (isSolid) {
+      console.log(ToGridX(newX), ToGridY(newY), MapLayers.Character);
+      console.log("solid");
       return false;
     }
 
@@ -342,7 +343,7 @@ export class CharacterNetworkUpdate {
       // if character is moving, update the position
 
       // old position is now walkable
-      MapLoader.grids.get(map)!.setWalkableAt(ToGridX(data.x), ToGridY(data.y), true);
+      MapLoader.grids.get(map)?.setWalkableAt(ToGridX(data.x), ToGridY(data.y), true);
 
       updatedData.x = newX;
       updatedData.y = newY;
@@ -361,7 +362,7 @@ export class CharacterNetworkUpdate {
 
       // update our grid with solid information
 
-      MapLoader.grids.get(map)!.setWalkableAt(ToGridX(updatedData.x), ToGridY(updatedData.y), false);
+      MapLoader.grids.get(map)?.setWalkableAt(ToGridX(updatedData.x), ToGridY(updatedData.y), false);
     }
   }
 }

@@ -37,6 +37,7 @@ export class MovementHelper {
       y: FromGridY(gridY),
       layer,
       health: { $gt: 0 },
+      scene: map,
     });
 
     if (hasNPC) {
@@ -48,6 +49,7 @@ export class MovementHelper {
       y: FromGridY(gridY),
       isOnline: true,
       layer,
+      scene: map,
     });
 
     if (hasCharacter) {
@@ -64,6 +66,7 @@ export class MovementHelper {
       x: FromGridX(gridX),
       y: FromGridY(gridY),
       isSolid: true,
+      scene: map,
     });
 
     if (hasItem) {

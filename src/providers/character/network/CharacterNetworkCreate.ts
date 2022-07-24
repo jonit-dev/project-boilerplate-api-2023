@@ -37,17 +37,17 @@ export class CharacterNetworkCreate {
       async (data: ICharacterCreateFromClient, character: ICharacter) => {
         // check if character is already logged in
 
-        if (character.isOnline) {
-          // then force logout the previous associated client
-          this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
-            reason: "You've been disconnected because you logged in from another location!",
-          });
-          // and then logout also the client that just connected
-          this.socketMessaging.sendEventToUser(String(channel.id), CharacterSocketEvents.CharacterForceDisconnect, {
-            reason: "You've been disconnected because you logged in from another location!",
-          });
-          return;
-        }
+        // if (character.isOnline) {
+        //   // then force logout the previous associated client
+        //   this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+        //     reason: "You've been disconnected because you logged in from another location!",
+        //   });
+        //   // and then logout also the client that just connected
+        //   this.socketMessaging.sendEventToUser(String(channel.id), CharacterSocketEvents.CharacterForceDisconnect, {
+        //     reason: "You've been disconnected because you logged in from another location!",
+        //   });
+        //   return;
+        // }
 
         character.isOnline = true;
         character.channelId = data.channelId;
@@ -59,7 +59,8 @@ export class CharacterNetworkCreate {
         await this.BattleNetworkStopTargeting.stopTargeting(character);
 
         const map = character.scene;
-        MapLoader.grids.get(map)!.setWalkableAt(ToGridX(character.x), ToGridY(character.y), false);
+
+        MapLoader.grids.get(map)?.setWalkableAt(ToGridX(character.x), ToGridY(character.y), false);
 
         await character.save();
 
@@ -116,9 +117,6 @@ export class CharacterNetworkCreate {
     character: ICharacter
   ): Promise<void> {
     const nearbyCharacters = await this.playerView.getCharactersInView(character);
-
-    console.log("warning nearby characters...");
-    console.log(nearbyCharacters.map((p) => p.name).join(", "));
 
     if (nearbyCharacters.length > 0) {
       for (const nearbyCharacter of nearbyCharacters) {
