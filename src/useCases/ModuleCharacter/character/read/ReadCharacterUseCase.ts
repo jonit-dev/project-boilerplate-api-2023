@@ -16,7 +16,7 @@ export class ReadCharacterUseCase {
   }
 
   public async readAll(ownerId: string): Promise<ICharacter[]> {
-    return await this.characterRepository.readAll(
+    const characters = await this.characterRepository.readAll(
       Character,
       {
         owner: ownerId,
@@ -25,5 +25,12 @@ export class ReadCharacterUseCase {
       null,
       true
     );
+
+    for (const char of characters) {
+      const inventory = await char.inventory;
+      char.inventory = inventory;
+    }
+
+    return characters;
   }
 }
