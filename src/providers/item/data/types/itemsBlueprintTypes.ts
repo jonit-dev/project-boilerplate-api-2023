@@ -4,6 +4,10 @@ export enum SwordBlueprint {
   DragonsSword = "dragon's-sword",
   DoubleEdgedSword = "double-edged-sword",
   BroadSword = "broad-sword",
+  ElvenSword = "elven-sword",
+  FireSword = "fire-sword",
+  Katana = "katana",
+  KnightsSword = "knights-sword",
 }
 
 export enum HelmetBlueprint {
@@ -11,6 +15,8 @@ export enum HelmetBlueprint {
   Cap = "cap",
   StuddedHelmet = "studded-helmet",
   Turban = "turban",
+  BrassHelmet = "brass-helmet",
+  SoldiersHelmet = "soldiers-helmet",
 }
 
 export enum EffectsBlueprint {
@@ -102,19 +108,25 @@ export enum MacesBlueprint {
 
 export enum MagicsBlueprint {
   Rune = "rune",
+  Book = "book",
 }
 
 export enum OthersBlueprint {
   Candle = "candle",
+  RoyalChalice = "royal-chalice",
 }
 
 export enum StaffsBlueprint {
   AppendicesStaff = "appendice's-staff",
+  CorruptionStaff = "corruption-staff",
+  FireStaff = "fire-staff",
 }
 
 export enum ShieldsBlueprint {
   WoodenShield = "wooden-shield",
   StuddedShield = "studded-shield",
+  KnightsShield = "knights-shield",
+  PlateShield = "plate-shield",
 }
 
 export enum LegsBlueprint {
@@ -124,4 +136,10 @@ export enum LegsBlueprint {
 
 export enum AccessoriesBlueprint {
   SilverKey = "silver-key",
+}
+
+export enum HammersBlueprint {
+  Hammer = "hammer",
+  IronHammer = "iron-hammer",
+  WarHammer = "war-hammer",
 }

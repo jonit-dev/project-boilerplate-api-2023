@@ -24,6 +24,16 @@ describe("MovementHelper.ts", () => {
     expect(hasSolidNPC).toBeTruthy();
   });
 
+  it("should properly detect if a position is snapped or not to grid", () => {
+    const isSnappedToGrid = movementHelper.isSnappedToGrid(16, 16);
+
+    expect(isSnappedToGrid).toBeTruthy();
+
+    const isNotSnappedToGrid = movementHelper.isSnappedToGrid(15, 15);
+
+    expect(isNotSnappedToGrid).toBeFalsy();
+  });
+
   it("should properly detect an empty tile near a NPC", async () => {
     const npc = await unitTestHelper.createMockNPC();
 

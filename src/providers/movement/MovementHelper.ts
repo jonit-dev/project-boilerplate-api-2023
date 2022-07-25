@@ -23,6 +23,10 @@ interface IPosition {
 export class MovementHelper {
   constructor(private mathHelper: MathHelper, private mapSolids: MapSolids) {}
 
+  public isSnappedToGrid(x: number, y: number): boolean {
+    return x % GRID_WIDTH === 0 && y % GRID_WIDTH === 0;
+  }
+
   public isSolid = async (
     map: string,
     gridX: number,

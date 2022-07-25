@@ -254,6 +254,11 @@ export class CharacterNetworkUpdate {
       return true; // if character is not moving, we dont need to check anything else!
     }
 
+    if (this.movementHelper.isSnappedToGrid(newX, newY)) {
+      console.log(`🚫 ${character.name} lost snapping to grid!`);
+      return false;
+    }
+
     const isSolid = await this.movementHelper.isSolid(
       character.scene,
       ToGridX(newX),
@@ -262,8 +267,6 @@ export class CharacterNetworkUpdate {
     );
 
     if (isSolid) {
-      console.log(ToGridX(newX), ToGridY(newY), MapLayers.Character);
-      console.log("solid");
       return false;
     }
 
