@@ -254,7 +254,7 @@ export class CharacterNetworkUpdate {
       return true; // if character is not moving, we dont need to check anything else!
     }
 
-    if (this.movementHelper.isSnappedToGrid(newX, newY)) {
+    if (!this.movementHelper.isSnappedToGrid(newX, newY)) {
       console.log(`🚫 ${character.name} lost snapping to grid!`);
       return false;
     }
