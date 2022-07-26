@@ -3490,7 +3490,26 @@
       "draworder": "topdown",
       "id": 13,
       "name": "Items",
-      "objects": [],
+      "objects": [
+        {
+          "class": "",
+          "height": 16,
+          "id": 105,
+          "name": "Broad Sword",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "broad-sword"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 576,
+          "y": 672
+        }
+      ],
       "opacity": 1,
       "type": "objectgroup",
       "visible": true,
@@ -4864,7 +4883,7 @@
       "starty": 0,
       "type": "tilelayer",
       "visible": true,
-      "width": 208,
+      "width": 192,
       "x": 0,
       "y": 0
     },
@@ -6136,7 +6155,7 @@
     }
   ],
   "nextlayerid": 22,
-  "nextobjectid": 105,
+  "nextobjectid": 106,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.9.0",
