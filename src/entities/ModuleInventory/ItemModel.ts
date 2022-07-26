@@ -58,6 +58,8 @@ const itemSchema = createLeanSchema(
       fullDescription: string;
     }),
     decayTime: Type.date(),
+    maxRange: Type.number(),
+    requiredAmmoKey: Type.string(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

@@ -15,4 +15,6 @@ export const itemBow: Partial<IItem> = {
   attack: 2,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  maxRange: 7,
+  requiredAmmoKey: "arrow",
 };
