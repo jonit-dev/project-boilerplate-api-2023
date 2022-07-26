@@ -223,6 +223,20 @@
       "y": 0
     },
     {
+      "chunks": [],
+      "height": 0,
+      "id": 14,
+      "name": "decoration",
+      "opacity": 1,
+      "startx": 0,
+      "starty": 0,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 0,
+      "x": 0,
+      "y": 0
+    },
+    {
       "draworder": "topdown",
       "id": 9,
       "name": "Items",
@@ -516,7 +530,7 @@
       "y": 0
     }
   ],
-  "nextlayerid": 14,
+  "nextlayerid": 15,
   "nextobjectid": 5,
   "orientation": "orthogonal",
   "renderorder": "right-down",
