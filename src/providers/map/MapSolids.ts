@@ -1,5 +1,4 @@
-import { MAP_LAYERS_TO_ID, MAP_OBJECT_LAYERS } from "@providers/constants/MapConstants";
-import { ITiled, MapLayers } from "@rpg-engine/shared";
+import { ITiled, MapLayers, MAP_LAYERS_TO_ID, MAP_OBJECT_LAYERS } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MapLoader } from "./MapLoader";
 import { MapTiles } from "./MapTiles";

@@ -1,8 +1,7 @@
 import { MapModel } from "@entities/ModuleSystem/MapModel";
-import { MAP_REQUIRED_LAYERS } from "@providers/constants/MapConstants";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { InternalServerError } from "@providers/errors/InternalServerError";
-import { ITiled } from "@rpg-engine/shared";
+import { ITiled, MAP_REQUIRED_LAYERS } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
 import md5File from "md5-file";
