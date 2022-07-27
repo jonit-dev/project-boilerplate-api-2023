@@ -1,9 +1,18 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { CharacterClass, CharacterGender, FromGridX, FromGridY, MapLayers, TypeHelper } from "@rpg-engine/shared";
+import {
+  CharacterClass,
+  CharacterGender,
+  FromGridX,
+  FromGridY,
+  ItemSubType,
+  ItemType,
+  MapLayers,
+  TypeHelper,
+} from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
-import { Equipment } from "./EquipmentModel";
+import { Equipment, IEquipment } from "./EquipmentModel";
 import { Skill } from "./SkillsModel";
 
 const characterSchema = createLeanSchema(
@@ -144,6 +153,7 @@ const characterSchema = createLeanSchema(
       inventory: Promise<IItem>;
       speed: number;
       movementIntervalMs: number;
+      weapon: Promise<IItem>;
     }),
   },
   {
@@ -213,6 +223,26 @@ characterSchema.virtual("inventory").get(async function (this: ICharacter) {
   }
 
   return null;
+});
+
+characterSchema.virtual("weapon").get(async function (this: ICharacter) {
+  const equipment = (await Equipment.findById(this.equipment)) as IEquipment;
+  // Get right and left hand items
+  // What if has weapons on both hands? for now, only one weapon per character is allowed
+  const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
+  const leftHandItem = equipment.leftHand ? await Item.findById(equipment.leftHand) : undefined;
+
+  // ItemSubType Shield is of type Weapon, so check that the weapon is not subType Shield (because cannot attack with Shield)
+  if (rightHandItem?.type === ItemType.Weapon && rightHandItem?.subType !== ItemSubType.Shield) {
+    return rightHandItem;
+  }
+
+  if (leftHandItem?.type === ItemType.Weapon && leftHandItem?.subType !== ItemSubType.Shield) {
+    return leftHandItem;
+  }
+
+  // If user has no weapons return unarmed
+  return { subType: "unarmed" } as IItem;
 });
 
 characterSchema.post("remove", async function (this: ICharacter) {

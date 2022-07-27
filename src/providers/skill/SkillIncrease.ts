@@ -65,7 +65,7 @@ export class SkillIncrease {
       throw new Error(`equipment not found for character ${attacker.id}`);
     }
 
-    const increasedSP = await this.increaseWeaponSP(skills, equipment);
+    const increasedSP = await this.increaseItemSP(skills, await attacker.weapon);
     await skills.save();
 
     // If character skill level increased, send level up event specifying the skill that upgraded
@@ -209,32 +209,6 @@ export class SkillIncrease {
 
     // warn character about his experience gain
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ExperienceGain, levelUpEventPayload);
-  }
-
-  private async increaseWeaponSP(skills: ISkill, equipment: IEquipment): Promise<IIncreaseSPResult> {
-    // Get right and left hand items
-    // What if has weapons on both hands? for now, only one weapon per character is allowed
-    const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
-    const leftHandItem = equipment.leftHand ? await Item.findById(equipment.leftHand) : undefined;
-
-    // ItemSubType Shield is of type Weapon, so check that the weapon is not subType Shield (because cannot attack with Shield)
-    let foundWeapon = false;
-    if (rightHandItem?.type === ItemType.Weapon && rightHandItem?.subType !== ItemSubType.Shield) {
-      foundWeapon = true;
-      return this.increaseItemSP(skills, rightHandItem);
-    }
-
-    if (leftHandItem?.type === ItemType.Weapon && leftHandItem?.subType !== ItemSubType.Shield) {
-      foundWeapon = true;
-      return this.increaseItemSP(skills, leftHandItem);
-    }
-
-    // If user has no weapons (unarmed), then update 'first' skill
-    if (!foundWeapon) {
-      return this.increaseItemSP(skills, { subType: "unarmed" } as IItem);
-    }
-
-    return {} as IIncreaseSPResult;
   }
 
   private increaseItemSP(skills: ISkill, item: IItem): IIncreaseSPResult {

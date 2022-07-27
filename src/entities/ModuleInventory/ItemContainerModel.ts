@@ -24,6 +24,7 @@ const itemContainerSchema = createSchema(
       totalItemsQty: number;
       isEmpty: boolean;
       itemIds: string[];
+      items: Promise<IItem[]>;
       emptySlotsQty: number;
       firstAvailableSlot: IItem | null;
       firstAvailableSlotId: number | null;
@@ -40,6 +41,16 @@ itemContainerSchema.virtual("itemIds").get(function (this: IItemContainer) {
   return Object.values(this.slots)
     .filter((x) => x !== null)
     .map((item: IItem) => item.id || item._id);
+});
+
+itemContainerSchema.virtual("items").get(function (this: IItemContainer) {
+  if (!this.slots) {
+    return [];
+  }
+
+  return Item.find({
+    _id: { $in: this.itemIds },
+  });
 });
 
 itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer) {
