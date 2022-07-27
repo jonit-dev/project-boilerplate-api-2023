@@ -54,6 +54,14 @@ export class ItemContainerOpen {
       return;
     }
 
+    if (itemContainer.isOwnerRestricted && itemContainer.owner !== character._id) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Container cannot be accessed.",
+        type: "error",
+      });
+      return;
+    }
+
     const isContainerOpenValid = await this.isContainerOpenValid(itemContainer, character);
 
     if (isContainerOpenValid) {
