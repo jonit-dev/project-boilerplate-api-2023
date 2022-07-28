@@ -25,25 +25,6 @@ describe("CharacterView.ts", () => {
     });
   });
 
-  it("should properly get elements in char view", async () => {
-    const blueprintData = itemsBlueprintIndex[SwordBlueprint.ShortSword];
-
-    const shortSword = new Item({
-      ...blueprintData,
-      x: testCharacter.x,
-      y: testCharacter.y,
-      scene: testCharacter.scene,
-    });
-
-    await shortSword.save();
-
-    const itemsInCharView: IItem[] = await characterView.getElementsInCharView(Item, testCharacter);
-
-    expect(itemsInCharView.length).toBe(1);
-
-    expect(itemsInCharView[0]._id).toEqual(shortSword._id);
-  });
-
   it("should properly add a view element to the character view", async () => {
     const viewElement = {
       id: "testId",
@@ -101,6 +82,25 @@ describe("CharacterView.ts", () => {
     expect(charactersAround.find((c) => c.id === char3.id)).toBeTruthy();
 
     expect(charactersAround.find((c) => c.id === char4.id)).toBeFalsy();
+  });
+
+  it("should properly get elements in char view", async () => {
+    const blueprintData = itemsBlueprintIndex[SwordBlueprint.ShortSword];
+
+    const shortSword = new Item({
+      ...blueprintData,
+      x: testCharacter.x,
+      y: testCharacter.y,
+      scene: testCharacter.scene,
+    });
+
+    await shortSword.save();
+
+    const itemsInCharView: IItem[] = await characterView.getElementsInCharView(Item, testCharacter);
+
+    expect(itemsInCharView.length).toBe(1);
+
+    expect(itemsInCharView[0]._id).toEqual(shortSword._id);
   });
 
   afterAll(async () => {
