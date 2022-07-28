@@ -81,7 +81,10 @@ export class BattleRangedAttack {
       return { location: ItemSlotType.Accessory, id: accesory._id, key: requiredAmmoKey };
     }
 
-    const backpack = equipment.inventory! as unknown as IItem;
+    if (!equipment.inventory) {
+      return {} as IRequiredAmmo;
+    }
+    const backpack = equipment.inventory as unknown as IItem;
     const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
 
     if (!backpackContainer) {

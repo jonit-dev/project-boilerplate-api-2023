@@ -1,12 +1,12 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
-import { ItemSubType, ItemType } from "@rpg-engine/shared/dist/types/item.types";
+import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import {
   ISkillDetails,
   ISkillEventFromServer,

@@ -227,6 +227,10 @@ characterSchema.virtual("inventory").get(async function (this: ICharacter) {
 
 characterSchema.virtual("weapon").get(async function (this: ICharacter) {
   const equipment = (await Equipment.findById(this.equipment)) as IEquipment;
+
+  if (!equipment) {
+    return { subType: "unarmed" } as IItem;
+  }
   // Get right and left hand items
   // What if has weapons on both hands? for now, only one weapon per character is allowed
   const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
