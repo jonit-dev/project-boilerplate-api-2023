@@ -251,7 +251,7 @@ export class EquipmentEquip {
   public async removeItemFromInventory(itemId: string, itemContainer: IItemContainer): Promise<void> {
     let index = 0;
     for (let slot in itemContainer.slots) {
-      if (itemContainer.slots[slot] && itemContainer.slots[slot]._id === itemId) {
+      if (itemContainer.slots[slot] && itemContainer.slots[slot]._id.toString() === itemId.toString()) {
         slot = "";
         break;
       }
@@ -259,6 +259,7 @@ export class EquipmentEquip {
     }
 
     itemContainer.slots[index] = null;
+    itemContainer.markModified("slots");
     await itemContainer.save();
   }
 

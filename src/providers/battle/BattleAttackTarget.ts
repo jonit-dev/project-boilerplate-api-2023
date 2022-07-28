@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
@@ -20,6 +21,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
+import { BattleRangedAttack } from "./BattleRangedAttack";
 import { BattleNetworkStopTargeting } from "./network/BattleNetworkStopTargetting";
 
 @provide(BattleAttackTarget)
@@ -34,7 +36,8 @@ export class BattleAttackTarget {
     private battleEffects: BattleEffects,
     private characterDeath: CharacterDeath,
     private npcDeath: NPCDeath,
-    private skillIncrease: SkillIncrease
+    private skillIncrease: SkillIncrease,
+    private battleRangedAttack: BattleRangedAttack
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
@@ -46,6 +49,45 @@ export class BattleAttackTarget {
           await this.hitTarget(attacker, target);
         }
 
+        break;
+      case EntityAttackType.Ranged:
+        // For now, ranged attack supported for characters only
+        if (attacker.type !== "Character") {
+          break;
+        }
+
+        const character = attacker as ICharacter;
+        // Get equipment to validate if character has ranged attack ammo (bow -> arrow or spear)
+        const equipment = await Equipment.findById(character.equipment).populate("inventory").exec();
+        if (!equipment) {
+          throw new Error(`equipment not found for character ${character.id}`);
+        }
+
+        const rangedAttackAmmo = await this.battleRangedAttack.getAmmoForRangedAttack(
+          await character.weapon,
+          equipment
+        );
+        if (_.isEmpty(rangedAttackAmmo)) {
+          this.battleRangedAttack.sendNoAmmoEvent(character, target);
+          break;
+        }
+
+        // check if distance between attacker and target is
+        // within the ranged weapon max range
+        const isUnderDistanceRange = this.movementHelper.isUnderRange(
+          attacker.x,
+          attacker.y,
+          target.x,
+          target.y,
+          rangedAttackAmmo.maxRange
+        );
+
+        if (isUnderDistanceRange) {
+          await this.hitTarget(attacker, target);
+          await this.battleRangedAttack.consumeAmmo(equipment, rangedAttackAmmo);
+        } else {
+          this.battleRangedAttack.sendNotInRangeEvent(character, target);
+        }
         break;
     }
 

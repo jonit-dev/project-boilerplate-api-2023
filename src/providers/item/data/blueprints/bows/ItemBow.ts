@@ -16,5 +16,5 @@ export const itemBow: Partial<IItem> = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,
-  requiredAmmoKey: "arrow",
+  requiredAmmoKey: BowsBlueprint.Arrow,
 };
