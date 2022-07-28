@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
@@ -56,8 +57,16 @@ export class BattleAttackTarget {
         }
 
         const character = attacker as ICharacter;
-        // Get ranged attack ammo (bow -> arrow or spear)
-        const rangedAttackAmmo = await this.battleRangedAttack.getAmmoForRangedAttack(character);
+        // Get equipment to validate if character has ranged attack ammo (bow -> arrow or spear)
+        const equipment = await Equipment.findById(character.equipment).populate("inventory").exec();
+        if (!equipment) {
+          throw new Error(`equipment not found for character ${character.id}`);
+        }
+
+        const rangedAttackAmmo = await this.battleRangedAttack.getAmmoForRangedAttack(
+          await character.weapon,
+          equipment
+        );
         if (_.isEmpty(rangedAttackAmmo)) {
           this.battleRangedAttack.sendNoAmmoEvent(character, target);
           break;
@@ -75,6 +84,7 @@ export class BattleAttackTarget {
 
         if (isUnderDistanceRange) {
           await this.hitTarget(attacker, target);
+          await this.battleRangedAttack.consumeAmmo(equipment, rangedAttackAmmo);
         } else {
           this.battleRangedAttack.sendNotInRangeEvent(character, target);
         }

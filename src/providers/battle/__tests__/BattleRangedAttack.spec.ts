@@ -10,6 +10,7 @@ import { BowsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { Types } from "mongoose";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 
 describe("BattleRangedAttack.spec.ts", () => {
   let battleRangedAttack: BattleRangedAttack;
@@ -61,7 +62,10 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   it("character does not have required ammo", async () => {
-    const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter);
+    const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(
+      await testCharacter.weapon,
+      characterEquipment
+    );
 
     expect(rangedAttackAmmo).toEqual({});
   });
@@ -69,7 +73,10 @@ describe("BattleRangedAttack.spec.ts", () => {
   it("character carries required ammo in accesory slot", async () => {
     const arrowId = await equipArrowInAccessorySlot(characterEquipment);
 
-    const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter);
+    const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(
+      await testCharacter.weapon,
+      characterEquipment
+    );
 
     expect(rangedAttackAmmo).not.toEqual({});
     expect(rangedAttackAmmo.location).toEqual(ItemSlotType.Accessory);
@@ -78,11 +85,44 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(rangedAttackAmmo.maxRange).toBeGreaterThan(1);
   });
 
+  it("ammo should be consumed | Accessory slot", async () => {
+    const arrowId = await equipArrowInAccessorySlot(characterEquipment);
+
+    await battleRangedAttack.consumeAmmo(characterEquipment, {
+      location: ItemSlotType.Accessory,
+      id: arrowId,
+      key: BowsBlueprint.Arrow,
+      maxRange: 2,
+    });
+
+    expect(await Item.findById(arrowId)).toBeNull();
+    expect(characterEquipment.accessory).toBeUndefined();
+  });
+
+  it("ammo should be consumed | Inventory slot", async () => {
+    const arrowId = await equipArrowInBackpackSlot(characterEquipment);
+
+    await battleRangedAttack.consumeAmmo(characterEquipment, {
+      location: ItemSlotType.Inventory,
+      id: arrowId,
+      key: BowsBlueprint.Arrow,
+      maxRange: 2,
+    });
+
+    const backpack = characterEquipment.inventory as unknown as IItem;
+    const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
+
+    const itemsIds = backpackContainer?.itemIds.map((id) => Types.ObjectId(id).toString());
+
+    expect(await Item.findById(arrowId)).toBeNull();
+    expect(itemsIds).not.toContain(arrowId.toString());
+    expect(itemsIds?.length).toBeGreaterThan(0);
+  });
+
   it("should NOT hit a target if attacker, attacker does not have enough ammo", async () => {
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
     // expect hitTarget to not have been called
-
     expect(hitTarget).not.toHaveBeenCalled();
   });
 
@@ -118,6 +158,10 @@ describe("BattleRangedAttack.spec.ts", () => {
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
     expect(hitTarget).toBeCalledTimes(2);
+
+    // when trying to attack again, hitTarget will not be called because ammo was consumed
+    await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
+    expect(hitTarget).toBeCalledTimes(2);
   });
 
   afterAll(async () => {
@@ -143,6 +187,7 @@ async function equipArrowInBackpackSlot(equipment: IEquipment): Promise<Types.Ob
   // Add items to character's backpack
   const backpack = equipment.inventory as unknown as IItem;
   const backpackContainer = await unitTestHelper.createMockBackpackItemContainer(backpack);
+  backpack.itemContainer = backpackContainer._id;
 
   await Item.updateOne(
     {
