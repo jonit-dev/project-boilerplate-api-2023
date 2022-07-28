@@ -1,4 +1,5 @@
 import { ItemType, TypeHelper } from "@rpg-engine/shared";
+import { Types } from "mongoose";
 import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { IItem, Item } from "./ItemModel";
 
@@ -49,7 +50,7 @@ itemContainerSchema.virtual("items").get(function (this: IItemContainer) {
   }
 
   return Item.find({
-    _id: { $in: this.itemIds },
+    _id: { $in: this.itemIds.map((id) => Types.ObjectId(id)) },
   });
 });
 

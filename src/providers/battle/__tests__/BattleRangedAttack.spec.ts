@@ -7,7 +7,7 @@ import { BattleAttackTarget } from "../BattleAttackTarget";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BowsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { Types } from "mongoose";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
@@ -34,13 +34,14 @@ describe("BattleRangedAttack.spec.ts", () => {
     testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
+      hasInventory: true,
       hasSkills: true,
     });
     await testNPC.populate("skills").execPopulate();
     await testCharacter.populate("skills").execPopulate();
 
     // Equip testCharacter with a Bow
-    characterEquipment = (await Equipment.findById(testCharacter.equipment)) as IEquipment;
+    characterEquipment = (await Equipment.findById(testCharacter.equipment).populate("inventory").exec()) as IEquipment;
     const bow = itemsBlueprintIndex[BowsBlueprint.Bow];
     const bowItem = new Item({ ...bow });
     const res = await bowItem.save();
@@ -105,8 +106,15 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(hitTarget).not.toHaveBeenCalled();
   });
 
-  it("should hit a target if attacker has ranged attack type, required ammo and target is in range", async () => {
+  it("should hit a target if attacker has ranged attack type, required ammo and target is in range | ammo in accesory slot", async () => {
     await equipArrowInAccessorySlot(characterEquipment);
+    await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
+
+    expect(hitTarget).toHaveBeenCalled();
+  });
+
+  it("should hit a target if attacker has ranged attack type, required ammo and target is in range | ammo in backpack slot", async () => {
+    await equipArrowInBackpackSlot(characterEquipment);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
     expect(hitTarget).toHaveBeenCalled();
@@ -117,11 +125,41 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 });
 
-async function equipArrowInAccessorySlot(equipment: IEquipment): Promise<Types.ObjectId> {
+async function createArrow(): Promise<Types.ObjectId> {
   const arrow = itemsBlueprintIndex[BowsBlueprint.Arrow];
   const arrowItem = new Item({ ...arrow });
   const res = await arrowItem.save();
-  equipment!.accessory = res._id as Types.ObjectId | undefined;
-  await equipment.save();
   return res._id;
+}
+
+async function equipArrowInAccessorySlot(equipment: IEquipment): Promise<Types.ObjectId> {
+  const arrowId = await createArrow();
+  equipment!.accessory = arrowId;
+  await equipment.save();
+  return arrowId;
+}
+
+async function equipArrowInBackpackSlot(equipment: IEquipment): Promise<Types.ObjectId> {
+  // Add items to character's backpack
+  const backpack = equipment.inventory as unknown as IItem;
+  const backpackContainer = await unitTestHelper.createMockBackpackItemContainer(backpack);
+
+  await Item.updateOne(
+    {
+      _id: backpack._id,
+    },
+    {
+      $set: {
+        itemContainer: backpackContainer._id,
+      },
+    }
+  );
+  const arrowId = await createArrow();
+
+  const slotId = backpackContainer.firstAvailableSlotId;
+  backpackContainer.slots[slotId!] = arrowId;
+
+  backpackContainer.markModified("slots");
+  await backpackContainer.save();
+  return arrowId;
 }
