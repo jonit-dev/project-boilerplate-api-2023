@@ -117,7 +117,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     await equipArrowInBackpackSlot(characterEquipment);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toHaveBeenCalled();
+    expect(hitTarget).toBeCalledTimes(2);
   });
 
   afterAll(async () => {
