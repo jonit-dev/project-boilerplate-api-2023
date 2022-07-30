@@ -24,6 +24,7 @@ export class NPCLoader {
       }
 
       const npcKeys = getNpcKeys(NPCs);
+
       const uniqueArrayKeys = Array.from(new Set(npcKeys));
       checkIfNpcBlueprintsExists(uniqueArrayKeys, mapName);
 
@@ -63,8 +64,8 @@ export class NPCLoader {
 
 function getNpcKeys(NPCs: any[]): string[] {
   return NPCs.map((npc) => {
-    const name = npc.name;
-    const key = name.toLowerCase().replace(" ", "-");
+    const key = npc.properties.find((p) => p.name === "key")?.value;
+
     return key;
   });
 }
