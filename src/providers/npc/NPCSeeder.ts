@@ -78,17 +78,23 @@ export class NPCSeeder {
   }
 
   private async createNewNPCWithSkills(NPCData: INPCSeedData): Promise<void> {
-    const skills = new Skill({ ...(NPCData.skills as unknown as ISkill), ownerType: "NPC" }); // pre-populate skills, if present in metadata
+    try {
+      const skills = new Skill({ ...(NPCData.skills as unknown as ISkill), ownerType: "NPC" }); // pre-populate skills, if present in metadata
 
-    const newNPC = new NPC({
-      ...NPCData,
-      skills: skills._id,
-    });
-    await newNPC.save();
+      const newNPC = new NPC({
+        ...NPCData,
+        skills: skills._id,
+      });
+      await newNPC.save();
 
-    skills.owner = newNPC._id;
+      skills.owner = newNPC._id;
 
-    await skills.save();
+      await skills.save();
+    } catch (error) {
+      console.log(`❌ Failed to spawn NPC ${NPCData.key}. Is the blueprint for this NPC missing?`);
+
+      console.error(error);
+    }
   }
 
   private setInitialNPCPositionAsSolid(NPCData: INPCSeedData): void {
