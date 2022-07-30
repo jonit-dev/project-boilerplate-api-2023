@@ -23,6 +23,10 @@ export class NPCLoader {
         continue;
       }
 
+      const npcKeys = getNpcKeys(NPCs);
+      const uniqueArrayKeys = Array.from(new Set(npcKeys));
+      checkIfNpcBlueprintsExists(uniqueArrayKeys, mapName);
+
       for (const tiledNPC of NPCs) {
         if (!mapName) {
           throw new Error(`NPCLoader: Scene name is not found for map ${mapName}`);
@@ -54,5 +58,22 @@ export class NPCLoader {
     }
 
     return npcSeedData;
+  }
+}
+
+function getNpcKeys(NPCs: any[]): string[] {
+  return NPCs.map((npc) => {
+    const name = npc.name;
+    const key = name.toLowerCase().replace(" ", "-");
+    return key;
+  });
+}
+
+function checkIfNpcBlueprintsExists(NPCs: string[], mapName: string): void {
+  const missingNPCs = NPCs.filter((npc) => !npcsBlueprintIndex[npc]);
+  if (missingNPCs.length > 0) {
+    throw new Error(
+      `❌ NPCLoader: Missing NPC blueprints for keys ${missingNPCs.join(", ")}. Please, double check the map ${mapName}`
+    );
   }
 }

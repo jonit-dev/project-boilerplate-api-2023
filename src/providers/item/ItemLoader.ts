@@ -24,6 +24,10 @@ export class ItemLoader {
         continue;
       }
 
+      const itemKeys = getItemKeys(items);
+      const uniqueArrayKeys = Array.from(new Set(itemKeys));
+      checkIfItemBlueprintsExists(uniqueArrayKeys, mapName);
+
       for (const tiledItemData of items) {
         if (!mapName) {
           throw new Error(`ItemLoader: Map name is not found for ${mapName}`);
@@ -41,5 +45,24 @@ export class ItemLoader {
     }
 
     return itemSeedData;
+  }
+}
+
+function getItemKeys(items: any[]): string[] {
+  return items.map((item) => {
+    const name = item.name;
+    const key = name.toLowerCase().replace(" ", "-");
+    return key;
+  });
+}
+
+function checkIfItemBlueprintsExists(items: string[], mapName: string): void {
+  const missingNPCs = items.filter((npc) => !itemsBlueprintIndex[npc]);
+  if (missingNPCs.length > 0) {
+    throw new Error(
+      `❌ ItemLoader: Missing Item blueprints for keys ${missingNPCs.join(
+        ", "
+      )}. Please, double check the map ${mapName}`
+    );
   }
 }

@@ -1,7 +1,7 @@
 import { MapModel } from "@entities/ModuleSystem/MapModel";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { InternalServerError } from "@providers/errors/InternalServerError";
-import { ITiled, MAP_REQUIRED_LAYERS } from "@rpg-engine/shared";
+import { ITiled, MapLayers, MAP_REQUIRED_LAYERS } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
 import md5File from "md5-file";
@@ -9,6 +9,12 @@ import PF from "pathfinding";
 import { createZipMap } from "./MapCompressionHelper";
 import { MapObjectsLoader } from "./MapObjectsLoader";
 import { MapSolids } from "./MapSolids";
+import { MapTiles } from "./MapTiles";
+
+type MapObject = {
+  name: string;
+  data: ITiled;
+};
 
 @provide(MapLoader)
 export class MapLoader {
@@ -20,6 +26,7 @@ export class MapLoader {
     // get all map names
 
     const mapNames = fs.readdirSync(STATIC_PATH + "/maps");
+    const mapToCheckTransitions: MapObject[] = [];
 
     for (const mapFileName of mapNames) {
       if (mapFileName.includes("_hash")) {
@@ -29,6 +36,7 @@ export class MapLoader {
       if (!mapFileName.endsWith(".json")) {
         continue;
       }
+
       const mapPath = `${STATIC_PATH}/maps/${mapFileName}`;
       const currentMap = JSON.parse(fs.readFileSync(mapPath, "utf8")) as unknown as ITiled;
 
@@ -36,7 +44,11 @@ export class MapLoader {
         this.hasMapRequiredLayers(mapFileName, currentMap as ITiled);
       }
 
-      await this.checkMapUpdated(mapPath, mapFileName, currentMap);
+      const updated = await this.checkMapUpdated(mapPath, mapFileName, currentMap);
+
+      if (updated) {
+        mapToCheckTransitions.push({ name: mapFileName, data: currentMap });
+      }
 
       const mapName = mapFileName.replace(".json", "");
 
@@ -45,6 +57,10 @@ export class MapLoader {
 
       this.mapSolidsManager.generateGridSolids(mapName, currentMap);
     }
+
+    mapToCheckTransitions.forEach((item) => {
+      this.checkMapTransitions(item.data, item.name);
+    });
 
     console.log("📦 Maps and grids are loaded!");
   }
@@ -61,7 +77,7 @@ export class MapLoader {
     }
   }
 
-  private async checkMapUpdated(mapPath: string, mapFileName: string, mapObject: object): Promise<void> {
+  private async checkMapUpdated(mapPath: string, mapFileName: string, mapObject: object): Promise<boolean> {
     const mapChecksum = this.checksum(mapPath);
     const fileName = mapFileName.replace(".json", "");
     const mapData = await MapModel.find({ name: fileName });
@@ -76,6 +92,7 @@ export class MapLoader {
         // create zip
         const pathToSave = `${STATIC_PATH}/maps`;
         await createZipMap(fileName, mapObject, pathToSave);
+        return true;
       }
     } else {
       console.log(`📦 Map ${fileName} is created!`);
@@ -84,12 +101,46 @@ export class MapLoader {
       // create zip
       const pathToSave = `${STATIC_PATH}/maps`;
       await createZipMap(fileName, mapObject, pathToSave);
+      return true;
     }
 
-    // await readZip(fileName);
+    return false;
   }
 
   public checksum(path): string {
     return md5File.sync(path);
+  }
+
+  private checkMapTransitions(map: ITiled, mapName: string): void {
+    const transitions = this.mapObjectsLoader.getObjectLayerData("Transitions", map);
+
+    if (!transitions) {
+      return;
+    }
+
+    transitions.forEach((transition) => {
+      const properties = transition.properties;
+      if (properties && properties.length > 0) {
+        if (properties.length === 3) {
+          const gridX = properties[0].value as unknown as number;
+          const gridY = properties[1].value as unknown as number;
+          const map = properties[2].value;
+
+          const mapTiles = new MapTiles();
+          const resultado = mapTiles.getTileId(map, gridX, gridY, MapLayers.Ground);
+          if (resultado === 0) {
+            throw new Error(`❌ MapLoader: Missing the map ${mapName}`);
+          }
+        } else {
+          const map = properties[0].value;
+
+          const mapData = MapLoader.maps.get(map);
+
+          if (!mapData) {
+            throw new Error(`❌ MapLoader: Missing the map ${map}`);
+          }
+        }
+      }
+    });
   }
 }
