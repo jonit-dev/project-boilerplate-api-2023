@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "tsc": "tsc",
+    "tsc": "tsc -p . --pretty --skipLibCheck --noEmit",
     "test": "yarn jest --silent test",
     "test:debug": "yarn jest test --detectOpenHandles",
     "test:coverage": "yarn jest --silent --coverage",
@@ -29,7 +29,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "yarn build && yarn lint && yarn test",
+      "pre-push": "yarn tsc && yarn lint && yarn test",
       "pre-commit": "pretty-quick --staged"
     }
   },
