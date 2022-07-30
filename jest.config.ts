@@ -4,7 +4,7 @@ const config: Config.InitialOptions = {
   preset: "@shelf/jest-mongodb",
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(ts)?$",
   transform: {
-    "^.+\\.(ts|tsx)?$": "ts-jest",
+    "^.+\\.(t|j)sx?$": "@swc/jest",
   },
   testEnvironment: "node",
   setupFiles: ["dotenv/config", "./jestInitialSetup.ts"],
@@ -16,11 +16,6 @@ const config: Config.InitialOptions = {
     "^@useCases/(.*)$": "<rootDir>/src/useCases/$1",
     "^@data/(.*)$": "<rootDir>/src/providers/data/$1",
     "^(\\.{1,2}/.*)\\.js$": "$1",
-  },
-  globals: {
-    "ts-jest": {
-      isolatedModules: true,
-    },
   },
 };
 
