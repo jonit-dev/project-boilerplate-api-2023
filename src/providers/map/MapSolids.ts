@@ -1,4 +1,4 @@
-import { ITiled, MapLayers, MAP_LAYERS_TO_ID, MAP_OBJECT_LAYERS } from "@rpg-engine/shared";
+import { ITiled, MapLayers } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MapLoader } from "./MapLoader";
 import { MapTiles } from "./MapTiles";
@@ -21,20 +21,9 @@ export class MapSolids {
 
     for (let gridX = 0; gridX < currentMap.width; gridX++) {
       for (let gridY = 0; gridY < currentMap.height; gridY++) {
-        const layers = currentMap.layers;
+        const isSolid = this.isTileSolid(map, gridX, gridY, MapLayers.Character);
 
-        for (const layer of layers) {
-          if (MAP_OBJECT_LAYERS.includes(layer.name)) {
-            // skip object layers, because this is just for solid generation
-            continue;
-          }
-
-          const isSolid = this.isTileSolid(map, gridX, gridY, MAP_LAYERS_TO_ID[layer.name]);
-
-          if (MAP_LAYERS_TO_ID[layer.name] === MapLayers.Character) {
-            gridMap.setWalkableAt(gridX, gridY, !isSolid);
-          }
-        }
+        gridMap.setWalkableAt(gridX, gridY, !isSolid);
       }
     }
   }
