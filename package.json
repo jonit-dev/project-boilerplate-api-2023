@@ -9,7 +9,7 @@
     "test:debug": "yarn jest test --detectOpenHandles",
     "test:coverage": "yarn jest --silent --coverage",
     "test:config": "yarn jest --showConfig test",
-    "dev": "yarn install && ts-node-dev --transpile-only --inspect=0.0.0.0:9229 --respawn -r tsconfig-paths/register ./src/server.ts",
+    "dev": "yarn install && ts-node-dev --transpile-only -r tsconfig-paths/register ./src/server.ts",
     "build": "tsc -p .",
     "update:shared-deps": "yarn add @rpg-engine/shared",
     "lint": "eslint --fix ./src/**/*.ts",
@@ -60,13 +60,14 @@
     "number-string": "^1.1.5",
     "pathfinding": "^0.4.18",
     "sleep-promise": "^9.1.0",
-    "socket.io": "^4.4.1",
-    "ts-node": "^10.7.0"
+    "socket.io": "^4.4.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
     "@rpg-engine/shared": "^0.3.74",
     "@shelf/jest-mongodb": "^2.2.1",
+    "@swc/core": "^1.2.220",
+    "@swc/helpers": "^0.4.3",
     "@types/bcrypt": "^3.0.0",
     "@types/express": "^4.17.8",
     "@types/jest": "^27.4.0",
@@ -119,6 +120,7 @@
     "prettier": "^2.2.1",
     "pretty-quick": "^3.1.0",
     "reflect-metadata": "^0.1.13",
+    "regenerator-runtime": "^0.13.9",
     "root-path": "^0.2.1",
     "route-cache": "^0.4.5",
     "sib-api-v3-sdk": "^8.0.2",
