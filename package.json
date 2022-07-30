@@ -9,7 +9,7 @@
     "test:debug": "yarn jest test --detectOpenHandles",
     "test:coverage": "yarn jest --silent --coverage",
     "test:config": "yarn jest --showConfig test",
-    "dev": "yarn install && ts-node-dev --transpile-only -r tsconfig-paths/register ./src/server.ts",
+    "dev": "yarn install && ts-node-dev --transpile-only --respawn -r tsconfig-paths/register ./src/server.ts",
     "build": "tsc -p .",
     "update:shared-deps": "yarn add @rpg-engine/shared",
     "lint": "eslint --fix ./src/**/*.ts",
