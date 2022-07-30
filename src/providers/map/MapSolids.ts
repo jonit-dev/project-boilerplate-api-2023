@@ -19,6 +19,8 @@ export class MapSolids {
       return;
     }
 
+    //! Warning: If the server starts to crash with a undefined in setWalkable at, double check if your Tiled map width and height is right! If not, go to Map > Resize map
+
     for (let gridX = 0; gridX < currentMap.width; gridX++) {
       for (let gridY = 0; gridY < currentMap.height; gridY++) {
         const isSolid = this.isTileSolid(map, gridX, gridY, MapLayers.Character);
