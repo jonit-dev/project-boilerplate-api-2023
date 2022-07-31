@@ -7,6 +7,7 @@ import { npcRat } from "./NPCRat";
 import { npcSkeleton } from "./NPCSkeleton";
 import { npcSkeletonKnight } from "./NPCSkeletonKnight";
 import { npcSlime } from "./NPCSlime";
+import { npcSpider } from "./NPCSpider";
 import { npcWolf } from "./NPCWolf";
 
 export const hostileNPCs = {
@@ -18,6 +19,7 @@ export const hostileNPCs = {
   ghost: npcGhost,
   minotaur: npcMinotaur,
   slime: npcSlime,
-  Wolf: npcWolf,
+  wolf: npcWolf,
   ghoul: npcGhoul,
+  spider: npcSpider,
 };

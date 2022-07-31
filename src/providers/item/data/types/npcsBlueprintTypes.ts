@@ -26,4 +26,5 @@ export enum HostileNPCsBlueprint {
   Slime = "slime",
   Wolf = "wolf",
   Ghoul = "ghoul",
+  Spider = "spider",
 }
