@@ -3,38 +3,61 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IItemDrop, IUIShowMessage, UIMessageType, UISocketEvents } from "@rpg-engine/shared";
+import {
+  IEquipmentAndInventoryUpdatePayload,
+  IEquipmentSet,
+  IItemDrop,
+  ItemSocketEvents,
+  IUIShowMessage,
+  UIMessageType,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ItemDrop)
 export class ItemDrop {
   constructor(private socketMessaging: SocketMessaging, private characterWeight: CharacterWeight) {}
 
-  public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<Boolean> {
+  public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<void> {
     const isDropValid = await this.isItemDropValid(itemDrop, character);
 
     if (!isDropValid) {
-      return false;
+      return;
     }
 
     const dropItem = (await Item.findById(itemDrop.itemId)) as unknown as IItem;
 
     if (dropItem) {
       const isItemRemoved = await this.removeItemFromInventory(dropItem, character, itemDrop.fromContainerId);
-      if (!isItemRemoved) return false;
+      if (!isItemRemoved) {
+        return;
+      }
 
       await this.characterWeight.updateCharacterWeight(character);
 
-      return true;
-    }
+      const updatedContainer = (await ItemContainer.findById(itemDrop.fromContainerId)) as unknown as IItemContainer;
+      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+        equipment: {} as unknown as IEquipmentSet,
+        inventory: {
+          _id: updatedContainer._id,
+          parentItem: updatedContainer!.parentItem.toString(),
+          owner: updatedContainer?.owner?.toString() || character.name,
+          name: updatedContainer?.name,
+          slotQty: updatedContainer!.slotQty,
+          slots: updatedContainer?.slots,
+          // allowedItemTypes: this.getAllowedItemTypes(),
+          isEmpty: updatedContainer!.isEmpty,
+        },
+      };
 
-    return false;
+      this.updateInventoryCharacter(payloadUpdate, character);
+    }
   }
 
   /**
    * This method will remove a item from the character inventory
    */
-  private async removeItemFromInventory(item: IItem, character: ICharacter, fromContainerId: string): Promise<Boolean> {
+  private async removeItemFromInventory(item: IItem, character: ICharacter, fromContainerId: string): Promise<boolean> {
     const selectedItem = (await Item.findById(item.id)) as IItem;
     const targetContainer = (await ItemContainer.findById(fromContainerId)) as unknown as IItemContainer;
 
@@ -127,6 +150,14 @@ export class ItemDrop {
     }
 
     return true;
+  }
+
+  private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
+    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+      character.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      payloadUpdate
+    );
   }
 
   public sendGenericErrorMessage(character: ICharacter): void {

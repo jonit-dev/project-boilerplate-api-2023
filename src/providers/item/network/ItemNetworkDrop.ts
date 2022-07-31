@@ -11,13 +11,7 @@ export class ItemNetworkDrop {
   public onItemDrop(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, ItemSocketEvents.Drop, async (data: IItemDrop, character) => {
       if (data) {
-        const itemDrop = await this.itemDrop.performItemDrop(data, character);
-        if (!itemDrop) {
-          this.itemDrop.sendCustomErrorMessage(
-            character,
-            "Sorry, something went wrong while trying to drop this item."
-          );
-        }
+        await this.itemDrop.performItemDrop(data, character);
       }
     });
   }
