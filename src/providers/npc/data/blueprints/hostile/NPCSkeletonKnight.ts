@@ -1,5 +1,10 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { ArmorsBlueprint, ShieldsBlueprint, SwordBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  ArmorsBlueprint,
+  BootsBlueprint,
+  ShieldsBlueprint,
+  SwordBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -43,6 +48,10 @@ export const npcSkeletonKnight = {
     {
       itemBlueprintKey: SwordBlueprint.DragonsSword,
       chance: 1,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.StuddedBoots,
+      chance: 25,
     },
   ],
 } as Partial<INPC>;

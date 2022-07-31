@@ -1,5 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { DaggersBluePrint, FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -34,6 +34,10 @@ export const npcWolf = {
     },
     {
       itemBlueprintKey: FoodsBlueprint.Bread,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: DaggersBluePrint.Dagger,
       chance: 30,
     },
   ],

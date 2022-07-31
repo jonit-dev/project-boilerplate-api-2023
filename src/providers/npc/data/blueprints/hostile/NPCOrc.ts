@@ -3,7 +3,9 @@ import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  GlovesBlueprint,
   HelmetBlueprint,
+  MacesBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -45,6 +47,18 @@ export const npcOrc = {
     {
       itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.StuddedBoots,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: GlovesBlueprint.StuddedGloves,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: MacesBlueprint.SpikedClub,
+      chance: 10,
     },
   ],
 } as Partial<INPC>;
