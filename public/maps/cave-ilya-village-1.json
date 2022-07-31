@@ -442,8 +442,8 @@
           "rotation": 0,
           "visible": true,
           "width": 16,
-          "x": 97.3333,
-          "y": 170
+          "x": 96,
+          "y": 176
         },
         {
           "class": "NPC",
@@ -460,8 +460,8 @@
           "rotation": 0,
           "visible": true,
           "width": 16,
-          "x": 303.667,
-          "y": 295.167
+          "x": 304,
+          "y": 288
         },
         {
           "class": "NPC",
@@ -496,8 +496,8 @@
           "rotation": 0,
           "visible": true,
           "width": 16,
-          "x": 117,
-          "y": 129.5
+          "x": 112,
+          "y": 128
         },
         {
           "class": "NPC",
@@ -514,8 +514,8 @@
           "rotation": 0,
           "visible": true,
           "width": 16,
-          "x": 138,
-          "y": 188
+          "x": 144,
+          "y": 176
         },
         {
           "class": "NPC",
@@ -533,7 +533,7 @@
           "visible": true,
           "width": 16,
           "x": 304,
-          "y": 259
+          "y": 256
         }
       ],
       "opacity": 1,
