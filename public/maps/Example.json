@@ -1300,6 +1300,16 @@
           "name": "Transition",
           "properties": [
             {
+              "name": "gridX",
+              "type": "int",
+              "value": 13
+            },
+            {
+              "name": "gridY",
+              "type": "int",
+              "value": 111
+            },
+            {
               "name": "map",
               "type": "string",
               "value": "Ilya"
@@ -1317,6 +1327,16 @@
           "id": 85,
           "name": "Transition",
           "properties": [
+            {
+              "name": "gridX",
+              "type": "int",
+              "value": 13
+            },
+            {
+              "name": "gridY",
+              "type": "int",
+              "value": 111
+            },
             {
               "name": "map",
               "type": "string",
