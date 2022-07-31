@@ -123,7 +123,7 @@ export class BattleNetworkInitTargeting {
       };
     }
 
-    if (target.alignment === NPCAlignment.Neutral || target.alignment === NPCAlignment.Friendly) {
+    if (target.alignment === NPCAlignment.Friendly) {
       return {
         isValid: false,
         reason: "You cannot attack this entity.",
