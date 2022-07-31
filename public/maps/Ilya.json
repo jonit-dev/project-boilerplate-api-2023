@@ -5332,6 +5332,241 @@
           "width": 16,
           "x": 2352,
           "y": 1248
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 117,
+          "name": "Deer",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "deer"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 896,
+          "y": 528
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 118,
+          "name": "Deer",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "deer"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 912,
+          "y": 672
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 119,
+          "name": "Deer",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "deer"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 1568,
+          "y": 1456
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 120,
+          "name": "Deer",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "deer"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 1456,
+          "y": 1408
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 121,
+          "name": "Deer",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "deer"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 2384,
+          "y": 960
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 122,
+          "name": "Deer",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "deer"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 1456,
+          "y": 544
+        },
+
+        {
+          "class": "",
+          "height": 16,
+          "id": 123,
+          "name": "Deer",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "deer"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 1488,
+          "y": 656
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 124,
+          "name": "Deer",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "deer"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 32,
+          "y": 1536
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 125,
+          "name": "Wolf",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "wolf"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 32,
+          "y": 1424
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 126,
+          "name": "Wolf",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "wolf"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 256,
+          "y": 848
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 127,
+          "name": "Wolf",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "wolf"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 1856,
+          "y": 832
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 128,
+          "name": "Wolf",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "wolf"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 1968,
+          "y": 1504
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 129,
+          "name": "Wolf",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "wolf"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 1824,
+          "y": 1600
         }
       ],
       "opacity": 1,
@@ -6479,7 +6714,7 @@
     }
   ],
   "nextlayerid": 22,
-  "nextobjectid": 117,
+  "nextobjectid": 130,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.9.0",
