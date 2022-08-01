@@ -69,7 +69,7 @@ export class ItemContainerOpen {
     // if we have an owner and its not the character, return false
 
     if (itemContainer.owner && itemContainer.isOwnerRestricted) {
-      if (itemContainer.owner.toString() !== character.owner.toString()) {
+      if (itemContainer.owner.toString() !== character.id.toString()) {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
           message: "You can't open this container because it's not yours.",
           type: "error",
