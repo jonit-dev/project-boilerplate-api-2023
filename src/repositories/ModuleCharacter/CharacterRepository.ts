@@ -27,21 +27,12 @@ export class CharacterRepository extends CRUD {
     const skills = new Skill({ ownerType: "Character" });
     await skills.save();
 
-    const { inventory, armor, leftHand } = await this.generateInitialItems(ownerId);
-
-    let equipment = new Equipment();
-    equipment.inventory = inventory;
-    equipment.leftHand = leftHand;
-    equipment.armor = armor;
-    equipment = await equipment.save();
-
     const createdCharacter = await this.create(
       Character,
       {
         ...newCharacter,
         owner: ownerId,
         skills: skills._id,
-        equipment: equipment._id,
       },
       null,
       ["name"]
@@ -52,6 +43,18 @@ export class CharacterRepository extends CRUD {
 
     createdCharacter.weight = weight;
     createdCharacter.maxWeight = maxWeight;
+
+    await createdCharacter.save();
+
+    const { inventory, armor, leftHand } = await this.generateInitialItems(createdCharacter._id);
+
+    let equipment = new Equipment();
+    equipment.inventory = inventory;
+    equipment.leftHand = leftHand;
+    equipment.armor = armor;
+    equipment = await equipment.save();
+
+    createdCharacter.equipment = equipment._id;
 
     await createdCharacter.save();
 
