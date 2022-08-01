@@ -390,6 +390,62 @@
           "width": 16,
           "x": 96,
           "y": 256
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 15,
+          "name": "Transition",
+          "properties": [
+            {
+              "name": "gridX",
+              "type": "int",
+              "value": 46
+            },
+            {
+              "name": "gridY",
+              "type": "int",
+              "value": 42
+            },
+            {
+              "name": "map",
+              "type": "string",
+              "value": "ilya-graveyard-01"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 640,
+          "y": 208
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 16,
+          "name": "Transition",
+          "properties": [
+            {
+              "name": "gridX",
+              "type": "int",
+              "value": 28
+            },
+            {
+              "name": "gridY",
+              "type": "int",
+              "value": 24
+            },
+            {
+              "name": "map",
+              "type": "string",
+              "value": "ilya-graveyard-01"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 304,
+          "y": 112
         }
       ],
       "opacity": 1,
@@ -402,7 +458,170 @@
       "draworder": "topdown",
       "id": 10,
       "name": "NPCs",
-      "objects": [],
+      "objects": [
+        {
+          "class": "",
+          "height": 16,
+          "id": 5,
+          "name": "Rat",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "rat"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 96,
+          "y": 400
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 6,
+          "name": "Rat",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "rat"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 144,
+          "y": 384
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 7,
+          "name": "Spider",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "spider"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 368,
+          "y": 368
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 8,
+          "name": "Spider",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "spider"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 480,
+          "y": 432
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 9,
+          "name": "Spider",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "spider"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 544,
+          "y": 448
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 10,
+          "name": "Skeleton",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "skeleton"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 368,
+          "y": 80
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 11,
+          "name": "Skeleton",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "skeleton"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 688,
+          "y": 208
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 12,
+          "name": "Spider",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "spider"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 720,
+          "y": 192
+        },
+        {
+          "class": "",
+          "height": 16,
+          "id": 13,
+          "name": "Spider",
+          "properties": [
+            {
+              "name": "key",
+              "type": "string",
+              "value": "spider"
+            }
+          ],
+          "rotation": 0,
+          "visible": true,
+          "width": 16,
+          "x": 720,
+          "y": 240
+        }
+      ],
       "opacity": 1,
       "type": "objectgroup",
       "visible": true,
@@ -531,7 +750,7 @@
     }
   ],
   "nextlayerid": 15,
-  "nextobjectid": 5,
+  "nextobjectid": 17,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.9.0",

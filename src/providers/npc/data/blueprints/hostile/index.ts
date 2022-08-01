@@ -14,7 +14,7 @@ export const hostileNPCs = {
   orc: npcOrc,
   skeleton: npcSkeleton,
   rat: npcRat,
-  skeletonKnight: npcSkeletonKnight,
+  "skeleton-knight": npcSkeletonKnight,
   bat: npcBat,
   ghost: npcGhost,
   minotaur: npcMinotaur,
