@@ -3610,7 +3610,7 @@
     },
     {
       "chunks": [],
-      "height": 80,
+      "height": 0,
       "id": 11,
       "name": "roof",
       "opacity": 1,
@@ -3622,10 +3622,10 @@
         }
       ],
       "startx": 0,
-      "starty": 16,
+      "starty": 0,
       "type": "tilelayer",
       "visible": true,
-      "width": 128,
+      "width": 0,
       "x": 0,
       "y": 0
     },
@@ -43294,7 +43294,7 @@
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -43309,7 +43309,7 @@
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -44489,7 +44489,7 @@
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -44504,7 +44504,7 @@
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -45031,7 +45031,7 @@
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -45046,7 +45046,7 @@
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -45634,7 +45634,7 @@
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -45649,7 +45649,7 @@
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -45694,7 +45694,7 @@
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -45709,7 +45709,7 @@
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
