@@ -177,7 +177,7 @@ export class EquipmentEquip {
     return true;
   }
 
-  private updateItemInventoryCharacter(
+  public updateItemInventoryCharacter(
     equipmentAndInventoryUpdate: IEquipmentAndInventoryUpdatePayload,
     character: ICharacter
   ): void {

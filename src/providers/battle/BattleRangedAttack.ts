@@ -6,7 +6,13 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { BowsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BattleSocketEvents, IBattleRangedAttackFailed, ItemSlotType, ItemSubType } from "@rpg-engine/shared";
+import {
+  BattleSocketEvents,
+  IBattleRangedAttackFailed,
+  IEquipmentAndInventoryUpdatePayload,
+  ItemSlotType,
+  ItemSubType,
+} from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -99,18 +105,43 @@ export class BattleRangedAttack {
     return {} as IRequiredAmmo;
   }
 
-  public async consumeAmmo(equipment: IEquipment, ammo: IRequiredAmmo): Promise<void> {
+  /**
+   * Consumes ammo from character's equipment accessory slot or inventory slot
+   * and sends updateItemInventoryCharacter event
+   */
+  public async consumeAmmo(equipment: IEquipment, ammo: IRequiredAmmo, character: ICharacter): Promise<void> {
+    const backpack = equipment.inventory as unknown as IItem;
+    const backpackContainer = (await ItemContainer.findById(backpack.itemContainer)) as IItemContainer;
+
     switch (ammo.location) {
       case ItemSlotType.Accessory:
         equipment.accessory = undefined;
         await equipment.save();
         break;
       case ItemSlotType.Inventory:
-        const backpack = equipment.inventory as unknown as IItem;
-        const backpackContainer = (await ItemContainer.findById(backpack.itemContainer)) as IItemContainer;
         await this.equipmentEquip.removeItemFromInventory(ammo.id.toString(), backpackContainer);
         break;
+      default:
+        throw new Error("Invalid ammo location");
     }
     await Item.deleteOne({ _id: ammo.id });
+
+    const equipmentSlots = await this.equipmentEquip.getEquipmentSlots(equipment._id);
+
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      equipment: equipmentSlots,
+      inventory: {
+        _id: backpack._id,
+        parentItem: backpackContainer.parentItem.toString(),
+        owner: backpackContainer.owner?.toString() || character.name,
+        name: backpackContainer.name,
+        slotQty: backpackContainer.slotQty,
+        slots: backpackContainer.slots,
+        allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
+        isEmpty: backpackContainer.isEmpty,
+      },
+    };
+
+    this.equipmentEquip.updateItemInventoryCharacter(payloadUpdate, character);
   }
 }
