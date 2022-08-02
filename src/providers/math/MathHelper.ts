@@ -2,6 +2,8 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import numberString from "number-string";
 
+type Direction = "down" | "up" | "left" | "right" | "down_right" | "down_left" | "up_right" | "up_left";
+
 interface IPoint {
   x: number;
   y: number;
@@ -65,5 +67,30 @@ export class MathHelper {
 
   public isXYInsideRectangle(point: IPoint, rect: IRect): boolean {
     return point.x > rect.left && point.x < rect.right && point.y > rect.top && point.y < rect.bottom;
+  }
+
+  public getDirectionFromPoint(origin: IPoint, destination: IPoint): Direction {
+    const xDiff = destination.x - origin.x;
+    const yDiff = destination.y - origin.y;
+
+    if (xDiff === 0 && yDiff === 0) {
+      throw new Error("origin and destination are the same point");
+    }
+
+    return xDiff === 0 && yDiff > 0
+      ? "down"
+      : xDiff === 0 && yDiff < 0
+      ? "up"
+      : yDiff === 0 && xDiff > 0
+      ? "right"
+      : yDiff === 0 && xDiff < 0
+      ? "left"
+      : yDiff > 0 && xDiff > 0
+      ? "down_right"
+      : yDiff < 0 && xDiff > 0
+      ? "up_right"
+      : yDiff > 0 && xDiff < 0
+      ? "down_left"
+      : "up_left";
   }
 }
