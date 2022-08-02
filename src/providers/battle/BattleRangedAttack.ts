@@ -5,12 +5,15 @@ import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { BowsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   BattleSocketEvents,
   IBattleRangedAttackFailed,
   IEquipmentAndInventoryUpdatePayload,
+  IRangedAttack,
   ItemSlotType,
+  ItemSocketEvents,
   ItemSubType,
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -27,7 +30,11 @@ interface IRequiredAmmo {
 
 @provide(BattleRangedAttack)
 export class BattleRangedAttack {
-  constructor(private socketMessaging: SocketMessaging, private equipmentEquip: EquipmentEquip) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private equipmentEquip: EquipmentEquip,
+    private mathHelper: MathHelper
+  ) {}
 
   public sendNoAmmoEvent(character: ICharacter, target: ICharacter | INPC): void {
     this.socketMessaging.sendEventToUser<IBattleRangedAttackFailed>(
@@ -51,6 +58,15 @@ export class BattleRangedAttack {
         reason: "Ranged attack failed because target distance exceeds weapon max range",
       }
     );
+  }
+
+  public sendRangedAttackEvent(attacker: ICharacter, target: ICharacter | INPC, ammo: IRequiredAmmo): void {
+    this.socketMessaging.sendEventToUser<IRangedAttack>(attacker.channelId!, ItemSocketEvents.RangedAttack, {
+      attackerId: attacker.id,
+      targetId: target.id,
+      direction: this.mathHelper.getDirectionFromPoint({ x: attacker.x, y: attacker.y }, { x: target.x, y: target.y }),
+      ammoKey: ammo.key,
+    });
   }
 
   public async getAmmoForRangedAttack(weapon: IItem, equipment: IEquipment): Promise<IRequiredAmmo> {
