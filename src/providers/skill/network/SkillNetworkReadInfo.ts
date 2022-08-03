@@ -3,7 +3,7 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { ISkill, IUIShowMessage, SkillSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { IUIShowMessage, SkillSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(SkillNetworkReadInfo)
@@ -11,9 +11,9 @@ export class SkillNetworkReadInfo {
   constructor(private socketAuth: SocketAuth, private socketMessaging: SocketMessaging) {}
 
   public onGetInfo(channel: SocketChannel): void {
-    this.socketAuth.authCharacterOn(channel, SkillSocketEvents.ReadInfo, async (character: ICharacter) => {
-      const skill = await Skill.find({
-        owner: character._id,
+    this.socketAuth.authCharacterOn(channel, SkillSocketEvents.ReadInfo, async (data, character: ICharacter) => {
+      const skill = await Skill.findOne({
+        owner: character.id,
       });
 
       if (!skill) {
@@ -24,11 +24,9 @@ export class SkillNetworkReadInfo {
         return false;
       }
 
-      this.socketMessaging.sendEventToUser<ISkill>(
-        character.channelId!,
-        SkillSocketEvents.ReadInfo,
-        skill as unknown as ISkill
-      );
+      this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
+        skill,
+      });
     });
   }
 }
