@@ -1,8 +1,7 @@
+import { Direction } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import numberString from "number-string";
-
-type Direction = "down" | "up" | "left" | "right" | "down_right" | "down_left" | "up_right" | "up_left";
 
 interface IPoint {
   x: number;

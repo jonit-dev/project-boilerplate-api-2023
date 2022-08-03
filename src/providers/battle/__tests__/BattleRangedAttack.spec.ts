@@ -88,12 +88,16 @@ describe("BattleRangedAttack.spec.ts", () => {
   it("ammo should be consumed | Accessory slot", async () => {
     const arrowId = await equipArrowInAccessorySlot(characterEquipment);
 
-    await battleRangedAttack.consumeAmmo(characterEquipment, {
-      location: ItemSlotType.Accessory,
-      id: arrowId,
-      key: BowsBlueprint.Arrow,
-      maxRange: 2,
-    });
+    await battleRangedAttack.consumeAmmo(
+      characterEquipment,
+      {
+        location: ItemSlotType.Accessory,
+        id: arrowId,
+        key: BowsBlueprint.Arrow,
+        maxRange: 2,
+      },
+      testCharacter
+    );
 
     expect(await Item.findById(arrowId)).toBeNull();
     expect(characterEquipment.accessory).toBeUndefined();
@@ -102,12 +106,16 @@ describe("BattleRangedAttack.spec.ts", () => {
   it("ammo should be consumed | Inventory slot", async () => {
     const arrowId = await equipArrowInBackpackSlot(characterEquipment);
 
-    await battleRangedAttack.consumeAmmo(characterEquipment, {
-      location: ItemSlotType.Inventory,
-      id: arrowId,
-      key: BowsBlueprint.Arrow,
-      maxRange: 2,
-    });
+    await battleRangedAttack.consumeAmmo(
+      characterEquipment,
+      {
+        location: ItemSlotType.Inventory,
+        id: arrowId,
+        key: BowsBlueprint.Arrow,
+        maxRange: 2,
+      },
+      testCharacter
+    );
 
     const backpack = characterEquipment.inventory as unknown as IItem;
     const backpackContainer = await ItemContainer.findById(backpack.itemContainer);

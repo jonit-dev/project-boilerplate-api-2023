@@ -83,8 +83,9 @@ export class BattleAttackTarget {
         );
 
         if (isUnderDistanceRange) {
+          this.battleRangedAttack.sendRangedAttackEvent(attacker as ICharacter, target, rangedAttackAmmo);
           await this.hitTarget(attacker, target);
-          await this.battleRangedAttack.consumeAmmo(equipment, rangedAttackAmmo);
+          await this.battleRangedAttack.consumeAmmo(equipment, rangedAttackAmmo, attacker as ICharacter);
         } else {
           this.battleRangedAttack.sendNotInRangeEvent(character, target);
         }
