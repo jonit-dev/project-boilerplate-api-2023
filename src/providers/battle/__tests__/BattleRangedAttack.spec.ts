@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { container, mapLoader, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, ItemSlotType } from "@rpg-engine/shared";
 import { BattleRangedAttack } from "../BattleRangedAttack";
 import { BattleAttackTarget } from "../BattleAttackTarget";
@@ -24,6 +24,8 @@ describe("BattleRangedAttack.spec.ts", () => {
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
+    await mapLoader.init();
+
     battleRangedAttack = container.get<BattleRangedAttack>(BattleRangedAttack);
     battleAttackTarget = container.get<BattleAttackTarget>(BattleAttackTarget);
     hitTarget = jest.spyOn(battleAttackTarget, "hitTarget" as any);
@@ -52,12 +54,12 @@ describe("BattleRangedAttack.spec.ts", () => {
 
     testCharacter.attackType = EntityAttackType.Ranged;
 
-    testCharacter.x = FromGridX(0);
-    testCharacter.y = FromGridX(0);
+    testCharacter.x = FromGridX(4);
+    testCharacter.y = FromGridY(4);
     await testCharacter.save();
 
     testNPC.x = FromGridX(2);
-    testNPC.y = FromGridX(2);
+    testNPC.y = FromGridY(2);
     await testNPC.save();
   });
 
@@ -150,6 +152,19 @@ describe("BattleRangedAttack.spec.ts", () => {
     await battleAttackTarget.checkRangeAndAttack(attacker, defender);
 
     // expect hitTarget to not have been called
+
+    expect(hitTarget).not.toHaveBeenCalled();
+  });
+
+  it("should NOT hit a target because a solid is in the way of the ranged attack", async () => {
+    // There's a solid map tile in grid point (1,1)
+    const attacker = testCharacter;
+    attacker.x = FromGridX(0);
+    attacker.y = FromGridY(0);
+    await attacker.save();
+
+    await equipArrowInBackpackSlot(characterEquipment);
+    await battleAttackTarget.checkRangeAndAttack(attacker, testNPC);
 
     expect(hitTarget).not.toHaveBeenCalled();
   });

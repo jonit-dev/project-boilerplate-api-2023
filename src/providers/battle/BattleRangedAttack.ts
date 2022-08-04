@@ -15,11 +15,15 @@ import {
   ItemSlotType,
   ItemSocketEvents,
   ItemSubType,
+  MapLayers,
+  ToGridX,
+  ToGridY,
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 
 interface IRequiredAmmo {
   location: string;
@@ -33,7 +37,8 @@ export class BattleRangedAttack {
   constructor(
     private socketMessaging: SocketMessaging,
     private equipmentEquip: EquipmentEquip,
-    private mathHelper: MathHelper
+    private mathHelper: MathHelper,
+    private movementHelper: MovementHelper
   ) {}
 
   public sendNoAmmoEvent(character: ICharacter, target: ICharacter | INPC): void {
@@ -56,6 +61,18 @@ export class BattleRangedAttack {
         targetId: target.id,
         type: target.type as EntityType,
         reason: "Ranged attack failed because target distance exceeds weapon max range",
+      }
+    );
+  }
+
+  public sendSolidInTrajectoryEvent(character: ICharacter, target: ICharacter | INPC): void {
+    this.socketMessaging.sendEventToUser<IBattleRangedAttackFailed>(
+      character.channelId!,
+      BattleSocketEvents.RangedAttackFailure,
+      {
+        targetId: target.id,
+        type: target.type as EntityType,
+        reason: "Ranged attack failed because there's a solid in ranged attack trajectory",
       }
     );
   }
@@ -159,5 +176,23 @@ export class BattleRangedAttack {
     };
 
     this.equipmentEquip.updateItemInventoryCharacter(payloadUpdate, character);
+  }
+
+  public async solidInTrajectory(attacker: ICharacter, target: ICharacter | INPC): Promise<boolean> {
+    const origin = { x: ToGridX(attacker.x), y: ToGridY(attacker.y) };
+    const destination = { x: ToGridX(target.x), y: ToGridY(target.y) };
+
+    const crossedGridPoints = this.mathHelper.getCrossedGridPoints(origin, destination);
+
+    for (const point of crossedGridPoints) {
+      if (_.isEqual(point, origin) || _.isEqual(point, destination)) {
+        continue;
+      }
+      const isSolid = await this.movementHelper.isSolid(attacker.scene, point.x, point.y, MapLayers.Character);
+      if (isSolid) {
+        return true;
+      }
+    }
+    return false;
   }
 }

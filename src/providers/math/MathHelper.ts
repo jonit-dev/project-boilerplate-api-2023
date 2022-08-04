@@ -92,4 +92,43 @@ export class MathHelper {
       ? "down_left"
       : "up_left";
   }
+
+  /**
+   * Implements Bresenham algorithm to return an array of grid points that get crossed by a line between 2 points
+   * (including start and end points)
+   * @param start line starting point x and y coordinates
+   * @param end line end point x and y coordinates
+   * @returns array of crossed grid points
+   */
+  public getCrossedGridPoints(start: IPoint, end: IPoint): IPoint[] {
+    const arr: IPoint[] = [];
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const adx = Math.abs(dx);
+    const ady = Math.abs(dy);
+    const sx = dx > 0 ? 1 : -1;
+    const sy = dy > 0 ? 1 : -1;
+    let eps = 0;
+
+    if (adx > ady) {
+      for (let x = start.x, y = start.y; sx < 0 ? x >= end.x : x <= end.x; x += sx) {
+        eps += ady;
+        arr.push({ x, y });
+        if (eps << 1 >= adx) {
+          y += sy;
+          eps -= adx;
+        }
+      }
+    } else {
+      for (let x = start.x, y = start.y; sy < 0 ? y >= end.y : y <= end.y; y += sy) {
+        eps += adx;
+        arr.push({ x, y });
+        if (eps << 1 >= ady) {
+          x += sx;
+          eps -= ady;
+        }
+      }
+    }
+    return arr;
+  }
 }
