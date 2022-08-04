@@ -6,13 +6,22 @@ export class ReadCharacterUseCase {
   constructor(private characterRepository: CharacterRepository) {}
 
   public async read(id: string): Promise<ICharacter> {
-    return await this.characterRepository.readOne(
+    const character = await this.characterRepository.readOne(
       Character,
       {
         _id: id,
       },
       ["owner", "skills"]
     );
+
+    // convert character to object to we can pass the inventory to it (otherwise it will output a {})
+    const charObject = character.toObject();
+
+    const inventory = await character.inventory;
+    delete charObject.inventory;
+    charObject.inventory = inventory;
+
+    return charObject;
   }
 
   public async readAll(ownerId: string): Promise<ICharacter[]> {
