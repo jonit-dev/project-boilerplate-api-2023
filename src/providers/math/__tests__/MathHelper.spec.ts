@@ -39,6 +39,31 @@ describe("MathHelper.ts", () => {
     direction = mathHelper.getDirectionFromPoint({ x: 16, y: 16 }, { x: 0, y: 0 });
     expect(direction).toBe("up_left");
   });
+
+  it("should get an array of the crossed grid points by a line between 2 points", () => {
+    const expectedResults = {
+      diagonalLine: [
+        { x: 0, y: 0 },
+        { x: 1, y: 1 },
+        { x: 2, y: 2 },
+        { x: 3, y: 3 },
+        { x: 4, y: 4 },
+        { x: 5, y: 5 },
+      ],
+      horizontalLine: [
+        { x: 0, y: 5 },
+        { x: 0, y: 4 },
+        { x: 0, y: 3 },
+        { x: 0, y: 2 },
+        { x: 0, y: 1 },
+        { x: 0, y: 0 },
+      ],
+    };
+    const crossedGridPointsDiagonalLine = mathHelper.getCrossedGridPoints({ x: 0, y: 0 }, { x: 5, y: 5 });
+    expect(crossedGridPointsDiagonalLine).toEqual(expectedResults.diagonalLine);
+    const crossedGridPointsHorizontalLine = mathHelper.getCrossedGridPoints({ x: 0, y: 5 }, { x: 0, y: 0 });
+    expect(crossedGridPointsHorizontalLine).toEqual(expectedResults.horizontalLine);
+  });
 });
 
 // your code here
