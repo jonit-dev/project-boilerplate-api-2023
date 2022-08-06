@@ -15,6 +15,7 @@ export class ReadCharacterUseCase {
     );
 
     // convert character to object to we can pass the inventory to it (otherwise it will output a {})
+    //! TODO: Temporary ugly hack until we figure out a better way to do this
     const charObject = character.toObject();
 
     const inventory = await character.inventory;
