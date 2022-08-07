@@ -28,23 +28,6 @@ describe("EquipmentUnequip.spec.ts", () => {
     charBody = (await unitTestHelper.createMockItemContainer(character)) as unknown as IItem;
   });
 
-  it("Should return item slot if item equipped", () => {
-    const itemContainer = charBody!.itemContainer as unknown as IItemContainer;
-    itemContainer.slots[2] = item;
-
-    const slot = equipmentUnequip.unEquipItemFromEquipmentSlot(itemContainer.slots, item, equipment, "NECK");
-
-    expect(slot).toEqual(item);
-  });
-
-  it("Should return undefined if item not equipped", () => {
-    const itemContainer = charBody!.itemContainer as unknown as IItemContainer;
-
-    const slot = equipmentUnequip.unEquipItemFromEquipmentSlot(itemContainer.slots, item, equipment, "NECK");
-
-    expect(slot).toEqual(undefined);
-  });
-
   it("Should increase item slot quantity if item in slot, but not max quantity yet", () => {
     const itemContainer = charBody!.itemContainer as unknown as IItemContainer;
     itemContainer.slots[2] = item;

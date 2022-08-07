@@ -2,13 +2,12 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
-import { MovementHelper } from "@providers/movement/MovementHelper";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
   IItem,
-  ItemSlotType,
   ItemSocketEvents,
   ItemType,
   IUIShowMessage,
@@ -18,15 +17,10 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(EquipmentEquip)
 export class EquipmentEquip {
-  constructor(
-    private movementHelper: MovementHelper,
+  constructor(private socketMessaging: SocketMessaging) {}
 
-    private socketMessaging: SocketMessaging
-  ) {}
-
-  public async equip(character: ICharacter, itemId: string, targetSlot: ItemSlotType): Promise<void> {
+  public async equip(character: ICharacter, itemId: string): Promise<void> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
-    const equipItemFromMap = false;
 
     const inventory = (await character.inventory) as unknown as IItem;
 
@@ -34,31 +28,33 @@ export class EquipmentEquip {
       owner: character.id,
     })) as IItemContainer;
 
-    const isEquipValid = this.validateEquip(
-      item,
-      character,
-      itemContainer,
-      inventory,
-      equipItemFromMap,
-      itemId,
-      targetSlot
-    );
+    const equipment = await Equipment.findById(character.equipment);
+
+    if (!equipment) {
+      return;
+    }
+
+    const isEquipValid = this.validateEquip(item, character, itemContainer, inventory, itemId);
 
     if (!isEquipValid) {
       return;
     }
 
-    const equipment = await Equipment.findById(character.equipment);
+    const availableSlot = this.getAvailableSlot(item, equipment as unknown as IEquipmentSet, itemContainer);
+
+    if (availableSlot === "") {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "There aren't slots available.",
+        type: "error",
+      });
+      return;
+    }
+
     if (equipment) {
-      equipment[targetSlot.toLowerCase()] = await this.getItemId(equipItemFromMap, item as unknown as IItem);
-      equipment.inventory = equipItemFromMap === false ? undefined : equipment.inventory;
+      equipment[availableSlot] = await this.getItemId(item as unknown as IItem);
       await equipment.save();
 
-      if (!equipItemFromMap) {
-        await this.removeItemFromInventory(itemId, itemContainer!);
-      } else {
-        await this.removeItemFromMap(itemId);
-      }
+      await this.removeItemFromInventory(itemId, itemContainer!);
 
       const equipmentSlots = await this.getEquipmentSlots(equipment._id);
 
@@ -85,9 +81,7 @@ export class EquipmentEquip {
     character: ICharacter,
     itemContainer: IItemContainer,
     inventory: IItem,
-    equipItemFromMap: boolean,
-    itemId: string,
-    targetSlot: ItemSlotType
+    itemId: string
   ): boolean {
     if (!item) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -97,29 +91,7 @@ export class EquipmentEquip {
       return false;
     }
 
-    if (item.x === undefined) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Invalid X item coordinates",
-        type: "error",
-      });
-      return false;
-    }
-
-    if (!item.y === undefined) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Invalid Y item coordinates",
-        type: "error",
-      });
-      return false;
-    }
-
-    const itemIsOnRange = this.isItemOnRange(character, item as unknown as IItem);
-
-    if (itemIsOnRange) {
-      equipItemFromMap = true;
-    }
-
-    if (!equipItemFromMap && !itemContainer) {
+    if (!itemContainer) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "Container not found.",
         type: "error",
@@ -127,7 +99,7 @@ export class EquipmentEquip {
       return false;
     }
 
-    if (!equipItemFromMap && !inventory) {
+    if (!inventory) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "Inventory is empty.",
         type: "error",
@@ -135,15 +107,15 @@ export class EquipmentEquip {
       return false;
     }
 
-    if (equipItemFromMap && inventory._id !== itemId) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Item is out of range!",
-        type: "error",
-      });
-      return false;
+    let userHasItem = false;
+    for (const slot in itemContainer.slots) {
+      if (itemContainer.slots[slot] && itemContainer.slots[slot]._id.toString() === itemId.toString()) {
+        userHasItem = true;
+        break;
+      }
     }
 
-    if (!equipItemFromMap && inventory._id !== itemId) {
+    if (!userHasItem) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "User doesn't have this item",
         type: "error",
@@ -167,14 +139,41 @@ export class EquipmentEquip {
       return false;
     }
 
-    if (!item?.allowedEquipSlotType?.includes(targetSlot)) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Item cannot be equipped in this slot",
-        type: "error",
-      });
-      return false;
-    }
     return true;
+  }
+
+  public getAvailableSlot(item: IItem, equipment: IEquipmentSet, itemContainer: IItemContainer): string {
+    let availableSlot = "";
+    const itemSlotTypes = [
+      "head",
+      "neck",
+      "leftHand",
+      "rightHand",
+      "ring",
+      "legs",
+      "boot",
+      "accessory",
+      "armor",
+      "inventory",
+    ];
+    for (const allowedSlotType of item?.allowedEquipSlotType) {
+      const allowedSlotTypeCamelCase = this.getWordCamelCase(allowedSlotType);
+      if (equipment[allowedSlotTypeCamelCase] === undefined) {
+        if (!itemSlotTypes.includes(allowedSlotTypeCamelCase)) {
+          const itemTypeCamelCase = this.getWordCamelCase(item.type);
+          availableSlot = itemTypeCamelCase;
+        } else {
+          availableSlot = allowedSlotTypeCamelCase;
+        }
+        break;
+      }
+    }
+
+    return availableSlot;
+  }
+
+  public getWordCamelCase(word: string): string {
+    return word.charAt(0).toLowerCase() + word.slice(1);
   }
 
   public updateItemInventoryCharacter(
@@ -188,33 +187,18 @@ export class EquipmentEquip {
     );
   }
 
-  public isItemOnRange(character: ICharacter, item: IItem): boolean {
-    return this.movementHelper.isUnderRange(character.x, character.y, item.x!, item.y!, 1);
-  }
-
-  public async getItemId(equipItemFromMap: boolean, item: IItem): Promise<string> {
-    if (!equipItemFromMap) {
-      return item._id;
-    }
-
+  public async getItemId(item: IItem): Promise<string> {
+    const blueprintData = itemsBlueprintIndex[item.textureKey];
     let newItem = new Item({
-      ...item,
+      ...blueprintData,
+      owner: item.owner,
     });
-
-    newItem.name = item.name;
-    newItem.weight = item.weight;
-    newItem.textureKey = item.textureKey;
-    newItem.texturePath = item.texturePath;
-    newItem.key = item.key;
-    newItem.description = item.description;
 
     newItem = await newItem.save();
 
-    return newItem._id;
-  }
+    await Item.remove({ _id: item._id });
 
-  private async removeItemFromMap(itemId: string): Promise<void> {
-    await Item.deleteOne({ _id: itemId });
+    return newItem._id;
   }
 
   public async getEquipmentSlots(equipmentId: string): Promise<IEquipmentSet> {
