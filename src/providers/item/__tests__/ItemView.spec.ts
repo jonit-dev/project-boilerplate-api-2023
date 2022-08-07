@@ -64,6 +64,16 @@ describe("ItemView.ts", () => {
     expect(character!.view.items[testItem._id]).not.toBeDefined();
   });
 
+  it("should throw error if a we try to remove an item from a map without a scene", async () => {
+    try {
+      testItem.scene = undefined;
+      await itemView.removeItemFromMap(testItem);
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      expect(error).toHaveProperty("message", "You cannot call this method without an item x, y and scene.");
+    }
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });

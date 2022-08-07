@@ -1,8 +1,9 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
-import { NPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MapLoader } from "@providers/map/MapLoader";
 import { MapSolids } from "@providers/map/MapSolids";
+import { MapTransition } from "@providers/map/MapTransition";
 import { MathHelper } from "@providers/math/MathHelper";
 import {
   AnimationDirection,
@@ -21,7 +22,7 @@ interface IPosition {
 
 @provide(MovementHelper)
 export class MovementHelper {
-  constructor(private mathHelper: MathHelper, private mapSolids: MapSolids) {}
+  constructor(private mathHelper: MathHelper, private mapSolids: MapSolids, private mapTransition: MapTransition) {}
 
   public isSnappedToGrid(x: number, y: number): boolean {
     return x % GRID_WIDTH === 0 && y % GRID_WIDTH === 0;
@@ -32,7 +33,8 @@ export class MovementHelper {
     gridX: number,
     gridY: number,
     layer: MapLayers,
-    checkAllLayersBelow: boolean = true
+    checkAllLayersBelow: boolean = true,
+    caller: INPC | ICharacter | undefined = undefined
   ): Promise<boolean> => {
     // check for characters and NPCs
 
@@ -75,6 +77,14 @@ export class MovementHelper {
 
     if (hasItem) {
       return true;
+    }
+
+    if (caller instanceof NPC) {
+      const hasTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
+
+      if (hasTransition) {
+        return true;
+      }
     }
 
     return false;

@@ -68,6 +68,12 @@ export class SkillIncrease {
     const increasedSP = await this.increaseItemSP(skills, await attacker.weapon);
     await skills.save();
 
+    if (increasedSP) {
+      this.socketMessaging.sendEventToUser(attacker.channelId!, SkillSocketEvents.ReadInfo, {
+        skill: skills,
+      });
+    }
+
     // If character skill level increased, send level up event specifying the skill that upgraded
     if (increasedSP.skillLevelUp && attacker.channelId) {
       this.sendSkillLevelUpEvents(increasedSP, attacker, target);
@@ -209,6 +215,13 @@ export class SkillIncrease {
 
     // warn character about his experience gain
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ExperienceGain, levelUpEventPayload);
+
+    // refresh skills (lv, xp, xpToNextLevel)
+    const skill = await Skill.findById(character.skills);
+
+    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
+      skill,
+    });
   }
 
   private increaseItemSP(skills: ISkill, item: IItem): IIncreaseSPResult {

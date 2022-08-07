@@ -82,11 +82,20 @@ export class BattleAttackTarget {
           rangedAttackAmmo.maxRange
         );
 
-        if (isUnderDistanceRange) {
-          await this.hitTarget(attacker, target);
-          await this.battleRangedAttack.consumeAmmo(equipment, rangedAttackAmmo);
-        } else {
+        if (!isUnderDistanceRange) {
           this.battleRangedAttack.sendNotInRangeEvent(character, target);
+          break;
+        }
+
+        // check if there's a solid in ranged attack trajectory
+        const solidInTrajectory = await this.battleRangedAttack.solidInTrajectory(attacker as ICharacter, target);
+
+        if (!solidInTrajectory) {
+          this.battleRangedAttack.sendRangedAttackEvent(attacker as ICharacter, target, rangedAttackAmmo);
+          await this.hitTarget(attacker, target);
+          await this.battleRangedAttack.consumeAmmo(equipment, rangedAttackAmmo, attacker as ICharacter);
+        } else {
+          this.battleRangedAttack.sendSolidInTrajectoryEvent(character, target);
         }
         break;
     }
@@ -109,7 +118,7 @@ export class BattleAttackTarget {
           {
             targetId: target.id,
             type: target.type as EntityType,
-            reason: "Battle target cancelled because target is too distant",
+            reason: "Your battle target was lost.",
           }
         );
       }

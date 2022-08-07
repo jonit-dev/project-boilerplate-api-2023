@@ -1,5 +1,10 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { BootsBlueprint, SpearsBlueprint, SwordBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  BootsBlueprint,
+  GlovesBlueprint,
+  SpearsBlueprint,
+  SwordBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -40,6 +45,10 @@ export const npcMinotaur = {
     {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: GlovesBlueprint.PlateGloves,
+      chance: 15,
     },
   ],
 } as Partial<INPC>;
