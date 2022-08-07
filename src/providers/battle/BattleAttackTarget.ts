@@ -118,7 +118,7 @@ export class BattleAttackTarget {
           {
             targetId: target.id,
             type: target.type as EntityType,
-            reason: "Battle target cancelled because target is too distant",
+            reason: "Your battle target was lost.",
           }
         );
       }

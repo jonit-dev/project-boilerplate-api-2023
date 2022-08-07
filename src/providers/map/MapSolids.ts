@@ -23,9 +23,20 @@ export class MapSolids {
 
     for (let gridX = 0; gridX < currentMap.width; gridX++) {
       for (let gridY = 0; gridY < currentMap.height; gridY++) {
-        const isSolid = this.isTileSolid(map, gridX, gridY, MapLayers.Character);
-
-        gridMap.setWalkableAt(gridX, gridY, !isSolid);
+        try {
+          const isSolid = this.isTileSolid(map, gridX, gridY, MapLayers.Character);
+          gridMap.setWalkableAt(gridX, gridY, !isSolid);
+        } catch (error) {
+          console.log(
+            "❌ Failed to set walkable for map",
+            map,
+            " at ",
+            gridX,
+            gridY,
+            error,
+            "Please double check in Tiled if all of your ge_collide properties are set."
+          );
+        }
       }
     }
   }

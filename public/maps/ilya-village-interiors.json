@@ -37727,6 +37727,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -37737,6 +37742,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -38319,6 +38329,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
             }
           ]
         },
@@ -38329,6 +38344,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
             }
           ]
         },
@@ -38912,6 +38932,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
             }
           ]
         },
@@ -38922,6 +38947,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
             }
           ]
         },
@@ -39504,6 +39534,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
             }
           ]
         },
@@ -39514,6 +39549,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
             }
           ]
         },
@@ -40097,6 +40137,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
             }
           ]
         },
@@ -40107,6 +40152,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
             }
           ]
         },
@@ -40689,6 +40739,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
             }
           ]
         },
@@ -40699,6 +40754,11 @@
               "name": "description",
               "type": "string",
               "value": "a wall."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
             }
           ]
         },
@@ -41282,6 +41342,11 @@
               "name": "description",
               "type": "string",
               "value": "a floor."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -41292,6 +41357,11 @@
               "name": "description",
               "type": "string",
               "value": "a floor."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -41874,6 +41944,11 @@
               "name": "description",
               "type": "string",
               "value": "a floor."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -41884,6 +41959,11 @@
               "name": "description",
               "type": "string",
               "value": "a floor."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -42467,6 +42547,11 @@
               "name": "description",
               "type": "string",
               "value": "a floor."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -42477,6 +42562,11 @@
               "name": "description",
               "type": "string",
               "value": "a floor."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -43059,6 +43149,11 @@
               "name": "description",
               "type": "string",
               "value": "a floor."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -43069,6 +43164,11 @@
               "name": "description",
               "type": "string",
               "value": "a floor."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -43652,6 +43752,11 @@
               "name": "description",
               "type": "string",
               "value": "a floor."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
@@ -43662,6 +43767,11 @@
               "name": "description",
               "type": "string",
               "value": "a floor."
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": false
             }
           ]
         },
