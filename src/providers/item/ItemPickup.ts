@@ -4,7 +4,15 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IItemPickup, IUIShowMessage, UIMessageType, UISocketEvents } from "@rpg-engine/shared";
+import {
+  IEquipmentAndInventoryUpdatePayload,
+  IEquipmentSet,
+  IItemPickup,
+  ItemSocketEvents,
+  IUIShowMessage,
+  UIMessageType,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemView } from "./ItemView";
 
@@ -39,10 +47,37 @@ export class ItemPickup {
         await this.itemView.removeItemFromMap(pickupItem);
       }
 
+      // send update inventory event to user
+
+      const updatedContainer = (await ItemContainer.findById(itemPickup.toContainerId)) as unknown as IItemContainer;
+      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+        equipment: {} as unknown as IEquipmentSet,
+        inventory: {
+          _id: updatedContainer._id,
+          parentItem: updatedContainer!.parentItem.toString(),
+          owner: updatedContainer?.owner?.toString() || character.name,
+          name: updatedContainer?.name,
+          slotQty: updatedContainer!.slotQty,
+          slots: updatedContainer?.slots,
+          // allowedItemTypes: this.getAllowedItemTypes(),
+          isEmpty: updatedContainer!.isEmpty,
+        },
+      };
+
+      this.updateInventoryCharacter(payloadUpdate, character);
+
       return true;
     }
 
     return false;
+  }
+
+  private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
+    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+      character.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      payloadUpdate
+    );
   }
 
   /**
