@@ -21,14 +21,21 @@ export class ItemDrop {
   public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<boolean> {
     const isDropValid = await this.isItemDropValid(itemDrop, character);
 
+    console.log(isDropValid);
+
     if (!isDropValid) {
       return false;
     }
 
     const dropItem = (await Item.findById(itemDrop.itemId)) as unknown as IItem;
 
+    console.log(dropItem);
+
     if (dropItem) {
       const isItemRemoved = await this.removeItemFromInventory(dropItem, character, itemDrop.fromContainerId);
+
+      console.log("isItemRemoved", isItemRemoved);
+
       if (!isItemRemoved) {
         return false;
       }
@@ -52,6 +59,12 @@ export class ItemDrop {
         };
 
         this.updateInventoryCharacter(payloadUpdate, character);
+
+        // if itemDrop toPosition has x and y, then drop item to that position in the map
+        dropItem.x = itemDrop.x;
+        dropItem.y = itemDrop.y;
+        dropItem.scene = itemDrop.scene;
+        await dropItem.save();
 
         return true;
       } catch (err) {
