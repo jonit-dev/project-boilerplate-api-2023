@@ -1,8 +1,8 @@
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentEquipNetwork } from "./EquipmentEquipNetwork";
-import { EquipmentUnequipNetwork } from "./EquipmentUnequipNetwork";
 import { EquipmentReadNetwork } from "./EquipmentReadNetwork";
+import { EquipmentUnequipNetwork } from "./EquipmentUnequipNetwork";
 
 @provide(EquipmentNetwork)
 export class EquipmentNetwork {

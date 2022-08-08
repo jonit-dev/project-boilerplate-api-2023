@@ -25,26 +25,8 @@ describe("EquipmentEquip.spec.ts", () => {
     charBody = (await unitTestHelper.createMockItemContainer(character)) as unknown as IItem;
   });
 
-  it("Returns true if item is on range", () => {
-    const result = equipmentEquip.isItemOnRange(character, item);
-
-    expect(result).toBe(true);
-  });
-
-  it("Returns false if item is out of range", () => {
-    character.x = 200;
-    const result = equipmentEquip.isItemOnRange(character, item);
-
-    expect(result).toBe(false);
-  });
-
-  it("Returns the same item id if equip item from inventory", async () => {
-    const result = await equipmentEquip.getItemId(false, item);
-    expect(result).toBe(item._id);
-  });
-
   it("Returns new item id if equip item from map", async () => {
-    const result = await equipmentEquip.getItemId(true, item);
+    const result = await equipmentEquip.getItemId(item);
     expect(result).not.toBe(item._id);
   });
 

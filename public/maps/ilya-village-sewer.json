@@ -48244,12 +48244,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "a sewage water."
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
