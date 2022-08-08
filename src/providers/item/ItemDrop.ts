@@ -21,20 +21,14 @@ export class ItemDrop {
   public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<boolean> {
     const isDropValid = await this.isItemDropValid(itemDrop, character);
 
-    console.log(isDropValid);
-
     if (!isDropValid) {
       return false;
     }
 
     const dropItem = (await Item.findById(itemDrop.itemId)) as unknown as IItem;
 
-    console.log(dropItem);
-
     if (dropItem) {
       const isItemRemoved = await this.removeItemFromInventory(dropItem, character, itemDrop.fromContainerId);
-
-      console.log("isItemRemoved", isItemRemoved);
 
       if (!isItemRemoved) {
         return false;
