@@ -196,7 +196,7 @@ export class EquipmentEquip {
 
     newItem = await newItem.save();
 
-    await Item.remove({ _id: item._id });
+    await Item.deleteOne({ _id: item._id });
 
     return newItem._id;
   }

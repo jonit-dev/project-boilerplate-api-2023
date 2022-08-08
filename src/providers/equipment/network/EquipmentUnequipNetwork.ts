@@ -21,8 +21,6 @@ export class EquipmentUnequipNetwork {
 
         const inventory = (await character.inventory) as unknown as IItem;
 
-        console.log(character._id);
-
         const itemContainer = (await ItemContainer.findOne({
           owner: character.id,
         })) as unknown as IItemContainer;
