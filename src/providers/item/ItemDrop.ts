@@ -18,11 +18,11 @@ import { provide } from "inversify-binding-decorators";
 export class ItemDrop {
   constructor(private socketMessaging: SocketMessaging, private characterWeight: CharacterWeight) {}
 
-  public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<void> {
+  public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<boolean> {
     const isDropValid = await this.isItemDropValid(itemDrop, character);
 
     if (!isDropValid) {
-      return;
+      return false;
     }
 
     const dropItem = (await Item.findById(itemDrop.itemId)) as unknown as IItem;
@@ -30,28 +30,36 @@ export class ItemDrop {
     if (dropItem) {
       const isItemRemoved = await this.removeItemFromInventory(dropItem, character, itemDrop.fromContainerId);
       if (!isItemRemoved) {
-        return;
+        return false;
       }
 
-      await this.characterWeight.updateCharacterWeight(character);
+      try {
+        await this.characterWeight.updateCharacterWeight(character);
 
-      const updatedContainer = (await ItemContainer.findById(itemDrop.fromContainerId)) as unknown as IItemContainer;
-      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-        equipment: {} as unknown as IEquipmentSet,
-        inventory: {
-          _id: updatedContainer._id,
-          parentItem: updatedContainer!.parentItem.toString(),
-          owner: updatedContainer?.owner?.toString() || character.name,
-          name: updatedContainer?.name,
-          slotQty: updatedContainer!.slotQty,
-          slots: updatedContainer?.slots,
-          // allowedItemTypes: this.getAllowedItemTypes(),
-          isEmpty: updatedContainer!.isEmpty,
-        },
-      };
+        const updatedContainer = (await ItemContainer.findById(itemDrop.fromContainerId)) as unknown as IItemContainer;
+        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+          equipment: {} as unknown as IEquipmentSet,
+          inventory: {
+            _id: updatedContainer._id,
+            parentItem: updatedContainer!.parentItem.toString(),
+            owner: updatedContainer?.owner?.toString() || character.name,
+            name: updatedContainer?.name,
+            slotQty: updatedContainer!.slotQty,
+            slots: updatedContainer?.slots,
+            // allowedItemTypes: this.getAllowedItemTypes(),
+            isEmpty: updatedContainer!.isEmpty,
+          },
+        };
 
-      this.updateInventoryCharacter(payloadUpdate, character);
+        this.updateInventoryCharacter(payloadUpdate, character);
+
+        return true;
+      } catch (err) {
+        console.log(err);
+        return false;
+      }
     }
+    return false;
   }
 
   /**
