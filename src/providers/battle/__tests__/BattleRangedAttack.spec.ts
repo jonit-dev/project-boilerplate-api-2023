@@ -6,7 +6,7 @@ import { BattleRangedAttack } from "../BattleRangedAttack";
 import { BattleAttackTarget } from "../BattleAttackTarget";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { BowsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { BowsBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { Types } from "mongoose";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -187,6 +187,13 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(hitTarget).toBeCalledTimes(2);
   });
 
+  it("should hit a target if attacker has ranged attack type and target is in range | Spear weapon", async () => {
+    await equipWithSpear(characterEquipment);
+    await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
+
+    expect(hitTarget).toBeCalledTimes(3);
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
@@ -230,4 +237,13 @@ async function equipArrowInBackpackSlot(equipment: IEquipment): Promise<Types.Ob
   backpackContainer.markModified("slots");
   await backpackContainer.save();
   return arrowId;
+}
+
+async function equipWithSpear(equipment: IEquipment): Promise<void> {
+  const spear = itemsBlueprintIndex[SpearsBlueprint.Spear];
+  const spearItem = new Item({ ...spear });
+  const res = await spearItem.save();
+  equipment.rightHand = res._id as Types.ObjectId | undefined;
+
+  await equipment.save();
 }
