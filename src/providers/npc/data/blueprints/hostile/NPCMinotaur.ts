@@ -32,7 +32,7 @@ export const npcMinotaur = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 80,
+  experience: 16,
   loots: [
     {
       itemBlueprintKey: SwordBlueprint.DragonsSword,

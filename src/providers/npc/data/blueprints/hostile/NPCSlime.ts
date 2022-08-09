@@ -26,7 +26,7 @@ export const npcSlime = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 15,
+  experience: 3,
   loots: [
     {
       itemBlueprintKey: GlovesBlueprint.LeatherGloves,

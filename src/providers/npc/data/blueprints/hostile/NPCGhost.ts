@@ -26,7 +26,7 @@ export const npcGhost = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 50,
+  experience: 10,
   loots: [
     {
       itemBlueprintKey: BowsBlueprint.Arrow,

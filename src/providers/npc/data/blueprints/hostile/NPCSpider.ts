@@ -26,7 +26,7 @@ export const npcSpider = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 25,
+  experience: 5,
   loots: [
     {
       itemBlueprintKey: GlovesBlueprint.LeatherGloves,

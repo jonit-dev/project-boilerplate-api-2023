@@ -25,7 +25,7 @@ export const npcBat = {
       level: 1,
     },
   },
-  experience: 15,
+  experience: 3,
   loots: [
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,

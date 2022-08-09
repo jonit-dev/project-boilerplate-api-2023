@@ -8,6 +8,8 @@ import { Error } from "mongoose";
 import { calculateSPToNextLevel, calculateXPToNextLevel } from "../SkillCalculator";
 import { SkillIncrease } from "../SkillIncrease";
 
+const SP_INCREASE_UNIT = 0.2;
+
 type TestCase = {
   item: ItemSubType;
   skill: string;
@@ -79,7 +81,7 @@ describe("SkillIncrease.spec.ts | increaseItemSP test cases", () => {
 
       // @ts-ignore
       let increasedSkills;
-      for (let i = 0; i < spToLvl2; i++) {
+      for (let i = 0; i < spToLvl2 * 5; i++) {
         // @ts-ignore
         increasedSkills = skillIncrease.increaseItemSP(skills, { subType: test.item } as IItem);
       }
@@ -167,8 +169,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
     expect(testNPC.xpToRelease?.length).toBe(0);
     expect(updatedSkills?.first.level).toBe(initialLevel);
-    expect(updatedSkills?.first.skillPoints).toBe(1);
-    expect(updatedSkills?.first.skillPointsToNextLevel).toBe(spToLvl2 - 1);
+    expect(updatedSkills?.first.skillPoints).toBe(SP_INCREASE_UNIT);
+    expect(updatedSkills?.first.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_UNIT);
     expect(updatedSkills?.level).toBe(initialLevel);
     expect(updatedSkills?.experience).toBe(initialSkills.experience);
     expect(updatedSkills?.xpToNextLevel).toBe(xpToLvl2);
@@ -183,8 +185,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     const updatedSkills = await Skill.findById(testCharacter.skills);
 
     expect(updatedSkills?.first.level).toBe(initialLevel);
-    expect(updatedSkills?.first.skillPoints).toBe(1);
-    expect(updatedSkills?.first.skillPointsToNextLevel).toBe(spToLvl2 - 1);
+    expect(updatedSkills?.first.skillPoints).toBe(SP_INCREASE_UNIT);
+    expect(updatedSkills?.first.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_UNIT);
 
     // Without releasing the XP, experience values should be same as initial values
     // and NPC's xpToRelease array should have a length == 1
@@ -194,8 +196,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(testNPC.xpToRelease?.length).toBe(1);
   });
 
-  it("should increase character's 'first' skill level and skill points. Should increase experience and level up to level 3", async () => {
-    const spToAdd = spToLvl2 + 5;
+  it("should increase character's 'first' skill level and skill points. Should increase experience and level up to level 5", async () => {
+    const spToAdd = spToLvl2 * 5 + 5;
 
     for (let i = 0; i < spToAdd; i++) {
       await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 2);
@@ -205,12 +207,12 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     const updatedSkills = await Skill.findById(testCharacter.skills);
 
     expect(updatedSkills?.first.level).toBe(initialLevel + 1);
-    expect(updatedSkills?.first.skillPoints).toBe(spToAdd);
-    expect(updatedSkills?.first.skillPointsToNextLevel).toBe(spToLvl3 - 5);
+    expect(updatedSkills?.first.skillPoints).toBe(spToAdd * SP_INCREASE_UNIT);
+    expect(updatedSkills?.first.skillPointsToNextLevel).toBe(spToLvl3 - 5 * SP_INCREASE_UNIT);
 
-    expect(updatedSkills?.level).toBe(initialLevel + 2);
+    expect(updatedSkills?.level).toBe(initialLevel + 4);
     expect(updatedSkills?.experience).toBe(spToAdd * 2);
-    expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(updatedSkills?.experience!, initialLevel + 3));
+    expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(updatedSkills?.experience!, initialLevel + 5));
     expect(testNPC.xpToRelease?.length).toBe(0);
 
     expect(sendSkillLevelUpEvents).toHaveBeenCalled();

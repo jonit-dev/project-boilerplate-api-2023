@@ -23,7 +23,7 @@ export const npcRedDragon = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 7000,
+  experience: 1400,
   loots: [
     {
       itemBlueprintKey: SwordBlueprint.DragonsSword,

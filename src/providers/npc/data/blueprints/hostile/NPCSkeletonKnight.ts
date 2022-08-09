@@ -31,7 +31,7 @@ export const npcSkeletonKnight = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 60,
+  experience: 12,
   loots: [
     {
       itemBlueprintKey: ArmorsBlueprint.StuddedArmor,

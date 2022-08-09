@@ -17,6 +17,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { SkillCalculator } from "./SkillCalculator";
 
+const SP_INCREASE_UNIT = 0.2;
 const ItemSkill = new Map<ItemSubType | string, string>([
   ["unarmed", "first"],
   [ItemSubType.Sword, "sword"],
@@ -233,7 +234,7 @@ export class SkillIncrease {
     }
 
     const updatedSkillDetails = skills[skillToUpdate] as ISkillDetails;
-    updatedSkillDetails.skillPoints++;
+    updatedSkillDetails.skillPoints = Math.round((updatedSkillDetails.skillPoints + SP_INCREASE_UNIT) * 100) / 100;
     updatedSkillDetails.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(
       updatedSkillDetails.skillPoints,
       updatedSkillDetails.level + 1

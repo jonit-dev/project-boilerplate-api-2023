@@ -26,7 +26,7 @@ export const npcWolf = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 40,
+  experience: 8,
   loots: [
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,

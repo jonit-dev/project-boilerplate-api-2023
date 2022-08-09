@@ -23,7 +23,7 @@ export const npcDwarfGuard = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 100,
+  experience: 20,
   loots: [
     {
       itemBlueprintKey: BootsBlueprint.Boots,

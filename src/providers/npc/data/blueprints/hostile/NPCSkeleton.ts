@@ -28,7 +28,7 @@ export const npcSkeleton = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 45,
+  experience: 9,
   loots: [
     {
       itemBlueprintKey: ArmorsBlueprint.Jacket,

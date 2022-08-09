@@ -26,7 +26,7 @@ export const npcRat = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 15,
+  experience: 3,
   loots: [
     {
       itemBlueprintKey: FoodsBlueprint.Cheese,

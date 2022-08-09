@@ -35,12 +35,12 @@ export const calculateXPToNextLevel = (currentXP: number, level: number): number
   const xpToNextLevel = getXPForLevel(level);
   const xpToNextLevelDiff = xpToNextLevel - currentXP;
 
-  return xpToNextLevelDiff;
+  return Math.round(xpToNextLevelDiff * 100) / 100;
 };
 
 export const calculateSPToNextLevel = (currentSP: number, level: number): number => {
   const spToNextLevel = getSPForLevel(level);
   const spToNextLevelDiff = spToNextLevel - currentSP;
 
-  return spToNextLevelDiff;
+  return Math.round(spToNextLevelDiff * 100) / 100;
 };

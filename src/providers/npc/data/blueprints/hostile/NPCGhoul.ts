@@ -33,7 +33,7 @@ export const npcGhoul = {
     },
   },
   fleeOnLowHealth: false,
-  experience: 80,
+  experience: 16,
   loots: [
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,

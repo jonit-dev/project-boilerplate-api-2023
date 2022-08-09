@@ -30,7 +30,7 @@ export const npcOrc = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 70,
+  experience: 14,
   loots: [
     {
       itemBlueprintKey: BootsBlueprint.Boots,
