@@ -1862,13 +1862,13 @@
         {
           "data": [
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 3279, 3280, 3281, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3301, 3302, 3303, 0, 0, 0, 0, 0,
-            4078, 4079, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4119, 4120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 3273, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3292, 0, 0, 0, 0, 0, 0, 0, 4078, 4079, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4119, 4120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3336, 3337, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3500, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3518, 0, 0, 0
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3321, 3322, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3500, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 3518, 0, 0, 0
           ],
           "height": 16,
           "width": 16,
@@ -1941,8 +1941,8 @@
         },
         {
           "data": [
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3669, 0, 0, 0, 3336, 3337, 0, 0,
-            0, 3589, 3589, 0, 0, 0, 0, 0, 0, 4683, 4684, 0, 0, 3334, 3335, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4724, 4725, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3669, 0, 0, 0, 3321, 3322, 0, 0,
+            0, 3589, 3589, 0, 0, 0, 0, 0, 0, 4683, 4684, 0, 0, 3319, 3320, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4724, 4725, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4765, 4766, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4806, 4807, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1963,8 +1963,8 @@
             4350, 4351, 4352, 4353, 4354, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4391, 4392, 4393, 4394, 4395, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 4431, 4432, 4433, 4434, 4435, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4472, 4473, 4474, 4475,
             4476, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3276, 3277, 0, 0, 0, 0, 3583, 3587, 0, 0, 0, 0, 0, 0, 0, 0,
-            3298, 3299, 0, 3669, 0, 0, 3601, 3605, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3619, 2147487267, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3270, 3271, 0, 0, 0, 0, 3583, 3587, 0, 0, 0, 0, 0, 0, 0, 0,
+            3289, 3290, 0, 3669, 0, 0, 3601, 3605, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3619, 2147487267, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
           ],
           "height": 16,
@@ -1978,8 +1978,8 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3669, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3669, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3278,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3669, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3272,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3291, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0
           ],
@@ -2664,7 +2664,7 @@
             {
               "name": "gridY",
               "type": "int",
-              "value": 64
+              "value": 80
             },
             {
               "name": "map",
@@ -2692,7 +2692,7 @@
             {
               "name": "gridY",
               "type": "int",
-              "value": 64
+              "value": 80
             },
             {
               "name": "map",
@@ -2720,7 +2720,7 @@
             {
               "name": "gridY",
               "type": "int",
-              "value": 64
+              "value": 80
             },
             {
               "name": "map",
@@ -2748,7 +2748,7 @@
             {
               "name": "gridY",
               "type": "int",
-              "value": 22
+              "value": 38
             },
             {
               "name": "map",
@@ -2776,7 +2776,7 @@
             {
               "name": "gridY",
               "type": "int",
-              "value": 22
+              "value": 38
             },
             {
               "name": "map",
@@ -2804,7 +2804,7 @@
             {
               "name": "gridY",
               "type": "int",
-              "value": 22
+              "value": 38
             },
             {
               "name": "map",
@@ -3109,205 +3109,6 @@
         {
           "class": "NPC",
           "height": 16,
-          "id": 25,
-          "name": "Rat",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "rat"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 400,
-          "y": 1040
-        },
-        {
-          "class": "NPC",
-          "height": 16,
-          "id": 26,
-          "name": "Rat",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "rat"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 432,
-          "y": 1056
-        },
-        {
-          "class": "NPC",
-          "height": 16,
-          "id": 27,
-          "name": "Rat",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "rat"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 464,
-          "y": 1024
-        },
-        {
-          "class": "NPC",
-          "height": 16,
-          "id": 28,
-          "name": "Spider",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "spider"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 368,
-          "y": 1360
-        },
-        {
-          "class": "NPC",
-          "height": 16,
-          "id": 29,
-          "name": "Spider",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "spider"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 368,
-          "y": 1424
-        },
-        {
-          "class": "NPC",
-          "height": 16,
-          "id": 30,
-          "name": "Spider",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "spider"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 400,
-          "y": 1392
-        },
-        {
-          "class": "NPC",
-          "height": 16,
-          "id": 31,
-          "name": "Slime",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "slime"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 448,
-          "y": 1280
-        },
-        {
-          "class": "NPC",
-          "height": 16,
-          "id": 32,
-          "name": "Slime",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "slime"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 416,
-          "y": 1280
-        },
-        {
-          "class": "NPC",
-          "height": 16,
-          "id": 33,
-          "name": "Skeleton",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "skeleton"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 560,
-          "y": 1504
-        },
-        {
-          "class": "NPC",
-          "height": 16,
-          "id": 34,
-          "name": "Skeleton",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "skeleton"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 576,
-          "y": 1472
-        },
-
-        {
-          "class": "NPC",
-          "height": 16,
-          "id": 35,
-          "name": "Skeleton",
-          "properties": [
-            {
-              "name": "key",
-              "type": "string",
-              "value": "skeleton"
-            }
-          ],
-          "rotation": 0,
-          "visible": true,
-          "width": 16,
-          "x": 608,
-          "y": 1472
-        },
-        {
-          "class": "NPC",
-          "height": 16,
           "id": 36,
           "name": "Skeleton",
           "properties": [
@@ -3485,6 +3286,7 @@
           "x": 1472,
           "y": 1632
         },
+
         {
           "class": "NPC",
           "height": 16,
@@ -3575,7 +3377,6 @@
           "x": 1472,
           "y": 1344
         },
-
         {
           "class": "NPC",
           "height": 16,
@@ -3774,6 +3575,7 @@
           "x": 2784,
           "y": 1520
         },
+
         {
           "class": "NPC",
           "height": 16,
@@ -3864,7 +3666,6 @@
           "x": 3376,
           "y": 1376
         },
-
         {
           "class": "NPC",
           "height": 16,
@@ -53198,11 +52999,11 @@
       "tilewidth": 16
     },
     {
-      "columns": 22,
+      "columns": 19,
       "firstgid": 3217,
       "image": "../../assets/tilesets/mines-exterior/output/mines-exterior.png",
-      "imageheight": 165,
-      "imagewidth": 354,
+      "imageheight": 112,
+      "imagewidth": 304,
       "margin": 0,
       "name": "mines-exterior",
       "spacing": 0,
@@ -53516,12 +53317,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "mine cart"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -53531,12 +53332,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "mine cart"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -53546,12 +53347,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "mine cart"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -53576,12 +53377,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "mine cart"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -53591,12 +53392,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "mine cart"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -53606,12 +53407,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "mine cart"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -53802,7 +53603,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "rails"
             },
             {
               "name": "ge_collide",
@@ -53817,7 +53618,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "rails"
             },
             {
               "name": "ge_collide",
@@ -53832,7 +53633,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "rails"
             },
             {
               "name": "ge_collide",
@@ -53847,7 +53648,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "rails"
             },
             {
               "name": "ge_collide",
@@ -53892,12 +53693,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -53907,12 +53708,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -53922,12 +53723,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -53938,12 +53739,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -53953,12 +53754,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -53968,12 +53769,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54073,12 +53874,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54088,12 +53889,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": "rails"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54103,12 +53904,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": "rails"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54118,12 +53919,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": "rails"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54133,12 +53934,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": "rails"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54148,12 +53949,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54163,12 +53964,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54194,12 +53995,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54209,12 +54010,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54224,12 +54025,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54239,12 +54040,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54254,12 +54055,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54269,12 +54070,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54284,12 +54085,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54299,12 +54100,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "cave enterance"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54359,12 +54160,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54374,12 +54175,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": "rails"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54389,12 +54190,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": "rails"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54404,12 +54205,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": "rails"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54420,12 +54221,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": "rails"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54435,12 +54236,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54450,12 +54251,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54465,12 +54266,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54480,12 +54281,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54495,12 +54296,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54510,12 +54311,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "cave enterance"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54555,7 +54356,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": ""
             },
             {
               "name": "ge_collide",
@@ -54570,7 +54371,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": ""
             },
             {
               "name": "ge_collide",
@@ -54585,7 +54386,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": ""
             },
             {
               "name": "ge_collide",
@@ -54600,7 +54401,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": ""
             },
             {
               "name": "ge_collide",
@@ -54751,12 +54552,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "stone"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54766,12 +54567,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "stone"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54781,12 +54582,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "stone"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54796,12 +54597,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "stone"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54811,12 +54612,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "ore"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54826,12 +54627,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "ore"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54841,12 +54642,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "ore"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54856,12 +54657,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "ore"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54871,12 +54672,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "ore"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54886,12 +54687,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "ore"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54902,12 +54703,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "ore"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54917,12 +54718,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "ore"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -54962,7 +54763,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "rails"
             },
             {
               "name": "ge_collide",
@@ -54977,12 +54778,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "stone"
+              "value": "rails"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -54992,12 +54793,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "stone"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55007,7 +54808,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": "stone"
+              "value": "dynamites"
             },
             {
               "name": "ge_collide",
@@ -55022,7 +54823,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": "stone"
+              "value": "dynamites"
             },
             {
               "name": "ge_collide",
@@ -55037,12 +54838,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55052,12 +54853,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55067,12 +54868,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55082,12 +54883,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55188,12 +54989,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "ore"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -55203,12 +55004,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "ore"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -55233,7 +55034,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": ""
             },
             {
               "name": "ge_collide",
@@ -55263,7 +55064,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "rails"
             },
             {
               "name": "ge_collide",
@@ -55278,12 +55079,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "dynamites"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55308,12 +55109,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": ""
+              "value": "dynamites"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
@@ -55368,12 +55169,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55384,12 +55185,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55399,12 +55200,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55414,12 +55215,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55429,12 +55230,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55444,12 +55245,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55459,12 +55260,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55474,12 +55275,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55489,12 +55290,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55504,12 +55305,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "ore"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55564,7 +55365,7 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": ""
             },
             {
               "name": "ge_collide",
@@ -55579,17 +55380,32 @@
             {
               "name": "description",
               "type": "string",
-              "value": "rails"
+              "value": "dynamites"
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": false
+              "value": true
             }
           ]
         },
         {
           "id": 158,
+          "properties": [
+            {
+              "name": "description",
+              "type": "string",
+              "value": "dynamites"
+            },
+            {
+              "name": "ge_collide",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 159,
           "properties": [
             {
               "name": "description",
@@ -55603,21 +55419,6 @@
             }
           ]
         },
-        {
-          "id": 159,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": "dynamites"
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": true
-            }
-          ]
-        },
 
         {
           "id": 160,
@@ -55625,12 +55426,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "dynamites"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55941,12 +55742,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "dynamites"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -55956,12 +55757,12 @@
             {
               "name": "description",
               "type": "string",
-              "value": "dynamites"
+              "value": ""
             },
             {
               "name": "ge_collide",
               "type": "bool",
-              "value": true
+              "value": false
             }
           ]
         },
@@ -56057,458 +55858,6 @@
         },
         {
           "id": 189,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 190,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 191,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-
-        {
-          "id": 192,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 193,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 194,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 195,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 196,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 197,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 198,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 199,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 200,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 201,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 202,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 203,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 204,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 205,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 206,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 207,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-
-        {
-          "id": 208,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 209,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 210,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 211,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 212,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 213,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 214,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 215,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 216,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 217,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 218,
-          "properties": [
-            {
-              "name": "description",
-              "type": "string",
-              "value": ""
-            },
-            {
-              "name": "ge_collide",
-              "type": "bool",
-              "value": false
-            }
-          ]
-        },
-        {
-          "id": 219,
           "properties": [
             {
               "name": "description",
