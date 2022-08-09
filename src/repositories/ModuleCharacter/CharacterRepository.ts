@@ -64,7 +64,11 @@ export class CharacterRepository extends CRUD {
     equipment.owner = createdCharacter._id;
     await equipment.save();
 
-    return createdCharacter;
+    const charObject = createdCharacter.toObject();
+    const characterInventory = await createdCharacter.inventory;
+    charObject.inventory = characterInventory;
+
+    return charObject;
   }
 
   public async updateCharacter(id: string, updateCharacter: UpdateCharacterDTO, ownerId: string): Promise<ICharacter> {
