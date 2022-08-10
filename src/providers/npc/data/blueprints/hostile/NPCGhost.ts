@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { BowsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -26,7 +27,7 @@ export const npcGhost = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 10,
+  experience: 10 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: BowsBlueprint.Arrow,

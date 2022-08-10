@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
   BootsBlueprint,
@@ -28,7 +29,7 @@ export const npcSkeleton = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 9,
+  experience: 9 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: ArmorsBlueprint.Jacket,

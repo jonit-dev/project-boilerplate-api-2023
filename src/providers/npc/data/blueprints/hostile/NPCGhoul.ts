@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   GlovesBlueprint,
   LegsBlueprint,
@@ -33,7 +34,7 @@ export const npcGhoul = {
     },
   },
   fleeOnLowHealth: false,
-  experience: 16,
+  experience: 16 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,

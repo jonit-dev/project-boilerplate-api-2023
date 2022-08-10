@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { FoodsBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -25,7 +26,7 @@ export const npcBat = {
       level: 1,
     },
   },
-  experience: 3,
+  experience: 3 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,

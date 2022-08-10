@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { GlovesBlueprint, HelmetBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -14,19 +15,19 @@ export const npcSlime = {
   attackType: EntityAttackType.Melee,
   speed: 3,
   skills: {
-    level: 1,
+    level: 2,
     strength: {
-      level: 1,
+      level: 2,
     },
     dexterity: {
-      level: 1,
+      level: 3,
     },
     resistance: {
-      level: 1,
+      level: 5,
     },
   },
   fleeOnLowHealth: true,
-  experience: 3,
+  experience: 13 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: GlovesBlueprint.LeatherGloves,

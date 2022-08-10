@@ -4,6 +4,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { SP_INCREASE_RATIO } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
@@ -17,7 +18,6 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { SkillCalculator } from "./SkillCalculator";
 
-const SP_INCREASE_UNIT = 0.2;
 const ItemSkill = new Map<ItemSubType | string, string>([
   ["unarmed", "first"],
   [ItemSubType.Sword, "sword"],
@@ -234,7 +234,7 @@ export class SkillIncrease {
     }
 
     const updatedSkillDetails = skills[skillToUpdate] as ISkillDetails;
-    updatedSkillDetails.skillPoints = Math.round((updatedSkillDetails.skillPoints + SP_INCREASE_UNIT) * 100) / 100;
+    updatedSkillDetails.skillPoints = Math.round((updatedSkillDetails.skillPoints + SP_INCREASE_RATIO) * 100) / 100;
     updatedSkillDetails.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(
       updatedSkillDetails.skillPoints,
       updatedSkillDetails.level + 1

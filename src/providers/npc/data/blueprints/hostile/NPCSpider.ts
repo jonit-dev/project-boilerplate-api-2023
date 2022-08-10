@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { GlovesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -26,7 +27,7 @@ export const npcSpider = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 5,
+  experience: 5 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: GlovesBlueprint.LeatherGloves,

@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { BootsBlueprint, GlovesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -23,7 +24,7 @@ export const npcDwarf = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 15,
+  experience: 15 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: BootsBlueprint.Boots,

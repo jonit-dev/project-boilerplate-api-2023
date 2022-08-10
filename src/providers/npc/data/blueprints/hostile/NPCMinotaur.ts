@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   BootsBlueprint,
   GlovesBlueprint,
@@ -32,7 +33,7 @@ export const npcMinotaur = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 16,
+  experience: 16 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: SwordBlueprint.DragonsSword,
