@@ -100,10 +100,10 @@ export class BattleRangedAttack {
           result.maxRange = weapon.maxRange || 0;
         }
         break;
-      // TODO: Implement Spear case
-      // case ItemSubType.Spear:
-      //   range = weapon.maxRange || 0;
-      //   break;
+
+      case ItemSubType.Spear:
+        result = { location: "hand", id: weapon.id, key: weapon.key, maxRange: weapon.maxRange || 0 };
+        break;
     }
     return result;
   }
@@ -153,6 +153,15 @@ export class BattleRangedAttack {
         break;
       case ItemSlotType.Inventory:
         await this.equipmentEquip.removeItemFromInventory(ammo.id.toString(), backpackContainer);
+        break;
+      case "hand":
+        // Spear item is held in hand
+        // Check which hand and remove the item
+        const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
+        rightHandItem?.subType === ItemSubType.Spear
+          ? (equipment.rightHand = undefined)
+          : (equipment.leftHand = undefined);
+        await equipment.save();
         break;
       default:
         throw new Error("Invalid ammo location");
