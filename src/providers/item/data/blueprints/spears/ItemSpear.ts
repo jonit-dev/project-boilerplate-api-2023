@@ -15,4 +15,5 @@ export const itemSpear: Partial<IItem> = {
   defense: 0,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  maxRange: 7,
 };
