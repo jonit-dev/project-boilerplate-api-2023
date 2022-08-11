@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
@@ -13,7 +14,7 @@ export const npcRat = {
   textureKey: HostileNPCsBlueprint.Rat,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 1.5,
+  speed: MovementSpeed.Slow,
   skills: {
     level: 1,
     strength: {

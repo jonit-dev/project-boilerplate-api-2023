@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
@@ -18,7 +19,7 @@ export const npcSkeletonKnight = {
   textureKey: HostileNPCsBlueprint.SkeletonKnight,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 5,
+  speed: MovementSpeed.Fast,
   skills: {
     level: 2,
     strength: {

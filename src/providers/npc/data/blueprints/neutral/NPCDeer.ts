@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveAwayMovement } from "../../abstractions/BaseNeutralNPC";
@@ -10,7 +11,7 @@ export const npcDeer = {
   textureKey: "deer",
   alignment: NPCAlignment.Neutral,
   attackType: EntityAttackType.Melee,
-  speed: 4,
+  speed: MovementSpeed.ExtraFast,
   skills: {
     level: 1,
     strength: {

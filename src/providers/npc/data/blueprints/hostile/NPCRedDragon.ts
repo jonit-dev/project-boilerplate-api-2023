@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { SwordBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
@@ -13,7 +14,7 @@ export const npcRedDragon = {
   textureKey: HostileNPCsBlueprint.RedDragon,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 4,
+  speed: MovementSpeed.Standard,
   skills: {
     level: 50,
     strength: {

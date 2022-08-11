@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { BootsBlueprint, GlovesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
@@ -13,7 +14,7 @@ export const npcDwarfGuard = {
   textureKey: HostileNPCsBlueprint.DwarfGuard,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 4,
+  speed: MovementSpeed.Fast,
   skills: {
     level: 4,
     strength: {

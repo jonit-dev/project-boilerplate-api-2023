@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
@@ -20,7 +21,7 @@ export const npcOrc = {
   textureKey: HostileNPCsBlueprint.Orc,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 2,
+  speed: MovementSpeed.Slow,
   skills: {
     level: 3,
     strength: {

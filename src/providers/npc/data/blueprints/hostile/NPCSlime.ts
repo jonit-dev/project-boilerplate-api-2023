@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { GlovesBlueprint, HelmetBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
@@ -13,11 +14,11 @@ export const npcSlime = {
   textureKey: HostileNPCsBlueprint.Slime,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: 3,
+  speed: MovementSpeed.ExtraSlow,
   skills: {
-    level: 2,
+    level: 4,
     strength: {
-      level: 2,
+      level: 4,
     },
     dexterity: {
       level: 3,
