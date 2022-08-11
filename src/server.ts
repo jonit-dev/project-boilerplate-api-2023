@@ -52,8 +52,6 @@ app.listen(port, async () => {
 
   //! TODO: Allocate according to pm2 instances
 
-  // await npcManager.init();
-
   await characterConnection.resetCharacterAttributes();
 
   if (appEnv.general.ENV === EnvType.Production) {
