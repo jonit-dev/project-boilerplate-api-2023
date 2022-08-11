@@ -34,8 +34,6 @@ export class NPCSpawn {
 
     // re add behavior loop
 
-    this.npcManager.startBehaviorLoop(npc);
-
     const nearbyCharacters = await this.characterView.getCharactersAroundXYPosition(npc.x, npc.y, npc.scene);
 
     for (const nearbyCharacter of nearbyCharacters) {

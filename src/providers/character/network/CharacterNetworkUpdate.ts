@@ -4,6 +4,7 @@ import { ItemView } from "@providers/item/ItemView";
 import { MapLoader } from "@providers/map/MapLoader";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { NPCManager } from "@providers/npc/NPCManager";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -36,7 +37,8 @@ export class CharacterNetworkUpdate {
     private characterView: CharacterView,
     private characterBan: CharacterBan,
     private objectHelper: DataStructureHelper,
-    private mapTransition: MapTransition
+    private mapTransition: MapTransition,
+    private npcManager: NPCManager
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -83,6 +85,8 @@ export class CharacterNetworkUpdate {
           await this.warnEmitterAboutCharactersAround(character);
 
           await this.npcView.warnCharacterAboutNPCsInView(character);
+
+          await this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
           await this.itemView.warnCharacterAboutItemsInView(character);
 

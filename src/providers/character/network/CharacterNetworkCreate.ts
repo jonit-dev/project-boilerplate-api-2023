@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { ItemView } from "@providers/item/ItemView";
 import { MapLoader } from "@providers/map/MapLoader";
+import { NPCManager } from "@providers/npc/NPCManager";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
@@ -27,7 +28,8 @@ export class CharacterNetworkCreate {
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
     private itemView: ItemView,
-    private BattleNetworkStopTargeting: BattleNetworkStopTargeting
+    private BattleNetworkStopTargeting: BattleNetworkStopTargeting,
+    private npcManager: NPCManager
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -75,6 +77,8 @@ export class CharacterNetworkCreate {
         }
 
         await this.npcView.warnCharacterAboutNPCsInView(character);
+
+        await this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
         await this.itemView.warnCharacterAboutItemsInView(character);
 

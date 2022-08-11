@@ -10,7 +10,7 @@ export const npcDeer = {
   textureKey: "deer",
   alignment: NPCAlignment.Neutral,
   attackType: EntityAttackType.Melee,
-  speed: 6,
+  speed: 4,
   skills: {
     level: 1,
     strength: {

@@ -8,7 +8,6 @@ import {
   cronJobs,
   db,
   mapLoader,
-  npcManager,
   seeds,
   server,
   socketAdapter,
@@ -53,7 +52,7 @@ app.listen(port, async () => {
 
   //! TODO: Allocate according to pm2 instances
 
-  await npcManager.init();
+  // await npcManager.init();
 
   await characterConnection.resetCharacterAttributes();
 

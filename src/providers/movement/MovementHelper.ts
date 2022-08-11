@@ -62,7 +62,7 @@ export class MovementHelper {
       return true;
     }
 
-    const hasSolid = await this.mapSolids.isTileSolid(map, gridX, gridY, layer, checkAllLayersBelow);
+    const hasSolid = this.mapSolids.isTileSolid(map, gridX, gridY, layer, checkAllLayersBelow);
 
     if (hasSolid) {
       return true;
