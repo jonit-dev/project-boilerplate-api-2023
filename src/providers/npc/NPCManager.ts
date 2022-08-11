@@ -131,7 +131,7 @@ export class NPCManager {
           console.log(err);
         }
       },
-      2500 / npc.speed
+      3000 / npc.speed
     );
   }
 }
