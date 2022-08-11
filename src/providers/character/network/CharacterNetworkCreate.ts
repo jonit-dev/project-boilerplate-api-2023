@@ -99,15 +99,7 @@ export class CharacterNetworkCreate {
           maxMana: character.maxMana,
         };
 
-        // if there's no character with this id connected, add it.
-        console.log(`💡: Character ${character.name} has connected!`);
-        console.log(data);
-
         channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
-
-        const connectedCharacters = await this.socketConnection.getConnectedCharacters();
-
-        console.log("- Total characters connected:", connectedCharacters.length);
 
         this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
       }

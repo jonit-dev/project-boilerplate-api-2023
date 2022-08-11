@@ -58,26 +58,25 @@ export class NPCManager {
   public startBehaviorLoop(initialNPC: INPC): void {
     let npc = initialNPC;
 
-    // make sure we clean up any existing NPC cycles before starting a new one
+    let npcCycle;
 
-    NPCCycle.npcCycles.delete(npc.id);
+    if (!NPCCycle.npcCycles.has(npc.id)) {
+      npcCycle = new NPCCycle(
+        npc.id,
+        async () => {
+          try {
+            // check if actually there's a character near. If not, let's not waste server resources!
+            npc = (await NPC.findById(initialNPC._id).populate("skills")) || initialNPC; // update npc instance on each behavior loop!
 
-    new NPCCycle(
-      npc.id,
-      async () => {
-        try {
-          // check if actually there's a character near. If not, let's not waste server resources!
-
-          npc = (await NPC.findById(initialNPC._id).populate("skills")) || initialNPC; // update npc instance on each behavior loop!
-
-          await this.startCoreNPCBehavior(npc);
-        } catch (err) {
-          console.log(`Error in ${npc.key}`);
-          console.log(err);
-        }
-      },
-      3000 / npc.speed
-    );
+            await this.startCoreNPCBehavior(npc);
+          } catch (err) {
+            console.log(`Error in ${npc.key}`);
+            console.log(err);
+          }
+        },
+        2500 / npc.speed
+      );
+    }
 
     // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
     const checkRange = _.random(5000, 10000);
@@ -86,7 +85,7 @@ export class NPCManager {
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
       if (nearbyCharacters.length === 0) {
-        NPCCycle.npcCycles.delete(npc.id);
+        npcCycle.clear();
         clearInterval(interval);
       }
     }, checkRange);
