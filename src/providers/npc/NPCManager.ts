@@ -76,19 +76,20 @@ export class NPCManager {
         },
         2500 / npc.speed
       );
+
+      // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
+      const checkRange = _.random(5000, 10000);
+
+      const interval = setInterval(async () => {
+        const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+
+        if (!nearbyCharacters.length && NPCCycle.npcCycles.has(npc.id)) {
+          console.log("Clearing NPC cycle for " + npc.key);
+          npcCycle.clear();
+          clearInterval(interval);
+        }
+      }, checkRange);
     }
-
-    // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
-    const checkRange = _.random(5000, 10000);
-
-    const interval = setInterval(async () => {
-      const nearbyCharacters = await this.npcView.getCharactersInView(npc);
-
-      if (nearbyCharacters.length === 0) {
-        npcCycle.clear();
-        clearInterval(interval);
-      }
-    }, checkRange);
   }
 
   private async startCoreNPCBehavior(npc: INPC): Promise<void> {
