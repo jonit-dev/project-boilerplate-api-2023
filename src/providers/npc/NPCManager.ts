@@ -58,6 +58,10 @@ export class NPCManager {
   public startBehaviorLoop(initialNPC: INPC): void {
     let npc = initialNPC;
 
+    // make sure we clean up any existing NPC cycles before starting a new one
+
+    NPCCycle.npcCycles.delete(npc.id);
+
     new NPCCycle(
       npc.id,
       async () => {
