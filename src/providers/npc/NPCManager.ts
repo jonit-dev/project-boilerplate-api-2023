@@ -1,7 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { appEnv } from "@providers/config/env";
-import { EnvType, NPCMovementType, NPCPathOrientation, SocketTypes, ToGridX, ToGridY } from "@rpg-engine/shared";
+import {
+  EnvType,
+  NPCAlignment,
+  NPCMovementType,
+  NPCPathOrientation,
+  SocketTypes,
+  ToGridX,
+  ToGridY,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCMovement } from "./movement/NPCMovement";
@@ -81,9 +89,17 @@ export class NPCManager {
       const checkRange = _.random(5000, 10000);
 
       const interval = setInterval(async () => {
-        const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+        let shouldFreezeNPC = false;
+        if (npc.alignment === NPCAlignment.Friendly) {
+          const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+          shouldFreezeNPC = !nearbyCharacters.length;
+        }
 
-        if (!nearbyCharacters.length && NPCCycle.npcCycles.has(npc.id)) {
+        if (npc.alignment === NPCAlignment.Hostile) {
+          shouldFreezeNPC = !npc.targetCharacter;
+        }
+
+        if (shouldFreezeNPC && NPCCycle.npcCycles.has(npc.id)) {
           npcCycle.clear();
           clearInterval(interval);
         }
