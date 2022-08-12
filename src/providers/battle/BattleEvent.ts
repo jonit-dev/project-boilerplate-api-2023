@@ -49,6 +49,7 @@ export class BattleEvent {
 
     const damage = Math.round(_.random(0, totalPotentialAttackerDamage));
 
-    return damage;
+    // damage cannot be higher than target's remaining health
+    return damage > target.health ? target.health : damage;
   }
 }

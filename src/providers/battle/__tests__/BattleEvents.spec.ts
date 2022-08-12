@@ -80,6 +80,17 @@ describe("BattleEvents.spec.ts", () => {
     expect(hit).toBe(10);
   });
 
+  it("hit damage should be less or equal to target's health", async () => {
+    await testNPC.populate("skills").execPopulate();
+    await testCharacter.populate("skills").execPopulate();
+
+    jest.spyOn(_, "random").mockImplementation(() => 1000);
+
+    const hit = await battleEvents.calculateHitDamage(testCharacter, testNPC);
+
+    expect(hit).toBe(testNPC.health);
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
