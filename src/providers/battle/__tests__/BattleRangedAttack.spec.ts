@@ -1,16 +1,16 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, mapLoader, unitTestHelper } from "@providers/inversify/container";
-import { FromGridX, FromGridY, ItemSlotType } from "@rpg-engine/shared";
-import { BattleRangedAttack } from "../BattleRangedAttack";
-import { BattleAttackTarget } from "../BattleAttackTarget";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BowsBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { Types } from "mongoose";
+import { FromGridX, FromGridY, ItemSlotType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { Types } from "mongoose";
+import { BattleAttackTarget } from "../BattleAttackTarget";
+import { BattleRangedAttack } from "../BattleRangedAttack";
 
 describe("BattleRangedAttack.spec.ts", () => {
   let battleRangedAttack: BattleRangedAttack;
@@ -24,7 +24,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
-    await mapLoader.init();
+    await unitTestHelper.initializeMapLoader();
 
     battleRangedAttack = container.get<BattleRangedAttack>(BattleRangedAttack);
     battleAttackTarget = container.get<BattleAttackTarget>(BattleAttackTarget);

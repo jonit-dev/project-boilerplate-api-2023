@@ -24,7 +24,7 @@ export class MapLoader {
   public async init(): Promise<void> {
     // get all map names
 
-    const mapNames = fs.readdirSync(STATIC_PATH + "/maps");
+    const mapNames = this.getMapNames();
     const mapToCheckTransitions: MapObject[] = [];
 
     for (const mapFileName of mapNames) {
@@ -58,6 +58,10 @@ export class MapLoader {
     }
 
     console.log("📦 Maps and grids are loaded!");
+  }
+
+  private getMapNames(): string[] {
+    return fs.readdirSync(STATIC_PATH + "/maps");
   }
 
   private hasMapRequiredLayers(mapName: string, map: ITiled): void {

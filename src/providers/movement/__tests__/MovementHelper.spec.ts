@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { container, mapLoader, unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 
@@ -8,7 +8,7 @@ describe("MovementHelper.ts", () => {
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
-    await mapLoader.init();
+    await unitTestHelper.initializeMapLoader();
     movementHelper = container.get<MovementHelper>(MovementHelper);
   });
 

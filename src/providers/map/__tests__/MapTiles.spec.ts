@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { container, mapLoader, unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { MapLayers } from "@rpg-engine/shared";
 import { MapTiles } from "../MapTiles";
 
@@ -10,7 +10,7 @@ describe("MapTiles.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
 
-    await mapLoader.init();
+    await unitTestHelper.initializeMapLoader();
     mapTiles = container.get<MapTiles>(MapTiles);
   });
 

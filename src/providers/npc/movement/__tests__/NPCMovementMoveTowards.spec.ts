@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, mapLoader, unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, NPCMovementType, NPCPathOrientation } from "@rpg-engine/shared";
 import { NPCMovementMoveTowards } from "../NPCMovementMoveTowards";
 import { NPCTarget } from "../NPCTarget";
@@ -14,7 +14,7 @@ describe("NPCMovementMoveTowards.ts", () => {
     await unitTestHelper.beforeAllJestHook();
 
     npcMovementMoveTowards = container.get<NPCMovementMoveTowards>(NPCMovementMoveTowards);
-    await mapLoader.init();
+    await unitTestHelper.initializeMapLoader();
     npcTarget = container.get<NPCTarget>(NPCTarget);
   });
 

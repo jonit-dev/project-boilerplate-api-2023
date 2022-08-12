@@ -1,5 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, mapLoader, unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, NPCMovementType } from "@rpg-engine/shared";
 import { NPCMovementFixedPath } from "../NPCMovementFixedPath";
 
@@ -10,7 +10,7 @@ describe("NPCMovementFixedPath.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     npcMovementFixedPath = container.get<NPCMovementFixedPath>(NPCMovementFixedPath);
-    await mapLoader.init();
+    await unitTestHelper.initializeMapLoader();
   });
 
   beforeEach(async () => {

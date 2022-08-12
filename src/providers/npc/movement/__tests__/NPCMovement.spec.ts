@@ -1,5 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, mapLoader, unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { NPCMovement } from "../NPCMovement";
 
@@ -10,7 +10,7 @@ describe("NPCMovement.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     npcMovement = container.get<NPCMovement>(NPCMovement);
-    await mapLoader.init();
+    await unitTestHelper.initializeMapLoader();
   });
 
   beforeEach(async () => {

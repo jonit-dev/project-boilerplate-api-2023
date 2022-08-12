@@ -6,7 +6,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { container } from "@providers/inversify/container";
+import { container, mapLoader } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
@@ -38,6 +38,13 @@ interface IMockNPCOptions {
 @provide(UnitTestHelper)
 export class UnitTestHelper {
   private mongoServer: MongoMemoryServer;
+
+  public async initializeMapLoader(): Promise<void> {
+    // @ts-ignore
+    jest.spyOn(mapLoader, "getMapNames").mockImplementation(() => ["unit-test-map.json", "Example.json"]);
+
+    await mapLoader.init();
+  }
 
   public async createMockNPC(
     extraProps: Record<string, unknown> | null = null,
