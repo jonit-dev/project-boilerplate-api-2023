@@ -84,7 +84,6 @@ export class NPCManager {
         const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
         if (!nearbyCharacters.length && NPCCycle.npcCycles.has(npc.id)) {
-          console.log("Clearing NPC cycle for " + npc.key);
           npcCycle.clear();
           clearInterval(interval);
         }
