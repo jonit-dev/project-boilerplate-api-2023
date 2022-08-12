@@ -53,7 +53,7 @@ export class MapSolids {
     gridX: number,
     gridY: number,
     layer: MapLayers,
-    strategy: SolidCheckStrategy = "CHECK_ALL_LAYERS"
+    strategy: SolidCheckStrategy = "CHECK_ALL_LAYERS_BELOW"
   ): boolean {
     switch (strategy) {
       case "CHECK_ALL_LAYERS":

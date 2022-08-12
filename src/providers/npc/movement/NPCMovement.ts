@@ -46,7 +46,14 @@ export class NPCMovement {
 
       // check if max range is reached
 
-      const hasSolid = await this.movementHelper.isSolid(map, newGridX, newGridY, npc.layer, "CHECK_ALL_LAYERS", npc);
+      const hasSolid = await this.movementHelper.isSolid(
+        map,
+        newGridX,
+        newGridY,
+        npc.layer,
+        "CHECK_ALL_LAYERS_BELOW",
+        npc
+      );
 
       if (hasSolid) {
         // console.log(`${npc.key} tried to move to ${newGridX}, ${newGridY}, but it's solid`);

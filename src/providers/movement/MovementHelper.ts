@@ -33,7 +33,7 @@ export class MovementHelper {
     gridX: number,
     gridY: number,
     layer: MapLayers,
-    strategy: SolidCheckStrategy = "CHECK_ALL_LAYERS",
+    strategy: SolidCheckStrategy = "CHECK_ALL_LAYERS_BELOW",
     caller: INPC | ICharacter | undefined = undefined
   ): Promise<boolean> => {
     // check for characters and NPCs
