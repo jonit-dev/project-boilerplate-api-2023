@@ -1,6 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MapLoader } from "@providers/map/MapLoader";
-import { MapSolids } from "@providers/map/MapSolids";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { INPCPositionUpdatePayload, NPCAlignment, NPCSocketEvents, ToGridX, ToGridY } from "@rpg-engine/shared";
@@ -20,8 +19,7 @@ export class NPCMovement {
   constructor(
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
-    private movementHelper: MovementHelper,
-    private mapSolids: MapSolids
+    private movementHelper: MovementHelper
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -48,7 +46,7 @@ export class NPCMovement {
 
       // check if max range is reached
 
-      const hasSolid = await this.movementHelper.isSolid(map, newGridX, newGridY, npc.layer, true, npc);
+      const hasSolid = await this.movementHelper.isSolid(map, newGridX, newGridY, npc.layer, "CHECK_ALL_LAYERS", npc);
 
       if (hasSolid) {
         // console.log(`${npc.key} tried to move to ${newGridX}, ${newGridY}, but it's solid`);

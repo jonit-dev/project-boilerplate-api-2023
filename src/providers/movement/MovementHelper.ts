@@ -2,7 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MapLoader } from "@providers/map/MapLoader";
-import { MapSolids } from "@providers/map/MapSolids";
+import { MapSolids, SolidCheckStrategy } from "@providers/map/MapSolids";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MathHelper } from "@providers/math/MathHelper";
 import {
@@ -33,7 +33,7 @@ export class MovementHelper {
     gridX: number,
     gridY: number,
     layer: MapLayers,
-    checkAllLayersBelow: boolean = true,
+    strategy: SolidCheckStrategy = "CHECK_ALL_LAYERS",
     caller: INPC | ICharacter | undefined = undefined
   ): Promise<boolean> => {
     // check for characters and NPCs
@@ -62,7 +62,7 @@ export class MovementHelper {
       return true;
     }
 
-    const hasSolid = this.mapSolids.isTileSolid(map, gridX, gridY, layer, checkAllLayersBelow);
+    const hasSolid = this.mapSolids.isTileSolid(map, gridX, gridY, layer, strategy);
 
     if (hasSolid) {
       return true;

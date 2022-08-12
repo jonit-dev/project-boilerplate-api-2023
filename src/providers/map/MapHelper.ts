@@ -1,8 +1,16 @@
-import { ITiledObject } from "@rpg-engine/shared";
+import { ITiledObject, MapLayers } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(MapHelper)
 export class MapHelper {
+  public getHighestMapLayer = (): number => {
+    const keys = Object.keys(MapLayers).filter((k) => typeof MapLayers[k as any] === "number");
+
+    const values = keys.map((k) => Number(MapLayers[k as any]));
+
+    return Math.max(...values);
+  };
+
   public mergeBlueprintWithTiledProps<T>(
     tiledData: ITiledObject,
     mapName: string,
