@@ -14,8 +14,8 @@ export class EquipmentEquipNetwork {
       channel,
       ItemSocketEvents.Equip,
       async (data: IEquipItemPayload, character: ICharacter) => {
-        const { itemId } = data;
-        await this.equipmentEquip.equip(character, itemId);
+        const { itemId, itemContainerId } = data;
+        await this.equipmentEquip.equip(character, itemId, itemContainerId);
       }
     );
   }

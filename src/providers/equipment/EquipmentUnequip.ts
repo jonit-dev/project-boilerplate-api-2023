@@ -105,7 +105,7 @@ export class EquipmentUnequip {
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,
       inventory: {
-        _id: inventory._id,
+        _id: itemContainer._id,
         parentItem: itemContainer!.parentItem.toString(),
         owner: itemContainer?.owner?.toString() || character.name,
         name: itemContainer?.name,

@@ -2,7 +2,6 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
@@ -19,14 +18,12 @@ import { provide } from "inversify-binding-decorators";
 export class EquipmentEquip {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  public async equip(character: ICharacter, itemId: string): Promise<void> {
+  public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<void> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
 
     const inventory = (await character.inventory) as unknown as IItem;
 
-    const itemContainer = (await ItemContainer.findOne({
-      owner: character.id,
-    })) as IItemContainer;
+    const itemContainer = (await ItemContainer.findById(itemContainerId)) as IItemContainer;
 
     const equipment = await Equipment.findById(character.equipment);
 
@@ -51,7 +48,7 @@ export class EquipmentEquip {
     }
 
     if (equipment) {
-      equipment[availableSlot] = await this.getItemId(item as unknown as IItem);
+      equipment[availableSlot] = item._id;
       await equipment.save();
 
       await this.removeItemFromInventory(itemId, itemContainer!);
@@ -61,7 +58,7 @@ export class EquipmentEquip {
       const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
         equipment: equipmentSlots,
         inventory: {
-          _id: inventory._id,
+          _id: itemContainer._id,
           parentItem: itemContainer!.parentItem.toString(),
           owner: itemContainer?.owner?.toString() || character.name,
           name: itemContainer?.name,
@@ -107,7 +104,7 @@ export class EquipmentEquip {
       return false;
     }
 
-    let userHasItem = false;
+    let userHasItem = true;
     for (const slot in itemContainer.slots) {
       if (itemContainer.slots[slot] && itemContainer.slots[slot]._id.toString() === itemId.toString()) {
         userHasItem = true;
@@ -156,20 +153,27 @@ export class EquipmentEquip {
       "armor",
       "inventory",
     ];
+
     for (const allowedSlotType of item?.allowedEquipSlotType) {
       const allowedSlotTypeCamelCase = this.getWordCamelCase(allowedSlotType);
-      if (equipment[allowedSlotTypeCamelCase] === undefined) {
-        if (!itemSlotTypes.includes(allowedSlotTypeCamelCase)) {
-          const itemTypeCamelCase = this.getWordCamelCase(item.type);
-          availableSlot = itemTypeCamelCase;
-        } else {
-          availableSlot = allowedSlotTypeCamelCase;
-        }
+      const itemSubTypeCamelCase = this.getWordCamelCase(item.subType);
+
+      const slotType = this.getSlotType(itemSlotTypes, allowedSlotTypeCamelCase, itemSubTypeCamelCase);
+
+      if (equipment[slotType] === undefined) {
+        availableSlot = slotType;
         break;
       }
     }
 
     return availableSlot;
+  }
+
+  private getSlotType(itemSlotTypes: string[], slotType: string, subType: string): string {
+    if (!itemSlotTypes.includes(slotType)) {
+      return subType;
+    }
+    return slotType;
   }
 
   public getWordCamelCase(word: string): string {
@@ -185,20 +189,6 @@ export class EquipmentEquip {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       equipmentAndInventoryUpdate
     );
-  }
-
-  public async getItemId(item: IItem): Promise<string> {
-    const blueprintData = itemsBlueprintIndex[item.textureKey];
-    let newItem = new Item({
-      ...blueprintData,
-      owner: item.owner,
-    });
-
-    newItem = await newItem.save();
-
-    await Item.deleteOne({ _id: item._id });
-
-    return newItem._id;
   }
 
   public async getEquipmentSlots(equipmentId: string): Promise<IEquipmentSet> {

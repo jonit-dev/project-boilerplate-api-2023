@@ -25,11 +25,6 @@ describe("EquipmentEquip.spec.ts", () => {
     charBody = (await unitTestHelper.createMockItemContainer(character)) as unknown as IItem;
   });
 
-  it("Returns new item id if equip item from map", async () => {
-    const result = await equipmentEquip.getItemId(item);
-    expect(result).not.toBe(item._id);
-  });
-
   it("Should get the equipment slots", async () => {
     const result = await equipmentEquip.getEquipmentSlots(equipment._id);
 
