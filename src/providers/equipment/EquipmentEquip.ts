@@ -37,7 +37,7 @@ export class EquipmentEquip {
       return;
     }
 
-    const availableSlot = this.getAvailableSlot(item, equipment as unknown as IEquipmentSet, itemContainer);
+    const availableSlot = this.getAvailableSlot(item, equipment as unknown as IEquipmentSet);
 
     if (availableSlot === "") {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -104,7 +104,7 @@ export class EquipmentEquip {
       return false;
     }
 
-    let userHasItem = true;
+    let userHasItem = false;
     for (const slot in itemContainer.slots) {
       if (itemContainer.slots[slot] && itemContainer.slots[slot]._id.toString() === itemId.toString()) {
         userHasItem = true;
@@ -139,7 +139,7 @@ export class EquipmentEquip {
     return true;
   }
 
-  public getAvailableSlot(item: IItem, equipment: IEquipmentSet, itemContainer: IItemContainer): string {
+  public getAvailableSlot(item: IItem, equipment: IEquipmentSet): string {
     let availableSlot = "";
     const itemSlotTypes = [
       "head",
