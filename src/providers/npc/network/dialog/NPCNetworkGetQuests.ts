@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { Quest } from "@entities/ModuleQuest/QuestModel";
+import { Quest, hasStatus } from "@entities/ModuleQuest/QuestModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -63,21 +63,22 @@ export class NPCNetworkGetQuests {
             throw new Error(`GetQuests > Quests not found for NPC id: ${data.npcId}`);
           }
 
-          const pendingQuests: IQuest[] = [];
+          const filteredQuests: IQuest[] = [];
           for (const q of quests) {
-            if (await q.isPending) {
-              pendingQuests.push(q as unknown as IQuest);
+            const hasRequiredStatus = await hasStatus(q, data.status);
+            if (hasRequiredStatus) {
+              filteredQuests.push(q as unknown as IQuest);
             }
           }
 
-          if (!pendingQuests.length) {
+          if (!filteredQuests.length) {
             this.sendNoQuestsMessage(character);
             return;
           }
 
           this.socketMessaging.sendEventToUser<IQuestsResponse>(character.channelId!, QuestSocketEvents.GetQuests, {
             npcId: npc._id,
-            quests: pendingQuests,
+            quests: filteredQuests,
           });
 
           setTimeout(() => {
