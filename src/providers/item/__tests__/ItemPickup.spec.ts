@@ -234,8 +234,10 @@ describe("ItemPickup.ts", () => {
 
     it("should throw an error if user tries to pickup an item that he doesn't own", async () => {
       testItem.owner = "62b792030c3f470048781135" as unknown as Types.ObjectId; // inexistent character
-      testItem.x = testCharacter.x;
-      testItem.y = testCharacter.y;
+      // to have an owner, an item must be in a container, not on the map!
+      testItem.x = undefined;
+      testItem.y = undefined;
+      testItem.scene = undefined;
       await testItem.save();
 
       const pickup = await pickupItem(inventoryItemContainerId);
@@ -286,6 +288,19 @@ describe("ItemPickup.ts", () => {
       } else {
         throw new Error("Failed to remove character equipment!");
       }
+    });
+
+    it("should throw an error if the character tries to pickup an item that's from another map", async () => {
+      testItem.scene = "another-random-scene";
+      await testItem.save();
+
+      const pickup = await pickupItem(inventoryItemContainerId);
+      expect(pickup).toBeFalsy();
+
+      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+        testCharacter,
+        "Sorry, you can't pick up items from another map."
+      );
     });
   });
 
