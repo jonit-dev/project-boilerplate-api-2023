@@ -8,7 +8,7 @@ export const itemGroundBlood: Partial<IItem> = {
   type: ItemType.Other,
   subType: ItemSubType.Other,
   decayTime: dayjs(new Date()).add(10, "minute").toDate(),
-  layer: MapLayers.Ground, // avoid overlap with body
+  layer: MapLayers.Ground + 0.5, // avoid overlap with body
   textureAtlas: "battle-effects",
   texturePath: "red-blood-1.png",
   textureKey: "red-blood",
