@@ -1,4 +1,5 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
+import { QuestStatus } from "@rpg-engine/shared";
 import _ from "lodash";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import {
@@ -16,7 +17,7 @@ const questSchema = createLeanSchema(
     rewards: Type.array().of(Type.objectId({ ref: "QuestReward" })),
     objectives: Type.array().of(Type.objectId()),
     ...({} as {
-      objectivesDetails: IQuestObjectiveKill[] | IQuestObjectiveInteraction[];
+      objectivesDetails: Promise<IQuestObjectiveKill[] | IQuestObjectiveInteraction[]>;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
@@ -45,3 +46,13 @@ questSchema.virtual("objectivesDetails").get(async function (this: IQuest) {
 export type IQuest = ExtractDoc<typeof questSchema>;
 
 export const Quest = typedModel("Quest", questSchema);
+
+export async function hasStatus(quest: IQuest, status: QuestStatus): Promise<boolean> {
+  const objectives = await quest.objectivesDetails;
+  for (const obj of objectives) {
+    if (obj.status === status) {
+      return true;
+    }
+  }
+  return false;
+}
