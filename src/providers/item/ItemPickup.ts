@@ -9,6 +9,7 @@ import {
   IEquipmentSet,
   IItemPickup,
   ItemSocketEvents,
+  ItemType,
   IUIShowMessage,
   UIMessageType,
   UISocketEvents,
@@ -59,7 +60,7 @@ export class ItemPickup {
           name: updatedContainer?.name,
           slotQty: updatedContainer!.slotQty,
           slots: updatedContainer?.slots,
-          // allowedItemTypes: this.getAllowedItemTypes(),
+          allowedItemTypes: this.getAllowedItemTypes(),
           isEmpty: updatedContainer!.isEmpty,
         },
       };
@@ -231,7 +232,7 @@ export class ItemPickup {
       return false;
     }
 
-    if (item.owner && item.owner !== character.owner) {
+    if (item.owner && item.owner.toString() !== character._id.toString()) {
       this.sendCustomErrorMessage(character, "Sorry, this item is not yours.");
       return false;
     }
@@ -266,5 +267,15 @@ export class ItemPickup {
       message,
       type,
     });
+  }
+
+  public getAllowedItemTypes(): ItemType[] {
+    const allowedItemTypes: ItemType[] = [];
+
+    for (const allowedItemType of Object.keys(ItemType)) {
+      allowedItemTypes.push(ItemType[allowedItemType]);
+    }
+
+    return allowedItemTypes;
   }
 }

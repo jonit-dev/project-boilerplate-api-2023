@@ -1,11 +1,14 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
+  IItem,
+  IItemContainer,
   IItemDrop,
   ItemSocketEvents,
   IUIShowMessage,
@@ -25,10 +28,24 @@ export class ItemDrop {
       return false;
     }
 
-    const dropItem = (await Item.findById(itemDrop.itemId)) as unknown as IItem;
+    console.log(character);
+
+    const dropItem = await Item.findById(itemDrop.itemId);
 
     if (dropItem) {
-      const isItemRemoved = await this.removeItemFromInventory(dropItem, character, itemDrop.fromContainerId);
+      let isItemRemoved = false;
+
+      if (itemDrop.fromEquipmentSet) {
+        isItemRemoved = await this.removeItemFromEquipmentSet(dropItem as unknown as IItem, character);
+      } else {
+        isItemRemoved = await this.removeItemFromInventory(
+          dropItem as unknown as IItem,
+          character,
+          itemDrop.fromContainerId
+        );
+      }
+
+      console.log("Is item removed", isItemRemoved);
 
       if (!isItemRemoved) {
         return false;
@@ -37,10 +54,14 @@ export class ItemDrop {
       try {
         await this.characterWeight.updateCharacterWeight(character);
 
-        const updatedContainer = (await ItemContainer.findById(itemDrop.fromContainerId)) as unknown as IItemContainer;
-        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-          equipment: {} as unknown as IEquipmentSet,
-          inventory: {
+        const equipmentSlots = await this.getEquipmentSlots(character.equipment?.toString());
+
+        let inventory = {} as IItemContainer;
+        if (!itemDrop.fromEquipmentSet) {
+          const updatedContainer = (await ItemContainer.findById(
+            itemDrop.fromContainerId
+          )) as unknown as IItemContainer;
+          inventory = {
             _id: updatedContainer._id,
             parentItem: updatedContainer!.parentItem.toString(),
             owner: updatedContainer?.owner?.toString() || character.name,
@@ -49,7 +70,12 @@ export class ItemDrop {
             slots: updatedContainer?.slots,
             // allowedItemTypes: this.getAllowedItemTypes(),
             isEmpty: updatedContainer!.isEmpty,
-          },
+          };
+        }
+
+        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+          equipment: equipmentSlots,
+          inventory: inventory,
         };
 
         this.updateInventoryCharacter(payloadUpdate, character);
@@ -69,14 +95,49 @@ export class ItemDrop {
     return false;
   }
 
+  private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
+    const equipmentSetId = character.equipment;
+    const equipmentSet = await Equipment.findById(equipmentSetId);
+
+    if (!equipmentSet) {
+      this.sendCustomErrorMessage(character, "Sorry, equipment set not found.");
+      return false;
+    }
+
+    let targetSlot = "";
+    const itemSlotTypes = [
+      "head",
+      "neck",
+      "leftHand",
+      "rightHand",
+      "ring",
+      "legs",
+      "boot",
+      "accessory",
+      "armor",
+      "inventory",
+    ];
+
+    for (const itemSlotType of itemSlotTypes) {
+      if (equipmentSet[itemSlotType] && equipmentSet[itemSlotType].toString() === item._id.toString()) {
+        targetSlot = itemSlotType;
+      }
+    }
+
+    equipmentSet[targetSlot] = undefined;
+
+    await equipmentSet.save();
+
+    return true;
+  }
+
   /**
    * This method will remove a item from the character inventory
    */
   private async removeItemFromInventory(item: IItem, character: ICharacter, fromContainerId: string): Promise<boolean> {
-    const selectedItem = (await Item.findById(item.id)) as IItem;
-    const targetContainer = (await ItemContainer.findById(fromContainerId)) as unknown as IItemContainer;
+    const targetContainer = await ItemContainer.findById(fromContainerId);
 
-    if (!selectedItem) {
+    if (!item) {
       console.log("dropItemFromInventory: Item not found");
       this.sendGenericErrorMessage(character);
       return false;
@@ -92,13 +153,13 @@ export class ItemDrop {
       const slotItem = targetContainer.slots?.[i];
 
       if (!slotItem) continue;
-      if (slotItem.key === selectedItem.key) {
+      if (slotItem.key === item.key) {
         // Changing item slot to null, thus removing it
         targetContainer.slots[i] = null;
 
         await ItemContainer.updateOne(
           {
-            _id: targetContainer.id,
+            _id: targetContainer._id,
           },
           {
             $set: {
@@ -118,6 +179,35 @@ export class ItemDrop {
 
   private async isItemDropValid(itemDrop: IItemDrop, character: ICharacter): Promise<Boolean> {
     const item = await Item.findById(itemDrop.itemId);
+    const isFromEquipmentSet = itemDrop.fromEquipmentSet;
+
+    if (!item) {
+      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
+      return false;
+    }
+
+    if (!isFromEquipmentSet) {
+      await this.validateItemDropFromInventory(itemDrop, item as unknown as IItem, character);
+    }
+
+    if (character.isBanned) {
+      this.sendCustomErrorMessage(character, "Sorry, you are banned and can't drop this item.");
+      return false;
+    }
+
+    if (!character.isOnline) {
+      this.sendCustomErrorMessage(character, "Sorry, you must be online to drop this item.");
+      return false;
+    }
+
+    return true;
+  }
+
+  private async validateItemDropFromInventory(
+    itemDrop: IItemDrop,
+    item: IItem,
+    character: ICharacter
+  ): Promise<boolean> {
     const inventory = await character.inventory;
 
     if (!inventory) {
@@ -132,12 +222,9 @@ export class ItemDrop {
       return false;
     }
 
-    if (!item) {
-      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
-      return false;
-    }
-
-    const hasItemInInventory = inventoryContainer?.itemIds?.find((itemId) => String(itemId) === String(item.id));
+    const hasItemInInventory = inventoryContainer?.itemIds?.find(
+      (itemId) => String(itemId) === String(itemDrop.itemId)
+    );
 
     if (!hasItemInInventory) {
       this.sendCustomErrorMessage(character, "Sorry, you do not have this item in your inventory.");
@@ -146,16 +233,6 @@ export class ItemDrop {
 
     if (itemDrop.fromContainerId.toString() !== inventoryContainer?.id.toString()) {
       this.sendCustomErrorMessage(character, "Sorry, this item does not belong to your inventory.");
-      return false;
-    }
-
-    if (character.isBanned) {
-      this.sendCustomErrorMessage(character, "Sorry, you are banned and can't drop this item.");
-      return false;
-    }
-
-    if (!character.isOnline) {
-      this.sendCustomErrorMessage(character, "Sorry, you must be online to drop this item.");
       return false;
     }
 
@@ -187,5 +264,40 @@ export class ItemDrop {
       message,
       type,
     });
+  }
+
+  public async getEquipmentSlots(equipmentId: string | undefined): Promise<IEquipmentSet> {
+    if (equipmentId === undefined) {
+      return {} as IEquipmentSet;
+    }
+
+    const equipment = await Equipment.findById(equipmentId)
+      .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
+      .exec();
+
+    const head = equipment?.head! as unknown as IItem;
+    const neck = equipment?.neck! as unknown as IItem;
+    const leftHand = equipment?.leftHand! as unknown as IItem;
+    const rightHand = equipment?.rightHand! as unknown as IItem;
+    const ring = equipment?.ring! as unknown as IItem;
+    const legs = equipment?.legs! as unknown as IItem;
+    const boot = equipment?.boot! as unknown as IItem;
+    const accessory = equipment?.accessory! as unknown as IItem;
+    const armor = equipment?.armor! as unknown as IItem;
+    const inventory = equipment?.inventory! as unknown as IItem;
+
+    return {
+      _id: equipment!._id,
+      head,
+      neck,
+      leftHand,
+      rightHand,
+      ring,
+      legs,
+      boot,
+      accessory,
+      armor,
+      inventory,
+    };
   }
 }
