@@ -28,8 +28,6 @@ export class ItemDrop {
       return false;
     }
 
-    console.log(character);
-
     const dropItem = await Item.findById(itemDrop.itemId);
 
     if (dropItem) {
@@ -44,8 +42,6 @@ export class ItemDrop {
           itemDrop.fromContainerId
         );
       }
-
-      console.log("Is item removed", isItemRemoved);
 
       if (!isItemRemoved) {
         return false;
@@ -187,7 +183,11 @@ export class ItemDrop {
     }
 
     if (!isFromEquipmentSet) {
-      await this.validateItemDropFromInventory(itemDrop, item as unknown as IItem, character);
+      const validation = await this.validateItemDropFromInventory(itemDrop, item as unknown as IItem, character);
+
+      if (!validation) {
+        return false;
+      }
     }
 
     if (character.isBanned) {

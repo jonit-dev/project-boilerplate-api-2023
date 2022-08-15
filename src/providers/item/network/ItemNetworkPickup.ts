@@ -11,13 +11,7 @@ export class ItemNetworkPickup {
   public onItemPickup(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, ItemSocketEvents.Pickup, async (data: IItemPickup, character) => {
       if (data) {
-        const itemPickup = await this.itemPickup.performItemPickup(data, character);
-        if (!itemPickup) {
-          this.itemPickup.sendCustomErrorMessage(
-            character,
-            "Sorry, something went wrong while trying to pickup this item."
-          );
-        }
+        await this.itemPickup.performItemPickup(data, character);
       }
     });
   }

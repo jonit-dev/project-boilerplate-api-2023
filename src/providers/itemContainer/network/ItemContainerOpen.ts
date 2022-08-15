@@ -14,13 +14,15 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { ItemContainerHelper } from "../ItemContainerHelper";
 
 @provide(ItemContainerOpen)
 export class ItemContainerOpen {
   constructor(
     private socketAuth: SocketAuth,
     private socketMessaging: SocketMessaging,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private itemContainerHelper: ItemContainerHelper
   ) {}
 
   public onOpen(channel: SocketChannel): void {
@@ -59,9 +61,20 @@ export class ItemContainerOpen {
     if (isContainerOpenValid) {
       // if container opening is valid, send back container information
 
-      this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
-        itemContainer,
-      });
+      try {
+        const type = await this.itemContainerHelper.getType(itemContainer);
+
+        if (!type) {
+          throw new Error("Failed to get item type");
+        }
+
+        this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
+          itemContainer,
+          type,
+        });
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 

@@ -3,19 +3,21 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { ItemSocketEvents, ToGridX, UISocketEvents } from "@rpg-engine/shared";
+import { IItemContainer, ItemSocketEvents, ToGridX, UISocketEvents } from "@rpg-engine/shared";
+import { ItemContainerHelper } from "../ItemContainerHelper";
 import { ItemContainerOpen } from "../network/ItemContainerOpen";
 
 describe("ItemContainerOpen.ts", () => {
   let itemContainerOpen: ItemContainerOpen;
-
   let testCharacter: ICharacter;
   let inventory: IItem;
+  let itemContainerHelper: ItemContainerHelper;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
 
     itemContainerOpen = container.get<ItemContainerOpen>(ItemContainerOpen);
+    itemContainerHelper = container.get<ItemContainerHelper>(ItemContainerHelper);
   });
 
   beforeEach(async () => {
@@ -44,12 +46,15 @@ describe("ItemContainerOpen.ts", () => {
       testCharacter
     );
 
+    const type = await itemContainerHelper.getType(inventoryItemContainer as unknown as IItemContainer);
+
     // @ts-ignore
     expect(itemContainerOpen.socketMessaging.sendEventToUser).toHaveBeenCalledWith(
       testCharacter.channelId!,
       ItemSocketEvents.ContainerRead,
       {
         itemContainer: inventoryItemContainer,
+        type,
       }
     );
   });

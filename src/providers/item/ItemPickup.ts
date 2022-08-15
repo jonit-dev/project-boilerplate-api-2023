@@ -203,12 +203,26 @@ export class ItemPickup {
   private async isItemPickupValid(itemPickup: IItemPickup, character: ICharacter): Promise<Boolean> {
     const item = await Item.findById(itemPickup.itemId);
 
-    const inventory = await character.inventory;
-
     if (!item) {
       this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
-
       return false;
+    }
+
+    const isItemOnMap = item.x && item.y && item.scene;
+
+    const inventory = await character.inventory;
+
+    if (!inventory) {
+      console.log("Sorry, you must have a bag or backpack to pick up this item.");
+      this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to pick up this item.");
+      return false;
+    }
+
+    if (isItemOnMap) {
+      if (character.scene !== item.scene) {
+        this.sendCustomErrorMessage(character, "Sorry, you can't pick up items from another map.");
+        return false;
+      }
     }
 
     const weight = await this.characterWeight.getWeight(character);
@@ -232,9 +246,14 @@ export class ItemPickup {
       return false;
     }
 
-    if (item.owner && item.owner.toString() !== character._id.toString()) {
-      this.sendCustomErrorMessage(character, "Sorry, this item is not yours.");
-      return false;
+    if (!isItemOnMap) {
+      // if item is not on the map
+
+      if (item.owner && item.owner !== character._id.toString()) {
+        // check if item is owned by someone else
+        this.sendCustomErrorMessage(character, "Sorry, this item is not yours.");
+        return false;
+      }
     }
 
     if (character.isBanned) {
@@ -244,11 +263,6 @@ export class ItemPickup {
 
     if (!character.isOnline) {
       this.sendCustomErrorMessage(character, "Sorry, you must be online to pick up this item.");
-      return false;
-    }
-
-    if (!inventory) {
-      this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to pick up this item.");
       return false;
     }
 
