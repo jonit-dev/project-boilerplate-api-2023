@@ -4,6 +4,9 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { IQuest, Quest } from "@entities/ModuleQuest/QuestModel";
+import { QuestObjectiveInteraction, QuestObjectiveKill } from "@entities/ModuleQuest/QuestObjectiveModel";
+import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { container, mapLoader } from "@providers/inversify/container";
@@ -18,12 +21,13 @@ import {
   randomMovementMockNPC,
   stoppedMovementMockNPC,
 } from "@providers/unitTests/mock/NPCMock";
-import { ISocketTransmissionZone, NPCMovementType } from "@rpg-engine/shared";
+import { ISocketTransmissionZone, NPCMovementType, QuestType, Type } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
 import { itemMock, stackableItemMock } from "./mock/itemMock";
+import { questInteractionObjectiveMock, questKillObjectiveMock, questMock, questRewardsMock } from "./mock/questMock";
 
 interface IMockCharacterOptions {
   hasEquipment?: boolean;
@@ -33,6 +37,11 @@ interface IMockCharacterOptions {
 
 interface IMockNPCOptions {
   hasSkills?: boolean;
+}
+
+interface IMockQuestOptions {
+  type?: QuestType;
+  objectivesCount?: number;
 }
 
 @provide(UnitTestHelper)
@@ -258,6 +267,72 @@ export class UnitTestHelper {
     backpackContainer.slots = slots;
 
     return backpackContainer.save();
+  }
+
+  public async createMockQuest(
+    npcId: string,
+    options?: IMockQuestOptions,
+    extraProps?: Record<string, unknown> | null
+  ): Promise<IQuest> {
+    if (!npcId) {
+      throw new Error("need to provide npc id to create a mock quest");
+    }
+
+    let testQuestRewards = new QuestReward({
+      ...questRewardsMock,
+    });
+    testQuestRewards = await testQuestRewards.save();
+
+    const testQuest = new Quest({
+      ...questMock,
+      ...extraProps,
+      npcId,
+      rewards: [testQuestRewards._id],
+      objectives: [],
+    });
+
+    const objCount = options ? options.objectivesCount || 1 : 1;
+
+    if (options && options.type) {
+      switch (options.type) {
+        case QuestType.Interaction:
+          for (let i = 0; i < objCount; i++) {
+            await this.addQuestInteractionObjectiveMock(testQuest);
+          }
+          break;
+
+        case QuestType.Kill:
+          for (let i = 0; i < objCount; i++) {
+            await this.addQuestKillObjectiveMock(testQuest);
+          }
+          break;
+        default:
+          throw new Error(`unsupported quest type ${options.type}`);
+      }
+    } else {
+      // by default create 1 objective kill
+      for (let i = 0; i < objCount; i++) {
+        await this.addQuestKillObjectiveMock(testQuest);
+      }
+    }
+
+    return testQuest.save();
+  }
+
+  private async addQuestInteractionObjectiveMock(quest: IQuest): Promise<void> {
+    let testQuestObjectiveInteraction = new QuestObjectiveInteraction({
+      ...questInteractionObjectiveMock,
+    });
+    testQuestObjectiveInteraction = await testQuestObjectiveInteraction.save();
+    quest.objectives!.push(testQuestObjectiveInteraction._id);
+  }
+
+  private async addQuestKillObjectiveMock(quest: IQuest): Promise<void> {
+    let testQuestObjectiveKill = new QuestObjectiveKill({
+      ...questKillObjectiveMock,
+    });
+    testQuestObjectiveKill = await testQuestObjectiveKill.save();
+    quest.objectives!.push(testQuestObjectiveKill._id);
   }
 
   public async beforeAllJestHook(): Promise<void> {

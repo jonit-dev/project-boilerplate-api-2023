@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { Quest, hasStatus } from "@entities/ModuleQuest/QuestModel";
+import { Quest } from "@entities/ModuleQuest/QuestModel";
 import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -47,7 +47,7 @@ export class NPCNetworkChooseQuest {
           throw new Error(`ChooseQuest > Quest not found: ${data.questId}`);
         }
 
-        const isPending = await hasStatus(quest, QuestStatus.Pending);
+        const isPending = await quest.hasStatus(QuestStatus.Pending);
         if (!isPending) {
           throw new Error(`ChooseQuest > Quest is not pending: ${data.questId}`);
         }

@@ -18,6 +18,7 @@ const questSchema = createLeanSchema(
     objectives: Type.array().of(Type.objectId()),
     ...({} as {
       objectivesDetails: Promise<IQuestObjectiveKill[] | IQuestObjectiveInteraction[]>;
+      hasStatus(status: QuestStatus): Promise<boolean>;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
@@ -43,16 +44,35 @@ questSchema.virtual("objectivesDetails").get(async function (this: IQuest) {
   return killObj.concat(interactionObj);
 });
 
+questSchema.methods.hasStatus = async function (this: IQuest, status: QuestStatus): Promise<boolean> {
+  const objectives = await this.objectivesDetails;
+  // Case pending && completed ==> All should be same state
+  // Case in progress ==> With 1 in progress is inProgress state
+  // Case in progress ==> With 1 completed and 1 pending, is also inProgress state
+  let currentStatus = QuestStatus.Pending;
+  for (let i = 0; i < objectives.length; i++) {
+    const obj = objectives[i];
+    if (i === 0) {
+      currentStatus = obj.status as QuestStatus;
+      continue;
+    }
+
+    if (obj.status === QuestStatus.InProgress) {
+      currentStatus = obj.status;
+      break;
+    }
+
+    if (
+      (currentStatus === QuestStatus.Pending && obj.status === QuestStatus.Completed) ||
+      (currentStatus === QuestStatus.Completed && obj.status === QuestStatus.Pending)
+    ) {
+      currentStatus = QuestStatus.InProgress;
+      break;
+    }
+  }
+  return currentStatus === status;
+};
+
 export type IQuest = ExtractDoc<typeof questSchema>;
 
 export const Quest = typedModel("Quest", questSchema);
-
-export async function hasStatus(quest: IQuest, status: QuestStatus): Promise<boolean> {
-  const objectives = await quest.objectivesDetails;
-  for (const obj of objectives) {
-    if (obj.status === status) {
-      return true;
-    }
-  }
-  return false;
-}

@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { Quest, hasStatus } from "@entities/ModuleQuest/QuestModel";
+import { Quest } from "@entities/ModuleQuest/QuestModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -65,7 +65,7 @@ export class NPCNetworkGetQuests {
 
           const filteredQuests: IQuest[] = [];
           for (const q of quests) {
-            const hasRequiredStatus = await hasStatus(q, data.status);
+            const hasRequiredStatus = await q.hasStatus(data.status);
             if (hasRequiredStatus) {
               filteredQuests.push(q as unknown as IQuest);
             }
