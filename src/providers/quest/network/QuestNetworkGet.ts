@@ -20,8 +20,8 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 
-@provide(NPCNetworkGetQuests)
-export class NPCNetworkGetQuests {
+@provide(QuestNetworkGet)
+export class QuestNetworkGet {
   constructor(
     private socketAuth: SocketAuth,
     private mathHelper: MathHelper,

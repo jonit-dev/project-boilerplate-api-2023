@@ -31,7 +31,8 @@ describe("QuestModel.ts", () => {
   });
 
   it("validate hasStatus function - quest with multiple objectives", async () => {
-    testQuest = await unitTestHelper.createMockQuest(testNPC.id, { type: QuestType.Kill, objectivesCount: 5 });
+    const objectivesCount = 5;
+    testQuest = await unitTestHelper.createMockQuest(testNPC.id, { type: QuestType.Kill, objectivesCount });
 
     expect(await testQuest.hasStatus(QuestStatus.Pending)).toEqual(true);
     const obj = await QuestObjectiveKill.findById(testQuest.objectives![0]);
@@ -42,7 +43,7 @@ describe("QuestModel.ts", () => {
 
     expect(await testQuest.hasStatus(QuestStatus.InProgress)).toEqual(true);
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < objectivesCount; i++) {
       const obj = await QuestObjectiveKill.findById(testQuest.objectives![i]);
       // Update status - some objectives completed, others pending
       obj!.status = QuestStatus.Completed;

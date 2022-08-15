@@ -19,8 +19,8 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-@provide(NPCNetworkChooseQuest)
-export class NPCNetworkChooseQuest {
+@provide(QuestNetworkChoose)
+export class QuestNetworkChoose {
   constructor(
     private socketAuth: SocketAuth,
     private mathHelper: MathHelper,
