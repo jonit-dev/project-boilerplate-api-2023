@@ -6,6 +6,7 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { NPCDeath } from "@providers/npc/NPCDeath";
+import { QuestSystem } from "@providers/quest/QuestSystem";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -37,7 +38,8 @@ export class BattleAttackTarget {
     private characterDeath: CharacterDeath,
     private npcDeath: NPCDeath,
     private skillIncrease: SkillIncrease,
-    private battleRangedAttack: BattleRangedAttack
+    private battleRangedAttack: BattleRangedAttack,
+    private questSystem: QuestSystem
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
@@ -185,8 +187,11 @@ export class BattleAttackTarget {
             await this.npcDeath.handleNPCDeath(target as INPC, attacker as ICharacter);
             await this.skillIncrease.releaseXP(target as INPC);
 
-            // clear attacker target
             if (attacker instanceof Character) {
+              // update kill quests status (if any)
+              await this.questSystem.updateKillQuests(attacker as ICharacter, (target as INPC).key);
+
+              // clear attacker target
               await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
             }
           }

@@ -11,6 +11,7 @@ const questObjectiveKillSchema = createLeanSchema(
     creatureKeys: Type.array().of(Type.string()),
     type: Type.string({ required: true, default: QuestType.Kill }),
     status: Type.string({ required: true, default: QuestStatus.Pending }),
+    quest: Type.objectId({ required: true, ref: "Quest" }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
@@ -26,6 +27,7 @@ const questObjectiveInteractionSchema = createLeanSchema(
     targetNPCKey: Type.string({ required: true }),
     type: Type.string({ required: true, default: QuestType.Interaction }),
     status: Type.string({ required: true, default: QuestStatus.Pending }),
+    quest: Type.objectId({ required: true, ref: "Quest" }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
