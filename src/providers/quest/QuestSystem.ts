@@ -21,18 +21,30 @@ import _ from "lodash";
 export class QuestSystem {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  public async updateKillQuests(character: ICharacter, creatureKey: string): Promise<void> {
-    const killObjectives = await this.getObjectives(character, QuestType.Kill);
-    if (_.isEmpty(killObjectives)) {
+  public async updateQuests(type: QuestType, character: ICharacter, targetKey: string): Promise<void> {
+    const objectives = await this.getObjectives(character, type);
+    if (_.isEmpty(objectives)) {
       return;
     }
-    const updatedQuest = await this.updateKillObjective(killObjectives as IQuestObjectiveKill[], creatureKey);
+
+    let updatedQuest: IQuest | undefined;
+    switch (type) {
+      case QuestType.Kill:
+        updatedQuest = await this.updateKillObjective(objectives as IQuestObjectiveKill[], targetKey);
+        break;
+      case QuestType.Interaction:
+        updatedQuest = await this.updateInteractionObjective(objectives as IQuestObjectiveInteraction[], targetKey);
+        break;
+      default:
+        throw new Error(`Invalid quest type ${type}`);
+    }
+
     if (!updatedQuest) {
       return;
     }
 
     if (await updatedQuest.hasStatus(QuestStatus.Completed)) {
-      this.releaseRewards(updatedQuest, character);
+      await this.releaseRewards(updatedQuest, character);
     }
   }
 

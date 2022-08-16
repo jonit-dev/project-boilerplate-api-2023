@@ -15,6 +15,7 @@ import {
   GRID_WIDTH,
   IBattleCancelTargeting,
   IBattleEventFromServer,
+  QuestType,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -189,7 +190,7 @@ export class BattleAttackTarget {
 
             if (attacker instanceof Character) {
               // update kill quests status (if any)
-              await this.questSystem.updateKillQuests(attacker as ICharacter, (target as INPC).key);
+              await this.questSystem.updateQuests(QuestType.Kill, attacker as ICharacter, (target as INPC).key);
 
               // clear attacker target
               await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
