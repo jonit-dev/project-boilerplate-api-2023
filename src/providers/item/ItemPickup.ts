@@ -9,6 +9,7 @@ import {
   IEquipmentSet,
   IItemPickup,
   ItemSocketEvents,
+  ItemType,
   IUIShowMessage,
   UIMessageType,
   UISocketEvents,
@@ -59,7 +60,7 @@ export class ItemPickup {
           name: updatedContainer?.name,
           slotQty: updatedContainer!.slotQty,
           slots: updatedContainer?.slots,
-          // allowedItemTypes: this.getAllowedItemTypes(),
+          allowedItemTypes: this.getAllowedItemTypes(),
           isEmpty: updatedContainer!.isEmpty,
         },
       };
@@ -248,7 +249,7 @@ export class ItemPickup {
     if (!isItemOnMap) {
       // if item is not on the map
 
-      if (item.owner && item.owner !== character.owner) {
+      if (item.owner && item.owner !== character._id.toString()) {
         // check if item is owned by someone else
         this.sendCustomErrorMessage(character, "Sorry, this item is not yours.");
         return false;
@@ -280,5 +281,15 @@ export class ItemPickup {
       message,
       type,
     });
+  }
+
+  public getAllowedItemTypes(): ItemType[] {
+    const allowedItemTypes: ItemType[] = [];
+
+    for (const allowedItemType of Object.keys(ItemType)) {
+      allowedItemTypes.push(ItemType[allowedItemType]);
+    }
+
+    return allowedItemTypes;
   }
 }
