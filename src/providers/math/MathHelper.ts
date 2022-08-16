@@ -131,4 +131,31 @@ export class MathHelper {
     }
     return arr;
   }
+
+  /**
+   * Gets circundating grid points of a specified point in the grid.
+   * Negative coordinates are discarded
+   * @param point base point to get the surrounding points from
+   * @param delta radial distance from the point
+   * @returns array of surrounding grid points for the delta specified
+   */
+  public getCircundatingGridPoints(point: IPoint, delta: number): IPoint[] {
+    const arr: IPoint[] = [];
+    for (let dx = -delta; dx <= delta; dx++) {
+      for (let dy = delta; dy >= -delta; dy--) {
+        // do not include base point
+        if (dx === 0 && dy === 0) {
+          continue;
+        }
+        const candidate: IPoint = { x: point.x + dx, y: point.y + dy };
+        // if x or y coordinates are negative, dont include this point
+        if (candidate.x < 0 || candidate.y < 0) {
+          continue;
+        }
+        arr.push(candidate);
+      }
+    }
+
+    return arr;
+  }
 }

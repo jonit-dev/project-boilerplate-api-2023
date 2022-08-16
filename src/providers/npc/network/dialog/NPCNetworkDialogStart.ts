@@ -1,5 +1,6 @@
 import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { MathHelper } from "@providers/math/MathHelper";
+import { QuestSystem } from "@providers/quest/QuestSystem";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -12,6 +13,7 @@ import {
   NPCSocketEvents,
   NPCTargetType,
   NPC_MAX_TALKING_DISTANCE_IN_GRID,
+  QuestType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
@@ -21,7 +23,8 @@ export class NPCNetworkDialogStart {
     private socketAuth: SocketAuth,
     private mathHelper: MathHelper,
     private socketMessaging: SocketMessaging,
-    private interpolationParser: InterpolationParser
+    private interpolationParser: InterpolationParser,
+    private questSystem: QuestSystem
   ) {}
 
   public onDialogStart(channel: SocketChannel): void {
@@ -62,6 +65,10 @@ export class NPCNetworkDialogStart {
                   dialogText,
                 }
               );
+
+              // Update interaction quest for character (if has any)
+              await this.questSystem.updateQuests(QuestType.Interaction, character, npc.key);
+
               setTimeout(() => {
                 // clear target and rollback movement type
                 npc.currentMovementType = npc.originalMovementType;
