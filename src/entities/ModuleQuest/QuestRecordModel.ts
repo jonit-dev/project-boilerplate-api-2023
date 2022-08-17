@@ -3,7 +3,7 @@ import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const questRecordSchema = createLeanSchema(
   {
-    character: Type.objectId({ ref: "Character" }),
+    character: Type.objectId({ required: true, ref: "Character" }),
     objective: Type.objectId({ required: true }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
