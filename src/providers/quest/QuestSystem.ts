@@ -132,7 +132,7 @@ export class QuestSystem {
 
   /**
    * This function updates the interaction objective of a quest if npcKey is
-   * equal to the targetNPCKey of one of the objectives. In such case,
+   * equal to the targetNPCkey of one of the objectives. In such case,
    * returns the quest that is owner to the updated objective. If none is updated,
    * returns undefined
    *
@@ -146,7 +146,7 @@ export class QuestSystem {
     // check for each objective if the npc key is the correspondiong npc
     // If many cases, only update the first one
     for (const obj of objectives) {
-      if (obj.targetNPCKey! === npcKey) {
+      if (obj.targetNPCkey! === npcKey) {
         obj.status = QuestStatus.Completed;
         await obj.save();
         return (await Quest.findById(obj.quest)) as IQuestModel;
@@ -159,7 +159,7 @@ export class QuestSystem {
     const rewards = await QuestReward.find({ _id: { $in: quest.rewards } });
 
     // Get character's backpack to store there the rewards
-    const equipment = await Equipment.findById(character.equipment).populate("inventory");
+    const equipment = await Equipment.findById(character.equipment).populate("inventory").exec();
     if (!equipment) {
       throw new Error(
         `Character equipment not found. Character id ${character.id}, Equipment id ${character.equipment}`
@@ -176,8 +176,8 @@ export class QuestSystem {
     try {
       const overflowingRewards: IItemModel[] = [];
       for (const reward of rewards) {
-        overflowingRewards.concat(
-          await this.releaseItemRewards(reward, backpackContainer as unknown as IItemContainer)
+        overflowingRewards.push(
+          ...(await this.releaseItemRewards(reward, backpackContainer as unknown as IItemContainer))
         );
         // TODO implement when spells are supported
         // await this.releaseSpellRewards(reward, backpackContainer);

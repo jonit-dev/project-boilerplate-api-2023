@@ -19,6 +19,7 @@ import { othersBlueprintIndex } from "./blueprints/others/index";
 import { staffsBlueprintIndex } from "./blueprints/staffs/index";
 import { shieldsBlueprintIndex } from "./blueprints/shields/index";
 import { legsBlueprintIndex } from "./blueprints/legs/index";
+import { accessoriesBlueprintsIndex } from "./blueprints/accessories/index";
 
 export const itemsBlueprintIndex: IBlueprint = {
   ...bodiesBlueprintsIndex,
@@ -41,4 +42,5 @@ export const itemsBlueprintIndex: IBlueprint = {
   ...staffsBlueprintIndex,
   ...shieldsBlueprintIndex,
   ...legsBlueprintIndex,
+  ...accessoriesBlueprintsIndex,
 };
