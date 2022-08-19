@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { ItemView } from "../ItemView";
@@ -36,11 +36,17 @@ describe("ItemView.ts", () => {
   it("should properly remove item x, y and scene after calling the method removeItemFromMap", async () => {
     await itemView.removeItemFromMap(testItem);
 
+    const item = await Item.findById(testItem.id);
+
+    if (!item) {
+      throw new Error("Item not found.");
+    }
+
     expect(spyWarnCharactersAboutItemRemovalInView).toHaveBeenCalled();
 
-    expect(testItem.x).toBe(undefined);
-    expect(testItem.y).toBe(undefined);
-    expect(testItem.scene).toBe(undefined);
+    expect(item.x).toBe(null);
+    expect(item.y).toBe(null);
+    expect(item.scene).toBe(null);
   });
 
   it("should get one item after calling the method getItemsInCharacterView", async () => {
