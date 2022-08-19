@@ -13,18 +13,18 @@ export class ItemContainerHelper {
       }
 
       if (item.name.includes("body")) {
-        return "loot";
+        return ItemContainerType.Loot;
       }
 
       if (item.x && item.y && item.scene) {
-        return "map-container";
+        return ItemContainerType.MapContainer;
       }
 
       const owner = (await Character.findById(item.owner)) as unknown as ICharacter;
       const inventory = await owner?.inventory;
 
       if (item.id.toString() === inventory.id.toString()) {
-        return "inventory";
+        return ItemContainerType.Inventory;
       }
     } catch (error) {
       console.error(error);
