@@ -3,6 +3,7 @@ import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { container } from "@providers/inversify/container";
 import { ItemView } from "@providers/item/ItemView";
 import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
+import { UpdateQuery } from "mongoose";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { ItemContainer } from "./ItemContainerModel";
 
@@ -97,7 +98,7 @@ const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"
   }
 };
 
-itemSchema.post("updateOne", async function (this: IItem, teste: any) {
+itemSchema.post("updateOne", async function (this: UpdateQuery<IItem>) {
   const updatedItem = { ...this, ...this._update.$set };
   await warnAboutItemChanges(updatedItem, "changes");
 });
