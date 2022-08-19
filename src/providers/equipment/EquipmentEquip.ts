@@ -21,7 +21,8 @@ export class EquipmentEquip {
   public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<void> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
 
-    const itemContainer = (await ItemContainer.findById(itemContainerId)) as IItemContainer;
+    const equipItemContainer = this.checkIfEquipItemContainer(item, itemContainerId);
+    const itemContainer = await this.getItemContainer(item, itemContainerId);
 
     const equipment = await Equipment.findById(character.equipment);
 
@@ -29,7 +30,7 @@ export class EquipmentEquip {
       return;
     }
 
-    const isEquipValid = this.validateEquip(item, character, itemContainer, itemId);
+    const isEquipValid = this.validateEquip(item, character, itemContainer, itemId, equipItemContainer);
 
     if (!isEquipValid) {
       return;
@@ -71,7 +72,30 @@ export class EquipmentEquip {
     }
   }
 
-  private validateEquip(item: IItem, character: ICharacter, itemContainer: IItemContainer, itemId: string): boolean {
+  private checkIfEquipItemContainer(item: IItem, itemContainerId: string): boolean {
+    if (item.isItemContainer && itemContainerId === "") {
+      return true;
+    }
+    return false;
+  }
+
+  private async getItemContainer(item: IItem, itemContainerId: string): Promise<IItemContainer> {
+    if (item.isItemContainer && itemContainerId === "") {
+      return (await ItemContainer.findById(item.itemContainer)) as IItemContainer;
+    }
+
+    const itemContainer = (await ItemContainer.findById(itemContainerId)) as IItemContainer;
+
+    return itemContainer;
+  }
+
+  private validateEquip(
+    item: IItem,
+    character: ICharacter,
+    itemContainer: IItemContainer,
+    itemId: string,
+    equipItemContainer: boolean
+  ): boolean {
     if (!item) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "Item not found.",
@@ -88,11 +112,14 @@ export class EquipmentEquip {
       return false;
     }
 
-    let userHasItem = false;
-    for (const slot in itemContainer.slots) {
-      if (itemContainer.slots[slot] && itemContainer.slots[slot]._id.toString() === itemId.toString()) {
-        userHasItem = true;
-        break;
+    let userHasItem = equipItemContainer || false;
+
+    if (!equipItemContainer) {
+      for (const slot in itemContainer.slots) {
+        if (itemContainer.slots[slot] && itemContainer.slots[slot]._id.toString() === itemId.toString()) {
+          userHasItem = true;
+          break;
+        }
       }
     }
 

@@ -29,10 +29,16 @@ export class ItemView {
     await this.warnCharactersAboutItemRemovalInView(item, item.x, item.y, item.scene);
 
     // unset x, y, and scene from item model
-    item.x = undefined;
-    item.y = undefined;
-    item.scene = undefined;
-    await item.save();
+    await Item.updateOne(
+      {
+        _id: item.id,
+      },
+      {
+        x: undefined,
+        y: undefined,
+        scene: undefined,
+      }
+    );
   }
 
   public async warnCharactersAboutItemRemovalInView(item: IItem, x: number, y: number, scene: string): Promise<void> {
