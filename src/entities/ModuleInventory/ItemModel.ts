@@ -97,8 +97,9 @@ const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"
   }
 };
 
-itemSchema.post("updateOne", async function (this: IItem) {
-  await warnAboutItemChanges(this, "changes");
+itemSchema.post("updateOne", async function (this: IItem, teste: any) {
+  const updatedItem = { ...this, ...this._update.$set };
+  await warnAboutItemChanges(updatedItem, "changes");
 });
 
 itemSchema.post("save", async function (this: IItem) {

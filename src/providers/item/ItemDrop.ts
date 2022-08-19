@@ -74,13 +74,19 @@ export class ItemDrop {
           inventory: inventory,
         };
 
-        this.updateInventoryCharacter(payloadUpdate, character);
-
         // if itemDrop toPosition has x and y, then drop item to that position in the map
-        dropItem.x = itemDrop.x;
-        dropItem.y = itemDrop.y;
-        dropItem.scene = itemDrop.scene;
-        await dropItem.save();
+        await Item.updateOne(
+          {
+            _id: dropItem._id,
+          },
+          {
+            x: itemDrop.x,
+            y: itemDrop.y,
+            scene: itemDrop.scene,
+          }
+        );
+
+        this.updateInventoryCharacter(payloadUpdate, character);
 
         return true;
       } catch (err) {
