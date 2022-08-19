@@ -15,6 +15,7 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { EquipmentEquip } from "../equipment/EquipmentEquip";
 import { ItemView } from "./ItemView";
 
 @provide(ItemPickup)
@@ -23,20 +24,34 @@ export class ItemPickup {
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
     private characterWeight: CharacterWeight,
-    private itemView: ItemView
+    private itemView: ItemView,
+    private equipmentEquip: EquipmentEquip
   ) {}
 
   public async performItemPickup(itemPickup: IItemPickup, character: ICharacter): Promise<Boolean> {
-    const isPickupValid = await this.isItemPickupValid(itemPickup, character);
+    const pickupItem = (await Item.findById(itemPickup.itemId)) as unknown as IItem;
+
+    if (!pickupItem) {
+      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
+      return false;
+    }
+
+    const inventario = await character.inventory;
+    const equipItemContainer = pickupItem.isItemContainer && inventario === null;
+
+    const isPickupValid = await this.isItemPickupValid(itemPickup, character, equipItemContainer);
 
     if (!isPickupValid) {
       return false;
     }
 
-    const pickupItem = (await Item.findById(itemPickup.itemId)) as unknown as IItem;
-
     if (pickupItem) {
-      const isItemAdded = await this.addItemToInventory(pickupItem, character, itemPickup.toContainerId);
+      const isItemAdded = await this.addItemToInventory(
+        pickupItem,
+        character,
+        itemPickup.toContainerId,
+        equipItemContainer
+      );
       if (!isItemAdded) return false;
 
       // whenever a new item is added, we need to update the character weight
@@ -50,23 +65,24 @@ export class ItemPickup {
 
       // send update inventory event to user
 
-      const updatedContainer = (await ItemContainer.findById(itemPickup.toContainerId)) as unknown as IItemContainer;
-      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-        equipment: {} as unknown as IEquipmentSet,
-        inventory: {
-          _id: updatedContainer._id,
-          parentItem: updatedContainer!.parentItem.toString(),
-          owner: updatedContainer?.owner?.toString() || character.name,
-          name: updatedContainer?.name,
-          slotQty: updatedContainer!.slotQty,
-          slots: updatedContainer?.slots,
-          allowedItemTypes: this.getAllowedItemTypes(),
-          isEmpty: updatedContainer!.isEmpty,
-        },
-      };
+      if (!equipItemContainer) {
+        const updatedContainer = (await ItemContainer.findById(itemPickup.toContainerId)) as unknown as IItemContainer;
+        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+          equipment: {} as unknown as IEquipmentSet,
+          inventory: {
+            _id: updatedContainer._id,
+            parentItem: updatedContainer!.parentItem.toString(),
+            owner: updatedContainer?.owner?.toString() || character.name,
+            name: updatedContainer?.name,
+            slotQty: updatedContainer!.slotQty,
+            slots: updatedContainer?.slots,
+            allowedItemTypes: this.getAllowedItemTypes(),
+            isEmpty: updatedContainer!.isEmpty,
+          },
+        };
 
-      this.updateInventoryCharacter(payloadUpdate, character);
-
+        this.updateInventoryCharacter(payloadUpdate, character);
+      }
       return true;
     }
 
@@ -84,15 +100,27 @@ export class ItemPickup {
   /**
    * This method will add or stack a item to the character inventory
    */
-  private async addItemToInventory(item: IItem, character: ICharacter, toContainerId: string): Promise<Boolean> {
+  private async addItemToInventory(
+    item: IItem,
+    character: ICharacter,
+    toContainerId: string,
+    equipItemContainer: boolean
+  ): Promise<Boolean> {
     const selectedItem = (await Item.findById(item.id)) as IItem;
-    const targetContainer = (await ItemContainer.findById(toContainerId)) as unknown as IItemContainer;
 
     if (!selectedItem) {
       console.log("addItemToInventory: Item not found");
       this.sendGenericErrorMessage(character);
       return false;
     }
+
+    // Equip Item Container
+    if (equipItemContainer) {
+      await this.equipmentEquip.equip(character, item.id, "");
+      return true;
+    }
+
+    const targetContainer = (await ItemContainer.findById(toContainerId)) as unknown as IItemContainer;
 
     if (!targetContainer) {
       console.log("addItemToInventory: Character container not found");
@@ -200,7 +228,11 @@ export class ItemPickup {
     return false;
   }
 
-  private async isItemPickupValid(itemPickup: IItemPickup, character: ICharacter): Promise<Boolean> {
+  private async isItemPickupValid(
+    itemPickup: IItemPickup,
+    character: ICharacter,
+    equipItemContainer: boolean
+  ): Promise<Boolean> {
     const item = await Item.findById(itemPickup.itemId);
 
     if (!item) {
@@ -212,7 +244,7 @@ export class ItemPickup {
 
     const inventory = await character.inventory;
 
-    if (!inventory) {
+    if (!inventory && !equipItemContainer) {
       console.log("Sorry, you must have a bag or backpack to pick up this item.");
       this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to pick up this item.");
       return false;

@@ -32,6 +32,14 @@ export class EquipmentUnequip {
       return;
     }
 
+    if (item && item.isItemContainer) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "It's not possible to unequip item container!",
+        type: "error",
+      });
+      return;
+    }
+
     if (!itemContainer) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "Container not found.",
