@@ -21,8 +21,6 @@ export class EquipmentEquip {
   public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<void> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
 
-    const inventory = (await character.inventory) as unknown as IItem;
-
     const itemContainer = (await ItemContainer.findById(itemContainerId)) as IItemContainer;
 
     const equipment = await Equipment.findById(character.equipment);
@@ -31,7 +29,7 @@ export class EquipmentEquip {
       return;
     }
 
-    const isEquipValid = this.validateEquip(item, character, itemContainer, inventory, itemId);
+    const isEquipValid = this.validateEquip(item, character, itemContainer, itemId);
 
     if (!isEquipValid) {
       return;
@@ -73,13 +71,7 @@ export class EquipmentEquip {
     }
   }
 
-  private validateEquip(
-    item: IItem,
-    character: ICharacter,
-    itemContainer: IItemContainer,
-    inventory: IItem,
-    itemId: string
-  ): boolean {
+  private validateEquip(item: IItem, character: ICharacter, itemContainer: IItemContainer, itemId: string): boolean {
     if (!item) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "Item not found.",
@@ -91,14 +83,6 @@ export class EquipmentEquip {
     if (!itemContainer) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "Container not found.",
-        type: "error",
-      });
-      return false;
-    }
-
-    if (!inventory) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Inventory is empty.",
         type: "error",
       });
       return false;
