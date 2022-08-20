@@ -13,6 +13,7 @@ const questSchema = createLeanSchema(
   {
     npcId: Type.objectId({ ref: "NPC" }),
     title: Type.string({ required: true }),
+    key: Type.string({ required: true }),
     description: Type.string({ required: true }),
     rewards: Type.array().of(Type.objectId({ ref: "QuestReward" })),
     objectives: Type.array().of(Type.objectId()),

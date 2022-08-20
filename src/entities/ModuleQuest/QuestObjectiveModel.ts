@@ -6,7 +6,7 @@ import { QuestType, QuestStatus } from "@rpg-engine/shared";
 
 const questObjectiveKillSchema = createLeanSchema(
   {
-    killCount: Type.number({ required: true }),
+    killCount: Type.number({ required: true, default: 0 }),
     killCountTarget: Type.number({ required: true }),
     creatureKeys: Type.array().of(Type.string()),
     type: Type.string({ required: true, default: QuestType.Kill }),

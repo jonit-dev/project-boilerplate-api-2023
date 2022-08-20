@@ -3,11 +3,13 @@ import { IQuestObjectiveKill } from "@entities/ModuleQuest/QuestObjectiveModel";
 import { IQuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { AccessoriesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { QuestsBlueprint } from "@providers/quest/data/questsBlueprintTypes";
 import { IQuestObjectiveInteraction } from "@rpg-engine/shared";
 
 export const questMock: Partial<IQuest> = {
   title: "Example quest",
   description: "This is the example quest used for tests",
+  key: QuestsBlueprint.Example,
 };
 
 export const questRewardsMock: Partial<IQuestReward> = {

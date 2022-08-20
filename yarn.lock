@@ -1694,10 +1694,10 @@
   resolved "https://registry.yarnpkg.com/@redis/time-series/-/time-series-1.0.3.tgz#4cfca8e564228c0bddcdf4418cba60c20b224ac4"
   integrity sha512-OFp0q4SGrTH0Mruf6oFsHGea58u8vS/iI5+NpYdicaM+7BgqBZH8FFvNZ8rYYLrUO/QRqMq72NpXmxLVNcdmjA==
 
-"@rpg-engine/shared@^0.3.99":
-  version "0.3.99"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.3.99.tgz#163445abc213d420047abff1c7a6509db7a6e2c3"
-  integrity sha512-Kjc/3+TqEHoyrGPnxW2jT/75uHoG7s71ei0pjvoxfrtlPmWlRuOJawSFsSiwU4ifNQHnkvRINe5CnqAx2XpZbw==
+"@rpg-engine/shared@^0.4.0":
+  version "0.4.11"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.4.11.tgz#1b92f625dd415a48f62e35cc9234ff17b0e88817"
+  integrity sha512-cJtcPPTsF789m6trk8QPlANtizm4tSnowsuK/WoFbVvFprkI5rY9y1SpPvsboSPyjK/zrkDEn/wvBowW2Yt5ew==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
