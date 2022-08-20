@@ -21,13 +21,13 @@ export class NPCSeeder {
       this.setInitialNPCPositionAsSolid(NPCData);
 
       if (!npcFound) {
-        console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
+        // console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
 
         await this.createNewNPCWithSkills(NPCData);
       } else {
         // if npc already exists, restart initial position
 
-        console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
+        // console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
 
         await this.resetNPC(npcFound);
 
