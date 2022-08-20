@@ -9,6 +9,7 @@ import {
   NPCMovementType,
   NPCPathOrientation,
   NPCTargetType,
+  QuestStatus,
   TypeHelper,
 } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -172,8 +173,13 @@ npcSchema.virtual("xpPerDamage").get(function (this: INPC) {
 });
 
 npcSchema.virtual("hasQuest").get(async function (this: INPC) {
-  const npcQuests = await Quest.find({ npcId: this._id }).limit(1);
-  return !!npcQuests.length;
+  const npcQuests = await Quest.find({ npcId: this._id });
+  for (const quest of npcQuests) {
+    if (await quest.hasStatus(QuestStatus.Pending)) {
+      return true;
+    }
+  }
+  return false;
 });
 
 npcSchema.post("remove", async function (this: INPC) {
