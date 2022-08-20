@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -45,40 +45,45 @@ export class BattleNetworkInitTargeting {
             target = await NPC.findOne({
               _id: data.targetId,
             });
-
-            if (!target) {
-              this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-                character.channelId!,
-                BattleSocketEvents.CancelTargeting,
-                {
-                  targetId: data.targetId,
-                  type: data.type,
-                  reason: "Invalid target.",
-                }
-              );
-              throw new Error(`Failed to set target on NPC ${data.targetId}`);
-            }
-
-            const isValidNPCTarget = this.isValidNPCTarget(target, character);
-
-            if (!isValidNPCTarget.isValid) {
-              console.log(
-                `${character.name} is trying to set a target to ${target.key} but it's not valid. Reason: ${isValidNPCTarget.reason}`
-              );
-              this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-                character.channelId!,
-                BattleSocketEvents.CancelTargeting,
-                {
-                  targetId: data.targetId,
-                  type: data.type,
-                  reason: isValidNPCTarget.reason,
-                }
-              );
-            } else {
-              await this.characterSetTargeting(character, target, data.type);
-            }
           }
 
+          if (data.type === EntityType.Character) {
+            target = await Character.findOne({
+              _id: data.targetId,
+            });
+          }
+
+          if (!target) {
+            this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+              character.channelId!,
+              BattleSocketEvents.CancelTargeting,
+              {
+                targetId: data.targetId,
+                type: data.type,
+                reason: "Invalid target.",
+              }
+            );
+            throw new Error(`Failed to set target on NPC ${data.targetId}`);
+          }
+
+          const isValidTarget = this.isValidTarget(target, character);
+
+          if (!isValidTarget.isValid) {
+            console.log(
+              `${character.name} is trying to set a target to ${target.name} but it's not valid. Reason: ${isValidTarget.reason}`
+            );
+            this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+              character.channelId!,
+              BattleSocketEvents.CancelTargeting,
+              {
+                targetId: data.targetId,
+                type: data.type,
+                reason: isValidTarget.reason,
+              }
+            );
+          } else {
+            await this.characterSetTargeting(character, target, data.type);
+          }
           // validate if character actually can set this target
         } catch (error) {
           console.error(error);
@@ -99,10 +104,10 @@ export class BattleNetworkInitTargeting {
     this.battleCharacterManager.onHandleCharacterBattleLoop(character, target);
   }
 
-  private isValidNPCTarget(target: INPC, character: ICharacter): ITargetValidation {
+  private isValidTarget(target: INPC | ICharacter | null, character: ICharacter): ITargetValidation {
     // check if target is within character range.
 
-    if (target.health === 0) {
+    if (target!.health === 0) {
       return {
         isValid: false,
         reason: "You cannot attack a target that's already dead.",
@@ -116,18 +121,21 @@ export class BattleNetworkInitTargeting {
       };
     }
 
-    if (target.scene !== character.scene) {
+    if (target!.scene !== character.scene) {
       return {
         isValid: false,
         reason: "Your target is not on the same scene.",
       };
     }
 
-    if (target.alignment === NPCAlignment.Friendly) {
-      return {
-        isValid: false,
-        reason: "You cannot attack this entity.",
-      };
+    if (target?.type === EntityType.NPC) {
+      const isNpcValid = this.isValidNPCTarget(target as unknown as INPC);
+      if (!isNpcValid) {
+        return {
+          isValid: false,
+          reason: "You cannot attack this entity.",
+        };
+      }
     }
 
     const isCharacterOnline = character.isOnline;
@@ -144,8 +152,8 @@ export class BattleNetworkInitTargeting {
     const isUnderRange = this.movementHelper.isUnderRange(
       character.x,
       character.y,
-      target.x,
-      target.y,
+      target!.x,
+      target!.y,
       SOCKET_TRANSMISSION_ZONE_WIDTH / GRID_WIDTH
     );
 
@@ -161,7 +169,15 @@ export class BattleNetworkInitTargeting {
     };
   }
 
+  private isValidNPCTarget(target: INPC): boolean {
+    if (target.alignment === NPCAlignment.Friendly) {
+      return false;
+    }
+    return true;
+  }
+
   // private isValidCharacterTarget(target: ICharacter, character): boolean {
   //   // TODO: implement it later, in PVP system
+  //   return true;
   // }
 }
