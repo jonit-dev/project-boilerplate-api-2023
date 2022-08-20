@@ -146,7 +146,7 @@ export class QuestSystem {
     // check for each objective if the npc key is the correspondiong npc
     // If many cases, only update the first one
     for (const obj of objectives) {
-      if (obj.targetNPCkey! === npcKey) {
+      if (obj.targetNPCkey! === npcKey.split("-")[0]) {
         obj.status = QuestStatus.Completed;
         await obj.save();
         return (await Quest.findById(obj.quest)) as IQuestModel;
