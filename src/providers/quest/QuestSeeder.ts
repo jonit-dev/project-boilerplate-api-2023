@@ -23,7 +23,7 @@ export class QuestSeeder {
       console.log("🤷 No Quest data to seed");
     }
 
-    for (const [_key, QuestData] of questSeedData.entries()) {
+    for (const [, QuestData] of questSeedData.entries()) {
       const questFound = (await Quest.findOne({
         npcId: QuestData.npcId,
         key: QuestData.key,

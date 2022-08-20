@@ -84,9 +84,9 @@ describe("ItemPickup.ts", () => {
       throw new Error("Failed to find item after pickup!");
     }
 
-    expect(item.x).toBeUndefined();
-    expect(item.y).toBeUndefined();
-    expect(item.scene).toBeUndefined();
+    expect(item.x).toBeNull();
+    expect(item.y).toBeNull();
+    expect(item.scene).toBeNull();
 
     const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
 

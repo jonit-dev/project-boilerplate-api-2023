@@ -4,7 +4,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { IItemContainer } from "@rpg-engine/shared";
+import { IItemContainer, ItemContainerType } from "@rpg-engine/shared";
 import { ItemContainerHelper } from "../ItemContainerHelper";
 
 describe("ItemContainerHelper", () => {
@@ -24,7 +24,7 @@ describe("ItemContainerHelper", () => {
       const inventoryItemContainer = await ItemContainer.findById(inventory.itemContainer);
 
       const type = await itemContainerHelper.getType(inventoryItemContainer as unknown as IItemContainer);
-      expect(type).toBe("inventory");
+      expect(type).toBe(ItemContainerType.Inventory);
     });
 
     it("should properly detect a loot itemContainer", async () => {
@@ -49,7 +49,7 @@ describe("ItemContainerHelper", () => {
 
       const type = await itemContainerHelper.getType(lootContainer as unknown as IItemContainer);
 
-      expect(type).toBe("loot");
+      expect(type).toBe(ItemContainerType.Loot);
     });
 
     it("should properly detect a map-container itemContainer type", async () => {
@@ -66,7 +66,7 @@ describe("ItemContainerHelper", () => {
 
       const type = await itemContainerHelper.getType(mapContainer as unknown as IItemContainer);
 
-      expect(type).toBe("map-container");
+      expect(type).toBe(ItemContainerType.MapContainer);
     });
   });
 
