@@ -64,6 +64,60 @@ describe("MathHelper.ts", () => {
     const crossedGridPointsHorizontalLine = mathHelper.getCrossedGridPoints({ x: 0, y: 5 }, { x: 0, y: 0 });
     expect(crossedGridPointsHorizontalLine).toEqual(expectedResults.horizontalLine);
   });
+
+  it("should get an array of the circundating grid points", () => {
+    const deltaOne = 1;
+    const deltaTwo = 2;
+    const expectedResults = {
+      deltaOne: [
+        { x: 0, y: 2 },
+        { x: 0, y: 1 },
+        { x: 0, y: 0 },
+        { x: 1, y: 2 },
+        { x: 1, y: 0 },
+        { x: 2, y: 2 },
+        { x: 2, y: 1 },
+        { x: 2, y: 0 },
+      ],
+      noNegatives: [
+        { x: 0, y: 1 },
+        { x: 1, y: 1 },
+        { x: 1, y: 0 },
+      ],
+      deltaTwo: [
+        { x: 0, y: 4 },
+        { x: 0, y: 3 },
+        { x: 0, y: 2 },
+        { x: 0, y: 1 },
+        { x: 0, y: 0 },
+        { x: 1, y: 4 },
+        { x: 1, y: 3 },
+        { x: 1, y: 2 },
+        { x: 1, y: 1 },
+        { x: 1, y: 0 },
+        { x: 2, y: 4 },
+        { x: 2, y: 3 },
+        { x: 2, y: 1 },
+        { x: 2, y: 0 },
+        { x: 3, y: 4 },
+        { x: 3, y: 3 },
+        { x: 3, y: 2 },
+        { x: 3, y: 1 },
+        { x: 3, y: 0 },
+        { x: 4, y: 4 },
+        { x: 4, y: 3 },
+        { x: 4, y: 2 },
+        { x: 4, y: 1 },
+        { x: 4, y: 0 },
+      ],
+    };
+    const circundatingPoints = mathHelper.getCircundatingGridPoints({ x: 1, y: 1 }, deltaOne);
+    expect(circundatingPoints).toEqual(expectedResults.deltaOne);
+    const noNegativePoints = mathHelper.getCircundatingGridPoints({ x: 0, y: 0 }, deltaOne);
+    expect(noNegativePoints).toEqual(expectedResults.noNegatives);
+    const circundatingPoints2 = mathHelper.getCircundatingGridPoints({ x: 2, y: 2 }, deltaTwo);
+    expect(circundatingPoints2).toEqual(expectedResults.deltaTwo);
+  });
 });
 
 // your code here

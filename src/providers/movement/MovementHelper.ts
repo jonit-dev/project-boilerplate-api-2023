@@ -15,7 +15,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import PF from "pathfinding";
-interface IPosition {
+export interface IPosition {
   x: number;
   y: number;
 }

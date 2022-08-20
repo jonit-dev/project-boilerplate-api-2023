@@ -41,7 +41,7 @@ questSchema.virtual("objectivesDetails").get(async function (this: IQuest) {
     return killObj || [];
   }
 
-  return killObj.concat(interactionObj);
+  return killObj.push(...interactionObj);
 });
 
 questSchema.methods.hasStatus = async function (this: IQuest, status: QuestStatus): Promise<boolean> {
