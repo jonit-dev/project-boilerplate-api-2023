@@ -49,8 +49,11 @@ export class UnitTestHelper {
   private mongoServer: MongoMemoryServer;
 
   public async initializeMapLoader(): Promise<void> {
-    // @ts-ignore
-    jest.spyOn(mapLoader, "getMapNames").mockImplementation(() => ["unit-test-map.json", "Example.json"]);
+    jest
+      // @ts-ignore
+      .spyOn(mapLoader, "getMapNames")
+      // @ts-ignore
+      .mockImplementation(() => ["unit-test-map.json", "Example.json", "unit-test-map-negative-coordinate.json"]);
 
     await mapLoader.init();
   }
