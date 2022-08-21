@@ -26,6 +26,7 @@ export class GridManager {
 
     for (let gridX = 0; gridX < width; gridX++) {
       for (let gridY = 0; gridY < height; gridY++) {
+        // isTileSolid will get the ge_collide property directly from the json file, thats why we should use "raw coordinates", in other words, we should subtract the tileset!
         const isSolid = this.mapSolids.isTileSolid(map, gridX - gridOffsetX, gridY - gridOffsetY, MapLayers.Character);
 
         this.setWalkable(map, gridX, gridY, !isSolid);
