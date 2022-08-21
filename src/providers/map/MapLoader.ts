@@ -6,8 +6,8 @@ import fs from "fs";
 import { provide } from "inversify-binding-decorators";
 import md5File from "md5-file";
 import PF from "pathfinding";
+import { GridManager } from "./GridManager";
 import { createZipMap } from "./MapCompressionHelper";
-import { MapObjectsLoader } from "./MapObjectsLoader";
 import { MapSolids } from "./MapSolids";
 
 type MapObject = {
@@ -19,7 +19,7 @@ type MapObject = {
 export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
   public static grids: Map<string, PF.Grid> = new Map();
-  constructor(private mapSolidsManager: MapSolids, private mapObjectsLoader: MapObjectsLoader) {}
+  constructor(private mapSolidsManager: MapSolids, private gridManager: GridManager) {}
 
   public async init(): Promise<void> {
     // get all map names

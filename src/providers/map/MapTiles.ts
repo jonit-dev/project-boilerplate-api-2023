@@ -20,7 +20,12 @@ export class MapTiles {
     return [chunk.x, chunk.y];
   }
 
-  public getMapWidthHeight(map: string, layerName: MapLayers): { width: number; height: number } {
+  public getMapWidthHeight(
+    map: string,
+    layerName: MapLayers,
+    gridOffsetX: number,
+    gridOffsetY: number
+  ): { width: number; height: number } {
     const layer = this.getLayer(map, layerName);
 
     if (!layer) {
@@ -34,8 +39,8 @@ export class MapTiles {
     }
 
     return {
-      width: chunk.x + chunk.width,
-      height: chunk.y + chunk.height,
+      width: chunk.x + chunk.width + gridOffsetX,
+      height: chunk.y + chunk.height + gridOffsetY,
     };
   }
 
