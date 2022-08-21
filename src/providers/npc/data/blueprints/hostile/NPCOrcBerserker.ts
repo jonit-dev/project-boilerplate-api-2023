@@ -2,70 +2,60 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
+  ArmorsBlueprint,
+  AxesBlueprint,
   BootsBlueprint,
-  FoodsBlueprint,
   GlovesBlueprint,
-  LegsBlueprint,
-  PotionsBlueprint,
-  SpearsBlueprint,
-  SwordBlueprint,
+  HelmetBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
-
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcMinotaur = {
+export const npcOrcBerserker = {
   ...generateMoveTowardsMovement(),
-  name: "Minotaur",
-  key: HostileNPCsBlueprint.Minotaur,
-  textureKey: HostileNPCsBlueprint.Minotaur,
+  name: "Orc Berserker",
+  key: HostileNPCsBlueprint.OrcBerserker,
+  textureKey: HostileNPCsBlueprint.OrcBerserker,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Fast,
+  speed: MovementSpeed.ExtraFast,
   skills: {
-    level: 8,
+    level: 12,
     strength: {
-      level: 5,
+      level: 10,
     },
     dexterity: {
-      level: 4,
-    },
-    resistance: {
-      level: 3,
+      level: 7,
     },
   },
   fleeOnLowHealth: true,
-  experience: 80 * EXP_RATIO,
+  experience: 60 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: SwordBlueprint.DragonsSword,
-      chance: 10,
+      itemBlueprintKey: BootsBlueprint.Boots,
+      chance: 30,
     },
     {
-      itemBlueprintKey: BootsBlueprint.CopperBoots,
-      chance: 20,
+      itemBlueprintKey: AxesBlueprint.Axe,
+      chance: 30,
     },
     {
-      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
-      chance: 5,
-    },
-    {
-      itemBlueprintKey: GlovesBlueprint.PlateGloves,
+      itemBlueprintKey: HelmetBlueprint.StuddedHelmet,
       chance: 15,
     },
     {
-      itemBlueprintKey: FoodsBlueprint.Fish,
-      chance: 30,
+      itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
+      chance: 15,
     },
     {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
+      itemBlueprintKey: BootsBlueprint.StuddedBoots,
+      chance: 15,
     },
     {
-      itemBlueprintKey: LegsBlueprint.StuddedLegs,
-      chance: 20,
+      itemBlueprintKey: GlovesBlueprint.StuddedGloves,
+      chance: 15,
     },
   ],
 } as Partial<INPC>;

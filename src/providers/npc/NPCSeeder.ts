@@ -102,7 +102,9 @@ export class NPCSeeder {
       // mark NPC initial position as solid on the map (pathfinding)
       MapLoader.grids.get(NPCData.scene)?.setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
     } catch (error) {
-      console.log(`❌ Failed to set NPC ${NPCData.key} initial position as solid on the map (${NPCData.scene}).`);
+      console.log(
+        `❌ Failed to set NPC ${NPCData.key} initial position (${NPCData.x}, ${NPCData.y}) as solid on the map (${NPCData.scene}).`
+      );
 
       console.error(error);
     }
