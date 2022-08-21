@@ -15,15 +15,6 @@ export class GridManager {
 
     const { width, height } = this.mapTiles.getMapWidthHeight(map, MapLayers.Ground, gridOffsetX, gridOffsetY);
 
-    const initialXY = this.mapTiles.getFirstXY(map, MapLayers.Ground);
-
-    if (!initialXY) {
-      throw new Error(`Could not find first xy for map: ${map}`);
-    }
-
-    const initialX = initialXY[0];
-    const initialY = initialXY[1];
-
     const newGrid = new PF.Grid(width, height);
 
     this.grids.set(map, newGrid);
@@ -32,8 +23,6 @@ export class GridManager {
     if (!grid) {
       throw new Error("❌Could not find grid for map: " + map);
     }
-
-    // loop through the grid and set walkable to false for all solids
 
     for (let gridX = 0; gridX < width; gridX++) {
       for (let gridY = 0; gridY < height; gridY++) {
