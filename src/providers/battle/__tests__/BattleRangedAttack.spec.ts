@@ -34,7 +34,10 @@ describe("BattleRangedAttack.spec.ts", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
-    testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
+    testNPC = await unitTestHelper.createMockNPC(
+      { attackType: EntityAttackType.Ranged, maxRangeAttack: 7 },
+      { hasSkills: true }
+    );
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasInventory: true,
@@ -64,39 +67,40 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   it("character does not have required ammo", async () => {
+    // @ts-ignore
     const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(
       await testCharacter.weapon,
       characterEquipment
     );
 
-    expect(rangedAttackAmmo).toEqual({});
+    expect(rangedAttackAmmo).toBeUndefined();
   });
 
   it("character carries required ammo in accesory slot", async () => {
     const arrowId = await equipArrowInAccessorySlot(characterEquipment);
-
+    // @ts-ignore
     const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(
       await testCharacter.weapon,
       characterEquipment
     );
 
-    expect(rangedAttackAmmo).not.toEqual({});
-    expect(rangedAttackAmmo.location).toEqual(ItemSlotType.Accessory);
-    expect(rangedAttackAmmo.id).toEqual(arrowId);
-    expect(rangedAttackAmmo.key).toEqual(BowsBlueprint.Arrow);
-    expect(rangedAttackAmmo.maxRange).toBeGreaterThan(1);
+    expect(rangedAttackAmmo).toBeDefined();
+    expect(rangedAttackAmmo!.location).toEqual(ItemSlotType.Accessory);
+    expect(rangedAttackAmmo!.id).toEqual(arrowId);
+    expect(rangedAttackAmmo!.key).toEqual(BowsBlueprint.Arrow);
+    expect(rangedAttackAmmo!.maxRange).toBeGreaterThan(1);
   });
 
   it("ammo should be consumed | Accessory slot", async () => {
     const arrowId = await equipArrowInAccessorySlot(characterEquipment);
 
     await battleRangedAttack.consumeAmmo(
-      characterEquipment,
       {
         location: ItemSlotType.Accessory,
         id: arrowId,
         key: BowsBlueprint.Arrow,
         maxRange: 2,
+        equipment: characterEquipment,
       },
       testCharacter
     );
@@ -109,12 +113,12 @@ describe("BattleRangedAttack.spec.ts", () => {
     const arrowId = await equipArrowInBackpackSlot(characterEquipment);
 
     await battleRangedAttack.consumeAmmo(
-      characterEquipment,
       {
         location: ItemSlotType.Inventory,
         id: arrowId,
         key: BowsBlueprint.Arrow,
         maxRange: 2,
+        equipment: characterEquipment,
       },
       testCharacter
     );
@@ -192,6 +196,11 @@ describe("BattleRangedAttack.spec.ts", () => {
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
     expect(hitTarget).toBeCalledTimes(3);
+  });
+
+  it("should hit a target | NPC ranged attack ", async () => {
+    await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
+    expect(hitTarget).toBeCalledTimes(4);
   });
 
   afterAll(async () => {

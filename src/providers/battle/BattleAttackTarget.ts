@@ -1,5 +1,4 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
@@ -53,52 +52,17 @@ export class BattleAttackTarget {
         }
 
         break;
+
       case EntityAttackType.Ranged:
-        // For now, ranged attack supported for characters only
-        if (attacker.type !== "Character") {
-          break;
-        }
+        const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
 
-        const character = attacker as ICharacter;
-        // Get equipment to validate if character has ranged attack ammo (bow -> arrow or spear)
-        const equipment = await Equipment.findById(character.equipment).populate("inventory").exec();
-        if (!equipment) {
-          throw new Error(`equipment not found for character ${character.id}`);
-        }
-
-        const rangedAttackAmmo = await this.battleRangedAttack.getAmmoForRangedAttack(
-          await character.weapon,
-          equipment
-        );
-        if (_.isEmpty(rangedAttackAmmo)) {
-          this.battleRangedAttack.sendNoAmmoEvent(character, target);
-          break;
-        }
-
-        // check if distance between attacker and target is
-        // within the ranged weapon max range
-        const isUnderDistanceRange = this.movementHelper.isUnderRange(
-          attacker.x,
-          attacker.y,
-          target.x,
-          target.y,
-          rangedAttackAmmo.maxRange
-        );
-
-        if (!isUnderDistanceRange) {
-          this.battleRangedAttack.sendNotInRangeEvent(character, target);
-          break;
-        }
-
-        // check if there's a solid in ranged attack trajectory
-        const solidInTrajectory = await this.battleRangedAttack.solidInTrajectory(attacker as ICharacter, target);
-
-        if (!solidInTrajectory) {
-          this.battleRangedAttack.sendRangedAttackEvent(attacker as ICharacter, target, rangedAttackAmmo);
+        if (rangedAttackParams) {
           await this.hitTarget(attacker, target);
-          await this.battleRangedAttack.consumeAmmo(equipment, rangedAttackAmmo, attacker as ICharacter);
-        } else {
-          this.battleRangedAttack.sendSolidInTrajectoryEvent(character, target);
+          this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+
+          if (attacker.type === "Character") {
+            await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
+          }
         }
         break;
     }
