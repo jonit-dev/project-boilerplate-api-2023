@@ -1,4 +1,5 @@
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { Quest } from "@entities/ModuleQuest/QuestModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import {
   CharacterClass,
@@ -8,6 +9,7 @@ import {
   NPCMovementType,
   NPCPathOrientation,
   NPCTargetType,
+  QuestStatus,
   TypeHelper,
 } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -149,6 +151,7 @@ const npcSchema = createLeanSchema(
       isAlive: boolean;
       type: string;
       xpPerDamage: number;
+      hasQuest: Promise<boolean>;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
@@ -167,6 +170,16 @@ npcSchema.virtual("type").get(function (this: INPC) {
 npcSchema.virtual("xpPerDamage").get(function (this: INPC) {
   // initial health = 100, xpPerDamage = experience / initial health
   return this.experience ? this.experience / 100 : 0;
+});
+
+npcSchema.virtual("hasQuest").get(async function (this: INPC) {
+  const npcQuests = await Quest.find({ npcId: this._id });
+  for (const quest of npcQuests) {
+    if (await quest.hasStatus(QuestStatus.Pending)) {
+      return true;
+    }
+  }
+  return false;
 });
 
 npcSchema.post("remove", async function (this: INPC) {

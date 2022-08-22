@@ -88,6 +88,7 @@ export class NPCMovement {
             maxHealth: npc.maxHealth,
             mana: npc.mana,
             maxMana: npc.maxMana,
+            hasQuest: await npc.hasQuest,
           }
         );
       }
