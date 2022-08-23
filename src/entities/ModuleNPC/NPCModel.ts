@@ -147,6 +147,7 @@ const npcSchema = createLeanSchema(
       chance: Type.number({ required: true, min: 0, max: 100 }),
       quantityRange: Type.array({ required: false, minItems: 2, maxItems: 2 }).of(Type.number()),
     }),
+    maxRangeAttack: Type.number({ required: false }),
     ...({} as {
       isAlive: boolean;
       type: string;
