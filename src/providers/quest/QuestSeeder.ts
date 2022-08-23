@@ -1,16 +1,16 @@
-import { provide } from "inversify-binding-decorators";
-import { QuestLoader } from "./QuestLoader";
 import { IQuest as IQuestModel, Quest } from "@entities/ModuleQuest/QuestModel";
-import { IQuest, QuestStatus, QuestType } from "@rpg-engine/shared";
 import {
   IQuestObjectiveInteraction,
   IQuestObjectiveKill,
   QuestObjectiveInteraction,
   QuestObjectiveKill,
 } from "@entities/ModuleQuest/QuestObjectiveModel";
-import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
+import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
+import { IQuest, QuestStatus, QuestType } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { QuestLoader } from "./QuestLoader";
 
 @provide(QuestSeeder)
 export class QuestSeeder {
@@ -30,7 +30,7 @@ export class QuestSeeder {
       })) as unknown as IQuestModel;
 
       if (!questFound) {
-        console.log(`🌱 Seeding database with Quest data for Quest with key: ${QuestData.key}`);
+        // console.log(`🌱 Seeding database with Quest data for Quest with key: ${QuestData.key}`);
 
         await this.createNewQuest(QuestData as IQuest);
       } else {
@@ -38,7 +38,7 @@ export class QuestSeeder {
         // and remove all existing quest records
         // in case someone started it
 
-        console.log(`🔎 Updating Quest ${QuestData.key} database data...`);
+        // console.log(`🔎 Updating Quest ${QuestData.key} database data...`);
         const isPending = await questFound.hasStatus(QuestStatus.Pending);
         if (!isPending) {
           const objectives = await questFound.objectivesDetails;

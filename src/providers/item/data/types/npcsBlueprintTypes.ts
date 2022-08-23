@@ -20,6 +20,9 @@ export enum HostileNPCsBlueprint {
   Ghost = "ghost",
   Minotaur = "minotaur",
   Orc = "orc",
+  OrcWarrior = "orc-warrior",
+  OrcBerserker = "orc-berserker",
+  OrcMage = "orc-mage",
   Rat = "rat",
   Skeleton = "skeleton",
   SkeletonKnight = "skeleton-knight",
@@ -29,5 +32,5 @@ export enum HostileNPCsBlueprint {
   Spider = "spider",
   Dwarf = "dwarf",
   DwarfGuard = "dwarf-guard",
-  RedDragon = "red-dragon",
+  RedDragon = "red-dragon-01",
 }

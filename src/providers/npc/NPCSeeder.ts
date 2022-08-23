@@ -21,13 +21,13 @@ export class NPCSeeder {
       this.setInitialNPCPositionAsSolid(NPCData);
 
       if (!npcFound) {
-        console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
+        // console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
 
         await this.createNewNPCWithSkills(NPCData);
       } else {
         // if npc already exists, restart initial position
 
-        console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
+        // console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
 
         await this.resetNPC(npcFound);
 
@@ -102,7 +102,9 @@ export class NPCSeeder {
       // mark NPC initial position as solid on the map (pathfinding)
       MapLoader.grids.get(NPCData.scene)?.setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
     } catch (error) {
-      console.log(`❌ Failed to set NPC ${NPCData.key} initial position as solid on the map (${NPCData.scene}).`);
+      console.log(
+        `❌ Failed to set NPC ${NPCData.key} initial position (${NPCData.x}, ${NPCData.y}) as solid on the map (${NPCData.scene}).`
+      );
 
       console.error(error);
     }

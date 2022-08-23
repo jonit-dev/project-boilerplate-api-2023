@@ -10,6 +10,7 @@ export class Seeder {
   constructor(private npcSeeder: NPCSeeder, private itemSeeder: ItemSeeder, private questSeeder: QuestSeeder) {}
 
   public async start(): Promise<void> {
+    console.time("🌱 Seeding");
     if (appEnv.general.ENV === EnvType.Development) {
       await this.npcSeeder.seed();
       await this.itemSeeder.seed();
@@ -22,5 +23,6 @@ export class Seeder {
         await this.questSeeder.seed();
       }
     }
+    console.timeEnd("🌱 Seeding");
   }
 }

@@ -14,14 +14,14 @@ export class ItemSeeder {
       const itemFound = (await Item.findOne({ tiledId: itemData.tiledId })) as unknown as IItem;
 
       if (!itemFound) {
-        console.log(`🌱 Seeding database with Item data for Item with key: ${itemData.key}`);
+        // console.log(`🌱 Seeding database with Item data for Item with key: ${itemData.key}`);
 
         const newItem = new Item({
           ...itemData,
         });
         await newItem.save();
       } else {
-        console.log(`🗡️ Updating Item ${itemData.key} database data...`);
+        // console.log(`🗡️ Updating Item ${itemData.key} database data...`);
 
         await Item.updateOne(
           {

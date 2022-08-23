@@ -4,6 +4,41 @@ import { MapLoader } from "./MapLoader";
 
 @provide(MapTiles)
 export class MapTiles {
+  public getFirstXY(map: string, layerName: MapLayers): [number, number] | undefined {
+    const layer = this.getLayer(map, layerName);
+
+    if (!layer) {
+      throw new Error(`Failed to find layer ${layerName}`);
+    }
+
+    const chunk = layer.chunks[0];
+
+    if (!chunk) {
+      return undefined;
+    }
+
+    return [chunk.x, chunk.y];
+  }
+
+  public getMapWidthHeight(map: string, layerName: MapLayers): { width: number; height: number } {
+    const layer = this.getLayer(map, layerName);
+
+    if (!layer) {
+      throw new Error(`Failed to find layer ${layerName}`);
+    }
+
+    const chunk = layer.chunks[layer.chunks.length - 1];
+
+    if (!chunk) {
+      throw new Error(`Failed to find chunk for layer ${layerName}`);
+    }
+
+    return {
+      width: chunk.x + chunk.width,
+      height: chunk.y + chunk.height,
+    };
+  }
+
   public isSolid(map: string, gridX: number, gridY: number, mapLayer: MapLayers): boolean {
     const layerName = TiledLayerNames[mapLayer];
 
