@@ -21,7 +21,7 @@ export const npcOrcWarrior = {
   textureKey: HostileNPCsBlueprint.OrcWarrior,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Slow,
+  speed: MovementSpeed.Fast,
   skills: {
     level: 5,
     strength: {
