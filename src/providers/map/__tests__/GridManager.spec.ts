@@ -115,7 +115,7 @@ describe("GridManager", () => {
     }
   });
 
-  it("should properly find the shortest path between 2 points", () => {
+  it("should properly find the shortest path between 2 points with negative coordinates", () => {
     const path = gridManager.findShortestPath("unit-test-map-negative-coordinate", -11, 10, -8, 12);
 
     if (!path) {
@@ -129,6 +129,20 @@ describe("GridManager", () => {
       [-9, 11],
       [-8, 11],
       [-8, 12],
+    ]);
+  });
+  it("should properly find the shortest path between 2 points WITHOUT negative coordinates", () => {
+    const path = gridManager.findShortestPath("unit-test-map-negative-coordinate", 15, 24, 17, 25);
+
+    if (!path) {
+      throw new Error("❌Could not find path");
+    }
+
+    expect(path).toEqual([
+      [15, 24],
+      [15, 25],
+      [16, 25],
+      [17, 25],
     ]);
   });
 
