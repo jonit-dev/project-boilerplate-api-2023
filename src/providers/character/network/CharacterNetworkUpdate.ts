@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { ItemView } from "@providers/item/ItemView";
-import { MapLoader } from "@providers/map/MapLoader";
+import { GridManager } from "@providers/map/GridManager";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -38,7 +38,8 @@ export class CharacterNetworkUpdate {
     private characterBan: CharacterBan,
     private objectHelper: DataStructureHelper,
     private mapTransition: MapTransition,
-    private npcManager: NPCManager
+    private npcManager: NPCManager,
+    private gridManager: GridManager
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -350,7 +351,7 @@ export class CharacterNetworkUpdate {
       // if character is moving, update the position
 
       // old position is now walkable
-      MapLoader.grids.get(map)?.setWalkableAt(ToGridX(data.x), ToGridY(data.y), true);
+      this.gridManager.setWalkable(map, ToGridX(data.x), ToGridY(data.y), true);
 
       updatedData.x = newX;
       updatedData.y = newY;
@@ -369,7 +370,7 @@ export class CharacterNetworkUpdate {
 
       // update our grid with solid information
 
-      MapLoader.grids.get(map)?.setWalkableAt(ToGridX(updatedData.x), ToGridY(updatedData.y), false);
+      this.gridManager.setWalkable(map, ToGridX(updatedData.x), ToGridY(updatedData.y), false);
     }
   }
 }

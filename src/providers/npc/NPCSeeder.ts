@@ -1,6 +1,6 @@
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { MapLoader } from "@providers/map/MapLoader";
+import { GridManager } from "@providers/map/GridManager";
 import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -8,7 +8,7 @@ import _ from "lodash";
 
 @provide(NPCSeeder)
 export class NPCSeeder {
-  constructor(private npcLoader: NPCLoader) {}
+  constructor(private npcLoader: NPCLoader, private gridManager: GridManager) {}
 
   public async seed(): Promise<void> {
     const npcSeedData = this.npcLoader.loadNPCSeedData();
@@ -100,7 +100,8 @@ export class NPCSeeder {
   private setInitialNPCPositionAsSolid(NPCData: INPCSeedData): void {
     try {
       // mark NPC initial position as solid on the map (pathfinding)
-      MapLoader.grids.get(NPCData.scene)?.setWalkableAt(ToGridX(NPCData.x), ToGridY(NPCData.y), false);
+
+      this.gridManager.setWalkable(NPCData.scene, ToGridX(NPCData.x), ToGridY(NPCData.y), false);
     } catch (error) {
       console.log(
         `❌ Failed to set NPC ${NPCData.key} initial position (${NPCData.x}, ${NPCData.y}) as solid on the map (${NPCData.scene}).`

@@ -34,26 +34,6 @@ describe("MapLoader.ts", () => {
     }
   });
 
-  it("should load the the grid", () => {
-    const mapNames = fs.readdirSync(STATIC_PATH + "/maps");
-
-    for (const mapFileName of mapNames) {
-      if (mapFileName.includes("_hash")) {
-        continue; // just cache files, skip!
-      }
-
-      if (!mapFileName.endsWith(".json")) {
-        continue;
-      }
-
-      const mapName = mapFileName.replace(".json", "");
-
-      const currentGrid = MapLoader.grids.get(mapName);
-
-      expect(currentGrid).toBeDefined();
-    }
-  });
-
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });

@@ -1,11 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { ItemView } from "@providers/item/ItemView";
-import { MapLoader } from "@providers/map/MapLoader";
+import { GridManager } from "@providers/map/GridManager";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
-import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
@@ -23,13 +22,13 @@ import { CharacterView } from "../CharacterView";
 export class CharacterNetworkCreate {
   constructor(
     private socketAuth: SocketAuth,
-    private socketConnection: SocketConnection,
     private playerView: CharacterView,
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
     private itemView: ItemView,
     private BattleNetworkStopTargeting: BattleNetworkStopTargeting,
-    private npcManager: NPCManager
+    private npcManager: NPCManager,
+    private gridManager: GridManager
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -62,7 +61,7 @@ export class CharacterNetworkCreate {
 
         const map = character.scene;
 
-        MapLoader.grids.get(map)?.setWalkableAt(ToGridX(character.x), ToGridY(character.y), false);
+        this.gridManager.setWalkable(map, ToGridX(character.x), ToGridY(character.y), false);
 
         await character.save();
 

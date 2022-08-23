@@ -1,7 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { MapLoader } from "@providers/map/MapLoader";
 import { MapSolids, SolidCheckStrategy } from "@providers/map/MapSolids";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MathHelper } from "@providers/math/MathHelper";
@@ -14,7 +13,6 @@ import {
   MapLayers,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import PF from "pathfinding";
 export interface IPosition {
   x: number;
   y: number;
@@ -89,38 +87,6 @@ export class MovementHelper {
 
     return false;
   };
-
-  public findShortestPath(
-    map: string,
-    startGridX: number,
-    startGridY: number,
-    endGridX: number,
-    endGridY: number
-  ): number[][] | undefined {
-    try {
-      const gridMap = MapLoader.grids.get(map);
-
-      if (!gridMap) {
-        throw new Error(`Failed to find grid for ${map}`);
-      } else {
-        const tempGrid = gridMap.clone(); // should be cloned, otherwise it will be modified by the finder!
-
-        const finder = new PF.AStarFinder();
-
-        //! According to the docs, both start and end point MUST be walkable, otherwise it will return [] and crash the pathfinding!
-        //! To avoid any issues in the main grid we'll just set this walkable in the tempGrid!
-
-        tempGrid.setWalkableAt(startGridX, startGridY, true);
-        tempGrid.setWalkableAt(endGridX, endGridY, true);
-
-        const path = finder.findPath(startGridX, startGridY, endGridX, endGridY, tempGrid!);
-
-        return path;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   public isMoving(startX: number, startY: number, endX: number, endY: number): boolean {
     const xDiff = endX - startX;
