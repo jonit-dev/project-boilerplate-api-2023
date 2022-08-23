@@ -56,7 +56,7 @@ export class GridManager {
     }
   }
 
-  public setWalkable(map: string, gridX: number, gridY: number, walkable: boolean): void {
+  public setWalkable(map: string, gridX: number, gridY: number, walkable: boolean, addOffset: boolean = false): void {
     try {
       const grid = this.grids.get(map);
 
@@ -64,7 +64,13 @@ export class GridManager {
         throw new Error("❌Could not find grid for map: " + map);
       }
 
-      grid.setWalkableAt(gridX, gridY, walkable);
+      if (addOffset) {
+        const { gridOffsetX, gridOffsetY } = this.getGridOffset(map)!;
+
+        grid.setWalkableAt(gridX + gridOffsetX, gridY + gridOffsetY, walkable);
+      } else {
+        grid.setWalkableAt(gridX, gridY, walkable);
+      }
     } catch (error) {
       console.log(`Failed to setWalkable=${walkable} for gridX ${gridX}, gridY ${gridY}`);
       console.error(error);
