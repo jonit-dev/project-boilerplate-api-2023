@@ -62,7 +62,7 @@ export class NPCMovement {
       }
 
       this.gridManager.setWalkable(map, ToGridX(oldX), ToGridY(oldY), true);
-      this.gridManager.setWalkable(map, ToGridX(oldX), ToGridY(oldY), false);
+      this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false);
 
       // warn nearby characters that the NPC moved;
 

@@ -53,7 +53,12 @@ export class UnitTestHelper {
       // @ts-ignore
       .spyOn(mapLoader, "getMapNames")
       // @ts-ignore
-      .mockImplementation(() => ["unit-test-map.json", "Example.json", "unit-test-map-negative-coordinate.json"]);
+      .mockImplementation(() => [
+        "unit-test-map.json",
+        "Example.json",
+        "unit-test-map-negative-coordinate.json",
+        "minotaur's-island.json",
+      ]);
 
     await mapLoader.init();
   }

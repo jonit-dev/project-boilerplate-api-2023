@@ -1358,40 +1358,6 @@
                 {
                  "class":"",
                  "height":16,
-                 "id":12,
-                 "name":"Deer",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"deer"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":416,
-                 "y":640
-                }, 
-                {
-                 "class":"",
-                 "height":16,
-                 "id":13,
-                 "name":"Deer",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"deer"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":816,
-                 "y":480
-                }, 
-                {
-                 "class":"",
-                 "height":16,
                  "id":14,
                  "name":"Wolf",
                  "properties":[
@@ -1409,40 +1375,6 @@
                 {
                  "class":"",
                  "height":16,
-                 "id":15,
-                 "name":"Wolf",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"wolf"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":944,
-                 "y":624
-                }, 
-                {
-                 "class":"",
-                 "height":16,
-                 "id":16,
-                 "name":"Wolf",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"wolf"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":352,
-                 "y":848
-                }, 
-                {
-                 "class":"",
-                 "height":16,
                  "id":19,
                  "name":"Dilur",
                  "properties":[
@@ -1450,6 +1382,11 @@
                          "name":"alignment",
                          "type":"string",
                          "value":"Friendly"
+                        }, 
+                        {
+                         "name":"currentMovementType",
+                         "type":"string",
+                         "value":"Random"
                         }, 
                         {
                          "name":"dialogText",
@@ -1462,9 +1399,24 @@
                          "value":"dwarf"
                         }, 
                         {
+                         "name":"maxRangeInGridCells",
+                         "type":"string",
+                         "value":"5"
+                        }, 
+                        {
                          "name":"name",
                          "type":"string",
                          "value":"Dilur"
+                        }, 
+                        {
+                         "name":"originalMovementType",
+                         "type":"string",
+                         "value":"Random"
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"string",
+                         "value":"2"
                         }],
                  "rotation":0,
                  "visible":true,

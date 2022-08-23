@@ -140,7 +140,7 @@ export class GridManager {
       tempGrid
     );
 
-    const newPath = path.map(([x, y]) => [x - (gridOffsetX || 0), y - (gridOffsetY || 0)]);
+    const newPath = path.map(([x, y]) => [x - (gridOffsetX ?? 0), y - (gridOffsetY ?? 0)]);
 
     return newPath;
   }

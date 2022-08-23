@@ -31,23 +31,12 @@ export class NPCMovementMoveTowards {
 
     const targetCharacter = await Character.findById(npc.targetCharacter).populate("skills");
 
-    let reachedTarget;
-    const reachedInitialPosition = npc.x === npc.initialX && npc.y === npc.initialY;
-
     if (targetCharacter) {
       await this.npcTarget.tryToClearOutOfRangeTargets(npc);
 
+      const reachedTarget = this.reachedTarget(npc, targetCharacter);
       if (npc.alignment === NPCAlignment.Hostile) {
         this.initBattleCycle(npc);
-      }
-
-      switch (npc.pathOrientation) {
-        case NPCPathOrientation.Forward:
-          reachedTarget = this.movementHelper.isUnderRange(npc.x, npc.y, targetCharacter.x, targetCharacter.y, 1);
-          break;
-        case NPCPathOrientation.Backward:
-          reachedTarget = reachedInitialPosition;
-          break;
       }
 
       // change movement to MoveWay (flee) if health is low!
@@ -62,7 +51,6 @@ export class NPCMovementMoveTowards {
       if (reachedTarget) {
         if (npc.pathOrientation === NPCPathOrientation.Backward) {
           // if NPC is coming back from being lured, reset its orientation to Forward
-
           npc.pathOrientation = NPCPathOrientation.Forward;
           await npc.save();
         }
@@ -106,10 +94,32 @@ export class NPCMovementMoveTowards {
       await this.npcTarget.tryToSetTarget(npc);
 
       // if not target is set and we're out of X and Y position, just move back
-      if (!npc.targetCharacter && !reachedInitialPosition && npc.pathOrientation === NPCPathOrientation.Backward) {
+      if (
+        !npc.targetCharacter &&
+        !this.reachedInitialPosition(npc) &&
+        npc.pathOrientation === NPCPathOrientation.Backward
+      ) {
         await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
       }
     }
+  }
+
+  private reachedInitialPosition(npc: INPC): boolean {
+    return npc.x === npc.initialX && npc.y === npc.initialY;
+  }
+
+  private reachedTarget(npc: INPC, targetCharacter: ICharacter): boolean {
+    const reachedInitialPosition = this.reachedInitialPosition(npc);
+
+    switch (npc.pathOrientation) {
+      case NPCPathOrientation.Forward:
+        return this.movementHelper.isUnderRange(npc.x, npc.y, targetCharacter.x, targetCharacter.y, 1);
+
+      case NPCPathOrientation.Backward:
+        return reachedInitialPosition;
+    }
+
+    return false;
   }
 
   private initBattleCycle(npc: INPC): void {
