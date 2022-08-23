@@ -32,5 +32,5 @@ export enum HostileNPCsBlueprint {
   Spider = "spider",
   Dwarf = "dwarf",
   DwarfGuard = "dwarf-guard",
-  RedDragon = "red-dragon",
+  RedDragon = "red-dragon-01",
 }
