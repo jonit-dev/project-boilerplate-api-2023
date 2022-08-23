@@ -44,7 +44,7 @@ export class BattleAttackTarget {
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
     switch (attacker?.attackType) {
-      case EntityAttackType.Melee:
+      case EntityAttackType.Melee: {
         const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1);
 
         if (isUnderMeleeRange) {
@@ -52,7 +52,7 @@ export class BattleAttackTarget {
         }
 
         break;
-
+      }
       case EntityAttackType.Ranged:
         const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
 
@@ -65,6 +65,28 @@ export class BattleAttackTarget {
           }
         }
         break;
+      // NPCs can have a hybrid attack type
+      // if closer enough, would be melee attack
+      // otherwise would be ranged attack
+      case EntityAttackType.MeleeRanged: {
+        if (attacker.type === "Character") {
+          throw new Error(`Character cannot have MeleeRanged hybrid attack type. Character id ${attacker.id}`);
+        }
+
+        const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1);
+
+        if (isUnderMeleeRange) {
+          await this.hitTarget(attacker, target);
+        } else {
+          const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
+
+          if (rangedAttackParams) {
+            await this.hitTarget(attacker, target);
+            this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+          }
+        }
+        break;
+      }
     }
 
     const isTargetClose = this.movementHelper.isUnderRange(

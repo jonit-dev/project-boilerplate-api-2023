@@ -203,6 +203,36 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(hitTarget).toBeCalledTimes(4);
   });
 
+  it("should hit a target | NPC hybrid attack type", async () => {
+    let testNPCHybridAttack = await unitTestHelper.createMockNPC(
+      { attackType: EntityAttackType.MeleeRanged, maxRangeAttack: 7 },
+      { hasSkills: true }
+    );
+    await testNPCHybridAttack.populate("skills").execPopulate();
+
+    testNPCHybridAttack.x = FromGridX(2);
+    testNPCHybridAttack.y = FromGridY(2);
+    await testNPCHybridAttack.save();
+
+    // Ranged attack
+    await battleAttackTarget.checkRangeAndAttack(testNPCHybridAttack, testCharacter);
+    expect(hitTarget).toBeCalledTimes(5);
+
+    // Melee attack (not passing maxRangeAttack field on purpose to check is doing melee attack)
+    testNPCHybridAttack = await unitTestHelper.createMockNPC(
+      { attackType: EntityAttackType.MeleeRanged },
+      { hasSkills: true }
+    );
+    await testNPCHybridAttack.populate("skills").execPopulate();
+
+    testNPCHybridAttack.x = FromGridX(4);
+    testNPCHybridAttack.y = FromGridY(3);
+    await testNPCHybridAttack.save();
+
+    await battleAttackTarget.checkRangeAndAttack(testNPCHybridAttack, testCharacter);
+    expect(hitTarget).toBeCalledTimes(6);
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
