@@ -1,8 +1,6 @@
-FROM node:16-slim
+FROM node:16
 
 RUN apt-get update
-
-RUN apt-get install g++ -y
 
 # Where our app will live in the container
 WORKDIR /usr/src/app
