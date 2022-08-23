@@ -204,32 +204,21 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   it("should hit a target | NPC hybrid attack type", async () => {
-    let testNPCHybridAttack = await unitTestHelper.createMockNPC(
-      { attackType: EntityAttackType.MeleeRanged, maxRangeAttack: 7 },
-      { hasSkills: true }
-    );
-    await testNPCHybridAttack.populate("skills").execPopulate();
-
-    testNPCHybridAttack.x = FromGridX(2);
-    testNPCHybridAttack.y = FromGridY(2);
-    await testNPCHybridAttack.save();
+    testNPC.attackType = EntityAttackType.MeleeRanged;
+    await testNPC.save();
 
     // Ranged attack
-    await battleAttackTarget.checkRangeAndAttack(testNPCHybridAttack, testCharacter);
+    await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
     expect(hitTarget).toBeCalledTimes(5);
 
     // Melee attack (not passing maxRangeAttack field on purpose to check is doing melee attack)
-    testNPCHybridAttack = await unitTestHelper.createMockNPC(
-      { attackType: EntityAttackType.MeleeRanged },
-      { hasSkills: true }
-    );
-    await testNPCHybridAttack.populate("skills").execPopulate();
+    testNPC.maxRangeAttack = undefined;
 
-    testNPCHybridAttack.x = FromGridX(4);
-    testNPCHybridAttack.y = FromGridY(3);
-    await testNPCHybridAttack.save();
+    testNPC.x = FromGridX(4);
+    testNPC.y = FromGridY(3);
+    await testNPC.save();
 
-    await battleAttackTarget.checkRangeAndAttack(testNPCHybridAttack, testCharacter);
+    await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
     expect(hitTarget).toBeCalledTimes(6);
   });
 
