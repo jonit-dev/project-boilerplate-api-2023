@@ -112,18 +112,27 @@ export class GridManager {
 
     const tempGrid = gridMap.clone(); // should be cloned, otherwise it will be modified by the finder!
 
+    if (!tempGrid) {
+      throw new Error("❌Could not clone grid for map: " + map);
+    }
+
     const finder = new PF.AStarFinder();
 
     //! According to the docs, both start and end point MUST be walkable, otherwise it will return [] and crash the pathfinding!
     //! To avoid any issues in the main grid we'll just set this walkable in the tempGrid!
-
-    tempGrid.setWalkableAt(startGridX, startGridY, true);
-    tempGrid.setWalkableAt(endGridX, endGridY, true);
-
-    const path = finder.findPath(startGridX, startGridY, endGridX, endGridY, tempGrid!);
-
     // remap path without offset
     const { gridOffsetX, gridOffsetY } = this.getGridOffset(map)!;
+
+    tempGrid.setWalkableAt(startGridX + gridOffsetX, startGridY + gridOffsetY, true);
+    tempGrid.setWalkableAt(endGridX + gridOffsetX, endGridY + gridOffsetY, true);
+
+    const path = finder.findPath(
+      startGridX + gridOffsetX,
+      startGridY + gridOffsetY,
+      endGridX + gridOffsetX,
+      endGridY + gridOffsetY,
+      tempGrid
+    );
 
     const newPath = path.map(([x, y]) => [x - (gridOffsetX || 0), y - (gridOffsetY || 0)]);
 

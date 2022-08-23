@@ -115,6 +115,23 @@ describe("GridManager", () => {
     }
   });
 
+  it("should properly find the shortest path between 2 points", () => {
+    const path = gridManager.findShortestPath("unit-test-map-negative-coordinate", -11, 10, -8, 12);
+
+    if (!path) {
+      throw new Error("❌Could not find path");
+    }
+
+    expect(path).toEqual([
+      [-11, 10],
+      [-11, 11],
+      [-10, 11],
+      [-9, 11],
+      [-8, 11],
+      [-8, 12],
+    ]);
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
