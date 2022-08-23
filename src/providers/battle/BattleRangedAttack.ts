@@ -25,7 +25,7 @@ import _ from "lodash";
 import { Types } from "mongoose";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 
-export interface IRangedAttackParams {
+interface IRangedAttackParams {
   location: string;
   id: Types.ObjectId;
   key: string;
