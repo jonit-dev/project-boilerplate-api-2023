@@ -105,7 +105,7 @@ const characterSchema = createLeanSchema(
       required: true,
     }),
     baseMovementIntervalMs: Type.number({
-      default: 150,
+      default: 30,
       required: true,
     }),
     isBanned: Type.boolean({
