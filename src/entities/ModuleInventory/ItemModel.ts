@@ -124,7 +124,7 @@ itemSchema.post("save", async function (this: IItem) {
       slotQty,
       slots,
       owner: this.owner,
-      isOwnerRestricted: true,
+      isOwnerRestricted: !!this.owner,
     });
 
     await newContainer.save();
