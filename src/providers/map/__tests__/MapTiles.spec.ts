@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { MapLayers } from "@rpg-engine/shared";
+import { GridManager } from "../GridManager";
 import { MapTiles } from "../MapTiles";
 
 describe("MapTiles.ts", () => {
   let mapTiles: MapTiles;
+  let gridManager: GridManager;
   const mapName = "unit-test-map";
 
   beforeAll(async () => {
@@ -12,6 +14,7 @@ describe("MapTiles.ts", () => {
 
     await unitTestHelper.initializeMapLoader();
     mapTiles = container.get<MapTiles>(MapTiles);
+    gridManager = container.get<GridManager>(GridManager);
   });
 
   beforeEach(async () => {
@@ -25,9 +28,16 @@ describe("MapTiles.ts", () => {
   });
 
   it("should properly calculate the correct map width and height", () => {
-    const { width, height } = mapTiles.getMapWidthHeight("unit-test-map-negative-coordinate", MapLayers.Ground);
+    const { gridOffsetX, gridOffsetY } = gridManager.getGridOffset("unit-test-map-negative-coordinate")!;
 
-    expect(width).toEqual(32);
+    const { width, height } = mapTiles.getMapWidthHeight(
+      "unit-test-map-negative-coordinate",
+      MapLayers.Ground,
+      gridOffsetX,
+      gridOffsetY
+    );
+
+    expect(width).toEqual(48);
     expect(height).toEqual(32);
   });
 

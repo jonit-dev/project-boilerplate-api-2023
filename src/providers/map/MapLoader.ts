@@ -5,10 +5,8 @@ import { ITiled, MAP_REQUIRED_LAYERS } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
 import md5File from "md5-file";
-import PF from "pathfinding";
+import { GridManager } from "./GridManager";
 import { createZipMap } from "./MapCompressionHelper";
-import { MapObjectsLoader } from "./MapObjectsLoader";
-import { MapSolids } from "./MapSolids";
 
 type MapObject = {
   name: string;
@@ -18,8 +16,7 @@ type MapObject = {
 @provide(MapLoader)
 export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
-  public static grids: Map<string, PF.Grid> = new Map();
-  constructor(private mapSolidsManager: MapSolids, private mapObjectsLoader: MapObjectsLoader) {}
+  constructor(private gridManager: GridManager) {}
 
   public async init(): Promise<void> {
     // get all map names
@@ -52,9 +49,8 @@ export class MapLoader {
       const mapName = mapFileName.replace(".json", "");
 
       MapLoader.maps.set(mapName, currentMap);
-      MapLoader.grids.set(mapName, new PF.Grid(currentMap.width, currentMap.height));
 
-      this.mapSolidsManager.generateGridSolids(mapName, currentMap);
+      this.gridManager.generateGridSolids(mapName);
     }
 
     console.log("📦 Maps and grids are loaded!");

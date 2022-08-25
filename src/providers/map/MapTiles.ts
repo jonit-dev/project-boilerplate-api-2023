@@ -20,22 +20,21 @@ export class MapTiles {
     return [chunk.x, chunk.y];
   }
 
-  public getMapWidthHeight(map: string, layerName: MapLayers): { width: number; height: number } {
-    const layer = this.getLayer(map, layerName);
+  public getMapWidthHeight(
+    map: string,
+    layerName: MapLayers,
+    gridOffsetX: number,
+    gridOffsetY: number
+  ): { width: number; height: number } {
+    const mapData = MapLoader.maps.get(map);
 
-    if (!layer) {
-      throw new Error(`Failed to find layer ${layerName}`);
-    }
-
-    const chunk = layer.chunks[layer.chunks.length - 1];
-
-    if (!chunk) {
-      throw new Error(`Failed to find chunk for layer ${layerName}`);
+    if (!mapData) {
+      throw new Error(`Failed to find map ${map}`);
     }
 
     return {
-      width: chunk.x + chunk.width,
-      height: chunk.y + chunk.height,
+      width: mapData.width + gridOffsetX,
+      height: mapData.height + gridOffsetY,
     };
   }
 

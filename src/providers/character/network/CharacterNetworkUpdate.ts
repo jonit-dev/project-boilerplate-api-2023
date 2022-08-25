@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { ItemView } from "@providers/item/ItemView";
-import { MapLoader } from "@providers/map/MapLoader";
+import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -40,6 +40,7 @@ export class CharacterNetworkUpdate {
     private objectHelper: DataStructureHelper,
     private mapTransition: MapTransition,
     private npcManager: NPCManager,
+    private gridManager: GridManager,
     private mapNonPVPZone: MapNonPVPZone
   ) {}
 
@@ -355,11 +356,13 @@ export class CharacterNetworkUpdate {
     const updatedData = data;
     const map = character.scene;
 
+    const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
+
     if (isMoving) {
       // if character is moving, update the position
 
       // old position is now walkable
-      MapLoader.grids.get(map)?.setWalkableAt(ToGridX(data.x), ToGridY(data.y), true);
+      this.gridManager.setWalkable(map, ToGridX(data.x) + gridOffsetX, ToGridY(data.y) + gridOffsetY, true);
 
       updatedData.x = newX;
       updatedData.y = newY;
@@ -378,7 +381,12 @@ export class CharacterNetworkUpdate {
 
       // update our grid with solid information
 
-      MapLoader.grids.get(map)?.setWalkableAt(ToGridX(updatedData.x), ToGridY(updatedData.y), false);
+      this.gridManager.setWalkable(
+        map,
+        ToGridX(updatedData.x) + gridOffsetX,
+        ToGridY(updatedData.y) + gridOffsetY,
+        false
+      );
     }
   }
 }

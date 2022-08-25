@@ -1,5 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { MapLoader } from "@providers/map/MapLoader";
+import { GridManager } from "@providers/map/GridManager";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { INPCPositionUpdatePayload, NPCAlignment, NPCSocketEvents, ToGridX, ToGridY } from "@rpg-engine/shared";
@@ -19,7 +19,8 @@ export class NPCMovement {
   constructor(
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private gridManager: GridManager
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -60,9 +61,10 @@ export class NPCMovement {
         return;
       }
 
-      // update grid solids
-      MapLoader.grids.get(map)?.setWalkableAt(ToGridX(oldX), ToGridY(oldY), true);
-      MapLoader.grids.get(map)?.setWalkableAt(ToGridX(newX), ToGridY(newY), false);
+      const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
+
+      this.gridManager.setWalkable(map, ToGridX(oldX) + gridOffsetX, ToGridY(oldY) + gridOffsetY, true);
+      this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
 
       // warn nearby characters that the NPC moved;
 
@@ -111,7 +113,7 @@ export class NPCMovement {
     endGridY: number
   ): IShortestPathPositionResult | undefined {
     try {
-      const npcPath = this.movementHelper.findShortestPath(npc.scene, startGridX, startGridY, endGridX, endGridY);
+      const npcPath = this.gridManager.findShortestPath(npc.scene, startGridX, startGridY, endGridX, endGridY);
 
       if (!npcPath || npcPath.length <= 1) {
         return;
