@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { ItemView } from "@providers/item/ItemView";
 import { MapLoader } from "@providers/map/MapLoader";
+import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -38,7 +39,8 @@ export class CharacterNetworkUpdate {
     private characterBan: CharacterBan,
     private objectHelper: DataStructureHelper,
     private mapTransition: MapTransition,
-    private npcManager: NPCManager
+    private npcManager: NPCManager,
+    private mapNonPVPZone: MapNonPVPZone
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -96,9 +98,16 @@ export class CharacterNetworkUpdate {
           // verify if we're in a map transition. If so, we need to trigger a scene transition
 
           const transition = this.mapTransition.getTransitionAtXY(character.scene, newX, newY);
-
           if (transition) {
             await this.mapTransition.changeCharacterScene(character, transition);
+          }
+
+          // verify if we're in a non pvp zone. If so, we need to trigger an attack stop event in case player was in a pvp combat
+          // console.log("CHECK CHAR")
+          const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, newX, newY);
+          if (nonPVPZone) {
+            // console.log("IS IN A NON PVP ZONE")
+            await this.mapNonPVPZone.stopCharacterAttack(character);
           }
         }
       }
