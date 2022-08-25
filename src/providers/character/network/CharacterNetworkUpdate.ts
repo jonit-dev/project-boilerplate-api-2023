@@ -347,11 +347,13 @@ export class CharacterNetworkUpdate {
     const updatedData = data;
     const map = character.scene;
 
+    const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
+
     if (isMoving) {
       // if character is moving, update the position
 
       // old position is now walkable
-      this.gridManager.setWalkable(map, ToGridX(data.x), ToGridY(data.y), true);
+      this.gridManager.setWalkable(map, ToGridX(data.x) + gridOffsetX, ToGridY(data.y) + gridOffsetY, true);
 
       updatedData.x = newX;
       updatedData.y = newY;
@@ -370,7 +372,12 @@ export class CharacterNetworkUpdate {
 
       // update our grid with solid information
 
-      this.gridManager.setWalkable(map, ToGridX(updatedData.x), ToGridY(updatedData.y), false);
+      this.gridManager.setWalkable(
+        map,
+        ToGridX(updatedData.x) + gridOffsetX,
+        ToGridY(updatedData.y) + gridOffsetY,
+        false
+      );
     }
   }
 }

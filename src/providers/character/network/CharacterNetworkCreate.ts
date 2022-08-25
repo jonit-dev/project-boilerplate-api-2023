@@ -61,7 +61,14 @@ export class CharacterNetworkCreate {
 
         const map = character.scene;
 
-        this.gridManager.setWalkable(map, ToGridX(character.x), ToGridY(character.y), false);
+        const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
+
+        this.gridManager.setWalkable(
+          map,
+          ToGridX(character.x) + gridOffsetX,
+          ToGridY(character.y) + gridOffsetY,
+          false
+        );
 
         await character.save();
 

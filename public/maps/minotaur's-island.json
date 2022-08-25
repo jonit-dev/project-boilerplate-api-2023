@@ -1,5 +1,5 @@
 { "compressionlevel":-1,
- "height":20,
+ "height":95,
  "infinite":true,
  "layers":[
         {
@@ -1358,6 +1358,40 @@
                 {
                  "class":"",
                  "height":16,
+                 "id":12,
+                 "name":"Deer",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"deer"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":16,
+                 "x":416,
+                 "y":640
+                }, 
+                {
+                 "class":"",
+                 "height":16,
+                 "id":13,
+                 "name":"Deer",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"deer"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":16,
+                 "x":816,
+                 "y":480
+                }, 
+                {
+                 "class":"",
+                 "height":16,
                  "id":14,
                  "name":"Wolf",
                  "properties":[
@@ -1370,6 +1404,40 @@
                  "visible":true,
                  "width":16,
                  "x":624,
+                 "y":848
+                }, 
+                {
+                 "class":"",
+                 "height":16,
+                 "id":15,
+                 "name":"Wolf",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"wolf"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":16,
+                 "x":944,
+                 "y":624
+                }, 
+                {
+                 "class":"",
+                 "height":16,
+                 "id":16,
+                 "name":"Wolf",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"wolf"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":16,
+                 "x":352,
                  "y":848
                 }, 
                 {
@@ -22821,7 +22889,7 @@
                         {
                          "name":"ge_collide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -22835,7 +22903,7 @@
                         {
                          "name":"ge_collide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -22849,7 +22917,7 @@
                         {
                          "name":"ge_collide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -22863,7 +22931,7 @@
                         {
                          "name":"ge_collide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -23715,7 +23783,7 @@
                         {
                          "name":"ge_collide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -23729,7 +23797,7 @@
                         {
                          "name":"ge_collide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -23743,7 +23811,7 @@
                         {
                          "name":"ge_collide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -23757,7 +23825,7 @@
                         {
                          "name":"ge_collide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 },
             
@@ -41957,6 +42025,48 @@
                 },
             
                 {
+                 "id":3120,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3121,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3122,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
                  "id":3149,
                  "properties":[
                         {
@@ -42056,6 +42166,35 @@
                         }]
                 }, 
                 {
+                 "id":3185,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3187,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                },
+            
+                {
                  "id":3214,
                  "properties":[
                         {
@@ -42099,8 +42238,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":3219,
                  "properties":[
@@ -42155,6 +42293,77 @@
                          "value":true
                         }]
                 }, 
+                {
+                 "id":3250,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3251,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3252,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3257,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3258,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                },
+            
                 {
                  "id":3279,
                  "properties":[
@@ -42244,11 +42453,95 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":3289,
                  "properties":[
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3315,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3316,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3317,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3318,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3322,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                },
+            
+                {
+                 "id":3323,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
                         {
                          "name":"ge_collide",
                          "type":"bool",
@@ -42355,6 +42648,91 @@
                         }]
                 }, 
                 {
+                 "id":3380,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3381,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3382,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3383,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                },
+            
+                {
+                 "id":3387,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3388,
+                 "properties":[
+                        {
+                         "name":"description",
+                         "type":"string",
+                         "value":"a mountain."
+                        }, 
+                        {
+                         "name":"ge_collide",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
                  "id":3409,
                  "properties":[
                         {
@@ -42389,8 +42767,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":3413,
                  "properties":[
@@ -42480,7 +42857,8 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
+                },
+            
                 {
                  "id":3477,
                  "properties":[
@@ -42534,8 +42912,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":3483,
                  "properties":[
@@ -68043,5 +68420,5 @@
  "tilewidth":16,
  "type":"map",
  "version":"1.9",
- "width":30
+ "width":80
 }

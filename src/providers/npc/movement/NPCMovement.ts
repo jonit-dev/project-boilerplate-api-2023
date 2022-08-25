@@ -61,8 +61,10 @@ export class NPCMovement {
         return;
       }
 
-      this.gridManager.setWalkable(map, ToGridX(oldX), ToGridY(oldY), true);
-      this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false);
+      const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
+
+      this.gridManager.setWalkable(map, ToGridX(oldX) + gridOffsetX, ToGridY(oldY) + gridOffsetY, true);
+      this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
 
       // warn nearby characters that the NPC moved;
 

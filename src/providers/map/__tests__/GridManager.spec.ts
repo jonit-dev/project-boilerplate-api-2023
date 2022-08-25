@@ -22,7 +22,7 @@ describe("GridManager", () => {
     await unitTestHelper.beforeEachJestHook(true);
   });
 
-  it("should properly generate a grid solid map and correctly size it (width, height)", () => {
+  const checkMapSize = (mapName: string): void => {
     expect(gridManager.grids.has(mapName)).toBeTruthy();
 
     const grid = gridManager.grids.get(mapName);
@@ -34,9 +34,15 @@ describe("GridManager", () => {
     const { gridOffsetX, gridOffsetY } = gridManager.getGridOffset(mapName)!;
 
     const { width, height } = mapTiles.getMapWidthHeight(mapName, MapLayers.Ground, gridOffsetX, gridOffsetY);
+    console.log(`Map ${mapName} has grid offset: ${gridOffsetX}, ${gridOffsetY} and size ${width}, ${height}`);
 
     expect(grid.width).toBe(width);
     expect(grid.height).toBe(height);
+  };
+
+  it("should properly generate a grid solid map and correctly size it (width, height)", () => {
+    checkMapSize(mapName);
+    checkMapSize("Example");
   });
 
   it("should return the offset x and y if a map has negative coordinates", () => {

@@ -26,21 +26,15 @@ export class MapTiles {
     gridOffsetX: number,
     gridOffsetY: number
   ): { width: number; height: number } {
-    const layer = this.getLayer(map, layerName);
+    const mapData = MapLoader.maps.get(map);
 
-    if (!layer) {
-      throw new Error(`Failed to find layer ${layerName}`);
-    }
-
-    const chunk = layer.chunks[layer.chunks.length - 1];
-
-    if (!chunk) {
-      throw new Error(`Failed to find chunk for layer ${layerName}`);
+    if (!mapData) {
+      throw new Error(`Failed to find map ${map}`);
     }
 
     return {
-      width: chunk.x + chunk.width + gridOffsetX,
-      height: chunk.y + chunk.height + gridOffsetY,
+      width: mapData.width + gridOffsetX,
+      height: mapData.height + gridOffsetY,
     };
   }
 

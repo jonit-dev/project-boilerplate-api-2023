@@ -7,7 +7,6 @@ import { provide } from "inversify-binding-decorators";
 import md5File from "md5-file";
 import { GridManager } from "./GridManager";
 import { createZipMap } from "./MapCompressionHelper";
-import { MapSolids } from "./MapSolids";
 
 type MapObject = {
   name: string;
@@ -17,7 +16,7 @@ type MapObject = {
 @provide(MapLoader)
 export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
-  constructor(private mapSolidsManager: MapSolids, private gridManager: GridManager) {}
+  constructor(private gridManager: GridManager) {}
 
   public async init(): Promise<void> {
     // get all map names
