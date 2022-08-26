@@ -137,6 +137,23 @@ export class NPCMovementMoveTowards {
           const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
           const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
 
+          // Check if character is low health
+          if (npc.canSwitchToLowHealthTarget) {
+            // Math.random? 10% - 30% of chance
+
+            // Odds passed and we can check if char is low health and increase speed
+            if (targetCharacter.health <= targetCharacter.maxHealth / 4) {
+              // Increase NPC speed by 30% if there is a low health character nearby
+              npc.speed += npc.speed * 0.3;
+            }
+          }
+
+          // Check if we can change target
+          if (npc.canSwitchToRandomTarget) {
+            // This is the correct method?
+            this.npcTarget.tryToSetTarget(npc);
+          }
+
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
             // if reached target and alignment is enemy, lets hit it
 
