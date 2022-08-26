@@ -100,7 +100,7 @@ export class BattleAttackTarget {
     if (!isTargetClose) {
       if (attacker.type === "Character") {
         const character = attacker as ICharacter;
-        this.battleNetworkStopTargeting.stopTargeting(character);
+        await this.battleNetworkStopTargeting.stopTargeting(character);
         this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
           character.channelId!,
           BattleSocketEvents.CancelTargeting,
@@ -196,8 +196,9 @@ export class BattleAttackTarget {
     }
 
     // finally, send battleHitPayload to characters around
+    const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
 
-    const nearbyCharacters = await this.characterView.getCharactersInView(attacker as ICharacter);
+    const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
       this.socketMessaging.sendEventToUser(
@@ -209,10 +210,8 @@ export class BattleAttackTarget {
 
     // send battleEvent payload to origin character as well
 
-    const entity = attacker as ICharacter;
-
-    if (entity.channelId) {
-      this.socketMessaging.sendEventToUser(entity.channelId, BattleSocketEvents.BattleEvent, battleEventPayload);
+    if (character.channelId) {
+      this.socketMessaging.sendEventToUser(character.channelId, BattleSocketEvents.BattleEvent, battleEventPayload);
     }
   }
 }
