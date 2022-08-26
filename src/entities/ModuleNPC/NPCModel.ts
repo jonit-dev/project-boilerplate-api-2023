@@ -148,6 +148,14 @@ const npcSchema = createLeanSchema(
       quantityRange: Type.array({ required: false, minItems: 2, maxItems: 2 }).of(Type.number()),
     }),
     maxRangeAttack: Type.number({ required: false }),
+    canSwitchToRandomTarget: Type.boolean({
+      default: false,
+      required: true,
+    }),
+    canSwitchToLowHealthTarget: Type.boolean({
+      default: false,
+      required: true,
+    }),
     ...({} as {
       isAlive: boolean;
       type: string;
