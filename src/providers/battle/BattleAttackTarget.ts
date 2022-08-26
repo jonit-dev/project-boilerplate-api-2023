@@ -166,8 +166,14 @@ export class BattleAttackTarget {
             await this.battleEffects.generateBloodOnGround(target);
 
             await this.characterDeath.handleCharacterDeath(target as ICharacter);
-            await this.npcTarget.clearTarget(attacker as INPC);
-            await this.npcTarget.tryToSetTarget(attacker as INPC);
+
+            // Attacker could be a Character (PVP battle)
+            if (attacker.type === "NPC") {
+              await this.npcTarget.clearTarget(attacker as INPC);
+              await this.npcTarget.tryToSetTarget(attacker as INPC);
+            } else {
+              await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
+            }
           }
           if (target.type === "NPC") {
             await this.battleEffects.generateBloodOnGround(target);
