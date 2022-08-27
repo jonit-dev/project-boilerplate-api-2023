@@ -124,6 +124,7 @@ export class NPCMovementMoveTowards {
 
   private initBattleCycle(npc: INPC): void {
     const hasBattleCycle = NPCBattleCycle.npcBattleCycles.has(npc.id);
+    let cycleCount = 1;
 
     if (!hasBattleCycle) {
       new NPCBattleCycle(
@@ -137,12 +138,10 @@ export class NPCMovementMoveTowards {
           const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
           const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
 
-          // Check if character is low health
+          // Check if npc can switch to low health char
           if (npc.canSwitchToLowHealthTarget) {
-            // Math.random? 10% - 30% of chance
-
-            // Odds passed and we can check if char is low health and increase speed
-            if (targetCharacter.health <= targetCharacter.maxHealth / 4) {
+            // check if odds passed and char is low health to increase speed
+            if (this.checkOdds(cycleCount) && targetCharacter.health <= targetCharacter.maxHealth / 4) {
               // Increase NPC speed by 30% if there is a low health character nearby
               npc.speed += npc.speed * 0.3;
             }
@@ -159,6 +158,8 @@ export class NPCMovementMoveTowards {
 
             await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
           }
+
+          cycleCount++;
         },
         1000
       );
@@ -195,5 +196,25 @@ export class NPCMovementMoveTowards {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  private checkOdds(cycle): boolean {
+    // What is the perfect factor to increase odds percent by cycles?
+    const oddsFactor = 4;
+    const odds = cycle / oddsFactor;
+    const random = Math.random();
+
+    // Only 4 cycles has passed (10% chance)
+    if (odds <= 1) {
+      if (random < 0.1) return true;
+    } else if (odds <= 2) {
+      // 8 cycles has passed (20% chance)
+      if (random < 0.2) return true;
+    } else {
+      // more than 8 cycles has passed (30% chance)
+      if (random < 0.3) return true;
+    }
+
+    return false;
   }
 }
