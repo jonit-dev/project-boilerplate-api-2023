@@ -63,6 +63,10 @@ export class BattleCharacterManager {
       return false;
     }
 
+    if (target.id === attacker.id) {
+      return false;
+    }
+
     return true;
   }
 }

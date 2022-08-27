@@ -109,6 +109,13 @@ export class BattleNetworkInitTargeting {
   private isValidTarget(target: INPC | ICharacter | null, character: ICharacter): ITargetValidation {
     // check if target is within character range.
 
+    if (target?.id === character.id) {
+      return {
+        isValid: false,
+        reason: "You cannot attack yourself.",
+      };
+    }
+
     if (target!.health === 0) {
       return {
         isValid: false,
