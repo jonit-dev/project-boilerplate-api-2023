@@ -16,7 +16,6 @@ export class MapNonPVPZone {
 
   public stopCharacterAttack(character: ICharacter): void {
     try {
-      // console.log("SEND EVENTO TO USER ABOUT PVP ZONE")
       // send event to client telling it to stop any pvp combat in action.
       this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.NonPVPZone);
     } catch (error) {
@@ -28,23 +27,17 @@ export class MapNonPVPZone {
     try {
       const map = MapLoader.maps.get(mapName);
 
-      // console.log("CHECK MAP")
       if (!map) {
         throw new Error(`MapNonPVPZone: Map "${mapName}" is not found!`);
       }
-
-      // console.log("CHECK ZONES")
       const nonPVPZones = this.mapObjectsLoader.getObjectLayerData("NonPVPZones", map);
-
-      // console.log("CHECK ZONES RESULT")
-      // console.table(nonPVPZones)
 
       if (!nonPVPZones) {
         return false;
       }
 
       for (const nonPVPZone of nonPVPZones) {
-        const isOnRoofZone = mathHelper.isXYInsideRectangle(
+        const isOnNonPVPZone = mathHelper.isXYInsideRectangle(
           {
             x: x,
             y: y,
@@ -57,9 +50,8 @@ export class MapNonPVPZone {
           }
         );
 
-        if (isOnRoofZone) {
-          // console.log("I'm into a safe zone ")
-          return isOnRoofZone;
+        if (isOnNonPVPZone) {
+          return isOnNonPVPZone;
         }
       }
     } catch (error) {

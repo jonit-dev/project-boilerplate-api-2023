@@ -107,7 +107,6 @@ export class CharacterNetworkUpdate {
           // console.log("CHECK CHAR")
           const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, newX, newY);
           if (nonPVPZone) {
-            // console.log("IS IN A NON PVP ZONE")
             await this.mapNonPVPZone.stopCharacterAttack(character);
           }
         }
