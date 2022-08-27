@@ -150,7 +150,10 @@ export class NPCMovementMoveTowards {
           // Check if we can change target
           if (npc.canSwitchToRandomTarget) {
             // This is the correct method?
-            this.npcTarget.tryToSetTarget(npc);
+            if (this.checkOdds(cycleCount)) {
+              // Should we check for the same odds in switchToRandomTarget?
+              // What method should we call here?
+            }
           }
 
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
