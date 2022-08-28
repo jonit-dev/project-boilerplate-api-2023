@@ -84,11 +84,11 @@ const characterSchema = createLeanSchema(
     }),
     scene: Type.string({
       required: true,
-      default: "Ilya",
+      default: "ilya",
     }),
     initialScene: Type.string({
       required: true,
-      default: "Ilya",
+      default: "ilya",
     }),
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),

@@ -1,4 +1,4 @@
 # Chat :: Get All in Zone
-GET {{baseUrl}}/chat-log/zone?x=10&y=12&scene=Ilya&limit=5 HTTP/1.1
+GET {{baseUrl}}/chat-log/zone?x=10&y=12&scene=ilya&limit=5 HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
