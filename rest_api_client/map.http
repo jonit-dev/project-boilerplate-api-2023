@@ -1,4 +1,4 @@
 # Chat :: Get Map Metadata
-GET {{baseUrl}}/maps/another_map/metadata HTTP/1.1
+GET {{baseUrl}}/maps/Ilya/metadata HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
