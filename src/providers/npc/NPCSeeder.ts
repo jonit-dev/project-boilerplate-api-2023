@@ -89,8 +89,8 @@ export class NPCSeeder {
       const maxHealth =
         // @ts-ignore
         NPCData.healthRandomizerDice && NPCData.baseHealth
-          ? // @ts-ignore
-            NPCData.baseHealth + rollDice(NPCData.healthRandomizerDice)
+          // @ts-ignore  
+          ? NPCData.baseHealth + rollDice(NPCData.healthRandomizerDice)
           : NPCData.maxHealth;
 
       const newNPC = new NPC({
