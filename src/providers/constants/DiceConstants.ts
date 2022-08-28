@@ -1,8 +1,17 @@
 export enum Dice {
-  D4 = Math.floor(Math.random() * (Math.floor(5) - Math.ceil(1)) + 1),
-  D6 = Math.floor(Math.random() * (Math.floor(7) - Math.ceil(1)) + 1),
-  D8 = Math.floor(Math.random() * (Math.floor(9) - Math.ceil(1)) + 1),
-  D10 = Math.floor(Math.random() * (Math.floor(11) - Math.ceil(1)) + 1),
-  D12 = Math.floor(Math.random() * (Math.floor(13) - Math.ceil(1)) + 1),
-  D20 = Math.floor(Math.random() * (Math.floor(21) - Math.ceil(1)) + 1),
+  D4 = 4,
+  D6 = 6,
+  D8 = 8,
+  D12 = 12,
+  D20 = 20,
+}
+
+// roll the dice, accepts Dice Enum
+export function rollDice(dice: Dice): Number {
+  const max = Math.floor(dice);
+  const min = 1;
+
+  const diceNumber = Math.floor(Math.random() * (max - min) + min);
+
+  return diceNumber;
 }
