@@ -135,11 +135,15 @@ export class NPCMovementMoveTowards {
           }
 
           const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
+          const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
+
+          npc.direction = facingDirection;
+          await npc.save();
+
           const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
 
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
             // if reached target and alignment is enemy, lets hit it
-
             await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
           }
         },
