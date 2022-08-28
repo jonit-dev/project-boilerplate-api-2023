@@ -87,8 +87,10 @@ export class NPCSeeder {
       // ts-ignore is here until we update our ts-types lib
       // @ts-ignore
       const maxHealth =
+        // @ts-ignore
         NPCData.healthRandomizerDice && NPCData.baseHealth
-          ? NPCData.baseHealth + rollDice(NPCData.healthRandomizerDice)
+          ? // @ts-ignore
+            NPCData.baseHealth + rollDice(NPCData.healthRandomizerDice)
           : NPCData.maxHealth;
 
       const newNPC = new NPC({
