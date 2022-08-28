@@ -1,13 +1,19 @@
 /* eslint-disable no-new */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
+import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "./BattleAttackTarget";
 import { BattleCycle } from "./BattleCycle";
 
 @provide(BattleCharacterManager)
 export class BattleCharacterManager {
-  constructor(private battleAttackTarget: BattleAttackTarget) {}
+  constructor(
+    private battleAttackTarget: BattleAttackTarget,
+    private mapNonPVPZone: MapNonPVPZone,
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting
+  ) {}
 
   public onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): void {
     new BattleCycle(
@@ -36,7 +42,7 @@ export class BattleCharacterManager {
 
   public async attackTarget(character: ICharacter, target: ICharacter | INPC): Promise<boolean | undefined> {
     try {
-      const canAttack = this.canAttack(character, target);
+      const canAttack = await this.canAttack(character, target);
 
       if (!canAttack) {
         return false;
@@ -54,7 +60,7 @@ export class BattleCharacterManager {
     }
   }
 
-  private canAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): boolean {
+  private async canAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
     if (!target.isAlive) {
       return false;
     }
@@ -65,6 +71,18 @@ export class BattleCharacterManager {
 
     if (target.id === attacker.id) {
       return false;
+    }
+
+    if (target.type === "Character") {
+      const isNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(target.scene, target.x, target.y);
+      if (isNonPVPZone) {
+        // clear battle cycle when target enter in a pvp zone.
+        await this.battleNetworkStopTargeting.stopTargeting(attacker as unknown as ICharacter);
+        // and send a event to Client revert targeting
+        this.mapNonPVPZone.stopCharacterAttack(attacker as unknown as ICharacter);
+
+        return false;
+      }
     }
 
     return true;

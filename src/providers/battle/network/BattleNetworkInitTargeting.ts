@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -30,7 +31,8 @@ export class BattleNetworkInitTargeting {
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
     private battleCharacterManager: BattleCharacterManager,
-    private battleNetworkStopTargeting: BattleNetworkStopTargeting
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting,
+    private mapNonPVPZone: MapNonPVPZone
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
@@ -135,18 +137,13 @@ export class BattleNetworkInitTargeting {
       };
     }
 
-    if (target?.type === EntityType.NPC) {
-      const isNpcValid = this.isValidNPCTarget(target as unknown as INPC);
-      if (!isNpcValid) {
-        return {
-          isValid: false,
-          reason: "You cannot attack this entity.",
-        };
-      }
+    // Apply specific validations by target type
+    const specificTargetValidation = this.checkBySpecificType(target);
+    if (!specificTargetValidation?.isValid) {
+      return specificTargetValidation;
     }
 
     const isCharacterOnline = character.isOnline;
-
     if (!isCharacterOnline) {
       return {
         isValid: false,
@@ -155,7 +152,6 @@ export class BattleNetworkInitTargeting {
     }
 
     // check character attack type. If melee, target should be within a 1 grid cell range. if ranged, check max range.
-
     const isUnderRange = this.movementHelper.isUnderRange(
       character.x,
       character.y,
@@ -176,15 +172,39 @@ export class BattleNetworkInitTargeting {
     };
   }
 
-  private isValidNPCTarget(target: INPC): boolean {
-    if (target.alignment === NPCAlignment.Friendly) {
-      return false;
-    }
-    return true;
+  private checkBySpecificType(target: INPC | ICharacter | null): ITargetValidation {
+    if (target?.type === EntityType.NPC) return this.isValidNPCTarget(target as unknown as INPC);
+    if (target?.type === EntityType.Character) return this.isValidCharacterTarget(target as unknown as ICharacter);
+
+    return {
+      isValid: true,
+    };
   }
 
-  // private isValidCharacterTarget(target: ICharacter, character): boolean {
-  //   // TODO: implement it later, in PVP system
-  //   return true;
-  // }
+  private isValidNPCTarget(target: INPC): ITargetValidation {
+    if (target.alignment === NPCAlignment.Friendly) {
+      return {
+        isValid: false,
+        reason: "You cannot attack this entity.",
+      };
+    }
+
+    return {
+      isValid: true,
+    };
+  }
+
+  private isValidCharacterTarget(target: ICharacter): ITargetValidation {
+    const isNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(target.scene, target.x, target.y);
+    if (isNonPVPZone) {
+      return {
+        isValid: false,
+        reason: "You cannot attack a target inside a Non-PVP Zone!",
+      };
+    }
+
+    return {
+      isValid: true,
+    };
+  }
 }
