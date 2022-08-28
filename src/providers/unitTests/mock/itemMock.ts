@@ -22,7 +22,7 @@ export const itemMock: Partial<IItem> = {
   tiledId: 66,
   x: 320,
   y: 144,
-  scene: "Example",
+  scene: "example",
   createdAt: "2022-06-25T22:53:55.579Z",
   updatedAt: "2022-06-28T04:42:21.409Z",
 };
@@ -42,7 +42,7 @@ export const stackableItemMock: Partial<IItem> = {
   description: "A red apple.",
   weight: 0.05,
   allowedEquipSlotType: [ItemSlotType.Inventory],
-  scene: "Example",
+  scene: "example",
   createdAt: "2022-06-25T22:53:55.579Z",
   updatedAt: "2022-06-28T04:42:21.409Z",
   stackQty: 1,
