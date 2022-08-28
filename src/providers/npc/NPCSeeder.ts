@@ -1,5 +1,6 @@
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { rollDice } from "@providers/constants/DiceConstants";
 import { GridManager } from "@providers/map/GridManager";
 import { MapTiles } from "@providers/map/MapTiles";
 import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
@@ -82,8 +83,17 @@ export class NPCSeeder {
     try {
       const skills = new Skill({ ...(NPCData.skills as unknown as ISkill), ownerType: "NPC" }); // pre-populate skills, if present in metadata
 
+      // Settings the current NPC health by rollind dices with already
+      // ts-ignore is here until we update our ts-types lib
+      // @ts-ignore
+      const maxHealth =
+        NPCData.healthRandomizerDice && NPCData.baseHealth
+          ? NPCData.baseHealth + rollDice(NPCData.healthRandomizerDice)
+          : NPCData.maxHealth;
+
       const newNPC = new NPC({
         ...NPCData,
+        maxHealth: maxHealth,
         skills: skills._id,
       });
       await newNPC.save();
