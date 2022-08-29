@@ -6,7 +6,6 @@ export enum Dice {
   D20 = 20,
 }
 
-// roll the dice, accepts Dice Enum
 export function rollDice(dice: Dice): Number {
   const max = Math.floor(dice);
   const min = 1;

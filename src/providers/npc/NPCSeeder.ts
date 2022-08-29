@@ -82,20 +82,11 @@ export class NPCSeeder {
   private async createNewNPCWithSkills(NPCData: INPCSeedData): Promise<void> {
     try {
       const skills = new Skill({ ...(NPCData.skills as unknown as ISkill), ownerType: "NPC" }); // pre-populate skills, if present in metadata
-
-      // Settings the current NPC health by rollind dices with already
-      // ts-ignore is here until we update our ts-types lib
-      // @ts-ignore
-      const maxHealth =
-        // @ts-ignore
-        NPCData.healthRandomizerDice && NPCData.baseHealth
-          // @ts-ignore  
-          ? NPCData.baseHealth + rollDice(NPCData.healthRandomizerDice)
-          : NPCData.maxHealth;
+      const npcHealth = this.setNPCRandomHealth(NPCData);
 
       const newNPC = new NPC({
         ...NPCData,
-        maxHealth: maxHealth,
+        maxHealth: npcHealth,
         skills: skills._id,
       });
       await newNPC.save();
@@ -108,6 +99,18 @@ export class NPCSeeder {
 
       console.error(error);
     }
+  }
+
+  private setNPCRandomHealth(NPCData: INPCSeedData): number {
+    // ts-ignore is here until we update our ts-types lib
+    // @ts-ignore
+    if (NPCData.healthRandomizerDice && NPCData.baseHealth) {
+      // @ts-ignore
+      return NPCData.baseHealth + rollDice(NPCData.healthRandomizerDice);
+    }
+
+    // @ts-ignore
+    return NPCData.maxHealth;
   }
 
   private setInitialNPCPositionAsSolid(NPCData: INPCSeedData): void {
