@@ -116,8 +116,8 @@ export class NPCMovementMoveTowards {
 
     if (targetCharacter) {
       const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
-      npc.direction = facingDirection;
-      await npc.save();
+
+      await NPC.updateOne({ _id: npc.id }, { direction: facingDirection });
 
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
