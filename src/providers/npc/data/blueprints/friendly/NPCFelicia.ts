@@ -10,5 +10,5 @@ export const npcFelicia = {
   key: FriendlyNPCsBlueprint.Felicia,
   class: CharacterClass.None,
   gender: CharacterGender.Female,
-  scene: "Ilya",
+  scene: "ilya",
 } as Partial<INPC>;

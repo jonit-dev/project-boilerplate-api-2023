@@ -110,7 +110,6 @@ describe("CharacterDeath.ts | Character with items", () => {
     expect(spyDropCharacterItemsOnBody).toHaveBeenCalled();
 
     const characterBody = await Item.findOne({
-      owner: testCharacter._id,
       name: `${testCharacter.name}'s body`,
       scene: testCharacter.scene,
     })

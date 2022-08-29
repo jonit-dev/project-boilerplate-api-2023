@@ -215,13 +215,14 @@ export class BattleRangedAttack {
    * and sends updateItemInventoryCharacter event
    */
   public async consumeAmmo(attackParams: IRangedAttackParams, character: ICharacter): Promise<void> {
-    const backpack = attackParams.equipment!.inventory as unknown as IItem;
+    const equipment = attackParams.equipment!;
+    const backpack = equipment.inventory as unknown as IItem;
     const backpackContainer = (await ItemContainer.findById(backpack.itemContainer)) as IItemContainer;
 
     switch (attackParams.location) {
       case ItemSlotType.Accessory:
-        attackParams.equipment!.accessory = undefined;
-        await attackParams.equipment!.save();
+        equipment.accessory = undefined;
+        await equipment.save();
         break;
       case ItemSlotType.Inventory:
         await this.equipmentEquip.removeItemFromInventory(attackParams.id.toString(), backpackContainer);
@@ -229,20 +230,18 @@ export class BattleRangedAttack {
       case "hand":
         // Spear item is held in hand
         // Check which hand and remove the item
-        const rightHandItem = attackParams.equipment!.rightHand
-          ? await Item.findById(attackParams.equipment!.rightHand)
-          : undefined;
+        const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
         rightHandItem?.subType === ItemSubType.Spear
-          ? (attackParams.equipment!.rightHand = undefined)
-          : (attackParams.equipment!.leftHand = undefined);
-        await attackParams.equipment!.save();
+          ? (equipment.rightHand = undefined)
+          : (equipment.leftHand = undefined);
+        await equipment.save();
         break;
       default:
         throw new Error("Invalid ammo location");
     }
     await Item.deleteOne({ _id: attackParams.id });
 
-    const equipmentSlots = await this.equipmentEquip.getEquipmentSlots(attackParams.equipment!._id);
+    const equipmentSlots = await this.equipmentEquip.getEquipmentSlots(equipment._id);
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,

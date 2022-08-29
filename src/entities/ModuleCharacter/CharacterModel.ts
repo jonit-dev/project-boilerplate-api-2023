@@ -84,16 +84,16 @@ const characterSchema = createLeanSchema(
     }),
     scene: Type.string({
       required: true,
-      default: "Ilya",
+      default: "ilya",
     }),
     initialScene: Type.string({
       required: true,
-      default: "Ilya",
+      default: "ilya",
     }),
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),
     baseSpeed: Type.number({
-      default: 2.5,
+      default: 2,
       required: true,
     }),
     weight: Type.number({
@@ -105,7 +105,7 @@ const characterSchema = createLeanSchema(
       required: true,
     }),
     baseMovementIntervalMs: Type.number({
-      default: 150,
+      default: 40,
       required: true,
     }),
     isBanned: Type.boolean({

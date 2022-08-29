@@ -56,7 +56,6 @@ export class CharacterDeath {
 
     const charBody = new Item({
       ...blueprintData,
-      owner: character.id,
       name: `${character.name}'s body`,
       scene: character.scene,
       x: character.x,
@@ -161,7 +160,7 @@ export class CharacterDeath {
       const freeSlotId = bodyContainer.firstAvailableSlotId;
       // if there's space in body item container, then add the item
       if (freeSlotId !== null) {
-        bodyContainer.slots[Number(freeSlotId)] = equipment[equipmentName];
+        bodyContainer.slots[Number(freeSlotId)] = await Item.findById(equipment[equipmentName]);
         equipment[equipmentName] = undefined;
         await equipment.save();
       }

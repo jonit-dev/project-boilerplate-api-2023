@@ -15,7 +15,7 @@ describe("GridManager", () => {
     await unitTestHelper.initializeMapLoader();
 
     gridManager.generateGridSolids("unit-test-map-negative-coordinate");
-    gridManager.generateGridSolids("Example");
+    gridManager.generateGridSolids("example");
   });
 
   beforeEach(async () => {
@@ -42,7 +42,7 @@ describe("GridManager", () => {
 
   it("should properly generate a grid solid map and correctly size it (width, height)", () => {
     checkMapSize(mapName);
-    checkMapSize("Example");
+    checkMapSize("example");
   });
 
   it("should return the offset x and y if a map has negative coordinates", () => {
@@ -51,7 +51,7 @@ describe("GridManager", () => {
     expect(gridOffsetX).toBe(16);
     expect(gridOffsetY).toBe(0);
 
-    const { gridOffsetX: gridOffsetX2, gridOffsetY: gridOffsetY2 } = gridManager.getGridOffset("Example")!;
+    const { gridOffsetX: gridOffsetX2, gridOffsetY: gridOffsetY2 } = gridManager.getGridOffset("example")!;
 
     expect(gridOffsetX2).toBe(0);
     expect(gridOffsetY2).toBe(32);
@@ -101,7 +101,7 @@ describe("GridManager", () => {
     ];
 
     for (const nonSolid of nonSolids) {
-      expect(gridManager.isWalkable("Example", nonSolid[0], nonSolid[1])).toBe(true);
+      expect(gridManager.isWalkable("example", nonSolid[0], nonSolid[1])).toBe(true);
     }
 
     const solids = [
@@ -117,7 +117,7 @@ describe("GridManager", () => {
     ];
 
     for (const solid of solids) {
-      expect(gridManager.isWalkable("Example", solid[0], solid[1])).toBe(false);
+      expect(gridManager.isWalkable("example", solid[0], solid[1])).toBe(false);
     }
   });
 

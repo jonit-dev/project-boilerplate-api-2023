@@ -25,7 +25,7 @@ describe("NPCView.ts", () => {
         x: FromGridX(0),
         y: FromGridY(0),
         health: 100,
-        scene: "Example",
+        scene: "example",
       },
       { hasSkills: true }
     );
@@ -86,7 +86,7 @@ describe("NPCView.ts", () => {
       x: FromGridX(1),
       y: FromGridY(0),
       health: 100,
-      scene: "Example",
+      scene: "example",
     });
 
     // @ts-ignore
