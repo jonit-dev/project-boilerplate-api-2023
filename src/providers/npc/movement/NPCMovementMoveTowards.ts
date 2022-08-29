@@ -45,7 +45,6 @@ export class NPCMovementMoveTowards {
       }
 
       // change movement to MoveWay (flee) if health is low!
-
       if (npc.fleeOnLowHealth) {
         if (npc.health <= npc.maxHealth / 4) {
           npc.currentMovementType = NPCMovementType.MoveAway;
@@ -150,9 +149,9 @@ export class NPCMovementMoveTowards {
 
   private initBattleCycle(npc: INPC): void {
     const hasBattleCycle = NPCBattleCycle.npcBattleCycles.has(npc.id);
-    let cycleCount = 1;
 
     if (!hasBattleCycle) {
+      let cycleCount = 1;
       new NPCBattleCycle(
         npc.id,
         async () => {
@@ -162,13 +161,12 @@ export class NPCMovementMoveTowards {
           }
 
           const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
-
           const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
 
           // Check if npc can switch to low health char
           if (npc.canSwitchToLowHealthTarget) {
             // check if odds passed and char is low health to increase speed
-            if (this.checkOdds(cycleCount) && targetCharacter.health <= targetCharacter.maxHealth / 4) {
+            if (this.checkOdds(cycleCount) && targetCharacter?.health <= targetCharacter?.maxHealth / 4) {
               // Increase NPC speed by 30% if there is a low health character nearby
               npc.speed += npc.speed * 0.3;
             }
@@ -176,10 +174,9 @@ export class NPCMovementMoveTowards {
 
           // Check if we can change target
           if (npc.canSwitchToRandomTarget) {
-            // This is the correct method?
             if (this.checkOdds(cycleCount)) {
-              // Should we check for the same odds in switchToRandomTarget?
-              // What method should we call here?
+              // try to get new target
+              await this.npcTarget.tryToSetTarget(npc);
             }
           }
 
@@ -229,19 +226,19 @@ export class NPCMovementMoveTowards {
   }
 
   private checkOdds(cycle): boolean {
-    // What is the perfect factor to increase odds percent by cycles?
-    const oddsFactor = 4;
+    // What is the perfect factor to increase odds percentage by cycles?
+    const oddsFactor = 8;
     const odds = cycle / oddsFactor;
     const random = Math.random();
 
-    // Only 4 cycles has passed (10% chance)
+    // Only 8 cycles has passed (10% chance)
     if (odds <= 1) {
       if (random < 0.1) return true;
     } else if (odds <= 2) {
-      // 8 cycles has passed (20% chance)
+      // More than 8 cycles has passed (20% chance)
       if (random < 0.2) return true;
     } else {
-      // more than 8 cycles has passed (30% chance)
+      // More than 16 cycles has passed (30% chance)
       if (random < 0.3) return true;
     }
 
