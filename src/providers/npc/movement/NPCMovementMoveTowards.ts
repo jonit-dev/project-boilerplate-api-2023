@@ -2,17 +2,20 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   FromGridX,
   FromGridY,
   NPCAlignment,
   NPCMovementType,
   NPCPathOrientation,
+  NPCSocketEvents,
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCBattleCycle } from "../NPCBattleCycle";
+import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
 
@@ -22,7 +25,9 @@ export class NPCMovementMoveTowards {
     private movementHelper: MovementHelper,
     private npcMovement: NPCMovement,
     private npcTarget: NPCTarget,
-    private battleAttackTarget: BattleAttackTarget
+    private battleAttackTarget: BattleAttackTarget,
+    private socketMessaging: SocketMessaging,
+    private npcView: NPCView
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
@@ -54,6 +59,8 @@ export class NPCMovementMoveTowards {
           npc.pathOrientation = NPCPathOrientation.Forward;
           await npc.save();
         }
+
+        await this.faceTarget(npc);
 
         return;
       }
@@ -104,6 +111,25 @@ export class NPCMovementMoveTowards {
     }
   }
 
+  private async faceTarget(npc: INPC): Promise<void> {
+    const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills").lean()) as ICharacter;
+
+    if (targetCharacter) {
+      const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
+
+      await NPC.updateOne({ _id: npc.id }, { direction: facingDirection });
+
+      const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+
+      for (const nearbyCharacter of nearbyCharacters) {
+        this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, NPCSocketEvents.NPCDataUpdate, {
+          id: npc.id,
+          direction: npc.direction,
+        });
+      }
+    }
+  }
+
   private reachedInitialPosition(npc: INPC): boolean {
     return npc.x === npc.initialX && npc.y === npc.initialY;
   }
@@ -135,11 +161,11 @@ export class NPCMovementMoveTowards {
           }
 
           const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
+
           const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
 
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
             // if reached target and alignment is enemy, lets hit it
-
             await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
           }
         },
@@ -160,6 +186,7 @@ export class NPCMovementMoveTowards {
 
       if (!shortestPath) {
         // throw new Error("No shortest path found!");
+
         return;
       }
 

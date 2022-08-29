@@ -7,7 +7,6 @@ export class MapObjectsLoader {
     const data = map.layers.find((layer) => layer.name === objectLayerName);
 
     if (!data) {
-      console.log(`❌ Failed to load data because there is no "${objectLayerName}" layer!`);
       return;
     }
 
