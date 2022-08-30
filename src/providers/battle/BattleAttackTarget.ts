@@ -120,6 +120,11 @@ export class BattleAttackTarget {
   }
 
   private async hitTarget(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
+    // if target is dead, do nothing.
+    if (!target.isAlive) {
+      return;
+    }
+
     const battleEvent = await this.battleEvent.calculateEvent(attacker, target);
 
     let battleEventPayload: Partial<IBattleEventFromServer> = {
@@ -165,7 +170,7 @@ export class BattleAttackTarget {
           if (target.type === "Character") {
             await this.battleEffects.generateBloodOnGround(target);
 
-            await this.characterDeath.handleCharacterDeath(target as ICharacter);
+            await this.characterDeath.handleCharacterDeath(attacker, target as ICharacter);
 
             // Attacker could be a Character (PVP battle)
             if (attacker.type === "NPC") {

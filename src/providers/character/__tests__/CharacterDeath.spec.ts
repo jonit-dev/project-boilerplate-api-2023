@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemContainer, IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { CharacterDeath } from "../CharacterDeath";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
+import { CharacterDeath } from "../CharacterDeath";
 
 describe("CharacterDeath.ts", () => {
   let characterDeath: CharacterDeath;
   let testCharacter: ICharacter;
+  let testNPC: INPC;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -19,11 +22,12 @@ describe("CharacterDeath.ts", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
+    testNPC = await unitTestHelper.createMockNPC();
     testCharacter = await unitTestHelper.createMockCharacter();
   });
 
   it("should properly generate a character body on death", async () => {
-    await characterDeath.handleCharacterDeath(testCharacter);
+    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 
     const charBody = await Item.findOne({
       owner: testCharacter._id,
@@ -32,8 +36,23 @@ describe("CharacterDeath.ts", () => {
     expect(charBody).toBeDefined();
   });
 
+  it("attacker's targeting should be properly cleared after character death", async () => {
+    testNPC.targetCharacter = testCharacter._id;
+    await testNPC.save();
+    new NPCBattleCycle(testNPC.id, () => {}, 10000);
+
+    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+    const updatedNPC = await NPC.findById(testNPC.id);
+    expect(updatedNPC?.targetCharacter).toBeUndefined();
+
+    const npcBattleCycle = NPCBattleCycle.npcBattleCycles.get(testNPC.id);
+
+    expect(npcBattleCycle).toBeUndefined();
+  });
+
   it("should respawn a character after its death", async () => {
-    await characterDeath.handleCharacterDeath(testCharacter);
+    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 
     expect(testCharacter.health === testCharacter.maxHealth).toBeTruthy();
     expect(testCharacter.mana === testCharacter.maxMana).toBeTruthy();
@@ -46,7 +65,7 @@ describe("CharacterDeath.ts", () => {
     // @ts-ignore
     const spySocketMessaging = jest.spyOn(characterDeath.socketMessaging, "sendEventToUser");
 
-    await characterDeath.handleCharacterDeath(testCharacter);
+    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 
     expect(spySocketMessaging).toHaveBeenCalled();
   });
@@ -61,6 +80,7 @@ describe("CharacterDeath.ts | Character with items", () => {
   let testCharacter: ICharacter;
   let backpackContainer: IItemContainer;
   let characterEquipment: IEquipment;
+  let testNPC: INPC;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -69,7 +89,7 @@ describe("CharacterDeath.ts | Character with items", () => {
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
-
+    testNPC = await unitTestHelper.createMockNPC();
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
 
     characterEquipment = (await Equipment.findById(testCharacter.equipment).populate("inventory").exec()) as IEquipment;
@@ -105,7 +125,7 @@ describe("CharacterDeath.ts | Character with items", () => {
     expect(backpackContainer.slots[1]).not.toBeNull();
 
     // character dies
-    await characterDeath.handleCharacterDeath(testCharacter);
+    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 
     expect(spyDropCharacterItemsOnBody).toHaveBeenCalled();
 
