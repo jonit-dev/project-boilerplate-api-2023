@@ -64,6 +64,14 @@ export class EquipmentUnequip {
       return;
     }
 
+    if (!inventory) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "It's not possible to unequip this item without an inventory!",
+        type: "error",
+      });
+      return;
+    }
+
     const slots: IItem[] = itemContainer.slots;
 
     let itemAlreadyInSlot = false;
