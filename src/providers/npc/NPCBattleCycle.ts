@@ -25,7 +25,6 @@ export class NPCBattleCycle {
   }
 
   public async clear(): Promise<void> {
-    console.log(`NPCBattleCycle clear called! ID:[${this.id}]`);
     clearInterval(this.interval);
     NPCBattleCycle.npcBattleCycles.delete(this.id);
 
