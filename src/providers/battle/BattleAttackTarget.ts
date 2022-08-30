@@ -120,6 +120,11 @@ export class BattleAttackTarget {
   }
 
   private async hitTarget(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
+    // if target is dead, do nothing.
+    if (!target.isAlive) {
+      return;
+    }
+
     const battleEvent = await this.battleEvent.calculateEvent(attacker, target);
 
     let battleEventPayload: Partial<IBattleEventFromServer> = {

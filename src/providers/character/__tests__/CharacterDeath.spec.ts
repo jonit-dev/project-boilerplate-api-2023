@@ -3,8 +3,9 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
 import { CharacterDeath } from "../CharacterDeath";
 
 describe("CharacterDeath.ts", () => {
@@ -33,6 +34,21 @@ describe("CharacterDeath.ts", () => {
     });
 
     expect(charBody).toBeDefined();
+  });
+
+  it("attacker's targeting should be properly cleared after character death", async () => {
+    testNPC.targetCharacter = testCharacter._id;
+    await testNPC.save();
+    new NPCBattleCycle(testNPC.id, () => {}, 10000);
+
+    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+    const updatedNPC = await NPC.findById(testNPC.id);
+    expect(updatedNPC?.targetCharacter).toBeUndefined();
+
+    const npcBattleCycle = NPCBattleCycle.npcBattleCycles.get(testNPC.id);
+
+    expect(npcBattleCycle).toBeUndefined();
   });
 
   it("should respawn a character after its death", async () => {
