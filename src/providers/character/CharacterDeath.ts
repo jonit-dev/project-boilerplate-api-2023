@@ -2,23 +2,32 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { CharacterTarget } from "./CharacterTarget";
 
 const DROP_EQUIPMENT_CHANCE = 30; // there's a 30% chance of dropping any of the equipped items
 const DROPPABLE_EQUIPMENT = ["head", "neck", "leftHand", "rightHand", "ring", "legs", "boot", "accessory", "armor"];
 
 @provide(CharacterDeath)
 export class CharacterDeath {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterTarget: CharacterTarget,
+    private npcTarget: NPCTarget
+  ) {}
 
-  public async handleCharacterDeath(character: ICharacter): Promise<void> {
+  public async handleCharacterDeath(killer: INPC | ICharacter, character: ICharacter): Promise<void> {
     console.log(`💀 Character ${character.name} is dead 💀`);
+
+    await this.clearAttackerTarget(killer);
 
     // send event to the character that is dead
 
@@ -72,6 +81,17 @@ export class CharacterDeath {
     character.y = character.initialY;
     character.scene = character.initialScene;
     await character.save();
+  }
+
+  private async clearAttackerTarget(attacker: ICharacter | INPC): Promise<void> {
+    if (attacker.type === "Character") {
+      // clear killer's target
+      await this.characterTarget.clearTarget(attacker as ICharacter);
+    }
+
+    if (attacker.type === "NPC") {
+      await this.npcTarget.clearTarget(attacker as INPC);
+    }
   }
 
   private async dropCharacterItemsOnBody(characterBody: IItem, equipmentId: Types.ObjectId | undefined): Promise<void> {

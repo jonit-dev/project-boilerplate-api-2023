@@ -165,7 +165,7 @@ export class BattleAttackTarget {
           if (target.type === "Character") {
             await this.battleEffects.generateBloodOnGround(target);
 
-            await this.characterDeath.handleCharacterDeath(target as ICharacter);
+            await this.characterDeath.handleCharacterDeath(attacker, target as ICharacter);
 
             // Attacker could be a Character (PVP battle)
             if (attacker.type === "NPC") {
