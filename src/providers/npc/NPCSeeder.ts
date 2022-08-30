@@ -31,7 +31,7 @@ export class NPCSeeder {
 
         // console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
 
-        await this.resetNPC(npcFound);
+        await this.resetNPC(npcFound, NPCData);
 
         await this.updateNPCSkills(NPCData, npcFound);
 
@@ -52,15 +52,28 @@ export class NPCSeeder {
     }
   }
 
-  private async resetNPC(npc: INPC): Promise<void> {
-    npc.health = npc.maxHealth;
-    npc.mana = npc.maxMana;
-    npc.x = npc.initialX;
-    npc.y = npc.initialY;
-    npc.targetCharacter = undefined;
-    npc.currentMovementType = npc.originalMovementType;
+  private async resetNPC(npc: INPC, NPCData: INPCSeedData): Promise<void> {
+    try {
+      const randomMaxHealth = this.setNPCRandomHealth(NPCData);
 
-    await npc.save();
+      if (randomMaxHealth) {
+        npc.health = randomMaxHealth;
+        npc.maxHealth = randomMaxHealth;
+      } else {
+        npc.health = npc.maxHealth;
+      }
+
+      npc.mana = npc.maxMana;
+      npc.x = npc.initialX;
+      npc.y = npc.initialY;
+      npc.targetCharacter = undefined;
+      npc.currentMovementType = npc.originalMovementType;
+
+      await npc.save();
+    } catch (error) {
+      console.log(`❌ Failed to reset NPC ${NPCData.key}`);
+      console.error(error);
+    }
   }
 
   private async updateNPCSkills(NPCData: INPCSeedData, npc: INPC): Promise<void> {
