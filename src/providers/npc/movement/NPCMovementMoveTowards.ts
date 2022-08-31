@@ -14,10 +14,16 @@ import {
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 import { NPCBattleCycle } from "../NPCBattleCycle";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
+
+export interface ICharacterHealth {
+  id: string;
+  health: number;
+}
 
 @provide(NPCMovementMoveTowards)
 export class NPCMovementMoveTowards {
@@ -151,7 +157,6 @@ export class NPCMovementMoveTowards {
     const hasBattleCycle = NPCBattleCycle.npcBattleCycles.has(npc.id);
 
     if (!hasBattleCycle) {
-      let cycleCount = 1;
       new NPCBattleCycle(
         npc.id,
         async () => {
@@ -163,33 +168,61 @@ export class NPCMovementMoveTowards {
           const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
           const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
 
-          // Check if npc can switch to low health char
-          if (npc.canSwitchToLowHealthTarget) {
-            // check if odds passed and char is low health to increase speed
-            if (this.checkOdds(cycleCount) && targetCharacter?.health <= targetCharacter?.maxHealth / 4) {
-              // Increase NPC speed by 30% if there is a low health character nearby
-              npc.speed += npc.speed * 0.3;
-            }
-          }
-
-          // Check if we can change target
-          if (npc.canSwitchToRandomTarget) {
-            if (this.checkOdds(cycleCount)) {
-              // try to get new target
-              await this.npcTarget.tryToSetTarget(npc);
-            }
-          }
-
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
             // if reached target and alignment is enemy, lets hit it
             await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
           }
 
-          cycleCount++;
+          this.tryToSwitchToRandomTarget(npc);
         },
         1000
       );
     }
+  }
+
+  private async tryToSwitchToRandomTarget(npc: INPC): Promise<boolean> {
+    if (npc.canSwitchToLowHealthTarget || npc.canSwitchToRandomTarget) {
+      // Odds have failed, we will not change target
+      if (!this.checkOdds()) return false;
+
+      const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+      // Only one character around this NPC, cannot change target
+      if (nearbyCharacters.length <= 1) return false;
+      let alreadySetted = false;
+
+      if (npc.canSwitchToLowHealthTarget) {
+        const charactersHealth: ICharacterHealth[] = [];
+        for (const nearbyCharacter of nearbyCharacters) {
+          if (!nearbyCharacter.isAlive) {
+            continue;
+          }
+
+          charactersHealth.push({
+            id: nearbyCharacter.id,
+            health: nearbyCharacter.health,
+          });
+        }
+
+        const minHealthCharacterInfo = _.minBy(charactersHealth, "health");
+        const minHealthCharacter = (await Character.findById(minHealthCharacterInfo?.id)) as ICharacter;
+
+        // Only set as target if the minimum health character is with 25% of it's health
+        if (minHealthCharacter.health <= minHealthCharacter.maxHealth / 4) {
+          this.npcTarget.setTarget(npc, minHealthCharacter);
+          npc.speed += npc.speed * 0.3;
+          alreadySetted = true;
+          return true;
+        }
+      }
+
+      if (npc.canSwitchToRandomTarget && !alreadySetted) {
+        const randomCharacter = _.sample(nearbyCharacters);
+        if (randomCharacter) this.npcTarget.setTarget(npc, randomCharacter);
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private async moveTowardsPosition(npc: INPC, x: number, y: number): Promise<void> {
@@ -225,22 +258,11 @@ export class NPCMovementMoveTowards {
     }
   }
 
-  private checkOdds(cycle): boolean {
-    // What is the perfect factor to increase odds percentage by cycles?
-    const oddsFactor = 8;
-    const odds = cycle / oddsFactor;
+  private checkOdds(): boolean {
     const random = Math.random();
 
-    // Only 8 cycles has passed (10% chance)
-    if (odds <= 1) {
-      if (random < 0.1) return true;
-    } else if (odds <= 2) {
-      // More than 8 cycles has passed (20% chance)
-      if (random < 0.2) return true;
-    } else {
-      // More than 16 cycles has passed (30% chance)
-      if (random < 0.3) return true;
-    }
+    // Always have a 10% chance of returning true
+    if (random < 0.1) return true;
 
     return false;
   }
