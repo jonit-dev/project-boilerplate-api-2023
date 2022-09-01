@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { BootsBlueprint, GlovesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -15,6 +16,8 @@ export const npcDwarf = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
+  baseHealth: 76,
+  healthRandomizerDice: Dice.D4,
   skills: {
     level: 3,
     strength: {

@@ -156,6 +156,8 @@ const npcSchema = createLeanSchema(
       default: false,
       required: true,
     }),
+    baseHealth: Type.number({ required: true, default: 100 }),
+    healthRandomizerDice: Type.number({ required: true, default: 1 }),
     ...({} as {
       isAlive: boolean;
       type: string;

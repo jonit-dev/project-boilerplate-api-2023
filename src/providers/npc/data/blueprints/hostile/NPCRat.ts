@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -17,6 +18,8 @@ export const npcRat = {
   speed: MovementSpeed.Slow,
   canSwitchToLowHealthTarget: true,
   canSwitchToRandomTarget: true,
+  baseHealth: 25,
+  healthRandomizerDice: Dice.D4,
   skills: {
     level: 1,
     strength: {
