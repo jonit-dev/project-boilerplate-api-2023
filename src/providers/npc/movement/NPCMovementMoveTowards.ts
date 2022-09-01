@@ -14,10 +14,16 @@ import {
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 import { NPCBattleCycle } from "../NPCBattleCycle";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
+
+export interface ICharacterHealth {
+  id: string;
+  health: number;
+}
 
 @provide(NPCMovementMoveTowards)
 export class NPCMovementMoveTowards {
@@ -45,7 +51,6 @@ export class NPCMovementMoveTowards {
       }
 
       // change movement to MoveWay (flee) if health is low!
-
       if (npc.fleeOnLowHealth) {
         if (npc.health <= npc.maxHealth / 4) {
           npc.currentMovementType = NPCMovementType.MoveAway;
@@ -161,17 +166,63 @@ export class NPCMovementMoveTowards {
           }
 
           const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
-
           const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
 
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
             // if reached target and alignment is enemy, lets hit it
             await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
           }
+
+          this.tryToSwitchToRandomTarget(npc);
         },
         1000
       );
     }
+  }
+
+  private async tryToSwitchToRandomTarget(npc: INPC): Promise<boolean> {
+    if (npc.canSwitchToLowHealthTarget || npc.canSwitchToRandomTarget) {
+      // Odds have failed, we will not change target
+      if (!this.checkOdds()) return false;
+
+      const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+      // Only one character around this NPC, cannot change target
+      if (nearbyCharacters.length <= 1) return false;
+      let alreadySetted = false;
+
+      if (npc.canSwitchToLowHealthTarget) {
+        const charactersHealth: ICharacterHealth[] = [];
+        for (const nearbyCharacter of nearbyCharacters) {
+          if (!nearbyCharacter.isAlive) {
+            continue;
+          }
+
+          charactersHealth.push({
+            id: nearbyCharacter.id,
+            health: nearbyCharacter.health,
+          });
+        }
+
+        const minHealthCharacterInfo = _.minBy(charactersHealth, "health");
+        const minHealthCharacter = (await Character.findById(minHealthCharacterInfo?.id)) as ICharacter;
+
+        // Only set as target if the minimum health character is with 25% of it's health
+        if (minHealthCharacter.health <= minHealthCharacter.maxHealth / 4) {
+          this.npcTarget.setTarget(npc, minHealthCharacter);
+          npc.speed += npc.speed * 0.3;
+          alreadySetted = true;
+          return true;
+        }
+      }
+
+      if (npc.canSwitchToRandomTarget && !alreadySetted) {
+        const randomCharacter = _.sample(nearbyCharacters);
+        if (randomCharacter) this.npcTarget.setTarget(npc, randomCharacter);
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private async moveTowardsPosition(npc: INPC, x: number, y: number): Promise<void> {
@@ -205,5 +256,14 @@ export class NPCMovementMoveTowards {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  private checkOdds(): boolean {
+    const random = Math.random();
+
+    // Always have a 10% chance of returning true
+    if (random < 0.1) return true;
+
+    return false;
   }
 }
