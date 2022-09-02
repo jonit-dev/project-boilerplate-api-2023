@@ -16,8 +16,6 @@ export const npcRat = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
-  canSwitchToLowHealthTarget: true,
-  canSwitchToRandomTarget: true,
   baseHealth: 25,
   healthRandomizerDice: Dice.D4,
   skills: {

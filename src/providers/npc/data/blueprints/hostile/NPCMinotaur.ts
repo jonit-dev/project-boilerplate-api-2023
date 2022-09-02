@@ -25,6 +25,7 @@ export const npcMinotaur = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
+  canSwitchToLowHealthTarget: true,
   baseHealth: 186,
   healthRandomizerDice: Dice.D4,
   skills: {

@@ -18,6 +18,7 @@ export const npcOrc = {
   speed: MovementSpeed.Slow,
   baseHealth: 64,
   healthRandomizerDice: Dice.D4,
+  canSwitchToRandomTarget: true,
   skills: {
     level: 3,
     strength: {

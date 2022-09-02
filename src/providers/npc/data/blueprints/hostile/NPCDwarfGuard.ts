@@ -16,6 +16,7 @@ export const npcDwarfGuard = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
+  canSwitchToLowHealthTarget: true,
   baseHealth: 79,
   healthRandomizerDice: Dice.D4,
   skills: {

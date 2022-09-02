@@ -23,6 +23,7 @@ export const npcGhoul = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
+  canSwitchToRandomTarget: true,
   baseHealth: 97,
   healthRandomizerDice: Dice.D4,
   skills: {

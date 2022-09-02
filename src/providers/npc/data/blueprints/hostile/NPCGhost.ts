@@ -16,6 +16,7 @@ export const npcGhost = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
+  canSwitchToRandomTarget: true,
   baseHealth: 103,
   healthRandomizerDice: Dice.D4,
   skills: {

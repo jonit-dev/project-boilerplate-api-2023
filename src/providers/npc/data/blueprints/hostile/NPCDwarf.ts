@@ -16,6 +16,7 @@ export const npcDwarf = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
+  canSwitchToRandomTarget: true,
   baseHealth: 76,
   healthRandomizerDice: Dice.D4,
   skills: {
