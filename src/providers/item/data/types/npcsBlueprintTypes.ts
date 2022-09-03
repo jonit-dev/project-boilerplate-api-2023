@@ -34,3 +34,7 @@ export enum HostileNPCsBlueprint {
   DwarfGuard = "dwarf-guard",
   RedDragon = "red-dragon-01",
 }
+
+export enum BossesNPCsBlueprint {
+  Asterion = "asterion",
+}

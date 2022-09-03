@@ -28,12 +28,12 @@ const npcSchema = createLeanSchema(
       required: true,
     }),
     health: Type.number({
-      default: 100,
       required: true,
+      default: 100,
     }),
     maxHealth: Type.number({
-      default: 100,
       required: true,
+      default: 100,
     }),
     mana: Type.number({
       default: 0,

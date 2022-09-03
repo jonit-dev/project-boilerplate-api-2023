@@ -1,6 +1,6 @@
 {
-  "caves-ilya-village": 0.1,
-  "minotaur's-labyrinth": 0.1,
+  "caves-ilya-village": 1.1,
+  "minotaur's-labyrinth": 1.3,
   "dungeon-ilya-01": 0.1,
   "dwarf-mines": 0.1,
   "example": 0.1,
@@ -8,8 +8,9 @@
   "unit-test-map": 0.1,
   "ilya-graveyard-01": 0.1,
   "dragon's-lair": 0.1,
-  "minotaur's-island": 0.1,
+  "minotaur's-island": 1.3,
   "ilya-village-sewer": 0.1,
-  "ilya": 0.1,
-  "ilya-village-interiors": 0.1
+  "ilya": 1,
+  "ilya-village-interiors": 0.1,
+  "caves-03": 1.4
 }

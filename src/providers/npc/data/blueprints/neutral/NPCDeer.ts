@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -12,6 +13,8 @@ export const npcDeer = {
   alignment: NPCAlignment.Neutral,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.ExtraFast,
+  baseHealth: 10,
+  healthRandomizerDice: Dice.D4,
   skills: {
     level: 1,
     strength: {
