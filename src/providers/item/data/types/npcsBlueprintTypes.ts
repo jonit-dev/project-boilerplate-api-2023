@@ -33,6 +33,12 @@ export enum HostileNPCsBlueprint {
   Dwarf = "dwarf",
   DwarfGuard = "dwarf-guard",
   RedDragon = "red-dragon-01",
+  Troll = "troll",
+  WildTroll = "wild-troll",
+  TrollWarrior = "troll-warrior",
+  TrollBerserker = "troll-berserker",
+  ForestTroll = "forest-troll",
+  CaveTroll = "cave-troll",
 }
 
 export enum BossesNPCsBlueprint {
