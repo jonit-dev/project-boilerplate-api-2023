@@ -34,8 +34,8 @@ export class BattleEvent {
     return BattleEventType.Miss;
   }
 
-  private hasBattleEventSucceeded(actionModifier: number, anotherActionModifier: number): boolean {
-    const chance = (actionModifier / (anotherActionModifier + actionModifier)) * 100;
+  private hasBattleEventSucceeded(actionModifier: number, oppositeActionModifier: number): boolean {
+    const chance = (actionModifier / (oppositeActionModifier + actionModifier)) * 100;
     const n = _.random(0, 100);
 
     return n <= chance;
