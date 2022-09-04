@@ -25,7 +25,7 @@ export class BattleEvent {
       return BattleEventType.Hit;
     }
 
-    const hasBlockSucceeded = this.hasBattleEventSucceeded(attackerModifiers, defenderModifiers);
+    const hasBlockSucceeded = this.hasBattleEventSucceeded(defenderModifiers, attackerModifiers);
 
     if (hasBlockSucceeded) {
       return BattleEventType.Block;
@@ -34,8 +34,8 @@ export class BattleEvent {
     return BattleEventType.Miss;
   }
 
-  private hasBattleEventSucceeded(attackerModifiers: number, defenderModifiers: number): boolean {
-    const chance = 21 - ((defenderModifiers - attackerModifiers) / 20) * 100;
+  private hasBattleEventSucceeded(actionModifier: number, anotherActionModifier: number): boolean {
+    const chance = (actionModifier / (anotherActionModifier + actionModifier)) * 100;
     const n = _.random(0, 100);
 
     return n <= chance;
@@ -46,7 +46,6 @@ export class BattleEvent {
     const defenderSkills = target.skills as unknown as ISkill;
 
     const totalPotentialAttackerDamage = (await attackerSkills.attack) * (100 / 100 + (await defenderSkills.defense));
-
     const damage = Math.round(_.random(0, totalPotentialAttackerDamage));
 
     // damage cannot be higher than target's remaining health
