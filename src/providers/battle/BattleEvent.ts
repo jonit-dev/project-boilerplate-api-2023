@@ -44,8 +44,11 @@ export class BattleEvent {
   public async calculateHitDamage(attacker: BattleParticipant, target: BattleParticipant): Promise<number> {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
+    const attackerTotalAttack = await attackerSkills.attack;
+    const defenderTotalDefense = await defenderSkills.defense;
 
-    const totalPotentialAttackerDamage = (await attackerSkills.attack) * (100 / 100 + (await defenderSkills.defense));
+    const totalPotentialAttackerDamage = _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));
+
     const damage = Math.round(_.random(0, totalPotentialAttackerDamage));
 
     // damage cannot be higher than target's remaining health
