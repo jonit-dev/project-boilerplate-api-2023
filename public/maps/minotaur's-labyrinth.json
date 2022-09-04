@@ -7018,7 +7018,7 @@
  "nextobjectid":117,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.9.0",
+ "tiledversion":"1.9.1",
  "tileheight":16,
  "tilesets":[
         {
@@ -7742,12 +7742,12 @@
                         {
                          "name":"description",
                          "type":"string",
-                         "value":""
+                         "value":"a cave wall."
                         }, 
                         {
                          "name":"ge_collide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
