@@ -25,7 +25,7 @@ export class BattleEvent {
       return BattleEventType.Hit;
     }
 
-    const hasBlockSucceeded = this.hasBattleEventSucceeded(attackerModifiers, defenderModifiers);
+    const hasBlockSucceeded = this.hasBattleEventSucceeded(defenderModifiers, attackerModifiers);
 
     if (hasBlockSucceeded) {
       return BattleEventType.Block;
@@ -34,8 +34,8 @@ export class BattleEvent {
     return BattleEventType.Miss;
   }
 
-  private hasBattleEventSucceeded(attackerModifiers: number, defenderModifiers: number): boolean {
-    const chance = 21 - ((defenderModifiers - attackerModifiers) / 20) * 100;
+  private hasBattleEventSucceeded(actionModifier: number, oppositeActionModifier: number): boolean {
+    const chance = (actionModifier / (oppositeActionModifier + actionModifier)) * 100;
     const n = _.random(0, 100);
 
     return n <= chance;
@@ -44,8 +44,10 @@ export class BattleEvent {
   public async calculateHitDamage(attacker: BattleParticipant, target: BattleParticipant): Promise<number> {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
+    const attackerTotalAttack = await attackerSkills.attack;
+    const defenderTotalDefense = await defenderSkills.defense;
 
-    const totalPotentialAttackerDamage = (await attackerSkills.attack) * (100 / 100 + (await defenderSkills.defense));
+    const totalPotentialAttackerDamage = _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));
 
     const damage = Math.round(_.random(0, totalPotentialAttackerDamage));
 
