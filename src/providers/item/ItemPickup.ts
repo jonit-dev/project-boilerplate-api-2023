@@ -46,6 +46,8 @@ export class ItemPickup {
     }
 
     if (pickupItem) {
+      await this.normalizeItemKey(pickupItem);
+
       const isItemAdded = await this.addItemToInventory(
         pickupItem,
         character,
@@ -226,6 +228,14 @@ export class ItemPickup {
     }
 
     return false;
+  }
+
+  // this removes any Tiled id from items, that may be added to the key and cause issues
+  // eg arrow-123 instead of arrow
+  private async normalizeItemKey(item: IItem): Promise<void> {
+    item.key = item.key.replace(/-\d+$/, "");
+
+    await item.save();
   }
 
   private async isItemPickupValid(

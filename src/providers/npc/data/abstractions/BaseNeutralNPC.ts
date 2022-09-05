@@ -28,7 +28,7 @@ export const generateMoveTowardsMovement = (): any => {
     ...generateBaseNPCProperties(),
     originalMovementType: NPCMovementType.MoveTowards,
     currentMovementType: NPCMovementType.MoveTowards,
-    maxRangeInGridCells: 10,
+    maxRangeInGridCells: 30,
     pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
     pathOrientation: NPCPathOrientation.Forward, // must be forward!
   };
