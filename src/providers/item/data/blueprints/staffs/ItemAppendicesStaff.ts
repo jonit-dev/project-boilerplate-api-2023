@@ -14,5 +14,6 @@ export const itemAppendicesStaff: Partial<IItem> = {
   attack: 1,
   defense: 0,
   weight: 1,
+  isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };

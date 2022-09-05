@@ -61,6 +61,7 @@ const itemSchema = createLeanSchema(
     decayTime: Type.date(),
     maxRange: Type.number(),
     requiredAmmoKey: Type.string(),
+    isTwoHanded: Type.boolean({ required: true, default: false }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

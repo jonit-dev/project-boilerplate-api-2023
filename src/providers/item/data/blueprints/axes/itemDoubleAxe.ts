@@ -13,5 +13,6 @@ export const itemDoubleAxe: Partial<IItem> = {
   description: "An doubled headed axe.",
   attack: 5,
   weight: 2,
+  isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };

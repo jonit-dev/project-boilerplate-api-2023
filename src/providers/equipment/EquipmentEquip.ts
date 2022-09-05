@@ -46,8 +46,20 @@ export class EquipmentEquip {
       return;
     }
 
+    // @ts-ignore
+    if (item.isTwoHanded) {
+      const canEquipTwoHanded = await this.checkTwoHandedEquip(equipment as unknown as IEquipmentSet);
+      if (!canEquipTwoHanded) {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "Cannot equip two handed item, hand slot already have an item!",
+          type: "error",
+        });
+      }
+    }
+
     if (equipment) {
       equipment[availableSlot] = item._id;
+
       await equipment.save();
 
       await this.removeItemFromInventory(itemId, itemContainer!);
@@ -148,6 +160,13 @@ export class EquipmentEquip {
     }
 
     return true;
+  }
+
+  private async checkTwoHandedEquip(equipment: IEquipmentSet): Promise<boolean> {
+    const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+    if (equipmentSlots.leftHand === "" && equipmentSlots.rightHand === "") return true;
+
+    return false;
   }
 
   public getAvailableSlot(item: IItem, equipment: IEquipmentSet): string {
