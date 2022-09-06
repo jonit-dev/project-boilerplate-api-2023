@@ -36,7 +36,12 @@ export const npcGhost = {
   loots: [
     {
       itemBlueprintKey: BowsBlueprint.Arrow,
-      chance: 45,
+      chance: 20,
+      quantityRange: [3, 10],
+    },
+    {
+      itemBlueprintKey: BowsBlueprint.Bow,
+      chance: 5,
     },
   ],
 } as Partial<INPC>;

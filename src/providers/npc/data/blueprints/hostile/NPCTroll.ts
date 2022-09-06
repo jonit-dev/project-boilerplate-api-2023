@@ -65,5 +65,9 @@ export const npcTroll = {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
     },
+    {
+      itemBlueprintKey: BowsBlueprint.Bow,
+      chance: 20,
+    },
   ],
 } as Partial<INPC>;

@@ -2,7 +2,12 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { BootsBlueprint, GlovesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  BootsBlueprint,
+  BowsBlueprint,
+  GlovesBlueprint,
+  MacesBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -46,6 +51,11 @@ export const npcDwarf = {
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: BowsBlueprint.Arrow,
+      chance: 20,
+      quantityRange: [5, 10],
     },
   ],
 } as Partial<INPC>;
