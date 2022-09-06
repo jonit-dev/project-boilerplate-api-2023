@@ -13,6 +13,7 @@ export enum FriendlyNPCsBlueprint {
   Trader = "trader",
   WomanBlueHair = "woman-blue-hair",
   WomanGreenHair = "woman-green-hair",
+  SeniorKnight1 = "senior-knight-1",
 }
 
 export enum HostileNPCsBlueprint {
@@ -33,4 +34,14 @@ export enum HostileNPCsBlueprint {
   Dwarf = "dwarf",
   DwarfGuard = "dwarf-guard",
   RedDragon = "red-dragon-01",
+  Troll = "troll",
+  WildTroll = "wild-troll",
+  TrollWarrior = "troll-warrior",
+  TrollBerserker = "troll-berserker",
+  ForestTroll = "forest-troll",
+  CaveTroll = "cave-troll",
+}
+
+export enum BossesNPCsBlueprint {
+  Asterion = "asterion",
 }

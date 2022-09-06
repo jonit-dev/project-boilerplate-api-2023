@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
+  BowsBlueprint,
   GlovesBlueprint,
   LegsBlueprint,
   MacesBlueprint,
@@ -23,6 +24,7 @@ export const npcGhoul = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
+  canSwitchToRandomTarget: true,
   baseHealth: 97,
   healthRandomizerDice: Dice.D4,
   skills: {
@@ -67,6 +69,11 @@ export const npcGhoul = {
     {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,
       chance: 2.5,
+    },
+    {
+      itemBlueprintKey: BowsBlueprint.Arrow,
+      chance: 30,
+      quantityRange: [10, 13],
     },
   ],
 } as Partial<INPC>;

@@ -1,4 +1,4 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
@@ -129,6 +129,24 @@ export class NPCTarget {
         // remove npc.targetCharacter
         await this.clearTarget(npc);
       }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  public async setTarget(npc: INPC, character: ICharacter): Promise<void> {
+    try {
+      if (!npc.isAlive) {
+        return;
+      }
+
+      const char = await Character.findById(character.id);
+      if (!char) {
+        throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
+      }
+
+      npc.targetCharacter = char._id;
+      await npc.save();
     } catch (error) {
       console.error(error);
     }

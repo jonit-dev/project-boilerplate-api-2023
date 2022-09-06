@@ -11,11 +11,16 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 import { EquipmentSlots } from "./EquipmentSlots";
 
 @provide(EquipmentUnequip)
 export class EquipmentUnequip {
-  constructor(private socketMessaging: SocketMessaging, private equipmentSlots: EquipmentSlots) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private equipmentSlots: EquipmentSlots,
+    private equipmentHelper: EquipmentRangeUpdate
+  ) {}
 
   public async unequip(
     character: ICharacter,
@@ -133,6 +138,8 @@ export class EquipmentUnequip {
     };
 
     this.updateItemInventoryCharacter(payloadUpdate, character);
+
+    await this.equipmentHelper.updateCharacterAttackType(character, item);
   }
 
   private updateItemInventoryCharacter(

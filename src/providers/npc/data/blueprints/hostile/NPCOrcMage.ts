@@ -6,6 +6,7 @@ import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  BowsBlueprint,
   GlovesBlueprint,
   HelmetBlueprint,
   MacesBlueprint,
@@ -25,6 +26,7 @@ export const npcOrcMage = {
   speed: MovementSpeed.Standard,
   baseHealth: 70,
   healthRandomizerDice: Dice.D4,
+  canSwitchToLowHealthTarget: true,
   skills: {
     level: 10,
     strength: {
@@ -64,6 +66,10 @@ export const npcOrcMage = {
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: BowsBlueprint.Bow,
+      chance: 5,
     },
   ],
 } as Partial<INPC>;

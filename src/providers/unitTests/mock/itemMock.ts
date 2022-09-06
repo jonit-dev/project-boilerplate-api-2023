@@ -1,4 +1,5 @@
 import { IItem, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
 export const itemMock: Partial<IItem> = {
   type: ItemType.Weapon,
@@ -25,6 +26,7 @@ export const itemMock: Partial<IItem> = {
   scene: "example",
   createdAt: "2022-06-25T22:53:55.579Z",
   updatedAt: "2022-06-28T04:42:21.409Z",
+  rangeType: EntityAttackType.Melee,
 };
 
 export const stackableItemMock: Partial<IItem> = {

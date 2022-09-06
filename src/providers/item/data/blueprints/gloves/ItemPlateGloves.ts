@@ -13,5 +13,5 @@ export const itemPlateGloves: Partial<IItem> = {
   description: "A pair of plated gloves.",
   defense: 10,
   weight: 2,
-  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  allowedEquipSlotType: [ItemSlotType.Accessory],
 };

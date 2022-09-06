@@ -6,6 +6,7 @@ import { npcFatBaldMan } from "./NPCFatBaldMan";
 import { npcFelicia } from "./NPCFelicia";
 import { npcMaleNobleBlackHair } from "./NPCMaleNobleBlackHair";
 import { npcMaria } from "./NPCMaria";
+import { npcSeniorKnight } from "./NPCSeniorKnight1";
 import { npcTrader } from "./NPCTrader";
 import { npcWomanBlueHair } from "./NPCWomanBlueHair";
 import { npcWomanGreenHair } from "./NPCWomanGreenHair";
@@ -22,4 +23,5 @@ export const friendlyNPCs = {
   "fat-bald-man": npcFatBaldMan,
   "male-noble-black-hair": npcMaleNobleBlackHair,
   "woman-green-hair": npcWomanGreenHair,
+  "senior-knight-1": npcSeniorKnight,
 };

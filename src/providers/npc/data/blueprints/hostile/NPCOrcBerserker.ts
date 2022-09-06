@@ -24,6 +24,7 @@ export const npcOrcBerserker = {
   speed: MovementSpeed.ExtraFast,
   baseHealth: 98,
   healthRandomizerDice: Dice.D4,
+  canSwitchToLowHealthTarget: true,
   skills: {
     level: 12,
     strength: {

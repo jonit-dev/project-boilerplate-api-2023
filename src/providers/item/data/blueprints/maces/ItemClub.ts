@@ -1,5 +1,6 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { MacesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemClub: Partial<IItem> = {
@@ -14,4 +15,5 @@ export const itemClub: Partial<IItem> = {
   attack: 2,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  rangeType: EntityAttackType.Melee,
 };

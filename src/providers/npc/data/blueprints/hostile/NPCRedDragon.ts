@@ -18,6 +18,7 @@ export const npcRedDragon = {
   speed: MovementSpeed.Standard,
   baseHealth: 315,
   healthRandomizerDice: Dice.D4,
+  canSwitchToLowHealthTarget: true,
   skills: {
     level: 50,
     strength: {
