@@ -28,8 +28,6 @@ export class EquipmentRangeUpdate {
 
       const equipmentRanges = _.compact([leftHandItem?.rangeType, rightHandItem?.rangeType]);
 
-      console.log(equipmentRanges);
-
       if (equipmentRanges.length === 0) {
         character.attackType = EntityAttackType.Melee;
         await character.save();
