@@ -70,9 +70,6 @@ const characterSchema = createLeanSchema(
       default: CharacterClass.None,
       enum: TypeHelper.enumToStringArray(CharacterClass),
     }),
-    textureKey: Type.string({
-      required: true,
-    }),
     totalWeightCapacity: Type.number({
       required: true,
       default: 100,
