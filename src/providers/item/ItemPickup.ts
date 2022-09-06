@@ -13,7 +13,6 @@ import {
   IUIShowMessage,
   UIMessageType,
   UISocketEvents,
-  ItemContainerType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentEquip } from "../equipment/EquipmentEquip";
@@ -39,6 +38,7 @@ export class ItemPickup {
     const inventario = await character.inventory;
     const equipItemContainer = pickupItem.isItemContainer && inventario === null;
     const isPickupValid = await this.isItemPickupValid(itemPickup, character, equipItemContainer);
+    const isMapContainer = pickupItem.x !== undefined && pickupItem.y !== undefined && pickupItem.scene !== undefined;
 
     if (!isPickupValid) {
       return false;
@@ -57,11 +57,11 @@ export class ItemPickup {
       await this.characterWeight.updateCharacterWeight(character);
 
       // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
-      if (pickupItem.x !== undefined && pickupItem.y !== undefined && pickupItem.scene !== undefined) {
+      if (isMapContainer) {
         // If an item has a x, y and scene, it means its coming from a map pickup. So we should destroy its representation and warn other characters nearby.
         await this.itemView.removeItemFromMap(pickupItem);
       } else {
-        if (itemPickup.fromContainerId !== ItemContainerType.MapContainer) {
+        if (itemPickup.fromContainerId) {
           const isItemRemoved = await this.removeItemFromContainer(
             pickupItem as unknown as IItem,
             character,
@@ -75,11 +75,10 @@ export class ItemPickup {
 
       // send update inventory event to user
       if (!equipItemContainer) {
-        const containerId =
-          itemPickup.fromContainerId !== ItemContainerType.MapContainer
-            ? itemPickup.fromContainerId
-            : itemPickup.toContainerId;
-        const updatedContainer = (await ItemContainer.findById(containerId)) as unknown as IItemContainer;
+        // if the origin container is a MapContainer so should update the char inventory
+        //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
+        const containerToUpdateId = isMapContainer ? itemPickup.toContainerId : itemPickup.fromContainerId;
+        const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as unknown as IItemContainer;
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
           equipment: {} as unknown as IEquipmentSet,
           inventory: {
@@ -156,7 +155,6 @@ export class ItemPickup {
 
       if (selectedItem.isStackable) {
         const itemStacked = await this.tryAddingItemToStack(character, targetContainer, selectedItem);
-
         if (itemStacked) {
           return true;
         }
@@ -277,12 +275,10 @@ export class ItemPickup {
               },
             }
           );
-
           return true;
         }
       }
     }
-
     return false;
   }
 
@@ -329,7 +325,7 @@ export class ItemPickup {
       return false;
     }
 
-    if (itemPickup.fromContainerId === ItemContainerType.MapContainer) {
+    if (item.x !== undefined && item.y !== undefined && item.scene !== undefined) {
       const underRange = this.movementHelper.isUnderRange(character.x, character.y, itemPickup.x, itemPickup.y, 1);
       if (!underRange) {
         this.sendCustomErrorMessage(character, "Sorry, you are too far away to pick up this item.");
