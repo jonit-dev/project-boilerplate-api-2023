@@ -1,4 +1,6 @@
 import { IItem, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+
 import { DaggersBluePrint } from "../../types/itemsBlueprintTypes";
 
 export const itemDagger: Partial<IItem> = {
@@ -15,4 +17,5 @@ export const itemDagger: Partial<IItem> = {
   attack: 3,
   weight: 4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  rangeType: EntityAttackType.Melee,
 };

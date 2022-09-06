@@ -1,5 +1,6 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { SpearsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemSpear: Partial<IItem> = {
@@ -16,4 +17,5 @@ export const itemSpear: Partial<IItem> = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,
+  rangeType: EntityAttackType.Melee,
 };

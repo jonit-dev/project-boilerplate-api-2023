@@ -1,5 +1,6 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { HammersBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemWarHammer: Partial<IItem> = {
@@ -15,4 +16,5 @@ export const itemWarHammer: Partial<IItem> = {
   defense: 0,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  rangeType: EntityAttackType.Melee,
 };
