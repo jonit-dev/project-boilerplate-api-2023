@@ -54,6 +54,7 @@ export class EquipmentEquip {
           message: "Cannot equip two handed item, hand slot already have an item!",
           type: "error",
         });
+        return;
       }
     }
 
@@ -164,7 +165,7 @@ export class EquipmentEquip {
 
   private async checkTwoHandedEquip(equipment: IEquipmentSet): Promise<boolean> {
     const equipmentSlots = await this.getEquipmentSlots(equipment._id);
-    if (equipmentSlots.leftHand === "" && equipmentSlots.rightHand === "") return true;
+    if (!equipmentSlots.leftHand && !equipmentSlots.rightHand) return true;
 
     return false;
   }

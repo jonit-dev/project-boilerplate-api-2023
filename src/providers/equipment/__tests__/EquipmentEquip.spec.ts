@@ -83,15 +83,13 @@ describe("EquipmentEquip.spec.ts", () => {
   it("Should not equip two handed weapon because there is already a weapon equipped", async () => {
     const inventory = await character.inventory;
     const container = await ItemContainer.findById(inventory.itemContainer);
-    const equipment = await Equipment.findById(inventory.id);
+    const equipment = await Equipment.findById(character.equipment);
 
-    if (container) {
+    if (container && equipment) {
       const slot = "leftHand";
       // @ts-ignore
       equipment[slot] = item._id;
       equipment.save();
-
-      console.log(equipment);
 
       container.slots[0] = itemTwoHanded;
       container.markModified("slots");
@@ -101,8 +99,8 @@ describe("EquipmentEquip.spec.ts", () => {
       const containerPostUpdate = await ItemContainer.findById(inventory.itemContainer);
       const equipmentPostUpdate = (await Equipment.findById(character.equipment)) as IEquipment;
 
-      // expect(containerPostUpdate?.slots[0]).toBeNull;
-      // expect(equipmentPostUpdate.leftHand?.toString()).toBe(itemTwoHanded._id.toString());
+      expect(containerPostUpdate?.slots[0]).toBeDefined();
+      expect(equipmentPostUpdate.leftHand?.toString()).toBe(item._id.toString());
     }
   });
 });
