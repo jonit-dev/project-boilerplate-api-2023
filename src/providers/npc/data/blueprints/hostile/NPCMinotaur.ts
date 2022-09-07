@@ -27,6 +27,7 @@ export const npcMinotaur = {
   speed: MovementSpeed.Fast,
   baseHealth: 186,
   healthRandomizerDice: Dice.D4,
+  skillRandomizerDice: Dice.D4,
   skills: {
     level: 8,
     strength: {

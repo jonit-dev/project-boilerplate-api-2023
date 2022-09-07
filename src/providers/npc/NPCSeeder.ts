@@ -96,11 +96,15 @@ export class NPCSeeder {
     try {
       const skills = new Skill({ ...(NPCData.skills as unknown as ISkill), ownerType: "NPC" }); // pre-populate skills, if present in metadata
       const npcHealth = this.setNPCRandomHealth(NPCData);
+      const skillsUpdated = this.setNPCRandomSkillLevel(NPCData, skills);
+
+      console.log(`NPC: ${NPCData.name} Skills:[${skills}]`);
+      console.log(`NPC: ${NPCData.name} Skills:[${skillsUpdated}]`);
 
       const newNPC = new NPC({
         ...NPCData,
         maxHealth: npcHealth,
-        skills: skills._id,
+        skills: skillsUpdated._id,
       });
       await newNPC.save();
 
@@ -112,6 +116,25 @@ export class NPCSeeder {
 
       console.error(error);
     }
+  }
+
+  private setNPCRandomSkillLevel(NPCData: INPCSeedData, skills: ISkill): ISkill {
+    // ts-ignore is here until we update our ts-types lib
+    const skillKeys = Object.keys(skills);
+
+    for (const key of skillKeys) {
+      // @ts-ignore
+      if (skills[key].level && NPCData.skillRandomizerDice) {
+        const level = skills[key].level;
+        // @ts-ignore
+        skills[key].level = level + rollDice(NPCData.skillRandomizerDice);
+      }
+    }
+
+    // @ts-ignore
+    if (NPCData.skillRandomizerDice) skills.level = skills.level + rollDice(NPCData.skillRandomizerDice);
+
+    return skills;
   }
 
   private setNPCRandomHealth(NPCData: INPCSeedData): number {
