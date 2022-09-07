@@ -3,7 +3,6 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { IItem, ItemType } from "@rpg-engine/shared";
-import { ObjectId } from "mongoose";
 import { EquipmentEquip } from "../EquipmentEquip";
 
 describe("EquipmentEquip.spec.ts", () => {
