@@ -18,6 +18,7 @@ export const npcSpider = {
   speed: MovementSpeed.Standard,
   baseHealth: 49,
   healthRandomizerDice: Dice.D4,
+  skillRandomizerDice: Dice.D4,
   skills: {
     level: 1,
     strength: {

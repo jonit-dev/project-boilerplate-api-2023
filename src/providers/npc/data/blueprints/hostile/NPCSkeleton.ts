@@ -23,6 +23,7 @@ export const npcSkeleton = {
   speed: MovementSpeed.Slow,
   baseHealth: 58,
   healthRandomizerDice: Dice.D4,
+  skillRandomizerDice: Dice.D4,
   skills: {
     level: 1,
     strength: {

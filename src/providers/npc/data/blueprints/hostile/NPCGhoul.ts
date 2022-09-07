@@ -25,6 +25,7 @@ export const npcGhoul = {
   speed: MovementSpeed.Slow,
   baseHealth: 97,
   healthRandomizerDice: Dice.D4,
+  skillRandomizerDice: Dice.D4,
   skills: {
     level: 4,
     strength: {

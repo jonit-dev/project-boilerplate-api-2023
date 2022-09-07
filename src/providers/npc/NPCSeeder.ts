@@ -98,9 +98,6 @@ export class NPCSeeder {
       const npcHealth = this.setNPCRandomHealth(NPCData);
       const skillsUpdated = this.setNPCRandomSkillLevel(NPCData, skills);
 
-      console.log(`NPC: ${NPCData.name} Skills:[${skills}]`);
-      console.log(`NPC: ${NPCData.name} Skills:[${skillsUpdated}]`);
-
       const newNPC = new NPC({
         ...NPCData,
         maxHealth: npcHealth,
@@ -120,11 +117,11 @@ export class NPCSeeder {
 
   private setNPCRandomSkillLevel(NPCData: INPCSeedData, skills: ISkill): ISkill {
     // ts-ignore is here until we update our ts-types lib
-    const skillKeys = Object.keys(skills);
+    const skillKeys = Object.keys(skills.toObject());
 
     for (const key of skillKeys) {
       // @ts-ignore
-      if (skills[key].level && NPCData.skillRandomizerDice) {
+      if (skills[key] && skills[key].level && NPCData.skillRandomizerDice) {
         const level = skills[key].level;
         // @ts-ignore
         skills[key].level = level + rollDice(NPCData.skillRandomizerDice);
