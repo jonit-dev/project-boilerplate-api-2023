@@ -16,15 +16,15 @@ export class ItemContainerHelper {
         return ItemContainerType.Loot;
       }
 
-      if (item.x && item.y && item.scene) {
-        return ItemContainerType.MapContainer;
-      }
-
       const owner = (await Character.findById(item.owner)) as unknown as ICharacter;
       const inventory = await owner?.inventory;
 
       if (item.id.toString() === inventory.id.toString()) {
         return ItemContainerType.Inventory;
+      }
+
+      if (item.x && item.y && item.scene) {
+        return ItemContainerType.MapContainer;
       }
     } catch (error) {
       console.error(error);
