@@ -33,7 +33,7 @@ export const npcSkeletonKnight = {
     dexterity: {
       level: 2,
     },
-    resistence: {
+    resistance: {
       level: 3,
     },
   },
