@@ -29,6 +29,7 @@ export const npcMinotaur = {
   baseHealth: 186,
   healthRandomizerDice: Dice.D4,
   skillRandomizerDice: Dice.D4,
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
     level: 8,
     strength: {

@@ -24,6 +24,7 @@ export const npcSkeleton = {
   baseHealth: 58,
   healthRandomizerDice: Dice.D4,
   skillRandomizerDice: Dice.D4,
+  skillsToBeRandomized: ["level", "strength", "dexterity"],
   skills: {
     level: 1,
     strength: {

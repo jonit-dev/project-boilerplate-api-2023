@@ -77,7 +77,7 @@ export class NPCSeeder {
   }
 
   private async updateNPCSkills(NPCData: INPCSeedData, npc: INPC): Promise<void> {
-    const skills = NPCData.skills as any;
+    const skills = this.setNPCRandomSkillLevel(NPCData);
 
     if (NPCData.skills) {
       await Skill.updateOne(
@@ -94,15 +94,15 @@ export class NPCSeeder {
 
   private async createNewNPCWithSkills(NPCData: INPCSeedData): Promise<void> {
     try {
-      const skills = new Skill({ ...(NPCData.skills as unknown as ISkill), ownerType: "NPC" }); // pre-populate skills, if present in metadata
+      const npcSkills = this.setNPCRandomSkillLevel(NPCData); // randomize skills present in the metadata only
+      const skills = new Skill({ ...(npcSkills as unknown as ISkill), ownerType: "NPC" }); // pre-populate skills, if present in metadata
       const npcHealth = this.setNPCRandomHealth(NPCData);
-      const skillsUpdated = this.setNPCRandomSkillLevel(NPCData, skills);
 
       const newNPC = new NPC({
         ...NPCData,
         health: npcHealth,
         maxHealth: npcHealth,
-        skills: skillsUpdated._id,
+        skills: skills._id,
       });
       await newNPC.save();
 
@@ -116,34 +116,41 @@ export class NPCSeeder {
     }
   }
 
-  private setNPCRandomSkillLevel(NPCData: INPCSeedData, skills: ISkill): ISkill {
+  private setNPCRandomSkillLevel(NPCData: INPCSeedData): Object {
     // ts-ignore is here until we update our ts-types lib
-    const skillKeys = Object.keys(skills.toObject());
 
-    for (const key of skillKeys) {
-      // @ts-ignore
-      if (skills[key] && skills[key].level && NPCData.skillRandomizerDice) {
-        const level = skills[key].level;
+    // @ts-ignore
+    if (!NPCData.skillRandomizerDice) return NPCData.skills;
+
+    /**
+     * If we have skills to be randomized we apply the randomDice value to that
+     * if not we get all skills added in the blueprint to change it's level
+     */
+    // @ts-ignore
+    const skillKeys: string[] = NPCData.skillsToBeRandomized
+      ? NPCData.skillsToBeRandomized
+      : Object.keys(NPCData.skills);
+
+    for (const skill of skillKeys) {
+      if (!NPCData.skills[skill]) continue;
+
+      if (skill === "level") {
         // @ts-ignore
-        skills[key].level = level + rollDice(NPCData.skillRandomizerDice);
+        NPCData.skills[skill] += rollDice(NPCData.skillRandomizerDice);
+      } else {
+        // @ts-ignore
+        NPCData.skills[skill].level += rollDice(NPCData.skillRandomizerDice);
       }
     }
 
-    // @ts-ignore
-    if (NPCData.skillRandomizerDice) skills.level = skills.level + rollDice(NPCData.skillRandomizerDice);
-
-    return skills;
+    return NPCData.skills;
   }
 
   private setNPCRandomHealth(NPCData: INPCSeedData): number {
-    // ts-ignore is here until we update our ts-types lib
-    // @ts-ignore
     if (NPCData.healthRandomizerDice && NPCData.baseHealth) {
-      // @ts-ignore
       return NPCData.baseHealth + rollDice(NPCData.healthRandomizerDice);
     }
 
-    // @ts-ignore
     return NPCData.maxHealth;
   }
 

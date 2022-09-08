@@ -29,6 +29,8 @@ export const npcTrollBerserker = {
   speed: MovementSpeed.Standard,
   baseHealth: 320,
   healthRandomizerDice: Dice.D20,
+  skillRandomizerDice: Dice.D12,
+  skillsToBeRandomized: ["level", "strength", "dexterity"],
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
