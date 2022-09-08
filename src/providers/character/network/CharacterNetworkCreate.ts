@@ -103,6 +103,7 @@ export class CharacterNetworkCreate {
           maxHealth: character.maxHealth,
           mana: character.mana,
           maxMana: character.maxMana,
+          textureKey: character.textureKey,
         };
 
         channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
@@ -144,6 +145,7 @@ export class CharacterNetworkCreate {
           maxHealth: nearbyCharacter.maxHealth,
           mana: nearbyCharacter.mana,
           maxMana: nearbyCharacter.maxMana,
+          textureKey: nearbyCharacter.textureKey,
         };
 
         // tell the emitter about these other characters too

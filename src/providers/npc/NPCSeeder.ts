@@ -100,6 +100,7 @@ export class NPCSeeder {
 
       const newNPC = new NPC({
         ...NPCData,
+        health: npcHealth,
         maxHealth: npcHealth,
         skills: skillsUpdated._id,
       });

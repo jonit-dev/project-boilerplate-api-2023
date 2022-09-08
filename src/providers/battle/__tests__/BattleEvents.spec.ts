@@ -16,7 +16,8 @@ describe("BattleEvents.spec.ts", () => {
     await unitTestHelper.beforeAllJestHook();
     battleEvents = container.get<BattleEvent>(BattleEvent);
 
-    jest.spyOn(_, "random").mockImplementation(() => 0);
+    // Set random as 50 to get the most likely Battle Event
+    jest.spyOn(_, "random").mockImplementation(() => 50);
   });
 
   beforeEach(async () => {
@@ -28,13 +29,13 @@ describe("BattleEvents.spec.ts", () => {
     await testCharacter.populate("skills").execPopulate();
   });
 
-  it("should properly calculate a hit or miss event", async () => {
+  it("should properly calculate a hit", async () => {
     const event = await battleEvents.calculateEvent(testNPC, testCharacter);
 
-    expect(event === BattleEventType.Hit || event === BattleEventType.Miss).toBeTruthy();
+    expect(event === BattleEventType.Hit).toBeTruthy();
   });
 
-  it("expect to miss if defender's dexterity is too high", async () => {
+  it("expect to block if defender's dexterity is too high", async () => {
     const defenderSkills = await Skill.findOne({ owner: testCharacter._id });
 
     if (defenderSkills) {
@@ -45,7 +46,7 @@ describe("BattleEvents.spec.ts", () => {
 
       const event = await battleEvents.calculateEvent(testNPC, testCharacter);
 
-      expect(event).toBe(BattleEventType.Miss);
+      expect(event).toBe(BattleEventType.Block);
     }
   });
 
@@ -67,6 +68,16 @@ describe("BattleEvents.spec.ts", () => {
 
       expect(event).toBe(BattleEventType.Hit);
     }
+  });
+
+  it("should properly calculate a miss event", async () => {
+    // 50% chance to hit and 50% chance to block
+    // with random = 51 will miss (each event is calculated independently)
+    jest.spyOn(_, "random").mockImplementation(() => 51);
+
+    const event = await battleEvents.calculateEvent(testNPC, testCharacter);
+
+    expect(event === BattleEventType.Miss).toBeTruthy();
   });
 
   it("should properly calculate a hit damage", async () => {

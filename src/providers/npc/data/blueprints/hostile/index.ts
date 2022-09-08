@@ -1,6 +1,8 @@
 import { npcBat } from "./NPCBat";
+import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
+import { npcForestTroll } from "./NPCForestTroll";
 import { npcGhost } from "./NPCGhost";
 import { npcGhoul } from "./NPCGhoul";
 import { npcMinotaur } from "./NPCMinotaur";
@@ -14,6 +16,10 @@ import { npcSkeleton } from "./NPCSkeleton";
 import { npcSkeletonKnight } from "./NPCSkeletonKnight";
 import { npcSlime } from "./NPCSlime";
 import { npcSpider } from "./NPCSpider";
+import { npcTroll } from "./NPCTroll";
+import { npcTrollBerserker } from "./NPCTrollBerserker";
+import { npcTrollWarrior } from "./NPCTrollWarrior";
+import { npcWildTroll } from "./NPCWildTroll";
 import { npcWolf } from "./NPCWolf";
 
 export const hostileNPCs = {
@@ -34,4 +40,10 @@ export const hostileNPCs = {
   dwarf: npcDwarf,
   "dwarf-guard": npcDwarfGuard,
   "red-dragon": npcRedDragon,
+  troll: npcTroll,
+  "wild-troll": npcWildTroll,
+  "troll-warrior": npcTrollWarrior,
+  "troll-berserker": npcTrollBerserker,
+  "forest-troll": npcForestTroll,
+  "cave-troll": npcCaveTroll,
 };

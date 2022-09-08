@@ -16,6 +16,7 @@ export const npcGhost = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
+  canSwitchToRandomTarget: true,
   baseHealth: 103,
   healthRandomizerDice: Dice.D4,
   skills: {
@@ -35,7 +36,12 @@ export const npcGhost = {
   loots: [
     {
       itemBlueprintKey: BowsBlueprint.Arrow,
-      chance: 45,
+      chance: 20,
+      quantityRange: [3, 10],
+    },
+    {
+      itemBlueprintKey: BowsBlueprint.Bow,
+      chance: 5,
     },
   ],
 } as Partial<INPC>;

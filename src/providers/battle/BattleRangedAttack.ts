@@ -1,11 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { BowsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   BattleSocketEvents,
@@ -23,7 +24,6 @@ import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
-import { MovementHelper } from "@providers/movement/MovementHelper";
 
 interface IRangedAttackParams {
   location: string;
@@ -119,27 +119,27 @@ export class BattleRangedAttack {
   }
 
   private sendNotInRangeEvent(character: ICharacter, target: ICharacter | INPC): void {
-    this.socketMessaging.sendEventToUser<IBattleRangedAttackFailed>(
-      character.channelId!,
-      BattleSocketEvents.RangedAttackFailure,
-      {
-        targetId: target.id,
-        type: target.type as EntityType,
-        reason: "Ranged attack failed because target distance exceeds weapon max range",
-      }
-    );
+    // this.socketMessaging.sendEventToUser<IBattleRangedAttackFailed>(
+    //   character.channelId!,
+    //   BattleSocketEvents.RangedAttackFailure,
+    //   {
+    //     targetId: target.id,
+    //     type: target.type as EntityType,
+    //     reason: "Ranged attack failed because target distance exceeds weapon max range",
+    //   }
+    // );
   }
 
   private sendSolidInTrajectoryEvent(character: ICharacter, target: ICharacter | INPC): void {
-    this.socketMessaging.sendEventToUser<IBattleRangedAttackFailed>(
-      character.channelId!,
-      BattleSocketEvents.RangedAttackFailure,
-      {
-        targetId: target.id,
-        type: target.type as EntityType,
-        reason: "Ranged attack failed because there's a solid in ranged attack trajectory",
-      }
-    );
+    // this.socketMessaging.sendEventToUser<IBattleRangedAttackFailed>(
+    //   character.channelId!,
+    //   BattleSocketEvents.RangedAttackFailure,
+    //   {
+    //     targetId: target.id,
+    //     type: target.type as EntityType,
+    //     reason: "Ranged attack failed because there's a solid in ranged attack trajectory",
+    //   }
+    // );
   }
 
   public sendRangedAttackEvent(
@@ -167,6 +167,7 @@ export class BattleRangedAttack {
           return result;
         }
         result = (await this.getRequiredAmmo(weapon.requiredAmmoKey, equipment)) as IRangedAttackParams;
+
         if (!_.isEmpty(result)) {
           result.maxRange = weapon.maxRange || 0;
         }
@@ -184,9 +185,10 @@ export class BattleRangedAttack {
     equipment: IEquipment
   ): Promise<Partial<IRangedAttackParams> | undefined> {
     // check if character has enough required ammo in inventory or equipment
-    const accesory = await Item.findById(equipment.accessory);
-    if (accesory && accesory.key === requiredAmmoKey) {
-      return { location: ItemSlotType.Accessory, id: accesory._id, key: requiredAmmoKey, equipment };
+    const accessory = await Item.findById(equipment.accessory);
+
+    if (accessory && accessory.key === requiredAmmoKey) {
+      return { location: ItemSlotType.Accessory, id: accessory._id, key: requiredAmmoKey, equipment };
     }
 
     if (!equipment.inventory) {
@@ -219,10 +221,28 @@ export class BattleRangedAttack {
     const backpack = equipment.inventory as unknown as IItem;
     const backpackContainer = (await ItemContainer.findById(backpack.itemContainer)) as IItemContainer;
 
+    let wasStackReduced = false;
+
     switch (attackParams.location) {
       case ItemSlotType.Accessory:
-        equipment.accessory = undefined;
-        await equipment.save();
+        const accessory = (await Item.findById(equipment.accessory)) as unknown as IItem;
+
+        if (!accessory) {
+          return;
+        }
+
+        // if item stackQty > 1, just decrease stackQty by 1
+        if (accessory.stackQty && accessory.stackQty > 1) {
+          wasStackReduced = true;
+
+          accessory.stackQty -= 1;
+          await accessory.save();
+        } else {
+          // if item stackQty === 1, remove item from equipment accessory slot
+          equipment.accessory = undefined;
+          await equipment.save();
+        }
+
         break;
       case ItemSlotType.Inventory:
         await this.equipmentEquip.removeItemFromInventory(attackParams.id.toString(), backpackContainer);
@@ -239,7 +259,9 @@ export class BattleRangedAttack {
       default:
         throw new Error("Invalid ammo location");
     }
-    await Item.deleteOne({ _id: attackParams.id });
+    if (!wasStackReduced) {
+      await Item.deleteOne({ _id: attackParams.id });
+    }
 
     const equipmentSlots = await this.equipmentEquip.getEquipmentSlots(equipment._id);
 
@@ -255,6 +277,8 @@ export class BattleRangedAttack {
         allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
         isEmpty: backpackContainer.isEmpty,
       },
+      openEquipmentSetOnUpdate: false,
+      openInventoryOnUpdate: false,
     };
 
     this.equipmentEquip.updateItemInventoryCharacter(payloadUpdate, character);

@@ -11,11 +11,16 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 import { EquipmentSlots } from "./EquipmentSlots";
 
 @provide(EquipmentUnequip)
 export class EquipmentUnequip {
-  constructor(private socketMessaging: SocketMessaging, private equipmentSlots: EquipmentSlots) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private equipmentSlots: EquipmentSlots,
+    private equipmentHelper: EquipmentRangeUpdate
+  ) {}
 
   public async unequip(
     character: ICharacter,
@@ -59,6 +64,14 @@ export class EquipmentUnequip {
     if (!character.isAlive) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "User is dead!",
+        type: "error",
+      });
+      return;
+    }
+
+    if (!inventory) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "It's not possible to unequip this item without an inventory!",
         type: "error",
       });
       return;
@@ -125,6 +138,8 @@ export class EquipmentUnequip {
     };
 
     this.updateItemInventoryCharacter(payloadUpdate, character);
+
+    await this.equipmentHelper.updateCharacterAttackType(character, item);
   }
 
   private updateItemInventoryCharacter(
