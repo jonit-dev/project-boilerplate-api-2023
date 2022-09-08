@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { IItem, ItemType } from "@rpg-engine/shared";
+import { IItem, ItemType, UISocketEvents } from "@rpg-engine/shared";
 import { EquipmentEquip } from "../EquipmentEquip";
 
 describe("EquipmentEquip.spec.ts", () => {
@@ -97,21 +97,45 @@ describe("EquipmentEquip.spec.ts", () => {
     }
   });
 
-  it("Should not equip a one handed weapon, if a two handed weapon is already equipped", async () => {});
+  it("Should not equip a one handed weapon, if a two handed weapon is already equipped", async () => {
+    const inventory = await character.inventory;
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+    const equipment = await Equipment.findById(character.equipment);
+
+    // @ts-ignore
+    const equipError = jest.spyOn(equipmentEquip.socketMessaging, "sendEventToUser" as any);
+
+    if (inventoryContainer && equipment) {
+      await tryToEquipItemWithAnotherAlreadyEquipped(inventoryContainer, "leftHand", equipment, itemTwoHanded, item);
+
+      expect(equipError).toHaveBeenCalledWith(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "You already have a two handed item equipped!",
+        type: "error",
+      });
+    }
+  });
 
   it("Should not equip two handed weapon because there is already a weapon equipped", async () => {
     const inventory = await character.inventory;
-    const container = await ItemContainer.findById(inventory.itemContainer);
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
     const equipment = await Equipment.findById(character.equipment);
 
-    if (container && equipment) {
-      await tryToEquipItemWithAnotherAlreadyEquipped(container, "leftHand", equipment, item, itemTwoHanded);
+    // @ts-ignore
+    const equipError = jest.spyOn(equipmentEquip.socketMessaging, "sendEventToUser" as any);
+
+    if (inventoryContainer && equipment) {
+      await tryToEquipItemWithAnotherAlreadyEquipped(inventoryContainer, "leftHand", equipment, item, itemTwoHanded);
 
       const containerPostUpdate = await ItemContainer.findById(inventory.itemContainer);
       const equipmentPostUpdate = (await Equipment.findById(character.equipment)) as IEquipment;
 
       expect(containerPostUpdate?.slots[0]).toBeDefined();
       expect(equipmentPostUpdate.leftHand?.toString()).toBe(item._id.toString());
+
+      expect(equipError).toHaveBeenCalledWith(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "You can't equip this two handed item with another item already in your hands!",
+        type: "error",
+      });
     }
   });
 });
