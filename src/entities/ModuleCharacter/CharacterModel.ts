@@ -2,13 +2,15 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import {
   CharacterClass,
-  CharacterGender,
   FromGridX,
   FromGridY,
   ItemSubType,
   ItemType,
   MapLayers,
   TypeHelper,
+  CharacterFactions,
+  ShadowWalkerRaces,
+  LifeBringerRaces,
 } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
@@ -39,6 +41,16 @@ const characterSchema = createLeanSchema(
     maxMana: Type.number({
       default: 100,
       required: true,
+    }),
+    faction: Type.string({
+      required: true,
+      enum: TypeHelper.enumToStringArray(CharacterFactions),
+    }),
+    race: Type.string({
+      required: true,
+      enum: Array.from(
+        new Set(TypeHelper.enumToStringArray(LifeBringerRaces).concat(TypeHelper.enumToStringArray(ShadowWalkerRaces)))
+      ),
     }),
     textureKey: Type.string({
       required: true,

@@ -1,3 +1,4 @@
+import { CharacterFactions, LifeBringerRaces } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
 export const characterMock = {
@@ -13,6 +14,8 @@ export const characterMock = {
   y: 112,
   direction: "left",
   class: "None",
+  faction: CharacterFactions.LifeBringer,
+  race: LifeBringerRaces.Human,
   textureKey: "kid-1",
   totalWeightCapacity: 100,
   isOnline: true,
