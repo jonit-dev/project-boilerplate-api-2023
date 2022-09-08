@@ -13,7 +13,7 @@ export const characterMock = {
   y: 112,
   direction: "left",
   class: "None",
-  gender: "Male",
+  textureKey: "kid-1",
   totalWeightCapacity: 100,
   isOnline: true,
   attackType: EntityAttackType.Melee,

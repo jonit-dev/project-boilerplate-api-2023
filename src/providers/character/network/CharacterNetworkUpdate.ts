@@ -151,6 +151,7 @@ export class CharacterNetworkUpdate {
         maxHealth: nearbyCharacter.maxHealth,
         mana: nearbyCharacter.mana,
         maxMana: nearbyCharacter.maxMana,
+        textureKey: nearbyCharacter.textureKey,
       };
 
       this.socketMessaging.sendEventToUser<ICharacterPositionUpdateFromServer>(
@@ -252,6 +253,7 @@ export class CharacterNetworkUpdate {
       maxHealth: character.maxHealth,
       mana: character.mana,
       maxMana: character.maxMana,
+      textureKey: character.textureKey,
     };
   }
 

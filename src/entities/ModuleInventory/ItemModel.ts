@@ -3,6 +3,7 @@ import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { container } from "@providers/inversify/container";
 import { ItemView } from "@providers/item/ItemView";
 import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { UpdateQuery } from "mongoose";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { ItemContainer } from "./ItemContainerModel";
@@ -22,6 +23,9 @@ const itemSchema = createLeanSchema(
       required: true,
       default: ItemSubType.Other,
       enum: TypeHelper.enumToStringArray(ItemSubType),
+    }),
+    rangeType: Type.string({
+      enum: TypeHelper.enumToStringArray(EntityAttackType),
     }),
     name: Type.string({ required: true }),
     description: Type.string({ required: true }),

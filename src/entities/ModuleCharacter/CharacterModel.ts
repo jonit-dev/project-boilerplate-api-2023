@@ -40,6 +40,11 @@ const characterSchema = createLeanSchema(
       default: 100,
       required: true,
     }),
+    textureKey: Type.string({
+      required: true,
+      default: "kid-1",
+    }),
+
     x: Type.number({
       default: FromGridX(39),
       required: true,
@@ -64,11 +69,6 @@ const characterSchema = createLeanSchema(
       required: true,
       default: CharacterClass.None,
       enum: TypeHelper.enumToStringArray(CharacterClass),
-    }),
-    gender: Type.string({
-      required: true,
-      default: CharacterGender.Male,
-      enum: TypeHelper.enumToStringArray(CharacterGender),
     }),
     totalWeightCapacity: Type.number({
       required: true,

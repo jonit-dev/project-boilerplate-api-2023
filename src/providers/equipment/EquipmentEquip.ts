@@ -13,10 +13,11 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 
 @provide(EquipmentEquip)
 export class EquipmentEquip {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging, private equipmentHelper: EquipmentRangeUpdate) {}
 
   public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<void> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
@@ -33,6 +34,7 @@ export class EquipmentEquip {
     const isEquipValid = this.validateEquip(item, character, itemContainer, itemId, equipItemContainer);
 
     if (!isEquipValid) {
+      console.log("Equip is not valid");
       return;
     }
 
@@ -82,6 +84,8 @@ export class EquipmentEquip {
       };
 
       this.updateItemInventoryCharacter(payloadUpdate, character);
+
+      await this.equipmentHelper.updateCharacterAttackType(character, item);
     }
   }
 
