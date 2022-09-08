@@ -128,8 +128,8 @@ export class NPCSeeder {
      */
     // @ts-ignore
     const skillKeys: string[] = NPCData.skillsToBeRandomized
-      ? // @ts-ignore
-        NPCData.skillsToBeRandomized
+    // @ts-ignore
+      ? NPCData.skillsToBeRandomized
       : Object.keys(NPCData.skills);
 
     for (const skill of skillKeys) {
