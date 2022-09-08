@@ -50,8 +50,6 @@ export class EquipmentEquip {
 
     const hasTwoHandedItemEquipped = await this.hasTwoHandedItemEquipped(equipment as unknown as IEquipmentSet);
 
-    console.log(hasTwoHandedItemEquipped);
-
     if (hasTwoHandedItemEquipped) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "You already have a two handed item equipped!",

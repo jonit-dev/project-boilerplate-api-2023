@@ -18,6 +18,24 @@ describe("EquipmentEquip.spec.ts", () => {
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
   });
 
+  const tryToEquipItemWithAnotherAlreadyEquipped = async (
+    inventoryContainer: IItemContainer,
+    slot: "leftHand" | "rightHand",
+    equipment: IEquipment,
+    alreadyEquippedItem: IItem,
+    itemToBeEquipped: IItem
+  ): Promise<void> => {
+    // @ts-ignore
+    equipment[slot] = alreadyEquippedItem._id;
+    await equipment.save();
+
+    inventoryContainer.slots[0] = itemToBeEquipped;
+    inventoryContainer.markModified("slots");
+    await inventoryContainer.save();
+
+    await equipmentEquip.equip(character, itemToBeEquipped._id, inventoryContainer?._id);
+  };
+
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
     equipment = await unitTestHelper.createEquipment();
@@ -79,21 +97,15 @@ describe("EquipmentEquip.spec.ts", () => {
     }
   });
 
+  it("Should not equip a one handed weapon, if a two handed weapon is already equipped", async () => {});
+
   it("Should not equip two handed weapon because there is already a weapon equipped", async () => {
     const inventory = await character.inventory;
     const container = await ItemContainer.findById(inventory.itemContainer);
     const equipment = await Equipment.findById(character.equipment);
 
     if (container && equipment) {
-      const slot = "leftHand";
-      // @ts-ignore
-      equipment[slot] = item._id;
-      equipment.save();
-
-      container.slots[0] = itemTwoHanded;
-      container.markModified("slots");
-      await container.save();
-      await equipmentEquip.equip(character, itemTwoHanded._id, container?._id);
+      await tryToEquipItemWithAnotherAlreadyEquipped(container, "leftHand", equipment, item, itemTwoHanded);
 
       const containerPostUpdate = await ItemContainer.findById(inventory.itemContainer);
       const equipmentPostUpdate = (await Equipment.findById(character.equipment)) as IEquipment;
