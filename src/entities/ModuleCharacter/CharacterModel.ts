@@ -45,12 +45,14 @@ const characterSchema = createLeanSchema(
     faction: Type.string({
       required: true,
       enum: TypeHelper.enumToStringArray(CharacterFactions),
+      default: CharacterFactions.LifeBringer,
     }),
     race: Type.string({
       required: true,
       enum: Array.from(
         new Set(TypeHelper.enumToStringArray(LifeBringerRaces).concat(TypeHelper.enumToStringArray(ShadowWalkerRaces)))
       ),
+      default: LifeBringerRaces.Human,
     }),
     textureKey: Type.string({
       required: true,
