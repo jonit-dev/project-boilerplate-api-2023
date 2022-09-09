@@ -65,6 +65,10 @@ export class MapTiles {
       const tileProperty = this.getTileProperty<boolean>(targetTileset!, tileId!, "ge_collide") || false;
 
       if (tileProperty) {
+        const isPassage = this.getTileProperty<boolean>(targetTileset!, tileId!, "is_passage") || false;
+        if (isPassage) {
+          return false;
+        }
         return tileProperty;
       } else {
         return false;
