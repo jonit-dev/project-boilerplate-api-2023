@@ -79,6 +79,35 @@ export class MapTiles {
     }
   }
 
+  public isPassage(map: string, gridX: number, gridY: number, mapLayer: MapLayers): boolean {
+    const layerName = TiledLayerNames[mapLayer];
+
+    const layer = this.getLayer(map, mapLayer);
+
+    if (!layer) {
+      throw new Error(`Failed to find layer ${layerName}`);
+    }
+
+    const rawTileId = this.getRawTileId(layer, gridX, gridY);
+
+    if (!rawTileId) {
+      return false;
+    }
+
+    const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
+
+    if (!targetTileset) {
+      return false;
+    }
+
+    if (rawTileId) {
+      const tileId = rawTileId - targetTileset.firstgid;
+      return this.getTileProperty<boolean>(targetTileset!, tileId!, "is_passage") || false;
+    }
+
+    return false;
+  }
+
   public getTileProperty<T>(tileset: ITileset, tileId: number, tileProperty: string): T | undefined {
     const tileInfo = tileset?.tiles?.find((tile) => tile.id === tileId);
 

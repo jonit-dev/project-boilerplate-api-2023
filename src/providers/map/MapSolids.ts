@@ -59,7 +59,52 @@ export class MapSolids {
     return false;
   }
 
+  public isTilePassage(
+    map: string,
+    gridX: number,
+    gridY: number,
+    layer: MapLayers,
+    strategy: SolidCheckStrategy = "CHECK_ALL_LAYERS_BELOW"
+  ): boolean {
+    switch (strategy) {
+      case "CHECK_ALL_LAYERS":
+        for (let i = this.mapHelper.getHighestMapLayer(); i >= 0; i--) {
+          const isPassage = this.tileIsPassageCheck(map, gridX, gridY, i);
+          if (isPassage) {
+            return true;
+          }
+        }
+        break;
+
+      case "CHECK_ALL_LAYERS_BELOW":
+        for (let i = layer; i >= MapLayers.Ground; i--) {
+          const isPassage = this.tileIsPassageCheck(map, gridX, gridY, i);
+          if (isPassage) {
+            return true;
+          }
+        }
+        break;
+      case "CHECK_ALL_LAYERS_ABOVE":
+        for (let i = layer; i <= this.mapHelper.getHighestMapLayer(); i++) {
+          const isPassage = this.tileIsPassageCheck(map, gridX, gridY, i);
+          if (isPassage) {
+            return true;
+          }
+        }
+        break;
+      case "CHECK_SINGLE_LAYER":
+      default:
+        return this.tileIsPassageCheck(map, gridX, gridY, layer);
+    }
+
+    return false;
+  }
+
   private tileSolidCheck(map: string, gridX: number, gridY: number, layer: MapLayers): boolean {
     return this.mapTiles.isSolid(map, gridX, gridY, layer);
+  }
+
+  private tileIsPassageCheck(map: string, gridX: number, gridY: number, layer: MapLayers): boolean {
+    return this.mapTiles.isPassage(map, gridX, gridY, layer);
   }
 }
