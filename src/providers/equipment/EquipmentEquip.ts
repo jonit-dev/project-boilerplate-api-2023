@@ -48,8 +48,30 @@ export class EquipmentEquip {
       return;
     }
 
+    const hasTwoHandedItemEquipped = await this.hasTwoHandedItemEquipped(equipment as unknown as IEquipmentSet);
+
+    if (hasTwoHandedItemEquipped) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "You already have a two handed item equipped!",
+        type: "error",
+      });
+      return;
+    }
+
+    if (item.isTwoHanded) {
+      const canEquipTwoHanded = await this.checkTwoHandedEquip(equipment as unknown as IEquipmentSet);
+      if (!canEquipTwoHanded) {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "You can't equip this two handed item with another item already in your hands!",
+          type: "error",
+        });
+        return;
+      }
+    }
+
     if (equipment) {
       equipment[availableSlot] = item._id;
+
       await equipment.save();
 
       await this.removeItemFromInventory(itemId, itemContainer!);
@@ -152,6 +174,23 @@ export class EquipmentEquip {
     }
 
     return true;
+  }
+
+  private async hasTwoHandedItemEquipped(equipment: IEquipmentSet): Promise<boolean> {
+    const leftHandItem = await Item.findById(equipment.leftHand);
+    const rightHandItem = await Item.findById(equipment.rightHand);
+
+    if (leftHandItem?.isTwoHanded || rightHandItem?.isTwoHanded) {
+      return true;
+    }
+    return false;
+  }
+
+  private async checkTwoHandedEquip(equipment: IEquipmentSet): Promise<boolean> {
+    const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+    if (!equipmentSlots.leftHand && !equipmentSlots.rightHand) return true;
+
+    return false;
   }
 
   public getAvailableSlot(item: IItem, equipment: IEquipmentSet): string {

@@ -5,7 +5,9 @@ Content-Type: application/json
 
 {
   "name": "Jonit",
-  "gender": "Male"
+  "faction": "Life Bringer",
+  "race": "Human",
+  "textureKey": "kid-1"
 }
 
 ###
@@ -25,7 +27,7 @@ Content-Type: application/json
 ###
 
 # Character :: Update
-PATCH {{baseUrl}}/characters/621465b7f8d01300b156bf22 HTTP/1.1
+PATCH {{baseUrl}}/characters/631986333577680077faa01a HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 

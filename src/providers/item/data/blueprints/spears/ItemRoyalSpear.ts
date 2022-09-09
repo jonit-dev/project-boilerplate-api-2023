@@ -15,6 +15,7 @@ export const itemRoyalSpear: Partial<IItem> = {
   defense: 3,
   attack: 10,
   weight: 8,
+  isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };
