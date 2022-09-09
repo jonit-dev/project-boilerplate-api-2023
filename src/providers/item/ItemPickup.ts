@@ -158,6 +158,8 @@ export class ItemPickup {
       if (selectedItem.isStackable) {
         const itemStacked = await this.tryAddingItemToStack(character, targetContainer, selectedItem);
         if (itemStacked) {
+          // if was stacked, remove the item from the database to avoid garbage
+          await Item.deleteOne({ _id: selectedItem.id });
           return true;
         }
       }
@@ -260,23 +262,30 @@ export class ItemPickup {
 
       if (slotItem.key === selectedItem.key) {
         if (slotItem.stackQty) {
+          const updatedStackQty = slotItem.stackQty + selectedItem.stackQty;
+          if (updatedStackQty > slotItem.maxStackSize) {
+            this.sendCustomErrorMessage(
+              character,
+              `Sorry, you cannot stack more than ${slotItem.maxStackSize} ${slotItem.key}s.`
+            );
+            return false;
+          }
+
           targetContainer.slots[i] = {
             ...slotItem,
-            stackQty: slotItem.stackQty + selectedItem.stackQty,
+            stackQty: updatedStackQty,
           };
 
-          await ItemContainer.updateOne(
+          await Item.updateOne(
             {
-              _id: targetContainer.id,
+              _id: slotItem._id,
             },
-            {
-              $set: {
-                slots: {
-                  ...targetContainer.slots,
-                },
-              },
-            }
+            { $set: { stackQty: updatedStackQty } }
           );
+
+          targetContainer.markModified("slots");
+          await targetContainer.save();
+
           return true;
         }
       }

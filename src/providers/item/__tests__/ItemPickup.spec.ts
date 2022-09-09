@@ -169,14 +169,20 @@ describe("ItemPickup.ts", () => {
   });
 
   it("should stack an item, if item isStackable", async () => {
-    const stackableItem = new Item(stackableItemMock);
-    await stackableItem.save();
+    const stackableItem1 = new Item(stackableItemMock);
+    await stackableItem1.save();
+
+    const stackableItem2 = new Item(stackableItemMock);
+    await stackableItem2.save();
+
+    const stackableItem3 = new Item(stackableItemMock);
+    await stackableItem3.save();
 
     const stackContainer = new ItemContainer({
       id: inventoryItemContainerId,
       parentItem: inventory.id,
       slots: {
-        0: stackableItem,
+        0: stackableItem1,
       },
       slotQty: 1,
     });
@@ -184,8 +190,8 @@ describe("ItemPickup.ts", () => {
     await stackContainer.save();
 
     // remember, we already added a stackable item above!
-    const secondAdd = await pickupItem(stackContainer.id, { itemId: stackableItem.id });
-    const thirdAdd = await pickupItem(stackContainer.id, { itemId: stackableItem.id });
+    const secondAdd = await pickupItem(stackContainer.id, { itemId: stackableItem2.id });
+    const thirdAdd = await pickupItem(stackContainer.id, { itemId: stackableItem3.id });
 
     expect(secondAdd).toBeTruthy();
     expect(thirdAdd).toBeTruthy();
@@ -194,6 +200,13 @@ describe("ItemPickup.ts", () => {
 
     expect(updatedStackContainer?.slots[0].stackQty).toBe(3);
     expect(updatedStackContainer?.slots[0].maxStackSize).toBe(10);
+
+    const updatedItem = await Item.findById(stackableItem1.id);
+    expect(updatedItem!.stackQty).toBe(3);
+
+    // items that were stacked should be deleted
+    expect(await Item.findById(stackableItem2.id)).toBeFalsy();
+    expect(await Item.findById(stackableItem3.id)).toBeFalsy();
   });
 
   describe("Item pickup validation", () => {
