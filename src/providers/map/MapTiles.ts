@@ -62,11 +62,6 @@ export class MapTiles {
     if (rawTileId) {
       const tileId = rawTileId - targetTileset.firstgid;
 
-      const isPassage = this.getTileProperty<boolean>(targetTileset!, tileId!, "is_passage") || false;
-      if (isPassage) {
-        return false;
-      }
-
       const tileProperty = this.getTileProperty<boolean>(targetTileset!, tileId!, "ge_collide") || false;
 
       if (tileProperty) {
