@@ -2,12 +2,14 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import {
   CharacterClass,
-  CharacterGender,
+  CharacterFactions,
   FromGridX,
   FromGridY,
   ItemSubType,
   ItemType,
+  LifeBringerRaces,
   MapLayers,
+  ShadowWalkerRaces,
   TypeHelper,
 } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -40,6 +42,23 @@ const characterSchema = createLeanSchema(
       default: 100,
       required: true,
     }),
+    faction: Type.string({
+      required: true,
+      enum: TypeHelper.enumToStringArray(CharacterFactions),
+      default: CharacterFactions.LifeBringer,
+    }),
+    race: Type.string({
+      required: true,
+      enum: Array.from(
+        new Set(TypeHelper.enumToStringArray(LifeBringerRaces).concat(TypeHelper.enumToStringArray(ShadowWalkerRaces)))
+      ),
+      default: LifeBringerRaces.Human,
+    }),
+    textureKey: Type.string({
+      required: true,
+      default: "kid-1",
+    }),
+
     x: Type.number({
       default: FromGridX(39),
       required: true,
@@ -64,11 +83,6 @@ const characterSchema = createLeanSchema(
       required: true,
       default: CharacterClass.None,
       enum: TypeHelper.enumToStringArray(CharacterClass),
-    }),
-    gender: Type.string({
-      required: true,
-      default: CharacterGender.Male,
-      enum: TypeHelper.enumToStringArray(CharacterGender),
     }),
     totalWeightCapacity: Type.number({
       required: true,

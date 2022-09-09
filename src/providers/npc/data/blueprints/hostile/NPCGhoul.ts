@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
+  BowsBlueprint,
   GlovesBlueprint,
   LegsBlueprint,
   MacesBlueprint,
@@ -34,7 +35,7 @@ export const npcGhoul = {
     dexterity: {
       level: 1,
     },
-    resistence: {
+    resistance: {
       level: 5,
     },
   },
@@ -68,6 +69,11 @@ export const npcGhoul = {
     {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,
       chance: 2.5,
+    },
+    {
+      itemBlueprintKey: BowsBlueprint.Arrow,
+      chance: 30,
+      quantityRange: [10, 13],
     },
   ],
 } as Partial<INPC>;

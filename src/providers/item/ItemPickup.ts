@@ -17,7 +17,6 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { EquipmentEquip } from "../equipment/EquipmentEquip";
 import { ItemView } from "./ItemView";
-
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(
@@ -38,14 +37,16 @@ export class ItemPickup {
 
     const inventario = await character.inventory;
     const equipItemContainer = pickupItem.isItemContainer && inventario === null;
-
     const isPickupValid = await this.isItemPickupValid(itemPickup, character, equipItemContainer);
+    const isMapContainer = pickupItem.x !== undefined && pickupItem.y !== undefined && pickupItem.scene !== undefined;
 
     if (!isPickupValid) {
       return false;
     }
 
     if (pickupItem) {
+      await this.normalizeItemKey(pickupItem);
+
       const isItemAdded = await this.addItemToInventory(
         pickupItem,
         character,
@@ -54,19 +55,32 @@ export class ItemPickup {
       );
       if (!isItemAdded) return false;
 
-      // whenever a new item is added, we need to update the character weight
+      // // whenever a new item is added, we need to update the character weight
       await this.characterWeight.updateCharacterWeight(character);
 
       // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
-      if (pickupItem.x !== undefined && pickupItem.y !== undefined && pickupItem.scene !== undefined) {
+      if (isMapContainer) {
         // If an item has a x, y and scene, it means its coming from a map pickup. So we should destroy its representation and warn other characters nearby.
         await this.itemView.removeItemFromMap(pickupItem);
+      } else {
+        if (itemPickup.fromContainerId) {
+          const isItemRemoved = await this.removeItemFromContainer(
+            pickupItem as unknown as IItem,
+            character,
+            itemPickup.fromContainerId
+          );
+          if (!isItemRemoved) {
+            return false;
+          }
+        }
       }
 
       // send update inventory event to user
-
       if (!equipItemContainer) {
-        const updatedContainer = (await ItemContainer.findById(itemPickup.toContainerId)) as unknown as IItemContainer;
+        // if the origin container is a MapContainer so should update the char inventory
+        //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
+        const containerToUpdateId = isMapContainer ? itemPickup.toContainerId : itemPickup.fromContainerId;
+        const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as unknown as IItemContainer;
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
           equipment: {} as unknown as IEquipmentSet,
           inventory: {
@@ -109,7 +123,6 @@ export class ItemPickup {
     const selectedItem = (await Item.findById(item.id)) as IItem;
 
     if (!selectedItem) {
-      console.log("addItemToInventory: Item not found");
       this.sendGenericErrorMessage(character);
       return false;
     }
@@ -123,7 +136,6 @@ export class ItemPickup {
     const targetContainer = (await ItemContainer.findById(toContainerId)) as unknown as IItemContainer;
 
     if (!targetContainer) {
-      console.log("addItemToInventory: Character container not found");
       this.sendGenericErrorMessage(character);
       return false;
     }
@@ -145,7 +157,6 @@ export class ItemPickup {
 
       if (selectedItem.isStackable) {
         const itemStacked = await this.tryAddingItemToStack(character, targetContainer, selectedItem);
-
         if (itemStacked) {
           return true;
         }
@@ -182,6 +193,54 @@ export class ItemPickup {
     return false;
   }
 
+  // not a final solution
+  private async removeItemFromContainer(
+    item: IItem,
+    character: ICharacter,
+    fromContainerId: string | undefined
+  ): Promise<Boolean> {
+    const selectedItem = (await Item.findById(item.id)) as IItem;
+    if (!selectedItem) {
+      this.sendGenericErrorMessage(character);
+      return false;
+    }
+
+    const targetContainer = (await ItemContainer.findById(fromContainerId)) as unknown as IItemContainer;
+    if (!targetContainer) {
+      this.sendGenericErrorMessage(character);
+      return false;
+    }
+
+    if (targetContainer) {
+      // // Inventory is empty, slot checking not needed
+      for (let i = 0; i < targetContainer.slotQty; i++) {
+        const slotItem = targetContainer.slots?.[i];
+
+        if (!slotItem) continue;
+        if (slotItem.key === item.key) {
+          // Changing item slot to null, thus removing it
+          targetContainer.slots[i] = null;
+
+          await ItemContainer.updateOne(
+            {
+              _id: targetContainer._id,
+            },
+            {
+              $set: {
+                slots: {
+                  ...targetContainer.slots,
+                },
+              },
+            }
+          );
+
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private async tryAddingItemToStack(
     character: ICharacter,
     targetContainer: IItemContainer,
@@ -190,7 +249,6 @@ export class ItemPickup {
     // loop through all inventory container slots, checking to see if selectedItem can be stackable
 
     if (!targetContainer.slots) {
-      console.log("tryAddingItemToStack: no slots in container ", targetContainer.id);
       this.sendCustomErrorMessage(character, "Sorry, there are no slots in your container.");
       return false;
     }
@@ -219,13 +277,19 @@ export class ItemPickup {
               },
             }
           );
-
           return true;
         }
       }
     }
-
     return false;
+  }
+
+  // this removes any Tiled id from items, that may be added to the key and cause issues
+  // eg arrow-123 instead of arrow
+  private async normalizeItemKey(item: IItem): Promise<void> {
+    item.key = item.key.replace(/-\d+$/, "");
+
+    await item.save();
   }
 
   private async isItemPickupValid(
@@ -245,7 +309,6 @@ export class ItemPickup {
     const inventory = await character.inventory;
 
     if (!inventory && !equipItemContainer) {
-      console.log("Sorry, you must have a bag or backpack to pick up this item.");
       this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to pick up this item.");
       return false;
     }
@@ -272,10 +335,12 @@ export class ItemPickup {
       return false;
     }
 
-    const underRange = this.movementHelper.isUnderRange(character.x, character.y, itemPickup.x, itemPickup.y, 1);
-    if (!underRange) {
-      this.sendCustomErrorMessage(character, "Sorry, you are too far away to pick up this item.");
-      return false;
+    if (item.x !== undefined && item.y !== undefined && item.scene !== undefined) {
+      const underRange = this.movementHelper.isUnderRange(character.x, character.y, itemPickup.x, itemPickup.y, 1);
+      if (!underRange) {
+        this.sendCustomErrorMessage(character, "Sorry, you are too far away to pick up this item.");
+        return false;
+      }
     }
 
     if (!isItemOnMap) {

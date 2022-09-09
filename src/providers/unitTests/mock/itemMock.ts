@@ -1,4 +1,5 @@
 import { IItem, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
 export const itemMock: Partial<IItem> = {
   type: ItemType.Weapon,
@@ -25,6 +26,7 @@ export const itemMock: Partial<IItem> = {
   scene: "example",
   createdAt: "2022-06-25T22:53:55.579Z",
   updatedAt: "2022-06-28T04:42:21.409Z",
+  rangeType: EntityAttackType.Melee,
 };
 
 export const stackableItemMock: Partial<IItem> = {
@@ -42,10 +44,40 @@ export const stackableItemMock: Partial<IItem> = {
   description: "A red apple.",
   weight: 0.05,
   allowedEquipSlotType: [ItemSlotType.Inventory],
+  x: 320,
+  y: 144,
   scene: "example",
   createdAt: "2022-06-25T22:53:55.579Z",
   updatedAt: "2022-06-28T04:42:21.409Z",
   stackQty: 1,
   maxStackSize: 10,
   isStackable: true,
+};
+
+export const itemTwoHandedMock: Partial<IItem> = {
+  type: ItemType.Weapon,
+  subType: ItemSubType.Staff,
+  textureAtlas: "items",
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  isTwoHanded: true,
+  maxStackSize: 1,
+  isUsable: false,
+  isStorable: true,
+  layer: 1,
+  isItemContainer: false,
+  isSolid: false,
+  key: "fire-staff",
+  texturePath: "staffs/fire-staff.png",
+  textureKey: "fire-staff",
+  name: "Fire Staff",
+  description: "A staff with an fire ember gem at the top.",
+  attack: 3,
+  defense: 0,
+  weight: 1,
+  tiledId: 66,
+  x: 320,
+  y: 144,
+  scene: "example",
+  createdAt: "2022-06-25T22:53:55.579Z",
+  updatedAt: "2022-06-28T04:42:21.409Z",
 };

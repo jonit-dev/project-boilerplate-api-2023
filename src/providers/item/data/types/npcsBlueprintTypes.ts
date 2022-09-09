@@ -13,6 +13,7 @@ export enum FriendlyNPCsBlueprint {
   Trader = "trader",
   WomanBlueHair = "woman-blue-hair",
   WomanGreenHair = "woman-green-hair",
+  SeniorKnight1 = "senior-knight-1",
 }
 
 export enum HostileNPCsBlueprint {
