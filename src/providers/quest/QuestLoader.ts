@@ -17,8 +17,8 @@ interface IQuestSeedData extends Omit<IQuest, "_id"> {}
 export class QuestLoader {
   constructor(private mapObjectsLoader: MapObjectsLoader) {}
 
-  public async loadQuestSeedData(): Promise<Map<string, IQuestSeedData>> {
-    const questSeedData = new Map<string, IQuestSeedData>();
+  public async loadQuestSeedData(): Promise<IQuestSeedData[]> {
+    const questSeedData: IQuestSeedData[] = [];
 
     for (const [mapName, mapData] of MapLoader.maps.entries()) {
       const NPCs = this.mapObjectsLoader.getObjectLayerData("NPCs", mapData);
@@ -36,20 +36,28 @@ export class QuestLoader {
       for (const keys of uniqueArrayKeys) {
         const data = questsBlueprintIndex[keys.questKey] as IQuest;
         data.npcId = keys.npcId!;
-        questSeedData.set(keys.questKey, data);
+        questSeedData.push({ ...data });
       }
     }
-
     return questSeedData;
   }
 }
 
 function getNpcKeysWithQuests(NPCs: any[]): INPCQuestKeys[] {
-  return NPCs.map((npc) => {
+  const npcQuests: INPCQuestKeys[] = [];
+  for (const npc of NPCs) {
     const npcKey = `${npc.properties.find((p) => p.name === "key")?.value}-${npc.id}`;
-    const questKey = npc.properties.find((p) => p.name === "questKey")?.value;
-    return { npcKey, questKey };
-  }).filter((k) => !!k.questKey);
+    const questKeys = npc.properties.find((p) => p.name === "questKeys")?.value;
+
+    if (questKeys) {
+      const questsData = questKeys.split(",").map((key: string) => {
+        return { npcKey, questKey: key.trim() };
+      });
+      npcQuests.push(...questsData);
+    }
+  }
+
+  return npcQuests;
 }
 
 function checkIfQuestBlueprintsExists(keys: INPCQuestKeys[], mapName: string): void {

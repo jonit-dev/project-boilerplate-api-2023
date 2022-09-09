@@ -23,16 +23,16 @@ export class QuestSeeder {
       console.log("🤷 No Quest data to seed");
     }
 
-    for (const [, QuestData] of questSeedData.entries()) {
+    for (const questData of questSeedData) {
       const questFound = (await Quest.findOne({
-        npcId: QuestData.npcId,
-        key: QuestData.key,
+        npcId: questData.npcId,
+        key: questData.key,
       })) as unknown as IQuestModel;
 
       if (!questFound) {
         // console.log(`🌱 Seeding database with Quest data for Quest with key: ${QuestData.key}`);
 
-        await this.createNewQuest(QuestData as IQuest);
+        await this.createNewQuest(questData as IQuest);
       } else {
         // if quest already exists, reset all objectives to pending
         // and remove all existing quest records
