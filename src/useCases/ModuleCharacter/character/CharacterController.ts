@@ -12,10 +12,12 @@ import {
   request,
   requestBody,
   requestParam,
+  queryParam,
 } from "inversify-express-utils";
 import { CreateCharacterDTO } from "./create/CreateCharacterDTO";
 import { CreateCharacterUseCase } from "./create/CreateCharacterUseCase";
 import { DeleteCharacterUseCase } from "./delete/DeleteCharacterUseCase";
+import { ReadFactionRacesUseCase } from "./races/ReadFactionRacesUseCase";
 import { ReadCharacterUseCase } from "./read/ReadCharacterUseCase";
 import { UpdateCharacterDTO } from "./update/UpdateCharacterDTO";
 import { UpdateCharacterUseCase } from "./update/UpdateCharacterUseCase";
@@ -26,8 +28,14 @@ export class CharacterController implements interfaces.Controller {
     private createCharacterUseCase: CreateCharacterUseCase,
     private readCharacterUseCase: ReadCharacterUseCase,
     private updateCharacterUseCase: UpdateCharacterUseCase,
-    private deleteCharacterUseCase: DeleteCharacterUseCase
+    private deleteCharacterUseCase: DeleteCharacterUseCase,
+    private readFactionRacesUseCase: ReadFactionRacesUseCase
   ) {}
+
+  @httpGet("/races")
+  private getFactionRaces(@queryParam("faction") faction: string): string[] {
+    return this.readFactionRacesUseCase.readAll(faction);
+  }
 
   @httpPost("/", DTOValidatorMiddleware(CreateCharacterDTO))
   private async createCharacter(

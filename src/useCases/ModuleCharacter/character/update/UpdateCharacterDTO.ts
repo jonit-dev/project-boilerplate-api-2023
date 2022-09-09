@@ -1,7 +1,5 @@
-import { tsDefaultDecorator, tsEnumDecorator } from "@providers/constants/ValidationConstants";
-import { CharacterFactions } from "@rpg-engine/shared";
-import { IsOptional, IsString, IsEnum } from "class-validator";
-import { CreateCharacterDTO } from "../create/CreateCharacterDTO";
+import { tsDefaultDecorator } from "@providers/constants/ValidationConstants";
+import { IsOptional, IsString } from "class-validator";
 
 export class UpdateCharacterDTO {
   @IsOptional()
