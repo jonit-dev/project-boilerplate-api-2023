@@ -2,15 +2,15 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import {
   CharacterClass,
+  CharacterFactions,
   FromGridX,
   FromGridY,
   ItemSubType,
   ItemType,
-  MapLayers,
-  TypeHelper,
-  CharacterFactions,
-  ShadowWalkerRaces,
   LifeBringerRaces,
+  MapLayers,
+  ShadowWalkerRaces,
+  TypeHelper,
 } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";

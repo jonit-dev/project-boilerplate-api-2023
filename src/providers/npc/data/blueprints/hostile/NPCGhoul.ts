@@ -35,7 +35,7 @@ export const npcGhoul = {
     dexterity: {
       level: 1,
     },
-    resistence: {
+    resistance: {
       level: 5,
     },
   },

@@ -15,6 +15,7 @@ export const itemFireStaff: Partial<IItem> = {
   attack: 3,
   defense: 0,
   weight: 1,
+  isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };
