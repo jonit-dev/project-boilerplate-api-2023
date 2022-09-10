@@ -23,7 +23,11 @@ export class NPCSeeder {
       this.setInitialNPCPositionAsSolid(NPCData);
 
       if (!npcFound) {
-        // console.log(`🌱 Seeding database with NPC data for NPC with key: ${NPCData.key}`);
+        console.log(
+          `🌱 Seeding database with NPC data for NPC with key: ${NPCData.key} ${NPCData.name} ${JSON.stringify(
+            NPCData.skills
+          )}`
+        );
 
         await this.createNewNPCWithSkills(NPCData);
       } else {
@@ -94,8 +98,7 @@ export class NPCSeeder {
 
   private async createNewNPCWithSkills(NPCData: INPCSeedData): Promise<void> {
     try {
-      const npcSkills = this.setNPCRandomSkillLevel(NPCData); // randomize skills present in the metadata only
-      const skills = new Skill({ ...(npcSkills as unknown as ISkill), ownerType: "NPC" }); // pre-populate skills, if present in metadata
+      const skills = this.setNPCRandomSkillLevel(NPCData); // randomize skills present in the metadata only
       const npcHealth = this.setNPCRandomHealth(NPCData);
 
       const newNPC = new NPC({
@@ -116,35 +119,31 @@ export class NPCSeeder {
     }
   }
 
-  private setNPCRandomSkillLevel(NPCData: INPCSeedData): Object {
-    // ts-ignore is here until we update our ts-types lib
-
-    // @ts-ignore
-    if (!NPCData.skillRandomizerDice) return NPCData.skills;
-
+  private setNPCRandomSkillLevel(NPCData: INPCSeedData): ISkill {
+    // Deep cloning object because all equals NPCs seeds references the same object.
+    const clonedNPC = _.cloneDeep(NPCData);
+    if (!clonedNPC.skillRandomizerDice) {
+      return new Skill({ ...(clonedNPC.skills as unknown as ISkill), ownerType: "NPC" });
+    }
     /**
      * If we have skills to be randomized we apply the randomDice value to that
      * if not we get all skills added in the blueprint to change it's level
      */
-    // @ts-ignore
-    const skillKeys: string[] = NPCData.skillsToBeRandomized
-    // @ts-ignore
-      ? NPCData.skillsToBeRandomized
-      : Object.keys(NPCData.skills);
+    const skillKeys: string[] = clonedNPC.skillsToBeRandomized
+      ? clonedNPC.skillsToBeRandomized
+      : Object.keys(clonedNPC.skills);
 
     for (const skill of skillKeys) {
-      if (!NPCData.skills[skill]) continue;
+      if (!clonedNPC.skills[skill]) continue;
 
       if (skill === "level") {
-        // @ts-ignore
-        NPCData.skills[skill] += rollDice(NPCData.skillRandomizerDice);
+        clonedNPC.skills[skill] = clonedNPC.skills[skill] + rollDice(clonedNPC.skillRandomizerDice);
       } else {
-        // @ts-ignore
-        NPCData.skills[skill].level += rollDice(NPCData.skillRandomizerDice);
+        clonedNPC.skills[skill].level = clonedNPC.skills[skill].level + rollDice(clonedNPC.skillRandomizerDice);
       }
     }
 
-    return NPCData.skills;
+    return new Skill({ ...(clonedNPC.skills as unknown as ISkill), ownerType: "NPC" });
   }
 
   private setNPCRandomHealth(NPCData: INPCSeedData): number {
