@@ -98,7 +98,7 @@ export class NPCSeeder {
 
   private async createNewNPCWithSkills(NPCData: INPCSeedData): Promise<void> {
     try {
-      const skills = this.setNPCRandomSkillLevel(NPCData); // randomize skills present in the metadata only
+      const skills = new Skill({ ...(this.setNPCRandomSkillLevel(NPCData) as unknown as ISkill), ownerType: "NPC" }); // randomize skills present in the metadata only
       const npcHealth = this.setNPCRandomHealth(NPCData);
 
       const newNPC = new NPC({
@@ -119,12 +119,11 @@ export class NPCSeeder {
     }
   }
 
-  private setNPCRandomSkillLevel(NPCData: INPCSeedData): ISkill {
+  private setNPCRandomSkillLevel(NPCData: INPCSeedData): Object {
     // Deep cloning object because all equals NPCs seeds references the same object.
     const clonedNPC = _.cloneDeep(NPCData);
-    if (!clonedNPC.skillRandomizerDice) {
-      return new Skill({ ...(clonedNPC.skills as unknown as ISkill), ownerType: "NPC" });
-    }
+    if (!clonedNPC.skillRandomizerDice) return clonedNPC.skills;
+
     /**
      * If we have skills to be randomized we apply the randomDice value to that
      * if not we get all skills added in the blueprint to change it's level
@@ -143,7 +142,7 @@ export class NPCSeeder {
       }
     }
 
-    return new Skill({ ...(clonedNPC.skills as unknown as ISkill), ownerType: "NPC" });
+    return clonedNPC.skills;
   }
 
   private setNPCRandomHealth(NPCData: INPCSeedData): number {
