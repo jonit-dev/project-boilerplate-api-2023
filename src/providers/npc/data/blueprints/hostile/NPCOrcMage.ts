@@ -25,9 +25,9 @@ export const npcOrcMage = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
   baseHealth: 70,
-  healthRandomizerDice: Dice.D4,
+  healthRandomizerDice: Dice.D12,
   skillRandomizerDice: Dice.D4,
-  skillsToBeRandomized: ["level", "strength", "dexterity"],
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
     level: 10,

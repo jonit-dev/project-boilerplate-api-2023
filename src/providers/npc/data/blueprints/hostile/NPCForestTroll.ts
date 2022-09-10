@@ -32,6 +32,8 @@ export const npcForestTroll = {
   baseHealth: 190,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
+  skillRandomizerDice: Dice.D4,
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
     level: 17,
     strength: {

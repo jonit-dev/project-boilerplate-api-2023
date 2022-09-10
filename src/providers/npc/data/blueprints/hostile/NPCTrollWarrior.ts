@@ -28,7 +28,7 @@ export const npcTrollWarrior = {
   baseHealth: 260,
   healthRandomizerDice: Dice.D20,
   skillRandomizerDice: Dice.D12,
-  skillsToBeRandomized: ["level", "strength", "dexterity"],
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {

@@ -1,5 +1,4 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
@@ -23,7 +22,7 @@ export const npcDwarf = {
   speed: MovementSpeed.Standard,
   canSwitchToRandomTarget: true,
   baseHealth: 76,
-  healthRandomizerDice: Dice.D4,
+
   skills: {
     level: 3,
     strength: {

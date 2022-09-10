@@ -23,7 +23,7 @@ export const npcOrcBerserker = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.ExtraFast,
   baseHealth: 98,
-  healthRandomizerDice: Dice.D4,
+  healthRandomizerDice: Dice.D6,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity"],
   canSwitchToLowHealthTarget: true,

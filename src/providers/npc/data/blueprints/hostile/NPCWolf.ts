@@ -18,10 +18,8 @@ export const npcWolf = {
   speed: MovementSpeed.Fast,
   baseHealth: 55,
   healthRandomizerDice: Dice.D4,
-  skillRandomizerDice: Dice.D4,
-  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 1,
+    level: 2,
     strength: {
       level: 2,
     },
