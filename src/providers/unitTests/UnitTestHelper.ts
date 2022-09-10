@@ -26,7 +26,7 @@ import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
-import { itemMock, stackableItemMock } from "./mock/itemMock";
+import { itemMock, itemTwoHandedMock, stackableItemMock } from "./mock/itemMock";
 import { questInteractionObjectiveMock, questKillObjectiveMock, questMock, questRewardsMock } from "./mock/questMock";
 
 interface IMockCharacterOptions {
@@ -122,6 +122,17 @@ export class UnitTestHelper {
   public async createMockItem(extraProps?: Partial<IItem>): Promise<IItem> {
     const newItem = new Item({
       ...itemMock,
+      ...extraProps,
+    });
+
+    await newItem.save();
+
+    return newItem;
+  }
+
+  public async createMockItemTwoHanded(extraProps?: Partial<IItem>): Promise<IItem> {
+    const newItem = new Item({
+      ...itemTwoHandedMock,
       ...extraProps,
     });
 
