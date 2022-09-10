@@ -1,5 +1,4 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { FoodsBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -17,7 +16,7 @@ export const npcBat = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.ExtraFast,
   baseHealth: 29,
-  healthRandomizerDice: Dice.D4,
+
   skills: {
     level: 1,
     strength: {

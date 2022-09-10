@@ -27,6 +27,8 @@ export const npcTroll = {
   speed: MovementSpeed.Slow,
   baseHealth: 178,
   healthRandomizerDice: Dice.D20,
+  skillRandomizerDice: Dice.D12,
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToRandomTarget: true,
   skills: {
     level: 15,
