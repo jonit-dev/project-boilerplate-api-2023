@@ -20,7 +20,7 @@
 
 #### Checklist
 
-- [ ] **Story requirement ments**
+- [ ] **Story requirement were met**
 - [ ] **All new necessary Unit tests were CREATED**
 - [ ] **All required unit tests are PASSING**
 - [ ] The proposed functionality was **tested manually locally**, and it's working fine.
