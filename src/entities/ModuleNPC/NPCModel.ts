@@ -105,6 +105,7 @@ const npcSchema = createLeanSchema(
     }),
     maxRangeInGridCells: Type.number(),
     maxRangedDistanceInGridCells: Type.number(),
+    maxAntiLuringRangeInGridCells: Type.number(),
     pathOrientation: Type.string({
       enum: TypeHelper.enumToStringArray(NPCPathOrientation),
     }),

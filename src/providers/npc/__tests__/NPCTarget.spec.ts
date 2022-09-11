@@ -22,6 +22,7 @@ describe("NPCTarget.ts", () => {
       {
         x: FromGridX(0),
         y: FromGridY(0),
+        maxAntiLuringRangeInGridCells: 50,
       },
       {
         hasSkills: true,
