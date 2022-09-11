@@ -6,7 +6,7 @@ export enum Dice {
   D20 = 20,
 }
 
-export function rollDice(dice: Dice): Number {
+export function rollDice(dice: Dice): number {
   const max = Math.floor(dice);
   const min = 1;
 

@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item, IItem as IItemModel } from "@entities/ModuleInventory/ItemModel";
+import { IItem as IItemModel, Item } from "@entities/ModuleInventory/ItemModel";
 import { IQuest as IQuestModel, Quest } from "@entities/ModuleQuest/QuestModel";
 import {
   IQuestObjectiveInteraction,
@@ -12,15 +12,18 @@ import {
 import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { IQuestReward, QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { MathHelper } from "@providers/math/MathHelper";
+import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   FromGridX,
   FromGridY,
   IEquipmentAndInventoryUpdatePayload,
   IItem,
   IItemContainer,
+  IQuest,
   IQuestsResponse,
   ItemSocketEvents,
   IUIShowMessage,
@@ -30,12 +33,9 @@ import {
   ToGridX,
   ToGridY,
   UISocketEvents,
-  IQuest,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
-import { MathHelper } from "@providers/math/MathHelper";
 
 @provide(QuestSystem)
 export class QuestSystem {
@@ -211,6 +211,8 @@ export class QuestSystem {
       const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
         equipment: equipmentSlots,
         inventory: inventory,
+        openEquipmentSetOnUpdate: false,
+        openInventoryOnUpdate: true,
       };
 
       this.sendQuestCompletedEvents(quest, character, payloadUpdate);

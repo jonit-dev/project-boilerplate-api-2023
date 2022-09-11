@@ -19,7 +19,7 @@ export const npcWolf = {
   baseHealth: 55,
   healthRandomizerDice: Dice.D4,
   skills: {
-    level: 1,
+    level: 2,
     strength: {
       level: 2,
     },

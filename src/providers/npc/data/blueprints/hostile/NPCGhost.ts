@@ -19,8 +19,10 @@ export const npcGhost = {
   canSwitchToRandomTarget: true,
   baseHealth: 103,
   healthRandomizerDice: Dice.D4,
+  skillRandomizerDice: Dice.D4,
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 1,
+    level: 2,
     strength: {
       level: 1,
     },

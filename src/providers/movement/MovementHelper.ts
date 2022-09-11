@@ -61,8 +61,9 @@ export class MovementHelper {
     }
 
     const hasSolid = this.mapSolids.isTileSolid(map, gridX, gridY, layer, strategy);
+    const isPassage = this.mapSolids.isTilePassage(map, gridX, gridY, layer, strategy);
 
-    if (hasSolid) {
+    if (hasSolid && !isPassage) {
       return true;
     }
 
