@@ -27,6 +27,8 @@ export const npcGhoul = {
   canSwitchToRandomTarget: true,
   baseHealth: 97,
   healthRandomizerDice: Dice.D4,
+  skillRandomizerDice: Dice.D4,
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
     level: 4,
     strength: {
