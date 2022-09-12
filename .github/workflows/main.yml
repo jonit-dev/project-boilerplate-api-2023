@@ -33,8 +33,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       # Runs a single command using the runners shell
-      - name: Setup Node space_size
-        run:  export NODE_OPTIONS="--max-old-space-size=8192"
       - name: Switch to Dev
         run: yarn env:switch:dev
       - name: Run install
