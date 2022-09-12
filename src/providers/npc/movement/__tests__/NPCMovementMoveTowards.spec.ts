@@ -80,11 +80,13 @@ describe("NPCMovementMoveTowards.ts", () => {
     testNPC.y = FromGridY(24);
     testNPC.initialX = FromGridX(14);
     testNPC.initialY = FromGridY(24);
+    testNPC.maxAntiLuringRangeInGridCells = 5;
     await testNPC.save();
     testCharacter.x = FromGridX(14);
     testCharacter.y = FromGridY(17);
     await testCharacter.save();
 
+    // set target to character
     await npcTarget.tryToSetTarget(testNPC);
     expect(testNPC.targetCharacter?.toString()).toBe(testCharacter._id.toString());
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);

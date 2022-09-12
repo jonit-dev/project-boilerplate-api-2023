@@ -100,10 +100,8 @@ export class NPCTarget {
         return;
       }
 
-      if (!npc.maxAntiLuringRangeInGridCells) {
-        throw new Error(
-          `NPC ${npc.key} is trying to verify target, but no maxAntiLuringRangeInGridCells is specified!`
-        );
+      if (!npc.maxRangeInGridCells) {
+        throw new Error(`NPC ${npc.key} is trying to verify target, but no maxRangeInGridCells is specified!`);
       }
 
       const targetCharacter = await Character.findById(npc.targetCharacter);
@@ -112,11 +110,10 @@ export class NPCTarget {
         throw new Error(`Error in ${npc.key}: Failed to find targetCharacter!`);
       }
 
-      // Range threhold for unset a target should be different, anti-luring activated!
-      const rangeThresholdDefinition = this.getAntiLuringRangeThreshold(npc);
+      const rangeThresholdDefinition = this.getRangeThreshold(npc);
 
       if (!rangeThresholdDefinition) {
-        throw new Error(`NPC ${npc.key} is trying to set target, failed to calculate rangeThresholdDefinition!`);
+        throw new Error(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
       }
 
       const isCharacterUnderRange = this.movementHelper.isUnderRange(
@@ -165,19 +162,5 @@ export class NPCTarget {
     }
 
     return npc.maxRangeInGridCells;
-  }
-
-  private getAntiLuringRangeThreshold(npc: INPC): number | undefined {
-    switch (npc.targetType) {
-      case NPCTargetType.Default:
-        // return npc.maxRangeInGridCells;
-        return npc.maxAntiLuringRangeInGridCells;
-
-      case NPCTargetType.Talking:
-        return NPC_MAX_TALKING_DISTANCE_IN_GRID;
-    }
-
-    // return npc.maxRangeInGridCells;
-    return npc.maxAntiLuringRangeInGridCells;
   }
 }

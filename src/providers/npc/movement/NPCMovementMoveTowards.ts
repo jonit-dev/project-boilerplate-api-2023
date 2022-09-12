@@ -78,12 +78,16 @@ export class NPCMovementMoveTowards {
 
         switch (npc.pathOrientation) {
           case NPCPathOrientation.Forward:
+            if (!npc.maxAntiLuringRangeInGridCells) {
+              throw new Error(`NPC ${npc.id} has no maxAntiLuringRangeInGridCells set!`);
+            }
+
             const isUnderOriginalPositionRange = this.movementHelper.isUnderRange(
               npc.x,
               npc.y,
               npc.initialX,
               npc.initialY,
-              npc.maxRangeInGridCells
+              npc.maxAntiLuringRangeInGridCells
             );
 
             if (isUnderOriginalPositionRange) {
