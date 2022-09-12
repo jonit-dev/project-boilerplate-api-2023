@@ -80,7 +80,7 @@ export class EquipmentEquip {
 
     const hasTwoHandedItemEquipped = await this.hasTwoHandedItemEquipped(equipment as unknown as IEquipmentSet);
 
-    if (hasTwoHandedItemEquipped) {
+    if (hasTwoHandedItemEquipped && this.isItemEquippableOnHands(item)) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "You already have a two handed item equipped!",
         type: "error",
@@ -126,6 +126,13 @@ export class EquipmentEquip {
 
       await this.equipmentHelper.updateCharacterAttackType(character, item);
     }
+  }
+
+  private isItemEquippableOnHands(item: IItem): boolean {
+    return !!(
+      item.allowedEquipSlotType.includes(ItemSlotType.LeftHand) ||
+      item.allowedEquipSlotType.includes(ItemSlotType.RightHand)
+    );
   }
 
   private checkIfEquipItemContainer(item: IItem, itemContainerId: string): boolean {
