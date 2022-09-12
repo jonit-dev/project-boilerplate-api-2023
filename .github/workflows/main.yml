@@ -26,10 +26,10 @@ jobs:
       - uses: actions/checkout@v3
 
       # Runs a single command using the runners shell
-      - name: Run install
-        run: yarn dev
       - name: Switch to Dev
         run: yarn env:switch:dev
+      - name: Run install
+        run: yarn dev     
       - name: Run a one-line script
         run: yarn test
       - name: Run status checks
