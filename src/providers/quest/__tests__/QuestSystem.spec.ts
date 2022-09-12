@@ -40,18 +40,26 @@ describe("QuestSystem.ts", () => {
     testInteractionQuest = await unitTestHelper.createMockQuest(testNPC.id, { type: QuestType.Interaction });
 
     // asign quest to the testCharacter
-    const objectives = await testKillQuest.objectivesDetails;
+    const killObjs = await testKillQuest.objectivesDetails;
     // @ts-ignore
-    objectives.push(...(await testInteractionQuest.objectivesDetails));
+    const interactObjs = await testInteractionQuest.objectivesDetails;
 
-    for (const obj of objectives) {
+    for (const obj of killObjs) {
       const questRecord = new QuestRecord();
+      questRecord.quest = testKillQuest._id;
       questRecord.character = testCharacter._id;
       questRecord.objective = obj._id;
+      questRecord.status = QuestStatus.InProgress;
       await questRecord.save();
+    }
 
-      obj.status = QuestStatus.InProgress;
-      await obj.save();
+    for (const obj of interactObjs) {
+      const questRecord = new QuestRecord();
+      questRecord.quest = testInteractionQuest._id;
+      questRecord.character = testCharacter._id;
+      questRecord.objective = obj._id;
+      questRecord.status = QuestStatus.InProgress;
+      await questRecord.save();
     }
   });
 
@@ -60,9 +68,9 @@ describe("QuestSystem.ts", () => {
     for (let i = 1; i <= 5 * objectivesCount; i++) {
       await questSystem.updateQuests(QuestType.Kill, testCharacter, creatureKey);
       if (i !== 5 * objectivesCount) {
-        expect(await testKillQuest.hasStatus(QuestStatus.InProgress)).toEqual(true);
+        expect(await testKillQuest.hasStatus(QuestStatus.InProgress, testCharacter.id)).toEqual(true);
       } else {
-        expect(await testKillQuest.hasStatus(QuestStatus.Completed)).toEqual(true);
+        expect(await testKillQuest.hasStatus(QuestStatus.Completed, testCharacter.id)).toEqual(true);
         expect(releaseRewards).toBeCalledTimes(1);
       }
     }
@@ -76,7 +84,7 @@ describe("QuestSystem.ts", () => {
 
   it("should update quest and release rewards | type interaction", async () => {
     await questSystem.updateQuests(QuestType.Interaction, testCharacter, npcKey);
-    expect(await testInteractionQuest.hasStatus(QuestStatus.Completed)).toEqual(true);
+    expect(await testInteractionQuest.hasStatus(QuestStatus.Completed, testCharacter.id)).toEqual(true);
     expect(releaseRewards).toBeCalledTimes(2);
   });
 

@@ -1,17 +1,14 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
-import { QuestType, QuestStatus } from "@rpg-engine/shared";
+import { QuestType } from "@rpg-engine/shared";
 
 /** QUEST KILL OBJECTIVE **/
 
 const questObjectiveKillSchema = createLeanSchema(
   {
-    killCount: Type.number({ required: true, default: 0 }),
     killCountTarget: Type.number({ required: true }),
     creatureKeys: Type.array().of(Type.string()),
     type: Type.string({ required: true, default: QuestType.Kill }),
-    status: Type.string({ required: true, default: QuestStatus.Pending }),
-    quest: Type.objectId({ required: true, ref: "Quest" }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
@@ -26,8 +23,6 @@ const questObjectiveInteractionSchema = createLeanSchema(
   {
     targetNPCkey: Type.string({ required: true }),
     type: Type.string({ required: true, default: QuestType.Interaction }),
-    status: Type.string({ required: true, default: QuestStatus.Pending }),
-    quest: Type.objectId({ required: true, ref: "Quest" }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

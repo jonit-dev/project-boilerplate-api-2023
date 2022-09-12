@@ -18,7 +18,6 @@ export const questRewardsMock: Partial<IQuestReward> = {
 };
 
 export const questKillObjectiveMock: Partial<IQuestObjectiveKill> = {
-  killCount: 0,
   killCountTarget: 5,
   creatureKeys: [HostileNPCsBlueprint.Orc],
 };

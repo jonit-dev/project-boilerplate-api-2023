@@ -7,7 +7,7 @@ import {
 } from "@entities/ModuleQuest/QuestObjectiveModel";
 import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
-import { IQuest, QuestStatus, QuestType } from "@rpg-engine/shared";
+import { IQuest, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { QuestLoader } from "./QuestLoader";
@@ -34,23 +34,12 @@ export class QuestSeeder {
 
         await this.createNewQuest(questData as IQuest);
       } else {
-        // if quest already exists, reset all objectives to pending
-        // and remove all existing quest records
+        // if quest already exists
+        // remove all existing quest records
         // in case someone started it
 
-        // console.log(`🔎 Updating Quest ${QuestData.key} database data...`);
-        const isPending = await questFound.hasStatus(QuestStatus.Pending);
-        if (!isPending) {
-          const objectives = await questFound.objectivesDetails;
-          for (const obj of objectives) {
-            obj.status = QuestStatus.Pending;
-            await obj.save();
-          }
-
-          await QuestRecord.deleteMany({
-            objective: { $in: questFound.objectives },
-          });
-        }
+        // console.log(`🔎 Reseting Quests status...`);
+        await QuestRecord.deleteMany();
       }
     }
   }
@@ -85,14 +74,12 @@ export class QuestSeeder {
           case QuestType.Kill:
             newObj = new QuestObjectiveKill({
               ...obj,
-              quest: newQuest._id,
             });
             newObj = await newObj.save();
             break;
           case QuestType.Interaction:
             newObj = new QuestObjectiveInteraction({
               ...obj,
-              quest: newQuest._id,
             });
             newObj = await newObj.save();
             break;
