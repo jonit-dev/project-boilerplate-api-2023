@@ -38,6 +38,8 @@ jobs:
       - name: Run install
         run: yarn install     
       - name: Run a one-line script
+        env:
+          NODE_OPTIONS: "--max-old-space-size=20480"
         run: yarn test
       - name: Run status checks
         run: node path/to/status-checks
