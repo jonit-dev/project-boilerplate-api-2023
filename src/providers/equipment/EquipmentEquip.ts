@@ -70,6 +70,12 @@ export class EquipmentEquip {
 
     const availableSlot = this.getAvailableSlot(item, equipment as unknown as IEquipmentSet);
 
+    // stackable items are only allowed in accessory slot. So, if cannot stack more,
+    // the message will be sended on tryAddingItemToStack function
+    if (availableSlot === "" && item.isStackable) {
+      return;
+    }
+
     if (availableSlot === "") {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "There aren't slots available.",
@@ -352,7 +358,7 @@ export class EquipmentEquip {
         return false;
       }
 
-      if (accessoryItem.key === selectedItem.key) {
+      if (accessoryItem.key === selectedItem.key.replace(/-\d+$/, "")) {
         if (selectedItem.stackQty) {
           const updatedStackQty = accessoryItem.stackQty! + selectedItem.stackQty;
 

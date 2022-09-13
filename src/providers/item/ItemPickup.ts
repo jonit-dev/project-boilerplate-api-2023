@@ -260,7 +260,7 @@ export class ItemPickup {
 
       if (!slotItem) continue;
 
-      if (slotItem.key === selectedItem.key) {
+      if (slotItem.key === selectedItem.key.replace(/-\d+$/, "")) {
         if (slotItem.stackQty) {
           const updatedStackQty = slotItem.stackQty + selectedItem.stackQty;
           if (updatedStackQty > slotItem.maxStackSize) {
