@@ -123,9 +123,12 @@ export class QuestSystem {
   private async updateKillObjective(data: IGetObjectivesResult, creatureKey: string): Promise<IQuestModel | undefined> {
     // check for each objective if the creature key is within their
     // creatureKey array. If many cases, only update the first one
+
+    const baseCreatureKey = creatureKey.replace(/-\d+$/, "");
+
     for (const i in data.objectives) {
       const obj = data.objectives[i] as IQuestObjectiveKill;
-      if (obj.creatureKeys!.indexOf(creatureKey) > -1) {
+      if (obj.creatureKeys!.indexOf(baseCreatureKey) > -1) {
         // get the quest record for the character
         const record = data.records.filter((r) => r.objective.toString() === obj._id.toString());
         if (!record.length) {
