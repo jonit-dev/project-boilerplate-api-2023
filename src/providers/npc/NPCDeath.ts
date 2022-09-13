@@ -104,8 +104,17 @@ export class NPCDeath {
         if (loot.quantityRange && loot.quantityRange.length === 2) {
           lootQuantity = Math.round(_.random(loot.quantityRange[0], loot.quantityRange[1]));
         }
-        while (lootQuantity > 0) {
-          const lootItem = new Item({ ...blueprintData });
+
+        const lootItem = new Item({ ...blueprintData });
+        // stackable items - only add 1 item and set stack qty = lootQty
+        if (lootItem.isStackable) {
+          if (lootQuantity > lootItem.maxStackSize) {
+            throw new Error(
+              `Loot quantity of ${lootQuantity} is higher than max stack size for item ${lootItem.key}, which is ${lootItem.maxStackSize}`
+            );
+          }
+
+          lootItem.stackQty = lootQuantity;
           await lootItem.save();
 
           const freeSlotId = itemContainer.firstAvailableSlotId;
@@ -114,10 +123,23 @@ export class NPCDeath {
           if (!freeSlotAvailable) {
             break;
           }
-
           itemContainer.slots[freeSlotId!] = lootItem;
+        } else {
+          while (lootQuantity > 0) {
+            const lootItem = new Item({ ...blueprintData });
+            await lootItem.save();
 
-          lootQuantity--;
+            const freeSlotId = itemContainer.firstAvailableSlotId;
+            freeSlotAvailable = freeSlotId !== null;
+
+            if (!freeSlotAvailable) {
+              break;
+            }
+
+            itemContainer.slots[freeSlotId!] = lootItem;
+
+            lootQuantity--;
+          }
         }
       }
     }
