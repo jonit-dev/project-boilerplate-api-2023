@@ -5,7 +5,6 @@ import {
   QuestObjectiveInteraction,
   QuestObjectiveKill,
 } from "@entities/ModuleQuest/QuestObjectiveModel";
-import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { IQuest, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -33,13 +32,6 @@ export class QuestSeeder {
         // console.log(`🌱 Seeding database with Quest data for Quest with key: ${QuestData.key}`);
 
         await this.createNewQuest(questData as IQuest);
-      } else {
-        // if quest already exists
-        // remove all existing quest records
-        // in case someone started it
-
-        // console.log(`🔎 Reseting Quests status...`);
-        await QuestRecord.deleteMany();
       }
     }
   }
