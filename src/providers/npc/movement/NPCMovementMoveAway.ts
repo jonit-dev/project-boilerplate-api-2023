@@ -22,7 +22,7 @@ export class NPCMovementMoveAway {
 
         const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, oppositeTargetDirection);
 
-        if (this.movementHelper.isUnderRange(npc.x, npc.y, newX, newY, npc.maxAntiLuringRangeInGridCells!)) {
+        if (this.movementHelper.isUnderRange(npc.x, npc.y, newX, newY, npc.maxRangeInGridCells!)) {
           await this.npcMovement.moveNPC(npc, npc.x, npc.y, newX, newY, oppositeTargetDirection);
         }
       } else {
