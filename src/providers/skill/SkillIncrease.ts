@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO } from "@providers/constants/SkillConstants";
@@ -18,15 +18,34 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { SkillCalculator } from "./SkillCalculator";
 
-const ItemSkill = new Map<ItemSubType | string, string>([
-  ["unarmed", "first"],
-  [ItemSubType.Sword, "sword"],
-  [ItemSubType.Dagger, "dagger"],
-  [ItemSubType.Axe, "axe"],
-  [ItemSubType.Bow, "distance"],
-  [ItemSubType.Spear, "distance"],
-  [ItemSubType.Shield, "shielding"],
-  [ItemSubType.Mace, "club"],
+declare enum CombatSkills {
+  First = "first",
+  Sword = "sword",
+  Dagger = "dagger",
+  Axe = "axe",
+  Distance = "distance",
+  Shielding = "shielding",
+  Club = "club",
+}
+
+declare enum BasicAttributes {
+  Strength = "strength",
+  Resistance = "resistance",
+  Dexterity = "dexterity",
+}
+
+const SkillsMap = new Map<ItemSubType | string, string>([
+  ["unarmed", CombatSkills.First],
+  [ItemSubType.Sword, CombatSkills.Sword],
+  [ItemSubType.Dagger, CombatSkills.Dagger],
+  [ItemSubType.Axe, CombatSkills.Axe],
+  [ItemSubType.Bow, CombatSkills.Distance],
+  [ItemSubType.Spear, CombatSkills.Distance],
+  [ItemSubType.Shield, CombatSkills.Shielding],
+  [ItemSubType.Mace, CombatSkills.Club],
+  [BasicAttributes.Strength, BasicAttributes.Strength],
+  [BasicAttributes.Resistance, BasicAttributes.Resistance],
+  [BasicAttributes.Dexterity, BasicAttributes.Dexterity],
 ]);
 
 interface IIncreaseSPResult {
@@ -66,18 +85,22 @@ export class SkillIncrease {
       throw new Error(`equipment not found for character ${attacker.id}`);
     }
 
-    const increasedSP = await this.increaseItemSP(skills, await attacker.weapon);
+    const increasedWeaponSP = this.increaseSP(skills, (await attacker.weapon).subType);
+    const increasedStrengthSP = this.increaseSP(skills, BasicAttributes.Strength);
     await skills.save();
 
-    if (increasedSP) {
-      this.socketMessaging.sendEventToUser(attacker.channelId!, SkillSocketEvents.ReadInfo, {
-        skill: skills,
-      });
+    this.socketMessaging.sendEventToUser(attacker.channelId!, SkillSocketEvents.ReadInfo, {
+      skill: skills,
+    });
+
+    // If character strength skill level increased, send level up event
+    if (increasedStrengthSP.skillLevelUp && attacker.channelId) {
+      this.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
     }
 
     // If character skill level increased, send level up event specifying the skill that upgraded
-    if (increasedSP.skillLevelUp && attacker.channelId) {
-      this.sendSkillLevelUpEvents(increasedSP, attacker, target);
+    if (increasedWeaponSP.skillLevelUp && attacker.channelId) {
+      this.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
     }
 
     await this.recordXPinBattle(attacker, target, damage);
@@ -98,11 +121,11 @@ export class SkillIncrease {
 
     let result = {} as IIncreaseSPResult;
     if (rightHandItem?.subType === ItemSubType.Shield) {
-      result = this.increaseItemSP(skills, rightHandItem);
+      result = this.increaseSP(skills, rightHandItem.subType);
     }
 
     if (leftHandItem?.subType === ItemSubType.Shield) {
-      result = this.increaseItemSP(skills, leftHandItem);
+      result = this.increaseSP(skills, leftHandItem.subType);
     }
 
     if (!_.isEmpty(result)) {
@@ -225,12 +248,12 @@ export class SkillIncrease {
     });
   }
 
-  private increaseItemSP(skills: ISkill, item: IItem): IIncreaseSPResult {
+  private increaseSP(skills: ISkill, skillKey: string): IIncreaseSPResult {
     let skillLevelUp = false;
-    const skillToUpdate = ItemSkill.get(item.subType);
+    const skillToUpdate = SkillsMap.get(skillKey);
 
     if (!skillToUpdate) {
-      throw new Error(`skill not found for item subtype ${item.subType}`);
+      throw new Error(`skill not found for item subtype ${skillKey}`);
     }
 
     const updatedSkillDetails = skills[skillToUpdate] as ISkillDetails;

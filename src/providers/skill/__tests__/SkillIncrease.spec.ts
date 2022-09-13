@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SP_INCREASE_RATIO } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -10,7 +9,7 @@ import { calculateSPToNextLevel, calculateXPToNextLevel } from "../SkillCalculat
 import { SkillIncrease } from "../SkillIncrease";
 
 type TestCase = {
-  item: ItemSubType;
+  item: string;
   skill: string;
 };
 
@@ -43,9 +42,21 @@ const simpleTestCases: TestCase[] = [
     item: ItemSubType.Mace,
     skill: "club",
   },
+  {
+    item: "strength",
+    skill: "strength",
+  },
+  {
+    item: "dexterity",
+    skill: "dexterity",
+  },
+  {
+    item: "resistance",
+    skill: "resistance",
+  },
 ];
 
-describe("SkillIncrease.spec.ts | increaseItemSP test cases", () => {
+describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
   let skillIncrease: SkillIncrease, skills: ISkill, initialLevel: number, spToLvl2: number;
 
   beforeAll(() => {
@@ -66,7 +77,7 @@ describe("SkillIncrease.spec.ts | increaseItemSP test cases", () => {
   it("should throw error when passing not a weapon item", () => {
     try {
       // @ts-ignore
-      skillIncrease.increaseItemSP(skills, { subType: ItemSubType.Potion } as IItem);
+      skillIncrease.increaseSP(skills, ItemSubType.Potion);
       throw new Error("this should have failed");
     } catch (error: any | Error) {
       expect(error.message).toBe(`skill not found for item subtype ${ItemSubType.Potion}`);
@@ -82,7 +93,7 @@ describe("SkillIncrease.spec.ts | increaseItemSP test cases", () => {
       let increasedSkills;
       for (let i = 0; i < spToLvl2 * 5; i++) {
         // @ts-ignore
-        increasedSkills = skillIncrease.increaseItemSP(skills, { subType: test.item } as IItem);
+        increasedSkills = skillIncrease.increaseSP(skills, test.item);
       }
 
       expect(increasedSkills.skillLevelUp).toBe(true);
@@ -178,14 +189,20 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(sendExpLevelUpEvents).not.toHaveBeenCalled();
   });
 
-  it("should increase character's 'first' skill level. Should not increase XP (not released)", async () => {
+  it("should increase character's skill level - 'first' & strength skills. Should not increase XP (not released)", async () => {
     await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 1);
 
     const updatedSkills = await Skill.findById(testCharacter.skills);
 
+    // 'first' skill should increase
     expect(updatedSkills?.first.level).toBe(initialLevel);
     expect(updatedSkills?.first.skillPoints).toBe(SP_INCREASE_RATIO);
     expect(updatedSkills?.first.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO);
+
+    // strength should increase too
+    expect(updatedSkills?.strength.level).toBe(initialLevel);
+    expect(updatedSkills?.strength.skillPoints).toBe(SP_INCREASE_RATIO);
+    expect(updatedSkills?.strength.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO);
 
     // Without releasing the XP, experience values should be same as initial values
     // and NPC's xpToRelease array should have a length == 1
