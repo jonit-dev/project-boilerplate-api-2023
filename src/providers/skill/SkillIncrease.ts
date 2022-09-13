@@ -18,7 +18,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { SkillCalculator } from "./SkillCalculator";
 
-declare enum CombatSkills {
+declare enum CombatSkill {
   First = "first",
   Sword = "sword",
   Dagger = "dagger",
@@ -28,24 +28,24 @@ declare enum CombatSkills {
   Club = "club",
 }
 
-declare enum BasicAttributes {
+declare enum BasicAttribute {
   Strength = "strength",
   Resistance = "resistance",
   Dexterity = "dexterity",
 }
 
 const SkillsMap = new Map<ItemSubType | string, string>([
-  ["unarmed", CombatSkills.First],
-  [ItemSubType.Sword, CombatSkills.Sword],
-  [ItemSubType.Dagger, CombatSkills.Dagger],
-  [ItemSubType.Axe, CombatSkills.Axe],
-  [ItemSubType.Bow, CombatSkills.Distance],
-  [ItemSubType.Spear, CombatSkills.Distance],
-  [ItemSubType.Shield, CombatSkills.Shielding],
-  [ItemSubType.Mace, CombatSkills.Club],
-  [BasicAttributes.Strength, BasicAttributes.Strength],
-  [BasicAttributes.Resistance, BasicAttributes.Resistance],
-  [BasicAttributes.Dexterity, BasicAttributes.Dexterity],
+  ["unarmed", CombatSkill.First],
+  [ItemSubType.Sword, CombatSkill.Sword],
+  [ItemSubType.Dagger, CombatSkill.Dagger],
+  [ItemSubType.Axe, CombatSkill.Axe],
+  [ItemSubType.Bow, CombatSkill.Distance],
+  [ItemSubType.Spear, CombatSkill.Distance],
+  [ItemSubType.Shield, CombatSkill.Shielding],
+  [ItemSubType.Mace, CombatSkill.Club],
+  [BasicAttribute.Strength, BasicAttribute.Strength],
+  [BasicAttribute.Resistance, BasicAttribute.Resistance],
+  [BasicAttribute.Dexterity, BasicAttribute.Dexterity],
 ]);
 
 interface IIncreaseSPResult {
@@ -86,7 +86,7 @@ export class SkillIncrease {
     }
 
     const increasedWeaponSP = this.increaseSP(skills, (await attacker.weapon).subType);
-    const increasedStrengthSP = this.increaseSP(skills, BasicAttributes.Strength);
+    const increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
     await skills.save();
 
     this.socketMessaging.sendEventToUser(attacker.channelId!, SkillSocketEvents.ReadInfo, {
