@@ -6,7 +6,7 @@
   "scripts": {
     "tsc": "tsc -p . --pretty --skipLibCheck --noEmit",
     "test": "yarn jest --silent test",
-    "test:ci": "yarn jest --watchAll=false --runInBand test",
+    "test:ci": "yarn jest --silent --collectCoverage test",
     "test:debug": "yarn jest test --detectOpenHandles",
     "test:coverage": "yarn jest --silent --coverage",
     "test:config": "yarn jest --showConfig test",

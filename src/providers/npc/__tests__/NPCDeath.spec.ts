@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { BowsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { NPCDeath } from "../NPCDeath";
 
@@ -156,6 +157,45 @@ describe("NPCDeath.ts", () => {
     expect(bodyItemContainer).not.toBeNull();
     expect(bodyItemContainer!.slots).toBeDefined();
     expect(bodyItemContainer!.slots[Number(0)]).toBeNull();
+  });
+
+  it("on NPC death, make sure loot stackable items are added to NPC body", async () => {
+    // @ts-ignore
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+
+    testNPC.loots = [
+      {
+        itemBlueprintKey: BowsBlueprint.Arrow,
+        chance: 100,
+        quantityRange: [30, 40],
+      },
+    ];
+
+    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+
+    expect(spyAddLootInNPCBody).toHaveBeenCalled();
+
+    const npcBody = await Item.findOne({
+      owner: testCharacter._id,
+      name: `${testNPC.name}'s body`,
+      x: testNPC.x,
+      y: testNPC.y,
+      scene: testNPC.scene,
+    });
+
+    expect(npcBody).not.toBeNull();
+    expect(npcBody!.itemContainer).toBeDefined();
+
+    const bodyItemContainer = await ItemContainer.findById(npcBody!.itemContainer);
+
+    expect(bodyItemContainer).not.toBeNull();
+    expect(bodyItemContainer!.slots).toBeDefined();
+    expect(bodyItemContainer!.slots[0]).toBeDefined();
+    expect(bodyItemContainer!.slots[1]).toBeNull();
+
+    const stackableLoot = bodyItemContainer!.slots[0] as IItem;
+    expect(stackableLoot.stackQty).toBeGreaterThanOrEqual(30);
+    expect(stackableLoot.stackQty).toBeLessThanOrEqual(40);
   });
 
   afterAll(async () => {
