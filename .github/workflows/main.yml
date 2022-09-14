@@ -38,7 +38,7 @@ jobs:
       - name: Run install
         run: yarn install
       - name: Run typescript and linter
-        run: yarn tsc && yarn linter
+        run: yarn tsc && yarn lint
       - name: Run formatter
         run: yarn format
       - name: Run tests
