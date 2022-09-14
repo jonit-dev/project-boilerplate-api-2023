@@ -37,7 +37,11 @@ jobs:
         run: yarn env:switch:dev
       - name: Run install
         run: yarn install
-      - name: Run a one-line script
+      - name: Run typescript and linter
+        run: yarn tsc && yarn linter
+      - name: Run formatter
+        run: yarn format
+      - name: Run tests
         env:
           NODE_OPTIONS: "--max-old-space-size=20480"
         run: yarn test:ci
