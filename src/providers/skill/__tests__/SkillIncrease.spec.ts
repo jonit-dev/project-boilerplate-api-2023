@@ -6,7 +6,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { ItemSubType } from "@rpg-engine/shared";
 import { Error } from "mongoose";
 import { calculateSPToNextLevel, calculateXPToNextLevel } from "../SkillCalculator";
-import { SkillIncrease } from "../SkillIncrease";
+import { BasicAttribute, SkillIncrease } from "../SkillIncrease";
 
 type TestCase = {
   item: string;
@@ -43,16 +43,16 @@ const simpleTestCases: TestCase[] = [
     skill: "club",
   },
   {
-    item: "strength",
-    skill: "strength",
+    item: BasicAttribute.Strength,
+    skill: BasicAttribute.Strength,
   },
   {
-    item: "dexterity",
-    skill: "dexterity",
+    item: BasicAttribute.Dexterity,
+    skill: BasicAttribute.Dexterity,
   },
   {
-    item: "resistance",
-    skill: "resistance",
+    item: BasicAttribute.Resistance,
+    skill: BasicAttribute.Resistance,
   },
 ];
 
@@ -243,6 +243,17 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(updatedSkills?.sword.skillPoints).toBe(initialSkills?.sword.skillPoints);
     expect(updatedSkills?.shielding.level).toBe(initialSkills?.shielding.level);
     expect(updatedSkills?.shielding.skillPoints).toBe(initialSkills?.shielding.skillPoints);
+  });
+
+  it("should increase character's resistance SP", async () => {
+    await skillIncrease.increaseBasicAttributeSP(testCharacter, BasicAttribute.Resistance);
+
+    const updatedSkills = await Skill.findById(testCharacter.skills);
+
+    // 'resistance' skill should increase
+    expect(updatedSkills?.resistance.level).toBe(initialLevel);
+    expect(updatedSkills?.resistance.skillPoints).toBe(SP_INCREASE_RATIO);
+    expect(updatedSkills?.resistance.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO);
   });
 
   afterAll(async () => {

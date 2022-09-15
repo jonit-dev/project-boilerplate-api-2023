@@ -28,7 +28,7 @@ declare enum CombatSkill {
   Club = "club",
 }
 
-declare enum BasicAttribute {
+export enum BasicAttribute {
   Strength = "strength",
   Resistance = "resistance",
   Dexterity = "dexterity",
@@ -87,11 +87,7 @@ export class SkillIncrease {
 
     const increasedWeaponSP = this.increaseSP(skills, (await attacker.weapon).subType);
     const increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
-    await skills.save();
-
-    this.socketMessaging.sendEventToUser(attacker.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills,
-    });
+    await this.updateSkills(skills, attacker);
 
     // If character strength skill level increased, send level up event
     if (increasedStrengthSP.skillLevelUp && attacker.channelId) {
@@ -128,11 +124,26 @@ export class SkillIncrease {
       result = this.increaseSP(skills, leftHandItem.subType);
     }
 
+    // if character does not have a shield, shielding skills are not updated
     if (!_.isEmpty(result)) {
-      await skills.save();
+      await this.updateSkills(skills, character);
       if (result.skillLevelUp && character.channelId) {
         this.sendSkillLevelUpEvents(result, character);
       }
+    }
+  }
+
+  public async increaseBasicAttributeSP(character: ICharacter, attribute: BasicAttribute): Promise<void> {
+    const skills = (await Skill.findById(character.skills)) as ISkill;
+    if (!skills) {
+      throw new Error(`skills not found for character ${character.id}`);
+    }
+
+    const result = this.increaseSP(skills, attribute);
+    await this.updateSkills(skills, character);
+
+    if (result.skillLevelUp && character.channelId) {
+      this.sendSkillLevelUpEvents(result, character);
     }
   }
 
@@ -178,7 +189,7 @@ export class SkillIncrease {
         levelUp = true;
       }
 
-      await skills.save();
+      await this.updateSkills(skills, character);
 
       if (levelUp) {
         this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp: record!.xp! }, character, target);
@@ -310,5 +321,13 @@ export class SkillIncrease {
 
       await target.save();
     }
+  }
+
+  private async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
+    await skills.save();
+
+    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
+      skill: skills,
+    });
   }
 }

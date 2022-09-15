@@ -6,7 +6,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { QuestSystem } from "@providers/quest/QuestSystem";
-import { SkillIncrease } from "@providers/skill/SkillIncrease";
+import { BasicAttribute, SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   BattleEventType,
@@ -165,6 +165,11 @@ export class BattleAttackTarget {
           postDamageTargetHP: target.health,
         };
 
+        // when target is Character, resistance SP increases
+        if (target.type === "Character") {
+          await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance);
+        }
+
         // check if character is dead after damage calculation. If so, send death event to client and characters around
         if (!target.isAlive) {
           if (target.type === "Character") {
@@ -200,10 +205,20 @@ export class BattleAttackTarget {
 
         // Increase shielding SP in target (if is Character)
         if (target.type === "Character") {
-          const character = target as ICharacter;
-          await this.skillIncrease.increaseShieldingSP(character);
+          await this.skillIncrease.increaseShieldingSP(target as ICharacter);
         }
       }
+    }
+
+    // When block attack, increase shielding SP in target (if is Character)
+    if (battleEvent === BattleEventType.Block && target.type === "Character") {
+      await this.skillIncrease.increaseShieldingSP(target as ICharacter);
+    }
+
+    // if battle event was a Miss, the character dodged the hit
+    // then, increase the character's dexterity SP
+    if (battleEvent === BattleEventType.Miss && target.type === "Character") {
+      await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
     }
 
     // finally, send battleHitPayload to characters around
