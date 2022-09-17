@@ -1814,14 +1814,14 @@
                  "name":"Father",
                  "properties":[
                         {
+                         "name":"dialogText",
+                         "type":"string",
+                         "value":"Hey {{char.name}}, I told your mother to not let you come here, but it seems that she ignored me once again. Well, we're having some trouble here with the rats. They're infesting the place and spreading diseases everywhere. Please take this slingshot and help me to clear the area! I'll give you a gift, if you help me with it!"
+                        }, 
+                        {
                          "name":"key",
                          "type":"string",
                          "value":"father"
-                        }, 
-                        {
-                         "name":"npcDialog",
-                         "type":"string",
-                         "value":"Hey {{char.name}}, I told your mother to not let you come here, but it seems that she ignored me once again. Well, we're having some trouble here with the rats. They're infesting the place and spreading diseases everywhere. Please take this slingshot and help me to clear the area! I'll give you a gift, if you help me with it!"
                         }, 
                         {
                          "name":"questKeys",
