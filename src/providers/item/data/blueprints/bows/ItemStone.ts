@@ -2,17 +2,17 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { RangedBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemArrow: Partial<IItem> = {
-  key: RangedBlueprint.Arrow,
+export const itemStone: Partial<IItem> = {
+  key: RangedBlueprint.Stone,
   type: ItemType.Weapon,
   subType: ItemSubType.Accessory,
   textureAtlas: "items",
-  texturePath: "ranged-weapons/arrow.png",
-  textureKey: "arrow",
-  name: "Arrow",
-  description: "An iron head arrow.",
-  attack: 1,
-  weight: 0.01,
+  texturePath: "ranged-weapons/stone.png",
+  textureKey: "stone",
+  name: "Stone",
+  description: "A stone.",
+  attack: 0.5,
+  weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,
 };

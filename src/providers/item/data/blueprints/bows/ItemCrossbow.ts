@@ -3,21 +3,21 @@ import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { RangedBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemSlingshot: Partial<IItem> = {
-  key: RangedBlueprint.Slingshot,
+export const itemCrossbow: Partial<IItem> = {
+  key: RangedBlueprint.Crossbow,
   type: ItemType.Weapon,
   rangeType: EntityAttackType.Ranged,
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
-  texturePath: "ranged-weapons/slingshot.png",
-  textureKey: "slingshot",
-  name: "Wooden Slingshot",
+  texturePath: "ranged-weapons/crossbow.png",
+  textureKey: "crossbow",
+  name: "Crossbow",
   description:
-    "A weapon used for shooting stones and usually made of a strip of wood bent by a cord connecting the two end.",
-  attack: 0.5,
-  weight: 1,
+    "A weapon used for shooting bolts and usually made of a strip of wood bent by a cord connecting the two end.",
+  attack: 3,
+  weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  maxRange: 4,
-  requiredAmmoKey: RangedBlueprint.Stone,
+  maxRange: 12,
+  requiredAmmoKey: RangedBlueprint.Bolt,
   isTwoHanded: true,
 };

@@ -7,10 +7,10 @@ export const itemBow: Partial<IItem> = {
   key: RangedBlueprint.Bow,
   type: ItemType.Weapon,
   rangeType: EntityAttackType.Ranged,
-  subType: ItemSubType.Bow,
+  subType: ItemSubType.Ranged,
   textureAtlas: "items",
-  texturePath: "bows/bow.png",
-  textureKey: "Bow",
+  texturePath: "ranged-weapons/bow.png",
+  textureKey: "bow",
   name: "Bow",
   description:
     "A weapon used for shooting arrows and usually made of a strip of wood bent by a cord connecting the two end.",

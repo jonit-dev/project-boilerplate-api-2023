@@ -3,21 +3,21 @@ import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { RangedBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemSlingshot: Partial<IItem> = {
-  key: RangedBlueprint.Slingshot,
+export const itemOrcishBow: Partial<IItem> = {
+  key: RangedBlueprint.OrcishBow,
   type: ItemType.Weapon,
   rangeType: EntityAttackType.Ranged,
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
-  texturePath: "ranged-weapons/slingshot.png",
-  textureKey: "slingshot",
-  name: "Wooden Slingshot",
+  texturePath: "ranged-weapons/orcish-bow.png",
+  textureKey: "orcish-bow",
+  name: "Orcish Bow",
   description:
-    "A weapon used for shooting stones and usually made of a strip of wood bent by a cord connecting the two end.",
-  attack: 0.5,
-  weight: 1,
+    "A bow with some decorative tooths and very long string. It is used by orcs for hunting or during battles.",
+  attack: 3,
+  weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  maxRange: 4,
-  requiredAmmoKey: RangedBlueprint.Stone,
+  maxRange: 10,
+  requiredAmmoKey: RangedBlueprint.Arrow,
   isTwoHanded: true,
 };

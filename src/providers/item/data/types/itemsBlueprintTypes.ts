@@ -91,8 +91,10 @@ export enum RangedBlueprint {
   Arrow = "arrow",
   Bolt = "bolt",
   Bow = "bow",
+  Crossbow = "crossbow",
   Slingshot = "slingshot",
   Stone = "stone",
+  OrcishBow = "orcish-bow",
 }
 
 export enum GlovesBlueprint {

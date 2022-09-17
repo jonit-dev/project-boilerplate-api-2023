@@ -7,7 +7,7 @@ export const itemBolt: Partial<IItem> = {
   type: ItemType.Weapon,
   subType: ItemSubType.Accessory,
   textureAtlas: "items",
-  texturePath: "bows/bolt.png",
+  texturePath: "ranged-weapons/bolt.png",
   textureKey: "bolt",
   name: "Bolt",
   description: "A crossbow bolt.",
