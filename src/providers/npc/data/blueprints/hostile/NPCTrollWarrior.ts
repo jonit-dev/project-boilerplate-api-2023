@@ -9,12 +9,12 @@ import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import {
-  BowsBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HelmetBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
+  RangedBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
 export const npcTrollWarrior = {
@@ -64,12 +64,12 @@ export const npcTrollWarrior = {
       chance: 30,
     },
     {
-      itemBlueprintKey: BowsBlueprint.Bolt,
+      itemBlueprintKey: RangedBlueprint.Bolt,
       chance: 50,
       quantityRange: [5, 10],
     },
     {
-      itemBlueprintKey: BowsBlueprint.Bow,
+      itemBlueprintKey: RangedBlueprint.Bow,
       chance: 20,
     },
 

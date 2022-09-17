@@ -9,11 +9,11 @@ import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import {
-  BowsBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
+  RangedBlueprint,
   SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
@@ -55,7 +55,7 @@ export const npcWildTroll = {
       chance: 30,
     },
     {
-      itemBlueprintKey: BowsBlueprint.Bolt,
+      itemBlueprintKey: RangedBlueprint.Bolt,
       chance: 50,
       quantityRange: [5, 10],
     },

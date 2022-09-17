@@ -5,7 +5,7 @@ import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
   BootsBlueprint,
-  BowsBlueprint,
+  RangedBlueprint,
   ShieldsBlueprint,
   SwordBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -60,7 +60,7 @@ export const npcSkeletonKnight = {
       chance: 25,
     },
     {
-      itemBlueprintKey: BowsBlueprint.Bow,
+      itemBlueprintKey: RangedBlueprint.Bow,
       chance: 10,
     },
   ],

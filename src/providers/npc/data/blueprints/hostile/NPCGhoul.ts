@@ -3,11 +3,11 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
-  BowsBlueprint,
   GlovesBlueprint,
   LegsBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
+  RangedBlueprint,
   SpearsBlueprint,
   SwordBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -73,7 +73,7 @@ export const npcGhoul = {
       chance: 2.5,
     },
     {
-      itemBlueprintKey: BowsBlueprint.Arrow,
+      itemBlueprintKey: RangedBlueprint.Arrow,
       chance: 30,
       quantityRange: [10, 13],
     },

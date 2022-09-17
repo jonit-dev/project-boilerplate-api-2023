@@ -3,9 +3,9 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   BootsBlueprint,
-  BowsBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
+  RangedBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -52,7 +52,7 @@ export const npcDwarf = {
       chance: 10,
     },
     {
-      itemBlueprintKey: BowsBlueprint.Arrow,
+      itemBlueprintKey: RangedBlueprint.Arrow,
       chance: 20,
       quantityRange: [5, 10],
     },

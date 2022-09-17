@@ -10,12 +10,12 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import {
   AxesBlueprint,
-  BowsBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
   HelmetBlueprint,
   PotionsBlueprint,
+  RangedBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
@@ -74,12 +74,12 @@ export const npcTrollBerserker = {
       chance: 30,
     },
     {
-      itemBlueprintKey: BowsBlueprint.Bolt,
+      itemBlueprintKey: RangedBlueprint.Bolt,
       chance: 50,
       quantityRange: [5, 10],
     },
     {
-      itemBlueprintKey: BowsBlueprint.Bow,
+      itemBlueprintKey: RangedBlueprint.Bow,
       chance: 20,
     },
 

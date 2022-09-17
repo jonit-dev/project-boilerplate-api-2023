@@ -5,7 +5,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { BowsBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { RangedBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, ItemSlotType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { Types } from "mongoose";
@@ -48,7 +48,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 
     // Equip testCharacter with a Bow
     characterEquipment = (await Equipment.findById(testCharacter.equipment).populate("inventory").exec()) as IEquipment;
-    const bow = itemsBlueprintIndex[BowsBlueprint.Bow];
+    const bow = itemsBlueprintIndex[RangedBlueprint.Bow];
     const bowItem = new Item({ ...bow });
     const res = await bowItem.save();
     characterEquipment!.rightHand = res._id as Types.ObjectId | undefined;
@@ -87,7 +87,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(rangedAttackAmmo).toBeDefined();
     expect(rangedAttackAmmo!.location).toEqual(ItemSlotType.Accessory);
     expect(rangedAttackAmmo!.id).toEqual(arrowId);
-    expect(rangedAttackAmmo!.key).toEqual(BowsBlueprint.Arrow);
+    expect(rangedAttackAmmo!.key).toEqual(RangedBlueprint.Arrow);
     expect(rangedAttackAmmo!.maxRange).toBeGreaterThan(1);
   });
 
@@ -98,7 +98,7 @@ describe("BattleRangedAttack.spec.ts", () => {
       {
         location: ItemSlotType.Accessory,
         id: arrowId,
-        key: BowsBlueprint.Arrow,
+        key: RangedBlueprint.Arrow,
         maxRange: 2,
         equipment: characterEquipment,
       },
@@ -116,7 +116,7 @@ describe("BattleRangedAttack.spec.ts", () => {
       {
         location: ItemSlotType.Inventory,
         id: arrowId,
-        key: BowsBlueprint.Arrow,
+        key: RangedBlueprint.Arrow,
         maxRange: 2,
         equipment: characterEquipment,
       },
@@ -228,7 +228,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 });
 
 async function createArrow(): Promise<Types.ObjectId> {
-  const arrow = itemsBlueprintIndex[BowsBlueprint.Arrow];
+  const arrow = itemsBlueprintIndex[RangedBlueprint.Arrow];
   const arrowItem = new Item({ ...arrow });
   const res = await arrowItem.save();
   return res._id;

@@ -4,7 +4,7 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { BowsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { NPCDeath } from "../NPCDeath";
 
@@ -165,7 +165,7 @@ describe("NPCDeath.ts", () => {
 
     testNPC.loots = [
       {
-        itemBlueprintKey: BowsBlueprint.Arrow,
+        itemBlueprintKey: RangedBlueprint.Arrow,
         chance: 100,
         quantityRange: [30, 40],
       },

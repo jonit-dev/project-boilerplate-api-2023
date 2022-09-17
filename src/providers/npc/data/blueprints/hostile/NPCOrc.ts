@@ -2,7 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { BootsBlueprint, BowsBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { BootsBlueprint, MacesBlueprint, RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -41,7 +41,7 @@ export const npcOrc = {
       chance: 10,
     },
     {
-      itemBlueprintKey: BowsBlueprint.Arrow,
+      itemBlueprintKey: RangedBlueprint.Arrow,
       chance: 20,
       quantityRange: [3, 10],
     },

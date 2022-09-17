@@ -10,13 +10,13 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import {
   BootsBlueprint,
-  BowsBlueprint,
   ContainersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
+  RangedBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -59,7 +59,7 @@ export const npcForestTroll = {
       chance: 30,
     },
     {
-      itemBlueprintKey: BowsBlueprint.Arrow,
+      itemBlueprintKey: RangedBlueprint.Arrow,
       chance: 50,
       quantityRange: [5, 10],
     },

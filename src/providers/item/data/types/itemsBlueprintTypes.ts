@@ -87,10 +87,12 @@ export enum PotionsBlueprint {
   LightAntidote = "light-antidote",
 }
 
-export enum BowsBlueprint {
+export enum RangedBlueprint {
   Arrow = "arrow",
   Bolt = "bolt",
   Bow = "bow",
+  Slingshot = "slingshot",
+  Stone = "stone",
 }
 
 export enum GlovesBlueprint {

@@ -6,10 +6,10 @@ import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
-  BowsBlueprint,
   GlovesBlueprint,
   HelmetBlueprint,
   MacesBlueprint,
+  RangedBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -70,7 +70,7 @@ export const npcOrcMage = {
       chance: 10,
     },
     {
-      itemBlueprintKey: BowsBlueprint.Bow,
+      itemBlueprintKey: RangedBlueprint.Bow,
       chance: 5,
     },
   ],
