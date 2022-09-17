@@ -7,6 +7,7 @@ import {
   BootsBlueprint,
   HelmetBlueprint,
   MacesBlueprint,
+  RangedBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -58,6 +59,11 @@ export const npcSkeleton = {
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: RangedBlueprint.Stone,
+      chance: 10,
+      quantityRange: [2, 3],
     },
   ],
 } as Partial<INPC>;

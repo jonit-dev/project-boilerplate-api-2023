@@ -4,7 +4,9 @@ export enum FriendlyNPCsBlueprint {
   Alice = "alice",
   Annie = "annie",
   Felicia = "felicia",
-  Maria = "Maria",
+  Maria = "maria",
+  Father = "father",
+  Mother = "mother",
 
   // real npcs
   FatBaldMan = "fat-bald-man",

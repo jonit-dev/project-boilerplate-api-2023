@@ -74,8 +74,17 @@ export const npcGhoul = {
     },
     {
       itemBlueprintKey: RangedBlueprint.Arrow,
-      chance: 30,
+      chance: 10,
       quantityRange: [10, 13],
+    },
+    {
+      itemBlueprintKey: RangedBlueprint.Bolt,
+      chance: 5,
+      quantityRange: [10, 13],
+    },
+    {
+      itemBlueprintKey: RangedBlueprint.Crossbow,
+      chance: 4,
     },
   ],
 } as Partial<INPC>;
