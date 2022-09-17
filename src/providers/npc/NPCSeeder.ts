@@ -2,7 +2,6 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { rollDice } from "@providers/constants/DiceConstants";
 import { GridManager } from "@providers/map/GridManager";
-import { MapTiles } from "@providers/map/MapTiles";
 import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
