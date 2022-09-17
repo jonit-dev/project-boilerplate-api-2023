@@ -263,6 +263,17 @@ export class QuestSystem {
 
       for (let i = 0; i < reward.qty; i++) {
         let rewardItem = new Item({ ...blueprintData });
+
+        if (rewardItem.maxStackSize > 1) {
+          if (reward.qty > rewardItem.maxStackSize) {
+            throw new Error(
+              `Loot quantity of ${rewardItem.key} is higher than max stack size for item ${rewardItem.name}, which is ${rewardItem.maxStackSize}`
+            );
+          }
+
+          rewardItem.stackQty = reward.qty;
+        }
+
         rewardItem = await rewardItem.save();
 
         const freeSlotId = itemContainer.firstAvailableSlotId;
@@ -274,6 +285,10 @@ export class QuestSystem {
           overflowingRewards.push(rewardItem);
         } else {
           itemContainer.slots[freeSlotId!] = rewardItem as unknown as IItem;
+        }
+
+        if (rewardItem.maxStackSize > 1) {
+          break;
         }
       }
     }

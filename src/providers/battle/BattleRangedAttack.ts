@@ -4,7 +4,6 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
-import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -163,9 +162,14 @@ export class BattleRangedAttack {
     switch (weapon.subType) {
       case ItemSubType.Ranged:
         // check if have enough arrows in inventory or equipment
-        if (weapon.requiredAmmoKey !== RangedBlueprint.Arrow) {
+        // if (weapon.requiredAmmoKey !== RangedBlueprint.Arrow) {
+        //   return result;
+        // }
+
+        if (!weapon.requiredAmmoKey) {
           return result;
         }
+
         result = (await this.getRequiredAmmo(weapon.requiredAmmoKey, equipment)) as IRangedAttackParams;
 
         if (!_.isEmpty(result)) {

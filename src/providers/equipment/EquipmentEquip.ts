@@ -23,6 +23,13 @@ export class EquipmentEquip {
   public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<void> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
 
+    if (!item) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Something went wrong while equipping item. Please try again.",
+        type: "error",
+      });
+      return;
+    }
     const equipItemContainer = this.checkIfEquipItemContainer(item, itemContainerId);
     const itemContainer = await this.getItemContainer(item, itemContainerId);
 
@@ -142,6 +149,8 @@ export class EquipmentEquip {
   }
 
   private checkIfEquipItemContainer(item: IItem, itemContainerId: string): boolean {
+    console.log(item);
+
     if (item.isItemContainer && itemContainerId === "") {
       return true;
     }
