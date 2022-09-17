@@ -6,7 +6,7 @@
   "scripts": {
     "tsc": "tsc -p . --pretty --skipLibCheck --noEmit",
     "test": "yarn jest --silent test",
-    "test:ci": "yarn jest --watchAll=false --runInBand test",
+    "test:ci": "yarn jest --silent --collectCoverage test",
     "test:debug": "yarn jest test --detectOpenHandles",
     "test:coverage": "yarn jest --silent --coverage",
     "test:config": "yarn jest --showConfig test",
@@ -15,7 +15,7 @@
     "update:shared-deps": "yarn add @rpg-engine/shared",
     "lint": "eslint --fix ./src/**/*.ts",
     "start:prod": "yarn install && yarn build && pm2 start pm2.json --no-daemon",
-    "format": "prettier --write . --loglevel silent",
+    "format": "yarn prettier -w ./src/** --loglevel silent",
     "check-formatting": "prettier --check 'src/**/*.ts'",
     "bootstrap": "git pull origin master && yarn install && yarn configure",
     "env:switch:dev": "./environment/env-switch.sh dev",
@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
-    "@rpg-engine/shared": "^0.4.37",
+    "@rpg-engine/shared": "^0.4.41",
     "@shelf/jest-mongodb": "^2.2.1",
     "@swc/core": "^1.2.220",
     "@swc/helpers": "^0.4.3",

@@ -1,5 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -7,6 +7,7 @@ import {
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
   IItem,
+  ItemSlotType,
   ItemSocketEvents,
   ItemType,
   IUIShowMessage,
@@ -38,7 +39,42 @@ export class EquipmentEquip {
       return;
     }
 
+    if (item.isStackable) {
+      // check if can stack the item
+      const itemStacked = await this.tryAddingItemToStack(character, equipment, item);
+      if (itemStacked) {
+        // if was stacked, remove the item from the database to avoid garbage
+        // also, remove the item from inventory
+        await Item.deleteOne({ _id: item._id });
+        await this.removeItemFromInventory(itemId, itemContainer!);
+
+        const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+          equipment: equipmentSlots,
+          inventory: {
+            _id: itemContainer._id,
+            parentItem: itemContainer!.parentItem.toString(),
+            owner: itemContainer?.owner?.toString() || character.name,
+            name: itemContainer?.name,
+            slotQty: itemContainer!.slotQty,
+            slots: itemContainer?.slots,
+            allowedItemTypes: this.getAllowedItemTypes(),
+            isEmpty: itemContainer!.isEmpty,
+          },
+        };
+
+        this.updateItemInventoryCharacter(payloadUpdate, character);
+        return;
+      }
+    }
+
     const availableSlot = this.getAvailableSlot(item, equipment as unknown as IEquipmentSet);
+
+    // stackable items are only allowed in accessory slot. So, if cannot stack more,
+    // the message will be sended on tryAddingItemToStack function
+    if (availableSlot === "" && item.isStackable) {
+      return;
+    }
 
     if (availableSlot === "") {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -50,7 +86,7 @@ export class EquipmentEquip {
 
     const hasTwoHandedItemEquipped = await this.hasTwoHandedItemEquipped(equipment as unknown as IEquipmentSet);
 
-    if (hasTwoHandedItemEquipped) {
+    if (hasTwoHandedItemEquipped && this.isItemEquippableOnHands(item)) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "You already have a two handed item equipped!",
         type: "error",
@@ -96,6 +132,13 @@ export class EquipmentEquip {
 
       await this.equipmentHelper.updateCharacterAttackType(character, item);
     }
+  }
+
+  private isItemEquippableOnHands(item: IItem): boolean {
+    return !!(
+      item.allowedEquipSlotType.includes(ItemSlotType.LeftHand) ||
+      item.allowedEquipSlotType.includes(ItemSlotType.RightHand)
+    );
   }
 
   private checkIfEquipItemContainer(item: IItem, itemContainerId: string): boolean {
@@ -299,5 +342,52 @@ export class EquipmentEquip {
     }
 
     return allowedItemTypes;
+  }
+
+  private async tryAddingItemToStack(
+    character: ICharacter,
+    equipment: IEquipment,
+    selectedItem: IItem
+  ): Promise<boolean> {
+    // only accessory slot can have stackable items
+    if (!selectedItem.allowedEquipSlotType.includes(ItemSlotType.Accessory)) {
+      return false;
+    }
+
+    const accessoryItem = await Item.findById(equipment.accessory);
+
+    if (accessoryItem) {
+      if (!accessoryItem.isStackable) {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "Cannot equip this item in accessory slot. You have equipped another item.",
+          type: "error",
+        });
+        return false;
+      }
+
+      if (accessoryItem.key === selectedItem.key.replace(/-\d+$/, "")) {
+        if (selectedItem.stackQty) {
+          const updatedStackQty = accessoryItem.stackQty! + selectedItem.stackQty;
+
+          if (updatedStackQty > accessoryItem.maxStackSize) {
+            this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+              message: `Sorry, you cannot stack more than ${accessoryItem.maxStackSize} ${accessoryItem.key}s.`,
+              type: "error",
+            });
+            return false;
+          }
+
+          await Item.updateOne(
+            {
+              _id: accessoryItem._id,
+            },
+            { $set: { stackQty: updatedStackQty } }
+          );
+
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

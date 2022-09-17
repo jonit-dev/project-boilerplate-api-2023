@@ -73,6 +73,7 @@ export const moveAwayMockNPC = {
   scene: "example",
   tiledId: 0,
   spawnIntervalMin: 1,
+  maxAntiLuringRangeInGridCells: 100,
   attackType: EntityAttackType.Melee,
 };
 
@@ -93,6 +94,7 @@ export const moveTowardsMockNPC = {
     height: 920,
   },
   maxRangeInGridCells: 10,
+  maxAntiLuringRangeInGridCells: 100,
   scene: "example",
   tiledId: 0,
   spawnIntervalMin: 1,
@@ -125,6 +127,7 @@ export const fixedPathMockNPC = {
   },
   pathOrientation: NPCPathOrientation.Forward, // must be forward!
   maxRangeInGridCells: 20,
+  maxAntiLuringRangeInGridCells: 100,
   spawnIntervalMin: 1,
   attackType: EntityAttackType.Melee,
 };

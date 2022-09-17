@@ -336,7 +336,6 @@ export class UnitTestHelper {
   private async addQuestInteractionObjectiveMock(quest: IQuest): Promise<void> {
     let testQuestObjectiveInteraction = new QuestObjectiveInteraction({
       ...questInteractionObjectiveMock,
-      quest: quest._id,
     });
     testQuestObjectiveInteraction = await testQuestObjectiveInteraction.save();
     quest.objectives!.push(testQuestObjectiveInteraction._id);
@@ -345,7 +344,6 @@ export class UnitTestHelper {
   private async addQuestKillObjectiveMock(quest: IQuest): Promise<void> {
     let testQuestObjectiveKill = new QuestObjectiveKill({
       ...questKillObjectiveMock,
-      quest: quest._id,
     });
     testQuestObjectiveKill = await testQuestObjectiveKill.save();
     quest.objectives!.push(testQuestObjectiveKill._id);

@@ -136,6 +136,10 @@ export enum LegsBlueprint {
 
 export enum AccessoriesBlueprint {
   SilverKey = "silver-key",
+  Bandana = "bandana",
+  CorruptionNecklace = "corruption-necklace",
+  DeathNecklace = "death-necklace",
+  ElvenRing = "elven-ring",
 }
 
 export enum HammersBlueprint {

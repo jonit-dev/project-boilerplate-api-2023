@@ -18,6 +18,8 @@ export const npcSlime = {
   speed: MovementSpeed.ExtraSlow,
   baseHealth: 118,
   healthRandomizerDice: Dice.D4,
+  skillRandomizerDice: Dice.D4,
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
     level: 4,
     strength: {

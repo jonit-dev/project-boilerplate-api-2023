@@ -65,7 +65,7 @@ export class QuestNetworkGet {
 
           const filteredQuests: IQuest[] = [];
           for (const q of quests) {
-            const hasRequiredStatus = await q.hasStatus(data.status);
+            const hasRequiredStatus = await q.hasStatus(data.status, character.id);
             if (hasRequiredStatus) {
               filteredQuests.push(q as unknown as IQuest);
             }

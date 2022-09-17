@@ -24,9 +24,11 @@ export const npcSkeletonKnight = {
   speed: MovementSpeed.Fast,
   baseHealth: 137,
   healthRandomizerDice: Dice.D4,
+  skillRandomizerDice: Dice.D4,
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 2,
+    level: 6,
     strength: {
       level: 2,
     },

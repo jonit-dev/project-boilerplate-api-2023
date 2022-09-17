@@ -5,9 +5,8 @@ import {
   QuestObjectiveInteraction,
   QuestObjectiveKill,
 } from "@entities/ModuleQuest/QuestObjectiveModel";
-import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
-import { IQuest, QuestStatus, QuestType } from "@rpg-engine/shared";
+import { IQuest, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { QuestLoader } from "./QuestLoader";
@@ -23,34 +22,16 @@ export class QuestSeeder {
       console.log("🤷 No Quest data to seed");
     }
 
-    for (const [, QuestData] of questSeedData.entries()) {
+    for (const questData of questSeedData) {
       const questFound = (await Quest.findOne({
-        npcId: QuestData.npcId,
-        key: QuestData.key,
+        npcId: questData.npcId,
+        key: questData.key,
       })) as unknown as IQuestModel;
 
       if (!questFound) {
         // console.log(`🌱 Seeding database with Quest data for Quest with key: ${QuestData.key}`);
 
-        await this.createNewQuest(QuestData as IQuest);
-      } else {
-        // if quest already exists, reset all objectives to pending
-        // and remove all existing quest records
-        // in case someone started it
-
-        // console.log(`🔎 Updating Quest ${QuestData.key} database data...`);
-        const isPending = await questFound.hasStatus(QuestStatus.Pending);
-        if (!isPending) {
-          const objectives = await questFound.objectivesDetails;
-          for (const obj of objectives) {
-            obj.status = QuestStatus.Pending;
-            await obj.save();
-          }
-
-          await QuestRecord.deleteMany({
-            objective: { $in: questFound.objectives },
-          });
-        }
+        await this.createNewQuest(questData as IQuest);
       }
     }
   }
@@ -85,14 +66,12 @@ export class QuestSeeder {
           case QuestType.Kill:
             newObj = new QuestObjectiveKill({
               ...obj,
-              quest: newQuest._id,
             });
             newObj = await newObj.save();
             break;
           case QuestType.Interaction:
             newObj = new QuestObjectiveInteraction({
               ...obj,
-              quest: newQuest._id,
             });
             newObj = await newObj.save();
             break;

@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item, IItem as IItemModel } from "@entities/ModuleInventory/ItemModel";
+import { IItem as IItemModel, Item } from "@entities/ModuleInventory/ItemModel";
 import { IQuest as IQuestModel, Quest } from "@entities/ModuleQuest/QuestModel";
 import {
   IQuestObjectiveInteraction,
@@ -9,18 +9,21 @@ import {
   QuestObjectiveInteraction,
   QuestObjectiveKill,
 } from "@entities/ModuleQuest/QuestObjectiveModel";
-import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
+import { IQuestRecord, QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { IQuestReward, QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { MathHelper } from "@providers/math/MathHelper";
+import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   FromGridX,
   FromGridY,
   IEquipmentAndInventoryUpdatePayload,
   IItem,
   IItemContainer,
+  IQuest,
   IQuestsResponse,
   ItemSocketEvents,
   IUIShowMessage,
@@ -30,12 +33,14 @@ import {
   ToGridX,
   ToGridY,
   UISocketEvents,
-  IQuest,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
-import { MathHelper } from "@providers/math/MathHelper";
+
+interface IGetObjectivesResult {
+  objectives: IQuestObjectiveInteraction[] | IQuestObjectiveKill[];
+  records: IQuestRecord[];
+}
 
 @provide(QuestSystem)
 export class QuestSystem {
@@ -48,18 +53,18 @@ export class QuestSystem {
   ) {}
 
   public async updateQuests(type: QuestType, character: ICharacter, targetKey: string): Promise<void> {
-    const objectives = await this.getObjectives(character, type);
-    if (_.isEmpty(objectives)) {
+    const objectivesData = await this.getObjectivesData(character, type);
+    if (_.isEmpty(objectivesData)) {
       return;
     }
 
     let updatedQuest: IQuestModel | undefined;
     switch (type) {
       case QuestType.Kill:
-        updatedQuest = await this.updateKillObjective(objectives as IQuestObjectiveKill[], targetKey);
+        updatedQuest = await this.updateKillObjective(objectivesData, targetKey);
         break;
       case QuestType.Interaction:
-        updatedQuest = await this.updateInteractionObjective(objectives as IQuestObjectiveInteraction[], targetKey);
+        updatedQuest = await this.updateInteractionObjective(objectivesData, targetKey);
         break;
       default:
         throw new Error(`Invalid quest type ${type}`);
@@ -69,34 +74,38 @@ export class QuestSystem {
       return;
     }
 
-    if (await updatedQuest.hasStatus(QuestStatus.Completed)) {
+    if (await updatedQuest.hasStatus(QuestStatus.Completed, character.id)) {
       await this.releaseRewards(updatedQuest as unknown as IQuest, character);
     }
   }
 
-  private async getObjectives(
+  private async getObjectivesData(
     character: ICharacter,
     type: QuestType,
     status = QuestStatus.InProgress
-  ): Promise<IQuestObjectiveInteraction[] | IQuestObjectiveKill[]> {
-    const questRecords = await QuestRecord.find({ character: character.id });
+  ): Promise<IGetObjectivesResult> {
+    const questRecords = await QuestRecord.find({ character: character.id, status });
 
     if (!questRecords.length) {
-      return [] as IQuestObjectiveInteraction[] | IQuestObjectiveKill[];
+      return {} as IGetObjectivesResult;
     }
 
     switch (type) {
       case QuestType.Interaction:
-        return QuestObjectiveInteraction.find({
-          status,
-          _id: { $in: questRecords.map((r) => r.objective) },
-        });
+        return {
+          objectives: await QuestObjectiveInteraction.find({
+            _id: { $in: questRecords.map((r) => r.objective) },
+          }),
+          records: questRecords,
+        };
 
       case QuestType.Kill:
-        return QuestObjectiveKill.find({
-          status,
-          _id: { $in: questRecords.map((r) => r.objective) },
-        });
+        return {
+          objectives: await QuestObjectiveKill.find({
+            _id: { $in: questRecords.map((r) => r.objective) },
+          }),
+          records: questRecords,
+        };
       default:
         throw new Error(`invalid quest type: ${type}`);
     }
@@ -108,23 +117,31 @@ export class QuestSystem {
    * returns the quest that is owner to the updated objective. If none is updated,
    * returns undefined
    *
-   * @param objectives array of quest kill objectives
+   * @param data quest objective data for the character
    * @param creatureKey key of the creature killed
    */
-  private async updateKillObjective(
-    objectives: IQuestObjectiveKill[],
-    creatureKey: string
-  ): Promise<IQuestModel | undefined> {
+  private async updateKillObjective(data: IGetObjectivesResult, creatureKey: string): Promise<IQuestModel | undefined> {
     // check for each objective if the creature key is within their
     // creatureKey array. If many cases, only update the first one
-    for (const obj of objectives) {
-      if (obj.creatureKeys!.indexOf(creatureKey) > -1) {
-        obj.killCount++;
-        if (obj.killCount === obj.killCountTarget) {
-          obj.status = QuestStatus.Completed;
+
+    const baseCreatureKey = creatureKey.replace(/-\d+$/, "");
+
+    for (const i in data.objectives) {
+      const obj = data.objectives[i] as IQuestObjectiveKill;
+      if (obj.creatureKeys!.indexOf(baseCreatureKey) > -1) {
+        // get the quest record for the character
+        const record = data.records.filter((r) => r.objective.toString() === obj._id.toString());
+        if (!record.length) {
+          throw new Error("Character hasn't started this quest");
         }
-        await obj.save();
-        return (await Quest.findById(obj.quest)) as IQuestModel;
+
+        record[0].killCount!++;
+        if (record[0].killCount === obj.killCountTarget) {
+          record[0].status = QuestStatus.Completed;
+        }
+
+        await record[0].save();
+        return (await Quest.findById(record[0].quest)) as IQuestModel;
       }
     }
     return undefined;
@@ -136,20 +153,26 @@ export class QuestSystem {
    * returns the quest that is owner to the updated objective. If none is updated,
    * returns undefined
    *
-   * @param objectives array of quest interaction objectives
+   * @param data objectives data of interaction objectives
    * @param npcKey key of npc that the charater interacted with
    */
   private async updateInteractionObjective(
-    objectives: IQuestObjectiveInteraction[],
+    data: IGetObjectivesResult,
     npcKey: string
   ): Promise<IQuestModel | undefined> {
     // check for each objective if the npc key is the correspondiong npc
     // If many cases, only update the first one
-    for (const obj of objectives) {
+    for (const i in data.objectives) {
+      const obj = data.objectives[i] as IQuestObjectiveInteraction;
       if (obj.targetNPCkey! === npcKey.split("-")[0]) {
-        obj.status = QuestStatus.Completed;
-        await obj.save();
-        return (await Quest.findById(obj.quest)) as IQuestModel;
+        // get the quest record for the character
+        const record = data.records.filter((r) => r.objective.toString() === obj._id.toString());
+        if (!record.length) {
+          throw new Error("Character hasn't started this quest");
+        }
+        record[0].status = QuestStatus.Completed;
+        await record[0].save();
+        return (await Quest.findById(record[0].quest)) as IQuestModel;
       }
     }
     return undefined;
@@ -211,6 +234,8 @@ export class QuestSystem {
       const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
         equipment: equipmentSlots,
         inventory: inventory,
+        openEquipmentSetOnUpdate: false,
+        openInventoryOnUpdate: true,
       };
 
       this.sendQuestCompletedEvents(quest, character, payloadUpdate);
