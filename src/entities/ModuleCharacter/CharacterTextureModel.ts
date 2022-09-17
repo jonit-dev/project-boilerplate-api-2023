@@ -2,7 +2,7 @@ import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { CharacterFactions, LifeBringerRaces, ShadowWalkerRaces, TypeHelper } from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
-const characterSchema = createLeanSchema({
+const characterTextureSchema = createLeanSchema({
   textureDisplayName: Type.string({
     required: true,
   }),
@@ -21,6 +21,6 @@ const characterSchema = createLeanSchema({
   }),
 });
 
-export type ICharacterTexture = ExtractDoc<typeof characterSchema>;
+export type ICharacterTexture = ExtractDoc<typeof characterTextureSchema>;
 
-export const CharacterTexture = typedModel("CharacterTexture", characterSchema);
+export const CharacterTexture = typedModel("CharacterTexture", characterTextureSchema);

@@ -1,0 +1,170 @@
+[
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "purple-hair-hero-1",
+    "textureDisplayName": "Purple Hair Hero 1"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "pink-hair-hero-1",
+    "textureDisplayName": "Pink Hair Hero 1"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "pink-hair-girl-1",
+    "textureDisplayName": "Pink Hair Girl 1"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "orange-hair-hero-2",
+    "textureDisplayName": "Orange Hair Hero 2"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "orange-hair-hero-1",
+    "textureDisplayName": "Orange Hair Hero 1"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "orange-hair-girl-2",
+    "textureDisplayName": "Orange Hair Girl 2"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "navy-blue-hair-hero",
+    "textureDisplayName": "Navy Blue Hair Hero"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "male-noble-black-hair",
+    "textureDisplayName": "Male Noble Black Hair"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "green-hair-hero-2",
+    "textureDisplayName": "Green Hair Hero 2"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "green-hair-hero-1",
+    "textureDisplayName": "Green Hair Hero 1"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "brown-hair-hero-2",
+    "textureDisplayName": "Brown Hair Hero 2"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Human",
+    "textureKey": "senior-knight-1",
+    "textureDisplayName": "Senior Knight 1"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "purple-hair-hero-1",
+    "textureDisplayName": "Purple Hair Hero 1"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "pink-hair-hero-1",
+    "textureDisplayName": "Pink Hair Hero 1"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "pink-hair-girl-1",
+    "textureDisplayName": "Pink Hair Girl 1"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "orange-hair-hero-2",
+    "textureDisplayName": "Orange Hair Hero 2"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "orange-hair-hero-1",
+    "textureDisplayName": "Orange Hair Hero 1"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "orange-hair-girl-2",
+    "textureDisplayName": "Orange Hair Girl 2"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "navy-blue-hair-hero",
+    "textureDisplayName": "Navy Blue Hair Hero"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "male-noble-black-hair",
+    "textureDisplayName": "Male Noble Black Hair"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "green-hair-hero-2",
+    "textureDisplayName": "Green Hair Hero 2"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "green-hair-hero-1",
+    "textureDisplayName": "Green Hair Hero 1"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "brown-hair-hero-2",
+    "textureDisplayName": "Brown Hair Hero 2"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Human",
+    "textureKey": "senior-knight-1",
+    "textureDisplayName": "Senior Knight 1"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Elf",
+    "textureKey": "elf-white-hair-1",
+    "textureDisplayName": "Elf White Hair 1"
+  },
+  {
+    "faction": "Life Bringer",
+    "race": "Dwarf",
+    "textureKey": "dwarf",
+    "textureDisplayName": "Dwarf"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Orc",
+    "textureKey": "orc",
+    "textureDisplayName": "Orc"
+  },
+  {
+    "faction": "Shadow Walker",
+    "race": "Minotaur",
+    "textureKey": "minotaur",
+    "textureDisplayName": "Minotaur"
+  }
+]

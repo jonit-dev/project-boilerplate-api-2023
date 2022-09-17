@@ -10,7 +10,7 @@ import _ from "lodash";
 
 @provide(NPCSeeder)
 export class NPCSeeder {
-  constructor(private npcLoader: NPCLoader, private gridManager: GridManager, private mapTiles: MapTiles) {}
+  constructor(private npcLoader: NPCLoader, private gridManager: GridManager) {}
 
   public async seed(): Promise<void> {
     const npcSeedData = this.npcLoader.loadNPCSeedData();
