@@ -161,7 +161,7 @@ export class BattleRangedAttack {
     let result: IRangedAttackParams | undefined;
     // Get ranged attack weapons (bow or spear)
     switch (weapon.subType) {
-      case ItemSubType.Bow:
+      case ItemSubType.Ranged:
         // check if have enough arrows in inventory or equipment
         if (weapon.requiredAmmoKey !== RangedBlueprint.Arrow) {
           return result;

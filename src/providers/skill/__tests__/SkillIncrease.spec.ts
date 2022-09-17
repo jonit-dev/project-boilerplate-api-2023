@@ -27,7 +27,7 @@ const simpleTestCases: TestCase[] = [
     skill: "axe",
   },
   {
-    item: ItemSubType.Bow,
+    item: ItemSubType.Ranged,
     skill: "distance",
   },
   {

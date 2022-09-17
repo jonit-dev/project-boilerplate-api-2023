@@ -39,7 +39,7 @@ const SkillsMap = new Map<ItemSubType | string, string>([
   [ItemSubType.Sword, CombatSkill.Sword],
   [ItemSubType.Dagger, CombatSkill.Dagger],
   [ItemSubType.Axe, CombatSkill.Axe],
-  [ItemSubType.Bow, CombatSkill.Distance],
+  [ItemSubType.Ranged, CombatSkill.Distance],
   [ItemSubType.Spear, CombatSkill.Distance],
   [ItemSubType.Shield, CombatSkill.Shielding],
   [ItemSubType.Mace, CombatSkill.Club],
