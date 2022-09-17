@@ -11,13 +11,11 @@ export class CharacterCrons {
 
   public schedule(): void {
     nodeCron.schedule("*/10 * * * *", async () => {
-      console.log("Checking inactive players...");
       await this.logoutInactiveCharacters();
     });
 
     // check banned characters every day
     nodeCron.schedule("0 0 * * *", async () => {
-      console.log("Checking banned characters...");
       await this.unbanCharacters();
     });
   }
