@@ -1,3 +1,17 @@
+#Factions :: Get Races by Faction
+GET {{baseUrl}}/factions/races?faction=Life Bringer HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+#Factions :: Get Sprites by Faction and Race
+GET {{baseUrl}}/factions/sprites?faction=Life Bringer&race=Human HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
 # Character :: Create
 POST {{baseUrl}}/characters HTTP/1.1
 Authorization: Bearer {{authToken}}

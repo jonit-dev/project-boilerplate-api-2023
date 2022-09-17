@@ -20,6 +20,7 @@ import { RefreshController } from "@useCases/ModuleSystem/user/refreshToken/Refr
 import { SignUpController } from "@useCases/ModuleSystem/user/signup/SignUpController";
 import { UnsubscribeUsercontroller } from "@useCases/ModuleSystem/user/unsubscribe/UnsubscribeUsercontroller";
 import { UpdateUserController } from "@useCases/ModuleSystem/user/update/UpdateUserController";
+import { FactionController } from "@useCases/ModuleCharacter/faction/FactionController";
 import { ContainerModule, interfaces } from "inversify";
 
 export const userControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
@@ -56,4 +57,5 @@ export const useCasesControllers = new ContainerModule((bind: interfaces.Bind, u
   bind<NPCController>(NPCController).toSelf();
   bind<ReadChatLogController>(ReadChatLogController).toSelf();
   bind<MapController>(MapController).toSelf();
+  bind<FactionController>(FactionController).toSelf();
 });
