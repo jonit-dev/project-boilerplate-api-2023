@@ -3561,17 +3561,22 @@
                  "class":"",
                  "height":16,
                  "id":61,
-                 "name":"Annie",
+                 "name":"Mother",
                  "properties":[
                         {
                          "name":"dialogText",
                          "type":"string",
-                         "value":"Hello! I'm {{npc.name}}. I'm afraid of you, that's why I'm moving away!"
+                         "value":"Hey my son, how are you doing? Your father just left to the sewers because it seems they're having an emergency there with rat infestations. Could you help him with it? He carved a slingshot during his trip to the forest yesterday, and he said he want to give it to you.\n"
                         }, 
                         {
                          "name":"key",
                          "type":"string",
-                         "value":"annie"
+                         "value":"mother"
+                        }, 
+                        {
+                         "name":"questKeys",
+                         "type":"string",
+                         "value":"interaction-father"
                         }],
                  "rotation":0,
                  "visible":true,

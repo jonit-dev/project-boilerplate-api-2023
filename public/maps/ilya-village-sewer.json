@@ -1811,12 +1811,22 @@
                  "class":"NPC",
                  "height":16,
                  "id":71,
-                 "name":"Rat",
+                 "name":"Father",
                  "properties":[
                         {
                          "name":"key",
                          "type":"string",
-                         "value":"rat"
+                         "value":"father"
+                        }, 
+                        {
+                         "name":"npcDialog",
+                         "type":"string",
+                         "value":"Hey {{char.name}}, I told your mother to not let you come here, but it seems that she ignored me once again. Well, we're having some trouble here with the rats. They're infesting the place and spreading diseases everywhere. Please take this slingshot and help me to clear the area! I'll give you a gift, if you help me with it!"
+                        }, 
+                        {
+                         "name":"questKeys",
+                         "type":"string",
+                         "value":"kill-rats"
                         }],
                  "rotation":0,
                  "visible":true,
@@ -2457,7 +2467,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }, 

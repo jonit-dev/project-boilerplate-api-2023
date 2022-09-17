@@ -7,6 +7,7 @@ import { npcFather } from "./NPCFather";
 import { npcFelicia } from "./NPCFelicia";
 import { npcMaleNobleBlackHair } from "./NPCMaleNobleBlackHair";
 import { npcMaria } from "./NPCMaria";
+import { npcMother } from "./NPCMother";
 import { npcSeniorKnight } from "./NPCSeniorKnight1";
 import { npcTrader } from "./NPCTrader";
 import { npcWomanBlueHair } from "./NPCWomanBlueHair";
@@ -26,4 +27,5 @@ export const friendlyNPCs = {
   "woman-green-hair": npcWomanGreenHair,
   "senior-knight-1": npcSeniorKnight,
   father: npcFather,
+  mother: npcMother,
 };
