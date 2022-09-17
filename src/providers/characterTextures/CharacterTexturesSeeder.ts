@@ -21,7 +21,7 @@ export class CharacterTexturesSeeder {
       } else {
         console.log("Texture already exists. Updating!");
         await CharacterTexture.updateOne(
-          { textureKey: textureData.textureKey },
+          { textureKey: textureData.textureKey, faction: textureData.faction },
           {
             $set: {
               ...textureData,
