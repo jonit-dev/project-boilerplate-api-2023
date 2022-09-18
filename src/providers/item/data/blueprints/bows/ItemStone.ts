@@ -11,7 +11,7 @@ export const itemStone: Partial<IItem> = {
   textureKey: "stone",
   name: "Stone",
   description: "A stone.",
-  attack: 0.5,
+  attack: 2,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,

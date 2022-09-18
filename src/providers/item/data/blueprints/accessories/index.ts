@@ -3,6 +3,7 @@ import { itemBandana } from "./ItemBandana";
 import { itemCorruptionNecklace } from "./ItemCorruptionNecklace";
 import { itemDeathNecklace } from "./ItemDeathNecklace";
 import { itemElvenRing } from "./ItemElvenRing";
+import { itemRope } from "./ItemRope";
 import { itemSilverKey } from "./itemSilverKey";
 
 export const accessoriesBlueprintsIndex = {
@@ -11,4 +12,5 @@ export const accessoriesBlueprintsIndex = {
   [AccessoriesBlueprint.DeathNecklace]: itemDeathNecklace,
   [AccessoriesBlueprint.Bandana]: itemBandana,
   [AccessoriesBlueprint.ElvenRing]: itemElvenRing,
+  [AccessoriesBlueprint.Rope]: itemRope,
 };

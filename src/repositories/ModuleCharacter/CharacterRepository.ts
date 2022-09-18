@@ -5,7 +5,14 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { ArmorsBlueprint, ContainersBlueprint, DaggersBluePrint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  AccessoriesBlueprint,
+  ArmorsBlueprint,
+  BootsBlueprint,
+  ContainersBlueprint,
+  DaggersBluePrint,
+  HelmetBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
 import { UpdateCharacterDTO } from "@useCases/ModuleCharacter/character/update/UpdateCharacterDTO";
@@ -16,6 +23,9 @@ interface IInitialItems {
   inventory: Types.ObjectId;
   leftHand: Types.ObjectId;
   armor: Types.ObjectId;
+  head: Types.ObjectId;
+  boot: Types.ObjectId;
+  accessory: Types.ObjectId;
 }
 @provide(CharacterRepository)
 export class CharacterRepository extends CRUD {
@@ -46,12 +56,15 @@ export class CharacterRepository extends CRUD {
 
     await createdCharacter.save();
 
-    const { inventory, armor, leftHand } = await this.generateInitialItems(createdCharacter._id);
+    const { inventory, armor, leftHand, head, boot, accessory } = await this.generateInitialItems(createdCharacter._id);
 
     let equipment = new Equipment();
     equipment.inventory = inventory;
     equipment.leftHand = leftHand;
     equipment.armor = armor;
+    equipment.head = head;
+    equipment.boot = boot;
+    equipment.accessory = accessory;
     equipment = await equipment.save();
 
     createdCharacter.equipment = equipment._id;
@@ -91,11 +104,17 @@ export class CharacterRepository extends CRUD {
     const bag = await this.generateInitialItem(ContainersBlueprint.Bag, ownerId);
     const dagger = await this.generateInitialItem(DaggersBluePrint.Dagger, ownerId);
     const jacket = await this.generateInitialItem(ArmorsBlueprint.Jacket, ownerId);
+    const cap = await this.generateInitialItem(HelmetBlueprint.Cap, ownerId);
+    const boot = await this.generateInitialItem(BootsBlueprint.Boots, ownerId);
+    const rope = await this.generateInitialItem(AccessoriesBlueprint.Rope, ownerId);
 
     return {
       inventory: bag._id,
       leftHand: dagger._id,
       armor: jacket._id,
+      head: cap._id,
+      boot: boot._id,
+      accessory: rope._id,
     };
   }
 }

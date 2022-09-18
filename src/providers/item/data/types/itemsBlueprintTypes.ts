@@ -144,6 +144,7 @@ export enum AccessoriesBlueprint {
   CorruptionNecklace = "corruption-necklace",
   DeathNecklace = "death-necklace",
   ElvenRing = "elven-ring",
+  Rope = "rope",
 }
 
 export enum HammersBlueprint {

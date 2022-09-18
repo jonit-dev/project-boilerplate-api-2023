@@ -1771,7 +1771,7 @@
                  "visible":true,
                  "width":16,
                  "x":352,
-                 "y":464
+                 "y":496
                 }, 
                 {
                  "class":"NPC",
@@ -1789,23 +1789,6 @@
                  "width":16,
                  "x":192,
                  "y":288
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":70,
-                 "name":"Bat",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"bat"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":416,
-                 "y":544
                 }, 
                 {
                  "class":"NPC",
@@ -1848,25 +1831,8 @@
                  "rotation":0,
                  "visible":true,
                  "width":16,
-                 "x":272,
+                 "x":160,
                  "y":544
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":73,
-                 "name":"Rat",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"rat"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":272,
-                 "y":720
                 }, 
                 {
                  "class":"NPC",
@@ -1888,23 +1854,6 @@
                 {
                  "class":"NPC",
                  "height":16,
-                 "id":76,
-                 "name":"Rat",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"rat"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":416,
-                 "y":704
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
                  "id":77,
                  "name":"Rat",
                  "properties":[
@@ -1918,91 +1867,6 @@
                  "width":16,
                  "x":624,
                  "y":288
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":78,
-                 "name":"Rat",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"rat"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":736,
-                 "y":320
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":79,
-                 "name":"Rat",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"rat"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":960,
-                 "y":256
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":81,
-                 "name":"Rat",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"rat"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":992,
-                 "y":256
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":84,
-                 "name":"Rat",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"rat"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":1088,
-                 "y":208
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":85,
-                 "name":"Rat",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"rat"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":1040,
-                 "y":400
                 }, 
                 {
                  "class":"NPC",
@@ -2037,8 +1901,7 @@
                  "width":16,
                  "x":1040,
                  "y":864
-                },
-            
+                }, 
                 {
                  "class":"NPC",
                  "height":16,
@@ -2093,40 +1956,6 @@
                 {
                  "class":"NPC",
                  "height":16,
-                 "id":96,
-                 "name":"Rat",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"rat"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":672,
-                 "y":432
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":98,
-                 "name":"Spider",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"spider"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":144,
-                 "y":544
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
                  "id":99,
                  "name":"Spider",
                  "properties":[
@@ -2161,40 +1990,6 @@
                 {
                  "class":"NPC",
                  "height":16,
-                 "id":103,
-                 "name":"Spider",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"spider"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":368,
-                 "y":960
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":104,
-                 "name":"Spider",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"spider"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":352,
-                 "y":768
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
                  "id":105,
                  "name":"Spider",
                  "properties":[
@@ -2208,57 +2003,6 @@
                  "width":16,
                  "x":416,
                  "y":832
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":108,
-                 "name":"Spider",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"spider"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":720,
-                 "y":784
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":109,
-                 "name":"Spider",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"spider"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":624,
-                 "y":672
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":110,
-                 "name":"Spider",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"spider"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":688,
-                 "y":336
                 }, 
                 {
                  "class":"NPC",
@@ -2293,59 +2037,8 @@
                  "width":16,
                  "x":1008,
                  "y":832
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":115,
-                 "name":"Spider",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"spider"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":1040,
-                 "y":208
                 },
             
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":116,
-                 "name":"Spider",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"spider"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":1056,
-                 "y":256
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":117,
-                 "name":"Spider",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"spider"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":1072,
-                 "y":448
-                }, 
                 {
                  "class":"NPC",
                  "height":16,
@@ -2383,47 +2076,30 @@
                 {
                  "class":"NPC",
                  "height":16,
-                 "id":124,
-                 "name":"Bat",
+                 "id":145,
+                 "name":"Rat",
                  "properties":[
                         {
                          "name":"key",
                          "type":"string",
-                         "value":"bat"
+                         "value":"rat"
                         }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
                  "x":176,
-                 "y":512
+                 "y":704
                 }, 
                 {
                  "class":"NPC",
                  "height":16,
-                 "id":126,
-                 "name":"Bat",
+                 "id":146,
+                 "name":"Rat",
                  "properties":[
                         {
                          "name":"key",
                          "type":"string",
-                         "value":"bat"
-                        }],
-                 "rotation":0,
-                 "visible":true,
-                 "width":16,
-                 "x":672,
-                 "y":720
-                }, 
-                {
-                 "class":"NPC",
-                 "height":16,
-                 "id":128,
-                 "name":"Bat",
-                 "properties":[
-                        {
-                         "name":"key",
-                         "type":"string",
-                         "value":"bat"
+                         "value":"rat"
                         }],
                  "rotation":0,
                  "visible":true,
@@ -2434,36 +2110,121 @@
                 {
                  "class":"NPC",
                  "height":16,
-                 "id":129,
-                 "name":"Bat",
+                 "id":147,
+                 "name":"Rat",
                  "properties":[
                         {
                          "name":"key",
                          "type":"string",
-                         "value":"bat"
+                         "value":"rat"
                         }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
                  "x":720,
-                 "y":480
+                 "y":448
                 }, 
                 {
                  "class":"NPC",
                  "height":16,
-                 "id":130,
-                 "name":"Bat",
+                 "id":148,
+                 "name":"Rat",
                  "properties":[
                         {
                          "name":"key",
                          "type":"string",
-                         "value":"bat"
+                         "value":"rat"
                         }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
-                 "x":1136,
-                 "y":336
+                 "x":640,
+                 "y":672
+                }, 
+                {
+                 "class":"NPC",
+                 "height":16,
+                 "id":149,
+                 "name":"Rat",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"rat"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":16,
+                 "x":400,
+                 "y":960
+                }, 
+                {
+                 "class":"NPC",
+                 "height":16,
+                 "id":150,
+                 "name":"Rat",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"rat"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":16,
+                 "x":992,
+                 "y":256
+                }, 
+                {
+                 "class":"NPC",
+                 "height":16,
+                 "id":151,
+                 "name":"Rat",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"rat"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":16,
+                 "x":1024,
+                 "y":304
+                }, 
+                {
+                 "class":"NPC",
+                 "height":16,
+                 "id":152,
+                 "name":"Rat",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"rat"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":16,
+                 "x":1072,
+                 "y":272
+                }, 
+                {
+                 "class":"NPC",
+                 "height":16,
+                 "id":153,
+                 "name":"Rat",
+                 "properties":[
+                        {
+                         "name":"key",
+                         "type":"string",
+                         "value":"rat"
+                        }],
+                 "rotation":0,
+                 "visible":true,
+                 "width":16,
+                 "x":1056,
+                 "y":416
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -2863,7 +2624,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":145,
+ "nextobjectid":154,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.9.1",

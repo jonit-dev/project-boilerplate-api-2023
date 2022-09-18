@@ -11,7 +11,7 @@ export const itemArrow: Partial<IItem> = {
   textureKey: "arrow",
   name: "Arrow",
   description: "An iron head arrow.",
-  attack: 1,
+  attack: 4,
   weight: 0.01,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,

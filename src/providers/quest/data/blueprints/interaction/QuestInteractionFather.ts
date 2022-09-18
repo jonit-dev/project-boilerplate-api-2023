@@ -4,7 +4,7 @@ import { IQuest, QuestType } from "@rpg-engine/shared";
 import { QuestsBlueprint } from "../../questsBlueprintTypes";
 
 export const questInteractionFather = {
-  title: "Clear the rat infestation",
+  title: "Speak with your father",
   description:
     "Help your father to clear the rat infestation in our village sewer, and receive a slingshot to help in your journey!",
   key: QuestsBlueprint.InteractionTrader,

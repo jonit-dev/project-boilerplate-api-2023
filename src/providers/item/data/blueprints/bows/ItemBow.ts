@@ -14,7 +14,7 @@ export const itemBow: Partial<IItem> = {
   name: "Bow",
   description:
     "A weapon used for shooting arrows and usually made of a strip of wood bent by a cord connecting the two end.",
-  attack: 2,
+  attack: 4,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,

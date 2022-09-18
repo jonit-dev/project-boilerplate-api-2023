@@ -149,8 +149,6 @@ export class EquipmentEquip {
   }
 
   private checkIfEquipItemContainer(item: IItem, itemContainerId: string): boolean {
-    console.log(item);
-
     if (item.isItemContainer && itemContainerId === "") {
       return true;
     }
