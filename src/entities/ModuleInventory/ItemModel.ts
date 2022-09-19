@@ -61,6 +61,7 @@ const itemSchema = createLeanSchema(
       isEquipable: boolean;
       isStackable: boolean;
       fullDescription: string;
+      baseKey: string;
     }),
     decayTime: Type.date(),
     maxRange: Type.number(),
@@ -69,6 +70,10 @@ const itemSchema = createLeanSchema(
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
+
+itemSchema.virtual("baseKey").get(function (this: IItem) {
+  return this.key.replace(/-\d+$/, "");
+});
 
 itemSchema.virtual("isEquipable").get(function (this: IItem) {
   return this.allowedEquipSlotType && this.allowedEquipSlotType.length > 0;
