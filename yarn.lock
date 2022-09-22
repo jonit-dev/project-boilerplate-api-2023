@@ -1696,9 +1696,9 @@
   integrity sha512-OFp0q4SGrTH0Mruf6oFsHGea58u8vS/iI5+NpYdicaM+7BgqBZH8FFvNZ8rYYLrUO/QRqMq72NpXmxLVNcdmjA==
 
 "@rpg-engine/shared@^0.4.43":
-  version "0.4.49"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.4.49.tgz#1fece52ac84667a107578c2c531ab7bd96846328"
-  integrity sha512-ijzT2lnHZZg12P569odowRWDH/8k1WuTeuR0uywZxgcuxVAYLdEyAsM7TgnnfN6a8LWsP/GMjXQB4za/j7p9Cg==
+  version "0.4.51"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.4.51.tgz#798155e7be3f2585737f8fbaa76580f85f2743fc"
+  integrity sha512-v9UugBQNefv/gbNC0eoGfdsjdOsr7YYK/XlXxz2rZa8nN7bOYT0VBvMjYgVvHOq4MFiFTaE3kCf1n3X9Y/zmxA==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"

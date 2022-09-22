@@ -16,6 +16,7 @@ import {
   NPCTargetType,
   NPC_MAX_TALKING_DISTANCE_IN_GRID,
   QuestSocketEvents,
+  QuestStatus,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -149,10 +150,16 @@ export class QuestNetworkGet {
       if (data.status) {
         const hasRequiredStatus = await quest.hasStatus(data.status, character.id);
         if (hasRequiredStatus) {
-          filteredQuests.push(quest as unknown as IQuest);
+          const filteredQuest = quest as unknown as IQuest;
+          filteredQuest.status = data.status;
+          filteredQuests.push(filteredQuest);
         }
       } else {
-        filteredQuests.push(quest as unknown as IQuest);
+        // For a character, quests can have either status InProgress or Completed
+        const isInProgress = await quest.hasStatus(QuestStatus.InProgress, character.id);
+        const questData = quest as unknown as IQuest;
+        isInProgress ? (questData.status = QuestStatus.InProgress) : (questData.status = QuestStatus.Completed);
+        filteredQuests.push(questData);
       }
     }
 
