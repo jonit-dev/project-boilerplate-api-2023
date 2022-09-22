@@ -112,7 +112,7 @@ export class BattleRangedAttack {
       {
         targetId: target.id,
         type: target.type as EntityType,
-        reason: "Ranged attack failed because character does not have enough ammo",
+        reason: "Ranged attack failed because character does not have the required ammo equipped in accessory slot",
       }
     );
   }
@@ -161,11 +161,6 @@ export class BattleRangedAttack {
     // Get ranged attack weapons (bow or spear)
     switch (weapon.subType) {
       case ItemSubType.Ranged:
-        // check if have enough arrows in inventory or equipment
-        // if (weapon.requiredAmmoKey !== RangedBlueprint.Arrow) {
-        //   return result;
-        // }
-
         if (!weapon.requiredAmmoKey) {
           return result;
         }
@@ -184,35 +179,16 @@ export class BattleRangedAttack {
     return result;
   }
 
+  // This function returns the required ammo data if the required ammo is in the equipment's accessory slot
   private async getRequiredAmmo(
     requiredAmmoKey: string,
     equipment: IEquipment
   ): Promise<Partial<IRangedAttackParams> | undefined> {
-    // check if character has enough required ammo in inventory or equipment
+    // check if character has enough required ammo in accessory slot
     const accessory = await Item.findById(equipment.accessory);
 
     if (accessory && accessory.key === requiredAmmoKey) {
       return { location: ItemSlotType.Accessory, id: accessory._id, key: requiredAmmoKey, equipment };
-    }
-
-    if (!equipment.inventory) {
-      return;
-    }
-    const backpack = equipment.inventory as unknown as IItem;
-    const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
-
-    if (!backpackContainer) {
-      throw new Error(`Backpack without item container. Item id ${backpack._id}`);
-    }
-
-    if (backpackContainer.emptySlotsQty === backpackContainer.slotQty) {
-      return;
-    }
-
-    for (const item of await backpackContainer.items) {
-      if (item.key === requiredAmmoKey) {
-        return { location: ItemSlotType.Inventory, id: item._id, key: requiredAmmoKey, equipment };
-      }
     }
   }
 
@@ -247,9 +223,6 @@ export class BattleRangedAttack {
           await equipment.save();
         }
 
-        break;
-      case ItemSlotType.Inventory:
-        await this.equipmentEquip.removeItemFromInventory(attackParams.id.toString(), backpackContainer);
         break;
       case "hand":
         // Spear item is held in hand
