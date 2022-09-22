@@ -66,10 +66,15 @@ describe("QuestNetworkGet.ts", () => {
   it("should get all character's quests | no status defined", async () => {
     // if status is not provided, should return all quests
     // @ts-ignore
-    const quests = await questNetworkGet.getCharacterQuests({ characterId: testCharacter.id }, testCharacter);
+    const questResponse = await questNetworkGet.getCharacterQuests({ characterId: testCharacter.id }, testCharacter);
 
-    expect(quests).toBeDefined();
-    expect(quests!.quests).toHaveLength(2);
+    expect(questResponse).toBeDefined();
+    expect(questResponse!.quests).toHaveLength(2);
+
+    // all quest should have status InProgress
+    for (const q of questResponse!.quests) {
+      expect(q.status).toEqual(QuestStatus.InProgress);
+    }
   });
 
   it("should get character's quests | status defined", async () => {
