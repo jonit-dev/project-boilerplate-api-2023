@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -109,28 +108,25 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(characterEquipment.accessory).toBeUndefined();
   });
 
-  it("ammo should be consumed | Inventory slot", async () => {
+  it("ammo should NOT be consumed | Inventory slot", async () => {
     const arrowId = await equipArrowInBackpackSlot(characterEquipment);
 
-    await battleRangedAttack.consumeAmmo(
-      {
-        location: ItemSlotType.Inventory,
-        id: arrowId,
-        key: RangedBlueprint.Arrow,
-        maxRange: 2,
-        equipment: characterEquipment,
-      },
-      testCharacter
-    );
-
-    const backpack = characterEquipment.inventory as unknown as IItem;
-    const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
-
-    const itemsIds = backpackContainer?.itemIds.map((id) => Types.ObjectId(id).toString());
-
-    expect(await Item.findById(arrowId)).toBeNull();
-    expect(itemsIds).not.toContain(arrowId.toString());
-    expect(itemsIds?.length).toBeGreaterThan(0);
+    try {
+      await battleRangedAttack.consumeAmmo(
+        {
+          location: ItemSlotType.Inventory,
+          id: arrowId,
+          key: RangedBlueprint.Arrow,
+          maxRange: 2,
+          equipment: characterEquipment,
+        },
+        testCharacter
+      );
+      throw new Error("This test should fail");
+    } catch (error: any) {
+      expect(error).toBeDefined();
+      expect(error.message).toContain("Invalid ammo location");
+    }
   });
 
   it("should NOT hit a target if attacker, attacker does not have enough ammo", async () => {
@@ -180,27 +176,23 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(hitTarget).toHaveBeenCalled();
   });
 
-  it("should hit a target if attacker has ranged attack type, required ammo and target is in range | ammo in backpack slot", async () => {
+  it("should hit NOT a target if attacker has ranged attack type, required ammo and target is in range | ammo in backpack slot", async () => {
     await equipArrowInBackpackSlot(characterEquipment);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(2);
-
-    // when trying to attack again, hitTarget will not be called because ammo was consumed
-    await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
-    expect(hitTarget).toBeCalledTimes(2);
+    expect(hitTarget).toBeCalledTimes(1);
   });
 
   it("should hit a target if attacker has ranged attack type and target is in range | Spear weapon", async () => {
     await equipWithSpear(characterEquipment);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(3);
+    expect(hitTarget).toBeCalledTimes(2);
   });
 
   it("should hit a target | NPC ranged attack ", async () => {
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(4);
+    expect(hitTarget).toBeCalledTimes(3);
   });
 
   it("should hit a target | NPC hybrid attack type", async () => {
@@ -209,7 +201,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 
     // Ranged attack
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(5);
+    expect(hitTarget).toBeCalledTimes(4);
 
     // Melee attack (not passing maxRangeAttack field on purpose to check is doing melee attack)
     testNPC.maxRangeAttack = undefined;
@@ -219,7 +211,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     await testNPC.save();
 
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(6);
+    expect(hitTarget).toBeCalledTimes(5);
   });
 
   afterAll(async () => {
