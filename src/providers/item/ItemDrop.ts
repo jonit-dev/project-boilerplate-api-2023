@@ -201,11 +201,9 @@ export class ItemDrop {
       }
     }
 
-    this.characterValidation.hasBasicValidation(character, {
+    return this.characterValidation.hasBasicValidation(character, {
       isOnline: "Sorry, you must be online to drop this item.",
     });
-
-    return true;
   }
 
   private async validateItemDropFromInventory(

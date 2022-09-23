@@ -364,11 +364,9 @@ export class ItemPickup {
       }
     }
 
-    this.characterValidation.hasBasicValidation(character, {
+    return this.characterValidation.hasBasicValidation(character, {
       isOnline: "Sorry, you must be online to pick up this item.",
     });
-
-    return true;
   }
 
   public sendGenericErrorMessage(character: ICharacter): void {
