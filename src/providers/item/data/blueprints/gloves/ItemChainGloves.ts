@@ -13,5 +13,5 @@ export const itemChainGloves: Partial<IItem> = {
   description: "A pair of metal chain gloves.",
   defense: 6,
   weight: 1,
-  allowedEquipSlotType: [ItemSlotType.Accessory],
+  allowedEquipSlotType: [ItemSlotType.Ring],
 };

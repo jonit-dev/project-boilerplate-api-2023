@@ -13,5 +13,5 @@ export const itemStuddedGloves: Partial<IItem> = {
   description: "A pair of leather gloves with metal studs.",
   defense: 4,
   weight: 0.5,
-  allowedEquipSlotType: [ItemSlotType.Accessory],
+  allowedEquipSlotType: [ItemSlotType.Ring],
 };
