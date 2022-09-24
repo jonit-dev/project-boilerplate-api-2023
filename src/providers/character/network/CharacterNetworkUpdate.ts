@@ -104,7 +104,8 @@ export class CharacterNetworkUpdate {
             const gridY = Number(this.mapTransition.getTransitionProperty(transition, "gridY"));
 
             if (!map || !gridX || !gridY) {
-              throw new Error("Failed to fetch required destination properties.");
+              console.error("Failed to fetch required destination properties.");
+              return;
             }
 
             const destination = {
