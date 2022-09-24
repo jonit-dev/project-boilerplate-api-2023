@@ -12,6 +12,12 @@ import { provide } from "inversify-binding-decorators";
 import { MapLoader } from "./MapLoader";
 import { MapObjectsLoader } from "./MapObjectsLoader";
 
+type TransitionDestination = {
+  map: string;
+  gridX: number;
+  gridY: number;
+};
+
 @provide(MapTransition)
 export class MapTransition {
   constructor(
@@ -20,18 +26,9 @@ export class MapTransition {
     private characterView: CharacterView
   ) {}
 
-  public async changeCharacterScene(character: ICharacter, transition: ITiledObject): Promise<void> {
+  public async changeCharacterScene(character: ICharacter, destination: TransitionDestination): Promise<void> {
     try {
       // fetch destination properties
-      const destination = {
-        map: this.getTransitionProperty(transition, "map"),
-        gridX: Number(this.getTransitionProperty(transition, "gridX")),
-        gridY: Number(this.getTransitionProperty(transition, "gridY")),
-      };
-
-      if (!destination.map || !destination.gridX || !destination.gridY) {
-        throw new Error("Failed to fetch required destination properties.");
-      }
 
       // change character map
       await Character.updateOne(
@@ -47,6 +44,41 @@ export class MapTransition {
 
       // send event to client telling it to restart the map. We don't need to specify which, because it will trigger a character refresh and scene reload on the client side.
       this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.ChangeMap);
+
+      this.socketMessaging.sendMessageToCloseCharacters<IViewDestroyElementPayload>(
+        character,
+        ViewSocketEvents.Destroy,
+        {
+          type: "characters",
+          id: character._id,
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  public async teleportCharacter(character: ICharacter, destination: TransitionDestination): Promise<void> {
+    try {
+      if (character.scene !== destination.map) {
+        throw new Error(`Character Scene: "${character.scene}" and map to teleport: "${destination.map}" mismatch!`);
+      }
+
+      // change character map
+      await Character.updateOne(
+        { _id: character._id },
+        {
+          $set: {
+            scene: destination.map,
+            x: FromGridX(destination.gridX),
+            y: FromGridX(destination.gridY),
+          },
+        }
+      );
+
+      // send event to client telling it that a character has been teleported?
+      // @ts-ignore
+      this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.TeleportCharacter);
 
       this.socketMessaging.sendMessageToCloseCharacters<IViewDestroyElementPayload>(
         character,
@@ -88,7 +120,7 @@ export class MapTransition {
     }
   }
 
-  private getTransitionProperty(transition: ITiledObject, propertyName: string): string | undefined {
+  public getTransitionProperty(transition: ITiledObject, propertyName: string): string | undefined {
     const property = transition.properties.find((property) => property.name === propertyName);
 
     if (property) {
