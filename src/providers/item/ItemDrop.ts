@@ -2,7 +2,6 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -20,11 +19,7 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(ItemDrop)
 export class ItemDrop {
-  constructor(
-    private socketMessaging: SocketMessaging,
-    private characterWeight: CharacterWeight,
-    private characterValidation: CharacterValidation
-  ) {}
+  constructor(private socketMessaging: SocketMessaging, private characterWeight: CharacterWeight) {}
 
   public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<boolean> {
     const isDropValid = await this.isItemDropValid(itemDrop, character);
@@ -201,9 +196,17 @@ export class ItemDrop {
       }
     }
 
-    return this.characterValidation.hasBasicValidation(character, {
-      isOnline: "Sorry, you must be online to drop this item.",
-    });
+    if (character.isBanned) {
+      this.sendCustomErrorMessage(character, "Sorry, you are banned and can't drop this item.");
+      return false;
+    }
+
+    if (!character.isOnline) {
+      this.sendCustomErrorMessage(character, "Sorry, you must be online to drop this item.");
+      return false;
+    }
+
+    return true;
   }
 
   private async validateItemDropFromInventory(

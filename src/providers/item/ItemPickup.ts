@@ -1,7 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -25,8 +24,7 @@ export class ItemPickup {
     private movementHelper: MovementHelper,
     private characterWeight: CharacterWeight,
     private itemView: ItemView,
-    private equipmentEquip: EquipmentEquip,
-    private characterValidation: CharacterValidation
+    private equipmentEquip: EquipmentEquip
   ) {}
 
   public async performItemPickup(itemPickup: IItemPickup, character: ICharacter): Promise<Boolean> {
@@ -364,9 +362,17 @@ export class ItemPickup {
       }
     }
 
-    return this.characterValidation.hasBasicValidation(character, {
-      isOnline: "Sorry, you must be online to pick up this item.",
-    });
+    if (character.isBanned) {
+      this.sendCustomErrorMessage(character, "Sorry, you are banned and can't pick up this item.");
+      return false;
+    }
+
+    if (!character.isOnline) {
+      this.sendCustomErrorMessage(character, "Sorry, you must be online to pick up this item.");
+      return false;
+    }
+
+    return true;
   }
 
   public sendGenericErrorMessage(character: ICharacter): void {
