@@ -1,6 +1,5 @@
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { CharacterItems } from "@providers/character/CharacterItems";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -46,7 +45,5 @@ export const socketEventsBinder = container.get<SocketEventsBinder>(SocketEvents
 
 export const characterConnection = container.get<CharacterConnection>(CharacterConnection);
 export const characterInventory = container.get<CharacterInventory>(CharacterInventory);
-
-export const characterItems = container.get<CharacterItems>(CharacterItems);
 
 export { container };

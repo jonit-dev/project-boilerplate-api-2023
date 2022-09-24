@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { characterItems, container, unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { EquipmentEquip } from "../../equipment/EquipmentEquip";
 
 import { ItemPickup } from "@providers/item/ItemPickup";
+import { CharacterItems } from "../CharacterItems";
 
 describe("CharacterItems.ts", () => {
   let testItem: IItem;
@@ -13,9 +14,12 @@ describe("CharacterItems.ts", () => {
   let inventory: IItem;
   let inventoryItemContainerId: string;
   let equipmentEquip: EquipmentEquip;
+  let characterItems: CharacterItems;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
+
+    characterItems = container.get<CharacterItems>(CharacterItems);
 
     itemPickup = container.get<ItemPickup>(ItemPickup);
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);

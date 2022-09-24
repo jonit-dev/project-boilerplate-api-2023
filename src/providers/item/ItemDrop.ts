@@ -16,10 +16,15 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { CharacterItems } from "../character/CharacterItems";
 
 @provide(ItemDrop)
 export class ItemDrop {
-  constructor(private socketMessaging: SocketMessaging, private characterWeight: CharacterWeight) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterWeight: CharacterWeight,
+    private characterItems: CharacterItems
+  ) {}
 
   public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<boolean> {
     const isDropValid = await this.isItemDropValid(itemDrop, character);
@@ -36,7 +41,7 @@ export class ItemDrop {
       if (itemDrop.fromEquipmentSet) {
         isItemRemoved = await this.removeItemFromEquipmentSet(dropItem as unknown as IItem, character);
       } else {
-        isItemRemoved = await this.removeItemFromInventory(
+        isItemRemoved = await this.beforeDropRemoveFromInventory(
           dropItem as unknown as IItem,
           character,
           itemDrop.fromContainerId
@@ -106,37 +111,17 @@ export class ItemDrop {
       return false;
     }
 
-    let targetSlot = "";
-    const itemSlotTypes = [
-      "head",
-      "neck",
-      "leftHand",
-      "rightHand",
-      "ring",
-      "legs",
-      "boot",
-      "accessory",
-      "armor",
-      "inventory",
-    ];
-
-    for (const itemSlotType of itemSlotTypes) {
-      if (equipmentSet[itemSlotType] && equipmentSet[itemSlotType].toString() === item._id.toString()) {
-        targetSlot = itemSlotType;
-      }
-    }
-
-    equipmentSet[targetSlot] = undefined;
-
-    await equipmentSet.save();
-
-    return true;
+    return this.characterItems.deleteItem(item._id, character, "equipment");
   }
 
   /**
    * This method will remove a item from the character inventory
    */
-  public async removeItemFromInventory(item: IItem, character: ICharacter, fromContainerId: string): Promise<boolean> {
+  private async beforeDropRemoveFromInventory(
+    item: IItem,
+    character: ICharacter,
+    fromContainerId: string
+  ): Promise<boolean> {
     const targetContainer = await ItemContainer.findById(fromContainerId);
 
     if (!item) {
@@ -151,32 +136,7 @@ export class ItemDrop {
       return false;
     }
 
-    for (let i = 0; i < targetContainer.slotQty; i++) {
-      const slotItem = targetContainer.slots?.[i];
-
-      if (!slotItem) continue;
-      if (slotItem.key === item.key) {
-        // Changing item slot to null, thus removing it
-        targetContainer.slots[i] = null;
-
-        await ItemContainer.updateOne(
-          {
-            _id: targetContainer._id,
-          },
-          {
-            $set: {
-              slots: {
-                ...targetContainer.slots,
-              },
-            },
-          }
-        );
-
-        return true;
-      }
-    }
-
-    return false;
+    return this.characterItems.deleteItem(item._id, character, "inventory");
   }
 
   private async isItemDropValid(itemDrop: IItemDrop, character: ICharacter): Promise<Boolean> {
