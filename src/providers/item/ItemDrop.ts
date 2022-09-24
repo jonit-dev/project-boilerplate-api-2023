@@ -2,7 +2,6 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterItems } from "@providers/character/CharacterItems";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -20,11 +19,7 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(ItemDrop)
 export class ItemDrop {
-  constructor(
-    private socketMessaging: SocketMessaging,
-    private characterWeight: CharacterWeight,
-    private characterItems: CharacterItems
-  ) {}
+  constructor(private socketMessaging: SocketMessaging, private characterWeight: CharacterWeight) {}
 
   public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<boolean> {
     const isDropValid = await this.isItemDropValid(itemDrop, character);
@@ -102,7 +97,7 @@ export class ItemDrop {
     return false;
   }
 
-  private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
+  public async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
     const equipmentSetId = character.equipment;
     const equipmentSet = await Equipment.findById(equipmentSetId);
 
@@ -141,7 +136,7 @@ export class ItemDrop {
   /**
    * This method will remove a item from the character inventory
    */
-  private async removeItemFromInventory(item: IItem, character: ICharacter, fromContainerId: string): Promise<boolean> {
+  public async removeItemFromInventory(item: IItem, character: ICharacter, fromContainerId: string): Promise<boolean> {
     const targetContainer = await ItemContainer.findById(fromContainerId);
 
     if (!item) {
