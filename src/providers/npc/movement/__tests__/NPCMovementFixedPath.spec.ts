@@ -55,5 +55,3 @@ describe("NPCMovementFixedPath.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here

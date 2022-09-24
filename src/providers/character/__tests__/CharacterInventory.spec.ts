@@ -31,5 +31,3 @@ describe("CharacterInventory.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here

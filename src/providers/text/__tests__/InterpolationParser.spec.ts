@@ -36,5 +36,3 @@ describe("InterpolationParser.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here

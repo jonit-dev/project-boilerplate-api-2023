@@ -107,5 +107,3 @@ describe("CharacterView.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here

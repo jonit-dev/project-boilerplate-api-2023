@@ -75,5 +75,3 @@ describe("CharacterValidation.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here
