@@ -39,7 +39,7 @@ export class ItemDrop {
       let isItemRemoved = false;
 
       if (itemDrop.fromEquipmentSet) {
-        isItemRemoved = await this.removeItemFromEquipmentSet(dropItem as unknown as IItem, character);
+        isItemRemoved = await this.beforeDropRemoveFromEquipmentSet(dropItem as unknown as IItem, character);
       } else {
         isItemRemoved = await this.beforeDropRemoveFromInventory(
           dropItem as unknown as IItem,
@@ -102,7 +102,7 @@ export class ItemDrop {
     return false;
   }
 
-  public async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
+  private async beforeDropRemoveFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
     const equipmentSetId = character.equipment;
     const equipmentSet = await Equipment.findById(equipmentSetId);
 
