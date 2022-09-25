@@ -16,7 +16,7 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterItems } from "../character/CharacterItems";
+import { CharacterItems } from "../character/characterItems/CharacterItems";
 
 @provide(ItemDrop)
 export class ItemDrop {

@@ -115,6 +115,9 @@ itemSchema.post("updateOne", async function (this: UpdateQuery<IItem>) {
 });
 
 itemSchema.post("save", async function (this: IItem) {
+  // fix item key
+  this.key = this.baseKey;
+
   if (this.isItemContainer) {
     let slotQty: number = 20;
 
