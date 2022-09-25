@@ -1,6 +1,6 @@
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IItemPickup, ItemSocketEvents } from "@rpg-engine/shared";
+import { ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUse } from "../ItemUse";
 
