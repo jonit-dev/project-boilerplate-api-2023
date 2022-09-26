@@ -18,7 +18,7 @@ export class CharacterValidation {
 
       if (errorMessages?.isOnline) {
         this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
-          message: errorMessages.isOnline,
+          message: errorMessages.isOnline || "You are offline and cannot perform this action!",
           type: "error",
         });
       }
@@ -31,7 +31,7 @@ export class CharacterValidation {
 
       if (errorMessages?.isAlive) {
         this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
-          message: errorMessages.isAlive,
+          message: errorMessages.isAlive || "You are dead and cannot perform this action!",
           type: "error",
         });
       }
