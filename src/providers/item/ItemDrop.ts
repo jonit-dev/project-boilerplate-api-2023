@@ -78,6 +78,8 @@ export class ItemDrop {
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
           equipment: equipmentSlots,
           inventory: inventory,
+          openEquipmentSetOnUpdate: false,
+          openInventoryOnUpdate: false,
         };
 
         // if itemDrop toPosition has x and y, then drop item to that position in the map
