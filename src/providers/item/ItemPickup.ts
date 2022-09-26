@@ -1,9 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { OperationStatus } from "@providers/types/ValidationTypes";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
@@ -15,7 +17,6 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { EquipmentEquip } from "../equipment/EquipmentEquip";
 import { ItemView } from "./ItemView";
 @provide(ItemPickup)
 export class ItemPickup {
@@ -24,7 +25,7 @@ export class ItemPickup {
     private movementHelper: MovementHelper,
     private characterWeight: CharacterWeight,
     private itemView: ItemView,
-    private equipmentEquip: EquipmentEquip
+    private characterItemContainer: CharacterItemContainer
   ) {}
 
   public async performItemPickup(itemPickup: IItemPickup, character: ICharacter): Promise<Boolean> {
@@ -47,13 +48,17 @@ export class ItemPickup {
     if (pickupItem) {
       await this.normalizeItemKey(pickupItem);
 
-      const isItemAdded = await this.addItemToInventory(
+      const { status, message } = await this.characterItemContainer.addItemToContainer(
         pickupItem,
         character,
         itemPickup.toContainerId,
         equipItemContainer
       );
-      if (!isItemAdded) return false;
+
+      if (status === OperationStatus.Error) {
+        if (message) this.sendCustomErrorMessage(character, message);
+        return false;
+      }
 
       // // whenever a new item is added, we need to update the character weight
       await this.characterWeight.updateCharacterWeight(character);
@@ -111,90 +116,6 @@ export class ItemPickup {
     );
   }
 
-  /**
-   * This method will add or stack a item to the character inventory
-   */
-  private async addItemToInventory(
-    item: IItem,
-    character: ICharacter,
-    toContainerId: string,
-    equipItemContainer: boolean
-  ): Promise<Boolean> {
-    const selectedItem = (await Item.findById(item.id)) as IItem;
-
-    if (!selectedItem) {
-      this.sendGenericErrorMessage(character);
-      return false;
-    }
-
-    // Equip Item Container
-    if (equipItemContainer) {
-      await this.equipmentEquip.equip(character, item.id, "");
-      return true;
-    }
-
-    const targetContainer = (await ItemContainer.findById(toContainerId)) as unknown as IItemContainer;
-
-    if (!targetContainer) {
-      this.sendGenericErrorMessage(character);
-      return false;
-    }
-
-    if (targetContainer) {
-      let isNewItem = true;
-
-      // Item Type is valid to add to a container?
-      const isItemTypeValid = targetContainer.allowedItemTypes?.filter((entry) => {
-        return entry === selectedItem?.type;
-      });
-      if (!isItemTypeValid) {
-        this.sendCustomErrorMessage(character, "Sorry, your inventory does not support this item type.");
-        return false;
-      }
-
-      // Inventory is empty, slot checking not needed
-      if (targetContainer.isEmpty) isNewItem = true;
-
-      if (selectedItem.isStackable) {
-        const itemStacked = await this.tryAddingItemToStack(character, targetContainer, selectedItem);
-        if (itemStacked) {
-          // if was stacked, remove the item from the database to avoid garbage
-          await Item.deleteOne({ _id: selectedItem.id });
-          return true;
-        }
-      }
-
-      // Check's done, need to create new item on char inventory
-      if (isNewItem) {
-        const firstAvailableSlotIndex = targetContainer.firstAvailableSlotId;
-
-        if (firstAvailableSlotIndex === null) {
-          this.sendCustomErrorMessage(character, "Sorry, your inventory is full.");
-          return false;
-        }
-
-        if (firstAvailableSlotIndex >= 0) {
-          targetContainer.slots[firstAvailableSlotIndex] = selectedItem;
-
-          await ItemContainer.updateOne(
-            {
-              _id: targetContainer.id,
-            },
-            {
-              $set: {
-                slots: targetContainer.slots,
-              },
-            }
-          );
-
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
   // not a final solution
   private async removeItemFromContainer(
     item: IItem,
@@ -235,56 +156,6 @@ export class ItemPickup {
               },
             }
           );
-
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  private async tryAddingItemToStack(
-    character: ICharacter,
-    targetContainer: IItemContainer,
-    selectedItem: IItem
-  ): Promise<boolean> {
-    // loop through all inventory container slots, checking to see if selectedItem can be stackable
-
-    if (!targetContainer.slots) {
-      this.sendCustomErrorMessage(character, "Sorry, there are no slots in your container.");
-      return false;
-    }
-
-    for (let i = 0; i < targetContainer.slotQty; i++) {
-      const slotItem = targetContainer.slots?.[i];
-
-      if (!slotItem) continue;
-
-      if (slotItem.key === selectedItem.key.replace(/-\d+$/, "")) {
-        if (slotItem.stackQty) {
-          const updatedStackQty = slotItem.stackQty + selectedItem.stackQty;
-          if (updatedStackQty > slotItem.maxStackSize) {
-            this.sendCustomErrorMessage(
-              character,
-              `Sorry, you cannot stack more than ${slotItem.maxStackSize} ${slotItem.key}s.`
-            );
-            return false;
-          }
-
-          targetContainer.slots[i] = {
-            ...slotItem,
-            stackQty: updatedStackQty,
-          };
-
-          await Item.updateOne(
-            {
-              _id: slotItem._id,
-            },
-            { $set: { stackQty: updatedStackQty } }
-          );
-
-          targetContainer.markModified("slots");
-          await targetContainer.save();
 
           return true;
         }

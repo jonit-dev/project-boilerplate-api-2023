@@ -1,6 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { CharacterItemStack } from "@providers/character/characterItems/CharacterItemStack";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
@@ -19,7 +21,9 @@ export class EquipmentUnequip {
   constructor(
     private socketMessaging: SocketMessaging,
     private equipmentSlots: EquipmentSlots,
-    private equipmentHelper: EquipmentRangeUpdate
+    private equipmentHelper: EquipmentRangeUpdate,
+    private characterValidation: CharacterValidation,
+    private characterItemStack: CharacterItemStack
   ) {}
 
   public async unequip(
@@ -53,21 +57,7 @@ export class EquipmentUnequip {
       return;
     }
 
-    if (character.isBanned) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "User has been banned!",
-        type: "error",
-      });
-      return;
-    }
-
-    if (!character.isAlive) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "User is dead!",
-        type: "error",
-      });
-      return;
-    }
+    this.characterValidation.hasBasicValidation(character);
 
     if (!inventory) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -173,9 +163,10 @@ export class EquipmentUnequip {
     item: IItem
   ): Promise<void> {
     let itemUnequipped = false;
+
     if (itemAlreadyInSlot) {
       if (itemSlot!.stackQty! < itemSlot!.maxStackSize) {
-        itemSlot!.stackQty!++;
+        itemSlot!.stackQty!++; //! THIS IS BUGGED!
         itemUnequipped = true;
       }
     }
