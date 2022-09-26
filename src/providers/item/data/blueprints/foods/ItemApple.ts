@@ -14,5 +14,11 @@ export const itemApple: Partial<IItem> = {
   description: "A red apple.",
   weight: 0.05,
   allowedEquipSlotType: [ItemSlotType.Inventory],
-  usableEffect: (character: ICharacter) => {},
+  usableEffect: (character: ICharacter): ICharacter => {
+    character.health += 1;
+    if (character.health > character.maxHealth) {
+      character.health = character.maxHealth;
+    }
+    return character;
+  },
 };

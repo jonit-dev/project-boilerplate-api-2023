@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { provide } from "inversify-binding-decorators";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
@@ -8,6 +8,7 @@ import {
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
   ItemSocketEvents,
+  ItemSubType,
   IUIShowMessage,
   UIMessageType,
   UISocketEvents,
@@ -16,7 +17,8 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { CharacterView } from "@providers/character/CharacterView";
+import { ItemUseCycle } from "./ItemUseCycle";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -25,7 +27,8 @@ export class ItemUse {
     private itemValidation: ItemValidation,
     private socketMessaging: SocketMessaging,
     private equipmentEquip: EquipmentEquip,
-    private characterWeight: CharacterWeight
+    private characterWeight: CharacterWeight,
+    private characterView: CharacterView
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -51,10 +54,9 @@ export class ItemUse {
       return false;
     }
 
-    await bluePrintItem.usableEffect(character);
+    this.applyItemUsage(bluePrintItem, character.id);
 
     const inventoryContainer = await this.getInventoryContainer(character);
-
     if (!inventoryContainer) {
       return false;
     }
@@ -82,11 +84,23 @@ export class ItemUse {
     return true;
   }
 
-  private sendCustomErrorMessage(character: ICharacter, message: string, type: UIMessageType = "error"): void {
-    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message,
-      type,
-    });
+  private applyItemUsage(bluePrintItem: Partial<IItem>, characterId: string): void {
+    const intervals = bluePrintItem.subType === ItemSubType.Food ? 5 : 1;
+    const intervalDurationSec = 10;
+
+    new ItemUseCycle(
+      async () => {
+        let character = await Character.findOne({ _id: characterId });
+        character = bluePrintItem.usableEffect(character);
+
+        if (character) {
+          await character.save();
+          await this.sendItemConsumptionEvent(character);
+        }
+      },
+      intervals,
+      intervalDurationSec
+    );
   }
 
   private async consumeItem(inventoryContainer: IItemContainer, item: IItem): Promise<void> {
@@ -127,6 +141,31 @@ export class ItemUse {
     }
 
     return inventoryContainer;
+  }
+
+  private async sendItemConsumptionEvent(character: ICharacter): Promise<void> {
+    const nearbyCharacters = await this.characterView.getCharactersInView(character);
+    // TODO: Khobab: added IItemConsumptionPayload interface and ItemConsumption event to shared types and use here
+    const payload: any = {
+      targetId: character._id,
+      health: character.health,
+      mana: character.mana,
+    };
+
+    for (const nearbyCharacter of nearbyCharacters) {
+      this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, "ItemConsumptionEvent", payload);
+    }
+
+    if (character.channelId) {
+      this.socketMessaging.sendEventToUser(character.channelId, "ItemConsumptionEvent", payload);
+    }
+  }
+
+  private sendCustomErrorMessage(character: ICharacter, message: string, type: UIMessageType = "error"): void {
+    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+      message,
+      type,
+    });
   }
 
   private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {

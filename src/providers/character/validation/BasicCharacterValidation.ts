@@ -8,13 +8,18 @@ export class BasicCharacterValidation {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public isCharacterValid(character: ICharacter): boolean {
+    if (!character.isAlive) {
+      this.sendCustomErrorMessage(character, "Sorry, you are dead.");
+      return false;
+    }
+
     if (character.isBanned) {
-      this.sendCustomErrorMessage(character, "Sorry, you are banned and can't drop this item.");
+      this.sendCustomErrorMessage(character, "Sorry, you are banned.");
       return false;
     }
 
     if (!character.isOnline) {
-      this.sendCustomErrorMessage(character, "Sorry, you must be online to drop this item.");
+      this.sendCustomErrorMessage(character, "Sorry, you are not online.");
       return false;
     }
 
