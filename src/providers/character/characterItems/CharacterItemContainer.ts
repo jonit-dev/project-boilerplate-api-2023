@@ -22,9 +22,9 @@ export class CharacterItemContainer {
     toContainerId: string,
     isEquipment?: boolean
   ): Promise<ICharacterItemResult> {
-    const selectedItem = (await Item.findById(item.id)) as unknown as IItem;
+    const itemToBeAdded = (await Item.findById(item.id)) as unknown as IItem;
 
-    if (!selectedItem) {
+    if (!itemToBeAdded) {
       return {
         status: OperationStatus.Error,
         message: "Oops! The item to be added was not found.",
@@ -52,7 +52,7 @@ export class CharacterItemContainer {
 
       // Item Type is valid to add to a container?
       const isItemTypeValid = targetContainer.allowedItemTypes?.filter((entry) => {
-        return entry === selectedItem?.type;
+        return entry === itemToBeAdded?.type;
       });
       if (!isItemTypeValid) {
         return {
@@ -64,8 +64,8 @@ export class CharacterItemContainer {
       // Inventory is empty, slot checking not needed
       if (targetContainer.isEmpty) isNewItem = true;
 
-      if (selectedItem.isStackable) {
-        const wasStacked = await this.characterItemStack.tryAddingItemToStack(targetContainer, selectedItem);
+      if (itemToBeAdded.isStackable) {
+        const wasStacked = await this.characterItemStack.tryAddingItemToStack(targetContainer, itemToBeAdded);
 
         if (wasStacked?.status === OperationStatus.Error) {
           return {
@@ -81,7 +81,7 @@ export class CharacterItemContainer {
 
       // Check's done, need to create new item on char inventory
       if (isNewItem) {
-        const result = await this.characterItemSlots.addNewItemOnFirstAvailableSlot(selectedItem, targetContainer);
+        const result = await this.characterItemSlots.addItemOnFirstAvailableSlot(itemToBeAdded, targetContainer);
 
         if (result?.status === OperationStatus.Error) {
           return {

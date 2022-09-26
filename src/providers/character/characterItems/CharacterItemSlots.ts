@@ -7,7 +7,23 @@ import { ICharacterItemResult } from "./CharacterItems";
 
 @provide(CharacterItemSlots)
 export class CharacterItemSlots {
-  public async addNewItemOnFirstAvailableSlot(
+  public async updateItemOnSlot(
+    slotIndex: number,
+    targetContainer: IItemContainer,
+    payload: Record<string, any>
+  ): Promise<void> {
+    const slotItem = targetContainer.slots[slotIndex];
+
+    targetContainer.slots[slotIndex] = {
+      ...slotItem,
+      ...payload,
+    };
+
+    targetContainer.markModified("slots");
+    await targetContainer.save();
+  }
+
+  public async addItemOnFirstAvailableSlot(
     selectedItem: IItem,
     targetContainer: IItemContainer
   ): Promise<ICharacterItemResult | undefined> {

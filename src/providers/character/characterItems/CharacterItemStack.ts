@@ -17,7 +17,7 @@ export class CharacterItemStack {
 
   public async tryAddingItemToStack(
     targetContainer: IItemContainer,
-    selectedItem: IItem
+    itemToBeAdded: IItem
   ): Promise<ICharacterItemResult | null> {
     // loop through all inventory container slots, checking to see if selectedItem can be stackable
 
@@ -33,33 +33,27 @@ export class CharacterItemStack {
 
       if (!slotItem) continue;
 
-      if (slotItem.key === selectedItem.key.replace(/-\d+$/, "")) {
+      if (slotItem.key === itemToBeAdded.key.replace(/-\d+$/, "")) {
         if (slotItem.stackQty) {
-          const updatedStackQty = slotItem.stackQty + selectedItem.stackQty;
+          const updatedStackQty = slotItem.stackQty + itemToBeAdded.stackQty;
 
-          if (updatedStackQty > selectedItem.maxStackSize) {
-            // update stackQty of existing item
-            targetContainer.slots[i] = {
-              ...slotItem,
-              stackQty: selectedItem.maxStackSize,
-            };
+          if (updatedStackQty > itemToBeAdded.maxStackSize) {
+            await this.characterItemSlots.updateItemOnSlot(i, targetContainer, {
+              stackQty: itemToBeAdded.maxStackSize,
+            });
 
-            targetContainer.markModified("slots");
-            await targetContainer.save();
-
-            selectedItem.stackQty = updatedStackQty - selectedItem.maxStackSize;
-            await selectedItem.save();
+            itemToBeAdded.stackQty = updatedStackQty - itemToBeAdded.maxStackSize;
+            await itemToBeAdded.save();
 
             return null; // this means a new item should be created on itemContainer!
           }
 
-          if (updatedStackQty <= selectedItem.maxStackSize) {
+          if (updatedStackQty <= itemToBeAdded.maxStackSize) {
             // if updatedStackQty is less than or equal to maxStackSize, update stackQty of existing item. Do not create new one!
 
-            targetContainer.slots[i] = {
-              ...slotItem,
+            await this.characterItemSlots.updateItemOnSlot(i, targetContainer, {
               stackQty: updatedStackQty,
-            };
+            });
 
             await Item.updateOne(
               {
@@ -67,13 +61,10 @@ export class CharacterItemStack {
               },
               { $set: { stackQty: updatedStackQty } }
             );
-
-            targetContainer.markModified("slots");
-            await targetContainer.save();
           }
 
-          // delete selectedItem to cleanup database (now hes on the container)
-          await Item.deleteOne({ _id: selectedItem._id });
+          // // delete selectedItem to cleanup database (now hes on the container)
+          await Item.deleteOne({ _id: itemToBeAdded._id });
 
           return {
             status: OperationStatus.Success,
