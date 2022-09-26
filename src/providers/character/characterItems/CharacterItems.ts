@@ -1,13 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { OperationStatus } from "@providers/types/ValidationTypes";
 import { ItemSlotType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemEquipment } from "./CharacterItemEquipment";
 import { CharacterItemInventory } from "./CharacterItemInventory";
 
-export interface ICharacterItemError {
-  error: string;
+export interface ICharacterItemResult {
+  status: OperationStatus;
+  message?: string;
 }
 
 @provide(CharacterItems)
@@ -22,7 +24,7 @@ export class CharacterItems {
     character: ICharacter,
     container: "inventory" | "equipment",
     slot?: ItemSlotType
-  ): Promise<boolean> {
+  ): Promise<ICharacterItemResult> {
     switch (container) {
       case "inventory":
         return await this.createItemInInventory(itemBlueprintKey, character);
@@ -30,16 +32,22 @@ export class CharacterItems {
       //   return await this.createItemInEquipment(itemBlueprintKey, character);
 
       default:
-        return false;
+        return {
+          status: OperationStatus.Error,
+          message: "Something went wrong while trying to create your inventory item.",
+        };
     }
   }
 
-  private async createItemInInventory(itemBlueprintKey: string, character: ICharacter): Promise<boolean> {
+  private async createItemInInventory(itemBlueprintKey: string, character: ICharacter): Promise<ICharacterItemResult> {
     const itemBlueprint = itemsBlueprintIndex[itemBlueprintKey];
 
     if (!itemBlueprint) {
       console.log("Item blueprint not found");
-      return false;
+      return {
+        status: OperationStatus.Error,
+        message: "Item blueprint not found",
+      };
     }
 
     try {
@@ -49,12 +57,17 @@ export class CharacterItems {
 
       await item.save();
 
-      return true;
+      return {
+        status: OperationStatus.Success,
+      };
     } catch (error) {
       console.error(error);
     }
 
-    return false;
+    return {
+      status: OperationStatus.Error,
+      message: "Something went wrong while trying to create your inventory item.",
+    };
   }
 
   //! Warning: This completely WIPES OUT the item from the inventory or equipment. It DOES NOT DROP IT. Once it's executed, it's gone! If you want to drop an item, check ItemDrop.ts
@@ -62,7 +75,7 @@ export class CharacterItems {
     itemId: string,
     character: ICharacter,
     container: "inventory" | "equipment" | "both"
-  ): Promise<boolean> {
+  ): Promise<ICharacterItemResult> {
     switch (container) {
       case "inventory":
         return await this.characterItemInventory.deleteItemFromInventory(itemId, character);
@@ -74,7 +87,10 @@ export class CharacterItems {
           (await this.characterItemEquipment.deleteItemFromEquipment(itemId, character))
         );
       default:
-        return false;
+        return {
+          status: OperationStatus.Error,
+          message: `"Something went wrong while trying to delete your ${container} item."`,
+        };
     }
   }
 

@@ -4,6 +4,7 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { OperationStatus } from "@providers/types/ValidationTypes";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
@@ -111,7 +112,15 @@ export class ItemDrop {
       return false;
     }
 
-    return this.characterItems.deleteItem(item._id, character, "equipment");
+    const { status, message } = await this.characterItems.deleteItem(item._id, character, "equipment");
+
+    if (status === OperationStatus.Error) {
+      if (message) this.sendCustomErrorMessage(character, message);
+
+      return false;
+    }
+
+    return true;
   }
 
   /**
@@ -136,7 +145,15 @@ export class ItemDrop {
       return false;
     }
 
-    return this.characterItems.deleteItem(item._id, character, "inventory");
+    const { status, message } = await this.characterItems.deleteItem(item._id, character, "inventory");
+
+    if (status === OperationStatus.Error) {
+      if (message) this.sendCustomErrorMessage(character, message);
+
+      return false;
+    }
+
+    return true;
   }
 
   private async isItemDropValid(itemDrop: IItemDrop, character: ICharacter): Promise<Boolean> {
