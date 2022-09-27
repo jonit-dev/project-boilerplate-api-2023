@@ -19,6 +19,7 @@ import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterView } from "@providers/character/CharacterView";
 import { ItemUseCycle } from "./ItemUseCycle";
+import { constant } from "lodash";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -86,21 +87,16 @@ export class ItemUse {
 
   private applyItemUsage(bluePrintItem: Partial<IItem>, characterId: string): void {
     const intervals = bluePrintItem.subType === ItemSubType.Food ? 5 : 1;
-    const intervalDurationSec = 10;
 
-    new ItemUseCycle(
-      async () => {
-        let character = await Character.findOne({ _id: characterId });
-        character = bluePrintItem.usableEffect(character);
+    new ItemUseCycle(async () => {
+      const character = await Character.findOne({ _id: characterId });
 
-        if (character) {
-          await character.save();
-          await this.sendItemConsumptionEvent(character);
-        }
-      },
-      intervals,
-      intervalDurationSec
-    );
+      if (character) {
+        bluePrintItem.usableEffect(character);
+        await character.save();
+        await this.sendItemConsumptionEvent(character);
+      }
+    }, intervals);
   }
 
   private async consumeItem(inventoryContainer: IItemContainer, item: IItem): Promise<void> {

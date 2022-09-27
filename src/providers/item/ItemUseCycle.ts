@@ -1,15 +1,17 @@
 export class ItemUseCycle {
-  constructor(fn: Function, intervals: number, intervalDurationSec: number) {
-    this.execute(fn, intervals, intervalDurationSec);
+  constructor(fn: Function, iterations: number) {
+    this.execute(fn, iterations);
   }
 
-  private async execute(fn: Function, intervals: number, intervalDurationSec: number): Promise<void> {
+  private async execute(fn: Function, iterations: number): Promise<void> {
     await fn();
 
-    intervals--;
-    if (intervals > 0) {
+    iterations--;
+    if (iterations > 0) {
+      const intervalDurationSec = 10;
+
       setTimeout(() => {
-        this.execute(fn, intervals, intervalDurationSec);
+        this.execute(fn, iterations);
       }, intervalDurationSec * 1000);
     }
   }
