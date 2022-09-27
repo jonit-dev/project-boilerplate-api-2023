@@ -74,6 +74,8 @@ describe("QuestNetworkGet.ts", () => {
     // all quest should have status InProgress
     for (const q of questResponse!.quests) {
       expect(q.status).toEqual(QuestStatus.InProgress);
+      // check objectives are returned
+      expect(q.objectives.length).toBeGreaterThanOrEqual(1);
     }
   });
 
@@ -95,6 +97,19 @@ describe("QuestNetworkGet.ts", () => {
 
     expect(pendingQuests).toBeDefined();
     expect(pendingQuests!.quests).toHaveLength(0);
+  });
+
+  it("should get all character's quests | check objectives data", async () => {
+    // if status is not provided, should return all quests
+    // @ts-ignore
+    const questResponse = await questNetworkGet.getCharacterQuests({ characterId: testCharacter.id }, testCharacter);
+
+    expect(questResponse!.quests[0].objectives).toHaveLength(2);
+    expect(questResponse!.quests[0].objectives[0].type).toEqual(QuestType.Kill);
+    // @ts-ignore
+    expect(questResponse!.quests[0].objectives[0].killCountTarget).toEqual(5);
+    // @ts-ignore
+    expect(questResponse!.quests[0].objectives[0].killCount).toEqual(0);
   });
 
   it("try get NPC's quests without status | should fail", async () => {
