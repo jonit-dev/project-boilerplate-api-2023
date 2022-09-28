@@ -45,7 +45,7 @@ export class CharacterItemStack {
             itemToBeAdded.stackQty = updatedStackQty - itemToBeAdded.maxStackSize;
             await itemToBeAdded.save();
 
-            return null; // this means a new item should be created on itemContainer!
+            return null; // this means a new item should be created on itemContainer, with the difference quantity!
           }
 
           if (updatedStackQty <= itemToBeAdded.maxStackSize) {

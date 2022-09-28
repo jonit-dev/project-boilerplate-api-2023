@@ -193,7 +193,7 @@ describe("ItemPickup.ts", () => {
       id: inventoryItemContainerId,
       parentItem: inventory.id,
       slots: {
-        0: stackableItem1,
+        0: stackableItem1.toJSON({ virtuals: true }),
       },
       slotQty: 1,
     });

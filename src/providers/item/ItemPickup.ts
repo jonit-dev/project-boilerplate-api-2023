@@ -56,8 +56,6 @@ export class ItemPickup {
     itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
     await itemToBePicked.save();
 
-    console.log(itemToBePicked.id, itemToBePicked.key, itemToBePicked.stackQty, itemToBePicked.maxStackSize);
-
     const { status, message } = await this.characterItemContainer.addItemToContainer(
       itemToBePicked,
       character,
@@ -197,8 +195,7 @@ export class ItemPickup {
     }
 
     if (!item.isItemContainer) {
-      const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(itemPickupData.toContainerId);
-
+      const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(itemPickupData.toContainerId, item);
       if (!hasAvailableSlot) {
         this.sendCustomErrorMessage(character, "Sorry, your container is full.");
         return false;
