@@ -5,6 +5,7 @@ import { Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { OperationStatus } from "@providers/types/ValidationTypes";
 import {
@@ -27,13 +28,14 @@ export class ItemDrop {
     private characterWeight: CharacterWeight,
     private characterItems: CharacterItems,
     private equipmentSlots: EquipmentSlots,
-    private characterValidation: CharacterValidation
+    private characterValidation: CharacterValidation,
+    private movementHelper: MovementHelper
   ) {}
 
   //! For now, only a drop from inventory or equipment set is allowed.
   public async performItemDrop(itemDropData: IItemDrop, character: ICharacter): Promise<boolean> {
     const isDropValid = await this.isItemDropValid(itemDropData, character);
-
+    const source = itemDropData.source;
     if (!isDropValid) {
       return false;
     }
@@ -45,56 +47,61 @@ export class ItemDrop {
       return false;
     }
 
-    const isEquipmentSetDrop = itemDropData.fromEquipmentSet;
+    const mapDrop = await this.tryDroppingToMap(itemDropData, itemToBeDropped as unknown as IItem, character);
 
-    let isItemRemoved = false;
-
-    if (isEquipmentSetDrop) {
-      isItemRemoved = await this.removeItemFromEquipmentSet(itemToBeDropped as unknown as IItem, character);
-    } else {
-      // we're dropping from the inventory!
-      isItemRemoved = await this.removeItemFromInventory(
-        itemToBeDropped as unknown as IItem,
-        character,
-        itemDropData.fromContainerId
-      );
-    }
-
-    if (!isItemRemoved) {
-      this.sendGenericErrorMessage(character);
+    if (!mapDrop) {
       return false;
     }
 
-    // if we reached this point, the drop was successful
+    let isItemRemoved = false;
 
     try {
-      await this.characterWeight.updateCharacterWeight(character);
+      switch (source) {
+        case "equipment":
+          isItemRemoved = await this.removeItemFromEquipmentSet(itemToBeDropped as unknown as IItem, character);
 
-      if (isEquipmentSetDrop) {
-        const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+          if (!isItemRemoved) {
+            this.sendGenericErrorMessage(character);
+            return false;
+          }
 
-        this.sendRefreshItemsEvent(
-          {
-            equipment: equipmentSlots,
+          const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+
+          this.sendRefreshItemsEvent(
+            {
+              equipment: equipmentSlots,
+              openEquipmentSetOnUpdate: false,
+            },
+            character
+          );
+
+          break;
+        case "inventory":
+          isItemRemoved = await this.removeItemFromInventory(
+            itemToBeDropped as unknown as IItem,
+            character,
+            itemDropData.fromContainerId
+          );
+
+          if (!isItemRemoved) {
+            this.sendGenericErrorMessage(character);
+            return false;
+          }
+
+          const inventoryContainer = (await ItemContainer.findById(
+            itemDropData.fromContainerId
+          )) as unknown as IItemContainer;
+
+          const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+            inventory: inventoryContainer,
             openEquipmentSetOnUpdate: false,
-          },
-          character
-        );
-      } else {
-        const inventoryContainer = (await ItemContainer.findById(
-          itemDropData.fromContainerId
-        )) as unknown as IItemContainer;
+            openInventoryOnUpdate: false,
+          };
 
-        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-          inventory: inventoryContainer,
-          openEquipmentSetOnUpdate: false,
-          openInventoryOnUpdate: false,
-        };
+          this.sendRefreshItemsEvent(payloadUpdate, character);
 
-        this.sendRefreshItemsEvent(payloadUpdate, character);
+          break;
       }
-
-      await this.tryDroppingToMap(itemDropData, itemToBeDropped as unknown as IItem);
 
       return true;
     } catch (err) {
@@ -105,11 +112,20 @@ export class ItemDrop {
     }
   }
 
-  private async tryDroppingToMap(itemDrop: IItemDrop, dropItem: IItem): Promise<void> {
+  private async tryDroppingToMap(itemDrop: IItemDrop, dropItem: IItem, character: ICharacter): Promise<boolean> {
     // if itemDrop toPosition has x and y, then drop item to that position in the map, if not, then drop to the character position
 
     const targetX = itemDrop.toPosition?.x || itemDrop.x;
     const targetY = itemDrop.toPosition?.y || itemDrop.y;
+
+    // check if targetX and Y is under range
+
+    const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, targetX, targetY, 8);
+
+    if (!isUnderRange) {
+      this.sendCustomErrorMessage(character, "Sorry, you're trying to drop this item too far away.");
+      return false;
+    }
 
     await Item.updateOne(
       {
@@ -121,6 +137,8 @@ export class ItemDrop {
         scene: itemDrop.scene,
       }
     );
+
+    return true;
   }
 
   private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
@@ -174,7 +192,7 @@ export class ItemDrop {
 
   private async isItemDropValid(itemDrop: IItemDrop, character: ICharacter): Promise<Boolean> {
     const item = await Item.findById(itemDrop.itemId);
-    const isFromEquipmentSet = itemDrop.fromEquipmentSet;
+    const isFromEquipmentSet = itemDrop.source === "equipment";
 
     if (!item) {
       this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
