@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -25,7 +26,8 @@ export class ItemPickup {
     private movementHelper: MovementHelper,
     private characterWeight: CharacterWeight,
     private itemView: ItemView,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private characterValidation: CharacterValidation
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<Boolean> {
@@ -180,14 +182,14 @@ export class ItemPickup {
     character: ICharacter,
     equipItemContainer: boolean
   ): Promise<Boolean> {
-    const isItemOnMap = item.x && item.y && item.scene;
-
     const inventory = await character.inventory;
 
     if (!inventory && !equipItemContainer) {
       this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to pick up this item.");
       return false;
     }
+
+    const isItemOnMap = item.x && item.y && item.scene;
 
     if (isItemOnMap) {
       if (character.scene !== item.scene) {

@@ -3,7 +3,6 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -25,7 +24,6 @@ import { CharacterItems } from "../character/characterItems/CharacterItems";
 export class ItemDrop {
   constructor(
     private socketMessaging: SocketMessaging,
-    private characterWeight: CharacterWeight,
     private characterItems: CharacterItems,
     private equipmentSlots: EquipmentSlots,
     private characterValidation: CharacterValidation,

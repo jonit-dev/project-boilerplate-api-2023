@@ -143,6 +143,22 @@ describe("ItemDrop.ts", () => {
   });
 
   describe("Item drop validation", () => {
+    it("should fail on trying to drop an item to a position that's far away", async () => {
+      const dropFar = await dropItem(inventoryItemContainerId, {
+        toPosition: { x: FromGridX(999), y: FromGridY(999), scene: testCharacter.scene },
+      });
+      expect(dropFar).toBeFalsy();
+      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+        testCharacter,
+        "Sorry, you're trying to drop this item too far away."
+      );
+
+      const dropClose = await dropItem(inventoryItemContainerId, {
+        toPosition: { x: testCharacter.x, y: testCharacter.y, scene: testCharacter.scene },
+      });
+      expect(dropClose).toBeTruthy();
+    });
+
     it("should throw an error if container is not accessible", async () => {
       const drop = await dropItem(inventoryItemContainerId, {
         itemId: "62b792030c3f470048781135", // inexistent item
