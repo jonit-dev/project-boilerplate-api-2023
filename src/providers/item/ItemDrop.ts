@@ -27,25 +27,25 @@ export class ItemDrop {
     private characterItems: CharacterItems
   ) {}
 
-  public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<boolean> {
-    const isDropValid = await this.isItemDropValid(itemDrop, character);
+  public async performItemDrop(itemDropData: IItemDrop, character: ICharacter): Promise<boolean> {
+    const isDropValid = await this.isItemDropValid(itemDropData, character);
 
     if (!isDropValid) {
       return false;
     }
 
-    const dropItem = await Item.findById(itemDrop.itemId);
+    const itemToBeDropped = await Item.findById(itemDropData.itemId);
 
-    if (dropItem) {
+    if (itemToBeDropped) {
       let isItemRemoved = false;
 
-      if (itemDrop.fromEquipmentSet) {
-        isItemRemoved = await this.beforeDropRemoveFromEquipmentSet(dropItem as unknown as IItem, character);
+      if (itemDropData.fromEquipmentSet) {
+        isItemRemoved = await this.removeItemFromEquipmentSet(itemToBeDropped as unknown as IItem, character);
       } else {
-        isItemRemoved = await this.beforeDropRemoveFromInventory(
-          dropItem as unknown as IItem,
+        isItemRemoved = await this.removeItemFromInventory(
+          itemToBeDropped as unknown as IItem,
           character,
-          itemDrop.fromContainerId
+          itemDropData.fromContainerId
         );
       }
 
@@ -59,9 +59,9 @@ export class ItemDrop {
         const equipmentSlots = await this.getEquipmentSlots(character.equipment?.toString());
 
         let inventory = {} as IItemContainer;
-        if (!itemDrop.fromEquipmentSet) {
+        if (!itemDropData.fromEquipmentSet) {
           const updatedContainer = (await ItemContainer.findById(
-            itemDrop.fromContainerId
+            itemDropData.fromContainerId
           )) as unknown as IItemContainer;
           inventory = {
             _id: updatedContainer._id,
@@ -70,7 +70,6 @@ export class ItemDrop {
             name: updatedContainer?.name,
             slotQty: updatedContainer!.slotQty,
             slots: updatedContainer?.slots,
-            // allowedItemTypes: this.getAllowedItemTypes(),
             isEmpty: updatedContainer!.isEmpty,
           };
         }
@@ -82,17 +81,7 @@ export class ItemDrop {
           openInventoryOnUpdate: false,
         };
 
-        // if itemDrop toPosition has x and y, then drop item to that position in the map
-        await Item.updateOne(
-          {
-            _id: dropItem._id,
-          },
-          {
-            x: itemDrop.x,
-            y: itemDrop.y,
-            scene: itemDrop.scene,
-          }
-        );
+        await this.tryDroppingToMap(itemDropData, itemToBeDropped as unknown as IItem);
 
         this.updateInventoryCharacter(payloadUpdate, character);
 
@@ -105,7 +94,23 @@ export class ItemDrop {
     return false;
   }
 
-  private async beforeDropRemoveFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
+  private async tryDroppingToMap(itemDrop: IItemDrop, dropItem: IItem): Promise<void> {
+    // if itemDrop toPosition has x and y, then drop item to that position in the map
+    if (itemDrop.toPosition.x && itemDrop.toPosition.y) {
+      await Item.updateOne(
+        {
+          _id: dropItem._id,
+        },
+        {
+          x: itemDrop.x,
+          y: itemDrop.y,
+          scene: itemDrop.scene,
+        }
+      );
+    }
+  }
+
+  private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
     const equipmentSetId = character.equipment;
     const equipmentSet = await Equipment.findById(equipmentSetId);
 
@@ -128,11 +133,7 @@ export class ItemDrop {
   /**
    * This method will remove a item from the character inventory
    */
-  private async beforeDropRemoveFromInventory(
-    item: IItem,
-    character: ICharacter,
-    fromContainerId: string
-  ): Promise<boolean> {
+  private async removeItemFromInventory(item: IItem, character: ICharacter, fromContainerId: string): Promise<boolean> {
     const targetContainer = await ItemContainer.findById(fromContainerId);
 
     if (!item) {
