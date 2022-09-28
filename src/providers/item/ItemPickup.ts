@@ -237,17 +237,7 @@ export class ItemPickup {
       }
     }
 
-    if (character.isBanned) {
-      this.sendCustomErrorMessage(character, "Sorry, you are banned and can't pick up this item.");
-      return false;
-    }
-
-    if (!character.isOnline) {
-      this.sendCustomErrorMessage(character, "Sorry, you must be online to pick up this item.");
-      return false;
-    }
-
-    return true;
+    return this.characterValidation.hasBasicValidation(character);
   }
 
   public sendGenericErrorMessage(character: ICharacter): void {

@@ -269,22 +269,12 @@ describe("ItemPickup.ts", () => {
       const pickup = await pickupItem(inventoryItemContainerId);
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, you are banned and can't pick up this item."
-      );
-
       testCharacter.isBanned = false;
       testCharacter.isOnline = false;
       await testCharacter.save();
 
       const pickup2 = await pickupItem(inventoryItemContainerId);
       expect(pickup2).toBeFalsy();
-
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, you must be online to pick up this item."
-      );
     });
 
     it("should throw an error if the user tries to pickup an item, without an inventory", async () => {
