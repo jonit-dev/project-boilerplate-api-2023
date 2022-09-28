@@ -33,7 +33,7 @@ export class CharacterItemInventory {
   public async checkItemInInventory(itemId: string, character: ICharacter): Promise<boolean> {
     const inventory = (await character.inventory) as unknown as IItem;
 
-    const inventoryItemContainer = await ItemContainer.findById(inventory.itemContainer);
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
       return false;
