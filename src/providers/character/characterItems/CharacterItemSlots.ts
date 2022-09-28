@@ -95,11 +95,18 @@ export class CharacterItemSlots {
     selectedItem: IItem,
     targetContainer: IItemContainer
   ): Promise<ICharacterItemResult | undefined> {
-    const firstAvailableSlotIndex = targetContainer.firstAvailableSlotId;
-
     const hasAvailableSlot = await this.hasAvailableSlot(targetContainer._id, selectedItem);
 
-    if (!hasAvailableSlot || firstAvailableSlotIndex === null) {
+    if (!hasAvailableSlot) {
+      return {
+        status: OperationStatus.Error,
+        message: "Sorry, your inventory is full.",
+      };
+    }
+
+    const firstAvailableSlotIndex = await this.getFirstAvailableSlotIndex(targetContainer, selectedItem);
+
+    if (firstAvailableSlotIndex === null) {
       return {
         status: OperationStatus.Error,
         message: "Sorry, your inventory is full.",
