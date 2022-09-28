@@ -1,7 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
+import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -9,7 +12,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { OperationStatus } from "@providers/types/ValidationTypes";
 import {
   IEquipmentAndInventoryUpdatePayload,
-  IEquipmentSet,
+  IItemContainer,
   IItemPickup,
   ItemSocketEvents,
   ItemType,
@@ -27,7 +30,9 @@ export class ItemPickup {
     private characterWeight: CharacterWeight,
     private itemView: ItemView,
     private characterItemContainer: CharacterItemContainer,
-    private characterValidation: CharacterValidation
+    private characterValidation: CharacterValidation,
+    private characterItems: CharacterItems,
+    private characterItemSlots: CharacterItemSlots
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
@@ -45,11 +50,13 @@ export class ItemPickup {
       itemToBePicked.x !== undefined && itemToBePicked.y !== undefined && itemToBePicked.scene !== undefined;
 
     if (!isPickupValid) {
-      this.sendCustomErrorMessage(character, "Sorry, you cannot pick up this item.");
       return false;
     }
 
-    itemToBePicked.key = itemToBePicked.baseKey;
+    itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
+    await itemToBePicked.save();
+
+    console.log(itemToBePicked.id, itemToBePicked.key, itemToBePicked.stackQty, itemToBePicked.maxStackSize);
 
     const { status, message } = await this.characterItemContainer.addItemToContainer(
       itemToBePicked,
@@ -63,7 +70,7 @@ export class ItemPickup {
       return false;
     }
 
-    // // whenever a new item is added, we need to update the character weight
+    // whenever a new item is added, we need to update the character weight
     await this.characterWeight.updateCharacterWeight(character);
 
     // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
@@ -76,36 +83,33 @@ export class ItemPickup {
         return false;
       }
     } else {
-      if (itemPickupData.fromContainerId) {
-        const isItemRemoved = await this.removeItemFromContainer(
-          itemToBePicked as unknown as IItem,
+      if (!itemPickupData.fromContainerId) {
+        this.sendCustomErrorMessage(
           character,
-          itemPickupData.fromContainerId
+          "Sorry, failed to remove item from container. Origin container not found."
         );
-        if (!isItemRemoved) {
-          return false;
-        }
+        return false;
+      }
+
+      const isItemRemoved = await this.removeItemFromContainer(
+        itemToBePicked as unknown as IItem,
+        character,
+        itemPickupData.fromContainerId
+      );
+      if (!isItemRemoved) {
+        this.sendCustomErrorMessage(character, "Sorry, failed to remove item from container.");
+        return false;
       }
     }
 
-    // send update inventory event to user
     if (!isEquipment) {
       // if the origin container is a MapContainer so should update the char inventory
       //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
       const containerToUpdateId = isMapContainer ? itemPickupData.toContainerId : itemPickupData.fromContainerId;
       const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as unknown as IItemContainer;
+
       const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-        equipment: {} as unknown as IEquipmentSet,
-        inventory: {
-          _id: updatedContainer._id,
-          parentItem: updatedContainer!.parentItem.toString(),
-          owner: updatedContainer?.owner?.toString() || character.name,
-          name: updatedContainer?.name,
-          slotQty: updatedContainer!.slotQty,
-          slots: updatedContainer?.slots,
-          allowedItemTypes: this.getAllowedItemTypes(),
-          isEmpty: updatedContainer!.isEmpty,
-        },
+        inventory: updatedContainer,
       };
 
       this.updateInventoryCharacter(payloadUpdate, character);
@@ -142,12 +146,12 @@ export class ItemPickup {
     if (targetContainer) {
       // // Inventory is empty, slot checking not needed
       for (let i = 0; i < targetContainer.slotQty; i++) {
-        const slotItem = targetContainer.slots?.[i];
+        const slotItem = targetContainer.slots?.[i] as unknown as IItem;
 
         if (!slotItem) continue;
         if (slotItem.key === item.key) {
-          // Changing item slot to null, thus removing it
-          targetContainer.slots[i] = null;
+          // Changing item slot to undefined, thus removing it
+          targetContainer.slots[i] = undefined;
 
           await ItemContainer.updateOne(
             {
@@ -173,13 +177,32 @@ export class ItemPickup {
     item: IItem,
     itemPickupData: IItemPickup,
     character: ICharacter,
-    equipItemContainer: boolean
+    isEquipmentContainer: boolean
   ): Promise<Boolean> {
+    if (isEquipmentContainer) {
+      // validate if equipment container exists
+      const equipmentContainer = await Equipment.findById(itemPickupData.toContainerId);
+
+      if (!equipmentContainer) {
+        this.sendCustomErrorMessage(character, "Sorry, equipment container not found");
+        return false;
+      }
+    }
+
     const inventory = await character.inventory;
 
-    if (!inventory && !equipItemContainer) {
-      this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to pick up this item.");
+    if (!inventory && !item.isItemContainer && !isEquipmentContainer) {
+      this.sendCustomErrorMessage(character, "Sorry, you need an inventory to pick this item.");
       return false;
+    }
+
+    if (!item.isItemContainer) {
+      const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(itemPickupData.toContainerId);
+
+      if (!hasAvailableSlot) {
+        this.sendCustomErrorMessage(character, "Sorry, your container is full.");
+        return false;
+      }
     }
 
     const isItemOnMap = item.x && item.y && item.scene;
@@ -212,7 +235,7 @@ export class ItemPickup {
         character.y,
         itemPickupData.x,
         itemPickupData.y,
-        1
+        2
       );
       if (!underRange) {
         this.sendCustomErrorMessage(character, "Sorry, you are too far away to pick up this item.");
@@ -228,6 +251,18 @@ export class ItemPickup {
         this.sendCustomErrorMessage(character, "Sorry, this item is not yours.");
         return false;
       }
+    }
+
+    // if item is not a container, we can proceed
+
+    const characterAlreadyHasItem = await this.characterItems.hasItem(
+      item._id,
+      character,
+      isEquipmentContainer ? "equipment" : "inventory"
+    );
+    if (characterAlreadyHasItem) {
+      this.sendCustomErrorMessage(character, "Sorry, you already have this item.");
+      return false;
     }
 
     return this.characterValidation.hasBasicValidation(character);
