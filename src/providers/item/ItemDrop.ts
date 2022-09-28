@@ -30,6 +30,7 @@ export class ItemDrop {
     private characterValidation: CharacterValidation
   ) {}
 
+  //! For now, only a drop from inventory or equipment set is allowed.
   public async performItemDrop(itemDropData: IItemDrop, character: ICharacter): Promise<boolean> {
     const isDropValid = await this.isItemDropValid(itemDropData, character);
 
@@ -39,80 +40,87 @@ export class ItemDrop {
 
     const itemToBeDropped = await Item.findById(itemDropData.itemId);
 
-    if (itemToBeDropped) {
-      let isItemRemoved = false;
+    if (!itemToBeDropped) {
+      this.sendCustomErrorMessage(character, "Sorry, item to be dropped wasn't found.");
+      return false;
+    }
 
-      if (itemDropData.fromEquipmentSet) {
-        isItemRemoved = await this.removeItemFromEquipmentSet(itemToBeDropped as unknown as IItem, character);
-      } else {
-        isItemRemoved = await this.removeItemFromInventory(
-          itemToBeDropped as unknown as IItem,
-          character,
-          itemDropData.fromContainerId
-        );
-      }
+    const isEquipmentSetDrop = itemDropData.fromEquipmentSet;
 
-      if (!isItemRemoved) {
-        return false;
-      }
+    let isItemRemoved = false;
 
-      try {
-        await this.characterWeight.updateCharacterWeight(character);
+    if (isEquipmentSetDrop) {
+      isItemRemoved = await this.removeItemFromEquipmentSet(itemToBeDropped as unknown as IItem, character);
+    } else {
+      // we're dropping from the inventory!
+      isItemRemoved = await this.removeItemFromInventory(
+        itemToBeDropped as unknown as IItem,
+        character,
+        itemDropData.fromContainerId
+      );
+    }
 
+    if (!isItemRemoved) {
+      this.sendGenericErrorMessage(character);
+      return false;
+    }
+
+    // if we reached this point, the drop was successful
+
+    try {
+      await this.characterWeight.updateCharacterWeight(character);
+
+      if (isEquipmentSetDrop) {
         const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
-        let inventory = {} as IItemContainer;
-        if (!itemDropData.fromEquipmentSet) {
-          const updatedContainer = (await ItemContainer.findById(
-            itemDropData.fromContainerId
-          )) as unknown as IItemContainer;
-          inventory = {
-            _id: updatedContainer._id,
-            parentItem: updatedContainer!.parentItem.toString(),
-            owner: updatedContainer?.owner?.toString() || character.name,
-            name: updatedContainer?.name,
-            slotQty: updatedContainer!.slotQty,
-            slots: updatedContainer?.slots,
-            isEmpty: updatedContainer!.isEmpty,
-          };
-        }
+        this.sendRefreshItemsEvent(
+          {
+            equipment: equipmentSlots,
+            openEquipmentSetOnUpdate: false,
+          },
+          character
+        );
+      } else {
+        const inventoryContainer = (await ItemContainer.findById(
+          itemDropData.fromContainerId
+        )) as unknown as IItemContainer;
 
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-          equipment: equipmentSlots,
-          inventory: inventory,
+          inventory: inventoryContainer,
           openEquipmentSetOnUpdate: false,
           openInventoryOnUpdate: false,
         };
 
-        await this.tryDroppingToMap(itemDropData, itemToBeDropped as unknown as IItem);
-
-        this.sendRefreshInventoryEvent(payloadUpdate, character);
-
-        return true;
-      } catch (err) {
-        this.sendGenericErrorMessage(character);
-
-        console.log(err);
-        return false;
+        this.sendRefreshItemsEvent(payloadUpdate, character);
       }
+
+      await this.tryDroppingToMap(itemDropData, itemToBeDropped as unknown as IItem);
+
+      return true;
+    } catch (err) {
+      this.sendGenericErrorMessage(character);
+
+      console.log(err);
+      return false;
     }
-    return false;
   }
 
   private async tryDroppingToMap(itemDrop: IItemDrop, dropItem: IItem): Promise<void> {
     // if itemDrop toPosition has x and y, then drop item to that position in the map
-    if (itemDrop.toPosition.x && itemDrop.toPosition.y) {
-      await Item.updateOne(
-        {
-          _id: dropItem._id,
-        },
-        {
-          x: itemDrop.x,
-          y: itemDrop.y,
-          scene: itemDrop.scene,
-        }
-      );
-    }
+
+    const targetX = itemDrop.toPosition?.x || itemDrop.x;
+    const targetY = itemDrop.toPosition?.y || itemDrop.y;
+
+    await Item.updateOne(
+      {
+        _id: dropItem._id,
+      },
+      {
+        x: targetX,
+        y: targetY,
+        scene: itemDrop.scene,
+      }
+    );
   }
 
   private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
@@ -225,7 +233,7 @@ export class ItemDrop {
     return true;
   }
 
-  private sendRefreshInventoryEvent(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
+  private sendRefreshItemsEvent(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
     this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
       character.channelId!,
       ItemSocketEvents.EquipmentAndInventoryUpdate,
