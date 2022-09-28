@@ -13,7 +13,6 @@ describe("CharacterItems.ts", () => {
   let itemPickup: ItemPickup;
   let inventory: IItem;
   let inventoryItemContainerId: string;
-  let equipmentEquip: EquipmentEquip;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();

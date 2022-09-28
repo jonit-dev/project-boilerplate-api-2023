@@ -106,7 +106,7 @@ export class ItemDrop {
   }
 
   private async tryDroppingToMap(itemDrop: IItemDrop, dropItem: IItem): Promise<void> {
-    // if itemDrop toPosition has x and y, then drop item to that position in the map
+    // if itemDrop toPosition has x and y, then drop item to that position in the map, if not, then drop to the character position
 
     const targetX = itemDrop.toPosition?.x || itemDrop.x;
     const targetY = itemDrop.toPosition?.y || itemDrop.y;
