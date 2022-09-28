@@ -23,6 +23,16 @@ export class CharacterItemSlots {
     await targetContainer.save();
   }
 
+  public async hasAvailableSlot(targetContainerId: string): Promise<boolean> {
+    const targetContainer = (await ItemContainer.findById(targetContainerId)) as unknown as IItemContainer;
+
+    if (!targetContainer) {
+      return false;
+    }
+
+    return targetContainer.firstAvailableSlotId !== null;
+  }
+
   public async addItemOnFirstAvailableSlot(
     selectedItem: IItem,
     targetContainer: IItemContainer
