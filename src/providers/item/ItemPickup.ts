@@ -28,31 +28,33 @@ export class ItemPickup {
     private characterItemContainer: CharacterItemContainer
   ) {}
 
-  public async performItemPickup(itemPickup: IItemPickup, character: ICharacter): Promise<Boolean> {
-    const pickupItem = (await Item.findById(itemPickup.itemId)) as unknown as IItem;
+  public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<Boolean> {
+    const itemToBePicked = (await Item.findById(itemPickupData.itemId)) as unknown as IItem;
 
-    if (!pickupItem) {
-      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
+    if (!itemToBePicked) {
+      this.sendCustomErrorMessage(character, "Sorry, the item to be picked up was not found.");
       return false;
     }
 
-    const inventario = await character.inventory;
-    const equipItemContainer = pickupItem.isItemContainer && inventario === null;
-    const isPickupValid = await this.isItemPickupValid(itemPickup, character, equipItemContainer);
-    const isMapContainer = pickupItem.x !== undefined && pickupItem.y !== undefined && pickupItem.scene !== undefined;
+    const inventory = await character.inventory;
+    const isEquipment = itemToBePicked.isItemContainer && inventory === null;
+    const isPickupValid = await this.isItemPickupValid(itemToBePicked, itemPickupData, character, isEquipment);
+    const isMapContainer =
+      itemToBePicked.x !== undefined && itemToBePicked.y !== undefined && itemToBePicked.scene !== undefined;
 
     if (!isPickupValid) {
+      this.sendCustomErrorMessage(character, "Sorry, you cannot pick up this item.");
       return false;
     }
 
-    if (pickupItem) {
-      await this.normalizeItemKey(pickupItem);
+    if (itemToBePicked) {
+      await this.normalizeItemKey(itemToBePicked);
 
       const { status, message } = await this.characterItemContainer.addItemToContainer(
-        pickupItem,
+        itemToBePicked,
         character,
-        itemPickup.toContainerId,
-        equipItemContainer
+        itemPickupData.toContainerId,
+        isEquipment
       );
 
       if (status === OperationStatus.Error) {
@@ -66,13 +68,13 @@ export class ItemPickup {
       // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
       if (isMapContainer) {
         // If an item has a x, y and scene, it means its coming from a map pickup. So we should destroy its representation and warn other characters nearby.
-        await this.itemView.removeItemFromMap(pickupItem);
+        await this.itemView.removeItemFromMap(itemToBePicked);
       } else {
-        if (itemPickup.fromContainerId) {
+        if (itemPickupData.fromContainerId) {
           const isItemRemoved = await this.removeItemFromContainer(
-            pickupItem as unknown as IItem,
+            itemToBePicked as unknown as IItem,
             character,
-            itemPickup.fromContainerId
+            itemPickupData.fromContainerId
           );
           if (!isItemRemoved) {
             return false;
@@ -81,10 +83,10 @@ export class ItemPickup {
       }
 
       // send update inventory event to user
-      if (!equipItemContainer) {
+      if (!isEquipment) {
         // if the origin container is a MapContainer so should update the char inventory
         //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
-        const containerToUpdateId = isMapContainer ? itemPickup.toContainerId : itemPickup.fromContainerId;
+        const containerToUpdateId = isMapContainer ? itemPickupData.toContainerId : itemPickupData.fromContainerId;
         const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as unknown as IItemContainer;
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
           equipment: {} as unknown as IEquipmentSet,
@@ -173,17 +175,11 @@ export class ItemPickup {
   }
 
   private async isItemPickupValid(
-    itemPickup: IItemPickup,
+    item: IItem,
+    itemPickupData: IItemPickup,
     character: ICharacter,
     equipItemContainer: boolean
   ): Promise<Boolean> {
-    const item = await Item.findById(itemPickup.itemId);
-
-    if (!item) {
-      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
-      return false;
-    }
-
     const isItemOnMap = item.x && item.y && item.scene;
 
     const inventory = await character.inventory;
@@ -216,7 +212,13 @@ export class ItemPickup {
     }
 
     if (item.x !== undefined && item.y !== undefined && item.scene !== undefined) {
-      const underRange = this.movementHelper.isUnderRange(character.x, character.y, itemPickup.x, itemPickup.y, 1);
+      const underRange = this.movementHelper.isUnderRange(
+        character.x,
+        character.y,
+        itemPickupData.x,
+        itemPickupData.y,
+        1
+      );
       if (!underRange) {
         this.sendCustomErrorMessage(character, "Sorry, you are too far away to pick up this item.");
         return false;

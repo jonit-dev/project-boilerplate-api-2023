@@ -216,7 +216,10 @@ describe("ItemPickup.ts", () => {
       });
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not accessible.");
+      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+        testCharacter,
+        "Sorry, the item to be picked up was not found."
+      );
     });
 
     it("should throw an error if you try to pickup an item that is not storable", async () => {
