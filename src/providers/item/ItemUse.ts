@@ -5,6 +5,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { BasicCharacterValidation } from "@providers/character/validation/BasicCharacterValidation";
 import { ItemValidation } from "./validation/ItemValidation";
 import {
+  ICharacterItemConsumed,
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
   ItemSocketEvents,
@@ -12,6 +13,7 @@ import {
   IUIShowMessage,
   UIMessageType,
   UISocketEvents,
+  CharacterSocketEvents,
 } from "@rpg-engine/shared";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
@@ -19,7 +21,6 @@ import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterView } from "@providers/character/CharacterView";
 import { ItemUseCycle } from "./ItemUseCycle";
-import { constant } from "lodash";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -141,19 +142,18 @@ export class ItemUse {
 
   private async sendItemConsumptionEvent(character: ICharacter): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
-    // TODO: Khobab: added IItemConsumptionPayload interface and ItemConsumption event to shared types and use here
-    const payload: any = {
+
+    const payload: ICharacterItemConsumed = {
       targetId: character._id,
       health: character.health,
-      mana: character.mana,
     };
 
     for (const nearbyCharacter of nearbyCharacters) {
-      this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, "ItemConsumptionEvent", payload);
+      this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, CharacterSocketEvents.ItemConsumed, payload);
     }
 
     if (character.channelId) {
-      this.socketMessaging.sendEventToUser(character.channelId, "ItemConsumptionEvent", payload);
+      this.socketMessaging.sendEventToUser(character.channelId, CharacterSocketEvents.ItemConsumed, payload);
     }
   }
 
