@@ -14,8 +14,6 @@ export class CharacterValidation {
 
   public hasBasicValidation(character: ICharacter, errorMessages?: IBaseValidationErrorMessages): boolean {
     if (!character.isOnline) {
-      console.log(`🚫 CharacterValidation: hasBasicValidation failed because ${character.name} is offline!`);
-
       if (errorMessages?.isOnline) {
         this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
           message: errorMessages.isOnline || "You are offline and cannot perform this action!",
@@ -27,8 +25,6 @@ export class CharacterValidation {
     }
 
     if (!character.isAlive) {
-      console.log(`🚫 CharacterValidation: hasBasicValidation failed because ${character.name} is dead!`);
-
       if (errorMessages?.isAlive) {
         this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
           message: errorMessages.isAlive || "You are dead and cannot perform this action!",
@@ -40,8 +36,6 @@ export class CharacterValidation {
     }
 
     if (character.isBanned) {
-      console.log(`🚫 CharacterValidation: hasBasicValidation failed because ${character.name} is banned!`);
-
       this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
         reason: "You cannot use this character while banned.",
       });

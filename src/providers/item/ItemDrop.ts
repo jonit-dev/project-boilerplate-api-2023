@@ -2,12 +2,13 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { OperationStatus } from "@providers/types/ValidationTypes";
 import {
   IEquipmentAndInventoryUpdatePayload,
-  IEquipmentSet,
   IItem,
   IItemContainer,
   IItemDrop,
@@ -24,7 +25,9 @@ export class ItemDrop {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterWeight: CharacterWeight,
-    private characterItems: CharacterItems
+    private characterItems: CharacterItems,
+    private equipmentSlots: EquipmentSlots,
+    private characterValidation: CharacterValidation
   ) {}
 
   public async performItemDrop(itemDropData: IItemDrop, character: ICharacter): Promise<boolean> {
@@ -56,7 +59,7 @@ export class ItemDrop {
       try {
         await this.characterWeight.updateCharacterWeight(character);
 
-        const equipmentSlots = await this.getEquipmentSlots(character.equipment?.toString());
+        const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
         let inventory = {} as IItemContainer;
         if (!itemDropData.fromEquipmentSet) {
@@ -83,10 +86,12 @@ export class ItemDrop {
 
         await this.tryDroppingToMap(itemDropData, itemToBeDropped as unknown as IItem);
 
-        this.updateInventoryCharacter(payloadUpdate, character);
+        this.sendRefreshInventoryEvent(payloadUpdate, character);
 
         return true;
       } catch (err) {
+        this.sendGenericErrorMessage(character);
+
         console.log(err);
         return false;
       }
@@ -169,29 +174,19 @@ export class ItemDrop {
     }
 
     if (!isFromEquipmentSet) {
-      const validation = await this.validateItemDropFromInventory(itemDrop, item as unknown as IItem, character);
+      const validation = await this.validateItemDropFromInventory(itemDrop, character);
 
       if (!validation) {
         return false;
       }
     }
 
-    if (character.isBanned) {
-      this.sendCustomErrorMessage(character, "Sorry, you are banned and can't drop this item.");
-      return false;
-    }
-
-    if (!character.isOnline) {
-      this.sendCustomErrorMessage(character, "Sorry, you must be online to drop this item.");
-      return false;
-    }
-
-    return true;
+    return this.characterValidation.hasBasicValidation(character);
   }
 
   private async validateItemDropFromInventory(
     itemDrop: IItemDrop,
-    item: IItem,
+
     character: ICharacter
   ): Promise<boolean> {
     const inventory = await character.inventory;
@@ -230,7 +225,7 @@ export class ItemDrop {
     return true;
   }
 
-  private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
+  private sendRefreshInventoryEvent(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
     this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
       character.channelId!,
       ItemSocketEvents.EquipmentAndInventoryUpdate,
@@ -250,40 +245,5 @@ export class ItemDrop {
       message,
       type,
     });
-  }
-
-  public async getEquipmentSlots(equipmentId: string | undefined): Promise<IEquipmentSet> {
-    if (equipmentId === undefined) {
-      return {} as IEquipmentSet;
-    }
-
-    const equipment = await Equipment.findById(equipmentId)
-      .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
-      .exec();
-
-    const head = equipment?.head! as unknown as IItem;
-    const neck = equipment?.neck! as unknown as IItem;
-    const leftHand = equipment?.leftHand! as unknown as IItem;
-    const rightHand = equipment?.rightHand! as unknown as IItem;
-    const ring = equipment?.ring! as unknown as IItem;
-    const legs = equipment?.legs! as unknown as IItem;
-    const boot = equipment?.boot! as unknown as IItem;
-    const accessory = equipment?.accessory! as unknown as IItem;
-    const armor = equipment?.armor! as unknown as IItem;
-    const inventory = equipment?.inventory! as unknown as IItem;
-
-    return {
-      _id: equipment!._id,
-      head,
-      neck,
-      leftHand,
-      rightHand,
-      ring,
-      legs,
-      boot,
-      accessory,
-      armor,
-      inventory,
-    };
   }
 }

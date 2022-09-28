@@ -182,22 +182,12 @@ describe("ItemDrop.ts", () => {
       const drop = await dropItem(inventoryItemContainerId);
       expect(drop).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, you are banned and can't drop this item."
-      );
-
       testCharacter.isBanned = false;
       testCharacter.isOnline = false;
       await testCharacter.save();
 
       const drop2 = await dropItem(inventoryItemContainerId);
       expect(drop2).toBeFalsy();
-
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, you must be online to drop this item."
-      );
     });
 
     it("should throw an error if the user tries to drop an item, without an inventory", async () => {
