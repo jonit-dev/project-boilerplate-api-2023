@@ -76,7 +76,7 @@ describe("ItemDrop.ts", () => {
         y: testCharacter.y,
         toPosition: { x: testCharacter.x, y: testCharacter.y, scene: testCharacter.scene },
         fromContainerId,
-        fromEquipmentSet: false,
+        source: "inventory",
         ...extraProps,
       },
       testCharacter
