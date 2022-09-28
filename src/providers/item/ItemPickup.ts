@@ -30,7 +30,7 @@ export class ItemPickup {
     private characterValidation: CharacterValidation
   ) {}
 
-  public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<Boolean> {
+  public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
     const itemToBePicked = (await Item.findById(itemPickupData.itemId)) as unknown as IItem;
 
     if (!itemToBePicked) {
@@ -69,7 +69,12 @@ export class ItemPickup {
     // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
     if (isMapContainer) {
       // If an item has a x, y and scene, it means its coming from a map pickup. So we should destroy its representation and warn other characters nearby.
-      await this.itemView.removeItemFromMap(itemToBePicked);
+      const itemRemovedFromMap = await this.itemView.removeItemFromMap(itemToBePicked);
+
+      if (!itemRemovedFromMap) {
+        this.sendCustomErrorMessage(character, "Sorry, failed to remove item from map.");
+        return false;
+      }
     } else {
       if (itemPickupData.fromContainerId) {
         const isItemRemoved = await this.removeItemFromContainer(
