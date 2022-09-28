@@ -49,67 +49,63 @@ export class ItemPickup {
       return false;
     }
 
-    if (itemToBePicked) {
-      await this.normalizeItemKey(itemToBePicked);
+    itemToBePicked.key = itemToBePicked.baseKey;
 
-      const { status, message } = await this.characterItemContainer.addItemToContainer(
-        itemToBePicked,
-        character,
-        itemPickupData.toContainerId,
-        isEquipment
-      );
+    const { status, message } = await this.characterItemContainer.addItemToContainer(
+      itemToBePicked,
+      character,
+      itemPickupData.toContainerId,
+      isEquipment
+    );
 
-      if (status === OperationStatus.Error) {
-        if (message) this.sendCustomErrorMessage(character, message);
-        return false;
-      }
-
-      // // whenever a new item is added, we need to update the character weight
-      await this.characterWeight.updateCharacterWeight(character);
-
-      // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
-      if (isMapContainer) {
-        // If an item has a x, y and scene, it means its coming from a map pickup. So we should destroy its representation and warn other characters nearby.
-        await this.itemView.removeItemFromMap(itemToBePicked);
-      } else {
-        if (itemPickupData.fromContainerId) {
-          const isItemRemoved = await this.removeItemFromContainer(
-            itemToBePicked as unknown as IItem,
-            character,
-            itemPickupData.fromContainerId
-          );
-          if (!isItemRemoved) {
-            return false;
-          }
-        }
-      }
-
-      // send update inventory event to user
-      if (!isEquipment) {
-        // if the origin container is a MapContainer so should update the char inventory
-        //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
-        const containerToUpdateId = isMapContainer ? itemPickupData.toContainerId : itemPickupData.fromContainerId;
-        const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as unknown as IItemContainer;
-        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-          equipment: {} as unknown as IEquipmentSet,
-          inventory: {
-            _id: updatedContainer._id,
-            parentItem: updatedContainer!.parentItem.toString(),
-            owner: updatedContainer?.owner?.toString() || character.name,
-            name: updatedContainer?.name,
-            slotQty: updatedContainer!.slotQty,
-            slots: updatedContainer?.slots,
-            allowedItemTypes: this.getAllowedItemTypes(),
-            isEmpty: updatedContainer!.isEmpty,
-          },
-        };
-
-        this.updateInventoryCharacter(payloadUpdate, character);
-      }
-      return true;
+    if (status === OperationStatus.Error) {
+      if (message) this.sendCustomErrorMessage(character, message);
+      return false;
     }
 
-    return false;
+    // // whenever a new item is added, we need to update the character weight
+    await this.characterWeight.updateCharacterWeight(character);
+
+    // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
+    if (isMapContainer) {
+      // If an item has a x, y and scene, it means its coming from a map pickup. So we should destroy its representation and warn other characters nearby.
+      await this.itemView.removeItemFromMap(itemToBePicked);
+    } else {
+      if (itemPickupData.fromContainerId) {
+        const isItemRemoved = await this.removeItemFromContainer(
+          itemToBePicked as unknown as IItem,
+          character,
+          itemPickupData.fromContainerId
+        );
+        if (!isItemRemoved) {
+          return false;
+        }
+      }
+    }
+
+    // send update inventory event to user
+    if (!isEquipment) {
+      // if the origin container is a MapContainer so should update the char inventory
+      //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
+      const containerToUpdateId = isMapContainer ? itemPickupData.toContainerId : itemPickupData.fromContainerId;
+      const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as unknown as IItemContainer;
+      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+        equipment: {} as unknown as IEquipmentSet,
+        inventory: {
+          _id: updatedContainer._id,
+          parentItem: updatedContainer!.parentItem.toString(),
+          owner: updatedContainer?.owner?.toString() || character.name,
+          name: updatedContainer?.name,
+          slotQty: updatedContainer!.slotQty,
+          slots: updatedContainer?.slots,
+          allowedItemTypes: this.getAllowedItemTypes(),
+          isEmpty: updatedContainer!.isEmpty,
+        },
+      };
+
+      this.updateInventoryCharacter(payloadUpdate, character);
+    }
+    return true;
   }
 
   private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
@@ -166,14 +162,6 @@ export class ItemPickup {
       }
     }
     return false;
-  }
-
-  // this removes any Tiled id from items, that may be added to the key and cause issues
-  // eg arrow-123 instead of arrow
-  private async normalizeItemKey(item: IItem): Promise<void> {
-    item.key = item.key.replace(/-\d+$/, "");
-
-    await item.save();
   }
 
   private async isItemPickupValid(

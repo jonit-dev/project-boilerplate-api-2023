@@ -3,6 +3,7 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -27,7 +28,8 @@ export class ItemDrop {
     private characterItems: CharacterItems,
     private equipmentSlots: EquipmentSlots,
     private characterValidation: CharacterValidation,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private characterWeight: CharacterWeight
   ) {}
 
   //! For now, only a drop from inventory or equipment set is allowed.
@@ -100,6 +102,8 @@ export class ItemDrop {
 
           break;
       }
+
+      await this.characterWeight.updateCharacterWeight(character);
 
       return true;
     } catch (err) {
