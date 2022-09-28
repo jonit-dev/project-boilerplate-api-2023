@@ -101,5 +101,3 @@ describe("NPCView.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here

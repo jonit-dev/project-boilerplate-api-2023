@@ -4,6 +4,7 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { OperationStatus } from "@providers/types/ValidationTypes";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
@@ -16,10 +17,15 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { CharacterItems } from "../character/characterItems/CharacterItems";
 
 @provide(ItemDrop)
 export class ItemDrop {
-  constructor(private socketMessaging: SocketMessaging, private characterWeight: CharacterWeight) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterWeight: CharacterWeight,
+    private characterItems: CharacterItems
+  ) {}
 
   public async performItemDrop(itemDrop: IItemDrop, character: ICharacter): Promise<boolean> {
     const isDropValid = await this.isItemDropValid(itemDrop, character);
@@ -34,9 +40,9 @@ export class ItemDrop {
       let isItemRemoved = false;
 
       if (itemDrop.fromEquipmentSet) {
-        isItemRemoved = await this.removeItemFromEquipmentSet(dropItem as unknown as IItem, character);
+        isItemRemoved = await this.beforeDropRemoveFromEquipmentSet(dropItem as unknown as IItem, character);
       } else {
-        isItemRemoved = await this.removeItemFromInventory(
+        isItemRemoved = await this.beforeDropRemoveFromInventory(
           dropItem as unknown as IItem,
           character,
           itemDrop.fromContainerId
@@ -72,6 +78,8 @@ export class ItemDrop {
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
           equipment: equipmentSlots,
           inventory: inventory,
+          openEquipmentSetOnUpdate: false,
+          openInventoryOnUpdate: false,
         };
 
         // if itemDrop toPosition has x and y, then drop item to that position in the map
@@ -97,7 +105,7 @@ export class ItemDrop {
     return false;
   }
 
-  private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
+  private async beforeDropRemoveFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
     const equipmentSetId = character.equipment;
     const equipmentSet = await Equipment.findById(equipmentSetId);
 
@@ -106,29 +114,13 @@ export class ItemDrop {
       return false;
     }
 
-    let targetSlot = "";
-    const itemSlotTypes = [
-      "head",
-      "neck",
-      "leftHand",
-      "rightHand",
-      "ring",
-      "legs",
-      "boot",
-      "accessory",
-      "armor",
-      "inventory",
-    ];
+    const { status, message } = await this.characterItems.deleteItem(item._id, character, "equipment");
 
-    for (const itemSlotType of itemSlotTypes) {
-      if (equipmentSet[itemSlotType] && equipmentSet[itemSlotType].toString() === item._id.toString()) {
-        targetSlot = itemSlotType;
-      }
+    if (status === OperationStatus.Error) {
+      if (message) this.sendCustomErrorMessage(character, message);
+
+      return false;
     }
-
-    equipmentSet[targetSlot] = undefined;
-
-    await equipmentSet.save();
 
     return true;
   }
@@ -136,7 +128,11 @@ export class ItemDrop {
   /**
    * This method will remove a item from the character inventory
    */
-  private async removeItemFromInventory(item: IItem, character: ICharacter, fromContainerId: string): Promise<boolean> {
+  private async beforeDropRemoveFromInventory(
+    item: IItem,
+    character: ICharacter,
+    fromContainerId: string
+  ): Promise<boolean> {
     const targetContainer = await ItemContainer.findById(fromContainerId);
 
     if (!item) {
@@ -151,32 +147,15 @@ export class ItemDrop {
       return false;
     }
 
-    for (let i = 0; i < targetContainer.slotQty; i++) {
-      const slotItem = targetContainer.slots?.[i];
+    const { status, message } = await this.characterItems.deleteItem(item._id, character, "inventory");
 
-      if (!slotItem) continue;
-      if (slotItem.key === item.key) {
-        // Changing item slot to null, thus removing it
-        targetContainer.slots[i] = null;
+    if (status === OperationStatus.Error) {
+      if (message) this.sendCustomErrorMessage(character, message);
 
-        await ItemContainer.updateOne(
-          {
-            _id: targetContainer._id,
-          },
-          {
-            $set: {
-              slots: {
-                ...targetContainer.slots,
-              },
-            },
-          }
-        );
-
-        return true;
-      }
+      return false;
     }
 
-    return false;
+    return true;
   }
 
   private async isItemDropValid(itemDrop: IItemDrop, character: ICharacter): Promise<Boolean> {

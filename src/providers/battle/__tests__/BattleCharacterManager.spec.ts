@@ -54,5 +54,3 @@ describe("BattleCharacterManager.spec.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here

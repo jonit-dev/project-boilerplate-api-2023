@@ -32,5 +32,3 @@ describe("EquipmentStatsCalculator.spec.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here

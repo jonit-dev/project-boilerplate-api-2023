@@ -24,6 +24,8 @@ export class MapLoader {
     const mapNames = this.getMapNames();
     const mapToCheckTransitions: MapObject[] = [];
 
+    console.time("🟧 Solids generated in");
+
     for (const mapFileName of mapNames) {
       if (mapFileName.includes("_hash")) {
         continue; // just cache files, skip!
@@ -52,6 +54,8 @@ export class MapLoader {
 
       this.gridManager.generateGridSolids(mapName);
     }
+
+    console.timeEnd("🟧 Solids generated in");
 
     console.log("📦 Maps and grids are loaded!");
   }

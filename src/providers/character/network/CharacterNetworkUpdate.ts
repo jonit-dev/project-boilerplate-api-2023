@@ -25,6 +25,7 @@ import {
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBan } from "../CharacterBan";
+import { CharacterValidation } from "../CharacterValidation";
 import { CharacterView } from "../CharacterView";
 
 @provide(CharacterNetworkUpdate)
@@ -41,7 +42,8 @@ export class CharacterNetworkUpdate {
     private mapTransition: MapTransition,
     private npcManager: NPCManager,
     private gridManager: GridManager,
-    private mapNonPVPZone: MapNonPVPZone
+    private mapNonPVPZone: MapNonPVPZone,
+    private characterValidation: CharacterValidation
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -293,25 +295,7 @@ export class CharacterNetworkUpdate {
       return false;
     }
 
-    if (!character.isOnline) {
-      console.log(`🚫 ${character.name} tried to move while offline!`);
-      return false;
-    }
-
-    if (!character.isAlive) {
-      console.log(`🚫 ${character.name} tried to move while dead!`);
-      return false;
-    }
-
-    if (character.isBanned) {
-      console.log(`🚫 ${character.name} tried to move while banned!`);
-
-      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
-        reason: "You cannot use this character while banned.",
-      });
-
-      return false;
-    }
+    this.characterValidation.hasBasicValidation(character);
 
     const serverCalculatedDirection = this.movementHelper.getGridMovementDirection(
       ToGridX(data.x),

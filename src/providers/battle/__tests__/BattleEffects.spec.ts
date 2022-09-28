@@ -36,5 +36,3 @@ describe("BattleEffects.spec.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here
