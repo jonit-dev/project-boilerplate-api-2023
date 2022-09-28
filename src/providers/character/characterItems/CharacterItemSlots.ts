@@ -23,14 +23,72 @@ export class CharacterItemSlots {
     await targetContainer.save();
   }
 
-  public async hasAvailableSlot(targetContainerId: string): Promise<boolean> {
+  public async hasAvailableSlot(targetContainerId: string, itemToBeAdded: IItem): Promise<boolean> {
     const targetContainer = (await ItemContainer.findById(targetContainerId)) as unknown as IItemContainer;
 
     if (!targetContainer) {
       return false;
     }
 
-    return targetContainer.firstAvailableSlotId !== null;
+    if (!itemToBeAdded.isStackable) {
+      return targetContainer.firstAvailableSlotId !== null;
+    } else {
+      // if item is stackable, check if there's an empty slot
+      const hasEmptySlot = targetContainer.firstAvailableSlotId !== null;
+
+      if (hasEmptySlot) {
+        return true;
+      }
+
+      // if there's no empty slot, check if there's a stackable item with the same type, and the stack is not full
+
+      // loop through all slots
+
+      for (const slot of Object.values(targetContainer.slots)) {
+        const slotItem = slot as unknown as IItem;
+
+        if (slotItem.isStackable || slotItem.maxStackSize > 1) {
+          if (slotItem.baseKey === itemToBeAdded.baseKey) {
+            const futureStackQty = slotItem.stackQty! + itemToBeAdded.stackQty!;
+            if (futureStackQty <= slotItem.maxStackSize) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  public async getFirstAvailableSlotIndex(
+    targetContainer: IItemContainer,
+    itemToBeAdded?: IItem
+  ): Promise<number | null> {
+    const itemContainer = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
+
+    if (!itemContainer) {
+      return null;
+    }
+
+    for (const [id, slot] of Object.entries(targetContainer.slots)) {
+      const slotItem = slot as unknown as IItem;
+
+      if (itemToBeAdded && slotItem && (slotItem.isStackable || slotItem.maxStackSize > 1)) {
+        if (slotItem.baseKey === itemToBeAdded.baseKey) {
+          const futureStackQty = slotItem.stackQty! + itemToBeAdded.stackQty!;
+          if (futureStackQty <= slotItem.maxStackSize) {
+            return Number(id);
+          }
+        }
+      } else {
+        if (!slotItem) {
+          return Number(id);
+        }
+      }
+    }
+
+    return null;
   }
 
   public async addItemOnFirstAvailableSlot(
@@ -39,7 +97,9 @@ export class CharacterItemSlots {
   ): Promise<ICharacterItemResult | undefined> {
     const firstAvailableSlotIndex = targetContainer.firstAvailableSlotId;
 
-    if (firstAvailableSlotIndex === null) {
+    const hasAvailableSlot = await this.hasAvailableSlot(targetContainer._id, selectedItem);
+
+    if (!hasAvailableSlot || firstAvailableSlotIndex === null) {
       return {
         status: OperationStatus.Error,
         message: "Sorry, your inventory is full.",
