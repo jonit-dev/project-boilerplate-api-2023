@@ -61,7 +61,7 @@ export class CharacterItemSlots {
 
           if (!slotItem) continue;
 
-          //TODO: Find a better way to do this
+          // TODO: Find a better way to do this
           if (slotItem.key.replace(/-\d+$/, "") === itemKey.replace(/-\d+$/, "")) {
             return slotItem;
           }
