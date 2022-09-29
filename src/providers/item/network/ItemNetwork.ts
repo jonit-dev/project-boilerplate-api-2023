@@ -4,6 +4,7 @@ import { ItemNetworkInfo } from "./ItemNetworkInfo";
 import { ItemNetworkUpdate } from "./ItemNetworkUpdate";
 import { ItemNetworkPickup } from "./ItemNetworkPickup";
 import { ItemNetworkDrop } from "./ItemNetworkDrop";
+import { ItemNetworkUse } from "./ItemNetworkUse";
 
 @provide(ItemNetwork)
 export class ItemNetwork {
@@ -11,7 +12,8 @@ export class ItemNetwork {
     private itemNetworkUpdate: ItemNetworkUpdate,
     private itemNetworkInfo: ItemNetworkInfo,
     private itemNetworkPickup: ItemNetworkPickup,
-    private itemNetworkDrop: ItemNetworkDrop
+    private itemNetworkDrop: ItemNetworkDrop,
+    private itemNetworkUse: ItemNetworkUse
   ) {}
 
   public onAddEventListeners(channel: SocketChannel): void {
@@ -19,5 +21,6 @@ export class ItemNetwork {
     this.itemNetworkInfo.onGetItemInfo(channel);
     this.itemNetworkPickup.onItemPickup(channel);
     this.itemNetworkDrop.onItemDrop(channel);
+    this.itemNetworkUse.onItemUse(channel);
   }
 }

@@ -1,5 +1,7 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemBanana: Partial<IItem> = {
@@ -13,4 +15,7 @@ export const itemBanana: Partial<IItem> = {
   description: "A ripe banana.",
   weight: 0.05,
   allowedEquipSlotType: [ItemSlotType.Inventory],
+  usableEffect: (character: ICharacter) => {
+    ItemUsableEffect.apply(character, EffectableAttribute.Health, 1);
+  },
 };

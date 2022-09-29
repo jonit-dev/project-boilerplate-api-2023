@@ -18,6 +18,10 @@ import {
   QuestSocketEvents,
   QuestStatus,
   UISocketEvents,
+  IQuestObjectiveKill,
+  IQuestObjectiveInteraction,
+  QuestType,
+  IQuestReward,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
@@ -147,17 +151,72 @@ export class QuestNetworkGet {
       }
 
       questsMap[quest._id] = true;
+      const objectives = await quest.objectivesDetails;
+      const objData: any[] = [];
+
+      for (const obj of objectives) {
+        // Update kill count in objective
+        if (obj.type === QuestType.Kill) {
+          const killObj = obj as unknown as IQuestObjectiveKill;
+          const data: IQuestObjectiveKill = {
+            id: killObj.id,
+            type: QuestType.Kill,
+            status: QuestStatus.InProgress,
+            killCountTarget: killObj.killCountTarget,
+            creatureKeys: killObj.creatureKeys,
+            killCount: 0,
+          };
+          if (obj._id.toString() === qr.objective.toString()) {
+            data.killCount = qr.killCount || 0;
+            if (data.killCount === data.killCountTarget) {
+              data.status = QuestStatus.Completed;
+            }
+          }
+          objData.push(data);
+        }
+        if (obj.type === QuestType.Interaction) {
+          const intObj = obj as unknown as IQuestObjectiveInteraction;
+          const data: IQuestObjectiveInteraction = {
+            id: intObj.id,
+            type: QuestType.Interaction,
+            status: QuestStatus.InProgress,
+            targetNPCkey: intObj.targetNPCkey,
+          };
+          objData.push(data);
+        }
+      }
+
       if (data.status) {
         const hasRequiredStatus = await quest.hasStatus(data.status, character.id);
         if (hasRequiredStatus) {
-          const filteredQuest = quest as unknown as IQuest;
+          const filteredQuest: IQuest = {
+            _id: quest._id,
+            createdAt: quest.updatedAt.toString(),
+            updatedAt: quest.updatedAt.toString(),
+            key: quest.key,
+            npcId: quest.npcId!.toString(),
+            title: quest.title,
+            description: quest.description,
+            rewards: quest.rewards as unknown as IQuestReward[],
+            objectives: objData,
+          };
           filteredQuest.status = data.status;
           filteredQuests.push(filteredQuest);
         }
       } else {
         // For a character, quests can have either status InProgress or Completed
         const isInProgress = await quest.hasStatus(QuestStatus.InProgress, character.id);
-        const questData = quest as unknown as IQuest;
+        const questData: IQuest = {
+          _id: quest._id,
+          createdAt: quest.updatedAt.toString(),
+          updatedAt: quest.updatedAt.toString(),
+          key: quest.key,
+          npcId: quest.npcId!.toString(),
+          title: quest.title,
+          description: quest.description,
+          rewards: quest.rewards as unknown as IQuestReward[],
+          objectives: objData,
+        };
         isInProgress ? (questData.status = QuestStatus.InProgress) : (questData.status = QuestStatus.Completed);
         filteredQuests.push(questData);
       }
