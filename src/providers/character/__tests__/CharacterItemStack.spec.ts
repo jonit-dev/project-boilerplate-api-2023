@@ -2,7 +2,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { EquipmentEquip } from "../../equipment/EquipmentEquip";
 
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { ItemPickup } from "@providers/item/ItemPickup";
@@ -13,13 +12,11 @@ describe("CharacterItems.ts", () => {
   let itemPickup: ItemPickup;
   let inventory: IItem;
   let inventoryItemContainerId: string;
-  let equipmentEquip: EquipmentEquip;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
 
     itemPickup = container.get<ItemPickup>(ItemPickup);
-    equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
   });
 
   beforeEach(async () => {
