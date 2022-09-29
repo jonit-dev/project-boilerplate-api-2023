@@ -24,22 +24,51 @@ export class CharacterItemSlots {
   }
 
   public async findItemSlotIndex(targetContainer: IItemContainer, itemId: string): Promise<number | undefined> {
-    const container = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
+    try {
+      const container = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
 
-    if (!container) {
-      throw new Error("Container not found");
-    }
+      if (!container) {
+        throw new Error("Container not found");
+      }
 
-    if (container) {
-      for (let i = 0; i < container.slotQty; i++) {
-        const slotItem = container.slots?.[i] as unknown as IItem;
+      if (container) {
+        for (let i = 0; i < container.slotQty; i++) {
+          const slotItem = container.slots?.[i] as unknown as IItem;
 
-        if (!slotItem) continue;
+          if (!slotItem) continue;
 
-        if (slotItem._id.toString() === itemId.toString()) {
-          return i;
+          if (slotItem?._id.toString() === itemId.toString()) {
+            return i;
+          }
         }
       }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  public async findItemWithSameKey(targetContainer: IItemContainer, itemKey: string): Promise<IItem | undefined> {
+    try {
+      const container = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
+
+      if (!container) {
+        throw new Error("Container not found");
+      }
+
+      if (container) {
+        for (let i = 0; i < container.slotQty; i++) {
+          const slotItem = container.slots?.[i] as unknown as IItem;
+
+          if (!slotItem) continue;
+
+          //TODO: Find a better way to do this
+          if (slotItem.key.replace(/-\d+$/, "") === itemKey.replace(/-\d+$/, "")) {
+            return slotItem;
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 

@@ -87,6 +87,23 @@ describe("CharacterItemSlots.ts", () => {
     expect(slotIndex).toEqual(5);
   });
 
+  it("should find an item with the same key", async () => {
+    const firstItem = await unitTestHelper.createMockItem();
+    const secondItem = await unitTestHelper.createMockItem();
+
+    inventoryContainer.slots = {
+      ...inventoryContainer.slots,
+      0: firstItem.toJSON({ virtuals: true }),
+    };
+    await inventoryContainer.save();
+
+    const itemSameKey = await characterItemSlots.findItemWithSameKey(inventoryContainer, secondItem.key);
+
+    expect(itemSameKey).toBeDefined();
+
+    expect(itemSameKey?._id).toEqual(firstItem._id);
+  });
+
   it("should properly get the first available slot", async () => {
     inventoryContainer.slotQty = 1;
     inventoryContainer.slots = {
