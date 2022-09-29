@@ -102,6 +102,7 @@ describe("CharacterItemSlots.ts", () => {
     expect(itemSameKey).toBeDefined();
 
     expect(itemSameKey?._id).toEqual(firstItem._id);
+    expect(itemSameKey?.key).toEqual(secondItem.key);
   });
 
   it("should properly get the first available slot", async () => {

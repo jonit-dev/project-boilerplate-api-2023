@@ -33,7 +33,7 @@ export class CharacterItemStack {
 
       if (!slotItem) continue;
 
-      if (slotItem.key === itemToBeAdded.key.replace(/-\d+$/, "")) {
+      if (slotItem.key.replace(/-\d+$/, "") === itemToBeAdded.key.replace(/-\d+$/, "")) {
         if (slotItem.stackQty) {
           const updatedStackQty = slotItem.stackQty + itemToBeAdded.stackQty;
 
