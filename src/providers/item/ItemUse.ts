@@ -1,10 +1,14 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { provide } from "inversify-binding-decorators";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { BasicCharacterValidation } from "@providers/character/validation/BasicCharacterValidation";
-import { ItemValidation } from "./validation/ItemValidation";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterView } from "@providers/character/CharacterView";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
+  CharacterSocketEvents,
   ICharacterItemConsumed,
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
@@ -13,19 +17,15 @@ import {
   IUIShowMessage,
   UIMessageType,
   UISocketEvents,
-  CharacterSocketEvents,
 } from "@rpg-engine/shared";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { CharacterView } from "@providers/character/CharacterView";
+import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
+import { ItemValidation } from "./validation/ItemValidation";
 
 @provide(ItemUse)
 export class ItemUse {
   constructor(
-    private basicCharacterValidation: BasicCharacterValidation,
+    private characterValidation: CharacterValidation,
     private itemValidation: ItemValidation,
     private socketMessaging: SocketMessaging,
     private equipmentEquip: EquipmentEquip,
@@ -34,7 +34,7 @@ export class ItemUse {
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
-    if (!this.basicCharacterValidation.isCharacterValid(character)) {
+    if (!this.characterValidation.hasBasicValidation(character)) {
       return false;
     }
 

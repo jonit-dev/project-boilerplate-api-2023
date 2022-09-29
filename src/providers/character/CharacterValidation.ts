@@ -1,47 +1,25 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { CharacterSocketEvents, IUIShowMessage, UIMessageType, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-
-interface IBaseValidationErrorMessages {
-  isOnline?: string;
-  isAlive?: string;
-}
 
 @provide(CharacterValidation)
 export class CharacterValidation {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  public hasBasicValidation(character: ICharacter, errorMessages?: IBaseValidationErrorMessages): boolean {
+  public hasBasicValidation(character: ICharacter): boolean {
     if (!character.isOnline) {
-      console.log(`🚫 CharacterValidation: hasBasicValidation failed because ${character.name} is offline!`);
-
-      if (errorMessages?.isOnline) {
-        this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
-          message: errorMessages.isOnline || "You are offline and cannot perform this action!",
-          type: "error",
-        });
-      }
-
+      this.sendCustomErrorMessage(character, "Sorry, you are not online.");
       return false;
     }
 
     if (!character.isAlive) {
-      console.log(`🚫 CharacterValidation: hasBasicValidation failed because ${character.name} is dead!`);
-
-      if (errorMessages?.isAlive) {
-        this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
-          message: errorMessages.isAlive || "You are dead and cannot perform this action!",
-          type: "error",
-        });
-      }
+      this.sendCustomErrorMessage(character, "Sorry, you are dead.");
 
       return false;
     }
 
     if (character.isBanned) {
-      console.log(`🚫 CharacterValidation: hasBasicValidation failed because ${character.name} is banned!`);
-
       this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
         reason: "You cannot use this character while banned.",
       });
@@ -50,5 +28,12 @@ export class CharacterValidation {
     }
 
     return true;
+  }
+
+  private sendCustomErrorMessage(character: ICharacter, message: string, type: UIMessageType = "error"): void {
+    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+      message,
+      type,
+    });
   }
 }
