@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
@@ -12,7 +12,6 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { OperationStatus } from "@providers/types/ValidationTypes";
 import {
   IEquipmentAndInventoryUpdatePayload,
-  IItemContainer,
   IItemPickup,
   ItemSocketEvents,
   ItemType,
@@ -89,14 +88,17 @@ export class ItemPickup {
         return false;
       }
 
-      const isItemRemoved = await this.removeItemFromContainer(
-        itemToBePicked as unknown as IItem,
-        character,
-        itemPickupData.fromContainerId
-      );
-      if (!isItemRemoved) {
-        this.sendCustomErrorMessage(character, "Sorry, failed to remove item from container.");
-        return false;
+      if (!isEquipment) {
+        // This regulates the pickup of items in containers like loot containers. Note that we canno't 'pickup' items from equipment, just unequip them to the inventory.
+        const isItemRemoved = await this.removeItemFromContainer(
+          itemToBePicked as unknown as IItem,
+          character,
+          itemPickupData.fromContainerId
+        );
+        if (!isItemRemoved) {
+          this.sendCustomErrorMessage(character, "Sorry, failed to remove item from container.");
+          return false;
+        }
       }
     }
 
@@ -104,7 +106,12 @@ export class ItemPickup {
       // if the origin container is a MapContainer so should update the char inventory
       //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
       const containerToUpdateId = isMapContainer ? itemPickupData.toContainerId : itemPickupData.fromContainerId;
-      const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as unknown as IItemContainer;
+      const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as any;
+
+      if (!updatedContainer) {
+        this.sendCustomErrorMessage(character, "Sorry, fetch container information.");
+        return false;
+      }
 
       const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
         inventory: updatedContainer,
@@ -123,7 +130,6 @@ export class ItemPickup {
     );
   }
 
-  // not a final solution
   private async removeItemFromContainer(
     item: IItem,
     character: ICharacter,
@@ -142,31 +148,7 @@ export class ItemPickup {
     }
 
     if (targetContainer) {
-      // // Inventory is empty, slot checking not needed
-      for (let i = 0; i < targetContainer.slotQty; i++) {
-        const slotItem = targetContainer.slots?.[i] as unknown as IItem;
-
-        if (!slotItem) continue;
-        if (slotItem.key === item.key) {
-          // Changing item slot to undefined, thus removing it
-          targetContainer.slots[i] = undefined;
-
-          await ItemContainer.updateOne(
-            {
-              _id: targetContainer._id,
-            },
-            {
-              $set: {
-                slots: {
-                  ...targetContainer.slots,
-                },
-              },
-            }
-          );
-
-          return true;
-        }
-      }
+      return await this.characterItemSlots.deleteItemOnSlot(targetContainer, item._id);
     }
     return false;
   }

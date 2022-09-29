@@ -23,6 +23,78 @@ export class CharacterItemSlots {
     await targetContainer.save();
   }
 
+  public async findItemSlotIndex(targetContainer: IItemContainer, itemId: string): Promise<number | undefined> {
+    const container = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
+
+    if (!container) {
+      throw new Error("Container not found");
+    }
+
+    if (container) {
+      for (let i = 0; i < container.slotQty; i++) {
+        const slotItem = container.slots?.[i] as unknown as IItem;
+
+        if (!slotItem) continue;
+
+        if (slotItem._id.toString() === itemId.toString()) {
+          return i;
+        }
+      }
+    }
+  }
+
+  public async findItemOnSlots(targetContainer: IItemContainer, itemId: string): Promise<IItem | undefined> {
+    try {
+      const container = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
+
+      if (!container) {
+        throw new Error("Container not found");
+      }
+
+      if (container) {
+        for (let i = 0; i < container.slotQty; i++) {
+          const slotItem = container.slots?.[i] as unknown as IItem;
+
+          if (!slotItem) continue;
+
+          if (slotItem._id.toString() === itemId.toString()) {
+            return slotItem;
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  public async deleteItemOnSlot(targetContainer: IItemContainer, itemId: string): Promise<boolean> {
+    for (let i = 0; i < targetContainer.slotQty; i++) {
+      const slotItem = targetContainer.slots?.[i] as unknown as IItem;
+
+      if (!slotItem) continue;
+      if (slotItem._id.toString() === itemId.toString()) {
+        // Changing item slot to undefined, thus removing it
+        targetContainer.slots[i] = undefined;
+
+        await ItemContainer.updateOne(
+          {
+            _id: targetContainer._id,
+          },
+          {
+            $set: {
+              slots: {
+                ...targetContainer.slots,
+              },
+            },
+          }
+        );
+
+        return true;
+      }
+    }
+    return false;
+  }
+
   public async hasAvailableSlot(targetContainerId: string, itemToBeAdded: IItem): Promise<boolean> {
     const targetContainer = (await ItemContainer.findById(targetContainerId)) as unknown as IItemContainer;
 

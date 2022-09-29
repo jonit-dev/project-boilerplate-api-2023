@@ -39,6 +39,54 @@ describe("CharacterItemSlots.ts", () => {
     await testItem.save();
   });
 
+  it("should properly find a specific item in a container slot", async () => {
+    const firstItem = await unitTestHelper.createMockItem();
+
+    inventoryContainer.slots = {
+      ...inventoryContainer.slots,
+      0: firstItem.toJSON({ virtuals: true }),
+    };
+    await inventoryContainer.save();
+
+    const foundItem = await characterItemSlots.findItemOnSlots(inventoryContainer, firstItem.id);
+
+    expect(foundItem).toBeDefined();
+
+    expect(foundItem?._id).toEqual(firstItem._id);
+  });
+
+  it("should properly delete an item on a targeted slot", async () => {
+    const firstItem = await unitTestHelper.createMockItem();
+
+    inventoryContainer.slots = {
+      ...inventoryContainer.slots,
+      0: firstItem.toJSON({ virtuals: true }),
+    };
+    await inventoryContainer.save();
+
+    const deleteItem = await characterItemSlots.deleteItemOnSlot(inventoryContainer, firstItem.id);
+
+    expect(deleteItem).toBeTruthy();
+
+    const foundItem = await characterItemSlots.findItemOnSlots(inventoryContainer, firstItem.id);
+
+    expect(foundItem).toBeUndefined();
+  });
+
+  it("should find an item by slot index", async () => {
+    const firstItem = await unitTestHelper.createMockItem();
+
+    inventoryContainer.slots = {
+      ...inventoryContainer.slots,
+      5: firstItem.toJSON({ virtuals: true }),
+    };
+    await inventoryContainer.save();
+
+    const slotIndex = await characterItemSlots.findItemSlotIndex(inventoryContainer, firstItem.id);
+
+    expect(slotIndex).toEqual(5);
+  });
+
   it("should properly get the first available slot", async () => {
     inventoryContainer.slotQty = 1;
     inventoryContainer.slots = {

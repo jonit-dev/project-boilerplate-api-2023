@@ -80,7 +80,7 @@ export class CharacterItemInventory {
       const slotItem = inventoryItemContainer.slots?.[i];
 
       if (!slotItem) continue;
-      if (slotItem.key === item.key) {
+      if (slotItem._id.toString() === item._id.toString()) {
         // Changing item slot to null, thus removing it
         inventoryItemContainer.slots[i] = null;
 
