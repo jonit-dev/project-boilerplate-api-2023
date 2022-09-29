@@ -40,7 +40,7 @@ const itemSchema = createLeanSchema(
     maxStackSize: Type.number({ required: true, default: 1 }),
     stackQty: Type.number(),
     isUsable: Type.boolean({ required: true, default: false }),
-    usableEffect: Type.string(),
+    usableEffect: Type.mixed(),
     isStorable: Type.boolean({ required: true, default: true }),
     x: Type.number(),
     y: Type.number(),

@@ -39,7 +39,7 @@ export class ItemDrop {
     if (dropItem) {
       let isItemRemoved = false;
 
-      if (itemDrop.fromEquipmentSet) {
+      if (itemDrop.source === "equipment") {
         isItemRemoved = await this.beforeDropRemoveFromEquipmentSet(dropItem as unknown as IItem, character);
       } else {
         isItemRemoved = await this.beforeDropRemoveFromInventory(
@@ -59,7 +59,7 @@ export class ItemDrop {
         const equipmentSlots = await this.getEquipmentSlots(character.equipment?.toString());
 
         let inventory = {} as IItemContainer;
-        if (!itemDrop.fromEquipmentSet) {
+        if (itemDrop.source !== "equipment") {
           const updatedContainer = (await ItemContainer.findById(
             itemDrop.fromContainerId
           )) as unknown as IItemContainer;
@@ -160,7 +160,7 @@ export class ItemDrop {
 
   private async isItemDropValid(itemDrop: IItemDrop, character: ICharacter): Promise<Boolean> {
     const item = await Item.findById(itemDrop.itemId);
-    const isFromEquipmentSet = itemDrop.fromEquipmentSet;
+    const isFromEquipmentSet = itemDrop.source === "equipment";
 
     if (!item) {
       this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
