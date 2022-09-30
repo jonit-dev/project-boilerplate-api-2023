@@ -102,12 +102,12 @@ describe("CharacterItems.ts", () => {
     return itemSelled;
   };
 
-  it.only("should sell an item from invetory to NPC", async () => {
+  it("should sell an item from invetory to NPC", async () => {
     const itemPickedUp = await npcPickupItem(npcInventoryItemContainerId);
 
     expect(itemPickedUp).toBeTruthy();
 
-    const itemSelled = await sellItem(npcInventoryItemContainerId, inventoryItemContainerId);
+    const _itemSelled = await sellItem(npcInventoryItemContainerId, inventoryItemContainerId);
 
     expect(itemSelled).toBeTruthy();
 
