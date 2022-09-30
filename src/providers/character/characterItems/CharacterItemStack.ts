@@ -28,6 +28,15 @@ export class CharacterItemStack {
       };
     }
 
+    const hasAvailableSlots = await this.characterItemSlots.hasAvailableSlot(targetContainer._id, itemToBeAdded);
+
+    if (!hasAvailableSlots) {
+      return {
+        status: OperationStatus.Error,
+        message: "Sorry, there are no available slots in your container.",
+      };
+    }
+
     for (let i = 0; i < targetContainer.slotQty; i++) {
       const slotItem = targetContainer.slots?.[i];
 
@@ -35,31 +44,33 @@ export class CharacterItemStack {
 
       if (slotItem.key.replace(/-\d+$/, "") === itemToBeAdded.key.replace(/-\d+$/, "")) {
         if (slotItem.stackQty) {
-          const updatedStackQty = slotItem.stackQty + itemToBeAdded.stackQty;
+          const futureStackQty = slotItem.stackQty + itemToBeAdded.stackQty;
 
-          if (updatedStackQty > itemToBeAdded.maxStackSize) {
+          if (futureStackQty > itemToBeAdded.maxStackSize) {
+            // existing item will have maxStack size
             await this.characterItemSlots.updateItemOnSlot(i, targetContainer, {
               stackQty: itemToBeAdded.maxStackSize,
             });
 
-            itemToBeAdded.stackQty = updatedStackQty - itemToBeAdded.maxStackSize;
+            // create a new item with the difference
+            itemToBeAdded.stackQty = futureStackQty - itemToBeAdded.maxStackSize;
             await itemToBeAdded.save();
 
             return null; // this means a new item should be created on itemContainer, with the difference quantity!
           }
 
-          if (updatedStackQty <= itemToBeAdded.maxStackSize) {
+          if (futureStackQty <= itemToBeAdded.maxStackSize) {
             // if updatedStackQty is less than or equal to maxStackSize, update stackQty of existing item. Do not create new one!
 
             await this.characterItemSlots.updateItemOnSlot(i, targetContainer, {
-              stackQty: updatedStackQty,
+              stackQty: futureStackQty,
             });
 
             await Item.updateOne(
               {
                 _id: slotItem._id,
               },
-              { $set: { stackQty: updatedStackQty } }
+              { $set: { stackQty: futureStackQty } }
             );
           }
 
