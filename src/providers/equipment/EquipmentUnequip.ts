@@ -6,14 +6,7 @@ import { CharacterItems } from "@providers/character/characterItems/CharacterIte
 import { CharacterItemStack } from "@providers/character/characterItems/CharacterItemStack";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  IEquipmentAndInventoryUpdatePayload,
-  IItem,
-  ItemSocketEvents,
-  ItemType,
-  IUIShowMessage,
-  UISocketEvents,
-} from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItem, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 import { EquipmentSlots } from "./EquipmentSlots";
@@ -54,28 +47,17 @@ export class EquipmentUnequip {
       return;
     }
 
-    let targetSlot = "";
-    const itemSlotTypes = [
-      "head",
-      "neck",
-      "leftHand",
-      "rightHand",
-      "ring",
-      "legs",
-      "boot",
-      "accessory",
-      "armor",
-      "inventory",
-    ];
-    for (const itemSlotType of itemSlotTypes) {
-      if (equipment[itemSlotType] && equipment[itemSlotType].toString() === itemId) {
-        targetSlot = itemSlotType;
-      }
+    let unequipOriginSlot = this.getUnequipOriginSlot(equipment, itemId);
+
+    if (!unequipOriginSlot) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Target slot not found!");
+
+      return;
     }
 
-    equipment[targetSlot] = undefined;
+    equipment[unequipOriginSlot] = undefined;
 
-    const itemSlot = this.checkIfItemAlreadyInSlot(slots, item, equipment as IEquipment, targetSlot);
+    const itemSlot = this.checkIfItemAlreadyInSlot(slots, item);
 
     if (itemSlot) {
       itemAlreadyInSlot = true;
@@ -105,18 +87,7 @@ export class EquipmentUnequip {
     await this.equipmentHelper.updateCharacterAttackType(character, item);
   }
 
-  private updateItemInventoryCharacter(
-    equipmentAndInventoryUpdate: IEquipmentAndInventoryUpdatePayload,
-    character: ICharacter
-  ): void {
-    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
-      character.channelId!,
-      ItemSocketEvents.EquipmentAndInventoryUpdate,
-      equipmentAndInventoryUpdate
-    );
-  }
-
-  public checkIfItemAlreadyInSlot(slots: IItem[], item: IItem, equipment: IEquipment, targetSlot: string): IItem {
+  public checkIfItemAlreadyInSlot(slots: IItem[], item: IItem): IItem {
     let itemSlot: IItem;
     for (const slot in slots) {
       if (slots[slot] && slots[slot].textureKey === item.textureKey) {
@@ -153,10 +124,8 @@ export class EquipmentUnequip {
       }
     }
     if (!itemUnequipped) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "There aren't slots available",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, there aren't slots available");
+
       return;
     }
 
@@ -180,6 +149,38 @@ export class EquipmentUnequip {
     }
 
     return allowedItemTypes;
+  }
+
+  private getUnequipOriginSlot(equipment: IEquipment, itemId: string): string | undefined {
+    const itemSlotTypes = [
+      "head",
+      "neck",
+      "leftHand",
+      "rightHand",
+      "ring",
+      "legs",
+      "boot",
+      "accessory",
+      "armor",
+      "inventory",
+    ];
+
+    for (const itemSlotType of itemSlotTypes) {
+      if (equipment[itemSlotType] && equipment[itemSlotType].toString() === itemId) {
+        return itemSlotType;
+      }
+    }
+  }
+
+  private updateItemInventoryCharacter(
+    equipmentAndInventoryUpdate: IEquipmentAndInventoryUpdatePayload,
+    character: ICharacter
+  ): void {
+    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+      character.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      equipmentAndInventoryUpdate
+    );
   }
 
   private isUnequipValid(inventory: IItem, itemContainer: IItemContainer, character: ICharacter, item: IItem): boolean {
@@ -212,7 +213,11 @@ export class EquipmentUnequip {
       return false;
     }
 
-    this.characterValidation.hasBasicValidation(character);
+    const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
+
+    if (!hasBasicValidation) {
+      return false;
+    }
 
     if (!inventory) {
       this.socketMessaging.sendErrorMessageToCharacter(
