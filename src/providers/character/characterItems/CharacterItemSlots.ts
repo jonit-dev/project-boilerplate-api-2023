@@ -54,6 +54,14 @@ export class CharacterItemSlots {
 
     targetContainer.markModified("slots");
     await targetContainer.save();
+
+    // remember that we also need to update the item on the database. What we have above is just a reference inside of the container (copy)
+    await Item.updateOne(
+      {
+        _id: slotItem._id,
+      },
+      { $set: { ...payload } }
+    );
   }
 
   public async findItemSlotIndex(targetContainer: IItemContainer, itemId: string): Promise<number | undefined> {
