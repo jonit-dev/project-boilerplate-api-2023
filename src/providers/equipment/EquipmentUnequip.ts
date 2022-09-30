@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 
 import { CharacterItemStack } from "@providers/character/characterItems/CharacterItemStack";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -24,7 +25,8 @@ export class EquipmentUnequip {
     private equipmentHelper: EquipmentRangeUpdate,
     private characterValidation: CharacterValidation,
     private characterItemStack: CharacterItemStack,
-    private socketMessaging: SocketMessaging
+    private socketMessaging: SocketMessaging,
+    private characterItems: CharacterItems
   ) {}
 
   public async unequip(
@@ -34,32 +36,9 @@ export class EquipmentUnequip {
     item: IItem,
     itemContainer: IItemContainer
   ): Promise<void> {
-    if (!item) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Item not found");
+    const isUnequipValid = this.isUnequipValid(inventory, itemContainer, character, item);
 
-      return;
-    }
-
-    if (item && item.isItemContainer) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "It's not possible to unequip item container!");
-
-      return;
-    }
-
-    if (!itemContainer) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Item container not found");
-
-      return;
-    }
-
-    this.characterValidation.hasBasicValidation(character);
-
-    if (!inventory) {
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        "It's not possible to unequip this item without an inventory!"
-      );
-
+    if (!isUnequipValid) {
       return;
     }
 
@@ -201,5 +180,49 @@ export class EquipmentUnequip {
     }
 
     return allowedItemTypes;
+  }
+
+  private isUnequipValid(inventory: IItem, itemContainer: IItemContainer, character: ICharacter, item: IItem): boolean {
+    const userHasItemToUnequip = this.characterItems.hasItem(item._id, character, "equipment");
+
+    if (!userHasItemToUnequip) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "You're trying to unequip an item that you don't own!"
+      );
+
+      return false;
+    }
+
+    if (!item) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Item not found");
+
+      return false;
+    }
+
+    if (item && item.isItemContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "It's not possible to unequip item container!");
+
+      return false;
+    }
+
+    if (!itemContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Item container not found");
+
+      return false;
+    }
+
+    this.characterValidation.hasBasicValidation(character);
+
+    if (!inventory) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "It's not possible to unequip this item without an inventory!"
+      );
+
+      return false;
+    }
+
+    return true;
   }
 }
