@@ -37,52 +37,83 @@ export class CharacterItemStack {
       };
     }
 
+    const allItemsSameKey = await this.characterItemSlots.getAllItemsFromKey(targetContainer, itemToBeAdded.key);
+
+    if (!allItemsSameKey?.length) {
+      return null; // create new item, if there are no items with the same key
+    }
+
+    const areAllItemsSameKeyStackFull = allItemsSameKey.every((item) => item.stackQty === itemToBeAdded.maxStackSize);
+
+    if (areAllItemsSameKeyStackFull) {
+      return null; // create new item, because there's nothing to stack!
+    }
+
     for (let i = 0; i < targetContainer.slotQty; i++) {
       const slotItem = targetContainer.slots?.[i];
 
-      if (!slotItem) continue;
+      if (!slotItem || slotItem.maxStackSize <= 1) continue; // if we dont have an item or its not stackable.
 
-      if (slotItem.key.replace(/-\d+$/, "") === itemToBeAdded.key.replace(/-\d+$/, "")) {
-        if (slotItem.stackQty) {
-          const futureStackQty = slotItem.stackQty + itemToBeAdded.stackQty;
+      const isSameItem = slotItem.key.replace(/-\d+$/, "") === itemToBeAdded.key.replace(/-\d+$/, "");
 
-          if (futureStackQty > itemToBeAdded.maxStackSize) {
-            // existing item will have maxStack size
-            await this.characterItemSlots.updateItemOnSlot(i, targetContainer, {
-              stackQty: itemToBeAdded.maxStackSize,
-            });
+      if (!isSameItem) continue;
 
-            // create a new item with the difference
-            itemToBeAdded.stackQty = futureStackQty - itemToBeAdded.maxStackSize;
-            await itemToBeAdded.save();
+      if (slotItem.stackQty) {
+        const futureStackQty = slotItem.stackQty + itemToBeAdded.stackQty;
 
-            return null; // this means a new item should be created on itemContainer, with the difference quantity!
-          }
+        if (futureStackQty > itemToBeAdded.maxStackSize) {
+          await this.addToStackAndCreateDifference(i, targetContainer, itemToBeAdded, futureStackQty);
 
-          if (futureStackQty <= itemToBeAdded.maxStackSize) {
-            // if updatedStackQty is less than or equal to maxStackSize, update stackQty of existing item. Do not create new one!
-
-            await this.characterItemSlots.updateItemOnSlot(i, targetContainer, {
-              stackQty: futureStackQty,
-            });
-
-            await Item.updateOne(
-              {
-                _id: slotItem._id,
-              },
-              { $set: { stackQty: futureStackQty } }
-            );
-          }
-
-          // // delete selectedItem to cleanup database (now hes on the container)
-          await Item.deleteOne({ _id: itemToBeAdded._id });
-
-          return {
-            status: OperationStatus.Success,
-          };
+          return null; // this means a new item should be created on itemContainer, with the difference quantity!
         }
+
+        if (futureStackQty <= itemToBeAdded.maxStackSize) {
+          // if updatedStackQty is less than or equal to maxStackSize, update stackQty of existing item. Do not create new one!
+          await this.addToExistingStack(i, slotItem, targetContainer, futureStackQty);
+        }
+
+        // // delete selectedItem to cleanup database (now hes on the container)
+        await Item.deleteOne({ _id: itemToBeAdded._id });
+
+        return {
+          status: OperationStatus.Success,
+        };
       }
     }
     return null;
+  }
+
+  private async addToExistingStack(
+    slotIndex: number,
+    slotItem: IItem,
+    targetContainer: IItemContainer,
+    futureStackQty: number
+  ) {
+    await this.characterItemSlots.updateItemOnSlot(slotIndex, targetContainer, {
+      stackQty: futureStackQty,
+    });
+
+    await Item.updateOne(
+      {
+        _id: slotItem._id,
+      },
+      { $set: { stackQty: futureStackQty } }
+    );
+  }
+
+  private async addToStackAndCreateDifference(
+    slotIndex: number,
+    targetContainer: IItemContainer,
+    itemToBeAdded: IItem,
+    futureStackQty: number
+  ) {
+    // existing item will have maxStack size
+    await this.characterItemSlots.updateItemOnSlot(slotIndex, targetContainer, {
+      stackQty: itemToBeAdded.maxStackSize,
+    });
+
+    // create a new item with the difference
+    itemToBeAdded.stackQty = futureStackQty - itemToBeAdded.maxStackSize;
+    await itemToBeAdded.save();
   }
 }
