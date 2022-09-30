@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+
 import { CharacterItemStack } from "@providers/character/characterItems/CharacterItemStack";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -19,11 +20,11 @@ import { EquipmentSlots } from "./EquipmentSlots";
 @provide(EquipmentUnequip)
 export class EquipmentUnequip {
   constructor(
-    private socketMessaging: SocketMessaging,
     private equipmentSlots: EquipmentSlots,
     private equipmentHelper: EquipmentRangeUpdate,
     private characterValidation: CharacterValidation,
-    private characterItemStack: CharacterItemStack
+    private characterItemStack: CharacterItemStack,
+    private socketMessaging: SocketMessaging
   ) {}
 
   public async unequip(
@@ -34,36 +35,31 @@ export class EquipmentUnequip {
     itemContainer: IItemContainer
   ): Promise<void> {
     if (!item) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Item not found.",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Item not found");
+
       return;
     }
 
     if (item && item.isItemContainer) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "It's not possible to unequip item container!",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(character, "It's not possible to unequip item container!");
+
       return;
     }
 
     if (!itemContainer) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Container not found.",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Item container not found");
+
       return;
     }
 
     this.characterValidation.hasBasicValidation(character);
 
     if (!inventory) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "It's not possible to unequip this item without an inventory!",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "It's not possible to unequip this item without an inventory!"
+      );
+
       return;
     }
 
@@ -74,10 +70,8 @@ export class EquipmentUnequip {
     const equipment = await Equipment.findById(character.equipment);
 
     if (!equipment) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Equipment set not found!",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Equipment not found");
+
       return;
     }
 

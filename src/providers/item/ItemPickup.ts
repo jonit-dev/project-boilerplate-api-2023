@@ -10,15 +10,7 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { OperationStatus } from "@providers/types/ValidationTypes";
-import {
-  IEquipmentAndInventoryUpdatePayload,
-  IItemPickup,
-  ItemSocketEvents,
-  ItemType,
-  IUIShowMessage,
-  UIMessageType,
-  UISocketEvents,
-} from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItemPickup, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemView } from "./ItemView";
 @provide(ItemPickup)
@@ -38,7 +30,7 @@ export class ItemPickup {
     const itemToBePicked = (await Item.findById(itemPickupData.itemId)) as unknown as IItem;
 
     if (!itemToBePicked) {
-      this.sendCustomErrorMessage(character, "Sorry, the item to be picked up was not found.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the item to be picked up was not found.");
       return false;
     }
 
@@ -63,7 +55,7 @@ export class ItemPickup {
     );
 
     if (status === OperationStatus.Error) {
-      if (message) this.sendCustomErrorMessage(character, message);
+      if (message) this.socketMessaging.sendErrorMessageToCharacter(character, message);
       return false;
     }
 
@@ -76,12 +68,12 @@ export class ItemPickup {
       const itemRemovedFromMap = await this.itemView.removeItemFromMap(itemToBePicked);
 
       if (!itemRemovedFromMap) {
-        this.sendCustomErrorMessage(character, "Sorry, failed to remove item from map.");
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, failed to remove item from map.");
         return false;
       }
     } else {
       if (!itemPickupData.fromContainerId) {
-        this.sendCustomErrorMessage(
+        this.socketMessaging.sendErrorMessageToCharacter(
           character,
           "Sorry, failed to remove item from container. Origin container not found."
         );
@@ -96,7 +88,7 @@ export class ItemPickup {
           itemPickupData.fromContainerId
         );
         if (!isItemRemoved) {
-          this.sendCustomErrorMessage(character, "Sorry, failed to remove item from container.");
+          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, failed to remove item from container.");
           return false;
         }
       }
@@ -109,7 +101,7 @@ export class ItemPickup {
       const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as any;
 
       if (!updatedContainer) {
-        this.sendCustomErrorMessage(character, "Sorry, fetch container information.");
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, fetch container information.");
         return false;
       }
 
@@ -137,13 +129,13 @@ export class ItemPickup {
   ): Promise<Boolean> {
     const selectedItem = (await Item.findById(item.id)) as IItem;
     if (!selectedItem) {
-      this.sendGenericErrorMessage(character);
+      this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
 
     const targetContainer = (await ItemContainer.findById(fromContainerId)) as unknown as IItemContainer;
     if (!targetContainer) {
-      this.sendGenericErrorMessage(character);
+      this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
 
@@ -164,7 +156,7 @@ export class ItemPickup {
       const equipmentContainer = await Equipment.findById(itemPickupData.toContainerId);
 
       if (!equipmentContainer) {
-        this.sendCustomErrorMessage(character, "Sorry, equipment container not found");
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment container not found");
         return false;
       }
     }
@@ -172,14 +164,14 @@ export class ItemPickup {
     const inventory = await character.inventory;
 
     if (!inventory && !item.isItemContainer && !isEquipmentContainer) {
-      this.sendCustomErrorMessage(character, "Sorry, you need an inventory to pick this item.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you need an inventory to pick this item.");
       return false;
     }
 
     if (!item.isItemContainer) {
       const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(itemPickupData.toContainerId, item);
       if (!hasAvailableSlot) {
-        this.sendCustomErrorMessage(character, "Sorry, your container is full.");
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your container is full.");
         return false;
       }
     }
@@ -188,7 +180,7 @@ export class ItemPickup {
 
     if (isItemOnMap) {
       if (character.scene !== item.scene) {
-        this.sendCustomErrorMessage(character, "Sorry, you can't pick up items from another map.");
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can't pick up items from another map.");
         return false;
       }
     }
@@ -199,12 +191,12 @@ export class ItemPickup {
     const ratio = (weight + item.weight) / maxWeight;
 
     if (ratio > 4) {
-      this.sendCustomErrorMessage(character, "Sorry, you are already carrying too much weight!");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you are already carrying too much weight!");
       return false;
     }
 
     if (!item.isStorable) {
-      this.sendCustomErrorMessage(character, "Sorry, you cannot store this item.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot store this item.");
       return false;
     }
 
@@ -217,7 +209,10 @@ export class ItemPickup {
         2
       );
       if (!underRange) {
-        this.sendCustomErrorMessage(character, "Sorry, you are too far away to pick up this item.");
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, you are too far away to pick up this item."
+        );
         return false;
       }
     }
@@ -227,7 +222,7 @@ export class ItemPickup {
 
       if (item.owner && item.owner !== character._id.toString()) {
         // check if item is owned by someone else
-        this.sendCustomErrorMessage(character, "Sorry, this item is not yours.");
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not yours.");
         return false;
       }
     }
@@ -240,25 +235,11 @@ export class ItemPickup {
       isEquipmentContainer ? "equipment" : "inventory"
     );
     if (characterAlreadyHasItem) {
-      this.sendCustomErrorMessage(character, "Sorry, you already have this item.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you already have this item.");
       return false;
     }
 
     return this.characterValidation.hasBasicValidation(character);
-  }
-
-  public sendGenericErrorMessage(character: ICharacter): void {
-    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: "Sorry, failed to add your item your inventory.",
-      type: "error",
-    });
-  }
-
-  public sendCustomErrorMessage(character: ICharacter, message: string, type: UIMessageType = "error"): void {
-    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message,
-      type,
-    });
   }
 
   public getAllowedItemTypes(): ItemType[] {

@@ -288,9 +288,9 @@ describe("CharacterItemSlots.ts", () => {
 
     const result = await characterItemSlots.addItemOnFirstAvailableSlot(anotherStackableItem, inventoryContainer);
 
-    console.log(result);
-
     console.log("inventoryContainer.slots", inventoryContainer.slots);
+
+    expect(result).toBeTruthy();
   });
 
   afterAll(async () => {

@@ -14,9 +14,6 @@ import {
   IItemContainer,
   IItemDrop,
   ItemSocketEvents,
-  IUIShowMessage,
-  UIMessageType,
-  UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
@@ -43,7 +40,7 @@ export class ItemDrop {
     const itemToBeDropped = await Item.findById(itemDropData.itemId);
 
     if (!itemToBeDropped) {
-      this.sendCustomErrorMessage(character, "Sorry, item to be dropped wasn't found.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item to be dropped wasn't found.");
       return false;
     }
 
@@ -61,7 +58,7 @@ export class ItemDrop {
           isItemRemoved = await this.removeItemFromEquipmentSet(itemToBeDropped as unknown as IItem, character);
 
           if (!isItemRemoved) {
-            this.sendGenericErrorMessage(character);
+            this.socketMessaging.sendErrorMessageToCharacter(character);
             return false;
           }
 
@@ -84,7 +81,7 @@ export class ItemDrop {
           );
 
           if (!isItemRemoved) {
-            this.sendGenericErrorMessage(character);
+            this.socketMessaging.sendErrorMessageToCharacter(character);
             return false;
           }
 
@@ -107,7 +104,7 @@ export class ItemDrop {
 
       return true;
     } catch (err) {
-      this.sendGenericErrorMessage(character);
+      this.socketMessaging.sendErrorMessageToCharacter(character);
 
       console.log(err);
       return false;
@@ -125,7 +122,10 @@ export class ItemDrop {
     const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, targetX, targetY, 8);
 
     if (!isUnderRange) {
-      this.sendCustomErrorMessage(character, "Sorry, you're trying to drop this item too far away.");
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you're trying to drop this item too far away."
+      );
       return false;
     }
 
@@ -148,14 +148,14 @@ export class ItemDrop {
     const equipmentSet = await Equipment.findById(equipmentSetId);
 
     if (!equipmentSet) {
-      this.sendCustomErrorMessage(character, "Sorry, equipment set not found.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment set not found.");
       return false;
     }
 
     const { status, message } = await this.characterItems.deleteItem(item._id, character, "equipment");
 
     if (status === OperationStatus.Error) {
-      if (message) this.sendCustomErrorMessage(character, message);
+      if (message) this.socketMessaging.sendErrorMessageToCharacter(character, message);
 
       return false;
     }
@@ -171,20 +171,20 @@ export class ItemDrop {
 
     if (!item) {
       console.log("dropItemFromInventory: Item not found");
-      this.sendGenericErrorMessage(character);
+      this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
 
     if (!targetContainer) {
       console.log("dropItemFromInventory: Character container not found");
-      this.sendGenericErrorMessage(character);
+      this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
 
     const { status, message } = await this.characterItems.deleteItem(item._id, character, "inventory");
 
     if (status === OperationStatus.Error) {
-      if (message) this.sendCustomErrorMessage(character, message);
+      if (message) this.socketMessaging.sendErrorMessageToCharacter(character, message);
 
       return false;
     }
@@ -197,7 +197,7 @@ export class ItemDrop {
     const isFromEquipmentSet = itemDrop.source === "equipment";
 
     if (!item) {
-      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not accessible.");
       return false;
     }
 
@@ -220,14 +220,17 @@ export class ItemDrop {
     const inventory = await character.inventory;
 
     if (!inventory) {
-      this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to drop this item.");
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you must have a bag or backpack to drop this item."
+      );
       return false;
     }
 
     const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
 
     if (!inventoryContainer) {
-      this.sendCustomErrorMessage(character, "Sorry, inventory container not found.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory container not found.");
       return false;
     }
 
@@ -236,17 +239,26 @@ export class ItemDrop {
     );
 
     if (!hasItemInInventory) {
-      this.sendCustomErrorMessage(character, "Sorry, you do not have this item in your inventory.");
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you do not have this item in your inventory."
+      );
       return false;
     }
 
     if (itemDrop.fromContainerId.toString() !== inventoryContainer?.id.toString()) {
-      this.sendCustomErrorMessage(character, "Sorry, this item does not belong to your inventory.");
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, this item does not belong to your inventory."
+      );
       return false;
     }
 
     if (!inventoryContainer) {
-      this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to drop this item.");
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you must have a bag or backpack to drop this item."
+      );
       return false;
     }
 
@@ -259,19 +271,5 @@ export class ItemDrop {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       payloadUpdate
     );
-  }
-
-  public sendGenericErrorMessage(character: ICharacter): void {
-    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: "Sorry, failed to drop your item from your inventory.",
-      type: "error",
-    });
-  }
-
-  public sendCustomErrorMessage(character: ICharacter, message: string, type: UIMessageType = "error"): void {
-    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message,
-      type,
-    });
   }
 }
