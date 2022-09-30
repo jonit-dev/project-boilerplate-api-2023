@@ -45,7 +45,7 @@ export class EquipmentUnequip {
       return;
     }
 
-    let unequipOriginSlot = this.getUnequipOriginSlot(equipment, itemId);
+    const unequipOriginSlot = this.getUnequipOriginSlot(equipment, itemId);
 
     if (!unequipOriginSlot) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Target slot not found!");
