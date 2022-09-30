@@ -73,7 +73,7 @@ export class CharacterItemStack {
           // if updatedStackQty is less than or equal to maxStackSize, update stackQty of existing item. Do not create new one!
           await this.addToExistingStack(i, targetContainer, futureStackQty);
 
-          // delete selectedItem to cleanup database (now hes on the container)
+          // since the qty was added to an existing item, we don't need to create a new one.
           await Item.deleteOne({ _id: itemToBeAdded._id });
 
           return {
