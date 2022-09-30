@@ -22,20 +22,18 @@ export class EquipmentUnequip {
     private characterItems: CharacterItems
   ) {}
 
-  public async unequip(
-    character: ICharacter,
-    inventory: IItem,
-    itemId: string,
-    item: IItem,
-    itemContainer: IItemContainer
-  ): Promise<void> {
-    const isUnequipValid = this.isUnequipValid(inventory, itemContainer, character, item);
+  public async unequip(character: ICharacter, inventory: IItem, itemId: string, item: IItem): Promise<void> {
+    const inventoryContainer = (await ItemContainer.findById(
+      inventory.itemContainer as string
+    )) as unknown as IItemContainer;
+
+    const isUnequipValid = this.isUnequipValid(inventory, inventoryContainer, character, item);
 
     if (!isUnequipValid) {
       return;
     }
 
-    const slots: IItem[] = itemContainer.slots;
+    const slots: IItem[] = inventoryContainer.slots;
 
     let itemAlreadyInSlot = false;
 
@@ -63,7 +61,7 @@ export class EquipmentUnequip {
       itemAlreadyInSlot = true;
     }
 
-    this.manageItemContainerSlots(itemAlreadyInSlot, character, itemContainer, itemSlot!, item);
+    this.manageItemContainerSlots(itemAlreadyInSlot, character, inventoryContainer, itemSlot!, item);
 
     await equipment.save();
     const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
@@ -71,14 +69,14 @@ export class EquipmentUnequip {
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,
       inventory: {
-        _id: itemContainer._id,
-        parentItem: itemContainer!.parentItem.toString(),
-        owner: itemContainer?.owner?.toString() || character.name,
-        name: itemContainer?.name,
-        slotQty: itemContainer!.slotQty,
-        slots: itemContainer?.slots,
+        _id: inventoryContainer._id,
+        parentItem: inventoryContainer!.parentItem.toString(),
+        owner: inventoryContainer?.owner?.toString() || character.name,
+        name: inventoryContainer?.name,
+        slotQty: inventoryContainer!.slotQty,
+        slots: inventoryContainer?.slots,
         allowedItemTypes: this.getAllowedItemTypes(),
-        isEmpty: itemContainer!.isEmpty,
+        isEmpty: inventoryContainer!.isEmpty,
       },
     };
 
@@ -183,7 +181,12 @@ export class EquipmentUnequip {
     );
   }
 
-  private isUnequipValid(inventory: IItem, itemContainer: IItemContainer, character: ICharacter, item: IItem): boolean {
+  private isUnequipValid(
+    inventory: IItem,
+    inventoryContainer: IItemContainer,
+    character: ICharacter,
+    item: IItem
+  ): boolean {
     const userHasItemToUnequip = this.characterItems.hasItem(item._id, character, "equipment");
 
     if (!userHasItemToUnequip) {
@@ -207,7 +210,7 @@ export class EquipmentUnequip {
       return false;
     }
 
-    if (!itemContainer) {
+    if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Item container not found");
 
       return false;
