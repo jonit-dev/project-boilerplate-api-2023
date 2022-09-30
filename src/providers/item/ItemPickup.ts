@@ -99,6 +99,91 @@ export class ItemPickup {
       }
       return true;
     }
+    return false;
+  }
+
+  public async performItemSell(
+    itemSell: IItemPickup,
+    character: ICharacter,
+    destinyCharacter: ICharacter
+  ): Promise<Boolean> {
+    const sellItem = (await Item.findById(itemSell.itemId)) as unknown as IItem;
+
+    if (!sellItem) {
+      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
+      return false;
+    }
+
+    const inventario = await character.inventory;
+    const equipItemContainer = sellItem.isItemContainer && inventario === null;
+    const isSellValid = await this.isItemSellValid(itemSell, character, equipItemContainer);
+    const isMapContainer = sellItem.x !== undefined && sellItem.y !== undefined && sellItem.scene !== undefined;
+
+    if (!isSellValid) {
+      return false;
+    }
+
+    if (sellItem) {
+      await this.normalizeItemKey(sellItem);
+
+      const isItemRemoved = await this.removeItemFromContainer(
+        sellItem,
+        character,
+        itemSell.toContainerId //,
+        // equipItemContainer
+      );
+      if (!isItemRemoved) return false;
+
+      // // whenever a new item is added, we need to update the character weight
+      await this.characterWeight.updateCharacterWeight(character);
+
+      // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
+      if (isMapContainer) {
+        // If an item has a x, y and scene, it means its coming from a map pickup. So we should destroy its representation and warn other characters nearby.
+        await this.itemView.removeItemFromMap(sellItem);
+      } else {
+        if (itemSell.fromContainerId) {
+          const isItemRemoved = await this.removeItemFromContainer(
+            sellItem as unknown as IItem,
+            character,
+            itemSell.fromContainerId
+          );
+          if (!isItemRemoved) {
+            return false;
+          }
+        }
+      }
+
+      // send update inventory event to user
+      if (!equipItemContainer) {
+        // if the origin container is a MapContainer so should update the char inventory
+        //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
+        const containerToUpdateId = isMapContainer ? itemSell.toContainerId : itemSell.fromContainerId;
+        const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as unknown as IItemContainer;
+        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+          equipment: {} as unknown as IEquipmentSet,
+          inventory: {
+            _id: updatedContainer._id,
+            parentItem: updatedContainer!.parentItem.toString(),
+            owner: updatedContainer?.owner?.toString() || character.name,
+            name: updatedContainer?.name,
+            slotQty: updatedContainer!.slotQty,
+            slots: updatedContainer?.slots,
+            allowedItemTypes: this.getAllowedItemTypes(),
+            isEmpty: updatedContainer!.isEmpty,
+          },
+        };
+
+        this.updateInventoryCharacter(payloadUpdate, character);
+      }
+      const hasTransferedToDestiny = await this.addItemToInventory(
+        sellItem,
+        destinyCharacter,
+        itemSell.fromContainerId!,
+        equipItemContainer
+      );
+      return hasTransferedToDestiny;
+    }
 
     return false;
   }
@@ -369,6 +454,80 @@ export class ItemPickup {
 
     if (!character.isOnline) {
       this.sendCustomErrorMessage(character, "Sorry, you must be online to pick up this item.");
+      return false;
+    }
+
+    return true;
+  }
+
+  private async isItemSellValid(
+    itemSell: IItemPickup,
+    character: ICharacter,
+    equipItemContainer: boolean
+  ): Promise<Boolean> {
+    const item = await Item.findById(itemSell.itemId);
+
+    if (!item) {
+      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
+      return false;
+    }
+
+    const isItemOnMap = item.x && item.y && item.scene;
+
+    const inventory = await character.inventory;
+
+    if (!inventory && !equipItemContainer) {
+      this.sendCustomErrorMessage(character, "Sorry, you must have a bag or backpack to pick up this item.");
+      return false;
+    }
+
+    if (isItemOnMap) {
+      if (character.scene !== item.scene) {
+        this.sendCustomErrorMessage(character, "Sorry, you can't pick up items from another map.");
+        return false;
+      }
+    }
+
+    const weight = await this.characterWeight.getWeight(character);
+    const maxWeight = await this.characterWeight.getMaxWeight(character);
+
+    const ratio = (weight + item.weight) / maxWeight;
+
+    if (ratio > 4) {
+      this.sendCustomErrorMessage(character, "Sorry, you are already carrying too much weight!");
+      return false;
+    }
+
+    if (!item.isStorable) {
+      this.sendCustomErrorMessage(character, "Sorry, you cannot store this item.");
+      return false;
+    }
+
+    if (item.x !== undefined && item.y !== undefined && item.scene !== undefined) {
+      const underRange = this.movementHelper.isUnderRange(character.x, character.y, itemSell.x, itemSell.y, 1);
+      if (!underRange) {
+        this.sendCustomErrorMessage(character, "Sorry, you are too far away to sell this item.");
+        return false;
+      }
+    }
+
+    if (!isItemOnMap) {
+      // if item is not on the map
+
+      if (item.owner && item.owner !== character._id.toString()) {
+        // check if item is owned by someone else
+        this.sendCustomErrorMessage(character, "Sorry, this item is not yours.");
+        return false;
+      }
+    }
+
+    if (character.isBanned) {
+      this.sendCustomErrorMessage(character, "Sorry, you are banned and can't sell this item.");
+      return false;
+    }
+
+    if (!character.isOnline) {
+      this.sendCustomErrorMessage(character, "Sorry, you must be online to sell this item.");
       return false;
     }
 

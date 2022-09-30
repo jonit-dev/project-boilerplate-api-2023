@@ -41,6 +41,23 @@ export class ItemView {
     );
   }
 
+  public async addItemToMap(item: IItem, x: number, y: number, scene: string): Promise<void> {
+    if (x === undefined || y === undefined || scene === undefined) {
+      throw new Error("You cannot call this method without an item x, y and scene.");
+    }
+
+    await Item.updateOne(
+      {
+        _id: item.id,
+      },
+      {
+        x,
+        y,
+        scene,
+      }
+    );
+  }
+
   public async warnCharactersAboutItemRemovalInView(item: IItem, x: number, y: number, scene: string): Promise<void> {
     if (x !== undefined && y !== undefined && scene !== undefined) {
       const charactersNearby = await this.characterView.getCharactersAroundXYPosition(x, y, scene);
