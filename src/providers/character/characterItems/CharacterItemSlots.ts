@@ -1,5 +1,5 @@
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { OperationStatus } from "@providers/types/ValidationTypes";
 
 import { provide } from "inversify-binding-decorators";
@@ -7,8 +7,8 @@ import { ICharacterItemResult } from "./CharacterItems";
 
 @provide(CharacterItemSlots)
 export class CharacterItemSlots {
-  public getTotalQty(targetContainer: IItemContainer, itemKey: string): number {
-    const allItemsSameKey = this.getAllItemsFromKey(targetContainer, itemKey);
+  public async getTotalQty(targetContainer: IItemContainer, itemKey: string): Promise<number> {
+    const allItemsSameKey = await this.getAllItemsFromKey(targetContainer, itemKey);
 
     let qty = 0;
     for (const item of allItemsSameKey) {
@@ -22,7 +22,7 @@ export class CharacterItemSlots {
     return qty;
   }
 
-  public getAllItemsFromKey(targetContainer: IItemContainer, itemKey: string): IItem[] {
+  public async getAllItemsFromKey(targetContainer: IItemContainer, itemKey: string): Promise<IItem[]> {
     const items: IItem[] = [];
 
     for (let i = 0; i < targetContainer.slotQty; i++) {
@@ -31,7 +31,9 @@ export class CharacterItemSlots {
       if (!slotItem) continue;
 
       if (slotItem.key.replace(/-\d+$/, "").toString() === itemKey.replace(/-\d+$/, "").toString()) {
-        items.push(slotItem);
+        const dbItem = (await Item.findById(slotItem._id)) as unknown as IItem;
+
+        items.push(dbItem);
       }
     }
 
