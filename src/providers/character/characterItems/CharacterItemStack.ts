@@ -58,11 +58,13 @@ export class CharacterItemStack {
 
       if (!isSameItem) continue;
 
+      if (slotItem.stackQty === slotItem.maxStackSize) continue; // if item is already full, skip
+
       if (slotItem.stackQty) {
         const futureStackQty = slotItem.stackQty + itemToBeAdded.stackQty;
 
         if (futureStackQty > itemToBeAdded.maxStackSize) {
-          await this.addToStackAndCreateDifference(i, targetContainer, itemToBeAdded, futureStackQty);
+          await this.addToStackAndCreateDifference(i, slotItem, targetContainer, itemToBeAdded, futureStackQty);
 
           return null; // this means a new item should be created on itemContainer, with the difference quantity!
         }
@@ -70,10 +72,10 @@ export class CharacterItemStack {
         if (futureStackQty <= itemToBeAdded.maxStackSize) {
           // if updatedStackQty is less than or equal to maxStackSize, update stackQty of existing item. Do not create new one!
           await this.addToExistingStack(i, slotItem, targetContainer, futureStackQty);
-        }
 
-        // // delete selectedItem to cleanup database (now hes on the container)
-        await Item.deleteOne({ _id: itemToBeAdded._id });
+          // delete selectedItem to cleanup database (now hes on the container)
+          await Item.deleteOne({ _id: itemToBeAdded._id });
+        }
 
         return {
           status: OperationStatus.Success,
@@ -103,6 +105,7 @@ export class CharacterItemStack {
 
   private async addToStackAndCreateDifference(
     slotIndex: number,
+    slotItem: IItem,
     targetContainer: IItemContainer,
     itemToBeAdded: IItem,
     futureStackQty: number
@@ -111,9 +114,22 @@ export class CharacterItemStack {
     await this.characterItemSlots.updateItemOnSlot(slotIndex, targetContainer, {
       stackQty: itemToBeAdded.maxStackSize,
     });
+    await Item.updateOne(
+      {
+        _id: slotItem._id,
+      },
+      { $set: { stackQty: itemToBeAdded.maxStackSize } }
+    );
 
     // create a new item with the difference
     itemToBeAdded.stackQty = futureStackQty - itemToBeAdded.maxStackSize;
     await itemToBeAdded.save();
+
+    await Item.updateOne(
+      {
+        _id: itemToBeAdded._id,
+      },
+      { $set: { stackQty: futureStackQty - itemToBeAdded.maxStackSize } }
+    );
   }
 }
