@@ -58,10 +58,7 @@ export class ItemUse {
 
     this.applyItemUsage(bluePrintItem, character.id);
 
-    const inventoryContainer = await this.getInventoryContainer(character);
-    if (!inventoryContainer) {
-      return false;
-    }
+    const inventoryContainer = (await this.getInventoryContainer(character)) as unknown as IItemContainer;
 
     await this.consumeItem(inventoryContainer, useItem);
 
@@ -128,16 +125,7 @@ export class ItemUse {
 
   private async getInventoryContainer(character: ICharacter): Promise<IItemContainer | null> {
     const inventory = await character.inventory;
-    if (!inventory) {
-      return null;
-    }
-
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
-    if (!inventoryContainer) {
-      return null;
-    }
-
-    return inventoryContainer;
+    return await ItemContainer.findById(inventory.itemContainer);
   }
 
   private async sendItemConsumptionEvent(character: ICharacter): Promise<void> {
