@@ -75,11 +75,11 @@ export class CharacterItemStack {
 
           // delete selectedItem to cleanup database (now hes on the container)
           await Item.deleteOne({ _id: itemToBeAdded._id });
-        }
 
-        return {
-          status: OperationStatus.Success,
-        };
+          return {
+            status: OperationStatus.Success,
+          };
+        }
       }
     }
     return null;
