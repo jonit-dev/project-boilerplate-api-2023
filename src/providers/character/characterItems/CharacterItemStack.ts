@@ -85,7 +85,11 @@ export class CharacterItemStack {
     return null;
   }
 
-  private async addToExistingStack(slotIndex: number, targetContainer: IItemContainer, futureStackQty: number) {
+  private async addToExistingStack(
+    slotIndex: number,
+    targetContainer: IItemContainer,
+    futureStackQty: number
+  ): Promise<void> {
     await this.characterItemSlots.updateItemOnSlot(slotIndex, targetContainer, {
       stackQty: futureStackQty,
     });
@@ -96,7 +100,7 @@ export class CharacterItemStack {
     targetContainer: IItemContainer,
     itemToBeAdded: IItem,
     futureStackQty: number
-  ) {
+  ): Promise<void> {
     // existing item will have maxStack size
     await this.characterItemSlots.updateItemOnSlot(slotIndex, targetContainer, {
       stackQty: itemToBeAdded.maxStackSize,
