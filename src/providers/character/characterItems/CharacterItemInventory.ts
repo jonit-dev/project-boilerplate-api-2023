@@ -33,7 +33,7 @@ export class CharacterItemInventory {
   public async checkItemInInventory(itemId: string, character: ICharacter): Promise<boolean> {
     const inventory = (await character.inventory) as unknown as IItem;
 
-    const inventoryItemContainer = await ItemContainer.findById(inventory.itemContainer);
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
       return false;
@@ -80,7 +80,7 @@ export class CharacterItemInventory {
       const slotItem = inventoryItemContainer.slots?.[i];
 
       if (!slotItem) continue;
-      if (slotItem.key === item.key) {
+      if (slotItem._id.toString() === item._id.toString()) {
         // Changing item slot to null, thus removing it
         inventoryItemContainer.slots[i] = null;
 

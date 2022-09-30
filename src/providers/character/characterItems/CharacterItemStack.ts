@@ -33,7 +33,7 @@ export class CharacterItemStack {
 
       if (!slotItem) continue;
 
-      if (slotItem.key === itemToBeAdded.key.replace(/-\d+$/, "")) {
+      if (slotItem.key.replace(/-\d+$/, "") === itemToBeAdded.key.replace(/-\d+$/, "")) {
         if (slotItem.stackQty) {
           const updatedStackQty = slotItem.stackQty + itemToBeAdded.stackQty;
 
@@ -45,7 +45,7 @@ export class CharacterItemStack {
             itemToBeAdded.stackQty = updatedStackQty - itemToBeAdded.maxStackSize;
             await itemToBeAdded.save();
 
-            return null; // this means a new item should be created on itemContainer!
+            return null; // this means a new item should be created on itemContainer, with the difference quantity!
           }
 
           if (updatedStackQty <= itemToBeAdded.maxStackSize) {
