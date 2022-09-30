@@ -46,7 +46,7 @@ describe("ItemDrop.ts", () => {
     await testCharacter.save();
     await testItem.save();
 
-    //@ts-ignore
+    // @ts-ignore
     sendErrorMessageToCharacter = jest.spyOn(itemDrop.socketMessaging, "sendErrorMessageToCharacter" as any);
   });
 

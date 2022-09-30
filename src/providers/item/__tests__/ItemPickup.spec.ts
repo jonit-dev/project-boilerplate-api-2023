@@ -43,7 +43,7 @@ describe("ItemPickup.ts", () => {
     await testCharacter.save();
     await testItem.save();
 
-    //@ts-ignore
+    // @ts-ignore
     sendErrorMessageToCharacter = jest.spyOn(itemPickup.socketMessaging, "sendErrorMessageToCharacter" as any);
   });
 
