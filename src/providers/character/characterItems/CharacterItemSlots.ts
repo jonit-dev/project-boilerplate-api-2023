@@ -7,6 +7,37 @@ import { ICharacterItemResult } from "./CharacterItems";
 
 @provide(CharacterItemSlots)
 export class CharacterItemSlots {
+  public async getTotalQty(targetContainer: IItemContainer, itemKey: string): Promise<number> {
+    const allItemsSameKey = await this.getAllItemsFromKey(targetContainer, itemKey);
+
+    let qty = 0;
+    for (const item of allItemsSameKey) {
+      if (item.stackQty) {
+        qty += item.stackQty;
+      } else {
+        qty += 1;
+      }
+    }
+
+    return qty;
+  }
+
+  public async getAllItemsFromKey(targetContainer: IItemContainer, itemKey: string): Promise<IItem[]> {
+    const items: IItem[] = [];
+
+    for (let i = 0; i < targetContainer.slotQty; i++) {
+      const slotItem = targetContainer.slots?.[i] as unknown as IItem;
+
+      if (!slotItem) continue;
+
+      if (slotItem.key.replace(/-\d+$/, "").toString() === itemKey.replace(/-\d+$/, "").toString()) {
+        items.push(slotItem);
+      }
+    }
+
+    return items;
+  }
+
   public async updateItemOnSlot(
     slotIndex: number,
     targetContainer: IItemContainer,
