@@ -22,7 +22,7 @@ export class CharacterItemSlots {
     return qty;
   }
 
-  public async getAllItemsFromKey(targetContainer: IItemContainer, itemKey: string): Promise<IItem[]> {
+  public getAllItemsFromKey(targetContainer: IItemContainer, itemKey: string): IItem[] {
     const items: IItem[] = [];
 
     for (let i = 0; i < targetContainer.slotQty; i++) {
