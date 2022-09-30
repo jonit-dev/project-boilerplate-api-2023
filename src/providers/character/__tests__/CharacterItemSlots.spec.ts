@@ -90,7 +90,7 @@ describe("CharacterItemSlots.ts", () => {
     };
     await inventoryContainer.save();
 
-    const itemsSameKey = await characterItemSlots.getAllItemsFromKey(inventoryContainer, firstItem.key);
+    const itemsSameKey = characterItemSlots.getAllItemsFromKey(inventoryContainer, firstItem.key);
 
     expect(itemsSameKey.length).toBe(2);
 

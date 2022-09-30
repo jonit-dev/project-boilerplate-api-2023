@@ -8,7 +8,7 @@ import { ICharacterItemResult } from "./CharacterItems";
 @provide(CharacterItemSlots)
 export class CharacterItemSlots {
   public async getTotalQty(targetContainer: IItemContainer, itemKey: string): Promise<number> {
-    const allItemsSameKey = await this.getAllItemsFromKey(targetContainer, itemKey);
+    const allItemsSameKey = this.getAllItemsFromKey(targetContainer, itemKey);
 
     let qty = 0;
     for (const item of allItemsSameKey) {
