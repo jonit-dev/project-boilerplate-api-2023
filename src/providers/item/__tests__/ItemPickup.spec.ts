@@ -15,7 +15,7 @@ describe("ItemPickup.ts", () => {
   let testCharacter: ICharacter;
   let testItem: IItem;
   let inventory: IItem;
-  let sendCustomErrorMessage: jest.SpyInstance;
+  let sendErrorMessageToCharacter: jest.SpyInstance;
   let inventoryItemContainerId: string;
   let characterWeight: CharacterWeight;
 
@@ -43,7 +43,8 @@ describe("ItemPickup.ts", () => {
     await testCharacter.save();
     await testItem.save();
 
-    sendCustomErrorMessage = jest.spyOn(itemPickup, "sendCustomErrorMessage" as any);
+    // @ts-ignore
+    sendErrorMessageToCharacter = jest.spyOn(itemPickup.socketMessaging, "sendErrorMessageToCharacter" as any);
   });
 
   const pickupItem = async (
@@ -134,7 +135,7 @@ describe("ItemPickup.ts", () => {
     });
 
     expect(pickupHeavyItem).toBeFalsy();
-    expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+    expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
       testCharacter,
       "Sorry, you are already carrying too much weight!"
     );
@@ -154,8 +155,8 @@ describe("ItemPickup.ts", () => {
     const pickup = await pickupItem(smallContainer.id);
     expect(pickup).toBeFalsy();
 
-    expect(sendCustomErrorMessage).toHaveBeenCalled();
-    expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, your container is full.");
+    expect(sendErrorMessageToCharacter).toHaveBeenCalled();
+    expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, your container is full.");
   });
 
   it("should not stack an item, if its not stackable", async () => {
@@ -227,7 +228,7 @@ describe("ItemPickup.ts", () => {
       });
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
         testCharacter,
         "Sorry, the item to be picked up was not found."
       );
@@ -243,7 +244,7 @@ describe("ItemPickup.ts", () => {
         itemId: notStorableItem.id,
       });
       expect(pickup).toBeFalsy();
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, you cannot store this item.");
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, you cannot store this item.");
     });
 
     it("should throw an error if item is too far away", async () => {
@@ -253,7 +254,7 @@ describe("ItemPickup.ts", () => {
       });
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
         testCharacter,
         "Sorry, you are too far away to pick up this item."
       );
@@ -270,7 +271,7 @@ describe("ItemPickup.ts", () => {
       const pickup = await pickupItem(inventoryItemContainerId);
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not yours.");
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not yours.");
     });
 
     it("should throw an error if the user tries to pickup an item and is banned or not online", async () => {
@@ -298,7 +299,7 @@ describe("ItemPickup.ts", () => {
         const pickup = await pickupItem(inventoryItemContainerId);
         expect(pickup).toBeFalsy();
 
-        expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+        expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
           testCharacter,
           "Sorry, you need an inventory to pick this item."
         );
@@ -314,7 +315,7 @@ describe("ItemPickup.ts", () => {
       const pickup = await pickupItem(inventoryItemContainerId);
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
         testCharacter,
         "Sorry, you can't pick up items from another map."
       );

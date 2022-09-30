@@ -14,9 +14,6 @@ import {
   IEquipmentSet,
   ItemSocketEvents,
   ItemSubType,
-  IUIShowMessage,
-  UIMessageType,
-  UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
@@ -46,13 +43,13 @@ export class ItemUse {
     const useItem = (await Item.findById(itemUse.itemId)) as IItem;
 
     if (!useItem) {
-      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not accessible.");
       return false;
     }
 
     const bluePrintItem = itemsBlueprintIndex[useItem.key];
     if (!bluePrintItem || !bluePrintItem.usableEffect) {
-      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not accessible.");
       return false;
     }
 
@@ -155,13 +152,6 @@ export class ItemUse {
     if (character.channelId) {
       this.socketMessaging.sendEventToUser(character.channelId, CharacterSocketEvents.ItemConsumed, payload);
     }
-  }
-
-  private sendCustomErrorMessage(character: ICharacter, message: string, type: UIMessageType = "error"): void {
-    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message,
-      type,
-    });
   }
 
   private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {

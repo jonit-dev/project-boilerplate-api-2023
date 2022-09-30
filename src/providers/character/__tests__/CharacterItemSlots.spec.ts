@@ -39,6 +39,65 @@ describe("CharacterItemSlots.ts", () => {
     await testItem.save();
   });
 
+  describe("Quantity calculation", () => {
+    it("should properly calculate qty of a NON-STACKABLE item", async () => {
+      const firstItem = await unitTestHelper.createMockItem();
+      const secondItem = await unitTestHelper.createMockItem();
+      inventoryContainer.slots = {
+        ...inventoryContainer.slots,
+        0: firstItem.toJSON({ virtuals: true }),
+        1: secondItem.toJSON({ virtuals: true }),
+      };
+      await inventoryContainer.save();
+
+      const qty = await characterItemSlots.getTotalQty(inventoryContainer, firstItem.key);
+
+      expect(qty).toBe(2);
+    });
+
+    it("should properly calculate qty of a STACKABLE item", async () => {
+      const firstItem = await unitTestHelper.createStackableMockItem({
+        stackQty: 25,
+      });
+      const secondItem = await unitTestHelper.createStackableMockItem({
+        stackQty: 25,
+      });
+      inventoryContainer.slots = {
+        ...inventoryContainer.slots,
+        0: firstItem.toJSON({ virtuals: true }),
+        1: secondItem.toJSON({ virtuals: true }),
+      };
+      await inventoryContainer.save();
+
+      const qty = await characterItemSlots.getTotalQty(inventoryContainer, firstItem.key);
+
+      expect(qty).toBe(50);
+    });
+  });
+
+  it("should get all items from a specific key", async () => {
+    const firstItem = await unitTestHelper.createMockItem();
+    const secondItem = await unitTestHelper.createMockItem();
+    const thirdItem = await unitTestHelper.createMockItem({
+      key: "different-item",
+    });
+
+    inventoryContainer.slots = {
+      ...inventoryContainer.slots,
+      0: firstItem.toJSON({ virtuals: true }),
+      1: thirdItem.toJSON({ virtuals: true }),
+      2: secondItem.toJSON({ virtuals: true }),
+    };
+    await inventoryContainer.save();
+
+    const itemsSameKey = await characterItemSlots.getAllItemsFromKey(inventoryContainer, firstItem.key);
+
+    expect(itemsSameKey.length).toBe(2);
+
+    expect(itemsSameKey[0].key).toBe(firstItem.key);
+    expect(itemsSameKey[1].key).toBe(secondItem.key);
+  });
+
   it("should properly find a specific item in a container slot", async () => {
     const firstItem = await unitTestHelper.createMockItem();
 
@@ -229,9 +288,9 @@ describe("CharacterItemSlots.ts", () => {
 
     const result = await characterItemSlots.addItemOnFirstAvailableSlot(anotherStackableItem, inventoryContainer);
 
-    console.log(result);
-
     console.log("inventoryContainer.slots", inventoryContainer.slots);
+
+    expect(result).toBeTruthy();
   });
 
   afterAll(async () => {

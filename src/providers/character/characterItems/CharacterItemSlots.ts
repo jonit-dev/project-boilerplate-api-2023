@@ -1,5 +1,5 @@
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { OperationStatus } from "@providers/types/ValidationTypes";
 
 import { provide } from "inversify-binding-decorators";
@@ -7,6 +7,39 @@ import { ICharacterItemResult } from "./CharacterItems";
 
 @provide(CharacterItemSlots)
 export class CharacterItemSlots {
+  public async getTotalQty(targetContainer: IItemContainer, itemKey: string): Promise<number> {
+    const allItemsSameKey = await this.getAllItemsFromKey(targetContainer, itemKey);
+
+    let qty = 0;
+    for (const item of allItemsSameKey) {
+      if (item.stackQty) {
+        qty += item.stackQty;
+      } else {
+        qty += 1;
+      }
+    }
+
+    return qty;
+  }
+
+  public async getAllItemsFromKey(targetContainer: IItemContainer, itemKey: string): Promise<IItem[]> {
+    const items: IItem[] = [];
+
+    for (let i = 0; i < targetContainer.slotQty; i++) {
+      const slotItem = targetContainer.slots?.[i] as unknown as IItem;
+
+      if (!slotItem) continue;
+
+      if (slotItem.key.replace(/-\d+$/, "").toString() === itemKey.replace(/-\d+$/, "").toString()) {
+        const dbItem = (await Item.findById(slotItem._id)) as unknown as IItem;
+
+        items.push(dbItem);
+      }
+    }
+
+    return items;
+  }
+
   public async updateItemOnSlot(
     slotIndex: number,
     targetContainer: IItemContainer,
@@ -21,6 +54,14 @@ export class CharacterItemSlots {
 
     targetContainer.markModified("slots");
     await targetContainer.save();
+
+    // remember that we also need to update the item on the database. What we have above is just a reference inside of the container (copy)
+    await Item.updateOne(
+      {
+        _id: slotItem._id,
+      },
+      { $set: { ...payload } }
+    );
   }
 
   public async findItemSlotIndex(targetContainer: IItemContainer, itemId: string): Promise<number | undefined> {
@@ -61,7 +102,7 @@ export class CharacterItemSlots {
 
           if (!slotItem) continue;
 
-          //TODO: Find a better way to do this
+          // TODO: Find a better way to do this
           if (slotItem.key.replace(/-\d+$/, "") === itemKey.replace(/-\d+$/, "")) {
             return slotItem;
           }

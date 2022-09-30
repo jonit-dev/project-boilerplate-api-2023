@@ -2,11 +2,19 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
+import { IUIShowMessage, UIMessageType, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(SocketMessaging)
 export class SocketMessaging {
   constructor(private characterView: CharacterView, private socketAdapter: SocketAdapter) {}
+
+  public sendErrorMessageToCharacter(character: ICharacter, message?: string, type: UIMessageType = "error"): void {
+    this.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+      message: message || "Sorry, something went wrong.",
+      type,
+    });
+  }
 
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
     try {
