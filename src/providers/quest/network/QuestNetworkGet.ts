@@ -109,10 +109,10 @@ export class QuestNetworkGet {
     }
 
     const filteredQuests: IQuest[] = [];
-    for (const q of quests) {
-      const hasRequiredStatus = await q.hasStatus(data.status, character.id);
-      if (hasRequiredStatus) {
-        filteredQuests.push(q as unknown as IQuest);
+    for (const quest of quests) {
+      const parsedQuest = await this.parseQuest(quest, character.id, data.status);
+      if (parsedQuest) {
+        filteredQuests.push(parsedQuest);
       }
     }
 
@@ -186,39 +186,9 @@ export class QuestNetworkGet {
         }
       }
 
-      if (data.status) {
-        const hasRequiredStatus = await quest.hasStatus(data.status, character.id);
-        if (hasRequiredStatus) {
-          const filteredQuest: IQuest = {
-            _id: quest._id,
-            createdAt: quest.updatedAt.toString(),
-            updatedAt: quest.updatedAt.toString(),
-            key: quest.key,
-            npcId: quest.npcId!.toString(),
-            title: quest.title,
-            description: quest.description,
-            rewards: quest.rewards as unknown as IQuestReward[],
-            objectives: objData,
-          };
-          filteredQuest.status = data.status;
-          filteredQuests.push(filteredQuest);
-        }
-      } else {
-        // For a character, quests can have either status InProgress or Completed
-        const isInProgress = await quest.hasStatus(QuestStatus.InProgress, character.id);
-        const questData: IQuest = {
-          _id: quest._id,
-          createdAt: quest.updatedAt.toString(),
-          updatedAt: quest.updatedAt.toString(),
-          key: quest.key,
-          npcId: quest.npcId!.toString(),
-          title: quest.title,
-          description: quest.description,
-          rewards: quest.rewards as unknown as IQuestReward[],
-          objectives: objData,
-        };
-        isInProgress ? (questData.status = QuestStatus.InProgress) : (questData.status = QuestStatus.Completed);
-        filteredQuests.push(questData);
+      const parsedQuest = await this.parseQuest(quest, character.id, data.status, objData);
+      if (parsedQuest) {
+        filteredQuests.push(parsedQuest);
       }
     }
 
@@ -232,5 +202,54 @@ export class QuestNetworkGet {
       message: "I don't have any quests for you right now.",
       type: "info",
     });
+  }
+
+  private async parseQuest(
+    quest: IQuestModel,
+    characterId: string,
+    status: QuestStatus | undefined,
+    objData?: any[]
+  ): Promise<IQuest | undefined> {
+    let response: IQuest | undefined;
+
+    if (status) {
+      const hasRequiredStatus = await quest.hasStatus(status, characterId);
+      if (hasRequiredStatus) {
+        response = {
+          _id: quest._id,
+          createdAt: quest.updatedAt.toString(),
+          updatedAt: quest.updatedAt.toString(),
+          key: quest.key,
+          npcId: quest.npcId!.toString(),
+          title: quest.title,
+          description: quest.description,
+          rewards: quest.rewards as unknown as IQuestReward[],
+          objectives: objData || (quest.objectives as any[]),
+          status,
+        };
+      }
+    } else {
+      response = {
+        _id: quest._id,
+        createdAt: quest.updatedAt.toString(),
+        updatedAt: quest.updatedAt.toString(),
+        key: quest.key,
+        npcId: quest.npcId!.toString(),
+        title: quest.title,
+        description: quest.description,
+        rewards: quest.rewards as unknown as IQuestReward[],
+        objectives: objData || (quest.objectives as any[]),
+      };
+
+      if (await quest.hasStatus(QuestStatus.InProgress, characterId)) {
+        response.status = QuestStatus.InProgress;
+      } else if (await quest.hasStatus(QuestStatus.Pending, characterId)) {
+        response.status = QuestStatus.Pending;
+      } else {
+        response.status = QuestStatus.Completed;
+      }
+    }
+
+    return response;
   }
 }

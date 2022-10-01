@@ -133,6 +133,7 @@ describe("QuestNetworkGet.ts", () => {
 
     expect(inProgressQuests).toBeDefined();
     expect(inProgressQuests!.quests).toHaveLength(2);
+    expect(inProgressQuests!.quests[0].status).toEqual(QuestStatus.InProgress);
 
     // @ts-ignore
     const pendingQuests = await questNetworkGet.getNPCQuests(
