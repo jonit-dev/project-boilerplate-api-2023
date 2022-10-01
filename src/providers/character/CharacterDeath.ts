@@ -67,6 +67,7 @@ export class CharacterDeath {
       ...blueprintData,
       name: `${character.name}'s body`,
       scene: character.scene,
+      texturePath: `${character.textureKey}/death/0.png`,
       x: character.x,
       y: character.y,
     });
