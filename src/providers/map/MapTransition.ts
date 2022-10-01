@@ -61,7 +61,9 @@ export class MapTransition {
   public async teleportCharacter(character: ICharacter, destination: TransitionDestination): Promise<void> {
     try {
       if (character.scene !== destination.map) {
-        throw new Error(`Character Scene: "${character.scene}" and map to teleport: "${destination.map}" mismatch!`);
+        throw new Error(
+          `Character Scene: "${character.scene}" and map to teleport: "${destination.map}" should be the same!`
+        );
       }
 
       // change character map
@@ -78,7 +80,7 @@ export class MapTransition {
 
       // send event to client telling it that a character has been teleported?
       // @ts-ignore
-      this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.TeleportCharacter);
+      this.socketMessaging.sendEventToUser(character.channelId!, "SameMapTeleport", destination);
 
       this.socketMessaging.sendMessageToCloseCharacters<IViewDestroyElementPayload>(
         character,
