@@ -18,10 +18,19 @@ export enum FriendlyNPCsBlueprint {
   SeniorKnight1 = "senior-knight-1",
 }
 
+export enum NeutralNPCsBlueprint {
+  Pig = "pig",
+  Deer = "deer",
+  GiantBrownRabbit = "giant-brown-rabbit",
+  GiantWhiteRabbit = "giant-white-rabbit",
+  GiantGrayRabbit = "giant-gray-rabbit",
+}
+
 export enum HostileNPCsBlueprint {
   Bat = "bat",
   Ghost = "ghost",
   Minotaur = "minotaur",
+  Goblin = "Goblin",
   Orc = "orc",
   OrcWarrior = "orc-warrior",
   OrcBerserker = "orc-berserker",
@@ -42,6 +51,9 @@ export enum HostileNPCsBlueprint {
   TrollBerserker = "troll-berserker",
   ForestTroll = "forest-troll",
   CaveTroll = "cave-troll",
+  BrownBear = "brown-bear",
+  PandaBear = "panda-bear",
+  PolarBear = "polar-bear",
 }
 
 export enum BossesNPCsBlueprint {

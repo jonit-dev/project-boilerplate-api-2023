@@ -1,25 +1,23 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { provide } from "inversify-binding-decorators";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ItemValidation } from "./validation/ItemValidation";
+import { CharacterView } from "@providers/character/CharacterView";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+
 import {
+  CharacterSocketEvents,
   ICharacterItemConsumed,
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
   ItemSocketEvents,
   ItemSubType,
-  IUIShowMessage,
-  UIMessageType,
-  UISocketEvents,
-  CharacterSocketEvents,
 } from "@rpg-engine/shared";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { CharacterView } from "@providers/character/CharacterView";
+import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
 
 @provide(ItemUse)
@@ -46,13 +44,13 @@ export class ItemUse {
     const useItem = (await Item.findById(itemUse.itemId)) as IItem;
 
     if (!useItem) {
-      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not accessible.");
       return false;
     }
 
     const bluePrintItem = itemsBlueprintIndex[useItem.key];
     if (!bluePrintItem || !bluePrintItem.usableEffect) {
-      this.sendCustomErrorMessage(character, "Sorry, this item is not accessible.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not accessible.");
       return false;
     }
 
@@ -143,13 +141,6 @@ export class ItemUse {
     if (character.channelId) {
       this.socketMessaging.sendEventToUser(character.channelId, CharacterSocketEvents.ItemConsumed, payload);
     }
-  }
-
-  private sendCustomErrorMessage(character: ICharacter, message: string, type: UIMessageType = "error"): void {
-    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message,
-      type,
-    });
   }
 
   private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {

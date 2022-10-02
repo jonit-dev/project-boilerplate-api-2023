@@ -5,7 +5,7 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { itemMock, stackableItemMock } from "@providers/unitTests/mock/itemMock";
+import { itemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { Types } from "mongoose";
 import { ItemPickup } from "../ItemPickup";
@@ -15,7 +15,7 @@ describe("ItemPickup.ts", () => {
   let testCharacter: ICharacter;
   let testItem: IItem;
   let inventory: IItem;
-  let sendCustomErrorMessage: jest.SpyInstance;
+  let sendErrorMessageToCharacter: jest.SpyInstance;
   let inventoryItemContainerId: string;
   let characterWeight: CharacterWeight;
 
@@ -43,13 +43,28 @@ describe("ItemPickup.ts", () => {
     await testCharacter.save();
     await testItem.save();
 
-    sendCustomErrorMessage = jest.spyOn(itemPickup, "sendCustomErrorMessage" as any);
+    // @ts-ignore
+    sendErrorMessageToCharacter = jest.spyOn(itemPickup.socketMessaging, "sendErrorMessageToCharacter" as any);
   });
 
-  const pickupItem = async (toContainerId: string, extraProps?: Record<string, unknown>) => {
+  const pickupItem = async (
+    toContainerId: string,
+    extraProps?: Record<string, unknown> | null,
+    newItem?: boolean,
+    isNewItemStackable?: boolean
+  ) => {
+    let itemToBePicked: IItem = testItem;
+    if (newItem) {
+      if (isNewItemStackable) {
+        itemToBePicked = await unitTestHelper.createStackableMockItem();
+      } else {
+        itemToBePicked = await unitTestHelper.createMockItem();
+      }
+    }
+
     const itemAdded = await itemPickup.performItemPickup(
       {
-        itemId: testItem.id,
+        itemId: itemToBePicked.id,
         x: testCharacter.x,
         y: testCharacter.y,
         scene: testCharacter.scene,
@@ -120,7 +135,7 @@ describe("ItemPickup.ts", () => {
     });
 
     expect(pickupHeavyItem).toBeFalsy();
-    expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+    expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
       testCharacter,
       "Sorry, you are already carrying too much weight!"
     );
@@ -140,8 +155,8 @@ describe("ItemPickup.ts", () => {
     const pickup = await pickupItem(smallContainer.id);
     expect(pickup).toBeFalsy();
 
-    expect(sendCustomErrorMessage).toHaveBeenCalled();
-    expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, your inventory is full.");
+    expect(sendErrorMessageToCharacter).toHaveBeenCalled();
+    expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, your container is full.");
   });
 
   it("should not stack an item, if its not stackable", async () => {
@@ -157,10 +172,10 @@ describe("ItemPickup.ts", () => {
     await nonStackContainer.save();
 
     // remember, we already added a stackable item above!
-    const secondAdd = await pickupItem(nonStackContainer.id);
-    const thirdAdd = await pickupItem(nonStackContainer.id);
-
+    const secondAdd = await pickupItem(nonStackContainer.id, null, true, false);
     expect(secondAdd).toBeTruthy();
+
+    const thirdAdd = await pickupItem(nonStackContainer.id, null, true, false);
     expect(thirdAdd).toBeTruthy();
 
     const updatedContainer = await ItemContainer.findById(nonStackContainer.id);
@@ -169,20 +184,17 @@ describe("ItemPickup.ts", () => {
   });
 
   it("should stack an item, if item isStackable", async () => {
-    const stackableItem1 = new Item(stackableItemMock);
-    await stackableItem1.save();
+    const stackableItem1 = await unitTestHelper.createStackableMockItem();
 
-    const stackableItem2 = new Item(stackableItemMock);
-    await stackableItem2.save();
+    const stackableItem2 = await unitTestHelper.createStackableMockItem();
 
-    const stackableItem3 = new Item(stackableItemMock);
-    await stackableItem3.save();
+    const stackableItem3 = await unitTestHelper.createStackableMockItem();
 
     const stackContainer = new ItemContainer({
       id: inventoryItemContainerId,
       parentItem: inventory.id,
       slots: {
-        0: stackableItem1,
+        0: stackableItem1.toJSON({ virtuals: true }),
       },
       slotQty: 1,
     });
@@ -216,7 +228,10 @@ describe("ItemPickup.ts", () => {
       });
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not accessible.");
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+        testCharacter,
+        "Sorry, the item to be picked up was not found."
+      );
     });
 
     it("should throw an error if you try to pickup an item that is not storable", async () => {
@@ -229,7 +244,7 @@ describe("ItemPickup.ts", () => {
         itemId: notStorableItem.id,
       });
       expect(pickup).toBeFalsy();
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, you cannot store this item.");
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, you cannot store this item.");
     });
 
     it("should throw an error if item is too far away", async () => {
@@ -239,7 +254,7 @@ describe("ItemPickup.ts", () => {
       });
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
         testCharacter,
         "Sorry, you are too far away to pick up this item."
       );
@@ -256,7 +271,7 @@ describe("ItemPickup.ts", () => {
       const pickup = await pickupItem(inventoryItemContainerId);
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not yours.");
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not yours.");
     });
 
     it("should throw an error if the user tries to pickup an item and is banned or not online", async () => {
@@ -266,22 +281,12 @@ describe("ItemPickup.ts", () => {
       const pickup = await pickupItem(inventoryItemContainerId);
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, you are banned and can't pick up this item."
-      );
-
       testCharacter.isBanned = false;
       testCharacter.isOnline = false;
       await testCharacter.save();
 
       const pickup2 = await pickupItem(inventoryItemContainerId);
       expect(pickup2).toBeFalsy();
-
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, you must be online to pick up this item."
-      );
     });
 
     it("should throw an error if the user tries to pickup an item, without an inventory", async () => {
@@ -294,9 +299,9 @@ describe("ItemPickup.ts", () => {
         const pickup = await pickupItem(inventoryItemContainerId);
         expect(pickup).toBeFalsy();
 
-        expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+        expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
           testCharacter,
-          "Sorry, you must have a bag or backpack to pick up this item."
+          "Sorry, you need an inventory to pick this item."
         );
       } else {
         throw new Error("Failed to remove character equipment!");
@@ -310,7 +315,7 @@ describe("ItemPickup.ts", () => {
       const pickup = await pickupItem(inventoryItemContainerId);
       expect(pickup).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
         testCharacter,
         "Sorry, you can't pick up items from another map."
       );

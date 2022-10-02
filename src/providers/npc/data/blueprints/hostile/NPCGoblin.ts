@@ -3,75 +3,82 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
-  ArmorsBlueprint,
+  AccessoriesBlueprint,
   AxesBlueprint,
   BootsBlueprint,
-  GlovesBlueprint,
+  FoodsBlueprint,
   HelmetBlueprint,
-  MacesBlueprint,
+  PotionsBlueprint,
   RangedBlueprint,
+  ShieldsBlueprint,
+  SwordBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcOrcMage = {
+export const npcGoblin = {
   ...generateMoveTowardsMovement(),
-  name: "Orc Mage",
-  key: HostileNPCsBlueprint.OrcMage,
-  textureKey: HostileNPCsBlueprint.OrcMage,
+  name: "Goblin",
+  key: HostileNPCsBlueprint.Goblin,
+  textureKey: HostileNPCsBlueprint.Goblin,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Standard,
-  baseHealth: 70,
+  speed: MovementSpeed.Fast,
+  baseHealth: 45,
   healthRandomizerDice: Dice.D12,
-  skillRandomizerDice: Dice.D4,
-  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
+  canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 10,
+    level: 5,
     strength: {
-      level: 10,
+      level: 5,
     },
     dexterity: {
-      level: 7,
+      level: 8,
     },
   },
   fleeOnLowHealth: true,
-  experience: 70 * EXP_RATIO,
+  experience: 40 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: BootsBlueprint.Boots,
-      chance: 30,
+      itemBlueprintKey: SwordBlueprint.ShortSword,
+      chance: 20,
     },
     {
-      itemBlueprintKey: AxesBlueprint.Axe,
-      chance: 30,
+      itemBlueprintKey: FoodsBlueprint.Fish,
+      chance: 10,
     },
+
     {
-      itemBlueprintKey: HelmetBlueprint.StuddedHelmet,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: BootsBlueprint.StuddedBoots,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: GlovesBlueprint.StuddedGloves,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: MacesBlueprint.SpikedClub,
+      itemBlueprintKey: HelmetBlueprint.BrassHelmet,
       chance: 10,
     },
     {
-      itemBlueprintKey: RangedBlueprint.Bow,
+      itemBlueprintKey: ShieldsBlueprint.WoodenShield,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.Bardiche,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.Sandals,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: PotionsBlueprint.LightLifePotion,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: RangedBlueprint.Stone,
+      chance: 30,
+      quantityRange: [5, 15],
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.Rope,
+      chance: 30,
     },
   ],
 } as Partial<INPC>;

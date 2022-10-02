@@ -15,7 +15,7 @@ describe("ItemDrop.ts", () => {
   let testCharacter: ICharacter;
   let testItem: IItem;
   let inventory: IItem;
-  let sendCustomErrorMessage: jest.SpyInstance;
+  let sendErrorMessageToCharacter: jest.SpyInstance;
   let inventoryItemContainerId: string;
   let characterWeight: CharacterWeight;
 
@@ -46,7 +46,8 @@ describe("ItemDrop.ts", () => {
     await testCharacter.save();
     await testItem.save();
 
-    sendCustomErrorMessage = jest.spyOn(itemDrop, "sendCustomErrorMessage" as any);
+    // @ts-ignore
+    sendErrorMessageToCharacter = jest.spyOn(itemDrop.socketMessaging, "sendErrorMessageToCharacter" as any);
   });
 
   const addItemToInventory = async (item: IItem): Promise<IItem> => {
@@ -143,13 +144,29 @@ describe("ItemDrop.ts", () => {
   });
 
   describe("Item drop validation", () => {
+    it("should fail on trying to drop an item to a position that's far away", async () => {
+      const dropFar = await dropItem(inventoryItemContainerId, {
+        toPosition: { x: FromGridX(999), y: FromGridY(999), scene: testCharacter.scene },
+      });
+      expect(dropFar).toBeFalsy();
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+        testCharacter,
+        "Sorry, you're trying to drop this item too far away."
+      );
+
+      const dropClose = await dropItem(inventoryItemContainerId, {
+        toPosition: { x: testCharacter.x, y: testCharacter.y, scene: testCharacter.scene },
+      });
+      expect(dropClose).toBeTruthy();
+    });
+
     it("should throw an error if container is not accessible", async () => {
       const drop = await dropItem(inventoryItemContainerId, {
         itemId: "62b792030c3f470048781135", // inexistent item
       });
       expect(drop).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not accessible.");
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not accessible.");
     });
 
     it("should throw an error if trying to drop an item that don't exist", async () => {
@@ -158,7 +175,7 @@ describe("ItemDrop.ts", () => {
       });
       expect(drop).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not accessible.");
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not accessible.");
     });
 
     it("should throw an error if trying to drop an item that you don't have in your inventory", async () => {
@@ -169,7 +186,7 @@ describe("ItemDrop.ts", () => {
       });
       expect(drop).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
         testCharacter,
         "Sorry, you do not have this item in your inventory."
       );
@@ -182,22 +199,12 @@ describe("ItemDrop.ts", () => {
       const drop = await dropItem(inventoryItemContainerId);
       expect(drop).toBeFalsy();
 
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, you are banned and can't drop this item."
-      );
-
       testCharacter.isBanned = false;
       testCharacter.isOnline = false;
       await testCharacter.save();
 
       const drop2 = await dropItem(inventoryItemContainerId);
       expect(drop2).toBeFalsy();
-
-      expect(sendCustomErrorMessage).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, you must be online to drop this item."
-      );
     });
 
     it("should throw an error if the user tries to drop an item, without an inventory", async () => {
@@ -210,7 +217,7 @@ describe("ItemDrop.ts", () => {
         const drop = await dropItem(inventoryItemContainerId);
         expect(drop).toBeFalsy();
 
-        expect(sendCustomErrorMessage).toHaveBeenCalledWith(
+        expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
           testCharacter,
           "Sorry, you must have a bag or backpack to drop this item."
         );
