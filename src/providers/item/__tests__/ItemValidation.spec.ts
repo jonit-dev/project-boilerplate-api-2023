@@ -1,16 +1,9 @@
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { ItemUse } from "../ItemUse";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { itemMock } from "@providers/unitTests/mock/itemMock";
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { CharacterSocketEvents, ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { UISocketEvents } from "@rpg-engine/shared";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { itemApple } from "../data/blueprints/foods/ItemApple";
-import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
-import { itemLightLifePotion } from "../data/blueprints/potions/ItemLightLifePotion";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ItemValidation } from "../validation/ItemValidation";
 
 describe("ItemValidation.ts", () => {
