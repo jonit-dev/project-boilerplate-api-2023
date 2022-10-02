@@ -18,6 +18,14 @@ export enum FriendlyNPCsBlueprint {
   SeniorKnight1 = "senior-knight-1",
 }
 
+export enum NeutralNPCsBlueprint {
+  Pig = "pig",
+  Deer = "deer",
+  GiantBrownRabbit = "giant-brown-rabbit",
+  GiantWhiteRabbit = "giant-white-rabbit",
+  GiantGrayRabbit = "giant-gray-rabbit",
+}
+
 export enum HostileNPCsBlueprint {
   Bat = "bat",
   Ghost = "ghost",
