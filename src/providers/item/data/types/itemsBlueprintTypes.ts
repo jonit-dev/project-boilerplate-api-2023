@@ -118,6 +118,7 @@ export enum MagicsBlueprint {
 export enum OthersBlueprint {
   Candle = "candle",
   RoyalChalice = "royal-chalice",
+  GoldCoin = "gold-coin",
 }
 
 export enum StaffsBlueprint {
