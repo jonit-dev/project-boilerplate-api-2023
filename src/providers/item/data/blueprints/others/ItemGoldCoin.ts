@@ -13,4 +13,5 @@ export const itemGoldCoin: Partial<IItem> = {
   description: "A pile of gold coins.",
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Ring],
+  maxStackSize: 100,
 };
