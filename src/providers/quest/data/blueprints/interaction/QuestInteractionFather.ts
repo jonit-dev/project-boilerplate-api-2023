@@ -1,5 +1,5 @@
 import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { FriendlyNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { IQuest, QuestType } from "@rpg-engine/shared";
 import { QuestsBlueprint } from "../../questsBlueprintTypes";
 

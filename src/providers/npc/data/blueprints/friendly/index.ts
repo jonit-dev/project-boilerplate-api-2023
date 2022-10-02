@@ -1,4 +1,4 @@
-import { FriendlyNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { npcAgatha } from "./NPCAgatha";
 import { npcAlice } from "./NPCAlice";
 import { npcAnnie } from "./NPCAnnie";

@@ -1,4 +1,4 @@
-import { NeutralNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { NeutralNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { npcDeer } from "./NPCDeer";
 import { npcGiantBrownRabbit } from "./NPCGiantBrownRabbit";
 import { npcGiantGrayRabbit } from "./NPCGiantGrayRabbit";

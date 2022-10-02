@@ -1,4 +1,4 @@
-import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { npcBat } from "./NPCBat";
 import { npcBrownBear } from "./NPCBrownBear";
 import { npcCaveTroll } from "./NPCCaveTroll";

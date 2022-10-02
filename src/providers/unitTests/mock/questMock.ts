@@ -2,7 +2,7 @@ import { IQuest } from "@entities/ModuleQuest/QuestModel";
 import { IQuestObjectiveKill } from "@entities/ModuleQuest/QuestObjectiveModel";
 import { IQuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { AccessoriesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { QuestsBlueprint } from "@providers/quest/data/questsBlueprintTypes";
 import { IQuestObjectiveInteraction } from "@rpg-engine/shared";
 

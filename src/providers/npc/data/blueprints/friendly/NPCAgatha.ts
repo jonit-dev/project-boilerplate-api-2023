@@ -1,5 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { FriendlyNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { CharacterClass, CharacterGender } from "@rpg-engine/shared";
 import { generateStoppedMovement } from "../../abstractions/BaseNeutralNPC";
 
