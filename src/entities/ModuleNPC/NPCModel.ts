@@ -156,6 +156,10 @@ const npcSchema = createLeanSchema(
       default: false,
       required: true,
     }),
+    isTrader: Type.boolean({
+      default: false,
+      required: false,
+    }),
     baseHealth: Type.number({ required: true, default: 100 }),
     healthRandomizerDice: Type.number({ required: true, default: 1 }),
     skillRandomizerDice: Type.number({ required: true, default: 1 }),
