@@ -7,33 +7,33 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveAwayMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcDeer = {
+export const npcWhiteSheep = {
   ...generateMoveAwayMovement(),
-  name: "Deer",
-  key: NeutralNPCsBlueprint.Deer,
-  textureKey: NeutralNPCsBlueprint.Deer,
+  name: "Sheep",
+  key: NeutralNPCsBlueprint.WhiteSheep,
+  textureKey: NeutralNPCsBlueprint.WhiteSheep,
   alignment: NPCAlignment.Neutral,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.ExtraFast,
-  baseHealth: 10,
-  healthRandomizerDice: Dice.D4,
+  speed: MovementSpeed.Standard,
+  baseHealth: 35,
+  healthRandomizerDice: Dice.D6,
   skills: {
-    level: 1,
+    level: 3,
     strength: {
-      level: 1,
-    },
-    dexterity: {
-      level: 1,
-    },
-    resistance: {
       level: 2,
     },
+    dexterity: {
+      level: 2,
+    },
+    resistance: {
+      level: 3,
+    },
   },
-  experience: 10,
+  experience: 22,
   loots: [
     {
-      itemBlueprintKey: FoodsBlueprint.Salmon,
-      chance: 30,
+      itemBlueprintKey: FoodsBlueprint.Bread,
+      chance: 50,
     },
   ],
 } as Partial<INPC>;

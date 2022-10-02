@@ -19,6 +19,10 @@ export enum FriendlyNPCsBlueprint {
 }
 
 export enum NeutralNPCsBlueprint {
+  WhiteSheep = "white-sheep",
+  BlackSheep = "black-sheep",
+  BlackWhiteSheep = "black-white-sheep",
+  BrownSheep = "brown-sheep",
   Pig = "pig",
   Deer = "deer",
   GiantBrownRabbit = "giant-brown-rabbit",

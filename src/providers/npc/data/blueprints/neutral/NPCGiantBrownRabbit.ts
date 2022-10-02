@@ -29,7 +29,7 @@ export const npcGiantBrownRabbit = {
       level: 3,
     },
   },
-  experience: 40,
+  experience: 20,
   loots: [
     {
       itemBlueprintKey: FoodsBlueprint.Apple,
