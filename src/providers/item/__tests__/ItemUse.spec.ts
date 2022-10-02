@@ -5,11 +5,13 @@ import { stackableItemMock } from "@providers/unitTests/mock/itemMock";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { CharacterSocketEvents, ItemSocketEvents } from "@rpg-engine/shared";
+import { CharacterSocketEvents, ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { itemApple } from "../data/blueprints/foods/ItemApple";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { itemLightLifePotion } from "../data/blueprints/potions/ItemLightLifePotion";
+import { BasicCharacterValidation } from "@providers/character/validation/BasicCharacterValidation";
+import { ItemValidation } from "../validation/ItemValidation";
 
 describe("ItemUse.ts", () => {
   let itemUse: ItemUse;
@@ -232,6 +234,62 @@ describe("ItemUse.ts", () => {
 
     const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
     expect(character.health).toBe(testCharacter.health + 20);
+  });
+
+  it("should call character validation", async () => {
+    const characterValidationMock = jest.spyOn(BasicCharacterValidation.prototype, "isCharacterValid");
+    characterValidationMock.mockReturnValue(false);
+
+    let result = await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
+    expect(result).toBeFalsy();
+
+    expect(characterValidationMock).toHaveBeenLastCalledWith(testCharacter);
+
+    characterValidationMock.mockReset();
+    characterValidationMock.mockReturnValue(true);
+
+    result = await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
+    expect(result).toBeTruthy();
+
+    characterValidationMock.mockRestore();
+  });
+
+  it("should call item validation", async () => {
+    const itemValidationMock = jest.spyOn(ItemValidation.prototype, "isItemInCharacterInventory");
+    itemValidationMock.mockReturnValue(Promise.resolve(false));
+
+    let result = await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
+    expect(result).toBeFalsy();
+
+    expect(itemValidationMock).toHaveBeenLastCalledWith(testCharacter, testItem.id);
+
+    itemValidationMock.mockReset();
+    itemValidationMock.mockReturnValue(Promise.resolve(true));
+
+    result = await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
+    expect(result).toBeTruthy();
+
+    itemValidationMock.mockRestore();
+  });
+
+  it("should fail if item does not have usable effect", async () => {
+    const appleUsableEffect: Function = itemApple.usableEffect;
+    itemApple.usableEffect = null;
+
+    const result = await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
+
+    if (typeof appleUsableEffect !== "undefined") {
+      itemApple.usableEffect = appleUsableEffect;
+    }
+
+    expect(result).toBeFalsy();
+
+    expect(sendEventToUser).toBeCalledTimes(1);
+
+    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+      message: "Sorry, this item is not accessible.",
+      type: "error",
+    });
   });
 });
 
