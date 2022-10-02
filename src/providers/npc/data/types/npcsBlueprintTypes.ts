@@ -54,6 +54,7 @@ export enum HostileNPCsBlueprint {
   BrownBear = "brown-bear",
   PandaBear = "panda-bear",
   PolarBear = "polar-bear",
+  WinterWolf = "winter-wolf",
 }
 
 export enum BossesNPCsBlueprint {

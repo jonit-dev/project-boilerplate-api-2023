@@ -25,6 +25,7 @@ import { npcTroll } from "./NPCTroll";
 import { npcTrollBerserker } from "./NPCTrollBerserker";
 import { npcTrollWarrior } from "./NPCTrollWarrior";
 import { npcWildTroll } from "./NPCWildTroll";
+import { npcWinterWolf } from "./NPCWinterWolf";
 import { npcWolf } from "./NPCWolf";
 
 export const hostileNPCs = {
@@ -55,4 +56,5 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.BrownBear]: npcBrownBear,
   [HostileNPCsBlueprint.PandaBear]: npcPandaBear,
   [HostileNPCsBlueprint.PolarBear]: npcPolarBear,
+  [HostileNPCsBlueprint.WinterWolf]: npcWinterWolf,
 };
