@@ -2,43 +2,41 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { FoodsBlueprint, GlovesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcSpider = {
+export const npcBrownBear = {
   ...generateMoveTowardsMovement(),
-  name: "Spider",
-  key: HostileNPCsBlueprint.Spider,
-  textureKey: HostileNPCsBlueprint.Spider,
+  name: "Brown Bear",
+  key: HostileNPCsBlueprint.BrownBear,
+  textureKey: HostileNPCsBlueprint.BrownBear,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
-  baseHealth: 49,
-  healthRandomizerDice: Dice.D4,
+  baseHealth: 80,
+  healthRandomizerDice: Dice.D6,
+  canSwitchToRandomTarget: true,
   skills: {
-    level: 1,
+    level: 8,
     strength: {
-      level: 2,
+      level: 9,
     },
     dexterity: {
-      level: 3,
-    },
-    resistance: {
-      level: 1,
+      level: 6,
     },
   },
   fleeOnLowHealth: true,
-  experience: 5 * EXP_RATIO,
+  experience: 60 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: GlovesBlueprint.LeatherGloves,
-      chance: 10,
+      itemBlueprintKey: FoodsBlueprint.Fish,
+      chance: 30,
     },
     {
-      itemBlueprintKey: FoodsBlueprint.Banana,
+      itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 20,
     },
   ],

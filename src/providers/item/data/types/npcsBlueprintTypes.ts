@@ -22,6 +22,7 @@ export enum HostileNPCsBlueprint {
   Bat = "bat",
   Ghost = "ghost",
   Minotaur = "minotaur",
+  Goblin = "Goblin",
   Orc = "orc",
   OrcWarrior = "orc-warrior",
   OrcBerserker = "orc-berserker",
@@ -42,6 +43,9 @@ export enum HostileNPCsBlueprint {
   TrollBerserker = "troll-berserker",
   ForestTroll = "forest-troll",
   CaveTroll = "cave-troll",
+  BrownBear = "brown-bear",
+  PandaBear = "panda-bear",
+  PolarBear = "polar-bear",
 }
 
 export enum BossesNPCsBlueprint {

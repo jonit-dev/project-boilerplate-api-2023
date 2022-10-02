@@ -1,15 +1,19 @@
 import { npcBat } from "./NPCBat";
+import { npcBrownBear } from "./NPCBrownBear";
 import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
 import { npcForestTroll } from "./NPCForestTroll";
 import { npcGhost } from "./NPCGhost";
 import { npcGhoul } from "./NPCGhoul";
+import { npcGoblin } from "./NPCGoblin";
 import { npcMinotaur } from "./NPCMinotaur";
 import { npcOrc } from "./NPCOrc";
 import { npcOrcBerserker } from "./NPCOrcBerserker";
 import { npcOrcMage } from "./NPCOrcMage";
 import { npcOrcWarrior } from "./NPCOrcWarrior";
+import { npcPandaBear } from "./NPCPandaBear";
+import { npcPolarBear } from "./NPCPolarBear";
 import { npcRat } from "./NPCRat";
 import { npcRedDragon } from "./NPCRedDragon";
 import { npcSkeleton } from "./NPCSkeleton";
@@ -46,4 +50,8 @@ export const hostileNPCs = {
   "troll-berserker": npcTrollBerserker,
   "forest-troll": npcForestTroll,
   "cave-troll": npcCaveTroll,
+  goblin: npcGoblin,
+  "brown-bear": npcBrownBear,
+  "panda-bear": npcPandaBear,
+  "polar-bear": npcPolarBear,
 };
