@@ -31,6 +31,7 @@ export enum NeutralNPCsBlueprint {
 }
 
 export enum HostileNPCsBlueprint {
+  BlackEagle = "black-eagle",
   Bat = "bat",
   Ghost = "ghost",
   Minotaur = "minotaur",
