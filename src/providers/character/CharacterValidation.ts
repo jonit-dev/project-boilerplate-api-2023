@@ -16,12 +16,10 @@ export class CharacterValidation {
     if (!character.isOnline) {
       console.log(`🚫 CharacterValidation: hasBasicValidation failed because ${character.name} is offline!`);
 
-      if (errorMessages?.isOnline) {
-        this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
-          message: errorMessages.isOnline || "You are offline and cannot perform this action!",
-          type: "error",
-        });
-      }
+      this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
+        message: errorMessages?.isOnline || "You are offline and cannot perform this action!",
+        type: "error",
+      });
 
       return false;
     }
@@ -29,12 +27,10 @@ export class CharacterValidation {
     if (!character.isAlive) {
       console.log(`🚫 CharacterValidation: hasBasicValidation failed because ${character.name} is dead!`);
 
-      if (errorMessages?.isAlive) {
-        this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
-          message: errorMessages.isAlive || "You are dead and cannot perform this action!",
-          type: "error",
-        });
-      }
+      this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
+        message: errorMessages?.isAlive || "You are dead and cannot perform this action!",
+        type: "error",
+      });
 
       return false;
     }

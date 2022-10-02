@@ -2,7 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { provide } from "inversify-binding-decorators";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { BasicCharacterValidation } from "@providers/character/validation/BasicCharacterValidation";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ItemValidation } from "./validation/ItemValidation";
 import {
   ICharacterItemConsumed,
@@ -25,7 +25,7 @@ import { ItemUseCycle } from "./ItemUseCycle";
 @provide(ItemUse)
 export class ItemUse {
   constructor(
-    private basicCharacterValidation: BasicCharacterValidation,
+    private characterValidation: CharacterValidation,
     private itemValidation: ItemValidation,
     private socketMessaging: SocketMessaging,
     private equipmentEquip: EquipmentEquip,
@@ -34,7 +34,7 @@ export class ItemUse {
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
-    if (!this.basicCharacterValidation.isCharacterValid(character)) {
+    if (!this.characterValidation.hasBasicValidation(character)) {
       return false;
     }
 

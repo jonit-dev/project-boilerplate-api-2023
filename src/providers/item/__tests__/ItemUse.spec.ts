@@ -10,7 +10,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { itemApple } from "../data/blueprints/foods/ItemApple";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { itemLightLifePotion } from "../data/blueprints/potions/ItemLightLifePotion";
-import { BasicCharacterValidation } from "@providers/character/validation/BasicCharacterValidation";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ItemValidation } from "../validation/ItemValidation";
 
 describe("ItemUse.ts", () => {
@@ -237,7 +237,7 @@ describe("ItemUse.ts", () => {
   });
 
   it("should call character validation", async () => {
-    const characterValidationMock = jest.spyOn(BasicCharacterValidation.prototype, "isCharacterValid");
+    const characterValidationMock = jest.spyOn(CharacterValidation.prototype, "hasBasicValidation");
     characterValidationMock.mockReturnValue(false);
 
     let result = await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
