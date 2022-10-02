@@ -15,7 +15,6 @@ export class CharacterValidation {
 
     if (!character.isAlive) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you are dead.");
-
       return false;
     }
 
