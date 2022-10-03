@@ -11,7 +11,7 @@ import {
   BootsBlueprint,
   ContainersBlueprint,
   DaggersBluePrint,
-  HelmetBlueprint,
+  HelmetsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
@@ -104,7 +104,7 @@ export class CharacterRepository extends CRUD {
     const bag = await this.generateInitialItem(ContainersBlueprint.Bag, ownerId);
     const dagger = await this.generateInitialItem(DaggersBluePrint.Dagger, ownerId);
     const jacket = await this.generateInitialItem(ArmorsBlueprint.Jacket, ownerId);
-    const cap = await this.generateInitialItem(HelmetBlueprint.Cap, ownerId);
+    const cap = await this.generateInitialItem(HelmetsBlueprint.Cap, ownerId);
     const boot = await this.generateInitialItem(BootsBlueprint.Boots, ownerId);
     const rope = await this.generateInitialItem(AccessoriesBlueprint.Rope, ownerId);
 

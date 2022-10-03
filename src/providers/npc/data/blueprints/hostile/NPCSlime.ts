@@ -2,7 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { GlovesBlueprint, HelmetBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { GlovesBlueprint, HelmetsBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -44,7 +44,7 @@ export const npcSlime = {
       chance: 20,
     },
     {
-      itemBlueprintKey: HelmetBlueprint.WingHelmet,
+      itemBlueprintKey: HelmetsBlueprint.WingHelmet,
       chance: 5,
     },
   ],

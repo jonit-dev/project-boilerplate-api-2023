@@ -7,11 +7,11 @@ import {
   AxesBlueprint,
   BootsBlueprint,
   FoodsBlueprint,
-  HelmetBlueprint,
+  HelmetsBlueprint,
   PotionsBlueprint,
   RangedBlueprint,
   ShieldsBlueprint,
-  SwordBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -43,7 +43,7 @@ export const npcGoblin = {
   experience: 40 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: SwordBlueprint.ShortSword,
+      itemBlueprintKey: SwordsBlueprint.ShortSword,
       chance: 20,
     },
     {
@@ -52,7 +52,7 @@ export const npcGoblin = {
     },
 
     {
-      itemBlueprintKey: HelmetBlueprint.BrassHelmet,
+      itemBlueprintKey: HelmetsBlueprint.BrassHelmet,
       chance: 10,
     },
     {

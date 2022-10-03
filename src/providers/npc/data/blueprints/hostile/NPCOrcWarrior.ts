@@ -7,7 +7,7 @@ import {
   AxesBlueprint,
   BootsBlueprint,
   GlovesBlueprint,
-  HelmetBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
   RangedBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -50,7 +50,7 @@ export const npcOrcWarrior = {
       chance: 30,
     },
     {
-      itemBlueprintKey: HelmetBlueprint.StuddedHelmet,
+      itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,
       chance: 15,
     },
     {

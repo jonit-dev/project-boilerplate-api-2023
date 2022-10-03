@@ -5,6 +5,7 @@ import { itemBananaBunch } from "./ItemBananaBunch";
 import { itemBread } from "./ItemBread";
 import { itemCheese } from "./ItemCheese";
 import { itemCheeseSlice } from "./ItemCheeseSlice";
+import { itemChickensMeat } from "./ItemChickensMeat";
 import { itemCookie } from "./ItemCookie";
 import { itemEgg } from "./ItemEgg";
 import { itemFish } from "./ItemFish";
@@ -21,4 +22,5 @@ export const foodsBlueprintIndex = {
   [FoodsBlueprint.Egg]: itemEgg,
   [FoodsBlueprint.Fish]: itemFish,
   [FoodsBlueprint.Salmon]: itemSalmon,
+  [FoodsBlueprint.ChickensMeat]: itemChickensMeat,
 };

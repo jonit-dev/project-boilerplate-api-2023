@@ -7,7 +7,7 @@ import {
   BootsBlueprint,
   RangedBlueprint,
   ShieldsBlueprint,
-  SwordBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -51,7 +51,7 @@ export const npcSkeletonKnight = {
       chance: 30,
     },
     {
-      itemBlueprintKey: SwordBlueprint.DoubleEdgedSword,
+      itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
       chance: 5,
     },
 

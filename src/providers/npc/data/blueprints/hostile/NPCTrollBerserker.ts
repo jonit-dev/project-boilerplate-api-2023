@@ -13,7 +13,7 @@ import {
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
-  HelmetBlueprint,
+  HelmetsBlueprint,
   PotionsBlueprint,
   RangedBlueprint,
   ShieldsBlueprint,
@@ -54,7 +54,7 @@ export const npcTrollBerserker = {
       chance: 15,
     },
     {
-      itemBlueprintKey: HelmetBlueprint.SoldiersHelmet,
+      itemBlueprintKey: HelmetsBlueprint.SoldiersHelmet,
       chance: 30,
     },
     {

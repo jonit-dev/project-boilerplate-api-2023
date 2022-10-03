@@ -1,4 +1,4 @@
-export enum SwordBlueprint {
+export enum SwordsBlueprint {
   ShortSword = "short-sword",
   BasiliskSword = "basilisk-sword",
   DragonsSword = "dragon's-sword",
@@ -10,7 +10,7 @@ export enum SwordBlueprint {
   KnightsSword = "knights-sword",
 }
 
-export enum HelmetBlueprint {
+export enum HelmetsBlueprint {
   WingHelmet = "wing-helmet",
   Cap = "cap",
   StuddedHelmet = "studded-helmet",
@@ -72,6 +72,7 @@ export enum FoodsBlueprint {
   Egg = "egg",
   Fish = "fish",
   Salmon = "salmon",
+  ChickensMeat = "chickens-meat",
 }
 
 export enum SpearsBlueprint {
