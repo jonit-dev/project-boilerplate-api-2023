@@ -73,6 +73,7 @@ export enum FoodsBlueprint {
   Fish = "fish",
   Salmon = "salmon",
   ChickensMeat = "chickens-meat",
+  Mushroom = "mushroom",
 }
 
 export enum SpearsBlueprint {

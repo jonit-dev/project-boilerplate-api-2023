@@ -1721,10 +1721,10 @@
     prettier "^2.2.1"
     typescript "^4.6.4"
 
-"@rpg-engine/soul@^0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/soul/-/soul-0.1.7.tgz#acc5ce8650b2ee4c85b87e98d2d5f2ec7a1fd551"
-  integrity sha512-Yc46vhpeIRNTIn+to9G4ZRdX+Vo75DnfULwjOeVNhEEYnbUjUlXd5a3wykpQv9Oa1UiGSj43sZdZStvzZ1SIEg==
+"@rpg-engine/soul@^0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/soul/-/soul-0.1.9.tgz#28902596635f833a5d44dbeac7edec5f8d763519"
+  integrity sha512-iACHdL2fR/24q9KciizPfHtlZQkRwQvIw0FYZPgc8F8qXZm/czanI+Pg+u+VGQX3i99jM2yEMm5xRhxhXdIFaA==
   dependencies:
     app-root-path "^3.1.0"
     change-case "^4.1.2"
