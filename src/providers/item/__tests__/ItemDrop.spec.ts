@@ -5,7 +5,7 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { FromGridX, FromGridY } from "@rpg-engine/shared";
+import { FromGridX, FromGridY, IItemDrop } from "@rpg-engine/shared";
 import { ItemDrop } from "../ItemDrop";
 import { ItemView } from "../ItemView";
 
@@ -79,7 +79,7 @@ describe("ItemDrop.ts", () => {
         fromContainerId,
         source: "inventory",
         ...extraProps,
-      },
+      } as IItemDrop,
       testCharacter
     );
     return itemDropped;
