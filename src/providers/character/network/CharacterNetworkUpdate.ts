@@ -111,9 +111,9 @@ export class CharacterNetworkUpdate {
             }
 
             const destination = {
-              map: map,
-              gridX: gridX,
-              gridY: gridY,
+              map,
+              gridX,
+              gridY,
             };
 
             // check if we are transitioning to the same map, if so we should only teleport the character
@@ -127,7 +127,7 @@ export class CharacterNetworkUpdate {
           // verify if we're in a non pvp zone. If so, we need to trigger an attack stop event in case player was in a pvp combat
           const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, newX, newY);
           if (nonPVPZone) {
-            await this.mapNonPVPZone.stopCharacterAttack(character);
+            this.mapNonPVPZone.stopCharacterAttack(character);
           }
         }
       }

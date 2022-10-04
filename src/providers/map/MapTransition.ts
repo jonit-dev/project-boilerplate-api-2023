@@ -1,5 +1,4 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   FromGridX,
@@ -20,11 +19,7 @@ type TransitionDestination = {
 
 @provide(MapTransition)
 export class MapTransition {
-  constructor(
-    private mapObjectsLoader: MapObjectsLoader,
-    private socketMessaging: SocketMessaging,
-    private characterView: CharacterView
-  ) {}
+  constructor(private mapObjectsLoader: MapObjectsLoader, private socketMessaging: SocketMessaging) {}
 
   public async changeCharacterScene(character: ICharacter, destination: TransitionDestination): Promise<void> {
     try {
@@ -71,7 +66,6 @@ export class MapTransition {
         { _id: character._id },
         {
           $set: {
-            scene: destination.map,
             x: FromGridX(destination.gridX),
             y: FromGridX(destination.gridY),
           },
@@ -79,8 +73,8 @@ export class MapTransition {
       );
 
       // send event to client telling it that a character has been teleported?
-      // @ts-ignore
-      this.socketMessaging.sendEventToUser(character.channelId!, "SameMapTeleport", destination);
+
+      this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.SameMapTeleport, destination);
 
       this.socketMessaging.sendMessageToCloseCharacters<IViewDestroyElementPayload>(
         character,
