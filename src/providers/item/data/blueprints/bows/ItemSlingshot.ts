@@ -18,6 +18,6 @@ export const itemSlingshot: Partial<IItem> = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 4,
-  requiredAmmoKey: RangedBlueprint.Stone,
+  requiredAmmoKeys: [RangedBlueprint.Stone],
   isTwoHanded: true,
 };

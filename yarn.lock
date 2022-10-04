@@ -1713,9 +1713,9 @@
     picomatch "^2.2.2"
 
 "@rpg-engine/shared@^0.4.55":
-  version "0.4.55"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.4.55.tgz#e20f044d749212dae054f3f8d5640757c0aa0395"
-  integrity sha512-x9A2TgqKNDuwkPWLEZxft+AIA18IVIQ35OcRR/aGC8O9WvjOGXB+h2dVck2Y8lweYlJ8vPzRtcTDk7SbG5d1IQ==
+  version "0.4.58"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.4.58.tgz#55418ed2a03c56411512dd8e7da5613f0ff55808"
+  integrity sha512-dpYIZXbKmO4DU2UcivFiW3g7duh0QYaEZthYhFV3M634ACYHeJK+uFcSSI43dbS5o+hjLXjCt8vLjdzxhYT1VA==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"

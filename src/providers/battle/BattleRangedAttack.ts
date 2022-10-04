@@ -161,11 +161,11 @@ export class BattleRangedAttack {
     // Get ranged attack weapons (bow or spear)
     switch (weapon.subType) {
       case ItemSubType.Ranged:
-        if (!weapon.requiredAmmoKey) {
+        if (!weapon.requiredAmmoKeys || !weapon.requiredAmmoKeys.length) {
           return result;
         }
 
-        result = (await this.getRequiredAmmo(weapon.requiredAmmoKey, equipment)) as IRangedAttackParams;
+        result = (await this.getRequiredAmmo(weapon.requiredAmmoKeys, equipment)) as IRangedAttackParams;
 
         if (!_.isEmpty(result)) {
           result.maxRange = weapon.maxRange || 0;
@@ -181,14 +181,16 @@ export class BattleRangedAttack {
 
   // This function returns the required ammo data if the required ammo is in the equipment's accessory slot
   private async getRequiredAmmo(
-    requiredAmmoKey: string,
+    requiredAmmoKeys: string[],
     equipment: IEquipment
   ): Promise<Partial<IRangedAttackParams> | undefined> {
     // check if character has enough required ammo in accessory slot
     const accessory = await Item.findById(equipment.accessory);
 
-    if (accessory && accessory.key === requiredAmmoKey) {
-      return { location: ItemSlotType.Accessory, id: accessory._id, key: requiredAmmoKey, equipment };
+    for (const ammoKey of requiredAmmoKeys) {
+      if (accessory && accessory.key === ammoKey) {
+        return { location: ItemSlotType.Accessory, id: accessory._id, key: ammoKey, equipment };
+      }
     }
   }
 
