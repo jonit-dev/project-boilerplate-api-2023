@@ -5,6 +5,7 @@ import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
 import { npcForestTroll } from "./NPCForestTroll";
+import { npcFrostSalamander } from "./NPCFrostSalamander";
 import { npcGhost } from "./NPCGhost";
 import { npcGhoul } from "./NPCGhoul";
 import { npcGoblin } from "./NPCGoblin";
@@ -57,4 +58,5 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.PandaBear]: npcPandaBear,
   [HostileNPCsBlueprint.PolarBear]: npcPolarBear,
   [HostileNPCsBlueprint.WinterWolf]: npcWinterWolf,
+  [HostileNPCsBlueprint.FrostSalamander]: npcFrostSalamander,
 };
