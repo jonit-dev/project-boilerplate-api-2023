@@ -5,9 +5,13 @@ import { itemBananaBunch } from "./ItemBananaBunch";
 import { itemBread } from "./ItemBread";
 import { itemCheese } from "./ItemCheese";
 import { itemCheeseSlice } from "./ItemCheeseSlice";
+import { itemChickensMeat } from "./ItemChickensMeat";
 import { itemCookie } from "./ItemCookie";
 import { itemEgg } from "./ItemEgg";
 import { itemFish } from "./ItemFish";
+import { itemMushroom } from "./ItemMushroom";
+import { itemPotato } from "./ItemPotato";
+import { itemRedMeat } from "./ItemRedMeat";
 import { itemSalmon } from "./ItemSalmon";
 
 export const foodsBlueprintIndex = {
@@ -21,4 +25,8 @@ export const foodsBlueprintIndex = {
   [FoodsBlueprint.Egg]: itemEgg,
   [FoodsBlueprint.Fish]: itemFish,
   [FoodsBlueprint.Salmon]: itemSalmon,
+  [FoodsBlueprint.ChickensMeat]: itemChickensMeat,
+  [FoodsBlueprint.Mushroom]: itemMushroom,
+  [FoodsBlueprint.Potato]: itemPotato,
+  [FoodsBlueprint.RedMeat]: itemRedMeat,
 };

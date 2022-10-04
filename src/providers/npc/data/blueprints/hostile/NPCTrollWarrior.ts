@@ -11,7 +11,7 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 import {
   FoodsBlueprint,
   GlovesBlueprint,
-  HelmetBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
   RangedBlueprint,
@@ -52,7 +52,7 @@ export const npcTrollWarrior = {
       chance: 10,
     },
     {
-      itemBlueprintKey: HelmetBlueprint.BrassHelmet,
+      itemBlueprintKey: HelmetsBlueprint.BrassHelmet,
       chance: 20,
     },
     {

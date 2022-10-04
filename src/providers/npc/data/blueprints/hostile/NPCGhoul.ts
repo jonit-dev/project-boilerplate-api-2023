@@ -9,7 +9,7 @@ import {
   PotionsBlueprint,
   RangedBlueprint,
   SpearsBlueprint,
-  SwordBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -61,7 +61,7 @@ export const npcGhoul = {
       chance: 5,
     },
     {
-      itemBlueprintKey: SwordBlueprint.DoubleEdgedSword,
+      itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
       chance: 15,
     },
     {

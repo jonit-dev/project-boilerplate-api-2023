@@ -9,7 +9,7 @@ import {
   LegsBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
-  SwordBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateMoveTowardsMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
 import { BossesNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -44,7 +44,7 @@ export const npcAsterion = {
   experience: 400 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: SwordBlueprint.DragonsSword,
+      itemBlueprintKey: SwordsBlueprint.DragonsSword,
       chance: 100,
     },
     {

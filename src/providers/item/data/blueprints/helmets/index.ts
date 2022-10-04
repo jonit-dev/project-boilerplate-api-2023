@@ -1,4 +1,4 @@
-import { HelmetBlueprint } from "../../types/itemsBlueprintTypes";
+import { HelmetsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemBrassHelmet } from "./ItemBrassHelmet";
 import { itemCap } from "./ItemCap";
 import { itemSoldiersHelmet } from "./ItemSoldiersHelmet";
@@ -7,10 +7,10 @@ import { itemTurban } from "./ItemTurban";
 import { itemWingHelmet } from "./ItemWingHelmet";
 
 export const helmetsBlueprintsIndex = {
-  [HelmetBlueprint.WingHelmet]: itemWingHelmet,
-  [HelmetBlueprint.Cap]: itemCap,
-  [HelmetBlueprint.StuddedHelmet]: itemStuddedHelmet,
-  [HelmetBlueprint.Turban]: itemTurban,
-  [HelmetBlueprint.BrassHelmet]: itemBrassHelmet,
-  [HelmetBlueprint.SoldiersHelmet]: itemSoldiersHelmet,
+  [HelmetsBlueprint.WingHelmet]: itemWingHelmet,
+  [HelmetsBlueprint.Cap]: itemCap,
+  [HelmetsBlueprint.StuddedHelmet]: itemStuddedHelmet,
+  [HelmetsBlueprint.Turban]: itemTurban,
+  [HelmetsBlueprint.BrassHelmet]: itemBrassHelmet,
+  [HelmetsBlueprint.SoldiersHelmet]: itemSoldiersHelmet,
 };
