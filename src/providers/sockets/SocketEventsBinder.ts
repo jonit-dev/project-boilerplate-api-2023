@@ -8,6 +8,7 @@ import { NPCNetwork } from "@providers/npc/network/NPCNetwork";
 import { QuestNetwork } from "@providers/quest/network/QuestNetwork";
 import { SkillNetwork } from "@providers/skill/network/SkillNetwork";
 import { ViewNetwork } from "@providers/view/network/ViewNetwork";
+import { UseWithNetwork } from "@providers/useWith/network/UseWithNetwork";
 import { provide } from "inversify-binding-decorators";
 import { SocketChannel } from "./SocketsTypes";
 
@@ -23,7 +24,8 @@ export class SocketEventsBinder {
     private itemContainerNetwork: ItemContainerNetwork,
     private equipmentNetwork: EquipmentNetwork,
     private skillNetwork: SkillNetwork,
-    private questNetwork: QuestNetwork
+    private questNetwork: QuestNetwork,
+    private useWithNetwork: UseWithNetwork
   ) {}
 
   public bindEvents(channel: SocketChannel): void {
@@ -37,5 +39,6 @@ export class SocketEventsBinder {
     this.equipmentNetwork.onAddEventListeners(channel);
     this.skillNetwork.onAddEventListeners(channel);
     this.questNetwork.onAddEventListeners(channel);
+    this.useWithNetwork.onAddEventListeners(channel);
   }
 }

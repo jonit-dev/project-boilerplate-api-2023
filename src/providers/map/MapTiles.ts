@@ -103,6 +103,33 @@ export class MapTiles {
     return false;
   }
 
+  public getUseWithKey(map: string, gridX: number, gridY: number, mapLayer: MapLayers): string | undefined {
+    const layerName = TiledLayerNames[mapLayer];
+
+    const layer = this.getLayer(map, mapLayer);
+
+    if (!layer) {
+      throw new Error(`Failed to find layer ${layerName}`);
+    }
+
+    const rawTileId = this.getRawTileId(layer, gridX, gridY);
+
+    if (!rawTileId) {
+      return;
+    }
+
+    const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
+
+    if (!targetTileset) {
+      return;
+    }
+
+    if (rawTileId) {
+      const tileId = rawTileId - targetTileset.firstgid;
+      return this.getTileProperty<string>(targetTileset!, tileId!, "usewith_key");
+    }
+  }
+
   public getTileProperty<T>(tileset: ITileset, tileId: number, tileProperty: string): T | undefined {
     const tileInfo = tileset?.tiles?.find((tile) => tile.id === tileId);
 
