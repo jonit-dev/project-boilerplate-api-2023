@@ -20,6 +20,7 @@ describe("BattleRangedAttack.spec.ts", () => {
   let characterEquipment: IEquipment;
 
   let hitTarget: any;
+  let bowItem: IItem;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -48,7 +49,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     // Equip testCharacter with a Bow
     characterEquipment = (await Equipment.findById(testCharacter.equipment).populate("inventory").exec()) as IEquipment;
     const bow = itemsBlueprintIndex[RangedBlueprint.Bow];
-    const bowItem = new Item({ ...bow });
+    bowItem = new Item({ ...bow });
     const res = await bowItem.save();
     characterEquipment!.rightHand = res._id as Types.ObjectId | undefined;
 
@@ -76,7 +77,7 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   it("character carries required ammo in accesory slot", async () => {
-    const arrowId = await equipArrowInAccessorySlot(characterEquipment);
+    const arrowId = await equipAmmoInAccessorySlot(characterEquipment, RangedBlueprint.Arrow);
     // @ts-ignore
     const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(
       await testCharacter.weapon,
@@ -91,7 +92,7 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   it("ammo should be consumed | Accessory slot", async () => {
-    const arrowId = await equipArrowInAccessorySlot(characterEquipment);
+    const arrowId = await equipAmmoInAccessorySlot(characterEquipment, RangedBlueprint.Arrow);
 
     await battleRangedAttack.consumeAmmo(
       {
@@ -137,7 +138,7 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   it("should NOT hit a target if attacker, target is out of range", async () => {
-    await equipArrowInAccessorySlot(characterEquipment);
+    await equipAmmoInAccessorySlot(characterEquipment, RangedBlueprint.Arrow);
 
     const attacker = testCharacter;
     attacker.x = FromGridX(0);
@@ -170,7 +171,7 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   it("should hit a target if attacker has ranged attack type, required ammo and target is in range | ammo in accesory slot", async () => {
-    await equipArrowInAccessorySlot(characterEquipment);
+    await equipAmmoInAccessorySlot(characterEquipment, RangedBlueprint.Arrow);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
     expect(hitTarget).toHaveBeenCalled();
@@ -214,23 +215,42 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(hitTarget).toBeCalledTimes(5);
   });
 
+  it("should hit a target, required ammo and target is in range | with multiple ammo keys", async () => {
+    // Add stone ammo key to bow item
+    // So now can use 2 types of ammo, arrows and stones
+    bowItem.requiredAmmoKeys?.push(RangedBlueprint.Stone);
+    await bowItem.save();
+    await equipAmmoInAccessorySlot(characterEquipment, RangedBlueprint.Arrow);
+    await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
+
+    expect(hitTarget).toBeCalledTimes(6);
+
+    await equipAmmoInAccessorySlot(characterEquipment, RangedBlueprint.Stone);
+    await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
+
+    expect(hitTarget).toBeCalledTimes(7);
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
 
-async function createArrow(): Promise<Types.ObjectId> {
-  const arrow = itemsBlueprintIndex[RangedBlueprint.Arrow];
-  const arrowItem = new Item({ ...arrow });
-  const res = await arrowItem.save();
+async function createItem(itemKey: RangedBlueprint): Promise<Types.ObjectId> {
+  const itemData = itemsBlueprintIndex[itemKey];
+  if (!itemData) {
+    throw new Error(`Unsupported item key '${itemKey}'`);
+  }
+  const newItem = new Item({ ...itemData });
+  const res = await newItem.save();
   return res._id;
 }
 
-async function equipArrowInAccessorySlot(equipment: IEquipment): Promise<Types.ObjectId> {
-  const arrowId = await createArrow();
-  equipment!.accessory = arrowId;
+async function equipAmmoInAccessorySlot(equipment: IEquipment, ammoKey: RangedBlueprint): Promise<Types.ObjectId> {
+  const ammoId = await createItem(ammoKey);
+  equipment!.accessory = ammoId;
   await equipment.save();
-  return arrowId;
+  return ammoId;
 }
 
 async function equipArrowInBackpackSlot(equipment: IEquipment): Promise<Types.ObjectId> {
@@ -249,7 +269,7 @@ async function equipArrowInBackpackSlot(equipment: IEquipment): Promise<Types.Ob
       },
     }
   );
-  const arrowId = await createArrow();
+  const arrowId = await createItem(RangedBlueprint.Arrow);
 
   const slotId = backpackContainer.firstAvailableSlotId;
   backpackContainer.slots[slotId!] = arrowId;

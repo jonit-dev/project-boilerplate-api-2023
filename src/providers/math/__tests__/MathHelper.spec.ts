@@ -119,5 +119,3 @@ describe("MathHelper.ts", () => {
     expect(circundatingPoints2).toEqual(expectedResults.deltaTwo);
   });
 });
-
-// your code here

@@ -61,5 +61,3 @@ describe("NPCMovement.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here

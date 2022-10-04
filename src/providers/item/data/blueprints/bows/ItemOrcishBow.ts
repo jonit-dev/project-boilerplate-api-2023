@@ -18,6 +18,6 @@ export const itemOrcishBow: Partial<IItem> = {
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 10,
-  requiredAmmoKey: RangedBlueprint.Arrow,
+  requiredAmmoKeys: [RangedBlueprint.Arrow],
   isTwoHanded: true,
 };

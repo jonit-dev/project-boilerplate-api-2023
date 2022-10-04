@@ -2,8 +2,14 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { BootsBlueprint, MacesBlueprint, RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import {
+  BootsBlueprint,
+  HammersBlueprint,
+  MacesBlueprint,
+  RangedBlueprint,
+  ShieldsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
@@ -20,25 +26,32 @@ export const npcOrc = {
   healthRandomizerDice: Dice.D6,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 3,
+    level: 7,
     strength: {
-      level: 3,
+      level: 7,
     },
     dexterity: {
-      level: 3,
+      level: 5,
     },
   },
   fleeOnLowHealth: true,
-  experience: 14 * EXP_RATIO,
+  experience: 40 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
     },
-
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.WoodenShield,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.IronHammer,
+      chance: 5,
     },
     {
       itemBlueprintKey: RangedBlueprint.Arrow,

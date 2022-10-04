@@ -70,5 +70,3 @@ describe("MovementHelper.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here

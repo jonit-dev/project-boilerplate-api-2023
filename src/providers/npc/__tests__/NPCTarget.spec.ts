@@ -145,5 +145,3 @@ describe("NPCTarget.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-// your code here

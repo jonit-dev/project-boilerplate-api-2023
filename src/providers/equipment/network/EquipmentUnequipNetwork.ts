@@ -1,5 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -21,11 +20,7 @@ export class EquipmentUnequipNetwork {
 
         const inventory = (await character.inventory) as unknown as IItem;
 
-        const itemContainer = (await ItemContainer.findOne({
-          owner: character.id,
-        })) as unknown as IItemContainer;
-
-        await this.equipmentUnequip.unequip(character, inventory, itemId, item, itemContainer);
+        await this.equipmentUnequip.unequip(character, inventory, itemId, item);
       }
     );
   }

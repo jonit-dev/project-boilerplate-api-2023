@@ -1,15 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
+
+import { CharacterItemStack } from "@providers/character/characterItems/CharacterItemStack";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  IEquipmentAndInventoryUpdatePayload,
-  IItem,
-  ItemSocketEvents,
-  ItemType,
-  IUIShowMessage,
-  UISocketEvents,
-} from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItem, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 import { EquipmentSlots } from "./EquipmentSlots";
@@ -17,108 +14,54 @@ import { EquipmentSlots } from "./EquipmentSlots";
 @provide(EquipmentUnequip)
 export class EquipmentUnequip {
   constructor(
-    private socketMessaging: SocketMessaging,
     private equipmentSlots: EquipmentSlots,
-    private equipmentHelper: EquipmentRangeUpdate
+    private equipmentHelper: EquipmentRangeUpdate,
+    private characterValidation: CharacterValidation,
+    private characterItemStack: CharacterItemStack,
+    private socketMessaging: SocketMessaging,
+    private characterItems: CharacterItems
   ) {}
 
-  public async unequip(
-    character: ICharacter,
-    inventory: IItem,
-    itemId: string,
-    item: IItem,
-    itemContainer: IItemContainer
-  ): Promise<void> {
-    if (!item) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Item not found.",
-        type: "error",
-      });
+  public async unequip(character: ICharacter, inventory: IItem, itemId: string, item: IItem): Promise<void> {
+    const inventoryContainer = (await ItemContainer.findById(
+      inventory.itemContainer as string
+    )) as unknown as IItemContainer;
+
+    const isUnequipValid = this.isUnequipValid(inventory, inventoryContainer, character, item);
+
+    if (!isUnequipValid) {
       return;
     }
 
-    if (item && item.isItemContainer) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "It's not possible to unequip item container!",
-        type: "error",
-      });
-      return;
-    }
-
-    if (!itemContainer) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Container not found.",
-        type: "error",
-      });
-      return;
-    }
-
-    if (character.isBanned) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "User has been banned!",
-        type: "error",
-      });
-      return;
-    }
-
-    if (!character.isAlive) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "User is dead!",
-        type: "error",
-      });
-      return;
-    }
-
-    if (!inventory) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "It's not possible to unequip this item without an inventory!",
-        type: "error",
-      });
-      return;
-    }
-
-    const slots: IItem[] = itemContainer.slots;
+    const slots: IItem[] = inventoryContainer.slots;
 
     let itemAlreadyInSlot = false;
 
     const equipment = await Equipment.findById(character.equipment);
 
     if (!equipment) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Equipment set not found!",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Equipment not found");
+
       return;
     }
 
-    let targetSlot = "";
-    const itemSlotTypes = [
-      "head",
-      "neck",
-      "leftHand",
-      "rightHand",
-      "ring",
-      "legs",
-      "boot",
-      "accessory",
-      "armor",
-      "inventory",
-    ];
-    for (const itemSlotType of itemSlotTypes) {
-      if (equipment[itemSlotType] && equipment[itemSlotType].toString() === itemId) {
-        targetSlot = itemSlotType;
-      }
+    const unequipOriginSlot = this.getUnequipOriginSlot(equipment, itemId);
+
+    if (!unequipOriginSlot) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Target slot not found!");
+
+      return;
     }
 
-    equipment[targetSlot] = undefined;
+    equipment[unequipOriginSlot] = undefined;
 
-    const itemSlot = this.checkIfItemAlreadyInSlot(slots, item, equipment as IEquipment, targetSlot);
+    const itemSlot = this.checkIfItemAlreadyInSlot(slots, item);
 
     if (itemSlot) {
       itemAlreadyInSlot = true;
     }
 
-    this.manageItemContainerSlots(itemAlreadyInSlot, character, itemContainer, itemSlot!, item);
+    this.manageItemContainerSlots(itemAlreadyInSlot, character, inventoryContainer, itemSlot!, item);
 
     await equipment.save();
     const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
@@ -126,14 +69,14 @@ export class EquipmentUnequip {
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,
       inventory: {
-        _id: itemContainer._id,
-        parentItem: itemContainer!.parentItem.toString(),
-        owner: itemContainer?.owner?.toString() || character.name,
-        name: itemContainer?.name,
-        slotQty: itemContainer!.slotQty,
-        slots: itemContainer?.slots,
+        _id: inventoryContainer._id,
+        parentItem: inventoryContainer!.parentItem.toString(),
+        owner: inventoryContainer?.owner?.toString() || character.name,
+        name: inventoryContainer?.name,
+        slotQty: inventoryContainer!.slotQty,
+        slots: inventoryContainer?.slots,
         allowedItemTypes: this.getAllowedItemTypes(),
-        isEmpty: itemContainer!.isEmpty,
+        isEmpty: inventoryContainer!.isEmpty,
       },
     };
 
@@ -142,18 +85,7 @@ export class EquipmentUnequip {
     await this.equipmentHelper.updateCharacterAttackType(character, item);
   }
 
-  private updateItemInventoryCharacter(
-    equipmentAndInventoryUpdate: IEquipmentAndInventoryUpdatePayload,
-    character: ICharacter
-  ): void {
-    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
-      character.channelId!,
-      ItemSocketEvents.EquipmentAndInventoryUpdate,
-      equipmentAndInventoryUpdate
-    );
-  }
-
-  public checkIfItemAlreadyInSlot(slots: IItem[], item: IItem, equipment: IEquipment, targetSlot: string): IItem {
+  public checkIfItemAlreadyInSlot(slots: IItem[], item: IItem): IItem {
     let itemSlot: IItem;
     for (const slot in slots) {
       if (slots[slot] && slots[slot].textureKey === item.textureKey) {
@@ -173,9 +105,10 @@ export class EquipmentUnequip {
     item: IItem
   ): Promise<void> {
     let itemUnequipped = false;
+
     if (itemAlreadyInSlot) {
       if (itemSlot!.stackQty! < itemSlot!.maxStackSize) {
-        itemSlot!.stackQty!++;
+        itemSlot!.stackQty!++; //! THIS IS BUGGED!
         itemUnequipped = true;
       }
     }
@@ -189,10 +122,8 @@ export class EquipmentUnequip {
       }
     }
     if (!itemUnequipped) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "There aren't slots available",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, there aren't slots available");
+
       return;
     }
 
@@ -216,5 +147,90 @@ export class EquipmentUnequip {
     }
 
     return allowedItemTypes;
+  }
+
+  private getUnequipOriginSlot(equipment: IEquipment, itemId: string): string | undefined {
+    const itemSlotTypes = [
+      "head",
+      "neck",
+      "leftHand",
+      "rightHand",
+      "ring",
+      "legs",
+      "boot",
+      "accessory",
+      "armor",
+      "inventory",
+    ];
+
+    for (const itemSlotType of itemSlotTypes) {
+      if (equipment[itemSlotType] && equipment[itemSlotType].toString() === itemId) {
+        return itemSlotType;
+      }
+    }
+  }
+
+  private updateItemInventoryCharacter(
+    equipmentAndInventoryUpdate: IEquipmentAndInventoryUpdatePayload,
+    character: ICharacter
+  ): void {
+    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+      character.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      equipmentAndInventoryUpdate
+    );
+  }
+
+  private isUnequipValid(
+    inventory: IItem,
+    inventoryContainer: IItemContainer,
+    character: ICharacter,
+    item: IItem
+  ): boolean {
+    const userHasItemToUnequip = this.characterItems.hasItem(item._id, character, "equipment");
+
+    if (!userHasItemToUnequip) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "You're trying to unequip an item that you don't own!"
+      );
+
+      return false;
+    }
+
+    if (!item) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Item not found");
+
+      return false;
+    }
+
+    if (item && item.isItemContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "It's not possible to unequip item container!");
+
+      return false;
+    }
+
+    if (!inventoryContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Item container not found");
+
+      return false;
+    }
+
+    const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
+
+    if (!hasBasicValidation) {
+      return false;
+    }
+
+    if (!inventory) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "It's not possible to unequip this item without an inventory!"
+      );
+
+      return false;
+    }
+
+    return true;
   }
 }
