@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { TILE_MAX_REACH_DISTANCE_IN_GRID } from "@providers/constants/TileConstants";
 import { MapTiles } from "@providers/map/MapTiles";
 import { MathHelper } from "@providers/math/MathHelper";
@@ -10,6 +10,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { GRID_WIDTH, IUseWithTile, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { UseWithHelper } from "./UseWithHelper";
 
 @provide(UseWithTile)
 export class UseWithTile {
@@ -17,7 +18,8 @@ export class UseWithTile {
     private socketAuth: SocketAuth,
     private mathHelper: MathHelper,
     private socketMessaging: SocketMessaging,
-    private mapTiles: MapTiles
+    private mapTiles: MapTiles,
+    private useWithHelper: UseWithHelper
   ) {}
 
   public onUseWithTile(channel: SocketChannel): void {
@@ -41,21 +43,7 @@ export class UseWithTile {
    */
   private async validateData(character: ICharacter, data: IUseWithTile): Promise<IItem | undefined> {
     // Check if character is alive and not banned
-    if (!character.isAlive) {
-      throw new Error(`UseWithTile > Character is dead! Character id: ${character.id}`);
-    }
-
-    if (character.isBanned) {
-      throw new Error(`UseWithTile > Character is banned! Character id: ${character.id}`);
-    }
-
-    if (!character.isOnline) {
-      throw new Error(`UseWithTile > Character is offline! Character id: ${character.id}`);
-    }
-
-    if (!data.targetTile) {
-      throw new Error(`UseWithTile > Field 'targetTile' is missing! data: ${JSON.stringify(data)}`);
-    }
+    this.useWithHelper.basicValidations(character, data);
 
     // Check if tile position is at character's reach
     const distanceToTile = this.mathHelper.getDistanceBetweenPoints(
@@ -83,39 +71,23 @@ export class UseWithTile {
       return;
     }
 
-    // Check if character has the originItemId on the equipment or inventory
+    // Check if character has the originItemId and originItemId on the equipment or inventory
     const equipment = await Equipment.findById(character.equipment).populate("inventory").exec();
     if (!equipment) {
       throw new Error(`Equipment not found for character with id ${character.id}`);
     }
-    let foundItem = false;
-    if (equipment.rightHand?.toString() === data.originItemId) {
-      foundItem = true;
-    } else if (equipment.leftHand?.toString() === data.originItemId) {
-      foundItem = true;
-    }
-    if (!foundItem) {
-      const backpack = equipment.inventory as unknown as IItem;
-      const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
-      if (!backpackContainer) {
-        throw new Error(
-          `Inventory ItemContainer not found for character with id ${
-            character.id
-          } and inventory with id ${backpack._id.toString()}`
-        );
-      }
-      foundItem = backpackContainer.itemIds.includes(data.originItemId);
+    const backpack = equipment.inventory as unknown as IItem;
+    const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
+    if (!backpackContainer) {
+      throw new Error(
+        `Inventory ItemContainer not found for character with id ${
+          character.id
+        } and inventory with id ${backpack._id.toString()}`
+      );
     }
 
-    if (!foundItem) {
-      throw new Error("Character does not own the item that wants to use");
-    }
-
-    // Check if the item corresponds to the useWithKey
-    const originItem = await Item.findById(data.originItemId);
-    if (!originItem) {
-      throw new Error(`Item with id ${data.originItemId} does not exist!`);
-    }
+    // Check if the character has the origin and target items
+    const originItem = await this.useWithHelper.getItem(equipment, backpackContainer, data.originItemId);
 
     if (originItem.baseKey !== useWithKey) {
       this.socketMessaging.sendErrorMessageToCharacter(
