@@ -22,7 +22,11 @@ describe("BattleEffects.spec.ts", () => {
     await battleEffects.generateBloodOnGround(testNPC);
 
     const hasBlood = await Item.findOne({
-      $or: [{ texturePath: "red-blood-1.png" }, { texturePath: "red-blood-2.png" }, { texturePath: "red-blood-3.png" }],
+      $or: [
+        { texturePath: "blood-floor/red-blood-1.png" },
+        { texturePath: "blood-floor/red-blood-2.png" },
+        { texturePath: "blood-floor/red-blood-3.png" },
+      ],
       x: testNPC.x,
       y: testNPC.y,
       scene: testNPC.scene,
