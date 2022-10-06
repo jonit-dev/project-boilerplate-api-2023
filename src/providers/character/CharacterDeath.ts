@@ -37,7 +37,7 @@ export class CharacterDeath {
     });
     // communicate all players around that character is dead
 
-    await this.socketMessaging.sendMessageToCloseCharacters<IBattleDeath>(character, BattleSocketEvents.BattleDeath, {
+    await this.socketMessaging.sendEventToCloseCharacters<IBattleDeath>(character, BattleSocketEvents.BattleDeath, {
       id: character.id,
       type: "Character",
     });

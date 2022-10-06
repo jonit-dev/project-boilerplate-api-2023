@@ -32,12 +32,11 @@ export class SocketMessaging {
     }
   }
 
-  public async sendMessageToCloseCharacters<T>(character: ICharacter, eventName: string, data?: T): Promise<void> {
+  public async sendEventToCloseCharacters<T>(character: ICharacter, eventName: string, data?: T): Promise<void> {
     const charactersNearby = await this.characterView.getCharactersInView(character);
 
     if (charactersNearby) {
       for (const character of charactersNearby) {
-        console.log(`📨 Sending ${eventName} to ${character.name} (channel: ${character.channelId})`);
         this.sendEventToUser<T>(character.channelId!, eventName, data || ({} as T));
       }
     }
