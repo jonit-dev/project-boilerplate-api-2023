@@ -230,6 +230,14 @@ export class SkillIncrease {
       message: `You advanced from level ${expData.previousLevel} to level ${expData.level}.`,
       type: "info",
     });
+
+    const payload = {
+      characterId: character.id,
+      eventType: SkillEventType.LevelUp,
+    };
+
+    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, payload);
+    this.socketMessaging.sendMessageToCloseCharacters(character, SkillSocketEvents.SkillGain, payload);
   }
 
   private async warnCharactersAroundAboutExpGains(character: ICharacter, exp: number): Promise<void> {
