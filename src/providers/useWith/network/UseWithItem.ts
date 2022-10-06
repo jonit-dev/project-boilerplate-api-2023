@@ -1,6 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -47,24 +45,9 @@ export class UseWithItem {
       throw new Error(`UseWithTile > Field 'targetItemId' is missing! data: ${JSON.stringify(data)}`);
     }
 
-    // Check if character has the originItemId and originItemId on the equipment or inventory
-    const equipment = await Equipment.findById(character.equipment).populate("inventory").exec();
-    if (!equipment) {
-      throw new Error(`Equipment not found for character with id ${character.id}`);
-    }
-    const backpack = equipment.inventory as unknown as IItem;
-    const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
-    if (!backpackContainer) {
-      throw new Error(
-        `Inventory ItemContainer not found for character with id ${
-          character.id
-        } and inventory with id ${backpack._id.toString()}`
-      );
-    }
-
-    // Check if the character has the origin and target items
-    const originItem = await this.useWithHelper.getItem(equipment, backpackContainer, data.originItemId);
-    const targetItem = await this.useWithHelper.getItem(equipment, backpackContainer, data.targetItemId);
+    // Check if character has the originItem and originItem on the equipment or inventory
+    const originItem = await this.useWithHelper.getItem(character, data.originItemId);
+    const targetItem = await this.useWithHelper.getItem(character, data.targetItemId);
 
     if (!targetItem.useWithEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(

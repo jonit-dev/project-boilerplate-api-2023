@@ -1,14 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { TILE_MAX_REACH_DISTANCE_IN_GRID } from "@providers/constants/TileConstants";
 import { MapTiles } from "@providers/map/MapTiles";
-import { MathHelper } from "@providers/math/MathHelper";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { GRID_WIDTH, IUseWithTile, UseWithSocketEvents } from "@rpg-engine/shared";
+import { IUseWithTile, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { UseWithHelper } from "./UseWithHelper";
 
@@ -16,10 +14,10 @@ import { UseWithHelper } from "./UseWithHelper";
 export class UseWithTile {
   constructor(
     private socketAuth: SocketAuth,
-    private mathHelper: MathHelper,
     private socketMessaging: SocketMessaging,
     private mapTiles: MapTiles,
-    private useWithHelper: UseWithHelper
+    private useWithHelper: UseWithHelper,
+    private movementHelper: MovementHelper
   ) {}
 
   public onUseWithTile(channel: SocketChannel): void {
@@ -46,14 +44,13 @@ export class UseWithTile {
     this.useWithHelper.basicValidations(character, data);
 
     // Check if tile position is at character's reach
-    const distanceToTile = this.mathHelper.getDistanceBetweenPoints(
+    const isUnderRange = this.movementHelper.isUnderRange(
+      character.x,
+      character.y,
       data.targetTile.x,
       data.targetTile.y,
-      character.x,
-      character.y
+      TILE_MAX_REACH_DISTANCE_IN_GRID
     );
-
-    const isUnderRange = distanceToTile <= TILE_MAX_REACH_DISTANCE_IN_GRID * GRID_WIDTH;
     if (!isUnderRange) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Tile out of reach...");
       return;
@@ -71,23 +68,8 @@ export class UseWithTile {
       return;
     }
 
-    // Check if character has the originItemId and originItemId on the equipment or inventory
-    const equipment = await Equipment.findById(character.equipment).populate("inventory").exec();
-    if (!equipment) {
-      throw new Error(`Equipment not found for character with id ${character.id}`);
-    }
-    const backpack = equipment.inventory as unknown as IItem;
-    const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
-    if (!backpackContainer) {
-      throw new Error(
-        `Inventory ItemContainer not found for character with id ${
-          character.id
-        } and inventory with id ${backpack._id.toString()}`
-      );
-    }
-
-    // Check if the character has the origin and target items
-    const originItem = await this.useWithHelper.getItem(equipment, backpackContainer, data.originItemId);
+    // Check if the character has the originItem
+    const originItem = await this.useWithHelper.getItem(character, data.originItemId);
 
     if (originItem.baseKey !== useWithKey) {
       this.socketMessaging.sendErrorMessageToCharacter(
