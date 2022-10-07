@@ -5,7 +5,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { AxesBlueprint, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 
-interface IUseWithTileEffect {
+export interface IUseWithTileEffect {
   (item: IItem, character: ICharacter): Promise<void>;
 }
 
@@ -30,7 +30,7 @@ export const useWithTileBlueprints: IUseWithTileBlueprint = {
     const backpackContainer = (await ItemContainer.findById(backpack.itemContainer)) as unknown as IItemContainer;
 
     const slotId = backpackContainer.firstAvailableSlotId;
-    if (!slotId) {
+    if (slotId === null) {
       // No slots available
       return;
     }

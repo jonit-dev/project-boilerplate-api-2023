@@ -4,7 +4,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { IUseWithItem } from "@rpg-engine/shared";
-import { useWithItemBlueprints } from "../blueprints/UseWithItemBlueprints";
+import { IUseWithItemEffect, useWithItemBlueprints } from "../blueprints/UseWithItemBlueprints";
 import { UseWithItem } from "../network/UseWithItem";
 
 describe("UseWithItem.ts", () => {
@@ -62,10 +62,10 @@ describe("UseWithItem.ts", () => {
     // @ts-ignore
     const response = await useWithItem.validateData(testCharacter, useWithItemData);
     expect(response.originItem.id).toEqual(originItem.id);
-    expect(response.targetItem.id).toEqual(targetItem.id);
+    expect(response.targetItem!.id).toEqual(targetItem.id);
 
-    await response.useWithEffect(response.targetItem, response.originItem, testCharacter);
-    expect(response.targetItem.attack).toEqual(ATTACK_INCREASE);
+    await (response.useWithEffect as IUseWithItemEffect)(response.targetItem!, response.originItem, testCharacter);
+    expect(response.targetItem!.attack).toEqual(ATTACK_INCREASE);
   });
 
   it("should fail validations | item without useWithEffect function defined", async () => {
@@ -76,7 +76,7 @@ describe("UseWithItem.ts", () => {
       throw new Error("This test should fail!");
     } catch (error: any) {
       expect(error.message).toEqual(
-        `targetItem '${targetItem.baseKey}' does not have a useWithEffect function defined`
+        `UseWithItem > targetItem '${targetItem.baseKey}' does not have a useWithEffect function defined`
       );
     }
   });
