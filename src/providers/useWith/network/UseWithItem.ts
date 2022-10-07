@@ -5,11 +5,13 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IUseWithItem, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { useWithItemBlueprints, IUseWithItemEffect } from "../blueprints/UseWithItemBlueprints";
 import { UseWithHelper } from "./UseWithHelper";
 
 interface IValidItemsResponse {
   originItem: IItem;
   targetItem: IItem;
+  useWithEffect: IUseWithItemEffect;
 }
 
 @provide(UseWithItem)
@@ -24,7 +26,10 @@ export class UseWithItem {
     this.socketAuth.authCharacterOn(channel, UseWithSocketEvents.UseWithItem, async (data: IUseWithItem, character) => {
       try {
         // Check if character is alive and not banned
-        await this.validateData(character, data);
+        const { originItem, targetItem, useWithEffect } = await this.validateData(character, data);
+
+        // call the useWithEffect function on target Item
+        await useWithEffect(targetItem, originItem, character);
       } catch (error) {
         console.error(error);
       }
@@ -49,14 +54,16 @@ export class UseWithItem {
     const originItem = await this.useWithHelper.getItem(character, data.originItemId);
     const targetItem = await this.useWithHelper.getItem(character, data.targetItemId);
 
-    if (!targetItem.useWithEffect) {
+    const useWithEffect = useWithItemBlueprints[targetItem.baseKey];
+
+    if (!useWithEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
-        `Item '${targetItem.baseKey}' cannot be used with anything...`
+        `Item '${targetItem.baseKey}' cannot be used with any item...`
       );
       throw new Error(`targetItem '${targetItem.baseKey}' does not have a useWithEffect function defined`);
     }
 
-    return { originItem, targetItem };
+    return { originItem, targetItem, useWithEffect };
   }
 }
