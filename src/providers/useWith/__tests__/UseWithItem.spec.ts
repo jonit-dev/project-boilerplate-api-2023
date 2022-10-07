@@ -47,8 +47,6 @@ describe("UseWithItem.ts", () => {
       }
     };
 
-    await targetItem.save();
-
     useWithItemData = {
       originItemId: originItem.id,
       targetItemId: targetItem.id,
