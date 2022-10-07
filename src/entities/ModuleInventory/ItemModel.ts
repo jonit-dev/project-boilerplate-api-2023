@@ -63,6 +63,7 @@ const itemSchema = createLeanSchema(
       isStackable: boolean;
       fullDescription: string;
       baseKey: string;
+      useWithEffect(targetItemId: string, originItemId: string, character: any): Promise<void>;
     }),
     decayTime: Type.date(),
     maxRange: Type.number(),
