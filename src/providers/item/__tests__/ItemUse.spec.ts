@@ -5,13 +5,14 @@ import { stackableItemMock } from "@providers/unitTests/mock/itemMock";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { CharacterSocketEvents, ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { AnimationEffectKeys, CharacterSocketEvents, ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { itemApple } from "../data/blueprints/foods/ItemApple";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { itemLightLifePotion } from "../data/blueprints/potions/ItemLightLifePotion";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ItemValidation } from "../validation/ItemValidation";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
 
 describe("ItemUse.ts", () => {
   let itemUse: ItemUse;
@@ -23,6 +24,7 @@ describe("ItemUse.ts", () => {
   let sendEventToUser: jest.SpyInstance;
   let itemUsageMock: jest.SpyInstance;
   let equipmentEquip: EquipmentEquip;
+  let animationEventMock: jest.SpyInstance;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -56,6 +58,9 @@ describe("ItemUse.ts", () => {
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
 
+    animationEventMock = jest.spyOn(AnimationEffect.prototype, "sendAnimationEvent");
+    animationEventMock.mockImplementation();
+
     itemUsageMock = jest.spyOn(itemUse as any, "applyItemUsage");
     itemUsageMock.mockImplementation();
   });
@@ -63,6 +68,7 @@ describe("ItemUse.ts", () => {
   afterEach(() => {
     sendEventToUser.mockRestore();
     itemUsageMock.mockRestore();
+    animationEventMock.mockRestore();
     jest.clearAllMocks();
   });
 
@@ -209,6 +215,12 @@ describe("ItemUse.ts", () => {
       });
     }
 
+    expect(animationEventMock).toBeCalledTimes(5);
+
+    const args = animationEventMock.mock.calls[0];
+    expect(args[0].id).toBe(testCharacter.id);
+    expect(args[1]).toBe(AnimationEffectKeys.ItemConsumed);
+
     const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
     expect(character.health).toBe(testCharacter.health + 5);
   });
@@ -231,6 +243,12 @@ describe("ItemUse.ts", () => {
       targetId: testCharacter._id,
       health: testCharacter.health + 20,
     });
+
+    expect(animationEventMock).toBeCalledTimes(1);
+
+    const args = animationEventMock.mock.calls[0];
+    expect(args[0].id).toBe(testCharacter.id);
+    expect(args[1]).toBe(AnimationEffectKeys.ItemConsumed);
 
     const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
     expect(character.health).toBe(testCharacter.health + 20);
