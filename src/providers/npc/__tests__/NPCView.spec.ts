@@ -4,17 +4,20 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { NPCView } from "../NPCView";
+import { NPCWarn } from "../NPCWarn";
 
 describe("NPCView.ts", () => {
   let npcView: NPCView;
   let testNPC: INPC;
   let testCharacter: ICharacter;
   let farAwayCharacter: ICharacter;
+  let npcWarn: NPCWarn;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
 
     npcView = container.get<NPCView>(NPCView);
+    npcWarn = container.get<NPCWarn>(NPCWarn);
   });
 
   beforeEach(async () => {
@@ -90,9 +93,9 @@ describe("NPCView.ts", () => {
     });
 
     // @ts-ignore
-    const spyOnSocketMessaging = jest.spyOn(npcView.socketMessaging, "sendEventToUser");
+    const spyOnSocketMessaging = jest.spyOn(npcWarn.socketMessaging, "sendEventToUser");
 
-    await npcView.warnCharacterAboutNPCsInView(testCharacter);
+    await npcWarn.warnCharacterAboutNPCsInView(testCharacter);
 
     expect(spyOnSocketMessaging).toHaveBeenCalled();
   });

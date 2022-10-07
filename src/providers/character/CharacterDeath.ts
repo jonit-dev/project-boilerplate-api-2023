@@ -37,10 +37,14 @@ export class CharacterDeath {
     });
     // communicate all players around that character is dead
 
-    await this.socketMessaging.sendEventToCloseCharacters<IBattleDeath>(character, BattleSocketEvents.BattleDeath, {
-      id: character.id,
-      type: "Character",
-    });
+    await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
+      character,
+      BattleSocketEvents.BattleDeath,
+      {
+        id: character.id,
+        type: "Character",
+      }
+    );
 
     // generate character's body
     const characterBody = await this.generateCharacterBody(character);

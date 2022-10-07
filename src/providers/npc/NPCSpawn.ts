@@ -4,17 +4,17 @@ import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCTarget } from "./movement/NPCTarget";
-import { NPCManager } from "./NPCManager";
 import { NPCView } from "./NPCView";
+import { NPCWarn } from "./NPCWarn";
 
 @provide(NPCSpawn)
 export class NPCSpawn {
   constructor(
-    private npcManager: NPCManager,
     private npcView: NPCView,
     private characterView: CharacterView,
     private mathHelper: MathHelper,
-    private npcTarget: NPCTarget
+    private npcTarget: NPCTarget,
+    private npcWarn: NPCWarn
   ) {}
 
   public async spawn(npc: INPC): Promise<void> {
@@ -37,7 +37,7 @@ export class NPCSpawn {
     const nearbyCharacters = await this.characterView.getCharactersAroundXYPosition(npc.x, npc.y, npc.scene);
 
     for (const nearbyCharacter of nearbyCharacters) {
-      await this.npcView.warnCharacterAboutNPCsInView(nearbyCharacter);
+      await this.npcWarn.warnCharacterAboutNPCsInView(nearbyCharacter);
     }
   }
 
