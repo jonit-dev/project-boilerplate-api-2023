@@ -3,7 +3,6 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { CharacterView } from "@providers/character/CharacterView";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -39,8 +38,7 @@ export class BattleRangedAttack {
     private socketMessaging: SocketMessaging,
     private equipmentEquip: EquipmentEquip,
     private mathHelper: MathHelper,
-    private movementHelper: MovementHelper,
-    private characterView: CharacterView
+    private movementHelper: MovementHelper
   ) {}
 
   /**
@@ -156,16 +154,32 @@ export class BattleRangedAttack {
       ammoKey: ammo.key || undefined,
     };
 
-    // send ranged attack event to all characters nearby the attacker
-    await this.socketMessaging.sendEventToCloseCharacters(
-      attacker as ICharacter,
-      ItemSocketEvents.RangedAttack,
-      payload
-    );
+    switch (attacker.type) {
+      case "Character":
+        const character = attacker as ICharacter;
+        // send ranged attack event to all characters nearby the attacker
+        await this.socketMessaging.sendEventToCharactersAroundCharacter(
+          character,
+          ItemSocketEvents.RangedAttack,
+          payload
+        );
 
-    // and also to the emitter (attacker)
-    const character = (attacker.type === "Character" ? attacker : target) as ICharacter;
-    this.socketMessaging.sendEventToUser<IRangedAttack>(character.channelId!, ItemSocketEvents.RangedAttack, payload);
+        this.socketMessaging.sendEventToUser<IRangedAttack>(
+          character.channelId!,
+          ItemSocketEvents.RangedAttack,
+          payload
+        );
+        break;
+
+      case "NPC":
+        const npc = attacker as INPC;
+        await this.socketMessaging.sendEventToCharactersAroundNPC(npc, ItemSocketEvents.RangedAttack, {
+          ...payload,
+          ammoKey: npc.ammoKey,
+        });
+
+        break;
+    }
   }
 
   private async getAmmoForRangedAttack(weapon: IItem, equipment: IEquipment): Promise<IRangedAttackParams | undefined> {

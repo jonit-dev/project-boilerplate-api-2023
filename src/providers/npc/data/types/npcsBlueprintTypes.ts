@@ -35,7 +35,7 @@ export enum HostileNPCsBlueprint {
   Bat = "bat",
   Ghost = "ghost",
   Minotaur = "minotaur",
-  Goblin = "Goblin",
+  Goblin = "goblin",
   Orc = "orc",
   OrcWarrior = "orc-warrior",
   OrcBerserker = "orc-berserker",
