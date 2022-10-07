@@ -16,7 +16,7 @@ export class BattleEffects {
       x: target.x,
       y: target.y,
       scene: target.scene,
-      texturePath: `red-blood-${_.random(1, 3)}.png`,
+      texturePath: `blood-floor/red-blood-${_.random(1, 3)}.png`,
       name: `${target.name}'s blood`,
     });
 
