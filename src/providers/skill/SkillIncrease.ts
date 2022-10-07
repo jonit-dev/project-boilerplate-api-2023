@@ -237,7 +237,7 @@ export class SkillIncrease {
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, payload);
-    this.socketMessaging.sendEventToCloseCharacters(character, SkillSocketEvents.SkillGain, payload);
+    this.socketMessaging.sendEventToCharactersAroundCharacter(character, SkillSocketEvents.SkillGain, payload);
   }
 
   private async warnCharactersAroundAboutExpGains(character: ICharacter, exp: number): Promise<void> {
