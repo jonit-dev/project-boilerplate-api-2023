@@ -4,6 +4,7 @@ import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { NPCView } from "@providers/npc/NPCView";
+import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -28,7 +29,8 @@ export class CharacterNetworkCreate {
     private itemView: ItemView,
     private BattleNetworkStopTargeting: BattleNetworkStopTargeting,
     private npcManager: NPCManager,
-    private gridManager: GridManager
+    private gridManager: GridManager,
+    private npcWarn: NPCWarn
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -82,7 +84,7 @@ export class CharacterNetworkCreate {
           return;
         }
 
-        await this.npcView.warnCharacterAboutNPCsInView(character);
+        await this.npcWarn.warnCharacterAboutNPCsInView(character);
 
         await this.npcManager.startNearbyNPCsBehaviorLoop(character);
 

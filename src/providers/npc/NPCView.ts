@@ -1,17 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
-import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import {
-  GRID_HEIGHT,
-  GRID_WIDTH,
-  INPCPositionUpdatePayload,
-  NPCAlignment,
-  NPCSocketEvents,
-  SOCKET_TRANSMISSION_ZONE_WIDTH,
-} from "@rpg-engine/shared";
+import { GRID_HEIGHT, GRID_WIDTH, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
 
@@ -23,11 +14,9 @@ interface IElementWithPosition {
 @provide(NPCView)
 export class NPCView {
   constructor(
-    private socketMessaging: SocketMessaging,
     private playerView: CharacterView,
     private socketTransmissionZone: SocketTransmissionZone,
-    private characterView: CharacterView,
-    private objectHelper: DataStructureHelper
+    private characterView: CharacterView
   ) {}
 
   public async getElementsInNPCView<T extends IElementWithPosition>(
@@ -76,60 +65,6 @@ export class NPCView {
 
   public async getNearestCharacter(npc: INPC): Promise<ICharacter | undefined | null> {
     return await this.characterView.getNearestCharactersFromXYPoint(npc.x, npc.y, npc.scene);
-  }
-
-  public async warnCharacterAboutNPCsInView(character: ICharacter): Promise<void> {
-    const npcsInView = await this.getNPCsInView(character);
-
-    for (const npc of npcsInView) {
-      const npcOnCharView = character.view.npcs[npc.id];
-
-      // if we already have a representation there, just skip!
-      if (npcOnCharView) {
-        const doesServerNPCMatchesClientNPC = this.objectHelper.doesObjectAttrMatches(npcOnCharView, npc, [
-          "id",
-          "scene",
-        ]);
-
-        if (doesServerNPCMatchesClientNPC) {
-          continue;
-        }
-      }
-
-      await this.characterView.addToCharacterView(
-        character,
-        {
-          id: npc.id,
-          x: npc.x,
-          y: npc.y,
-          scene: npc.scene,
-        },
-        "npcs"
-      );
-
-      this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
-        character.channelId!,
-        NPCSocketEvents.NPCPositionUpdate,
-        {
-          id: npc.id,
-          name: npc.name,
-          x: npc.x,
-          y: npc.y,
-          direction: npc.direction,
-          key: npc.key,
-          layer: npc.layer,
-          textureKey: npc.textureKey,
-          scene: npc.scene,
-          speed: npc.speed,
-          alignment: npc.alignment as NPCAlignment,
-          health: npc.health,
-          maxHealth: npc.maxHealth,
-          mana: npc.mana,
-          maxMana: npc.maxMana,
-          hasQuest: await npc.hasQuest,
-        }
-      );
-    }
   }
 
   public async getNPCsInView(character: ICharacter): Promise<INPC[]> {

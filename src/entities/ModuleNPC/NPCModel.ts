@@ -102,6 +102,7 @@ const npcSchema = createLeanSchema(
       default: NPCMovementType.Random,
       enum: TypeHelper.enumToStringArray(NPCMovementType),
     }),
+    ammoKey: Type.string(),
     maxRangeInGridCells: Type.number(),
     maxRangedDistanceInGridCells: Type.number(),
     maxAntiLuringRangeInGridCells: Type.number(),
