@@ -1,14 +1,14 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { OperationStatus } from "@providers/types/ValidationTypes";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
 import { provide } from "inversify-binding-decorators";
-import { ICharacterItemResult } from "./CharacterItems";
 import { CharacterItemSlots } from "./CharacterItemSlots";
 
 @provide(CharacterItemStack)
 export class CharacterItemStack {
-  constructor(private characterItemSlots: CharacterItemSlots) {}
+  constructor(private socketMessaging: SocketMessaging, private characterItemSlots: CharacterItemSlots) {}
 
   // cases to cover:
   // 1: User already has stackable item on its container, and we didn't reach the max stack size. Add to stack.
@@ -16,37 +16,35 @@ export class CharacterItemStack {
   // 3: User doesn't have stackable item on its container. Create a new item.
 
   public async tryAddingItemToStack(
+    character: ICharacter,
     targetContainer: IItemContainer,
     itemToBeAdded: IItem
-  ): Promise<ICharacterItemResult | null> {
+  ): Promise<boolean> {
     // loop through all inventory container slots, checking to see if selectedItem can be stackable
 
     if (!targetContainer.slots) {
-      return {
-        status: OperationStatus.Error,
-        message: "Sorry, there are no slots in your container.",
-      };
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, there are no slots in your container.");
     }
 
     const hasAvailableSlots = await this.characterItemSlots.hasAvailableSlot(targetContainer._id, itemToBeAdded);
 
     if (!hasAvailableSlots) {
-      return {
-        status: OperationStatus.Error,
-        message: "Sorry, there are no available slots in your container.",
-      };
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, there are no available slots in your container."
+      );
     }
 
     const allItemsSameKey = await this.characterItemSlots.getAllItemsFromKey(targetContainer, itemToBeAdded.key);
 
     if (!allItemsSameKey?.length) {
-      return null; // create new item, if there are no items with the same key
+      return false; // create new item, if there are no items with the same key
     }
 
     const areAllItemsSameKeyStackFull = allItemsSameKey.every((item) => item.stackQty === itemToBeAdded.maxStackSize);
 
     if (areAllItemsSameKeyStackFull) {
-      return null; // create new item, because there's nothing to stack!
+      return false; // create new item, because there's nothing to stack!
     }
 
     for (let i = 0; i < targetContainer.slotQty; i++) {
@@ -66,7 +64,7 @@ export class CharacterItemStack {
         if (futureStackQty > itemToBeAdded.maxStackSize) {
           await this.addToStackAndCreateDifference(i, targetContainer, itemToBeAdded, futureStackQty);
 
-          return null; // this means a new item should be created on itemContainer, with the difference quantity!
+          return false; // this means a new item should be created on itemContainer, with the difference quantity!
         }
 
         if (futureStackQty <= itemToBeAdded.maxStackSize) {
@@ -76,13 +74,11 @@ export class CharacterItemStack {
           // since the qty was added to an existing item, we don't need to create a new one.
           await Item.deleteOne({ _id: itemToBeAdded._id });
 
-          return {
-            status: OperationStatus.Success,
-          };
+          return true;
         }
       }
     }
-    return null;
+    return false;
   }
 
   private async addToExistingStack(

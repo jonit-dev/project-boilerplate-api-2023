@@ -286,9 +286,11 @@ describe("CharacterItemSlots.ts", () => {
       maxStackSize: 10,
     });
 
-    const result = await characterItemSlots.addItemOnFirstAvailableSlot(anotherStackableItem, inventoryContainer);
-
-    console.log("inventoryContainer.slots", inventoryContainer.slots);
+    const result = await characterItemSlots.addItemOnFirstAvailableSlot(
+      testCharacter,
+      anotherStackableItem,
+      inventoryContainer
+    );
 
     expect(result).toBeTruthy();
   });

@@ -1,12 +1,14 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { OperationStatus } from "@providers/types/ValidationTypes";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
 import { provide } from "inversify-binding-decorators";
-import { ICharacterItemResult } from "./CharacterItems";
 
 @provide(CharacterItemSlots)
 export class CharacterItemSlots {
+  constructor(private socketMessaging: SocketMessaging) {}
+
   public async getTotalQty(targetContainer: IItemContainer, itemKey: string): Promise<number> {
     const allItemsSameKey = await this.getAllItemsFromKey(targetContainer, itemKey);
 
@@ -234,25 +236,22 @@ export class CharacterItemSlots {
   }
 
   public async addItemOnFirstAvailableSlot(
+    character: ICharacter,
     selectedItem: IItem,
     targetContainer: IItemContainer
-  ): Promise<ICharacterItemResult | undefined> {
+  ): Promise<boolean> {
     const hasAvailableSlot = await this.hasAvailableSlot(targetContainer._id, selectedItem);
 
     if (!hasAvailableSlot) {
-      return {
-        status: OperationStatus.Error,
-        message: "Sorry, your inventory is full.",
-      };
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your inventory is full.");
+      return false;
     }
 
     const firstAvailableSlotIndex = await this.getFirstAvailableSlotIndex(targetContainer, selectedItem);
 
     if (firstAvailableSlotIndex === null) {
-      return {
-        status: OperationStatus.Error,
-        message: "Sorry, your inventory is full.",
-      };
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your inventory is full.");
+      return false;
     }
 
     if (firstAvailableSlotIndex >= 0) {
@@ -269,9 +268,9 @@ export class CharacterItemSlots {
         }
       );
 
-      return {
-        status: OperationStatus.Success,
-      };
+      return true;
     }
+
+    return false;
   }
 }

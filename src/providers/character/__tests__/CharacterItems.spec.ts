@@ -83,11 +83,9 @@ describe("CharacterItems.ts", () => {
     const itemPickedUp = await pickupItem(inventoryItemContainerId);
     expect(itemPickedUp).toBeTruthy();
 
-    const result = await characterItems.deleteItem(testItem.id, testCharacter, "inventory");
+    const result = await characterItems.deleteItemFromContainer(testItem.id, testCharacter, "inventory");
 
-    expect(result).toEqual({
-      status: "success",
-    });
+    expect(result).toBeTruthy();
   });
 
   it("should properly remove an item from the equipment", async () => {
@@ -96,11 +94,9 @@ describe("CharacterItems.ts", () => {
     // try to equip the test item
     await equipmentEquip.equip(testCharacter, testItem.id, inventoryItemContainerId);
 
-    const result = await characterItems.deleteItem(testItem.id, testCharacter, "equipment");
+    const result = await characterItems.deleteItemFromContainer(testItem.id, testCharacter, "equipment");
 
-    expect(result).toEqual({
-      status: "success",
-    });
+    expect(result).toBeTruthy();
   });
 
   afterAll(async () => {
