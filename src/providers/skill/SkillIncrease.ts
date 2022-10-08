@@ -6,7 +6,8 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { AnimationEffectKeys, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import {
   ISkillDetails,
@@ -65,7 +66,8 @@ export class SkillIncrease {
   constructor(
     private skillCalculator: SkillCalculator,
     private socketMessaging: SocketMessaging,
-    private characterView: CharacterView
+    private characterView: CharacterView,
+    private animationEffect: AnimationEffect
   ) {}
 
   /**
@@ -337,5 +339,7 @@ export class SkillIncrease {
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill: skills,
     });
+
+    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.SkillLevelUp);
   }
 }
