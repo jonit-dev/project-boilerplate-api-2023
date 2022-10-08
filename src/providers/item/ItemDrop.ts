@@ -7,7 +7,6 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { OperationStatus } from "@providers/types/ValidationTypes";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IItem,
@@ -152,11 +151,9 @@ export class ItemDrop {
       return false;
     }
 
-    const { status, message } = await this.characterItems.deleteItem(item._id, character, "equipment");
+    const wasItemDeleted = await this.characterItems.deleteItemFromContainer(item._id, character, "equipment");
 
-    if (status === OperationStatus.Error) {
-      if (message) this.socketMessaging.sendErrorMessageToCharacter(character, message);
-
+    if (!wasItemDeleted) {
       return false;
     }
 
@@ -181,11 +178,9 @@ export class ItemDrop {
       return false;
     }
 
-    const { status, message } = await this.characterItems.deleteItem(item._id, character, "inventory");
+    const wasItemDeleted = await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
 
-    if (status === OperationStatus.Error) {
-      if (message) this.socketMessaging.sendErrorMessageToCharacter(character, message);
-
+    if (!wasItemDeleted) {
       return false;
     }
 

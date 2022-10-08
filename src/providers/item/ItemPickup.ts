@@ -2,14 +2,12 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { OperationStatus } from "@providers/types/ValidationTypes";
 import { IEquipmentAndInventoryUpdatePayload, IItemPickup, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemView } from "./ItemView";
@@ -20,7 +18,6 @@ export class ItemPickup {
     private movementHelper: MovementHelper,
     private characterWeight: CharacterWeight,
     private itemView: ItemView,
-    private characterItemContainer: CharacterItemContainer,
     private characterValidation: CharacterValidation,
     private characterItems: CharacterItems,
     private characterItemSlots: CharacterItemSlots
@@ -47,15 +44,14 @@ export class ItemPickup {
     itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
     await itemToBePicked.save();
 
-    const { status, message } = await this.characterItemContainer.addItemToContainer(
+    const addToContainer = await this.characterItems.addItem(
       itemToBePicked,
       character,
       itemPickupData.toContainerId,
       isEquipment
     );
 
-    if (status === OperationStatus.Error) {
-      if (message) this.socketMessaging.sendErrorMessageToCharacter(character, message);
+    if (!addToContainer) {
       return false;
     }
 
