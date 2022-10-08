@@ -1,30 +1,30 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
-import { OperationStatus } from "@providers/types/ValidationTypes";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ICharacterItemResult } from "./CharacterItems";
 
 @provide(CharacterItemInventory)
 export class CharacterItemInventory {
-  public async deleteItemFromInventory(itemId: string, character: ICharacter): Promise<ICharacterItemResult> {
+  constructor(private socketMessaging: SocketMessaging) {}
+
+  public async deleteItemFromInventory(itemId: string, character: ICharacter): Promise<boolean> {
     const doesCharacterHaveItemInInventory = await this.checkItemInInventory(itemId, character);
 
     if (!doesCharacterHaveItemInInventory) {
-      return {
-        status: OperationStatus.Error,
-        message: "Oops! The character does not have the item to be deleted.",
-      };
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Oops! The character does not have the item to be deleted."
+      );
+      return false;
     }
 
     const item = await Item.findById(itemId);
 
     if (!item) {
-      return {
-        status: OperationStatus.Error,
-        message: "Oops! The item to be deleted from the inventory was not found.",
-      };
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The item to be deleted was not found.");
+      return false;
     }
 
     return await this.removeItemFromInventory(item._id, character);
@@ -48,32 +48,26 @@ export class CharacterItemInventory {
     return !!inventoryItemIds.find((id) => String(id) === String(itemId));
   }
 
-  private async removeItemFromInventory(itemId: string, character: ICharacter): Promise<ICharacterItemResult> {
+  private async removeItemFromInventory(itemId: string, character: ICharacter): Promise<boolean> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
 
     if (!item) {
-      return {
-        status: OperationStatus.Error,
-        message: "Oops! The item to be deleted was not found.",
-      };
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The item to be removed was not found.");
+      return false;
     }
 
     const inventory = (await character.inventory) as unknown as IItem;
 
     if (!inventory) {
-      return {
-        status: OperationStatus.Error,
-        message: "Oops! The character does not have an inventory.",
-      };
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The character does not have an inventory.");
+      return false;
     }
 
     const inventoryItemContainer = await ItemContainer.findById(inventory.itemContainer);
 
     if (!inventoryItemContainer) {
-      return {
-        status: OperationStatus.Error,
-        message: "Oops! The character does not have an inventory.",
-      };
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The character does not have an inventory.");
+      return false;
     }
 
     for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
@@ -97,15 +91,15 @@ export class CharacterItemInventory {
           }
         );
 
-        return {
-          status: OperationStatus.Success,
-        };
+        return true;
       }
     }
 
-    return {
-      status: OperationStatus.Error,
-      message: "Oops! Something went wrong while trying to remove the item from the inventory.",
-    };
+    this.socketMessaging.sendErrorMessageToCharacter(
+      character,
+      "Oops! Something went wrong while trying to remove the item from the inventory."
+    );
+
+    return false;
   }
 }

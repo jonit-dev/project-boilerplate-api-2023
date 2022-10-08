@@ -9,7 +9,6 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { OperationStatus } from "@providers/types/ValidationTypes";
 import { IEquipmentAndInventoryUpdatePayload, IItemPickup, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemView } from "./ItemView";
@@ -47,15 +46,14 @@ export class ItemPickup {
     itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
     await itemToBePicked.save();
 
-    const { status, message } = await this.characterItemContainer.addItemToContainer(
+    const addToContainer = await this.characterItemContainer.addItemToContainer(
       itemToBePicked,
       character,
       itemPickupData.toContainerId,
       isEquipment
     );
 
-    if (status === OperationStatus.Error) {
-      if (message) this.socketMessaging.sendErrorMessageToCharacter(character, message);
+    if (!addToContainer) {
       return false;
     }
 

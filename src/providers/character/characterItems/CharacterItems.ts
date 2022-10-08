@@ -1,13 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { OperationStatus } from "@providers/types/ValidationTypes";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemEquipment } from "./CharacterItemEquipment";
 import { CharacterItemInventory } from "./CharacterItemInventory";
-
-export interface ICharacterItemResult {
-  status: OperationStatus;
-  message?: string;
-}
 
 @provide(CharacterItems)
 export class CharacterItems {
@@ -21,7 +15,7 @@ export class CharacterItems {
     itemId: string,
     character: ICharacter,
     container: "inventory" | "equipment" | "both"
-  ): Promise<ICharacterItemResult> {
+  ): Promise<boolean> {
     switch (container) {
       case "inventory":
         return await this.characterItemInventory.deleteItemFromInventory(itemId, character);
@@ -33,10 +27,7 @@ export class CharacterItems {
           (await this.characterItemEquipment.deleteItemFromEquipment(itemId, character))
         );
       default:
-        return {
-          status: OperationStatus.Error,
-          message: `"Something went wrong while trying to delete your ${container} item."`,
-        };
+        return false;
     }
   }
 

@@ -85,9 +85,7 @@ describe("CharacterItems.ts", () => {
 
     const result = await characterItems.deleteItem(testItem.id, testCharacter, "inventory");
 
-    expect(result).toEqual({
-      status: "success",
-    });
+    expect(result).toBeTruthy();
   });
 
   it("should properly remove an item from the equipment", async () => {
