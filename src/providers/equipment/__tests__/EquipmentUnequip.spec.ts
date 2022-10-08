@@ -3,12 +3,17 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemSocketEvents } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { EquipmentRangeUpdate } from "../EquipmentRangeUpdate";
 import { EquipmentSlots } from "../EquipmentSlots";
 
 import { EquipmentUnequip } from "../EquipmentUnequip";
 
 describe("EquipmentUnequip.spec.ts", () => {
+  let equipmentRangeUpdate: EquipmentRangeUpdate;
   let equipmentUnequip: EquipmentUnequip;
   let equipment: IEquipment;
   let testItem: IItem;
@@ -16,7 +21,6 @@ describe("EquipmentUnequip.spec.ts", () => {
   let testCharacter: ICharacter;
 
   let inventory: IItem;
-
   let equipmentSlots: EquipmentSlots;
 
   let socketMessaging;
@@ -25,6 +29,7 @@ describe("EquipmentUnequip.spec.ts", () => {
     await unitTestHelper.beforeAllJestHook();
     equipmentUnequip = container.get<EquipmentUnequip>(EquipmentUnequip);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
+    equipmentRangeUpdate = container.get<EquipmentRangeUpdate>(EquipmentRangeUpdate);
   });
 
   beforeEach(async () => {
@@ -76,7 +81,25 @@ describe("EquipmentUnequip.spec.ts", () => {
     );
   });
 
-  it("Should update the character attack type, when unequipping", () => {});
+  it("Should update the character attack type, when unequipping", async () => {
+    const bowBlueprint = itemsBlueprintIndex[RangedBlueprint.Bow];
+
+    const rangedItem = await unitTestHelper.createMockItem({
+      ...bowBlueprint,
+    });
+
+    equipment.leftHand = rangedItem._id;
+    await equipment.save();
+
+    await equipmentRangeUpdate.updateCharacterAttackType(testCharacter, rangedItem);
+
+    expect(testCharacter.attackType).toBe(EntityAttackType.Ranged);
+
+    const unequip = await equipmentUnequip.unequip(testCharacter, inventory, rangedItem);
+    expect(unequip).toBeTruthy();
+
+    expect(testCharacter.attackType).toBe(EntityAttackType.Melee);
+  });
 
   describe("Validation cases", () => {});
 
