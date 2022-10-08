@@ -1,12 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 
-import { CharacterItemStack } from "@providers/character/characterItems/CharacterItemStack";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentAndInventoryUpdatePayload, IItem, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 import { EquipmentSlots } from "./EquipmentSlots";
@@ -17,14 +17,13 @@ export class EquipmentUnequip {
     private equipmentSlots: EquipmentSlots,
     private equipmentHelper: EquipmentRangeUpdate,
     private characterValidation: CharacterValidation,
-    private characterItemStack: CharacterItemStack,
     private socketMessaging: SocketMessaging,
     private characterItems: CharacterItems
   ) {}
 
   public async unequip(character: ICharacter, inventory: IItem, itemId: string, item: IItem): Promise<void> {
     const inventoryContainer = (await ItemContainer.findById(
-      inventory.itemContainer as string
+      inventory.itemContainer as unknown as string
     )) as unknown as IItemContainer;
 
     const isUnequipValid = this.isUnequipValid(inventory, inventoryContainer, character, item);
