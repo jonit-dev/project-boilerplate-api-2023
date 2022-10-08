@@ -151,7 +151,7 @@ export class ItemDrop {
       return false;
     }
 
-    const wasItemDeleted = await this.characterItems.deleteItem(item._id, character, "equipment");
+    const wasItemDeleted = await this.characterItems.deleteItemFromContainer(item._id, character, "equipment");
 
     if (!wasItemDeleted) {
       return false;
@@ -178,7 +178,7 @@ export class ItemDrop {
       return false;
     }
 
-    const wasItemDeleted = await this.characterItems.deleteItem(item._id, character, "inventory");
+    const wasItemDeleted = await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
 
     if (!wasItemDeleted) {
       return false;

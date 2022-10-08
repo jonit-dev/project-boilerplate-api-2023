@@ -2,7 +2,6 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -19,7 +18,6 @@ export class ItemPickup {
     private movementHelper: MovementHelper,
     private characterWeight: CharacterWeight,
     private itemView: ItemView,
-    private characterItemContainer: CharacterItemContainer,
     private characterValidation: CharacterValidation,
     private characterItems: CharacterItems,
     private characterItemSlots: CharacterItemSlots
@@ -46,7 +44,7 @@ export class ItemPickup {
     itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
     await itemToBePicked.save();
 
-    const addToContainer = await this.characterItemContainer.addItemToContainer(
+    const addToContainer = await this.characterItems.addItem(
       itemToBePicked,
       character,
       itemPickupData.toContainerId,

@@ -292,8 +292,6 @@ describe("CharacterItemSlots.ts", () => {
       inventoryContainer
     );
 
-    console.log("inventoryContainer.slots", inventoryContainer.slots);
-
     expect(result).toBeTruthy();
   });
 
