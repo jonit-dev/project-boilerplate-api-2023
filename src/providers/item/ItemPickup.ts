@@ -44,7 +44,7 @@ export class ItemPickup {
     itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
     await itemToBePicked.save();
 
-    const addToContainer = await this.characterItems.addItem(
+    const addToContainer = await this.characterItems.addItemToContainer(
       itemToBePicked,
       character,
       itemPickupData.toContainerId,

@@ -1,12 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { OperationStatus } from "@providers/types/ValidationTypes";
+import { ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 import { EquipmentSlots } from "./EquipmentSlots";
@@ -19,52 +19,64 @@ export class EquipmentUnequip {
     private characterValidation: CharacterValidation,
     private socketMessaging: SocketMessaging,
     private characterItems: CharacterItems,
-    private characterItemSlots: CharacterItemSlots,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemSlots: CharacterItemSlots
   ) {}
 
-  public async unequip(character: ICharacter, inventory: IItem, item: IItem): Promise<void> {
+  public async unequip(character: ICharacter, inventory: IItem, item: IItem): Promise<boolean> {
     const inventoryContainerId = inventory.itemContainer as unknown as string;
 
     if (!inventoryContainerId) {
       throw new Error("Inventory container id is not defined.");
     }
 
+    if (!character.equipment) {
+      this.socketMessaging.sendErrorMessageToCharacter(character);
+      return false;
+    }
+
     const canUnequip = await this.isUnequipValid(character, item, inventoryContainerId);
 
     if (!canUnequip) {
-      return;
+      return false;
     }
 
     //   add it to the inventory
 
-    const addItemToInventory = await this.characterItemContainer.addItemToContainer(
-      item,
-      character,
-      inventoryContainerId
-    );
+    const addItemToInventory = await this.characterItems.addItemToContainer(item, character, inventoryContainerId);
 
-    if (!addItemToInventory || addItemToInventory.status === OperationStatus.Error) {
-      console.log(addItemToInventory.message);
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        addItemToInventory.message || "Sorry, failed to add item to inventory."
-      );
+    if (!addItemToInventory) {
+      return false;
     }
 
     // then remove item from equipment slot
 
-    const deleteItemFromEquipment = await this.characterItems.deleteItem(item._id, character, "equipment");
+    const deletedItemFromEquipment = await this.characterItems.deleteItemFromContainer(
+      item._id,
+      character,
+      "equipment"
+    );
 
-    if (!deleteItemFromEquipment || deleteItemFromEquipment.status === OperationStatus.Error) {
-      console.log(deleteItemFromEquipment.message);
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        deleteItemFromEquipment.message || "Sorry, failed to remove item from equipment."
-      );
+    if (!deletedItemFromEquipment) {
+      // if we couldn't remove the item from the equipment, we need to remove it from the inventory to avoid a duplicate item
+      await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
+
+      return false;
     }
 
     // send payload event to the client, informing about the change
+
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+
+    const inventoryContainer = await ItemContainer.findById(inventoryContainerId);
+
+    this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.EquipmentAndInventoryUpdate, {
+      equipment: equipmentSlots,
+      inventory: inventoryContainer,
+    });
+
+    await this.equipmentHelper.updateCharacterAttackType(character, item);
+
+    return true;
   }
 
   private async isUnequipValid(character: ICharacter, item: IItem, inventoryContainerId: string): Promise<boolean> {
@@ -88,6 +100,11 @@ export class EquipmentUnequip {
 
     if (!hasSlotsAvailable) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your inventory is full.");
+      return false;
+    }
+
+    if (!item) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry! Item not found.");
       return false;
     }
 

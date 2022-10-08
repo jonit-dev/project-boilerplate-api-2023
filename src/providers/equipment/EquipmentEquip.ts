@@ -137,7 +137,7 @@ export class EquipmentEquip {
 
       this.updateItemInventoryCharacter(payloadUpdate, character);
 
-      await this.equipmentHelper.updateCharacterAttackType(character, item);
+      await this.equipmentHelper.updateCharacterAttackType(character, item as any);
     }
   }
 
