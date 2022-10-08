@@ -187,7 +187,7 @@ npcSchema.virtual("type").get(function (this: INPC) {
 
 npcSchema.virtual("xpPerDamage").get(function (this: INPC) {
   // initial health = 100, xpPerDamage = experience / initial health
-  return this.experience ? this.experience / 100 : 0;
+  return this.experience ? this.experience / this.maxHealth : 0;
 });
 
 npcSchema.virtual("hasQuest").get(async function (this: INPC) {
