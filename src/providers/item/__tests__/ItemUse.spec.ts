@@ -219,7 +219,7 @@ describe("ItemUse.ts", () => {
 
     const args = animationEventMock.mock.calls[0];
     expect(args[0].id).toBe(testCharacter.id);
-    expect(args[1]).toBe(AnimationEffectKeys.ItemConsumed);
+    expect(args[1]).toBe(AnimationEffectKeys.LifeHeal);
 
     const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
     expect(character.health).toBe(testCharacter.health + 5);
@@ -248,7 +248,7 @@ describe("ItemUse.ts", () => {
 
     const args = animationEventMock.mock.calls[0];
     expect(args[0].id).toBe(testCharacter.id);
-    expect(args[1]).toBe(AnimationEffectKeys.ItemConsumed);
+    expect(args[1]).toBe(AnimationEffectKeys.LifeHeal);
 
     const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
     expect(character.health).toBe(testCharacter.health + 20);
