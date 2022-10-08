@@ -10,6 +10,7 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
 import {
+  AnimationEffectKeys,
   CharacterSocketEvents,
   ICharacterItemConsumed,
   IEquipmentAndInventoryUpdatePayload,
@@ -19,6 +20,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -28,7 +30,8 @@ export class ItemUse {
     private socketMessaging: SocketMessaging,
     private equipmentEquip: EquipmentEquip,
     private characterWeight: CharacterWeight,
-    private characterView: CharacterView
+    private characterView: CharacterView,
+    private animationEffect: AnimationEffect
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -141,6 +144,8 @@ export class ItemUse {
     if (character.channelId) {
       this.socketMessaging.sendEventToUser(character.channelId, CharacterSocketEvents.ItemConsumed, payload);
     }
+
+    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LifeHeal);
   }
 
   private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
