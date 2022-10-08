@@ -3,10 +3,10 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { AnimationEffectKeys, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import {
@@ -225,6 +225,8 @@ export class SkillIncrease {
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
+
+    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.SkillLevelUp);
   }
 
   private sendExpLevelUpEvents(expData: IIncreaseXPResult, character: ICharacter, target: INPC | ICharacter): void {
@@ -339,7 +341,5 @@ export class SkillIncrease {
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill: skills,
     });
-
-    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.SkillLevelUp);
   }
 }
