@@ -3,6 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { ItemSocketEvents } from "@rpg-engine/shared";
 import { EquipmentSlots } from "../EquipmentSlots";
 
 import { EquipmentUnequip } from "../EquipmentUnequip";
@@ -15,9 +16,10 @@ describe("EquipmentUnequip.spec.ts", () => {
   let testCharacter: ICharacter;
 
   let inventory: IItem;
-  let inventoryContainer: IItemContainer;
 
   let equipmentSlots: EquipmentSlots;
+
+  let socketMessaging;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -36,13 +38,15 @@ describe("EquipmentUnequip.spec.ts", () => {
     });
     equipment = (await Equipment.findById(testCharacter.equipment)) as unknown as IEquipment;
 
-    // TODO: Equip with a basic short sword and stackable item
+    // Equip with a basic short sword and stackable item
     equipment.leftHand = testItem._id;
     equipment.accessory = testStackableItem._id;
     await equipment.save();
 
     inventory = await testCharacter.inventory;
-    inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    // @ts-ignore
+    socketMessaging = jest.spyOn(equipmentUnequip.socketMessaging, "sendEventToUser");
   });
 
   it("Should sucessfully unequip an item", async () => {
@@ -54,7 +58,23 @@ describe("EquipmentUnequip.spec.ts", () => {
     expect(slots.leftHand).toBeUndefined();
   });
 
-  it("Should successfully trigger a inventory and equipment update event, when unequip is successful", () => {});
+  it("Should successfully trigger a inventory and equipment update event, when unequip is successful", async () => {
+    const unequip = await equipmentUnequip.unequip(testCharacter, inventory, testItem);
+    expect(unequip).toBeTruthy();
+
+    const slots = await equipmentSlots.getEquipmentSlots(testCharacter.equipment as unknown as string);
+
+    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    expect(socketMessaging).toHaveBeenCalledWith(
+      testCharacter.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      {
+        equipment: slots,
+        inventory: inventoryContainer,
+      }
+    );
+  });
 
   it("Should update the character attack type, when unequipping", () => {});
 
