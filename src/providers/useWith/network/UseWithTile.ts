@@ -1,5 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { TILE_MAX_REACH_DISTANCE_IN_GRID } from "@providers/constants/TileConstants";
 import { MapTiles } from "@providers/map/MapTiles";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -8,7 +7,8 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IUseWithTile, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { UseWithHelper } from "./UseWithHelper";
+import { IUseWithTileEffect, useWithTileBlueprints } from "../blueprints/UseWithTileBlueprints";
+import { IValidUseWithResponse, UseWithHelper } from "./UseWithHelper";
 
 @provide(UseWithTile)
 export class UseWithTile {
@@ -23,9 +23,10 @@ export class UseWithTile {
   public onUseWithTile(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, UseWithSocketEvents.UseWithTile, async (data: IUseWithTile, character) => {
       try {
-        const selectedItem = await this.validateData(character, data);
-        if (selectedItem) {
-          // TODO: call the useEffect
+        const useWithData = await this.validateData(character, data);
+        if (useWithData) {
+          const { originItem, useWithEffect } = useWithData;
+          await (useWithEffect as IUseWithTileEffect)(originItem, character);
         }
       } catch (error) {
         console.error(error);
@@ -34,12 +35,12 @@ export class UseWithTile {
   }
 
   /**
-   * Validates the input data and returns the originItem sent on the request
+   * Validates the input data and returns the IValidUseWithResponse based on the item and tile passed on data field
    * @param character
    * @param data
-   * @returns originItem is the item that can be used with the tile
+   * @returns IValidUseWithResponse with the item that can be used with the tile and the useWithEffect function defined for it
    */
-  private async validateData(character: ICharacter, data: IUseWithTile): Promise<IItem | undefined> {
+  private async validateData(character: ICharacter, data: IUseWithTile): Promise<IValidUseWithResponse | undefined> {
     // Check if character is alive and not banned
     this.useWithHelper.basicValidations(character, data);
 
@@ -79,6 +80,18 @@ export class UseWithTile {
       return;
     }
 
-    return originItem;
+    const useWithEffect = useWithTileBlueprints[originItem.baseKey];
+
+    if (!useWithEffect) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        `Item '${originItem.baseKey}' cannot be used with tiles...`
+      );
+      throw new Error(
+        `UseWithTile > originItem '${originItem.baseKey}' does not have a useWithEffect function defined`
+      );
+    }
+
+    return { originItem, useWithEffect };
   }
 }

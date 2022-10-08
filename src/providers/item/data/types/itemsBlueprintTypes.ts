@@ -50,6 +50,7 @@ export enum AxesBlueprint {
   Axe = "axe",
   Bardiche = "bardiche",
   DoubleAxe = "double-axe",
+  Pickaxe = "pickaxe",
 }
 
 export enum BootsBlueprint {

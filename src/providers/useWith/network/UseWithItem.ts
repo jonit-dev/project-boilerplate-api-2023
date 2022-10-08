@@ -1,16 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IUseWithItem, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { UseWithHelper } from "./UseWithHelper";
-
-interface IValidItemsResponse {
-  originItem: IItem;
-  targetItem: IItem;
-}
+import { useWithItemBlueprints, IUseWithItemEffect } from "../blueprints/UseWithItemBlueprints";
+import { IValidUseWithResponse, UseWithHelper } from "./UseWithHelper";
 
 @provide(UseWithItem)
 export class UseWithItem {
@@ -24,7 +19,10 @@ export class UseWithItem {
     this.socketAuth.authCharacterOn(channel, UseWithSocketEvents.UseWithItem, async (data: IUseWithItem, character) => {
       try {
         // Check if character is alive and not banned
-        await this.validateData(character, data);
+        const { originItem, targetItem, useWithEffect } = await this.validateData(character, data);
+
+        // call the useWithEffect function on target Item
+        await (useWithEffect as IUseWithItemEffect)(targetItem!, originItem, character);
       } catch (error) {
         console.error(error);
       }
@@ -32,12 +30,12 @@ export class UseWithItem {
   }
 
   /**
-   * Validates the input data and returns the originItem sent on the request
+   * Validates the input data and returns the IValidUseWithResponse for the items passed in data
    * @param character
    * @param data
-   * @returns originItem is the item that can be used with the tile
+   * @returns IValidUseWithResponse with the items that can be used with and the useWithEffect function defined for the targetItem
    */
-  private async validateData(character: ICharacter, data: IUseWithItem): Promise<IValidItemsResponse> {
+  private async validateData(character: ICharacter, data: IUseWithItem): Promise<IValidUseWithResponse> {
     // Check if character is alive and not banned
     this.useWithHelper.basicValidations(character, data);
 
@@ -49,14 +47,18 @@ export class UseWithItem {
     const originItem = await this.useWithHelper.getItem(character, data.originItemId);
     const targetItem = await this.useWithHelper.getItem(character, data.targetItemId);
 
-    if (!targetItem.useWithEffect) {
+    const useWithEffect = useWithItemBlueprints[targetItem.baseKey];
+
+    if (!useWithEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
-        `Item '${targetItem.baseKey}' cannot be used with anything...`
+        `Item '${targetItem.baseKey}' cannot be used with any item...`
       );
-      throw new Error(`targetItem '${targetItem.baseKey}' does not have a useWithEffect function defined`);
+      throw new Error(
+        `UseWithItem > targetItem '${targetItem.baseKey}' does not have a useWithEffect function defined`
+      );
     }
 
-    return { originItem, targetItem };
+    return { originItem, targetItem, useWithEffect };
   }
 }
