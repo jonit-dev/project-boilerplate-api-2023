@@ -64,17 +64,6 @@ describe("EquipmentEquip.spec.ts", () => {
     expect(allowedItemTypes).toEqual(Object.keys(ItemType));
   });
 
-  it("Should remove item from item container", async () => {
-    const itemContainer = charBody!.itemContainer as unknown as IItemContainer;
-    itemContainer.slots[2] = item;
-    itemContainer.slots[3] = item;
-
-    await equipmentEquip.removeItemFromInventory(item._id, itemContainer);
-
-    expect(itemContainer.slots[2]).toBeNull();
-    expect(itemContainer.slots[3]).not.toBeNull();
-  });
-
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });

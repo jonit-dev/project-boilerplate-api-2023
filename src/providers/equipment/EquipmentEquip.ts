@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
@@ -18,7 +19,11 @@ import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 
 @provide(EquipmentEquip)
 export class EquipmentEquip {
-  constructor(private socketMessaging: SocketMessaging, private equipmentHelper: EquipmentRangeUpdate) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private equipmentHelper: EquipmentRangeUpdate,
+    private characterItemInventory: CharacterItemInventory
+  ) {}
 
   public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<void> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
@@ -53,7 +58,7 @@ export class EquipmentEquip {
         // if was stacked, remove the item from the database to avoid garbage
         // also, remove the item from inventory
         await Item.deleteOne({ _id: item._id });
-        await this.removeItemFromInventory(itemId, itemContainer!);
+        await this.characterItemInventory.deleteItemFromInventory(itemId, character);
 
         const equipmentSlots = await this.getEquipmentSlots(equipment._id);
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
@@ -117,7 +122,7 @@ export class EquipmentEquip {
 
       await equipment.save();
 
-      await this.removeItemFromInventory(itemId, itemContainer!);
+      await this.characterItemInventory.deleteItemFromInventory(itemId, character);
 
       const equipmentSlots = await this.getEquipmentSlots(equipment._id);
 
@@ -326,21 +331,6 @@ export class EquipmentEquip {
     };
   }
 
-  public async removeItemFromInventory(itemId: string, itemContainer: IItemContainer): Promise<void> {
-    let index = 0;
-    for (let slot in itemContainer.slots) {
-      if (itemContainer.slots[slot] && itemContainer.slots[slot]._id.toString() === itemId.toString()) {
-        slot = "";
-        break;
-      }
-      index++;
-    }
-
-    itemContainer.slots[index] = null;
-    itemContainer.markModified("slots");
-    await itemContainer.save();
-  }
-
   public getAllowedItemTypes(): ItemType[] {
     const allowedItemTypes: ItemType[] = [];
 
@@ -366,13 +356,13 @@ export class EquipmentEquip {
     if (accessoryItem) {
       if (!accessoryItem.isStackable) {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "Cannot equip this item in accessory slot. You have equipped another item.",
+          message: "Accessory slot is not empty!",
           type: "error",
         });
         return false;
       }
 
-      if (accessoryItem.key === selectedItem.key.replace(/-\d+$/, "")) {
+      if (accessoryItem.key.replace(/-\d+$/, "") === selectedItem.key.replace(/-\d+$/, "")) {
         if (selectedItem.stackQty) {
           const updatedStackQty = accessoryItem.stackQty! + selectedItem.stackQty;
 

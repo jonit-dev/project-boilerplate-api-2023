@@ -2,13 +2,15 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ItemValidation } from "./validation/ItemValidation";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { ItemValidation } from "./validation/ItemValidation";
 
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
@@ -20,7 +22,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
-import { AnimationEffect } from "@providers/animation/AnimationEffect";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -31,7 +32,8 @@ export class ItemUse {
     private equipmentEquip: EquipmentEquip,
     private characterWeight: CharacterWeight,
     private characterView: CharacterView,
-    private animationEffect: AnimationEffect
+    private animationEffect: AnimationEffect,
+    private characterItems: CharacterItems
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -61,7 +63,7 @@ export class ItemUse {
 
     const inventoryContainer = (await this.getInventoryContainer(character)) as unknown as IItemContainer;
 
-    await this.consumeItem(inventoryContainer, useItem);
+    await this.consumeItem(character, inventoryContainer, useItem);
 
     await this.characterWeight.updateCharacterWeight(character);
 
@@ -98,7 +100,7 @@ export class ItemUse {
     }, intervals);
   }
 
-  private async consumeItem(inventoryContainer: IItemContainer, item: IItem): Promise<void> {
+  private async consumeItem(character: ICharacter, inventoryContainer: IItemContainer, item: IItem): Promise<void> {
     let stackReduced = false;
 
     if (item.isStackable && item.stackQty && item.stackQty > 1) {
@@ -119,7 +121,7 @@ export class ItemUse {
     }
 
     if (!stackReduced) {
-      await this.equipmentEquip.removeItemFromInventory(item._id, inventoryContainer);
+      await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
       await Item.deleteOne({ _id: item._id });
     }
   }
