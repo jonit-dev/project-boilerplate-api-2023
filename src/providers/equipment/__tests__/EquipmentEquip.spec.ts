@@ -124,7 +124,7 @@ describe("EquipmentEquip.spec.ts", () => {
         expect(equipmentPostUpdate.leftHand?.toString()).toBe(item._id.toString());
 
         expect(equipError).toHaveBeenCalledWith(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "Sorry, you can't equip this two handed item with another item already in your hands!",
+          message: "Sorry, you already have an item equipped on your hands.",
           type: "error",
         });
       }

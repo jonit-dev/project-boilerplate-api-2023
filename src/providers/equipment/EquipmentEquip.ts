@@ -106,10 +106,11 @@ export class EquipmentEquip {
     if (item.isTwoHanded) {
       const canEquipTwoHanded = await this.checkTwoHandedEquip(equipment as unknown as IEquipmentSet);
       if (!canEquipTwoHanded) {
-        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "Sorry, you can't equip this two handed item with another item already in your hands!",
-          type: "error",
-        });
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, you already have an item equipped on your hands."
+        );
+
         return false;
       }
     }
