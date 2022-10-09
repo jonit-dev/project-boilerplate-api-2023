@@ -3,7 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 
-import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
@@ -13,7 +13,7 @@ import {
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
-  HelmetBlueprint,
+  HelmetsBlueprint,
   PotionsBlueprint,
   RangedBlueprint,
   ShieldsBlueprint,
@@ -54,7 +54,7 @@ export const npcTrollBerserker = {
       chance: 15,
     },
     {
-      itemBlueprintKey: HelmetBlueprint.SoldiersHelmet,
+      itemBlueprintKey: HelmetsBlueprint.SoldiersHelmet,
       chance: 30,
     },
     {

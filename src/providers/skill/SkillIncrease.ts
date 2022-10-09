@@ -3,10 +3,11 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import { AnimationEffectKeys, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import {
   ISkillDetails,
@@ -65,7 +66,8 @@ export class SkillIncrease {
   constructor(
     private skillCalculator: SkillCalculator,
     private socketMessaging: SocketMessaging,
-    private characterView: CharacterView
+    private characterView: CharacterView,
+    private animationEffect: AnimationEffect
   ) {}
 
   /**
@@ -223,6 +225,8 @@ export class SkillIncrease {
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
+
+    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.SkillLevelUp);
   }
 
   private sendExpLevelUpEvents(expData: IIncreaseXPResult, character: ICharacter, target: INPC | ICharacter): void {
@@ -230,6 +234,16 @@ export class SkillIncrease {
       message: `You advanced from level ${expData.previousLevel} to level ${expData.level}.`,
       type: "info",
     });
+
+    const payload = {
+      characterId: character.id,
+      eventType: SkillEventType.LevelUp,
+    };
+
+    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, payload);
+    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LevelUp);
+
+    this.socketMessaging.sendEventToCharactersAroundCharacter(character, SkillSocketEvents.SkillGain, payload);
   }
 
   private async warnCharactersAroundAboutExpGains(character: ICharacter, exp: number): Promise<void> {

@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { IQuest } from "@entities/ModuleQuest/QuestModel";
-import { QuestStatus, QuestType } from "@rpg-engine/shared";
-import { QuestSystem } from "../QuestSystem";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
-import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { IQuest } from "@entities/ModuleQuest/QuestModel";
+import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
+import { QuestStatus, QuestType } from "@rpg-engine/shared";
+import { QuestSystem } from "../QuestSystem";
 
 describe("QuestSystem.ts", () => {
   let questSystem: QuestSystem,

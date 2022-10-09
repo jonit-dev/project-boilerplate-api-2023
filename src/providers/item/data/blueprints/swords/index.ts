@@ -1,4 +1,4 @@
-import { SwordBlueprint } from "../../types/itemsBlueprintTypes";
+import { SwordsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemBasiliskSword } from "./ItemBasiliskSword";
 import { itemBroadSword } from "./ItemBroadSword";
 import { itemDoubleEdgedSword } from "./ItemDoubleEdgedSword";
@@ -10,13 +10,13 @@ import { itemKnightsSword } from "./ItemKnightsSword";
 import { itemShortSword } from "./ItemShortSword";
 
 export const swordBlueprintIndex = {
-  [SwordBlueprint.ShortSword]: itemShortSword,
-  [SwordBlueprint.BasiliskSword]: itemBasiliskSword,
-  [SwordBlueprint.DragonsSword]: itemDragonsSword,
-  [SwordBlueprint.DoubleEdgedSword]: itemDoubleEdgedSword,
-  [SwordBlueprint.BroadSword]: itemBroadSword,
-  [SwordBlueprint.ElvenSword]: itemElvenSword,
-  [SwordBlueprint.Katana]: itemKatana,
-  [SwordBlueprint.KnightsSword]: itemKnightsSword,
-  [SwordBlueprint.FireSword]: itemFireSword,
+  [SwordsBlueprint.ShortSword]: itemShortSword,
+  [SwordsBlueprint.BasiliskSword]: itemBasiliskSword,
+  [SwordsBlueprint.DragonsSword]: itemDragonsSword,
+  [SwordsBlueprint.DoubleEdgedSword]: itemDoubleEdgedSword,
+  [SwordsBlueprint.BroadSword]: itemBroadSword,
+  [SwordsBlueprint.ElvenSword]: itemElvenSword,
+  [SwordsBlueprint.Katana]: itemKatana,
+  [SwordsBlueprint.KnightsSword]: itemKnightsSword,
+  [SwordsBlueprint.FireSword]: itemFireSword,
 };

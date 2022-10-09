@@ -102,6 +102,7 @@ const npcSchema = createLeanSchema(
       default: NPCMovementType.Random,
       enum: TypeHelper.enumToStringArray(NPCMovementType),
     }),
+    ammoKey: Type.string(),
     maxRangeInGridCells: Type.number(),
     maxRangedDistanceInGridCells: Type.number(),
     maxAntiLuringRangeInGridCells: Type.number(),
@@ -156,6 +157,10 @@ const npcSchema = createLeanSchema(
       default: false,
       required: true,
     }),
+    isTrader: Type.boolean({
+      default: false,
+      required: false,
+    }),
     baseHealth: Type.number({ required: true, default: 100 }),
     healthRandomizerDice: Type.number({ required: true, default: 1 }),
     skillRandomizerDice: Type.number({ required: true, default: 1 }),
@@ -182,7 +187,7 @@ npcSchema.virtual("type").get(function (this: INPC) {
 
 npcSchema.virtual("xpPerDamage").get(function (this: INPC) {
   // initial health = 100, xpPerDamage = experience / initial health
-  return this.experience ? this.experience / 100 : 0;
+  return this.experience ? this.experience / this.maxHealth : 0;
 });
 
 npcSchema.virtual("hasQuest").get(async function (this: INPC) {

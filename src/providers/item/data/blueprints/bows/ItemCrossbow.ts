@@ -18,6 +18,6 @@ export const itemCrossbow: Partial<IItem> = {
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 12,
-  requiredAmmoKey: RangedBlueprint.Bolt,
+  requiredAmmoKeys: [RangedBlueprint.Bolt],
   isTwoHanded: true,
 };

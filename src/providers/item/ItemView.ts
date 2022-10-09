@@ -21,24 +21,30 @@ export class ItemView {
     private objectHelper: DataStructureHelper
   ) {}
 
-  public async removeItemFromMap(item: IItem): Promise<void> {
-    if (item.x === undefined || item.y === undefined || item.scene === undefined) {
-      throw new Error("You cannot call this method without an item x, y and scene.");
-    }
-
-    await this.warnCharactersAboutItemRemovalInView(item, item.x, item.y, item.scene);
-
-    // unset x, y, and scene from item model
-    await Item.updateOne(
-      {
-        _id: item.id,
-      },
-      {
-        x: undefined,
-        y: undefined,
-        scene: undefined,
+  public async removeItemFromMap(item: IItem): Promise<boolean> {
+    try {
+      if (item.x === undefined || item.y === undefined || item.scene === undefined) {
+        return false;
       }
-    );
+
+      await this.warnCharactersAboutItemRemovalInView(item, item.x, item.y, item.scene);
+
+      // unset x, y, and scene from item model
+      await Item.updateOne(
+        {
+          _id: item.id,
+        },
+        {
+          x: undefined,
+          y: undefined,
+          scene: undefined,
+        }
+      );
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   public async addItemToMap(item: IItem, x: number, y: number, scene: string): Promise<void> {

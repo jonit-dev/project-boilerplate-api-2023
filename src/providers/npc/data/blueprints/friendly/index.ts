@@ -1,3 +1,4 @@
+import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { npcAgatha } from "./NPCAgatha";
 import { npcAlice } from "./NPCAlice";
 import { npcAnnie } from "./NPCAnnie";
@@ -14,18 +15,18 @@ import { npcWomanBlueHair } from "./NPCWomanBlueHair";
 import { npcWomanGreenHair } from "./NPCWomanGreenHair";
 
 export const friendlyNPCs = {
-  agatha: npcAgatha,
-  alice: npcAlice,
-  annie: npcAnnie,
-  felicia: npcFelicia,
-  maria: npcMaria,
-  "black-knight": npcBlackKnight,
-  "woman-blue-hair": npcWomanBlueHair,
-  trader: npcTrader,
-  "fat-bald-man": npcFatBaldMan,
-  "male-noble-black-hair": npcMaleNobleBlackHair,
-  "woman-green-hair": npcWomanGreenHair,
-  "senior-knight-1": npcSeniorKnight,
-  father: npcFather,
-  mother: npcMother,
+  [FriendlyNPCsBlueprint.Agatha]: npcAgatha,
+  [FriendlyNPCsBlueprint.Alice]: npcAlice,
+  [FriendlyNPCsBlueprint.Annie]: npcAnnie,
+  [FriendlyNPCsBlueprint.Felicia]: npcFelicia,
+  [FriendlyNPCsBlueprint.Maria]: npcMaria,
+  [FriendlyNPCsBlueprint.BlackKnight]: npcBlackKnight,
+  [FriendlyNPCsBlueprint.WomanBlueHair]: npcWomanBlueHair,
+  [FriendlyNPCsBlueprint.Trader]: npcTrader,
+  [FriendlyNPCsBlueprint.FatBaldMan]: npcFatBaldMan,
+  [FriendlyNPCsBlueprint.MaleNobleBlackHair]: npcMaleNobleBlackHair,
+  [FriendlyNPCsBlueprint.WomanGreenHair]: npcWomanGreenHair,
+  [FriendlyNPCsBlueprint.SeniorKnight1]: npcSeniorKnight,
+  [FriendlyNPCsBlueprint.Father]: npcFather,
+  [FriendlyNPCsBlueprint.Mother]: npcMother,
 };

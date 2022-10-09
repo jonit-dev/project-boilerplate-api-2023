@@ -98,6 +98,25 @@ export class UnitTestHelper {
     return testNPC;
   }
 
+  public async addItemsToInventoryContainer(
+    container: IItemContainer,
+    slotQty: number,
+    items: IItem[]
+  ): Promise<IItemContainer> {
+    container.slotQty = slotQty;
+
+    const slots = {};
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      slots[i] = item.toJSON({ virtuals: true });
+    }
+
+    container.slots = slots;
+    await container.save();
+
+    return container;
+  }
+
   public async createMockItemContainer(character: ICharacter): Promise<IItem> {
     const blueprintData = itemsBlueprintIndex[BodiesBlueprint.CharacterBody];
 

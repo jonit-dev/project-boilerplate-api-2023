@@ -7,11 +7,11 @@ import {
   AxesBlueprint,
   BootsBlueprint,
   GlovesBlueprint,
-  HelmetBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
   RangedBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
-import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
@@ -50,7 +50,7 @@ export const npcOrcMage = {
       chance: 30,
     },
     {
-      itemBlueprintKey: HelmetBlueprint.StuddedHelmet,
+      itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,
       chance: 15,
     },
     {

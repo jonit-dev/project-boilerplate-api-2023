@@ -7,6 +7,7 @@ import { MapTransition } from "@providers/map/MapTransition";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { NPCView } from "@providers/npc/NPCView";
+import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -43,7 +44,8 @@ export class CharacterNetworkUpdate {
     private npcManager: NPCManager,
     private gridManager: GridManager,
     private mapNonPVPZone: MapNonPVPZone,
-    private characterValidation: CharacterValidation
+    private characterValidation: CharacterValidation,
+    private npcWarn: NPCWarn
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -89,7 +91,7 @@ export class CharacterNetworkUpdate {
           await this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
           await this.warnEmitterAboutCharactersAround(character);
 
-          await this.npcView.warnCharacterAboutNPCsInView(character);
+          await this.npcWarn.warnCharacterAboutNPCsInView(character);
 
           await this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
@@ -99,17 +101,35 @@ export class CharacterNetworkUpdate {
           await this.updateServerSideEmitterInfo(data, character, newX, newY, isMoving, data.direction);
 
           // verify if we're in a map transition. If so, we need to trigger a scene transition
-
           const transition = this.mapTransition.getTransitionAtXY(character.scene, newX, newY);
           if (transition) {
-            await this.mapTransition.changeCharacterScene(character, transition);
+            const map = this.mapTransition.getTransitionProperty(transition, "map");
+            const gridX = Number(this.mapTransition.getTransitionProperty(transition, "gridX"));
+            const gridY = Number(this.mapTransition.getTransitionProperty(transition, "gridY"));
+
+            if (!map || !gridX || !gridY) {
+              console.error("Failed to fetch required destination properties.");
+              return;
+            }
+
+            const destination = {
+              map,
+              gridX,
+              gridY,
+            };
+
+            // check if we are transitioning to the same map, if so we should only teleport the character
+            if (destination.map === character.scene) {
+              await this.mapTransition.teleportCharacter(character, destination);
+            } else {
+              await this.mapTransition.changeCharacterScene(character, destination);
+            }
           }
 
           // verify if we're in a non pvp zone. If so, we need to trigger an attack stop event in case player was in a pvp combat
-          // console.log("CHECK CHAR")
           const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, newX, newY);
           if (nonPVPZone) {
-            await this.mapNonPVPZone.stopCharacterAttack(character);
+            this.mapNonPVPZone.stopCharacterAttack(character);
           }
         }
       }

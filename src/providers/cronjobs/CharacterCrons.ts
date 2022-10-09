@@ -53,7 +53,7 @@ export class CharacterCrons {
         this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
           reason: "You have were disconnected due to inactivity!",
         });
-        this.socketMessaging.sendMessageToCloseCharacters(character, CharacterSocketEvents.CharacterLogout, {
+        this.socketMessaging.sendEventToCharactersAroundCharacter(character, CharacterSocketEvents.CharacterLogout, {
           id: character.id,
         });
 

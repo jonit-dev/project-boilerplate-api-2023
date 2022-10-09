@@ -112,7 +112,7 @@ export class BattleRangedAttack {
       {
         targetId: target.id,
         type: target.type as EntityType,
-        reason: "Ranged attack failed because character does not have the required ammo equipped in accessory slot",
+        reason: "Oops! Not enough ammo for your ranged attack!",
       }
     );
   }
@@ -141,19 +141,45 @@ export class BattleRangedAttack {
     // );
   }
 
-  public sendRangedAttackEvent(
+  public async sendRangedAttackEvent(
     attacker: ICharacter | INPC,
     target: ICharacter | INPC,
     ammo: IRangedAttackParams
-  ): void {
-    const character = (attacker.type === "Character" ? attacker : target) as ICharacter;
-    this.socketMessaging.sendEventToUser<IRangedAttack>(character.channelId!, ItemSocketEvents.RangedAttack, {
+  ): Promise<void> {
+    const payload = {
       attackerId: attacker.id,
       targetId: target.id,
       direction: this.mathHelper.getDirectionFromPoint({ x: attacker.x, y: attacker.y }, { x: target.x, y: target.y }),
       type: attacker.type,
       ammoKey: ammo.key || undefined,
-    });
+    };
+
+    switch (attacker.type) {
+      case "Character":
+        const character = attacker as ICharacter;
+        // send ranged attack event to all characters nearby the attacker
+        await this.socketMessaging.sendEventToCharactersAroundCharacter(
+          character,
+          ItemSocketEvents.RangedAttack,
+          payload
+        );
+
+        this.socketMessaging.sendEventToUser<IRangedAttack>(
+          character.channelId!,
+          ItemSocketEvents.RangedAttack,
+          payload
+        );
+        break;
+
+      case "NPC":
+        const npc = attacker as INPC;
+        await this.socketMessaging.sendEventToCharactersAroundNPC(npc, ItemSocketEvents.RangedAttack, {
+          ...payload,
+          ammoKey: npc.ammoKey,
+        });
+
+        break;
+    }
   }
 
   private async getAmmoForRangedAttack(weapon: IItem, equipment: IEquipment): Promise<IRangedAttackParams | undefined> {
@@ -161,11 +187,11 @@ export class BattleRangedAttack {
     // Get ranged attack weapons (bow or spear)
     switch (weapon.subType) {
       case ItemSubType.Ranged:
-        if (!weapon.requiredAmmoKey) {
+        if (!weapon.requiredAmmoKeys || !weapon.requiredAmmoKeys.length) {
           return result;
         }
 
-        result = (await this.getRequiredAmmo(weapon.requiredAmmoKey, equipment)) as IRangedAttackParams;
+        result = (await this.getRequiredAmmo(weapon.requiredAmmoKeys, equipment)) as IRangedAttackParams;
 
         if (!_.isEmpty(result)) {
           result.maxRange = weapon.maxRange || 0;
@@ -181,14 +207,16 @@ export class BattleRangedAttack {
 
   // This function returns the required ammo data if the required ammo is in the equipment's accessory slot
   private async getRequiredAmmo(
-    requiredAmmoKey: string,
+    requiredAmmoKeys: string[],
     equipment: IEquipment
   ): Promise<Partial<IRangedAttackParams> | undefined> {
     // check if character has enough required ammo in accessory slot
     const accessory = await Item.findById(equipment.accessory);
 
-    if (accessory && accessory.key === requiredAmmoKey) {
-      return { location: ItemSlotType.Accessory, id: accessory._id, key: requiredAmmoKey, equipment };
+    for (const ammoKey of requiredAmmoKeys) {
+      if (accessory && accessory.key === ammoKey) {
+        return { location: ItemSlotType.Accessory, id: accessory._id, key: ammoKey, equipment };
+      }
     }
   }
 

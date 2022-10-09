@@ -1,4 +1,4 @@
-export enum SwordBlueprint {
+export enum SwordsBlueprint {
   ShortSword = "short-sword",
   BasiliskSword = "basilisk-sword",
   DragonsSword = "dragon's-sword",
@@ -10,7 +10,7 @@ export enum SwordBlueprint {
   KnightsSword = "knights-sword",
 }
 
-export enum HelmetBlueprint {
+export enum HelmetsBlueprint {
   WingHelmet = "wing-helmet",
   Cap = "cap",
   StuddedHelmet = "studded-helmet",
@@ -50,6 +50,7 @@ export enum AxesBlueprint {
   Axe = "axe",
   Bardiche = "bardiche",
   DoubleAxe = "double-axe",
+  Pickaxe = "pickaxe",
 }
 
 export enum BootsBlueprint {
@@ -72,6 +73,10 @@ export enum FoodsBlueprint {
   Egg = "egg",
   Fish = "fish",
   Salmon = "salmon",
+  ChickensMeat = "chickens-meat",
+  Mushroom = "mushroom",
+  Potato = "potato",
+  RedMeat = "red-meat",
 }
 
 export enum SpearsBlueprint {
@@ -118,6 +123,7 @@ export enum MagicsBlueprint {
 export enum OthersBlueprint {
   Candle = "candle",
   RoyalChalice = "royal-chalice",
+  GoldCoin = "gold-coin",
 }
 
 export enum StaffsBlueprint {

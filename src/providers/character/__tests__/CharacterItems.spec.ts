@@ -5,7 +5,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { EquipmentEquip } from "../../equipment/EquipmentEquip";
 
 import { ItemPickup } from "@providers/item/ItemPickup";
-import { CharacterItems } from "../CharacterItems";
+import { CharacterItems } from "../characterItems/CharacterItems";
 
 describe("CharacterItems.ts", () => {
   let testItem: IItem;
@@ -86,9 +86,9 @@ describe("CharacterItems.ts", () => {
     const itemPickedUp = await pickupItem(inventoryItemContainerId);
     expect(itemPickedUp).toBeTruthy();
 
-    const result = await characterItems.deleteItem(testItem.id, testCharacter, "inventory");
+    const result = await characterItems.deleteItemFromContainer(testItem.id, testCharacter, "inventory");
 
-    expect(result).toBe(true);
+    expect(result).toBeTruthy();
   });
 
   it("should properly remove an item from the equipment", async () => {
@@ -97,9 +97,9 @@ describe("CharacterItems.ts", () => {
     // try to equip the test item
     await equipmentEquip.equip(testCharacter, testItem.id, inventoryItemContainerId);
 
-    const result = await characterItems.deleteItem(testItem.id, testCharacter, "equipment");
+    const result = await characterItems.deleteItemFromContainer(testItem.id, testCharacter, "equipment");
 
-    expect(result).toBe(true);
+    expect(result).toBeTruthy();
   });
 
   afterAll(async () => {

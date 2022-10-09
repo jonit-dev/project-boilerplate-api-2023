@@ -37,10 +37,14 @@ export class CharacterDeath {
     });
     // communicate all players around that character is dead
 
-    await this.socketMessaging.sendMessageToCloseCharacters<IBattleDeath>(character, BattleSocketEvents.BattleDeath, {
-      id: character.id,
-      type: "Character",
-    });
+    await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
+      character,
+      BattleSocketEvents.BattleDeath,
+      {
+        id: character.id,
+        type: "Character",
+      }
+    );
 
     // generate character's body
     const characterBody = await this.generateCharacterBody(character);
@@ -67,6 +71,7 @@ export class CharacterDeath {
       ...blueprintData,
       name: `${character.name}'s body`,
       scene: character.scene,
+      texturePath: `${character.textureKey}/death/0.png`,
       x: character.x,
       y: character.y,
     });

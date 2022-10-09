@@ -3,7 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 
-import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
@@ -11,7 +11,7 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 import {
   FoodsBlueprint,
   GlovesBlueprint,
-  HelmetBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
   RangedBlueprint,
@@ -52,7 +52,7 @@ export const npcTrollWarrior = {
       chance: 10,
     },
     {
-      itemBlueprintKey: HelmetBlueprint.BrassHelmet,
+      itemBlueprintKey: HelmetsBlueprint.BrassHelmet,
       chance: 20,
     },
     {

@@ -1,5 +1,5 @@
-import { ShieldsBlueprint, SwordBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { ShieldsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { IQuest, QuestType } from "@rpg-engine/shared";
 import { QuestsBlueprint } from "../../questsBlueprintTypes";
 
@@ -10,7 +10,7 @@ export const questKillRats = {
   key: QuestsBlueprint.KillRats,
   rewards: [
     {
-      itemKeys: [SwordBlueprint.ShortSword],
+      itemKeys: [SwordsBlueprint.ShortSword],
       qty: 1,
     },
     {

@@ -1,6 +1,7 @@
 import { CharacterView } from "@providers/character/CharacterView";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { container } from "@providers/inversify/container";
+import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemView } from "@providers/item/ItemView";
 import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -40,7 +41,7 @@ const itemSchema = createLeanSchema(
     maxStackSize: Type.number({ required: true, default: 1 }),
     stackQty: Type.number(),
     isUsable: Type.boolean({ required: true, default: false }),
-    usableEffect: Type.string(),
+    usableEffect: Type.mixed(),
     isStorable: Type.boolean({ required: true, default: true }),
     x: Type.number(),
     y: Type.number(),
@@ -66,7 +67,9 @@ const itemSchema = createLeanSchema(
     }),
     decayTime: Type.date(),
     maxRange: Type.number(),
-    requiredAmmoKey: Type.string(),
+    requiredAmmoKeys: Type.array({ required: false }).of(
+      Type.string({ enum: TypeHelper.enumToStringArray(RangedBlueprint) })
+    ),
     isTwoHanded: Type.boolean({ required: true, default: false }),
     hasUseWith: Type.boolean({ required: true, default: false }),
   },

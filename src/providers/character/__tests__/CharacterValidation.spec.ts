@@ -43,14 +43,12 @@ describe("CharacterValidation.ts", () => {
     testCharacter.health = 0;
     await testCharacter.save();
 
-    const result = characterValidation.hasBasicValidation(testCharacter, {
-      isAlive: "You are dead!",
-    });
+    const result = characterValidation.hasBasicValidation(testCharacter);
 
     expect(result).toBe(false);
     expect(sendGenericErrorMessage).toBeCalled();
     expect(sendGenericErrorMessage).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
-      message: "You are dead!",
+      message: "Sorry, you are dead.",
       type: "error",
     });
   });
@@ -59,14 +57,12 @@ describe("CharacterValidation.ts", () => {
     testCharacter.isOnline = false;
     await testCharacter.save();
 
-    const result = characterValidation.hasBasicValidation(testCharacter, {
-      isOnline: "You are offline!",
-    });
+    const result = characterValidation.hasBasicValidation(testCharacter);
 
     expect(result).toBe(false);
     expect(sendGenericErrorMessage).toBeCalled();
     expect(sendGenericErrorMessage).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
-      message: "You are offline!",
+      message: "Sorry, you are not online.",
       type: "error",
     });
   });

@@ -5,11 +5,11 @@ import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
   BootsBlueprint,
-  HelmetBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
   RangedBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
-import { HostileNPCsBlueprint } from "@providers/item/data/types/npcsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
@@ -53,7 +53,7 @@ export const npcSkeleton = {
       chance: 15,
     },
     {
-      itemBlueprintKey: HelmetBlueprint.Cap,
+      itemBlueprintKey: HelmetsBlueprint.Cap,
       chance: 30,
     },
     {
