@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { CharacterGold } from "@providers/character/CharacterGold";
+import { CharacterTrading } from "@providers/character/CharacterTrading";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -24,7 +24,7 @@ export class ItemPickup {
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
     private characterWeight: CharacterWeight,
-    private characterGold: CharacterGold,
+    private characterTrading: CharacterTrading,
     private itemView: ItemView,
     private equipmentEquip: EquipmentEquip
   ) {}
@@ -139,7 +139,7 @@ export class ItemPickup {
       // // whenever a new item is added, we need to update the character weight
       await this.characterWeight.updateCharacterWeight(character);
 
-      await this.characterGold.updateCharacterGold(destinyCharacter);
+      await this.characterTrading.updateCharacterGold(destinyCharacter);
 
       // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
       if (isMapContainer) {
