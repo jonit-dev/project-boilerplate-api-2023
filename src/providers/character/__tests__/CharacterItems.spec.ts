@@ -11,7 +11,7 @@ describe("CharacterItems.ts", () => {
   let testItem: IItem;
   let testCharacter: ICharacter;
   let npcCharacter: ICharacter;
-  let itemSelled: ItemPickup;
+  // let itemSelled: ItemPickup;
   let itemPickup: ItemPickup;
   let inventory: IItem;
   let npcInvetory: IItem;
@@ -25,7 +25,7 @@ describe("CharacterItems.ts", () => {
 
     characterItems = container.get<CharacterItems>(CharacterItems);
 
-    itemSelled = container.get<ItemPickup>(ItemPickup);
+    // itemSelled = container.get<ItemPickup>(ItemPickup);
     itemPickup = container.get<ItemPickup>(ItemPickup);
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
   });
@@ -48,6 +48,7 @@ describe("CharacterItems.ts", () => {
       y: testCharacter.y,
       scene: testCharacter.scene,
       weight: 0,
+      gold: 100,
     });
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;
@@ -91,6 +92,7 @@ describe("CharacterItems.ts", () => {
         itemId: testItem.id,
         x: npcCharacter.x,
         y: npcCharacter.y,
+        price: 100,
         scene: npcCharacter.scene,
         toContainerId: fromContainerId,
         fromContainerId: toContainerId,
@@ -107,7 +109,7 @@ describe("CharacterItems.ts", () => {
 
     expect(itemPickedUp).toBeTruthy();
 
-    const _itemSelled = await sellItem(npcInventoryItemContainerId, inventoryItemContainerId);
+    const itemSelled = await sellItem(npcInventoryItemContainerId, inventoryItemContainerId);
 
     expect(itemSelled).toBeTruthy();
 
