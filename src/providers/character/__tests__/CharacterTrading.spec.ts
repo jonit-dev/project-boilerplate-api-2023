@@ -2,7 +2,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { EquipmentEquip } from "../../equipment/EquipmentEquip";
 
 import { ItemPickup } from "@providers/item/ItemPickup";
 import { CharacterItems } from "../characterItems/CharacterItems";
@@ -18,7 +17,6 @@ describe("CharacterTrading.ts", () => {
   let npcInvetory: IItem;
   let inventoryItemContainerId: string;
   let npcInventoryItemContainerId: string;
-  let equipmentEquip: EquipmentEquip;
   let characterItems: CharacterItems;
 
   beforeAll(async () => {
@@ -28,7 +26,6 @@ describe("CharacterTrading.ts", () => {
 
     itemPickup = container.get<ItemPickup>(ItemPickup);
     itemTrading = container.get<CharacterTrading>(CharacterTrading);
-    equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
   });
 
   beforeEach(async () => {
