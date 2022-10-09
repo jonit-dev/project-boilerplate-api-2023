@@ -1,5 +1,6 @@
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { CharacterTrading } from "@providers/character/CharacterTrading";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";

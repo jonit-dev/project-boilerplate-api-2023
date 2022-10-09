@@ -6,14 +6,18 @@ import { EquipmentEquip } from "../../equipment/EquipmentEquip";
 
 import { ItemPickup } from "@providers/item/ItemPickup";
 import { CharacterItems } from "../CharacterItems";
+import { CharacterTrading } from "@providers/character/CharacterTrading";
 
-describe("CharacterItems.ts", () => {
+describe("CharacterTrading.ts", () => {
   let testItem: IItem;
   let testCharacter: ICharacter;
-  // let itemSelled: ItemPickup;
+  let npcCharacter: ICharacter;
+  let itemTrading: CharacterTrading;
   let itemPickup: ItemPickup;
   let inventory: IItem;
+  let npcInvetory: IItem;
   let inventoryItemContainerId: string;
+  let npcInventoryItemContainerId: string;
   let equipmentEquip: EquipmentEquip;
   let characterItems: CharacterItems;
 
@@ -22,8 +26,8 @@ describe("CharacterItems.ts", () => {
 
     characterItems = container.get<CharacterItems>(CharacterItems);
 
-    // itemSelled = container.get<ItemPickup>(ItemPickup);
     itemPickup = container.get<ItemPickup>(ItemPickup);
+    itemTrading = container.get<CharacterTrading>(CharacterTrading);
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
   });
 
@@ -31,6 +35,11 @@ describe("CharacterItems.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
 
     testCharacter = await (
+      await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true, hasSkills: true })
+    )
+      .populate("skills")
+      .execPopulate();
+    npcCharacter = await (
       await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true, hasSkills: true })
     )
       .populate("skills")
@@ -44,62 +53,59 @@ describe("CharacterItems.ts", () => {
     });
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;
+    npcInvetory = await npcCharacter.inventory;
+    npcInventoryItemContainerId = npcInvetory.itemContainer as unknown as string;
   });
 
-  const pickupItem = async (toContainerId: string, extraProps?: Record<string, unknown>) => {
+  const npcPickupItem = async (toContainerId: string, extraProps?: Record<string, unknown>) => {
     const itemAdded = await itemPickup.performItemPickup(
       {
         itemId: testItem.id,
-        x: testCharacter.x,
-        y: testCharacter.y,
-        scene: testCharacter.scene,
+        x: npcCharacter.x,
+        y: npcCharacter.y,
+        scene: npcCharacter.scene,
         toContainerId,
         ...extraProps,
       },
-      testCharacter
+      npcCharacter
     );
     return itemAdded;
   };
 
-  it("should properly identify an item on the inventory", async () => {
-    const itemPickedUp = await pickupItem(inventoryItemContainerId);
+  const sellItem = async (fromContainerId: string, toContainerId: string, extraProps?: Record<string, unknown>) => {
+    const itemSelled = await itemTrading.performItemSell(
+      {
+        itemId: testItem.id,
+        x: npcCharacter.x,
+        y: npcCharacter.y,
+        price: 100,
+        scene: npcCharacter.scene,
+        toContainerId: fromContainerId,
+        fromContainerId: toContainerId,
+        ...extraProps,
+      },
+      npcCharacter,
+      testCharacter
+    );
+    return itemSelled;
+  };
+
+  it("should sell an item from invetory to NPC", async () => {
+    const itemPickedUp = await npcPickupItem(npcInventoryItemContainerId);
 
     expect(itemPickedUp).toBeTruthy();
+
+    const itemSelled = await sellItem(npcInventoryItemContainerId, inventoryItemContainerId);
+
+    expect(itemSelled).toBeTruthy();
 
     const result = await characterItems.hasItem(testItem.id, testCharacter, "inventory");
 
     expect(result).toBe(true);
-  });
 
-  it("should properly identify an item on the equipment", async () => {
-    const itemPickedUp = await pickupItem(inventoryItemContainerId);
-    expect(itemPickedUp).toBeTruthy();
-    // try to equip the test item
-    await equipmentEquip.equip(testCharacter, testItem.id, inventoryItemContainerId);
+    const anotherSellForTheSameItem = await sellItem(npcInventoryItemContainerId, inventoryItemContainerId);
 
-    const result = await characterItems.hasItem(testItem.id, testCharacter, "equipment");
-
-    expect(result).toBe(true);
-  });
-
-  it("should properly remove an item from the inventory", async () => {
-    const itemPickedUp = await pickupItem(inventoryItemContainerId);
-    expect(itemPickedUp).toBeTruthy();
-
-    const result = await characterItems.deleteItem(testItem.id, testCharacter, "inventory");
-
-    expect(result).toBe(true);
-  });
-
-  it("should properly remove an item from the equipment", async () => {
-    const itemPickedUp = await pickupItem(inventoryItemContainerId);
-    expect(itemPickedUp).toBeTruthy();
-    // try to equip the test item
-    await equipmentEquip.equip(testCharacter, testItem.id, inventoryItemContainerId);
-
-    const result = await characterItems.deleteItem(testItem.id, testCharacter, "equipment");
-
-    expect(result).toBe(true);
+    expect(anotherSellForTheSameItem).toBeFalsy();
   });
 
   afterAll(async () => {
