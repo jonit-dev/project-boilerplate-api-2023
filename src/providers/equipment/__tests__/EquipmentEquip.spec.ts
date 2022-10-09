@@ -3,7 +3,6 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { ItemPickup } from "@providers/item/ItemPickup";
 import { ItemType, UISocketEvents } from "@rpg-engine/shared";
 import { EquipmentEquip } from "../EquipmentEquip";
 import { EquipmentSlots } from "../EquipmentSlots";
@@ -18,13 +17,11 @@ describe("EquipmentEquip.spec.ts", () => {
   let testItem: IItem;
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
-  let itemPickup: ItemPickup;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
-    itemPickup = container.get<ItemPickup>(ItemPickup);
   });
 
   const tryToEquipItemWithAnotherAlreadyEquipped = async (
