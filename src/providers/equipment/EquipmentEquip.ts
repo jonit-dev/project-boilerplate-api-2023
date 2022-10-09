@@ -63,19 +63,14 @@ export class EquipmentEquip {
         await Item.deleteOne({ _id: item._id });
         await this.characterItemInventory.deleteItemFromInventory(itemId, character);
 
+        const inventory = await character.inventory;
+
+        const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
         const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
           equipment: equipmentSlots,
-          inventory: {
-            _id: itemContainer._id,
-            parentItem: itemContainer!.parentItem.toString(),
-            owner: itemContainer?.owner?.toString() || character.name,
-            name: itemContainer?.name,
-            slotQty: itemContainer!.slotQty,
-            slots: itemContainer?.slots,
-            allowedItemTypes: this.getAllowedItemTypes(),
-            isEmpty: itemContainer!.isEmpty,
-          },
+          inventory: inventoryContainer,
         };
 
         this.updateItemInventoryCharacter(payloadUpdate, character);
@@ -83,7 +78,7 @@ export class EquipmentEquip {
       }
     }
 
-    const availableSlot = this.getAvailableSlot(item, equipment as unknown as IEquipmentSet);
+    const availableSlot = this.equipmentSlots.getAvailableSlot(item, equipment as unknown as IEquipmentSet);
 
     // stackable items are only allowed in accessory slot. So, if cannot stack more,
     // the message will be sended on tryAddingItemToStack function
@@ -246,45 +241,15 @@ export class EquipmentEquip {
     return false;
   }
 
-  public getAvailableSlot(item: IItem, equipment: IEquipmentSet): string {
-    let availableSlot = "";
-    const itemSlotTypes = [
-      "head",
-      "neck",
-      "leftHand",
-      "rightHand",
-      "ring",
-      "legs",
-      "boot",
-      "accessory",
-      "armor",
-      "inventory",
-    ];
-
-    for (const allowedSlotType of item?.allowedEquipSlotType) {
-      const allowedSlotTypeCamelCase = this.getWordCamelCase(allowedSlotType);
-      const itemSubTypeCamelCase = this.getWordCamelCase(item.subType);
-
-      const slotType = this.getSlotType(itemSlotTypes, allowedSlotTypeCamelCase, itemSubTypeCamelCase);
-
-      if (equipment[slotType] === undefined) {
-        availableSlot = slotType;
-        break;
-      }
-    }
-
-    return availableSlot;
-  }
-
-  public getWordCamelCase(word: string): string {
-    return word.charAt(0).toLowerCase() + word.slice(1);
-  }
-
-  private getSlotType(itemSlotTypes: string[], slotType: string, subType: string): string {
-    if (!itemSlotTypes.includes(slotType)) {
-      return subType;
-    }
-    return slotType;
+  public updateItemInventoryCharacter(
+    equipmentAndInventoryUpdate: IEquipmentAndInventoryUpdatePayload,
+    character: ICharacter
+  ): void {
+    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+      character.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      equipmentAndInventoryUpdate
+    );
   }
 
   public getAllowedItemTypes(): ItemType[] {
@@ -295,17 +260,6 @@ export class EquipmentEquip {
     }
 
     return allowedItemTypes;
-  }
-
-  public updateItemInventoryCharacter(
-    equipmentAndInventoryUpdate: IEquipmentAndInventoryUpdatePayload,
-    character: ICharacter
-  ): void {
-    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
-      character.channelId!,
-      ItemSocketEvents.EquipmentAndInventoryUpdate,
-      equipmentAndInventoryUpdate
-    );
   }
 
   private async tryAddingItemToStack(
