@@ -3,6 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
@@ -25,18 +26,17 @@ export class EquipmentEquip {
     private socketMessaging: SocketMessaging,
     private equipmentHelper: EquipmentRangeUpdate,
     private characterItemInventory: CharacterItemInventory,
-    private equipmentSlots: EquipmentSlots
+    private equipmentSlots: EquipmentSlots,
+    private characterValidation: CharacterValidation
   ) {}
 
-  public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<void> {
+  public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<boolean> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
 
     if (!item) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Something went wrong while equipping item. Please try again.",
-        type: "error",
-      });
-      return;
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the item to be equipped was not found.");
+
+      return false;
     }
     const equipItemContainer = this.checkIfEquipItemContainer(item, itemContainerId);
     const itemContainer = await this.getItemContainer(item, itemContainerId);
@@ -44,14 +44,15 @@ export class EquipmentEquip {
     const equipment = await Equipment.findById(character.equipment);
 
     if (!equipment) {
-      return;
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
+
+      return false;
     }
 
     const isEquipValid = this.validateEquip(item, character, itemContainer, itemId, equipItemContainer);
 
     if (!isEquipValid) {
-      console.log("Equip is not valid");
-      return;
+      return false;
     }
 
     if (item.isStackable) {
@@ -74,7 +75,7 @@ export class EquipmentEquip {
         };
 
         this.updateItemInventoryCharacter(payloadUpdate, character);
-        return;
+        return true;
       }
     }
 
@@ -83,35 +84,33 @@ export class EquipmentEquip {
     // stackable items are only allowed in accessory slot. So, if cannot stack more,
     // the message will be sended on tryAddingItemToStack function
     if (availableSlot === "" && item.isStackable) {
-      return;
+      return false;
     }
 
     if (availableSlot === "") {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "There aren't slots available.",
-        type: "error",
-      });
-      return;
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, no available slot for this item.");
+      return false;
     }
 
     const hasTwoHandedItemEquipped = await this.hasTwoHandedItemEquipped(equipment as unknown as IEquipmentSet);
 
     if (hasTwoHandedItemEquipped && this.isItemEquippableOnHands(item)) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "You already have a two handed item equipped!",
-        type: "error",
-      });
-      return;
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you already have a two-handed item equipped."
+      );
+
+      return false;
     }
 
     if (item.isTwoHanded) {
       const canEquipTwoHanded = await this.checkTwoHandedEquip(equipment as unknown as IEquipmentSet);
       if (!canEquipTwoHanded) {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "You can't equip this two handed item with another item already in your hands!",
+          message: "Sorry, you can't equip this two handed item with another item already in your hands!",
           type: "error",
         });
-        return;
+        return false;
       }
     }
 
@@ -136,7 +135,13 @@ export class EquipmentEquip {
       this.updateItemInventoryCharacter(payloadUpdate, character);
 
       await this.equipmentHelper.updateCharacterAttackType(character, item as any);
+
+      return true;
     }
+
+    this.socketMessaging.sendErrorMessageToCharacter(character, "Something went wrong while equipping your item.");
+
+    return false;
   }
 
   private isItemEquippableOnHands(item: IItem): boolean {
@@ -170,6 +175,12 @@ export class EquipmentEquip {
     itemId: string,
     equipItemContainer: boolean
   ): boolean {
+    const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
+
+    if (!hasBasicValidation) {
+      return false;
+    }
+
     if (!item) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "Item not found.",
@@ -200,22 +211,6 @@ export class EquipmentEquip {
     if (!userHasItem) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "User doesn't have this item",
-        type: "error",
-      });
-      return false;
-    }
-
-    if (character.isBanned) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "User has been banned!",
-        type: "error",
-      });
-      return false;
-    }
-
-    if (!character.isAlive) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "User is dead!",
         type: "error",
       });
       return false;
