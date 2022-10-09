@@ -112,6 +112,7 @@ export class UnitTestHelper {
     }
 
     container.slots = slots;
+    container.markModified("slots");
     await container.save();
 
     return container;

@@ -30,7 +30,7 @@ export class EquipmentEquip {
     private characterValidation: CharacterValidation
   ) {}
 
-  public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<boolean> {
+  public async equip(character: ICharacter, itemId: string, fromItemContainerId: string): Promise<boolean> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
 
     if (!item) {
@@ -38,8 +38,8 @@ export class EquipmentEquip {
 
       return false;
     }
-    const equipItemContainer = this.checkIfEquipItemContainer(item, itemContainerId);
-    const itemContainer = await this.getItemContainer(item, itemContainerId);
+
+    const itemContainer = await this.getItemContainer(item, fromItemContainerId);
 
     const equipment = await Equipment.findById(character.equipment);
 
@@ -49,7 +49,7 @@ export class EquipmentEquip {
       return false;
     }
 
-    const isEquipValid = this.validateEquip(item, character, itemContainer, itemId, equipItemContainer);
+    const isEquipValid = await this.validateEquip(item, character, itemContainer, itemId);
 
     if (!isEquipValid) {
       return false;
@@ -152,11 +152,23 @@ export class EquipmentEquip {
     );
   }
 
-  private checkIfEquipItemContainer(item: IItem, itemContainerId: string): boolean {
-    if (item.isItemContainer && itemContainerId === "") {
-      return true;
+  private async checkContainerType(item: IItem, itemContainerId: string): Promise<"inventory" | "npc-body"> {
+    const itemContainer = await ItemContainer.findById(itemContainerId);
+
+    if (!itemContainer) {
+      throw new Error("Item container not found");
     }
-    return false;
+
+    const parentItem = await Item.findById(itemContainer.parentItem);
+
+    if (!parentItem) {
+      throw new Error("Parent item not found");
+    }
+
+    // match -body on parentItem.key
+    const isBody = parentItem.key.match(/-body$/);
+
+    return isBody ? "npc-body" : "inventory";
   }
 
   private async getItemContainer(item: IItem, itemContainerId: string): Promise<IItemContainer> {
@@ -169,13 +181,12 @@ export class EquipmentEquip {
     return itemContainer;
   }
 
-  private validateEquip(
+  private async validateEquip(
     item: IItem,
     character: ICharacter,
     itemContainer: IItemContainer,
-    itemId: string,
-    equipItemContainer: boolean
-  ): boolean {
+    itemId: string
+  ): Promise<boolean> {
     const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
 
     if (!hasBasicValidation) {
@@ -183,38 +194,26 @@ export class EquipmentEquip {
     }
 
     if (!item) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Item not found.",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the item to be equipped was not found.");
       return false;
     }
 
     if (!itemContainer) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Container not found.",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the item container was not found.");
+
       return false;
     }
 
-    let userHasItem = equipItemContainer || false;
+    const isSourceContainerNPCBody = (await this.checkContainerType(item, itemContainer._id)) === "npc-body";
 
-    if (!equipItemContainer) {
-      for (const slot in itemContainer.slots) {
-        if (itemContainer.slots[slot] && itemContainer.slots[slot]?._id.toString() === itemId.toString()) {
-          userHasItem = true;
-          break;
-        }
+    if (!isSourceContainerNPCBody) {
+      const hasItemOnInventory = await this.characterItemInventory.checkItemInInventory(itemId, character);
+
+      if (!hasItemOnInventory) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you don't have this item.");
+
+        return false;
       }
-    }
-
-    if (!userHasItem) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "User doesn't have this item",
-        type: "error",
-      });
-      return false;
     }
 
     return true;
