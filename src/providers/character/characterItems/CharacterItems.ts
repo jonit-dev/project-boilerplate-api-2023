@@ -62,7 +62,7 @@ export class CharacterItems {
     }
   }
 
-  public async addItem(
+  public async addItemToContainer(
     item: IItem,
     character: ICharacter,
     toContainerId: string,
