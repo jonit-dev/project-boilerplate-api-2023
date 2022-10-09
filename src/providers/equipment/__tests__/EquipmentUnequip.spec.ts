@@ -5,7 +5,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ItemSocketEvents } from "@rpg-engine/shared";
+import { ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EquipmentRangeUpdate } from "../EquipmentRangeUpdate";
 import { EquipmentSlots } from "../EquipmentSlots";
@@ -21,6 +21,7 @@ describe("EquipmentUnequip.spec.ts", () => {
   let testCharacter: ICharacter;
 
   let inventory: IItem;
+  let inventoryContainer: IItemContainer;
   let equipmentSlots: EquipmentSlots;
 
   let socketMessaging;
@@ -36,7 +37,10 @@ describe("EquipmentUnequip.spec.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
 
     testItem = (await unitTestHelper.createMockItem()) as unknown as IItem;
-    testStackableItem = (await unitTestHelper.createStackableMockItem()) as unknown as IItem;
+    testStackableItem = (await unitTestHelper.createStackableMockItem({
+      stackQty: 25,
+      maxStackSize: 50,
+    })) as unknown as IItem;
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasInventory: true,
@@ -49,6 +53,7 @@ describe("EquipmentUnequip.spec.ts", () => {
     await equipment.save();
 
     inventory = await testCharacter.inventory;
+    inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
     // @ts-ignore
     socketMessaging = jest.spyOn(equipmentUnequip.socketMessaging, "sendEventToUser");
@@ -101,12 +106,64 @@ describe("EquipmentUnequip.spec.ts", () => {
     expect(testCharacter.attackType).toBe(EntityAttackType.Melee);
   });
 
-  describe("Validation cases", () => {});
+  describe("Validation cases", () => {
+    it("should not unequip an equipment that the character does not have on equipment", async () => {
+      equipment.leftHand = undefined;
+      await equipment.save();
+
+      const unequip = await equipmentUnequip.unequip(testCharacter, inventory, testItem);
+
+      expect(unequip).toBeFalsy();
+
+      expect(socketMessaging).toHaveBeenCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
+        message: "Sorry, you cannot unequip an item that you don't have.",
+        type: "error",
+      });
+    });
+
+    it("should fail if the inventory container is full", async () => {
+      const anotherItem = (await unitTestHelper.createMockItem()) as unknown as IItem;
+
+      inventoryContainer = await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 1, [anotherItem]);
+
+      const unequip = await equipmentUnequip.unequip(testCharacter, inventory, testItem);
+
+      expect(unequip).toBeFalsy();
+
+      expect(socketMessaging).toHaveBeenCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
+        message: "Sorry, your inventory is full.",
+        type: "error",
+      });
+
+      expect(equipment.leftHand).toBe(testItem._id);
+    });
+  });
 
   describe("Edge cases", () => {
-    it("Should successfully unequip an item that's stackable", () => {});
+    it("Should properly combine stackable items, on unequip", async () => {
+      const anotherStackableItem = (await unitTestHelper.createStackableMockItem({
+        stackQty: 25,
+        maxStackSize: 50,
+      })) as unknown as IItem;
 
-    it("Should NOT destroy the item, if we try to unequip but the inventory container is full", () => {});
+      inventoryContainer = await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 1, [
+        anotherStackableItem,
+      ]);
+
+      const unequip = await equipmentUnequip.unequip(testCharacter, inventory, testStackableItem);
+      expect(unequip).toBeTruthy();
+
+      const slots = await equipmentSlots.getEquipmentSlots(testCharacter.equipment as unknown as string);
+
+      expect(slots.accessory).toBeNull();
+
+      const inventoryContainerUpdated = (await ItemContainer.findById(
+        inventory.itemContainer
+      )) as unknown as IItemContainer;
+
+      expect(inventoryContainerUpdated.slots[0]._id).toEqual(anotherStackableItem._id);
+      expect(inventoryContainerUpdated.slots[0].stackQty).toBe(50);
+    });
   });
 
   afterAll(async () => {

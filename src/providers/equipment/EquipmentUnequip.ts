@@ -48,19 +48,18 @@ export class EquipmentUnequip {
       return false;
     }
 
-    // then remove item from equipment slot
+    const hasItemOnEquipment = await this.characterItems.hasItem(item._id, character, "equipment");
 
-    const deletedItemFromEquipment = await this.characterItems.deleteItemFromContainer(
-      item._id,
-      character,
-      "equipment"
-    );
+    if (hasItemOnEquipment) {
+      try {
+        await this.characterItems.deleteItemFromContainer(item._id, character, "equipment");
+      } catch (error) {
+        // if we couldn't remove the item from the equipment, we need to remove it from the inventory to avoid a duplicate item
+        await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
 
-    if (!deletedItemFromEquipment) {
-      // if we couldn't remove the item from the equipment, we need to remove it from the inventory to avoid a duplicate item
-      await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
-
-      return false;
+        console.error(error);
+        return false;
+      }
     }
 
     // send payload event to the client, informing about the change

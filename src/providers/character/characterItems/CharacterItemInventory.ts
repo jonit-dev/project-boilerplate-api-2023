@@ -15,7 +15,7 @@ export class CharacterItemInventory {
     if (!doesCharacterHaveItemInInventory) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
-        "Oops! The character does not have the item to be deleted."
+        "Oops! The character does not have the item to be deleted on the inventory."
       );
       return false;
     }
