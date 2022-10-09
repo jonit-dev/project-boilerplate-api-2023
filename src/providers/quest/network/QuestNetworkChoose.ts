@@ -90,12 +90,12 @@ export class QuestNetworkChoose {
 
           this.sendQuestStartedMessage(character);
 
-          setTimeout(() => {
+          setTimeout(async () => {
             // clear target and rollback movement type
             npc.currentMovementType = npc.originalMovementType;
             npc.targetCharacter = undefined;
             npc.targetType = NPCTargetType.Default;
-            npc.save();
+            await npc.save();
           }, 60 * 1000);
         } else {
           throw new Error(`NPC ${npc.name} out of range to choose a quest..`);

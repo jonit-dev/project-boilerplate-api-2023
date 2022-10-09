@@ -21,7 +21,7 @@ export class ForgotPasswordUseCase {
       throw new NotFoundError(TS.translate("users", "userNotFound"));
     }
 
-    this.analyticsHelper.track("ForgotPassword", user);
+    await this.analyticsHelper.track("ForgotPassword", user);
 
     if (user.authFlow !== UserAuthFlow.Basic) {
       throw new InternalServerError(TS.translate("auth", "authModeError"));

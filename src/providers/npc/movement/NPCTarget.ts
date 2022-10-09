@@ -21,7 +21,7 @@ export class NPCTarget {
     const npcBattleCycle = NPCBattleCycle.npcBattleCycles.get(npc.id);
 
     if (npcBattleCycle) {
-      npcBattleCycle.clear();
+      await npcBattleCycle.clear();
     }
   }
 

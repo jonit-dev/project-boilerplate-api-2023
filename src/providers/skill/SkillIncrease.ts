@@ -93,12 +93,12 @@ export class SkillIncrease {
 
     // If character strength skill level increased, send level up event
     if (increasedStrengthSP.skillLevelUp && attacker.channelId) {
-      this.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
+      await this.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
     }
 
     // If character skill level increased, send level up event specifying the skill that upgraded
     if (increasedWeaponSP.skillLevelUp && attacker.channelId) {
-      this.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
+      await this.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
     }
 
     await this.recordXPinBattle(attacker, target, damage);
@@ -130,7 +130,7 @@ export class SkillIncrease {
     if (!_.isEmpty(result)) {
       await this.updateSkills(skills, character);
       if (result.skillLevelUp && character.channelId) {
-        this.sendSkillLevelUpEvents(result, character);
+        await this.sendSkillLevelUpEvents(result, character);
       }
     }
   }
@@ -145,7 +145,7 @@ export class SkillIncrease {
     await this.updateSkills(skills, character);
 
     if (result.skillLevelUp && character.channelId) {
-      this.sendSkillLevelUpEvents(result, character);
+      await this.sendSkillLevelUpEvents(result, character);
     }
   }
 
@@ -194,7 +194,7 @@ export class SkillIncrease {
       await this.updateSkills(skills, character);
 
       if (levelUp) {
-        this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp: record!.xp! }, character, target);
+        await this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp: record!.xp! }, character, target);
       }
 
       await this.warnCharactersAroundAboutExpGains(character, record!.xp!);
@@ -203,11 +203,11 @@ export class SkillIncrease {
     await target.save();
   }
 
-  private sendSkillLevelUpEvents(
+  private async sendSkillLevelUpEvents(
     skillData: IIncreaseSPResult,
     character: ICharacter,
     target?: INPC | ICharacter
-  ): void {
+  ): Promise<void> {
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
       message: `You advanced from level ${skillData.skillLevel - 1} to ${skillData.skillLevel} in ${_.startCase(
         _.toLower(skillData.skillName)
@@ -226,10 +226,14 @@ export class SkillIncrease {
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
 
-    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.SkillLevelUp);
+    await this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.SkillLevelUp);
   }
 
-  private sendExpLevelUpEvents(expData: IIncreaseXPResult, character: ICharacter, target: INPC | ICharacter): void {
+  private async sendExpLevelUpEvents(
+    expData: IIncreaseXPResult,
+    character: ICharacter,
+    target: INPC | ICharacter
+  ): Promise<void> {
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
       message: `You advanced from level ${expData.previousLevel} to level ${expData.level}.`,
       type: "info",
@@ -241,9 +245,9 @@ export class SkillIncrease {
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, payload);
-    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LevelUp);
+    await this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LevelUp);
 
-    this.socketMessaging.sendEventToCharactersAroundCharacter(character, SkillSocketEvents.SkillGain, payload);
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(character, SkillSocketEvents.SkillGain, payload);
   }
 
   private async warnCharactersAroundAboutExpGains(character: ICharacter, exp: number): Promise<void> {

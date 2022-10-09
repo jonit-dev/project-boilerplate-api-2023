@@ -177,7 +177,7 @@ export class NPCMovementMoveTowards {
             await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
           }
 
-          this.tryToSwitchToRandomTarget(npc);
+          await this.tryToSwitchToRandomTarget(npc);
         },
         1000
       );
@@ -212,7 +212,7 @@ export class NPCMovementMoveTowards {
 
         // Only set as target if the minimum health character is with 25% of it's health
         if (minHealthCharacter.health <= minHealthCharacter.maxHealth / 4) {
-          this.npcTarget.setTarget(npc, minHealthCharacter);
+          await this.npcTarget.setTarget(npc, minHealthCharacter);
           npc.speed += npc.speed * 0.3;
           alreadySetted = true;
           return true;
@@ -221,7 +221,7 @@ export class NPCMovementMoveTowards {
 
       if (npc.canSwitchToRandomTarget && !alreadySetted) {
         const randomCharacter = _.sample(nearbyCharacters);
-        if (randomCharacter) this.npcTarget.setTarget(npc, randomCharacter);
+        if (randomCharacter) await this.npcTarget.setTarget(npc, randomCharacter);
         return true;
       }
     }

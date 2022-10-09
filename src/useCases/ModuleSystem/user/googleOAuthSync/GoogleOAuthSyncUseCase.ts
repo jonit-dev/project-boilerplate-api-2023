@@ -26,18 +26,18 @@ export class GoogleOAuthSyncUseCase {
         authFlow: UserAuthFlow.GoogleOAuth,
       });
 
-      this.analyticsHelper.track("UserLogin", newUser);
-      this.analyticsHelper.track("UserLoginGoogle", newUser);
-      this.analyticsHelper.updateUserInfo(newUser);
+      await this.analyticsHelper.track("UserLogin", newUser);
+      await this.analyticsHelper.track("UserLoginGoogle", newUser);
+      await this.analyticsHelper.updateUserInfo(newUser);
 
       return await newUser.generateAccessToken();
     } else {
       // Check if user already exists on database...
       // just create a new access token and refresh token and provide it
 
-      this.analyticsHelper.track("UserLogin", user);
-      this.analyticsHelper.track("UserLoginGoogle", user);
-      this.analyticsHelper.updateUserInfo(user);
+      await this.analyticsHelper.track("UserLogin", user);
+      await this.analyticsHelper.track("UserLoginGoogle", user);
+      await this.analyticsHelper.updateUserInfo(user);
 
       return await user.generateAccessToken();
     }

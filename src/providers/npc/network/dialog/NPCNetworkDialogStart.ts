@@ -69,12 +69,12 @@ export class NPCNetworkDialogStart {
               // Update interaction quest for character (if has any)
               await this.questSystem.updateQuests(QuestType.Interaction, character, npc.key);
 
-              setTimeout(() => {
+              setTimeout(async () => {
                 // clear target and rollback movement type
                 npc.currentMovementType = npc.originalMovementType;
                 npc.targetCharacter = undefined;
                 npc.targetType = NPCTargetType.Default;
-                npc.save();
+                await npc.save();
               }, 60 * 1000);
             } else {
               throw new Error(`NPCTalkToNPC > NPC dialogText is empty: ${npc._id}`);
