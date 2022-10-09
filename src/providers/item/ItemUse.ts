@@ -16,7 +16,6 @@ import {
   CharacterSocketEvents,
   ICharacterItemConsumed,
   IEquipmentAndInventoryUpdatePayload,
-  IEquipmentSet,
   ItemSocketEvents,
   ItemSubType,
 } from "@rpg-engine/shared";
@@ -67,17 +66,18 @@ export class ItemUse {
 
     await this.characterWeight.updateCharacterWeight(character);
 
+    const updatedInventoryContainer = await this.getInventoryContainer(character);
+
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-      equipment: {} as IEquipmentSet,
       inventory: {
-        _id: inventoryContainer._id,
-        parentItem: inventoryContainer!.parentItem.toString(),
-        owner: inventoryContainer?.owner?.toString() || character.name,
-        name: inventoryContainer?.name,
-        slotQty: inventoryContainer!.slotQty,
-        slots: inventoryContainer?.slots,
+        _id: updatedInventoryContainer?._id,
+        parentItem: updatedInventoryContainer!.parentItem.toString(),
+        owner: updatedInventoryContainer?.owner?.toString() || character.name,
+        name: updatedInventoryContainer?.name,
+        slotQty: updatedInventoryContainer!.slotQty,
+        slots: updatedInventoryContainer?.slots,
         allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
-        isEmpty: inventoryContainer!.isEmpty,
+        isEmpty: updatedInventoryContainer!.isEmpty,
       },
     };
 
