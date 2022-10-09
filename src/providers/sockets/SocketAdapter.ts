@@ -43,7 +43,7 @@ export class SocketAdapter implements ISocket {
     });
   }
 
-  public disconnect(): void {
-    SocketAdapter.socketClass?.disconnect();
+  public async disconnect(): Promise<void> {
+    await SocketAdapter.socketClass?.disconnect();
   }
 }

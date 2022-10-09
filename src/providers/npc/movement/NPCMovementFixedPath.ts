@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+// eslint-disable-next-line no-unused-vars
 import { NPCMovement } from "./NPCMovement";
 
 @provide(NPCMovementFixedPath)

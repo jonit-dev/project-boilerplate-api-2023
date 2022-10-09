@@ -24,9 +24,9 @@ export class LoginUseCase {
 
     const { accessToken, refreshToken } = await user.generateAccessToken();
 
-    this.analyticsHelper.updateUserInfo(user);
+    await this.analyticsHelper.updateUserInfo(user);
 
-    this.analyticsHelper.track("UserLogin", user);
+    await this.analyticsHelper.track("UserLogin", user);
 
     return {
       accessToken,

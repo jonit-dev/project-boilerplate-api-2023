@@ -58,7 +58,7 @@ export class BattleAttackTarget {
 
         if (rangedAttackParams) {
           await this.hitTarget(attacker, target);
-          this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+          await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
 
           if (attacker.type === "Character") {
             await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
@@ -82,7 +82,7 @@ export class BattleAttackTarget {
 
           if (rangedAttackParams) {
             await this.hitTarget(attacker, target);
-            this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+            await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
           }
         }
         break;

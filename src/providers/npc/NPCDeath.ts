@@ -45,7 +45,7 @@ export class NPCDeath {
       const npcCycle = NPCCycle.npcCycles.get(npc.id);
 
       if (npcCycle) {
-        npcCycle.clear();
+        await npcCycle.clear();
       }
 
       await this.npcTarget.clearTarget(npc);

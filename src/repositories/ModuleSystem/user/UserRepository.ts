@@ -19,9 +19,9 @@ export class UserRepository extends CRUD implements IUserRepository {
 
     await newUser.save();
 
-    this.analyticsHelper.track("UserRegister", newUser);
+    await this.analyticsHelper.track("UserRegister", newUser);
 
-    this.analyticsHelper.updateUserInfo(newUser);
+    await this.analyticsHelper.updateUserInfo(newUser);
 
     return newUser;
   }

@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { Quest, IQuest as IQuestModel } from "@entities/ModuleQuest/QuestModel";
+import { IQuest as IQuestModel, Quest } from "@entities/ModuleQuest/QuestModel";
 import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -10,6 +10,9 @@ import {
   GRID_WIDTH,
   IGetQuests,
   IQuest,
+  IQuestObjectiveInteraction,
+  IQuestObjectiveKill,
+  IQuestReward,
   IQuestsResponse,
   IUIShowMessage,
   NPCMovementType,
@@ -17,11 +20,8 @@ import {
   NPC_MAX_TALKING_DISTANCE_IN_GRID,
   QuestSocketEvents,
   QuestStatus,
-  UISocketEvents,
-  IQuestObjectiveKill,
-  IQuestObjectiveInteraction,
   QuestType,
-  IQuestReward,
+  UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
@@ -59,12 +59,12 @@ export class QuestNetworkGet {
 
           questsResponse = await this.getNPCQuests(npc, data, character);
 
-          setTimeout(() => {
+          setTimeout(async () => {
             // clear target and rollback movement type
             npc.currentMovementType = npc.originalMovementType;
             npc.targetCharacter = undefined;
             npc.targetType = NPCTargetType.Default;
-            npc.save();
+            await npc.save();
           }, 60 * 1000);
         } else if (data.characterId) {
           questsResponse = await this.getCharacterQuests(data, character);

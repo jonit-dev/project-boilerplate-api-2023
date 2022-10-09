@@ -2,13 +2,14 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ItemValidation } from "./validation/ItemValidation";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { ItemValidation } from "./validation/ItemValidation";
 
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
@@ -20,7 +21,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
-import { AnimationEffect } from "@providers/animation/AnimationEffect";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -145,7 +145,7 @@ export class ItemUse {
       this.socketMessaging.sendEventToUser(character.channelId, CharacterSocketEvents.ItemConsumed, payload);
     }
 
-    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LifeHeal);
+    await this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LifeHeal);
   }
 
   private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {

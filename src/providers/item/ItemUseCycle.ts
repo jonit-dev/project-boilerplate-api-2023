@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 export class ItemUseCycle {
   constructor(fn: Function, iterations: number) {
     this.execute(fn, iterations);

@@ -18,9 +18,9 @@ export class RefreshUseCase {
    * @param user
    * @param refreshToken
    */
-  public refreshToken(user: IUser, refreshToken: string): string | false {
+  public async refreshToken(user: IUser, refreshToken: string): Promise<string | false> {
     if (user) {
-      this.analyticsHelper.track("UserTokenRefresh", user);
+      await this.analyticsHelper.track("UserTokenRefresh", user);
     }
 
     if (!refreshToken) {
