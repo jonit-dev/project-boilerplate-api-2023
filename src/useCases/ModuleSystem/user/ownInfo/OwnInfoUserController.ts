@@ -11,9 +11,9 @@ export class OwnInfoUserController implements interfaces.Controller {
   constructor(private ownInfoUseCase: OwnInfoUserUseCase) {}
 
   @httpGet("/self", AuthMiddleware)
-  private ownInfo(req: IAuthenticatedRequest, res: Response): IUser {
+  private async ownInfo(req: IAuthenticatedRequest, res: Response): Promise<IUser> {
     const user = req.user;
 
-    return this.ownInfoUseCase.getUserInfo(user);
+    return await this.ownInfoUseCase.getUserInfo(user);
   }
 }

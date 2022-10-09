@@ -10,8 +10,8 @@ export class BattleNetworkStopTargeting {
   constructor(private socketAuth: SocketAuth) {}
 
   public onBattleStopTargeting(channel: SocketChannel): void {
-    this.socketAuth.authCharacterOn(channel, BattleSocketEvents.StopTargeting, (data, character) => {
-      this.stopTargeting(character);
+    this.socketAuth.authCharacterOn(channel, BattleSocketEvents.StopTargeting, async (data, character) => {
+      await this.stopTargeting(character);
     });
   }
 

@@ -17,6 +17,7 @@ export class NPCCycle {
     if (NPCCycle.npcCycles.has(this.id)) {
       const npcCycle = NPCCycle.npcCycles.get(this.id);
       if (npcCycle) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         npcCycle.clear();
       }
     } else {

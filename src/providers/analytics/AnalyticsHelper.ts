@@ -11,7 +11,7 @@ import { amplitudeClient, mixpanel } from "../constants/AnalyticsConstants";
 export class AnalyticsHelper {
   constructor() {}
 
-  public track(eventName: string, user?: IUser): void {
+  public async track(eventName: string, user?: IUser): Promise<void> {
     try {
       if (appEnv.general.ENV === EnvType.Development) {
         console.log(
@@ -22,7 +22,7 @@ export class AnalyticsHelper {
 
       console.log(`✨ Analytics: Tracking event ${eventName} ${user ? `for user ${user.email}` : ""}`);
 
-      amplitudeClient.logEvent({
+      await amplitudeClient.logEvent({
         event_type: eventName,
         user_id: user?.email,
         ip: "127.0.0.1",
@@ -30,7 +30,7 @@ export class AnalyticsHelper {
           time: new Date(),
         },
       });
-      amplitudeClient.flush();
+      await amplitudeClient.flush();
 
       let mixpanelProperties;
       if (user) {
@@ -49,7 +49,7 @@ export class AnalyticsHelper {
     }
   }
 
-  public updateUserInfo(user: IUser): void {
+  public async updateUserInfo(user: IUser): Promise<void> {
     try {
       if (appEnv.general.ENV === EnvType.Development) {
         return;
@@ -62,7 +62,7 @@ export class AnalyticsHelper {
         const identify = new Identify();
         identify.set("start_date", dayjs(new Date()).format(DEFAULT_DATE_FORMAT));
 
-        amplitudeClient.identify(user._id, user._id, identify);
+        await amplitudeClient.identify(user._id, user._id, identify);
 
         // mixpanel user
         mixpanel.people.set(

@@ -57,7 +57,7 @@ export class CRUD {
       await newRecord.save();
 
       if (user) {
-        this.analytics.track(`Create${Model.modelName}`, user);
+        await this.analytics.track(`Create${Model.modelName}`, user);
       }
 
       if (populateKeys) {
@@ -113,7 +113,7 @@ export class CRUD {
       }
 
       if (user) {
-        this.analytics.track(`ReadOne${Model.modelName}`, user);
+        await this.analytics.track(`ReadOne${Model.modelName}`, user);
       }
 
       return record;
@@ -176,7 +176,7 @@ export class CRUD {
       }
 
       if (user) {
-        this.analytics.track(`ReadAll${pluralize(Model.modelName)}`, user);
+        await this.analytics.track(`ReadAll${pluralize(Model.modelName)}`, user);
       }
 
       return results;
@@ -241,7 +241,7 @@ export class CRUD {
       }
 
       if (user) {
-        this.analytics.track(`UpdateOne${Model.modelName}`, user);
+        await this.analytics.track(`UpdateOne${Model.modelName}`, user);
       }
 
       await model.save();
@@ -395,7 +395,7 @@ export class CRUD {
       }
 
       if (user) {
-        this.analytics.track(`Delete${Model.modelName}`, user);
+        await this.analytics.track(`Delete${Model.modelName}`, user);
       }
     } catch (error) {
       console.error(error);

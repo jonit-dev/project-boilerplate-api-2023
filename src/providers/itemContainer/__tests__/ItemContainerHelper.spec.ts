@@ -45,7 +45,7 @@ describe("ItemContainerHelper", () => {
       const lootContainer = new ItemContainer({
         parentItem: charBody.id,
       });
-      lootContainer.save();
+      await lootContainer.save();
 
       const type = await itemContainerHelper.getType(lootContainer as unknown as IItemContainer);
 

@@ -17,6 +17,7 @@ export class BattleCycle {
     if (BattleCycle.battleCycles.has(this.id)) {
       const battleCycle = BattleCycle.battleCycles.get(this.id);
       if (battleCycle) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         battleCycle.clear();
       }
     } else {
