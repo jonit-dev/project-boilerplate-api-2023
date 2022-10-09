@@ -14,7 +14,7 @@ export class ChangePasswordUseCase {
   constructor(private analyticsHelper: AnalyticsHelper) {}
 
   public async changePassword(user: IUser, authChangePasswordDTO: AuthChangePasswordDTO): Promise<void> {
-    await this.analytics.track("ChangePassword", user);
+    await this.analyticsHelper.track("ChangePassword", user);
 
     const { currentPassword, newPassword } = authChangePasswordDTO;
 

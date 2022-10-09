@@ -15,6 +15,6 @@ export class LogoutUseCase {
 
     await user.save();
 
-    await this.analytics.track("UserLogout", user);
+    await this.analyticsHelper.track("UserLogout", user);
   }
 }
