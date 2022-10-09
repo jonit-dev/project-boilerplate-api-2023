@@ -241,6 +241,8 @@ export class SkillIncrease {
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, payload);
+    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LevelUp);
+
     this.socketMessaging.sendEventToCharactersAroundCharacter(character, SkillSocketEvents.SkillGain, payload);
   }
 
