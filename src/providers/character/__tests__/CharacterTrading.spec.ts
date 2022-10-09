@@ -5,7 +5,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { EquipmentEquip } from "../../equipment/EquipmentEquip";
 
 import { ItemPickup } from "@providers/item/ItemPickup";
-import { CharacterItems } from "../CharacterItems";
+import { CharacterItems } from "../characterItems/CharacterItems";
 import { CharacterTrading } from "@providers/character/CharacterTrading";
 
 describe("CharacterTrading.ts", () => {
