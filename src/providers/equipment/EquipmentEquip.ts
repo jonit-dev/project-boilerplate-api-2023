@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -8,6 +8,7 @@ import {
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
   IItem,
+  IItemContainer,
   ItemSlotType,
   ItemSocketEvents,
   ItemType,
@@ -16,13 +17,15 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
+import { EquipmentSlots } from "./EquipmentSlots";
 
 @provide(EquipmentEquip)
 export class EquipmentEquip {
   constructor(
     private socketMessaging: SocketMessaging,
     private equipmentHelper: EquipmentRangeUpdate,
-    private characterItemInventory: CharacterItemInventory
+    private characterItemInventory: CharacterItemInventory,
+    private equipmentSlots: EquipmentSlots
   ) {}
 
   public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<void> {
@@ -60,7 +63,7 @@ export class EquipmentEquip {
         await Item.deleteOne({ _id: item._id });
         await this.characterItemInventory.deleteItemFromInventory(itemId, character);
 
-        const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+        const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
           equipment: equipmentSlots,
           inventory: {
@@ -124,20 +127,15 @@ export class EquipmentEquip {
 
       await this.characterItemInventory.deleteItemFromInventory(itemId, character);
 
-      const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+
+      const inventory = await character.inventory;
+
+      const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
       const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
         equipment: equipmentSlots,
-        inventory: {
-          _id: itemContainer._id,
-          parentItem: itemContainer!.parentItem.toString(),
-          owner: itemContainer?.owner?.toString() || character.name,
-          name: itemContainer?.name,
-          slotQty: itemContainer!.slotQty,
-          slots: itemContainer?.slots,
-          allowedItemTypes: this.getAllowedItemTypes(),
-          isEmpty: itemContainer!.isEmpty,
-        },
+        inventory: inventoryContainer,
       };
 
       this.updateItemInventoryCharacter(payloadUpdate, character);
@@ -162,10 +160,10 @@ export class EquipmentEquip {
 
   private async getItemContainer(item: IItem, itemContainerId: string): Promise<IItemContainer> {
     if (item.isItemContainer && itemContainerId === "") {
-      return (await ItemContainer.findById(item.itemContainer)) as IItemContainer;
+      return (await ItemContainer.findById(item.itemContainer)) as unknown as IItemContainer;
     }
 
-    const itemContainer = (await ItemContainer.findById(itemContainerId)) as IItemContainer;
+    const itemContainer = (await ItemContainer.findById(itemContainerId)) as unknown as IItemContainer;
 
     return itemContainer;
   }
@@ -197,7 +195,7 @@ export class EquipmentEquip {
 
     if (!equipItemContainer) {
       for (const slot in itemContainer.slots) {
-        if (itemContainer.slots[slot] && itemContainer.slots[slot]._id.toString() === itemId.toString()) {
+        if (itemContainer.slots[slot] && itemContainer.slots[slot]?._id.toString() === itemId.toString()) {
           userHasItem = true;
           break;
         }
@@ -242,7 +240,7 @@ export class EquipmentEquip {
   }
 
   private async checkTwoHandedEquip(equipment: IEquipmentSet): Promise<boolean> {
-    const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
     if (!equipmentSlots.leftHand && !equipmentSlots.rightHand) return true;
 
     return false;
@@ -278,6 +276,10 @@ export class EquipmentEquip {
     return availableSlot;
   }
 
+  public getWordCamelCase(word: string): string {
+    return word.charAt(0).toLowerCase() + word.slice(1);
+  }
+
   private getSlotType(itemSlotTypes: string[], slotType: string, subType: string): string {
     if (!itemSlotTypes.includes(slotType)) {
       return subType;
@@ -285,8 +287,14 @@ export class EquipmentEquip {
     return slotType;
   }
 
-  public getWordCamelCase(word: string): string {
-    return word.charAt(0).toLowerCase() + word.slice(1);
+  public getAllowedItemTypes(): ItemType[] {
+    const allowedItemTypes: ItemType[] = [];
+
+    for (const allowedItemType of Object.keys(ItemType)) {
+      allowedItemTypes.push(ItemType[allowedItemType]);
+    }
+
+    return allowedItemTypes;
   }
 
   public updateItemInventoryCharacter(
@@ -298,47 +306,6 @@ export class EquipmentEquip {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       equipmentAndInventoryUpdate
     );
-  }
-
-  public async getEquipmentSlots(equipmentId: string): Promise<IEquipmentSet> {
-    const equipment = await Equipment.findById(equipmentId)
-      .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
-      .exec();
-
-    const head = equipment?.head! as unknown as IItem;
-    const neck = equipment?.neck! as unknown as IItem;
-    const leftHand = equipment?.leftHand! as unknown as IItem;
-    const rightHand = equipment?.rightHand! as unknown as IItem;
-    const ring = equipment?.ring! as unknown as IItem;
-    const legs = equipment?.legs! as unknown as IItem;
-    const boot = equipment?.boot! as unknown as IItem;
-    const accessory = equipment?.accessory! as unknown as IItem;
-    const armor = equipment?.armor! as unknown as IItem;
-    const inventory = equipment?.inventory! as unknown as IItem;
-
-    return {
-      _id: equipment!._id,
-      head,
-      neck,
-      leftHand,
-      rightHand,
-      ring,
-      legs,
-      boot,
-      accessory,
-      armor,
-      inventory,
-    };
-  }
-
-  public getAllowedItemTypes(): ItemType[] {
-    const allowedItemTypes: ItemType[] = [];
-
-    for (const allowedItemType of Object.keys(ItemType)) {
-      allowedItemTypes.push(ItemType[allowedItemType]);
-    }
-
-    return allowedItemTypes;
   }
 
   private async tryAddingItemToStack(

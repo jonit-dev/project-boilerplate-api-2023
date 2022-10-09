@@ -4,6 +4,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { IItem, ItemType, UISocketEvents } from "@rpg-engine/shared";
 import { EquipmentEquip } from "../EquipmentEquip";
+import { EquipmentSlots } from "../EquipmentSlots";
 
 describe("EquipmentEquip.spec.ts", () => {
   let equipmentEquip: EquipmentEquip;
@@ -11,11 +12,12 @@ describe("EquipmentEquip.spec.ts", () => {
   let item: IItem;
   let itemTwoHanded: IItem;
   let character: ICharacter;
-  let charBody: IItem;
+  let equipmentSlots: EquipmentSlots;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
+    equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
 
   const tryToEquipItemWithAnotherAlreadyEquipped = async (
@@ -42,11 +44,10 @@ describe("EquipmentEquip.spec.ts", () => {
     item = (await unitTestHelper.createMockItem({ x: 10, y: 10 })) as unknown as IItem;
     itemTwoHanded = (await unitTestHelper.createMockItemTwoHanded({ x: 10, y: 10 })) as unknown as IItem;
     character = await unitTestHelper.createMockCharacter({ x: 10, y: 20 }, { hasEquipment: true, hasInventory: true });
-    charBody = (await unitTestHelper.createMockItemContainer(character)) as unknown as IItem;
   });
 
   it("Should get the equipment slots", async () => {
-    const result = await equipmentEquip.getEquipmentSlots(equipment._id);
+    const result = await equipmentSlots.getEquipmentSlots(equipment._id);
 
     const itemHead = result.head as IItem;
     const itemNeck = result.neck as IItem;

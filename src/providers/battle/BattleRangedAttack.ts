@@ -4,6 +4,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
+import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -38,7 +39,8 @@ export class BattleRangedAttack {
     private socketMessaging: SocketMessaging,
     private equipmentEquip: EquipmentEquip,
     private mathHelper: MathHelper,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private equipmentSlots: EquipmentSlots
   ) {}
 
   /**
@@ -268,7 +270,7 @@ export class BattleRangedAttack {
       await Item.deleteOne({ _id: attackParams.id });
     }
 
-    const equipmentSlots = await this.equipmentEquip.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,
