@@ -1,26 +1,19 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { EquipmentRead } from "../EquipmentRead";
 import { EquipmentSlots } from "../EquipmentSlots";
 
 describe("EquipmentSlots.ts", () => {
-  let equipmentSetRead: EquipmentRead;
-
-  let testCharacter: ICharacter;
   let equipmentSlots: EquipmentSlots;
   let equipment: IEquipment;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
-    equipmentSetRead = container.get<EquipmentRead>(EquipmentRead);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
-    testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     equipment = await unitTestHelper.createEquipment();
   });
 
@@ -29,12 +22,38 @@ describe("EquipmentSlots.ts", () => {
 
     equipment.leftHand = regularItem._id;
     await equipment.save();
-    console.log(testCharacter);
-    console.log(equipmentSetRead);
 
-    // const isSlotAvailable = equipmentSlots.isSlotAvailable("leftHand", equipment);
+    const isSlotAvailable = await equipmentSlots.areAllowedSlotsAvailable(regularItem.allowedEquipSlotType!, equipment);
 
-    // expect(isSlotAvailable).toBeFalsy();
+    expect(isSlotAvailable).toBeFalsy();
+  });
+
+  it("should tell that the slot is AVAILABLE, if a STACKABLE item if not on its full capacity", async () => {
+    const stackableItem = await unitTestHelper.createMockItem({ stackQty: 10, maxStackSize: 20 });
+
+    equipment.leftHand = stackableItem._id;
+    await equipment.save();
+
+    const isSlotAvailable = await equipmentSlots.areAllowedSlotsAvailable(
+      stackableItem.allowedEquipSlotType!,
+      equipment
+    );
+
+    expect(isSlotAvailable).toBeTruthy();
+  });
+
+  it("should tell that a slot is NOT AVAILABLE, if a STACKABLE item is at full capacity", async () => {
+    const stackableItem = await unitTestHelper.createMockItem({ stackQty: 20, maxStackSize: 20 });
+
+    equipment.leftHand = stackableItem._id;
+    await equipment.save();
+
+    const isSlotAvailable = await equipmentSlots.areAllowedSlotsAvailable(
+      stackableItem.allowedEquipSlotType!,
+      equipment
+    );
+
+    expect(isSlotAvailable).toBeFalsy();
   });
 
   it("should get the equipment slots", async () => {

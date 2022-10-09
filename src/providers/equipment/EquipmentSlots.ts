@@ -1,11 +1,61 @@
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IEquipmentSet, IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { camelCase } from "lodash";
 
+export type EquipmentSlotTypes =
+  | "head"
+  | "neck"
+  | "leftHand"
+  | "rightHand"
+  | "ring"
+  | "legs"
+  | "boot"
+  | "accessory"
+  | "armor"
+  | "inventory";
+
 @provide(EquipmentSlots)
 export class EquipmentSlots {
-  private slots = ["head", "neck", "leftHand", "rightHand", "ring", "legs", "boot", "accessory", "armor", "inventory"];
+  private slots: EquipmentSlotTypes[] = [
+    "head",
+    "neck",
+    "leftHand",
+    "rightHand",
+    "ring",
+    "legs",
+    "boot",
+    "accessory",
+    "armor",
+    "inventory",
+  ];
+
+  public async areAllowedSlotsAvailable(slots: string[], equipment: IEquipment): Promise<boolean> {
+    const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+
+    for (const slotData of slots) {
+      const slot = camelCase(slotData) as EquipmentSlotTypes;
+
+      if (equipmentSlots[slot] === undefined) {
+        return true;
+      }
+
+      const equippedItem = equipmentSlots[slot] as unknown as IItem;
+      const isStackable = equippedItem.maxStackSize > 1;
+
+      if (!isStackable) {
+        return false;
+      }
+
+      // stackable items
+
+      if (equippedItem.stackQty === equippedItem.maxStackSize) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   public getAvailableSlot(item: IItem, equipment: IEquipmentSet): string {
     let availableSlot = "";
