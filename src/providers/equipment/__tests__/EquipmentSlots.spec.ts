@@ -1,11 +1,15 @@
-import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { EquipmentSlots } from "../EquipmentSlots";
 
 describe("EquipmentSlots.ts", () => {
   let equipmentSlots: EquipmentSlots;
   let equipment: IEquipment;
+  let testCharacter: ICharacter;
+  let socketMessaging;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -14,7 +18,32 @@ describe("EquipmentSlots.ts", () => {
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
-    equipment = await unitTestHelper.createEquipment();
+    testCharacter = await unitTestHelper.createMockCharacter(null, { hasInventory: true, hasEquipment: true });
+    equipment = (await Equipment.findById(testCharacter.equipment)) as unknown as IEquipment;
+    // @ts-ignore
+    socketMessaging = jest.spyOn(equipmentSlots.socketMessaging, "sendErrorMessageToCharacter");
+  });
+
+  it("should properly add a NON-STACKABLE item to a equipment slot", async () => {
+    const newItem = await unitTestHelper.createMockItem();
+    const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, newItem, equipment);
+
+    expect(result).toBe(true);
+
+    const equipmentSet = await equipmentSlots.getEquipmentSlots(equipment._id);
+
+    expect(equipmentSet).toBeTruthy();
+
+    const leftHandItem = equipmentSet.leftHand as unknown as IItem;
+
+    expect(leftHandItem._id).toEqual(newItem._id);
+  });
+
+  it("should properly add a STACKABLE item to an EMPTY equipment slot", async () => {
+    const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedBlueprint.Arrow, { stackQty: 10 });
+    const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, stackableItem, equipment);
+
+    expect(result).toBe(true);
   });
 
   it("should properly tell if an slot is availble or not for NON-STACKABLE item", async () => {
@@ -59,14 +88,24 @@ describe("EquipmentSlots.ts", () => {
   it("should get the equipment slots", async () => {
     const result = await equipmentSlots.getEquipmentSlots(equipment._id);
 
-    const itemHead = result.head as unknown as IItem;
-    const itemNeck = result.neck as unknown as IItem;
+    expect(result).toBeTruthy();
 
-    expect(itemHead._id).toEqual(equipment.head);
-    expect(itemHead.name).toBe("Short Sword");
+    expect(result.inventory).toBeDefined();
+  });
 
-    expect(itemNeck._id).toEqual(equipment.neck);
-    expect(itemNeck.name).toBe("Short Sword");
+  describe("Validations", () => {
+    it("should fail if you try to add a NON-STACKABLE item, but the slot is not empty", async () => {
+      const regularItem = await unitTestHelper.createMockItem();
+
+      equipment.leftHand = regularItem._id;
+      await equipment.save();
+
+      const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, regularItem, equipment);
+
+      expect(result).toBe(false);
+
+      expect(socketMessaging).toBeCalledWith(testCharacter, "Sorry, you don't have any available slots for this item.");
+    });
   });
 
   afterAll(async () => {
