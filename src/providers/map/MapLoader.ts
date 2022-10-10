@@ -18,13 +18,13 @@ export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
   constructor(private gridManager: GridManager) {}
 
-  public async init(isTest: boolean = false): Promise<void> {
+  public async init(isUnitTest: boolean = false): Promise<void> {
     // get all map names
 
     const mapNames = this.getMapNames();
     const mapToCheckTransitions: MapObject[] = [];
 
-    if (!isTest) {
+    if (!isUnitTest) {
       console.time("🟧 Solids generated in");
     }
 
@@ -44,7 +44,7 @@ export class MapLoader {
         this.hasMapRequiredLayers(mapFileName, currentMap as ITiled);
       }
 
-      const updated = await this.checkMapUpdated(mapPath, mapFileName, currentMap, isTest);
+      const updated = await this.checkMapUpdated(mapPath, mapFileName, currentMap, isUnitTest);
 
       if (updated) {
         mapToCheckTransitions.push({ name: mapFileName, data: currentMap });
@@ -57,7 +57,7 @@ export class MapLoader {
       this.gridManager.generateGridSolids(mapName);
     }
 
-    if (!isTest) {
+    if (!isUnitTest) {
       console.timeEnd("🟧 Solids generated in");
 
       console.log("📦 Maps and grids are loaded!");
@@ -84,8 +84,12 @@ export class MapLoader {
     mapPath: string,
     mapFileName: string,
     mapObject: object,
-    isTest: boolean = false
+    isUnitTest: boolean = false
   ): Promise<boolean> {
+    if (!isUnitTest) {
+      return true;
+    }
+
     const mapChecksum = this.checksum(mapPath);
     const fileName = mapFileName.replace(".json", "");
     const mapData = await MapModel.find({ name: fileName });
@@ -103,16 +107,14 @@ export class MapLoader {
         return true;
       }
     } else {
-      if (!isTest) {
-        console.log(`📦 Map ${fileName} is created!`);
+      console.log(`📦 Map ${fileName} is created!`);
 
-        await MapModel.create({ name: fileName, checksum: mapChecksum });
+      await MapModel.create({ name: fileName, checksum: mapChecksum });
 
-        // create zip
-        const pathToSave = `${STATIC_PATH}/maps`;
-        await createZipMap(fileName, mapObject, pathToSave);
-        return true;
-      }
+      // create zip
+      const pathToSave = `${STATIC_PATH}/maps`;
+      await createZipMap(fileName, mapObject, pathToSave);
+      return true;
     }
 
     return false;

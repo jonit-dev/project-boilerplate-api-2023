@@ -193,7 +193,6 @@ export class UnitTestHelper {
       ...characterMock,
       ...extraProps,
     });
-    await testCharacter.save();
 
     if (options?.hasSkills) {
       const charSkills = new Skill({
@@ -202,7 +201,6 @@ export class UnitTestHelper {
       charSkills.owner = testCharacter._id;
       testCharacter.skills = charSkills._id;
       await charSkills.save();
-      await testCharacter.save();
     }
 
     if (options?.hasEquipment) {
@@ -214,8 +212,9 @@ export class UnitTestHelper {
       }
       await equipment.save();
       testCharacter.equipment = equipment._id;
-      await testCharacter.save();
     }
+
+    await testCharacter.save();
     return testCharacter;
   }
 
