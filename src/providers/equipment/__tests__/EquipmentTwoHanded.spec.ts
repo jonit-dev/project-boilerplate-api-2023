@@ -12,8 +12,6 @@ describe("EquipmentTwoHanded.spec.ts", () => {
   let item: IItem;
   let itemTwoHanded: IItem;
   let testCharacter: ICharacter;
-  let testItem: IItem;
-  let inventory: IItem;
 
   const tryToEquipItemWithAnotherAlreadyEquipped = async (
     inventoryContainer: IItemContainer,
@@ -47,9 +45,6 @@ describe("EquipmentTwoHanded.spec.ts", () => {
       { x: 10, y: 20 },
       { hasEquipment: true, hasInventory: true, hasSkills: true }
     );
-    inventory = await testCharacter.inventory;
-
-    testItem = await unitTestHelper.createMockItem();
   });
 
   it("should properly equip a stack item", async () => {});

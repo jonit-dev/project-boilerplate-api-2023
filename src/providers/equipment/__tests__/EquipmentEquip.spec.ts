@@ -10,7 +10,7 @@ describe("EquipmentEquip.spec.ts", () => {
   let equipmentEquip: EquipmentEquip;
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
-  let socketMessaging;
+
   let sendEventToUser;
 
   beforeAll(async () => {
@@ -26,8 +26,6 @@ describe("EquipmentEquip.spec.ts", () => {
     inventory = await testCharacter.inventory;
     inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
-    // @ts-ignore
-    socketMessaging = jest.spyOn(equipmentEquip.socketMessaging, "sendErrorMessageToCharacter");
     // @ts-ignore
     sendEventToUser = jest.spyOn(equipmentEquip.socketMessaging, "sendEventToUser");
   });
