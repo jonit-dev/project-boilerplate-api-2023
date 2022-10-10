@@ -112,6 +112,7 @@ export class UnitTestHelper {
     }
 
     container.slots = slots;
+    container.markModified("slots");
     await container.save();
 
     return container;
@@ -136,6 +137,19 @@ export class UnitTestHelper {
     const item = await Item.findById(charBody._id).populate("itemContainer").exec();
 
     return item as IItem;
+  }
+
+  public async createMockItemFromBlueprint(blueprintKey: string, extraProps?: Partial<IItem>): Promise<IItem> {
+    const blueprintData = itemsBlueprintIndex[blueprintKey];
+
+    const newItem = new Item({
+      ...blueprintData,
+      ...extraProps,
+    });
+
+    await newItem.save();
+
+    return newItem;
   }
 
   public async createMockItem(extraProps?: Partial<IItem>): Promise<IItem> {

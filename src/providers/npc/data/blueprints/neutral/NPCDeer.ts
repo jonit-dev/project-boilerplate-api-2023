@@ -32,7 +32,7 @@ export const npcDeer = {
   experience: 10,
   loots: [
     {
-      itemBlueprintKey: FoodsBlueprint.Salmon,
+      itemBlueprintKey: FoodsBlueprint.RedMeat,
       chance: 30,
     },
   ],

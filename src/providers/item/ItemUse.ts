@@ -10,12 +10,12 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
   ICharacterItemConsumed,
   IEquipmentAndInventoryUpdatePayload,
-  IEquipmentSet,
   ItemSocketEvents,
   ItemSubType,
 } from "@rpg-engine/shared";
@@ -31,7 +31,8 @@ export class ItemUse {
     private equipmentEquip: EquipmentEquip,
     private characterWeight: CharacterWeight,
     private characterView: CharacterView,
-    private animationEffect: AnimationEffect
+    private animationEffect: AnimationEffect,
+    private characterItems: CharacterItems
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -61,21 +62,22 @@ export class ItemUse {
 
     const inventoryContainer = (await this.getInventoryContainer(character)) as unknown as IItemContainer;
 
-    await this.consumeItem(inventoryContainer, useItem);
+    await this.consumeItem(character, inventoryContainer, useItem);
 
     await this.characterWeight.updateCharacterWeight(character);
 
+    const updatedInventoryContainer = await this.getInventoryContainer(character);
+
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-      equipment: {} as IEquipmentSet,
       inventory: {
-        _id: inventoryContainer._id,
-        parentItem: inventoryContainer!.parentItem.toString(),
-        owner: inventoryContainer?.owner?.toString() || character.name,
-        name: inventoryContainer?.name,
-        slotQty: inventoryContainer!.slotQty,
-        slots: inventoryContainer?.slots,
+        _id: updatedInventoryContainer?._id,
+        parentItem: updatedInventoryContainer!.parentItem.toString(),
+        owner: updatedInventoryContainer?.owner?.toString() || character.name,
+        name: updatedInventoryContainer?.name,
+        slotQty: updatedInventoryContainer!.slotQty,
+        slots: updatedInventoryContainer?.slots,
         allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
-        isEmpty: inventoryContainer!.isEmpty,
+        isEmpty: updatedInventoryContainer!.isEmpty,
       },
     };
 
@@ -98,7 +100,7 @@ export class ItemUse {
     }, intervals);
   }
 
-  private async consumeItem(inventoryContainer: IItemContainer, item: IItem): Promise<void> {
+  private async consumeItem(character: ICharacter, inventoryContainer: IItemContainer, item: IItem): Promise<void> {
     let stackReduced = false;
 
     if (item.isStackable && item.stackQty && item.stackQty > 1) {
@@ -119,7 +121,7 @@ export class ItemUse {
     }
 
     if (!stackReduced) {
-      await this.equipmentEquip.removeItemFromInventory(item._id, inventoryContainer);
+      await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
       await Item.deleteOne({ _id: item._id });
     }
   }

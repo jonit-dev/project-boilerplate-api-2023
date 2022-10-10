@@ -1,18 +1,18 @@
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { ItemUse } from "../ItemUse";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { stackableItemMock } from "@providers/unitTests/mock/itemMock";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { AnimationEffectKeys, CharacterSocketEvents, ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { itemApple } from "../data/blueprints/foods/ItemApple";
-import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
-import { itemLightLifePotion } from "../data/blueprints/potions/ItemLightLifePotion";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ItemValidation } from "../validation/ItemValidation";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { stackableItemMock } from "@providers/unitTests/mock/itemMock";
+import { AnimationEffectKeys, CharacterSocketEvents, ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { itemApple } from "../data/blueprints/foods/ItemApple";
+import { itemLightLifePotion } from "../data/blueprints/potions/ItemLightLifePotion";
+import { ItemUse } from "../ItemUse";
+import { ItemValidation } from "../validation/ItemValidation";
 
 describe("ItemUse.ts", () => {
   let itemUse: ItemUse;
@@ -168,7 +168,6 @@ describe("ItemUse.ts", () => {
     const inventoryContainer = await getInventoryContainer();
 
     expect(sendEventToUser).toBeCalledWith(testCharacter.channelId, ItemSocketEvents.EquipmentAndInventoryUpdate, {
-      equipment: {},
       inventory: {
         _id: inventoryContainer._id,
         parentItem: inventoryContainer!.parentItem.toString(),

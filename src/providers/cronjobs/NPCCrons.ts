@@ -20,7 +20,6 @@ export class NPCCrons {
       });
 
       for (const deadNPC of deadNPCs) {
-        console.log(`💀 NPC ${deadNPC.name} is dead and will be respawned`);
         await this.npcSpawn.spawn(deadNPC);
       }
     });

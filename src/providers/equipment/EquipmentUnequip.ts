@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 
@@ -19,7 +20,8 @@ export class EquipmentUnequip {
     private characterValidation: CharacterValidation,
     private socketMessaging: SocketMessaging,
     private characterItems: CharacterItems,
-    private characterItemSlots: CharacterItemSlots
+    private characterItemSlots: CharacterItemSlots,
+    private characterItemContainer: CharacterItemContainer
   ) {}
 
   public async unequip(character: ICharacter, inventory: IItem, item: IItem): Promise<boolean> {
@@ -42,7 +44,11 @@ export class EquipmentUnequip {
 
     //   add it to the inventory
 
-    const addItemToInventory = await this.characterItems.addItemToContainer(item, character, inventoryContainerId);
+    const addItemToInventory = await this.characterItemContainer.addItemToContainer(
+      item,
+      character,
+      inventoryContainerId
+    );
 
     if (!addItemToInventory) {
       return false;

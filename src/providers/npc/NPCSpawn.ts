@@ -21,7 +21,6 @@ export class NPCSpawn {
     const canSpawn = await this.canSpawn(npc);
 
     if (!canSpawn) {
-      console.log(`💀 NPC ${npc.name} is too close to another character and will not be spawned`);
       return;
     }
 
