@@ -18,13 +18,15 @@ export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
   constructor(private gridManager: GridManager) {}
 
-  public async init(): Promise<void> {
+  public async init(isTest: boolean = false): Promise<void> {
     // get all map names
 
     const mapNames = this.getMapNames();
     const mapToCheckTransitions: MapObject[] = [];
 
-    console.time("🟧 Solids generated in");
+    if (!isTest) {
+      console.time("🟧 Solids generated in");
+    }
 
     for (const mapFileName of mapNames) {
       if (mapFileName.includes("_hash")) {
@@ -42,7 +44,7 @@ export class MapLoader {
         this.hasMapRequiredLayers(mapFileName, currentMap as ITiled);
       }
 
-      const updated = await this.checkMapUpdated(mapPath, mapFileName, currentMap);
+      const updated = await this.checkMapUpdated(mapPath, mapFileName, currentMap, isTest);
 
       if (updated) {
         mapToCheckTransitions.push({ name: mapFileName, data: currentMap });
@@ -55,9 +57,11 @@ export class MapLoader {
       this.gridManager.generateGridSolids(mapName);
     }
 
-    console.timeEnd("🟧 Solids generated in");
+    if (!isTest) {
+      console.timeEnd("🟧 Solids generated in");
 
-    console.log("📦 Maps and grids are loaded!");
+      console.log("📦 Maps and grids are loaded!");
+    }
   }
 
   private getMapNames(): string[] {
@@ -76,7 +80,12 @@ export class MapLoader {
     }
   }
 
-  private async checkMapUpdated(mapPath: string, mapFileName: string, mapObject: object): Promise<boolean> {
+  private async checkMapUpdated(
+    mapPath: string,
+    mapFileName: string,
+    mapObject: object,
+    isTest: boolean = false
+  ): Promise<boolean> {
     const mapChecksum = this.checksum(mapPath);
     const fileName = mapFileName.replace(".json", "");
     const mapData = await MapModel.find({ name: fileName });
@@ -94,13 +103,16 @@ export class MapLoader {
         return true;
       }
     } else {
-      console.log(`📦 Map ${fileName} is created!`);
-      await MapModel.create({ name: fileName, checksum: mapChecksum });
+      if (!isTest) {
+        console.log(`📦 Map ${fileName} is created!`);
 
-      // create zip
-      const pathToSave = `${STATIC_PATH}/maps`;
-      await createZipMap(fileName, mapObject, pathToSave);
-      return true;
+        await MapModel.create({ name: fileName, checksum: mapChecksum });
+
+        // create zip
+        const pathToSave = `${STATIC_PATH}/maps`;
+        await createZipMap(fileName, mapObject, pathToSave);
+        return true;
+      }
     }
 
     return false;
