@@ -39,6 +39,8 @@ describe("EquipmentEquip.spec.ts", () => {
     // make sure item was delete on the inventory
   });
 
+  it("should successfully update the attack type, after equipping an item", async () => {});
+
   describe("Validation", () => {
     it("should fail if the character does not have the item on the inventory (inventory source)", async () => {
       const equip = await equipmentEquip.equip(testCharacter, testItem._id, inventoryContainer.id);

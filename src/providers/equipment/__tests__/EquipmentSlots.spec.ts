@@ -1,9 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+
 import { EquipmentSlots } from "../EquipmentSlots";
 
 describe("EquipmentSlots.ts", () => {
@@ -11,6 +12,8 @@ describe("EquipmentSlots.ts", () => {
   let equipment: IEquipment;
   let testCharacter: ICharacter;
   let socketMessaging;
+  let inventory: IItem;
+  let inventoryContainer: IItemContainer;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -23,11 +26,14 @@ describe("EquipmentSlots.ts", () => {
     equipment = (await Equipment.findById(testCharacter.equipment)) as unknown as IEquipment;
     // @ts-ignore
     socketMessaging = jest.spyOn(equipmentSlots.socketMessaging, "sendErrorMessageToCharacter");
+
+    inventory = await testCharacter.inventory;
+    inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
   });
 
   it("should properly add a NON-STACKABLE item to a equipment slot", async () => {
     const newItem = await unitTestHelper.createMockItem();
-    const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, newItem, equipment);
+    const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, newItem, equipment, inventoryContainer);
 
     expect(result).toBe(true);
 
@@ -46,7 +52,12 @@ describe("EquipmentSlots.ts", () => {
     equipment.accessory = stackableItem._id;
     await equipment.save();
 
-    const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, stackableItem, equipment);
+    const result = await equipmentSlots.addItemToEquipmentSlot(
+      testCharacter,
+      stackableItem,
+      equipment,
+      inventoryContainer
+    );
 
     const slots = await equipmentSlots.getEquipmentSlots(equipment._id);
 
@@ -65,7 +76,12 @@ describe("EquipmentSlots.ts", () => {
     equipment.accessory = stackableItem._id;
     await equipment.save();
 
-    const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, stackableItem, equipment);
+    const result = await equipmentSlots.addItemToEquipmentSlot(
+      testCharacter,
+      stackableItem,
+      equipment,
+      inventoryContainer
+    );
 
     expect(result).toBeTruthy();
 
@@ -77,15 +93,19 @@ describe("EquipmentSlots.ts", () => {
     expect(accessorySlotItem.stackQty).toEqual(stackableItem.maxStackSize);
     // and the inventory to container the difference
 
-    const inventory = await testCharacter.inventory;
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+    const updatedInventoryContainer = await ItemContainer.findById(inventory.itemContainer);
 
-    expect(inventoryContainer?.slots[0].stackQty).toEqual(10);
+    expect(updatedInventoryContainer?.slots[0].stackQty).toEqual(10);
   });
 
   it("should properly add a STACKABLE item to an EMPTY equipment slot", async () => {
     const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedBlueprint.Arrow, { stackQty: 10 });
-    const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, stackableItem, equipment);
+    const result = await equipmentSlots.addItemToEquipmentSlot(
+      testCharacter,
+      stackableItem,
+      equipment,
+      inventoryContainer
+    );
 
     expect(result).toBe(true);
   });
@@ -145,7 +165,12 @@ describe("EquipmentSlots.ts", () => {
       equipment.rightHand = regularItem._id;
       await equipment.save();
 
-      const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, regularItem, equipment);
+      const result = await equipmentSlots.addItemToEquipmentSlot(
+        testCharacter,
+        regularItem,
+        equipment,
+        inventoryContainer
+      );
 
       expect(result).toBe(false);
 

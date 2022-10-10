@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
@@ -43,7 +43,12 @@ export class EquipmentSlots {
     "inventory",
   ];
 
-  public async addItemToEquipmentSlot(character: ICharacter, item: IItem, equipment: IEquipment): Promise<boolean> {
+  public async addItemToEquipmentSlot(
+    character: ICharacter,
+    item: IItem,
+    equipment: IEquipment,
+    originContainer: IItemContainer
+  ): Promise<boolean> {
     const equipmentSet = await this.getEquipmentSlots(equipment._id);
 
     const availableSlot = this.getAvailableSlot(item, equipmentSet);
@@ -63,7 +68,7 @@ export class EquipmentSlots {
       if (!targetSlotItem) {
         equipment[availableSlot] = item;
         await equipment.save();
-        await this.characterItemsInventory.deleteItemFromInventory(item.id, character);
+        await this.characterItemContainer.removeItemFromContainer(item, character, originContainer);
 
         return true;
       }
@@ -73,10 +78,13 @@ export class EquipmentSlots {
       if (isSameKey(targetSlotItem?.key, item.key)) {
         // if we have the same item, check if the stack is full or not
         if (futureStackSize <= targetSlotItem?.maxStackSize) {
-          targetSlotItem.stackQty! = futureStackSize;
+          targetSlotItem.stackQty! = futureStackSize; // just add it to the existing stack, and that's it.
           await targetSlotItem?.save();
 
-          return true; // just add it to the existing stack, and that's it.
+          // delete item from inventory
+          await this.characterItemContainer.removeItemFromContainer(item, character, originContainer);
+
+          return true;
         } else {
           // calculate the difference
           const difference = Math.abs(targetSlotItem?.maxStackSize - futureStackSize);
@@ -84,6 +92,8 @@ export class EquipmentSlots {
           // set the stack to max
           targetSlotItem.stackQty! = targetSlotItem?.maxStackSize;
           await targetSlotItem?.save();
+
+          await this.characterItemsInventory.deleteItemFromInventory(item.id, character); // this does not delete the item
 
           // set the item to the difference
           item.stackQty! = difference;
@@ -118,7 +128,7 @@ export class EquipmentSlots {
 
     equipment[availableSlot] = item;
     await equipment.save();
-    await this.characterItemsInventory.deleteItemFromInventory(item.id, character);
+    // await this.characterItemsInventory.deleteItemFromInventory(item.id, character);
 
     return true;
   }

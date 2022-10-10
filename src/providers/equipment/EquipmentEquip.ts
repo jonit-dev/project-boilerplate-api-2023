@@ -1,15 +1,23 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentAndInventoryUpdatePayload, IEquipmentSet, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
+import {
+  IEquipmentAndInventoryUpdatePayload,
+  IEquipmentSet,
+  ItemSlotType,
+  ItemSocketEvents,
+  ItemType,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 import { EquipmentSlots } from "./EquipmentSlots";
 import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
+
+export type SourceEquipContainerType = "inventory" | "container";
 
 @provide(EquipmentEquip)
 export class EquipmentEquip {
@@ -37,7 +45,9 @@ export class EquipmentEquip {
       return false;
     }
 
-    const isEquipValid = await this.isEquipValid(character, item, itemContainer);
+    const containerType = await this.checkContainerType(itemContainer.id);
+
+    const isEquipValid = await this.isEquipValid(character, item, containerType);
 
     if (!isEquipValid) {
       return false;
@@ -50,7 +60,7 @@ export class EquipmentEquip {
       return false;
     }
 
-    const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment);
+    const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
 
     if (!equipItem) {
       return false;
@@ -68,7 +78,9 @@ export class EquipmentEquip {
 
     this.updateItemInventoryCharacter(payloadUpdate, character);
 
-    return equipItem;
+    await this.equipmentHelper.updateCharacterAttackType(character, item as any);
+
+    return true;
   }
 
   public updateItemInventoryCharacter(
@@ -92,14 +104,16 @@ export class EquipmentEquip {
     return allowedItemTypes;
   }
 
-  private async isEquipValid(character: ICharacter, item: IItem, itemContainer: IItemContainer): Promise<boolean> {
+  private async isEquipValid(
+    character: ICharacter,
+    item: IItem,
+    containerType: SourceEquipContainerType
+  ): Promise<boolean> {
     const hasBasicValidation = await this.characterValidation.hasBasicValidation(character);
 
     if (!hasBasicValidation) {
       return false;
     }
-
-    const containerType = await this.checkContainerType(item, itemContainer.id);
 
     if (containerType === "inventory") {
       // if item is coming from a character's inventory, check if the character owns the item
@@ -147,7 +161,7 @@ export class EquipmentEquip {
     return true;
   }
 
-  private async checkContainerType(item: IItem, itemContainerId: string): Promise<"inventory" | "npc-body"> {
+  private async checkContainerType(itemContainerId: string): Promise<SourceEquipContainerType> {
     const itemContainer = await ItemContainer.findById(itemContainerId);
 
     if (!itemContainer) {
@@ -160,9 +174,10 @@ export class EquipmentEquip {
       throw new Error("Parent item not found");
     }
 
-    // match -body on parentItem.key
-    const isBody = parentItem.key.match(/-body$/);
+    if (parentItem.allowedEquipSlotType?.includes(ItemSlotType.Inventory)) {
+      return "inventory";
+    }
 
-    return isBody ? "npc-body" : "inventory";
+    return "container";
   }
 }

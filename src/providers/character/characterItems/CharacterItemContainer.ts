@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemSlots } from "./CharacterItemSlots";
@@ -14,8 +14,52 @@ export class CharacterItemContainer {
     private characterItemSlots: CharacterItemSlots
   ) {}
 
+  public async removeItemFromContainer(
+    item: IItem,
+    character: ICharacter,
+    fromContainer: IItemContainer
+  ): Promise<boolean> {
+    const itemToBeRemoved = item;
+
+    if (!itemToBeRemoved) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The item to be removed was not found.");
+      return false;
+    }
+
+    if (!fromContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The origin container was not found.");
+      return false;
+    }
+
+    for (let i = 0; i < fromContainer.slotQty; i++) {
+      const slotItem = fromContainer.slots?.[i];
+
+      if (!slotItem) continue;
+      if (slotItem._id.toString() === item._id.toString()) {
+        fromContainer.slots[i] = null;
+
+        await ItemContainer.updateOne(
+          {
+            _id: fromContainer._id,
+          },
+          {
+            $set: {
+              slots: {
+                ...fromContainer.slots,
+              },
+            },
+          }
+        );
+
+        return true;
+      }
+    }
+
+    return true;
+  }
+
   public async addItemToContainer(item: IItem, character: ICharacter, toContainerId: string): Promise<boolean> {
-    const itemToBeAdded = (await Item.findById(item.id)) as unknown as IItem;
+    const itemToBeAdded = item;
 
     if (!itemToBeAdded) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The item to be added was not found.");
