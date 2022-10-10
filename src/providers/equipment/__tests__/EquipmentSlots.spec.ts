@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -55,7 +56,32 @@ describe("EquipmentSlots.ts", () => {
     expect(accessorySlotItem.stackQty).toEqual(20);
   });
 
-  it("should properly add a STACKABLE item to an equipment slot, and stack it to the maximum and create the difference on the inventory", async () => {});
+  it("should properly add a STACKABLE item to an equipment slot, and stack it to the maximum and create the difference on the inventory", async () => {
+    const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedBlueprint.Arrow, {
+      stackQty: 10,
+      maxStackSize: 10,
+    });
+
+    equipment.accessory = stackableItem._id;
+    await equipment.save();
+
+    const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, stackableItem, equipment);
+
+    expect(result).toBeTruthy();
+
+    // expect slot to have maximum stack
+    const slotItems = await equipmentSlots.getEquipmentSlots(equipment._id);
+
+    const accessorySlotItem = slotItems.accessory as unknown as IItem;
+
+    expect(accessorySlotItem.stackQty).toEqual(stackableItem.maxStackSize);
+    // and the inventory to container the difference
+
+    const inventory = await testCharacter.inventory;
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+
+    expect(inventoryContainer?.slots[0].stackQty).toEqual(10);
+  });
 
   it("should properly add a STACKABLE item to an EMPTY equipment slot", async () => {
     const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedBlueprint.Arrow, { stackQty: 10 });
@@ -116,6 +142,7 @@ describe("EquipmentSlots.ts", () => {
       const regularItem = await unitTestHelper.createMockItem();
 
       equipment.leftHand = regularItem._id;
+      equipment.rightHand = regularItem._id;
       await equipment.save();
 
       const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, regularItem, equipment);

@@ -1,6 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentSet } from "@rpg-engine/shared";
@@ -21,7 +24,11 @@ export type EquipmentSlotTypes =
 
 @provide(EquipmentSlots)
 export class EquipmentSlots {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterItemContainer: CharacterItemContainer,
+    private characterItemsInventory: CharacterItemInventory
+  ) {}
 
   private slots: EquipmentSlotTypes[] = [
     "head",
@@ -41,9 +48,7 @@ export class EquipmentSlots {
 
     const availableSlot = this.getAvailableSlot(item, equipmentSet);
 
-    const areAllowedSlotsAvailable = await this.areAllowedSlotsAvailable(item.allowedEquipSlotType!, equipment);
-
-    if (!areAllowedSlotsAvailable) {
+    if (!availableSlot) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         "Sorry, you don't have any available slots for this item."
@@ -56,7 +61,11 @@ export class EquipmentSlots {
       const targetSlotItem = await Item.findById(targetSlotItemId);
 
       if (!targetSlotItem) {
-        throw new Error(`Item ${targetSlotItemId} not found`);
+        equipment[availableSlot] = item;
+        await equipment.save();
+        await this.characterItemsInventory.deleteItemFromInventory(item.id, character);
+
+        return true;
       }
 
       const futureStackSize = targetSlotItem.stackQty! + item.stackQty!;
@@ -69,7 +78,33 @@ export class EquipmentSlots {
 
           return true; // just add it to the existing stack, and that's it.
         } else {
-          throw new Error("not implemented");
+          // calculate the difference
+          const difference = Math.abs(targetSlotItem?.maxStackSize - futureStackSize);
+
+          // set the stack to max
+          targetSlotItem.stackQty! = targetSlotItem?.maxStackSize;
+          await targetSlotItem?.save();
+
+          // set the item to the difference
+          item.stackQty! = difference;
+          await item.save();
+
+          // then add it to the inventory
+
+          const inventory = await character.inventory;
+          const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+
+          if (!inventoryContainer) {
+            throw new Error(`Item container ${inventory._id} not found`);
+          }
+
+          const addDiffToContainer = await this.characterItemContainer.addItemToContainer(
+            item,
+            character,
+            inventoryContainer._id
+          );
+
+          return addDiffToContainer;
         }
       }
 
@@ -83,6 +118,7 @@ export class EquipmentSlots {
 
     equipment[availableSlot] = item;
     await equipment.save();
+    await this.characterItemsInventory.deleteItemFromInventory(item.id, character);
 
     return true;
   }
@@ -130,10 +166,19 @@ export class EquipmentSlots {
 
       const targetSlot = equipmentSet[slotType];
 
-      if (isSameKey(targetSlot?.key, item.key) && item.isStackable) {
-        if (targetSlot.stackQty! < targetSlot.maxStackSize) {
+      if (item.isStackable) {
+        // if target slot is empty, just add the stackable item
+        if (!targetSlot) {
           availableSlot = slotType;
           break;
+        }
+
+        // if not, check if its same key and it we can still stack it
+        if (isSameKey(targetSlot?.key, item.key)) {
+          if (targetSlot.stackQty! <= targetSlot.maxStackSize) {
+            availableSlot = slotType;
+            break;
+          }
         }
 
         continue;
