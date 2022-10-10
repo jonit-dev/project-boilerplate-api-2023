@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInventory";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemSlots } from "./CharacterItemSlots";
@@ -11,7 +12,8 @@ export class CharacterItemContainer {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterItemStack: CharacterItemStack,
-    private characterItemSlots: CharacterItemSlots
+    private characterItemSlots: CharacterItemSlots,
+    private equipmentEquipInventory: EquipmentEquipInventory
   ) {}
 
   public async removeItemFromContainer(
@@ -58,12 +60,27 @@ export class CharacterItemContainer {
     return true;
   }
 
-  public async addItemToContainer(item: IItem, character: ICharacter, toContainerId: string): Promise<boolean> {
+  public async addItemToContainer(
+    item: IItem,
+    character: ICharacter,
+    toContainerId: string,
+    isInventoryItem: boolean = false
+  ): Promise<boolean> {
     const itemToBeAdded = item;
 
     if (!itemToBeAdded) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The item to be added was not found.");
       return false;
+    }
+
+    if (isInventoryItem) {
+      const equipped = await this.equipmentEquipInventory.equipInventory(character, itemToBeAdded);
+
+      if (!equipped) {
+        return false;
+      }
+
+      return true;
     }
 
     const targetContainer = (await ItemContainer.findById(toContainerId)) as unknown as IItemContainer;

@@ -118,7 +118,9 @@ itemSchema.post("updateOne", async function (this: UpdateQuery<IItem>) {
 });
 
 itemSchema.post("save", async function (this: IItem) {
-  if (this.isItemContainer) {
+  const hasItemContainer = await ItemContainer.exists({ parentItem: this._id });
+
+  if (this.isItemContainer && !hasItemContainer) {
     let slotQty: number = 20;
 
     if (this.generateContainerSlots) {

@@ -4,10 +4,12 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { Types } from "mongoose";
+import { ContainersBlueprint } from "../data/types/itemsBlueprintTypes";
 import { ItemPickup } from "../ItemPickup";
 
 describe("ItemPickup.ts", () => {
@@ -18,12 +20,14 @@ describe("ItemPickup.ts", () => {
   let sendErrorMessageToCharacter: jest.SpyInstance;
   let inventoryItemContainerId: string;
   let characterWeight: CharacterWeight;
+  let equipmentSlots: EquipmentSlots;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
 
     itemPickup = container.get<ItemPickup>(ItemPickup);
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
+    equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
 
   beforeEach(async () => {
@@ -139,6 +143,57 @@ describe("ItemPickup.ts", () => {
       testCharacter,
       "Sorry, you are already carrying too much weight!"
     );
+  });
+
+  it("should properly pickup an inventory item", async () => {
+    const inventoryItem = (await unitTestHelper.createMockItemFromBlueprint(
+      ContainersBlueprint.Bag
+    )) as unknown as IItem;
+
+    const newInventoryContainer = await ItemContainer.findById(inventoryItem.itemContainer);
+
+    if (!newInventoryContainer) {
+      throw new Error("Failed to find inventory container!");
+    }
+
+    const newItem = await unitTestHelper.createMockItem();
+
+    await unitTestHelper.addItemsToInventoryContainer(newInventoryContainer, 10, [newItem]);
+
+    expect(newInventoryContainer.slots[0]._id).toEqual(newItem._id);
+
+    const equipment = await Equipment.findById(testCharacter.equipment);
+
+    if (!equipment) {
+      throw new Error("Failed to find equipment");
+    }
+
+    equipment.inventory = undefined; // remove inventory
+    await equipment.save();
+
+    expect(equipment.inventory).toBeUndefined();
+
+    const pickupInventory = await pickupItem(inventoryItemContainerId, {
+      itemId: inventoryItem.id,
+    });
+
+    expect(pickupInventory).toBeTruthy();
+
+    const equipmentSet = await equipmentSlots.getEquipmentSlots(equipment._id);
+
+    expect(equipmentSet).toBeTruthy();
+
+    const inventory = equipmentSet.inventory as unknown as IItem;
+
+    expect(inventory._id).toEqual(inventoryItem._id);
+
+    const newInventoryContainerAfterPickup = await ItemContainer.findById(inventory.itemContainer);
+
+    if (!newInventoryContainerAfterPickup) {
+      throw new Error("Failed to find inventory container!");
+    }
+
+    expect(newInventoryContainerAfterPickup?.slots[0]?._id).toEqual(newItem._id);
   });
 
   it("shouldn't add more items, if your inventory is full", async () => {

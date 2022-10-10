@@ -104,6 +104,24 @@ export class EquipmentEquip {
     return allowedItemTypes;
   }
 
+  private async checkContainerType(itemContainer: IItemContainer): Promise<SourceEquipContainerType> {
+    if (!itemContainer) {
+      throw new Error("Item container not found");
+    }
+
+    const parentItem = await Item.findById(itemContainer.parentItem);
+
+    if (!parentItem) {
+      throw new Error("Parent item not found");
+    }
+
+    if (parentItem.allowedEquipSlotType?.includes(ItemSlotType.Inventory)) {
+      return "inventory";
+    }
+
+    return "container";
+  }
+
   private async isEquipValid(
     character: ICharacter,
     item: IItem,
@@ -159,23 +177,5 @@ export class EquipmentEquip {
     }
 
     return true;
-  }
-
-  private async checkContainerType(itemContainer: IItemContainer): Promise<SourceEquipContainerType> {
-    if (!itemContainer) {
-      throw new Error("Item container not found");
-    }
-
-    const parentItem = await Item.findById(itemContainer.parentItem);
-
-    if (!parentItem) {
-      throw new Error("Parent item not found");
-    }
-
-    if (parentItem.allowedEquipSlotType?.includes(ItemSlotType.Inventory)) {
-      return "inventory";
-    }
-
-    return "container";
   }
 }

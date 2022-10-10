@@ -12,6 +12,7 @@ export class SocketMessaging {
   constructor(private characterView: CharacterView, private npcView: NPCView, private socketAdapter: SocketAdapter) {}
 
   public sendErrorMessageToCharacter(character: ICharacter, message?: string, type: UIMessageType = "error"): void {
+    console.log(message);
     this.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
       message: message || "Sorry, something went wrong.",
       type,

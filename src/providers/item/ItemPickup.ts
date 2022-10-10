@@ -7,6 +7,7 @@ import { CharacterItems } from "@providers/character/characterItems/CharacterIte
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemPickup, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
@@ -22,7 +23,8 @@ export class ItemPickup {
     private characterValidation: CharacterValidation,
     private characterItems: CharacterItems,
     private characterItemSlots: CharacterItemSlots,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private equipmentSlots: EquipmentSlots
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
@@ -34,8 +36,9 @@ export class ItemPickup {
     }
 
     const inventory = await character.inventory;
-    const isEquipment = itemToBePicked.isItemContainer && inventory === null;
-    const isPickupValid = await this.isItemPickupValid(itemToBePicked, itemPickupData, character, isEquipment);
+    const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
+    const isPickupValid = await this.isItemPickupValid(itemToBePicked, itemPickupData, character, isInventoryItem);
+
     const isMapContainer =
       itemToBePicked.x !== undefined && itemToBePicked.y !== undefined && itemToBePicked.scene !== undefined;
 
@@ -50,7 +53,7 @@ export class ItemPickup {
       itemToBePicked,
       character,
       itemPickupData.toContainerId,
-      isEquipment
+      isInventoryItem
     );
 
     if (!addToContainer) {
@@ -70,7 +73,7 @@ export class ItemPickup {
         return false;
       }
     } else {
-      if (!itemPickupData.fromContainerId) {
+      if (!itemPickupData.fromContainerId && !isInventoryItem) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
           "Sorry, failed to remove item from container. Origin container not found."
@@ -78,7 +81,7 @@ export class ItemPickup {
         return false;
       }
 
-      if (!isEquipment) {
+      if (!isInventoryItem) {
         // This regulates the pickup of items in containers like loot containers. Note that we canno't 'pickup' items from equipment, just unequip them to the inventory.
         const isItemRemoved = await this.removeItemFromContainer(
           itemToBePicked as unknown as IItem,
@@ -92,7 +95,7 @@ export class ItemPickup {
       }
     }
 
-    if (!isEquipment) {
+    if (!isInventoryItem) {
       // if the origin container is a MapContainer so should update the char inventory
       //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
       const containerToUpdateId = isMapContainer ? itemPickupData.toContainerId : itemPickupData.fromContainerId;
@@ -105,6 +108,14 @@ export class ItemPickup {
 
       const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
         inventory: updatedContainer,
+      };
+
+      this.updateInventoryCharacter(payloadUpdate, character);
+    } else {
+      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+
+      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+        equipment: equipmentSlots,
       };
 
       this.updateInventoryCharacter(payloadUpdate, character);
@@ -147,11 +158,11 @@ export class ItemPickup {
     item: IItem,
     itemPickupData: IItemPickup,
     character: ICharacter,
-    isEquipmentContainer: boolean
+    isInventoryItem: boolean
   ): Promise<Boolean> {
-    if (isEquipmentContainer) {
+    if (isInventoryItem) {
       // validate if equipment container exists
-      const equipmentContainer = await Equipment.findById(itemPickupData.toContainerId);
+      const equipmentContainer = await Equipment.findById(character.equipment);
 
       if (!equipmentContainer) {
         this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment container not found");
@@ -161,7 +172,7 @@ export class ItemPickup {
 
     const inventory = await character.inventory;
 
-    if (!inventory && !item.isItemContainer && !isEquipmentContainer) {
+    if (!inventory && !item.isItemContainer && !isInventoryItem) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you need an inventory to pick this item.");
       return false;
     }
@@ -230,7 +241,7 @@ export class ItemPickup {
     const characterAlreadyHasItem = await this.characterItems.hasItem(
       item._id,
       character,
-      isEquipmentContainer ? "equipment" : "inventory"
+      isInventoryItem ? "equipment" : "inventory"
     );
     if (characterAlreadyHasItem) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you already have this item.");

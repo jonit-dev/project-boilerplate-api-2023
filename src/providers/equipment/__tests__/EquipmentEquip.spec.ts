@@ -32,7 +32,7 @@ describe("EquipmentEquip.spec.ts", () => {
     sendEventToUser = jest.spyOn(equipmentEquip.socketMessaging, "sendEventToUser");
   });
 
-  it("should properly equip a non-stackable item", async () => {
+  it("should properly equip an item", async () => {
     inventoryContainer.slots[0] = testItem;
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();

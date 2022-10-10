@@ -229,7 +229,7 @@ export class BattleRangedAttack {
   public async consumeAmmo(attackParams: IRangedAttackParams, character: ICharacter): Promise<void> {
     const equipment = attackParams.equipment!;
     const backpack = equipment.inventory as unknown as IItem;
-    const backpackContainer = (await ItemContainer.findById(backpack.itemContainer)) as IItemContainer;
+    const backpackContainer = (await ItemContainer.findById(backpack?.itemContainer)) as IItemContainer;
 
     let wasStackReduced = false;
 

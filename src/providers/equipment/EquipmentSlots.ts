@@ -3,7 +3,6 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentSet } from "@rpg-engine/shared";
@@ -24,11 +23,7 @@ export type EquipmentSlotTypes =
 
 @provide(EquipmentSlots)
 export class EquipmentSlots {
-  constructor(
-    private socketMessaging: SocketMessaging,
-    private characterItemContainer: CharacterItemContainer,
-    private characterItemsInventory: CharacterItemInventory
-  ) {}
+  constructor(private socketMessaging: SocketMessaging, private characterItemContainer: CharacterItemContainer) {}
 
   private slots: EquipmentSlotTypes[] = [
     "head",
@@ -49,9 +44,7 @@ export class EquipmentSlots {
     equipment: IEquipment,
     originContainer: IItemContainer
   ): Promise<boolean> {
-    const equipmentSet = await this.getEquipmentSlots(equipment._id);
-
-    const availableSlot = this.getAvailableSlot(item, equipmentSet);
+    const availableSlot = await this.getAvailableSlot(item, equipment);
 
     if (!availableSlot) {
       this.socketMessaging.sendErrorMessageToCharacter(
@@ -72,6 +65,8 @@ export class EquipmentSlots {
     }
 
     if (item.isStackable) {
+      const equipmentSet = await this.getEquipmentSlots(equipment._id);
+
       const targetSlotItemId = equipmentSet[availableSlot];
       const targetSlotItem = await Item.findById(targetSlotItemId);
 
@@ -166,7 +161,9 @@ export class EquipmentSlots {
     return true;
   }
 
-  public getAvailableSlot(item: IItem, equipmentSet: IEquipmentSet): string {
+  public async getAvailableSlot(item: IItem, equipment: IEquipment): Promise<string> {
+    const equipmentSet = await this.getEquipmentSlots(equipment._id);
+
     let availableSlot = "";
     const itemSlotTypes = this.slots;
 
@@ -237,24 +234,6 @@ export class EquipmentSlots {
       armor,
       inventory,
     } as IEquipmentSet;
-  }
-
-  private async tryToRemoveItemFromOriginContainer(
-    item: IItem,
-    character: ICharacter,
-    originContainer: IItemContainer
-  ): Promise<boolean> {
-    const removeItem = await this.characterItemContainer.removeItemFromContainer(item, character, originContainer);
-
-    if (!removeItem) {
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        "Sorry, failed to remove item from origin container."
-      );
-      return false;
-    }
-
-    return true;
   }
 
   private getSlotType(itemSlotTypes: string[], slotType: string, subType: string): string {
