@@ -61,6 +61,16 @@ export class EquipmentSlots {
       return false;
     }
 
+    const removeItem = await this.characterItemContainer.removeItemFromContainer(item, character, originContainer);
+
+    if (!removeItem) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, failed to remove item from origin container."
+      );
+      return false;
+    }
+
     if (item.isStackable) {
       const targetSlotItemId = equipmentSet[availableSlot];
       const targetSlotItem = await Item.findById(targetSlotItemId);
@@ -68,7 +78,6 @@ export class EquipmentSlots {
       if (!targetSlotItem) {
         equipment[availableSlot] = item;
         await equipment.save();
-        await this.characterItemContainer.removeItemFromContainer(item, character, originContainer);
 
         return true;
       }
@@ -82,7 +91,6 @@ export class EquipmentSlots {
           await targetSlotItem?.save();
 
           // delete item from inventory
-          await this.characterItemContainer.removeItemFromContainer(item, character, originContainer);
 
           return true;
         } else {
@@ -92,8 +100,6 @@ export class EquipmentSlots {
           // set the stack to max
           targetSlotItem.stackQty! = targetSlotItem?.maxStackSize;
           await targetSlotItem?.save();
-
-          await this.characterItemsInventory.deleteItemFromInventory(item.id, character); // this does not delete the item
 
           // set the item to the difference
           item.stackQty! = difference;
@@ -231,6 +237,24 @@ export class EquipmentSlots {
       armor,
       inventory,
     } as IEquipmentSet;
+  }
+
+  private async tryToRemoveItemFromOriginContainer(
+    item: IItem,
+    character: ICharacter,
+    originContainer: IItemContainer
+  ): Promise<boolean> {
+    const removeItem = await this.characterItemContainer.removeItemFromContainer(item, character, originContainer);
+
+    if (!removeItem) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, failed to remove item from origin container."
+      );
+      return false;
+    }
+
+    return true;
   }
 
   private getSlotType(itemSlotTypes: string[], slotType: string, subType: string): string {

@@ -10,6 +10,8 @@ describe("EquipmentEquip.spec.ts", () => {
   let equipmentEquip: EquipmentEquip;
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
+  let socketMessaging;
+  let sendEventToUser;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -23,6 +25,11 @@ describe("EquipmentEquip.spec.ts", () => {
 
     inventory = await testCharacter.inventory;
     inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    // @ts-ignore
+    socketMessaging = jest.spyOn(equipmentEquip.socketMessaging, "sendErrorMessageToCharacter");
+    // @ts-ignore
+    sendEventToUser = jest.spyOn(equipmentEquip.socketMessaging, "sendEventToUser");
   });
 
   it("should properly equip a non-stackable item", async () => {
@@ -35,8 +42,12 @@ describe("EquipmentEquip.spec.ts", () => {
     expect(equip).toBeTruthy();
 
     // make sure item is on the slot and update event was called
+    expect(sendEventToUser).toHaveBeenCalled();
 
     // make sure item was delete on the inventory
+
+    const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
+    expect(updatedInventory?.slots[0]).toBeNull();
   });
 
   it("should successfully update the attack type, after equipping an item", async () => {});

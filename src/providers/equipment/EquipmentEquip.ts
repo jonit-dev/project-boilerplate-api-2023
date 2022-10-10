@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -45,7 +45,7 @@ export class EquipmentEquip {
       return false;
     }
 
-    const containerType = await this.checkContainerType(itemContainer.id);
+    const containerType = await this.checkContainerType(itemContainer);
 
     const isEquipValid = await this.isEquipValid(character, item, containerType);
 
@@ -161,9 +161,7 @@ export class EquipmentEquip {
     return true;
   }
 
-  private async checkContainerType(itemContainerId: string): Promise<SourceEquipContainerType> {
-    const itemContainer = await ItemContainer.findById(itemContainerId);
-
+  private async checkContainerType(itemContainer: IItemContainer): Promise<SourceEquipContainerType> {
     if (!itemContainer) {
       throw new Error("Item container not found");
     }
