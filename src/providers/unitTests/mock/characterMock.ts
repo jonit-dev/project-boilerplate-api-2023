@@ -12,6 +12,7 @@ export const characterMock = {
   mana: 100,
   x: 304,
   y: 112,
+  gold: 100,
   direction: "left",
   class: "None",
   faction: CharacterFactions.LifeBringer,

@@ -9,6 +9,7 @@ import { CharacterTrading } from "@providers/character/CharacterTrading";
 
 describe("CharacterTrading.ts", () => {
   let testItem: IItem;
+  let testGtItem: IItem;
   let testCharacter: ICharacter;
   let npcCharacter: ICharacter;
   let itemTrading: CharacterTrading;
@@ -48,6 +49,13 @@ describe("CharacterTrading.ts", () => {
       weight: 0,
       goldPrice: 100,
     });
+    testGtItem = await unitTestHelper.createMockItem({
+      x: testCharacter.x,
+      y: testCharacter.y,
+      scene: testCharacter.scene,
+      weight: 0,
+      goldPrice: 150,
+    });
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;
     npcInvetory = await npcCharacter.inventory;
@@ -58,6 +66,21 @@ describe("CharacterTrading.ts", () => {
     const itemAdded = await itemPickup.performItemPickup(
       {
         itemId: testItem.id,
+        x: npcCharacter.x,
+        y: npcCharacter.y,
+        scene: npcCharacter.scene,
+        toContainerId,
+        ...extraProps,
+      },
+      npcCharacter
+    );
+    return itemAdded;
+  };
+
+  const npcPickupAnotherItem = async (toContainerId: string, extraProps?: Record<string, unknown>) => {
+    const itemAdded = await itemPickup.performItemPickup(
+      {
+        itemId: testGtItem.id,
         x: npcCharacter.x,
         y: npcCharacter.y,
         scene: npcCharacter.scene,
@@ -87,6 +110,28 @@ describe("CharacterTrading.ts", () => {
     return itemSelled;
   };
 
+  const sellAnotherItem = async (
+    fromContainerId: string,
+    toContainerId: string,
+    extraProps?: Record<string, unknown>
+  ) => {
+    const itemSelled = await itemTrading.performItemSell(
+      {
+        itemId: testGtItem.id,
+        x: npcCharacter.x,
+        y: npcCharacter.y,
+        price: 150,
+        scene: npcCharacter.scene,
+        toContainerId: fromContainerId,
+        fromContainerId: toContainerId,
+        ...extraProps,
+      },
+      npcCharacter,
+      testCharacter
+    );
+    return itemSelled;
+  };
+
   it("should sell an item from invetory to NPC", async () => {
     const itemPickedUp = await npcPickupItem(npcInventoryItemContainerId);
 
@@ -103,6 +148,24 @@ describe("CharacterTrading.ts", () => {
     const anotherSellForTheSameItem = await sellItem(npcInventoryItemContainerId, inventoryItemContainerId);
 
     expect(anotherSellForTheSameItem).toBeFalsy();
+  });
+
+  it("should not sell an item from invetory to NPC if have a price greater than the total amount of gold", async () => {
+    const itemPickedUp = await npcPickupItem(npcInventoryItemContainerId);
+
+    expect(itemPickedUp).toBeTruthy();
+
+    const itemSelled = await sellItem(npcInventoryItemContainerId, inventoryItemContainerId);
+
+    expect(itemSelled).toBeTruthy();
+
+    const itemPickedUpAnother = await npcPickupAnotherItem(npcInventoryItemContainerId);
+
+    expect(itemPickedUpAnother).toBeTruthy();
+
+    const itemSelected = await sellAnotherItem(npcInventoryItemContainerId, inventoryItemContainerId);
+
+    expect(itemSelected).toBeFalsy();
   });
 
   afterAll(async () => {
