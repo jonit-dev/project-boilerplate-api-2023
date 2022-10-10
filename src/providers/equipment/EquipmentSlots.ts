@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentSet } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -40,14 +41,6 @@ export class EquipmentSlots {
 
     const availableSlot = this.getAvailableSlot(item, equipmentSet);
 
-    if (availableSlot === "") {
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        "Sorry, you don't have any available slots for this item."
-      );
-      return false;
-    }
-
     const areAllowedSlotsAvailable = await this.areAllowedSlotsAvailable(item.allowedEquipSlotType!, equipment);
 
     if (!areAllowedSlotsAvailable) {
@@ -55,6 +48,36 @@ export class EquipmentSlots {
         character,
         "Sorry, you don't have any available slots for this item."
       );
+      return false;
+    }
+
+    if (item.isStackable) {
+      const targetSlotItemId = equipmentSet[availableSlot];
+      const targetSlotItem = await Item.findById(targetSlotItemId);
+
+      if (!targetSlotItem) {
+        throw new Error(`Item ${targetSlotItemId} not found`);
+      }
+
+      const futureStackSize = targetSlotItem.stackQty! + item.stackQty!;
+
+      if (isSameKey(targetSlotItem?.key, item.key)) {
+        // if we have the same item, check if the stack is full or not
+        if (futureStackSize <= targetSlotItem?.maxStackSize) {
+          targetSlotItem.stackQty! = futureStackSize;
+          await targetSlotItem?.save();
+
+          return true; // just add it to the existing stack, and that's it.
+        } else {
+          throw new Error("not implemented");
+        }
+      }
+
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you don't have any available slots for this item."
+      );
+
       return false;
     }
 
@@ -105,7 +128,18 @@ export class EquipmentSlots {
 
       const slotType = this.getSlotType(itemSlotTypes, allowedSlotTypeCamelCase, itemSubTypeCamelCase);
 
-      if (equipmentSet[slotType] === undefined) {
+      const targetSlot = equipmentSet[slotType];
+
+      if (isSameKey(targetSlot?.key, item.key) && item.isStackable) {
+        if (targetSlot.stackQty! < targetSlot.maxStackSize) {
+          availableSlot = slotType;
+          break;
+        }
+
+        continue;
+      }
+
+      if (targetSlot === undefined) {
         availableSlot = slotType;
         break;
       }

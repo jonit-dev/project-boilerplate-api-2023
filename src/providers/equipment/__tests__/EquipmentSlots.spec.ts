@@ -39,6 +39,24 @@ describe("EquipmentSlots.ts", () => {
     expect(leftHandItem._id).toEqual(newItem._id);
   });
 
+  it("should properly add a STACKABLE item to an equipment slot, and stack it with the existing item (maxStackSize not reached)", async () => {
+    const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedBlueprint.Arrow, { stackQty: 10 });
+
+    equipment.accessory = stackableItem._id;
+    await equipment.save();
+
+    const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, stackableItem, equipment);
+
+    const slots = await equipmentSlots.getEquipmentSlots(equipment._id);
+
+    const accessorySlotItem = slots.accessory as unknown as IItem;
+
+    expect(result).toBe(true);
+    expect(accessorySlotItem.stackQty).toEqual(20);
+  });
+
+  it("should properly add a STACKABLE item to an equipment slot, and stack it to the maximum and create the difference on the inventory", async () => {});
+
   it("should properly add a STACKABLE item to an EMPTY equipment slot", async () => {
     const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedBlueprint.Arrow, { stackQty: 10 });
     const result = await equipmentSlots.addItemToEquipmentSlot(testCharacter, stackableItem, equipment);
