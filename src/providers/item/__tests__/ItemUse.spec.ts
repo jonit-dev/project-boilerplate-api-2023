@@ -208,7 +208,7 @@ describe("ItemUse.ts", () => {
 
     expect(sendEventToUser).toBeCalledTimes(5);
 
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 6; i++) {
       expect(sendEventToUser).toHaveBeenNthCalledWith(i, testCharacter.channelId, CharacterSocketEvents.ItemConsumed, {
         targetId: testCharacter._id,
         health: testCharacter.health + i,
