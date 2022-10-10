@@ -139,6 +139,19 @@ export class UnitTestHelper {
     return item as IItem;
   }
 
+  public async createMockItemFromBlueprint(blueprintKey: string, extraProps?: Partial<IItem>): Promise<IItem> {
+    const blueprintData = itemsBlueprintIndex[blueprintKey];
+
+    const newItem = new Item({
+      ...blueprintData,
+      ...extraProps,
+    });
+
+    await newItem.save();
+
+    return newItem;
+  }
+
   public async createMockItem(extraProps?: Partial<IItem>): Promise<IItem> {
     const newItem = new Item({
       ...itemMock,
