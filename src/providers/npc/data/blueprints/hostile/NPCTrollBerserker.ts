@@ -15,7 +15,7 @@ import {
   HammersBlueprint,
   HelmetsBlueprint,
   PotionsBlueprint,
-  RangedBlueprint,
+  RangedWeaponsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
@@ -74,12 +74,12 @@ export const npcTrollBerserker = {
       chance: 30,
     },
     {
-      itemBlueprintKey: RangedBlueprint.Bolt,
+      itemBlueprintKey: RangedWeaponsBlueprint.Bolt,
       chance: 50,
       quantityRange: [5, 10],
     },
     {
-      itemBlueprintKey: RangedBlueprint.Bow,
+      itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 20,
     },
 

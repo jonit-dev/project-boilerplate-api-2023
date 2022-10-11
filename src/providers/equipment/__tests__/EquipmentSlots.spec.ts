@@ -3,7 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 
 import { EquipmentSlots } from "../EquipmentSlots";
 
@@ -47,7 +47,9 @@ describe("EquipmentSlots.ts", () => {
   });
 
   it("should properly add a STACKABLE item to an equipment slot, and stack it with the existing item (maxStackSize not reached)", async () => {
-    const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedBlueprint.Arrow, { stackQty: 10 });
+    const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, {
+      stackQty: 10,
+    });
 
     equipment.accessory = stackableItem._id;
     await equipment.save();
@@ -68,7 +70,7 @@ describe("EquipmentSlots.ts", () => {
   });
 
   it("should properly add a STACKABLE item to an equipment slot, and stack it to the maximum and create the difference on the inventory", async () => {
-    const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedBlueprint.Arrow, {
+    const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, {
       stackQty: 10,
       maxStackSize: 10,
     });
@@ -99,7 +101,9 @@ describe("EquipmentSlots.ts", () => {
   });
 
   it("should properly add a STACKABLE item to an EMPTY equipment slot", async () => {
-    const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedBlueprint.Arrow, { stackQty: 10 });
+    const stackableItem = await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, {
+      stackQty: 10,
+    });
     const result = await equipmentSlots.addItemToEquipmentSlot(
       testCharacter,
       stackableItem,

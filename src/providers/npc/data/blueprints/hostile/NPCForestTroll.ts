@@ -16,7 +16,7 @@ import {
   HammersBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
-  RangedBlueprint,
+  RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -59,7 +59,7 @@ export const npcForestTroll = {
       chance: 30,
     },
     {
-      itemBlueprintKey: RangedBlueprint.Arrow,
+      itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 50,
       quantityRange: [5, 10],
     },

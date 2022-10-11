@@ -4,7 +4,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EquipmentRangeUpdate } from "../EquipmentRangeUpdate";
@@ -87,7 +87,7 @@ describe("EquipmentUnequip.spec.ts", () => {
   });
 
   it("Should update the character attack type, when unequipping", async () => {
-    const bowBlueprint = itemsBlueprintIndex[RangedBlueprint.Bow];
+    const bowBlueprint = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
 
     const rangedItem = await unitTestHelper.createMockItem({
       ...bowBlueprint,

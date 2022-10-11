@@ -3,65 +3,59 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
-  ArmorsBlueprint,
   BootsBlueprint,
-  RangedWeaponsBlueprint,
-  ShieldsBlueprint,
-  SwordsBlueprint,
+  FoodsBlueprint,
+  PotionsBlueprint,
+  SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcSkeletonKnight = {
+export const npcYeti: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Skeleton Knight",
-  key: HostileNPCsBlueprint.SkeletonKnight,
-  textureKey: HostileNPCsBlueprint.SkeletonKnight,
+  name: "Yeti",
+  key: HostileNPCsBlueprint.Yeti,
+  textureKey: HostileNPCsBlueprint.Yeti,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Fast,
-  baseHealth: 137,
-  healthRandomizerDice: Dice.D4,
-  skillRandomizerDice: Dice.D4,
-  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
+  speed: MovementSpeed.Slow,
+  baseHealth: 400,
+  healthRandomizerDice: Dice.D20,
+  canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 6,
+    level: 25,
     strength: {
-      level: 2,
+      level: 15,
     },
     dexterity: {
-      level: 2,
+      level: 14,
     },
     resistance: {
-      level: 3,
+      level: 20,
     },
   },
   fleeOnLowHealth: true,
-  experience: 12 * EXP_RATIO,
+  experience: 600 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
-      chance: 25,
+      itemBlueprintKey: BootsBlueprint.CopperBoots,
+      chance: 20,
     },
     {
-      itemBlueprintKey: ShieldsBlueprint.StuddedShield,
+      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
       chance: 30,
-    },
-    {
-      itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
-      chance: 5,
     },
 
     {
-      itemBlueprintKey: BootsBlueprint.StuddedBoots,
-      chance: 25,
+      itemBlueprintKey: FoodsBlueprint.Fish,
+      chance: 80,
     },
     {
-      itemBlueprintKey: RangedWeaponsBlueprint.Bow,
-      chance: 10,
+      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
+      chance: 50,
     },
   ],
-} as Partial<INPC>;
+};

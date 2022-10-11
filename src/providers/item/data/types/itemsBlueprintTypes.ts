@@ -51,6 +51,7 @@ export enum AxesBlueprint {
   Bardiche = "bardiche",
   DoubleAxe = "double-axe",
   Pickaxe = "pickaxe",
+  FrostDoubleAxe = "frost-double-axe",
 }
 
 export enum BootsBlueprint {
@@ -92,7 +93,7 @@ export enum PotionsBlueprint {
   LightAntidote = "light-antidote",
 }
 
-export enum RangedBlueprint {
+export enum RangedWeaponsBlueprint {
   Arrow = "arrow",
   Bolt = "bolt",
   Bow = "bow",
@@ -100,6 +101,8 @@ export enum RangedBlueprint {
   Slingshot = "slingshot",
   Stone = "stone",
   OrcishBow = "orcish-bow",
+  FrostBow = "frost-bow",
+  FrostCrossbow = "frost-crossbow",
 }
 
 export enum GlovesBlueprint {
