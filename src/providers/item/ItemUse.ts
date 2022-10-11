@@ -48,13 +48,13 @@ export class ItemUse {
     const useItem = (await Item.findById(itemUse.itemId)) as IItem;
 
     if (!useItem) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not accessible.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
       return false;
     }
 
     const bluePrintItem = itemsBlueprintIndex[useItem.key];
     if (!bluePrintItem || !bluePrintItem.usableEffect) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not accessible.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
       return false;
     }
 
