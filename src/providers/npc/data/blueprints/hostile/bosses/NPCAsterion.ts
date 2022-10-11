@@ -12,7 +12,7 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateMoveTowardsMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
-import { BossesNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -20,7 +20,7 @@ import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 export const npcAsterion = {
   ...generateMoveTowardsMovement(),
   name: "Asterion",
-  key: BossesNPCsBlueprint.Asterion,
+  key: HostileNPCsBlueprint.Asterion,
   textureKey: HostileNPCsBlueprint.Minotaur,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,

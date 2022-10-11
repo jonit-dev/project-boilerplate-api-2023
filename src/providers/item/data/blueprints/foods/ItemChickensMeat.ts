@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemChickensMeat: Partial<IItem> = {
@@ -12,5 +12,4 @@ export const itemChickensMeat: Partial<IItem> = {
   name: "Chickens Meat",
   description: "Chicken meat can be cooked and eaten to restore health",
   weight: 0.5,
-  allowedEquipSlotType: [ItemSlotType.Accessory],
 };

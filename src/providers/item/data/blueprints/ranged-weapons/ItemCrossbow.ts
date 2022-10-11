@@ -1,10 +1,10 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { RangedBlueprint } from "../../types/itemsBlueprintTypes";
+import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemCrossbow: Partial<IItem> = {
-  key: RangedBlueprint.Crossbow,
+  key: RangedWeaponsBlueprint.Crossbow,
   type: ItemType.Weapon,
   rangeType: EntityAttackType.Ranged,
   subType: ItemSubType.Ranged,
@@ -18,6 +18,6 @@ export const itemCrossbow: Partial<IItem> = {
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 12,
-  requiredAmmoKeys: [RangedBlueprint.Bolt],
+  requiredAmmoKeys: [RangedWeaponsBlueprint.Bolt],
   isTwoHanded: true,
 };

@@ -5,11 +5,12 @@ import { itemDoubleEdgedSword } from "./ItemDoubleEdgedSword";
 import { itemDragonsSword } from "./ItemDragonsSword";
 import { itemElvenSword } from "./ItemElvenSword";
 import { itemFireSword } from "./ItemFireSword";
+import { itemIceSword } from "./ItemIceSword";
 import { itemKatana } from "./ItemKatana";
 import { itemKnightsSword } from "./ItemKnightsSword";
 import { itemShortSword } from "./ItemShortSword";
 
-export const swordBlueprintIndex = {
+export const swordsBlueprintIndex = {
   [SwordsBlueprint.ShortSword]: itemShortSword,
   [SwordsBlueprint.BasiliskSword]: itemBasiliskSword,
   [SwordsBlueprint.DragonsSword]: itemDragonsSword,
@@ -19,4 +20,5 @@ export const swordBlueprintIndex = {
   [SwordsBlueprint.Katana]: itemKatana,
   [SwordsBlueprint.KnightsSword]: itemKnightsSword,
   [SwordsBlueprint.FireSword]: itemFireSword,
+  [SwordsBlueprint.IceSword]: itemIceSword,
 };

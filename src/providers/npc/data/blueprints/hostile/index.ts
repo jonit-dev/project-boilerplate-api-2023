@@ -10,6 +10,7 @@ import { npcFrostSalamander } from "./NPCFrostSalamander";
 import { npcGhost } from "./NPCGhost";
 import { npcGhoul } from "./NPCGhoul";
 import { npcGoblin } from "./NPCGoblin";
+import { npcIceTroll } from "./NPCIceTroll";
 import { npcMinotaur } from "./NPCMinotaur";
 import { npcOrc } from "./NPCOrc";
 import { npcOrcBerserker } from "./NPCOrcBerserker";
@@ -29,6 +30,7 @@ import { npcTrollWarrior } from "./NPCTrollWarrior";
 import { npcWildTroll } from "./NPCWildTroll";
 import { npcWinterWolf } from "./NPCWinterWolf";
 import { npcWolf } from "./NPCWolf";
+import { npcYeti } from "./NPCYeti";
 
 export const hostileNPCs = {
   [HostileNPCsBlueprint.Orc]: npcOrc,
@@ -61,4 +63,6 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.WinterWolf]: npcWinterWolf,
   [HostileNPCsBlueprint.FrostSalamander]: npcFrostSalamander,
   [HostileNPCsBlueprint.Bandit]: npcBandit,
+  [HostileNPCsBlueprint.Yeti]: npcYeti,
+  [HostileNPCsBlueprint.IceTroll]: npcIceTroll,
 };

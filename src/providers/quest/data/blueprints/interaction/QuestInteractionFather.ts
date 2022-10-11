@@ -1,4 +1,4 @@
-import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { IQuest, QuestType } from "@rpg-engine/shared";
 import { QuestsBlueprint } from "../../questsBlueprintTypes";
@@ -10,11 +10,11 @@ export const questInteractionFather = {
   key: QuestsBlueprint.InteractionTrader,
   rewards: [
     {
-      itemKeys: [RangedBlueprint.Slingshot],
+      itemKeys: [RangedWeaponsBlueprint.Slingshot],
       qty: 1,
     },
     {
-      itemKeys: [RangedBlueprint.Stone],
+      itemKeys: [RangedWeaponsBlueprint.Stone],
       qty: 100,
     },
   ],

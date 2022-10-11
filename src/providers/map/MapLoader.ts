@@ -18,13 +18,15 @@ export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
   constructor(private gridManager: GridManager) {}
 
-  public async init(): Promise<void> {
+  public async init(isUnitTest: boolean = false): Promise<void> {
     // get all map names
 
     const mapNames = this.getMapNames();
     const mapToCheckTransitions: MapObject[] = [];
 
-    console.time("🟧 Solids generated in");
+    if (!isUnitTest) {
+      console.time("🟧 Solids generated in");
+    }
 
     for (const mapFileName of mapNames) {
       if (mapFileName.includes("_hash")) {
@@ -42,7 +44,7 @@ export class MapLoader {
         this.hasMapRequiredLayers(mapFileName, currentMap as ITiled);
       }
 
-      const updated = await this.checkMapUpdated(mapPath, mapFileName, currentMap);
+      const updated = await this.checkMapUpdated(mapPath, mapFileName, currentMap, isUnitTest);
 
       if (updated) {
         mapToCheckTransitions.push({ name: mapFileName, data: currentMap });
@@ -55,9 +57,11 @@ export class MapLoader {
       this.gridManager.generateGridSolids(mapName);
     }
 
-    console.timeEnd("🟧 Solids generated in");
+    if (!isUnitTest) {
+      console.timeEnd("🟧 Solids generated in");
 
-    console.log("📦 Maps and grids are loaded!");
+      console.log("📦 Maps and grids are loaded!");
+    }
   }
 
   private getMapNames(): string[] {
@@ -76,7 +80,16 @@ export class MapLoader {
     }
   }
 
-  private async checkMapUpdated(mapPath: string, mapFileName: string, mapObject: object): Promise<boolean> {
+  private async checkMapUpdated(
+    mapPath: string,
+    mapFileName: string,
+    mapObject: object,
+    isUnitTest: boolean = false
+  ): Promise<boolean> {
+    if (!isUnitTest) {
+      return true;
+    }
+
     const mapChecksum = this.checksum(mapPath);
     const fileName = mapFileName.replace(".json", "");
     const mapData = await MapModel.find({ name: fileName });
@@ -95,6 +108,7 @@ export class MapLoader {
       }
     } else {
       console.log(`📦 Map ${fileName} is created!`);
+
       await MapModel.create({ name: fileName, checksum: mapChecksum });
 
       // create zip

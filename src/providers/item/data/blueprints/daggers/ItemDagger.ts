@@ -1,10 +1,10 @@
 import { IItem, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
-import { DaggersBluePrint } from "../../types/itemsBlueprintTypes";
+import { DaggersBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemDagger: Partial<IItem> = {
-  key: DaggersBluePrint.Dagger,
+  key: DaggersBlueprint.Dagger,
   type: ItemType.Weapon,
   subType: ItemSubType.Dagger,
   textureAtlas: "items",
@@ -15,7 +15,7 @@ export const itemDagger: Partial<IItem> = {
     "You see a dagger. It's a fighting knife with a very sharp point and usually two sharp edges, typically designed or capable of being used as a thrusting or stabbing weapon.",
   defense: 1,
   attack: 3,
-  weight: 4,
+  weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };

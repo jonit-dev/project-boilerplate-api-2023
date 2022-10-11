@@ -13,7 +13,7 @@ import {
   GlovesBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
-  RangedBlueprint,
+  RangedWeaponsBlueprint,
   SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
@@ -55,7 +55,7 @@ export const npcTroll = {
       chance: 30,
     },
     {
-      itemBlueprintKey: RangedBlueprint.Arrow,
+      itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 50,
       quantityRange: [5, 10],
     },
@@ -68,7 +68,7 @@ export const npcTroll = {
       chance: 30,
     },
     {
-      itemBlueprintKey: RangedBlueprint.Bow,
+      itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 20,
     },
   ],

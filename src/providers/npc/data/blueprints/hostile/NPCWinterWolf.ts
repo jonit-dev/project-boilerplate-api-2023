@@ -2,7 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { DaggersBluePrint, FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { DaggersBlueprint, FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -42,8 +42,8 @@ export const npcWinterWolf: Partial<INPC> = {
       chance: 30,
     },
     {
-      itemBlueprintKey: DaggersBluePrint.Dagger,
-      chance: 30,
+      itemBlueprintKey: DaggersBlueprint.FrostDagger,
+      chance: 20,
     },
   ],
 };

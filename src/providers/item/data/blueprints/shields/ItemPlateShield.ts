@@ -2,7 +2,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ShieldsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const ItemPlateShield: Partial<IItem> = {
+export const itemPlaceShield: Partial<IItem> = {
   key: ShieldsBlueprint.PlateShield,
   type: ItemType.Armor,
   subType: ItemSubType.Shield,

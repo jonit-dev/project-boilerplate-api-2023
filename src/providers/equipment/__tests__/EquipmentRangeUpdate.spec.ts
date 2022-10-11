@@ -2,8 +2,8 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { bowsBlueprintIndex } from "@providers/item/data/blueprints/bows/index";
-import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { rangedWeaponsBlueprintIndex } from "@providers/item/data/blueprints/ranged-weapons/index";
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
 import { EquipmentRangeUpdate } from "../EquipmentRangeUpdate";
@@ -78,7 +78,7 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
 });
 
 const createItemBow = async (): Promise<IItem> => {
-  const bowBluePrint = bowsBlueprintIndex[RangedBlueprint.Bow];
+  const bowBluePrint = rangedWeaponsBlueprintIndex[RangedWeaponsBlueprint.Bow];
   const bow = new Item({
     ...bowBluePrint,
   });
