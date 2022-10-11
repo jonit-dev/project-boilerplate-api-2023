@@ -2,16 +2,16 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ShieldsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemPlaceShield: Partial<IItem> = {
-  key: ShieldsBlueprint.PlateShield,
+export const itemYetiShield: Partial<IItem> = {
+  key: ShieldsBlueprint.YetiShield,
   type: ItemType.Armor,
   subType: ItemSubType.Shield,
   textureAtlas: "items",
-  texturePath: "shields/plate-shield.png",
-  textureKey: "plate-shield",
-  name: "Plate Shield",
-  description: "A large metal shield.",
-  defense: 10,
-  weight: 3,
+  texturePath: "shields/yeti-shield.png",
+  textureKey: "yeti-shield",
+  name: "Yeti's Shield",
+  description: "A rare shield used by Yetis, against the frost island invaders.",
+  defense: 11,
+  weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };

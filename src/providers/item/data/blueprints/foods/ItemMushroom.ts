@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemMushroom: Partial<IItem> = {
@@ -12,5 +12,4 @@ export const itemMushroom: Partial<IItem> = {
   name: "Mushroom",
   description: "An edible mushroom that can be eaten to restore health.",
   weight: 0.25,
-  allowedEquipSlotType: [ItemSlotType.Accessory],
 };

@@ -5,7 +5,8 @@ import { axesBlueprintIndex } from "./blueprints/axes/index";
 import { bodiesBlueprintsIndex } from "./blueprints/bodies/index";
 import { bootsBlueprintIndex } from "./blueprints/boots/index";
 import { containersBlueprintIndex } from "./blueprints/containers/index";
-import { daggersBlueprintsIndex } from "./blueprints/daggers/index";
+import { craftingResourcesBlueprintIndex } from "./blueprints/crafting-resources/index";
+import { daggersBlueprintIndex } from "./blueprints/daggers/index";
 import { effectsBlueprintsIndex } from "./blueprints/effects/index";
 import { foodsBlueprintIndex } from "./blueprints/foods/index";
 import { glovesBlueprintIndex } from "./blueprints/gloves/index";
@@ -19,15 +20,15 @@ import { rangedWeaponsBlueprintIndex } from "./blueprints/ranged-weapons/index";
 import { shieldsBlueprintIndex } from "./blueprints/shields/index";
 import { spearsBlueprintsIndex } from "./blueprints/spears/index";
 import { staffsBlueprintIndex } from "./blueprints/staffs/index";
-import { swordBlueprintIndex } from "./blueprints/swords/index";
+import { swordsBlueprintIndex } from "./blueprints/swords/index";
 
 export const itemsBlueprintIndex: IBlueprint = {
   ...bodiesBlueprintsIndex,
   ...containersBlueprintIndex,
   ...effectsBlueprintsIndex,
   ...helmetsBlueprintsIndex,
-  ...swordBlueprintIndex,
-  ...daggersBlueprintsIndex,
+  ...swordsBlueprintIndex,
+  ...daggersBlueprintIndex,
   ...armorsBlueprintsIndex,
   ...axesBlueprintIndex,
   ...bootsBlueprintIndex,
@@ -43,4 +44,5 @@ export const itemsBlueprintIndex: IBlueprint = {
   ...shieldsBlueprintIndex,
   ...legsBlueprintIndex,
   ...accessoriesBlueprintsIndex,
+  ...craftingResourcesBlueprintIndex,
 };

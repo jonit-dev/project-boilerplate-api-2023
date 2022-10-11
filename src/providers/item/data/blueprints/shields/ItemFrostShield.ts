@@ -2,16 +2,16 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ShieldsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemPlaceShield: Partial<IItem> = {
-  key: ShieldsBlueprint.PlateShield,
+export const itemFrostShield: Partial<IItem> = {
+  key: ShieldsBlueprint.FrostShield,
   type: ItemType.Armor,
   subType: ItemSubType.Shield,
   textureAtlas: "items",
-  texturePath: "shields/plate-shield.png",
-  textureKey: "plate-shield",
-  name: "Plate Shield",
-  description: "A large metal shield.",
-  defense: 10,
+  texturePath: "shields/frost-shield.png",
+  textureKey: "frost-shield",
+  name: "Frost Shield",
+  description: "A defensive tool based on a magic durable ice",
+  defense: 6,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };

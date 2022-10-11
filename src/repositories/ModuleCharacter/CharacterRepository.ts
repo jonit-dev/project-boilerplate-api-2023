@@ -10,7 +10,7 @@ import {
   ArmorsBlueprint,
   BootsBlueprint,
   ContainersBlueprint,
-  DaggersBluePrint,
+  DaggersBlueprint,
   HelmetsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
@@ -102,7 +102,7 @@ export class CharacterRepository extends CRUD {
 
   private async generateInitialItems(ownerId: string): Promise<IInitialItems> {
     const bag = await this.generateInitialItem(ContainersBlueprint.Bag, ownerId);
-    const dagger = await this.generateInitialItem(DaggersBluePrint.Dagger, ownerId);
+    const dagger = await this.generateInitialItem(DaggersBlueprint.Dagger, ownerId);
     const jacket = await this.generateInitialItem(ArmorsBlueprint.Jacket, ownerId);
     const cap = await this.generateInitialItem(HelmetsBlueprint.Cap, ownerId);
     const boot = await this.generateInitialItem(BootsBlueprint.Boots, ownerId);

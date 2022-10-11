@@ -5,6 +5,7 @@ import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
   SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -49,6 +50,10 @@ export const npcFrostSalamander: Partial<INPC> = {
       chance: 10,
     },
     {
+      itemBlueprintKey: SwordsBlueprint.IceSword,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
       chance: 15,
     },
@@ -62,8 +67,12 @@ export const npcFrostSalamander: Partial<INPC> = {
       quantityRange: [10, 13],
     },
     {
-      itemBlueprintKey: RangedWeaponsBlueprint.Crossbow,
-      chance: 20,
+      itemBlueprintKey: RangedWeaponsBlueprint.FrostCrossbow,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.VikingShield,
+      chance: 10,
     },
   ],
 };
