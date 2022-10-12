@@ -176,10 +176,7 @@ export class CharacterTrading {
       }
     }
 
-    const weight = await this.characterWeight.getWeight(character);
-    const maxWeight = await this.characterWeight.getMaxWeight(character);
-
-    const ratio = (weight + item.weight) / maxWeight;
+    const ratio = await this.characterWeight.getWeightRatio(character, item);
 
     if (ratio > 4) {
       this.sendCustomErrorMessage(character, "Sorry, you are already carrying too much weight!");
