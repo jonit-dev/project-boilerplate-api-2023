@@ -9,7 +9,7 @@ export const itemStuddedGloves: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "gloves/studded-gloves.png",
   textureKey: "studded-gloves",
-  name: "studded-gloves",
+  name: "Studded Gloves",
   description: "A pair of leather gloves with metal studs.",
   defense: 4,
   weight: 0.5,

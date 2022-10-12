@@ -9,7 +9,7 @@ export const itemManaPotion: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "potions/mana-potion.png",
   textureKey: "mana-potion",
-  name: "mana-potion",
+  name: "Mana Potion",
   description: "A flask containing blue liquid of a mana potion.",
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Inventory],
