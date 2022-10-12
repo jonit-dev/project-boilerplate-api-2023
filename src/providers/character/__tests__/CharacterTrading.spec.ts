@@ -109,6 +109,23 @@ describe("CharacterTrading.ts", () => {
     return itemSelled;
   };
 
+  const buyItem = async (fromContainerId: string, toContainerId: string, extraProps?: Record<string, unknown>) => {
+    const itemBuyed = await itemTrading.performItemBuy(
+      {
+        itemId: testItem.id,
+        x: npcCharacter.x,
+        y: npcCharacter.y,
+        scene: npcCharacter.scene,
+        toContainerId: fromContainerId,
+        fromContainerId: toContainerId,
+        ...extraProps,
+      },
+      testCharacter,
+      npcCharacter
+    );
+    return itemBuyed;
+  };
+
   const sellAnotherItem = async (
     fromContainerId: string,
     toContainerId: string,
@@ -128,6 +145,27 @@ describe("CharacterTrading.ts", () => {
       testCharacter
     );
     return itemSelled;
+  };
+
+  const buyAnotherItem = async (
+    fromContainerId: string,
+    toContainerId: string,
+    extraProps?: Record<string, unknown>
+  ) => {
+    const itemBuyed = await itemTrading.performItemBuy(
+      {
+        itemId: testGtItem.id,
+        x: npcCharacter.x,
+        y: npcCharacter.y,
+        scene: npcCharacter.scene,
+        toContainerId: fromContainerId,
+        fromContainerId: toContainerId,
+        ...extraProps,
+      },
+      testCharacter,
+      npcCharacter
+    );
+    return itemBuyed;
   };
 
   it("should sell an item from invetory to NPC", async () => {
@@ -162,6 +200,42 @@ describe("CharacterTrading.ts", () => {
     expect(itemPickedUpAnother).toBeTruthy();
 
     const itemSelected = await sellAnotherItem(npcInventoryItemContainerId, inventoryItemContainerId);
+
+    expect(itemSelected).toBeFalsy();
+  });
+
+  it("should but an item from NPC to inventory", async () => {
+    const itemPickedUp = await npcPickupItem(npcInventoryItemContainerId);
+
+    expect(itemPickedUp).toBeTruthy();
+
+    const itemSelled = await buyItem(npcInventoryItemContainerId, inventoryItemContainerId);
+
+    expect(itemSelled).toBeTruthy();
+
+    const result = await characterItems.hasItem(testItem.id, testCharacter, "inventory");
+
+    expect(result).toBe(true);
+
+    const anotherSellForTheSameItem = await buyItem(npcInventoryItemContainerId, inventoryItemContainerId);
+
+    expect(anotherSellForTheSameItem).toBeFalsy();
+  });
+
+  it("should not sell an item from NPC to inventory if have a price greater than the total amount of gold", async () => {
+    const itemPickedUp = await npcPickupItem(npcInventoryItemContainerId);
+
+    expect(itemPickedUp).toBeTruthy();
+
+    const itemSelled = await buyItem(npcInventoryItemContainerId, inventoryItemContainerId);
+
+    expect(itemSelled).toBeTruthy();
+
+    const itemPickedUpAnother = await npcPickupAnotherItem(npcInventoryItemContainerId);
+
+    expect(itemPickedUpAnother).toBeTruthy();
+
+    const itemSelected = await buyAnotherItem(npcInventoryItemContainerId, inventoryItemContainerId);
 
     expect(itemSelected).toBeFalsy();
   });

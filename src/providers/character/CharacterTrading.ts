@@ -52,6 +52,14 @@ export class CharacterTrading {
     return characterSelected!.gold;
   }
 
+  public async performItemBuy(
+    itemBuy: IItemPickup,
+    character: ICharacter,
+    destinyCharacter: ICharacter
+  ): Promise<Boolean> {
+    return await this.performItemSell(itemBuy, destinyCharacter, character);
+  }
+
   public async performItemSell(
     itemSell: IItemPickup,
     character: ICharacter,
