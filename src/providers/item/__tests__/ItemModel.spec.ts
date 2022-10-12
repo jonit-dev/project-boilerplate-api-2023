@@ -31,7 +31,7 @@ describe("ItemModel.ts", () => {
     expect(testItem.isEquipable).toBeTruthy();
     expect(testItem.isStackable).toBeFalsy();
     expect(testItem.fullDescription).toBe(
-      `${testItem.name}: Attack: ${testItem.attack}. Defense: ${testItem.defense}. Weight: ${testItem.weight}.`
+      `${testItem.name}: ${testItem.description} Attack: ${testItem.attack}. Defense: ${testItem.defense}. Weight: ${testItem.weight}.`
     );
   });
 
@@ -44,7 +44,7 @@ describe("ItemModel.ts", () => {
 
     expect(testItem.isEquipable).toBeTruthy();
     expect(testItem.isStackable).toBeTruthy();
-    expect(testItem.fullDescription).toBe(`${testItem.name}: ${testItem.description}`);
+    expect(testItem.fullDescription).toBe(`${testItem.name}: ${testItem.description} Weight: ${testItem.weight}.`);
   });
 
   it("validate post save() Item methods are properly executed | add itemContainer and slots ", async () => {
