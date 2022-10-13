@@ -6,7 +6,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ITradeItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterItems } from "./characterItems/CharacterItems";
+import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterValidation } from "./CharacterValidation";
 
@@ -17,7 +17,7 @@ export class CharacterTradingNPC {
     private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
     private characterTradingBalance: CharacterTradingBalance,
-    private characterItems: CharacterItems
+    private characterItemContainer: CharacterItemContainer
   ) {}
 
   public async buyItemsFromNPC(character: ICharacter, npc: INPC, items: ITradeItem[]): Promise<boolean> {
@@ -35,9 +35,12 @@ export class CharacterTradingNPC {
 
     for (const purchasedItem of items) {
       const itemBlueprint = itemsBlueprintIndex[purchasedItem.key];
-      const newItem = new Item();
+      const newItem = new Item({
+        ...itemBlueprint,
+      });
+      await newItem.save();
 
-      await this.characterItems.addItemToContainer(item);
+      await this.characterItemContainer.addItemToContainer(newItem, character, "inventory");
     }
 
     return true;
