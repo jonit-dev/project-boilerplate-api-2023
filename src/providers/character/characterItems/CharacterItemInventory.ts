@@ -2,15 +2,51 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
+import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { CharacterItemSlots } from "./CharacterItemSlots";
 
 @provide(CharacterItemInventory)
 export class CharacterItemInventory {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging, private characterItemSlots: CharacterItemSlots) {}
+
+  public async decrementItemFromInventory(itemKey: string, character: ICharacter, qty: number): Promise<boolean> {
+    const inventory = (await character.inventory) as unknown as IItem;
+
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
+
+    if (!inventoryItemContainer) {
+      return false;
+    }
+
+    for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
+      const slotItem = inventoryItemContainer.slots[i] as unknown as IItem;
+
+      if (!slotItem) continue;
+
+      if (isSameKey(slotItem.key, itemKey)) {
+        if (slotItem.isStackable) {
+          // if its stackable, decrement the stack
+          await this.characterItemSlots.updateItemOnSlot(i, inventoryItemContainer, {
+            ...slotItem,
+            stackQty: slotItem.stackQty! - qty,
+          });
+        } else {
+          // if its not stackable, just remove it
+
+          for (let i = 0; i < qty; i++) {
+            await this.deleteItemFromInventory(slotItem._id, character);
+          }
+        }
+      }
+    }
+
+    return true;
+  }
 
   public async deleteItemFromInventory(itemId: string, character: ICharacter): Promise<boolean> {
     const doesCharacterHaveItemInInventory = await this.checkItemInInventory(itemId, character);
