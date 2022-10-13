@@ -1,4 +1,3 @@
-import { CharacterTrading } from "@providers/character/CharacterTrading";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IItemPickup, ItemSocketEvents } from "@rpg-engine/shared";
@@ -7,11 +6,7 @@ import { ItemPickup } from "../ItemPickup";
 
 @provide(ItemNetworkPickup)
 export class ItemNetworkPickup {
-  constructor(
-    private socketAuth: SocketAuth,
-    private itemPickup: ItemPickup,
-    private characterTrading?: CharacterTrading
-  ) {}
+  constructor(private socketAuth: SocketAuth, private itemPickup: ItemPickup) {}
 
   public onItemPickup(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, ItemSocketEvents.Pickup, async (data: IItemPickup, character) => {

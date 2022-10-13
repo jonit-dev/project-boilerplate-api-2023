@@ -67,10 +67,6 @@ const characterSchema = createLeanSchema(
       default: FromGridY(38),
       required: true,
     }),
-    gold: Type.number({
-      defualt: 0,
-      required: true,
-    }),
     initialX: Type.number({
       default: FromGridX(33),
       required: true,
