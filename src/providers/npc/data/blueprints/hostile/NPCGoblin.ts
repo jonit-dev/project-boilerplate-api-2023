@@ -9,7 +9,7 @@ import {
   FoodsBlueprint,
   HelmetsBlueprint,
   PotionsBlueprint,
-  RangedBlueprint,
+  RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -25,7 +25,7 @@ export const npcGoblin = {
   textureKey: HostileNPCsBlueprint.Goblin,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.MeleeRanged,
-  ammoKey: RangedBlueprint.Stone,
+  ammoKey: RangedWeaponsBlueprint.Stone,
   maxRangeAttack: 6,
   speed: MovementSpeed.Fast,
   baseHealth: 45,
@@ -74,7 +74,7 @@ export const npcGoblin = {
       chance: 10,
     },
     {
-      itemBlueprintKey: RangedBlueprint.Stone,
+      itemBlueprintKey: RangedWeaponsBlueprint.Stone,
       chance: 30,
       quantityRange: [5, 15],
     },

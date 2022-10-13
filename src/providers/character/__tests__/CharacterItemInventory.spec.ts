@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { CharacterInventory } from "../CharacterInventory";
+import { CharacterItemInventory } from "../characterItems/CharacterItemInventory";
 
-describe("CharacterInventory.ts", () => {
-  let characterInventory: CharacterInventory;
+describe("CharacterItemInventory.ts", () => {
+  let characterItemInventory: CharacterItemInventory;
   let testCharacter: ICharacter;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
 
-    characterInventory = container.get<CharacterInventory>(CharacterInventory);
+    characterItemInventory = container.get<CharacterItemInventory>(CharacterItemInventory);
   });
 
   beforeEach(async () => {
@@ -20,7 +19,7 @@ describe("CharacterInventory.ts", () => {
   });
 
   it("should properly get the item in the inventory slot", async () => {
-    await characterInventory.addEquipmentToCharacter(testCharacter);
+    await characterItemInventory.addEquipmentToCharacter(testCharacter);
 
     const inventory = await testCharacter.inventory;
 

@@ -11,6 +11,12 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"], // Your TypeScript files extension
+      "parserOptions": { "project": "./tsconfig.json" }
+    }
+  ],
 
   "plugins": ["@typescript-eslint", "unused-imports", "promise"],
   "rules": {
@@ -24,6 +30,7 @@
     "keyword-spacing": "off",
     "camelcase": "off",
     "require-await": "error",
+
     "no-case-declarations": "off",
     "object-curly-spacing": "off",
     "space-before-function-paren": "off",
@@ -33,6 +40,7 @@
     "no-use-before-define": "off",
     "no-var": "error",
     "no-unused-vars": "warn",
+    "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/naming-convention": [
       "error",
       {

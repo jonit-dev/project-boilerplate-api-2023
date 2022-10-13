@@ -42,13 +42,13 @@ export class GeckosIO implements ISocket {
     });
   }
 
-  public disconnect(): void {
+  public async disconnect(): Promise<void> {
     console.log("🔌 Shutting down UDP socket connections...");
 
     const connections = this.socket.connectionsManager.getConnections();
 
     for (const [channelId, webRTCConnection] of connections) {
-      this.socket.connectionsManager.deleteConnection(webRTCConnection, channelId!);
+      await this.socket.connectionsManager.deleteConnection(webRTCConnection, channelId!);
     }
   }
 }

@@ -10,7 +10,7 @@ export const itemSpikedClub: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "maces/spiked-club.png",
   textureKey: "spiked-club",
-  name: "Spiked-club",
+  name: "Spiked club",
   description: "A simple wooden club with metal spikes.",
   attack: 3,
   weight: 1.5,

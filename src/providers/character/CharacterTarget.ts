@@ -16,7 +16,7 @@ export class CharacterTarget {
     // and on battle cycle
     const battleCycle = BattleCycle.battleCycles.get(character.id);
     if (battleCycle) {
-      battleCycle.clear();
+      await battleCycle.clear();
     }
   }
 }

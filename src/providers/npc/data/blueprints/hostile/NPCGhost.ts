@@ -2,7 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -37,12 +37,12 @@ export const npcGhost = {
   experience: 10 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: RangedBlueprint.Arrow,
+      itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 20,
       quantityRange: [3, 10],
     },
     {
-      itemBlueprintKey: RangedBlueprint.Bow,
+      itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 5,
     },
   ],

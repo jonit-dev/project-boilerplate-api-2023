@@ -47,18 +47,18 @@ export class AppleOAuthUseCase {
         authFlow: UserAuthFlow.AppleOAuth,
       });
 
-      this.analyticsHelper.track("UserLogin", newUser);
-      this.analyticsHelper.track("UserLoginApple", newUser);
-      this.analyticsHelper.updateUserInfo(newUser);
+      await this.analyticsHelper.track("UserLogin", newUser);
+      await this.analyticsHelper.track("UserLoginApple", newUser);
+      await this.analyticsHelper.updateUserInfo(newUser);
 
       return await newUser.generateAccessToken();
     } else {
       // Check if user already exists on database...
       // just create a new access token and refresh token and provide it
 
-      this.analyticsHelper.track("UserLogin", dbUser);
-      this.analyticsHelper.track("UserLoginApple", dbUser);
-      this.analyticsHelper.updateUserInfo(dbUser);
+      await this.analyticsHelper.track("UserLogin", dbUser);
+      await this.analyticsHelper.track("UserLoginApple", dbUser);
+      await this.analyticsHelper.updateUserInfo(dbUser);
 
       return await dbUser.generateAccessToken();
     }

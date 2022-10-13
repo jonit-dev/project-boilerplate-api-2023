@@ -168,7 +168,6 @@ describe("ItemUse.ts", () => {
     const inventoryContainer = await getInventoryContainer();
 
     expect(sendEventToUser).toBeCalledWith(testCharacter.channelId, ItemSocketEvents.EquipmentAndInventoryUpdate, {
-      equipment: {},
       inventory: {
         _id: inventoryContainer._id,
         parentItem: inventoryContainer!.parentItem.toString(),
@@ -305,7 +304,7 @@ describe("ItemUse.ts", () => {
     expect(sendEventToUser).toBeCalledTimes(1);
 
     expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
-      message: "Sorry, this item is not accessible.",
+      message: "Sorry, you cannot use this item.",
       type: "error",
     });
   });

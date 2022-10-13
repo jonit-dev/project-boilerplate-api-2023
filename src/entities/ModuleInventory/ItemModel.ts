@@ -1,7 +1,7 @@
 import { CharacterView } from "@providers/character/CharacterView";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { container } from "@providers/inversify/container";
-import { RangedBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemView } from "@providers/item/ItemView";
 import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -68,7 +68,7 @@ const itemSchema = createLeanSchema(
     decayTime: Type.date(),
     maxRange: Type.number(),
     requiredAmmoKeys: Type.array({ required: false }).of(
-      Type.string({ enum: TypeHelper.enumToStringArray(RangedBlueprint) })
+      Type.string({ enum: TypeHelper.enumToStringArray(RangedWeaponsBlueprint) })
     ),
     isTwoHanded: Type.boolean({ required: true, default: false }),
     hasUseWith: Type.boolean({ required: true, default: false }),
@@ -91,7 +91,7 @@ itemSchema.virtual("isStackable").get(function (this: IItem) {
 itemSchema.virtual("fullDescription").get(function (this: IItem) {
   return `${
     this.name
-  }: ${this.attack !== undefined && this.defense !== undefined ? `Attack: ${this.attack}. Defense: ${this.defense}.` + (this.weight && ` Weight: ${this.weight}.`) : this.description}`;
+  }: ${this.description}${this.type === ItemType.Weapon ? ` Attack: ${this.attack}. Defense: ${this.defense}.` : ""}${this.weight ? ` Weight: ${this.weight}.` : ""}`;
 });
 
 const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"): Promise<void> => {
@@ -119,7 +119,9 @@ itemSchema.post("updateOne", async function (this: UpdateQuery<IItem>) {
 });
 
 itemSchema.post("save", async function (this: IItem) {
-  if (this.isItemContainer) {
+  const hasItemContainer = await ItemContainer.exists({ parentItem: this._id });
+
+  if (this.isItemContainer && !hasItemContainer) {
     let slotQty: number = 20;
 
     if (this.generateContainerSlots) {

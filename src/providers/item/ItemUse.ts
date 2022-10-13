@@ -2,25 +2,25 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ItemValidation } from "./validation/ItemValidation";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { ItemValidation } from "./validation/ItemValidation";
 
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
   ICharacterItemConsumed,
   IEquipmentAndInventoryUpdatePayload,
-  IEquipmentSet,
   ItemSocketEvents,
   ItemSubType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
-import { AnimationEffect } from "@providers/animation/AnimationEffect";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -31,7 +31,8 @@ export class ItemUse {
     private equipmentEquip: EquipmentEquip,
     private characterWeight: CharacterWeight,
     private characterView: CharacterView,
-    private animationEffect: AnimationEffect
+    private animationEffect: AnimationEffect,
+    private characterItems: CharacterItems
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -47,13 +48,13 @@ export class ItemUse {
     const useItem = (await Item.findById(itemUse.itemId)) as IItem;
 
     if (!useItem) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not accessible.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
       return false;
     }
 
     const bluePrintItem = itemsBlueprintIndex[useItem.key];
     if (!bluePrintItem || !bluePrintItem.usableEffect) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not accessible.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
       return false;
     }
 
@@ -61,21 +62,22 @@ export class ItemUse {
 
     const inventoryContainer = (await this.getInventoryContainer(character)) as unknown as IItemContainer;
 
-    await this.consumeItem(inventoryContainer, useItem);
+    await this.consumeItem(character, inventoryContainer, useItem);
 
     await this.characterWeight.updateCharacterWeight(character);
 
+    const updatedInventoryContainer = await this.getInventoryContainer(character);
+
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-      equipment: {} as IEquipmentSet,
       inventory: {
-        _id: inventoryContainer._id,
-        parentItem: inventoryContainer!.parentItem.toString(),
-        owner: inventoryContainer?.owner?.toString() || character.name,
-        name: inventoryContainer?.name,
-        slotQty: inventoryContainer!.slotQty,
-        slots: inventoryContainer?.slots,
+        _id: updatedInventoryContainer?._id,
+        parentItem: updatedInventoryContainer!.parentItem.toString(),
+        owner: updatedInventoryContainer?.owner?.toString() || character.name,
+        name: updatedInventoryContainer?.name,
+        slotQty: updatedInventoryContainer!.slotQty,
+        slots: updatedInventoryContainer?.slots,
         allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
-        isEmpty: inventoryContainer!.isEmpty,
+        isEmpty: updatedInventoryContainer!.isEmpty,
       },
     };
 
@@ -98,7 +100,7 @@ export class ItemUse {
     }, intervals);
   }
 
-  private async consumeItem(inventoryContainer: IItemContainer, item: IItem): Promise<void> {
+  private async consumeItem(character: ICharacter, inventoryContainer: IItemContainer, item: IItem): Promise<void> {
     let stackReduced = false;
 
     if (item.isStackable && item.stackQty && item.stackQty > 1) {
@@ -119,7 +121,7 @@ export class ItemUse {
     }
 
     if (!stackReduced) {
-      await this.equipmentEquip.removeItemFromInventory(item._id, inventoryContainer);
+      await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
       await Item.deleteOne({ _id: item._id });
     }
   }
@@ -145,7 +147,7 @@ export class ItemUse {
       this.socketMessaging.sendEventToUser(character.channelId, CharacterSocketEvents.ItemConsumed, payload);
     }
 
-    this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LifeHeal);
+    await this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LifeHeal);
   }
 
   private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {

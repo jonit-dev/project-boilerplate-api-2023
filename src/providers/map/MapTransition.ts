@@ -40,7 +40,7 @@ export class MapTransition {
       // send event to client telling it to restart the map. We don't need to specify which, because it will trigger a character refresh and scene reload on the client side.
       this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.ChangeMap);
 
-      this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
+      await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
         character,
         ViewSocketEvents.Destroy,
         {
@@ -76,7 +76,7 @@ export class MapTransition {
 
       this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.SameMapTeleport, destination);
 
-      this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
+      await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
         character,
         ViewSocketEvents.Destroy,
         {

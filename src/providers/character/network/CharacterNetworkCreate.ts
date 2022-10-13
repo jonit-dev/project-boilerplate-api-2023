@@ -1,9 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+// eslint-disable-next-line no-unused-vars
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { NPCManager } from "@providers/npc/NPCManager";
-import { NPCView } from "@providers/npc/NPCView";
 import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -25,7 +25,6 @@ export class CharacterNetworkCreate {
     private socketAuth: SocketAuth,
     private playerView: CharacterView,
     private socketMessaging: SocketMessaging,
-    private npcView: NPCView,
     private itemView: ItemView,
     private BattleNetworkStopTargeting: BattleNetworkStopTargeting,
     private npcManager: NPCManager,
@@ -108,9 +107,9 @@ export class CharacterNetworkCreate {
           textureKey: character.textureKey,
         };
 
-        channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
+        await channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
 
-        this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
+        await this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
       }
     );
   }

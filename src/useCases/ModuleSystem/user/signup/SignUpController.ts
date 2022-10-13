@@ -23,7 +23,7 @@ export class SignUpController implements interfaces.Controller {
   public async signUp(@requestBody() authSignUpDTO, @request() req, @response() res): Promise<IUser> {
     const newUser = await this.signupUseCase.signUp(authSignUpDTO);
 
-    this.analyticsHelper.updateUserInfo(newUser);
+    await this.analyticsHelper.updateUserInfo(newUser);
 
     return res.status(HttpStatus.Created).send(newUser);
   }

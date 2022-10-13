@@ -14,7 +14,7 @@ import {
   HelmetsBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
-  RangedBlueprint,
+  RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
 export const npcTrollWarrior = {
@@ -64,12 +64,12 @@ export const npcTrollWarrior = {
       chance: 30,
     },
     {
-      itemBlueprintKey: RangedBlueprint.Bolt,
+      itemBlueprintKey: RangedWeaponsBlueprint.Bolt,
       chance: 50,
       quantityRange: [5, 10],
     },
     {
-      itemBlueprintKey: RangedBlueprint.Bow,
+      itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 20,
     },
 

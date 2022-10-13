@@ -8,6 +8,7 @@ export enum SwordsBlueprint {
   FireSword = "fire-sword",
   Katana = "katana",
   KnightsSword = "knights-sword",
+  IceSword = "ice-sword",
 }
 
 export enum HelmetsBlueprint {
@@ -33,8 +34,10 @@ export enum BodiesBlueprint {
   NPCBody = "npc-body",
 }
 
-export enum DaggersBluePrint {
+export enum DaggersBlueprint {
   Dagger = "dagger",
+  FrostDagger = "frost-dagger",
+  CorruptionDagger = "corruption-dagger",
 }
 
 export enum ArmorsBlueprint {
@@ -51,6 +54,8 @@ export enum AxesBlueprint {
   Bardiche = "bardiche",
   DoubleAxe = "double-axe",
   Pickaxe = "pickaxe",
+  FrostDoubleAxe = "frost-double-axe",
+  YetiHalberd = "yeti-halberd",
 }
 
 export enum BootsBlueprint {
@@ -78,6 +83,10 @@ export enum FoodsBlueprint {
   Potato = "potato",
   RedMeat = "red-meat",
 }
+export enum CraftingResourcesBlueprint {
+  BlueSapphire = "blue-sapphire",
+  BlueFeather = "blue-feather",
+}
 
 export enum SpearsBlueprint {
   RoyalSpear = "royal-spear",
@@ -92,7 +101,7 @@ export enum PotionsBlueprint {
   LightAntidote = "light-antidote",
 }
 
-export enum RangedBlueprint {
+export enum RangedWeaponsBlueprint {
   Arrow = "arrow",
   Bolt = "bolt",
   Bow = "bow",
@@ -100,6 +109,8 @@ export enum RangedBlueprint {
   Slingshot = "slingshot",
   Stone = "stone",
   OrcishBow = "orcish-bow",
+  FrostBow = "frost-bow",
+  FrostCrossbow = "frost-crossbow",
 }
 
 export enum GlovesBlueprint {
@@ -137,6 +148,9 @@ export enum ShieldsBlueprint {
   StuddedShield = "studded-shield",
   KnightsShield = "knights-shield",
   PlateShield = "plate-shield",
+  VikingShield = "viking-shield",
+  FrostShield = "frost-shield",
+  YetiShield = "yeti-shield",
 }
 
 export enum LegsBlueprint {

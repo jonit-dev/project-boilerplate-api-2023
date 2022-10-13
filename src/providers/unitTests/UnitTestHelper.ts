@@ -55,7 +55,7 @@ export class UnitTestHelper {
       // @ts-ignore
       .mockImplementation(() => ["unit-test-map.json", "example.json", "unit-test-map-negative-coordinate.json"]);
 
-    await mapLoader.init();
+    await mapLoader.init(true);
   }
 
   public async createMockNPC(
@@ -112,6 +112,7 @@ export class UnitTestHelper {
     }
 
     container.slots = slots;
+    container.markModified("slots");
     await container.save();
 
     return container;
@@ -136,6 +137,19 @@ export class UnitTestHelper {
     const item = await Item.findById(charBody._id).populate("itemContainer").exec();
 
     return item as IItem;
+  }
+
+  public async createMockItemFromBlueprint(blueprintKey: string, extraProps?: Partial<IItem>): Promise<IItem> {
+    const blueprintData = itemsBlueprintIndex[blueprintKey];
+
+    const newItem = new Item({
+      ...blueprintData,
+      ...extraProps,
+    });
+
+    await newItem.save();
+
+    return newItem;
   }
 
   public async createMockItem(extraProps?: Partial<IItem>): Promise<IItem> {
@@ -179,7 +193,6 @@ export class UnitTestHelper {
       ...characterMock,
       ...extraProps,
     });
-    await testCharacter.save();
 
     if (options?.hasSkills) {
       const charSkills = new Skill({
@@ -188,7 +201,6 @@ export class UnitTestHelper {
       charSkills.owner = testCharacter._id;
       testCharacter.skills = charSkills._id;
       await charSkills.save();
-      await testCharacter.save();
     }
 
     if (options?.hasEquipment) {
@@ -200,8 +212,9 @@ export class UnitTestHelper {
       }
       await equipment.save();
       testCharacter.equipment = equipment._id;
-      await testCharacter.save();
     }
+
+    await testCharacter.save();
     return testCharacter;
   }
 

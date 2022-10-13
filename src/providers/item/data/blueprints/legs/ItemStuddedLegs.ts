@@ -9,7 +9,7 @@ export const itemStuddedLegs: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "legs/studded-legs.png",
   textureKey: "studded-legs",
-  name: "studded-legs",
+  name: "Studded Legs",
   description: "A pair of simple studded legs.",
   defense: 6,
   weight: 1.2,

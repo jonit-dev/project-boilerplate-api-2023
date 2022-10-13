@@ -17,6 +17,7 @@ export class NPCBattleCycle {
     if (NPCBattleCycle.npcBattleCycles.has(this.id)) {
       const npcCycle = NPCBattleCycle.npcBattleCycles.get(this.id);
       if (npcCycle) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         npcCycle.clear();
       }
     } else {

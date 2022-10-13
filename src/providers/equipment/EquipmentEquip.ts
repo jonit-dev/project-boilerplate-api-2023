@@ -1,287 +1,86 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IEquipmentSet,
-  IItem,
   ItemSlotType,
   ItemSocketEvents,
   ItemType,
-  IUIShowMessage,
-  UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
+import { EquipmentSlots } from "./EquipmentSlots";
+import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
+
+export type SourceEquipContainerType = "inventory" | "container";
 
 @provide(EquipmentEquip)
 export class EquipmentEquip {
-  constructor(private socketMessaging: SocketMessaging, private equipmentHelper: EquipmentRangeUpdate) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private equipmentHelper: EquipmentRangeUpdate,
+    private characterItemInventory: CharacterItemInventory,
+    private equipmentSlots: EquipmentSlots,
+    private characterValidation: CharacterValidation,
+    private equipmentTwoHanded: EquipmentTwoHanded
+  ) {}
 
-  public async equip(character: ICharacter, itemId: string, itemContainerId: string): Promise<void> {
-    const item = (await Item.findById(itemId)) as unknown as IItem;
+  public async equip(character: ICharacter, itemId: string, fromItemContainerId: string): Promise<boolean> {
+    const item = await Item.findById(itemId);
 
     if (!item) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Something went wrong while equipping item. Please try again.",
-        type: "error",
-      });
-      return;
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item not found.");
+      return false;
     }
-    const equipItemContainer = this.checkIfEquipItemContainer(item, itemContainerId);
-    const itemContainer = await this.getItemContainer(item, itemContainerId);
+
+    const itemContainer = await ItemContainer.findById(fromItemContainerId);
+
+    if (!itemContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item container not found.");
+      return false;
+    }
+
+    const containerType = await this.checkContainerType(itemContainer);
+
+    const isEquipValid = await this.isEquipValid(character, item, containerType);
+
+    if (!isEquipValid) {
+      return false;
+    }
 
     const equipment = await Equipment.findById(character.equipment);
 
     if (!equipment) {
-      return;
-    }
-
-    const isEquipValid = this.validateEquip(item, character, itemContainer, itemId, equipItemContainer);
-
-    if (!isEquipValid) {
-      console.log("Equip is not valid");
-      return;
-    }
-
-    if (item.isStackable) {
-      // check if can stack the item
-      const itemStacked = await this.tryAddingItemToStack(character, equipment, item);
-      if (itemStacked) {
-        // if was stacked, remove the item from the database to avoid garbage
-        // also, remove the item from inventory
-        await Item.deleteOne({ _id: item._id });
-        await this.removeItemFromInventory(itemId, itemContainer!);
-
-        const equipmentSlots = await this.getEquipmentSlots(equipment._id);
-        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-          equipment: equipmentSlots,
-          inventory: {
-            _id: itemContainer._id,
-            parentItem: itemContainer!.parentItem.toString(),
-            owner: itemContainer?.owner?.toString() || character.name,
-            name: itemContainer?.name,
-            slotQty: itemContainer!.slotQty,
-            slots: itemContainer?.slots,
-            allowedItemTypes: this.getAllowedItemTypes(),
-            isEmpty: itemContainer!.isEmpty,
-          },
-        };
-
-        this.updateItemInventoryCharacter(payloadUpdate, character);
-        return;
-      }
-    }
-
-    const availableSlot = this.getAvailableSlot(item, equipment as unknown as IEquipmentSet);
-
-    // stackable items are only allowed in accessory slot. So, if cannot stack more,
-    // the message will be sended on tryAddingItemToStack function
-    if (availableSlot === "" && item.isStackable) {
-      return;
-    }
-
-    if (availableSlot === "") {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "There aren't slots available.",
-        type: "error",
-      });
-      return;
-    }
-
-    const hasTwoHandedItemEquipped = await this.hasTwoHandedItemEquipped(equipment as unknown as IEquipmentSet);
-
-    if (hasTwoHandedItemEquipped && this.isItemEquippableOnHands(item)) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "You already have a two handed item equipped!",
-        type: "error",
-      });
-      return;
-    }
-
-    if (item.isTwoHanded) {
-      const canEquipTwoHanded = await this.checkTwoHandedEquip(equipment as unknown as IEquipmentSet);
-      if (!canEquipTwoHanded) {
-        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "You can't equip this two handed item with another item already in your hands!",
-          type: "error",
-        });
-        return;
-      }
-    }
-
-    if (equipment) {
-      equipment[availableSlot] = item._id;
-
-      await equipment.save();
-
-      await this.removeItemFromInventory(itemId, itemContainer!);
-
-      const equipmentSlots = await this.getEquipmentSlots(equipment._id);
-
-      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-        equipment: equipmentSlots,
-        inventory: {
-          _id: itemContainer._id,
-          parentItem: itemContainer!.parentItem.toString(),
-          owner: itemContainer?.owner?.toString() || character.name,
-          name: itemContainer?.name,
-          slotQty: itemContainer!.slotQty,
-          slots: itemContainer?.slots,
-          allowedItemTypes: this.getAllowedItemTypes(),
-          isEmpty: itemContainer!.isEmpty,
-        },
-      };
-
-      this.updateItemInventoryCharacter(payloadUpdate, character);
-
-      await this.equipmentHelper.updateCharacterAttackType(character, item as any);
-    }
-  }
-
-  private isItemEquippableOnHands(item: IItem): boolean {
-    return !!(
-      item.allowedEquipSlotType.includes(ItemSlotType.LeftHand) ||
-      item.allowedEquipSlotType.includes(ItemSlotType.RightHand)
-    );
-  }
-
-  private checkIfEquipItemContainer(item: IItem, itemContainerId: string): boolean {
-    if (item.isItemContainer && itemContainerId === "") {
-      return true;
-    }
-    return false;
-  }
-
-  private async getItemContainer(item: IItem, itemContainerId: string): Promise<IItemContainer> {
-    if (item.isItemContainer && itemContainerId === "") {
-      return (await ItemContainer.findById(item.itemContainer)) as IItemContainer;
-    }
-
-    const itemContainer = (await ItemContainer.findById(itemContainerId)) as IItemContainer;
-
-    return itemContainer;
-  }
-
-  private validateEquip(
-    item: IItem,
-    character: ICharacter,
-    itemContainer: IItemContainer,
-    itemId: string,
-    equipItemContainer: boolean
-  ): boolean {
-    if (!item) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Item not found.",
-        type: "error",
-      });
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
       return false;
     }
 
-    if (!itemContainer) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Container not found.",
-        type: "error",
-      });
+    const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
+
+    if (!equipItem) {
       return false;
     }
 
-    let userHasItem = equipItemContainer || false;
+    const inventory = await character.inventory;
 
-    if (!equipItemContainer) {
-      for (const slot in itemContainer.slots) {
-        if (itemContainer.slots[slot] && itemContainer.slots[slot]._id.toString() === itemId.toString()) {
-          userHasItem = true;
-          break;
-        }
-      }
-    }
+    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as any;
 
-    if (!userHasItem) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "User doesn't have this item",
-        type: "error",
-      });
-      return false;
-    }
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      equipment: equipmentSlots,
+      inventory: inventoryContainer,
+    };
 
-    if (character.isBanned) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "User has been banned!",
-        type: "error",
-      });
-      return false;
-    }
+    this.updateItemInventoryCharacter(payloadUpdate, character);
 
-    if (!character.isAlive) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "User is dead!",
-        type: "error",
-      });
-      return false;
-    }
+    await this.equipmentHelper.updateCharacterAttackType(character, item as any);
 
     return true;
-  }
-
-  private async hasTwoHandedItemEquipped(equipment: IEquipmentSet): Promise<boolean> {
-    const leftHandItem = await Item.findById(equipment.leftHand);
-    const rightHandItem = await Item.findById(equipment.rightHand);
-
-    if (leftHandItem?.isTwoHanded || rightHandItem?.isTwoHanded) {
-      return true;
-    }
-    return false;
-  }
-
-  private async checkTwoHandedEquip(equipment: IEquipmentSet): Promise<boolean> {
-    const equipmentSlots = await this.getEquipmentSlots(equipment._id);
-    if (!equipmentSlots.leftHand && !equipmentSlots.rightHand) return true;
-
-    return false;
-  }
-
-  public getAvailableSlot(item: IItem, equipment: IEquipmentSet): string {
-    let availableSlot = "";
-    const itemSlotTypes = [
-      "head",
-      "neck",
-      "leftHand",
-      "rightHand",
-      "ring",
-      "legs",
-      "boot",
-      "accessory",
-      "armor",
-      "inventory",
-    ];
-
-    for (const allowedSlotType of item?.allowedEquipSlotType) {
-      const allowedSlotTypeCamelCase = this.getWordCamelCase(allowedSlotType);
-      const itemSubTypeCamelCase = this.getWordCamelCase(item.subType);
-
-      const slotType = this.getSlotType(itemSlotTypes, allowedSlotTypeCamelCase, itemSubTypeCamelCase);
-
-      if (equipment[slotType] === undefined) {
-        availableSlot = slotType;
-        break;
-      }
-    }
-
-    return availableSlot;
-  }
-
-  private getSlotType(itemSlotTypes: string[], slotType: string, subType: string): string {
-    if (!itemSlotTypes.includes(slotType)) {
-      return subType;
-    }
-    return slotType;
-  }
-
-  public getWordCamelCase(word: string): string {
-    return word.charAt(0).toLowerCase() + word.slice(1);
   }
 
   public updateItemInventoryCharacter(
@@ -295,52 +94,6 @@ export class EquipmentEquip {
     );
   }
 
-  public async getEquipmentSlots(equipmentId: string): Promise<IEquipmentSet> {
-    const equipment = await Equipment.findById(equipmentId)
-      .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
-      .exec();
-
-    const head = equipment?.head! as unknown as IItem;
-    const neck = equipment?.neck! as unknown as IItem;
-    const leftHand = equipment?.leftHand! as unknown as IItem;
-    const rightHand = equipment?.rightHand! as unknown as IItem;
-    const ring = equipment?.ring! as unknown as IItem;
-    const legs = equipment?.legs! as unknown as IItem;
-    const boot = equipment?.boot! as unknown as IItem;
-    const accessory = equipment?.accessory! as unknown as IItem;
-    const armor = equipment?.armor! as unknown as IItem;
-    const inventory = equipment?.inventory! as unknown as IItem;
-
-    return {
-      _id: equipment!._id,
-      head,
-      neck,
-      leftHand,
-      rightHand,
-      ring,
-      legs,
-      boot,
-      accessory,
-      armor,
-      inventory,
-    };
-  }
-
-  public async removeItemFromInventory(itemId: string, itemContainer: IItemContainer): Promise<void> {
-    let index = 0;
-    for (let slot in itemContainer.slots) {
-      if (itemContainer.slots[slot] && itemContainer.slots[slot]._id.toString() === itemId.toString()) {
-        slot = "";
-        break;
-      }
-      index++;
-    }
-
-    itemContainer.slots[index] = null;
-    itemContainer.markModified("slots");
-    await itemContainer.save();
-  }
-
   public getAllowedItemTypes(): ItemType[] {
     const allowedItemTypes: ItemType[] = [];
 
@@ -351,50 +104,78 @@ export class EquipmentEquip {
     return allowedItemTypes;
   }
 
-  private async tryAddingItemToStack(
+  private async checkContainerType(itemContainer: IItemContainer): Promise<SourceEquipContainerType> {
+    if (!itemContainer) {
+      throw new Error("Item container not found");
+    }
+
+    const parentItem = await Item.findById(itemContainer.parentItem);
+
+    if (!parentItem) {
+      throw new Error("Parent item not found");
+    }
+
+    if (parentItem.allowedEquipSlotType?.includes(ItemSlotType.Inventory)) {
+      return "inventory";
+    }
+
+    return "container";
+  }
+
+  private async isEquipValid(
     character: ICharacter,
-    equipment: IEquipment,
-    selectedItem: IItem
+    item: IItem,
+    containerType: SourceEquipContainerType
   ): Promise<boolean> {
-    // only accessory slot can have stackable items
-    if (!selectedItem.allowedEquipSlotType.includes(ItemSlotType.Accessory)) {
+    const hasBasicValidation = await this.characterValidation.hasBasicValidation(character);
+
+    if (!hasBasicValidation) {
       return false;
     }
 
-    const accessoryItem = await Item.findById(equipment.accessory);
+    if (containerType === "inventory") {
+      // if item is coming from a character's inventory, check if the character owns the item
 
-    if (accessoryItem) {
-      if (!accessoryItem.isStackable) {
-        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "Cannot equip this item in accessory slot. You have equipped another item.",
-          type: "error",
-        });
+      const isItemInInventory = await this.characterItemInventory.checkItemInInventory(item._id, character);
+
+      if (!isItemInInventory) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, you don't have this item in your inventory."
+        );
         return false;
       }
+    }
 
-      if (accessoryItem.key === selectedItem.key.replace(/-\d+$/, "")) {
-        if (selectedItem.stackQty) {
-          const updatedStackQty = accessoryItem.stackQty! + selectedItem.stackQty;
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
-          if (updatedStackQty > accessoryItem.maxStackSize) {
-            this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-              message: `Sorry, you cannot stack more than ${accessoryItem.maxStackSize} ${accessoryItem.key}s.`,
-              type: "error",
-            });
-            return false;
-          }
+    const hasTwoHandedItemEquipped = await this.equipmentTwoHanded.hasTwoHandedItemEquipped(
+      equipmentSlots as unknown as IEquipmentSet
+    );
 
-          await Item.updateOne(
-            {
-              _id: accessoryItem._id,
-            },
-            { $set: { stackQty: updatedStackQty } }
-          );
+    if (hasTwoHandedItemEquipped && this.equipmentTwoHanded.isItemEquippableOnHands(item)) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you already have a two-handed item equipped."
+      );
 
-          return true;
-        }
+      return false;
+    }
+
+    if (item.isTwoHanded) {
+      const canEquipTwoHanded = await this.equipmentTwoHanded.checkTwoHandedEquip(
+        equipmentSlots as unknown as IEquipmentSet
+      );
+      if (!canEquipTwoHanded) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, you already have an item equipped on your hands."
+        );
+
+        return false;
       }
     }
-    return false;
+
+    return true;
   }
 }

@@ -7,7 +7,7 @@ import {
   LegsBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
-  RangedBlueprint,
+  RangedWeaponsBlueprint,
   SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -73,17 +73,17 @@ export const npcGhoul = {
       chance: 2.5,
     },
     {
-      itemBlueprintKey: RangedBlueprint.Arrow,
+      itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 10,
       quantityRange: [10, 13],
     },
     {
-      itemBlueprintKey: RangedBlueprint.Bolt,
+      itemBlueprintKey: RangedWeaponsBlueprint.Bolt,
       chance: 5,
       quantityRange: [10, 13],
     },
     {
-      itemBlueprintKey: RangedBlueprint.Crossbow,
+      itemBlueprintKey: RangedWeaponsBlueprint.Crossbow,
       chance: 4,
     },
   ],

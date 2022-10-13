@@ -9,7 +9,7 @@ export const itemWoodenShield: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "shields/wooden-shield.png",
   textureKey: "wooden-shield",
-  name: "wooden-shield",
+  name: "Wooden Shield",
   description: "A simple round wooden shield for protection.",
   defense: 3,
   weight: 2,

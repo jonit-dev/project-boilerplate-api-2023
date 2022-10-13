@@ -40,8 +40,8 @@ export class SocketIO implements ISocket {
     });
   }
 
-  public disconnect(): void {
+  public async disconnect(): Promise<void> {
     console.log("🔌 Shutting down TCP socket connections...");
-    this.socket.close();
+    await this.socket.close();
   }
 }
