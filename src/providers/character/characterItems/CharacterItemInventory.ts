@@ -20,6 +20,7 @@ export class CharacterItemInventory {
     const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
       return false;
     }
 
