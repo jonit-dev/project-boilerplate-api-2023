@@ -1,6 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ITradeItem } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
@@ -20,5 +22,18 @@ export class CharacterTradingBalance {
     const totalGold = await this.characterItemSlots.getTotalQty(inventoryContainer, OthersBlueprint.GoldCoin);
 
     return totalGold;
+  }
+
+  public calculateItemsTotalPrice(npc: INPC, items: ITradeItem[]): number {
+    return items.reduce((total, item) => {
+      const npcHasItem = npc?.traderItems?.some((traderItem) => traderItem.key === item.key);
+
+      if (!npcHasItem) {
+        // if NPC doesnt have an item, do not take it into account into the total cost (because we won't sell it, anyway)
+        return total;
+      }
+
+      return total + item.price * item.qty;
+    }, 0);
   }
 }

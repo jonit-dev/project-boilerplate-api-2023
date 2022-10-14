@@ -5,13 +5,13 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { CharacterTradeSocketEvents, ICharacterNPCTrade } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterTradingNPC } from "../CharacterTradingNPC";
+import { CharacterTradingNPCBuy } from "../CharacterTradingNPCBuy";
 
 @provide(CharacterNetworkTrading)
 export class CharacterNetworkTrading {
   constructor(
     private socketAuth: SocketAuth,
-    private characterTradingNPC: CharacterTradingNPC,
+    private characterTradingNPCBuy: CharacterTradingNPCBuy,
     private socketMessaging: SocketMessaging
   ) {}
 
@@ -34,10 +34,9 @@ export class CharacterNetworkTrading {
 
         switch (type) {
           case "buy":
-            await this.characterTradingNPC.buyItemsFromNPC(character, npc, items);
+            await this.characterTradingNPCBuy.buyItemsFromNPC(character, npc, items);
             break;
           case "sell":
-            await this.characterTradingNPC.sellItemsToNPC(character, npc, items);
             break;
         }
       }

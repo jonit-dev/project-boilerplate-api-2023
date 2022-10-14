@@ -1712,10 +1712,10 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@rpg-engine/shared@^0.5.49":
-  version "0.5.49"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.5.49.tgz#8f5e79cfbfcc15d0595c651aa888d8857c56c558"
-  integrity sha512-nx5NNzN9Rw9ddlySrlV2Ik0bzgO6WszZtymcjWptYUEj1lH0OcZbrjNbNeDxdRRljDyCArTlQW4TILeZ5H1lSA==
+"@rpg-engine/shared@^0.5.50":
+  version "0.5.50"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.5.50.tgz#cd39829398c488e1d4883e8994f7e4cade6cd7de"
+  integrity sha512-7EqQtid7xBV1QqgoL+/99vDs9Y5VuY1Bf6Q4c72OcUXO/cq04gKxDKB8dCKGn5mGFysFCfPf97SW3NOX70oukA==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
