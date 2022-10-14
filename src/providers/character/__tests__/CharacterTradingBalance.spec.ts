@@ -23,7 +23,7 @@ describe("CharacterTradingBalance.ts", () => {
 
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasInventory: true,
-      hasSkills: true,
+
       hasEquipment: true,
     });
     inventory = await testCharacter.inventory;

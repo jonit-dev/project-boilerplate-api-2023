@@ -44,6 +44,12 @@ export class CharacterTradingValidation {
         );
         return false;
       }
+
+      // make sure NPC has item to be sold
+      if (!npc.traderItems.length) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this NPC has no items for sale.");
+        return false;
+      }
     }
 
     //  Is the character near the seller NPC?

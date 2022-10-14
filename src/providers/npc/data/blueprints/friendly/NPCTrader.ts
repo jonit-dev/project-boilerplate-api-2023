@@ -13,11 +13,11 @@ export const npcTrader = {
   isTrader: true,
   traderItems: [
     {
-      blueprintKey: PotionsBlueprint.LightEndurancePotion,
+      key: PotionsBlueprint.LightEndurancePotion,
       price: 15,
     },
     {
-      blueprintKey: SwordsBlueprint.ShortSword,
+      key: SwordsBlueprint.ShortSword,
       price: 50,
     },
   ],
