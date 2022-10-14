@@ -69,7 +69,7 @@ describe("CharacterTradingBalance.ts", () => {
         price: 15,
       },
       {
-        key: SwordsBlueprint.ElvenSword, // this item is not in the NPC's traderItems. It's here on purpuse, to test if the total price is calculated correctly
+        key: SwordsBlueprint.ElvenSword, // this item is not in the NPC's traderItems. It's here on purpose, to test if the total price is calculated correctly
         qty: 1,
         price: 500,
       },

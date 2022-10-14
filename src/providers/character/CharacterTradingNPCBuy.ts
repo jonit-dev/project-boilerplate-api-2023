@@ -71,6 +71,8 @@ export class CharacterTradingNPCBuy {
       const itemBlueprint = itemsBlueprintIndex[purchasedItem.key] as Partial<IItem>;
       const isStackable = itemBlueprint?.maxStackSize! > 1;
 
+      let wasItemAddedToContainer;
+
       if (isStackable) {
         // buy the whole stack at once
         const newItem = new Item({
@@ -80,7 +82,11 @@ export class CharacterTradingNPCBuy {
         await newItem.save();
 
         // add it to the character's inventory
-        await this.characterItemContainer.addItemToContainer(newItem, character, inventoryContainerId);
+        wasItemAddedToContainer = await this.characterItemContainer.addItemToContainer(
+          newItem,
+          character,
+          inventoryContainerId
+        );
       } else {
         for (let i = 0; i < purchasedItem.qty; i++) {
           const newItem = new Item({
@@ -89,7 +95,19 @@ export class CharacterTradingNPCBuy {
           await newItem.save();
 
           // add it to the character's inventory
-          await this.characterItemContainer.addItemToContainer(newItem, character, inventoryContainerId);
+          wasItemAddedToContainer = await this.characterItemContainer.addItemToContainer(
+            newItem,
+            character,
+            inventoryContainerId
+          );
+        }
+
+        if (!wasItemAddedToContainer) {
+          this.socketMessaging.sendErrorMessageToCharacter(
+            character,
+            "An error occurred while processing your purchase."
+          );
+          return false;
         }
       }
     }

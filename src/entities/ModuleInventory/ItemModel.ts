@@ -45,7 +45,6 @@ const itemSchema = createLeanSchema(
     isStorable: Type.boolean({ required: true, default: true }),
     x: Type.number(),
     y: Type.number(),
-    goldPrice: Type.number(),
     scene: Type.string(),
     layer: Type.number({
       default: MapLayers.OverGround,
