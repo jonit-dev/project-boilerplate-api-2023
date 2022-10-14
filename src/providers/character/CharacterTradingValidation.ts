@@ -37,6 +37,12 @@ export class CharacterTradingValidation {
     for (const item of items) {
       const itemBlueprint = itemsBlueprintIndex[item.key];
 
+      // check if the item has price <= 0
+      if (item.price <= 0 || item.qty <= 0) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, invalid parameters for ${item.key}.`);
+        return false;
+      }
+
       if (!itemBlueprint) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,

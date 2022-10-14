@@ -95,6 +95,25 @@ describe("CharacterTradingValidation.ts", () => {
     expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "You are too far away from the seller.");
   });
 
+  it("should throw an error if a transaction item has price or quantity <= 0", () => {
+    transactionItems = [
+      {
+        key: PotionsBlueprint.LightEndurancePotion,
+        qty: 0,
+        price: -1,
+      },
+    ];
+
+    const isValid = characterTradingValidation.validateTransaction(testCharacter, testNPCTrader, transactionItems);
+
+    expect(isValid).toBe(false);
+
+    expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+      testCharacter,
+      "Sorry, invalid parameters for light-endurance-potion."
+    );
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
