@@ -23,7 +23,6 @@ describe("CharacterTradingValidation.ts", () => {
       {
         key: PotionsBlueprint.LightEndurancePotion,
         qty: 1,
-        price: 15,
       },
     ];
   });
@@ -95,12 +94,29 @@ describe("CharacterTradingValidation.ts", () => {
     expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "You are too far away from the seller.");
   });
 
+  it("should fail if an invalid blueprint item is used", () => {
+    transactionItems = [
+      {
+        key: "invalid-blueprint-key",
+        qty: 1,
+      },
+    ];
+
+    const isValid = characterTradingValidation.validateTransaction(testCharacter, testNPCTrader, transactionItems);
+
+    expect(isValid).toBe(false);
+
+    expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+      testCharacter,
+      "Sorry, this NPC is not selling this item."
+    );
+  });
+
   it("should throw an error if a transaction item has price or quantity <= 0", () => {
     transactionItems = [
       {
         key: PotionsBlueprint.LightEndurancePotion,
         qty: 0,
-        price: -1,
       },
     ];
 

@@ -33,7 +33,9 @@ export class CharacterTradingBalance {
         return total;
       }
 
-      return total + item.price * item.qty;
+      const traderItem = npc.traderItems?.find((traderItem) => traderItem.key === item.key);
+
+      return total + traderItem?.price! * item.qty;
     }, 0);
   }
 }

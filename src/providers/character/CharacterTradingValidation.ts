@@ -27,8 +27,8 @@ export class CharacterTradingValidation {
       return false;
     }
 
-    if (!npc.traderItems) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "This NPC has no items for sale.");
+    if (!npc.traderItems?.length) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this NPC has no items for sale.");
       return false;
     }
 
@@ -37,8 +37,15 @@ export class CharacterTradingValidation {
     for (const item of items) {
       const itemBlueprint = itemsBlueprintIndex[item.key];
 
+      const traderItem = npc.traderItems?.find((traderItem) => traderItem.key === item.key);
+
+      if (!traderItem) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this NPC is not selling this item.");
+        return false;
+      }
+
       // check if the item has price <= 0
-      if (item.price <= 0 || item.qty <= 0) {
+      if (traderItem.price <= 0 || item.qty <= 0) {
         this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, invalid parameters for ${item.key}.`);
         return false;
       }
