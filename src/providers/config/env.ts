@@ -18,6 +18,7 @@ export const appEnv = {
     FMP_API_KEY: process.env.FMP_API_KEY,
     SENTRY_DNS_URL: process.env.SENTRY_DNS_URL,
     MAX_PM2_INSTANCES: Number(process.env.MAX_PM2_INSTANCES)!,
+    IS_UNIT_TEST: process.env.JEST_WORKER_ID !== undefined,
   },
   analytics: {
     mixpanelToken: process.env.MIXPANEL_TOKEN,
