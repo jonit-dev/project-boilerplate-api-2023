@@ -108,7 +108,6 @@ describe("CharacterTradingValidation.ts", () => {
       expect(updatedInventoryContainer.slots[0].stackQty).toBe(85); // gold left
       expect(updatedInventoryContainer.slots[1].key).toBe(PotionsBlueprint.LightEndurancePotion); // potion bought
 
-      expect(sendEventToUser).toHaveBeenCalledTimes(1);
       expect(sendEventToUser).toHaveBeenCalledWith(
         testCharacter.channelId!,
         ItemSocketEvents.EquipmentAndInventoryUpdate,
@@ -142,7 +141,6 @@ describe("CharacterTradingValidation.ts", () => {
       expect(updatedInventoryContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Arrow); // potion bought
       expect(updatedInventoryContainer.slots[1].stackQty).toBe(25);
 
-      expect(sendEventToUser).toHaveBeenCalledTimes(1);
       expect(sendEventToUser).toHaveBeenCalledWith(
         testCharacter.channelId!,
         ItemSocketEvents.EquipmentAndInventoryUpdate,
@@ -179,6 +177,13 @@ describe("CharacterTradingValidation.ts", () => {
     });
 
     it("should fail if we don't have enough gold for a purchase", async () => {
+      transactionItems = [
+        {
+          key: RangedWeaponsBlueprint.Arrow,
+          qty: 100,
+        },
+      ];
+
       const goldCoins = await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, {
         stackQty: 10,
       });
