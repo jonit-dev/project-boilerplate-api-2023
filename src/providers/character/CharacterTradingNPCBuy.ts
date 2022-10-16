@@ -1,11 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ITradeItem } from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents, ITradeItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
@@ -16,7 +16,6 @@ import { CharacterWeight } from "./CharacterWeight";
 @provide(CharacterTradingNPCBuy)
 export class CharacterTradingNPCBuy {
   constructor(
-    private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
     private characterTradingBalance: CharacterTradingBalance,
     private characterItemContainer: CharacterItemContainer,
@@ -115,7 +114,25 @@ export class CharacterTradingNPCBuy {
     // finally, update character's weight
     await this.characterWeight.updateCharacterWeight(character);
 
+    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      inventory: inventoryContainer,
+      openEquipmentSetOnUpdate: false,
+      openInventoryOnUpdate: true,
+    };
+
+    this.sendRefreshItemsEvent(payloadUpdate, character);
+
     return true;
+  }
+
+  private sendRefreshItemsEvent(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
+    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+      character.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      payloadUpdate
+    );
   }
 
   private async validateBuyTransaction(
@@ -145,7 +162,7 @@ export class CharacterTradingNPCBuy {
       if (isStackable && item.qty > itemBlueprint?.maxStackSize!) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
-          `You can't buy more than the max stack size for the item '${item.name}'.`
+          `You can't buy more than the max stack size for the item '${itemBlueprint.name}'.`
         );
         return false;
       }
@@ -160,7 +177,7 @@ export class CharacterTradingNPCBuy {
     const hasEnoughGold = characterTotalGoldInventory >= totalCost;
 
     if (!hasEnoughGold) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "You don't have enough gold make this purchase.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "You don't have enough gold for this purchase.");
       return false;
     }
 
