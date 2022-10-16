@@ -3,7 +3,7 @@ import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { CharacterTradeSocketEvents, ICharacterNPCTrade } from "@rpg-engine/shared";
+import { CharacterTradeSocketEvents, ICharacterNPCTradeRequest } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterTradingNPCBuy } from "../CharacterTradingNPCBuy";
 
@@ -19,7 +19,7 @@ export class CharacterNetworkTrading {
     this.socketAuth.authCharacterOn(
       channel,
       CharacterTradeSocketEvents.TradeWithNPC,
-      async (data: ICharacterNPCTrade, character: ICharacter) => {
+      async (data: ICharacterNPCTradeRequest, character: ICharacter) => {
         const { npcId, type, items } = data;
 
         const npc = await NPC.findById(npcId);

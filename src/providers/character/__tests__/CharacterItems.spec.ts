@@ -40,7 +40,6 @@ describe("CharacterItems.ts", () => {
       y: testCharacter.y,
       scene: testCharacter.scene,
       weight: 0,
-      goldPrice: 100,
     });
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;
