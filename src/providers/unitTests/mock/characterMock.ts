@@ -1,18 +1,12 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterFactions, LifeBringerRaces } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
-export const characterMock = {
-  cameraCoordinates: {
-    x: -43.0000000000007,
-    y: -141.75,
-    width: 566,
-    height: 827.5,
-  },
+export const characterMock: Partial<ICharacter> = {
   health: 100,
   mana: 100,
   x: 304,
   y: 112,
-  gold: 100,
   direction: "left",
   class: "None",
   faction: CharacterFactions.LifeBringer,
@@ -24,7 +18,6 @@ export const characterMock = {
   scene: "example",
   initialScene: "example",
   name: "Test Character",
-  owner: "6233ff328f3b09002fe32f9b",
   channelId: "mock-inexistent-channel-id",
   view: {
     characters: {},
