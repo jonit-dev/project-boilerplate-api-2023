@@ -8,7 +8,6 @@ export const itemGladiatorHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/gladiator's-helmet.png",
-  textureKey: "gladiator's-helmet",
   name: "Gladiator Helmet",
   description:
     "For antiquity, gladiator helmets were unique in their design. This helmet was designed to help maximize defense.",

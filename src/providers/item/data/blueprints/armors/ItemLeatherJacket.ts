@@ -8,7 +8,7 @@ export const itemLeatherJacket: Partial<IItem> = {
   subType: ItemSubType.Armor,
   textureAtlas: "items",
   texturePath: "armors/leather-jacket.png",
-  textureKey: "leather-jacket",
+
   name: "Leather Jacket",
   description: "A jacket made of treated leather.",
   defense: 5,

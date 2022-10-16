@@ -10,7 +10,7 @@ export const itemMushroom: Partial<IItem> = {
   subType: ItemSubType.Food,
   textureAtlas: "items",
   texturePath: "foods/mushroom.png",
-  textureKey: "mushroom",
+
   name: "Mushroom",
   description: "An edible mushroom that can be eaten to restore health.",
   weight: 0.25,

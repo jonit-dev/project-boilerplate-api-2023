@@ -9,7 +9,7 @@ export const itemClub: Partial<IItem> = {
   subType: ItemSubType.Mace,
   textureAtlas: "items",
   texturePath: "maces/club.png",
-  textureKey: "club",
+
   name: "Club",
   description: "A simple wooden club.",
   attack: 2,

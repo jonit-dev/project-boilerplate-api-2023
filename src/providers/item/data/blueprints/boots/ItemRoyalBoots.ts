@@ -8,7 +8,7 @@ export const itemRoyalBoots: Partial<IItem> = {
   subType: ItemSubType.Boot,
   textureAtlas: "items",
   texturePath: "boots/royal-boots.png",
-  textureKey: "royal-boots",
+
   name: "Royal Boots",
   description: "The Royal Boots are made with fine and high quality materials.",
   defense: 13,

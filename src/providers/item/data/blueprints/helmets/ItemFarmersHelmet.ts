@@ -8,7 +8,7 @@ export const itemFarmersHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/farmers-helmet.png",
-  textureKey: "farmers-helmet",
+
   name: "Farmers Helmet",
   description: "A Simple farmer helmet made with cotton.",
   defense: 2,

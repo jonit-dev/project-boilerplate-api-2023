@@ -8,7 +8,7 @@ export const itemWizardHat: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/wizard-hat.png",
-  textureKey: "wizard-hat",
+
   name: "Wizard Hat",
   description: "A  Wizard Hat its a fine hat sewn of magickal fabrics. Popular more for its form than its function.",
   defense: 3,

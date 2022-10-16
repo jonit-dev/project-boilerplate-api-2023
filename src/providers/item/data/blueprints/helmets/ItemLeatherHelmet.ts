@@ -8,7 +8,7 @@ export const itemLeatherHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/leather-helmet.png",
-  textureKey: "leather-helmet",
+
   name: "Leather Helmet",
   description: "It is wind-proof and not accumulating dust and protect from the cold.",
   defense: 4,

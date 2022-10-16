@@ -8,7 +8,7 @@ export const itemPlateArmor: Partial<IItem> = {
   subType: ItemSubType.Armor,
   textureAtlas: "items",
   texturePath: "armors/plate-armor.png",
-  textureKey: "plate-armor",
+
   name: "Plate Armor",
   description:
     "A Plate Armor consists of shaped, interlocking metal plates to cover the entire body and articulated to allow mobility.",

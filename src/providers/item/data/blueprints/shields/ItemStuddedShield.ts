@@ -8,7 +8,7 @@ export const itemStuddedShield: Partial<IItem> = {
   subType: ItemSubType.Shield,
   textureAtlas: "items",
   texturePath: "shields/studded-shield.png",
-  textureKey: "studded-shield",
+
   name: "Studded Shield",
   description: "A wooden shield covered in leather and metal studs.",
   defense: 5,

@@ -8,7 +8,7 @@ export const itemCoat: Partial<IItem> = {
   subType: ItemSubType.Armor,
   textureAtlas: "items",
   texturePath: "armors/coat.png",
-  textureKey: "coat",
+
   name: "Coat",
   description: "A heavy pelt coat to warm you.",
   defense: 3,

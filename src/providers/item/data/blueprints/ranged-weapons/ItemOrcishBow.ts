@@ -10,7 +10,7 @@ export const itemOrcishBow: Partial<IItem> = {
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
   texturePath: "ranged-weapons/orcish-bow.png",
-  textureKey: "orcish-bow",
+
   name: "Orcish Bow",
   description:
     "A bow with some decorative tooths and very long string. It is used by orcs for hunting or during battles.",

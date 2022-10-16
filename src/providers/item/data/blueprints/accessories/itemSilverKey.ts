@@ -8,7 +8,6 @@ export const itemSilverKey: Partial<IItem> = {
   subType: ItemSubType.Accessory,
   textureAtlas: "items",
   texturePath: "others/silver-key.png",
-  textureKey: "accessories",
   name: "Silver Key",
   description: "a well made silver key.",
   defense: 0,

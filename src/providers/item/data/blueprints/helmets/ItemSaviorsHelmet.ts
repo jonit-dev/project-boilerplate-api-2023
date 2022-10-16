@@ -8,7 +8,7 @@ export const itemSaviorsHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/saviors-helmet.png",
-  textureKey: "saviors-helmet",
+
   name: "Saviors Helmet",
   description: "The Salviors Helmet are made of tin and decorated with eagle feathers nas laterais.",
   defense: 17,

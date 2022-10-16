@@ -8,7 +8,7 @@ export const itemSoldiersHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/soldiers-helmet.png",
-  textureKey: "soldiers-helmet",
+
   name: "Soldiers Helmet",
   description: "A helmet used by standard soldier.",
   defense: 7,
