@@ -8,7 +8,7 @@ export const itemWingHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/wing-helmet.png",
-  textureKey: "wing-helmet",
+
   name: "Wing Helmet",
   description:
     "You see a wing helmet. It's decorated with wings and ancient depictions of the god Hermes, Mercury and of Roma.",

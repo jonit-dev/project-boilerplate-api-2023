@@ -8,7 +8,7 @@ export const itemVikingShield: Partial<IItem> = {
   subType: ItemSubType.Shield,
   textureAtlas: "items",
   texturePath: "shields/viking-shield.png",
-  textureKey: "viking-shield",
+
   name: "Viking Shield",
   description:
     "It consists of thin planking, which forms a circular shape. In the middle is a dome of iron to protect the shield bearer's hand.",

@@ -9,7 +9,7 @@ export const itemYetiHalberd: Partial<IItem> = {
   subType: ItemSubType.Axe,
   textureAtlas: "items",
   texturePath: "axes/yeti-halberd.png",
-  textureKey: "yeti-halberd",
+
   name: "Yeti's Halberd",
   description:
     "An ice weapon consisting of an ax blade balanced by a pick with an elongated pike head at the end of the staff.",

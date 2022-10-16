@@ -8,7 +8,7 @@ export const itemRedHoodie: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/red-hoodie.png",
-  textureKey: "red-hoodie",
+
   name: "Red Hoodie",
   description: "A simple red hoodie made with cotton. Very useful to hide your identity.",
   defense: 2,

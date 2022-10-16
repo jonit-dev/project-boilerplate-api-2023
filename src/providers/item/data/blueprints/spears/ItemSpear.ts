@@ -9,7 +9,7 @@ export const itemSpear: Partial<IItem> = {
   subType: ItemSubType.Spear,
   textureAtlas: "items",
   texturePath: "spears/spear.png",
-  textureKey: "spear",
+
   name: "Spear",
   description: "A standard wooden spear with metal tip.",
   attack: 3,

@@ -8,7 +8,7 @@ export const itemLightEndurancePotion: Partial<IItem> = {
   subType: ItemSubType.Magic,
   textureAtlas: "items",
   texturePath: "potions/light-endurance-potion.png",
-  textureKey: "light-endurance-potion",
+
   name: "Light Endurance Potion",
   description: "A small flask containing an elixir of endurance.",
   weight: 0.5,

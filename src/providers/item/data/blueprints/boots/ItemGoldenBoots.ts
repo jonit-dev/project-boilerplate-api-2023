@@ -8,7 +8,7 @@ export const itemGoldenBoots: Partial<IItem> = {
   subType: ItemSubType.Boot,
   textureAtlas: "items",
   texturePath: "boots/golden-boots.png",
-  textureKey: "golden-boots",
+
   name: "Golden Boots",
   description: "An boot made of gold. It is a part of the Golden set.",
   defense: 11,

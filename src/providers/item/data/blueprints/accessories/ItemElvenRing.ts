@@ -8,7 +8,6 @@ export const itemElvenRing: Partial<IItem> = {
   subType: ItemSubType.Accessory,
   textureAtlas: "items",
   texturePath: "rings/elven-ring.png",
-  textureKey: "rings",
   name: "Elven Ring",
   description: "a golden ring crafted by an elven master craftsman.",
   attack: 1,

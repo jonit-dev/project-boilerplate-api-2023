@@ -9,7 +9,6 @@ export const itemCorruptionStaff: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "staffs/corruption-staff.png",
-  textureKey: "corruption-staff",
   name: "Corruption Staff",
   description: "A shriveled staff of corruption.",
   attack: 3,

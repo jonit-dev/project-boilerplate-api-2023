@@ -8,7 +8,6 @@ export const itemDeathNecklace: Partial<IItem> = {
   subType: ItemSubType.Accessory,
   textureAtlas: "items",
   texturePath: "accessories/death-necklace.png",
-  textureKey: "accessories",
   name: "Death Necklace",
   description: "a dark necklace imbued with the energy of the dead.",
   attack: 2,

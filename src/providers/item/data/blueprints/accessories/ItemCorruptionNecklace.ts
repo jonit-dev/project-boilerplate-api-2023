@@ -8,7 +8,6 @@ export const itemCorruptionNecklace: Partial<IItem> = {
   subType: ItemSubType.Accessory,
   textureAtlas: "items",
   texturePath: "accessories/corruption-necklace.png",
-  textureKey: "accessories",
   name: "Corruption Necklace",
   description: "a neckclace tainted by corrupted energy.",
   attack: 1,

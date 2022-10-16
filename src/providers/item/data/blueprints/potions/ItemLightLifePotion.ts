@@ -10,7 +10,7 @@ export const itemLightLifePotion: Partial<IItem> = {
   subType: ItemSubType.Magic,
   textureAtlas: "items",
   texturePath: "potions/light-life-potion.png",
-  textureKey: "light-life-potion",
+
   name: "Light Life Potion",
   description: "A small flask containing an elixir of endurance.",
   weight: 0.5,

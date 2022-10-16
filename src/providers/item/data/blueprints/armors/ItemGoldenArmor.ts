@@ -8,7 +8,6 @@ export const itemGoldenArmor: Partial<IItem> = {
   subType: ItemSubType.Armor,
   textureAtlas: "items",
   texturePath: "armors/golden-armor.png",
-  textureKey: "golden-armor",
   name: "Golden Armor",
   description: "A Golden Armor is a suit of heavy-duty scale armor made out of gold.",
   defense: 18,

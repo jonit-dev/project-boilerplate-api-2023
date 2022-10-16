@@ -9,7 +9,7 @@ export const itemWarHammer: Partial<IItem> = {
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "hammers/war-hammer.png",
-  textureKey: "war-hammer",
+
   name: "War Hammer",
   description: "A large war hammer.",
   attack: 5,

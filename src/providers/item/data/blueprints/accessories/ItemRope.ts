@@ -8,7 +8,7 @@ export const itemRope: Partial<IItem> = {
   subType: ItemSubType.Accessory,
   textureAtlas: "items",
   texturePath: "accessories/rope.png",
-  textureKey: "accessories",
+
   name: "Rope",
   description: "A simple rope.",
   weight: 1,

@@ -8,7 +8,7 @@ export const itemBerserkersHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/berserkers-helmet.png",
-  textureKey: "berserkers-helmet",
+
   name: "Berserkers Helmet",
   description:
     "Berserker Helmet is an enclosed helmet designed to protect the entire head while intimidating enemies on the battlefield.",

@@ -8,7 +8,7 @@ export const itemPlaceShield: Partial<IItem> = {
   subType: ItemSubType.Shield,
   textureAtlas: "items",
   texturePath: "shields/plate-shield.png",
-  textureKey: "plate-shield",
+
   name: "Plate Shield",
   description: "A large metal shield.",
   defense: 10,

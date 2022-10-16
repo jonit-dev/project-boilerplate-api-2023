@@ -9,7 +9,6 @@ export const itemIceSword: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "swords/ice-sword.png",
-  textureKey: "ice-sword",
   name: "Ice Sword",
   description: "An ice sword with a blade so thin, that can cut a man in half. ",
   attack: 6,

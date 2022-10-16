@@ -10,7 +10,7 @@ export const itemBread: Partial<IItem> = {
   subType: ItemSubType.Food,
   textureAtlas: "items",
   texturePath: "foods/bread.png",
-  textureKey: "bread",
+
   name: "Bread",
   description: "A loaf of bread.",
   weight: 0.1,

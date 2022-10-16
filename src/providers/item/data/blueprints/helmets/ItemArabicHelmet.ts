@@ -8,7 +8,7 @@ export const itemArabicHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/arabic-helmet.png",
-  textureKey: "arabic-helmet",
+
   name: "Arabic Helmet",
   description: "The Arabic Helmet a rounded format and has a guard around the eyes and mouth.",
   defense: 3,
