@@ -8,7 +8,7 @@ export const itemFrostCrossbow: Partial<IItem> = {
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
   texturePath: "ranged-weapons/frost-crossbow.png",
-  textureKey: "frost-crossbow",
+
   name: "Frost Crossbow",
   description: "The Ice Crossbow is a two-handed crossbow-type ranged weapon.",
   weight: 3,

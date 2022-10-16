@@ -8,7 +8,7 @@ export const itemFrostBow: Partial<IItem> = {
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
   texturePath: "ranged-weapons/frost-bow.png",
-  textureKey: "frost-bow",
+
   name: "Frost Bow",
   description: "Ice cristal made bow, formed by the reflection of sunlight from ice crystals floating in the air.",
   weight: 2,

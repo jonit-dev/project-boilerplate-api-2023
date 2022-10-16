@@ -8,7 +8,7 @@ export const itemStuddedArmor: Partial<IItem> = {
   subType: ItemSubType.Armor,
   textureAtlas: "items",
   texturePath: "armors/studded-armor.png",
-  textureKey: "studded-armor",
+
   name: "Studded Armor",
   description: "A basic leather armor with metal studs.",
   defense: 10,

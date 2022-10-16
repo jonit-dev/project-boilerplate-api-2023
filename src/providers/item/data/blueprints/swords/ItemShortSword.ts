@@ -9,7 +9,6 @@ export const itemShortSword: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "swords/short-sword.png",
-  textureKey: "short-sword",
   name: "Short Sword",
   description: "You see a short sword. It is a single-handed sword with a handle that just features a grip.",
   attack: 5,

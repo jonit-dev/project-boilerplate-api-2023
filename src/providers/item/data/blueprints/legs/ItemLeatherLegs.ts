@@ -8,7 +8,7 @@ export const itemLeatherLegs: Partial<IItem> = {
   subType: ItemSubType.Legs,
   textureAtlas: "items",
   texturePath: "legs/leather-legs.png",
-  textureKey: "leather-legs",
+
   name: "Leather Legs",
   description: "A pair of simple leather legs.",
   defense: 4,

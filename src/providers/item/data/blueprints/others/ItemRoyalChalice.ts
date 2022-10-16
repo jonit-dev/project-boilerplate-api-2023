@@ -8,7 +8,7 @@ export const itemRoyalChalice: Partial<IItem> = {
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "others/royal-chalice.png",
-  textureKey: "royal-chalice",
+
   name: "Royal Chalice",
   description: "A well master crafted chalice worth of a king.",
   weight: 1,

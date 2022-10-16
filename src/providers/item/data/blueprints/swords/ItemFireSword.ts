@@ -9,7 +9,6 @@ export const itemFireSword: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "swords/fire-sword.png",
-  textureKey: "fire-sword",
   name: "Fire Sword",
   description: "A sword with the power of flames.",
   attack: 12,

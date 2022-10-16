@@ -10,7 +10,7 @@ export const itemChickensMeat: Partial<IItem> = {
   subType: ItemSubType.Food,
   textureAtlas: "items",
   texturePath: "foods/chickens-meat.png",
-  textureKey: "chickens-meat",
+
   name: "Chickens Meat",
   description: "Chicken meat can be cooked and eaten to restore health",
   weight: 0.5,

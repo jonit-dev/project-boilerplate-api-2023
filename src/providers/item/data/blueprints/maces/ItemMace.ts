@@ -9,7 +9,7 @@ export const itemMace: Partial<IItem> = {
   subType: ItemSubType.Mace,
   textureAtlas: "items",
   texturePath: "maces/mace.png",
-  textureKey: "mace",
+
   name: "Mace",
   description: "A simple iron headed mace.",
   attack: 3,

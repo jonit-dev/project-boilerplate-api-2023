@@ -10,7 +10,7 @@ export const itemBananaBunch: Partial<IItem> = {
   subType: ItemSubType.Food,
   textureAtlas: "items",
   texturePath: "foods/banana-bunch.png",
-  textureKey: "banana-bunch",
+
   name: "Banana Bunch",
   description: "A bundle of ripe bananas.",
   weight: 0.03,

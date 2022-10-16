@@ -9,7 +9,6 @@ export const itemDoubleEdgedSword: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "swords/double-edged-sword.png",
-  textureKey: "double-edged-sword",
   name: "Double Edged Sword",
   description: "An iron sword sharpened on both sides with incredible edge.",
   attack: 4,

@@ -8,7 +8,7 @@ export const itemBackpack: Partial<IItem> = {
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "containers/backpack.png",
-  textureKey: "backpack",
+
   name: "Backpack",
   description: "You see a backpack. It has made using leather and it has a total of 20 slots.",
   weight: 3,
