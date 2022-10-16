@@ -8,7 +8,7 @@ export const itemBlueSapphire: Partial<IItem> = {
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "crafting-resources/blue-sapphire.png",
-  textureKey: "blue-sapphire",
+
   name: "Blue Sapphire",
   description: "Sapphire is a precious gemstone, formed from a mineral called corundum.",
   weight: 0.1,

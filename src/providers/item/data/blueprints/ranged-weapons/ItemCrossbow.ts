@@ -10,7 +10,7 @@ export const itemCrossbow: Partial<IItem> = {
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
   texturePath: "ranged-weapons/crossbow.png",
-  textureKey: "crossbow",
+
   name: "Crossbow",
   description:
     "A weapon used for shooting bolts and usually made of a strip of wood bent by a cord connecting the two end.",

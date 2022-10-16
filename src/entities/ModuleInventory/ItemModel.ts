@@ -33,7 +33,6 @@ const itemSchema = createLeanSchema(
     key: Type.string({ required: true }),
     textureAtlas: Type.string({ required: true, default: "items" }),
     texturePath: Type.string({ required: true }),
-    textureKey: Type.string({ required: true }),
     attack: Type.number(),
     defense: Type.number(),
     weight: Type.number({ required: true }),

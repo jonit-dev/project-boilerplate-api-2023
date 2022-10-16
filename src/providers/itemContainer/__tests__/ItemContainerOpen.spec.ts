@@ -3,6 +3,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItemContainer, ItemSocketEvents, ToGridX, UISocketEvents } from "@rpg-engine/shared";
 import { ItemContainerHelper } from "../ItemContainerHelper";
 import { ItemContainerOpen } from "../network/ItemContainerOpen";
@@ -219,6 +220,43 @@ describe("ItemContainerOpen.ts", () => {
           type: "error",
         }
       );
+    });
+  });
+
+  describe("open character inventory", () => {
+    let openItemContainerMock: jest.SpyInstance;
+    let sendEventToUserMock: jest.SpyInstance;
+
+    beforeEach(() => {
+      openItemContainerMock = jest.spyOn(itemContainerOpen, "openContainer");
+      openItemContainerMock.mockImplementation();
+
+      sendEventToUserMock = jest.spyOn(SocketMessaging.prototype, "sendErrorMessageToCharacter");
+    });
+
+    afterEach(() => {
+      openItemContainerMock.mockRestore();
+      sendEventToUserMock.mockRestore();
+    });
+
+    it("should call open container", async () => {
+      await itemContainerOpen.openInventory(testCharacter);
+
+      expect(sendEventToUserMock).toBeCalledTimes(0);
+      expect(openItemContainerMock).toBeCalledTimes(1);
+
+      expect(openItemContainerMock).toBeCalledWith({ itemId: inventory._id }, testCharacter);
+    });
+
+    it("should not call open container", async () => {
+      const characterWithoutInventory = await unitTestHelper.createMockCharacter();
+
+      await itemContainerOpen.openInventory(characterWithoutInventory);
+
+      expect(sendEventToUserMock).toBeCalledTimes(1);
+      expect(openItemContainerMock).toBeCalledTimes(0);
+
+      expect(sendEventToUserMock).toBeCalledWith(characterWithoutInventory, "Sorry, you don’t have an inventory.");
     });
   });
 

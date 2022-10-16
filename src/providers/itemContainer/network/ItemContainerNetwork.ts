@@ -8,5 +8,6 @@ export class ItemContainerNetwork {
 
   public onAddEventListeners(channel: SocketChannel): void {
     this.itemContainerOpen.onOpen(channel);
+    this.itemContainerOpen.onInventoryOpen(channel);
   }
 }

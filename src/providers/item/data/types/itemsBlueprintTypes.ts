@@ -12,12 +12,27 @@ export enum SwordsBlueprint {
 }
 
 export enum HelmetsBlueprint {
-  WingHelmet = "wing-helmet",
+  ArabicHelmet = "arabic-helmet",
+  BerserkersHelmet = "berserkers-helmet",
+  BrassHelmet = "brass-helmet",
   Cap = "cap",
+  DarkWizardHat = "dark-wizard-hat",
+  DeathsHelmet = "deaths-helmet",
+  FarmersHelmet = "farmers-helmet",
+  GladiatorHelmet = "gladiator's-helmet",
+  InfantryHelmet = "infantry-helmet",
+  IronHelmet = "iron-helmet",
+  LeatherHelmet = "leather-helmet",
+  RedHoodie = "red-hoodie",
+  RoyalHelmet = "royal-helmet",
+  RoyalKnightHelmet = "royal-knight-helmet",
+  SaviorsHelmet = "saviors-helmet",
+  SoldiersHelmet = "soldiers-helmet",
   StuddedHelmet = "studded-helmet",
   Turban = "turban",
-  BrassHelmet = "brass-helmet",
-  SoldiersHelmet = "soldiers-helmet",
+  VikingHelmet = "viking-helmet",
+  WingHelmet = "wing-helmet",
+  WizardHat = "wizard-hat",
 }
 
 export enum EffectsBlueprint {
@@ -41,12 +56,14 @@ export enum DaggersBlueprint {
 }
 
 export enum ArmorsBlueprint {
-  Jacket = "jacket",
-  Coat = "coat",
-  LeatherJacket = "leather-jacket",
-  StuddedArmor = "studded-armor",
   BronzeArmor = "bronze-armor",
+  Coat = "coat",
+  GoldenArmor = "golden-armor",
   IronArmor = "iron-armor",
+  Jacket = "jacket",
+  LeatherJacket = "leather-jacket",
+  PlateArmor = "plate-armor",
+  StuddedArmor = "studded-armor",
 }
 
 export enum AxesBlueprint {
@@ -61,10 +78,14 @@ export enum AxesBlueprint {
 export enum BootsBlueprint {
   Boots = "boots",
   CopperBoots = "copper-boots",
+  GoldenBoots = "golden-boots",
   IronBoots = "iron-boots",
+  PlateBoots = "plate-boots",
   ReforcedBoots = "reforced-boots",
-  StuddedBoots = "studded-boots",
+  RoyalBoots = "royal-boots",
   Sandals = "sandals",
+  SilverBoots = "silver-boots",
+  StuddedBoots = "studded-boots",
 }
 
 export enum FoodsBlueprint {
@@ -144,12 +165,14 @@ export enum StaffsBlueprint {
 }
 
 export enum ShieldsBlueprint {
-  WoodenShield = "wooden-shield",
-  StuddedShield = "studded-shield",
+  FrostShield = "frost-shield",
   KnightsShield = "knights-shield",
   PlateShield = "plate-shield",
+  ScutumShield = "scutum-shield",
+  SilverShield = "SilverShield",
+  StuddedShield = "studded-shield",
   VikingShield = "viking-shield",
-  FrostShield = "frost-shield",
+  WoodenShield = "wooden-shield",
   YetiShield = "yeti-shield",
 }
 

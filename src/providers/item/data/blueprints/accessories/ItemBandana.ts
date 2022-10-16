@@ -8,7 +8,6 @@ export const itemBandana: Partial<IItem> = {
   subType: ItemSubType.Accessory,
   textureAtlas: "items",
   texturePath: "accessories/bandana.png",
-  textureKey: "accessories",
   name: "Bandana",
   description: "a simple cloth bandana.",
   defense: 0,

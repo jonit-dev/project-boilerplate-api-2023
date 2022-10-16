@@ -9,7 +9,6 @@ export const itemAppendicesStaff: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "staffs/appendice's-staff.png",
-  textureKey: "appendice's-staff",
   name: "Appendice's Staff",
   description: "A simple wooden staff used by those learning the basics of magic.",
   attack: 1,

@@ -9,7 +9,7 @@ export const itemKatana: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "swords/katana.png",
-  textureKey: "katana",
+
   name: "Katana",
   description: "A katana.",
   attack: 6,

@@ -10,7 +10,7 @@ export const itemSlingshot: Partial<IItem> = {
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
   texturePath: "ranged-weapons/slingshot.png",
-  textureKey: "slingshot",
+
   name: "Wooden Slingshot",
   description:
     "A weapon used for shooting stones and usually made of a strip of wood bent by a cord connecting the two end.",

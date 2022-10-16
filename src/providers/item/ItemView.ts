@@ -106,7 +106,6 @@ export class ItemView {
         id: item.id,
         texturePath: item.texturePath,
         textureAtlas: item.textureAtlas,
-        textureKey: item.textureKey,
         type: item.type as ItemType,
         subType: item.subType as ItemSubType,
         name: item.name,
@@ -114,6 +113,8 @@ export class ItemView {
         y: item.y,
         scene: item.scene,
         layer: item.layer,
+        stackQty: item.stackQty!,
+        isStackable: item.isStackable,
       });
 
       await this.characterView.addToCharacterView(

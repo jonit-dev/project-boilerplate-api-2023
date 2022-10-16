@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -33,6 +33,23 @@ export class ItemContainerOpen {
         await this.openContainer(data, character);
       }
     );
+  }
+
+  public onInventoryOpen(channel: SocketChannel): void {
+    this.socketAuth.authCharacterOn(channel, ItemSocketEvents.InventoryOpen, async (data, character) => {
+      await this.openInventory(character);
+    });
+  }
+
+  public async openInventory(character: ICharacter): Promise<void> {
+    const inventory = (await character.inventory) as unknown as IItem;
+
+    if (!inventory || !inventory.itemContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you don’t have an inventory.");
+      return;
+    }
+
+    await this.openContainer({ itemId: inventory._id }, character);
   }
 
   public async openContainer(data: IItemContainerOpen, character: ICharacter): Promise<void> {

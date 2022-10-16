@@ -9,7 +9,7 @@ export const itemCorruptionDagger: Partial<IItem> = {
   subType: ItemSubType.Dagger,
   textureAtlas: "items",
   texturePath: "daggers/corruption-dagger.png",
-  textureKey: "corruption-dagger",
+
   name: "Corruption Dagger",
   description: "An artifact from ancient times. Its blade allows it to cut in ways no other weapon could.",
   weight: 2,
