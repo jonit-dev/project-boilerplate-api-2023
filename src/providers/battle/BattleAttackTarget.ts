@@ -42,10 +42,20 @@ export class BattleAttackTarget {
     private questSystem: QuestSystem
   ) {}
 
-  public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
+  public async checkRangeAndAttack(
+    attacker: ICharacter | INPC,
+    target: ICharacter | INPC
+  ): Promise<void> {
+
     switch (attacker?.attackType) {
       case EntityAttackType.Melee: {
-        const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1);
+        const isUnderMeleeRange = this.movementHelper.isUnderRange(
+          attacker.x,
+          attacker.y,
+          target.x,
+          target.y,
+          1
+        );
 
         if (isUnderMeleeRange) {
           await this.hitTarget(attacker, target);
@@ -58,22 +68,37 @@ export class BattleAttackTarget {
 
         if (rangedAttackParams) {
           await this.hitTarget(attacker, target);
-          await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+          await this.battleRangedAttack.sendRangedAttackEvent(
+            attacker,
+            target,
+            rangedAttackParams
+          );
 
           if (attacker.type === "Character") {
-            await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
+            await this.battleRangedAttack.consumeAmmo(
+              rangedAttackParams,
+              attacker as ICharacter
+            );
           }
         }
         break;
-      // NPCs can have a hybrid attack type
-      // if closer enough, would be melee attack
-      // otherwise would be ranged attack
+      /* 
+      NPCs can have a hybrid attack type
+      if closer enough, would be melee attack
+      otherwise would be ranged attack 
+      */
       case EntityAttackType.MeleeRanged: {
         if (attacker.type === "Character") {
           throw new Error(`Character cannot have MeleeRanged hybrid attack type. Character id ${attacker.id}`);
         }
 
-        const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1);
+        const isUnderMeleeRange = this.movementHelper.isUnderRange(
+          attacker.x,
+          attacker.y,
+          target.x,
+          target.y,
+          1
+        );
 
         if (isUnderMeleeRange) {
           await this.hitTarget(attacker, target);
@@ -82,7 +107,11 @@ export class BattleAttackTarget {
 
           if (rangedAttackParams) {
             await this.hitTarget(attacker, target);
-            await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+            await this.battleRangedAttack.sendRangedAttackEvent(
+              attacker,
+              target,
+              rangedAttackParams
+            );
           }
         }
         break;
@@ -101,6 +130,7 @@ export class BattleAttackTarget {
       if (attacker.type === "Character") {
         const character = attacker as ICharacter;
         await this.battleNetworkStopTargeting.stopTargeting(character);
+
         this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
           character.channelId!,
           BattleSocketEvents.CancelTargeting,
@@ -119,7 +149,10 @@ export class BattleAttackTarget {
     }
   }
 
-  private async hitTarget(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
+  private async hitTarget(
+    attacker: ICharacter | INPC,
+    target: ICharacter | INPC
+  ): Promise<void> {
     // if target is dead, do nothing.
     if (!target.isAlive) {
       return;
@@ -167,10 +200,17 @@ export class BattleAttackTarget {
 
         // when target is Character, resistance SP increases
         if (target.type === "Character") {
-          await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance);
+          await this.skillIncrease.increaseBasicAttributeSP(
+            target as ICharacter,
+            BasicAttribute.Resistance
+          );
         }
 
-        // check if character is dead after damage calculation. If so, send death event to client and characters around
+        /*
+        Check if character is dead after damage calculation. 
+        If so, send death event to client and characters around.
+        */
+       
         if (!target.isAlive) {
           if (target.type === "Character") {
             await this.battleEffects.generateBloodOnGround(target);
@@ -192,7 +232,11 @@ export class BattleAttackTarget {
 
             if (attacker instanceof Character) {
               // update kill quests status (if any)
-              await this.questSystem.updateQuests(QuestType.Kill, attacker as ICharacter, (target as INPC).key);
+              await this.questSystem.updateQuests(
+                QuestType.Kill,
+                attacker as ICharacter,
+                (target as INPC).key
+              );
 
               // clear attacker target
               await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
@@ -218,7 +262,10 @@ export class BattleAttackTarget {
     // if battle event was a Miss, the character dodged the hit
     // then, increase the character's dexterity SP
     if (battleEvent === BattleEventType.Miss && target.type === "Character") {
-      await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
+      await this.skillIncrease.increaseBasicAttributeSP(
+        target as ICharacter,
+        BasicAttribute.Dexterity
+      );
     }
 
     // finally, send battleHitPayload to characters around
@@ -237,7 +284,11 @@ export class BattleAttackTarget {
     // send battleEvent payload to origin character as well
 
     if (character.channelId) {
-      this.socketMessaging.sendEventToUser(character.channelId, BattleSocketEvents.BattleEvent, battleEventPayload);
+      this.socketMessaging.sendEventToUser(
+        character.channelId,
+        BattleSocketEvents.BattleEvent,
+        battleEventPayload
+      );
     }
   }
 }

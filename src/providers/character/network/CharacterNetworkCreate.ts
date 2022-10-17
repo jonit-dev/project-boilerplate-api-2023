@@ -1,5 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-// eslint-disable-next-line no-unused-vars
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
@@ -26,7 +25,7 @@ export class CharacterNetworkCreate {
     private playerView: CharacterView,
     private socketMessaging: SocketMessaging,
     private itemView: ItemView,
-    private BattleNetworkStopTargeting: BattleNetworkStopTargeting,
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private npcManager: NPCManager,
     private gridManager: GridManager,
     private npcWarn: NPCWarn
@@ -58,7 +57,7 @@ export class CharacterNetworkCreate {
           npcs: {},
           characters: {},
         };
-        await this.BattleNetworkStopTargeting.stopTargeting(character);
+        await this.battleNetworkStopTargeting.stopTargeting(character);
 
         const map = character.scene;
 
@@ -89,7 +88,11 @@ export class CharacterNetworkCreate {
 
         await this.itemView.warnCharacterAboutItemsInView(character);
 
-        // here we inject our server side character properties, to make sure the client is not hacking anything!
+        /*
+        Here we inject our server side character properties, 
+        to make sure the client is not hacking anything
+        */
+
         const dataFromServer: ICharacterCreateFromServer = {
           ...data,
           id: character._id,
@@ -107,7 +110,8 @@ export class CharacterNetworkCreate {
           textureKey: character.textureKey,
         };
 
-        await channel.join(data.channelId); // join channel specific to the user, to we can send direct  later if we want.
+        // join channel specific to the user, to we can send direct later if we want.
+        await channel.join(data.channelId); 
 
         await this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
       }
