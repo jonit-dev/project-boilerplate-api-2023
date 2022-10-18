@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ChatLog, IChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { ItemSpellCast } from "@providers/item/ItemSpellCast";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -22,7 +23,8 @@ export class ChatNetworkGlobalMessaging {
     private socketAuth: SocketAuth,
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
-    private socketTransmissionZone: SocketTransmissionZone
+    private socketTransmissionZone: SocketTransmissionZone,
+    private itemSpellCast: ItemSpellCast
   ) {}
 
   public onGlobalMessaging(channel: SocketChannel): void {
@@ -31,7 +33,9 @@ export class ChatNetworkGlobalMessaging {
       ChatSocketEvents.GlobalChatMessageCreate,
       async (data: IChatMessageCreatePayload, character: ICharacter) => {
         try {
-          if (this.canCharacterSendMessage(character)) {
+          if (this.itemSpellCast.isSpellCasting(data.message)) {
+            this.itemSpellCast.castSpell(data.message, character);
+          } else if (this.canCharacterSendMessage(character)) {
             const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
             await this.saveChatLog(data, character);
