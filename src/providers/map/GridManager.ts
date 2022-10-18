@@ -28,8 +28,14 @@ export class GridManager {
       for (let gridY = 0; gridY < height; gridY++) {
         // isTileSolid will get the ge_collide property directly from the json file, thats why we should use "raw coordinates", in other words, we should subtract the tileset!
         const isSolid = this.mapSolids.isTileSolid(map, gridX - gridOffsetX, gridY - gridOffsetY, MapLayers.Character);
+        const isPassage = this.mapSolids.isTilePassage(
+          map,
+          gridX - gridOffsetX,
+          gridY - gridOffsetY,
+          MapLayers.Character
+        );
 
-        this.setWalkable(map, gridX, gridY, !isSolid);
+        this.setWalkable(map, gridX, gridY, !isSolid || isPassage);
       }
     }
   }
