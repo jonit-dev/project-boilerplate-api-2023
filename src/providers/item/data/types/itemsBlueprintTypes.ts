@@ -195,3 +195,7 @@ export enum HammersBlueprint {
   IronHammer = "iron-hammer",
   WarHammer = "war-hammer",
 }
+
+export enum SpellsBlueprint {
+  SelfHealingSpell = "self-healing-spell",
+}
