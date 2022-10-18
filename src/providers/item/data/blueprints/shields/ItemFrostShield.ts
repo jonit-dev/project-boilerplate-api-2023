@@ -8,7 +8,7 @@ export const itemFrostShield: Partial<IItem> = {
   subType: ItemSubType.Shield,
   textureAtlas: "items",
   texturePath: "shields/frost-shield.png",
-  textureKey: "frost-shield",
+
   name: "Frost Shield",
   description: "A defensive tool based on a magic durable ice",
   defense: 6,

@@ -8,7 +8,7 @@ export const itemChainGloves: Partial<IItem> = {
   subType: ItemSubType.Glove,
   textureAtlas: "items",
   texturePath: "gloves/chain-gloves.png",
-  textureKey: "chain-gloves",
+
   name: "Chain Gloves",
   description: "A pair of metal chain gloves.",
   defense: 6,

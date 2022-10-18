@@ -10,7 +10,7 @@ export const itemPotato: Partial<IItem> = {
   subType: ItemSubType.Food,
   textureAtlas: "items",
   texturePath: "foods/potato.png",
-  textureKey: "potato",
+
   name: "Potato",
   description: "You see a short sword. It is a single-handed sword with a handle that just features a grip.",
   weight: 10,

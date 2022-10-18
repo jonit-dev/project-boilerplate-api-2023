@@ -8,7 +8,7 @@ export const itemRune: Partial<IItem> = {
   subType: ItemSubType.Magic,
   textureAtlas: "items",
   texturePath: "magics/rune.png",
-  textureKey: "rune",
+
   name: "Rune",
   description: "An ancient carved rune.",
   weight: 0.5,

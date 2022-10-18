@@ -6,7 +6,6 @@ import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
-import { NPCView } from "@providers/npc/NPCView";
 import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -35,7 +34,6 @@ export class CharacterNetworkUpdate {
     private socketMessaging: SocketMessaging,
     private socketAuth: SocketAuth,
     private movementHelper: MovementHelper,
-    private npcView: NPCView,
     private itemView: ItemView,
     private characterView: CharacterView,
     private characterBan: CharacterBan,
@@ -118,7 +116,10 @@ export class CharacterNetworkUpdate {
               gridY,
             };
 
-            // check if we are transitioning to the same map, if so we should only teleport the character
+            /*
+            Check if we are transitioning to the same map, 
+            if so we should only teleport the character
+            */
             if (destination.map === character.scene) {
               await this.mapTransition.teleportCharacter(character, destination);
             } else {
@@ -126,7 +127,10 @@ export class CharacterNetworkUpdate {
             }
           }
 
-          // verify if we're in a non pvp zone. If so, we need to trigger an attack stop event in case player was in a pvp combat
+          /* 
+          Verify if we're in a non pvp zone. If so, we need to trigger 
+          an attack stop event in case player was in a pvp combat
+          */
           const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, newX, newY);
           if (nonPVPZone) {
             this.mapNonPVPZone.stopCharacterAttack(character);

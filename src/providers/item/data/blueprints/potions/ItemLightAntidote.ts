@@ -10,7 +10,7 @@ export const itemLightAntidote: Partial<IItem> = {
   subType: ItemSubType.Magic,
   textureAtlas: "items",
   texturePath: "potions/light-antidote.png",
-  textureKey: "light-antidote",
+
   name: "Light Antidote",
   description: "A small flask containing an elixir of antidote.",
   weight: 0.5,

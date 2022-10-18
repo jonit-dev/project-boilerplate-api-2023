@@ -10,7 +10,7 @@ export const itemCookie: Partial<IItem> = {
   subType: ItemSubType.Food,
   textureAtlas: "items",
   texturePath: "foods/cookie.png",
-  textureKey: "cookie",
+
   name: "Cookie",
   description: "A baked cookie.",
   weight: 0.05,

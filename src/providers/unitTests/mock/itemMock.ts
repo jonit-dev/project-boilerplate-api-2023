@@ -39,7 +39,6 @@ export const stackableItemMock: Partial<IItem> = {
   isSolid: false,
   key: "apple",
   texturePath: "foods/apple.png",
-  textureKey: "apple",
   name: "Apple",
   description: "A red apple.",
   weight: 0.05,

@@ -8,7 +8,7 @@ export const itemCopperBoots: Partial<IItem> = {
   subType: ItemSubType.Boot,
   textureAtlas: "items",
   texturePath: "boots/copper-boots.png",
-  textureKey: "copper-boots",
+
   name: "Copper Boots",
   description: "A boots plated with cooper.",
   defense: 4,

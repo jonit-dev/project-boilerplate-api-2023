@@ -10,6 +10,7 @@ import { CharacterItems } from "../characterItems/CharacterItems";
 describe("CharacterItems.ts", () => {
   let testItem: IItem;
   let testCharacter: ICharacter;
+  // let itemSelled: ItemPickup;
   let itemPickup: ItemPickup;
   let inventory: IItem;
   let inventoryItemContainerId: string;
@@ -21,6 +22,7 @@ describe("CharacterItems.ts", () => {
 
     characterItems = container.get<CharacterItems>(CharacterItems);
 
+    // itemSelled = container.get<ItemPickup>(ItemPickup);
     itemPickup = container.get<ItemPickup>(ItemPickup);
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
   });

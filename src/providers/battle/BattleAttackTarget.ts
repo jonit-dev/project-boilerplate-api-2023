@@ -65,9 +65,11 @@ export class BattleAttackTarget {
           }
         }
         break;
-      // NPCs can have a hybrid attack type
-      // if closer enough, would be melee attack
-      // otherwise would be ranged attack
+      /* 
+      NPCs can have a hybrid attack type
+      if closer enough, would be melee attack
+      otherwise would be ranged attack 
+      */
       case EntityAttackType.MeleeRanged: {
         if (attacker.type === "Character") {
           throw new Error(`Character cannot have MeleeRanged hybrid attack type. Character id ${attacker.id}`);
@@ -101,6 +103,7 @@ export class BattleAttackTarget {
       if (attacker.type === "Character") {
         const character = attacker as ICharacter;
         await this.battleNetworkStopTargeting.stopTargeting(character);
+
         this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
           character.channelId!,
           BattleSocketEvents.CancelTargeting,
@@ -170,7 +173,11 @@ export class BattleAttackTarget {
           await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance);
         }
 
-        // check if character is dead after damage calculation. If so, send death event to client and characters around
+        /*
+        Check if character is dead after damage calculation. 
+        If so, send death event to client and characters around.
+        */
+
         if (!target.isAlive) {
           if (target.type === "Character") {
             await this.battleEffects.generateBloodOnGround(target);

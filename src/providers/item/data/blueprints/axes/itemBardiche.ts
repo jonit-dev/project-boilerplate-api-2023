@@ -9,7 +9,6 @@ export const itemBardiche: Partial<IItem> = {
   subType: ItemSubType.Axe,
   textureAtlas: "items",
   texturePath: "axes/bardiche.png",
-  textureKey: "axe",
   name: "Bardiche",
   description: "A polearm with a large blade at one end.",
   attack: 5,

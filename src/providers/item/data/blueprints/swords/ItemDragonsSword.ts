@@ -9,7 +9,6 @@ export const itemDragonsSword: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "swords/dragon's-sword.png",
-  textureKey: "dragon's-sword",
   name: "Dragon's Sword",
   description: "A mythical sword crafted from the claws and teeth of a fallen dragon to be yielded by a great warrior.",
   attack: 16,

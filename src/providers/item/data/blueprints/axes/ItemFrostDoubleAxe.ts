@@ -9,7 +9,7 @@ export const itemFrostDoubleAxe: Partial<IItem> = {
   subType: ItemSubType.Axe,
   textureAtlas: "items",
   texturePath: "axes/frost-double-axe.png",
-  textureKey: "frost-double-axe",
+
   name: "Frost Double Axe",
   description: "A large master-crafted weapon with a frosted blade.",
   attack: 7,

@@ -11,7 +11,7 @@ export const itemGroundBlood: Partial<IItem> = {
   layer: MapLayers.Ground + 0.5, // avoid overlap with body
   textureAtlas: "battle-effects",
   texturePath: "blood-floor/red-blood-1.png",
-  textureKey: "red-blood",
+
   name: "Blood",
   description: "You see blood from a living creature.",
   weight: 1,

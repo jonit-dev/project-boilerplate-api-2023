@@ -8,7 +8,7 @@ export const itemBlueFeather: Partial<IItem> = {
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "crafting-resources/blue-feather.png",
-  textureKey: "blue-feather",
+
   name: "Blue Feather",
   description: "A craft material used to make arrows.",
   weight: 0.1,

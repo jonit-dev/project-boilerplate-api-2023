@@ -2,7 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
@@ -72,5 +72,12 @@ export class CharacterWeight {
     }
 
     return totalWeight;
+  }
+
+  public async getWeightRatio(character: ICharacter, item: IItem): Promise<number> {
+    const weight = await this.getWeight(character);
+    const maxWeight = await this.getMaxWeight(character);
+
+    return (weight + item.weight) / maxWeight;
   }
 }

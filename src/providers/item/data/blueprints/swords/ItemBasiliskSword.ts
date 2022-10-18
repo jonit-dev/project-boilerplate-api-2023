@@ -9,7 +9,6 @@ export const itemBasiliskSword: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "swords/basilisk-sword.png",
-  textureKey: "basilisk-sword",
   name: "Basilisk Sword",
   description: "A sword crafted from the remains of a basilisk.",
   attack: 10,

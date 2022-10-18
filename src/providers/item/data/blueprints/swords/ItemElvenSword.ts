@@ -9,7 +9,6 @@ export const itemElvenSword: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "swords/elven-sword.png",
-  textureKey: "elven-sword",
   name: "Elven Sword",
   description: "A fine and slender sword crafted by elves.",
   attack: 8,

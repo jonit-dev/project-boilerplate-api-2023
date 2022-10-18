@@ -8,7 +8,7 @@ export const itemBook: Partial<IItem> = {
   subType: ItemSubType.Magic,
   textureAtlas: "items",
   texturePath: "magics/book.png",
-  textureKey: "book",
+
   name: "Book",
   description: "A leather bound book.",
   weight: 0.5,

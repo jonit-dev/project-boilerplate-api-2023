@@ -47,6 +47,23 @@ export class ItemView {
     }
   }
 
+  public async addItemToMap(item: IItem, x: number, y: number, scene: string): Promise<void> {
+    if (x === undefined || y === undefined || scene === undefined) {
+      throw new Error("You cannot call this method without an item x, y and scene.");
+    }
+
+    await Item.updateOne(
+      {
+        _id: item.id,
+      },
+      {
+        x,
+        y,
+        scene,
+      }
+    );
+  }
+
   public async warnCharactersAboutItemRemovalInView(item: IItem, x: number, y: number, scene: string): Promise<void> {
     if (x !== undefined && y !== undefined && scene !== undefined) {
       const charactersNearby = await this.characterView.getCharactersAroundXYPosition(x, y, scene);
@@ -85,11 +102,12 @@ export class ItemView {
         continue;
       }
 
+      console.log(`item.isStackable: ${item.isStackable}`);
+
       this.socketMessaging.sendEventToUser<IItemUpdate>(character.channelId!, ItemSocketEvents.Update, {
         id: item.id,
         texturePath: item.texturePath,
         textureAtlas: item.textureAtlas,
-        textureKey: item.textureKey,
         type: item.type as ItemType,
         subType: item.subType as ItemSubType,
         name: item.name,
