@@ -125,7 +125,7 @@ describe("NPCDeath.ts", () => {
     expect(bodyItemContainer).not.toBeNull();
     expect(bodyItemContainer!.slots).toBeDefined();
     expect(bodyItemContainer!.slots[19]).toBeNull();
-    for (let i = 0; i <= 5; i++) {
+    for (let i = 0; i <= 6; i++) {
       expect(bodyItemContainer!.slots[Number(i)]).not.toBeNull();
     }
   });
