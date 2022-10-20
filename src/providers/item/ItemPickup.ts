@@ -12,6 +12,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemPickup, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { ItemOwnership } from "./ItemOwnership";
 import { ItemView } from "./ItemView";
 @provide(ItemPickup)
 export class ItemPickup {
@@ -24,7 +25,8 @@ export class ItemPickup {
     private characterItems: CharacterItems,
     private characterItemSlots: CharacterItemSlots,
     private characterItemContainer: CharacterItemContainer,
-    private equipmentSlots: EquipmentSlots
+    private equipmentSlots: EquipmentSlots,
+    private itemOwnership: ItemOwnership
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
@@ -120,6 +122,9 @@ export class ItemPickup {
 
       this.updateInventoryCharacter(payloadUpdate, character);
     }
+
+    await this.itemOwnership.addItemOwnership(itemToBePicked, character);
+
     return true;
   }
 
