@@ -15,10 +15,13 @@ export class SocketAuth {
     callback: (data, character: ICharacter, owner: IUser) => Promise<void> | void
   ): void {
     channel.on(event, async (data: any) => {
+      let owner, character;
+
       try {
         // check if authenticated user actually owns the character (we'll fetch it from the payload id);
-        const owner = channel.userData || (channel.handshake.query.userData as IUser);
-        const character = await Character.findOne({
+        owner = channel?.userData || (channel?.handshake?.query?.userData as IUser);
+
+        character = await Character.findOne({
           _id: data.socketCharId,
           owner: owner.id,
         });
@@ -38,7 +41,7 @@ export class SocketAuth {
           console.error(e);
         }
       } catch (error) {
-        console.error(`${event}, channel ${channel} failed with error: ${error}`);
+        console.error(`${character.name} => ${event}, channel ${channel} failed with error: ${error}`);
       }
     });
   }
