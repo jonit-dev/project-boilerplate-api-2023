@@ -102,8 +102,6 @@ export class ItemView {
         continue;
       }
 
-      console.log(`item.isStackable: ${item.isStackable}`);
-
       this.socketMessaging.sendEventToUser<IItemUpdate>(character.channelId!, ItemSocketEvents.Update, {
         id: item.id,
         texturePath: item.texturePath,
