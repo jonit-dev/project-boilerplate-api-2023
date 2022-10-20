@@ -13,7 +13,7 @@ export class SocketMessaging {
   constructor(private characterView: CharacterView, private npcView: NPCView, private socketAdapter: SocketAdapter) {}
 
   public sendErrorMessageToCharacter(character: ICharacter, message?: string, type: UIMessageType = "error"): void {
-    if (appEnv.general.ENV === EnvType.Development && !appEnv.general.IS_UNIT_TEST) {
+    if (appEnv.general.ENV === EnvType.Development) {
       console.log(`✉︎ Error sent to ${character.name}: ${message}`);
     }
 

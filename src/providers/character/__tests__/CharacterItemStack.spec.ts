@@ -104,6 +104,16 @@ describe("CharacterItemStack.ts", () => {
   });
 
   it("should create a new item on target container, if no similar stackable item is found on it.", async () => {
+    const newStackableItem = await unitTestHelper.createStackableMockItem({
+      x: testCharacter.x,
+      y: testCharacter.y,
+      scene: testCharacter.scene,
+      weight: 0,
+      stackQty: 25,
+      isStackable: true,
+      maxStackSize: 100,
+    });
+
     // erase first item on inventoryContainer
     await ItemContainer.updateOne(
       {
@@ -118,7 +128,7 @@ describe("CharacterItemStack.ts", () => {
       }
     );
 
-    const itemAdded = await pickupItem(testItem, inventoryItemContainerId);
+    const itemAdded = await pickupItem(newStackableItem, inventoryItemContainerId);
 
     const updatedInventoryContainer = await ItemContainer.findById(inventoryItemContainerId);
 

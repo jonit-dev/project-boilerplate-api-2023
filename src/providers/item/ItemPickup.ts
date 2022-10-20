@@ -190,7 +190,7 @@ export class ItemPickup {
       }
     }
 
-    const isItemOnMap = item.x && item.y && item.scene;
+    const isItemOnMap = item.x !== undefined && item.y !== undefined && item.scene !== undefined;
 
     if (isItemOnMap) {
       if (character.scene !== item.scene) {
