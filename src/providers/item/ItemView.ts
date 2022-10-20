@@ -113,7 +113,7 @@ export class ItemView {
         y: item.y,
         scene: item.scene,
         layer: item.layer,
-        stackQty: item.stackQty!,
+        stackQty: item.stackQty || 0,
         isStackable: item.isStackable,
       });
 

@@ -11,7 +11,7 @@ import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { container, mapLoader } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { BodiesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
@@ -221,7 +221,7 @@ export class UnitTestHelper {
   public async addInventoryToCharacter(character: ICharacter): Promise<IEquipment> {
     const characterInventory = container.get<CharacterInventory>(CharacterInventory);
 
-    const equipment = await characterInventory.createEquipmentWithInventory(character);
+    const equipment = await characterInventory.createEquipmentWithInventory(character, ContainersBlueprint.Backpack);
 
     return equipment;
   }
