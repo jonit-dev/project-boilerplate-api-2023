@@ -12,6 +12,8 @@ import {
   IChatMessageCreatePayload,
   IChatMessageReadPayload,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
+  UISocketEvents,
+  IUIShowMessage,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
@@ -34,10 +36,24 @@ export class ChatNetworkGlobalMessaging {
           if (this.canCharacterSendMessage(character)) {
             const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
-            await this.saveChatLog(data, character);
-            const chatLogs = await this.getChatLogsInZone(character, data.limit);
-            this.sendMessagesToNearbyCharacters(chatLogs, nearbyCharacters);
-            this.sendMessagesToCharacter(chatLogs, character);
+            if (data.message.length > 0) {
+              await this.saveChatLog(data, character);
+              const chatLogs = await this.getChatLogsInZone(character, data.limit);
+
+              this.sendMessagesToNearbyCharacters(chatLogs, nearbyCharacters);
+              this.sendMessagesToCharacter(chatLogs, character);
+            } else {
+              const dataOfErrorMessage: IUIShowMessage = {
+                message: "Text a message to send.",
+                type: "error",
+              };
+
+              this.socketMessaging.sendEventToUser<IUIShowMessage>(
+                character.channelId!,
+                UISocketEvents.ShowMessage,
+                dataOfErrorMessage
+              );
+            }
           }
         } catch (error) {
           console.error(error);
@@ -64,6 +80,7 @@ export class ChatNetworkGlobalMessaging {
   private sendMessagesToNearbyCharacters(chatLogs: IChatMessageReadPayload, nearbyCharacters: ICharacter[]): void {
     for (const nearbyCharacter of nearbyCharacters) {
       const isValidCharacterTarget = this.shouldCharacterReceiveMessage(nearbyCharacter);
+
       if (isValidCharacterTarget) {
         this.socketMessaging.sendEventToUser<IChatMessageReadPayload>(
           nearbyCharacter.channelId!,
