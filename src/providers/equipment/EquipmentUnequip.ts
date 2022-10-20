@@ -25,7 +25,15 @@ export class EquipmentUnequip {
   ) {}
 
   public async unequip(character: ICharacter, inventory: IItem, item: IItem): Promise<boolean> {
-    const inventoryContainerId = inventory.itemContainer as unknown as string;
+    if (!inventory) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry! You cannot unequip an item without an inventory. Drop it, instead."
+      );
+      return false;
+    }
+
+    const inventoryContainerId = inventory?.itemContainer as unknown as string;
 
     if (!inventoryContainerId) {
       throw new Error("Inventory container id is not defined.");
