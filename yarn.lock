@@ -1712,7 +1712,7 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@rpg-engine/shared@^0.5.59":
+"@rpg-engine/shared@^0.5.54":
   version "0.5.59"
   resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.5.59.tgz#11f8c12b928d80b6b9d7d3cb84b9b5803476e2fe"
   integrity sha512-PDFR3BWb/OvzZQruw04rnCJSFvz6StTqqCxQFVg/KNN24xEY4n83d+0B4RqVH4c8CtX8CXMxgL0HL96dkF19vw==
