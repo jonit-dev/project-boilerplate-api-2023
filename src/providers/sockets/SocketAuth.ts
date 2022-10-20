@@ -12,7 +12,7 @@ export class SocketAuth {
   public authCharacterOn(
     channel,
     event: string,
-    callback: (data, character: ICharacter, owner: IUser) => Promise<void> | void
+    callback: (data, character: ICharacter, owner: IUser) => Promise<any>
   ): void {
     channel.on(event, async (data: any) => {
       let owner, character;
