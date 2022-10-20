@@ -19,8 +19,8 @@ export const itemSelfHealing: Partial<IItemSpell> = {
   castingType: SpellCastingType.SelfCasting,
   magicWords: "heal me now",
   manaCost: 10,
-  minLevelRequired: 1,
-  minMagicLevelRequired: 1,
+  minLevelRequired: 2,
+  minMagicLevelRequired: 2,
   animationKey: AnimationEffectKeys.LifeHeal,
 
   usableEffect: (character: ICharacter) => {
