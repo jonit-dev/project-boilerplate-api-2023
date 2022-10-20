@@ -8,7 +8,7 @@ import {
   ITiledObject,
   IViewDestroyElementPayload,
   MapSocketEvents,
-  ViewSocketEvents
+  ViewSocketEvents,
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
@@ -29,10 +29,7 @@ export class MapTransition {
     private battleNetworkStopTargeting: BattleNetworkStopTargeting
   ) {}
 
-  public async changeCharacterScene(
-    character: ICharacter,
-    destination: TransitionDestination
-  ): Promise<void> {
+  public async changeCharacterScene(character: ICharacter, destination: TransitionDestination): Promise<void> {
     try {
       // fetch destination properties
       // change character map
@@ -48,7 +45,6 @@ export class MapTransition {
       );
 
       if (character.target.id && character.target.type) {
-
         const targetId = character.target.id as unknown as string;
         const targetType = character.target.type as unknown as EntityType;
         const targetReason = "Your battle target was lost.";
@@ -56,29 +52,25 @@ export class MapTransition {
         const dataOfCancelTargeting: IBattleCancelTargeting = {
           targetId: targetId,
           type: targetType,
-          reason: targetReason
+          reason: targetReason,
         };
-      
+
         this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
           character.channelId!,
           BattleSocketEvents.CancelTargeting,
           dataOfCancelTargeting
         );
-      
+
         await this.battleNetworkStopTargeting.stopTargeting(character);
-        
       }
-      
+
       /* 
       Send event to client telling it to restart the map. 
       We don't need to specify which, because it will trigger a character 
       refresh and scene reload on the client side. 
       */
-      
-      this.socketMessaging.sendEventToUser(
-        character.channelId!,
-        MapSocketEvents.ChangeMap
-      );
+
+      this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.ChangeMap);
 
       await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
         character,
@@ -93,10 +85,7 @@ export class MapTransition {
     }
   }
 
-  public async teleportCharacter(
-    character: ICharacter,
-    destination: TransitionDestination
-  ): Promise<void> {
+  public async teleportCharacter(character: ICharacter, destination: TransitionDestination): Promise<void> {
     try {
       if (character.scene !== destination.map) {
         throw new Error(
@@ -114,9 +103,8 @@ export class MapTransition {
           },
         }
       );
-      
-      if (character.target.id && character.target.type) {
 
+      if (character.target.id && character.target.type) {
         const targetId = character.target.id as unknown as string;
         const targetType = character.target.type as unknown as EntityType;
         const targetReason = "Your battle target was lost.";
@@ -124,25 +112,20 @@ export class MapTransition {
         const dataOfCancelTargeting: IBattleCancelTargeting = {
           targetId: targetId,
           type: targetType,
-          reason: targetReason
+          reason: targetReason,
         };
-      
+
         this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
           character.channelId!,
           BattleSocketEvents.CancelTargeting,
           dataOfCancelTargeting
         );
-      
+
         await this.battleNetworkStopTargeting.stopTargeting(character);
-        
       }
       // send event to client telling it that a character has been teleported?
-      
-      this.socketMessaging.sendEventToUser(
-        character.channelId!,
-        MapSocketEvents.SameMapTeleport,
-        destination
-      );
+
+      this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.SameMapTeleport, destination);
 
       await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
         character,
@@ -157,11 +140,7 @@ export class MapTransition {
     }
   }
 
-  public getTransitionAtXY(
-    mapName: string,
-    x: number,
-    y: number
-  ): ITiledObject | undefined {
+  public getTransitionAtXY(mapName: string, x: number, y: number): ITiledObject | undefined {
     try {
       const map = MapLoader.maps.get(mapName);
 
@@ -188,11 +167,7 @@ export class MapTransition {
     }
   }
 
-  public getTransitionProperty(
-    transition: ITiledObject,
-    propertyName: string
-  ): string | undefined {
-
+  public getTransitionProperty(transition: ITiledObject, propertyName: string): string | undefined {
     const property = transition.properties.find((property) => property.name === propertyName);
 
     if (property) {

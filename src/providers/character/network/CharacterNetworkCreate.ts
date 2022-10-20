@@ -111,7 +111,7 @@ export class CharacterNetworkCreate {
         };
 
         // join channel specific to the user, to we can send direct later if we want.
-        await channel.join(data.channelId); 
+        await channel.join(data.channelId);
 
         await this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
       }

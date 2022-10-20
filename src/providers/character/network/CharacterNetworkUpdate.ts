@@ -52,22 +52,13 @@ export class CharacterNetworkUpdate {
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
         if (data) {
-          const isMoving = this.movementHelper.isMoving(
-            data.x,
-            data.y,
-            data.newX,
-            data.newY
-          );
+          const isMoving = this.movementHelper.isMoving(data.x, data.y, data.newX, data.newY);
 
           // send message back to the user telling that the requested position update is not valid!
 
           let isPositionUpdateValid = true;
 
-          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
-            data.x,
-            data.y,
-            data.direction
-          );
+          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(data.x, data.y, data.direction);
 
           if (isMoving) {
             isPositionUpdateValid = await this.checkIfValidPositionUpdate(
@@ -105,14 +96,7 @@ export class CharacterNetworkUpdate {
           await this.itemView.warnCharacterAboutItemsInView(character);
 
           // update emitter position from connectedPlayers
-          await this.updateServerSideEmitterInfo(
-            data,
-            character,
-            newX,
-            newY,
-            isMoving,
-            data.direction
-          );
+          await this.updateServerSideEmitterInfo(data, character, newX, newY, isMoving, data.direction);
 
           // verify if we're in a map transition. If so, we need to trigger a scene transition
           const transition = this.mapTransition.getTransitionAtXY(character.scene, newX, newY);
@@ -147,11 +131,7 @@ export class CharacterNetworkUpdate {
           Verify if we're in a non pvp zone. If so, we need to trigger 
           an attack stop event in case player was in a pvp combat
           */
-          const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(
-            character.scene,
-            newX,
-            newY
-          );
+          const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, newX, newY);
           if (nonPVPZone) {
             this.mapNonPVPZone.stopCharacterAttack(character);
           }
@@ -216,17 +196,13 @@ export class CharacterNetworkUpdate {
 
     // if we already have a representation there, just skip!
     if (charOnCharView) {
-      const doesServerCharMatchesClientChar = this.objectHelper.doesObjectAttrMatches(
-        charOnCharView,
-        nearbyCharacter,
-        [
-          "id",
-          "x",
-          "y",
-          "direction",
-          "scene",
-        ]
-      );
+      const doesServerCharMatchesClientChar = this.objectHelper.doesObjectAttrMatches(charOnCharView, nearbyCharacter, [
+        "id",
+        "x",
+        "y",
+        "direction",
+        "scene",
+      ]);
 
       if (doesServerCharMatchesClientChar) {
         return false;
@@ -336,14 +312,10 @@ export class CharacterNetworkUpdate {
     }
 
     if (character.speed === 0) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(
-        character.channelId!,
-        UISocketEvents.ShowMessage,
-        {
-          message: "Sorry, you're too heavy to move. Please drop something from your inventory.",
-          type: "error",
-        }
-      );
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Sorry, you're too heavy to move. Please drop something from your inventory.",
+        type: "error",
+      });
       return false;
     }
 
@@ -373,9 +345,7 @@ export class CharacterNetworkUpdate {
       }
     }
 
-    if (Math.round(character.x) !== Math.round(data.x) && 
-      Math.round(character.y) !== Math.round(data.y)
-    ) {
+    if (Math.round(character.x) !== Math.round(data.x) && Math.round(character.y) !== Math.round(data.y)) {
       console.log(`🚫 ${character.name} tried to move from a different origin position`);
 
       return false; // mismatch between client and server position
