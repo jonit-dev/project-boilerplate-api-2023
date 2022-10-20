@@ -208,10 +208,15 @@ describe("ItemUse.ts", () => {
     expect(sendEventToUser).toBeCalledTimes(5);
 
     for (let i = 1; i <= 5; i++) {
-      expect(sendEventToUser).toHaveBeenNthCalledWith(i, testCharacter.channelId, CharacterSocketEvents.ItemConsumed, {
-        targetId: testCharacter._id,
-        health: testCharacter.health + i,
-      });
+      expect(sendEventToUser).toHaveBeenNthCalledWith(
+        i,
+        testCharacter.channelId,
+        CharacterSocketEvents.AttributeChanged,
+        {
+          targetId: testCharacter._id,
+          health: testCharacter.health + i,
+        }
+      );
     }
 
     expect(animationEventMock).toBeCalledTimes(5);
@@ -238,7 +243,7 @@ describe("ItemUse.ts", () => {
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
-    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterSocketEvents.ItemConsumed, {
+    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterSocketEvents.AttributeChanged, {
       targetId: testCharacter._id,
       health: testCharacter.health + 20,
     });

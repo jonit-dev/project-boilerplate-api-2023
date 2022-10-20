@@ -34,7 +34,7 @@ describe("ItemSpellCast.ts", () => {
       .execPopulate();
 
     characterSkills = testCharacter.skills as unknown as ISkill;
-    characterSkills.level = itemSelfHealing.minLevelRequired;
+    characterSkills.level = itemSelfHealing.minLevelRequired!;
     characterSkills.magic.level = itemSelfHealing.minMagicLevelRequired;
     await characterSkills.save();
 

@@ -23,7 +23,10 @@ export class ItemSpellCast {
       return false;
     }
 
-    return false;
+    spell.usableEffect(character);
+    await character.save();
+
+    return true;
   }
 
   private async isSpellCastingValid(spell, character: ICharacter): Promise<boolean> {
