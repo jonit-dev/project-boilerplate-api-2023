@@ -4,13 +4,14 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { BodiesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
 
 const DROP_EQUIPMENT_CHANCE = 30; // there's a 30% chance of dropping any of the equipped items
@@ -21,7 +22,8 @@ export class CharacterDeath {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterTarget: CharacterTarget,
-    private npcTarget: NPCTarget
+    private npcTarget: NPCTarget,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter, character: ICharacter): Promise<void> {
@@ -30,20 +32,22 @@ export class CharacterDeath {
     await this.clearAttackerTarget(killer);
 
     // send event to the character that is dead
-
-    this.socketMessaging.sendEventToUser<IBattleDeath>(character.channelId!, BattleSocketEvents.BattleDeath, {
+    const dataOfCharacterDeath: IBattleDeath = {
       id: character.id,
       type: "Character",
-    });
+    };
+
+    this.socketMessaging.sendEventToUser<IBattleDeath>(
+      character.channelId!,
+      BattleSocketEvents.BattleDeath,
+      dataOfCharacterDeath
+    );
     // communicate all players around that character is dead
 
     await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
       character,
       BattleSocketEvents.BattleDeath,
-      {
-        id: character.id,
-        type: "Character",
-      }
+      dataOfCharacterDeath
     );
 
     // generate character's body
@@ -52,14 +56,10 @@ export class CharacterDeath {
     // drop equipped items and backpack items
     await this.dropCharacterItemsOnBody(characterBody, character.equipment);
 
-    // Restart health and X,Y after death.
     await this.respawnCharacter(character);
 
     // finally, force disconnect character that is dead.
-    this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, {
-      id: character.id,
-      type: "Character",
-    });
+    this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, dataOfCharacterDeath);
 
     // TODO: Add death penalty here.
   }
@@ -80,11 +80,14 @@ export class CharacterDeath {
   }
 
   public async respawnCharacter(character: ICharacter): Promise<void> {
+    const inventory = await this.characterInventory.createEquipmentWithInventory(character, ContainersBlueprint.Bag);
+
     character.health = character.maxHealth;
     character.mana = character.maxMana;
     character.x = character.initialX;
     character.y = character.initialY;
     character.scene = character.initialScene;
+    character.equipment = inventory._id;
     await character.save();
   }
 
