@@ -2,12 +2,19 @@ import { ICharacter, Character } from "@entities/ModuleCharacter/CharacterModel"
 import { provide } from "inversify-binding-decorators";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import { IItemSpell } from "./data/blueprints/spells/index";
 
 @provide(ItemSpellCast)
 export class ItemSpellCast {
-  constructor(private socketMessaging: SocketMessaging, private characterValidation: CharacterValidation) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterValidation: CharacterValidation,
+    private animationEffect: AnimationEffect
+  ) {}
 
   public isSpellCasting(msg: string): boolean {
     return !!this.getSpell(msg);
@@ -25,6 +32,8 @@ export class ItemSpellCast {
 
     spell.usableEffect(character);
     await character.save();
+
+    await this.sendPostSpellCastEvents(character, spell);
 
     return true;
   }
@@ -77,5 +86,22 @@ export class ItemSpellCast {
       }
     }
     return null;
+  }
+
+  private async sendPostSpellCastEvents(character: ICharacter, spell: IItemSpell): Promise<void> {
+    const payload: ICharacterAttributeChanged = {
+      targetId: character._id,
+      health: character.health,
+      mana: character.mana,
+    };
+
+    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(
+      character,
+      CharacterSocketEvents.AttributeChanged,
+      payload
+    );
+
+    await this.animationEffect.sendAnimationEvent(character, spell.animationKey);
   }
 }

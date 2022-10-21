@@ -1,10 +1,10 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ItemSpellCast } from "../ItemSpellCast";
-import { AnimationEffectKeys, UISocketEvents } from "@rpg-engine/shared";
+import { AnimationEffectKeys, AnimationSocketEvents, CharacterSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { itemSelfHealing } from "../data/blueprints/spells/ItemSelfHealing";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 
@@ -147,6 +147,35 @@ describe("ItemSpellCast.ts", () => {
     expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
       message: "Sorry, you can not cast this spell at this character magic level.",
       type: "error",
+    });
+  });
+
+  it("should cast self healing spell successfully", async () => {
+    const newHealth = testCharacter.health + itemSelfHealing.manaCost!;
+    const newMana = testCharacter.mana - itemSelfHealing.manaCost!;
+
+    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeTruthy();
+
+    const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
+    expect(character.health).toBe(newHealth);
+    expect(character.mana).toBe(newMana);
+
+    expect(sendEventToUser).toBeCalledTimes(2);
+
+    expect(sendEventToUser).toHaveBeenNthCalledWith(
+      1,
+      testCharacter.channelId,
+      CharacterSocketEvents.AttributeChanged,
+      {
+        targetId: testCharacter._id,
+        health: newHealth,
+        mana: newMana,
+      }
+    );
+
+    expect(sendEventToUser).toHaveBeenNthCalledWith(2, testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
+      targetId: testCharacter._id,
+      effectKey: itemSelfHealing.animationKey,
     });
   });
 });
