@@ -184,6 +184,7 @@ export class ItemPickup {
 
     if (!item.isItemContainer) {
       const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(itemPickupData.toContainerId, item);
+
       if (!hasAvailableSlot) {
         this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your container is full.");
         return false;

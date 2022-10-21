@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
 import { provide } from "inversify-binding-decorators";
@@ -192,7 +193,7 @@ export class CharacterItemSlots {
         const slotItem = slot as unknown as IItem;
 
         if (slotItem.isStackable || slotItem.maxStackSize > 1) {
-          if (slotItem.baseKey === itemToBeAdded.baseKey) {
+          if (isSameKey(slotItem.key, itemToBeAdded.key)) {
             const futureStackQty = slotItem.stackQty! + itemToBeAdded.stackQty!;
             if (futureStackQty <= slotItem.maxStackSize) {
               return true;
