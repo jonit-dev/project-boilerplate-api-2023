@@ -23,7 +23,7 @@ describe("ItemContainerHelper", () => {
     it("should properly detect an inventory itemContainer", async () => {
       const inventoryItemContainer = await ItemContainer.findById(inventory.itemContainer);
 
-      const type = await itemContainerHelper.getType(inventoryItemContainer as unknown as IItemContainer);
+      const type = await itemContainerHelper.getContainerType(inventoryItemContainer as unknown as IItemContainer);
       expect(type).toBe(ItemContainerType.Inventory);
     });
 
@@ -47,7 +47,7 @@ describe("ItemContainerHelper", () => {
       });
       await lootContainer.save();
 
-      const type = await itemContainerHelper.getType(lootContainer as unknown as IItemContainer);
+      const type = await itemContainerHelper.getContainerType(lootContainer as unknown as IItemContainer);
 
       expect(type).toBe(ItemContainerType.Loot);
     });
@@ -64,7 +64,7 @@ describe("ItemContainerHelper", () => {
       });
       await mapContainer.save();
 
-      const type = await itemContainerHelper.getType(mapContainer as unknown as IItemContainer);
+      const type = await itemContainerHelper.getContainerType(mapContainer as unknown as IItemContainer);
 
       expect(type).toBe(ItemContainerType.MapContainer);
     });

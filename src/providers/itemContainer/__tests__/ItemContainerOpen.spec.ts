@@ -47,7 +47,7 @@ describe("ItemContainerOpen.ts", () => {
       testCharacter
     );
 
-    const type = await itemContainerHelper.getType(inventoryItemContainer as unknown as IItemContainer);
+    const type = await itemContainerHelper.getContainerType(inventoryItemContainer as unknown as IItemContainer);
 
     // @ts-ignore
     expect(itemContainerOpen.socketMessaging.sendEventToUser).toHaveBeenCalledWith(
