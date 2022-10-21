@@ -236,23 +236,28 @@ export class CharacterItemSlots {
     return null;
   }
 
-  public async addItemOnFirstAvailableSlot(
+  public async tryAddingItemOnFirstSlot(
     character: ICharacter,
     selectedItem: IItem,
-    targetContainer: IItemContainer
+    targetContainer: IItemContainer,
+    dropOnMapIfFull: boolean = true
   ): Promise<boolean> {
-    const hasAvailableSlot = await this.hasAvailableSlot(targetContainer._id, selectedItem);
-
-    if (!hasAvailableSlot) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your inventory is full.");
-      return false;
-    }
-
     const firstAvailableSlotIndex = await this.getFirstAvailableSlotIndex(targetContainer, selectedItem);
 
     if (firstAvailableSlotIndex === null) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your inventory is full.");
-      return false;
+      if (!dropOnMapIfFull) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your inventory is full.");
+        return false;
+      }
+
+      // if inventory is full, just drop the item on the ground
+
+      selectedItem.x = character.x;
+      selectedItem.y = character.y;
+      selectedItem.scene = character.scene;
+      await selectedItem.save();
+
+      return true;
     }
 
     if (firstAvailableSlotIndex >= 0) {

@@ -39,24 +39,6 @@ export class CharacterTradingNPCBuy {
       return false;
     }
 
-    // if we reached this point, it means the purchase is valid. Let's proceed...
-
-    // first, decrement the gold from the character inventory
-    const totalCost = this.characterTradingBalance.calculateItemsTotalPrice(npc, items);
-
-    const isGoldDecremented = await this.characterItemInventory.decrementItemFromInventory(
-      OthersBlueprint.GoldCoin,
-      character,
-      totalCost
-    );
-
-    if (!isGoldDecremented) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "An error occurred while processing your purchase.");
-      return false;
-    }
-
-    // then, add the purchased items to the character inventory
-
     for (const purchasedItem of items) {
       // check if the item to be purchased is actually available in the NPC
 
@@ -64,6 +46,30 @@ export class CharacterTradingNPCBuy {
 
       if (!npcHasItem) {
         continue;
+      }
+
+      const itemPrice = npc?.traderItems?.find((traderItem) => traderItem.key === purchasedItem.key)?.price;
+
+      if (!itemPrice) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "The item price is not valid for item " + purchasedItem.name
+        );
+        return false;
+      }
+
+      const isGoldDecremented = await this.characterItemInventory.decrementItemFromInventory(
+        OthersBlueprint.GoldCoin,
+        character,
+        itemPrice * purchasedItem.qty
+      );
+
+      if (!isGoldDecremented) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "An error occurred while processing your purchase."
+        );
+        return false;
       }
 
       // create the new item representation on the database

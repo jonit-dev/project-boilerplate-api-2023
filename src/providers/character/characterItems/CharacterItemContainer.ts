@@ -124,7 +124,7 @@ export class CharacterItemContainer {
 
       // Check's done, need to create new item on char inventory
       if (isNewItem) {
-        const result = await this.characterItemSlots.addItemOnFirstAvailableSlot(
+        const result = await this.characterItemSlots.tryAddingItemOnFirstSlot(
           character,
           itemToBeAdded,
           targetContainer

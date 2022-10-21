@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import {
@@ -203,6 +203,39 @@ describe("CharacterTradingValidation.ts", () => {
         testCharacter,
         "You don't have enough gold for this purchase."
       );
+    });
+
+    it("should drop the item on map, if we buy it but we have no slots available", async () => {
+      transactionItems = [
+        {
+          key: PotionsBlueprint.LightEndurancePotion,
+          qty: 1,
+        },
+      ];
+
+      const testItem = await unitTestHelper.createMockItem();
+
+      const goldCoins = await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, {
+        stackQty: 100,
+      });
+
+      inventoryContainer.slotQty = 2;
+      inventoryContainer.slots = {
+        0: goldCoins.toJSON({ virtuals: true }),
+        1: testItem.toJSON({ virtuals: true }),
+      };
+      inventoryContainer.markModified("slots");
+      await inventoryContainer.save();
+
+      const result = await characterTradingNPCBuy.buyItemsFromNPC(testCharacter, testNPCTrader, transactionItems);
+
+      expect(result).toBe(true);
+
+      const purchasedItem = await Item.findOne({ key: PotionsBlueprint.LightEndurancePotion });
+
+      expect(purchasedItem?.x).toBe(testCharacter.x);
+      expect(purchasedItem?.y).toBe(testCharacter.y);
+      expect(purchasedItem?.scene).toBe(testCharacter.scene);
     });
   });
 
