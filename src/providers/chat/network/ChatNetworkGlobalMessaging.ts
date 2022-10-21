@@ -36,7 +36,7 @@ export class ChatNetworkGlobalMessaging {
       async (data: IChatMessageCreatePayload, character: ICharacter) => {
         try {
           if (this.itemSpellCast.isSpellCasting(data.message)) {
-            this.itemSpellCast.castSpell(data.message, character);
+            await this.itemSpellCast.castSpell(data.message, character);
           } else if (this.canCharacterSendMessage(character)) {
             const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 

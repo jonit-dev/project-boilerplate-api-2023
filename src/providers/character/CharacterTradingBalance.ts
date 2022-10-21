@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ITradeItem } from "@rpg-engine/shared";
+import { ITradeRequestItem } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
@@ -24,7 +24,7 @@ export class CharacterTradingBalance {
     return totalGold;
   }
 
-  public calculateItemsTotalPrice(npc: INPC, items: ITradeItem[]): number {
+  public calculateItemsTotalPrice(npc: INPC, items: ITradeRequestItem[]): number {
     return items.reduce((total, item) => {
       const npcHasItem = npc?.traderItems?.some((traderItem) => traderItem.key === item.key);
 

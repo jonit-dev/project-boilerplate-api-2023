@@ -3,7 +3,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ITradeItem } from "@rpg-engine/shared";
+import { ITradeRequestItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterValidation } from "./CharacterValidation";
 
@@ -15,7 +15,7 @@ export class CharacterTradingValidation {
     private movementHelper: MovementHelper
   ) {}
 
-  public validateTransaction(character: ICharacter, npc: INPC, items: ITradeItem[]): boolean {
+  public validateTransaction(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): boolean {
     const baseValidation = this.characterValidation.hasBasicValidation(character);
 
     if (!baseValidation) {

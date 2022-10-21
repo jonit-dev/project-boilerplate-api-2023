@@ -1,10 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ItemSpellCast } from "../ItemSpellCast";
-import { AnimationEffectKeys, AnimationSocketEvents, CharacterSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { AnimationSocketEvents, CharacterSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { itemSelfHealing } from "../data/blueprints/spells/ItemSelfHealing";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 
@@ -13,7 +12,6 @@ describe("ItemSpellCast.ts", () => {
   let testCharacter: ICharacter;
   let characterSkills: ISkill;
   let sendEventToUser: jest.SpyInstance;
-  let animationEventMock: jest.SpyInstance;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -39,14 +37,10 @@ describe("ItemSpellCast.ts", () => {
     await characterSkills.save();
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
-
-    // animationEventMock = jest.spyOn(AnimationEffect.prototype, "sendAnimationEvent");
-    // animationEventMock.mockImplementation();
   });
 
   afterEach(() => {
     sendEventToUser.mockRestore();
-    // animationEventMock.mockRestore();
     jest.clearAllMocks();
   });
 
