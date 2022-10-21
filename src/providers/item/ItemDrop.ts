@@ -1,21 +1,16 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  IEquipmentAndInventoryUpdatePayload,
-  IItem,
-  IItemContainer,
-  IItemDrop,
-  ItemSocketEvents,
-} from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItemContainer, IItemDrop, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
+import { ItemOwnership } from "./ItemOwnership";
 
 @provide(ItemDrop)
 export class ItemDrop {
@@ -25,7 +20,8 @@ export class ItemDrop {
     private equipmentSlots: EquipmentSlots,
     private characterValidation: CharacterValidation,
     private movementHelper: MovementHelper,
-    private characterWeight: CharacterWeight
+    private characterWeight: CharacterWeight,
+    private itemOwnership: ItemOwnership
   ) {}
 
   //! For now, only a drop from inventory or equipment set is allowed.
@@ -128,16 +124,20 @@ export class ItemDrop {
       return false;
     }
 
+    // update x, y, scene and unset owner, using updateOne
+
     await Item.updateOne(
+      { _id: dropItem._id },
       {
-        _id: dropItem._id,
-      },
-      {
-        x: targetX,
-        y: targetY,
-        scene: itemDrop.scene,
+        $set: {
+          x: targetX,
+          y: targetY,
+          scene: character.scene,
+        },
       }
     );
+
+    await this.itemOwnership.removeItemOwnership(dropItem);
 
     return true;
   }

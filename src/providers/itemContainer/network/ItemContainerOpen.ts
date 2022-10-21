@@ -79,7 +79,7 @@ export class ItemContainerOpen {
       // if container opening is valid, send back container information
 
       try {
-        const type = await this.itemContainerHelper.getType(itemContainer);
+        const type = await this.itemContainerHelper.getContainerType(itemContainer);
 
         if (!type) {
           throw new Error("Failed to get item type");

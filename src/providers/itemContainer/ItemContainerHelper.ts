@@ -5,9 +5,10 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(ItemContainerHelper)
 export class ItemContainerHelper {
-  public async getType(itemContainer: IItemContainer): Promise<ItemContainerType | undefined> {
+  public async getContainerType(itemContainer: IItemContainer): Promise<ItemContainerType | undefined> {
     try {
       const item = await Item.findById(itemContainer.parentItem);
+
       if (!item) {
         throw new Error("Failed to get item type: item not found");
       }
@@ -23,9 +24,11 @@ export class ItemContainerHelper {
       const owner = (await Character.findById(item.owner)) as unknown as ICharacter;
       const inventory = await owner?.inventory;
 
-      if (item.id.toString() === inventory.id.toString()) {
+      if (item?._id.toString() === inventory?._id.toString()) {
         return ItemContainerType.Inventory;
       }
+
+      return ItemContainerType.Loot; // last resort, lets consider its a loot container
     } catch (error) {
       console.error(error);
     }

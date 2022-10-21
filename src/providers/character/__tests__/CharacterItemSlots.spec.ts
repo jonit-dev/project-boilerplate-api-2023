@@ -286,7 +286,7 @@ describe("CharacterItemSlots.ts", () => {
       maxStackSize: 10,
     });
 
-    const result = await characterItemSlots.addItemOnFirstAvailableSlot(
+    const result = await characterItemSlots.tryAddingItemOnFirstSlot(
       testCharacter,
       anotherStackableItem,
       inventoryContainer
