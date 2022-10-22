@@ -3,9 +3,10 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
-  FoodsBlueprint,
+  LegsBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
+  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -13,30 +14,30 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcBlackSpider: Partial<INPC> = {
+export const npcAssaultSpider: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Black Spider",
-  key: HostileNPCsBlueprint.BlackSpider,
-  textureKey: HostileNPCsBlueprint.BlackSpider,
+  name: "Assault Spider",
+  key: HostileNPCsBlueprint.AssaultSpider,
+  textureKey: HostileNPCsBlueprint.AssaultSpider,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Standard,
-  baseHealth: 45,
+  speed: MovementSpeed.Fast,
+  baseHealth: 60,
   healthRandomizerDice: Dice.D6,
   skills: {
-    level: 5,
+    level: 7,
     strength: {
       level: 3,
     },
     dexterity: {
-      level: 3,
+      level: 5,
     },
     resistance: {
       level: 2,
     },
   },
   fleeOnLowHealth: true,
-  experience: 12 * EXP_RATIO,
+  experience: 18 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
@@ -48,12 +49,20 @@ export const npcBlackSpider: Partial<INPC> = {
       chance: 20,
     },
     {
-      itemBlueprintKey: FoodsBlueprint.Fish,
-      chance: 30,
+      itemBlueprintKey: LegsBlueprint.StuddedLegs,
+      chance: 5,
     },
     {
-      itemBlueprintKey: SwordsBlueprint.ShortSword,
+      itemBlueprintKey: SwordsBlueprint.BroadSword,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.Katana,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
+      chance: 2.5,
     },
   ],
 };
