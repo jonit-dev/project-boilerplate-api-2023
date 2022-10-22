@@ -1,13 +1,13 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
+  OthersBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -37,11 +37,15 @@ export const npcOrcBerserker = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 60 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: BootsBlueprint.Boots,
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
+      quantityRange: [10, 40],
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.IronBoots,
+      chance: 10,
     },
     {
       itemBlueprintKey: AxesBlueprint.Axe,
@@ -57,7 +61,7 @@ export const npcOrcBerserker = {
     },
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
-      chance: 15,
+      chance: 30,
     },
     {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,

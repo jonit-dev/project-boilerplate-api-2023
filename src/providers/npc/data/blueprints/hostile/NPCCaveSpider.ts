@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   AxesBlueprint,
   BootsBlueprint,
@@ -25,22 +24,21 @@ export const npcCaveSpider: Partial<INPC> = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
-  baseHealth: 75,
+  baseHealth: 80,
   healthRandomizerDice: Dice.D6,
   skills: {
-    level: 9,
+    level: 8,
     strength: {
-      level: 5,
+      level: 9,
     },
     dexterity: {
       level: 6,
     },
     resistance: {
-      level: 3,
+      level: 5,
     },
   },
   fleeOnLowHealth: true,
-  experience: 22 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,

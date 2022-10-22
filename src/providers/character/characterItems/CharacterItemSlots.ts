@@ -141,6 +141,8 @@ export class CharacterItemSlots {
   }
 
   public async deleteItemOnSlot(targetContainer: IItemContainer, itemId: string): Promise<boolean> {
+    console.log("deleteItemOnSlot", targetContainer, itemId);
+
     for (let i = 0; i < targetContainer.slotQty; i++) {
       const slotItem = targetContainer.slots?.[i] as unknown as IItem;
 
@@ -148,6 +150,8 @@ export class CharacterItemSlots {
       if (slotItem._id.toString() === itemId.toString()) {
         // Changing item slot to undefined, thus removing it
         targetContainer.slots[i] = undefined;
+
+        console.log("item found and deleted", targetContainer.slots[i]);
 
         await ItemContainer.updateOne(
           {

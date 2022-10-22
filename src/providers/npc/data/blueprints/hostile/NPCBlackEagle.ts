@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   FoodsBlueprint,
   PotionsBlueprint,
@@ -32,9 +31,11 @@ export const npcBlackEagle = {
     dexterity: {
       level: 8,
     },
+    resistance: {
+      level: 3,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 50 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,

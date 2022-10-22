@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   FoodsBlueprint,
   OthersBlueprint,
@@ -36,7 +35,6 @@ export const npcBlackSpider: Partial<INPC> = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 12 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,

@@ -1,11 +1,11 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   GlovesBlueprint,
   LegsBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   SpearsBlueprint,
@@ -42,8 +42,12 @@ export const npcGhoul = {
     },
   },
   fleeOnLowHealth: false,
-  experience: 16 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [10, 25],
+    },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 10,

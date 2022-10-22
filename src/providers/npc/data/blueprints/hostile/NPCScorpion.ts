@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { FoodsBlueprint, OthersBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -32,7 +31,6 @@ export const npcScorpion: Partial<INPC> = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 8 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,

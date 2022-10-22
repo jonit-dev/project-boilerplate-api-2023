@@ -1,6 +1,8 @@
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
+import { calculateExperience } from "@providers/npc/NPCExperience";
 import { calculateSPToNextLevel, calculateXPToNextLevel } from "@providers/skill/SkillCalculator";
-import { SkillType, TypeHelper } from "@rpg-engine/shared";
+import { NPCAlignment, SkillType, TypeHelper } from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Equipment } from "./EquipmentModel";
 
@@ -88,6 +90,28 @@ export const skillsSchema = createLeanSchema(
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
+
+skillsSchema.post("save", async function (this: ISkill) {
+  const npc = (await NPC.findById(this.owner)) as unknown as INPC;
+
+  if (!npc || npc?.experience) {
+    return;
+  }
+
+  if (npc?.alignment === NPCAlignment.Hostile) {
+    const skills = await Skill.findById(this._id);
+    const experience = calculateExperience(npc.baseHealth, skills as unknown as ISkill);
+
+    await NPC.updateOne(
+      {
+        _id: npc._id,
+      },
+      {
+        experience,
+      }
+    );
+  }
+});
 
 skillsSchema.virtual("attack").get(async function (this: ISkill) {
   if (this.ownerType === "Character") {

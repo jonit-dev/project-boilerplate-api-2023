@@ -1,11 +1,11 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   BootsBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -27,17 +27,24 @@ export const npcDwarfGuard = {
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 4,
+    level: 7,
     strength: {
-      level: 4,
+      level: 5,
     },
     dexterity: {
-      level: 5,
+      level: 6,
+    },
+    resistance: {
+      level: 8,
     },
   },
   fleeOnLowHealth: true,
-  experience: 20 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [15, 25],
+    },
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,

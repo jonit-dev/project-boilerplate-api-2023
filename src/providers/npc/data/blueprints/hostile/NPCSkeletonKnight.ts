@@ -1,10 +1,10 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
   BootsBlueprint,
+  OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -40,8 +40,12 @@ export const npcSkeletonKnight = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 12 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [10, 30],
+    },
     {
       itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
       chance: 25,

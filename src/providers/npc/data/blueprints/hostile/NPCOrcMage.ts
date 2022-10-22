@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
   AxesBlueprint,
@@ -9,6 +8,7 @@ import {
   GlovesBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -39,8 +39,12 @@ export const npcOrcMage = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 70 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [10, 30],
+    },
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
@@ -71,7 +75,7 @@ export const npcOrcMage = {
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,
-      chance: 5,
+      chance: 20,
     },
   ],
 } as Partial<INPC>;

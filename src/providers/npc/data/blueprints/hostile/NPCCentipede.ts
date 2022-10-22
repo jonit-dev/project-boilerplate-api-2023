@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { BootsBlueprint, FoodsBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -32,7 +31,7 @@ export const npcCentipede: Partial<INPC> = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 30 * EXP_RATIO,
+
   loots: [
     {
       itemBlueprintKey: BootsBlueprint.ReforcedBoots,

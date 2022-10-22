@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -31,7 +30,6 @@ export const npcRedDragon = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 1400 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,

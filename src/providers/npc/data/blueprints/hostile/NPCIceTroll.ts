@@ -1,10 +1,10 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   AxesBlueprint,
   FoodsBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   SwordsBlueprint,
@@ -40,8 +40,12 @@ export const npcIceTroll: Partial<INPC> = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 160 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [25, 40],
+    },
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 20,

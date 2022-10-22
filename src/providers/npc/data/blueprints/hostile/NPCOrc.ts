@@ -1,11 +1,11 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   BootsBlueprint,
   HammersBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -35,10 +35,14 @@ export const npcOrc = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 40 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: BootsBlueprint.Boots,
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [5, 25],
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 30,
     },
     {

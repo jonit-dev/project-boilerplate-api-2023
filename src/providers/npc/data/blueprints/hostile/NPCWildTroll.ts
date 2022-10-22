@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -12,6 +11,7 @@ import {
   FoodsBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   SpearsBlueprint,
@@ -40,8 +40,12 @@ export const npcWildTroll = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 160 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [20, 35],
+    },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 25,

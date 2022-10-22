@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -15,6 +14,7 @@ import {
   GlovesBlueprint,
   HammersBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -42,10 +42,17 @@ export const npcForestTroll = {
     dexterity: {
       level: 5,
     },
+    resistance: {
+      level: 14,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 160 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [25, 60],
+    },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 25,

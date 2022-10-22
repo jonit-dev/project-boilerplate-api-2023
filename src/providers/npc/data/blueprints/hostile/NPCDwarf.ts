@@ -1,10 +1,10 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   BootsBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -22,19 +22,25 @@ export const npcDwarf = {
   speed: MovementSpeed.Standard,
   canSwitchToRandomTarget: true,
   baseHealth: 76,
-
   skills: {
-    level: 3,
+    level: 4,
     strength: {
-      level: 2,
+      level: 3,
     },
     dexterity: {
       level: 4,
     },
+    resistance: {
+      level: 5,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 15 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [10, 15],
+    },
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,

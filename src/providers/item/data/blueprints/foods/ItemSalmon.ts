@@ -14,6 +14,7 @@ export const itemSalmon: Partial<IItem> = {
   name: "Salmon",
   description: "A fresh salmon fish.",
   weight: 0.2,
+  maxStackSize: 100,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.apply(character, EffectableAttribute.Health, 2);
   },
