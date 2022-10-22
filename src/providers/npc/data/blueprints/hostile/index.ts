@@ -6,8 +6,10 @@ import { npcBlackSpider } from "./NPCBlackSpider";
 import { npcBrownBear } from "./NPCBrownBear";
 import { npcCaveSpider } from "./NPCCaveSpider";
 import { npcCaveTroll } from "./NPCCaveTroll";
+import { npcCentipede } from "./NPCCentipede";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
+import { npcElderGolem } from "./NPCElderGolem";
 import { npcForestTroll } from "./NPCForestTroll";
 import { npcFrostSalamander } from "./NPCFrostSalamander";
 import { npcGhost } from "./NPCGhost";
@@ -73,4 +75,6 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.BlackSpider]: npcBlackSpider,
   [HostileNPCsBlueprint.AssaultSpider]: npcAssaultSpider,
   [HostileNPCsBlueprint.CaveSpider]: npcCaveSpider,
+  [HostileNPCsBlueprint.Centipede]: npcCentipede,
+  [HostileNPCsBlueprint.ElderGolem]: npcElderGolem,
 };

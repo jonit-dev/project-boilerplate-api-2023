@@ -4,64 +4,58 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
-  AxesBlueprint,
-  BootsBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
+  OthersBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcOrcBerserker = {
+export const npcElderGolem: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Orc Berserker",
-  key: HostileNPCsBlueprint.OrcBerserker,
-  textureKey: HostileNPCsBlueprint.OrcBerserker,
+  name: "Elder Golem",
+  key: HostileNPCsBlueprint.ElderGolem,
+  textureKey: HostileNPCsBlueprint.ElderGolem,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.ExtraFast,
-  baseHealth: 98,
+  speed: MovementSpeed.Slow,
+  baseHealth: 120,
   healthRandomizerDice: Dice.D6,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 12,
+    level: 18,
     strength: {
-      level: 10,
+      level: 15,
     },
     dexterity: {
-      level: 7,
+      level: 3,
+    },
+    resistance: {
+      level: 15,
     },
   },
-  fleeOnLowHealth: true,
-  experience: 60 * EXP_RATIO,
+  experience: 80 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: BootsBlueprint.Boots,
-      chance: 30,
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 25,
+      quantityRange: [25, 50],
     },
     {
-      itemBlueprintKey: AxesBlueprint.Axe,
-      chance: 30,
+      itemBlueprintKey: HelmetsBlueprint.SaviorsHelmet,
+      chance: 20,
     },
     {
-      itemBlueprintKey: HelmetsBlueprint.BerserkersHelmet,
-      chance: 15,
+      itemBlueprintKey: ArmorsBlueprint.PlateArmor,
+      chance: 20,
     },
     {
-      itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: BootsBlueprint.StuddedBoots,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: GlovesBlueprint.StuddedGloves,
-      chance: 15,
+      itemBlueprintKey: GlovesBlueprint.ChainGloves,
+      chance: 20,
     },
   ],
-} as Partial<INPC>;
+};
