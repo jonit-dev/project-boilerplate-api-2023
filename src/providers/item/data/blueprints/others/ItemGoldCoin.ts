@@ -8,7 +8,6 @@ export const itemGoldCoin: Partial<IItem> = {
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "others/gold-coin.png",
-
   name: "Gold Coin",
   description: "A pile of gold coins.",
   weight: 0.01,

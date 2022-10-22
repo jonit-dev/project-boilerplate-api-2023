@@ -141,18 +141,14 @@ export class ItemPickup {
     character: ICharacter,
     fromContainerId: string | undefined
   ): Promise<Boolean> {
-    console.log(item);
-
     const selectedItem = (await Item.findById(item._id)) as IItem;
     if (!selectedItem) {
-      console.log("Selected item not found");
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
 
     const targetContainer = (await ItemContainer.findById(fromContainerId)) as unknown as IItemContainer;
     if (!targetContainer) {
-      console.log("Target container not found");
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
