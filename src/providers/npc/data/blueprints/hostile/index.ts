@@ -1,6 +1,7 @@
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { npcBandit } from "./NPCBandit";
 import { npcBat } from "./NPCBat";
+import { npcBlackSpider } from "./NPCBlackSpider";
 import { npcBrownBear } from "./NPCBrownBear";
 import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcDwarf } from "./NPCDwarf";
@@ -67,4 +68,5 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.Yeti]: npcYeti,
   [HostileNPCsBlueprint.IceTroll]: npcIceTroll,
   [HostileNPCsBlueprint.Scorpion]: npcScorpion,
+  [HostileNPCsBlueprint.BlackSpider]: npcBlackSpider,
 };
