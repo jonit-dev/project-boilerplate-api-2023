@@ -65,4 +65,5 @@ export enum HostileNPCsBlueprint {
   Yeti = "yeti", // Boss
   Asterion = "asterion", // Boss
   IceTroll = "ice-troll",
+  Scorpion = "scorpion",
 }
