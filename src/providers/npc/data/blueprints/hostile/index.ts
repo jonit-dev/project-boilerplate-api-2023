@@ -4,6 +4,7 @@ import { npcBandit } from "./NPCBandit";
 import { npcBat } from "./NPCBat";
 import { npcBlackSpider } from "./NPCBlackSpider";
 import { npcBrownBear } from "./NPCBrownBear";
+import { npcCaveSpider } from "./NPCCaveSpider";
 import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
@@ -71,4 +72,5 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.Scorpion]: npcScorpion,
   [HostileNPCsBlueprint.BlackSpider]: npcBlackSpider,
   [HostileNPCsBlueprint.AssaultSpider]: npcAssaultSpider,
+  [HostileNPCsBlueprint.CaveSpider]: npcCaveSpider,
 };

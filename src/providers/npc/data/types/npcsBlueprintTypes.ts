@@ -68,4 +68,5 @@ export enum HostileNPCsBlueprint {
   Scorpion = "scorpion",
   BlackSpider = "black-spider",
   AssaultSpider = "assault-spider",
+  CaveSpider = "cave-spider",
 }
