@@ -29,7 +29,6 @@ export const npcDeer = {
       level: 2,
     },
   },
-  experience: 10,
   loots: [
     {
       itemBlueprintKey: FoodsBlueprint.RedMeat,

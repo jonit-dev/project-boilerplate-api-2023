@@ -29,7 +29,6 @@ export const npcWhiteSheep = {
       level: 3,
     },
   },
-  experience: 22,
   loots: [
     {
       itemBlueprintKey: FoodsBlueprint.Bread,

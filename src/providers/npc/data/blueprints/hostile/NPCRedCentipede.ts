@@ -2,45 +2,45 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { NeutralNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { generateMoveAwayMovement } from "../../abstractions/BaseNeutralNPC";
+import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcGiantBrownRabbit = {
-  ...generateMoveAwayMovement(),
-  name: "Giant Rabbit",
-  key: NeutralNPCsBlueprint.GiantBrownRabbit,
-  textureKey: NeutralNPCsBlueprint.GiantBrownRabbit,
-  alignment: NPCAlignment.Neutral,
+export const npcRedCentipede: Partial<INPC> = {
+  ...generateMoveTowardsMovement(),
+  name: "Red Centipede",
+  key: HostileNPCsBlueprint.RedCentipede,
+  textureKey: HostileNPCsBlueprint.RedCentipede,
+  alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.ExtraFast,
-  baseHealth: 50,
-  healthRandomizerDice: Dice.D4,
+  speed: MovementSpeed.Slow,
+  baseHealth: 45,
+  healthRandomizerDice: Dice.D6,
+  canSwitchToRandomTarget: true,
   skills: {
-    level: 3,
+    level: 7,
     strength: {
-      level: 4,
+      level: 7,
     },
     dexterity: {
-      level: 10,
+      level: 5,
     },
     resistance: {
-      level: 3,
+      level: 2,
     },
   },
+  fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: FoodsBlueprint.Apple,
       chance: 50,
+      quantityRange: [1, 3],
     },
     {
       itemBlueprintKey: FoodsBlueprint.Banana,
       chance: 25,
-    },
-    {
-      itemBlueprintKey: FoodsBlueprint.Cookie,
-      chance: 20,
+      quantityRange: [1, 3],
     },
   ],
-} as Partial<INPC>;
+};

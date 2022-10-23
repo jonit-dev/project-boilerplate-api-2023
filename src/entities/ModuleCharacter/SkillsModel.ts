@@ -98,7 +98,7 @@ skillsSchema.post("save", async function (this: ISkill) {
     return;
   }
 
-  if (npc?.alignment === NPCAlignment.Hostile) {
+  if (npc?.alignment === NPCAlignment.Hostile || npc?.alignment === NPCAlignment.Neutral) {
     const skills = await Skill.findById(this._id);
     const experience = calculateExperience(npc.baseHealth, skills as unknown as ISkill);
 

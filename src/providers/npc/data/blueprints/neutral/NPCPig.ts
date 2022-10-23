@@ -29,7 +29,6 @@ export const npcPig = {
       level: 3,
     },
   },
-  experience: 25,
   loots: [
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
