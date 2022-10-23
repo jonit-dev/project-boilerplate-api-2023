@@ -10,6 +10,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import {
   AnimationEffectKeys,
@@ -32,7 +33,8 @@ export class ItemUse {
     private characterWeight: CharacterWeight,
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
-    private characterItems: CharacterItems
+    private characterItems: CharacterItems,
+    private characterItemInventory: CharacterItemInventory
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -109,15 +111,14 @@ export class ItemUse {
 
       for (let i = 0; i < inventoryContainer.slotQty; i++) {
         const slotItem = inventoryContainer.slots?.[i];
-        if (slotItem && slotItem.key === item.key) {
+        if (slotItem && slotItem.key === item.key && !stackReduced) {
           inventoryContainer.slots[i].stackQty = item.stackQty;
+          stackReduced = true;
         }
       }
 
       inventoryContainer.markModified("slots");
       await inventoryContainer.save();
-
-      stackReduced = true;
     }
 
     if (!stackReduced) {
