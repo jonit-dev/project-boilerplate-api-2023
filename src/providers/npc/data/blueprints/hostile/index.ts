@@ -10,11 +10,15 @@ import { npcCentipede } from "./NPCCentipede";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
 import { npcElderGolem } from "./NPCElderGolem";
+import { npcFireFox } from "./NPCFireFox";
 import { npcForestTroll } from "./NPCForestTroll";
+import { npcForestWalker } from "./NPCForestWalker";
 import { npcFrostSalamander } from "./NPCFrostSalamander";
 import { npcGhost } from "./NPCGhost";
 import { npcGhoul } from "./NPCGhoul";
+import { npcGiantBat } from "./NPCGiantBat";
 import { npcGoblin } from "./NPCGoblin";
+import { npcIceFox } from "./NPCIceFox";
 import { npcIceTroll } from "./NPCIceTroll";
 import { npcMinotaur } from "./NPCMinotaur";
 import { npcOrc } from "./NPCOrc";
@@ -77,4 +81,8 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.CaveSpider]: npcCaveSpider,
   [HostileNPCsBlueprint.Centipede]: npcCentipede,
   [HostileNPCsBlueprint.ElderGolem]: npcElderGolem,
+  [HostileNPCsBlueprint.FireFox]: npcFireFox,
+  [HostileNPCsBlueprint.ForestWalker]: npcForestWalker,
+  [HostileNPCsBlueprint.GiantBat]: npcGiantBat,
+  [HostileNPCsBlueprint.IceFox]: npcIceFox,
 };

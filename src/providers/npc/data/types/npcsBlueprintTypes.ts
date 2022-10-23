@@ -71,4 +71,8 @@ export enum HostileNPCsBlueprint {
   CaveSpider = "cave-spider",
   Centipede = "centipede",
   ElderGolem = "elder-golem",
+  FireFox = "fire-fox",
+  ForestWalker = "forest-walker",
+  GiantBat = "giant-bat",
+  IceFox = "ice-fox",
 }

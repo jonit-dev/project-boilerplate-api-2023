@@ -2,58 +2,71 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
-  ArmorsBlueprint,
+  AxesBlueprint,
   GlovesBlueprint,
-  HelmetsBlueprint,
   OthersBlueprint,
+  RangedWeaponsBlueprint,
+  ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcElderGolem: Partial<INPC> = {
+export const npcIceFox: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Elder Golem",
-  key: HostileNPCsBlueprint.ElderGolem,
-  textureKey: HostileNPCsBlueprint.ElderGolem,
+  name: "Ice Fox",
+  key: HostileNPCsBlueprint.IceFox,
+  textureKey: HostileNPCsBlueprint.IceFox,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Slow,
-  baseHealth: 120,
+  speed: MovementSpeed.ExtraFast,
+  baseHealth: 150,
   healthRandomizerDice: Dice.D6,
-  skillRandomizerDice: Dice.D4,
-  skillsToBeRandomized: ["level", "strength", "dexterity"],
-  canSwitchToLowHealthTarget: true,
+  canSwitchToRandomTarget: true,
   skills: {
-    level: 18,
+    level: 17,
     strength: {
-      level: 15,
+      level: 20,
     },
     dexterity: {
-      level: 3,
+      level: 25,
     },
     resistance: {
       level: 15,
     },
   },
+  fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 25,
+      chance: 40,
       quantityRange: [25, 50],
     },
     {
-      itemBlueprintKey: HelmetsBlueprint.SaviorsHelmet,
+      itemBlueprintKey: RangedWeaponsBlueprint.FrostBow,
       chance: 20,
     },
     {
-      itemBlueprintKey: ArmorsBlueprint.PlateArmor,
+      itemBlueprintKey: RangedWeaponsBlueprint.FrostCrossbow,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
+      chance: 50,
+      quantityRange: [10, 20],
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.FrostShield,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.FrostDoubleAxe,
       chance: 5,
     },
     {
       itemBlueprintKey: GlovesBlueprint.ChainGloves,
-      chance: 20,
+      chance: 10,
     },
   ],
 };

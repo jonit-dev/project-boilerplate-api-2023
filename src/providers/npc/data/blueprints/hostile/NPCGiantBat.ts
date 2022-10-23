@@ -2,58 +2,55 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
-  ArmorsBlueprint,
-  GlovesBlueprint,
+  FoodsBlueprint,
   HelmetsBlueprint,
   OthersBlueprint,
+  PotionsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcElderGolem: Partial<INPC> = {
+export const npcGiantBat: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Elder Golem",
-  key: HostileNPCsBlueprint.ElderGolem,
-  textureKey: HostileNPCsBlueprint.ElderGolem,
+  name: "Giant Bat",
+  key: HostileNPCsBlueprint.GiantBat,
+  textureKey: HostileNPCsBlueprint.GiantBat,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Slow,
-  baseHealth: 120,
+  speed: MovementSpeed.Standard,
+  baseHealth: 64,
   healthRandomizerDice: Dice.D6,
-  skillRandomizerDice: Dice.D4,
-  skillsToBeRandomized: ["level", "strength", "dexterity"],
-  canSwitchToLowHealthTarget: true,
+  canSwitchToRandomTarget: true,
   skills: {
-    level: 18,
+    level: 7,
     strength: {
-      level: 15,
+      level: 7,
     },
     dexterity: {
-      level: 3,
-    },
-    resistance: {
-      level: 15,
+      level: 5,
     },
   },
+  fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 25,
-      quantityRange: [25, 50],
+      chance: 30,
+      quantityRange: [5, 10],
     },
     {
-      itemBlueprintKey: HelmetsBlueprint.SaviorsHelmet,
-      chance: 20,
+      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
+      chance: 15,
     },
     {
-      itemBlueprintKey: ArmorsBlueprint.PlateArmor,
-      chance: 5,
+      itemBlueprintKey: HelmetsBlueprint.DeathsHelmet,
+      chance: 10,
     },
     {
-      itemBlueprintKey: GlovesBlueprint.ChainGloves,
-      chance: 20,
+      itemBlueprintKey: FoodsBlueprint.Banana,
+      chance: 30,
+      quantityRange: [1, 3],
     },
   ],
 };

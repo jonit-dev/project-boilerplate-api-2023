@@ -2,74 +2,76 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
-  ArmorsBlueprint,
-  AxesBlueprint,
   BootsBlueprint,
-  GlovesBlueprint,
-  HelmetsBlueprint,
+  ContainersBlueprint,
+  FoodsBlueprint,
   OthersBlueprint,
+  PotionsBlueprint,
+  RangedWeaponsBlueprint,
+  ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcOrcBerserker = {
+export const npcForestWalker: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Orc Berserker",
-  key: HostileNPCsBlueprint.OrcBerserker,
-  textureKey: HostileNPCsBlueprint.OrcBerserker,
+  name: "Forest Walker",
+  key: HostileNPCsBlueprint.ForestWalker,
+  textureKey: HostileNPCsBlueprint.ForestWalker,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.ExtraFast,
-  baseHealth: 98,
-  healthRandomizerDice: Dice.D6,
+  speed: MovementSpeed.Slow,
+  baseHealth: 220,
+  healthRandomizerDice: Dice.D20,
+  canSwitchToRandomTarget: true,
   skillRandomizerDice: Dice.D4,
-  skillsToBeRandomized: ["level", "strength", "dexterity"],
-  canSwitchToLowHealthTarget: true,
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 12,
+    level: 17,
     strength: {
-      level: 10,
+      level: 18,
     },
     dexterity: {
-      level: 7,
+      level: 5,
+    },
+    resistance: {
+      level: 14,
     },
   },
   fleeOnLowHealth: true,
+
   loots: [
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
-      quantityRange: [10, 40],
+      quantityRange: [25, 60],
     },
     {
-      itemBlueprintKey: BootsBlueprint.IronBoots,
-      chance: 10,
-    },
-    {
-      itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
-      chance: 10,
-    },
-    {
-      itemBlueprintKey: AxesBlueprint.Axe,
+      itemBlueprintKey: PotionsBlueprint.LightLifePotion,
       chance: 30,
     },
     {
-      itemBlueprintKey: HelmetsBlueprint.BerserkersHelmet,
-      chance: 15,
+      itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
+      chance: 50,
+      quantityRange: [10, 20],
     },
     {
-      itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: BootsBlueprint.StuddedBoots,
+      itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
     },
     {
-      itemBlueprintKey: GlovesBlueprint.StuddedGloves,
+      itemBlueprintKey: ContainersBlueprint.Backpack,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.VikingShield,
+      chance: 10,
     },
   ],
-} as Partial<INPC>;
+};
