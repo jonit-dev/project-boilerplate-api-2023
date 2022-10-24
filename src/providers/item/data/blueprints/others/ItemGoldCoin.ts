@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { OthersBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemGoldCoin: Partial<IItem> = {
@@ -11,6 +11,5 @@ export const itemGoldCoin: Partial<IItem> = {
   name: "Gold Coin",
   description: "A pile of gold coins.",
   weight: 0.01,
-  allowedEquipSlotType: [ItemSlotType.Ring],
   maxStackSize: 100,
 };

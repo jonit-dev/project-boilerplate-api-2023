@@ -5,6 +5,7 @@ import {
   BootsBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   MacesBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
@@ -47,8 +48,16 @@ export const npcOrc = {
       chance: 30,
     },
     {
+      itemBlueprintKey: OthersBlueprint.Candle,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: HelmetsBlueprint.LeatherHelmet,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.LeatherLegs,
+      chance: 15,
     },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,

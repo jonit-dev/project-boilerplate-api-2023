@@ -9,6 +9,7 @@ import {
   GlovesBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
+  MagicsBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -81,6 +82,14 @@ export const npcOrcMage = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
       chance: 1,
+    },
+    {
+      itemBlueprintKey: MagicsBlueprint.Book,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: MagicsBlueprint.Rune,
+      chance: 10,
     },
   ],
 } as Partial<INPC>;

@@ -8,7 +8,6 @@ export const itemCandle: Partial<IItem> = {
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "others/candle.png",
-
   name: "Candle",
   description: "A wax candle.",
   weight: 0.05,

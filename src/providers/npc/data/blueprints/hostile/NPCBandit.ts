@@ -8,6 +8,7 @@ import {
   FoodsBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   MacesBlueprint,
   OthersBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -70,6 +71,10 @@ export const npcBandit: Partial<INPC> = {
     {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.LeatherLegs,
+      chance: 15,
     },
     {
       itemBlueprintKey: AxesBlueprint.Bardiche,

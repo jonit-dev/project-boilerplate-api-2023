@@ -51,6 +51,10 @@ export const npcDwarf = {
       chance: 15,
     },
     {
+      itemBlueprintKey: OthersBlueprint.Candle,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,
       chance: 15,
     },

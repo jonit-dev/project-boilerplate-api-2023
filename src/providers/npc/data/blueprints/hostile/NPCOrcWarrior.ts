@@ -8,6 +8,7 @@ import {
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   MacesBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
@@ -80,6 +81,10 @@ export const npcOrcWarrior = {
     },
     {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.LeatherLegs,
       chance: 15,
     },
     {

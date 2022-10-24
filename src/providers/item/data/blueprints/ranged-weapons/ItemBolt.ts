@@ -8,10 +8,9 @@ export const itemBolt: Partial<IItem> = {
   subType: ItemSubType.Accessory,
   textureAtlas: "items",
   texturePath: "ranged-weapons/bolt.png",
-
   name: "Bolt",
   description: "A crossbow bolt.",
-  attack: 2,
-  weight: 0.02,
+  attack: 6,
+  weight: 0.2,
   allowedEquipSlotType: [ItemSlotType.Accessory],
 };
