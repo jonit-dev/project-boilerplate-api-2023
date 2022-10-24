@@ -1,6 +1,11 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { FoodsBlueprint, OthersBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  CraftingResourcesBlueprint,
+  FoodsBlueprint,
+  OthersBlueprint,
+  PotionsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -40,6 +45,11 @@ export const npcBat = {
     {
       itemBlueprintKey: FoodsBlueprint.Banana,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BatsWing,
+      chance: 50,
+      quantityRange: [1, 3],
     },
   ],
 } as Partial<INPC>;

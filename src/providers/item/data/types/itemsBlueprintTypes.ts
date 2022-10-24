@@ -107,6 +107,8 @@ export enum FoodsBlueprint {
 export enum CraftingResourcesBlueprint {
   BlueSapphire = "blue-sapphire",
   BlueFeather = "blue-feather",
+  Leather = "leather",
+  BatsWing = "bats-wing",
 }
 
 export enum SpearsBlueprint {

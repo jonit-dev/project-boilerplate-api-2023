@@ -28,6 +28,7 @@ export enum NeutralNPCsBlueprint {
   GiantBrownRabbit = "giant-brown-rabbit",
   GiantWhiteRabbit = "giant-white-rabbit",
   GiantGrayRabbit = "giant-gray-rabbit",
+  RedDeer = "red-deer",
 }
 
 export enum HostileNPCsBlueprint {
