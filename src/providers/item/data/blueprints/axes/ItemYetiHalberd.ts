@@ -9,11 +9,11 @@ export const itemYetiHalberd: Partial<IItem> = {
   subType: ItemSubType.Axe,
   textureAtlas: "items",
   texturePath: "axes/yeti-halberd.png",
-
   name: "Yeti's Halberd",
   description:
     "An ice weapon consisting of an ax blade balanced by a pick with an elongated pike head at the end of the staff.",
-  attack: 5,
+  attack: 20,
+  defense: 5,
   weight: 2,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

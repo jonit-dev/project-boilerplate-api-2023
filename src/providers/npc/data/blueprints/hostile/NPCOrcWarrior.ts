@@ -54,6 +54,10 @@ export const npcOrcWarrior = {
       chance: 30,
     },
     {
+      itemBlueprintKey: ArmorsBlueprint.IronArmor,
+      chance: 20,
+    },
+    {
       itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,
       chance: 15,
     },

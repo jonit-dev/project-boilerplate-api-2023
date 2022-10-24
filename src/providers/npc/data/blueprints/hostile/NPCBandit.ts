@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  AccessoriesBlueprint,
   AxesBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
@@ -65,6 +66,10 @@ export const npcBandit: Partial<INPC> = {
       itemBlueprintKey: CraftingResourcesBlueprint.Silk,
       chance: 30,
       quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.Bandana,
+      chance: 30,
     },
   ],
 };

@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
+  ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
   FoodsBlueprint,
@@ -51,6 +52,10 @@ export const npcGoblin = {
     {
       itemBlueprintKey: SwordsBlueprint.ShortSword,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.IronArmor,
+      chance: 5,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Fish,

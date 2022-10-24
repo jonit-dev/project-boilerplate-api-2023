@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
@@ -73,6 +74,10 @@ export const npcMinotaur = {
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
+      chance: 10,
     },
     {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,

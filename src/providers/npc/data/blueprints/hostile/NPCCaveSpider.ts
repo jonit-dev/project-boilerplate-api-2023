@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  AccessoriesBlueprint,
   AxesBlueprint,
   BootsBlueprint,
   LegsBlueprint,
@@ -72,6 +73,10 @@ export const npcCaveSpider: Partial<INPC> = {
     {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,
       chance: 2.5,
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.DeathNecklace,
+      chance: 5,
     },
   ],
 };

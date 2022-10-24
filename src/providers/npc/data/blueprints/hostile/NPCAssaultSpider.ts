@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  AccessoriesBlueprint,
   LegsBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
@@ -61,6 +62,10 @@ export const npcAssaultSpider: Partial<INPC> = {
     {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,
       chance: 2.5,
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.CorruptionNecklace,
+      chance: 10,
     },
   ],
 };

@@ -1,6 +1,6 @@
 export enum QuestsBlueprint {
   Example = "example",
-  KillOrcs = "kill-orcs",
+  OrcFortress = "orc-fortress",
   KillRats = "kill-rats",
   InteractionTrader = "interaction-trader",
   InteractionFather = "interaction-father",

@@ -11,7 +11,7 @@ export const itemStuddedArmor: Partial<IItem> = {
 
   name: "Studded Armor",
   description: "A basic leather armor with metal studs.",
-  defense: 10,
+  defense: 12,
   weight: 1.4,
   allowedEquipSlotType: [ItemSlotType.Torso],
 };

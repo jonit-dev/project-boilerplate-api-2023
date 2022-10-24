@@ -9,8 +9,7 @@ export const itemSilverKey: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "others/silver-key.png",
   name: "Silver Key",
-  description: "a well made silver key.",
-  defense: 0,
+  description: "A well made silver key.",
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
 };

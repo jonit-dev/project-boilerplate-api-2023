@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   GlovesBlueprint,
@@ -53,6 +54,10 @@ export const npcDwarfGuard = {
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.IronArmor,
+      chance: 20,
     },
     {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,

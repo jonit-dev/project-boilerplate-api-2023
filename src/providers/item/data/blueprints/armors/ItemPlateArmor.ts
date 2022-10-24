@@ -12,7 +12,7 @@ export const itemPlateArmor: Partial<IItem> = {
   name: "Plate Armor",
   description:
     "A Plate Armor consists of shaped, interlocking metal plates to cover the entire body and articulated to allow mobility.",
-  defense: 13,
+  defense: 25,
   weight: 4,
   allowedEquipSlotType: [ItemSlotType.Torso],
 };
