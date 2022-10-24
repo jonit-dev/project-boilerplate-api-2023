@@ -38,6 +38,16 @@ export class ItemSpellCast {
     return true;
   }
 
+  public async learnLatestSkillLevelSpells(character: ICharacter): Promise<void> {
+    const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
+      "skills"
+    )) as unknown as ICharacter;
+    const skills = updatedCharacter.skills as unknown as ISkill;
+
+    const spells = this.getSkillLevelSpells(skills.level);
+    await this.addToCharacterLearnedSpells(updatedCharacter, spells);
+  }
+
   private async isSpellCastingValid(spell, character: ICharacter): Promise<boolean> {
     if (!spell) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, spell not found.");
@@ -67,13 +77,14 @@ export class ItemSpellCast {
       return false;
     }
 
-    if (skills.magic.level < spell.minMagicLevelRequired) {
+    // TODO: Implement magic level validation later
+    /* if (skills.magic.level < spell.minMagicLevelRequired) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         "Sorry, you can not cast this spell at this character magic level."
       );
       return false;
-    }
+    } */
 
     return true;
   }
@@ -86,6 +97,29 @@ export class ItemSpellCast {
       }
     }
     return null;
+  }
+
+  private getSkillLevelSpells(level): IItemSpell[] {
+    const spells: IItemSpell[] = [];
+    for (const key in itemsBlueprintIndex) {
+      const item = itemsBlueprintIndex[key];
+      if (item.magicWords && level === item.minLevelRequired) {
+        spells.push(item as unknown as IItemSpell);
+      }
+    }
+    return spells;
+  }
+
+  private async addToCharacterLearnedSpells(character: ICharacter, spells: IItemSpell[]): Promise<void> {
+    const learned = character.learnedSpells ?? [];
+    spells.forEach((spell) => {
+      if (!learned.includes(spell.key)) {
+        learned.push(spell.key);
+      }
+    });
+
+    character.learnedSpells = learned;
+    await character.save();
   }
 
   private async sendPostSpellCastEvents(character: ICharacter, spell: IItemSpell): Promise<void> {
