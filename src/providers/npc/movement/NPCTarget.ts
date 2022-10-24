@@ -1,7 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
+import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCBattleCycle } from "../NPCBattleCycle";
 import { NPCView } from "../NPCView";
@@ -9,7 +10,7 @@ import { NPCDirection } from "./NPCMovement";
 
 @provide(NPCTarget)
 export class NPCTarget {
-  constructor(private npcView: NPCView, private movementHelper: MovementHelper) {}
+  constructor(private npcView: NPCView, private movementHelper: MovementHelper, private mapNonPVPZone: MapNonPVPZone) {}
 
   public async clearTarget(npc: INPC): Promise<void> {
     npc.targetCharacter = undefined;
@@ -19,7 +20,6 @@ export class NPCTarget {
     await npc.save();
 
     const npcBattleCycle = NPCBattleCycle.npcBattleCycles.get(npc.id);
-
     if (npcBattleCycle) {
       await npcBattleCycle.clear();
     }
@@ -83,6 +83,14 @@ export class NPCTarget {
 
         if (!character) {
           throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
+        }
+
+        const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, character.x, character.y);
+        // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
+        if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
+          await this.clearTarget(npc);
+
+          return;
         }
 
         npc.targetCharacter = character._id;

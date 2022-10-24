@@ -1,10 +1,12 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { GridManager } from "@providers/map/GridManager";
+import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { INPCPositionUpdatePayload, NPCAlignment, NPCSocketEvents, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCView } from "../NPCView";
+import { NPCTarget } from "./NPCTarget";
 
 export type NPCDirection = "up" | "down" | "left" | "right";
 
@@ -20,7 +22,9 @@ export class NPCMovement {
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
     private movementHelper: MovementHelper,
-    private gridManager: GridManager
+    private gridManager: GridManager,
+    private mapNonPVPZone: MapNonPVPZone,
+    private npcTarget: NPCTarget
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -64,13 +68,24 @@ export class NPCMovement {
       const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
 
       this.gridManager.setWalkable(map, ToGridX(oldX) + gridOffsetX, ToGridY(oldY) + gridOffsetY, true);
+
       this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
 
       // warn nearby characters that the NPC moved;
-
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
       for (const character of nearbyCharacters) {
+        const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, character.x, character.y);
+
+        /*
+        This is to prevent the NPC from attacking the player if they are in a non-PVP zone. 
+        And when the player leaves the zone, the NPC will attack them again.
+        */
+
+        if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
+          await this.npcTarget.clearTarget(npc);
+        }
+
         this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
           character.channelId!,
           NPCSocketEvents.NPCPositionUpdate,
