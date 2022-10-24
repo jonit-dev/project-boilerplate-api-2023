@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   ArmorsBlueprint,
   GlovesBlueprint,
+  HelmetsBlueprint,
   OthersBlueprint,
   StaffsBlueprint,
   SwordsBlueprint,
@@ -57,6 +58,10 @@ export const npcFireFox: Partial<INPC> = {
     },
     {
       itemBlueprintKey: GlovesBlueprint.ChainGloves,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.VikingHelmet,
       chance: 10,
     },
   ],

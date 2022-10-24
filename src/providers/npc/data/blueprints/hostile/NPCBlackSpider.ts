@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   FoodsBlueprint,
+  HelmetsBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
   SwordsBlueprint,
@@ -44,6 +45,10 @@ export const npcBlackSpider: Partial<INPC> = {
     {
       itemBlueprintKey: PotionsBlueprint.ManaPotion,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.WizardHat,
+      chance: 10,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Fish,

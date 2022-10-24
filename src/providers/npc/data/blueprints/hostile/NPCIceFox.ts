@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AxesBlueprint,
   CraftingResourcesBlueprint,
+  DaggersBlueprint,
   GlovesBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
@@ -68,6 +69,10 @@ export const npcIceFox: Partial<INPC> = {
     {
       itemBlueprintKey: GlovesBlueprint.ChainGloves,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.FrostDagger,
+      chance: 20,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Silk,

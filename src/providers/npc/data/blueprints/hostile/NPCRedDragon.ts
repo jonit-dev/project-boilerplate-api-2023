@@ -1,7 +1,13 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { ArmorsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  ArmorsBlueprint,
+  BootsBlueprint,
+  HelmetsBlueprint,
+  OthersBlueprint,
+  SwordsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -35,12 +41,33 @@ export const npcRedDragon = {
   fleeOnLowHealth: true,
   loots: [
     {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 50,
+      quantityRange: [100, 225],
+    },
+    {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
       chance: 40,
     },
     {
       itemBlueprintKey: ArmorsBlueprint.GoldenArmor,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.GoldenBoots,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.RoyalHelmet,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.SaviorsHelmet,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.RoyalKnightHelmet,
+      chance: 5,
     },
   ],
 } as Partial<INPC>;

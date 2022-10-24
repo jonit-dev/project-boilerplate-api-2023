@@ -11,7 +11,7 @@ export const itemReforcedBoots: Partial<IItem> = {
 
   name: "Reforced Boots",
   description: "A boot made with reinforced leather.",
-  defense: 6,
+  defense: 4,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Feet],
 };

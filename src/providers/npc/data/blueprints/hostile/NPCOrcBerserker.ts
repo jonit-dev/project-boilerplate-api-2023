@@ -6,6 +6,7 @@ import {
   AxesBlueprint,
   BootsBlueprint,
   GlovesBlueprint,
+  HammersBlueprint,
   HelmetsBlueprint,
   OthersBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -49,6 +50,10 @@ export const npcOrcBerserker = {
     },
     {
       itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.WarHammer,
       chance: 10,
     },
     {

@@ -9,12 +9,11 @@ export const itemHammer: Partial<IItem> = {
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "hammers/hammer.png",
-
   name: "Hammer",
   description: "A simple hammer.",
-  attack: 2,
-  defense: 0,
-  weight: 1,
+  attack: 5,
+  defense: 2,
+  weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };

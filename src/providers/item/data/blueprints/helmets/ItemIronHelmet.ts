@@ -8,11 +8,10 @@ export const itemIronHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/iron-helmet.png",
-
   name: "Iron Helmet",
   description:
     "Iron Helmet is part of the Iron Set, and is a Lightweight helmet also known as a war hat, is a type of helmet made of iron or steel.",
   defense: 10,
-  weight: 2.5,
+  weight: 3,
   allowedEquipSlotType: [ItemSlotType.Head],
 };

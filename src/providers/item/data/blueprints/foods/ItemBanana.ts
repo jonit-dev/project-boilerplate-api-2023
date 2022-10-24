@@ -16,6 +16,6 @@ export const itemBanana: Partial<IItem> = {
   weight: 0.05,
   maxStackSize: 100,
   usableEffect: (character: ICharacter) => {
-    ItemUsableEffect.apply(character, EffectableAttribute.Health, 1);
+    ItemUsableEffect.apply(character, EffectableAttribute.Health, 2);
   },
 };

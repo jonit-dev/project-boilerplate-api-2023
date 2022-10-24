@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
   HammersBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
@@ -46,6 +47,10 @@ export const npcOrc = {
       chance: 30,
     },
     {
+      itemBlueprintKey: HelmetsBlueprint.LeatherHelmet,
+      chance: 30,
+    },
+    {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 10,
     },
@@ -56,6 +61,10 @@ export const npcOrc = {
     {
       itemBlueprintKey: HammersBlueprint.IronHammer,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.FarmersHelmet,
+      chance: 20,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,

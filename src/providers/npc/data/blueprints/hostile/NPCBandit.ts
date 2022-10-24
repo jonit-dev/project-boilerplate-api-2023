@@ -7,6 +7,7 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
   OthersBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -53,6 +54,18 @@ export const npcBandit: Partial<INPC> = {
     {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.LeatherHelmet,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.RedHoodie,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.Turban,
+      chance: 30,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Fish,

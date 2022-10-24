@@ -11,6 +11,7 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
@@ -68,6 +69,10 @@ export const npcTroll = {
     {
       itemBlueprintKey: SpearsBlueprint.Spear,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.GladiatorHelmet,
+      chance: 10,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,

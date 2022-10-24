@@ -8,11 +8,10 @@ export const itemVikingHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/viking-helmet.png",
-
   name: "Viking Helmet",
   description:
     "Viking helmets provided  protection by covering part of the face , and they also provided anonymity to the warriors.",
-  defense: 12,
+  defense: 8,
   weight: 2.4,
   allowedEquipSlotType: [ItemSlotType.Head],
 };

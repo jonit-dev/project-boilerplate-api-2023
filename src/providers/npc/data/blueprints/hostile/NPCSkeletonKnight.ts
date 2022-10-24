@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   ArmorsBlueprint,
   BootsBlueprint,
+  HelmetsBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -30,13 +31,13 @@ export const npcSkeletonKnight = {
   skills: {
     level: 6,
     strength: {
-      level: 2,
+      level: 6,
     },
     dexterity: {
-      level: 2,
+      level: 4,
     },
     resistance: {
-      level: 3,
+      level: 2,
     },
   },
   fleeOnLowHealth: true,
@@ -56,9 +57,12 @@ export const npcSkeletonKnight = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.IronHelmet,
       chance: 5,
     },
-
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 25,

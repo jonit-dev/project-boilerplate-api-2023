@@ -13,6 +13,7 @@ import {
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
@@ -69,6 +70,10 @@ export const npcForestTroll = {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 50,
       quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.ArabicHelmet,
+      chance: 10,
     },
     {
       itemBlueprintKey: SpearsBlueprint.Spear,

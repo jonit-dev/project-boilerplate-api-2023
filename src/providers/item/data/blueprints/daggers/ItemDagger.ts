@@ -13,8 +13,8 @@ export const itemDagger: Partial<IItem> = {
   name: "Dagger",
   description:
     "You see a dagger. It's a fighting knife with a very sharp point and usually two sharp edges, typically designed or capable of being used as a thrusting or stabbing weapon.",
-  defense: 1,
-  attack: 3,
+  defense: 2,
+  attack: 5,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

@@ -3,6 +3,8 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
+  DaggersBlueprint,
+  HelmetsBlueprint,
   LegsBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
@@ -52,7 +54,11 @@ export const npcAssaultSpider: Partial<INPC> = {
       chance: 5,
     },
     {
-      itemBlueprintKey: SwordsBlueprint.BroadSword,
+      itemBlueprintKey: HelmetsBlueprint.DarkWizardHat,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.CorruptionDagger,
       chance: 15,
     },
     {

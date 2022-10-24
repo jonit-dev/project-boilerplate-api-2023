@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AxesBlueprint,
+  BootsBlueprint,
   FoodsBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
@@ -66,6 +67,10 @@ export const npcIceTroll: Partial<INPC> = {
     {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.PlateBoots,
+      chance: 10,
     },
 
     {

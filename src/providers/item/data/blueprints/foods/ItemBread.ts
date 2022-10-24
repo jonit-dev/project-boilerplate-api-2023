@@ -16,6 +16,6 @@ export const itemBread: Partial<IItem> = {
   weight: 0.1,
   maxStackSize: 10,
   usableEffect: (character: ICharacter) => {
-    ItemUsableEffect.apply(character, EffectableAttribute.Health, 1);
+    ItemUsableEffect.apply(character, EffectableAttribute.Health, 2);
   },
 };

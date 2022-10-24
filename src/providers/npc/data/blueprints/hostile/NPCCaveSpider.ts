@@ -5,11 +5,11 @@ import {
   AccessoriesBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  HelmetsBlueprint,
   LegsBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
   ShieldsBlueprint,
-  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -71,8 +71,8 @@ export const npcCaveSpider: Partial<INPC> = {
       chance: 20,
     },
     {
-      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
-      chance: 2.5,
+      itemBlueprintKey: HelmetsBlueprint.DeathsHelmet,
+      chance: 5,
     },
     {
       itemBlueprintKey: AccessoriesBlueprint.DeathNecklace,

@@ -52,6 +52,10 @@ export const npcTrollWarrior = {
       chance: 25,
     },
     {
+      itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
+      chance: 15,
+    },
+    {
       itemBlueprintKey: GlovesBlueprint.PlateGloves,
       chance: 10,
     },

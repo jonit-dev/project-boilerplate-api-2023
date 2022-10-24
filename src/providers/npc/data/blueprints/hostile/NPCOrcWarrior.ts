@@ -6,6 +6,7 @@ import {
   AxesBlueprint,
   BootsBlueprint,
   GlovesBlueprint,
+  HammersBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
   OthersBlueprint,
@@ -54,8 +55,16 @@ export const npcOrcWarrior = {
       chance: 30,
     },
     {
+      itemBlueprintKey: HammersBlueprint.IronHammer,
+      chance: 15,
+    },
+    {
       itemBlueprintKey: ArmorsBlueprint.IronArmor,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
+      chance: 5,
     },
     {
       itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,
