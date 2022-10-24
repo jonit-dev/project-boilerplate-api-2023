@@ -1,62 +1,48 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import {
-  CraftingResourcesBlueprint,
-  FoodsBlueprint,
-  SwordsBlueprint,
-} from "@providers/item/data/types/itemsBlueprintTypes";
+import { FoodsBlueprint, GlovesBlueprint, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcRaccoon: Partial<INPC> = {
+export const npcSpiderling: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Raccoon",
-  key: HostileNPCsBlueprint.Raccoon,
-  textureKey: HostileNPCsBlueprint.Raccoon,
+  name: "Spiderling",
+  key: HostileNPCsBlueprint.Spiderling,
+  textureKey: HostileNPCsBlueprint.Spiderling,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
-  baseHealth: 40,
-  healthRandomizerDice: Dice.D6,
-  canSwitchToRandomTarget: true,
+  baseHealth: 60,
+  healthRandomizerDice: Dice.D4,
   skills: {
-    level: 1,
+    level: 3,
     strength: {
       level: 3,
     },
     dexterity: {
-      level: 2,
+      level: 4,
     },
     resistance: {
-      level: 2,
+      level: 1,
     },
   },
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: FoodsBlueprint.Salmon,
-      chance: 20,
-      quantityRange: [1, 3],
-    },
-    {
-      itemBlueprintKey: FoodsBlueprint.Cheese,
-      chance: 10,
-      quantityRange: [1, 3],
-    },
-    {
-      itemBlueprintKey: FoodsBlueprint.Bread,
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
+      quantityRange: [5, 15],
     },
     {
-      itemBlueprintKey: SwordsBlueprint.ShortSword,
+      itemBlueprintKey: GlovesBlueprint.StuddedGloves,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.Banana,
       chance: 20,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.Leather,
-      chance: 50,
       quantityRange: [1, 3],
     },
   ],

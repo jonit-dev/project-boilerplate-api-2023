@@ -18,7 +18,7 @@ export const npcSnake: Partial<INPC> = {
   textureKey: HostileNPCsBlueprint.Snake,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Standard,
+  speed: MovementSpeed.Fast,
   baseHealth: 40,
   healthRandomizerDice: Dice.D6,
   canSwitchToRandomTarget: true,

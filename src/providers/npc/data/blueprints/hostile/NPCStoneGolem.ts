@@ -3,40 +3,40 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
-  GlovesBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
-  SpearsBlueprint,
+  RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcMudGolem: Partial<INPC> = {
+export const npcStoneGolem: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Mud Golem",
-  key: HostileNPCsBlueprint.MudGolem,
-  textureKey: HostileNPCsBlueprint.MudGolem,
+  name: "Stone Golem",
+  key: HostileNPCsBlueprint.StoneGolem,
+  textureKey: HostileNPCsBlueprint.StoneGolem,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
   baseHealth: 300,
-  healthRandomizerDice: Dice.D6,
+  healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 18,
+    level: 22,
     strength: {
-      level: 15,
+      level: 22,
     },
     dexterity: {
-      level: 5,
+      level: 2,
     },
     resistance: {
-      level: 25,
+      level: 30,
     },
   },
   fleeOnLowHealth: true,
@@ -44,21 +44,14 @@ export const npcMudGolem: Partial<INPC> = {
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
-      quantityRange: [30, 70],
+      quantityRange: [30, 80],
     },
 
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,
     },
-    {
-      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: GlovesBlueprint.PlateGloves,
-      chance: 15,
-    },
+
     {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
@@ -66,6 +59,21 @@ export const npcMudGolem: Partial<INPC> = {
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.Stone,
+      chance: 90,
+      quantityRange: [10, 25],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.IronIngot,
+      chance: 30,
+      quantityRange: [10, 25],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Obsidian,
+      chance: 30,
+      quantityRange: [10, 25],
     },
   ],
 };
