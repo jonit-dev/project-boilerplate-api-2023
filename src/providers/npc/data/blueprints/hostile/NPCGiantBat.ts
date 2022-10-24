@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
   OthersBlueprint,
@@ -50,6 +51,11 @@ export const npcGiantBat: Partial<INPC> = {
     {
       itemBlueprintKey: FoodsBlueprint.Banana,
       chance: 30,
+      quantityRange: [1, 3],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BatsWing,
+      chance: 50,
       quantityRange: [1, 3],
     },
   ],

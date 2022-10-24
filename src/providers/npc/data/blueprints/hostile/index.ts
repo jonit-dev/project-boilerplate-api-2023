@@ -36,6 +36,7 @@ import { npcScorpion } from "./NPCScorpion";
 import { npcSkeleton } from "./NPCSkeleton";
 import { npcSkeletonKnight } from "./NPCSkeletonKnight";
 import { npcSlime } from "./NPCSlime";
+import { npcSparrow } from "./NPCSparrow";
 import { npcSpider } from "./NPCSpider";
 import { npcTroll } from "./NPCTroll";
 import { npcTrollBerserker } from "./NPCTrollBerserker";
@@ -91,4 +92,5 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.MudGolem]: npcMudGolem,
   [HostileNPCsBlueprint.Raccoon]: npcRaccoon,
   [HostileNPCsBlueprint.RedCentipede]: npcRedCentipede,
+  [HostileNPCsBlueprint.Sparrow]: npcSparrow,
 };

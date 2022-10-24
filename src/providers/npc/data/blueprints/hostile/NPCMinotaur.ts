@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   LegsBlueprint,
@@ -76,6 +77,10 @@ export const npcMinotaur = {
     {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 1,
     },
   ],
 } as Partial<INPC>;

@@ -79,4 +79,5 @@ export enum HostileNPCsBlueprint {
   MudGolem = "mud-golem",
   Raccoon = "raccoon",
   RedCentipede = "red-centipede",
+  Sparrow = "sparrow",
 }

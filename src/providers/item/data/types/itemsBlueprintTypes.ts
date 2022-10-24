@@ -109,6 +109,11 @@ export enum CraftingResourcesBlueprint {
   BlueFeather = "blue-feather",
   Leather = "leather",
   BatsWing = "bats-wing",
+  Silk = "silk",
+  ColoredFeather = "colored-feather",
+  Diamond = "diamond",
+  Feather = "feather",
+  GoldenIngot = "golden-ingot",
 }
 
 export enum SpearsBlueprint {

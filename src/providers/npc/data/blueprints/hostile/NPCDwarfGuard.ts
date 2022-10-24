@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
   OthersBlueprint,
@@ -65,6 +66,15 @@ export const npcDwarfGuard = {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 20,
       quantityRange: [7, 12],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 1,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenIngot,
+      chance: 10,
+      quantityRange: [1, 3],
     },
   ],
 } as Partial<INPC>;

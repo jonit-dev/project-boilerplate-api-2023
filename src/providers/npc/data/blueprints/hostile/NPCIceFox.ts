@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AxesBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
@@ -67,6 +68,15 @@ export const npcIceFox: Partial<INPC> = {
     {
       itemBlueprintKey: GlovesBlueprint.ChainGloves,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Silk,
+      chance: 30,
+      quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 1,
     },
   ],
 };

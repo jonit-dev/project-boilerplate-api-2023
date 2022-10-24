@@ -5,6 +5,7 @@ import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
@@ -76,6 +77,10 @@ export const npcOrcMage = {
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 1,
     },
   ],
 } as Partial<INPC>;

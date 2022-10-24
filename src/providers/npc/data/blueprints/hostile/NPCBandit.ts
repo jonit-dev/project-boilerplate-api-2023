@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AxesBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
@@ -59,6 +60,11 @@ export const npcBandit: Partial<INPC> = {
     {
       itemBlueprintKey: AxesBlueprint.Bardiche,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Silk,
+      chance: 30,
+      quantityRange: [5, 10],
     },
   ],
 };

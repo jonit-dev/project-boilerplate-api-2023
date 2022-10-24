@@ -5,22 +5,21 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   PotionsBlueprint,
-  RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcBlackEagle = {
+export const npcSparrow: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Black Eagle",
-  key: HostileNPCsBlueprint.BlackEagle,
-  textureKey: HostileNPCsBlueprint.BlackEagle,
+  name: "Sparrow",
+  key: HostileNPCsBlueprint.Sparrow,
+  textureKey: HostileNPCsBlueprint.Sparrow,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.ExtraFast,
-  baseHealth: 55,
+  speed: MovementSpeed.Fast,
+  baseHealth: 40,
   healthRandomizerDice: Dice.D12,
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
@@ -47,19 +46,9 @@ export const npcBlackEagle = {
       chance: 50,
     },
     {
-      itemBlueprintKey: RangedWeaponsBlueprint.Stone,
-      chance: 30,
-      quantityRange: [5, 15],
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.ColoredFeather,
-      chance: 5,
-      quantityRange: [1, 10],
-    },
-    {
       itemBlueprintKey: CraftingResourcesBlueprint.Feather,
-      chance: 30,
+      chance: 50,
       quantityRange: [5, 10],
     },
   ],
-} as Partial<INPC>;
+};

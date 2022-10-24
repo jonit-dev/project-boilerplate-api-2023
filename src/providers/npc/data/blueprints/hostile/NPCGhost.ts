@@ -1,7 +1,11 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { OthersBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  CraftingResourcesBlueprint,
+  OthersBlueprint,
+  RangedWeaponsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -56,6 +60,11 @@ export const npcGhost = {
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Crossbow,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Silk,
+      chance: 30,
+      quantityRange: [5, 10],
     },
   ],
 } as Partial<INPC>;
