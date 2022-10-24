@@ -34,7 +34,7 @@ export const npcYeti: Partial<INPC> = {
       level: 14,
     },
     resistance: {
-      level: 20,
+      level: 30,
     },
   },
   fleeOnLowHealth: true,

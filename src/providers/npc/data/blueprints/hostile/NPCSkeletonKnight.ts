@@ -29,15 +29,15 @@ export const npcSkeletonKnight = {
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 6,
+    level: 12,
     strength: {
-      level: 6,
+      level: 12,
     },
     dexterity: {
-      level: 4,
+      level: 6,
     },
     resistance: {
-      level: 2,
+      level: 5,
     },
   },
   fleeOnLowHealth: true,
@@ -66,6 +66,10 @@ export const npcSkeletonKnight = {
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 25,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.KnightsShield,
+      chance: 5,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,

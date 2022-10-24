@@ -30,6 +30,9 @@ export const npcPolarBear = {
     dexterity: {
       level: 8,
     },
+    resistance: {
+      level: 8,
+    },
   },
   fleeOnLowHealth: true,
   loots: [

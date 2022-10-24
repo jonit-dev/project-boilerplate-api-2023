@@ -6,6 +6,7 @@ import {
   BootsBlueprint,
   HelmetsBlueprint,
   OthersBlueprint,
+  ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -68,6 +69,10 @@ export const npcRedDragon = {
     {
       itemBlueprintKey: HelmetsBlueprint.RoyalKnightHelmet,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.SilverShield,
+      chance: 30,
     },
   ],
 } as Partial<INPC>;

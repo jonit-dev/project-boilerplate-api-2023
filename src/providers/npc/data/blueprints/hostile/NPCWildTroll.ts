@@ -39,6 +39,9 @@ export const npcWildTroll = {
     dexterity: {
       level: 5,
     },
+    resistance: {
+      level: 12,
+    },
   },
   fleeOnLowHealth: true,
   loots: [

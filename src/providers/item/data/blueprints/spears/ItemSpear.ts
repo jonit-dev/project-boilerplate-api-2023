@@ -9,14 +9,14 @@ export const itemSpear: Partial<IItem> = {
   subType: ItemSubType.Spear,
   textureAtlas: "items",
   texturePath: "spears/spear.png",
-
   name: "Spear",
   description: "A standard wooden spear with metal tip.",
-  attack: 3,
-  defense: 0,
-  weight: 1,
+  attack: 5,
+  defense: 2,
+  weight: 3,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,
   rangeType: EntityAttackType.Melee,
+  maxStackSize: 100,
 };

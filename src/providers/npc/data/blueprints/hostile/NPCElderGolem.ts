@@ -8,6 +8,7 @@ import {
   GlovesBlueprint,
   HelmetsBlueprint,
   OthersBlueprint,
+  ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -59,6 +60,10 @@ export const npcElderGolem: Partial<INPC> = {
     },
     {
       itemBlueprintKey: BootsBlueprint.RoyalBoots,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.PlateShield,
       chance: 5,
     },
     {

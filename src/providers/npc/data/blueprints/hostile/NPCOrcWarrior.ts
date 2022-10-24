@@ -12,6 +12,7 @@ import {
   MacesBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -39,6 +40,9 @@ export const npcOrcWarrior = {
     dexterity: {
       level: 5,
     },
+    resistance: {
+      level: 5,
+    },
   },
   fleeOnLowHealth: true,
   loots: [
@@ -54,6 +58,10 @@ export const npcOrcWarrior = {
     {
       itemBlueprintKey: AxesBlueprint.Axe,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.BroadSword,
+      chance: 15,
     },
     {
       itemBlueprintKey: HammersBlueprint.IronHammer,

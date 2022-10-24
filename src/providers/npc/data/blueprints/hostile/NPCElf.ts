@@ -3,13 +3,11 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
-  AxesBlueprint,
   BootsBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
   OthersBlueprint,
-  PotionsBlueprint,
-  StaffsBlueprint,
+  RangedWeaponsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -17,26 +15,29 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcCaveSpider: Partial<INPC> = {
+export const npcElf: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Cave Spider",
-  key: HostileNPCsBlueprint.CaveSpider,
-  textureKey: HostileNPCsBlueprint.CaveSpider,
+  name: "Elf",
+  key: HostileNPCsBlueprint.Elf,
+  textureKey: HostileNPCsBlueprint.Elf,
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.Melee,
+  attackType: EntityAttackType.MeleeRanged,
+  ammoKey: RangedWeaponsBlueprint.Arrow,
+  maxRangeAttack: 6,
   speed: MovementSpeed.Fast,
-  baseHealth: 80,
-  healthRandomizerDice: Dice.D6,
+  baseHealth: 64,
+  healthRandomizerDice: Dice.D12,
+  canSwitchToRandomTarget: true,
   skills: {
-    level: 12,
+    level: 7,
     strength: {
-      level: 9,
+      level: 7,
     },
     dexterity: {
-      level: 6,
+      level: 7,
     },
     resistance: {
-      level: 5,
+      level: 3,
     },
   },
   fleeOnLowHealth: true,
@@ -44,39 +45,40 @@ export const npcCaveSpider: Partial<INPC> = {
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
-      quantityRange: [3, 10],
+      quantityRange: [5, 25],
     },
     {
-      itemBlueprintKey: PotionsBlueprint.ManaPotion,
-      chance: 20,
+      itemBlueprintKey: BootsBlueprint.StuddedBoots,
+      chance: 30,
     },
     {
-      itemBlueprintKey: LegsBlueprint.StuddedLegs,
-      chance: 5,
-    },
-    {
-      itemBlueprintKey: SwordsBlueprint.BroadSword,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: StaffsBlueprint.CorruptionStaff,
+      itemBlueprintKey: OthersBlueprint.Candle,
       chance: 10,
     },
     {
-      itemBlueprintKey: AxesBlueprint.Bardiche,
-      chance: 5,
+      itemBlueprintKey: HelmetsBlueprint.LeatherHelmet,
+      chance: 30,
     },
     {
-      itemBlueprintKey: BootsBlueprint.Sandals,
+      itemBlueprintKey: LegsBlueprint.LeatherLegs,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.ElvenSword,
+      chance: 2.5,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.ShortSword,
       chance: 20,
     },
     {
-      itemBlueprintKey: HelmetsBlueprint.DeathsHelmet,
-      chance: 5,
+      itemBlueprintKey: AccessoriesBlueprint.ElvenRing,
+      chance: 1,
     },
     {
-      itemBlueprintKey: AccessoriesBlueprint.DeathNecklace,
-      chance: 5,
+      itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
+      chance: 20,
+      quantityRange: [3, 10],
     },
   ],
 };

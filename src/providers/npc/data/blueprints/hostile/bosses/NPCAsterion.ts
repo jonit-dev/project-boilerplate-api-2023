@@ -25,7 +25,7 @@ export const npcAsterion = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 386,
+  baseHealth: 450,
   healthRandomizerDice: Dice.D20,
   skills: {
     level: 20,

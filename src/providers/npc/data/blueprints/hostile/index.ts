@@ -10,6 +10,7 @@ import { npcCentipede } from "./NPCCentipede";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
 import { npcElderGolem } from "./NPCElderGolem";
+import { npcElf } from "./NPCElf";
 import { npcFireFox } from "./NPCFireFox";
 import { npcForestTroll } from "./NPCForestTroll";
 import { npcForestWalker } from "./NPCForestWalker";
@@ -99,4 +100,5 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.Snake]: npcSnake,
   [HostileNPCsBlueprint.Spiderling]: npcSpiderling,
   [HostileNPCsBlueprint.StoneGolem]: npcStoneGolem,
+  [HostileNPCsBlueprint.Elf]: npcElf,
 };

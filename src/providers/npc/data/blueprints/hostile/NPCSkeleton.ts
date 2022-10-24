@@ -32,6 +32,9 @@ export const npcSkeleton = {
     dexterity: {
       level: 1,
     },
+    resistance: {
+      level: 1,
+    },
   },
   fleeOnLowHealth: true,
   loots: [

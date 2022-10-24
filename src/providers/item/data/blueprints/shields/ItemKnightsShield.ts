@@ -8,7 +8,6 @@ export const itemKnightsShield: Partial<IItem> = {
   subType: ItemSubType.Shield,
   textureAtlas: "items",
   texturePath: "shields/knights-shield.png",
-
   name: "Knights Shield",
   description: "A well made shield used by the knights of the realm.",
   defense: 8,

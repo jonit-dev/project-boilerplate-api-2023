@@ -32,6 +32,9 @@ export const npcGiantBat: Partial<INPC> = {
     dexterity: {
       level: 5,
     },
+    resistance: {
+      level: 7,
+    },
   },
   fleeOnLowHealth: true,
   loots: [

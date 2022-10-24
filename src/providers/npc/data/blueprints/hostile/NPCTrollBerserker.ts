@@ -40,7 +40,10 @@ export const npcTrollBerserker = {
       level: 30,
     },
     dexterity: {
-      level: 12,
+      level: 30,
+    },
+    resistance: {
+      level: 30,
     },
   },
   fleeOnLowHealth: true,

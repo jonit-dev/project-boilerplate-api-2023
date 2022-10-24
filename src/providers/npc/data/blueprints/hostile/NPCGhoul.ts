@@ -30,9 +30,9 @@ export const npcGhoul = {
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 4,
+    level: 6,
     strength: {
-      level: 4,
+      level: 6,
     },
     dexterity: {
       level: 1,

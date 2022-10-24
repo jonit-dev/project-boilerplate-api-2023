@@ -8,7 +8,6 @@ export const itemSilverShield: Partial<IItem> = {
   subType: ItemSubType.Shield,
   textureAtlas: "items",
   texturePath: "shields/silver-shield.png",
-
   name: "Silver Shield",
   description: "An Shield made by the capricious artisan and is covered with silver.",
   defense: 10,

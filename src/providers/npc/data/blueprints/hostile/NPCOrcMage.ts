@@ -32,12 +32,15 @@ export const npcOrcMage = {
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 10,
+    level: 14,
     strength: {
       level: 10,
     },
     dexterity: {
       level: 7,
+    },
+    resistance: {
+      level: 2,
     },
   },
   fleeOnLowHealth: true,

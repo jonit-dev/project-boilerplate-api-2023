@@ -35,6 +35,9 @@ export const npcOrc = {
     dexterity: {
       level: 5,
     },
+    resistance: {
+      level: 5,
+    },
   },
   fleeOnLowHealth: true,
   loots: [

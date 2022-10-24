@@ -11,6 +11,7 @@ import {
   LegsBlueprint,
   MacesBlueprint,
   OthersBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -47,6 +48,10 @@ export const npcBandit: Partial<INPC> = {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
       quantityRange: [5, 15],
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.BroadSword,
+      chance: 5,
     },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,

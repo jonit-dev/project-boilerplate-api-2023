@@ -9,6 +9,7 @@ import {
   OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -70,6 +71,10 @@ export const npcStoneGolem: Partial<INPC> = {
       chance: 5,
     },
     {
+      itemBlueprintKey: ShieldsBlueprint.PlateShield,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.Stone,
       chance: 90,
       quantityRange: [10, 25],
@@ -83,6 +88,10 @@ export const npcStoneGolem: Partial<INPC> = {
       itemBlueprintKey: CraftingResourcesBlueprint.Obsidian,
       chance: 30,
       quantityRange: [10, 25],
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.SilverShield,
+      chance: 1,
     },
   ],
 };

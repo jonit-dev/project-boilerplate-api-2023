@@ -29,12 +29,15 @@ export const npcOrcBerserker = {
   skillsToBeRandomized: ["level", "strength", "dexterity"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 12,
+    level: 14,
     strength: {
-      level: 10,
+      level: 14,
     },
     dexterity: {
-      level: 7,
+      level: 5,
+    },
+    resistance: {
+      level: 10,
     },
   },
   fleeOnLowHealth: true,

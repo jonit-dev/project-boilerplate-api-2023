@@ -15,6 +15,7 @@ import {
   OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
 export const npcTrollWarrior = {
@@ -39,6 +40,9 @@ export const npcTrollWarrior = {
     dexterity: {
       level: 10,
     },
+    resistance: {
+      level: 20,
+    },
   },
   fleeOnLowHealth: true,
   loots: [
@@ -54,6 +58,10 @@ export const npcTrollWarrior = {
     {
       itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.ScutumShield,
+      chance: 2,
     },
     {
       itemBlueprintKey: GlovesBlueprint.PlateGloves,

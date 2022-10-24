@@ -12,7 +12,7 @@ export const itemBroadSword: Partial<IItem> = {
   name: "Broad Sword",
   description: "A towering two-handed iron sword.",
   attack: 6,
-  defense: 0,
+  defense: 3,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

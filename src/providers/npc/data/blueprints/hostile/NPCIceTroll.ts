@@ -8,6 +8,7 @@ import {
   OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -58,6 +59,10 @@ export const npcIceTroll: Partial<INPC> = {
     },
     {
       itemBlueprintKey: AxesBlueprint.FrostDoubleAxe,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.FrostShield,
       chance: 15,
     },
     {

@@ -40,6 +40,9 @@ export const npcTroll = {
     dexterity: {
       level: 3,
     },
+    resistance: {
+      level: 10,
+    },
   },
   fleeOnLowHealth: true,
 

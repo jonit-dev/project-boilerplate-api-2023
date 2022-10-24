@@ -26,6 +26,9 @@ export const npcPandaBear = {
     dexterity: {
       level: 6,
     },
+    resistance: {
+      level: 6,
+    },
   },
   fleeOnLowHealth: true,
   loots: [

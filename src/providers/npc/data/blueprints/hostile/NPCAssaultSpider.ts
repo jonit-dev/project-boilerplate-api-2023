@@ -9,6 +9,7 @@ import {
   OthersBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
+  StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -56,6 +57,10 @@ export const npcAssaultSpider: Partial<INPC> = {
     {
       itemBlueprintKey: HelmetsBlueprint.DarkWizardHat,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.CorruptionStaff,
+      chance: 5,
     },
     {
       itemBlueprintKey: DaggersBlueprint.CorruptionDagger,
