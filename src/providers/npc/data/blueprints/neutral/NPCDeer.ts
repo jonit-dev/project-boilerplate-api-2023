@@ -1,7 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingResourcesBlueprint, FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NeutralNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -34,6 +34,11 @@ export const npcDeer = {
       itemBlueprintKey: FoodsBlueprint.RedMeat,
       chance: 30,
       quantityRange: [1, 2],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Leather,
+      chance: 50,
+      quantityRange: [1, 3],
     },
   ],
 } as Partial<INPC>;

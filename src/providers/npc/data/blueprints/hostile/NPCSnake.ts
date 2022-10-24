@@ -3,7 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   CraftingResourcesBlueprint,
-  FoodsBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -11,48 +11,44 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcPolarBear = {
+export const npcSnake: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Polar Bear",
-  key: HostileNPCsBlueprint.PolarBear,
-  textureKey: HostileNPCsBlueprint.PolarBear,
+  name: "Snake",
+  key: HostileNPCsBlueprint.Snake,
+  textureKey: HostileNPCsBlueprint.Snake,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Fast,
-  baseHealth: 100,
+  speed: MovementSpeed.Standard,
+  baseHealth: 40,
   healthRandomizerDice: Dice.D6,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 10,
+    level: 3,
     strength: {
-      level: 10,
+      level: 3,
     },
     dexterity: {
-      level: 8,
+      level: 3,
+    },
+    resistance: {
+      level: 2,
     },
   },
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: FoodsBlueprint.Fish,
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
+      quantityRange: [3, 10],
     },
     {
-      itemBlueprintKey: FoodsBlueprint.Salmon,
-      chance: 20,
+      itemBlueprintKey: PotionsBlueprint.LightAntidote,
+      chance: 10,
     },
     {
-      itemBlueprintKey: FoodsBlueprint.Banana,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 20,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.Leather,
-      chance: 50,
+      itemBlueprintKey: CraftingResourcesBlueprint.Herb,
+      chance: 40,
       quantityRange: [5, 10],
     },
   ],
-} as Partial<INPC>;
+};

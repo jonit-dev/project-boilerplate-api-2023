@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
   OthersBlueprint,
@@ -60,6 +61,11 @@ export const npcDwarf = {
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 20,
+      quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.IronIngot,
+      chance: 40,
       quantityRange: [5, 10],
     },
   ],

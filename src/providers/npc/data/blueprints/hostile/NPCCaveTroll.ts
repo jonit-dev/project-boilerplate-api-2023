@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 
 import {
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
@@ -70,6 +71,11 @@ export const npcCaveTroll = {
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodLog,
+      chance: 30,
+      quantityRange: [1, 2],
     },
   ],
 } as Partial<INPC>;

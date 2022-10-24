@@ -114,6 +114,12 @@ export enum CraftingResourcesBlueprint {
   Diamond = "diamond",
   Feather = "feather",
   GoldenIngot = "golden-ingot",
+  Herb = "herb",
+  GreaterWoodLog = "greater-wood-log",
+  IronIngot = "iron-ingot",
+  Obsidian = "obsidian",
+  Wheat = "wheat",
+  WolfTooth = "wolf-tooth",
 }
 
 export enum SpearsBlueprint {

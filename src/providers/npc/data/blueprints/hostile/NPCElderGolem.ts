@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   ArmorsBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
   OthersBlueprint,
@@ -54,6 +55,11 @@ export const npcElderGolem: Partial<INPC> = {
     {
       itemBlueprintKey: GlovesBlueprint.ChainGloves,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodLog,
+      chance: 30,
+      quantityRange: [1, 2],
     },
   ],
 };

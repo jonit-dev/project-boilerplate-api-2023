@@ -76,5 +76,15 @@ export const npcDwarfGuard = {
       chance: 10,
       quantityRange: [1, 3],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.IronIngot,
+      chance: 40,
+      quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Obsidian,
+      chance: 5,
+      quantityRange: [3, 5],
+    },
   ],
 } as Partial<INPC>;

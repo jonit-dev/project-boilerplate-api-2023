@@ -8,6 +8,7 @@ import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import {
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
@@ -75,6 +76,11 @@ export const npcTroll = {
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodLog,
+      chance: 30,
+      quantityRange: [1, 2],
     },
   ],
 } as Partial<INPC>;
