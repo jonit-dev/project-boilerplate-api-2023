@@ -38,14 +38,14 @@ export class ItemSpellCast {
     return true;
   }
 
-  public async learnLatestSkillLevelSpells(character: ICharacter): Promise<void> {
-    const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
-      "skills"
-    )) as unknown as ICharacter;
-    const skills = updatedCharacter.skills as unknown as ISkill;
+  public async learnLatestSkillLevelSpells(characterId: string, notifyUser: boolean): Promise<void> {
+    const character = (await Character.findOne({ _id: characterId }).populate("skills")) as unknown as ICharacter;
+    const skills = character.skills as unknown as ISkill;
 
     const spells = this.getSkillLevelSpells(skills.level);
-    await this.addToCharacterLearnedSpells(updatedCharacter, spells);
+    await this.addToCharacterLearnedSpells(character, spells);
+
+    notifyUser && this.sendLearnedSpellNotification(character, spells);
   }
 
   private async isSpellCastingValid(spell, character: ICharacter): Promise<boolean> {
@@ -137,5 +137,21 @@ export class ItemSpellCast {
     );
 
     await this.animationEffect.sendAnimationEvent(character, spell.animationKey);
+  }
+
+  private sendLearnedSpellNotification(character: ICharacter, spells: IItemSpell[]): void {
+    if (!spells || spells.length < 1) {
+      return;
+    }
+    const learned: string[] = [];
+    spells.forEach((spell) => {
+      learned.push(spell.name + " (" + spell.magicWords + ")");
+    });
+
+    this.socketMessaging.sendErrorMessageToCharacter(
+      character,
+      "You have learned new spell(s): " + learned.join(", "),
+      "info"
+    );
   }
 }

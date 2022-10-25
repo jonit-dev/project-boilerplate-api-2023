@@ -176,7 +176,7 @@ describe("ItemSpellCast.ts", () => {
 
   it("should add spells to learned spells (level 2 character)", async () => {
     const runTest = async (): Promise<void> => {
-      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter);
+      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter._id, false);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
@@ -186,6 +186,32 @@ describe("ItemSpellCast.ts", () => {
       expect(skills.level).toBe(2);
       expect(character.learnedSpells).toBeDefined();
       expect([...character.learnedSpells!]).toEqual([itemSelfHealing.key]);
+
+      expect(sendEventToUser).not.toHaveBeenCalled();
+    };
+
+    testCharacter.learnedSpells = undefined;
+    await testCharacter.save();
+    await runTest();
+  });
+
+  it("should add spells to learned spells (level 2 character) and notify user", async () => {
+    const runTest = async (): Promise<void> => {
+      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter._id, true);
+
+      const character = (await Character.findOne({ _id: testCharacter._id }).populate(
+        "skills"
+      )) as unknown as ICharacter;
+      const skills = character.skills as unknown as ISkill;
+
+      expect(skills.level).toBe(2);
+      expect(character.learnedSpells).toBeDefined();
+      expect([...character.learnedSpells!]).toEqual([itemSelfHealing.key]);
+
+      expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+        message: "You have learned new spell(s): Self Healing Spell (heal me now)",
+        type: "info",
+      });
     };
 
     testCharacter.learnedSpells = undefined;
@@ -195,7 +221,7 @@ describe("ItemSpellCast.ts", () => {
 
   it("should not duplicate spells on append (level 2 character)", async () => {
     const runTest = async (): Promise<void> => {
-      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter);
+      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter._id, false);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
@@ -214,7 +240,7 @@ describe("ItemSpellCast.ts", () => {
 
   it("should not add any spell to character (level 1 character)", async () => {
     const runTest = async (): Promise<void> => {
-      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter);
+      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter._id, true);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
@@ -224,6 +250,8 @@ describe("ItemSpellCast.ts", () => {
       expect(skills.level).toBe(1);
       expect(character.learnedSpells).toBeDefined();
       expect([...character.learnedSpells!]).toEqual([]);
+
+      expect(sendEventToUser).not.toHaveBeenCalled();
     };
 
     testCharacter.learnedSpells = undefined;
