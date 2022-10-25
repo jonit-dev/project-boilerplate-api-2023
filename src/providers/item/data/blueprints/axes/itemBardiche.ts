@@ -12,7 +12,8 @@ export const itemBardiche: Partial<IItem> = {
   name: "Bardiche",
   description: "A polearm with a large blade at one end.",
   attack: 5,
-  weight: 2.5,
+  defense: 2,
+  weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };

@@ -1,12 +1,14 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   AxesBlueprint,
+  BootsBlueprint,
   FoodsBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -40,8 +42,12 @@ export const npcIceTroll: Partial<INPC> = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 160 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [25, 40],
+    },
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 20,
@@ -56,12 +62,20 @@ export const npcIceTroll: Partial<INPC> = {
       chance: 15,
     },
     {
+      itemBlueprintKey: ShieldsBlueprint.FrostShield,
+      chance: 15,
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.FrostCrossbow,
       chance: 20,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.PlateBoots,
+      chance: 10,
     },
 
     {

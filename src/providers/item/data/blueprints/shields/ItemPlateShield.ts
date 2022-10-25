@@ -8,10 +8,9 @@ export const itemPlaceShield: Partial<IItem> = {
   subType: ItemSubType.Shield,
   textureAtlas: "items",
   texturePath: "shields/plate-shield.png",
-
   name: "Plate Shield",
   description: "A large metal shield.",
-  defense: 10,
+  defense: 13,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };

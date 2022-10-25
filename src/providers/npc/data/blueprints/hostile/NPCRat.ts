@@ -1,8 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { FoodsBlueprint, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -16,7 +15,7 @@ export const npcRat = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
-  baseHealth: 25,
+  baseHealth: 20,
   healthRandomizerDice: Dice.D4,
   skills: {
     level: 1,
@@ -27,12 +26,17 @@ export const npcRat = {
       level: 1,
     },
     resistance: {
-      level: 2,
+      level: 1,
     },
   },
   fleeOnLowHealth: true,
-  experience: 3 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [1, 3],
+    },
+
     {
       itemBlueprintKey: FoodsBlueprint.Cheese,
       chance: 30,

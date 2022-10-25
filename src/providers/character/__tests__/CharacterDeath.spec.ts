@@ -153,6 +153,10 @@ describe("CharacterDeath.ts | Character with items", () => {
     for (let i = 0; i < backpackContainer.slotQty; i++) {
       expect(backpackContainer.slots[i]).toBeNull();
     }
+
+    // items ownership should be null after death
+    expect(bodyItemContainer.slots[0].owner).toBeUndefined();
+    expect(bodyItemContainer.slots[1].owner).toBeUndefined();
   });
 
   it("should drop equipment item on character's dead body", async () => {

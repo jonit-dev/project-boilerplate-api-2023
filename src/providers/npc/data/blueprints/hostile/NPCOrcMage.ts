@@ -1,14 +1,16 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
+  MagicsBlueprint,
+  OthersBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -30,17 +32,24 @@ export const npcOrcMage = {
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 10,
+    level: 14,
     strength: {
       level: 10,
     },
     dexterity: {
       level: 7,
     },
+    resistance: {
+      level: 2,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 70 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [10, 30],
+    },
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
@@ -71,7 +80,19 @@ export const npcOrcMage = {
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,
-      chance: 5,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 1,
+    },
+    {
+      itemBlueprintKey: MagicsBlueprint.Book,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: MagicsBlueprint.Rune,
+      chance: 10,
     },
   ],
 } as Partial<INPC>;

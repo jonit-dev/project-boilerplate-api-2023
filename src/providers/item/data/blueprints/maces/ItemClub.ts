@@ -9,11 +9,11 @@ export const itemClub: Partial<IItem> = {
   subType: ItemSubType.Mace,
   textureAtlas: "items",
   texturePath: "maces/club.png",
-
   name: "Club",
   description: "A simple wooden club.",
-  attack: 2,
-  weight: 1,
+  attack: 6,
+  defense: 2,
+  weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };

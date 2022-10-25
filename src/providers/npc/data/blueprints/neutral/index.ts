@@ -6,6 +6,7 @@ import { npcGiantBrownRabbit } from "./NPCGiantBrownRabbit";
 import { npcGiantGrayRabbit } from "./NPCGiantGrayRabbit";
 import { npcGiantWhiteRabbit } from "./NPCGiantWhiteRabbit";
 import { npcPig } from "./NPCPig";
+import { npcRedDeer } from "./NPCRedDeer";
 import { npcWhiteSheep } from "./NPCWhiteSheep";
 
 export const neutralNPCs = {
@@ -17,4 +18,5 @@ export const neutralNPCs = {
   [NeutralNPCsBlueprint.BrownSheep]: npcBrownSheep,
   [NeutralNPCsBlueprint.BlackWhiteSheep]: npcBlackWhiteSheep,
   [NeutralNPCsBlueprint.WhiteSheep]: npcWhiteSheep,
+  [NeutralNPCsBlueprint.RedDeer]: npcRedDeer,
 };

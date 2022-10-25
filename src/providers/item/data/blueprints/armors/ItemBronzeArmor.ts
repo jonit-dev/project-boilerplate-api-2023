@@ -8,10 +8,9 @@ export const itemBronzeArmor: Partial<IItem> = {
   subType: ItemSubType.Armor,
   textureAtlas: "items",
   texturePath: "armors/bronze-armor.png",
-
   name: "Bronze Armor",
   description: "A bronze plated armor.",
-  defense: 16,
+  defense: 18,
   weight: 5,
   allowedEquipSlotType: [ItemSlotType.Torso],
 };

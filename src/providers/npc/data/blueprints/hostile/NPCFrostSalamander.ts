@@ -1,8 +1,8 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -39,8 +39,12 @@ export const npcFrostSalamander: Partial<INPC> = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 100 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [5, 40],
+    },
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 20,

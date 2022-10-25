@@ -1,12 +1,17 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
+  AccessoriesBlueprint,
   AxesBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
+  HelmetsBlueprint,
+  LegsBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -37,8 +42,17 @@ export const npcBandit: Partial<INPC> = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 50 * EXP_RATIO,
+
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [5, 15],
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.BroadSword,
+      chance: 5,
+    },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 20,
@@ -48,12 +62,37 @@ export const npcBandit: Partial<INPC> = {
       chance: 20,
     },
     {
+      itemBlueprintKey: HelmetsBlueprint.LeatherHelmet,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.RedHoodie,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.Turban,
+      chance: 30,
+    },
+    {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
     },
     {
+      itemBlueprintKey: LegsBlueprint.LeatherLegs,
+      chance: 15,
+    },
+    {
       itemBlueprintKey: AxesBlueprint.Bardiche,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Silk,
+      chance: 30,
+      quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.Bandana,
+      chance: 30,
     },
   ],
 };

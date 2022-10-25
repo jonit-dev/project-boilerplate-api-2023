@@ -8,10 +8,9 @@ export const itemYetiShield: Partial<IItem> = {
   subType: ItemSubType.Shield,
   textureAtlas: "items",
   texturePath: "shields/yeti-shield.png",
-
   name: "Yeti's Shield",
   description: "A rare shield used by Yetis, against the frost island invaders.",
-  defense: 11,
+  defense: 8,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };

@@ -1,12 +1,14 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
+  ArmorsBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   LegsBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
   SwordsBlueprint,
@@ -24,7 +26,7 @@ export const npcMinotaur = {
   textureKey: HostileNPCsBlueprint.Minotaur,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Fast,
+  speed: MovementSpeed.Standard,
   canSwitchToLowHealthTarget: true,
   baseHealth: 186,
   healthRandomizerDice: Dice.D4,
@@ -39,15 +41,23 @@ export const npcMinotaur = {
       level: 4,
     },
     resistance: {
-      level: 3,
+      level: 8,
     },
   },
   fleeOnLowHealth: true,
-  experience: 80 * EXP_RATIO,
   loots: [
     {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [10, 40],
+    },
+    {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 10,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.BroadSword,
+      chance: 15,
     },
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
@@ -70,8 +80,16 @@ export const npcMinotaur = {
       chance: 30,
     },
     {
+      itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 1,
     },
   ],
 } as Partial<INPC>;

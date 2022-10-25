@@ -1,8 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingResourcesBlueprint, FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -27,9 +26,11 @@ export const npcPandaBear = {
     dexterity: {
       level: 6,
     },
+    resistance: {
+      level: 6,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 72 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: FoodsBlueprint.Fish,
@@ -42,6 +43,11 @@ export const npcPandaBear = {
     {
       itemBlueprintKey: FoodsBlueprint.Banana,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Leather,
+      chance: 50,
+      quantityRange: [5, 10],
     },
   ],
 } as Partial<INPC>;

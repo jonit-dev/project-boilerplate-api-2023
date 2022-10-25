@@ -1,29 +1,47 @@
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
+import { npcAssaultSpider } from "./NPCAssaultSpider";
 import { npcBandit } from "./NPCBandit";
 import { npcBat } from "./NPCBat";
+import { npcBlackSpider } from "./NPCBlackSpider";
 import { npcBrownBear } from "./NPCBrownBear";
+import { npcCaveSpider } from "./NPCCaveSpider";
 import { npcCaveTroll } from "./NPCCaveTroll";
+import { npcCentipede } from "./NPCCentipede";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
+import { npcElderGolem } from "./NPCElderGolem";
+import { npcElf } from "./NPCElf";
+import { npcFireFox } from "./NPCFireFox";
 import { npcForestTroll } from "./NPCForestTroll";
+import { npcForestWalker } from "./NPCForestWalker";
 import { npcFrostSalamander } from "./NPCFrostSalamander";
 import { npcGhost } from "./NPCGhost";
 import { npcGhoul } from "./NPCGhoul";
+import { npcGiantBat } from "./NPCGiantBat";
 import { npcGoblin } from "./NPCGoblin";
+import { npcIceFox } from "./NPCIceFox";
 import { npcIceTroll } from "./NPCIceTroll";
 import { npcMinotaur } from "./NPCMinotaur";
+import { npcMudGolem } from "./NPCMudGolem";
 import { npcOrc } from "./NPCOrc";
 import { npcOrcBerserker } from "./NPCOrcBerserker";
 import { npcOrcMage } from "./NPCOrcMage";
 import { npcOrcWarrior } from "./NPCOrcWarrior";
 import { npcPandaBear } from "./NPCPandaBear";
 import { npcPolarBear } from "./NPCPolarBear";
+import { npcRaccoon } from "./NPCRaccoon";
 import { npcRat } from "./NPCRat";
+import { npcRedCentipede } from "./NPCRedCentipede";
 import { npcRedDragon } from "./NPCRedDragon";
+import { npcScorpion } from "./NPCScorpion";
 import { npcSkeleton } from "./NPCSkeleton";
 import { npcSkeletonKnight } from "./NPCSkeletonKnight";
 import { npcSlime } from "./NPCSlime";
+import { npcSnake } from "./NPCSnake";
+import { npcSparrow } from "./NPCSparrow";
 import { npcSpider } from "./NPCSpider";
+import { npcSpiderling } from "./NPCSpiderling";
+import { npcStoneGolem } from "./NPCStoneGolem";
 import { npcTroll } from "./NPCTroll";
 import { npcTrollBerserker } from "./NPCTrollBerserker";
 import { npcTrollWarrior } from "./NPCTrollWarrior";
@@ -65,4 +83,22 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.Bandit]: npcBandit,
   [HostileNPCsBlueprint.Yeti]: npcYeti,
   [HostileNPCsBlueprint.IceTroll]: npcIceTroll,
+  [HostileNPCsBlueprint.Scorpion]: npcScorpion,
+  [HostileNPCsBlueprint.BlackSpider]: npcBlackSpider,
+  [HostileNPCsBlueprint.AssaultSpider]: npcAssaultSpider,
+  [HostileNPCsBlueprint.CaveSpider]: npcCaveSpider,
+  [HostileNPCsBlueprint.Centipede]: npcCentipede,
+  [HostileNPCsBlueprint.ElderGolem]: npcElderGolem,
+  [HostileNPCsBlueprint.FireFox]: npcFireFox,
+  [HostileNPCsBlueprint.ForestWalker]: npcForestWalker,
+  [HostileNPCsBlueprint.GiantBat]: npcGiantBat,
+  [HostileNPCsBlueprint.IceFox]: npcIceFox,
+  [HostileNPCsBlueprint.MudGolem]: npcMudGolem,
+  [HostileNPCsBlueprint.Raccoon]: npcRaccoon,
+  [HostileNPCsBlueprint.RedCentipede]: npcRedCentipede,
+  [HostileNPCsBlueprint.Sparrow]: npcSparrow,
+  [HostileNPCsBlueprint.Snake]: npcSnake,
+  [HostileNPCsBlueprint.Spiderling]: npcSpiderling,
+  [HostileNPCsBlueprint.StoneGolem]: npcStoneGolem,
+  [HostileNPCsBlueprint.Elf]: npcElf,
 };

@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -9,9 +8,12 @@ import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import {
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   SpearsBlueprint,
@@ -38,10 +40,18 @@ export const npcTroll = {
     dexterity: {
       level: 3,
     },
+    resistance: {
+      level: 10,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 120 * EXP_RATIO,
+
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [30, 40],
+    },
     {
       itemBlueprintKey: MacesBlueprint.Club,
       chance: 25,
@@ -64,12 +74,21 @@ export const npcTroll = {
       chance: 20,
     },
     {
+      itemBlueprintKey: HelmetsBlueprint.GladiatorHelmet,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodLog,
+      chance: 30,
+      quantityRange: [1, 2],
     },
   ],
 } as Partial<INPC>;

@@ -1712,19 +1712,19 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@rpg-engine/shared@^0.5.60":
-  version "0.5.60"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.5.60.tgz#5400a1451facfda9a155f1c4250602946f1edab5"
-  integrity sha512-zGtX3aqs/KxyxTSG2K5qcUFHbbB9Vm5YRHyok30i/bRby3xwLfac43VHFGWUn2IVNkHxNJjrrHGKKeFkIYTlqg==
+"@rpg-engine/shared@^0.5.63":
+  version "0.5.63"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.5.63.tgz#93993fe73c1f524d062f9678d95f48bf18b715ec"
+  integrity sha512-6+NIoGOHbEW37O5rBYrQkUVMd6+lfMiG+uKqndQF4C8xmdQDzff7jJcfgqLyGjDBrMiK0Uz8rqNftjH+tEsHBA==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
     typescript "^4.6.4"
 
-"@rpg-engine/soul@^0.1.14":
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/soul/-/soul-0.1.14.tgz#1181158e02d9b7a43dcc9402375921e30f48b416"
-  integrity sha512-mtOnZp5HMa1jo7derNE9g3exNc78e7BSUV6wIu9lnNlH7IdodH4UYXBNljWhSC7VKgrAk/TYyunhBtKaXAaldA==
+"@rpg-engine/soul@^0.1.16":
+  version "0.1.16"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/soul/-/soul-0.1.16.tgz#7e64c6fc028be63f255ca89ab39e86a22b73192b"
+  integrity sha512-aSnan+S/PDVAGCvaF/X9BqR/+kzEpfwe7GkfLoFmIbEsQChKIF9nuxZQhe4cNoKttSx3cyjVbCMOM3SezHtdKg==
   dependencies:
     app-root-path "^3.1.0"
     change-case "^4.1.2"

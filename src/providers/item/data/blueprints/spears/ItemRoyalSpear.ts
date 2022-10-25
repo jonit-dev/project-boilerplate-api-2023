@@ -9,7 +9,6 @@ export const itemRoyalSpear: Partial<IItem> = {
   subType: ItemSubType.Spear,
   textureAtlas: "items",
   texturePath: "spears/royal-spear.png",
-
   name: "Royal Spear",
   description: "A spear whose elegance is immediately apparent. It was the sole preserve of royalty.",
   defense: 3,

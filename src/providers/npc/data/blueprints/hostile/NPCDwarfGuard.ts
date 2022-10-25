@@ -1,11 +1,13 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
+  ArmorsBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -27,17 +29,24 @@ export const npcDwarfGuard = {
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 4,
+    level: 7,
     strength: {
-      level: 4,
+      level: 5,
     },
     dexterity: {
-      level: 5,
+      level: 6,
+    },
+    resistance: {
+      level: 8,
     },
   },
   fleeOnLowHealth: true,
-  experience: 20 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [15, 25],
+    },
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
@@ -45,6 +54,10 @@ export const npcDwarfGuard = {
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.IronArmor,
+      chance: 20,
     },
     {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,
@@ -58,6 +71,25 @@ export const npcDwarfGuard = {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 20,
       quantityRange: [7, 12],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 1,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenIngot,
+      chance: 10,
+      quantityRange: [1, 3],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.IronIngot,
+      chance: 40,
+      quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Obsidian,
+      chance: 5,
+      quantityRange: [3, 5],
     },
   ],
 } as Partial<INPC>;

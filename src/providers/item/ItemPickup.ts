@@ -14,6 +14,8 @@ import { IEquipmentAndInventoryUpdatePayload, IItemPickup, ItemSocketEvents, Ite
 import { provide } from "inversify-binding-decorators";
 import { ItemOwnership } from "./ItemOwnership";
 import { ItemView } from "./ItemView";
+
+import { MapHelper } from "@providers/map/MapHelper";
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(
@@ -26,7 +28,8 @@ export class ItemPickup {
     private characterItemSlots: CharacterItemSlots,
     private characterItemContainer: CharacterItemContainer,
     private equipmentSlots: EquipmentSlots,
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private mapHelper: MapHelper
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
@@ -51,11 +54,31 @@ export class ItemPickup {
     itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
     await itemToBePicked.save();
 
+    if (itemPickupData.fromContainerId && !isMapContainer) {
+      const fromContainer = (await ItemContainer.findById(itemPickupData.fromContainerId)) as unknown as IItemContainer;
+
+      if (!fromContainer) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the origin container was not found.");
+        return false;
+      }
+
+      const removeFromOriginContainer = await this.removeFromOriginContainer(character, fromContainer, itemToBePicked);
+
+      if (!removeFromOriginContainer) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, failed to remove the item from the origin container."
+        );
+        return false;
+      }
+    }
+
     const addToContainer = await this.characterItemContainer.addItemToContainer(
       itemToBePicked,
       character,
       itemPickupData.toContainerId,
-      isInventoryItem
+      isInventoryItem,
+      itemPickupData.fromContainerId
     );
 
     if (!addToContainer) {
@@ -81,19 +104,6 @@ export class ItemPickup {
           "Sorry, failed to remove item from container. Origin container not found."
         );
         return false;
-      }
-
-      if (!isInventoryItem) {
-        // This regulates the pickup of items in containers like loot containers. Note that we canno't 'pickup' items from equipment, just unequip them to the inventory.
-        const isItemRemoved = await this.removeItemFromContainer(
-          itemToBePicked as unknown as IItem,
-          character,
-          itemPickupData.fromContainerId
-        );
-        if (!isItemRemoved) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, failed to remove item from container.");
-          return false;
-        }
       }
     }
 
@@ -136,29 +146,6 @@ export class ItemPickup {
     );
   }
 
-  private async removeItemFromContainer(
-    item: IItem,
-    character: ICharacter,
-    fromContainerId: string | undefined
-  ): Promise<Boolean> {
-    const selectedItem = (await Item.findById(item.id)) as IItem;
-    if (!selectedItem) {
-      this.socketMessaging.sendErrorMessageToCharacter(character);
-      return false;
-    }
-
-    const targetContainer = (await ItemContainer.findById(fromContainerId)) as unknown as IItemContainer;
-    if (!targetContainer) {
-      this.socketMessaging.sendErrorMessageToCharacter(character);
-      return false;
-    }
-
-    if (targetContainer) {
-      return await this.characterItemSlots.deleteItemOnSlot(targetContainer, item._id);
-    }
-    return false;
-  }
-
   private async isItemPickupValid(
     item: IItem,
     itemPickupData: IItemPickup,
@@ -191,7 +178,8 @@ export class ItemPickup {
       }
     }
 
-    const isItemOnMap = item.x !== undefined && item.y !== undefined && item.scene !== undefined;
+    const isItemOnMap =
+      this.mapHelper.isCoordinateValid(item.x) && this.mapHelper.isCoordinateValid(item.y) && item.scene;
 
     if (isItemOnMap) {
       if (character.scene !== item.scene) {
@@ -265,5 +253,23 @@ export class ItemPickup {
     }
 
     return allowedItemTypes;
+  }
+
+  private async removeFromOriginContainer(
+    character: ICharacter,
+    fromContainer: IItemContainer,
+    itemToBeRemoved: IItem
+  ): Promise<boolean> {
+    const wasRemoved = await this.characterItemSlots.deleteItemOnSlot(fromContainer, itemToBeRemoved._id);
+
+    if (!wasRemoved) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, failed to remove the item from the origin container."
+      );
+      return false;
+    }
+
+    return true;
   }
 }

@@ -1,10 +1,10 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   BootsBlueprint,
   FoodsBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -34,12 +34,16 @@ export const npcYeti: Partial<INPC> = {
       level: 14,
     },
     resistance: {
-      level: 20,
+      level: 30,
     },
   },
   fleeOnLowHealth: true,
-  experience: 600 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [25, 75],
+    },
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,

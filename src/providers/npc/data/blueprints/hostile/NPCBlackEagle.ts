@@ -1,8 +1,8 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
@@ -32,9 +32,11 @@ export const npcBlackEagle = {
     dexterity: {
       level: 8,
     },
+    resistance: {
+      level: 3,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 50 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
@@ -48,6 +50,16 @@ export const npcBlackEagle = {
       itemBlueprintKey: RangedWeaponsBlueprint.Stone,
       chance: 30,
       quantityRange: [5, 15],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.ColoredFeather,
+      chance: 5,
+      quantityRange: [1, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Feather,
+      chance: 30,
+      quantityRange: [5, 10],
     },
   ],
 } as Partial<INPC>;

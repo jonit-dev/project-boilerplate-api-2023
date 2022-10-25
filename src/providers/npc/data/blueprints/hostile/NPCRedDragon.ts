@@ -1,8 +1,14 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  ArmorsBlueprint,
+  BootsBlueprint,
+  HelmetsBlueprint,
+  OthersBlueprint,
+  ShieldsBlueprint,
+  SwordsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -15,27 +21,58 @@ export const npcRedDragon = {
   textureKey: HostileNPCsBlueprint.RedDragon,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Standard,
-  baseHealth: 315,
-  healthRandomizerDice: Dice.D4,
+  speed: MovementSpeed.Fast,
+  baseHealth: 600,
+  healthRandomizerDice: Dice.D20,
   skillRandomizerDice: Dice.D20,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 50,
+    level: 70,
     strength: {
-      level: 50,
+      level: 70,
     },
     dexterity: {
-      level: 30,
+      level: 70,
+    },
+    resistance: {
+      level: 70,
     },
   },
   fleeOnLowHealth: true,
-  experience: 1400 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 50,
+      quantityRange: [100, 225],
+    },
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
       chance: 40,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.GoldenArmor,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.GoldenBoots,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.RoyalHelmet,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.SaviorsHelmet,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.RoyalKnightHelmet,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.SilverShield,
+      chance: 30,
     },
   ],
 } as Partial<INPC>;

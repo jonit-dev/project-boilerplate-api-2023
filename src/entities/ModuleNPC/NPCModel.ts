@@ -133,9 +133,7 @@ const npcSchema = createLeanSchema(
       default: false,
       required: true,
     }),
-    experience: Type.number({
-      required: false,
-    }),
+    experience: Type.number(),
     xpToRelease: Type.array().of({
       charId: Type.objectId({
         ref: "Character",

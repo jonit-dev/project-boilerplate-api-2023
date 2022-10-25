@@ -1,12 +1,11 @@
-import { ICharacter, Character } from "@entities/ModuleCharacter/CharacterModel";
-import { provide } from "inversify-binding-decorators";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
-import { IItemSpell } from "./data/blueprints/spells/index";
+import { provide } from "inversify-binding-decorators";
+import { IItemSpell, spellsBlueprintsIndex } from "./data/blueprints/spells/index";
 
 @provide(ItemSpellCast)
 export class ItemSpellCast {
@@ -90,8 +89,8 @@ export class ItemSpellCast {
   }
 
   private getSpell(magicWords: string): any {
-    for (const key in itemsBlueprintIndex) {
-      const item = itemsBlueprintIndex[key];
+    for (const key in spellsBlueprintsIndex) {
+      const item = spellsBlueprintsIndex[key];
       if (item.magicWords === magicWords) {
         return item;
       }

@@ -12,6 +12,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
 import { CharacterInventory } from "./CharacterInventory";
+import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 import { CharacterTarget } from "./CharacterTarget";
 
 const DROP_EQUIPMENT_CHANCE = 30; // there's a 30% chance of dropping any of the equipped items
@@ -23,7 +24,8 @@ export class CharacterDeath {
     private socketMessaging: SocketMessaging,
     private characterTarget: CharacterTarget,
     private npcTarget: NPCTarget,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private characterItemSlots: CharacterItemSlots
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter, character: ICharacter): Promise<void> {
@@ -64,7 +66,7 @@ export class CharacterDeath {
     // TODO: Add death penalty here.
   }
 
-  public generateCharacterBody(character: ICharacter): Promise<IItem | any> {
+  public async generateCharacterBody(character: ICharacter): Promise<IItem | any> {
     const blueprintData = itemsBlueprintIndex[BodiesBlueprint.CharacterBody];
 
     const charBody = new Item({
@@ -76,7 +78,25 @@ export class CharacterDeath {
       y: character.y,
     });
 
-    return charBody.save();
+    // remove character ownership from items
+    const inventory = await character.inventory;
+    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
+
+    if (inventoryContainer) {
+      for (let i = 0; i < inventoryContainer.slotQty; i++) {
+        const itemSlot = inventoryContainer.slots[i];
+
+        if (!itemSlot) continue;
+
+        await this.characterItemSlots.updateItemOnSlot(i, inventoryContainer, {
+          ...itemSlot,
+          owner: null,
+          scene: character.scene,
+        });
+      }
+    }
+
+    return await charBody.save();
   }
 
   public async respawnCharacter(character: ICharacter): Promise<void> {

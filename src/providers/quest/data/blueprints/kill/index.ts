@@ -1,7 +1,8 @@
-import { questKillOrcs } from "./QuestKillOrcs";
+import { QuestsBlueprint } from "../../questsBlueprintTypes";
 import { questKillRats } from "./QuestKillRats";
+import { questOrcFortress } from "./QuestOrcFortress";
 
 export const killQuests = {
-  "kill-orcs": questKillOrcs,
-  "kill-rats": questKillRats,
+  [QuestsBlueprint.OrcFortress]: questOrcFortress,
+  [QuestsBlueprint.KillRats]: questKillRats,
 };

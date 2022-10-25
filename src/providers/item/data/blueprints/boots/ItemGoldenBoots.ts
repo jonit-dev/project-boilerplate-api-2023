@@ -11,7 +11,7 @@ export const itemGoldenBoots: Partial<IItem> = {
 
   name: "Golden Boots",
   description: "An boot made of gold. It is a part of the Golden set.",
-  defense: 11,
+  defense: 16,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Feet],
 };

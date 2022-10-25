@@ -109,15 +109,14 @@ export class ItemUse {
 
       for (let i = 0; i < inventoryContainer.slotQty; i++) {
         const slotItem = inventoryContainer.slots?.[i];
-        if (slotItem && slotItem.key === item.key) {
+        if (slotItem && slotItem.key === item.key && !stackReduced) {
           inventoryContainer.slots[i].stackQty = item.stackQty;
+          stackReduced = true;
         }
       }
 
       inventoryContainer.markModified("slots");
       await inventoryContainer.save();
-
-      stackReduced = true;
     }
 
     if (!stackReduced) {

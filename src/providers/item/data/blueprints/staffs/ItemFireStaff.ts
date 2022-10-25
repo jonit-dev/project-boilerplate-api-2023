@@ -9,11 +9,10 @@ export const itemFireStaff: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "staffs/fire-staff.png",
-
   name: "Fire Staff",
   description: "A staff with an fire ember gem at the top.",
-  attack: 3,
-  defense: 0,
+  attack: 9,
+  defense: 4,
   weight: 1,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

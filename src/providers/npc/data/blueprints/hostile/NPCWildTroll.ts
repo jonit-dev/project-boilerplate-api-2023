@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -11,7 +10,9 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 import {
   FoodsBlueprint,
   GlovesBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   SpearsBlueprint,
@@ -38,16 +39,27 @@ export const npcWildTroll = {
     dexterity: {
       level: 5,
     },
+    resistance: {
+      level: 12,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 160 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [20, 35],
+    },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 25,
     },
     {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.GladiatorHelmet,
       chance: 10,
     },
     {
