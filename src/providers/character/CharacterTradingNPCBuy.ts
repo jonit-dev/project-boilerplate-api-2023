@@ -5,7 +5,12 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents, ITradeItem } from "@rpg-engine/shared";
+import {
+  IEquipmentAndInventoryUpdatePayload,
+  IItemContainer,
+  ItemSocketEvents,
+  ITradeRequestItem,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
@@ -24,7 +29,7 @@ export class CharacterTradingNPCBuy {
     private characterTradingValidation: CharacterTradingValidation
   ) {}
 
-  public async buyItemsFromNPC(character: ICharacter, npc: INPC, items: ITradeItem[]): Promise<boolean> {
+  public async buyItemsFromNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<boolean> {
     const inventory = await character.inventory;
     const inventoryContainerId = inventory.itemContainer as unknown as string;
 
@@ -53,7 +58,7 @@ export class CharacterTradingNPCBuy {
       if (!itemPrice) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
-          "The item price is not valid for item " + purchasedItem.name
+          "The item price is not valid for item " + purchasedItem.key
         );
         return false;
       }
@@ -144,7 +149,7 @@ export class CharacterTradingNPCBuy {
   private async validateBuyTransaction(
     character: ICharacter,
     npc: INPC,
-    itemsToPurchase: ITradeItem[]
+    itemsToPurchase: ITradeRequestItem[]
   ): Promise<boolean> {
     const isBaseTransactionValid = this.characterTradingValidation.validateTransaction(character, npc, itemsToPurchase);
 
@@ -158,7 +163,7 @@ export class CharacterTradingNPCBuy {
       if (!itemBlueprint) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
-          `Sorry, the item '${item.name}' is not available for purchase.`
+          `Sorry, the item '${item.key}' is not available for purchase.`
         );
         return false;
       }
