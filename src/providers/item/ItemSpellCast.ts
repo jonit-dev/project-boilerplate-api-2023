@@ -1,11 +1,11 @@
-import { ICharacter, Character } from "@entities/ModuleCharacter/CharacterModel";
-import { provide } from "inversify-binding-decorators";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
-import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterSocketEvents, ICharacterItemConsumed } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
 import { IItemSpell } from "./data/blueprints/spells/index";
 
 @provide(ItemSpellCast)
@@ -89,7 +89,7 @@ export class ItemSpellCast {
   }
 
   private async sendPostSpellCastEvents(character: ICharacter, spell: IItemSpell): Promise<void> {
-    const payload: ICharacterAttributeChanged = {
+    const payload: ICharacterItemConsumed = {
       targetId: character._id,
       health: character.health,
       mana: character.mana,
