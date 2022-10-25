@@ -10,7 +10,7 @@ import {
   RangedWeaponsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ItemSocketEvents, ITradeItem } from "@rpg-engine/shared";
+import { ItemSocketEvents, ITradeRequestItem } from "@rpg-engine/shared";
 import { CharacterTradingNPCBuy } from "../CharacterTradingNPCBuy";
 
 describe("CharacterTradingValidation.ts", () => {
@@ -20,7 +20,7 @@ describe("CharacterTradingValidation.ts", () => {
   let characterTradingNPCBuy: CharacterTradingNPCBuy;
   let sendErrorMessageToCharacter: jest.SpyInstance;
   let sendEventToUser: jest.SpyInstance;
-  let transactionItems: ITradeItem[];
+  let transactionItems: ITradeRequestItem[];
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
 

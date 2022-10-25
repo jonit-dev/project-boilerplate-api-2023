@@ -3,7 +3,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { PotionsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { GRID_HEIGHT, GRID_WIDTH, ITradeItem } from "@rpg-engine/shared";
+import { GRID_HEIGHT, GRID_WIDTH, ITradeRequestItem } from "@rpg-engine/shared";
 import { CharacterTradingValidation } from "../CharacterTradingValidation";
 
 describe("CharacterTradingValidation.ts", () => {
@@ -12,7 +12,7 @@ describe("CharacterTradingValidation.ts", () => {
   let nonTraderNPC: INPC;
   let characterTradingValidation: CharacterTradingValidation;
   let sendErrorMessageToCharacter: jest.SpyInstance;
-  let transactionItems: ITradeItem[];
+  let transactionItems: ITradeRequestItem[];
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
