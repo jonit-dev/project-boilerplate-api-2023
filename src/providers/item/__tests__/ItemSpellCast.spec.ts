@@ -1,11 +1,11 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ItemSpellCast } from "../ItemSpellCast";
 import { AnimationSocketEvents, CharacterSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { itemSelfHealing } from "../data/blueprints/spells/ItemSelfHealing";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { ItemSpellCast } from "../ItemSpellCast";
 
 describe("ItemSpellCast.ts", () => {
   let itemSpellCast: ItemSpellCast;

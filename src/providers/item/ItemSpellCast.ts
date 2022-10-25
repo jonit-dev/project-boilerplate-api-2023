@@ -100,8 +100,8 @@ export class ItemSpellCast {
 
   private getSkillLevelSpells(level): IItemSpell[] {
     const spells: IItemSpell[] = [];
-    for (const key in itemsBlueprintIndex) {
-      const item = itemsBlueprintIndex[key];
+    for (const key in spellsBlueprintsIndex) {
+      const item = spellsBlueprintsIndex[key];
       if (item.magicWords && level === item.minLevelRequired) {
         spells.push(item as unknown as IItemSpell);
       }
