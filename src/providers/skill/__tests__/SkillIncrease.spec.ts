@@ -3,6 +3,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SP_INCREASE_RATIO } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { ItemSpellCast } from "@providers/item/ItemSpellCast";
 import { ItemSubType } from "@rpg-engine/shared";
 import { Error } from "mongoose";
 import { calculateSPToNextLevel, calculateXPToNextLevel } from "../SkillCalculator";
@@ -118,7 +119,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     spToLvl3: number,
     xpToLvl2: number,
     sendSkillLevelUpEvents: any,
-    sendExpLevelUpEvents: any;
+    sendExpLevelUpEvents: any,
+    spellLearnMock: jest.SpyInstance;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -138,6 +140,12 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
     sendSkillLevelUpEvents = jest.spyOn(skillIncrease, "sendSkillLevelUpEvents" as any);
     sendExpLevelUpEvents = jest.spyOn(skillIncrease, "sendExpLevelUpEvents" as any);
+    spellLearnMock = jest.spyOn(ItemSpellCast.prototype, "learnLatestSkillLevelSpells");
+    spellLearnMock.mockImplementation();
+  });
+
+  afterAll(() => {
+    spellLearnMock.mockRestore();
   });
 
   beforeEach(async () => {
@@ -170,6 +178,11 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
     expect(sendSkillLevelUpEvents).not.toHaveBeenCalled();
     expect(sendExpLevelUpEvents).not.toHaveBeenCalled();
+
+    expect(spellLearnMock).not.toHaveBeenCalled();
+    // faking timers is creating issue with mongo calls
+    await wait(5.2);
+    expect(spellLearnMock).not.toHaveBeenCalled();
   });
 
   it("should increase character's 'first' skill points and should not increase xp (damage 0)", async () => {
@@ -187,6 +200,11 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
     expect(sendSkillLevelUpEvents).not.toHaveBeenCalled();
     expect(sendExpLevelUpEvents).not.toHaveBeenCalled();
+
+    expect(spellLearnMock).not.toHaveBeenCalled();
+    // faking timers is creating issue with mongo calls
+    await wait(5.2);
+    expect(spellLearnMock).not.toHaveBeenCalled();
   });
 
   it("should increase character's skill level - 'first' & strength skills. Should not increase XP (not released)", async () => {
@@ -234,6 +252,12 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(sendSkillLevelUpEvents).toHaveBeenCalled();
     expect(sendExpLevelUpEvents).toHaveBeenCalled();
 
+    expect(spellLearnMock).not.toHaveBeenCalled();
+    // faking timers is creating issue with mongo calls
+    await wait(5.2);
+    expect(spellLearnMock).toHaveBeenCalledTimes(1);
+    expect(spellLearnMock).toHaveBeenCalledWith(testCharacter._id, true);
+
     // Check that other skills remained unchanged
     expect(updatedSkills?.axe.level).toBe(initialSkills?.axe.level);
     expect(updatedSkills?.axe.skillPoints).toBe(initialSkills?.axe.skillPoints);
@@ -260,3 +284,12 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     await unitTestHelper.afterAllJestHook();
   });
 });
+
+function wait(sec): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const inter = setInterval(() => {
+      resolve();
+      clearInterval(inter);
+    }, sec * 1000);
+  });
+}

@@ -37,6 +37,16 @@ export class ItemSpellCast {
     return true;
   }
 
+  public async learnLatestSkillLevelSpells(characterId: string, notifyUser: boolean): Promise<void> {
+    const character = (await Character.findOne({ _id: characterId }).populate("skills")) as unknown as ICharacter;
+    const skills = character.skills as unknown as ISkill;
+
+    const spells = this.getSkillLevelSpells(skills.level);
+    await this.addToCharacterLearnedSpells(character, spells);
+
+    notifyUser && this.sendLearnedSpellNotification(character, spells);
+  }
+
   private async isSpellCastingValid(spell, character: ICharacter): Promise<boolean> {
     if (!spell) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, spell not found.");
@@ -66,13 +76,14 @@ export class ItemSpellCast {
       return false;
     }
 
-    if (skills.magic.level < spell.minMagicLevelRequired) {
+    // TODO: Implement magic level validation later
+    /* if (skills.magic.level < spell.minMagicLevelRequired) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         "Sorry, you can not cast this spell at this character magic level."
       );
       return false;
-    }
+    } */
 
     return true;
   }
@@ -85,6 +96,29 @@ export class ItemSpellCast {
       }
     }
     return null;
+  }
+
+  private getSkillLevelSpells(level): IItemSpell[] {
+    const spells: IItemSpell[] = [];
+    for (const key in spellsBlueprintsIndex) {
+      const item = spellsBlueprintsIndex[key];
+      if (item.magicWords && level === item.minLevelRequired) {
+        spells.push(item as unknown as IItemSpell);
+      }
+    }
+    return spells;
+  }
+
+  private async addToCharacterLearnedSpells(character: ICharacter, spells: IItemSpell[]): Promise<void> {
+    const learned = character.learnedSpells ?? [];
+    spells.forEach((spell) => {
+      if (!learned.includes(spell.key)) {
+        learned.push(spell.key);
+      }
+    });
+
+    character.learnedSpells = learned;
+    await character.save();
   }
 
   private async sendPostSpellCastEvents(character: ICharacter, spell: IItemSpell): Promise<void> {
@@ -102,5 +136,21 @@ export class ItemSpellCast {
     );
 
     await this.animationEffect.sendAnimationEvent(character, spell.animationKey);
+  }
+
+  private sendLearnedSpellNotification(character: ICharacter, spells: IItemSpell[]): void {
+    if (!spells || spells.length < 1) {
+      return;
+    }
+    const learned: string[] = [];
+    spells.forEach((spell) => {
+      learned.push(spell.name + " (" + spell.magicWords + ")");
+    });
+
+    this.socketMessaging.sendErrorMessageToCharacter(
+      character,
+      "You have learned new spell(s): " + learned.join(", "),
+      "info"
+    );
   }
 }

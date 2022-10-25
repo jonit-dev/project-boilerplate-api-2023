@@ -17,6 +17,7 @@ import {
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { ItemSpellCast } from "../item/ItemSpellCast";
 import { SkillCalculator } from "./SkillCalculator";
 
 declare enum CombatSkill {
@@ -67,7 +68,8 @@ export class SkillIncrease {
     private skillCalculator: SkillCalculator,
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
-    private animationEffect: AnimationEffect
+    private animationEffect: AnimationEffect,
+    private itemSpellCast: ItemSpellCast
   ) {}
 
   /**
@@ -195,6 +197,9 @@ export class SkillIncrease {
 
       if (levelUp) {
         await this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp: record!.xp! }, character, target);
+        setTimeout(async () => {
+          await this.itemSpellCast.learnLatestSkillLevelSpells(character._id, true);
+        }, 5000);
       }
 
       await this.warnCharactersAroundAboutExpGains(character, record!.xp!);
