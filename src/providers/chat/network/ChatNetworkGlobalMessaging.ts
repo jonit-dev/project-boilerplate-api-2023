@@ -1,6 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ChatLog, IChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
+import { ItemSpellCast } from "@providers/item/ItemSpellCast";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -12,8 +14,6 @@ import {
   IChatMessageCreatePayload,
   IChatMessageReadPayload,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
-  UISocketEvents,
-  IUIShowMessage,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
@@ -24,7 +24,9 @@ export class ChatNetworkGlobalMessaging {
     private socketAuth: SocketAuth,
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
-    private socketTransmissionZone: SocketTransmissionZone
+    private socketTransmissionZone: SocketTransmissionZone,
+    private itemSpellCast: ItemSpellCast,
+    private characterValidation: CharacterValidation
   ) {}
 
   public onGlobalMessaging(channel: SocketChannel): void {
@@ -33,37 +35,30 @@ export class ChatNetworkGlobalMessaging {
       ChatSocketEvents.GlobalChatMessageCreate,
       async (data: IChatMessageCreatePayload, character: ICharacter) => {
         try {
-          if (this.canCharacterSendMessage(character)) {
-            const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
+          const canChat = this.characterValidation.hasBasicValidation(character);
 
-            if (data.message.length > 0) {
-              await this.saveChatLog(data, character);
-              const chatLogs = await this.getChatLogsInZone(character, data.limit);
+          if (!canChat) {
+            return;
+          }
 
-              this.sendMessagesToNearbyCharacters(chatLogs, nearbyCharacters);
-              this.sendMessagesToCharacter(chatLogs, character);
-            } else {
-              const dataOfErrorMessage: IUIShowMessage = {
-                message: "Text a message to send.",
-                type: "error",
-              };
+          if (this.itemSpellCast.isSpellCasting(data.message)) {
+            await this.itemSpellCast.castSpell(data.message, character);
+          }
 
-              this.socketMessaging.sendEventToUser<IUIShowMessage>(
-                character.channelId!,
-                UISocketEvents.ShowMessage,
-                dataOfErrorMessage
-              );
-            }
+          const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
+
+          if (data.message.length > 0) {
+            await this.saveChatLog(data, character);
+            const chatLogs = await this.getChatLogsInZone(character, data.limit);
+
+            this.sendMessagesToNearbyCharacters(chatLogs, nearbyCharacters);
+            this.sendMessagesToCharacter(chatLogs, character);
           }
         } catch (error) {
           console.error(error);
         }
       }
     );
-  }
-
-  private canCharacterSendMessage(character: ICharacter): Boolean {
-    return character.isOnline && !character.isBanned;
   }
 
   private async saveChatLog(data: IChatMessageCreatePayload, character: ICharacter): Promise<IChatLog> {

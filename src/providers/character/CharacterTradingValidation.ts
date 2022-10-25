@@ -4,7 +4,6 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ITradeRequestItem } from "@rpg-engine/shared";
-
 import { provide } from "inversify-binding-decorators";
 import { CharacterValidation } from "./CharacterValidation";
 

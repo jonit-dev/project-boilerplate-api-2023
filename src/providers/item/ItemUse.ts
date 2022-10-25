@@ -10,12 +10,11 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
-  ICharacterItemConsumed,
+  ICharacterAttributeChanged,
   IEquipmentAndInventoryUpdatePayload,
   ItemSocketEvents,
   ItemSubType,
@@ -33,8 +32,7 @@ export class ItemUse {
     private characterWeight: CharacterWeight,
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
-    private characterItems: CharacterItems,
-    private characterItemInventory: CharacterItemInventory
+    private characterItems: CharacterItems
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -135,17 +133,17 @@ export class ItemUse {
   private async sendItemConsumptionEvent(character: ICharacter): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
-    const payload: ICharacterItemConsumed = {
+    const payload: ICharacterAttributeChanged = {
       targetId: character._id,
       health: character.health,
     };
 
     for (const nearbyCharacter of nearbyCharacters) {
-      this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, CharacterSocketEvents.ItemConsumed, payload);
+      this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
     }
 
     if (character.channelId) {
-      this.socketMessaging.sendEventToUser(character.channelId, CharacterSocketEvents.ItemConsumed, payload);
+      this.socketMessaging.sendEventToUser(character.channelId, CharacterSocketEvents.AttributeChanged, payload);
     }
 
     await this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LifeHeal);

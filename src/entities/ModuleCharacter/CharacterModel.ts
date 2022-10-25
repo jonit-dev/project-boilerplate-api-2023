@@ -1,5 +1,6 @@
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
+import { SpellsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import {
   CharacterClass,
   CharacterFactions,
@@ -161,6 +162,11 @@ const characterSchema = createLeanSchema(
     equipment: Type.objectId({
       ref: "Equipment",
     }),
+    learnedSpells: Type.array().of(
+      Type.string({
+        enum: TypeHelper.enumToStringArray(SpellsBlueprint),
+      })
+    ),
     ...({} as {
       isAlive: boolean;
       type: string;

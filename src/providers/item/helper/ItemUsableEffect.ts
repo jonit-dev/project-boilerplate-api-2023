@@ -17,6 +17,8 @@ export class ItemUsableEffect {
     const maxAttr = EffectableAttribute.Health === attr ? EffectableMaxAttribute.Health : EffectableMaxAttribute.Mana;
     if (character[attr] > character[maxAttr]) {
       character[attr] = character[maxAttr];
+    } else if (character[attr] < 0) {
+      character[attr] = 0;
     }
   }
 }

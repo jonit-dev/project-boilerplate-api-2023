@@ -9,7 +9,7 @@ export class AnimationEffect {
 
   public async sendAnimationEvent(character: ICharacter, effectKey: string): Promise<void> {
     const payload: IAnimationEffect = {
-      targetId: character.id,
+      targetId: character._id,
       effectKey,
     };
 
