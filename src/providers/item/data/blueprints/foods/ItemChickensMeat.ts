@@ -14,6 +14,7 @@ export const itemChickensMeat: Partial<IItem> = {
   name: "Chickens Meat",
   description: "Chicken meat can be cooked and eaten to restore health",
   weight: 0.5,
+  maxStackSize: 100,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.apply(character, EffectableAttribute.Health, 2);
   },

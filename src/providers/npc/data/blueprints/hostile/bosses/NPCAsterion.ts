@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   BootsBlueprint,
   FoodsBlueprint,
@@ -26,7 +25,7 @@ export const npcAsterion = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 386,
+  baseHealth: 450,
   healthRandomizerDice: Dice.D20,
   skills: {
     level: 20,
@@ -41,7 +40,6 @@ export const npcAsterion = {
     },
   },
   fleeOnLowHealth: true,
-  experience: 400 * EXP_RATIO,
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,

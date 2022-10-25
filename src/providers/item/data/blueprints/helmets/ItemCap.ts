@@ -8,7 +8,6 @@ export const itemCap: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/cap.png",
-
   name: "Cap",
   description: "Simple cap.",
   defense: 2,

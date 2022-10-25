@@ -1,15 +1,18 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
   GlovesBlueprint,
+  HammersBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   RangedWeaponsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -37,10 +40,17 @@ export const npcOrcWarrior = {
     dexterity: {
       level: 5,
     },
+    resistance: {
+      level: 5,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 35 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [20, 55],
+    },
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
@@ -48,6 +58,22 @@ export const npcOrcWarrior = {
     {
       itemBlueprintKey: AxesBlueprint.Axe,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.BroadSword,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.IronHammer,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.IronArmor,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
+      chance: 5,
     },
     {
       itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,
@@ -66,12 +92,16 @@ export const npcOrcWarrior = {
       chance: 15,
     },
     {
+      itemBlueprintKey: LegsBlueprint.LeatherLegs,
+      chance: 15,
+    },
+    {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 10,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.OrcishBow,
-      chance: 3,
+      chance: 20,
     },
   ],
 } as Partial<INPC>;

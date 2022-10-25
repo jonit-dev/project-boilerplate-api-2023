@@ -1,13 +1,14 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
   GlovesBlueprint,
+  HammersBlueprint,
   HelmetsBlueprint,
+  OthersBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -28,27 +29,46 @@ export const npcOrcBerserker = {
   skillsToBeRandomized: ["level", "strength", "dexterity"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 12,
+    level: 14,
     strength: {
-      level: 10,
+      level: 14,
     },
     dexterity: {
-      level: 7,
+      level: 5,
+    },
+    resistance: {
+      level: 10,
     },
   },
   fleeOnLowHealth: true,
-  experience: 60 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: BootsBlueprint.Boots,
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
+      quantityRange: [10, 40],
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.IronBoots,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.WarHammer,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
+      chance: 10,
     },
     {
       itemBlueprintKey: AxesBlueprint.Axe,
       chance: 30,
     },
     {
-      itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,
+      itemBlueprintKey: HelmetsBlueprint.BerserkersHelmet,
       chance: 15,
     },
     {
@@ -57,7 +77,7 @@ export const npcOrcBerserker = {
     },
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
-      chance: 15,
+      chance: 30,
     },
     {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,

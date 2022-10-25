@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -10,10 +9,12 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import {
   AxesBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -39,12 +40,19 @@ export const npcTrollBerserker = {
       level: 30,
     },
     dexterity: {
-      level: 12,
+      level: 30,
+    },
+    resistance: {
+      level: 30,
     },
   },
   fleeOnLowHealth: true,
-  experience: 300 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [60, 80],
+    },
     {
       itemBlueprintKey: GlovesBlueprint.PlateGloves,
       chance: 30,
@@ -86,6 +94,16 @@ export const npcTrollBerserker = {
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodLog,
+      chance: 30,
+      quantityRange: [1, 2],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 10,
+      quantityRange: [1, 2],
     },
   ],
 } as Partial<INPC>;

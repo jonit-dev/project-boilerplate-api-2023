@@ -1,16 +1,18 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   AccessoriesBlueprint,
+  ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -40,13 +42,28 @@ export const npcGoblin = {
     dexterity: {
       level: 8,
     },
+    resistance: {
+      level: 3,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 40 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 20,
+      quantityRange: [15, 40],
+    },
     {
       itemBlueprintKey: SwordsBlueprint.ShortSword,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.Spear,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.IronArmor,
+      chance: 5,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Fish,

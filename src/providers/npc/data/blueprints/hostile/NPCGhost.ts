@@ -1,8 +1,11 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  CraftingResourcesBlueprint,
+  OthersBlueprint,
+  RangedWeaponsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -17,33 +20,51 @@ export const npcGhost = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
   canSwitchToRandomTarget: true,
-  baseHealth: 103,
+  baseHealth: 30,
   healthRandomizerDice: Dice.D4,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 2,
+    level: 3,
     strength: {
-      level: 1,
+      level: 3,
     },
     dexterity: {
-      level: 1,
+      level: 2,
     },
     resistance: {
-      level: 1,
+      level: 5,
     },
   },
   fleeOnLowHealth: true,
-  experience: 10 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [5, 7],
+    },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 20,
       quantityRange: [3, 10],
     },
     {
+      itemBlueprintKey: RangedWeaponsBlueprint.Bolt,
+      chance: 20,
+      quantityRange: [3, 10],
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,
-      chance: 5,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.Crossbow,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Silk,
+      chance: 30,
+      quantityRange: [5, 10],
     },
   ],
 } as Partial<INPC>;

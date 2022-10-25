@@ -12,7 +12,8 @@ export const itemFrostDoubleAxe: Partial<IItem> = {
 
   name: "Frost Double Axe",
   description: "A large master-crafted weapon with a frosted blade.",
-  attack: 7,
+  attack: 14,
+  defense: 5,
   weight: 4,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

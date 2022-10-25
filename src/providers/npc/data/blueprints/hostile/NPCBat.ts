@@ -1,7 +1,11 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { FoodsBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  CraftingResourcesBlueprint,
+  FoodsBlueprint,
+  OthersBlueprint,
+  PotionsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -16,7 +20,6 @@ export const npcBat = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.ExtraFast,
   baseHealth: 29,
-
   skills: {
     level: 1,
     strength: {
@@ -29,8 +32,12 @@ export const npcBat = {
       level: 1,
     },
   },
-  experience: 3 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [1, 5],
+    },
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 15,
@@ -38,6 +45,11 @@ export const npcBat = {
     {
       itemBlueprintKey: FoodsBlueprint.Banana,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BatsWing,
+      chance: 50,
+      quantityRange: [1, 3],
     },
   ],
 } as Partial<INPC>;

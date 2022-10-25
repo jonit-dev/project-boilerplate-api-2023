@@ -14,7 +14,7 @@ export const itemCorruptionDagger: Partial<IItem> = {
   description: "An artifact from ancient times. Its blade allows it to cut in ways no other weapon could.",
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 5,
-  defense: 2,
+  attack: 7,
+  defense: 3,
   rangeType: EntityAttackType.Melee,
 };

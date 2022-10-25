@@ -1,11 +1,13 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   BootsBlueprint,
   HammersBlueprint,
+  HelmetsBlueprint,
+  LegsBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -33,13 +35,32 @@ export const npcOrc = {
     dexterity: {
       level: 5,
     },
+    resistance: {
+      level: 5,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 40 * EXP_RATIO,
   loots: [
     {
-      itemBlueprintKey: BootsBlueprint.Boots,
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
+      quantityRange: [5, 25],
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.StuddedBoots,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: OthersBlueprint.Candle,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.LeatherHelmet,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.LeatherLegs,
+      chance: 15,
     },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
@@ -52,6 +73,10 @@ export const npcOrc = {
     {
       itemBlueprintKey: HammersBlueprint.IronHammer,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.FarmersHelmet,
+      chance: 20,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,

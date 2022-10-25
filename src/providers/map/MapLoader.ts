@@ -44,7 +44,7 @@ export class MapLoader {
         this.hasMapRequiredLayers(mapFileName, currentMap as ITiled);
       }
 
-      const updated = await this.checkMapUpdated(mapPath, mapFileName, currentMap, isUnitTest);
+      const updated = await this.checkMapUpdated(mapPath, mapFileName, currentMap);
 
       if (updated) {
         mapToCheckTransitions.push({ name: mapFileName, data: currentMap });
@@ -80,23 +80,14 @@ export class MapLoader {
     }
   }
 
-  private async checkMapUpdated(
-    mapPath: string,
-    mapFileName: string,
-    mapObject: object,
-    isUnitTest: boolean = false
-  ): Promise<boolean> {
-    if (!isUnitTest) {
-      return true;
-    }
-
+  private async checkMapUpdated(mapPath: string, mapFileName: string, mapObject: object): Promise<boolean> {
     const mapChecksum = this.checksum(mapPath);
     const fileName = mapFileName.replace(".json", "");
-    const mapData = await MapModel.find({ name: fileName });
+    const mapData = await MapModel.findOne({ name: fileName });
 
-    if (mapData.length !== 0) {
-      const map = mapData[0];
-      if (map.checksum !== mapChecksum) {
+    if (mapData) {
+      const map = mapData;
+      if (map?.checksum !== mapChecksum) {
         console.log(`📦 Map ${fileName} is updated!`);
         map.checksum = mapChecksum;
         await map.save();

@@ -10,11 +10,11 @@ export const itemBow: Partial<IItem> = {
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
   texturePath: "ranged-weapons/bow.png",
-
   name: "Bow",
   description:
     "A weapon used for shooting arrows and usually made of a strip of wood bent by a cord connecting the two end.",
-  attack: 4,
+  attack: 5,
+  defense: 2,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,

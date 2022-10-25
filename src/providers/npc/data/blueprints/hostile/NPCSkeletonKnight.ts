@@ -1,10 +1,11 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import {
   ArmorsBlueprint,
   BootsBlueprint,
+  HelmetsBlueprint,
+  OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -28,20 +29,24 @@ export const npcSkeletonKnight = {
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 6,
+    level: 12,
     strength: {
-      level: 2,
+      level: 12,
     },
     dexterity: {
-      level: 2,
+      level: 6,
     },
     resistance: {
-      level: 3,
+      level: 5,
     },
   },
   fleeOnLowHealth: true,
-  experience: 12 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [10, 30],
+    },
     {
       itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
       chance: 25,
@@ -52,12 +57,19 @@ export const npcSkeletonKnight = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.IronHelmet,
       chance: 5,
     },
-
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 25,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.KnightsShield,
+      chance: 5,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,

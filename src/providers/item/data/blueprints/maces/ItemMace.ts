@@ -9,11 +9,11 @@ export const itemMace: Partial<IItem> = {
   subType: ItemSubType.Mace,
   textureAtlas: "items",
   texturePath: "maces/mace.png",
-
   name: "Mace",
   description: "A simple iron headed mace.",
-  attack: 3,
-  weight: 1.2,
+  attack: 8,
+  defense: 3,
+  weight: 4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };

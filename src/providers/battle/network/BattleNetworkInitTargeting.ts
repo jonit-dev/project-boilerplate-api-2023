@@ -108,7 +108,6 @@ export class BattleNetworkInitTargeting {
 
   private isValidTarget(target: INPC | ICharacter | null, character: ICharacter): ITargetValidation {
     // check if target is within character range.
-
     if (target?.id === character.id) {
       return {
         isValid: false,
@@ -137,10 +136,27 @@ export class BattleNetworkInitTargeting {
       };
     }
 
+    const npc = target as INPC;
+
+    const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(npc.scene, npc.x, npc.y);
+
+    if (isCharInNonPVPZone && npc.type === EntityType.NPC) {
+      return {
+        isValid: false,
+        reason: "You cannot attack a NPC inside a Non-PVP Zone!",
+      };
+    }
+
     // Apply specific validations by target type
     const specificTargetValidation = this.checkBySpecificType(target);
     if (!specificTargetValidation?.isValid) {
       return specificTargetValidation;
+    }
+
+    // Cannot attack inside a NoN PvP Zone a target outside a NoN PvP Zone
+    const specificCharacterValidation = this.checkBySpecificType(character);
+    if (!specificCharacterValidation?.isValid) {
+      return specificCharacterValidation;
     }
 
     const isCharacterOnline = character.isOnline;
@@ -151,7 +167,11 @@ export class BattleNetworkInitTargeting {
       };
     }
 
-    // check character attack type. If melee, target should be within a 1 grid cell range. if ranged, check max range.
+    /*
+    Check character attack type. If melee, target should be within a 1 grid cell range. 
+    If ranged, check max range.
+    */
+
     const isUnderRange = this.movementHelper.isUnderRange(
       character.x,
       character.y,
@@ -182,7 +202,9 @@ export class BattleNetworkInitTargeting {
   }
 
   private isValidNPCTarget(target: INPC): ITargetValidation {
-    if (target.alignment === NPCAlignment.Friendly) {
+    const isNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(target.scene, target.x, target.y);
+
+    if (isNonPVPZone && target.alignment === NPCAlignment.Friendly) {
       return {
         isValid: false,
         reason: "You cannot attack this entity.",
@@ -196,6 +218,7 @@ export class BattleNetworkInitTargeting {
 
   private isValidCharacterTarget(target: ICharacter): ITargetValidation {
     const isNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(target.scene, target.x, target.y);
+
     if (isNonPVPZone) {
       return {
         isValid: false,

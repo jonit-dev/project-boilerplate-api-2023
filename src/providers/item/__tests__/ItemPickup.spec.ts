@@ -9,7 +9,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { Types } from "mongoose";
-import { ContainersBlueprint } from "../data/types/itemsBlueprintTypes";
+import { BodiesBlueprint, ContainersBlueprint, OthersBlueprint } from "../data/types/itemsBlueprintTypes";
 import { ItemPickup } from "../ItemPickup";
 
 describe("ItemPickup.ts", () => {
@@ -374,6 +374,39 @@ describe("ItemPickup.ts", () => {
         testCharacter,
         "Sorry, you can't pick up items from another map."
       );
+    });
+
+    it("should properly pickup a stackable item from a dead body", async () => {
+      const deadBody = await unitTestHelper.createMockItemFromBlueprint(BodiesBlueprint.NPCBody, {
+        key: "npc-test-dead-body",
+        texturePath: "kid-1/death/0.png",
+        description: "A dead body. It really stinks.",
+        name: "Test Dead body",
+      });
+
+      const deadBodyContainer = await ItemContainer.findOne({ parentItem: deadBody.id });
+
+      const stackableItem = await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, {
+        stackQty: 10,
+      });
+
+      expect(deadBodyContainer).toBeTruthy();
+
+      if (deadBodyContainer) {
+        deadBodyContainer.slotQty = 20;
+        deadBodyContainer.slots = {
+          ...deadBodyContainer.slots,
+          0: stackableItem.toJSON({ virtuals: true }),
+        };
+        deadBodyContainer.markModified("slots");
+        await deadBodyContainer.save();
+
+        const pickup = await pickupItem(inventoryItemContainerId, {
+          itemId: stackableItem.id,
+          fromContainerId: deadBodyContainer.id,
+        });
+        expect(pickup).toBeTruthy();
+      }
     });
   });
 

@@ -13,6 +13,7 @@ export const itemFrostCrossbow: Partial<IItem> = {
   description: "The Ice Crossbow is a two-handed crossbow-type ranged weapon.",
   weight: 3,
   attack: 8,
+  defense: 4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 10,
   requiredAmmoKeys: [RangedWeaponsBlueprint.Bolt],

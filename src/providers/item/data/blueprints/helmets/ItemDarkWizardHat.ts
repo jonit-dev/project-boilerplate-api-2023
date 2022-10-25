@@ -8,7 +8,6 @@ export const itemDarkWizardHat: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/dark-wizard-hat.png",
-
   name: "Dark Wizard Hat",
   description: "Black mage hide their faces in the shadows of their Black  Hats.",
   defense: 3,

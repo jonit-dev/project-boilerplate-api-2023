@@ -11,9 +11,9 @@ export const itemDoubleEdgedSword: Partial<IItem> = {
   texturePath: "swords/double-edged-sword.png",
   name: "Double Edged Sword",
   description: "An iron sword sharpened on both sides with incredible edge.",
-  attack: 4,
-  defense: 0,
-  weight: 1,
+  attack: 7,
+  defense: 4,
+  weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };

@@ -8,7 +8,6 @@ export const itemStuddedLegs: Partial<IItem> = {
   subType: ItemSubType.Legs,
   textureAtlas: "items",
   texturePath: "legs/studded-legs.png",
-
   name: "Studded Legs",
   description: "A pair of simple studded legs.",
   defense: 6,

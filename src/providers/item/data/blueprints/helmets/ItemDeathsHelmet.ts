@@ -8,9 +8,8 @@ export const itemDeathsHelmet: Partial<IItem> = {
   subType: ItemSubType.Helmet,
   textureAtlas: "items",
   texturePath: "helmets/deaths-helmet.png",
-
   name: "Deaths Helmet",
-  description: "This helmet is made from a dead king.",
+  description: "This helmet is made from parts of a corrupted material.",
   defense: 4,
   weight: 0.7,
   allowedEquipSlotType: [ItemSlotType.Head],

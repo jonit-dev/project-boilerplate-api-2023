@@ -28,6 +28,7 @@ export enum NeutralNPCsBlueprint {
   GiantBrownRabbit = "giant-brown-rabbit",
   GiantWhiteRabbit = "giant-white-rabbit",
   GiantGrayRabbit = "giant-gray-rabbit",
+  RedDeer = "red-deer",
 }
 
 export enum HostileNPCsBlueprint {
@@ -65,4 +66,22 @@ export enum HostileNPCsBlueprint {
   Yeti = "yeti", // Boss
   Asterion = "asterion", // Boss
   IceTroll = "ice-troll",
+  Scorpion = "scorpion",
+  BlackSpider = "black-spider",
+  AssaultSpider = "assault-spider",
+  CaveSpider = "cave-spider",
+  Centipede = "centipede",
+  ElderGolem = "elder-golem",
+  FireFox = "fire-fox",
+  ForestWalker = "forest-walker",
+  GiantBat = "giant-bat",
+  IceFox = "ice-fox",
+  MudGolem = "mud-golem",
+  Raccoon = "raccoon",
+  RedCentipede = "red-centipede",
+  Sparrow = "sparrow",
+  Snake = "snake",
+  Spiderling = "spiderling",
+  StoneGolem = "stone-golem",
+  Elf = "elf",
 }

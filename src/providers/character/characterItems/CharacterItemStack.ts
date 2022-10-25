@@ -72,6 +72,7 @@ export class CharacterItemStack {
           await this.addToExistingStack(i, targetContainer, futureStackQty);
 
           // since the qty was added to an existing item, we don't need to create a new one.
+
           await Item.deleteOne({ _id: itemToBeAdded._id });
 
           return true;

@@ -11,7 +11,7 @@ export const itemIronArmor: Partial<IItem> = {
 
   name: "Iron Armor",
   description: "An iron plated armor.",
-  defense: 24,
+  defense: 14,
   weight: 6,
   allowedEquipSlotType: [ItemSlotType.Torso],
 };

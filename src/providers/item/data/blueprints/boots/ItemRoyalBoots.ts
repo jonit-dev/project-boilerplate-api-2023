@@ -11,7 +11,7 @@ export const itemRoyalBoots: Partial<IItem> = {
 
   name: "Royal Boots",
   description: "The Royal Boots are made with fine and high quality materials.",
-  defense: 13,
+  defense: 12,
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Feet],
 };

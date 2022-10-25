@@ -12,6 +12,7 @@ export const itemAxe: Partial<IItem> = {
   name: "Axe",
   description: "A simple iron axe.",
   attack: 3,
+  defense: 2,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

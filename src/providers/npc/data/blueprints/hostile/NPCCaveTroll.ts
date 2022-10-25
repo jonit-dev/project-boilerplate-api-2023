@@ -1,21 +1,21 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EXP_RATIO } from "@providers/constants/SkillConstants";
-
-import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import {
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
+  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
+import { NPCAlignment } from "@rpg-engine/shared";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 export const npcCaveTroll = {
   ...generateMoveTowardsMovement(),
@@ -36,10 +36,17 @@ export const npcCaveTroll = {
     dexterity: {
       level: 5,
     },
+    resistance: {
+      level: 15,
+    },
   },
   fleeOnLowHealth: true,
-  experience: 180 * EXP_RATIO,
   loots: [
+    {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 30,
+      quantityRange: [25, 50],
+    },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 25,
@@ -64,6 +71,11 @@ export const npcCaveTroll = {
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodLog,
+      chance: 30,
+      quantityRange: [1, 2],
     },
   ],
 } as Partial<INPC>;
