@@ -3,7 +3,7 @@ import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, ICharacterItemConsumed } from "@rpg-engine/shared";
+import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { IItemSpell, spellsBlueprintsIndex } from "./data/blueprints/spells/index";
 
@@ -88,7 +88,7 @@ export class ItemSpellCast {
   }
 
   private async sendPostSpellCastEvents(character: ICharacter, spell: IItemSpell): Promise<void> {
-    const payload: ICharacterItemConsumed = {
+    const payload: ICharacterAttributeChanged = {
       targetId: character._id,
       health: character.health,
       mana: character.mana,

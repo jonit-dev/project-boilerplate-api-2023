@@ -14,7 +14,7 @@ import { CharacterItems } from "@providers/character/characterItems/CharacterIte
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
-  ICharacterItemConsumed,
+  ICharacterAttributeChanged,
   IEquipmentAndInventoryUpdatePayload,
   ItemSocketEvents,
   ItemSubType,
@@ -133,7 +133,7 @@ export class ItemUse {
   private async sendItemConsumptionEvent(character: ICharacter): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
-    const payload: ICharacterItemConsumed = {
+    const payload: ICharacterAttributeChanged = {
       targetId: character._id,
       health: character.health,
     };
