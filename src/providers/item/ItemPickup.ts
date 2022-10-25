@@ -14,6 +14,8 @@ import { IEquipmentAndInventoryUpdatePayload, IItemPickup, ItemSocketEvents, Ite
 import { provide } from "inversify-binding-decorators";
 import { ItemOwnership } from "./ItemOwnership";
 import { ItemView } from "./ItemView";
+
+import { MapHelper } from "@providers/map/MapHelper";
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(
@@ -26,7 +28,8 @@ export class ItemPickup {
     private characterItemSlots: CharacterItemSlots,
     private characterItemContainer: CharacterItemContainer,
     private equipmentSlots: EquipmentSlots,
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private mapHelper: MapHelper
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
@@ -175,7 +178,8 @@ export class ItemPickup {
       }
     }
 
-    const isItemOnMap = item.x !== undefined && item.y !== undefined && item.scene !== undefined;
+    const isItemOnMap =
+      this.mapHelper.isCoordinateValid(item.x) && this.mapHelper.isCoordinateValid(item.y) && item.scene;
 
     if (isItemOnMap) {
       if (character.scene !== item.scene) {

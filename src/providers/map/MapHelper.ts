@@ -3,6 +3,8 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(MapHelper)
 export class MapHelper {
+  public isCoordinateValid = (value: number | undefined | null): boolean => !(!value && value !== 0);
+
   public getHighestMapLayer = (): number => {
     const keys = Object.keys(MapLayers).filter((k) => typeof MapLayers[k as any] === "number");
 
