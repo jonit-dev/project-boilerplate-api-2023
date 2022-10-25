@@ -182,7 +182,6 @@ export class ItemPickup {
       this.mapHelper.isCoordinateValid(item.x) && this.mapHelper.isCoordinateValid(item.y) && item.scene;
 
     if (isItemOnMap) {
-      console.log(character.scene, item.scene);
       if (character.scene !== item.scene) {
         this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can't pick up items from another map.");
         return false;
