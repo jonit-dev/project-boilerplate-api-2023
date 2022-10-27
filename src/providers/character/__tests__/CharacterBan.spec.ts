@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import dayjs from "dayjs";
@@ -44,9 +43,9 @@ describe("CharacterBan.ts", () => {
 
     const today = dayjs(new Date());
 
-    const diffBanRemovalDate = dayjs(testCharacter.banRemovalDate!).diff(today, "hours");
+    const banRemovalDate = dayjs(testCharacter.banRemovalDate);
 
-    expect(diffBanRemovalDate).toBe(24 * 10 - 1);
+    expect(banRemovalDate.diff(today, "day")).toBe(9);
   });
 
   afterAll(async () => {
