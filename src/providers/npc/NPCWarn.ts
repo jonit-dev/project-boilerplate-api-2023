@@ -44,6 +44,8 @@ export class NPCWarn {
         "npcs"
       );
 
+      const hasQuest = await npc.hasQuest;
+
       this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
         character.channelId!,
         NPCSocketEvents.NPCPositionUpdate,
@@ -63,7 +65,9 @@ export class NPCWarn {
           maxHealth: npc.maxHealth,
           mana: npc.mana,
           maxMana: npc.maxMana,
-          hasQuest: await npc.hasQuest,
+          hasQuest,
+          isTrader: npc.isTrader,
+          traderItems: npc.traderItems,
         }
       );
     }
