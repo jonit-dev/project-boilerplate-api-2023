@@ -1712,13 +1712,14 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@rpg-engine/shared@^0.5.63":
-  version "0.5.63"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.5.63.tgz#93993fe73c1f524d062f9678d95f48bf18b715ec"
-  integrity sha512-6+NIoGOHbEW37O5rBYrQkUVMd6+lfMiG+uKqndQF4C8xmdQDzff7jJcfgqLyGjDBrMiK0Uz8rqNftjH+tEsHBA==
+"@rpg-engine/shared@^0.5.66":
+  version "0.5.66"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.5.66.tgz#76ee707bb9a28624ed1b07e42b4e0dfcee08ff64"
+  integrity sha512-Gz3Qlo7f2CnCKi5Ke58o+KU2kGpcBf18nesIYanOIOhmx2FtcuBZqfa/or8IcL8tS8+y2tqBA7Mx3KutPkAa+w==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
+    tsc "^2.0.4"
     typescript "^4.6.4"
 
 "@rpg-engine/soul@^0.1.16":
@@ -8361,6 +8362,11 @@ ts-node@^10.4.0:
     make-error "^1.1.1"
     v8-compile-cache-lib "^3.0.1"
     yn "3.1.1"
+
+tsc@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/tsc/-/tsc-2.0.4.tgz#5f6499146abea5dca4420b451fa4f2f9345238f5"
+  integrity sha512-fzoSieZI5KKJVBYGvwbVZs/J5za84f2lSTLPYf6AGiIf43tZ3GNrI1QzTLcjtyDDP4aLxd46RTZq1nQxe7+k5Q==
 
 tsconfig-paths@^3.10.1, tsconfig-paths@^3.14.1:
   version "3.14.1"
