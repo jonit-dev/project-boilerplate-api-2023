@@ -108,7 +108,7 @@ describe("CharacterTradingValidation.ts", () => {
 
     expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
       testCharacter,
-      "Sorry, this NPC is not selling this item."
+      "Sorry, one of the items you are trying to buy is not available."
     );
   });
 
