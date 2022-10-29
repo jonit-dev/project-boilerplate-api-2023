@@ -55,7 +55,7 @@ export class UnitTestHelper {
       // @ts-ignore
       .mockImplementation(() => ["unit-test-map.json", "example.json", "unit-test-map-negative-coordinate.json"]);
 
-    await mapLoader.init(true);
+    await mapLoader.init();
   }
 
   public async createMockNPC(
