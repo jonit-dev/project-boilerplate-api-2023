@@ -49,5 +49,4 @@ services:
 
 networks:
   rpg-network:
-    driver: bridge
     external: true
