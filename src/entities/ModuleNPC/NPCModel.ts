@@ -164,6 +164,9 @@ const npcSchema = createLeanSchema(
     healthRandomizerDice: Type.number({ required: true, default: 1 }),
     skillRandomizerDice: Type.number({ required: true, default: 1 }),
     skillsToBeRandomized: [Type.string({ required: false })],
+    hasDepot: Type.boolean({
+      default: false,
+    }),
     ...({} as {
       isAlive: boolean;
       type: string;
