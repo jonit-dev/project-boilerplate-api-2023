@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -6,13 +7,15 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ITradeRequestItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterValidation } from "./CharacterValidation";
+import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 
 @provide(CharacterTradingValidation)
 export class CharacterTradingValidation {
   constructor(
     private characterValidation: CharacterValidation,
     private socketMessaging: SocketMessaging,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private characterItemSlots: CharacterItemSlots
   ) {}
 
   public validateTransaction(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): boolean {
@@ -59,11 +62,24 @@ export class CharacterTradingValidation {
     }
 
     const inventory = await character.inventory;
-    const inventoryContainerId = inventory.itemContainer as unknown as string;
+    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
-    if (!inventoryContainerId) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "You don't have an inventory.");
+    if (!inventoryContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The character does not have an inventory.");
       return false;
+    }
+
+    for (const item of items) {
+      const itemBlueprint = itemsBlueprintIndex[item.key];
+      const qty = await this.characterItemSlots.getTotalQty(inventoryContainer, item.key);
+
+      if (qty < 1 || qty < item.qty) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          `Sorry, You can not sell ${item.qty} ${itemBlueprint.name}. You only have ${qty}.`
+        );
+        return false;
+      }
     }
 
     return true;
@@ -87,7 +103,7 @@ export class CharacterTradingValidation {
       if (!itemBlueprint) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
-          "Sorry, one of the items you are trying to buy is not available."
+          "Sorry, one of the items you are trying to trade is not available."
         );
         return false;
       }
@@ -97,7 +113,7 @@ export class CharacterTradingValidation {
     const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, npc.x, npc.y, 2);
 
     if (!isUnderRange) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "You are too far away from the seller.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "You are too far away from the trader.");
       return false;
     }
 
