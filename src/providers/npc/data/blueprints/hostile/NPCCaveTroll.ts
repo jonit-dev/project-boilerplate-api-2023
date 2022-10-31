@@ -10,7 +10,6 @@ import {
   OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
-  SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -64,10 +63,7 @@ export const npcCaveTroll = {
       chance: 50,
       quantityRange: [5, 10],
     },
-    {
-      itemBlueprintKey: SpearsBlueprint.Spear,
-      chance: 20,
-    },
+
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,

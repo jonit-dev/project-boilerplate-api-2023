@@ -12,7 +12,6 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
-  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -57,10 +56,7 @@ export const npcGoblin = {
       itemBlueprintKey: SwordsBlueprint.ShortSword,
       chance: 20,
     },
-    {
-      itemBlueprintKey: SpearsBlueprint.Spear,
-      chance: 20,
-    },
+
     {
       itemBlueprintKey: ArmorsBlueprint.IronArmor,
       chance: 5,

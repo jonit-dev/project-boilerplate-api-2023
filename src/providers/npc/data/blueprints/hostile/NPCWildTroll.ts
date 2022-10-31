@@ -15,7 +15,6 @@ import {
   OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
-  SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
 export const npcWildTroll = {
@@ -71,10 +70,7 @@ export const npcWildTroll = {
       chance: 50,
       quantityRange: [5, 10],
     },
-    {
-      itemBlueprintKey: SpearsBlueprint.Spear,
-      chance: 20,
-    },
+
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
