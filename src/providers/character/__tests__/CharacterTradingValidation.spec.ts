@@ -1,10 +1,17 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { itemBroadSword } from "@providers/item/data/blueprints/swords/ItemBroadSword";
+import { itemIceSword } from "@providers/item/data/blueprints/swords/ItemIceSword";
+import { itemKatana } from "@providers/item/data/blueprints/swords/ItemKatana";
 import { PotionsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { GRID_HEIGHT, GRID_WIDTH, ITradeRequestItem } from "@rpg-engine/shared";
 import { CharacterTradingValidation } from "../CharacterTradingValidation";
+import { CharacterValidation } from "../CharacterValidation";
 
 describe("CharacterTradingValidation.ts", () => {
   let testCharacter: ICharacter;
@@ -13,6 +20,8 @@ describe("CharacterTradingValidation.ts", () => {
   let characterTradingValidation: CharacterTradingValidation;
   let sendErrorMessageToCharacter: jest.SpyInstance;
   let transactionItems: ITradeRequestItem[];
+  let transactionSellItems: ITradeRequestItem[];
+  let inventoryItemContainerId: string;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -25,15 +34,25 @@ describe("CharacterTradingValidation.ts", () => {
         qty: 1,
       },
     ];
+
+    transactionSellItems = [
+      {
+        key: itemIceSword.key!,
+        qty: 1,
+      },
+    ];
   });
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
-    testCharacter = await unitTestHelper.createMockCharacter({
-      x: 0,
-      y: 0,
-    });
+    testCharacter = await unitTestHelper.createMockCharacter(
+      {
+        x: 0,
+        y: 0,
+      },
+      { hasEquipment: true, hasInventory: true, hasSkills: false }
+    );
 
     nonTraderNPC = await unitTestHelper.createMockNPC();
 
@@ -53,9 +72,47 @@ describe("CharacterTradingValidation.ts", () => {
       ],
     });
 
+    const testItem1 = new Item(itemIceSword);
+    await testItem1.save();
+
+    const testItem2 = new Item(itemIceSword);
+    await testItem2.save();
+
+    const testItem3 = new Item(itemKatana);
+    await testItem3.save();
+
+    const inventory = await testCharacter.inventory;
+    inventoryItemContainerId = inventory.itemContainer as unknown as string;
+
+    await addItemToInventory(testItem1, 0);
+    await addItemToInventory(testItem2, 1);
+    await addItemToInventory(testItem3, 2);
+
     // @ts-ignore
     sendErrorMessageToCharacter = jest.spyOn(characterTradingValidation.socketMessaging, "sendErrorMessageToCharacter");
   });
+
+  const getInventoryContainer = async (): Promise<IItemContainer> => {
+    return (await ItemContainer.findById(inventoryItemContainerId)) as unknown as IItemContainer;
+  };
+
+  const addItemToInventory = async (item: IItem, slotIndex: number): Promise<IItem> => {
+    const bag = await getInventoryContainer();
+    if (bag) {
+      bag.slots[slotIndex] = item;
+      await ItemContainer.updateOne(
+        {
+          _id: bag.id,
+        },
+        {
+          $set: {
+            slots: bag.slots,
+          },
+        }
+      );
+    }
+    return item;
+  };
 
   it("should check if a trader NPC has the property isTrader set to true and has items ", () => {
     expect(testNPCTrader.isTrader).toBe(true);
@@ -91,7 +148,7 @@ describe("CharacterTradingValidation.ts", () => {
 
     expect(isValid).toBe(false);
 
-    expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "You are too far away from the seller.");
+    expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "You are too far away from the trader.");
   });
 
   it("should fail if an invalid blueprint item is used", () => {
@@ -108,7 +165,7 @@ describe("CharacterTradingValidation.ts", () => {
 
     expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
       testCharacter,
-      "Sorry, this NPC is not selling this item."
+      "Sorry, one of the items you are trying to trade is not available."
     );
   });
 
@@ -128,6 +185,251 @@ describe("CharacterTradingValidation.ts", () => {
       testCharacter,
       "Sorry, invalid parameters for light-endurance-potion."
     );
+  });
+
+  describe("validate sell request", () => {
+    it("should pass validation", async () => {
+      const result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeTruthy();
+    });
+
+    it("should call character validation", async () => {
+      const characterValidationMock = jest.spyOn(CharacterValidation.prototype, "hasBasicValidation");
+      characterValidationMock.mockReturnValue(false);
+
+      let result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeFalsy();
+
+      expect(characterValidationMock).toHaveBeenLastCalledWith(testCharacter);
+
+      characterValidationMock.mockReset();
+      characterValidationMock.mockReturnValue(true);
+
+      result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeTruthy();
+
+      characterValidationMock.mockRestore();
+    });
+
+    it("should fail if npc is not a trader", async () => {
+      const result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        nonTraderNPC,
+        transactionSellItems
+      );
+      expect(result).toBe(false);
+
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "This NPC is not a trader.");
+    });
+
+    it("should fail if it items has invalid blue print key", async () => {
+      // test with all items invalid
+      let sellItems = [
+        {
+          key: "invalid-key",
+          qty: 1,
+        },
+      ];
+
+      let result = await characterTradingValidation.validateSellTransaction(testCharacter, testNPCTrader, sellItems);
+      expect(result).toBe(false);
+
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+        testCharacter,
+        "Sorry, one of the items you are trying to trade is not available."
+      );
+
+      // test with some valid items
+      sendErrorMessageToCharacter.mockReset();
+      sellItems = transactionSellItems.concat(sellItems);
+
+      result = await characterTradingValidation.validateSellTransaction(testCharacter, testNPCTrader, sellItems);
+      expect(result).toBe(false);
+
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+        testCharacter,
+        "Sorry, one of the items you are trying to trade is not available."
+      );
+    });
+
+    it("should fail if trader is not under range", async () => {
+      const isUnderRangeMock = jest.spyOn(MovementHelper.prototype, "isUnderRange");
+      isUnderRangeMock.mockReturnValue(false);
+
+      testCharacter.x = 32;
+      testCharacter.y = 44;
+      await testCharacter.save();
+
+      testNPCTrader.x = 44;
+      testNPCTrader.y = 46;
+      await testNPCTrader.save();
+
+      let result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeFalsy();
+
+      expect(isUnderRangeMock).toHaveBeenLastCalledWith(
+        testCharacter.x,
+        testCharacter.y,
+        testNPCTrader.x,
+        testNPCTrader.y,
+        2
+      );
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "You are too far away from the trader.");
+
+      isUnderRangeMock.mockReset();
+      isUnderRangeMock.mockReturnValue(true);
+
+      result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeTruthy();
+    });
+
+    it("should fail if character does not have an inventory", async () => {
+      const equipment = await Equipment.findById(testCharacter.equipment);
+      if (equipment) {
+        equipment.inventory = undefined;
+        await equipment.save();
+      }
+
+      const result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeFalsy();
+
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+        testCharacter,
+        "Oops! The character does not have an inventory."
+      );
+    });
+
+    it("should fail if character does not have an item container", async () => {
+      const inventory = await testCharacter.inventory;
+
+      if (inventory) {
+        inventory.itemContainer = undefined;
+        await inventory.save();
+      }
+
+      const result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeFalsy();
+
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+        testCharacter,
+        "Oops! The character does not have an inventory."
+      );
+    });
+
+    it("should fail if character does not have item in inventory", async () => {
+      transactionSellItems.push({
+        key: itemBroadSword.key!,
+        qty: 1,
+      });
+
+      const result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeFalsy();
+
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+        testCharacter,
+        `Sorry, You can not sell 1 ${itemBroadSword.name}. You only have 0.`
+      );
+    });
+
+    it("should fail if character trying to sell more qty than in inventory", async () => {
+      transactionSellItems = [
+        {
+          key: itemIceSword.key!,
+          qty: 3,
+        },
+        {
+          key: itemKatana.key!,
+          qty: 1,
+        },
+      ];
+
+      let result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeFalsy();
+
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+        testCharacter,
+        `Sorry, You can not sell 3 ${itemIceSword.name}. You only have 2.`
+      );
+
+      sendErrorMessageToCharacter.mockReset();
+      transactionSellItems = [
+        {
+          key: itemIceSword.key!,
+          qty: 2,
+        },
+        {
+          key: itemKatana.key!,
+          qty: 2,
+        },
+      ];
+
+      result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeFalsy();
+
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+        testCharacter,
+        `Sorry, You can not sell 2 ${itemKatana.name}. You only have 1.`
+      );
+
+      sendErrorMessageToCharacter.mockReset();
+      transactionSellItems = [
+        {
+          key: itemIceSword.key!,
+          qty: 2,
+        },
+        {
+          key: itemKatana.key!,
+          qty: 1,
+        },
+      ];
+
+      result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeTruthy();
+    });
   });
 
   afterAll(async () => {
