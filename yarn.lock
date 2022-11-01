@@ -1710,9 +1710,9 @@
     picomatch "^2.2.2"
 
 "@rpg-engine/shared@^0.5.66":
-  version "0.5.66"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.5.66.tgz#76ee707bb9a28624ed1b07e42b4e0dfcee08ff64"
-  integrity sha512-Gz3Qlo7f2CnCKi5Ke58o+KU2kGpcBf18nesIYanOIOhmx2FtcuBZqfa/or8IcL8tS8+y2tqBA7Mx3KutPkAa+w==
+  version "0.5.67"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.5.67.tgz#3760234c7d5584c07d41159a67c6de83e40c288e"
+  integrity sha512-3YTBWRlqclzTPJjuikpB8++t8zJ0iOf1wswH3Z89336c2BTnngyeoApNzsMuyYl7IuLLQ8Cc5hyFkCzeEvGjdw==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
