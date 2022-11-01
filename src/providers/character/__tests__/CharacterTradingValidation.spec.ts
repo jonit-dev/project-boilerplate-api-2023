@@ -1,18 +1,17 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { PotionsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { itemBroadSword } from "@providers/item/data/blueprints/swords/ItemBroadSword";
 import { itemIceSword } from "@providers/item/data/blueprints/swords/ItemIceSword";
 import { itemKatana } from "@providers/item/data/blueprints/swords/ItemKatana";
-import { itemBroadSword } from "@providers/item/data/blueprints/swords/ItemBroadSword";
+import { PotionsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { GRID_HEIGHT, GRID_WIDTH, ITradeRequestItem } from "@rpg-engine/shared";
 import { CharacterTradingValidation } from "../CharacterTradingValidation";
 import { CharacterValidation } from "../CharacterValidation";
-import { MovementHelper } from "@providers/movement/MovementHelper";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 
 describe("CharacterTradingValidation.ts", () => {
   let testCharacter: ICharacter;
