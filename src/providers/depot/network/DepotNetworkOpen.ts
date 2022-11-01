@@ -1,27 +1,29 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { SocketAuth } from "@providers/sockets/SocketAuth";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { MAX_DISTANCE_TO_NPC_IN_GRID } from "@providers/constants/DepotConstants";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
-  IDepotContainerOpen,
   DepotSocketEvents,
-  IItemContainerRead,
+  IDepotContainerOpen,
   IItemContainer,
+  IItemContainerRead,
   ItemContainerType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { MAX_DISTANCE_TO_NPC_IN_GRID } from "@providers/constants/DepotConstants";
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 
 @provide(DepotNetworkOpen)
 export class DepotNetworkOpen {
   constructor(
     private socketAuth: SocketAuth,
     private movementHelper: MovementHelper,
-    private socketMessaging: SocketMessaging
+    private socketMessaging: SocketMessaging,
+    private characterValidation: CharacterValidation
   ) {}
 
   public onDepotContainerOpen(channel: SocketChannel): void {
@@ -31,16 +33,10 @@ export class DepotNetworkOpen {
       async (data: IDepotContainerOpen, character) => {
         try {
           // Check if character is alive and not banned
-          if (!character.isAlive) {
-            throw new Error(`DepotContainerOpen > Character is dead! Character id: ${character.id}`);
-          }
+          const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
 
-          if (character.isBanned) {
-            throw new Error(`DepotContainerOpen > Character is banned! Character id: ${character.id}`);
-          }
-
-          if (!character.isOnline) {
-            throw new Error(`DepotContainerOpen > Character is offline! Character id: ${character.id}`);
+          if (!hasBasicValidation) {
+            return;
           }
 
           const npc = await NPC.findOne({
