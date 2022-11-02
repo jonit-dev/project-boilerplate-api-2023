@@ -25,23 +25,36 @@ export class CharacterItemInventory {
     }
 
     for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
-      const slotItem = inventoryItemContainer.slots[i] as unknown as IItem;
+      if (qty <= 0) break;
 
+      const slotItem = inventoryItemContainer.slots[i] as unknown as IItem;
       if (!slotItem) continue;
 
       if (isSameKey(slotItem.key, itemKey)) {
         if (slotItem.isStackable) {
           // if its stackable, decrement the stack
-          await this.characterItemSlots.updateItemOnSlot(i, inventoryItemContainer, {
-            ...slotItem,
-            stackQty: slotItem.stackQty! - qty,
-          });
+
+          let remaining = 0;
+
+          if (qty <= slotItem.stackQty!) {
+            remaining = this.fixPrecision(slotItem.stackQty! - qty);
+            qty = 0;
+          } else {
+            qty = this.fixPrecision(qty - slotItem.stackQty!);
+          }
+
+          if (remaining > 0) {
+            await this.characterItemSlots.updateItemOnSlot(i, inventoryItemContainer, {
+              ...slotItem,
+              stackQty: remaining,
+            });
+          } else {
+            await this.characterItemSlots.deleteItemOnSlot(inventoryItemContainer, slotItem._id);
+          }
         } else {
           // if its not stackable, just remove it
-
-          for (let i = 0; i < qty; i++) {
-            await this.deleteItemFromInventory(slotItem._id, character);
-          }
+          await this.deleteItemFromInventory(slotItem._id, character);
+          qty--;
         }
       }
     }
@@ -166,5 +179,9 @@ export class CharacterItemInventory {
     await equipment.save();
 
     return equipment;
+  }
+
+  private fixPrecision(num): number {
+    return Math.round(num * 100 + Number.EPSILON) / 100;
   }
 }

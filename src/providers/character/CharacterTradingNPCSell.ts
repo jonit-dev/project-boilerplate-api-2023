@@ -5,12 +5,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  IEquipmentAndInventoryUpdatePayload,
-  IItemContainer,
-  ItemSocketEvents,
-  ITradeRequestItem,
-} from "@rpg-engine/shared";
+import { IItemContainer, ItemSocketEvents, ITradeRequestItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
