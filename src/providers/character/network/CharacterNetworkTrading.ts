@@ -3,7 +3,7 @@ import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { CharacterTradeSocketEvents, ICharacterNPCTradeRequest } from "@rpg-engine/shared";
+import { CharacterTradeSocketEvents, ICharacterNPCTradeInit, ICharacterNPCTradeRequest } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterTradingNPCBuy } from "../CharacterTradingNPCBuy";
 import { CharacterTradingNPCSell } from "../CharacterTradingNPCSell";
@@ -18,6 +18,23 @@ export class CharacterNetworkTrading {
   ) {}
 
   public onCharacterNPCTrade(channel: SocketChannel): void {
+    this.socketAuth.authCharacterOn(
+      channel,
+      CharacterTradeSocketEvents.TradeInit,
+      async (data: ICharacterNPCTradeInit, character: ICharacter) => {
+        const { npcId, type } = data;
+
+        switch (type) {
+          case "buy":
+            await this.characterTradingNPCBuy.initializeBuy(npcId, character);
+            break;
+          case "sell":
+            // TODO: Implement sell
+            break;
+        }
+      }
+    );
+
     this.socketAuth.authCharacterOn(
       channel,
       CharacterTradeSocketEvents.TradeWithNPC,
