@@ -1,3 +1,4 @@
+import { CharacterTradeSocketEvents, ItemSocketEvents, ITradeRequestItem } from "@rpg-engine/shared";
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
@@ -10,7 +11,6 @@ import {
   RangedWeaponsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ItemSocketEvents, ITradeRequestItem } from "@rpg-engine/shared";
 import { CharacterTradingNPCBuy } from "../CharacterTradingNPCBuy";
 
 describe("CharacterTradingValidation.ts", () => {
@@ -149,6 +149,46 @@ describe("CharacterTradingValidation.ts", () => {
           openEquipmentSetOnUpdate: false,
           openInventoryOnUpdate: true,
         }
+      );
+    });
+  });
+
+  describe("Buy transaction initialization", () => {
+    beforeEach(async () => {
+      await prepareTransaction();
+
+      const goldCoins = await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, {
+        stackQty: 100,
+      });
+
+      inventoryContainer.slotQty = 20;
+      inventoryContainer.slots = {
+        ...inventoryContainer.slots,
+        0: goldCoins.toJSON({ virtuals: true }),
+      };
+      inventoryContainer.markModified("slots");
+      await inventoryContainer.save();
+    });
+
+    it("should properly initialize a buy transaction", async () => {
+      await characterTradingNPCBuy.initializeBuy(testNPCTrader._id, testCharacter);
+
+      const payload = {
+        characterAvailableGold: 100,
+        npcId: testNPCTrader._id,
+        traderItems: expect.arrayContaining([
+          expect.objectContaining({
+            key: PotionsBlueprint.LightEndurancePotion,
+            price: 15,
+          }),
+        ]),
+        type: "buy",
+      };
+
+      expect(sendEventToUser).toHaveBeenCalledWith(
+        testCharacter.channelId!,
+        CharacterTradeSocketEvents.TradeInit,
+        payload
       );
     });
   });
