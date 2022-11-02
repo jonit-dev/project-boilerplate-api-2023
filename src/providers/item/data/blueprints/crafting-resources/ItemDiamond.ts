@@ -12,4 +12,5 @@ export const itemDiamond: Partial<IItem> = {
   description: "A rare item that can be used as a jewel or as a crafting resource.",
   weight: 0.25,
   maxStackSize: 10,
+  sellPrice: 10,
 };

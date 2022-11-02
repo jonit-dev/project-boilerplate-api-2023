@@ -13,6 +13,7 @@ import { CharacterTradingValidation } from "../CharacterTradingValidation";
 import { CharacterValidation } from "../CharacterValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { itemGroundBlood } from "@providers/item/data/blueprints/effects/ItemGroundBlood";
 
 describe("CharacterTradingValidation.ts", () => {
   let testCharacter: ICharacter;
@@ -32,13 +33,6 @@ describe("CharacterTradingValidation.ts", () => {
     transactionItems = [
       {
         key: PotionsBlueprint.LightEndurancePotion,
-        qty: 1,
-      },
-    ];
-
-    transactionSellItems = [
-      {
-        key: itemIceSword.key!,
         qty: 1,
       },
     ];
@@ -89,8 +83,19 @@ describe("CharacterTradingValidation.ts", () => {
     await addItemToInventory(testItem2, 1);
     await addItemToInventory(testItem3, 2);
 
+    transactionSellItems = [
+      {
+        key: itemIceSword.key!,
+        qty: 1,
+      },
+    ];
+
     // @ts-ignore
     sendErrorMessageToCharacter = jest.spyOn(characterTradingValidation.socketMessaging, "sendErrorMessageToCharacter");
+  });
+
+  afterEach(() => {
+    sendErrorMessageToCharacter.mockRestore();
   });
 
   const getInventoryContainer = async (): Promise<IItemContainer> => {
@@ -361,6 +366,25 @@ describe("CharacterTradingValidation.ts", () => {
       expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
         testCharacter,
         `Sorry, You can not sell 1 ${itemBroadSword.name}. You only have 0.`
+      );
+    });
+
+    it("should fail if item blue print does not have sellPrice", async () => {
+      transactionSellItems.push({
+        key: itemGroundBlood.key!,
+        qty: 1,
+      });
+
+      const result = await characterTradingValidation.validateSellTransaction(
+        testCharacter,
+        testNPCTrader,
+        transactionSellItems
+      );
+      expect(result).toBeFalsy();
+
+      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
+        testCharacter,
+        `Sorry, ${itemGroundBlood.name} can not be sold.`
       );
     });
 

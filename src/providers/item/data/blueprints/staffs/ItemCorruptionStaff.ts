@@ -17,4 +17,5 @@ export const itemCorruptionStaff: Partial<IItem> = {
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
+  sellPrice: 70,
 };

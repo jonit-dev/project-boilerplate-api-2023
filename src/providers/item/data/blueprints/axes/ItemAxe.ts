@@ -16,4 +16,5 @@ export const itemAxe: Partial<IItem> = {
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
+  sellPrice: 50,
 };

@@ -73,7 +73,10 @@ export class CharacterTradingValidation {
       const itemBlueprint = itemsBlueprintIndex[item.key];
       const qty = await this.characterItemSlots.getTotalQty(inventoryContainer, item.key);
 
-      if (qty < 1 || qty < item.qty) {
+      if (!itemBlueprint.sellPrice) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, ${itemBlueprint.name} can not be sold.`);
+        return false;
+      } else if (qty < 1 || qty < item.qty) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
           `Sorry, You can not sell ${item.qty} ${itemBlueprint.name}. You only have ${qty}.`

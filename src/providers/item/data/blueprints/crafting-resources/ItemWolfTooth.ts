@@ -12,4 +12,5 @@ export const itemWolfTooth: Partial<IItem> = {
   description: "A crafting material used as a magic reagent.",
   weight: 0.01,
   maxStackSize: 100,
+  sellPrice: 10,
 };

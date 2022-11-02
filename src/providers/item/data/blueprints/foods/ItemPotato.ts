@@ -15,6 +15,7 @@ export const itemPotato: Partial<IItem> = {
   description: "You see a short sword. It is a single-handed sword with a handle that just features a grip.",
   weight: 10,
   maxStackSize: 100,
+  sellPrice: 5,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.apply(character, EffectableAttribute.Health, 2);
   },

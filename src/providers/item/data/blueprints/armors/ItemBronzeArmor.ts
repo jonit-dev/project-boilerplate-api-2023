@@ -13,4 +13,5 @@ export const itemBronzeArmor: Partial<IItem> = {
   defense: 18,
   weight: 5,
   allowedEquipSlotType: [ItemSlotType.Torso],
+  sellPrice: 150,
 };

@@ -13,4 +13,5 @@ export const itemBrassHelmet: Partial<IItem> = {
   defense: 5,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Head],
+  sellPrice: 22,
 };

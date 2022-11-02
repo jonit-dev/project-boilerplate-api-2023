@@ -13,4 +13,5 @@ export const itemPlaceShield: Partial<IItem> = {
   defense: 13,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  sellPrice: 30,
 };

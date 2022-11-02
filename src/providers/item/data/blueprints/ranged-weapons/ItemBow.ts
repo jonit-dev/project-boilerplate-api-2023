@@ -20,4 +20,5 @@ export const itemBow: Partial<IItem> = {
   maxRange: 7,
   requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow],
   isTwoHanded: true,
+  sellPrice: 40,
 };

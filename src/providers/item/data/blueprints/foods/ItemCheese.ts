@@ -15,6 +15,7 @@ export const itemCheese: Partial<IItem> = {
   description: "A cheese wheel.",
   weight: 1,
   maxStackSize: 10,
+  sellPrice: 5,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.apply(character, EffectableAttribute.Health, 2);
   },

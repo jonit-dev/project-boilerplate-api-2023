@@ -13,4 +13,5 @@ export const itemKnightsShield: Partial<IItem> = {
   defense: 8,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  sellPrice: 17,
 };

@@ -11,4 +11,5 @@ export const itemRoyalChalice: Partial<IItem> = {
   name: "Royal Chalice",
   description: "A well master crafted chalice worth of a king.",
   weight: 1,
+  sellPrice: 5,
 };

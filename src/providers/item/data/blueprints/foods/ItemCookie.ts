@@ -15,6 +15,7 @@ export const itemCookie: Partial<IItem> = {
   description: "A baked cookie.",
   weight: 0.05,
   maxStackSize: 100,
+  sellPrice: 5,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.apply(character, EffectableAttribute.Health, 1);
   },

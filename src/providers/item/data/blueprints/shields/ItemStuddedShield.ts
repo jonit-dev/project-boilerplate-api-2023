@@ -13,4 +13,5 @@ export const itemStuddedShield: Partial<IItem> = {
   defense: 4,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  sellPrice: 10,
 };

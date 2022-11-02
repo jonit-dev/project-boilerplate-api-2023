@@ -17,4 +17,5 @@ export const itemCorruptionDagger: Partial<IItem> = {
   attack: 7,
   defense: 3,
   rangeType: EntityAttackType.Melee,
+  sellPrice: 35,
 };

@@ -13,4 +13,5 @@ export const itemRope: Partial<IItem> = {
   description: "A simple rope.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
+  sellPrice: 5,
 };

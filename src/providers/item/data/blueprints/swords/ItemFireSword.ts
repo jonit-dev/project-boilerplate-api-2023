@@ -16,4 +16,5 @@ export const itemFireSword: Partial<IItem> = {
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
+  sellPrice: 90,
 };
