@@ -65,7 +65,7 @@ export class UnitTestHelper {
     time: string,
     period: PeriodOfDay,
     weather: string,
-    createdAt: Date
+    createdAt?: Date
   ): Promise<IControlTime> {
     const weatherControl = new MapControlTimeModel({
       time: time,
