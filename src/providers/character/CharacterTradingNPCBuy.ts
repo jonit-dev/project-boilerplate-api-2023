@@ -7,6 +7,7 @@ import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes"
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   CharacterTradeSocketEvents,
+  ICharacterNPCTradeInitBuyResponse,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
   ItemSocketEvents,
@@ -50,12 +51,16 @@ export class CharacterTradingNPCBuy {
 
     const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
 
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterTradeSocketEvents.TradeInit, {
-      npcId: npc._id,
-      type: "buy",
-      traderItems,
-      characterAvailableGold,
-    });
+    this.socketMessaging.sendEventToUser<ICharacterNPCTradeInitBuyResponse>(
+      character.channelId!,
+      CharacterTradeSocketEvents.TradeInit,
+      {
+        npcId: npc._id,
+        type: "buy",
+        traderItems: traderItems || [],
+        characterAvailableGold,
+      }
+    );
   }
 
   public async buyItemsFromNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<boolean> {
