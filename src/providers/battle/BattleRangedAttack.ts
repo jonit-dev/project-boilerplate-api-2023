@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
@@ -228,8 +227,6 @@ export class BattleRangedAttack {
    */
   public async consumeAmmo(attackParams: IRangedAttackParams, character: ICharacter): Promise<void> {
     const equipment = attackParams.equipment!;
-    const backpack = equipment.inventory as unknown as IItem;
-    const backpackContainer = (await ItemContainer.findById(backpack?.itemContainer)) as IItemContainer;
 
     let wasStackReduced = false;
 
@@ -274,16 +271,6 @@ export class BattleRangedAttack {
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,
-      inventory: {
-        _id: backpack._id,
-        parentItem: backpackContainer.parentItem.toString(),
-        owner: backpackContainer.owner?.toString() || character.name,
-        name: backpackContainer.name,
-        slotQty: backpackContainer.slotQty,
-        slots: backpackContainer.slots,
-        allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
-        isEmpty: backpackContainer.isEmpty,
-      },
       openEquipmentSetOnUpdate: false,
       openInventoryOnUpdate: false,
     };
