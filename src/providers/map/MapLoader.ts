@@ -1,4 +1,5 @@
 import { MapModel } from "@entities/ModuleSystem/MapModel";
+import { appEnv } from "@providers/config/env";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { InternalServerError } from "@providers/errors/InternalServerError";
 import { ITiled, MAP_REQUIRED_LAYERS } from "@rpg-engine/shared";
@@ -18,13 +19,13 @@ export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
   constructor(private gridManager: GridManager) {}
 
-  public async init(isUnitTest: boolean = false): Promise<void> {
+  public async init(): Promise<void> {
     // get all map names
 
     const mapNames = this.getMapNames();
     const mapToCheckTransitions: MapObject[] = [];
 
-    if (!isUnitTest) {
+    if (!appEnv.general.IS_UNIT_TEST) {
       console.time("🟧 Solids generated in");
     }
 
@@ -44,7 +45,9 @@ export class MapLoader {
         this.hasMapRequiredLayers(mapFileName, currentMap as ITiled);
       }
 
-      const updated = await this.checkMapUpdated(mapPath, mapFileName, currentMap);
+      const updated = !appEnv.general.IS_UNIT_TEST
+        ? await this.checkMapUpdated(mapPath, mapFileName, currentMap)
+        : true;
 
       if (updated) {
         mapToCheckTransitions.push({ name: mapFileName, data: currentMap });
@@ -57,7 +60,7 @@ export class MapLoader {
       this.gridManager.generateGridSolids(mapName);
     }
 
-    if (!isUnitTest) {
+    if (!appEnv.general.IS_UNIT_TEST) {
       console.timeEnd("🟧 Solids generated in");
 
       console.log("📦 Maps and grids are loaded!");

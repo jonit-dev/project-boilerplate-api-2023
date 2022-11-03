@@ -19,7 +19,6 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
-  SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
 export const npcForestTroll = {
@@ -75,10 +74,7 @@ export const npcForestTroll = {
       itemBlueprintKey: HelmetsBlueprint.ArabicHelmet,
       chance: 10,
     },
-    {
-      itemBlueprintKey: SpearsBlueprint.Spear,
-      chance: 20,
-    },
+
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
