@@ -1,7 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
+import { MapControlTime } from "@providers/map/MapControlTime";
+import { IControlTime, WeatherSocketEvents } from "@providers/map/types/ControlTimeTypes";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -28,7 +31,8 @@ export class CharacterNetworkCreate {
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private npcManager: NPCManager,
     private gridManager: GridManager,
-    private npcWarn: NPCWarn
+    private npcWarn: NPCWarn,
+    private mapControlTime: MapControlTime
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -114,13 +118,28 @@ export class CharacterNetworkCreate {
         await channel.join(data.channelId);
 
         await this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
+
+        // how we keep only one record in registry, we have just one do find.
+        const lastTimeWeatherChanged = await MapControlTimeModel.findOne();
+        if (lastTimeWeatherChanged) {
+          const dataOfWeather: IControlTime = {
+            time: lastTimeWeatherChanged.time,
+            period: lastTimeWeatherChanged.period,
+            weather: lastTimeWeatherChanged.weather,
+          };
+
+          this.socketMessaging.sendEventToUser<IControlTime>(
+            dataFromServer.channelId!,
+            WeatherSocketEvents.TimeWeatherControl,
+            dataOfWeather
+          );
+        }
       }
     );
   }
 
   public async sendCreationMessageToCharacters(
     emitterChannelId: string,
-
     dataFromServer: ICharacterCreateFromServer,
     character: ICharacter
   ): Promise<void> {

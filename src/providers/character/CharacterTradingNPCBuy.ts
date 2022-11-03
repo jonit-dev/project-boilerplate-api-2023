@@ -6,6 +6,8 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
+  CharacterTradeSocketEvents,
+  ICharacterNPCTradeInitBuyResponse,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
   ItemSocketEvents,
@@ -28,6 +30,38 @@ export class CharacterTradingNPCBuy {
     private characterWeight: CharacterWeight,
     private characterTradingValidation: CharacterTradingValidation
   ) {}
+
+  public async initializeBuy(npcId: string, character: ICharacter): Promise<void> {
+    const npc = await this.characterTradingValidation.validateAndReturnTraderNPC(npcId, character);
+
+    if (!npc) {
+      throw new Error("Failed to initialize buy transaction. NPC not found!");
+    }
+
+    const traderItems = npc?.traderItems?.map(({ key, price }) => {
+      const { texturePath, name } = itemsBlueprintIndex[key] as IItem;
+
+      return {
+        key,
+        price,
+        texturePath,
+        name,
+      };
+    });
+
+    const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
+
+    this.socketMessaging.sendEventToUser<ICharacterNPCTradeInitBuyResponse>(
+      character.channelId!,
+      CharacterTradeSocketEvents.TradeInit,
+      {
+        npcId: npc._id,
+        type: "buy",
+        traderItems: traderItems || [],
+        characterAvailableGold,
+      }
+    );
+  }
 
   public async buyItemsFromNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<boolean> {
     const inventory = await character.inventory;

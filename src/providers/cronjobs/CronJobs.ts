@@ -5,6 +5,7 @@ import { CharacterCrons } from "./CharacterCrons";
 import { ChatLogCrons } from "./ChatLogCrons";
 import { ItemCrons } from "./ItemCrons";
 import { NPCCrons } from "./NPCCrons";
+import { ControlTimeCrons } from "./ControlTimeCrons";
 
 @provide(Cronjob)
 export class Cronjob {
@@ -12,7 +13,8 @@ export class Cronjob {
     private characterCron: CharacterCrons,
     private itemCrons: ItemCrons,
     private chatLogCron: ChatLogCrons,
-    private npcCron: NPCCrons
+    private npcCron: NPCCrons,
+    private controlTimeCron: ControlTimeCrons
   ) {}
 
   public start(): void {
@@ -40,6 +42,9 @@ export class Cronjob {
           case "3":
             this.npcCron.schedule();
             break;
+          case "4":
+            this.controlTimeCron.schedule();
+            break;
         }
         break;
       case EnvType.Development:
@@ -48,6 +53,7 @@ export class Cronjob {
         this.itemCrons.schedule();
         this.chatLogCron.schedule();
         this.npcCron.schedule();
+        this.controlTimeCron.schedule();
         break;
     }
   }

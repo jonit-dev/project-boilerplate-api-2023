@@ -1,13 +1,13 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ITradeRequestItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterValidation } from "./CharacterValidation";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
+import { CharacterValidation } from "./CharacterValidation";
 
 @provide(CharacterTradingValidation)
 export class CharacterTradingValidation {
@@ -17,6 +17,30 @@ export class CharacterTradingValidation {
     private movementHelper: MovementHelper,
     private characterItemSlots: CharacterItemSlots
   ) {}
+
+  public async validateAndReturnTraderNPC(npcId: string, character: ICharacter): Promise<INPC | undefined> {
+    const npc = await NPC.findOne({
+      _id: npcId,
+    });
+
+    if (!npc) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, the NPC you're trying to trade with is not available."
+      );
+      return;
+    }
+
+    if (!npc.isTrader) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, the NPC you're trying to trade with is not a trader."
+      );
+      return;
+    }
+
+    return npc;
+  }
 
   public validateTransaction(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): boolean {
     const hasBasicValidation = this.hasBasicValidation(character, npc, items);

@@ -8,10 +8,13 @@ import { IQuest, Quest } from "@entities/ModuleQuest/QuestModel";
 import { QuestObjectiveInteraction, QuestObjectiveKill } from "@entities/ModuleQuest/QuestObjectiveModel";
 import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { IControlTime, MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { container, mapLoader } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { PeriodOfDay } from "@providers/map/types/ControlTimeTypes";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
@@ -26,7 +29,7 @@ import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
-import { itemMock, itemTwoHandedMock, stackableItemMock } from "./mock/itemMock";
+import { itemMock, itemTwoHandedMock, stackableItemMock, itemMockArmor } from "./mock/itemMock";
 import { questInteractionObjectiveMock, questKillObjectiveMock, questMock, questRewardsMock } from "./mock/questMock";
 
 interface IMockCharacterOptions {
@@ -55,7 +58,24 @@ export class UnitTestHelper {
       // @ts-ignore
       .mockImplementation(() => ["unit-test-map.json", "example.json", "unit-test-map-negative-coordinate.json"]);
 
-    await mapLoader.init(true);
+    await mapLoader.init();
+  }
+
+  public async createWeatherControlMock(
+    time: string,
+    period: PeriodOfDay,
+    weather: string,
+    createdAt?: Date
+  ): Promise<IControlTime> {
+    const weatherControl = new MapControlTimeModel({
+      time: time,
+      period: period,
+      weather: weather,
+      createdAt: createdAt,
+    });
+    await weatherControl.save();
+
+    return weatherControl;
   }
 
   public async createMockNPC(
@@ -174,6 +194,17 @@ export class UnitTestHelper {
     return newItem;
   }
 
+  public async createMockArmor(extraProps?: Partial<IItem>): Promise<IItem> {
+    const newItem = new Item({
+      ...itemMockArmor,
+      ...extraProps,
+    });
+
+    await newItem.save();
+
+    return newItem;
+  }
+
   public async createStackableMockItem(extraProps?: Partial<IItem>): Promise<IItem> {
     const newItem = new Item({
       ...stackableItemMock,
@@ -183,6 +214,26 @@ export class UnitTestHelper {
     await newItem.save();
 
     return newItem;
+  }
+
+  public async createMockAndEquipItens(character: ICharacter, extraProps?: Partial<IItem>): Promise<void> {
+    const itemSword = await this.createMockItem();
+    const itemArmor = await this.createMockArmor();
+    const equipmentEquip: EquipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
+
+    const inventory = await character.inventory;
+
+    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    inventoryContainer.slots[0] = itemSword;
+    inventoryContainer.slots[1] = itemArmor;
+    inventoryContainer.markModified("slots");
+
+    await inventoryContainer.save();
+
+    await equipmentEquip.equip(character, itemSword._id, inventoryContainer.id);
+
+    await equipmentEquip.equip(character, itemArmor._id, inventoryContainer.id);
   }
 
   public async createMockCharacter(

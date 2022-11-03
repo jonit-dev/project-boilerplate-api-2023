@@ -1,9 +1,12 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
+import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { calculateExperience } from "@providers/npc/NPCExperience";
 import { calculateSPToNextLevel, calculateXPToNextLevel } from "@providers/skill/SkillCalculator";
 import { NPCAlignment, SkillType, TypeHelper } from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { Character } from "./CharacterModel";
 import { Equipment } from "./EquipmentModel";
 
 const skillDetails = (type: SkillType): Record<string, any> => {
@@ -121,10 +124,22 @@ skillsSchema.virtual("attack").get(async function (this: ISkill) {
 
     if (equipment) {
       const totalEquippedAttack = await equipment?.totalEquippedAttack;
+      const dataOfWeather = await MapControlTimeModel.findOne();
+      const character = await Character.findById(this.owner);
+      const totalAttackNoBonus = this.strength.level + this.level + totalEquippedAttack;
+      const totalAttackWithBonus = totalAttackNoBonus + totalAttackNoBonus * INCREASE_BONUS_FACTION;
 
       // TODO: This should also take into consideration the weapon proficiency of the character.
 
-      return this.strength.level + this.level + totalEquippedAttack || 0;
+      if (character?.faction === "Life Bringer" && dataOfWeather?.period === "Morning") {
+        return totalAttackWithBonus || 0;
+      }
+
+      if (character?.faction === "Shadow Walker" && dataOfWeather?.period === "Night") {
+        return totalAttackWithBonus || 0;
+      }
+
+      return totalAttackNoBonus || 0;
     }
   }
 
@@ -139,8 +154,20 @@ skillsSchema.virtual("defense").get(async function (this: ISkill) {
     });
     if (equipment) {
       const totalEquippedDefense = await equipment?.totalEquippedDefense;
+      const dataOfWeather = await MapControlTimeModel.findOne();
+      const character = await Character.findById(this.owner);
+      const totalDefenseNoBonus = this.resistance.level + this.level + totalEquippedDefense;
+      const totalDefenseWithBonus = totalDefenseNoBonus + totalDefenseNoBonus * INCREASE_BONUS_FACTION;
 
-      return this.resistance.level + this.level + totalEquippedDefense || 0;
+      if (character?.faction === "Life Bringer" && dataOfWeather?.period === "Morning") {
+        return totalDefenseWithBonus || 0;
+      }
+
+      if (character?.faction === "Shadow Walker" && dataOfWeather?.period === "Night") {
+        return totalDefenseWithBonus || 0;
+      }
+
+      return totalDefenseNoBonus || 0;
     }
   }
   // for regular NPCs
