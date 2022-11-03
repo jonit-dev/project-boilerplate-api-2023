@@ -158,4 +158,8 @@ export class MathHelper {
 
     return arr;
   }
+
+  public fixPrecision(num: number): number {
+    return Math.round(num * 100 + Number.EPSILON) / 100;
+  }
 }
