@@ -14,4 +14,5 @@ export const itemCoat: Partial<IItem> = {
   defense: 3,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Torso],
+  sellPrice: 20,
 };

@@ -13,4 +13,5 @@ export const itemBook: Partial<IItem> = {
   description: "A leather bound book.",
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Accessory],
+  sellPrice: 10,
 };

@@ -13,4 +13,5 @@ export const itemLightEndurancePotion: Partial<IItem> = {
   description: "A small flask containing an elixir of endurance.",
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Inventory],
+  sellPrice: 15,
 };

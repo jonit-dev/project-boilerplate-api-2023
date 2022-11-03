@@ -17,4 +17,5 @@ export const itemFrostDagger: Partial<IItem> = {
   attack: 8,
   weight: 1,
   rangeType: EntityAttackType.Melee,
+  sellPrice: 30,
 };

@@ -13,4 +13,5 @@ export const itemDarkWizardHat: Partial<IItem> = {
   defense: 3,
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Head],
+  sellPrice: 6,
 };

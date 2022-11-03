@@ -18,4 +18,5 @@ export const itemFrostDoubleAxe: Partial<IItem> = {
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
+  sellPrice: 90,
 };

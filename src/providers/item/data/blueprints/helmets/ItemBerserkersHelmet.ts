@@ -14,4 +14,5 @@ export const itemBerserkersHelmet: Partial<IItem> = {
   defense: 6,
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.Head],
+  sellPrice: 21,
 };

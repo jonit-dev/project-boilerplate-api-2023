@@ -13,4 +13,5 @@ export const itemWoodenShield: Partial<IItem> = {
   defense: 3,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  sellPrice: 8,
 };

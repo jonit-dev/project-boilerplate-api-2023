@@ -13,4 +13,5 @@ export const itemLeatherLegs: Partial<IItem> = {
   defense: 4,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Legs],
+  sellPrice: 10,
 };

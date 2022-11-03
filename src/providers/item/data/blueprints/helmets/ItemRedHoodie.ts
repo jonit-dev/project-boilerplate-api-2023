@@ -13,4 +13,5 @@ export const itemRedHoodie: Partial<IItem> = {
   defense: 2,
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Head],
+  sellPrice: 3,
 };

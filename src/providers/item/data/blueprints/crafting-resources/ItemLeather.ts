@@ -12,4 +12,5 @@ export const itemLeather: Partial<IItem> = {
   description: "Raw material that can be used to craft armors and other goods",
   weight: 3,
   maxStackSize: 100,
+  sellPrice: 10,
 };

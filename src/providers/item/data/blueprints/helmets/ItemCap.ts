@@ -13,4 +13,5 @@ export const itemCap: Partial<IItem> = {
   defense: 2,
   weight: 0.3,
   allowedEquipSlotType: [ItemSlotType.Head],
+  sellPrice: 5,
 };

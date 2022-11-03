@@ -12,4 +12,5 @@ export const itemCandle: Partial<IItem> = {
   description: "A wax candle.",
   weight: 0.05,
   allowedEquipSlotType: [ItemSlotType.Ring],
+  sellPrice: 1,
 };

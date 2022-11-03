@@ -13,4 +13,5 @@ export const itemTurban: Partial<IItem> = {
   defense: 1,
   weight: 0.2,
   allowedEquipSlotType: [ItemSlotType.Head],
+  sellPrice: 5,
 };

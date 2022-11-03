@@ -12,4 +12,5 @@ export const itemColoredFeather: Partial<IItem> = {
   description: "A crafting resource used for making arrows and magic items",
   weight: 0.01,
   maxStackSize: 100,
+  sellPrice: 10,
 };

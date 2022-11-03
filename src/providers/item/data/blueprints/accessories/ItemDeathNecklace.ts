@@ -14,4 +14,5 @@ export const itemDeathNecklace: Partial<IItem> = {
   defense: 0,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
+  sellPrice: 15,
 };

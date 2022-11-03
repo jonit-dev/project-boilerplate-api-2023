@@ -15,6 +15,7 @@ export const itemCheeseSlice: Partial<IItem> = {
   description: "A thick slice of yellow cheese.",
   weight: 0.1,
   maxStackSize: 100,
+  sellPrice: 5,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.apply(character, EffectableAttribute.Health, 1);
   },

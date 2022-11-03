@@ -13,4 +13,5 @@ export const itemBlueSapphire: Partial<IItem> = {
   description: "Sapphire is a precious gemstone, formed from a mineral called corundum.",
   weight: 0.1,
   maxStackSize: 10,
+  sellPrice: 10,
 };

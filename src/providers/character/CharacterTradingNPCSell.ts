@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { ITradeRequestItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+
 import { CharacterTradingValidation } from "./CharacterTradingValidation";
 
 @provide(CharacterTradingNPCSell)

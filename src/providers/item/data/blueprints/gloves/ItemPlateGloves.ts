@@ -14,4 +14,5 @@ export const itemPlateGloves: Partial<IItem> = {
   defense: 10,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.Ring],
+  sellPrice: 6,
 };
