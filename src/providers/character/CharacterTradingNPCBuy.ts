@@ -37,7 +37,16 @@ export class CharacterTradingNPCBuy {
       throw new Error("Failed to initialize buy transaction. NPC not found!");
     }
 
-    const traderItems = npc?.traderItems;
+    const traderItems = npc?.traderItems?.map(({ key, price }) => {
+      const { texturePath, name } = itemsBlueprintIndex[key] as IItem;
+
+      return {
+        key,
+        price,
+        texturePath,
+        name,
+      };
+    });
 
     const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
 
