@@ -13,6 +13,7 @@ export class ControlTimeCrons {
     For porpose of testing we will keep this part of code commented,
     uncomment and the control time will send one event per minute.
     */
+
     // nodeCron.schedule("* * * * *", async () => {
     //   await this.mapControlTime.controlTime(
     //     "06:00",
@@ -31,7 +32,7 @@ export class ControlTimeCrons {
       );
     });
 
-    // Afternoon 13:00
+    //   // Afternoon 13:00
     nodeCron.schedule("0 9 * * *", async () => {
       await this.mapControlTime.controlTime("13:00", PeriodOfDay.Afternoon, WEATHER_OF_DAY[2]);
     });
