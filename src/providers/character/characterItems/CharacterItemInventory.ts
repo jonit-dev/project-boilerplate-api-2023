@@ -22,7 +22,7 @@ export class CharacterItemInventory {
   public async decrementItemFromInventory(itemKey: string, character: ICharacter, qty: number): Promise<boolean> {
     const inventory = (await character.inventory) as unknown as IItem;
 
-    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
+    let inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
@@ -56,13 +56,15 @@ export class CharacterItemInventory {
               stackQty: remaining,
             });
           } else {
-            result = await this.characterItemSlots.deleteItemOnSlot(inventoryItemContainer, slotItem._id);
+            result = await this.deleteItemFromInventory(slotItem._id, character);
 
-            if (!result) {
-              this.socketMessaging.sendErrorMessageToCharacter(
-                character,
-                "Oops! The item to be removed was not found."
-              );
+            // we need to fetch updated container in case some quantity remains to be substracted
+            if (result && qty > 0) {
+              inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
+              if (!inventoryItemContainer) {
+                result = false;
+                break;
+              }
             }
           }
         } else {

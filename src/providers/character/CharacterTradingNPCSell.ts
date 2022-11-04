@@ -30,6 +30,10 @@ export class CharacterTradingNPCSell {
   ) {}
 
   public async sellItemsToNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<void> {
+    if (!items.length) {
+      return;
+    }
+
     items = this.mergeSameItems(items);
 
     const isValid = await this.characterTradingValidation.validateSellTransaction(character, npc, items);
@@ -38,11 +42,15 @@ export class CharacterTradingNPCSell {
     }
 
     const soldItems = await this.removeItemsFromInventory(items, character);
+    if (!soldItems.length) {
+      return;
+    }
+
     await this.addGoldToInventory(soldItems, character);
 
     await this.characterWeight.updateCharacterWeight(character);
 
-    await this.sendRefreshItemsEent(character);
+    await this.sendRefreshItemsEvent(character);
   }
 
   private mergeSameItems(items: ITradeRequestItem[]): ITradeRequestItem[] {
@@ -74,6 +82,7 @@ export class CharacterTradingNPCSell {
         removedItems.push(item);
       }
     }
+    // if an item is failed to decrement then error would be sent from inside the decrement function
     return removedItems;
   }
 
@@ -104,7 +113,7 @@ export class CharacterTradingNPCSell {
     }
 
     if (!success) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "An error occurred while processing your trade.");
+      this.sendErrorOccurred(character);
     }
   }
 
@@ -121,7 +130,7 @@ export class CharacterTradingNPCSell {
     return qty;
   }
 
-  private async sendRefreshItemsEent(character: ICharacter): Promise<void> {
+  private async sendRefreshItemsEvent(character: ICharacter): Promise<void> {
     const inventory = await character.inventory;
     const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
@@ -136,5 +145,9 @@ export class CharacterTradingNPCSell {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       payloadUpdate
     );
+  }
+
+  private sendErrorOccurred(character: ICharacter): void {
+    this.socketMessaging.sendErrorMessageToCharacter(character, "An error occurred while processing your trade.");
   }
 }
