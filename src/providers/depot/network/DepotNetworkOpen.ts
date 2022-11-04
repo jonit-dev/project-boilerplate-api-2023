@@ -1,4 +1,3 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
@@ -6,6 +5,7 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { MAX_DISTANCE_TO_NPC_IN_GRID } from "@providers/constants/DepotConstants";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
+import { Types } from "mongoose";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
@@ -60,7 +60,13 @@ export class DepotNetworkOpen {
             return;
           }
 
-          const itemContainer = await this.getDepotContainer(character, data.npcId);
+          if (!npc.hasDepot) {
+            throw new Error(
+              `DepotContainerOpen > NPC does not support depot ('hasDepot' = false): NPC id ${data.npcId}`
+            );
+          }
+
+          const itemContainer = await this.getDepotContainer(character.id, data.npcId);
 
           this.socketMessaging.sendEventToUser<IItemContainerRead>(
             character.channelId!,
@@ -77,12 +83,12 @@ export class DepotNetworkOpen {
     );
   }
 
-  private async getDepotContainer(character: ICharacter, npcId: string): Promise<IItemContainer> {
+  private async getDepotContainer(characterId: string, npcId: string): Promise<IItemContainer> {
     let itemContainer: IItemContainer;
 
     const depot = await Depot.findOne({
-      owner: character.id,
-      npc: npcId,
+      owner: Types.ObjectId(characterId),
+      npc: Types.ObjectId(npcId),
     })
       .populate("itemContainer")
       .exec();
@@ -92,8 +98,8 @@ export class DepotNetworkOpen {
     } else {
       // Depot does not exist, create new one
       let newDepot = new Depot({
-        owner: character.id,
-        npc: npcId,
+        owner: Types.ObjectId(characterId),
+        npc: Types.ObjectId(npcId),
       });
 
       newDepot = await newDepot.save();
