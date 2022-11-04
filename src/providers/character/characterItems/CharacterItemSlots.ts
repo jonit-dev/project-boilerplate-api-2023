@@ -36,7 +36,7 @@ export class CharacterItemSlots {
       if (slotItem.key.replace(/-\d+$/, "").toString() === itemKey.replace(/-\d+$/, "").toString()) {
         const dbItem = (await Item.findById(slotItem._id)) as unknown as IItem;
 
-        items.push(dbItem);
+        dbItem && items.push(dbItem);
       }
     }
 
