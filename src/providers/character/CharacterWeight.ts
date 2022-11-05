@@ -57,6 +57,11 @@ export class CharacterWeight {
       for (const slot of slots) {
         const item = await Item.findById(slot).lean();
         if (item) {
+          if (item.stackQty && item.stackQty > 1) {
+            // -1 because the count is include the weight of the container item.
+            // 100 arrows x 0.1 = 10 weight, but the result will be 10.1 without the -1.
+            totalWeight += item.weight * (item.stackQty - 1);
+          }
           totalWeight += item.weight;
         }
       }
@@ -66,6 +71,11 @@ export class CharacterWeight {
       for (const bagItem of inventoryContainer.itemIds) {
         const item = await Item.findById(bagItem).lean();
         if (item) {
+          if (item.stackQty && item.stackQty > 1) {
+            // -1 because the count is include the weight of the container item.
+            // 100 arrows x 0.1 = 10 weight, but the result will be 10.1 without the -1.
+            totalWeight += item.weight * (item.stackQty - 1);
+          }
           totalWeight += item.weight;
         }
       }
