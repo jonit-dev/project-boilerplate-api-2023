@@ -159,6 +159,8 @@ const npcSchema = createLeanSchema(
     traderItems: Type.array().of({
       key: Type.string({ required: true }),
       price: Type.number({ required: true }),
+      texturePath: Type.string({ required: true }),
+      name: Type.string({ required: true }),
     }),
     baseHealth: Type.number({ required: true, default: 100 }),
     healthRandomizerDice: Type.number({ required: true, default: 1 }),
