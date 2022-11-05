@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { Depot, IDepot } from "@entities/ModuleDepot/DepotModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
@@ -10,6 +11,7 @@ import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { IControlTime, MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { container, mapLoader } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -29,7 +31,7 @@ import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
-import { itemMock, itemTwoHandedMock, stackableItemMock, itemMockArmor } from "./mock/itemMock";
+import { itemMock, stackableGoldCoinMock, itemTwoHandedMock, stackableItemMock, itemMockArmor } from "./mock/itemMock";
 import { questInteractionObjectiveMock, questKillObjectiveMock, questMock, questRewardsMock } from "./mock/questMock";
 
 interface IMockCharacterOptions {
@@ -50,6 +52,7 @@ interface IMockQuestOptions {
 @provide(UnitTestHelper)
 export class UnitTestHelper {
   private mongoServer: MongoMemoryServer;
+  private characterItems: CharacterItems;
 
   public async initializeMapLoader(): Promise<void> {
     jest
@@ -216,6 +219,17 @@ export class UnitTestHelper {
     return newItem;
   }
 
+  public async createGoldCoinMockItem(extraProps?: Partial<IItem>): Promise<IItem> {
+    const newItem = new Item({
+      ...stackableGoldCoinMock,
+      ...extraProps,
+    });
+
+    await newItem.save();
+
+    return newItem;
+  }
+
   public async createMockAndEquipItens(character: ICharacter, extraProps?: Partial<IItem>): Promise<void> {
     const itemSword = await this.createMockItem();
     const itemArmor = await this.createMockArmor();
@@ -366,6 +380,38 @@ export class UnitTestHelper {
     return backpackContainer.save();
   }
 
+  public async consumeMockItem(
+    character: ICharacter,
+    inventoryContainer: IItemContainer,
+    item: IItem
+  ): Promise<boolean> {
+    let stackReduced = false;
+    console.log("AQUI2", item);
+    if (item.isStackable && item.stackQty && item.stackQty > 1) {
+      item.stackQty -= 1;
+      await item.save();
+
+      for (let i = 0; i < inventoryContainer.slotQty; i++) {
+        const slotItem = inventoryContainer.slots?.[i];
+        if (slotItem && slotItem.key === item.key && !stackReduced) {
+          inventoryContainer.slots[i].stackQty = item.stackQty;
+          stackReduced = true;
+        }
+      }
+
+      inventoryContainer.markModified("slots");
+      await inventoryContainer.save();
+    }
+
+    if (!stackReduced && item.stackQty && item.stackQty > 0) {
+      await Item.deleteOne({ _id: item._id });
+
+      return false;
+    }
+
+    return true;
+  }
+
   public async createMockQuest(
     npcId: string,
     options?: IMockQuestOptions,
@@ -430,6 +476,45 @@ export class UnitTestHelper {
     });
     testQuestObjectiveKill = await testQuestObjectiveKill.save();
     quest.objectives!.push(testQuestObjectiveKill._id);
+  }
+
+  public async createMockDepot(
+    npcId: string,
+    characterId: string,
+    extraProps?: Partial<IItemContainer>
+  ): Promise<IDepot> {
+    if (!npcId) {
+      throw new Error("need to provide npc id to create a mock depot");
+    }
+
+    if (!characterId) {
+      throw new Error("need to provide npc id to create a mock depot");
+    }
+    let newDepot = new Depot({
+      owner: characterId,
+      npc: npcId,
+    });
+
+    newDepot = await newDepot.save();
+
+    let depotItemContainer = new ItemContainer({
+      parentItem: newDepot._id,
+      ...extraProps,
+    });
+    depotItemContainer = await depotItemContainer.save();
+
+    await Depot.updateOne(
+      {
+        _id: newDepot._id,
+      },
+      {
+        $set: {
+          itemContainer: depotItemContainer._id,
+        },
+      }
+    );
+
+    return newDepot;
   }
 
   public async beforeAllJestHook(): Promise<void> {

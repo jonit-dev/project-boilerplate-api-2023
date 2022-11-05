@@ -3,7 +3,6 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -16,7 +15,6 @@ import { ItemValidation } from "../validation/ItemValidation";
 
 describe("ItemUse.ts", () => {
   let itemUse: ItemUse;
-  let characterWeight: CharacterWeight;
   let testCharacter: ICharacter;
   let testItem: IItem;
   let inventory: IItem;
@@ -30,7 +28,6 @@ describe("ItemUse.ts", () => {
     await unitTestHelper.beforeAllJestHook();
 
     itemUse = container.get<ItemUse>(ItemUse);
-    characterWeight = container.get<CharacterWeight>(CharacterWeight);
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
   });
 
@@ -114,20 +111,6 @@ describe("ItemUse.ts", () => {
 
     expect(itemUsageMock).toBeCalledTimes(1);
     expect(itemUsageMock).toBeCalledWith(itemApple, testCharacter.id);
-  });
-
-  it("should decrease character weight, after an item is consumed", async () => {
-    const currentWeight = await characterWeight.getWeight(testCharacter);
-    expect(currentWeight).toBe(3.05);
-
-    /* stackable item quantity does not affect character weight, 
-        only base item weight does, so need to consume all quantity */
-
-    await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
-    await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
-
-    const afterWeight = await characterWeight.getWeight(testCharacter);
-    expect(afterWeight).toBe(3);
   });
 
   it("should decrement item from inventory, after item is consumed", async () => {
