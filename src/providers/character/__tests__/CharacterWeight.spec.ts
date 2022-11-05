@@ -1,21 +1,27 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { CharacterWeight } from "../CharacterWeight";
 
 describe("CharacterWeight.ts", () => {
   let testCharacter: ICharacter;
   let characterWeight: CharacterWeight;
+  let inventoryContainer: IItemContainer;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
-
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
   });
 
   beforeEach(async () => {
     testCharacter = await (
-      await unitTestHelper.createMockCharacter(null, { hasSkills: true, hasEquipment: true, hasInventory: true })
+      await unitTestHelper.createMockCharacter(null, {
+        hasSkills: true,
+        hasEquipment: true,
+        hasInventory: true,
+      })
     )
       .populate("skills")
       .execPopulate();
@@ -33,6 +39,83 @@ describe("CharacterWeight.ts", () => {
     const weight = await characterWeight.getWeight(testCharacter);
 
     expect(weight).toBe(3);
+  });
+
+  it("should add 100 coins and test the return of weight", async () => {
+    const beforeAddGoldCoins = await characterWeight.getWeight(testCharacter);
+    expect(beforeAddGoldCoins).toBe(3);
+
+    const goldCoins = await unitTestHelper.createGoldCoinMockItem({
+      stackQty: 100,
+      maxStackSize: 100,
+    });
+
+    const inventory = await testCharacter.inventory;
+    inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    inventoryContainer = await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 1, [goldCoins]);
+
+    const afterAddGoldCoins = await characterWeight.getWeight(testCharacter);
+    expect(afterAddGoldCoins).toBe(4);
+  });
+
+  it("should add a armor/sword and test the return of weight", async () => {
+    const beforeAddArmor = await characterWeight.getWeight(testCharacter);
+    expect(beforeAddArmor).toBe(3);
+
+    await unitTestHelper.createMockAndEquipItens(testCharacter);
+
+    const afterAddArmor = await characterWeight.getWeight(testCharacter);
+    expect(afterAddArmor).toBe(9);
+  });
+
+  it("should add 100 Apple, Consume and check the return of weight", async () => {
+    const beforeAddApples = await characterWeight.getWeight(testCharacter);
+    expect(beforeAddApples).toBe(3);
+
+    const apples = await unitTestHelper.createStackableMockItem({
+      stackQty: 100,
+      maxStackSize: 100,
+    });
+
+    const inventory = await testCharacter.inventory;
+    inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    inventoryContainer = await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 1, [apples]);
+
+    // Check Weight after add apples
+    const afterAddApples = await characterWeight.getWeight(testCharacter);
+    expect(afterAddApples).toBe(8);
+
+    // Consume 1 item
+    await unitTestHelper.consumeMockItem(testCharacter, inventoryContainer, apples);
+    const afterConsumeApple = await characterWeight.getWeight(testCharacter);
+
+    expect(afterConsumeApple).toBe(7.95);
+
+    // Consume another one
+    await unitTestHelper.consumeMockItem(testCharacter, inventoryContainer, apples);
+    const afterSecondConsume = await characterWeight.getWeight(testCharacter);
+
+    expect(afterSecondConsume).toBe(7.9);
+
+    // Consume All
+    const applesLeft = apples?.stackQty;
+    if (applesLeft) {
+      for (let i = 0; i < applesLeft; i++) {
+        const result = await unitTestHelper.consumeMockItem(testCharacter, inventoryContainer, apples);
+
+        // Check if any item is left or weight is correct
+        if (result === false) {
+          const afterConsumeAllApple = await characterWeight.getWeight(testCharacter);
+          expect(afterConsumeAllApple).toBe(3);
+
+          const appleItens = (await Item.findById(apples.id)) as unknown as IItem;
+          expect(appleItens).toBeNull();
+        }
+      }
+    }
+
+    const afterAllAplles = await characterWeight.getWeight(testCharacter);
+    expect(afterAllAplles).toBe(3);
   });
 
   afterAll(async () => {

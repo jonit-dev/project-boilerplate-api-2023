@@ -53,6 +53,30 @@ export const stackableItemMock: Partial<IItem> = {
   isStackable: true,
 };
 
+export const stackableGoldCoinMock: Partial<IItem> = {
+  type: ItemType.Other,
+  subType: ItemSubType.Other,
+  textureAtlas: "items",
+  texturePath: "others/gold-coin.png",
+  name: "Gold Coin",
+  key: "gold-coin",
+  description: "A pile of gold coins.",
+  weight: 0.01,
+  maxStackSize: 100,
+  isUsable: true,
+  isStorable: true,
+  isItemContainer: false,
+  isSolid: false,
+  stackQty: 1,
+  allowedEquipSlotType: [ItemSlotType.Inventory],
+  x: 320,
+  y: 144,
+  scene: "example",
+  createdAt: "2022-06-25T22:53:55.579Z",
+  updatedAt: "2022-06-28T04:42:21.409Z",
+  isStackable: true,
+};
+
 export const itemTwoHandedMock: Partial<IItem> = {
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
