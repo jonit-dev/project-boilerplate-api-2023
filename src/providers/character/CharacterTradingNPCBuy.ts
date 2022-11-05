@@ -12,6 +12,7 @@ import {
   IItemContainer,
   ItemSocketEvents,
   ITradeRequestItem,
+  ITradeResponseItem,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
@@ -47,7 +48,7 @@ export class CharacterTradingNPCBuy {
         texturePath,
         name,
       };
-    });
+    }) as ITradeResponseItem[];
 
     const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
 
