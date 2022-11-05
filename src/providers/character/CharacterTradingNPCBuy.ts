@@ -13,6 +13,7 @@ import {
   ItemSocketEvents,
   ITradeRequestItem,
   ITradeResponseItem,
+  NPCMovementType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
@@ -51,6 +52,9 @@ export class CharacterTradingNPCBuy {
     }) as ITradeResponseItem[];
 
     const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
+
+    // change NPC movement type to stopped
+    await this.setFocusOnCharacter(npc, character);
 
     this.socketMessaging.sendEventToUser<ICharacterNPCTradeInitBuyResponse>(
       character.channelId!,
@@ -171,6 +175,19 @@ export class CharacterTradingNPCBuy {
     this.sendRefreshItemsEvent(payloadUpdate, character);
 
     return true;
+  }
+
+  private async setFocusOnCharacter(npc: INPC, character: ICharacter): Promise<void> {
+    npc.currentMovementType = NPCMovementType.Stopped;
+    npc.targetCharacter = character._id;
+    await npc.save();
+
+    // auto clear after 1 minute
+    setTimeout(async () => {
+      npc.currentMovementType = npc.originalMovementType;
+      npc.targetCharacter = undefined;
+      await npc.save();
+    }, 60 * 1000);
   }
 
   private sendRefreshItemsEvent(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
