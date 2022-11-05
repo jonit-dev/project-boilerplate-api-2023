@@ -5,6 +5,7 @@ import { Item } from "@entities/ModuleInventory/ItemModel";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -12,12 +13,16 @@ import { CharacterItemSlots } from "./CharacterItemSlots";
 
 @provide(CharacterItemInventory)
 export class CharacterItemInventory {
-  constructor(private socketMessaging: SocketMessaging, private characterItemSlots: CharacterItemSlots) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterItemSlots: CharacterItemSlots,
+    private mathHelper: MathHelper
+  ) {}
 
   public async decrementItemFromInventory(itemKey: string, character: ICharacter, qty: number): Promise<boolean> {
     const inventory = (await character.inventory) as unknown as IItem;
 
-    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
+    let inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
@@ -30,6 +35,8 @@ export class CharacterItemInventory {
       const slotItem = inventoryItemContainer.slots[i] as unknown as IItem;
       if (!slotItem) continue;
 
+      let result = true;
+
       if (isSameKey(slotItem.key, itemKey)) {
         if (slotItem.isStackable) {
           // if its stackable, decrement the stack
@@ -37,10 +44,10 @@ export class CharacterItemInventory {
           let remaining = 0;
 
           if (qty <= slotItem.stackQty!) {
-            remaining = this.fixPrecision(slotItem.stackQty! - qty);
+            remaining = this.mathHelper.fixPrecision(slotItem.stackQty! - qty);
             qty = 0;
           } else {
-            qty = this.fixPrecision(qty - slotItem.stackQty!);
+            qty = this.mathHelper.fixPrecision(qty - slotItem.stackQty!);
           }
 
           if (remaining > 0) {
@@ -49,13 +56,26 @@ export class CharacterItemInventory {
               stackQty: remaining,
             });
           } else {
-            await this.characterItemSlots.deleteItemOnSlot(inventoryItemContainer, slotItem._id);
+            result = await this.deleteItemFromInventory(slotItem._id, character);
+
+            // we need to fetch updated container in case some quantity remains to be substracted
+            if (result && qty > 0) {
+              inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
+              if (!inventoryItemContainer) {
+                result = false;
+                break;
+              }
+            }
           }
         } else {
           // if its not stackable, just remove it
-          await this.deleteItemFromInventory(slotItem._id, character);
+          result = await this.deleteItemFromInventory(slotItem._id, character);
           qty--;
         }
+      }
+
+      if (!result) {
+        return false;
       }
     }
 
@@ -179,9 +199,5 @@ export class CharacterItemInventory {
     await equipment.save();
 
     return equipment;
-  }
-
-  private fixPrecision(num): number {
-    return Math.round(num * 100 + Number.EPSILON) / 100;
   }
 }
