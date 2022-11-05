@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { Depot, IDepot } from "@entities/ModuleDepot/DepotModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
@@ -475,6 +476,45 @@ export class UnitTestHelper {
     });
     testQuestObjectiveKill = await testQuestObjectiveKill.save();
     quest.objectives!.push(testQuestObjectiveKill._id);
+  }
+
+  public async createMockDepot(
+    npcId: string,
+    characterId: string,
+    extraProps?: Partial<IItemContainer>
+  ): Promise<IDepot> {
+    if (!npcId) {
+      throw new Error("need to provide npc id to create a mock depot");
+    }
+
+    if (!characterId) {
+      throw new Error("need to provide npc id to create a mock depot");
+    }
+    let newDepot = new Depot({
+      owner: characterId,
+      npc: npcId,
+    });
+
+    newDepot = await newDepot.save();
+
+    let depotItemContainer = new ItemContainer({
+      parentItem: newDepot._id,
+      ...extraProps,
+    });
+    depotItemContainer = await depotItemContainer.save();
+
+    await Depot.updateOne(
+      {
+        _id: newDepot._id,
+      },
+      {
+        $set: {
+          itemContainer: depotItemContainer._id,
+        },
+      }
+    );
+
+    return newDepot;
   }
 
   public async beforeAllJestHook(): Promise<void> {
