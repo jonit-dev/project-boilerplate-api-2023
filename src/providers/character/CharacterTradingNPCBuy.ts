@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { appEnv } from "@providers/config/env";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -191,19 +192,22 @@ export class CharacterTradingNPCBuy {
     );
 
     // auto clear after 1 minute
-    setTimeout(async () => {
-      await NPC.updateOne(
-        {
-          _id: npc._id,
-        },
-        {
-          $set: {
-            currentMovementType: npc.originalMovementType,
-            targetCharacter: undefined,
+
+    if (!appEnv.general.IS_UNIT_TEST) {
+      setTimeout(async () => {
+        await NPC.updateOne(
+          {
+            _id: npc._id,
           },
-        }
-      );
-    }, 60 * 1000);
+          {
+            $set: {
+              currentMovementType: npc.originalMovementType,
+              targetCharacter: undefined,
+            },
+          }
+        );
+      }, 60 * 1000);
+    }
   }
 
   private sendRefreshItemsEvent(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
