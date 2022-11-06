@@ -8,7 +8,6 @@ export const itemSilverBoots: Partial<IItem> = {
   subType: ItemSubType.Boot,
   textureAtlas: "items",
   texturePath: "boots/silver-boots.png",
-
   name: "Silver Boots",
   description: "Silver boots are a part of a set made of Silver.",
   defense: 10,
