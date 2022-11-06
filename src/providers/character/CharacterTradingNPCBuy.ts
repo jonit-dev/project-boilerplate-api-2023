@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -178,15 +178,31 @@ export class CharacterTradingNPCBuy {
   }
 
   private async setFocusOnCharacter(npc: INPC, character: ICharacter): Promise<void> {
-    npc.currentMovementType = NPCMovementType.Stopped;
-    npc.targetCharacter = character._id;
-    await npc.save();
+    await NPC.updateOne(
+      {
+        _id: npc._id,
+      },
+      {
+        $set: {
+          currentMovementType: NPCMovementType.Stopped,
+          targetCharacter: character._id,
+        },
+      }
+    );
 
     // auto clear after 1 minute
     setTimeout(async () => {
-      npc.currentMovementType = npc.originalMovementType;
-      npc.targetCharacter = undefined;
-      await npc.save();
+      await NPC.updateOne(
+        {
+          _id: npc._id,
+        },
+        {
+          $set: {
+            currentMovementType: npc.originalMovementType,
+            targetCharacter: undefined,
+          },
+        }
+      );
     }, 60 * 1000);
   }
 
