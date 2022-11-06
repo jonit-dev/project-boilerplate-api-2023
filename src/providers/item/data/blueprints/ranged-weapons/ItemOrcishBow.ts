@@ -6,11 +6,10 @@ import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 export const itemOrcishBow: Partial<IItem> = {
   key: RangedWeaponsBlueprint.OrcishBow,
   type: ItemType.Weapon,
-  rangeType: EntityAttackType.Ranged,
   subType: ItemSubType.Ranged,
+  rangeType: EntityAttackType.Ranged,
   textureAtlas: "items",
   texturePath: "ranged-weapons/orcish-bow.png",
-
   name: "Orcish Bow",
   description:
     "A bow with some decorative tooths and very long string. It is used by orcs for hunting or during battles.",

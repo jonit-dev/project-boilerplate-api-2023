@@ -9,7 +9,6 @@ export const itemCharacterBody: Partial<IItem> = {
   subType: ItemSubType.DeadBody,
   textureAtlas: "entities",
   texturePath: "kid-1/death/0.png",
-
   name: "Character's Body",
   description: "You see a character's body.",
   weight: 100,
