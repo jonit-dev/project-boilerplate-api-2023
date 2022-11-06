@@ -8,7 +8,6 @@ export const itemReforcedBoots: Partial<IItem> = {
   subType: ItemSubType.Boot,
   textureAtlas: "items",
   texturePath: "boots/reforced-boots.png",
-
   name: "Reforced Boots",
   description: "A boot made with reinforced leather.",
   defense: 4,

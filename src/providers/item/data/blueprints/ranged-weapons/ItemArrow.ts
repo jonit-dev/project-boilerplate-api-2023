@@ -8,7 +8,6 @@ export const itemArrow: Partial<IItem> = {
   subType: ItemSubType.Accessory,
   textureAtlas: "items",
   texturePath: "ranged-weapons/arrow.png",
-
   name: "Arrow",
   description: "An iron head arrow.",
   attack: 4,
