@@ -141,4 +141,15 @@ export class CharacterItemContainer {
 
     return false;
   }
+
+  public async getItemContainer(character: ICharacter): Promise<IItemContainer | null> {
+    const inventory = await character.inventory;
+    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
+
+    if (!inventoryContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The character does not have an inventory.");
+    }
+
+    return inventoryContainer;
+  }
 }
