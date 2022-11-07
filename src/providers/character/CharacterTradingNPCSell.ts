@@ -45,6 +45,10 @@ export class CharacterTradingNPCSell {
     }
 
     const characterItems = await this.getCharacterItemsToSell(character);
+    if (!characterItems) {
+      return;
+    }
+
     const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
 
     await this.characterTarget.setFocusOnCharacter(npc, character);
@@ -183,12 +187,12 @@ export class CharacterTradingNPCSell {
     this.socketMessaging.sendErrorMessageToCharacter(character, "An error occurred while processing your trade.");
   }
 
-  private async getCharacterItemsToSell(character: ICharacter): Promise<ITradeResponseItem[]> {
+  private async getCharacterItemsToSell(character: ICharacter): Promise<ITradeResponseItem[] | undefined> {
     const responseItems: ITradeResponseItem[] = [];
 
     const container = await this.characterItemContainer.getItemContainer(character);
     if (!container) {
-      return responseItems;
+      return;
     }
 
     const uniqueItems: string[] = [];
