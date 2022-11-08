@@ -1,6 +1,6 @@
 import { IControlTime } from "@entities/ModuleSystem/MapControlTimeModel";
 import { unitTestHelper } from "@providers/inversify/container";
-import { PeriodOfDay } from "@providers/map/types/ControlTimeTypes";
+import { PeriodOfDay } from "@rpg-engine/shared";
 
 describe("MapControlTimeModel.ts", () => {
   let testWeather: IControlTime;
