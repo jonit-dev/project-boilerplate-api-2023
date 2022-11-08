@@ -1,8 +1,8 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { IControlTime, WeatherSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { IControlTime, WeatherSocketEvents } from "../../providers/map/types/ControlTimeTypes";
 
 @provide(MapControlTime)
 export class MapControlTime {

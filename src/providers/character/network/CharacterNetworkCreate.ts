@@ -3,8 +3,6 @@ import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel"
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
-import { MapControlTime } from "@providers/map/MapControlTime";
-import { IControlTime, WeatherSocketEvents } from "@providers/map/types/ControlTimeTypes";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -15,8 +13,10 @@ import {
   CharacterSocketEvents,
   ICharacterCreateFromClient,
   ICharacterCreateFromServer,
+  IControlTime,
   ToGridX,
   ToGridY,
+  WeatherSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
@@ -31,8 +31,7 @@ export class CharacterNetworkCreate {
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private npcManager: NPCManager,
     private gridManager: GridManager,
-    private npcWarn: NPCWarn,
-    private mapControlTime: MapControlTime
+    private npcWarn: NPCWarn
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {

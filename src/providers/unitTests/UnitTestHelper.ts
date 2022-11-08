@@ -16,7 +16,6 @@ import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { container, mapLoader } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { PeriodOfDay } from "@providers/map/types/ControlTimeTypes";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
@@ -26,7 +25,7 @@ import {
   randomMovementMockNPC,
   stoppedMovementMockNPC,
 } from "@providers/unitTests/mock/NPCMock";
-import { ISocketTransmissionZone, NPCMovementType, QuestType } from "@rpg-engine/shared";
+import { ISocketTransmissionZone, NPCMovementType, PeriodOfDay, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";

@@ -2,8 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IControlTime } from "@entities/ModuleSystem/MapControlTimeModel";
 import { unitTestHelper } from "@providers/inversify/container";
-import { PeriodOfDay } from "@providers/map/types/ControlTimeTypes";
-import { CharacterFactions, ShadowWalkerRaces, LifeBringerRaces } from "@rpg-engine/shared";
+import { CharacterFactions, ShadowWalkerRaces, LifeBringerRaces, PeriodOfDay } from "@rpg-engine/shared";
 
 describe("SkillBonusLifeBringer.ts", () => {
   let characterLifeBringer: ICharacter;
