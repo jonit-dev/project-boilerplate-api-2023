@@ -38,7 +38,7 @@ export class CharacterItemInventory {
       let result = true;
 
       if (isSameKey(slotItem.key, itemKey)) {
-        if (slotItem.isStackable) {
+        if (slotItem.maxStackSize > 1) {
           // if its stackable, decrement the stack
 
           let remaining = 0;

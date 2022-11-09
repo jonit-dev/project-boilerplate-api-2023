@@ -103,10 +103,12 @@ export class CharacterTradingNPCBuy {
         return false;
       }
 
+      const decrementQty = itemPrice * purchasedItem.qty;
+
       const isGoldDecremented = await this.characterItemInventory.decrementItemFromInventory(
         OthersBlueprint.GoldCoin,
         character,
-        itemPrice * purchasedItem.qty
+        decrementQty
       );
 
       if (!isGoldDecremented) {

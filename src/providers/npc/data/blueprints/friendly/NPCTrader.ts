@@ -15,14 +15,10 @@ export const npcTrader = {
     {
       key: PotionsBlueprint.LightEndurancePotion,
       price: 15,
-      texturePath: "potions/light-endurance-potion.png",
-      name: "Poção Braba",
     },
     {
       key: SwordsBlueprint.ShortSword,
       price: 50,
-      texturePath: "swords/short-sword.png",
-      name: "Espada fraca",
     },
   ],
 } as Partial<INPC>;
