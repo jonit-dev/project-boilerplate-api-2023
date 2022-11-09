@@ -50,7 +50,6 @@ export class NPCMovement {
       const newGridY = ToGridY(newY);
 
       // check if max range is reached
-
       const hasSolid = await this.movementHelper.isSolid(
         map,
         newGridX,
@@ -59,13 +58,13 @@ export class NPCMovement {
         "CHECK_ALL_LAYERS_BELOW",
         npc
       );
+      const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
 
       if (hasSolid) {
         // console.log(`${npc.key} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
+        this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
         return;
       }
-
-      const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
 
       this.gridManager.setWalkable(map, ToGridX(oldX) + gridOffsetX, ToGridY(oldY) + gridOffsetY, true);
 
