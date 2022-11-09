@@ -29,7 +29,7 @@ export class CharacterNetworkTrading {
             await this.characterTradingNPCBuy.initializeBuy(npcId, character);
             break;
           case "sell":
-            // TODO: Implement sell
+            await this.characterTradingNPCSell.initializeSell(npcId, character);
             break;
         }
       }

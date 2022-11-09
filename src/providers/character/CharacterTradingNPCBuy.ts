@@ -1,8 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { appEnv } from "@providers/config/env";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -14,11 +13,11 @@ import {
   ItemSocketEvents,
   ITradeRequestItem,
   ITradeResponseItem,
-  NPCMovementType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { CharacterTarget } from "./CharacterTarget";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterTradingValidation } from "./CharacterTradingValidation";
 import { CharacterWeight } from "./CharacterWeight";
@@ -31,7 +30,8 @@ export class CharacterTradingNPCBuy {
     private characterItemContainer: CharacterItemContainer,
     private characterItemInventory: CharacterItemInventory,
     private characterWeight: CharacterWeight,
-    private characterTradingValidation: CharacterTradingValidation
+    private characterTradingValidation: CharacterTradingValidation,
+    private characterTarget: CharacterTarget
   ) {}
 
   public async initializeBuy(npcId: string, character: ICharacter): Promise<void> {
@@ -55,7 +55,7 @@ export class CharacterTradingNPCBuy {
     const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
 
     // change NPC movement type to stopped
-    await this.setFocusOnCharacter(npc, character);
+    await this.characterTarget.setFocusOnCharacter(npc, character);
 
     this.socketMessaging.sendEventToUser<ICharacterNPCTradeInitBuyResponse>(
       character.channelId!,
@@ -176,38 +176,6 @@ export class CharacterTradingNPCBuy {
     this.sendRefreshItemsEvent(payloadUpdate, character);
 
     return true;
-  }
-
-  private async setFocusOnCharacter(npc: INPC, character: ICharacter): Promise<void> {
-    await NPC.updateOne(
-      {
-        _id: npc._id,
-      },
-      {
-        $set: {
-          currentMovementType: NPCMovementType.Stopped,
-          targetCharacter: character._id,
-        },
-      }
-    );
-
-    // auto clear after 1 minute
-
-    if (!appEnv.general.IS_UNIT_TEST) {
-      setTimeout(async () => {
-        await NPC.updateOne(
-          {
-            _id: npc._id,
-          },
-          {
-            $set: {
-              currentMovementType: npc.originalMovementType,
-              targetCharacter: undefined,
-            },
-          }
-        );
-      }, 60 * 1000);
-    }
   }
 
   private sendRefreshItemsEvent(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {

@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ItemSocketEvents } from "@rpg-engine/shared";
+import { CharacterTradeSocketEvents, ItemSocketEvents, NPCMovementType } from "@rpg-engine/shared";
 import { CharacterItemInventory } from "../characterItems/CharacterItemInventory";
 import { CharacterTradingNPCSell } from "../CharacterTradingNPCSell";
 import { CharacterTradingValidation } from "../CharacterTradingValidation";
@@ -264,5 +266,317 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(sendErrorMessageToCharacter).not.toBeCalled();
     expect(sendEventToUser).not.toBeCalled();
+  });
+
+  it("should create two gold items if more gold earned than max stack size", async () => {
+    const items = [
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 100 }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 100 }),
+    ];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    const sellItems = [
+      {
+        key: RangedWeaponsBlueprint.Slingshot,
+        qty: 2,
+      },
+      {
+        key: RangedWeaponsBlueprint.Arrow,
+        qty: 200,
+      },
+    ];
+
+    await characterTradingNPCSell.sellItemsToNPC(testCharacter, testNPCTrader, sellItems);
+
+    const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    expect(updatedContainer.slots[0]).not.toBeNull();
+    expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
+    expect(updatedContainer.slots[0].stackQty).toBe(100);
+
+    expect(updatedContainer.slots[1]).not.toBeNull();
+    expect(updatedContainer.slots[1].key).toBe(OthersBlueprint.GoldCoin);
+    expect(updatedContainer.slots[1].stackQty).toBe(20);
+
+    expect(updatedContainer.slots[2]).toBeNull();
+    expect(updatedContainer.slots[3]).toBeNull();
+  });
+
+  it("should add gold to existing stack if possible", async () => {
+    const items = [
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 100 }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 100 }),
+      await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 10 }),
+    ];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    const sellItems = [
+      {
+        key: RangedWeaponsBlueprint.Slingshot,
+        qty: 2,
+      },
+      {
+        key: RangedWeaponsBlueprint.Arrow,
+        qty: 200,
+      },
+    ];
+
+    await characterTradingNPCSell.sellItemsToNPC(testCharacter, testNPCTrader, sellItems);
+
+    const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    expect(updatedContainer.slots[0]).not.toBeNull();
+    expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
+    expect(updatedContainer.slots[0].stackQty).toBe(30);
+
+    expect(updatedContainer.slots[4]).not.toBeNull();
+    expect(updatedContainer.slots[4].key).toBe(OthersBlueprint.GoldCoin);
+    expect(updatedContainer.slots[4].stackQty).toBe(100);
+
+    expect(updatedContainer.slots[1]).toBeNull();
+    expect(updatedContainer.slots[2]).toBeNull();
+    expect(updatedContainer.slots[3]).toBeNull();
+  });
+
+  it("should drop gold on map if no slot available", async () => {
+    const items = [
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 100 }),
+    ];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 2, items);
+
+    const sellItems = [
+      {
+        key: RangedWeaponsBlueprint.Arrow,
+        qty: 50,
+      },
+    ];
+
+    await characterTradingNPCSell.sellItemsToNPC(testCharacter, testNPCTrader, sellItems);
+
+    const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    expect(updatedContainer.slots[0]).not.toBeNull();
+    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Slingshot);
+
+    expect(updatedContainer.slots[1]).not.toBeNull();
+    expect(updatedContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Arrow);
+    expect(updatedContainer.slots[1].stackQty).toBe(50);
+
+    const droppedGold = await Item.findOne({ key: OthersBlueprint.GoldCoin });
+
+    expect(droppedGold?.x).toBe(testCharacter.x);
+    expect(droppedGold?.y).toBe(testCharacter.y);
+    expect(droppedGold?.scene).toBe(testCharacter.scene);
+  });
+
+  it("should return items to be sold", async () => {
+    await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
+
+    expect(sendEventToUser).toBeCalled();
+
+    const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
+    const arrow = itemsBlueprintIndex[RangedWeaponsBlueprint.Arrow];
+
+    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterTradeSocketEvents.TradeInit, {
+      npcId: testNPCTrader._id,
+      type: "sell",
+      characterItems: [
+        {
+          key: slingShot.key,
+          price: slingShot.sellPrice,
+          name: slingShot.name,
+          texturePath: slingShot.texturePath,
+          qty: 2,
+        },
+        {
+          key: arrow.key,
+          price: arrow.sellPrice,
+          name: arrow.name,
+          texturePath: arrow.texturePath,
+          qty: 100,
+        },
+      ],
+      characterAvailableGold: 0,
+    });
+  });
+
+  it("should stop npc movement and set character as target", async () => {
+    expect(testNPCTrader.currentMovementType).toBe(NPCMovementType.Random);
+    expect(testNPCTrader.targetCharacter).not.toBeDefined();
+
+    await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
+
+    const latest = (await NPC.findById(testNPCTrader._id)) as unknown as INPC;
+    expect(latest.currentMovementType).toBe(NPCMovementType.Stopped);
+    expect(latest.targetCharacter).toStrictEqual(testCharacter._id);
+  });
+
+  it("should not invoke trade if npc does not exist", async () => {
+    await characterTradingNPCSell.initializeSell(testCharacter._id, testCharacter);
+
+    expect(sendEventToUser).not.toBeCalled();
+
+    expect(sendErrorMessageToCharacter).toBeCalled();
+    expect(sendErrorMessageToCharacter).toHaveBeenLastCalledWith(
+      testCharacter,
+      "Sorry, the NPC you're trying to trade with is not available."
+    );
+  });
+
+  it("should not invoke trade if npc is not a trader", async () => {
+    testNPCTrader.isTrader = false;
+    await testNPCTrader.save();
+
+    await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
+
+    expect(sendEventToUser).not.toBeCalled();
+
+    expect(sendErrorMessageToCharacter).toBeCalled();
+    expect(sendErrorMessageToCharacter).toHaveBeenLastCalledWith(
+      testCharacter,
+      "Sorry, the NPC you're trying to trade with is not a trader."
+    );
+  });
+
+  it("should return correct amount of gold in inventory", async () => {
+    const items = [
+      await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 50 }),
+      await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 95 }),
+    ];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
+
+    expect(sendEventToUser).toBeCalled();
+
+    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterTradeSocketEvents.TradeInit, {
+      npcId: testNPCTrader._id,
+      type: "sell",
+      characterItems: [],
+      characterAvailableGold: 145,
+    });
+  });
+
+  it("should not invoke trade if inventory does not exist", async () => {
+    const equipment = await Equipment.findById(testCharacter.equipment);
+    if (equipment) {
+      equipment.inventory = undefined;
+      await equipment.save();
+    }
+
+    await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
+
+    expect(sendEventToUser).not.toBeCalled();
+
+    expect(sendErrorMessageToCharacter).toBeCalled();
+    expect(sendErrorMessageToCharacter).toHaveBeenLastCalledWith(
+      testCharacter,
+      "Oops! The character does not have an inventory."
+    );
+  });
+
+  it("should not invoke trade if item container does not exist", async () => {
+    const inventory = await testCharacter.inventory;
+    if (inventory) {
+      inventory.itemContainer = undefined;
+      await inventory.save();
+    }
+
+    await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
+
+    expect(sendEventToUser).not.toBeCalled();
+
+    expect(sendErrorMessageToCharacter).toBeCalled();
+    expect(sendErrorMessageToCharacter).toHaveBeenLastCalledWith(
+      testCharacter,
+      "Oops! The character does not have an inventory."
+    );
+  });
+
+  it("should return no items if inventory is empty", async () => {
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, []);
+
+    await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
+
+    expect(sendEventToUser).toBeCalled();
+    expect(sendErrorMessageToCharacter).not.toBeCalled();
+
+    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterTradeSocketEvents.TradeInit, {
+      npcId: testNPCTrader._id,
+      type: "sell",
+      characterItems: [],
+      characterAvailableGold: 0,
+    });
+  });
+
+  it("should not return an item if it does not have a blueprint", async () => {
+    const items = [
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot, {
+        key: "invalid-slingshot-key",
+      }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+    ];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
+
+    expect(sendEventToUser).toBeCalled();
+    expect(sendErrorMessageToCharacter).not.toBeCalled();
+
+    const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
+    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterTradeSocketEvents.TradeInit, {
+      npcId: testNPCTrader._id,
+      type: "sell",
+      characterItems: [
+        {
+          key: slingShot.key,
+          price: slingShot.sellPrice,
+          name: slingShot.name,
+          texturePath: slingShot.texturePath,
+          qty: 1,
+        },
+      ],
+      characterAvailableGold: 0,
+    });
+  });
+
+  it("should not return an item if it does not have a sell price", async () => {
+    const items = [
+      await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 10 }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+    ];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
+
+    expect(sendEventToUser).toBeCalled();
+    expect(sendErrorMessageToCharacter).not.toBeCalled();
+
+    const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
+    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterTradeSocketEvents.TradeInit, {
+      npcId: testNPCTrader._id,
+      type: "sell",
+      characterItems: [
+        {
+          key: slingShot.key,
+          price: slingShot.sellPrice,
+          name: slingShot.name,
+          texturePath: slingShot.texturePath,
+          qty: 1,
+        },
+      ],
+      characterAvailableGold: 10,
+    });
   });
 });

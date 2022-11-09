@@ -7,14 +7,20 @@ import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes"
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
+  CharacterTradeSocketEvents,
+  ICharacterNPCTradeInitSellResponse,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
   ItemSocketEvents,
   ITradeRequestItem,
+  ITradeResponseItem,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
+import { CharacterTarget } from "./CharacterTarget";
+import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterTradingValidation } from "./CharacterTradingValidation";
 import { CharacterWeight } from "./CharacterWeight";
 
@@ -26,8 +32,38 @@ export class CharacterTradingNPCSell {
     private characterItemInventory: CharacterItemInventory,
     private characterWeight: CharacterWeight,
     private characterTradingValidation: CharacterTradingValidation,
-    private mathHelper: MathHelper
+    private mathHelper: MathHelper,
+    private characterItemSlots: CharacterItemSlots,
+    private characterTradingBalance: CharacterTradingBalance,
+    private characterTarget: CharacterTarget
   ) {}
+
+  public async initializeSell(npcId: string, character: ICharacter): Promise<void> {
+    const npc = await this.characterTradingValidation.validateAndReturnTraderNPC(npcId, character);
+    if (!npc) {
+      return;
+    }
+
+    const characterItems = await this.getCharacterItemsToSell(character);
+    if (!characterItems) {
+      return;
+    }
+
+    const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
+
+    await this.characterTarget.setFocusOnCharacter(npc, character);
+
+    this.socketMessaging.sendEventToUser<ICharacterNPCTradeInitSellResponse>(
+      character.channelId!,
+      CharacterTradeSocketEvents.TradeInit,
+      {
+        npcId: npc._id,
+        type: "sell",
+        characterItems: characterItems || [],
+        characterAvailableGold,
+      }
+    );
+  }
 
   public async sellItemsToNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<void> {
     if (!items.length) {
@@ -149,5 +185,40 @@ export class CharacterTradingNPCSell {
 
   private sendErrorOccurred(character: ICharacter): void {
     this.socketMessaging.sendErrorMessageToCharacter(character, "An error occurred while processing your trade.");
+  }
+
+  private async getCharacterItemsToSell(character: ICharacter): Promise<ITradeResponseItem[] | undefined> {
+    const responseItems: ITradeResponseItem[] = [];
+
+    const container = await this.characterItemContainer.getItemContainer(character);
+    if (!container) {
+      return;
+    }
+
+    const uniqueItems: string[] = [];
+    for (let i = 0; i < container.slotQty; i++) {
+      const slotItem = container.slots[i];
+      if (!slotItem) {
+        continue;
+      }
+
+      if (!uniqueItems.includes(slotItem.key)) {
+        uniqueItems.push(slotItem.key);
+      }
+    }
+
+    for (const itemKey of uniqueItems) {
+      const item = itemsBlueprintIndex[itemKey];
+      if (!item || !item.sellPrice) continue;
+
+      responseItems.push({
+        key: item.key,
+        price: item.sellPrice,
+        name: item.name,
+        texturePath: item.texturePath,
+        qty: await this.characterItemSlots.getTotalQty(container, itemKey),
+      });
+    }
+    return responseItems;
   }
 }
