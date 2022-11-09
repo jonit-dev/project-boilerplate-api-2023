@@ -137,7 +137,7 @@ export class CharacterTradingValidation {
     }
 
     //  Is the character near the seller NPC?
-    const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, npc.x, npc.y, 3);
+    const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, npc.x, npc.y, 2);
 
     if (!isUnderRange) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "You are too far away from the trader.");
