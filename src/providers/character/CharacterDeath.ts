@@ -88,10 +88,15 @@ export class CharacterDeath {
 
         if (!itemSlot) continue;
 
+        // make sure we wipe out any x and y variables, if present, to avoid causing issues
+
         await this.characterItemSlots.updateItemOnSlot(i, inventoryContainer, {
           ...itemSlot,
           owner: null,
           scene: character.scene,
+          x: undefined,
+          y: undefined,
+          tiledId: undefined,
         });
       }
     }
