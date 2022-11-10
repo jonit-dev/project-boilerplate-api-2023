@@ -33,7 +33,6 @@ describe("CharacterItemStack.ts", () => {
       scene: testCharacter.scene,
       weight: 0,
       stackQty: 25,
-      isStackable: true,
       maxStackSize: 100,
     });
     inventory = await testCharacter.inventory;
@@ -65,7 +64,6 @@ describe("CharacterItemStack.ts", () => {
       scene: testCharacter.scene,
       weight: 0,
       stackQty: 25,
-      isStackable: true,
       maxStackSize: 100,
     });
 
@@ -87,7 +85,6 @@ describe("CharacterItemStack.ts", () => {
       scene: testCharacter.scene,
       weight: 0,
       stackQty: 85,
-      isStackable: true,
       maxStackSize: 100,
     });
     const itemAdded = await pickupItem(newStackableItem, inventoryItemContainerId);
@@ -110,7 +107,6 @@ describe("CharacterItemStack.ts", () => {
       scene: testCharacter.scene,
       weight: 0,
       stackQty: 25,
-      isStackable: true,
       maxStackSize: 100,
     });
 

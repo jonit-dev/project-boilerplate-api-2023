@@ -109,7 +109,7 @@ export class CharacterItemContainer {
       // Inventory is empty, slot checking not needed
       if (targetContainer.isEmpty) isNewItem = true;
 
-      if (itemToBeAdded.isStackable) {
+      if (itemToBeAdded.maxStackSize > 1) {
         const wasStacked = await this.characterItemStack.tryAddingItemToStack(
           character,
           targetContainer,

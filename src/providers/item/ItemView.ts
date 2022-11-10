@@ -114,7 +114,7 @@ export class ItemView {
         scene: item.scene,
         layer: item.layer,
         stackQty: item.stackQty || 0,
-        isStackable: item.isStackable,
+        isStackable: item.maxStackSize > 1,
       });
 
       await this.characterView.addToCharacterView(

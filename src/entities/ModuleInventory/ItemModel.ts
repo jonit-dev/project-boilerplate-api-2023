@@ -59,7 +59,6 @@ const itemSchema = createLeanSchema(
     isSolid: Type.boolean({ required: true, default: false }),
     ...({} as {
       isEquipable: boolean;
-      isStackable: boolean;
       fullDescription: string;
       baseKey: string;
     }),
@@ -81,10 +80,6 @@ itemSchema.virtual("baseKey").get(function (this: IItem) {
 
 itemSchema.virtual("isEquipable").get(function (this: IItem) {
   return this.allowedEquipSlotType && this.allowedEquipSlotType.length > 0;
-});
-
-itemSchema.virtual("isStackable").get(function (this: IItem) {
-  return this.maxStackSize > 1;
 });
 
 itemSchema.virtual("fullDescription").get(function (this: IItem) {
