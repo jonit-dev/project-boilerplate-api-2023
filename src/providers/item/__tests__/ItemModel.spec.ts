@@ -29,7 +29,7 @@ describe("ItemModel.ts", () => {
 
   it("validate isEquipable, isStackable and fullDescription Item fields", () => {
     expect(testItem.isEquipable).toBeTruthy();
-    expect(testItem.isStackable).toBeFalsy();
+    expect(testItem.maxStackSize > 1).toBeFalsy();
     expect(testItem.fullDescription).toBe(
       `${testItem.name}: ${testItem.description} Attack: ${testItem.attack}. Defense: ${testItem.defense}. Weight: ${testItem.weight}.`
     );
@@ -43,7 +43,7 @@ describe("ItemModel.ts", () => {
     });
 
     expect(testItem.isEquipable).toBeTruthy();
-    expect(testItem.isStackable).toBeTruthy();
+    expect(testItem.maxStackSize > 1).toBeTruthy();
     expect(testItem.fullDescription).toBe(`${testItem.name}: ${testItem.description} Weight: ${testItem.weight}.`);
   });
 

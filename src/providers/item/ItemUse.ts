@@ -103,7 +103,7 @@ export class ItemUse {
   private async consumeItem(character: ICharacter, inventoryContainer: IItemContainer, item: IItem): Promise<void> {
     let stackReduced = false;
 
-    if (item.isStackable && item.stackQty && item.stackQty > 1) {
+    if (item.maxStackSize > 1 && item.stackQty && item.stackQty > 1) {
       item.stackQty -= 1;
       await item.save();
 

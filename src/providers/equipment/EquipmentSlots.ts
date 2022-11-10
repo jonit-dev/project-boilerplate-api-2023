@@ -64,7 +64,7 @@ export class EquipmentSlots {
       return false;
     }
 
-    if (item.isStackable) {
+    if (item.maxStackSize > 1) {
       const equipmentSet = await this.getEquipmentSlots(equipment._id);
 
       const targetSlotItemId = equipmentSet[availableSlot];
@@ -179,7 +179,7 @@ export class EquipmentSlots {
 
       const targetSlot = equipmentSet[slotType];
 
-      if (item.isStackable) {
+      if (item.maxStackSize > 1) {
         // if target slot is empty, just add the stackable item
         if (!targetSlot) {
           availableSlot = slotType;

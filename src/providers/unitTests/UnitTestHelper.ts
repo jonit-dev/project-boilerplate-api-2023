@@ -30,7 +30,7 @@ import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
-import { itemMock, stackableGoldCoinMock, itemTwoHandedMock, stackableItemMock, itemMockArmor } from "./mock/itemMock";
+import { itemMock, itemMockArmor, itemTwoHandedMock, stackableGoldCoinMock, stackableItemMock } from "./mock/itemMock";
 import { questInteractionObjectiveMock, questKillObjectiveMock, questMock, questRewardsMock } from "./mock/questMock";
 
 interface IMockCharacterOptions {
@@ -385,8 +385,7 @@ export class UnitTestHelper {
     item: IItem
   ): Promise<boolean> {
     let stackReduced = false;
-    console.log("AQUI2", item);
-    if (item.isStackable && item.stackQty && item.stackQty > 1) {
+    if (item.maxStackSize > 1 && item.stackQty && item.stackQty > 1) {
       item.stackQty -= 1;
       await item.save();
 
