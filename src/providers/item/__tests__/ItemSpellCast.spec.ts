@@ -133,8 +133,7 @@ describe("ItemSpellCast.ts", () => {
     });
   });
 
-  // TODO: Implement magic level validation later
-  /* it("should fail due to lower magic level", async () => {
+  it("should fail due to lower magic level", async () => {
     characterSkills.magic.level = (itemSelfHealing.minMagicLevelRequired ?? 2) - 1;
     await characterSkills.save();
 
@@ -146,7 +145,7 @@ describe("ItemSpellCast.ts", () => {
       message: "Sorry, you can not cast this spell at this character magic level.",
       type: "error",
     });
-  }); */
+  });
 
   it("should cast self healing spell successfully", async () => {
     const newHealth = testCharacter.health + itemSelfHealing.manaCost!;

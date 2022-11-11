@@ -98,14 +98,13 @@ export class ItemSpellCast {
       return false;
     }
 
-    // TODO: Implement magic level validation later
-    /* if (skills.magic.level < spell.minMagicLevelRequired) {
+    if (skills.magic.level < spell.minMagicLevelRequired) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         "Sorry, you can not cast this spell at this character magic level."
       );
       return false;
-    } */
+    }
 
     return true;
   }
