@@ -1,7 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { container } from "@providers/inversify/container";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -9,11 +11,21 @@ import { IItemSpell, spellsBlueprintsIndex } from "./data/blueprints/spells/inde
 
 @provide(ItemSpellCast)
 export class ItemSpellCast {
+  private skillIncrease: SkillIncrease;
+
   constructor(
     private socketMessaging: SocketMessaging,
     private characterValidation: CharacterValidation,
     private animationEffect: AnimationEffect
   ) {}
+
+  private getSkillIncreaseInstance(): SkillIncrease {
+    // Circular Injection
+    if (!this.skillIncrease) {
+      this.skillIncrease = container.get<SkillIncrease>(SkillIncrease);
+    }
+    return this.skillIncrease;
+  }
 
   public isSpellCasting(msg: string): boolean {
     return !!this.getSpell(msg);
@@ -33,6 +45,8 @@ export class ItemSpellCast {
     await character.save();
 
     await this.sendPostSpellCastEvents(character, spell);
+
+    await this.getSkillIncreaseInstance().increaseMagicSP(character, spell);
 
     return true;
   }
@@ -67,6 +81,14 @@ export class ItemSpellCast {
       "skills"
     )) as unknown as ICharacter;
     const skills = updatedCharacter.skills as unknown as ISkill;
+
+    if (!skills) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you can not cast this spell without any skills."
+      );
+      return false;
+    }
 
     if (skills.level < spell.minLevelRequired) {
       this.socketMessaging.sendErrorMessageToCharacter(
