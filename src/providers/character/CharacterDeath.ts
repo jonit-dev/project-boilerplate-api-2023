@@ -169,15 +169,10 @@ export class CharacterDeath {
 
         const itemId = inventoryContainer.slots[i]._id;
 
-        const item = await Item.findById(itemId);
+        let item = (await Item.findById(itemId)) as IItem;
 
         if (item) {
-          item.x = undefined;
-          item.y = undefined;
-          item.owner = undefined;
-          item.scene = undefined;
-          item.tiledId = undefined;
-          await item.save();
+          item = await this.clearItem(item);
 
           bodyContainer.slots[Number(freeSlotId)] = item;
           inventoryContainer.slots[Number(i)] = null;
@@ -198,24 +193,17 @@ export class CharacterDeath {
 
       if (!itemId) continue;
 
-      const item = await Item.findById(itemId);
+      let item = (await Item.findById(itemId)) as IItem;
 
       if (item) {
         await this.itemOwnership.removeItemOwnership(item);
 
         const n = _.random(0, 100);
 
-        console.log(`n: ${n}`);
-
         if (n <= DROP_EQUIPMENT_CHANCE) {
           const freeSlotId = bodyContainer.firstAvailableSlotId;
           if (freeSlotId !== null) {
-            console.log("Dropping item on body", item.name);
-            item.x = undefined;
-            item.y = undefined;
-            item.owner = undefined;
-            item.scene = undefined;
-            item.tiledId = undefined;
+            item = await this.clearItem(item);
             bodyContainer.slots[Number(freeSlotId)] = item;
             equipment[slot] = undefined;
 
@@ -228,5 +216,16 @@ export class CharacterDeath {
         }
       }
     }
+  }
+
+  private async clearItem(item: IItem): Promise<IItem> {
+    item.x = undefined;
+    item.y = undefined;
+    item.owner = undefined;
+    item.scene = undefined;
+    item.tiledId = undefined;
+    await item.save();
+
+    return item;
   }
 }

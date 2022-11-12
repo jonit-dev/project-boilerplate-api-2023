@@ -16,7 +16,6 @@ export class CharacterInventory {
 
     if (!useExistingEquipment) {
       equipment = new Equipment();
-      equipment.save();
     } else {
       equipment = await Equipment.findById(character.equipment);
 
