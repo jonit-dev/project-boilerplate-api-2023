@@ -1,9 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import {
-  IItemContainer,
-  ItemContainer as dropInventoryItemsOnBody,
-} from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -122,7 +119,7 @@ export class CharacterDeath {
     }
 
     // get item container associated with characterBody
-    const itemContainer = await dropInventoryItemsOnBody.findById(characterBody.itemContainer);
+    const itemContainer = await ItemContainer.findById(characterBody.itemContainer);
 
     if (!itemContainer) {
       throw new Error(`Error fetching itemContainer for Item with key ${characterBody.key}`);
@@ -148,7 +145,7 @@ export class CharacterDeath {
   }
 
   private async dropInventoryItemsOnBody(bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
-    const inventoryContainer = await dropInventoryItemsOnBody.findById(inventory.itemContainer);
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
 
     if (!inventoryContainer) {
       throw new Error(`Inventory without item container. Item id ${inventory._id}`);
