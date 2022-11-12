@@ -18,6 +18,7 @@ import { npcFrostSalamander } from "./NPCFrostSalamander";
 import { npcGhost } from "./NPCGhost";
 import { npcGhoul } from "./NPCGhoul";
 import { npcGiantBat } from "./NPCGiantBat";
+import { npcGiantSpider } from "./NPCGiantSpider";
 import { npcGoblin } from "./NPCGoblin";
 import { npcIceFox } from "./NPCIceFox";
 import { npcIceTroll } from "./NPCIceTroll";
@@ -101,4 +102,5 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.Spiderling]: npcSpiderling,
   [HostileNPCsBlueprint.StoneGolem]: npcStoneGolem,
   [HostileNPCsBlueprint.Elf]: npcElf,
+  [HostileNPCsBlueprint.GiantSpider]: npcGiantSpider,
 };
