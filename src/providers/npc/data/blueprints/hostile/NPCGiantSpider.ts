@@ -26,7 +26,7 @@ export const npcGiantSpider: Partial<INPC> = {
   textureKey: HostileNPCsBlueprint.GiantSpider,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Fast,
+  speed: MovementSpeed.ExtraFast,
   baseHealth: 600,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
