@@ -285,7 +285,7 @@ export class UnitTestHelper {
   public async addInventoryToCharacter(character: ICharacter): Promise<IEquipment> {
     const characterInventory = container.get<CharacterInventory>(CharacterInventory);
 
-    const equipment = await characterInventory.createEquipmentWithInventory(character, ContainersBlueprint.Backpack);
+    const equipment = await characterInventory.generateNewInventory(character, ContainersBlueprint.Backpack);
 
     return equipment;
   }
