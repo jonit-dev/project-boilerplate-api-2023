@@ -6,8 +6,8 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
-import { CharacterDeath } from "../CharacterDeath";
-
+import _ from "lodash";
+import { CharacterDeath, DROP_EQUIPMENT_CHANCE } from "../CharacterDeath";
 describe("CharacterDeath.ts", () => {
   let characterDeath: CharacterDeath;
   let testCharacter: ICharacter;
@@ -23,7 +23,11 @@ describe("CharacterDeath.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
 
     testNPC = await unitTestHelper.createMockNPC();
-    testCharacter = await unitTestHelper.createMockCharacter();
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasInventory: true,
+      hasSkills: true,
+    });
   });
 
   it("should properly generate a character body on death", async () => {
@@ -172,8 +176,11 @@ describe("CharacterDeath.ts | Character with items", () => {
     // of dropping the items to drop both of them
     // and make one extra call that should not add anything to the body container
     for (let i = 0; i < 3; i++) {
+      // mock lodash random to always return 100
+      jest.spyOn(_, "random").mockImplementation(() => DROP_EQUIPMENT_CHANCE);
+
       // @ts-ignore
-      await characterDeath.dropEquippedItemOnBody(bodyItemContainer, characterEquipment, 100);
+      await characterDeath.dropEquippedItemOnBody(bodyItemContainer, characterEquipment);
     }
 
     const updatedEquipment = (await Equipment.findById(characterEquipment._id)) as IEquipment;

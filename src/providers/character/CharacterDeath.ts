@@ -1,22 +1,35 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import {
+  IItemContainer,
+  ItemContainer as dropInventoryItemsOnBody,
+} from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BattleSocketEvents, IBattleDeath, IItem } from "@rpg-engine/shared";
+import { BattleSocketEvents, IBattleDeath } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
 import { CharacterInventory } from "./CharacterInventory";
-import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 import { CharacterTarget } from "./CharacterTarget";
 
-const DROP_EQUIPMENT_CHANCE = 30; // there's a 30% chance of dropping any of the equipped items
-const DROPPABLE_EQUIPMENT = ["head", "neck", "leftHand", "rightHand", "ring", "legs", "boot", "accessory", "armor"];
+export const DROP_EQUIPMENT_CHANCE = 30; // there's a 30% chance of dropping any of the equipped items
+export const DROPPABLE_EQUIPMENT = [
+  "head",
+  "neck",
+  "leftHand",
+  "rightHand",
+  "ring",
+  "legs",
+  "boot",
+  "accessory",
+  "armor",
+];
 
 @provide(CharacterDeath)
 export class CharacterDeath {
@@ -25,7 +38,7 @@ export class CharacterDeath {
     private characterTarget: CharacterTarget,
     private npcTarget: NPCTarget,
     private characterInventory: CharacterInventory,
-    private characterItemSlots: CharacterItemSlots
+    private itemOwnership: ItemOwnership
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter, character: ICharacter): Promise<void> {
@@ -78,41 +91,17 @@ export class CharacterDeath {
       y: character.y,
     });
 
-    // remove character ownership from items
-    const inventory = await character.inventory;
-    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
-
-    if (inventoryContainer) {
-      for (let i = 0; i < inventoryContainer.slotQty; i++) {
-        const itemSlot = inventoryContainer.slots[i];
-
-        if (!itemSlot) continue;
-
-        // make sure we wipe out any x and y variables, if present, to avoid causing issues
-
-        await this.characterItemSlots.updateItemOnSlot(i, inventoryContainer, {
-          ...itemSlot,
-          owner: null,
-          scene: character.scene,
-          x: undefined,
-          y: undefined,
-          tiledId: undefined,
-        });
-      }
-    }
-
     return await charBody.save();
   }
 
   public async respawnCharacter(character: ICharacter): Promise<void> {
-    const inventory = await this.characterInventory.createEquipmentWithInventory(character, ContainersBlueprint.Bag);
+    await this.characterInventory.generateNewInventory(character, ContainersBlueprint.Bag, true);
 
     character.health = character.maxHealth;
     character.mana = character.maxMana;
     character.x = character.initialX;
     character.y = character.initialY;
     character.scene = character.initialScene;
-    character.equipment = inventory._id;
     await character.save();
   }
 
@@ -133,7 +122,7 @@ export class CharacterDeath {
     }
 
     // get item container associated with characterBody
-    const itemContainer = await ItemContainer.findById(characterBody.itemContainer);
+    const itemContainer = await dropInventoryItemsOnBody.findById(characterBody.itemContainer);
 
     if (!itemContainer) {
       throw new Error(`Error fetching itemContainer for Item with key ${characterBody.key}`);
@@ -145,77 +134,98 @@ export class CharacterDeath {
     }
 
     // drop all backpack items (inventory field)
-    const backpack = equipment.inventory as unknown as IItem;
-    if (backpack) {
-      await this.dropBackpackItemsOnBody(itemContainer, backpack);
+    const inventory = equipment.inventory as unknown as IItem;
+    if (inventory) {
+      await this.dropInventoryItemsOnBody(itemContainer, inventory);
     }
 
     // there's a chance of dropping any of the equipped items
     // default chances: 30%
-    await this.dropEquippedItemOnBody(itemContainer, equipment, DROP_EQUIPMENT_CHANCE);
+    await this.dropEquippedItemOnBody(itemContainer, equipment);
 
     itemContainer.markModified("slots");
     await itemContainer.save();
   }
 
-  private async dropBackpackItemsOnBody(bodyContainer: IItemContainer, backpack: IItem): Promise<void> {
-    const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
+  private async dropInventoryItemsOnBody(bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
+    const inventoryContainer = await dropInventoryItemsOnBody.findById(inventory.itemContainer);
 
-    if (!backpackContainer) {
-      throw new Error(`Backpack without item container. Item id ${backpack._id}`);
+    if (!inventoryContainer) {
+      throw new Error(`Inventory without item container. Item id ${inventory._id}`);
     }
 
-    if (backpackContainer.emptySlotsQty === backpackContainer.slotQty) {
+    if (inventoryContainer.emptySlotsQty === inventoryContainer.slotQty) {
       return;
     }
 
-    for (const i in backpackContainer.slots) {
-      if (backpackContainer.slots[i] !== null) {
+    for (const i in inventoryContainer.slots) {
+      if (inventoryContainer.slots[i] !== null) {
         const freeSlotId = bodyContainer.firstAvailableSlotId;
         // if there's space in body item container, then add the backpack item
         // otherwise, leave the for loop
         if (freeSlotId === null) {
           break;
         }
-        bodyContainer.slots[Number(freeSlotId)] = backpackContainer.slots[i];
-        backpackContainer.slots[Number(i)] = null;
+
+        const itemId = inventoryContainer.slots[i]._id;
+
+        const item = await Item.findById(itemId);
+
+        if (item) {
+          item.x = undefined;
+          item.y = undefined;
+          item.owner = undefined;
+          item.scene = undefined;
+          item.tiledId = undefined;
+          await item.save();
+
+          bodyContainer.slots[Number(freeSlotId)] = item;
+          inventoryContainer.slots[Number(i)] = null;
+
+          bodyContainer.markModified("slots");
+          await bodyContainer.save();
+
+          inventoryContainer.markModified("slots");
+          await inventoryContainer.save();
+        }
       }
     }
-
-    backpackContainer.markModified("slots");
-    await backpackContainer.save();
   }
 
-  private async dropEquippedItemOnBody(
-    bodyContainer: IItemContainer,
-    equipment: IEquipment,
-    dropEquipmentChance: number
-  ): Promise<void> {
-    const rand = Math.round(_.random(0, 100));
-    if (rand > dropEquipmentChance) {
-      return;
-    }
+  private async dropEquippedItemOnBody(bodyContainer: IItemContainer, equipment: IEquipment): Promise<void> {
+    for (const slot of DROPPABLE_EQUIPMENT) {
+      const itemId = await equipment[slot];
 
-    const equipLength = DROPPABLE_EQUIPMENT.length;
-    // randomnly select the equipment to drop (head, neck, etc..)
-    // if not equipped, then check next one
-    let equipmentName: any;
-    let foundEquipment = false;
-    for (let i = 0; i < equipLength; i++) {
-      equipmentName = DROPPABLE_EQUIPMENT[(rand + i) % equipLength];
-      if (equipment[equipmentName] !== undefined && equipment[equipmentName] !== null) {
-        foundEquipment = true;
-        break;
-      }
-    }
+      if (!itemId) continue;
 
-    if (foundEquipment) {
-      const freeSlotId = bodyContainer.firstAvailableSlotId;
-      // if there's space in body item container, then add the item
-      if (freeSlotId !== null) {
-        bodyContainer.slots[Number(freeSlotId)] = await Item.findById(equipment[equipmentName]);
-        equipment[equipmentName] = undefined;
-        await equipment.save();
+      const item = await Item.findById(itemId);
+
+      if (item) {
+        await this.itemOwnership.removeItemOwnership(item);
+
+        const n = _.random(0, 100);
+
+        console.log(`n: ${n}`);
+
+        if (n <= DROP_EQUIPMENT_CHANCE) {
+          const freeSlotId = bodyContainer.firstAvailableSlotId;
+          if (freeSlotId !== null) {
+            console.log("Dropping item on body", item.name);
+            item.x = undefined;
+            item.y = undefined;
+            item.owner = undefined;
+            item.scene = undefined;
+            item.tiledId = undefined;
+            bodyContainer.slots[Number(freeSlotId)] = item;
+            equipment[slot] = undefined;
+
+            bodyContainer.markModified("slots");
+            await bodyContainer.save();
+
+            equipment.markModified(slot);
+            await equipment.save();
+          }
+        }
       }
     }
   }
