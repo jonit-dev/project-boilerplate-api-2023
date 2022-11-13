@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemManaPotion: Partial<IItem> = {
@@ -14,7 +14,6 @@ export const itemManaPotion: Partial<IItem> = {
   name: "Mana Potion",
   description: "A flask containing blue liquid of a mana potion.",
   weight: 0.5,
-  allowedEquipSlotType: [ItemSlotType.Inventory],
   sellPrice: 20,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.apply(character, EffectableAttribute.Mana, 20);
