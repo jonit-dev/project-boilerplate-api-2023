@@ -10,6 +10,7 @@ import { QuestObjectiveInteraction, QuestObjectiveKill } from "@entities/ModuleQ
 import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { IControlTime, MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
+import { IUser, User } from "@entities/ModuleSystem/UserModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
@@ -32,6 +33,7 @@ import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
 import { itemMock, itemMockArmor, itemTwoHandedMock, stackableGoldCoinMock, stackableItemMock } from "./mock/itemMock";
 import { questInteractionObjectiveMock, questKillObjectiveMock, questMock, questRewardsMock } from "./mock/questMock";
+import { userMock } from "./mock/userMock";
 
 interface IMockCharacterOptions {
   hasEquipment?: boolean;
@@ -408,6 +410,17 @@ export class UnitTestHelper {
     }
 
     return true;
+  }
+
+  public async createMockUser(extraProps?: Partial<IUser>): Promise<IUser> {
+    const newUser = new User({
+      ...userMock,
+      ...extraProps,
+    });
+
+    await newUser.save();
+
+    return newUser;
   }
 
   public async createMockQuest(

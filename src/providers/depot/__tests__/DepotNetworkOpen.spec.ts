@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
@@ -67,6 +66,42 @@ describe("DepotNetworkOpen.ts", () => {
     expect(depotContainer).toBeDefined();
 
     expect(depotContainer.parentItem).toEqual(characterDepot!._id);
+  });
+
+  it("When a Character is deleted, should remove the Depot", async () => {
+    // @ts-ignore
+    const depotContainer = await depotNetworkOpen.getDepotContainer(testCharacter.id, testNPC.id);
+
+    expect(depotContainer).toBeDefined();
+    expect(depotContainer!.slotQty).toEqual(20);
+
+    const newDepot = await Depot.findOne({
+      owner: Types.ObjectId(testCharacter.id),
+      npc: Types.ObjectId(testNPC.id),
+    })
+      .populate("itemContainer")
+      .exec();
+
+    expect(newDepot).toBeDefined();
+    expect(depotContainer.parentItem).toEqual(newDepot!._id);
+
+    const result = await testCharacter
+      .remove()
+      .then((res) => {
+        return true;
+      })
+      .catch(() => {
+        return false;
+      });
+
+    expect(result).toBeTruthy();
+
+    const depotAfterDelete = await Depot.findOne({
+      owner: Types.ObjectId(testCharacter.id),
+      npc: Types.ObjectId(testNPC.id),
+    });
+
+    expect(depotAfterDelete).toBeNull();
   });
 
   afterAll(async () => {

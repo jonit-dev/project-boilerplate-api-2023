@@ -66,7 +66,7 @@ export class CharacterController implements interfaces.Controller {
   private async deleteCharacter(
     @requestParam("id") id: string,
     @request() request: IAuthenticatedRequest
-  ): Promise<void> {
+  ): Promise<boolean> {
     const ownerId = request.user.id;
 
     return await this.deleteCharacterUseCase.delete(id, ownerId);
