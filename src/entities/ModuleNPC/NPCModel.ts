@@ -158,7 +158,6 @@ const npcSchema = createLeanSchema(
     isTrader: Type.boolean({}),
     traderItems: Type.array().of({
       key: Type.string({ required: true }),
-      price: Type.number({ required: true }),
       texturePath: Type.string(),
       name: Type.string(),
     }),

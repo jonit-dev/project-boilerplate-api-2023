@@ -4,6 +4,7 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TRADER_SELL_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
@@ -105,7 +106,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(69);
+    expect(updatedContainer.slots[0].stackQty).toBe(34.5);
 
     expect(updatedContainer.slots[2]).not.toBeNull();
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
@@ -227,7 +228,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(42);
+    expect(updatedContainer.slots[0].stackQty).toBe(21);
 
     expect(updatedContainer.slots[1]).toBeNull();
 
@@ -282,15 +283,6 @@ describe("CharacterTradingNPCSell.ts", () => {
   });
 
   it("should create two gold items if more gold earned than max stack size", async () => {
-    const items = [
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 20 }),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 20 }),
-    ];
-
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
-
     const sellItems = [
       {
         key: RangedWeaponsBlueprint.Slingshot,
@@ -298,7 +290,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       },
       {
         key: RangedWeaponsBlueprint.Arrow,
-        qty: 40,
+        qty: 100,
       },
     ];
 
@@ -312,7 +304,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[1]).not.toBeNull();
     expect(updatedContainer.slots[1].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[1].stackQty).toBe(78);
+    expect(updatedContainer.slots[1].stackQty).toBe(49);
 
     expect(updatedContainer.slots[2]).toBeNull();
     expect(updatedContainer.slots[3]).toBeNull();
@@ -322,8 +314,8 @@ describe("CharacterTradingNPCSell.ts", () => {
     const items = [
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 20 }),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 20 }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
       await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 10 }),
     ];
 
@@ -336,7 +328,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       },
       {
         key: RangedWeaponsBlueprint.Arrow,
-        qty: 40,
+        qty: 100,
       },
     ];
 
@@ -346,7 +338,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(88);
+    expect(updatedContainer.slots[0].stackQty).toBe(59);
 
     expect(updatedContainer.slots[4]).not.toBeNull();
     expect(updatedContainer.slots[4].key).toBe(OthersBlueprint.GoldCoin);
@@ -404,14 +396,14 @@ describe("CharacterTradingNPCSell.ts", () => {
       characterItems: [
         {
           key: slingShot.key,
-          price: slingShot.basePrice,
+          price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
           name: slingShot.name,
           texturePath: slingShot.texturePath,
           qty: 2,
         },
         {
           key: arrow.key,
-          price: arrow.basePrice,
+          price: arrow.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
           name: arrow.name,
           texturePath: arrow.texturePath,
           qty: 100,
@@ -553,7 +545,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       characterItems: [
         {
           key: slingShot.key,
-          price: slingShot.basePrice,
+          price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
           name: slingShot.name,
           texturePath: slingShot.texturePath,
           qty: 1,
@@ -583,7 +575,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       characterItems: [
         {
           key: slingShot.key,
-          price: slingShot.basePrice,
+          price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
           name: slingShot.name,
           texturePath: slingShot.texturePath,
           qty: 1,

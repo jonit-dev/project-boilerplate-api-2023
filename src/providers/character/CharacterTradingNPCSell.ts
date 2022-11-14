@@ -157,8 +157,7 @@ export class CharacterTradingNPCSell {
     let qty = 0;
 
     for (const item of items) {
-      const blueprint = itemsBlueprintIndex[item.key];
-      qty += item.qty * blueprint.basePrice;
+      qty += item.qty * this.characterTradingBalance.getItemSellPrice(item.key);
     }
 
     qty = this.mathHelper.fixPrecision(qty);
@@ -209,11 +208,12 @@ export class CharacterTradingNPCSell {
 
     for (const itemKey of uniqueItems) {
       const item = itemsBlueprintIndex[itemKey];
+
       if (!item || !item.basePrice) continue;
 
       responseItems.push({
         key: item.key,
-        price: item.basePrice,
+        price: this.characterTradingBalance.getItemSellPrice(item.key),
         name: item.name,
         texturePath: item.texturePath,
         qty: await this.characterItemSlots.getTotalQty(container, itemKey),

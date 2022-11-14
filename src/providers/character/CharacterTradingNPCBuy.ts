@@ -41,16 +41,21 @@ export class CharacterTradingNPCBuy {
       throw new Error("Failed to initialize buy transaction. NPC not found!");
     }
 
-    const traderItems = npc?.traderItems?.map(({ key, price }) => {
-      const { texturePath, name } = itemsBlueprintIndex[key] as IItem;
+    const traderItems: ITradeResponseItem[] = [];
 
-      return {
-        key,
-        price,
-        texturePath,
-        name,
-      };
-    }) as ITradeResponseItem[];
+    npc?.traderItems?.forEach(({ key }) => {
+      const item = itemsBlueprintIndex[key] as IItem;
+      const price = this.characterTradingBalance.getItemBuyPrice(key);
+
+      if (price) {
+        traderItems.push({
+          key,
+          price,
+          texturePath: item.texturePath,
+          name: item.name,
+        });
+      }
+    });
 
     const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
 
@@ -93,7 +98,7 @@ export class CharacterTradingNPCBuy {
         continue;
       }
 
-      const itemPrice = npc?.traderItems?.find((traderItem) => traderItem.key === purchasedItem.key)?.price;
+      const itemPrice = this.characterTradingBalance.getItemBuyPrice(purchasedItem.key);
 
       if (!itemPrice) {
         this.socketMessaging.sendErrorMessageToCharacter(

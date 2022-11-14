@@ -58,11 +58,9 @@ describe("CharacterTradingValidation.ts", () => {
       traderItems: [
         {
           key: PotionsBlueprint.LightEndurancePotion,
-          price: 15,
         },
         {
           key: SwordsBlueprint.ShortSword,
-          price: 50,
         },
       ],
     });

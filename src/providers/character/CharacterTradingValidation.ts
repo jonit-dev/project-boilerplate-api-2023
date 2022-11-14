@@ -63,8 +63,9 @@ export class CharacterTradingValidation {
         return false;
       }
 
+      const basePrice = itemsBlueprintIndex[item.key]?.basePrice ?? 0;
       // check if the item has price <= 0
-      if (traderItem.price <= 0 || item.qty <= 0) {
+      if (basePrice <= 0 || item.qty <= 0) {
         this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, invalid parameters for ${item.key}.`);
         return false;
       }

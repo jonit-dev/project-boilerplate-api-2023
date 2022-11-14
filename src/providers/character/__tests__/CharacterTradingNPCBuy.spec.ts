@@ -55,15 +55,12 @@ describe("CharacterTradingValidation.ts", () => {
       traderItems: [
         {
           key: PotionsBlueprint.LightEndurancePotion,
-          price: 15,
         },
         {
           key: SwordsBlueprint.ShortSword,
-          price: 50,
         },
         {
           key: RangedWeaponsBlueprint.Arrow,
-          price: 0.5,
         },
       ],
     });
@@ -105,7 +102,7 @@ describe("CharacterTradingValidation.ts", () => {
         inventory.itemContainer
       )) as unknown as IItemContainer;
 
-      expect(updatedInventoryContainer.slots[0].stackQty).toBe(85); // gold left
+      expect(updatedInventoryContainer.slots[0].stackQty).toBe(77.5); // gold left
       expect(updatedInventoryContainer.slots[1].key).toBe(PotionsBlueprint.LightEndurancePotion); // potion bought
 
       expect(sendEventToUser).toHaveBeenCalledWith(
@@ -137,7 +134,7 @@ describe("CharacterTradingValidation.ts", () => {
         inventory.itemContainer
       )) as unknown as IItemContainer;
 
-      expect(updatedInventoryContainer.slots[0].stackQty).toBe(87.5); // gold left
+      expect(updatedInventoryContainer.slots[0].stackQty).toBe(25); // gold left
       expect(updatedInventoryContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Arrow); // potion bought
       expect(updatedInventoryContainer.slots[1].stackQty).toBe(25);
 
@@ -179,7 +176,6 @@ describe("CharacterTradingValidation.ts", () => {
         traderItems: expect.arrayContaining([
           expect.objectContaining({
             key: PotionsBlueprint.LightEndurancePotion,
-            price: 15,
           }),
         ]),
         type: "buy",
