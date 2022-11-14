@@ -12,5 +12,5 @@ export const itemBatsWing: Partial<IItem> = {
   description: "A crafting resource used for witchcraft and sorcery",
   weight: 1,
   maxStackSize: 100,
-  sellPrice: 10,
+  basePrice: 0.5,
 };

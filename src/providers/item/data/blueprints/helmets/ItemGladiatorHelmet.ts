@@ -14,5 +14,5 @@ export const itemGladiatorHelmet: Partial<IItem> = {
   defense: 8,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.Head],
-  sellPrice: 30,
+  basePrice: 57,
 };

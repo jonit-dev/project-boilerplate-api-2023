@@ -14,5 +14,5 @@ export const itemStone: Partial<IItem> = {
   weight: 0.3,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,
-  sellPrice: 0.1,
+  basePrice: 1,
 };

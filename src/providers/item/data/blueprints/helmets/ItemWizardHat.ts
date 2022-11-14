@@ -13,5 +13,5 @@ export const itemWizardHat: Partial<IItem> = {
   defense: 3,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Head],
-  sellPrice: 10,
+  basePrice: 37,
 };

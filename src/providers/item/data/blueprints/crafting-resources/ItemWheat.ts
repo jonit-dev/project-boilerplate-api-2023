@@ -12,5 +12,5 @@ export const itemWheat: Partial<IItem> = {
   description: "A crafting material commonly used to make food.",
   weight: 0.25,
   maxStackSize: 100,
-  sellPrice: 10,
+  basePrice: 0.5,
 };

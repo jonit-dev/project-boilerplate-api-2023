@@ -17,5 +17,5 @@ export const itemSpikedClub: Partial<IItem> = {
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  sellPrice: 9,
+  basePrice: 65,
 };

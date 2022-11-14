@@ -18,5 +18,5 @@ export const itemDagger: Partial<IItem> = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  sellPrice: 25,
+  basePrice: 38,
 };

@@ -14,5 +14,5 @@ export const itemVikingShield: Partial<IItem> = {
   defense: 6,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  sellPrice: 13,
+  basePrice: 49,
 };

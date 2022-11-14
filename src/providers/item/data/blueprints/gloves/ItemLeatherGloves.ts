@@ -14,5 +14,5 @@ export const itemLeatherGloves: Partial<IItem> = {
   defense: 2,
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Ring],
-  sellPrice: 3,
+  basePrice: 33,
 };

@@ -14,5 +14,5 @@ export const itemLeatherHelmet: Partial<IItem> = {
   defense: 4,
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Head],
-  sellPrice: 7,
+  basePrice: 41,
 };

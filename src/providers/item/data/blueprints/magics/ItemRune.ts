@@ -13,5 +13,5 @@ export const itemRune: Partial<IItem> = {
   description: "An ancient carved rune.",
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Accessory, ItemSlotType.Inventory],
-  sellPrice: 10,
+  basePrice: 1,
 };

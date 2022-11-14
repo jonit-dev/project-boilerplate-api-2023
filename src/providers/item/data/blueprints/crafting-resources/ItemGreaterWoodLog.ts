@@ -12,5 +12,5 @@ export const itemGreaterWoodLog: Partial<IItem> = {
   description: "A heavy crafting resource that is generally split into smaller logs before usage.",
   weight: 10,
   maxStackSize: 10,
-  sellPrice: 10,
+  basePrice: 5,
 };

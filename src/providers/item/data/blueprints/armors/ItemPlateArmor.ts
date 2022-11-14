@@ -15,5 +15,5 @@ export const itemPlateArmor: Partial<IItem> = {
   defense: 25,
   weight: 4,
   allowedEquipSlotType: [ItemSlotType.Torso],
-  sellPrice: 170,
+  basePrice: 125,
 };

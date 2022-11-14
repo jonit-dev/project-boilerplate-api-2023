@@ -12,5 +12,5 @@ export const itemHerb: Partial<IItem> = {
   description: "A crafting resource used for making healing potions and antidotes.",
   weight: 0.01,
   maxStackSize: 100,
-  sellPrice: 10,
+  basePrice: 0.5,
 };

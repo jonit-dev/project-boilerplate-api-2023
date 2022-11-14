@@ -15,8 +15,8 @@ export const itemBanana: Partial<IItem> = {
   description: "A ripe banana.",
   weight: 0.05,
   maxStackSize: 100,
-  sellPrice: 5,
+  basePrice: 10,
   usableEffect: (character: ICharacter) => {
-    ItemUsableEffect.apply(character, EffectableAttribute.Health, 2);
+    ItemUsableEffect.apply(character, EffectableAttribute.Health, 1);
   },
 };

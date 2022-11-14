@@ -14,5 +14,5 @@ export const itemStuddedGloves: Partial<IItem> = {
   defense: 4,
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Ring],
-  sellPrice: 4,
+  basePrice: 41,
 };

@@ -12,5 +12,5 @@ export const itemObsidian: Partial<IItem> = {
   description: "A crafting material made of naturally occurring volcanic glass.",
   weight: 1,
   maxStackSize: 100,
-  sellPrice: 10,
+  basePrice: 0.5,
 };

@@ -12,5 +12,5 @@ export const itemSilverKey: Partial<IItem> = {
   description: "A well made silver key.",
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  sellPrice: 5,
+  basePrice: 1,
 };

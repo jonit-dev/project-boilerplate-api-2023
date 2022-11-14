@@ -6,7 +6,11 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { OthersBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  AccessoriesBlueprint,
+  OthersBlueprint,
+  RangedWeaponsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterTradeSocketEvents, ItemSocketEvents, NPCMovementType } from "@rpg-engine/shared";
 import { CharacterItemInventory } from "../characterItems/CharacterItemInventory";
@@ -101,7 +105,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(15);
+    expect(updatedContainer.slots[0].stackQty).toBe(69);
 
     expect(updatedContainer.slots[2]).not.toBeNull();
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
@@ -189,13 +193,22 @@ describe("CharacterTradingNPCSell.ts", () => {
   });
 
   it("should sell all provided items with aggregated qty", async () => {
+    const items = [
+      await unitTestHelper.createMockItemFromBlueprint(AccessoriesBlueprint.Bandana),
+      await unitTestHelper.createMockItemFromBlueprint(AccessoriesBlueprint.Bandana),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
+    ];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
     const sellItems = [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: AccessoriesBlueprint.Bandana,
         qty: 1,
       },
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: AccessoriesBlueprint.Bandana,
         qty: 1,
       },
       {
@@ -214,7 +227,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(30);
+    expect(updatedContainer.slots[0].stackQty).toBe(42);
 
     expect(updatedContainer.slots[1]).toBeNull();
 
@@ -272,8 +285,8 @@ describe("CharacterTradingNPCSell.ts", () => {
     const items = [
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 100 }),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 100 }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 20 }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 20 }),
     ];
 
     await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
@@ -285,7 +298,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       },
       {
         key: RangedWeaponsBlueprint.Arrow,
-        qty: 200,
+        qty: 40,
       },
     ];
 
@@ -299,7 +312,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[1]).not.toBeNull();
     expect(updatedContainer.slots[1].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[1].stackQty).toBe(20);
+    expect(updatedContainer.slots[1].stackQty).toBe(78);
 
     expect(updatedContainer.slots[2]).toBeNull();
     expect(updatedContainer.slots[3]).toBeNull();
@@ -309,8 +322,8 @@ describe("CharacterTradingNPCSell.ts", () => {
     const items = [
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 100 }),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 100 }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 20 }),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 20 }),
       await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 10 }),
     ];
 
@@ -323,7 +336,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       },
       {
         key: RangedWeaponsBlueprint.Arrow,
-        qty: 200,
+        qty: 40,
       },
     ];
 
@@ -333,7 +346,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(30);
+    expect(updatedContainer.slots[0].stackQty).toBe(88);
 
     expect(updatedContainer.slots[4]).not.toBeNull();
     expect(updatedContainer.slots[4].key).toBe(OthersBlueprint.GoldCoin);
@@ -391,14 +404,14 @@ describe("CharacterTradingNPCSell.ts", () => {
       characterItems: [
         {
           key: slingShot.key,
-          price: slingShot.sellPrice,
+          price: slingShot.basePrice,
           name: slingShot.name,
           texturePath: slingShot.texturePath,
           qty: 2,
         },
         {
           key: arrow.key,
-          price: arrow.sellPrice,
+          price: arrow.basePrice,
           name: arrow.name,
           texturePath: arrow.texturePath,
           qty: 100,
@@ -540,7 +553,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       characterItems: [
         {
           key: slingShot.key,
-          price: slingShot.sellPrice,
+          price: slingShot.basePrice,
           name: slingShot.name,
           texturePath: slingShot.texturePath,
           qty: 1,
@@ -570,7 +583,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       characterItems: [
         {
           key: slingShot.key,
-          price: slingShot.sellPrice,
+          price: slingShot.basePrice,
           name: slingShot.name,
           texturePath: slingShot.texturePath,
           qty: 1,

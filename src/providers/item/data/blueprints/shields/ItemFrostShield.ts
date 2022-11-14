@@ -13,5 +13,5 @@ export const itemFrostShield: Partial<IItem> = {
   defense: 7,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  sellPrice: 15,
+  basePrice: 53,
 };

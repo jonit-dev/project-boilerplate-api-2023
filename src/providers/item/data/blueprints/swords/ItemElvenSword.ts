@@ -16,5 +16,5 @@ export const itemElvenSword: Partial<IItem> = {
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  sellPrice: 80,
+  basePrice: 69,
 };

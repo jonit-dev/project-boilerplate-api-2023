@@ -13,5 +13,5 @@ export const itemIronBoots: Partial<IItem> = {
   defense: 5,
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.Feet],
-  sellPrice: 15,
+  basePrice: 45,
 };

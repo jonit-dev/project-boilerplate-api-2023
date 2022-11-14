@@ -12,5 +12,5 @@ export const itemGoldenIngot: Partial<IItem> = {
   description: "A precious metal and crafting resource.",
   weight: 1,
   maxStackSize: 100,
-  sellPrice: 10,
+  basePrice: 0.5,
 };

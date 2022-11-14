@@ -16,5 +16,5 @@ export const itemBardiche: Partial<IItem> = {
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  sellPrice: 60,
+  basePrice: 38,
 };

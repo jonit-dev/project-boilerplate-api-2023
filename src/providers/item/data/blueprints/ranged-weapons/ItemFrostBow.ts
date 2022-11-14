@@ -19,5 +19,5 @@ export const itemFrostBow: Partial<IItem> = {
   maxRange: 9,
   requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow],
   isTwoHanded: true,
-  sellPrice: 50,
+  basePrice: 87,
 };

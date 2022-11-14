@@ -19,5 +19,5 @@ export const itemSpear: Partial<IItem> = {
   maxRange: 7,
   rangeType: EntityAttackType.Melee,
   maxStackSize: 100,
-  sellPrice: 50,
+  basePrice: 10,
 };

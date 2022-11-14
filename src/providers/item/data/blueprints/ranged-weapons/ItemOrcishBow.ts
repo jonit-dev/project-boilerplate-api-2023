@@ -20,5 +20,5 @@ export const itemOrcishBow: Partial<IItem> = {
   maxRange: 10,
   requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow],
   isTwoHanded: true,
-  sellPrice: 45,
+  basePrice: 81,
 };

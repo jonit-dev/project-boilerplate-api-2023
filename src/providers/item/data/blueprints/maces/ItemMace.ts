@@ -16,5 +16,5 @@ export const itemMace: Partial<IItem> = {
   weight: 4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  sellPrice: 7,
+  basePrice: 69,
 };
