@@ -14,5 +14,5 @@ export const itemStuddedArmor: Partial<IItem> = {
   defense: 12,
   weight: 1.4,
   allowedEquipSlotType: [ItemSlotType.Torso],
-  sellPrice: 130,
+  basePrice: 73,
 };

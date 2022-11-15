@@ -58,11 +58,9 @@ describe("CharacterTradingValidation.ts", () => {
       traderItems: [
         {
           key: PotionsBlueprint.LightEndurancePotion,
-          price: 15,
         },
         {
           key: SwordsBlueprint.ShortSword,
-          price: 50,
         },
       ],
     });
@@ -369,7 +367,7 @@ describe("CharacterTradingValidation.ts", () => {
       );
     });
 
-    it("should fail if item blue print does not have sellPrice", async () => {
+    it("should fail if item blue print does not have basePrice", async () => {
       transactionSellItems.push({
         key: itemGroundBlood.key!,
         qty: 1,

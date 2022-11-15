@@ -13,5 +13,5 @@ export const itemGoldenArmor: Partial<IItem> = {
   defense: 38,
   weight: 5,
   allowedEquipSlotType: [ItemSlotType.Torso],
-  sellPrice: 250,
+  basePrice: 177,
 };

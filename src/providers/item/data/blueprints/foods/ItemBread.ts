@@ -15,8 +15,8 @@ export const itemBread: Partial<IItem> = {
   description: "A loaf of bread.",
   weight: 0.1,
   maxStackSize: 10,
-  sellPrice: 5,
+  basePrice: 100,
   usableEffect: (character: ICharacter) => {
-    ItemUsableEffect.apply(character, EffectableAttribute.Health, 2);
+    ItemUsableEffect.apply(character, EffectableAttribute.Health, 10);
   },
 };

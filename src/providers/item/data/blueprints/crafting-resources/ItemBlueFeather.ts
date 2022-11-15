@@ -13,5 +13,5 @@ export const itemBlueFeather: Partial<IItem> = {
   description: "A craft material used to make arrows.",
   weight: 0.1,
   maxStackSize: 100,
-  sellPrice: 10,
+  basePrice: 0.5,
 };

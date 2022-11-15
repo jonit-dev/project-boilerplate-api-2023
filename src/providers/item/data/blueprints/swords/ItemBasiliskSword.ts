@@ -16,5 +16,5 @@ export const itemBasiliskSword: Partial<IItem> = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  sellPrice: 120,
+  basePrice: 77,
 };

@@ -13,5 +13,5 @@ export const itemSilverBoots: Partial<IItem> = {
   defense: 10,
   weight: 0.6,
   allowedEquipSlotType: [ItemSlotType.Feet],
-  sellPrice: 15,
+  basePrice: 65,
 };

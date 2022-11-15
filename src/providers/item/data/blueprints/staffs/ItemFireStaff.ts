@@ -17,5 +17,5 @@ export const itemFireStaff: Partial<IItem> = {
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  sellPrice: 100,
+  basePrice: 77,
 };

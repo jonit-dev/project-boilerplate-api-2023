@@ -13,5 +13,5 @@ export const itemReforcedBoots: Partial<IItem> = {
   defense: 4,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Feet],
-  sellPrice: 10,
+  basePrice: 41,
 };

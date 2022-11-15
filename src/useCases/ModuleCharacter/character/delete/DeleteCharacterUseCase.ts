@@ -2,7 +2,6 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { provide } from "inversify-binding-decorators";
-import { UserRepository } from "@repositories/ModuleSystem/user/UserRepository";
 
 @provide(DeleteCharacterUseCase)
 export class DeleteCharacterUseCase {

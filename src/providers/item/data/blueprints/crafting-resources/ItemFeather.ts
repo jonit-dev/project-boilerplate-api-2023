@@ -12,5 +12,5 @@ export const itemFeather: Partial<IItem> = {
   description: "A common crafting resource, used mainly for making projectiles",
   weight: 0.01,
   maxStackSize: 100,
-  sellPrice: 10,
+  basePrice: 0.5,
 };

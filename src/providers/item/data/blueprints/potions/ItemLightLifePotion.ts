@@ -14,7 +14,7 @@ export const itemLightLifePotion: Partial<IItem> = {
   name: "Light Life Potion",
   description: "A small flask containing an elixir of endurance.",
   weight: 0.5,
-  sellPrice: 20,
+  basePrice: 40,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.apply(character, EffectableAttribute.Health, 20);
   },

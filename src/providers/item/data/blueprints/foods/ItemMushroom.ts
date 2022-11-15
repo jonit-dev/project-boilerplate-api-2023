@@ -15,8 +15,8 @@ export const itemMushroom: Partial<IItem> = {
   description: "An edible mushroom that can be eaten to restore health.",
   weight: 0.25,
   maxStackSize: 100,
-  sellPrice: 5,
+  basePrice: 10,
   usableEffect: (character: ICharacter) => {
-    ItemUsableEffect.apply(character, EffectableAttribute.Health, 2);
+    ItemUsableEffect.apply(character, EffectableAttribute.Health, 1);
   },
 };

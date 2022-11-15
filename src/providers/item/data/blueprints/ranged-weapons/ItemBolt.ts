@@ -14,5 +14,5 @@ export const itemBolt: Partial<IItem> = {
   weight: 0.2,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,
-  sellPrice: 0.5,
+  basePrice: 3,
 };

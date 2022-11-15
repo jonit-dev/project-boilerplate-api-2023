@@ -12,5 +12,5 @@ export const itemIronIngot: Partial<IItem> = {
   description: "An useful and common crafting resource.",
   weight: 1,
   maxStackSize: 100,
-  sellPrice: 10,
+  basePrice: 0.5,
 };

@@ -11,5 +11,5 @@ export const itemLightAntidote: Partial<IItem> = {
   name: "Light Antidote",
   description: "A small flask containing an elixir of antidote.",
   weight: 0.5,
-  sellPrice: 15,
+  basePrice: 15,
 };

@@ -13,5 +13,5 @@ export const itemSilverShield: Partial<IItem> = {
   defense: 10,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  sellPrice: 20,
+  basePrice: 65,
 };

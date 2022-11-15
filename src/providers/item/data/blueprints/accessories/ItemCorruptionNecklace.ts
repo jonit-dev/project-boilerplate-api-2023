@@ -14,5 +14,5 @@ export const itemCorruptionNecklace: Partial<IItem> = {
   defense: 0,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Neck],
-  sellPrice: 10,
+  basePrice: 26,
 };

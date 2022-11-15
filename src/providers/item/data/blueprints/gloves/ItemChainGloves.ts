@@ -14,5 +14,5 @@ export const itemChainGloves: Partial<IItem> = {
   defense: 6,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.Ring],
-  sellPrice: 5,
+  basePrice: 49,
 };

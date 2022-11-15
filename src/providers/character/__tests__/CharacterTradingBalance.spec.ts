@@ -52,12 +52,10 @@ describe("CharacterTradingBalance.ts", () => {
         {
           key: PotionsBlueprint.LightEndurancePotion,
           qty: 1,
-          price: 15,
         },
         {
           key: SwordsBlueprint.ShortSword,
           qty: 1,
-          price: 50,
         },
       ],
     });
@@ -66,18 +64,16 @@ describe("CharacterTradingBalance.ts", () => {
       {
         key: PotionsBlueprint.LightEndurancePotion,
         qty: 1,
-        price: 15,
       },
       {
         key: SwordsBlueprint.ElvenSword, // this item is not in the NPC's traderItems. It's here on purpose, to test if the total price is calculated correctly
         qty: 1,
-        price: 500,
       },
     ];
 
     const totalPrice = await characterTradingBalance.calculateItemsTotalPrice(testNPC, transactionItems);
 
-    expect(totalPrice).toBe(15);
+    expect(totalPrice).toBe(22.5);
   });
 
   afterAll(async () => {

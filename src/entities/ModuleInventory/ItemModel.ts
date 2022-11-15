@@ -69,7 +69,7 @@ const itemSchema = createLeanSchema(
     ),
     isTwoHanded: Type.boolean({ required: true, default: false }),
     hasUseWith: Type.boolean({ required: true, default: false }),
-    sellPrice: Type.number(),
+    basePrice: Type.number(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

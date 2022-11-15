@@ -20,5 +20,5 @@ export const itemSlingshot: Partial<IItem> = {
   maxRange: 4,
   requiredAmmoKeys: [RangedWeaponsBlueprint.Stone],
   isTwoHanded: true,
-  sellPrice: 10,
+  basePrice: 49,
 };

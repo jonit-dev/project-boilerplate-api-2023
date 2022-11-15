@@ -19,5 +19,5 @@ export const itemFrostCrossbow: Partial<IItem> = {
   maxRange: 10,
   requiredAmmoKeys: [RangedWeaponsBlueprint.Bolt],
   isTwoHanded: true,
-  sellPrice: 50,
+  basePrice: 93,
 };

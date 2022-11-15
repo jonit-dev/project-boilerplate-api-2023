@@ -12,5 +12,5 @@ export const itemSilk: Partial<IItem> = {
   description: "A crafting resource used for making clothes and other items",
   weight: 0.05,
   maxStackSize: 100,
-  sellPrice: 10,
+  basePrice: 0.5,
 };

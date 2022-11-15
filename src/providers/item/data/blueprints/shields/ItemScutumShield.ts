@@ -13,5 +13,5 @@ export const itemScutumShield: Partial<IItem> = {
   defense: 10,
   weight: 5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  sellPrice: 20,
+  basePrice: 65,
 };

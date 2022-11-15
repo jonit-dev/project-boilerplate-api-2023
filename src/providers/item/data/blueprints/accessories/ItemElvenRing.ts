@@ -14,5 +14,5 @@ export const itemElvenRing: Partial<IItem> = {
   defense: 1,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  sellPrice: 25,
+  basePrice: 30,
 };

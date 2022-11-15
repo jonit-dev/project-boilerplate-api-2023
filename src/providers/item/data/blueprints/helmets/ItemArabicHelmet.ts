@@ -13,5 +13,5 @@ export const itemArabicHelmet: Partial<IItem> = {
   defense: 3,
   weight: 0.8,
   allowedEquipSlotType: [ItemSlotType.Head],
-  sellPrice: 20,
+  basePrice: 37,
 };
