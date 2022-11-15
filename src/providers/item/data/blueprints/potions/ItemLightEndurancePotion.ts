@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemLightEndurancePotion: Partial<IItem> = {
@@ -12,6 +12,5 @@ export const itemLightEndurancePotion: Partial<IItem> = {
   name: "Light Endurance Potion",
   description: "A small flask containing an elixir of endurance.",
   weight: 0.5,
-  allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 15,
 };

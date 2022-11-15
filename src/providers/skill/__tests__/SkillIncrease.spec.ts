@@ -1,8 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { SP_INCREASE_RATIO } from "@providers/constants/SkillConstants";
+import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { itemSelfHealing } from "@providers/item/data/blueprints/spells/ItemSelfHealing";
 import { ItemSpellCast } from "@providers/item/ItemSpellCast";
 import { ItemSubType } from "@rpg-engine/shared";
 import { Error } from "mongoose";
@@ -278,6 +279,19 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(updatedSkills?.resistance.level).toBe(initialLevel);
     expect(updatedSkills?.resistance.skillPoints).toBe(SP_INCREASE_RATIO);
     expect(updatedSkills?.resistance.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO);
+  });
+
+  it("should increase character's magic SP as per mana cost", async () => {
+    await skillIncrease.increaseMagicSP(testCharacter, itemSelfHealing);
+
+    const updatedSkills = await Skill.findById(testCharacter.skills);
+
+    // 'resistance' skill should increase
+    expect(updatedSkills?.magic.level).toBe(initialLevel);
+
+    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemSelfHealing.manaCost ?? 0);
+    expect(updatedSkills?.magic.skillPoints).toBe(skillPoints);
+    expect(updatedSkills?.magic.skillPointsToNextLevel).toBe(spToLvl2 - skillPoints);
   });
 
   afterAll(async () => {

@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemGreaterLifePotion: Partial<IItem> = {
@@ -14,7 +14,6 @@ export const itemGreaterLifePotion: Partial<IItem> = {
   name: "Greater Life Potion",
   description: "A flask containing deep red liquid of a greater elixir of life.",
   weight: 0.5,
-  allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 100,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.apply(character, EffectableAttribute.Health, 50);

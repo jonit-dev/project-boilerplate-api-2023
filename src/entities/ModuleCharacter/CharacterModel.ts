@@ -1,4 +1,7 @@
+import { Depot } from "@entities/ModuleDepot/DepotModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { User } from "@entities/ModuleSystem/UserModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { SpellsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import {
@@ -270,10 +273,44 @@ characterSchema.virtual("weapon").get(async function (this: ICharacter) {
 });
 
 characterSchema.post("remove", async function (this: ICharacter) {
-  const skill = await Skill.findOne({ _id: this.skills });
+  try {
+    const skill = await Skill.findOne({ _id: this.skills });
+    if (skill) {
+      await skill.remove();
+    }
 
-  if (skill) {
-    await skill.remove();
+    const depot = await Depot.findOne({ owner: this._id });
+    if (depot) {
+      await depot.remove();
+    }
+
+    const equipment = await Equipment.findOne({ owner: this._id });
+    if (equipment) {
+      await equipment.remove();
+    }
+
+    const inventory = await ItemContainer.findOne({ owner: this._id });
+    if (inventory) {
+      await inventory.remove();
+    }
+
+    const items = await Item.find({ owner: this._id });
+    if (items) {
+      for (const item of items) {
+        await item.remove();
+      }
+    }
+
+    const user = await User.findOne({ characters: this._id });
+    if (user) {
+      await User.updateOne({
+        $pull: {
+          characters: this._id,
+        },
+      });
+    }
+  } catch (error) {
+    console.log(error);
   }
 });
 

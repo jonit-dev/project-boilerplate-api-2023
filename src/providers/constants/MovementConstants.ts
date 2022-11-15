@@ -4,5 +4,4 @@ export enum MovementSpeed {
   Standard = 2.5,
   Fast = 3,
   ExtraFast = 3.5,
-  LightSpeed = 4,
 }

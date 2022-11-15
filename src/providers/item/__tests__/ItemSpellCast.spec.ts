@@ -1,9 +1,11 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { AnimationSocketEvents, CharacterSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { AnimationSocketEvents, CharacterSocketEvents, SkillSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { itemSelfHealing } from "../data/blueprints/spells/ItemSelfHealing";
 import { ItemSpellCast } from "../ItemSpellCast";
 
@@ -42,6 +44,7 @@ describe("ItemSpellCast.ts", () => {
   afterEach(() => {
     sendEventToUser.mockRestore();
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   afterAll(async () => {
@@ -130,8 +133,7 @@ describe("ItemSpellCast.ts", () => {
     });
   });
 
-  // TODO: Implement magic level validation later
-  /* it("should fail due to lower magic level", async () => {
+  it("should fail due to lower magic level", async () => {
     characterSkills.magic.level = (itemSelfHealing.minMagicLevelRequired ?? 2) - 1;
     await characterSkills.save();
 
@@ -143,7 +145,7 @@ describe("ItemSpellCast.ts", () => {
       message: "Sorry, you can not cast this spell at this character magic level.",
       type: "error",
     });
-  }); */
+  });
 
   it("should cast self healing spell successfully", async () => {
     const newHealth = testCharacter.health + itemSelfHealing.manaCost!;
@@ -155,7 +157,12 @@ describe("ItemSpellCast.ts", () => {
     expect(character.health).toBe(newHealth);
     expect(character.mana).toBe(newMana);
 
-    expect(sendEventToUser).toBeCalledTimes(2);
+    /**
+     * 1. health changed event
+     * 2. life heal animation event
+     * 3. skill update event
+     */
+    expect(sendEventToUser).toBeCalledTimes(3);
 
     expect(sendEventToUser).toHaveBeenNthCalledWith(
       1,
@@ -171,6 +178,52 @@ describe("ItemSpellCast.ts", () => {
     expect(sendEventToUser).toHaveBeenNthCalledWith(2, testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
       effectKey: itemSelfHealing.animationKey,
+    });
+  });
+
+  it("should call skill increase functionality to increase character skills", async () => {
+    const increaseSPMock = jest.spyOn(SkillIncrease.prototype, "increaseMagicSP");
+    increaseSPMock.mockImplementation();
+
+    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeTruthy();
+
+    expect(increaseSPMock).toHaveBeenCalledTimes(1);
+    expect(increaseSPMock).toHaveBeenLastCalledWith(testCharacter, itemSelfHealing);
+
+    increaseSPMock.mockRestore();
+  });
+
+  it("should increase skill and send skill update event", async () => {
+    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeTruthy();
+
+    const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills)) as unknown as ISkill;
+    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemSelfHealing.manaCost ?? 0);
+    expect(updatedSkills?.magic.skillPoints).toBe(skillPoints);
+
+    expect(sendEventToUser).toBeCalledTimes(3);
+
+    const skillUpdateEventParams = sendEventToUser.mock.calls[2];
+
+    expect(skillUpdateEventParams[0]).toBe(testCharacter.channelId);
+    expect(skillUpdateEventParams[1]).toBe(SkillSocketEvents.ReadInfo);
+
+    expect(skillUpdateEventParams[2]).toBeDefined();
+    expect(skillUpdateEventParams[2].skill).toBeDefined();
+    expect(skillUpdateEventParams[2].skill.magic).toBeDefined();
+    expect(skillUpdateEventParams[2].skill.magic.skillPoints).toBe(skillPoints);
+  });
+
+  it("should not cast spell if character does not have any skills", async () => {
+    testCharacter.skills = undefined;
+    await testCharacter.save();
+
+    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeFalsy();
+
+    expect(sendEventToUser).toBeCalledTimes(1);
+
+    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+      message: "Sorry, you can not cast this spell without any skills.",
+      type: "error",
     });
   });
 

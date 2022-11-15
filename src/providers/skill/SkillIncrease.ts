@@ -5,7 +5,8 @@ import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
-import { SP_INCREASE_RATIO } from "@providers/constants/SkillConstants";
+import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
+import { IItemSpell } from "@providers/item/data/blueprints/spells/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { AnimationEffectKeys, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
@@ -34,6 +35,7 @@ export enum BasicAttribute {
   Strength = "strength",
   Resistance = "resistance",
   Dexterity = "dexterity",
+  Magic = "magic",
 }
 
 const SkillsMap = new Map<ItemSubType | string, string>([
@@ -48,6 +50,7 @@ const SkillsMap = new Map<ItemSubType | string, string>([
   [BasicAttribute.Strength, BasicAttribute.Strength],
   [BasicAttribute.Resistance, BasicAttribute.Resistance],
   [BasicAttribute.Dexterity, BasicAttribute.Dexterity],
+  [BasicAttribute.Magic, BasicAttribute.Magic],
 ]);
 
 interface IIncreaseSPResult {
@@ -137,13 +140,24 @@ export class SkillIncrease {
     }
   }
 
-  public async increaseBasicAttributeSP(character: ICharacter, attribute: BasicAttribute): Promise<void> {
+  public async increaseMagicSP(character: ICharacter, spellBluePrint: Partial<IItemSpell>): Promise<void> {
+    await this.increaseBasicAttributeSP(character, BasicAttribute.Magic, (skillDetails: ISkillDetails) => {
+      const manaSp = Math.round((spellBluePrint.manaCost ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
+      return this.calculateNewSP(skillDetails) + manaSp;
+    });
+  }
+
+  public async increaseBasicAttributeSP(
+    character: ICharacter,
+    attribute: BasicAttribute,
+    skillPointsCalculator?: Function
+  ): Promise<void> {
     const skills = (await Skill.findById(character.skills)) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
 
-    const result = this.increaseSP(skills, attribute);
+    const result = this.increaseSP(skills, attribute, skillPointsCalculator);
     await this.updateSkills(skills, character);
 
     if (result.skillLevelUp && character.channelId) {
@@ -282,7 +296,7 @@ export class SkillIncrease {
     });
   }
 
-  private increaseSP(skills: ISkill, skillKey: string): IIncreaseSPResult {
+  private increaseSP(skills: ISkill, skillKey: string, skillPointsCalculator?: Function): IIncreaseSPResult {
     let skillLevelUp = false;
     const skillToUpdate = SkillsMap.get(skillKey);
 
@@ -290,8 +304,14 @@ export class SkillIncrease {
       throw new Error(`skill not found for item subtype ${skillKey}`);
     }
 
+    if (!skillPointsCalculator) {
+      skillPointsCalculator = (skillDetails: ISkillDetails): number => {
+        return this.calculateNewSP(skillDetails);
+      };
+    }
+
     const updatedSkillDetails = skills[skillToUpdate] as ISkillDetails;
-    updatedSkillDetails.skillPoints = Math.round((updatedSkillDetails.skillPoints + SP_INCREASE_RATIO) * 100) / 100;
+    updatedSkillDetails.skillPoints = skillPointsCalculator(updatedSkillDetails);
     updatedSkillDetails.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(
       updatedSkillDetails.skillPoints,
       updatedSkillDetails.level + 1
@@ -313,6 +333,10 @@ export class SkillIncrease {
       skillLevel: updatedSkillDetails.level,
       skillLevelUp,
     };
+  }
+
+  private calculateNewSP(skillDetails: ISkillDetails): number {
+    return Math.round((skillDetails.skillPoints + SP_INCREASE_RATIO) * 100) / 100;
   }
 
   /**

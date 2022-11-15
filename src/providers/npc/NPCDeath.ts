@@ -107,7 +107,7 @@ export class NPCDeath {
 
         const lootItem = new Item({ ...blueprintData });
         // stackable items - only add 1 item and set stack qty = lootQty
-        if (lootItem.isStackable) {
+        if (lootItem.maxStackSize > 1) {
           if (lootQuantity > lootItem.maxStackSize) {
             throw new Error(
               `Loot quantity of ${lootQuantity} is higher than max stack size for item ${lootItem.key}, which is ${lootItem.maxStackSize}`

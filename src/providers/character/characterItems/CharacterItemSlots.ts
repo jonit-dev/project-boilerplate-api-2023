@@ -175,7 +175,7 @@ export class CharacterItemSlots {
       return false;
     }
 
-    if (!itemToBeAdded.isStackable) {
+    if (!(itemToBeAdded.maxStackSize > 1)) {
       return targetContainer.firstAvailableSlotId !== null;
     } else {
       // if item is stackable, check if there's an empty slot
@@ -192,7 +192,7 @@ export class CharacterItemSlots {
       for (const slot of Object.values(targetContainer.slots)) {
         const slotItem = slot as unknown as IItem;
 
-        if (slotItem.isStackable || slotItem.maxStackSize > 1) {
+        if (slotItem.maxStackSize > 1) {
           if (isSameKey(slotItem.key, itemToBeAdded.key)) {
             const futureStackQty = slotItem.stackQty! + itemToBeAdded.stackQty!;
             if (futureStackQty <= slotItem.maxStackSize) {
@@ -219,7 +219,7 @@ export class CharacterItemSlots {
     for (const [id, slot] of Object.entries(targetContainer.slots)) {
       const slotItem = slot as unknown as IItem;
 
-      if (itemToBeAdded && slotItem && (slotItem.isStackable || slotItem.maxStackSize > 1)) {
+      if (itemToBeAdded && slotItem && slotItem.maxStackSize > 1) {
         if (slotItem.baseKey === itemToBeAdded.baseKey) {
           const futureStackQty = slotItem.stackQty! + itemToBeAdded.stackQty!;
           if (futureStackQty <= slotItem.maxStackSize) {

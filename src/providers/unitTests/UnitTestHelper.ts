@@ -10,6 +10,7 @@ import { QuestObjectiveInteraction, QuestObjectiveKill } from "@entities/ModuleQ
 import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { IControlTime, MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
+import { IUser, User } from "@entities/ModuleSystem/UserModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
@@ -30,8 +31,9 @@ import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
-import { itemMock, stackableGoldCoinMock, itemTwoHandedMock, stackableItemMock, itemMockArmor } from "./mock/itemMock";
+import { itemMock, itemMockArmor, itemTwoHandedMock, stackableGoldCoinMock, stackableItemMock } from "./mock/itemMock";
 import { questInteractionObjectiveMock, questKillObjectiveMock, questMock, questRewardsMock } from "./mock/questMock";
+import { userMock } from "./mock/userMock";
 
 interface IMockCharacterOptions {
   hasEquipment?: boolean;
@@ -285,7 +287,7 @@ export class UnitTestHelper {
   public async addInventoryToCharacter(character: ICharacter): Promise<IEquipment> {
     const characterInventory = container.get<CharacterInventory>(CharacterInventory);
 
-    const equipment = await characterInventory.createEquipmentWithInventory(character, ContainersBlueprint.Backpack);
+    const equipment = await characterInventory.generateNewInventory(character, ContainersBlueprint.Backpack);
 
     return equipment;
   }
@@ -385,8 +387,7 @@ export class UnitTestHelper {
     item: IItem
   ): Promise<boolean> {
     let stackReduced = false;
-    console.log("AQUI2", item);
-    if (item.isStackable && item.stackQty && item.stackQty > 1) {
+    if (item.maxStackSize > 1 && item.stackQty && item.stackQty > 1) {
       item.stackQty -= 1;
       await item.save();
 
@@ -409,6 +410,17 @@ export class UnitTestHelper {
     }
 
     return true;
+  }
+
+  public async createMockUser(extraProps?: Partial<IUser>): Promise<IUser> {
+    const newUser = new User({
+      ...userMock,
+      ...extraProps,
+    });
+
+    await newUser.save();
+
+    return newUser;
   }
 
   public async createMockQuest(
