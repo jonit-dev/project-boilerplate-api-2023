@@ -1,5 +1,8 @@
+import { EXTERIOR_LIGHTENING_MAPS, NO_LIGHTENING_MAPS } from "@providers/constants/MapConstants";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
+
+import { caveLightening, exteriorLightening } from "@providers/map/data/abstractions/mapLightening";
 import { IMapMetaData, ITiled, MAP_LAYERS } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
@@ -26,7 +29,19 @@ export class GetMapMetadataUseCase {
         };
       });
 
-      const mapMetadata: IMapMetaData = {
+      let mapBlueprint;
+
+      if (!NO_LIGHTENING_MAPS.includes(mapName)) {
+        if (EXTERIOR_LIGHTENING_MAPS.includes(mapName)) {
+          mapBlueprint = exteriorLightening;
+        } else {
+          mapBlueprint = caveLightening;
+        }
+      }
+
+      const mapMetadata: Partial<IMapMetaData> = {
+        key: mapName.toLowerCase(),
+        ...mapBlueprint,
         name: mapName,
         version,
         layers,
