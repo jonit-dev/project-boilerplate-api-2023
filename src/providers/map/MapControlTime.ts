@@ -1,26 +1,31 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IControlTime, WeatherSocketEvents } from "@rpg-engine/shared";
+import { AvailableWeather, IControlTime, WeatherSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import random from "lodash/random";
 
 @provide(MapControlTime)
 export class MapControlTime {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  public getRandomWeather(weatherOfDay: string[]): string {
-    const randomWeather = Math.floor(Math.random() * weatherOfDay.length);
+  public getRandomWeather(): AvailableWeather {
+    const n = random(0, 100);
 
-    return weatherOfDay[randomWeather];
+    if (n < 80) {
+      return AvailableWeather.Standard;
+    } else {
+      return AvailableWeather.SoftRain;
+    }
   }
 
-  public async controlTime(time: string, periodOfDay: string, weatherOfDay: string): Promise<IControlTime> {
+  public async controlTime(time: string, periodOfDay: string): Promise<IControlTime> {
     const onlineCharacters = await Character.find({ isOnline: true });
 
     const dataOfWeather: IControlTime = {
       time: time,
       period: periodOfDay,
-      weather: weatherOfDay,
+      weather: this.getRandomWeather(),
     };
 
     // Delete old registry
