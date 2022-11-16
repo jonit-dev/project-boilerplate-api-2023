@@ -162,6 +162,11 @@ export enum MacesBlueprint {
 
 export enum MagicsBlueprint {
   Rune = "rune",
+  DarkRune = "dark-rune",
+  FireRune = "fire-rune",
+  HealRune = "heal-rune",
+  PoisonRune = "poison-rune",
+  ThunderRune = "thunder-rune",
   Book = "book",
 }
 
