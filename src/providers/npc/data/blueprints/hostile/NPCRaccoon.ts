@@ -37,17 +37,17 @@ export const npcRaccoon: Partial<INPC> = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: FoodsBlueprint.Salmon,
+      itemBlueprintKey: FoodsBlueprint.WildSalmon,
       chance: 20,
       quantityRange: [1, 3],
     },
     {
-      itemBlueprintKey: FoodsBlueprint.Cheese,
+      itemBlueprintKey: FoodsBlueprint.Egg,
       chance: 10,
       quantityRange: [1, 3],
     },
     {
-      itemBlueprintKey: FoodsBlueprint.Bread,
+      itemBlueprintKey: FoodsBlueprint.Blueberry,
       chance: 30,
     },
     {

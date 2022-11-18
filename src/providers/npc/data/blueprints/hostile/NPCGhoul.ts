@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   LegsBlueprint,
   MacesBlueprint,
@@ -55,6 +56,11 @@ export const npcGhoul = {
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Worm,
+      chance: 50,
+      quantityRange: [10, 15],
     },
     {
       itemBlueprintKey: PotionsBlueprint.ManaPotion,

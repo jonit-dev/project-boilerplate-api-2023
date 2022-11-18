@@ -45,7 +45,9 @@ export const npcBat = {
     {
       itemBlueprintKey: FoodsBlueprint.Banana,
       chance: 30,
+      quantityRange: [1, 3],
     },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.BatsWing,
       chance: 50,

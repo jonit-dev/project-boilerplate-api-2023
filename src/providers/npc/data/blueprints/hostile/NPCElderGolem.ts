@@ -67,7 +67,7 @@ export const npcElderGolem: Partial<INPC> = {
       chance: 5,
     },
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodLog,
+      itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodenLog,
       chance: 30,
       quantityRange: [1, 2],
     },

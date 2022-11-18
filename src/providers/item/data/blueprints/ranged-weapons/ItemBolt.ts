@@ -5,7 +5,7 @@ import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 export const itemBolt: Partial<IItem> = {
   key: RangedWeaponsBlueprint.Bolt,
   type: ItemType.Weapon,
-  subType: ItemSubType.Accessory,
+  subType: ItemSubType.Ranged,
   textureAtlas: "items",
   texturePath: "ranged-weapons/bolt.png",
   name: "Bolt",

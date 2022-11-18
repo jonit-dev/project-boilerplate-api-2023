@@ -11,7 +11,7 @@ export const itemAxe: Partial<IItem> = {
   texturePath: "axes/axe.png",
   name: "Axe",
   description: "A simple iron axe.",
-  attack: 3,
+  attack: 6,
   defense: 2,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

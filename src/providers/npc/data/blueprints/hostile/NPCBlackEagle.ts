@@ -52,6 +52,11 @@ export const npcBlackEagle = {
       quantityRange: [5, 15],
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.Worm,
+      chance: 50,
+      quantityRange: [5, 10],
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.ColoredFeather,
       chance: 5,
       quantityRange: [1, 10],

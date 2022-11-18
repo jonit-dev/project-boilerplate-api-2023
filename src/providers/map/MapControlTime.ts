@@ -1,7 +1,7 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { AvailableWeather, IControlTime, WeatherSocketEvents } from "@rpg-engine/shared";
+import { AvailableWeather, IControlTime, PeriodOfDay, WeatherSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 
@@ -19,7 +19,7 @@ export class MapControlTime {
     }
   }
 
-  public async controlTime(time: string, periodOfDay: string): Promise<IControlTime> {
+  public async controlTime(time: string, periodOfDay: PeriodOfDay): Promise<IControlTime> {
     const onlineCharacters = await Character.find({ isOnline: true });
 
     const dataOfWeather: IControlTime = {

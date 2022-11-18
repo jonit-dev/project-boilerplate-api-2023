@@ -18,7 +18,7 @@ export const itemBow: Partial<IItem> = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,
-  requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow],
+  requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow],
   isTwoHanded: true,
   basePrice: 63,
 };

@@ -33,12 +33,21 @@ export const npcBrownBear = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: FoodsBlueprint.Fish,
+      itemBlueprintKey: FoodsBlueprint.WildSalmon,
       chance: 30,
     },
     {
-      itemBlueprintKey: FoodsBlueprint.Salmon,
-      chance: 20,
+      itemBlueprintKey: FoodsBlueprint.BrownFish,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.RedMeat,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.RawBeefSteak,
+      chance: 5,
+      quantityRange: [1, 3],
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Leather,

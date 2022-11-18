@@ -7,6 +7,7 @@ import {
   GlovesBlueprint,
   LegsBlueprint,
   PotionsBlueprint,
+  RangedWeaponsBlueprint,
   SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -64,6 +65,15 @@ export const npcAsterion = {
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.AsterionsBow,
+      chance: 25,
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.IronArrow,
+      chance: 25,
+      quantityRange: [10, 20],
     },
     {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,

@@ -9,6 +9,7 @@ import {
   OthersBlueprint,
   RangedWeaponsBlueprint,
   SwordsBlueprint,
+  ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -58,6 +59,11 @@ export const npcElf: Partial<INPC> = {
     {
       itemBlueprintKey: HelmetsBlueprint.LeatherHelmet,
       chance: 30,
+    },
+
+    {
+      itemBlueprintKey: ToolsBlueprint.FishingRod,
+      chance: 10,
     },
     {
       itemBlueprintKey: LegsBlueprint.LeatherLegs,
