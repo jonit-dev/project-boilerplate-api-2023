@@ -15,6 +15,7 @@ import { itemObsidian } from "./ItemObsidian";
 import { itemSilk } from "./ItemSilk";
 import { itemWheat } from "./ItemWheat";
 import { itemWolfTooth } from "./ItemWolfTooth";
+import { itemWorm } from "./ItemWorm";
 
 export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.BlueSapphire]: itemBlueSapphire,
@@ -33,4 +34,5 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.Wheat]: itemWheat,
   [CraftingResourcesBlueprint.WolfTooth]: itemWolfTooth,
   [CraftingResourcesBlueprint.Bone]: itemBone,
+  [CraftingResourcesBlueprint.Worm]: itemWorm,
 };

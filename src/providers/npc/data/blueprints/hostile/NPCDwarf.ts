@@ -52,6 +52,10 @@ export const npcDwarf = {
       chance: 10,
     },
     {
+      itemBlueprintKey: ToolsBlueprint.FishingRod,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 15,
     },

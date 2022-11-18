@@ -133,6 +133,7 @@ export enum CraftingResourcesBlueprint {
   Wheat = "wheat",
   WolfTooth = "wolf-tooth",
   Bone = "bone",
+  Worm = "worm",
 }
 
 export enum ToolsBlueprint {
