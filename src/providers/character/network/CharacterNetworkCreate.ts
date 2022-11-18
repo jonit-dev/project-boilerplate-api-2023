@@ -10,10 +10,12 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   AnimationDirection,
+  AvailableWeather,
   CharacterSocketEvents,
   ICharacterCreateFromClient,
   ICharacterCreateFromServer,
   IControlTime,
+  PeriodOfDay,
   ToGridX,
   ToGridY,
   WeatherSocketEvents,
@@ -123,8 +125,8 @@ export class CharacterNetworkCreate {
         if (lastTimeWeatherChanged) {
           const dataOfWeather: IControlTime = {
             time: lastTimeWeatherChanged.time,
-            period: lastTimeWeatherChanged.period,
-            weather: lastTimeWeatherChanged.weather,
+            period: lastTimeWeatherChanged.period as PeriodOfDay,
+            weather: lastTimeWeatherChanged.weather as AvailableWeather,
           };
 
           this.socketMessaging.sendEventToUser<IControlTime>(

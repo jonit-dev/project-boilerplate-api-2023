@@ -1,4 +1,4 @@
-import { PeriodOfDay, WEATHER_OF_DAY } from "@rpg-engine/shared";
+import { PeriodOfDay, AvailableWeather, TypeHelper } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 import { MapControlTime } from "../map/MapControlTime";
@@ -24,57 +24,49 @@ export class ControlTimeCrons {
     // Day One
     // Morning 6:00
     nodeCron.schedule("0 6 * * *", async () => {
-      await this.mapControlTime.controlTime(
-        "06:00",
-        PeriodOfDay.Morning,
-        this.mapControlTime.getRandomWeather(WEATHER_OF_DAY)
-      );
+      await this.mapControlTime.controlTime("06:00", PeriodOfDay.Morning, this.mapControlTime.getRandomWeather());
     });
 
     //   // Afternoon 13:00
     nodeCron.schedule("0 9 * * *", async () => {
-      await this.mapControlTime.controlTime("13:00", PeriodOfDay.Afternoon, WEATHER_OF_DAY[2]);
+      await this.mapControlTime.controlTime("13:00", PeriodOfDay.Afternoon, AvailableWeather.SoftRain);
     });
 
     // Night 19:00
     nodeCron.schedule("* 12 * * *", async () => {
-      await this.mapControlTime.controlTime("19:00", PeriodOfDay.Night, WEATHER_OF_DAY[0]);
+      await this.mapControlTime.controlTime("19:00", PeriodOfDay.Night, AvailableWeather.Standard);
     });
 
     // Day Two
     // Morning 6:00
     nodeCron.schedule("* 16 * * *", async () => {
-      await this.mapControlTime.controlTime("06:00", PeriodOfDay.Morning, WEATHER_OF_DAY[2]);
+      await this.mapControlTime.controlTime("06:00", PeriodOfDay.Morning, AvailableWeather.SoftRain);
     });
 
     // Afternoon 13:00
     nodeCron.schedule("* 19 * * *", async () => {
-      await this.mapControlTime.controlTime("13:00", PeriodOfDay.Afternoon, WEATHER_OF_DAY[1]);
+      await this.mapControlTime.controlTime("13:00", PeriodOfDay.Afternoon, AvailableWeather.HeavyRain);
     });
 
     // Night 19:00
     nodeCron.schedule("* 22 * * *", async () => {
-      await this.mapControlTime.controlTime("19:00", PeriodOfDay.Night, WEATHER_OF_DAY[0]);
+      await this.mapControlTime.controlTime("19:00", PeriodOfDay.Night, AvailableWeather.Standard);
     });
 
     // Day Three
     // Morning 6:00
     nodeCron.schedule("* 1 * * *", async () => {
-      await this.mapControlTime.controlTime("06:00", PeriodOfDay.Morning, WEATHER_OF_DAY[0]);
+      await this.mapControlTime.controlTime("06:00", PeriodOfDay.Morning, AvailableWeather.Standard);
     });
 
     // Afternoon 13:00
     nodeCron.schedule("* 4 * * *", async () => {
-      await this.mapControlTime.controlTime("13:00", PeriodOfDay.Afternoon, WEATHER_OF_DAY[0]);
+      await this.mapControlTime.controlTime("13:00", PeriodOfDay.Afternoon, AvailableWeather.Standard);
     });
 
     // Night 19:00
     nodeCron.schedule("* 7 * * *", async () => {
-      await this.mapControlTime.controlTime(
-        "19:00",
-        PeriodOfDay.Night,
-        this.mapControlTime.getRandomWeather(WEATHER_OF_DAY)
-      );
+      await this.mapControlTime.controlTime("19:00", PeriodOfDay.Night, this.mapControlTime.getRandomWeather());
     });
   }
 }

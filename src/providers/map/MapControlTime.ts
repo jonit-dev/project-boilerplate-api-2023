@@ -1,20 +1,37 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IControlTime, WeatherSocketEvents } from "@rpg-engine/shared";
+import { AvailableWeather, IControlTime, PeriodOfDay, TypeHelper, WeatherSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(MapControlTime)
 export class MapControlTime {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  public getRandomWeather(weatherOfDay: string[]): string {
-    const randomWeather = Math.floor(Math.random() * weatherOfDay.length);
+  public getRandomWeather(): AvailableWeather {
+    const length = TypeHelper.enumToStringArray(AvailableWeather).length;
+    const randomWeather = Math.floor(Math.random() * length);
 
-    return weatherOfDay[randomWeather];
+    let weather = AvailableWeather.Standard;
+    switch (randomWeather) {
+      case 1:
+        weather = AvailableWeather.SoftRain;
+        break;
+      case 2:
+        weather = AvailableWeather.HeavyRain;
+        break;
+      case 3:
+        weather = AvailableWeather.Snowing;
+        break;
+    }
+    return weather;
   }
 
-  public async controlTime(time: string, periodOfDay: string, weatherOfDay: string): Promise<IControlTime> {
+  public async controlTime(
+    time: string,
+    periodOfDay: PeriodOfDay,
+    weatherOfDay: AvailableWeather
+  ): Promise<IControlTime> {
     const onlineCharacters = await Character.find({ isOnline: true });
 
     const dataOfWeather: IControlTime = {
