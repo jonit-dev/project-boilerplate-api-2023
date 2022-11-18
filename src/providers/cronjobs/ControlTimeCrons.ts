@@ -1,4 +1,4 @@
-import { PeriodOfDay, AvailableWeather, TypeHelper } from "@rpg-engine/shared";
+import { PeriodOfDay, AvailableWeather } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 import { MapControlTime } from "../map/MapControlTime";
