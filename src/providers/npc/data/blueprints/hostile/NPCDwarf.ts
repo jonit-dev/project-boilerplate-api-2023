@@ -7,6 +7,7 @@ import {
   MacesBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
+  ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -45,6 +46,10 @@ export const npcDwarf = {
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: ToolsBlueprint.Pickaxe,
+      chance: 10,
     },
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
