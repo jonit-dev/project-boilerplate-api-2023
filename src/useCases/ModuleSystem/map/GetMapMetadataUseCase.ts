@@ -3,6 +3,7 @@ import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 
 import { caveLightening, exteriorLightening } from "@providers/map/data/abstractions/mapLightening";
+import { mapsBlueprintIndex } from "@providers/map/data/index";
 import { IMapMetaData, ITiled, MAP_LAYERS } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
@@ -29,19 +30,24 @@ export class GetMapMetadataUseCase {
         };
       });
 
-      let mapBlueprint;
+      let baseMetadata;
 
       if (!NO_LIGHTENING_MAPS.includes(mapName)) {
         if (EXTERIOR_LIGHTENING_MAPS.includes(mapName)) {
-          mapBlueprint = exteriorLightening;
+          baseMetadata = exteriorLightening;
         } else {
-          mapBlueprint = caveLightening;
+          baseMetadata = caveLightening;
         }
       }
 
+      // try to add additional blueprint metadata
+
+      const additionalMetadata = mapsBlueprintIndex[mapName];
+
       const mapMetadata: Partial<IMapMetaData> = {
         key: mapName.toLowerCase(),
-        ...mapBlueprint,
+        ...baseMetadata,
+        ...additionalMetadata,
         name: mapName,
         version,
         layers,
