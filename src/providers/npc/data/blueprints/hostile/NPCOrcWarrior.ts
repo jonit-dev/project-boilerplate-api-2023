@@ -5,6 +5,7 @@ import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
@@ -79,6 +80,11 @@ export const npcOrcWarrior = {
     {
       itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.RottenMeat,
+      chance: 40,
+      quantityRange: [5, 10],
     },
     {
       itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,

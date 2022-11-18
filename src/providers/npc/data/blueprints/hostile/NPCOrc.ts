@@ -58,6 +58,11 @@ export const npcOrc = {
       quantityRange: [1, 2],
     },
     {
+      itemBlueprintKey: FoodsBlueprint.RottenMeat,
+      chance: 40,
+      quantityRange: [5, 10],
+    },
+    {
       itemBlueprintKey: ToolsBlueprint.CarpentersAxe,
       chance: 20,
     },

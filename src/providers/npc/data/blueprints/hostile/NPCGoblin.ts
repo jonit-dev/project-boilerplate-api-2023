@@ -66,6 +66,11 @@ export const npcGoblin = {
       chance: 10,
     },
     {
+      itemBlueprintKey: FoodsBlueprint.RottenMeat,
+      chance: 40,
+      quantityRange: [5, 10],
+    },
+    {
       itemBlueprintKey: FoodsBlueprint.Pineapple,
       chance: 10,
       quantityRange: [1, 2],

@@ -20,6 +20,7 @@ import { itemPotato } from "./ItemPotato";
 import { itemRawBeefSteak } from "./ItemRawBeefSteak";
 import { itemRedMeat } from "./ItemRedMeat";
 import { itemRedMushroom } from "./ItemRedMushroom";
+import { itemRottenMeat } from "./ItemRottenMeat";
 import { itemSalmon } from "./ItemSalmon";
 import { itemTuna } from "./ItemTuna";
 import { itemWatermelon } from "./ItemWatermelon";
@@ -51,4 +52,5 @@ export const foodsBlueprintIndex = {
   [FoodsBlueprint.BrownMushroom]: itemBrownMushroom,
   [FoodsBlueprint.RedMushroom]: itemRedMushroom,
   [FoodsBlueprint.IceMushroom]: itemIceMushroom,
+  [FoodsBlueprint.RottenMeat]: itemRottenMeat,
 };
