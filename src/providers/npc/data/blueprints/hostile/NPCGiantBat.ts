@@ -57,6 +57,16 @@ export const npcGiantBat: Partial<INPC> = {
       quantityRange: [1, 3],
     },
     {
+      itemBlueprintKey: FoodsBlueprint.Coconut,
+      chance: 30,
+      quantityRange: [1, 3],
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.Watermelon,
+      chance: 10,
+      quantityRange: [1, 3],
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.BatsWing,
       chance: 50,
       quantityRange: [1, 3],

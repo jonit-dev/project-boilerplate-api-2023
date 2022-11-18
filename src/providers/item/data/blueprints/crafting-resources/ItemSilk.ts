@@ -4,7 +4,7 @@ import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemSilk: Partial<IItem> = {
   key: CraftingResourcesBlueprint.Silk,
-  type: ItemType.CraftMaterial,
+  type: ItemType.CraftingResource,
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "crafting-resources/silk.png",
@@ -13,4 +13,5 @@ export const itemSilk: Partial<IItem> = {
   weight: 0.05,
   maxStackSize: 100,
   basePrice: 0.5,
+  hasUseWith: true,
 };

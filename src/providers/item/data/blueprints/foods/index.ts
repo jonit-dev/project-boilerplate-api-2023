@@ -2,17 +2,28 @@ import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemApple } from "./ItemApple";
 import { itemBanana } from "./ItemBanana";
 import { itemBananaBunch } from "./ItemBananaBunch";
+import { itemBlueberry } from "./ItemBlueberry";
 import { itemBread } from "./ItemBread";
+import { itemBrownFish } from "./ItemBrownFish";
+import { itemBrownMushroom } from "./ItemBrownMushroom";
 import { itemCheese } from "./ItemCheese";
 import { itemCheeseSlice } from "./ItemCheeseSlice";
 import { itemChickensMeat } from "./ItemChickensMeat";
+import { itemCoconut } from "./ItemCoconut";
 import { itemCookie } from "./ItemCookie";
 import { itemEgg } from "./ItemEgg";
 import { itemFish } from "./ItemFish";
+import { itemIceMushroom } from "./ItemIceMushroom";
 import { itemMushroom } from "./ItemMushroom";
+import { itemPineapple } from "./ItemPineapple";
 import { itemPotato } from "./ItemPotato";
+import { itemRawBeefSteak } from "./ItemRawBeefSteak";
 import { itemRedMeat } from "./ItemRedMeat";
+import { itemRedMushroom } from "./ItemRedMushroom";
 import { itemSalmon } from "./ItemSalmon";
+import { itemTuna } from "./ItemTuna";
+import { itemWatermelon } from "./ItemWatermelon";
+import { itemWildSalmon } from "./ItemWildSalmon";
 
 export const foodsBlueprintIndex = {
   [FoodsBlueprint.Apple]: itemApple,
@@ -29,4 +40,15 @@ export const foodsBlueprintIndex = {
   [FoodsBlueprint.Mushroom]: itemMushroom,
   [FoodsBlueprint.Potato]: itemPotato,
   [FoodsBlueprint.RedMeat]: itemRedMeat,
+  [FoodsBlueprint.WildSalmon]: itemWildSalmon,
+  [FoodsBlueprint.Tuna]: itemTuna,
+  [FoodsBlueprint.BrownFish]: itemBrownFish,
+  [FoodsBlueprint.RawBeefSteak]: itemRawBeefSteak,
+  [FoodsBlueprint.Pineapple]: itemPineapple,
+  [FoodsBlueprint.Blueberry]: itemBlueberry,
+  [FoodsBlueprint.Watermelon]: itemWatermelon,
+  [FoodsBlueprint.Coconut]: itemCoconut,
+  [FoodsBlueprint.BrownMushroom]: itemBrownMushroom,
+  [FoodsBlueprint.RedMushroom]: itemRedMushroom,
+  [FoodsBlueprint.IceMushroom]: itemIceMushroom,
 };

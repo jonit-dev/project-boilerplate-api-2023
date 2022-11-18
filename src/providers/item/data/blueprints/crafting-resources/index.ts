@@ -2,6 +2,7 @@ import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemBatsWing } from "./ItemBatsWing";
 import { itemBlueFeather } from "./ItemBlueFeather";
 import { itemBlueSapphire } from "./ItemBlueSapphire";
+import { itemBone } from "./ItemBone";
 import { itemColoredFeather } from "./ItemColoredFeather";
 import { itemDiamond } from "./ItemDiamond";
 import { itemFeather } from "./ItemFeather";
@@ -31,4 +32,5 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.Obsidian]: itemObsidian,
   [CraftingResourcesBlueprint.Wheat]: itemWheat,
   [CraftingResourcesBlueprint.WolfTooth]: itemWolfTooth,
+  [CraftingResourcesBlueprint.Bone]: itemBone,
 };

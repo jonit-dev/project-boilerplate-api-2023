@@ -108,5 +108,10 @@ export const npcOrcWarrior = {
       itemBlueprintKey: RangedWeaponsBlueprint.OrcishBow,
       chance: 20,
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.IronArrow,
+      chance: 20,
+      quantityRange: [5, 10],
+    },
   ],
 } as Partial<INPC>;

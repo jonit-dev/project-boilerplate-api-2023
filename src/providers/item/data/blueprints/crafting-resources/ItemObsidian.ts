@@ -4,7 +4,7 @@ import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemObsidian: Partial<IItem> = {
   key: CraftingResourcesBlueprint.Obsidian,
-  type: ItemType.CraftMaterial,
+  type: ItemType.CraftingResource,
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "crafting-resources/obsidian.png",
@@ -13,4 +13,5 @@ export const itemObsidian: Partial<IItem> = {
   weight: 1,
   maxStackSize: 100,
   basePrice: 0.5,
+  hasUseWith: true,
 };

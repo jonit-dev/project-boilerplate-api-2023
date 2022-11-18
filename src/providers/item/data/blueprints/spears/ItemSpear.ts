@@ -18,6 +18,5 @@ export const itemSpear: Partial<IItem> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,
   rangeType: EntityAttackType.Melee,
-  maxStackSize: 100,
   basePrice: 10,
 };

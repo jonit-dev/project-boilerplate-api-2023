@@ -17,7 +17,7 @@ export const itemFrostBow: Partial<IItem> = {
   defense: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 9,
-  requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow],
+  requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow],
   isTwoHanded: true,
   basePrice: 87,
 };

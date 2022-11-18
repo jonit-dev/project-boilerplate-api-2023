@@ -4,7 +4,7 @@ import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemGreaterWoodenLog: Partial<IItem> = {
   key: CraftingResourcesBlueprint.GreaterWoodenLog,
-  type: ItemType.CraftMaterial,
+  type: ItemType.CraftingResource,
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "crafting-resources/greater-wooden-log.png",
@@ -13,4 +13,5 @@ export const itemGreaterWoodenLog: Partial<IItem> = {
   weight: 10,
   maxStackSize: 10,
   basePrice: 5,
+  hasUseWith: true,
 };

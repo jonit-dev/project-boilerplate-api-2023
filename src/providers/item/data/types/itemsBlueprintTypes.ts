@@ -103,6 +103,17 @@ export enum FoodsBlueprint {
   Mushroom = "mushroom",
   Potato = "potato",
   RedMeat = "red-meat",
+  WildSalmon = "wild-salmon",
+  Tuna = "tuna",
+  BrownFish = "brown-fish",
+  RawBeefSteak = "raw-beef-steak",
+  Pineapple = "pineapple",
+  Blueberry = "blueberry",
+  Watermelon = "watermelon",
+  Coconut = "coconut",
+  BrownMushroom = "brown-mushroom",
+  RedMushroom = "red-mushroom",
+  IceMushroom = "ice-mushroom",
 }
 export enum CraftingResourcesBlueprint {
   BlueSapphire = "blue-sapphire",
@@ -120,6 +131,7 @@ export enum CraftingResourcesBlueprint {
   Obsidian = "obsidian",
   Wheat = "wheat",
   WolfTooth = "wolf-tooth",
+  Bone = "bone",
 }
 
 export enum ToolsBlueprint {
@@ -132,6 +144,7 @@ export enum ToolsBlueprint {
 export enum SpearsBlueprint {
   RoyalSpear = "royal-spear",
   Spear = "spear",
+  StoneSpear = "stone-spear",
 }
 
 export enum PotionsBlueprint {
@@ -152,6 +165,8 @@ export enum RangedWeaponsBlueprint {
   OrcishBow = "orcish-bow",
   FrostBow = "frost-bow",
   FrostCrossbow = "frost-crossbow",
+  IronArrow = "iron-arrow",
+  AsterionsBow = "asterions-bow",
 }
 
 export enum GlovesBlueprint {
@@ -181,6 +196,7 @@ export enum OthersBlueprint {
   Candle = "candle",
   RoyalChalice = "royal-chalice",
   GoldCoin = "gold-coin",
+  Map = "map",
 }
 
 export enum StaffsBlueprint {

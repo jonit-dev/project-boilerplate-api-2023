@@ -40,5 +40,10 @@ export const npcDeer = {
       chance: 50,
       quantityRange: [1, 3],
     },
+    {
+      itemBlueprintKey: FoodsBlueprint.RawBeefSteak,
+      chance: 5,
+      quantityRange: [1, 3],
+    },
   ],
 } as Partial<INPC>;
