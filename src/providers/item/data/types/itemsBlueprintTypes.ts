@@ -124,6 +124,7 @@ export enum CraftingResourcesBlueprint {
 
 export enum ToolsBlueprint {
   ButchersKnife = "butchers-knife",
+  CarpentersAxe = "carpenters-axe",
 }
 
 export enum SpearsBlueprint {

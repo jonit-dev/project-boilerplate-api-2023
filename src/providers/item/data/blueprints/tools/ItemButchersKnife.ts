@@ -6,7 +6,7 @@ import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 export const itemButchersKnife: Partial<IItem> = {
   key: ToolsBlueprint.ButchersKnife,
   type: ItemType.Tool,
-  subType: ItemSubType.Other,
+  subType: ItemSubType.Tool,
   textureAtlas: "items",
   texturePath: "tools/butchers-knife.png",
   name: "Butcher's Knife",

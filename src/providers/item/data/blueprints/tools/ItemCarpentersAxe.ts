@@ -1,20 +1,20 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { AxesBlueprint } from "../../types/itemsBlueprintTypes";
+import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemAxe: Partial<IItem> = {
-  key: AxesBlueprint.Axe,
-  type: ItemType.Weapon,
-  subType: ItemSubType.Axe,
+export const itemCarpentersAxe: Partial<IItem> = {
+  key: ToolsBlueprint.CarpentersAxe,
+  type: ItemType.Tool,
+  subType: ItemSubType.Tool,
   textureAtlas: "items",
-  texturePath: "axes/axe.png",
-  name: "Axe",
-  description: "A simple iron axe.",
+  texturePath: "tools/carpenters-axe.png",
+  name: "Carpenter's Axe",
+  description: "An axe designed primarily as a work axe.",
   attack: 6,
   defense: 2,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  basePrice: 36,
+  basePrice: 50,
 };
