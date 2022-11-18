@@ -4,18 +4,18 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { AnimationEffectKeys } from "@rpg-engine/shared";
 
-export const itemUseWithEntityDarkRune: Partial<IItemUseWithEntity> = {
+export const itemUseWithEntityHealRune: Partial<IItemUseWithEntity> = {
   ...(itemDarkRune as IItemUseWithEntity),
 
   power: 10,
   minMagicLevelRequired: 2,
 
-  animationKey: AnimationEffectKeys.Dark,
-  projectileAnimationKey: AnimationEffectKeys.Hit,
+  animationKey: AnimationEffectKeys.Blue,
+  projectileAnimationKey: AnimationEffectKeys.LifeHeal,
 
   usableEffect: async (caster: ICharacter, target: ICharacter) => {
-    const points = await calculateItemUseEffectPoints(itemUseWithEntityDarkRune, caster);
+    const points = await calculateItemUseEffectPoints(itemUseWithEntityHealRune, caster);
 
-    ItemUsableEffect.apply(target, EffectableAttribute.Mana, -1 * points);
+    ItemUsableEffect.apply(target, EffectableAttribute.Health, points);
   },
 };
