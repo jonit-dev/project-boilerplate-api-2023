@@ -6,7 +6,7 @@ import { itemColoredFeather } from "./ItemColoredFeather";
 import { itemDiamond } from "./ItemDiamond";
 import { itemFeather } from "./ItemFeather";
 import { itemGoldenIngot } from "./ItemGoldenIngot";
-import { itemGreaterWoodLog } from "./ItemGreaterWoodLog";
+import { itemGreaterWoodenLog } from "./ItemGreaterWoodenLog";
 import { itemHerb } from "./ItemHerb";
 import { itemIronIngot } from "./ItemIronIngot";
 import { itemLeather } from "./ItemLeather";
@@ -26,7 +26,7 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.Feather]: itemFeather,
   [CraftingResourcesBlueprint.GoldenIngot]: itemGoldenIngot,
   [CraftingResourcesBlueprint.Herb]: itemHerb,
-  [CraftingResourcesBlueprint.GreaterWoodLog]: itemGreaterWoodLog,
+  [CraftingResourcesBlueprint.GreaterWoodenLog]: itemGreaterWoodenLog,
   [CraftingResourcesBlueprint.IronIngot]: itemIronIngot,
   [CraftingResourcesBlueprint.Obsidian]: itemObsidian,
   [CraftingResourcesBlueprint.Wheat]: itemWheat,
