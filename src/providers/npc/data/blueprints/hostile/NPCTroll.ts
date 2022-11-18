@@ -82,7 +82,7 @@ export const npcTroll = {
       chance: 20,
     },
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodLog,
+      itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodenLog,
       chance: 30,
       quantityRange: [1, 2],
     },

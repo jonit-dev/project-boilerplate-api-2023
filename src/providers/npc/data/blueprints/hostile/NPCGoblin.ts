@@ -13,6 +13,7 @@ import {
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
+  ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -64,6 +65,31 @@ export const npcGoblin = {
     {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.RottenMeat,
+      chance: 40,
+      quantityRange: [5, 10],
+    },
+
+    {
+      itemBlueprintKey: ToolsBlueprint.FishingRod,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.Pineapple,
+      chance: 10,
+      quantityRange: [1, 2],
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.BrownFish,
+      chance: 10,
+      quantityRange: [1, 2],
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.BrownMushroom,
+      chance: 10,
+      quantityRange: [1, 2],
     },
 
     {

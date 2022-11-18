@@ -5,6 +5,7 @@ import {
   AxesBlueprint,
   CraftingResourcesBlueprint,
   DaggersBlueprint,
+  FoodsBlueprint,
   GlovesBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
@@ -82,6 +83,11 @@ export const npcIceFox: Partial<INPC> = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
       chance: 1,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.IceMushroom,
+      chance: 10,
+      quantityRange: [3, 4],
     },
   ],
 };
