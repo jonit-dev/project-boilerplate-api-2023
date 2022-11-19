@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { calculateItemUseEffectPoints } from "@providers/useWith/network/UseWithHelper";
+import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
 
 import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { IMagicItemUseWithEntity, MagicsBlueprint } from "../../types/itemsBlueprintTypes";

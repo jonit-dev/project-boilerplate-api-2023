@@ -8,7 +8,7 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { IUseWithTileEffect, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, IUseWithTile, MapLayers } from "@rpg-engine/shared";
 import { useWithTileBlueprints } from "../blueprints/UseWithTileBlueprints";
-import { UseWithTile } from "../network/UseWithTile";
+import { UseWithTile } from "../UseWithTile";
 
 describe("UseWithTile.ts", () => {
   let testItem: IItem,

@@ -8,8 +8,8 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IUseWithTile, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { useWithTileBlueprints } from "../blueprints/UseWithTileBlueprints";
-import { UseWithHelper } from "./UseWithHelper";
+import { useWithTileBlueprints } from "./blueprints/UseWithTileBlueprints";
+import { UseWithHelper } from "./libs/UseWithHelper";
 
 @provide(UseWithTile)
 export class UseWithTile {

@@ -10,7 +10,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IUseWithItem, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { UseWithHelper } from "./UseWithHelper";
+import { UseWithHelper } from "./libs/UseWithHelper";
 
 @provide(UseWithItem)
 export class UseWithItem {

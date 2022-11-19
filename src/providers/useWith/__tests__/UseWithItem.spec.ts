@@ -8,7 +8,7 @@ import { IUseWithItemEffect, ToolsBlueprint } from "@providers/item/data/types/i
 
 import { IUseWithItem } from "@rpg-engine/shared";
 
-import { UseWithItem } from "../network/UseWithItem";
+import { UseWithItem } from "../UseWithItem";
 
 describe("UseWithItem.ts", () => {
   const INVALID_ITEM_MSG = "Cannot read properties of undefined (reading 'useWithEffect')";
