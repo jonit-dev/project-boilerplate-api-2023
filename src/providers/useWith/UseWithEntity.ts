@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -43,7 +44,8 @@ export class UseWithEntity {
       return false;
     }
 
-    if (!useWithEntityBlueprintsIndex[item.key]) {
+    const blueprint = useWithEntityBlueprintsIndex[item.key];
+    if (!blueprint) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, `Sorry, '${item.name}' cannot be used with target.`);
       return false;
     }
@@ -81,6 +83,18 @@ export class UseWithEntity {
     }
 
     if (!(await this.itemValidation.isItemInCharacterInventory(caster, item._id))) {
+      return false;
+    }
+
+    const updatedCharacter = (await Character.findOne({ _id: caster._id }).populate("skills")) as unknown as ICharacter;
+    const skills = updatedCharacter.skills as unknown as ISkill;
+    const casterMagicLevel = skills?.magic?.level ?? 0;
+
+    if (casterMagicLevel < blueprint.minMagicLevelRequired) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        caster,
+        `Sorry, '${blueprint.name}' can not only be used with target at magic level '${blueprint.minMagicLevelRequired}' or greater.`
+      );
       return false;
     }
 
