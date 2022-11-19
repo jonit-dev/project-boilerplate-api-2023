@@ -39,6 +39,24 @@ describe("CharacterValidation.ts", () => {
     );
   });
 
+  it("should throw a custom error if the character is banned", async () => {
+    testCharacter.isBanned = true;
+    await testCharacter.save();
+
+    const customBannedMsg = "Sorry, your taget is banned.";
+    const result = characterValidation.hasBasicValidation(testCharacter, new Map([["banned", customBannedMsg]]));
+
+    expect(result).toBe(false);
+    expect(sendGenericErrorMessage).toBeCalled();
+    expect(sendGenericErrorMessage).toBeCalledWith(
+      testCharacter.channelId!,
+      CharacterSocketEvents.CharacterForceDisconnect,
+      {
+        reason: customBannedMsg,
+      }
+    );
+  });
+
   it("should throw an error if character is dead", async () => {
     testCharacter.health = 0;
     await testCharacter.save();
@@ -53,6 +71,21 @@ describe("CharacterValidation.ts", () => {
     });
   });
 
+  it("should throw a custom error if character is dead", async () => {
+    testCharacter.health = 0;
+    await testCharacter.save();
+
+    const customDeadMsg = "Sorry, your taget is dead.";
+    const result = characterValidation.hasBasicValidation(testCharacter, new Map([["not-alive", customDeadMsg]]));
+
+    expect(result).toBe(false);
+    expect(sendGenericErrorMessage).toBeCalled();
+    expect(sendGenericErrorMessage).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
+      message: customDeadMsg,
+      type: "error",
+    });
+  });
+
   it("should throw an error if character is offline", async () => {
     testCharacter.isOnline = false;
     await testCharacter.save();
@@ -63,6 +96,21 @@ describe("CharacterValidation.ts", () => {
     expect(sendGenericErrorMessage).toBeCalled();
     expect(sendGenericErrorMessage).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
       message: "Sorry, you are not online.",
+      type: "error",
+    });
+  });
+
+  it("should throw a custom error if character is offline", async () => {
+    testCharacter.isOnline = false;
+    await testCharacter.save();
+
+    const customOfflineMsg = "Sorry, your taget is offline.";
+    const result = characterValidation.hasBasicValidation(testCharacter, new Map([["not-online", customOfflineMsg]]));
+
+    expect(result).toBe(false);
+    expect(sendGenericErrorMessage).toBeCalled();
+    expect(sendGenericErrorMessage).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
+      message: customOfflineMsg,
       type: "error",
     });
   });
