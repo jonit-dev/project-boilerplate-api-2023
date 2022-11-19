@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { TILE_MAX_REACH_DISTANCE_IN_GRID } from "@providers/constants/TileConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { IUseWithTileEffect, IValidUseWithResponse } from "@providers/item/data/types/itemsBlueprintTypes";
+import { IValidUseWithResponse } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MapTiles } from "@providers/map/MapTiles";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -28,9 +28,10 @@ export class UseWithTile {
       async (useWithTileData: IUseWithTile, character) => {
         try {
           const useWithData = await this.validateData(character, useWithTileData);
+
           if (useWithData) {
-            const { originItem, useWithEffect } = useWithData;
-            await (useWithEffect as IUseWithTileEffect)(originItem, useWithTileData.targetTile, character);
+            const { originItem, useWithTileEffect } = useWithData;
+            await useWithTileEffect!(originItem, useWithTileData.targetTile, character);
           }
         } catch (error) {
           console.error(error);
@@ -112,6 +113,6 @@ export class UseWithTile {
       );
     }
 
-    return { originItem, useWithEffect };
+    return { originItem, useWithItemEffect: useWithEffect };
   }
 }

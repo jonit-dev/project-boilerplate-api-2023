@@ -259,13 +259,15 @@ export interface IUseWithItemEffect {
 }
 
 export interface IItemUseWithEntity extends IItem {
-  useWithEffect: IUseWithTileEffect | IUseWithItemEffect;
+  useWithItemEffect?: IUseWithItemEffect;
+  useWithTileEffect?: IUseWithTileEffect;
 }
 
 export interface IValidUseWithResponse {
   originItem: IItem;
   targetItem?: IItem;
-  useWithEffect: IUseWithTileEffect | IUseWithItemEffect;
+  useWithItemEffect?: IUseWithItemEffect;
+  useWithTileEffect?: IUseWithTileEffect;
 }
 
 export interface IMagicItemUseWithEntity extends IItem {
@@ -277,7 +279,6 @@ export interface IMagicItemUseWithEntity extends IItem {
 
 export interface IUseWithTargetTile {
   //! Import  on IUseWithTile too
-
   x: number;
   y: number;
   map: string;

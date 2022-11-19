@@ -7,7 +7,6 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { IUseWithTileEffect, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, IUseWithTile, MapLayers } from "@rpg-engine/shared";
-import { useWithTileBlueprints } from "../blueprints/UseWithTileBlueprints";
 import { UseWithTile } from "../UseWithTile";
 
 describe("UseWithTile.ts", () => {
@@ -31,11 +30,11 @@ describe("UseWithTile.ts", () => {
       .exec()) as unknown as IEquipment;
     testItem = await unitTestHelper.createMockItem();
 
-    // create itemContanier for character backpack
+    // create itemContainer for character backpack
     testCharacterItemContainer = await addBackpackContainer(testCharacterEquipment.inventory as unknown as IItem);
 
     // Define a useWithEffect functionality for the testItem
-    useWithTileBlueprints[testItem.baseKey] = useWithEffectTestExample;
+    itemsBlueprintIndex[testItem.baseKey] = useWithEffectTestExample;
 
     // Locate character close to the tile
     testCharacter.x = FromGridX(0);
@@ -66,7 +65,11 @@ describe("UseWithTile.ts", () => {
     expect(response).toBeDefined();
     expect(response!.originItem.id).toEqual(testItem.id);
 
-    await (response!.useWithEffect as IUseWithTileEffect)(response!.originItem, testCharacter);
+    await (response!.useWithItemEffect as IUseWithTileEffect)(
+      response!.originItem,
+      useWithTileData.targetTile,
+      testCharacter
+    );
 
     // Check if character has the coins in the bag
     const backpackContainer = (await ItemContainer.findById(
@@ -79,7 +82,7 @@ describe("UseWithTile.ts", () => {
 
   it("should fail validations | item without useWithEffect function defined", async () => {
     try {
-      delete useWithTileBlueprints[testItem.baseKey];
+      delete itemsBlueprintIndex[testItem.baseKey];
       // @ts-ignore
       await useWithTile.validateData(testCharacter, useWithTileData);
       throw new Error("This test should fail!");

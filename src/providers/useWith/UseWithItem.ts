@@ -1,10 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import {
-  IItemUseWithEntity,
-  IUseWithItemEffect,
-  IValidUseWithResponse,
-} from "@providers/item/data/types/itemsBlueprintTypes";
+import { IItemUseWithEntity, IValidUseWithResponse } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -23,10 +19,10 @@ export class UseWithItem {
   public onUseWithItem(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, UseWithSocketEvents.UseWithItem, async (data: IUseWithItem, character) => {
       try {
-        const { originItem, targetItem, useWithEffect } = await this.validateData(character, data);
+        const { originItem, targetItem, useWithItemEffect } = await this.validateData(character, data);
 
         // call the useWithEffect function on target Item
-        await (useWithEffect as IUseWithItemEffect)(targetItem!, originItem, character);
+        await useWithItemEffect!(targetItem!, originItem, character);
       } catch (error) {
         console.error(error);
       }
@@ -51,9 +47,9 @@ export class UseWithItem {
     const originItem = await this.useWithHelper.getItem(character, data.originItemId);
     const targetItem = await this.useWithHelper.getItem(character, data.targetItemId);
 
-    const itemWithUseWithEffect = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity> | undefined;
+    const itemWithUseWithEffect = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
 
-    if (!itemWithUseWithEffect || !itemWithUseWithEffect.useWithEffect) {
+    if (!itemWithUseWithEffect || !itemWithUseWithEffect.useWithItemEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         `Item '${targetItem.baseKey}' cannot be used with any item...`
@@ -63,6 +59,10 @@ export class UseWithItem {
       );
     }
 
-    return { originItem, targetItem, useWithEffect: itemWithUseWithEffect.useWithEffect };
+    return {
+      originItem,
+      targetItem,
+      useWithItemEffect: itemWithUseWithEffect.useWithItemEffect,
+    };
   }
 }

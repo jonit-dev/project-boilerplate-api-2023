@@ -1,9 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
-import { IItemUseWithEntity, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
+import { IItemUseWithItemEntity, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemUseWithTest: Partial<IItemUseWithEntity> = {
+export const itemUseWithTest: Partial<IItemUseWithItemEntity> = {
   key: ToolsBlueprint.UseWithTest,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,
@@ -14,7 +14,7 @@ export const itemUseWithTest: Partial<IItemUseWithEntity> = {
   weight: 0.25,
   hasUseWith: true,
   basePrice: 70,
-  useWithEffect: async (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> => {
+  useWithItemEffect: async (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> => {
     targetItem.name = "Item affected by use with effect!";
     await targetItem.save();
   },

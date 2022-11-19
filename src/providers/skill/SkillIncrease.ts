@@ -245,7 +245,7 @@ export class SkillIncrease {
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
 
-    await this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.SkillLevelUp);
+    await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.SkillLevelUp);
   }
 
   private async sendExpLevelUpEvents(
@@ -264,7 +264,7 @@ export class SkillIncrease {
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, payload);
-    await this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LevelUp);
+    await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.LevelUp);
 
     await this.socketMessaging.sendEventToCharactersAroundCharacter(character, SkillSocketEvents.SkillGain, payload);
   }

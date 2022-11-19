@@ -1,5 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { container } from "@providers/inversify/container";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { IItemUseWithEntity, IUseWithTargetTile, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -14,7 +16,13 @@ export const itemFishingRod: Partial<IItemUseWithEntity> = {
   weight: 0.25,
   hasUseWith: true,
   basePrice: 70,
-  useWithEffect: (item: IItem, targetTile: IUseWithTargetTile, character: ICharacter): void => {
-    console.log(item, targetTile, character);
+  useWithTileEffect: async (
+    originItem: IItem,
+    targetTile: IUseWithTargetTile,
+    character: ICharacter
+  ): Promise<void> => {
+    const animationEffect = container.get<AnimationEffect>(AnimationEffect);
+
+    await animationEffect.sendAnimationEventToXYPosition(character, "fishing", targetTile.x, targetTile.y);
   },
 };

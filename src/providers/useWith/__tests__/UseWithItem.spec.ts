@@ -4,14 +4,14 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { IUseWithItemEffect, ToolsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { IItemUseWithEntity, IUseWithItemEffect, ToolsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 
 import { IUseWithItem } from "@rpg-engine/shared";
 
 import { UseWithItem } from "../UseWithItem";
 
 describe("UseWithItem.ts", () => {
-  const INVALID_ITEM_MSG = "Cannot read properties of undefined (reading 'useWithEffect')";
+  const INVALID_ITEM_MSG = "Cannot read properties of undefined (reading 'useWithItemEffect')";
 
   let targetItem: IItem,
     originItem: IItem,
@@ -49,13 +49,15 @@ describe("UseWithItem.ts", () => {
     expect(response.originItem.id).toEqual(originItem.id);
     expect(response.targetItem!.id).toEqual(targetItem.id);
 
-    await (response.useWithEffect as IUseWithItemEffect)(response.targetItem!, response.originItem, testCharacter);
+    await (response.useWithItemEffect as IUseWithItemEffect)(response.targetItem!, response.originItem, testCharacter);
     expect(response.targetItem!.name).toEqual("Item affected by use with effect!");
   });
 
   it("should fail validations | item without useWithEffect function defined", async () => {
     try {
-      delete itemsBlueprintIndex[originItem.baseKey].useWithEffect;
+      const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
+
+      delete itemBlueprint.useWithItemEffect;
       // @ts-ignore
       await useWithItem.validateData(testCharacter, useWithItemData);
       throw new Error("This test should fail!");
@@ -81,7 +83,9 @@ describe("UseWithItem.ts", () => {
   it("useWithEffect should throw error if invalid originItem is passed", async () => {
     try {
       originItem.key = "invalid-item";
-      const useWithEffect = itemsBlueprintIndex[originItem.baseKey].useWithEffect as IUseWithItemEffect;
+      const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
+
+      const useWithEffect = itemBlueprint.useWithItemEffect!;
       await useWithEffect(targetItem, originItem, testCharacter);
       throw new Error("This test should fail!");
     } catch (error: any) {
