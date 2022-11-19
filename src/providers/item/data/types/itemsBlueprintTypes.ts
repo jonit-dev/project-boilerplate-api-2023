@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { MapLayers } from "@rpg-engine/shared";
 
 export enum SwordsBlueprint {
   ShortSword = "short-sword",
@@ -250,7 +251,7 @@ export enum SpellsBlueprint {
 //! EXPORT THIS TO SHARED
 
 export interface IUseWithTileEffect {
-  (item: IItem, character: ICharacter): Promise<void>;
+  (item: IItem, targetTile: IUseWithTargetTile, character: ICharacter): Promise<void> | void;
 }
 
 export interface IUseWithItemEffect {
@@ -272,4 +273,13 @@ export interface IMagicItemUseWithEntity extends IItem {
   animationKey: string;
   projectileAnimationKey: string;
   minMagicLevelRequired: number;
+}
+
+export interface IUseWithTargetTile {
+  //! Import  on IUseWithTile too
+
+  x: number;
+  y: number;
+  map: string;
+  layer: MapLayers;
 }
