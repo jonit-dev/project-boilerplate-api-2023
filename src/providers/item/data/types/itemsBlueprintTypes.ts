@@ -266,3 +266,10 @@ export interface IValidUseWithResponse {
   targetItem?: IItem;
   useWithEffect: IUseWithTileEffect | IUseWithItemEffect;
 }
+
+export interface IMagicItemUseWithEntity extends IItem {
+  power: number;
+  animationKey: string;
+  projectileAnimationKey: string;
+  minMagicLevelRequired: number;
+}
