@@ -5,9 +5,9 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { IUseWithTileEffect, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, IUseWithTile, MapLayers } from "@rpg-engine/shared";
-import { IUseWithTileEffect, useWithTileBlueprints } from "../blueprints/UseWithTileBlueprints";
+import { useWithTileBlueprints } from "../blueprints/UseWithTileBlueprints";
 import { UseWithTile } from "../network/UseWithTile";
 
 describe("UseWithTile.ts", () => {

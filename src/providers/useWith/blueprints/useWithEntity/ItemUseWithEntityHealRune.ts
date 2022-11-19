@@ -1,11 +1,11 @@
-import { calculateItemUseEffectPoints, IItemUseWithEntity } from "../UseWithEntityBlueprints";
-import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { AnimationEffectKeys } from "@rpg-engine/shared";
+import { calculateItemUseEffectPoints, IMagicItemUseWithEntity } from "../UseWithEntityBlueprints";
 
-export const itemUseWithEntityHealRune: Partial<IItemUseWithEntity> = {
-  ...(itemDarkRune as IItemUseWithEntity),
+export const itemUseWithEntityHealRune: Partial<IMagicItemUseWithEntity> = {
+  ...(itemDarkRune as IMagicItemUseWithEntity),
 
   power: 10,
   minMagicLevelRequired: 2,

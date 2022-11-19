@@ -1,3 +1,6 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+
 export enum SwordsBlueprint {
   ShortSword = "short-sword",
   BasiliskSword = "basilisk-sword",
@@ -141,6 +144,7 @@ export enum ToolsBlueprint {
   CarpentersAxe = "carpenters-axe",
   FishingRod = "fishing-rod",
   Pickaxe = "pickaxe",
+  UseWithTest = "use-with-test",
 }
 
 export enum SpearsBlueprint {
@@ -241,4 +245,24 @@ export enum HammersBlueprint {
 
 export enum SpellsBlueprint {
   SelfHealingSpell = "self-healing-spell",
+}
+
+//! EXPORT THIS TO SHARED
+
+export interface IUseWithTileEffect {
+  (item: IItem, character: ICharacter): Promise<void>;
+}
+
+export interface IUseWithItemEffect {
+  (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> | void;
+}
+
+export interface IItemUseWithEntity extends IItem {
+  useWithEffect: IUseWithTileEffect | IUseWithItemEffect;
+}
+
+export interface IValidUseWithResponse {
+  originItem: IItem;
+  targetItem?: IItem;
+  useWithEffect: IUseWithTileEffect | IUseWithItemEffect;
 }

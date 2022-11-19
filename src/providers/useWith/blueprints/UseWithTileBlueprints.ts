@@ -3,11 +3,7 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { AxesBlueprint, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-
-export interface IUseWithTileEffect {
-  (item: IItem, character: ICharacter): Promise<void>;
-}
+import { AxesBlueprint, IUseWithTileEffect, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 
 interface IUseWithTileBlueprint {
   [key: string]: IUseWithTileEffect;

@@ -1,8 +1,9 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
-import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
+import { IItemUseWithEntity, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemFishingRod: Partial<IItem> = {
+export const itemFishingRod: Partial<IItemUseWithEntity> = {
   key: ToolsBlueprint.FishingRod,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,
@@ -13,4 +14,10 @@ export const itemFishingRod: Partial<IItem> = {
   weight: 0.25,
   hasUseWith: true,
   basePrice: 70,
+  useWithEffect: (targetItem: IItem, originItem: IItem, character: ICharacter): void => {
+    console.log("Use with effect triggered with the following data:");
+    console.log("targetItem", targetItem);
+    console.log("originItem", originItem);
+    console.log("character", character);
+  },
 };

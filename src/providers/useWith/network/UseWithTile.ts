@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { TILE_MAX_REACH_DISTANCE_IN_GRID } from "@providers/constants/TileConstants";
+import { IUseWithTileEffect, IValidUseWithResponse } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MapTiles } from "@providers/map/MapTiles";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -7,8 +8,8 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IUseWithTile, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { IUseWithTileEffect, useWithTileBlueprints } from "../blueprints/UseWithTileBlueprints";
-import { IValidUseWithResponse, UseWithHelper } from "./UseWithHelper";
+import { useWithTileBlueprints } from "../blueprints/UseWithTileBlueprints";
+import { UseWithHelper } from "./UseWithHelper";
 
 @provide(UseWithTile)
 export class UseWithTile {

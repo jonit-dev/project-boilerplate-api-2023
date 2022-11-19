@@ -11,7 +11,7 @@ import { itemUseWithEntityPoisonRune } from "./useWithEntity/ItemUseWithEntityPo
 const maxPoints = 100;
 
 export async function calculateItemUseEffectPoints(
-  item: Partial<IItemUseWithEntity>,
+  item: Partial<IMagicItemUseWithEntity>,
   caster: ICharacter
 ): Promise<number> {
   const updatedCharacter = (await Character.findOne({ _id: caster._id }).populate("skills")) as unknown as ICharacter;
@@ -22,7 +22,7 @@ export async function calculateItemUseEffectPoints(
   return Math.round((level + (maxPoints - minPoints)) / (level + ITEM_USE_WITH_ENTITY_EFFECT_RATIO) + minPoints);
 }
 
-export interface IItemUseWithEntity extends IItem {
+export interface IMagicItemUseWithEntity extends IItem {
   power: number;
   animationKey: string;
   projectileAnimationKey: string;

@@ -1,17 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { IUseWithItem, IUseWithTile } from "@rpg-engine/shared";
-import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { provide } from "inversify-binding-decorators";
-import { IUseWithTileEffect } from "../blueprints/UseWithTileBlueprints";
-import { IUseWithItemEffect } from "../blueprints/UseWithItemBlueprints";
-
-export interface IValidUseWithResponse {
-  originItem: IItem;
-  targetItem?: IItem;
-  useWithEffect: IUseWithTileEffect | IUseWithItemEffect;
-}
 
 @provide(UseWithHelper)
 export class UseWithHelper {
