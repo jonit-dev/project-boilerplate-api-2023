@@ -22,18 +22,22 @@ export class UseWithEntity {
   ) {}
 
   public async execute(payload: IUseWithEntity, character: ICharacter): Promise<void> {
-    const target = await this.getEntity(payload.entityId, payload.entityType);
-    const item = (await Item.findById(payload.itemId)) as unknown as IItem;
+    const target = payload.entityId ? await this.getEntity(payload.entityId, payload.entityType) : null;
+    const item = payload.itemId ? ((await Item.findById(payload.itemId)) as unknown as IItem) : null;
 
     const isValid = await this.validateRequest(character, target, item);
     if (!isValid) {
       return;
     }
 
-    await this.executeEffect(character, target, item);
+    await this.executeEffect(character, target!, item!);
   }
 
-  private async validateRequest(caster: ICharacter, target: ICharacter | INPC, item: IItem): Promise<boolean> {
+  private async validateRequest(
+    caster: ICharacter,
+    target: ICharacter | INPC | null,
+    item: IItem | null
+  ): Promise<boolean> {
     if (!target) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target was not found.");
       return false;
