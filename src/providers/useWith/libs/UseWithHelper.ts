@@ -1,17 +1,12 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { IUseWithItem, IUseWithTile } from "@rpg-engine/shared";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { ITEM_USE_WITH_ENTITY_EFFECT_RATIO } from "@providers/constants/ItemConstants";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { IMagicItemUseWithEntity } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ISkill, IUseWithItem, IUseWithTile } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { IUseWithTileEffect } from "../blueprints/UseWithTileBlueprints";
-import { IUseWithItemEffect } from "../blueprints/UseWithItemBlueprints";
-
-export interface IValidUseWithResponse {
-  originItem: IItem;
-  targetItem?: IItem;
-  useWithEffect: IUseWithTileEffect | IUseWithItemEffect;
-}
 
 @provide(UseWithHelper)
 export class UseWithHelper {
@@ -41,4 +36,23 @@ export class UseWithHelper {
     }
     return item;
   }
+}
+
+export const MAX_USE_EFFECT_POINTS = 100;
+
+export async function calculateItemUseEffectPoints(itemKey: string, caster: ICharacter): Promise<number> {
+  const updatedCharacter = (await Character.findOne({ _id: caster._id }).populate("skills")) as unknown as ICharacter;
+  const level = (updatedCharacter.skills as unknown as ISkill)?.magic?.level ?? 0;
+
+  const itemData = itemsBlueprintIndex[itemKey] as IMagicItemUseWithEntity;
+
+  if (!itemData.power) {
+    throw new Error(`Item ${itemKey} does not have a power property`);
+  }
+
+  const minPoints = itemData.power ?? 0;
+
+  return Math.round(
+    (level + (MAX_USE_EFFECT_POINTS - minPoints)) / (level + ITEM_USE_WITH_ENTITY_EFFECT_RATIO) + minPoints
+  );
 }

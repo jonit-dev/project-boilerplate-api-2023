@@ -1,14 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { TILE_MAX_REACH_DISTANCE_IN_GRID } from "@providers/constants/TileConstants";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { IItemUseWithEntity, IValidUseWithResponse } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MapTiles } from "@providers/map/MapTiles";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IUseWithTile, UseWithSocketEvents } from "@rpg-engine/shared";
+import { IUseWithTile, ToGridX, ToGridY, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { IUseWithTileEffect, useWithTileBlueprints } from "../blueprints/UseWithTileBlueprints";
-import { IValidUseWithResponse, UseWithHelper } from "./UseWithHelper";
+import { UseWithHelper } from "./libs/UseWithHelper";
 
 @provide(UseWithTile)
 export class UseWithTile {
@@ -21,17 +22,22 @@ export class UseWithTile {
   ) {}
 
   public onUseWithTile(channel: SocketChannel): void {
-    this.socketAuth.authCharacterOn(channel, UseWithSocketEvents.UseWithTile, async (data: IUseWithTile, character) => {
-      try {
-        const useWithData = await this.validateData(character, data);
-        if (useWithData) {
-          const { originItem, useWithEffect } = useWithData;
-          await (useWithEffect as IUseWithTileEffect)(originItem, character);
+    this.socketAuth.authCharacterOn(
+      channel,
+      UseWithSocketEvents.UseWithTile,
+      async (useWithTileData: IUseWithTile, character) => {
+        try {
+          const useWithData = await this.validateData(character, useWithTileData);
+
+          if (useWithData) {
+            const { originItem, useWithTileEffect } = useWithData;
+            await useWithTileEffect!(originItem, useWithTileData.targetTile, character);
+          }
+        } catch (error) {
+          console.error(error);
         }
-      } catch (error) {
-        console.error(error);
       }
-    });
+    );
   }
 
   /**
@@ -53,19 +59,34 @@ export class UseWithTile {
       TILE_MAX_REACH_DISTANCE_IN_GRID
     );
     if (!isUnderRange) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Tile out of reach...");
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the selected tile is out of reach.");
+      return;
+    }
+    // check if tile exists
+    const tileId = await this.mapTiles.getTileId(
+      data.targetTile.map,
+      ToGridX(data.targetTile.x),
+      ToGridY(data.targetTile.y),
+      data.targetTile.layer
+    );
+
+    if (!tileId) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the selected tile doesn't exist.");
       return;
     }
 
     // Check if tile has useWithKey defined
     const useWithKey = this.mapTiles.getUseWithKey(
       data.targetTile.map,
-      data.targetTile.x,
-      data.targetTile.y,
+      ToGridX(data.targetTile.x),
+      ToGridY(data.targetTile.y),
       data.targetTile.layer
     );
     if (!useWithKey) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "This tile cannot be used with anything...");
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, this tile cannot be used with the item provided"
+      );
       return;
     }
 
@@ -80,18 +101,20 @@ export class UseWithTile {
       return;
     }
 
-    const useWithEffect = useWithTileBlueprints[originItem.baseKey];
+    const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
 
-    if (!useWithEffect) {
+    const useWithTileEffect = itemBlueprint.useWithTileEffect;
+
+    if (!useWithTileEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         `Item '${originItem.baseKey}' cannot be used with tiles...`
       );
       throw new Error(
-        `UseWithTile > originItem '${originItem.baseKey}' does not have a useWithEffect function defined`
+        `UseWithTile > originItem '${originItem.baseKey}' does not have a useWithTileEffect function defined`
       );
     }
 
-    return { originItem, useWithEffect };
+    return { originItem, useWithTileEffect };
   }
 }

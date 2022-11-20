@@ -146,7 +146,7 @@ export class ItemUse {
       this.socketMessaging.sendEventToUser(character.channelId, CharacterSocketEvents.AttributeChanged, payload);
     }
 
-    await this.animationEffect.sendAnimationEvent(character, AnimationEffectKeys.LifeHeal);
+    await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.LifeHeal);
   }
 
   private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {

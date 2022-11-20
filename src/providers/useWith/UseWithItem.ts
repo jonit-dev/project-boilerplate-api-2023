@@ -1,11 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { IItemUseWithEntity, IValidUseWithResponse } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IUseWithItem, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { useWithItemBlueprints, IUseWithItemEffect } from "../blueprints/UseWithItemBlueprints";
-import { IValidUseWithResponse, UseWithHelper } from "./UseWithHelper";
+import { UseWithHelper } from "./libs/UseWithHelper";
 
 @provide(UseWithItem)
 export class UseWithItem {
@@ -18,11 +19,10 @@ export class UseWithItem {
   public onUseWithItem(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, UseWithSocketEvents.UseWithItem, async (data: IUseWithItem, character) => {
       try {
-        // Check if character is alive and not banned
-        const { originItem, targetItem, useWithEffect } = await this.validateData(character, data);
+        const { originItem, targetItem, useWithItemEffect } = await this.validateData(character, data);
 
         // call the useWithEffect function on target Item
-        await (useWithEffect as IUseWithItemEffect)(targetItem!, originItem, character);
+        await useWithItemEffect!(targetItem!, originItem, character);
       } catch (error) {
         console.error(error);
       }
@@ -47,18 +47,22 @@ export class UseWithItem {
     const originItem = await this.useWithHelper.getItem(character, data.originItemId);
     const targetItem = await this.useWithHelper.getItem(character, data.targetItemId);
 
-    const useWithEffect = useWithItemBlueprints[targetItem.baseKey];
+    const itemWithUseWithEffect = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
 
-    if (!useWithEffect) {
+    if (!itemWithUseWithEffect || !itemWithUseWithEffect.useWithItemEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         `Item '${targetItem.baseKey}' cannot be used with any item...`
       );
       throw new Error(
-        `UseWithItem > targetItem '${targetItem.baseKey}' does not have a useWithEffect function defined`
+        `UseWithItem > targetItem '${originItem.baseKey}' does not have a useWithEffect function defined`
       );
     }
 
-    return { originItem, targetItem, useWithEffect };
+    return {
+      originItem,
+      targetItem,
+      useWithItemEffect: itemWithUseWithEffect.useWithItemEffect,
+    };
   }
 }
