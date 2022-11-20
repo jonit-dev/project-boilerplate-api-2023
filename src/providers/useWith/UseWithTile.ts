@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { TILE_MAX_REACH_DISTANCE_IN_GRID } from "@providers/constants/TileConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { IValidUseWithResponse } from "@providers/item/data/types/itemsBlueprintTypes";
+import { IItemUseWithEntity, IValidUseWithResponse } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MapTiles } from "@providers/map/MapTiles";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -101,18 +101,20 @@ export class UseWithTile {
       return;
     }
 
-    const useWithEffect = itemsBlueprintIndex[originItem.baseKey].useWithEffect;
+    const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
 
-    if (!useWithEffect) {
+    const useWithTileEffect = itemBlueprint.useWithTileEffect;
+
+    if (!useWithTileEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         `Item '${originItem.baseKey}' cannot be used with tiles...`
       );
       throw new Error(
-        `UseWithTile > originItem '${originItem.baseKey}' does not have a useWithEffect function defined`
+        `UseWithTile > originItem '${originItem.baseKey}' does not have a useWithTileEffect function defined`
       );
     }
 
-    return { originItem, useWithItemEffect: useWithEffect };
+    return { originItem, useWithTileEffect };
   }
 }

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ToolsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, IUseWithTile, MapLayers } from "@rpg-engine/shared";
 import { UseWithTile } from "../UseWithTile";
 
@@ -13,13 +13,13 @@ describe("UseWithTile.ts", () => {
   let testItem: IItem,
     testCharacter: ICharacter,
     testCharacterEquipment: IEquipment,
-    testCharacterItemContainer: IItemContainer,
     useWithTile: UseWithTile,
     useWithTileData: IUseWithTile;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     useWithTile = container.get<UseWithTile>(UseWithTile);
+    await unitTestHelper.initializeMapLoader();
   });
 
   beforeEach(async () => {
@@ -28,13 +28,7 @@ describe("UseWithTile.ts", () => {
     testCharacterEquipment = (await Equipment.findById(testCharacter.equipment)
       .populate("inventory")
       .exec()) as unknown as IEquipment;
-    testItem = await unitTestHelper.createMockItem();
-
-    // create itemContainer for character backpack
-    testCharacterItemContainer = await addBackpackContainer(testCharacterEquipment.inventory as unknown as IItem);
-
-    // Define a useWithEffect functionality for the testItem
-    itemsBlueprintIndex[testItem.baseKey] = useWithEffectTestExample;
+    testItem = await unitTestHelper.createMockItemFromBlueprint(ToolsBlueprint.UseWithTileTest);
 
     // Locate character close to the tile
     testCharacter.x = FromGridX(0);
@@ -54,12 +48,12 @@ describe("UseWithTile.ts", () => {
     // equip character with item
     testCharacterEquipment.leftHand = testItem._id;
     await testCharacterEquipment.save();
-  });
 
-  it("should pass all validations, run the useWithEffect and apply expected effect", async () => {
     // @ts-ignore
     jest.spyOn(useWithTile.mapTiles, "getUseWithKey" as any).mockImplementation(() => testItem.baseKey);
+  });
 
+  it("should pass all validations, run the useWithTileEffect and apply expected effect", async () => {
     // @ts-ignore
     const response = await useWithTile.validateData(testCharacter, useWithTileData);
     expect(response).toBeDefined();
@@ -67,24 +61,19 @@ describe("UseWithTile.ts", () => {
 
     await response?.useWithTileEffect!(response!.originItem, useWithTileData.targetTile, testCharacter);
 
-    // Check if character has the coins in the bag
-    const backpackContainer = (await ItemContainer.findById(
-      testCharacterItemContainer.id
-    )) as unknown as IItemContainer;
-    expect(backpackContainer.slots[0]).toBeDefined();
-    expect(backpackContainer.slots[0].key).toEqual(OthersBlueprint.GoldCoin);
-    expect(backpackContainer.slots[0].stackQty).toEqual(5);
+    expect(testCharacter.name).toEqual("Character affected by use with tile effect!");
   });
 
-  it("should fail validations | item without useWithEffect function defined", async () => {
+  it("should fail validations | item without useWithTileEffect function defined", async () => {
     try {
-      delete itemsBlueprintIndex[testItem.baseKey];
+      const itemBlueprint = itemsBlueprintIndex[testItem.baseKey];
+      delete itemBlueprint.useWithTileEffect;
       // @ts-ignore
       await useWithTile.validateData(testCharacter, useWithTileData);
       throw new Error("This test should fail!");
     } catch (error: any) {
       expect(error.message).toEqual(
-        `UseWithTile > originItem '${testItem.baseKey}' does not have a useWithEffect function defined`
+        `UseWithTile > originItem '${testItem.baseKey}' does not have a useWithTileEffect function defined`
       );
     }
   });

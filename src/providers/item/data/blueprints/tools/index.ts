@@ -11,6 +11,6 @@ export const toolsBlueprintIndex = {
   [ToolsBlueprint.CarpentersAxe]: itemCarpentersAxe,
   [ToolsBlueprint.FishingRod]: itemFishingRod,
   [ToolsBlueprint.Pickaxe]: itemPickaxe,
-  [ToolsBlueprint.UseWithItemTest]: itemUseWithItemTest,
-  [ToolsBlueprint.UseWithTileTest]: itemUseWithTileTest,
+  [ToolsBlueprint.UseWithItemTest]: itemUseWithItemTest, //! UNIT TEST ONLY
+  [ToolsBlueprint.UseWithTileTest]: itemUseWithTileTest, //! UNIT TEST ONLY
 };
