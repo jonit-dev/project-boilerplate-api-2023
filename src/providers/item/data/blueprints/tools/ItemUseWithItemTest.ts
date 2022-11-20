@@ -1,7 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItemUseWithEntity } from "@providers/useWith/useWithTypes";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
-import { IItemUseWithEntity, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
+import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemUseWithItemTest: Partial<IItemUseWithEntity> = {
   key: ToolsBlueprint.UseWithItemTest,

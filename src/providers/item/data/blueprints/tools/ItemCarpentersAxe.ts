@@ -1,6 +1,7 @@
+import { IItemUseWithEntity } from "@providers/useWith/useWithTypes";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { IItemUseWithEntity, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
+import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemCarpentersAxe: Partial<IItemUseWithEntity> = {
   key: ToolsBlueprint.CarpentersAxe,

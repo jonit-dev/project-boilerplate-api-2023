@@ -4,7 +4,8 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { IItemUseWithEntity, IUseWithItemEffect, ToolsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ToolsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { IItemUseWithEntity, IUseWithItemEffect } from "@providers/useWith/useWithTypes";
 
 import { IUseWithItem } from "@rpg-engine/shared";
 

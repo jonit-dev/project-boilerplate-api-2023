@@ -1,9 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
+import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 
 import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { IMagicItemUseWithEntity, MagicsBlueprint } from "../../types/itemsBlueprintTypes";
+import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
   key: MagicsBlueprint.PoisonRune,

@@ -4,7 +4,7 @@ import { CharacterItems } from "@providers/character/characterItems/CharacterIte
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ITEM_USE_WITH_ENTITY_EFFECT_RATIO } from "@providers/constants/ItemConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { IMagicItemUseWithEntity } from "@providers/item/data/types/itemsBlueprintTypes";
+import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 import { ISkill, IUseWithItem, IUseWithTile } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 

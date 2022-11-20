@@ -1,9 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { IItemUseWithEntity, IValidUseWithResponse } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { IItemUseWithEntity, IValidUseWithResponse } from "@providers/useWith/useWithTypes";
 import { IUseWithItem, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { UseWithHelper } from "./libs/UseWithHelper";
