@@ -1,9 +1,8 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
+import { IItemUseWithEntity, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemButchersKnife: Partial<IItem> = {
+export const itemButchersKnife: Partial<IItemUseWithEntity> = {
   key: ToolsBlueprint.ButchersKnife,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,

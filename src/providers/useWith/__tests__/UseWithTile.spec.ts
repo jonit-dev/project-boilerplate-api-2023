@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ToolsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -108,22 +107,3 @@ describe("UseWithTile.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
-
-async function addBackpackContainer(backpack: IItem): Promise<IItemContainer> {
-  const backpackContainer = await unitTestHelper.createMockBackpackItemContainer(backpack);
-
-  await Item.updateOne(
-    {
-      _id: backpack._id,
-    },
-    {
-      $set: {
-        itemContainer: backpackContainer._id,
-      },
-    }
-  );
-
-  backpackContainer.slots[0] = null;
-  backpackContainer.markModified("slots");
-  return backpackContainer.save();
-}
