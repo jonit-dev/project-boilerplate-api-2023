@@ -89,6 +89,11 @@ export class UseWithEntity {
       }
     }
 
+    if (caster.scene !== target.scene) {
+      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is not on the same scene.");
+      return false;
+    }
+
     const isUnderRange = this.movementHelper.isUnderRange(
       caster.x,
       caster.y,

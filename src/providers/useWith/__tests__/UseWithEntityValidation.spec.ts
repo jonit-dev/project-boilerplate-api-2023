@@ -503,6 +503,30 @@ describe("UseWithEntityValidation.ts", () => {
     });
   });
 
+  it("should fail validation if target is on different scene", async () => {
+    executeEffectMock.mockImplementation();
+
+    targetCharacter.scene = testCharacter.scene + "-2";
+    await targetCharacter.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    expect(executeEffectMock).toBeCalledTimes(0);
+    expect(sendEventToUserMock).toBeCalledTimes(1);
+
+    expect(sendEventToUserMock).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+      message: "Sorry, your target is not on the same scene.",
+      type: "error",
+    });
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
