@@ -12,7 +12,7 @@ import { FoodsBlueprint, MagicsBlueprint } from "@providers/item/data/types/item
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, GRID_WIDTH, NPCMovementType, UISocketEvents } from "@rpg-engine/shared";
+import { GRID_WIDTH, NPCMovementType, UISocketEvents } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { UseWithEntity } from "../UseWithEntity";
 
