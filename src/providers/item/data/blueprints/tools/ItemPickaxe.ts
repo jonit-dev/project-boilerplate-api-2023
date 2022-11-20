@@ -18,4 +18,5 @@ export const itemPickaxe: Partial<IItemUseWithEntity> = {
   rangeType: EntityAttackType.Melee,
   basePrice: 60,
   hasUseWith: true,
+  useWithMaxDistanceGrid: 2,
 };

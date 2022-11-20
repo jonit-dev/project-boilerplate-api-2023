@@ -18,4 +18,5 @@ export const itemButchersKnife: Partial<IItemUseWithEntity> = {
   rangeType: EntityAttackType.Melee,
   basePrice: 45,
   hasUseWith: true,
+  useWithMaxDistanceGrid: 2,
 };

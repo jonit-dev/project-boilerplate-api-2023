@@ -15,6 +15,7 @@ export const itemUseWithTileTest: Partial<IItemUseWithEntity> = {
   weight: 0.25,
   hasUseWith: true,
   basePrice: 70,
+  useWithMaxDistanceGrid: 2,
   useWithTileEffect: async (item: IItem, targetTile: IUseWithTargetTile, character: ICharacter): Promise<void> => {
     character.name = "Character affected by use with tile effect!";
     await character.save();
