@@ -2,6 +2,7 @@ import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { User } from "@entities/ModuleSystem/UserModel";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { SpellsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import {
@@ -111,7 +112,7 @@ const characterSchema = createLeanSchema(
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),
     baseSpeed: Type.number({
-      default: 2,
+      default: MovementSpeed.Slow,
       required: true,
     }),
     weight: Type.number({

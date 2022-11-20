@@ -4,7 +4,7 @@ import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemWolfTooth: Partial<IItem> = {
   key: CraftingResourcesBlueprint.WolfTooth,
-  type: ItemType.CraftMaterial,
+  type: ItemType.CraftingResource,
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "crafting-resources/wolf-tooth.png",
@@ -13,4 +13,5 @@ export const itemWolfTooth: Partial<IItem> = {
   weight: 0.01,
   maxStackSize: 100,
   basePrice: 0.5,
+  hasUseWith: true,
 };

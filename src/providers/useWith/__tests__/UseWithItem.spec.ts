@@ -3,13 +3,15 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { IItemUseWithEntity, IUseWithItemEffect, ToolsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+
 import { IUseWithItem } from "@rpg-engine/shared";
-import { IUseWithItemEffect, useWithItemBlueprints } from "../blueprints/UseWithItemBlueprints";
-import { UseWithItem } from "../network/UseWithItem";
+
+import { UseWithItem } from "../UseWithItem";
 
 describe("UseWithItem.ts", () => {
-  const ATTACK_INCREASE = 100;
-  const INVALID_ITEM_MSG = "Invalid item!";
+  const INVALID_ITEM_MSG = "Cannot read properties of undefined (reading 'useWithItemEffect')";
 
   let targetItem: IItem,
     originItem: IItem,
@@ -27,25 +29,8 @@ describe("UseWithItem.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     testCharacterEquipment = (await Equipment.findById(testCharacter.equipment)) as unknown as IEquipment;
-    originItem = await unitTestHelper.createStackableMockItem();
+    originItem = await unitTestHelper.createMockItemFromBlueprint(ToolsBlueprint.UseWithItemTest);
     targetItem = await unitTestHelper.createMockItem();
-
-    // Define a useWithEffect functionality for the testItem
-    useWithItemBlueprints[targetItem.baseKey] = async function (
-      targetItem: IItem,
-      originItem: IItem,
-      character: ICharacter
-    ) {
-      switch (originItem.baseKey) {
-        case "apple":
-          // effect increases attack to 100
-          targetItem.attack = ATTACK_INCREASE;
-          await targetItem.save();
-          break;
-        default:
-          throw new Error(INVALID_ITEM_MSG);
-      }
-    };
 
     useWithItemData = {
       originItemId: originItem.id,
@@ -64,19 +49,21 @@ describe("UseWithItem.ts", () => {
     expect(response.originItem.id).toEqual(originItem.id);
     expect(response.targetItem!.id).toEqual(targetItem.id);
 
-    await (response.useWithEffect as IUseWithItemEffect)(response.targetItem!, response.originItem, testCharacter);
-    expect(response.targetItem!.attack).toEqual(ATTACK_INCREASE);
+    await (response.useWithItemEffect as IUseWithItemEffect)(response.targetItem!, response.originItem, testCharacter);
+    expect(response.targetItem!.name).toEqual("Item affected by use with effect!");
   });
 
   it("should fail validations | item without useWithEffect function defined", async () => {
     try {
-      delete useWithItemBlueprints[targetItem.baseKey];
+      const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
+
+      delete itemBlueprint.useWithItemEffect;
       // @ts-ignore
       await useWithItem.validateData(testCharacter, useWithItemData);
       throw new Error("This test should fail!");
     } catch (error: any) {
       expect(error.message).toEqual(
-        `UseWithItem > targetItem '${targetItem.baseKey}' does not have a useWithEffect function defined`
+        `UseWithItem > targetItem '${originItem.baseKey}' does not have a useWithEffect function defined`
       );
     }
   });
@@ -96,7 +83,9 @@ describe("UseWithItem.ts", () => {
   it("useWithEffect should throw error if invalid originItem is passed", async () => {
     try {
       originItem.key = "invalid-item";
-      const useWithEffect = useWithItemBlueprints[targetItem.baseKey];
+      const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
+
+      const useWithEffect = itemBlueprint.useWithItemEffect!;
       await useWithEffect(targetItem, originItem, testCharacter);
       throw new Error("This test should fail!");
     } catch (error: any) {

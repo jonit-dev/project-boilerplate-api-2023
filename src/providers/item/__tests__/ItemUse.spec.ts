@@ -55,7 +55,7 @@ describe("ItemUse.ts", () => {
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
 
-    animationEventMock = jest.spyOn(AnimationEffect.prototype, "sendAnimationEvent");
+    animationEventMock = jest.spyOn(AnimationEffect.prototype, "sendAnimationEventToCharacter");
     animationEventMock.mockImplementation();
 
     itemUsageMock = jest.spyOn(itemUse as any, "applyItemUsage");

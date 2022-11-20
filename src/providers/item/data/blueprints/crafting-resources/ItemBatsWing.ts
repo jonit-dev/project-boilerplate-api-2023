@@ -4,8 +4,8 @@ import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemBatsWing: Partial<IItem> = {
   key: CraftingResourcesBlueprint.BatsWing,
-  type: ItemType.CraftMaterial,
-  subType: ItemSubType.Other,
+  type: ItemType.CraftingResource,
+  subType: ItemSubType.CraftingResource,
   textureAtlas: "items",
   texturePath: "crafting-resources/bat-wing.png",
   name: "Bat Wing",
@@ -13,4 +13,5 @@ export const itemBatsWing: Partial<IItem> = {
   weight: 1,
   maxStackSize: 100,
   basePrice: 0.5,
+  hasUseWith: true,
 };

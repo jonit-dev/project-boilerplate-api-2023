@@ -1,3 +1,7 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { MapLayers } from "@rpg-engine/shared";
+
 export enum SwordsBlueprint {
   ShortSword = "short-sword",
   BasiliskSword = "basilisk-sword",
@@ -103,6 +107,18 @@ export enum FoodsBlueprint {
   Mushroom = "mushroom",
   Potato = "potato",
   RedMeat = "red-meat",
+  WildSalmon = "wild-salmon",
+  Tuna = "tuna",
+  BrownFish = "brown-fish",
+  RawBeefSteak = "raw-beef-steak",
+  Pineapple = "pineapple",
+  Blueberry = "blueberry",
+  Watermelon = "watermelon",
+  Coconut = "coconut",
+  BrownMushroom = "brown-mushroom",
+  RedMushroom = "red-mushroom",
+  IceMushroom = "ice-mushroom",
+  RottenMeat = "rotten-meat",
 }
 export enum CraftingResourcesBlueprint {
   BlueSapphire = "blue-sapphire",
@@ -115,16 +131,28 @@ export enum CraftingResourcesBlueprint {
   Feather = "feather",
   GoldenIngot = "golden-ingot",
   Herb = "herb",
-  GreaterWoodLog = "greater-wood-log",
+  GreaterWoodenLog = "greater-wooden-log",
   IronIngot = "iron-ingot",
   Obsidian = "obsidian",
   Wheat = "wheat",
   WolfTooth = "wolf-tooth",
+  Bone = "bone",
+  Worm = "worm",
+}
+
+export enum ToolsBlueprint {
+  ButchersKnife = "butchers-knife",
+  CarpentersAxe = "carpenters-axe",
+  FishingRod = "fishing-rod",
+  Pickaxe = "pickaxe",
+  UseWithItemTest = "use-with-item-test",
+  UseWithTileTest = "use-with-tile-test",
 }
 
 export enum SpearsBlueprint {
   RoyalSpear = "royal-spear",
   Spear = "spear",
+  StoneSpear = "stone-spear",
 }
 
 export enum PotionsBlueprint {
@@ -145,6 +173,8 @@ export enum RangedWeaponsBlueprint {
   OrcishBow = "orcish-bow",
   FrostBow = "frost-bow",
   FrostCrossbow = "frost-crossbow",
+  IronArrow = "iron-arrow",
+  AsterionsBow = "asterions-bow",
 }
 
 export enum GlovesBlueprint {
@@ -174,6 +204,7 @@ export enum OthersBlueprint {
   Candle = "candle",
   RoyalChalice = "royal-chalice",
   GoldCoin = "gold-coin",
+  Map = "map",
 }
 
 export enum StaffsBlueprint {
@@ -216,4 +247,41 @@ export enum HammersBlueprint {
 
 export enum SpellsBlueprint {
   SelfHealingSpell = "self-healing-spell",
+}
+
+//! EXPORT THIS TO SHARED
+
+export interface IUseWithTileEffect {
+  (item: IItem, targetTile: IUseWithTargetTile, character: ICharacter): Promise<void> | void;
+}
+
+export interface IUseWithItemEffect {
+  (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> | void;
+}
+
+export interface IItemUseWithEntity extends IItem {
+  useWithItemEffect?: IUseWithItemEffect;
+  useWithTileEffect?: IUseWithTileEffect;
+}
+
+export interface IValidUseWithResponse {
+  originItem: IItem;
+  targetItem?: IItem;
+  useWithItemEffect?: IUseWithItemEffect;
+  useWithTileEffect?: IUseWithTileEffect;
+}
+
+export interface IMagicItemUseWithEntity extends IItem {
+  power: number;
+  animationKey: string;
+  projectileAnimationKey: string;
+  minMagicLevelRequired: number;
+}
+
+export interface IUseWithTargetTile {
+  //! Import  on IUseWithTile too
+  x: number;
+  y: number;
+  map: string;
+  layer: MapLayers;
 }

@@ -5,6 +5,7 @@ import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
@@ -13,6 +14,7 @@ import {
   OthersBlueprint,
   RangedWeaponsBlueprint,
   SwordsBlueprint,
+  ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -56,6 +58,10 @@ export const npcOrcWarrior = {
       chance: 30,
     },
     {
+      itemBlueprintKey: ToolsBlueprint.ButchersKnife,
+      chance: 15,
+    },
+    {
       itemBlueprintKey: AxesBlueprint.Axe,
       chance: 30,
     },
@@ -74,6 +80,11 @@ export const npcOrcWarrior = {
     {
       itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.RottenMeat,
+      chance: 40,
+      quantityRange: [5, 10],
     },
     {
       itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,
@@ -102,6 +113,11 @@ export const npcOrcWarrior = {
     {
       itemBlueprintKey: RangedWeaponsBlueprint.OrcishBow,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.IronArrow,
+      chance: 20,
+      quantityRange: [5, 10],
     },
   ],
 } as Partial<INPC>;

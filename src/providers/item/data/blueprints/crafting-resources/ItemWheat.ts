@@ -4,7 +4,7 @@ import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemWheat: Partial<IItem> = {
   key: CraftingResourcesBlueprint.Wheat,
-  type: ItemType.CraftMaterial,
+  type: ItemType.CraftingResource,
   subType: ItemSubType.Other,
   textureAtlas: "items",
   texturePath: "crafting-resources/wheat.png",
@@ -13,4 +13,5 @@ export const itemWheat: Partial<IItem> = {
   weight: 0.25,
   maxStackSize: 100,
   basePrice: 0.5,
+  hasUseWith: true,
 };

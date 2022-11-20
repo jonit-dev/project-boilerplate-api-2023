@@ -7,10 +7,12 @@ import { ITEM_USE_WITH_ENTITY_GRID_CELL_RANGE } from "@providers/constants/ItemC
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUseWithEntity } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
+import { SocketAuth } from "@providers/sockets/SocketAuth";
+import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { IUseWithEntity, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { useWithEntityBlueprintsIndex } from "./blueprints/UseWithEntityBlueprints";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
 
 @provide(UseWithEntity)
 export class UseWithEntity {
@@ -18,8 +20,21 @@ export class UseWithEntity {
     private socketMessaging: SocketMessaging,
     private characterValidation: CharacterValidation,
     private movementHelper: MovementHelper,
-    private itemValidation: ItemValidation
+    private itemValidation: ItemValidation,
+    private socketAuth: SocketAuth
   ) {}
+
+  public onUseWithEntity(channel: SocketChannel): void {
+    this.socketAuth.authCharacterOn(
+      channel,
+      UseWithSocketEvents.UseWithEntity,
+      async (data: IUseWithEntity, character) => {
+        if (data) {
+          await this.execute(data, character);
+        }
+      }
+    );
+  }
 
   public async execute(payload: IUseWithEntity, character: ICharacter): Promise<void> {
     const target = payload.entityId ? await this.getEntity(payload.entityId, payload.entityType) : null;
@@ -48,8 +63,8 @@ export class UseWithEntity {
       return false;
     }
 
-    const blueprint = useWithEntityBlueprintsIndex[item.key];
-    if (!blueprint) {
+    const blueprint = itemsBlueprintIndex[item.key];
+    if (!blueprint || !blueprint.power) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, `Sorry, '${item.name}' cannot be used with target.`);
       return false;
     }

@@ -1,8 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
-import { container } from "@providers/inversify/container";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { container } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
@@ -156,7 +156,7 @@ export class ItemSpellCast {
       payload
     );
 
-    await this.animationEffect.sendAnimationEvent(character, spell.animationKey);
+    await this.animationEffect.sendAnimationEventToCharacter(character, spell.animationKey);
   }
 
   private sendLearnedSpellNotification(character: ICharacter, spells: IItemSpell[]): void {

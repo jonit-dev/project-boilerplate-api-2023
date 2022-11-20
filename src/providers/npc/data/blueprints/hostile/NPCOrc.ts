@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
+  FoodsBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
@@ -10,6 +11,7 @@ import {
   OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -49,6 +51,20 @@ export const npcOrc = {
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.RedMushroom,
+      chance: 10,
+      quantityRange: [1, 2],
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.RottenMeat,
+      chance: 40,
+      quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: ToolsBlueprint.CarpentersAxe,
+      chance: 20,
     },
     {
       itemBlueprintKey: OthersBlueprint.Candle,

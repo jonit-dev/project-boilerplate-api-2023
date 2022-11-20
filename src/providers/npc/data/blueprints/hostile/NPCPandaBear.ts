@@ -41,6 +41,11 @@ export const npcPandaBear = {
       chance: 20,
     },
     {
+      itemBlueprintKey: FoodsBlueprint.RawBeefSteak,
+      chance: 5,
+      quantityRange: [1, 3],
+    },
+    {
       itemBlueprintKey: FoodsBlueprint.Banana,
       chance: 15,
     },
@@ -48,6 +53,11 @@ export const npcPandaBear = {
       itemBlueprintKey: CraftingResourcesBlueprint.Leather,
       chance: 50,
       quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.IceMushroom,
+      chance: 10,
+      quantityRange: [1, 2],
     },
   ],
 } as Partial<INPC>;
