@@ -64,7 +64,7 @@ export class UseWithEntity {
     }
 
     const blueprint = itemsBlueprintIndex[item.key];
-    if (!blueprint || !blueprint.power) {
+    if (!blueprint || !blueprint.power || !blueprint.usableEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, `Sorry, '${item.name}' cannot be used with target.`);
       return false;
     }
@@ -74,7 +74,7 @@ export class UseWithEntity {
     }
 
     if (!target.isAlive) {
-      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your taget is dead.");
+      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is dead.");
       return false;
     }
 
