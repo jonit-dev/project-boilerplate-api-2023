@@ -5,7 +5,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { IUseWithTileEffect, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, IUseWithTile, MapLayers } from "@rpg-engine/shared";
 import { UseWithTile } from "../UseWithTile";
 
@@ -65,11 +65,7 @@ describe("UseWithTile.ts", () => {
     expect(response).toBeDefined();
     expect(response!.originItem.id).toEqual(testItem.id);
 
-    await (response!.useWithItemEffect as IUseWithTileEffect)(
-      response!.originItem,
-      useWithTileData.targetTile,
-      testCharacter
-    );
+    await response?.useWithTileEffect!(response!.originItem, useWithTileData.targetTile, testCharacter);
 
     // Check if character has the coins in the bag
     const backpackContainer = (await ItemContainer.findById(
@@ -141,30 +137,4 @@ async function addBackpackContainer(backpack: IItem): Promise<IItemContainer> {
   backpackContainer.slots[0] = null;
   backpackContainer.markModified("slots");
   return backpackContainer.save();
-}
-
-async function useWithEffectTestExample(item: IItem, character: ICharacter) {
-  // EXAMPLE: Using testItem with tile will mint 5 gold coins to the characters bag
-  const coinBlueprint = itemsBlueprintIndex[OthersBlueprint.GoldCoin];
-  const newCoins = new Item({ ...coinBlueprint });
-  newCoins.stackQty = 5;
-
-  const equipment = await Equipment.findById(character.equipment).populate("inventory").exec();
-  if (!equipment) {
-    throw new Error("Character does not have equipment");
-  }
-  const backpack = equipment.inventory as unknown as IItem;
-  const backpackContainer = (await ItemContainer.findById(backpack.itemContainer)) as unknown as IItemContainer;
-  if (!backpackContainer) {
-    throw new Error("Character does not have item container");
-  }
-
-  const slotId = backpackContainer.firstAvailableSlotId;
-  if (slotId === null) {
-    throw new Error("No slots available");
-  }
-  backpackContainer.slots[slotId] = await newCoins.save();
-
-  backpackContainer.markModified("slots");
-  await backpackContainer.save();
 }

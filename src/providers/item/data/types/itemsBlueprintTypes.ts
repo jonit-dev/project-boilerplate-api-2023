@@ -145,7 +145,8 @@ export enum ToolsBlueprint {
   CarpentersAxe = "carpenters-axe",
   FishingRod = "fishing-rod",
   Pickaxe = "pickaxe",
-  UseWithTest = "use-with-test",
+  UseWithItemTest = "use-with-item-test",
+  UseWithTileTest = "use-with-tile-test",
 }
 
 export enum SpearsBlueprint {

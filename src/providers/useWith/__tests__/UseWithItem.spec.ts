@@ -29,7 +29,7 @@ describe("UseWithItem.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     testCharacterEquipment = (await Equipment.findById(testCharacter.equipment)) as unknown as IEquipment;
-    originItem = await unitTestHelper.createMockItemFromBlueprint(ToolsBlueprint.UseWithTest);
+    originItem = await unitTestHelper.createMockItemFromBlueprint(ToolsBlueprint.UseWithItemTest);
     targetItem = await unitTestHelper.createMockItem();
 
     useWithItemData = {
