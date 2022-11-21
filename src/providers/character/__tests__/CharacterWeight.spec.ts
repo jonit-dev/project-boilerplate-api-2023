@@ -1,18 +1,23 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { CharacterDeath } from "../CharacterDeath";
 import { CharacterWeight } from "../CharacterWeight";
 
 describe("CharacterWeight.ts", () => {
   let testCharacter: ICharacter;
   let characterWeight: CharacterWeight;
   let inventoryContainer: IItemContainer;
+  let characterDeath: CharacterDeath;
+  let testNPC: INPC;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
+    characterDeath = container.get<CharacterDeath>(CharacterDeath);
   });
 
   beforeEach(async () => {
@@ -25,6 +30,8 @@ describe("CharacterWeight.ts", () => {
     )
       .populate("skills")
       .execPopulate();
+
+    testNPC = await unitTestHelper.createMockNPC();
   });
 
   it("should properly calculate the character maxWeight", async () => {
@@ -116,6 +123,31 @@ describe("CharacterWeight.ts", () => {
 
     const afterAllAplles = await characterWeight.getWeight(testCharacter);
     expect(afterAllAplles).toBe(3);
+  });
+
+  it("After death, one of equipment will drop and the weight should update.", async () => {
+    await characterWeight.updateCharacterWeight(testCharacter);
+    const beforeAddArmor = await Character.findOne(testCharacter._id).lean();
+    expect(beforeAddArmor?.weight).toBe(3);
+
+    await unitTestHelper.createMockAndEquipItens(testCharacter);
+    await characterWeight.updateCharacterWeight(testCharacter);
+    const afterAddArmor = await Character.findOne(testCharacter._id).lean();
+
+    expect(afterAddArmor?.weight).toBe(9);
+
+    // when die you loose your backpack: -3 weight.
+    // but when you respawn you get a new bag: +1.5 weight
+    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+    const weightAfterDeath = await Character.findOne(testCharacter._id).lean();
+
+    // bag(1.5)                       = 1.5
+    // sword(1) + bag(1.5)            = 2.5
+    // armor(5) + bag(1.5)            = 6.5
+    // armor(5) + sword(1) + bag(1.5) = 7.5
+    // When die have a % do drop a item, its random so we can't test it with ONE number fixed.
+    const possibleResults = [7.5, 6.5, 2.5, 1.5];
+    expect(possibleResults).toContain(weightAfterDeath?.weight);
   });
 
   afterAll(async () => {
