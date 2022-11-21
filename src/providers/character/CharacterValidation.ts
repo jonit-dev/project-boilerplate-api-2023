@@ -7,20 +7,23 @@ import { provide } from "inversify-binding-decorators";
 export class CharacterValidation {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  public hasBasicValidation(character: ICharacter): boolean {
+  public hasBasicValidation(character: ICharacter, msg?: Map<string, string>): boolean {
     if (!character.isOnline) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you are not online.");
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        msg?.get("not-online") ?? "Sorry, you are not online."
+      );
       return false;
     }
 
     if (!character.isAlive) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you are dead.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, msg?.get("not-alive") ?? "Sorry, you are dead.");
       return false;
     }
 
     if (character.isBanned) {
       this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
-        reason: "You cannot use this character while banned.",
+        reason: msg?.get("banned") ?? "You cannot use this character while banned.",
       });
 
       return false;
