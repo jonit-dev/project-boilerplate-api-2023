@@ -28,9 +28,11 @@ export class CharacterWeight {
 
   public async getMaxWeight(character: ICharacter): Promise<number> {
     const skill = await Skill.findById(character.skills).lean();
-    const maxWeight = skill?.strength.level * 15;
-
-    return maxWeight;
+    if (skill) {
+      return skill.strength.level * 15;
+    } else {
+      return 15;
+    }
   }
 
   public async getWeight(character: ICharacter): Promise<number> {
