@@ -1,6 +1,7 @@
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Quest } from "@entities/ModuleQuest/QuestModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
+import { EntryEffectBlueprint } from "@providers/entities/data/types/entryEffectBlueprintTypes";
 import {
   CharacterClass,
   CharacterGender,
@@ -173,6 +174,10 @@ const npcSchema = createLeanSchema(
       type: string;
       xpPerDamage: number;
       hasQuest: Promise<boolean>;
+    }),
+    entityEffects: Type.array().of({
+      type: [String],
+      enum: EntryEffectBlueprint,
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
