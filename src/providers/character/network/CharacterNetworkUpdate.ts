@@ -3,6 +3,7 @@ import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHel
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
+import { MapTiles } from "@providers/map/MapTiles";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -43,7 +44,8 @@ export class CharacterNetworkUpdate {
     private gridManager: GridManager,
     private mapNonPVPZone: MapNonPVPZone,
     private characterValidation: CharacterValidation,
-    private npcWarn: NPCWarn
+    private npcWarn: NPCWarn,
+    private mapTiles: MapTiles
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {

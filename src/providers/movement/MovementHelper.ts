@@ -36,6 +36,13 @@ export class MovementHelper {
   ): Promise<boolean> => {
     // check for characters and NPCs
 
+    const hasSolid = this.mapSolids.isTileSolid(map, gridX, gridY, layer, strategy);
+    const isPassage = this.mapSolids.isTilePassage(map, gridX, gridY, layer, strategy);
+
+    if (hasSolid && !isPassage) {
+      return true;
+    }
+
     const hasNPC = await NPC.exists({
       x: FromGridX(gridX),
       y: FromGridY(gridY),
@@ -46,6 +53,14 @@ export class MovementHelper {
 
     if (hasNPC) {
       return true;
+    }
+
+    if (caller instanceof NPC) {
+      const hasTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
+
+      if (hasTransition) {
+        return true;
+      }
     }
 
     const hasCharacter = await Character.exists({
@@ -60,13 +75,6 @@ export class MovementHelper {
       return true;
     }
 
-    const hasSolid = this.mapSolids.isTileSolid(map, gridX, gridY, layer, strategy);
-    const isPassage = this.mapSolids.isTilePassage(map, gridX, gridY, layer, strategy);
-
-    if (hasSolid && !isPassage) {
-      return true;
-    }
-
     const hasItem = await Item.exists({
       x: FromGridX(gridX),
       y: FromGridY(gridY),
@@ -76,14 +84,6 @@ export class MovementHelper {
 
     if (hasItem) {
       return true;
-    }
-
-    if (caller instanceof NPC) {
-      const hasTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
-
-      if (hasTransition) {
-        return true;
-      }
     }
 
     return false;

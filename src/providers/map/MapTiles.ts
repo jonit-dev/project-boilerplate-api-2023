@@ -1,4 +1,12 @@
-import { ITiledChunk, ITiledLayer, ITileset, MapLayers, TiledLayerNames } from "@rpg-engine/shared";
+import {
+  ITiledChunk,
+  ITiledLayer,
+  ITileset,
+  MapLayers,
+  MAP_LAYERS,
+  MAP_LAYERS_TO_ID,
+  TiledLayerNames,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MapLoader } from "./MapLoader";
 
@@ -39,6 +47,12 @@ export class MapTiles {
   }
 
   public isSolid(map: string, gridX: number, gridY: number, mapLayer: MapLayers): boolean {
+    const areAllLayersTileEmpty = this.areAllLayersTileEmpty(map, gridX, gridY);
+
+    if (areAllLayersTileEmpty) {
+      return true;
+    }
+
     const layerName = TiledLayerNames[mapLayer];
 
     const layer = this.getLayer(map, mapLayer);
@@ -158,6 +172,28 @@ export class MapTiles {
     );
   }
 
+  public areAllLayersTileEmpty(map: string, gridX: number, gridY: number): boolean {
+    for (const layer of MAP_LAYERS) {
+      let tileId;
+
+      try {
+        tileId = this.getTileId(map, gridX, gridY, MAP_LAYERS_TO_ID[layer]);
+
+        if (tileId === undefined) {
+          continue;
+        }
+      } catch (error) {
+        continue;
+      }
+
+      if (tileId >= 0) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   public getTileId(map: string, gridX: number, gridY: number, mapLayer: MapLayers): number | undefined {
     const layerName = TiledLayerNames[mapLayer];
 
@@ -177,8 +213,6 @@ export class MapTiles {
       const tileId = rawTileId! - targetTileset!.firstgid;
 
       return tileId;
-    } else {
-      return 0;
     }
   }
 
