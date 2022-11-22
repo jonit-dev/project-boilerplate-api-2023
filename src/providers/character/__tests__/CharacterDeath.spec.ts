@@ -8,6 +8,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
 import _ from "lodash";
 import { CharacterDeath, DROP_EQUIPMENT_CHANCE } from "../CharacterDeath";
+
 describe("CharacterDeath.ts", () => {
   let characterDeath: CharacterDeath;
   let testCharacter: ICharacter;
@@ -94,7 +95,11 @@ describe("CharacterDeath.ts | Character with items", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
     testNPC = await unitTestHelper.createMockNPC();
-    testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasInventory: true,
+      hasSkills: true,
+    });
 
     characterEquipment = (await Equipment.findById(testCharacter.equipment).populate("inventory").exec()) as IEquipment;
 
