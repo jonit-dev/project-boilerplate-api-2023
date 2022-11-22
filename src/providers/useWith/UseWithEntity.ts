@@ -10,9 +10,22 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IUseWithEntity, UseWithSocketEvents } from "@rpg-engine/shared";
+import {
+  CharacterSocketEvents,
+  ICharacterAttributeChanged,
+  IEquipmentAndInventoryUpdatePayload,
+  IItemContainer,
+  ItemSocketEvents,
+  IUseWithEntity,
+  UseWithSocketEvents,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
+import { IMagicItemUseWithEntity } from "./useWithTypes";
 
 @provide(UseWithEntity)
 export class UseWithEntity {
@@ -21,7 +34,11 @@ export class UseWithEntity {
     private characterValidation: CharacterValidation,
     private movementHelper: MovementHelper,
     private itemValidation: ItemValidation,
-    private socketAuth: SocketAuth
+    private socketAuth: SocketAuth,
+    private characterItemInventory: CharacterItemInventory,
+    private characterWeight: CharacterWeight,
+    private animationEffect: AnimationEffect,
+    private characterItemContainer: CharacterItemContainer
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -126,7 +143,58 @@ export class UseWithEntity {
   }
 
   private async executeEffect(caster: ICharacter, target: ICharacter | INPC, item: IItem): Promise<void> {
-    await Promise.resolve();
+    const blueprint = itemsBlueprintIndex[item.key];
+
+    await blueprint.usableEffect(caster, target);
+    await target.save();
+
+    await this.characterItemInventory.decrementItemFromInventory(item.key, caster, 1);
+    await this.characterWeight.updateCharacterWeight(caster);
+
+    await this.sendRefreshItemsEvent(caster);
+    await this.sendTargetUpdateEvents(caster);
+
+    await this.sendAnimationEvents(caster, target, blueprint as IMagicItemUseWithEntity);
+  }
+
+  private async sendRefreshItemsEvent(character: ICharacter): Promise<void> {
+    const container = (await this.characterItemContainer.getItemContainer(character)) as unknown as IItemContainer;
+
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      inventory: container,
+      openEquipmentSetOnUpdate: false,
+      openInventoryOnUpdate: true,
+    };
+
+    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+      character.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      payloadUpdate
+    );
+  }
+
+  private async sendTargetUpdateEvents(character: ICharacter): Promise<void> {
+    const payload: ICharacterAttributeChanged = {
+      targetId: character._id,
+      health: character.health,
+      mana: character.mana,
+    };
+
+    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(
+      character,
+      CharacterSocketEvents.AttributeChanged,
+      payload
+    );
+  }
+
+  private async sendAnimationEvents(
+    caster: ICharacter,
+    target: ICharacter | INPC,
+    item: IMagicItemUseWithEntity
+  ): Promise<void> {
+    await this.animationEffect.sendAnimationEventToCharacter(caster, item.animationKey, target._id);
   }
 
   private async getEntity(entityId: string, entityType: EntityType): Promise<ICharacter | INPC> {
