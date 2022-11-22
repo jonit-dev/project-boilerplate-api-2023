@@ -13,7 +13,6 @@ import {
   ItemType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 import { EquipmentSlots } from "./EquipmentSlots";
 import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
 
@@ -23,7 +22,6 @@ export type SourceEquipContainerType = "inventory" | "container";
 export class EquipmentEquip {
   constructor(
     private socketMessaging: SocketMessaging,
-    private equipmentHelper: EquipmentRangeUpdate,
     private characterItemInventory: CharacterItemInventory,
     private equipmentSlots: EquipmentSlots,
     private characterValidation: CharacterValidation,
@@ -77,8 +75,6 @@ export class EquipmentEquip {
     };
 
     this.updateItemInventoryCharacter(payloadUpdate, character);
-
-    await this.equipmentHelper.updateCharacterAttackType(character, item as any);
 
     return true;
   }

@@ -19,7 +19,7 @@ import {
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
-import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
+import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
@@ -186,23 +186,22 @@ export class BattleRangedAttack {
   private async getAmmoForRangedAttack(weapon: IItem, equipment: IEquipment): Promise<IRangedAttackParams | undefined> {
     let result: IRangedAttackParams | undefined;
     // Get ranged attack weapons (bow or spear)
-    switch (weapon.subType) {
-      case ItemSubType.Ranged:
-        if (!weapon.requiredAmmoKeys || !weapon.requiredAmmoKeys.length) {
-          return result;
-        }
 
-        result = (await this.getRequiredAmmo(weapon.requiredAmmoKeys, equipment)) as IRangedAttackParams;
+    if (weapon.rangeType === EntityAttackType.Ranged) {
+      if (!weapon.requiredAmmoKeys || !weapon.requiredAmmoKeys.length) {
+        return result;
+      }
 
-        if (!_.isEmpty(result)) {
-          result.maxRange = weapon.maxRange || 0;
-        }
-        break;
+      result = (await this.getRequiredAmmo(weapon.requiredAmmoKeys, equipment)) as IRangedAttackParams;
 
-      case ItemSubType.Spear:
-        result = { location: "hand", id: weapon.id, key: weapon.key, maxRange: weapon.maxRange || 0, equipment };
-        break;
+      if (!_.isEmpty(result)) {
+        result.maxRange = weapon.maxRange || 0;
+      }
     }
+    if (weapon.subType === "Spear") {
+      result = { location: "hand", id: weapon.id, key: weapon.key, maxRange: weapon.maxRange || 0, equipment };
+    }
+
     return result;
   }
 

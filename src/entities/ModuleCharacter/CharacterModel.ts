@@ -147,11 +147,6 @@ const characterSchema = createLeanSchema(
         enum: TypeHelper.enumToStringArray(EntityType),
       }),
     },
-    attackType: Type.string({
-      required: true,
-      enum: TypeHelper.enumToStringArray(EntityAttackType),
-      default: EntityAttackType.Melee,
-    }),
     attackIntervalSpeed: Type.number({
       required: true,
       default: 1000,
@@ -178,6 +173,7 @@ const characterSchema = createLeanSchema(
       speed: number;
       movementIntervalMs: number;
       weapon: Promise<IItem>;
+      attackType: Promise<EntityAttackType>;
     }),
   },
   {
@@ -247,6 +243,32 @@ characterSchema.virtual("inventory").get(async function (this: ICharacter) {
   }
 
   return null;
+});
+
+characterSchema.virtual("attackType").get(async function (this: ICharacter): Promise<EntityAttackType> {
+  const weapon = await this.weapon;
+
+  if (weapon?.subType === "None") {
+    return EntityAttackType.None;
+  }
+
+  if (weapon?.subType === "unarmed") {
+    return EntityAttackType.Melee;
+  }
+
+  if (weapon?.rangeType === "Melee") {
+    return EntityAttackType.Melee;
+  }
+
+  if (weapon?.rangeType === "Ranged" || weapon?.subType === "Ranged") {
+    return EntityAttackType.Ranged;
+  }
+
+  if (weapon?.rangeType === "MeleeRanged") {
+    return EntityAttackType.MeleeRanged;
+  }
+
+  return EntityAttackType.Melee;
 });
 
 characterSchema.virtual("weapon").get(async function (this: ICharacter) {
