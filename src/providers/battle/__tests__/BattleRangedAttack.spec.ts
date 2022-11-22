@@ -14,11 +14,9 @@ import { BattleRangedAttack } from "../BattleRangedAttack";
 describe("BattleRangedAttack.spec.ts", () => {
   let battleRangedAttack: BattleRangedAttack;
   let battleAttackTarget: BattleAttackTarget;
-
   let testNPC: INPC;
   let testCharacter: ICharacter;
   let characterEquipment: IEquipment;
-
   let hitTarget: any;
   let bowItem: IItem;
 
@@ -38,11 +36,13 @@ describe("BattleRangedAttack.spec.ts", () => {
       { attackType: EntityAttackType.Ranged, maxRangeAttack: 7 },
       { hasSkills: true }
     );
+
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasInventory: true,
       hasSkills: true,
     });
+
     await testNPC.populate("skills").execPopulate();
     await testCharacter.populate("skills").execPopulate();
 
@@ -54,8 +54,6 @@ describe("BattleRangedAttack.spec.ts", () => {
     characterEquipment!.rightHand = res._id as Types.ObjectId | undefined;
 
     await characterEquipment!.save();
-
-    testCharacter.attackType = EntityAttackType.Ranged;
 
     testCharacter.x = FromGridX(4);
     testCharacter.y = FromGridY(4);
@@ -185,15 +183,16 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   it("should hit a target if attacker has ranged attack type and target is in range | Spear weapon", async () => {
+    await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
     await equipWithSpear(characterEquipment);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(2);
+    expect(hitTarget).toBeCalledTimes(1);
   });
 
   it("should hit a target | NPC ranged attack ", async () => {
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(3);
+    expect(hitTarget).toBeCalledTimes(2);
   });
 
   it("should hit a target | NPC hybrid attack type", async () => {
@@ -202,7 +201,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 
     // Ranged attack
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(4);
+    expect(hitTarget).toBeCalledTimes(3);
 
     // Melee attack (not passing maxRangeAttack field on purpose to check is doing melee attack)
     testNPC.maxRangeAttack = undefined;
@@ -212,7 +211,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     await testNPC.save();
 
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(5);
+    expect(hitTarget).toBeCalledTimes(4);
   });
 
   it("should hit a target, required ammo and target is in range | with multiple ammo keys", async () => {
@@ -223,12 +222,12 @@ describe("BattleRangedAttack.spec.ts", () => {
     await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(6);
+    expect(hitTarget).toBeCalledTimes(5);
 
     await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Stone);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(7);
+    expect(hitTarget).toBeCalledTimes(6);
   });
 
   afterAll(async () => {
@@ -273,7 +272,6 @@ async function equipArrowInBackpackSlot(equipment: IEquipment): Promise<Types.Ob
     }
   );
   const arrowId = await createItem(RangedWeaponsBlueprint.Arrow);
-
   const slotId = backpackContainer.firstAvailableSlotId;
   backpackContainer.slots[slotId!] = arrowId;
 
