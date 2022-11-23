@@ -64,8 +64,7 @@ export class CharacterItemContainer {
     item: IItem,
     character: ICharacter,
     toContainerId: string,
-    isInventoryItem: boolean = false,
-    fromContainerId?: string
+    isInventoryItem: boolean = false
   ): Promise<boolean> {
     const itemToBeAdded = item;
 
