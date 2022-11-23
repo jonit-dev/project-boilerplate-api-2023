@@ -42,17 +42,20 @@ export class BattleAttackTarget {
     private questSystem: QuestSystem
   ) {}
 
-  public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
-    switch (attacker?.attackType) {
+  public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
+    switch (await attacker?.attackType) {
       case EntityAttackType.Melee: {
         const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1);
 
         if (isUnderMeleeRange) {
           await this.hitTarget(attacker, target);
+
+          return true;
         }
 
         break;
       }
+
       case EntityAttackType.Ranged:
         const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
 
@@ -62,6 +65,8 @@ export class BattleAttackTarget {
 
           if (attacker.type === "Character") {
             await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
+
+            return true;
           }
         }
         break;
@@ -79,15 +84,23 @@ export class BattleAttackTarget {
 
         if (isUnderMeleeRange) {
           await this.hitTarget(attacker, target);
+
+          return true;
         } else {
           const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
 
           if (rangedAttackParams) {
             await this.hitTarget(attacker, target);
             await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+
+            return true;
           }
         }
         break;
+      }
+
+      default: {
+        return false;
       }
     }
 
@@ -119,7 +132,11 @@ export class BattleAttackTarget {
         const npc = attacker as INPC;
         await this.npcTarget.tryToClearOutOfRangeTargets(npc);
       }
+
+      return false;
     }
+
+    return true;
   }
 
   private async hitTarget(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
@@ -138,7 +155,6 @@ export class BattleAttackTarget {
 
     if (battleEvent === BattleEventType.Hit) {
       const damage = await this.battleEvent.calculateHitDamage(attacker, target);
-
       if (damage > 0) {
         // Increase attacker SP for weapon used and XP (if is character)
         if (attacker.type === "Character") {

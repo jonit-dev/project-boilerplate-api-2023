@@ -31,7 +31,16 @@ import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
-import { itemMock, itemMockArmor, itemTwoHandedMock, stackableGoldCoinMock, stackableItemMock } from "./mock/itemMock";
+import {
+  itemMock,
+  itemMockArmor,
+  itemTwoHandedMock,
+  stackableGoldCoinMock,
+  stackableItemMock,
+  itemMockShield,
+  itemMockBow,
+  itemMeleeRangedMock,
+} from "./mock/itemMock";
 import { questInteractionObjectiveMock, questKillObjectiveMock, questMock, questRewardsMock } from "./mock/questMock";
 import { userMock } from "./mock/userMock";
 
@@ -187,9 +196,44 @@ export class UnitTestHelper {
     return newItem;
   }
 
+  public async createItemBow(extraProps?: Partial<IItem>): Promise<IItem> {
+    const itemBow = new Item({
+      ...itemMockBow,
+      ...extraProps,
+      _id: undefined,
+    });
+
+    await itemBow.save();
+
+    return itemBow;
+  }
+
+  public async createItemMeleeRanged(extraProps?: Partial<IItem>): Promise<IItem> {
+    const itemMeleeRanged = new Item({
+      ...itemMeleeRangedMock,
+      ...extraProps,
+      _id: undefined,
+    });
+
+    await itemMeleeRanged.save();
+
+    return itemMeleeRanged;
+  }
+
   public async createMockItemTwoHanded(extraProps?: Partial<IItem>): Promise<IItem> {
-    const newItem = new Item({
+    const itemTwoHanded = new Item({
       ...itemTwoHandedMock,
+      ...extraProps,
+    });
+
+    await itemTwoHanded.save();
+
+    return itemTwoHanded;
+  }
+
+  public async createMockArmor(extraProps?: Partial<IItem>): Promise<IItem> {
+    const newItem = new Item({
+      ...itemMockArmor,
       ...extraProps,
     });
 
@@ -198,9 +242,9 @@ export class UnitTestHelper {
     return newItem;
   }
 
-  public async createMockArmor(extraProps?: Partial<IItem>): Promise<IItem> {
+  public async createMockShield(extraProps?: Partial<IItem>): Promise<IItem> {
     const newItem = new Item({
-      ...itemMockArmor,
+      ...itemMockShield,
       ...extraProps,
     });
 
@@ -319,11 +363,19 @@ export class UnitTestHelper {
       attack: 5,
     });
 
+    const itemLeftHand = new Item({
+      ...itemMockBow,
+      ...extraProps,
+      _id: undefined,
+    });
+
     await itemHead.save();
     await itemNeck.save();
+    await itemLeftHand.save();
 
     equipment.head = itemHead._id;
     equipment.neck = itemNeck._id;
+    equipment.leftHand = itemLeftHand._id;
 
     return await equipment.save();
   }

@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterFactions, LifeBringerRaces } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { Types } from "mongoose";
 
 export const characterMock: Partial<ICharacter> = {
@@ -15,7 +14,6 @@ export const characterMock: Partial<ICharacter> = {
   textureKey: "kid-1",
   totalWeightCapacity: 100,
   isOnline: true,
-  attackType: EntityAttackType.Melee,
   scene: "example",
   initialScene: "example",
   name: "Test Character",

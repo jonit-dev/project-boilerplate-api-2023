@@ -40,7 +40,7 @@ export class BattleCharacterManager {
     );
   }
 
-  public async attackTarget(character: ICharacter, target: ICharacter | INPC): Promise<boolean | undefined> {
+  public async attackTarget(character: ICharacter, target: ICharacter | INPC): Promise<boolean> {
     try {
       const canAttack = await this.canAttack(character, target);
 
@@ -52,11 +52,16 @@ export class BattleCharacterManager {
         throw new Error("Failed to find character");
       }
 
-      await this.battleAttackTarget.checkRangeAndAttack(character, target);
+      const checkRangeAndAttack = await this.battleAttackTarget.checkRangeAndAttack(character, target);
 
-      return true;
+      if (checkRangeAndAttack) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (err) {
       console.error(err);
+      return false;
     }
   }
 

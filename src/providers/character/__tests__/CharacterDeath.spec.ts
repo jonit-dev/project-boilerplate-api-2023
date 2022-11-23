@@ -1,13 +1,14 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
+import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import _ from "lodash";
 import { CharacterDeath, DROP_EQUIPMENT_CHANCE } from "../CharacterDeath";
+
 describe("CharacterDeath.ts", () => {
   let characterDeath: CharacterDeath;
   let testCharacter: ICharacter;
@@ -15,7 +16,6 @@ describe("CharacterDeath.ts", () => {
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
-
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
   });
 
@@ -93,8 +93,13 @@ describe("CharacterDeath.ts | Character with items", () => {
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
+
     testNPC = await unitTestHelper.createMockNPC();
-    testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasInventory: true,
+      hasSkills: true,
+    });
 
     characterEquipment = (await Equipment.findById(testCharacter.equipment).populate("inventory").exec()) as IEquipment;
 
@@ -102,6 +107,7 @@ describe("CharacterDeath.ts | Character with items", () => {
     const equipment = await unitTestHelper.createEquipment();
     characterEquipment.head = equipment.neck;
     characterEquipment.neck = equipment.head;
+    characterEquipment.leftHand = equipment.leftHand;
     await characterEquipment.save();
 
     // Add items to character's backpack
@@ -193,7 +199,33 @@ describe("CharacterDeath.ts | Character with items", () => {
     expect(bodyItemContainer!.slots).toBeDefined();
     expect(bodyItemContainer!.slots[0]).not.toBeNull();
     expect(bodyItemContainer!.slots[1]).not.toBeNull();
-    expect(bodyItemContainer!.slots[2]).toBeNull();
+    expect(bodyItemContainer!.slots[2]).not.toBeNull();
+  });
+
+  it("should update the attack type after dead and drop Bow, Ranged to Melee", async () => {
+    // @ts-ignore
+    const characterBody = (await characterDeath.generateCharacterBody(testCharacter)) as IItem;
+    const bodyItemContainer = (await ItemContainer.findById(characterBody.itemContainer)) as IItemContainer;
+
+    expect(characterEquipment.leftHand).toBeDefined();
+
+    const characterAttackTypeBeforeEquip = await Character.findById({ _id: testCharacter._id });
+
+    expect(await characterAttackTypeBeforeEquip?.attackType).toEqual(EntityAttackType.Ranged);
+
+    for (let i = 0; i < 3; i++) {
+      jest.spyOn(_, "random").mockImplementation(() => DROP_EQUIPMENT_CHANCE);
+      // @ts-ignore
+      await characterDeath.dropEquippedItemOnBody(bodyItemContainer, characterEquipment);
+    }
+
+    const updatedEquipment = (await Equipment.findById(characterEquipment._id)) as IEquipment;
+
+    expect(updatedEquipment.leftHand).not.toBeDefined();
+
+    const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
+
+    expect(await characterAttackTypeAfterEquip?.attackType).toEqual(EntityAttackType.Melee);
   });
 
   afterAll(async () => {

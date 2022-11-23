@@ -40,7 +40,7 @@ describe("EquipmentTwoHanded.spec.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
 
     item = (await unitTestHelper.createMockItem({ x: 10, y: 10 })) as unknown as IItem;
-    itemTwoHanded = (await unitTestHelper.createMockItemTwoHanded({ x: 10, y: 10 })) as unknown as IItem;
+    itemTwoHanded = (await unitTestHelper.createMockItemTwoHanded()) as unknown as IItem;
     testCharacter = await unitTestHelper.createMockCharacter(
       { x: 10, y: 20 },
       { hasEquipment: true, hasInventory: true, hasSkills: true }

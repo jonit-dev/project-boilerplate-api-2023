@@ -59,7 +59,10 @@ const simpleTestCases: TestCase[] = [
 ];
 
 describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
-  let skillIncrease: SkillIncrease, skills: ISkill, initialLevel: number, spToLvl2: number;
+  let skillIncrease: SkillIncrease;
+  let skills: ISkill;
+  let initialLevel: number;
+  let spToLvl2: number;
 
   beforeAll(() => {
     skillIncrease = container.get<SkillIncrease>(SkillIncrease);
