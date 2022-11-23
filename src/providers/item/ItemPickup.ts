@@ -1,57 +1,43 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
-import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
-import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
-import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemPickup, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemOwnership } from "./ItemOwnership";
 import { ItemView } from "./ItemView";
 
-import { MapHelper } from "@providers/map/MapHelper";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemPickupFromContainer } from "./ItemPickup/ItemPickupFromContainer";
+import { ItemPickupValidator } from "./ItemPickup/ItemPickupValidator";
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(
     private socketMessaging: SocketMessaging,
-    private movementHelper: MovementHelper,
     private characterWeight: CharacterWeight,
     private itemView: ItemView,
-    private characterValidation: CharacterValidation,
-    private characterItems: CharacterItems,
-    private characterItemSlots: CharacterItemSlots,
+
     private characterItemContainer: CharacterItemContainer,
     private equipmentSlots: EquipmentSlots,
     private itemOwnership: ItemOwnership,
-    private mapHelper: MapHelper,
-    private itemPickupFromContainer: ItemPickupFromContainer
+    private itemPickupFromContainer: ItemPickupFromContainer,
+    private itemPickupValidator: ItemPickupValidator
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
-    const itemToBePicked = (await Item.findById(itemPickupData.itemId)) as unknown as IItem;
+    const inventory = await character.inventory;
+    const itemToBePicked = (await this.itemPickupValidator.isItemPickupValid(itemPickupData, character)) as IItem;
 
     if (!itemToBePicked) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the item to be picked up was not found.");
       return false;
     }
 
-    const inventory = await character.inventory;
     const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
-    const isPickupValid = await this.isItemPickupValid(itemToBePicked, itemPickupData, character, isInventoryItem);
 
     const isMapContainer =
       itemToBePicked.x !== undefined && itemToBePicked.y !== undefined && itemToBePicked.scene !== undefined;
-
-    if (!isPickupValid) {
-      return false;
-    }
 
     itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
     await itemToBePicked.save();
@@ -139,105 +125,6 @@ export class ItemPickup {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       payloadUpdate
     );
-  }
-
-  private async isItemPickupValid(
-    item: IItem,
-    itemPickupData: IItemPickup,
-    character: ICharacter,
-    isInventoryItem: boolean
-  ): Promise<Boolean> {
-    if (isInventoryItem) {
-      // validate if equipment container exists
-      const equipmentContainer = await Equipment.findById(character.equipment);
-
-      if (!equipmentContainer) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment container not found");
-        return false;
-      }
-    }
-
-    const inventory = await character.inventory;
-
-    if (!inventory && !item.isItemContainer && !isInventoryItem) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you need an inventory to pick this item.");
-      return false;
-    }
-
-    if (!item.isItemContainer) {
-      const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(itemPickupData.toContainerId, item);
-
-      if (!hasAvailableSlot) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your container is full.");
-        return false;
-      }
-    }
-
-    const isItemOnMap =
-      this.mapHelper.isCoordinateValid(item.x) && this.mapHelper.isCoordinateValid(item.y) && item.scene;
-
-    if (isItemOnMap) {
-      if (character.scene !== item.scene) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can't pick up items from another map.");
-        return false;
-      }
-    }
-
-    const weight = await this.characterWeight.getWeight(character);
-    const maxWeight = await this.characterWeight.getMaxWeight(character);
-
-    const ratio = (weight + item.weight) / maxWeight;
-
-    if (ratio > 4) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you are already carrying too much weight!");
-      return false;
-    }
-
-    if (!item.isStorable) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot store this item.");
-      return false;
-    }
-
-    if (item.x !== undefined && item.y !== undefined && item.scene !== undefined) {
-      const underRange = this.movementHelper.isUnderRange(
-        character.x,
-        character.y,
-        itemPickupData.x,
-        itemPickupData.y,
-        2
-      );
-      if (!underRange) {
-        this.socketMessaging.sendErrorMessageToCharacter(
-          character,
-          "Sorry, you are too far away to pick up this item."
-        );
-        return false;
-      }
-    }
-
-    if (!isItemOnMap) {
-      // if item is not on the map
-
-      if (item.owner && item.owner !== character._id.toString()) {
-        // check if item is owned by someone else
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not yours.");
-        return false;
-      }
-    }
-
-    // if item is not a container, we can proceed
-
-    const characterAlreadyHasItem = await this.characterItems.hasItem(
-      item._id,
-      character,
-      isInventoryItem ? "equipment" : "inventory"
-    );
-    if (characterAlreadyHasItem) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you already have this item.");
-      return false;
-    }
-
-    return this.characterValidation.hasBasicValidation(character);
   }
 
   public getAllowedItemTypes(): ItemType[] {
