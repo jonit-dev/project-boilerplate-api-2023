@@ -67,7 +67,7 @@ describe("BattleRangedAttack.spec.ts", () => {
   it("character does not have required ammo", async () => {
     // @ts-ignore
     const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(
-      await testCharacter.weapon,
+      (await testCharacter.weapon) as unknown as IItem,
       characterEquipment
     );
 
@@ -78,7 +78,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     const arrowId = await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
     // @ts-ignore
     const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(
-      await testCharacter.weapon,
+      (await testCharacter.weapon) as unknown as IItem,
       characterEquipment
     );
 

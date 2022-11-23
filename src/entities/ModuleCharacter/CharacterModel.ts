@@ -172,7 +172,7 @@ const characterSchema = createLeanSchema(
       inventory: Promise<IItem>;
       speed: number;
       movementIntervalMs: number;
-      weapon: Promise<IItem>;
+      weapon: Promise<IItem | undefined>;
       attackType: Promise<EntityAttackType>;
     }),
   },
@@ -248,34 +248,20 @@ characterSchema.virtual("inventory").get(async function (this: ICharacter) {
 characterSchema.virtual("attackType").get(async function (this: ICharacter): Promise<EntityAttackType> {
   const weapon = await this.weapon;
 
-  if (weapon?.subType === "None") {
-    return EntityAttackType.None;
-  }
-
-  if (weapon?.subType === "unarmed") {
+  if (!weapon) {
     return EntityAttackType.Melee;
   }
 
-  if (weapon?.rangeType === "Melee") {
-    return EntityAttackType.Melee;
-  }
+  const rangeType = weapon?.rangeType as unknown as EntityAttackType;
 
-  if (weapon?.rangeType === "Ranged" || weapon?.subType === "Ranged") {
-    return EntityAttackType.Ranged;
-  }
-
-  if (weapon?.rangeType === "MeleeRanged") {
-    return EntityAttackType.MeleeRanged;
-  }
-
-  return EntityAttackType.Melee;
+  return rangeType;
 });
 
-characterSchema.virtual("weapon").get(async function (this: ICharacter) {
+characterSchema.virtual("weapon").get(async function (this: ICharacter): Promise<IItem | undefined> {
   const equipment = (await Equipment.findById(this.equipment)) as IEquipment;
 
   if (!equipment) {
-    return { subType: "unarmed" } as IItem;
+    return undefined;
   }
   // Get right and left hand items
   // What if has weapons on both hands? for now, only one weapon per character is allowed
@@ -290,9 +276,6 @@ characterSchema.virtual("weapon").get(async function (this: ICharacter) {
   if (leftHandItem?.type === ItemType.Weapon && leftHandItem?.subType !== ItemSubType.Shield) {
     return leftHandItem;
   }
-
-  // If user has no weapons return unarmed
-  return { subType: "unarmed" } as IItem;
 });
 
 characterSchema.post("remove", async function (this: ICharacter) {

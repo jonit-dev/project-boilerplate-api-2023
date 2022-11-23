@@ -39,7 +39,7 @@ export enum BasicAttribute {
 }
 
 const SkillsMap = new Map<ItemSubType | string, string>([
-  ["unarmed", CombatSkill.First],
+  ["None", CombatSkill.First],
   [ItemSubType.Sword, CombatSkill.Sword],
   [ItemSubType.Dagger, CombatSkill.Dagger],
   [ItemSubType.Axe, CombatSkill.Axe],
@@ -92,7 +92,9 @@ export class SkillIncrease {
       throw new Error(`equipment not found for character ${attacker.id}`);
     }
 
-    const increasedWeaponSP = this.increaseSP(skills, (await attacker.weapon).subType);
+    const weapon = await attacker.weapon;
+
+    const increasedWeaponSP = this.increaseSP(skills, weapon?.subType || "None");
     const increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
     await this.updateSkills(skills, attacker);
 

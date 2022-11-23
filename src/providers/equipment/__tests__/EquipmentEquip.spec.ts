@@ -158,7 +158,7 @@ describe("EquipmentEquip.spec.ts", () => {
       const characterAttackType = await Character.findById({ _id: testCharacter._id });
 
       expect(await characterAttackType?.attackType).toEqual(EntityAttackType.Melee);
-      expect(await characterAttackType?.weapon).toEqual({ subType: "unarmed" });
+      expect(await characterAttackType?.weapon).toBeUndefined();
     });
   });
 });
