@@ -103,6 +103,27 @@ export class CharacterItemInventory {
     return await this.removeItemFromInventory(item._id, character);
   }
 
+  public async checkItemInInventoryByKey(itemKey: string, character: ICharacter): Promise<boolean> {
+    const inventory = (await character.inventory) as unknown as IItem;
+
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
+
+    if (!inventoryItemContainer) {
+      return false;
+    }
+
+    for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
+      const slotItem = inventoryItemContainer.slots[i] as unknown as IItem;
+      if (!slotItem) continue;
+
+      if (isSameKey(slotItem.key, itemKey)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public async checkItemInInventory(itemId: string, character: ICharacter): Promise<boolean> {
     const inventory = (await character.inventory) as unknown as IItem;
 
