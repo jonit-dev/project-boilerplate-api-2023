@@ -3,7 +3,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ITEM_USE_WITH_ENTITY_GRID_CELL_RANGE } from "@providers/constants/ItemConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -45,34 +45,33 @@ describe("UseWithEntityValidation.ts", () => {
   };
 
   const prepareData = async () => {
-    testCharacter = await (
-      await unitTestHelper.createMockCharacter(
-        {
-          x: 10,
-          y: 11,
-        },
-        { hasEquipment: true, hasInventory: true, hasSkills: true }
-      )
-    )
-      .populate("skills")
-      .execPopulate();
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasInventory: true,
+      hasSkills: true,
+    });
 
-    targetCharacter = await unitTestHelper.createMockCharacter(
-      {
-        x: 11,
-        y: 12,
-      },
-      { hasEquipment: true, hasInventory: true, hasSkills: true }
-    );
+    targetCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasInventory: true,
+      hasSkills: true,
+    });
 
-    testNPC = await unitTestHelper.createMockNPC(
-      {
-        x: 15,
-        y: 15,
-      },
-      null,
-      NPCMovementType.Stopped
-    );
+    await testCharacter.populate("skills").execPopulate();
+
+    testCharacter.x = 10;
+    testCharacter.y = 11;
+    await testCharacter.save();
+
+    targetCharacter.x = 11;
+    targetCharacter.y = 12;
+    await targetCharacter.save();
+
+    testNPC = await unitTestHelper.createMockNPC(null, null, NPCMovementType.Stopped);
+
+    testNPC.x = 15;
+    testNPC.y = 15;
+    await testNPC.save();
 
     inventory = await testCharacter.inventory;
     inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
@@ -527,7 +526,129 @@ describe("UseWithEntityValidation.ts", () => {
     });
   });
 
+  it("should successfully use dark rune on target character", async () => {
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
+    expect(target.health).toBe(100);
+    expect(target.mana).toBe(90);
+  });
+
+  it("should successfully use poison rune on target character", async () => {
+    const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.PoisonRune)];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    await useWithEntity.execute(
+      {
+        itemId: items[0]._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
+    expect(target.health).toBe(90);
+    expect(target.mana).toBe(100);
+  });
+
+  it("should successfully use fire rune on target character", async () => {
+    const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.FireRune)];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    await useWithEntity.execute(
+      {
+        itemId: items[0]._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
+    expect(target.health).toBe(90);
+    expect(target.mana).toBe(100);
+  });
+
+  it("should successfully use heal rune on target character", async () => {
+    const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.HealRune)];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    targetCharacter.health = 50;
+    await targetCharacter.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: items[0]._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
+    expect(target.health).toBe(60);
+    expect(target.mana).toBe(100);
+  });
+
+  it("should deal extra damage depending on magic level", async () => {
+    characterSkills.magic.level = 12;
+    await characterSkills.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
+    expect(target.health).toBe(100);
+    expect(target.mana).toBe(89);
+  });
+
+  it("should successfully use fire rune on target npc", async () => {
+    const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.FireRune)];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    await useWithEntity.execute(
+      {
+        itemId: items[0]._id,
+        entityId: testNPC._id,
+        entityType: EntityType.NPC,
+      },
+      testCharacter
+    );
+
+    const target = (await NPC.findOne({ _id: testNPC._id })) as unknown as INPC;
+    expect(target.health).toBe(90);
+  });
+
   afterAll(async () => {
+    /**
+     * CharacterView.getOtherElementsInView when used with .lean({virtuals true})
+     * causes a little slow down and if we close the connection right after the test
+     * the test starts failing with connection closed error
+     */
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 500);
+    });
+
     await unitTestHelper.afterAllJestHook();
   });
 });
