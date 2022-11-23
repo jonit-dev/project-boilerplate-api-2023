@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
@@ -16,6 +16,7 @@ import { ItemOwnership } from "./ItemOwnership";
 import { ItemView } from "./ItemView";
 
 import { MapHelper } from "@providers/map/MapHelper";
+import { ItemPickupFromContainer } from "./ItemPickup/ItemPickupFromContainer";
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(
@@ -29,7 +30,8 @@ export class ItemPickup {
     private characterItemContainer: CharacterItemContainer,
     private equipmentSlots: EquipmentSlots,
     private itemOwnership: ItemOwnership,
-    private mapHelper: MapHelper
+    private mapHelper: MapHelper,
+    private itemPickupFromContainer: ItemPickupFromContainer
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
@@ -55,20 +57,13 @@ export class ItemPickup {
     await itemToBePicked.save();
 
     if (itemPickupData.fromContainerId && !isMapContainer) {
-      const fromContainer = (await ItemContainer.findById(itemPickupData.fromContainerId)) as unknown as IItemContainer;
+      const pickupFromContainer = await this.itemPickupFromContainer.pickupFromContainer(
+        itemPickupData,
+        itemToBePicked,
+        character
+      );
 
-      if (!fromContainer) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the origin container was not found.");
-        return false;
-      }
-
-      const removeFromOriginContainer = await this.removeFromOriginContainer(character, fromContainer, itemToBePicked);
-
-      if (!removeFromOriginContainer) {
-        this.socketMessaging.sendErrorMessageToCharacter(
-          character,
-          "Sorry, failed to remove the item from the origin container."
-        );
+      if (!pickupFromContainer) {
         return false;
       }
     }
@@ -253,23 +248,5 @@ export class ItemPickup {
     }
 
     return allowedItemTypes;
-  }
-
-  private async removeFromOriginContainer(
-    character: ICharacter,
-    fromContainer: IItemContainer,
-    itemToBeRemoved: IItem
-  ): Promise<boolean> {
-    const wasRemoved = await this.characterItemSlots.deleteItemOnSlot(fromContainer, itemToBeRemoved._id);
-
-    if (!wasRemoved) {
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        "Sorry, failed to remove the item from the origin container."
-      );
-      return false;
-    }
-
-    return true;
   }
 }
