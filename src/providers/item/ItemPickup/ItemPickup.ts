@@ -6,13 +6,13 @@ import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemPickup, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ItemOwnership } from "./ItemOwnership";
-import { ItemView } from "./ItemView";
+import { ItemOwnership } from "../ItemOwnership";
+import { ItemView } from "../ItemView";
 
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemPickupFromContainer } from "./ItemPickup/ItemPickupFromContainer";
-import { ItemPickupMapContainer } from "./ItemPickup/ItemPickupMapContainer";
-import { ItemPickupValidator } from "./ItemPickup/ItemPickupValidator";
+import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
+import { ItemPickupMapContainer } from "./ItemPickupMapContainer";
+import { ItemPickupValidator } from "./ItemPickupValidator";
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(

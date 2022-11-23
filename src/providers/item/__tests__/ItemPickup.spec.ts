@@ -8,7 +8,7 @@ import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { ContainersBlueprint } from "../data/types/itemsBlueprintTypes";
-import { ItemPickup } from "../ItemPickup";
+import { ItemPickup } from "../ItemPickup/ItemPickup";
 
 describe("ItemPickup.ts", () => {
   let itemPickup: ItemPickup;
