@@ -70,7 +70,7 @@ export class BattleRangedAttack {
         throw new Error(`equipment not found for character ${character.id}`);
       }
 
-      rangedAttackParams = await this.getAmmoForRangedAttack(await character.weapon, equipment);
+      rangedAttackParams = await this.getAmmoForRangedAttack((await character.weapon) as unknown as IItem, equipment);
       if (!rangedAttackParams) {
         this.sendNoAmmoEvent(character, target);
         return;
