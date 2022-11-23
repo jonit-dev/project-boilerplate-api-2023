@@ -11,6 +11,7 @@ import { ItemView } from "./ItemView";
 
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemPickupFromContainer } from "./ItemPickup/ItemPickupFromContainer";
+import { ItemPickupMapContainer } from "./ItemPickup/ItemPickupMapContainer";
 import { ItemPickupValidator } from "./ItemPickup/ItemPickupValidator";
 @provide(ItemPickup)
 export class ItemPickup {
@@ -23,7 +24,8 @@ export class ItemPickup {
     private equipmentSlots: EquipmentSlots,
     private itemOwnership: ItemOwnership,
     private itemPickupFromContainer: ItemPickupFromContainer,
-    private itemPickupValidator: ItemPickupValidator
+    private itemPickupValidator: ItemPickupValidator,
+    private itemPickupMapContainer: ItemPickupMapContainer
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
@@ -35,14 +37,13 @@ export class ItemPickup {
     }
 
     const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
-
-    const isMapContainer =
+    const isPickupFromMapContainer =
       itemToBePicked.x !== undefined && itemToBePicked.y !== undefined && itemToBePicked.scene !== undefined;
 
     itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
     await itemToBePicked.save();
 
-    if (itemPickupData.fromContainerId && !isMapContainer) {
+    if (itemPickupData.fromContainerId && !isPickupFromMapContainer) {
       const pickupFromContainer = await this.itemPickupFromContainer.pickupFromContainer(
         itemPickupData,
         itemToBePicked,
@@ -70,28 +71,28 @@ export class ItemPickup {
     await this.characterWeight.updateCharacterWeight(character);
 
     // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
-    if (isMapContainer) {
-      // If an item has a x, y and scene, it means its coming from a map pickup. So we should destroy its representation and warn other characters nearby.
-      const itemRemovedFromMap = await this.itemView.removeItemFromMap(itemToBePicked);
+    if (isPickupFromMapContainer) {
+      const pickupFromMap = await this.itemPickupMapContainer.pickupFromMapContainer(itemToBePicked, character);
 
-      if (!itemRemovedFromMap) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, failed to remove item from map.");
+      if (!pickupFromMap) {
         return false;
       }
-    } else {
-      if (!itemPickupData.fromContainerId && !isInventoryItem) {
+    }
+
+    if (!isInventoryItem) {
+      if (!itemPickupData.fromContainerId && !isInventoryItem && !isPickupFromMapContainer) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
           "Sorry, failed to remove item from container. Origin container not found."
         );
         return false;
       }
-    }
 
-    if (!isInventoryItem) {
       // if the origin container is a MapContainer so should update the char inventory
       //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
-      const containerToUpdateId = isMapContainer ? itemPickupData.toContainerId : itemPickupData.fromContainerId;
+      const containerToUpdateId = isPickupFromMapContainer
+        ? itemPickupData.toContainerId
+        : itemPickupData.fromContainerId;
       const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as any;
 
       if (!updatedContainer) {
