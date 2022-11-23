@@ -14,6 +14,7 @@ import _ from "lodash";
 import { Types } from "mongoose";
 import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
+import { CharacterWeight } from "./CharacterWeight";
 
 export const DROP_EQUIPMENT_CHANCE = 30; // there's a 30% chance of dropping any of the equipped items
 export const DROPPABLE_EQUIPMENT = [
@@ -35,7 +36,8 @@ export class CharacterDeath {
     private characterTarget: CharacterTarget,
     private npcTarget: NPCTarget,
     private characterInventory: CharacterInventory,
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private characterWeight: CharacterWeight
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter, character: ICharacter): Promise<void> {
@@ -69,6 +71,7 @@ export class CharacterDeath {
     await this.dropCharacterItemsOnBody(characterBody, character.equipment);
 
     await this.respawnCharacter(character);
+    await this.characterWeight.updateCharacterWeight(character);
 
     // finally, force disconnect character that is dead.
     this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, dataOfCharacterDeath);

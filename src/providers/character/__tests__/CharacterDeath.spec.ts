@@ -3,7 +3,6 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -96,14 +95,11 @@ describe("CharacterDeath.ts | Character with items", () => {
     await unitTestHelper.beforeEachJestHook(true);
 
     testNPC = await unitTestHelper.createMockNPC();
-
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasInventory: true,
       hasSkills: true,
     });
-
-    await testCharacter.populate("skills").execPopulate();
 
     characterEquipment = (await Equipment.findById(testCharacter.equipment).populate("inventory").exec()) as IEquipment;
 

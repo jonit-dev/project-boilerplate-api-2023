@@ -82,10 +82,36 @@ itemSchema.virtual("isEquipable").get(function (this: IItem) {
   return this.allowedEquipSlotType && this.allowedEquipSlotType.length > 0;
 });
 
-itemSchema.virtual("fullDescription").get(function (this: IItem) {
-  return `${
-    this.name
-  }: ${this.description}${this.type === ItemType.Weapon ? ` Attack: ${this.attack}. Defense: ${this.defense}.` : ""}${this.weight ? ` Weight: ${this.weight}.` : ""}`;
+itemSchema.virtual("fullDescription").get(function (this: IItem): string {
+  let message: string = "";
+
+  if (!this.attack && this.defense && this.weight) {
+    message = `${this.name}: ${this.description}${` Defense: ${this.defense}. Weight: ${this.weight}.`}`;
+
+    return message;
+  }
+
+  if (this.attack && !this.defense && this.weight) {
+    message = `${this.name}: ${this.description}${` Attack: ${this.attack}. Weight: ${this.weight}.`}`;
+
+    return message;
+  }
+
+  if (!this.attack && !this.defense && this.weight) {
+    message = `${this.name}: ` + `${this.description}` + `${this.weight ? ` Weight: ${this.weight}.` : ""}`;
+
+    return message;
+  }
+
+  if (this.attack && this.defense && this.weight) {
+    message = `${this.name}: ${
+      this.description
+    }${` Attack: ${this.attack}. Defense: ${this.defense}. Weight: ${this.weight}.`}`;
+
+    return message;
+  }
+
+  return message;
 });
 
 const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"): Promise<void> => {

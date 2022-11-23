@@ -3,11 +3,13 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { unitTestHelper } from "@providers/inversify/container";
+import { itemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 
 describe("ItemModel.ts", () => {
   let testCharacter: ICharacter;
   let testItem: IItem;
+  let testItemArmor: IItem;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -25,14 +27,57 @@ describe("ItemModel.ts", () => {
       scene: testCharacter.scene,
       isItemContainer: true,
     });
+
+    testItemArmor = await unitTestHelper.createMockArmor({
+      x: FromGridX(0),
+      y: FromGridY(0),
+      scene: testCharacter.scene,
+      isItemContainer: true,
+    });
   });
 
-  it("validate isEquipable, isStackable and fullDescription Item fields", () => {
+  it("validate isEquipable, isStackable and fullDescription Item fields [ Attack/Defense/Weight ]", () => {
+    const testItem = new Item({
+      ...itemMock,
+      _id: undefined,
+      defense: 10,
+      attack: 8,
+    });
+
     expect(testItem.isEquipable).toBeTruthy();
     expect(testItem.maxStackSize > 1).toBeFalsy();
     expect(testItem.fullDescription).toBe(
       `${testItem.name}: ${testItem.description} Attack: ${testItem.attack}. Defense: ${testItem.defense}. Weight: ${testItem.weight}.`
     );
+  });
+
+  it("validate isEquipable, isStackable and fullDescription Item fields [ Defense/Weight ]", () => {
+    expect(testItemArmor.isEquipable).toBeTruthy();
+    expect(testItemArmor.maxStackSize > 1).toBeFalsy();
+    expect(testItemArmor.fullDescription).toBe(
+      `${testItemArmor.name}: ${testItemArmor.description} Defense: ${testItemArmor.defense}. Weight: ${testItemArmor.weight}.`
+    );
+  });
+
+  it("validate isEquipable, isStackable and fullDescription Item fields [ Attack/Weight ]", () => {
+    expect(testItem.isEquipable).toBeTruthy();
+    expect(testItem.maxStackSize > 1).toBeFalsy();
+    expect(testItem.fullDescription).toBe(
+      `${testItem.name}: ${testItem.description} Attack: ${testItem.attack}. Weight: ${testItem.weight}.`
+    );
+  });
+
+  it("validate isEquipable, isStackable and fullDescription Item fields [ Weight ]", () => {
+    const testItem = new Item({
+      ...itemMock,
+      _id: undefined,
+      attack: undefined,
+      defense: undefined,
+    });
+
+    expect(testItem.isEquipable).toBeTruthy();
+    expect(testItem.maxStackSize > 1).toBeFalsy();
+    expect(testItem.fullDescription).toBe(`${testItem.name}: ${testItem.description} Weight: ${testItem.weight}.`);
   });
 
   it("validate isEquipable, isStackable and fullDescription Item fields | stackable item", async () => {
