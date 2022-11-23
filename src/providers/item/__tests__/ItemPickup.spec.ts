@@ -6,18 +6,15 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { itemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
-import { Types } from "mongoose";
-import { BodiesBlueprint, ContainersBlueprint, OthersBlueprint } from "../data/types/itemsBlueprintTypes";
-import { ItemPickup } from "../ItemPickup";
+import { ContainersBlueprint } from "../data/types/itemsBlueprintTypes";
+import { ItemPickup } from "../ItemPickup/ItemPickup";
 
 describe("ItemPickup.ts", () => {
   let itemPickup: ItemPickup;
   let testCharacter: ICharacter;
   let testItem: IItem;
   let inventory: IItem;
-  let sendErrorMessageToCharacter: jest.SpyInstance;
   let inventoryItemContainerId: string;
   let characterWeight: CharacterWeight;
   let equipmentSlots: EquipmentSlots;
@@ -33,7 +30,7 @@ describe("ItemPickup.ts", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
-    testCharacter = await await unitTestHelper.createMockCharacter(null, {
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasInventory: true,
       hasSkills: true,
@@ -46,9 +43,6 @@ describe("ItemPickup.ts", () => {
     testCharacter.y = FromGridY(0);
     await testCharacter.save();
     await testItem.save();
-
-    // @ts-ignore
-    sendErrorMessageToCharacter = jest.spyOn(itemPickup.socketMessaging, "sendErrorMessageToCharacter" as any);
   });
 
   const pickupItem = async (
@@ -103,9 +97,9 @@ describe("ItemPickup.ts", () => {
       throw new Error("Failed to find item after pickup!");
     }
 
-    expect(item.x).toBeNull();
-    expect(item.y).toBeNull();
-    expect(item.scene).toBeNull();
+    expect(item.x).toBeUndefined();
+    expect(item.y).toBeUndefined();
+    expect(item.scene).toBeUndefined();
 
     const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
 
@@ -127,22 +121,6 @@ describe("ItemPickup.ts", () => {
 
     const newMaxWeight = await characterWeight.getMaxWeight(testCharacter!);
     expect(newMaxWeight).toBe(15);
-  });
-
-  it("should block the item pickup, if the item is too heavy", async () => {
-    const heavyItem = await unitTestHelper.createMockItem({
-      weight: 999,
-    });
-
-    const pickupHeavyItem = await pickupItem(inventoryItemContainerId, {
-      itemId: heavyItem.id,
-    });
-
-    expect(pickupHeavyItem).toBeFalsy();
-    expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
-      testCharacter,
-      "Sorry, you are already carrying too much weight!"
-    );
   });
 
   it("should properly pickup an inventory item", async () => {
@@ -194,24 +172,6 @@ describe("ItemPickup.ts", () => {
     }
 
     expect(newInventoryContainerAfterPickup?.slots[0]?._id).toEqual(newItem._id);
-  });
-
-  it("shouldn't add more items, if your inventory is full", async () => {
-    const smallContainer = new ItemContainer({
-      id: inventoryItemContainerId,
-      parentItem: inventory.id,
-    });
-    smallContainer.slotQty = 1;
-    smallContainer.slots = {
-      0: testItem,
-    };
-    await smallContainer.save();
-
-    const pickup = await pickupItem(smallContainer.id);
-    expect(pickup).toBeFalsy();
-
-    expect(sendErrorMessageToCharacter).toHaveBeenCalled();
-    expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, your container is full.");
   });
 
   it("should not stack an item, if its not stackable", async () => {
@@ -274,140 +234,6 @@ describe("ItemPickup.ts", () => {
     // items that were stacked should be deleted
     expect(await Item.findById(stackableItem2.id)).toBeFalsy();
     expect(await Item.findById(stackableItem3.id)).toBeFalsy();
-  });
-
-  describe("Item pickup validation", () => {
-    it("should throw an error if container is not accessible", async () => {
-      const pickup = await pickupItem(inventoryItemContainerId, {
-        itemId: "62b792030c3f470048781135", // inexistent item
-      });
-      expect(pickup).toBeFalsy();
-
-      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, the item to be picked up was not found."
-      );
-    });
-
-    it("should throw an error if you try to pickup an item that is not storable", async () => {
-      const notStorableItem = new Item({
-        ...itemMock,
-        isStorable: false,
-      });
-      await notStorableItem.save();
-      const pickup = await pickupItem(inventoryItemContainerId, {
-        itemId: notStorableItem.id,
-      });
-      expect(pickup).toBeFalsy();
-      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, you cannot store this item.");
-    });
-
-    it("should throw an error if item is too far away", async () => {
-      const pickup = await pickupItem(inventoryItemContainerId, {
-        x: FromGridX(999),
-        y: FromGridY(999),
-      });
-      expect(pickup).toBeFalsy();
-
-      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, you are too far away to pick up this item."
-      );
-    });
-
-    it("should throw an error if user tries to pickup an item that he doesn't own", async () => {
-      testItem.owner = "62b792030c3f470048781135" as unknown as Types.ObjectId; // inexistent character
-      // to have an owner, an item must be in a container, not on the map!
-      testItem.x = undefined;
-      testItem.y = undefined;
-      testItem.scene = undefined;
-      await testItem.save();
-
-      const pickup = await pickupItem(inventoryItemContainerId);
-      expect(pickup).toBeFalsy();
-
-      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, this item is not yours.");
-    });
-
-    it("should throw an error if the user tries to pickup an item and is banned or not online", async () => {
-      testCharacter.isBanned = true;
-      await testCharacter.save();
-
-      const pickup = await pickupItem(inventoryItemContainerId);
-      expect(pickup).toBeFalsy();
-
-      testCharacter.isBanned = false;
-      testCharacter.isOnline = false;
-      await testCharacter.save();
-
-      const pickup2 = await pickupItem(inventoryItemContainerId);
-      expect(pickup2).toBeFalsy();
-    });
-
-    it("should throw an error if the user tries to pickup an item, without an inventory", async () => {
-      const charEquip = await Equipment.findOne({ _id: testCharacter.equipment });
-
-      if (charEquip) {
-        charEquip.inventory = undefined;
-        await charEquip.save();
-
-        const pickup = await pickupItem(inventoryItemContainerId);
-        expect(pickup).toBeFalsy();
-
-        expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
-          testCharacter,
-          "Sorry, you need an inventory to pick this item."
-        );
-      } else {
-        throw new Error("Failed to remove character equipment!");
-      }
-    });
-
-    it("should throw an error if the character tries to pickup an item that's from another map", async () => {
-      testItem.scene = "another-random-scene";
-      await testItem.save();
-
-      const pickup = await pickupItem(inventoryItemContainerId);
-      expect(pickup).toBeFalsy();
-
-      expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
-        testCharacter,
-        "Sorry, you can't pick up items from another map."
-      );
-    });
-
-    it("should properly pickup a stackable item from a dead body", async () => {
-      const deadBody = await unitTestHelper.createMockItemFromBlueprint(BodiesBlueprint.NPCBody, {
-        key: "npc-test-dead-body",
-        texturePath: "kid-1/death/0.png",
-        description: "A dead body. It really stinks.",
-        name: "Test Dead body",
-      });
-
-      const deadBodyContainer = await ItemContainer.findOne({ parentItem: deadBody.id });
-
-      const stackableItem = await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, {
-        stackQty: 10,
-      });
-
-      expect(deadBodyContainer).toBeTruthy();
-
-      if (deadBodyContainer) {
-        deadBodyContainer.slotQty = 20;
-        deadBodyContainer.slots = {
-          ...deadBodyContainer.slots,
-          0: stackableItem.toJSON({ virtuals: true }),
-        };
-        deadBodyContainer.markModified("slots");
-        await deadBodyContainer.save();
-
-        const pickup = await pickupItem(inventoryItemContainerId, {
-          itemId: stackableItem.id,
-          fromContainerId: deadBodyContainer.id,
-        });
-        expect(pickup).toBeTruthy();
-      }
-    });
   });
 
   afterAll(async () => {

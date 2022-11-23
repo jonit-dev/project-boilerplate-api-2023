@@ -4,7 +4,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { EquipmentEquip } from "../../equipment/EquipmentEquip";
 
-import { ItemPickup } from "@providers/item/ItemPickup";
+import { ItemPickup } from "@providers/item/ItemPickup/ItemPickup";
 import { CharacterItems } from "../characterItems/CharacterItems";
 
 describe("CharacterItems.ts", () => {
