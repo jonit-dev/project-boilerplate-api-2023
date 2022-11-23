@@ -79,45 +79,53 @@ export class ItemPickup {
       }
     }
 
-    if (!isInventoryItem) {
-      if (!itemPickupData.fromContainerId && !isInventoryItem && !isPickupFromMapContainer) {
-        this.socketMessaging.sendErrorMessageToCharacter(
-          character,
-          "Sorry, failed to remove item from container. Origin container not found."
-        );
-        return false;
-      }
+    if (isInventoryItem) {
+      await this.refreshEquipmentIfInventoryItem(character);
 
-      // if the origin container is a MapContainer so should update the char inventory
-      //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map)
-      const containerToUpdateId = isPickupFromMapContainer
-        ? itemPickupData.toContainerId
-        : itemPickupData.fromContainerId;
-      const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as any;
+      await this.itemOwnership.addItemOwnership(itemToBePicked, character);
 
-      if (!updatedContainer) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, fetch container information.");
-        return false;
-      }
-
-      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-        inventory: updatedContainer,
-      };
-
-      this.updateInventoryCharacter(payloadUpdate, character);
-    } else {
-      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
-
-      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-        equipment: equipmentSlots,
-      };
-
-      this.updateInventoryCharacter(payloadUpdate, character);
+      return true;
     }
+
+    if (!itemPickupData.fromContainerId && !isInventoryItem && !isPickupFromMapContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, failed to remove item from container. Origin container not found."
+      );
+      return false;
+    }
+
+    // if the origin container is a MapContainer we should update the char inventory = toContainerId
+    //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map) = fromContainerId
+    const containerToUpdateId = isPickupFromMapContainer
+      ? itemPickupData.toContainerId
+      : itemPickupData.fromContainerId;
+    const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as any;
+
+    if (!updatedContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, fetch container information.");
+      return false;
+    }
+
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      inventory: updatedContainer,
+    };
+
+    this.updateInventoryCharacter(payloadUpdate, character);
 
     await this.itemOwnership.addItemOwnership(itemToBePicked, character);
 
     return true;
+  }
+
+  private async refreshEquipmentIfInventoryItem(character: ICharacter): Promise<void> {
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      equipment: equipmentSlots,
+    };
+
+    this.updateInventoryCharacter(payloadUpdate, character);
   }
 
   private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
