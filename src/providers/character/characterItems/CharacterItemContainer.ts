@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInventory";
+import { ItemMap } from "@providers/item/ItemMap";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemSlots } from "./CharacterItemSlots";
@@ -13,7 +14,8 @@ export class CharacterItemContainer {
     private socketMessaging: SocketMessaging,
     private characterItemStack: CharacterItemStack,
     private characterItemSlots: CharacterItemSlots,
-    private equipmentEquipInventory: EquipmentEquipInventory
+    private equipmentEquipInventory: EquipmentEquipInventory,
+    private itemMap: ItemMap
   ) {}
 
   public async removeItemFromContainer(
@@ -64,8 +66,7 @@ export class CharacterItemContainer {
     item: IItem,
     character: ICharacter,
     toContainerId: string,
-    isInventoryItem: boolean = false,
-    fromContainerId?: string
+    isInventoryItem: boolean = false
   ): Promise<boolean> {
     const itemToBeAdded = item;
 
@@ -108,6 +109,8 @@ export class CharacterItemContainer {
 
       // Inventory is empty, slot checking not needed
       if (targetContainer.isEmpty) isNewItem = true;
+
+      await this.itemMap.clearItemCoordinates(itemToBeAdded, targetContainer);
 
       if (itemToBeAdded.maxStackSize > 1) {
         const wasStacked = await this.characterItemStack.tryAddingItemToStack(

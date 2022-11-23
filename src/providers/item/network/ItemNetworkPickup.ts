@@ -2,7 +2,7 @@ import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IItemPickup, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ItemPickup } from "../ItemPickup";
+import { ItemPickup } from "../ItemPickup/ItemPickup";
 
 @provide(ItemNetworkPickup)
 export class ItemNetworkPickup {

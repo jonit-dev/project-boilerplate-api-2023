@@ -4,7 +4,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { ItemPickup } from "@providers/item/ItemPickup";
+import { ItemPickup } from "@providers/item/ItemPickup/ItemPickup";
 
 describe("CharacterItemStack.ts", () => {
   let testItem: IItem;
