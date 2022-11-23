@@ -30,7 +30,7 @@ describe("ItemPickup.ts", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
-    testCharacter = await await unitTestHelper.createMockCharacter(null, {
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasInventory: true,
       hasSkills: true,
@@ -97,9 +97,9 @@ describe("ItemPickup.ts", () => {
       throw new Error("Failed to find item after pickup!");
     }
 
-    expect(item.x).toBeNull();
-    expect(item.y).toBeNull();
-    expect(item.scene).toBeNull();
+    expect(item.x).toBeUndefined();
+    expect(item.y).toBeUndefined();
+    expect(item.scene).toBeUndefined();
 
     const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
 

@@ -55,21 +55,6 @@ export class ItemPickup {
       }
     }
 
-    const addToContainer = await this.characterItemContainer.addItemToContainer(
-      itemToBePicked,
-      character,
-      itemPickupData.toContainerId,
-      isInventoryItem,
-      itemPickupData.fromContainerId
-    );
-
-    if (!addToContainer) {
-      return false;
-    }
-
-    // whenever a new item is added, we need to update the character weight
-    await this.characterWeight.updateCharacterWeight(character);
-
     // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
     if (isPickupFromMapContainer) {
       const pickupFromMap = await this.itemPickupMapContainer.pickupFromMapContainer(itemToBePicked, character);
@@ -79,10 +64,21 @@ export class ItemPickup {
       }
     }
 
+    const addToContainer = await this.characterItemContainer.addItemToContainer(
+      itemToBePicked,
+      character,
+      itemPickupData.toContainerId,
+      isInventoryItem
+    );
+
+    if (!addToContainer) {
+      return false;
+    }
+
     if (isInventoryItem) {
       await this.refreshEquipmentIfInventoryItem(character);
 
-      await this.itemOwnership.addItemOwnership(itemToBePicked, character);
+      await this.finalizePickup(itemToBePicked, character);
 
       return true;
     }
@@ -113,9 +109,16 @@ export class ItemPickup {
 
     this.updateInventoryCharacter(payloadUpdate, character);
 
-    await this.itemOwnership.addItemOwnership(itemToBePicked, character);
+    await this.finalizePickup(itemToBePicked, character);
 
     return true;
+  }
+
+  private async finalizePickup(itemToBePicked: IItem, character: ICharacter): Promise<void> {
+    await this.itemOwnership.addItemOwnership(itemToBePicked, character);
+
+    // whenever a new item is added, we need to update the character weight
+    await this.characterWeight.updateCharacterWeight(character);
   }
 
   private async refreshEquipmentIfInventoryItem(character: ICharacter): Promise<void> {
