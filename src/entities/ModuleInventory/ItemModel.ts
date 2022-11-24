@@ -3,6 +3,7 @@ import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { container } from "@providers/inversify/container";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemView } from "@providers/item/ItemView";
+import { MapHelper } from "@providers/map/MapHelper";
 import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { UpdateQuery } from "mongoose";
@@ -82,18 +83,48 @@ itemSchema.virtual("isEquipable").get(function (this: IItem) {
   return this.allowedEquipSlotType && this.allowedEquipSlotType.length > 0;
 });
 
-itemSchema.virtual("fullDescription").get(function (this: IItem) {
-  return `${
-    this.name
-  }: ${this.description}${this.type === ItemType.Weapon ? ` Attack: ${this.attack}. Defense: ${this.defense}.` : ""}${this.weight ? ` Weight: ${this.weight}.` : ""}`;
+itemSchema.virtual("fullDescription").get(function (this: IItem): string {
+  let message: string = "";
+
+  if (!this.attack && this.defense && this.weight) {
+    message = `${this.name}: ${this.description}${` Defense: ${this.defense}. Weight: ${this.weight}.`}`;
+
+    return message;
+  }
+
+  if (this.attack && !this.defense && this.weight) {
+    message = `${this.name}: ${this.description}${` Attack: ${this.attack}. Weight: ${this.weight}.`}`;
+
+    return message;
+  }
+
+  if (!this.attack && !this.defense && this.weight) {
+    message = `${this.name}: ` + `${this.description}` + `${this.weight ? ` Weight: ${this.weight}.` : ""}`;
+
+    return message;
+  }
+
+  if (this.attack && this.defense && this.weight) {
+    message = `${this.name}: ${
+      this.description
+    }${` Attack: ${this.attack}. Defense: ${this.defense}. Weight: ${this.weight}.`}`;
+
+    return message;
+  }
+
+  return message;
 });
 
 const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"): Promise<void> => {
-  if (item.x !== undefined && item.y !== undefined && item.scene) {
+  const mapHelper = container.get<MapHelper>(MapHelper);
+
+  const hasCoordinates = item.x && item.y && item.scene;
+
+  if (hasCoordinates && mapHelper.isCoordinateValid(item.x) && mapHelper.isCoordinateValid(item.y)) {
     const characterView = container.get<CharacterView>(CharacterView);
     const itemView = container.get<ItemView>(ItemView);
 
-    const nearbyCharacters = await characterView.getCharactersAroundXYPosition(item.x, item.y, item.scene);
+    const nearbyCharacters = await characterView.getCharactersAroundXYPosition(item.x!, item.y!, item.scene!);
 
     for (const character of nearbyCharacters) {
       if (warnType === "changes") {
@@ -101,7 +132,7 @@ const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"
       }
 
       if (warnType === "removal") {
-        await itemView.warnCharactersAboutItemRemovalInView(item, item.x, item.y, item.scene);
+        await itemView.warnCharactersAboutItemRemovalInView(item, item.x!, item.y!, item.scene!);
       }
     }
   }

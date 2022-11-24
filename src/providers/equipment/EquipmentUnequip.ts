@@ -4,19 +4,16 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
-
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { EquipmentRangeUpdate } from "./EquipmentRangeUpdate";
 import { EquipmentSlots } from "./EquipmentSlots";
 
 @provide(EquipmentUnequip)
 export class EquipmentUnequip {
   constructor(
     private equipmentSlots: EquipmentSlots,
-    private equipmentHelper: EquipmentRangeUpdate,
     private characterValidation: CharacterValidation,
     private socketMessaging: SocketMessaging,
     private characterItems: CharacterItems,
@@ -86,8 +83,6 @@ export class EquipmentUnequip {
       equipment: equipmentSlots,
       inventory: inventoryContainer,
     });
-
-    await this.equipmentHelper.updateCharacterAttackType(character, item);
 
     return true;
   }

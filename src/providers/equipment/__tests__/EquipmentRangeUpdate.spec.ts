@@ -1,21 +1,17 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { unitTestHelper } from "@providers/inversify/container";
 import { rangedWeaponsBlueprintIndex } from "@providers/item/data/blueprints/ranged-weapons/index";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
-import { EquipmentRangeUpdate } from "../EquipmentRangeUpdate";
-
 describe("EquipmentRangeUpdate.spec.ts", () => {
   let item: IItem;
   let character: ICharacter;
-  let equipmentRangeUpdate: EquipmentRangeUpdate;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
-    equipmentRangeUpdate = container.get<EquipmentRangeUpdate>(EquipmentRangeUpdate);
   });
 
   beforeEach(async () => {
@@ -28,15 +24,13 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
   it("should properly detect melee equipped items", async () => {
     await equipItem(item, character, "leftHand");
 
-    await equipmentRangeUpdate.updateCharacterAttackType(character, item as any);
-
     const updatedCharacter = await Character.findById(character._id);
 
     if (!updatedCharacter) {
       throw new Error("Character not found");
     }
 
-    expect(updatedCharacter.attackType).toBe(EntityAttackType.Melee);
+    expect(await updatedCharacter.attackType).toBe(EntityAttackType.Melee);
   });
 
   it("should properly detect a ranged equipped item", async () => {
@@ -44,32 +38,26 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
 
     await equipItem(bow, character, "leftHand");
 
-    await equipmentRangeUpdate.updateCharacterAttackType(character, item as any);
-
     const updatedCharacter = await Character.findById(character._id);
 
     if (!updatedCharacter) {
       throw new Error("Character not found");
     }
 
-    expect(updatedCharacter.attackType).toBe(EntityAttackType.Ranged);
+    expect(await updatedCharacter.attackType).toBe(EntityAttackType.Ranged);
   });
 
   it("should properly detect a hybrid attack type (MeleeRanged)", async () => {
-    const bow = await createItemBow();
+    const itemMeleeRanged = await unitTestHelper.createItemMeleeRanged();
 
-    await equipItem(bow, character, "leftHand");
-    await equipItem(item, character, "rightHand");
-
-    await equipmentRangeUpdate.updateCharacterAttackType(character, item as any);
-
+    await equipItem(itemMeleeRanged, character, "leftHand");
     const updatedCharacter = await Character.findById(character._id);
 
     if (!updatedCharacter) {
       throw new Error("Character not found");
     }
 
-    expect(updatedCharacter.attackType).toBe(EntityAttackType.MeleeRanged);
+    expect(await updatedCharacter.attackType).toBe(EntityAttackType.MeleeRanged);
   });
 
   afterAll(async () => {

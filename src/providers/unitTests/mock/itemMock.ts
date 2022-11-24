@@ -1,3 +1,4 @@
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IItem, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
@@ -78,6 +79,7 @@ export const stackableGoldCoinMock: Partial<IItem> = {
 export const itemTwoHandedMock: Partial<IItem> = {
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
+  rangeType: EntityAttackType.Melee,
   textureAtlas: "items",
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   isTwoHanded: true,
@@ -127,4 +129,54 @@ export const itemMockArmor: Partial<IItem> = {
   scene: "example",
   createdAt: "2022-06-25T22:53:55.579Z",
   updatedAt: "2022-06-28T04:42:21.409Z",
+};
+
+export const itemMockShield: Partial<IItem> = {
+  type: ItemType.Armor,
+  subType: ItemSubType.Shield,
+  key: "frost-shield",
+  textureAtlas: "items",
+  texturePath: "shields/frost-shield.png",
+  name: "Frost Shield",
+  description: "A defensive tool based on a magic durable ice",
+  defense: 7,
+  weight: 3,
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+};
+
+export const itemMockBow: Partial<IItem> = {
+  type: ItemType.Weapon,
+  rangeType: EntityAttackType.Ranged,
+  subType: ItemSubType.Ranged,
+  textureAtlas: "items",
+  texturePath: "ranged-weapons/bow.png",
+  key: "bow",
+  name: "Bow",
+  description:
+    "A weapon used for shooting arrows and usually made of a strip of wood bent by a cord connecting the two end.",
+  attack: 5,
+  defense: 2,
+  weight: 1,
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  maxRange: 7,
+  requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow],
+  isTwoHanded: true,
+};
+
+export const itemMeleeRangedMock: Partial<IItem> = {
+  type: ItemType.Weapon,
+  rangeType: EntityAttackType.MeleeRanged,
+  textureAtlas: "items",
+  texturePath: "ranged-weapons/bow.png",
+  key: "bow",
+  name: "Bow",
+  description:
+    "A weapon used for shooting arrows and usually made of a strip of wood bent by a cord connecting the two end.",
+  attack: 5,
+  defense: 2,
+  weight: 1,
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  maxRange: 7,
+  requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow],
+  isTwoHanded: true,
 };

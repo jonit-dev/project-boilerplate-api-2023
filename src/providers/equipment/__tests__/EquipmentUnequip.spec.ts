@@ -7,30 +7,24 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { EquipmentRangeUpdate } from "../EquipmentRangeUpdate";
 import { EquipmentSlots } from "../EquipmentSlots";
-
 import { EquipmentUnequip } from "../EquipmentUnequip";
 
 describe("EquipmentUnequip.spec.ts", () => {
-  let equipmentRangeUpdate: EquipmentRangeUpdate;
   let equipmentUnequip: EquipmentUnequip;
   let equipment: IEquipment;
   let testItem: IItem;
   let testStackableItem: IItem;
   let testCharacter: ICharacter;
-
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
   let equipmentSlots: EquipmentSlots;
-
   let socketMessaging;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     equipmentUnequip = container.get<EquipmentUnequip>(EquipmentUnequip);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
-    equipmentRangeUpdate = container.get<EquipmentRangeUpdate>(EquipmentRangeUpdate);
   });
 
   beforeEach(async () => {
@@ -96,14 +90,12 @@ describe("EquipmentUnequip.spec.ts", () => {
     equipment.leftHand = rangedItem._id;
     await equipment.save();
 
-    await equipmentRangeUpdate.updateCharacterAttackType(testCharacter, rangedItem);
-
-    expect(testCharacter.attackType).toBe(EntityAttackType.Ranged);
+    expect(await testCharacter.attackType).toBe(EntityAttackType.Ranged);
 
     const unequip = await equipmentUnequip.unequip(testCharacter, inventory, rangedItem);
     expect(unequip).toBeTruthy();
 
-    expect(testCharacter.attackType).toBe(EntityAttackType.Melee);
+    expect(await testCharacter.attackType).toBe(EntityAttackType.Melee);
   });
 
   describe("Validation cases", () => {

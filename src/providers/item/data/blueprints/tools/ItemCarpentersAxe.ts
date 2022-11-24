@@ -18,4 +18,5 @@ export const itemCarpentersAxe: Partial<IItemUseWithEntity> = {
   rangeType: EntityAttackType.Melee,
   basePrice: 50,
   hasUseWith: true,
+  useWithMaxDistanceGrid: 2,
 };

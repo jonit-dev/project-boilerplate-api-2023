@@ -11,6 +11,7 @@ export interface IUseWithItemEffect {
 }
 
 export interface IItemUseWithEntity extends IItem {
+  useWithMaxDistanceGrid: number;
   useWithItemEffect?: IUseWithItemEffect;
   useWithTileEffect?: IUseWithTileEffect;
 }
@@ -23,6 +24,7 @@ export interface IValidUseWithResponse {
 }
 
 export interface IMagicItemUseWithEntity extends IItem {
+  useWithMaxDistanceGrid: number;
   power: number;
   animationKey: string;
   projectileAnimationKey: string;

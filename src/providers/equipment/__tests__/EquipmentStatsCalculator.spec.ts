@@ -19,13 +19,13 @@ describe("EquipmentStatsCalculator.spec.ts", () => {
   it("should properly get total attack", async () => {
     const result = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "attack");
 
-    expect(result).toBe(13);
+    expect(result).toBe(18);
   });
 
   it("should properly get total defense", async () => {
     const result = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "defense");
 
-    expect(result).toBe(14);
+    expect(result).toBe(16);
   });
 
   afterAll(async () => {

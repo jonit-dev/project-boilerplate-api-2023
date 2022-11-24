@@ -15,6 +15,7 @@ export const itemUseWithItemTest: Partial<IItemUseWithEntity> = {
   weight: 0.25,
   hasUseWith: true,
   basePrice: 70,
+  useWithMaxDistanceGrid: 2,
   useWithItemEffect: async (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> => {
     targetItem.name = "Item affected by use with effect!";
     await targetItem.save();
