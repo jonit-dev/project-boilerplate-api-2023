@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
-import { UseWithWoodenSticks } from "@providers/useWith/items/UseWithWoodenSticks";
+import { UseWithItemToItem } from "@providers/useWith/abstractions/UseWithItemToItem";
 import { IItemUseWith } from "@providers/useWith/useWithTypes";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
@@ -16,9 +16,9 @@ export const itemWoodenSticks: Partial<IItemUseWith> = {
   description: "Wooden sticks used for crafting.",
   weight: 1,
   useWithItemEffect: async (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> => {
-    const useWithWoodenSticks = container.get<UseWithWoodenSticks>(UseWithWoodenSticks);
+    const useWithItemToItem = container.get<UseWithItemToItem>(UseWithItemToItem);
 
-    await useWithWoodenSticks.execute(targetItem, originItem, character);
+    await useWithItemToItem.execute(targetItem, originItem, character, "cutting-wood");
   },
   maxStackSize: 100,
 };

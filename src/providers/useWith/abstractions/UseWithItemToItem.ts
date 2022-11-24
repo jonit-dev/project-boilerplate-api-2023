@@ -12,8 +12,8 @@ import random from "lodash/random";
 import { recipeBlueprintsIndex } from "../recipes/index";
 import { IUseWithCraftingRecipe } from "../useWithTypes";
 
-@provide(UseWithWoodenSticks)
-export class UseWithWoodenSticks {
+@provide(UseWithItemToItem)
+export class UseWithItemToItem {
   constructor(
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
@@ -21,7 +21,12 @@ export class UseWithWoodenSticks {
     private characterItemContainer: CharacterItemContainer
   ) {}
 
-  public async execute(targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> {
+  public async execute(
+    targetItem: IItem,
+    originItem: IItem,
+    character: ICharacter,
+    animationEffectKey?: string
+  ): Promise<void> {
     const hasRequiredItems = await this.hasRequiredItemsOnInventory(targetItem, originItem, character);
 
     if (!hasRequiredItems) return;
@@ -54,16 +59,32 @@ export class UseWithWoodenSticks {
       return;
     }
 
-    const hasConsumedIngredients = await this.consumeRequiredItems(matchingRecipe, character);
+    const wereIngredientsConsumed = await this.consumeRequiredItems(matchingRecipe, character);
 
-    if (!hasConsumedIngredients) return;
+    if (!wereIngredientsConsumed) return;
+
+    // check for probability of success
+    const n = random(0, 100);
+
+    if (n > matchingRecipe.successChance) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you failed to craft the item.");
+
+      await this.animationEffect.sendAnimationEventToCharacter(character, "miss");
+
+      await this.refreshCharacterInventory(character);
+      return;
+    }
 
     // now add the recipe output on the inventory
-    const hasCreatedRecipeOutput = await this.createRecipeOutputOnInventory(matchingRecipe, character);
+    const wasRecipeOutputCreated = await this.createRecipeOutputOnInventory(matchingRecipe, character);
 
-    if (!hasCreatedRecipeOutput) return;
+    if (!wasRecipeOutputCreated) return;
 
-    await this.refreshInventory(character);
+    if (animationEffectKey) {
+      await this.animationEffect.sendAnimationEventToCharacter(character, animationEffectKey);
+    }
+
+    await this.refreshCharacterInventory(character);
   }
 
   private async createRecipeOutputOnInventory(
@@ -71,10 +92,12 @@ export class UseWithWoodenSticks {
     character: ICharacter
   ): Promise<boolean> {
     const outputBlueprint = itemsBlueprintIndex[matchingRecipe.outputKey];
+
+    const getRandomStackQty = random(matchingRecipe.outputQtyRange[0], matchingRecipe.outputQtyRange[1]);
+
     const output = new Item({
       ...outputBlueprint,
-      // random qty between min and max
-      stackQty: random(matchingRecipe.outputQtyRange[0], matchingRecipe.outputQtyRange[1]),
+      stackQty: getRandomStackQty,
     });
     await output.save();
 
@@ -99,7 +122,6 @@ export class UseWithWoodenSticks {
   }
 
   private async consumeRequiredItems(matchingRecipe: IUseWithCraftingRecipe, character: ICharacter): Promise<boolean> {
-    // consume both items
     for (const requiredItem of matchingRecipe.requiredItems) {
       const hasDecrementedFromInventory = await this.characterItemInventory.decrementItemFromInventory(
         requiredItem.key,
@@ -139,7 +161,7 @@ export class UseWithWoodenSticks {
     return true;
   }
 
-  private async refreshInventory(character: ICharacter): Promise<void> {
+  private async refreshCharacterInventory(character: ICharacter): Promise<void> {
     const inventory = await character.inventory;
     const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 

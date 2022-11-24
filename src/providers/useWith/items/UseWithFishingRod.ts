@@ -45,6 +45,8 @@ export class UseWithFishingRod {
       return;
     }
 
+    await this.animationEffect.sendAnimationEventToXYPosition(character, "fishing", targetTile.x, targetTile.y);
+
     // if everything is allright, calculate a chance
 
     const n = random(0, 100);
@@ -57,8 +59,6 @@ export class UseWithFishingRod {
       const addedFishToBackpack = await this.addFishToBackpack(character);
 
       if (addedFishToBackpack) {
-        await this.animationEffect.sendAnimationEventToXYPosition(character, "fishing", targetTile.x, targetTile.y);
-
         await this.refreshInventory(character);
       }
     } else {
