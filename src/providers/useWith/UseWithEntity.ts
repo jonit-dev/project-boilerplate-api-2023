@@ -3,7 +3,6 @@ import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ITEM_USE_WITH_ENTITY_GRID_CELL_RANGE } from "@providers/constants/ItemConstants";
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -116,7 +115,7 @@ export class UseWithEntity {
       caster.y,
       target.x,
       target.y,
-      ITEM_USE_WITH_ENTITY_GRID_CELL_RANGE
+      blueprint.useWithMaxDistanceGrid
     );
     if (!isUnderRange) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your taget is out of reach.");

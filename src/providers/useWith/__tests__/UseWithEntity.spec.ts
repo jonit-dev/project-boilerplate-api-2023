@@ -5,7 +5,6 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ITEM_USE_WITH_ENTITY_GRID_CELL_RANGE } from "@providers/constants/ItemConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
 import { FoodsBlueprint, MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -425,7 +424,7 @@ describe("UseWithEntityValidation.ts", () => {
 
     const isUnderRangeMock = jest.spyOn(MovementHelper.prototype, "isUnderRange");
 
-    testNPC.x = testCharacter.x + (ITEM_USE_WITH_ENTITY_GRID_CELL_RANGE + 1) * GRID_WIDTH;
+    testNPC.x = testCharacter.x + (itemDarkRune.useWithMaxDistanceGrid! + 1) * GRID_WIDTH;
     testNPC.y = testCharacter.y;
     await testNPC.save();
 
@@ -452,7 +451,7 @@ describe("UseWithEntityValidation.ts", () => {
       testCharacter.y,
       testNPC.x,
       testNPC.y,
-      ITEM_USE_WITH_ENTITY_GRID_CELL_RANGE
+      itemDarkRune.useWithMaxDistanceGrid
     );
   });
 
