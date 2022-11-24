@@ -64,7 +64,7 @@ describe("UseWithItem.ts", () => {
       throw new Error("This test should fail!");
     } catch (error: any) {
       expect(error.message).toEqual(
-        `UseWithItem > targetItem '${originItem.baseKey}' does not have a useWithEffect function defined`
+        "Crafting interaction unavailable for items: Origin: use-with-item-test => Target: short-sword"
       );
     }
   });
