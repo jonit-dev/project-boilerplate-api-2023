@@ -19,7 +19,11 @@ export class CharacterItemInventory {
     private mathHelper: MathHelper
   ) {}
 
-  public async decrementItemFromInventory(itemKey: string, character: ICharacter, qty: number): Promise<boolean> {
+  public async decrementItemFromInventory(
+    itemKey: string,
+    character: ICharacter,
+    decrementQty: number
+  ): Promise<boolean> {
     const inventory = (await character.inventory) as unknown as IItem;
 
     let inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
@@ -30,7 +34,7 @@ export class CharacterItemInventory {
     }
 
     for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
-      if (qty <= 0) break;
+      if (decrementQty <= 0) break;
 
       const slotItem = inventoryItemContainer.slots[i] as unknown as IItem;
       if (!slotItem) continue;
@@ -43,11 +47,11 @@ export class CharacterItemInventory {
 
           let remaining = 0;
 
-          if (qty <= slotItem.stackQty!) {
-            remaining = this.mathHelper.fixPrecision(slotItem.stackQty! - qty);
-            qty = 0;
+          if (decrementQty <= slotItem.stackQty!) {
+            remaining = this.mathHelper.fixPrecision(slotItem.stackQty! - decrementQty);
+            decrementQty = 0;
           } else {
-            qty = this.mathHelper.fixPrecision(qty - slotItem.stackQty!);
+            decrementQty = this.mathHelper.fixPrecision(decrementQty - slotItem.stackQty!);
           }
 
           if (remaining > 0) {
@@ -59,7 +63,7 @@ export class CharacterItemInventory {
             result = await this.deleteItemFromInventory(slotItem._id, character);
 
             // we need to fetch updated container in case some quantity remains to be substracted
-            if (result && qty > 0) {
+            if (result && decrementQty > 0) {
               inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
               if (!inventoryItemContainer) {
                 result = false;
@@ -70,7 +74,7 @@ export class CharacterItemInventory {
         } else {
           // if its not stackable, just remove it
           result = await this.deleteItemFromInventory(slotItem._id, character);
-          qty--;
+          decrementQty--;
         }
       }
 

@@ -2,11 +2,11 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
 import { UseWithFishingRod } from "@providers/useWith/items/UseWithFishingRod";
-import { IItemUseWithEntity, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
+import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemFishingRod: Partial<IItemUseWithEntity> = {
+export const itemFishingRod: Partial<IItemUseWith> = {
   key: ToolsBlueprint.FishingRod,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,

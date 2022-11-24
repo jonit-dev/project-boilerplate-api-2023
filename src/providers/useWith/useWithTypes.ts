@@ -10,7 +10,7 @@ export interface IUseWithItemEffect {
   (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> | void;
 }
 
-export interface IItemUseWithEntity extends IItem {
+export interface IItemUseWith extends IItem {
   useWithMaxDistanceGrid: number;
   useWithItemEffect?: IUseWithItemEffect;
   useWithTileEffect?: IUseWithTileEffect;
@@ -36,4 +36,16 @@ export interface IUseWithTargetTile {
   y: number;
   map: string;
   layer: MapLayers;
+}
+
+export interface IUseWithCraftingRecipeItem {
+  key: string;
+  qty: number;
+}
+
+export interface IUseWithCraftingRecipe {
+  outputKey: string;
+  outputQtyRange: [number, number];
+  requiredItems: IUseWithCraftingRecipeItem[];
+  difficulty: number; // base % chance of success
 }

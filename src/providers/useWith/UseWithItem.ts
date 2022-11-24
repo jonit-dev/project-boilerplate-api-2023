@@ -3,7 +3,7 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IItemUseWithEntity, IValidUseWithResponse } from "@providers/useWith/useWithTypes";
+import { IItemUseWith, IValidUseWithResponse } from "@providers/useWith/useWithTypes";
 import { IUseWithItem, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { UseWithHelper } from "./libs/UseWithHelper";
@@ -47,7 +47,7 @@ export class UseWithItem {
     const originItem = await this.useWithHelper.getItem(character, data.originItemId);
     const targetItem = await this.useWithHelper.getItem(character, data.targetItemId);
 
-    const itemWithUseWithEffect = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
+    const itemWithUseWithEffect = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWith>;
 
     if (!itemWithUseWithEffect || !itemWithUseWithEffect.useWithItemEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(

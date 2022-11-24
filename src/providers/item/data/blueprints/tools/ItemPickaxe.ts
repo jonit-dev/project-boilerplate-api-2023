@@ -1,9 +1,9 @@
-import { IItemUseWithEntity } from "@providers/useWith/useWithTypes";
+import { IItemUseWith } from "@providers/useWith/useWithTypes";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemPickaxe: Partial<IItemUseWithEntity> = {
+export const itemPickaxe: Partial<IItemUseWith> = {
   key: ToolsBlueprint.Pickaxe,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,

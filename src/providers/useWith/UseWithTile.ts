@@ -6,7 +6,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IItemUseWithEntity, IValidUseWithResponse } from "@providers/useWith/useWithTypes";
+import { IItemUseWith, IValidUseWithResponse } from "@providers/useWith/useWithTypes";
 import { IUseWithTile, MAP_LAYERS_TO_ID, ToGridX, ToGridY, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { UseWithHelper } from "./libs/UseWithHelper";
@@ -53,7 +53,7 @@ export class UseWithTile {
     // Check if the character has the originItem
     const originItem = await this.useWithHelper.getItem(character, data.originItemId);
 
-    const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
+    const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWith>;
 
     // Check if tile position is at character's reach
     const isUnderRange = this.movementHelper.isUnderRange(
