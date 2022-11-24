@@ -41,7 +41,7 @@ describe("UseWithTile.ts", () => {
         x: FromGridX(0),
         y: FromGridY(0),
         map: "example",
-        layer: MapLayers.Ground,
+        layer: "ground" as unknown as MapLayers,
       },
     };
 

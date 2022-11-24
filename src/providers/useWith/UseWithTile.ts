@@ -6,8 +6,8 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IItemUseWithEntity, IValidUseWithResponse } from "@providers/useWith/useWithTypes";
-import { IUseWithTile, ToGridX, ToGridY, UseWithSocketEvents } from "@rpg-engine/shared";
+import { IItemUseWith, IValidUseWithResponse } from "@providers/useWith/useWithTypes";
+import { IUseWithTile, MAP_LAYERS_TO_ID, ToGridX, ToGridY, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { UseWithHelper } from "./libs/UseWithHelper";
 
@@ -50,24 +50,29 @@ export class UseWithTile {
     // Check if character is alive and not banned
     this.useWithHelper.basicValidations(character, data);
 
+    // Check if the character has the originItem
+    const originItem = await this.useWithHelper.getItem(character, data.originItemId);
+
+    const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWith>;
+
     // Check if tile position is at character's reach
     const isUnderRange = this.movementHelper.isUnderRange(
       character.x,
       character.y,
       data.targetTile.x,
       data.targetTile.y,
-      TILE_MAX_REACH_DISTANCE_IN_GRID
+      itemBlueprint.useWithMaxDistanceGrid || TILE_MAX_REACH_DISTANCE_IN_GRID
     );
     if (!isUnderRange) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the selected tile is out of reach.");
       return;
     }
     // check if tile exists
-    const tileId = await this.mapTiles.getTileId(
+    const tileId = this.mapTiles.getTileId(
       data.targetTile.map,
       ToGridX(data.targetTile.x),
       ToGridY(data.targetTile.y),
-      data.targetTile.layer
+      MAP_LAYERS_TO_ID[data.targetTile.layer]
     );
 
     if (!tileId) {
@@ -80,7 +85,7 @@ export class UseWithTile {
       data.targetTile.map,
       ToGridX(data.targetTile.x),
       ToGridY(data.targetTile.y),
-      data.targetTile.layer
+      MAP_LAYERS_TO_ID[data.targetTile.layer]
     );
     if (!useWithKey) {
       this.socketMessaging.sendErrorMessageToCharacter(
@@ -90,9 +95,6 @@ export class UseWithTile {
       return;
     }
 
-    // Check if the character has the originItem
-    const originItem = await this.useWithHelper.getItem(character, data.originItemId);
-
     if (originItem.baseKey !== useWithKey) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
@@ -100,8 +102,6 @@ export class UseWithTile {
       );
       return;
     }
-
-    const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
 
     const useWithTileEffect = itemBlueprint.useWithTileEffect;
 

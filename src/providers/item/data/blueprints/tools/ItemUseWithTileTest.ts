@@ -1,10 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { IItemUseWithEntity, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
+import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemUseWithTileTest: Partial<IItemUseWithEntity> = {
+export const itemUseWithTileTest: Partial<IItemUseWith> = {
   key: ToolsBlueprint.UseWithTileTest,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,
@@ -15,6 +15,7 @@ export const itemUseWithTileTest: Partial<IItemUseWithEntity> = {
   weight: 0.25,
   hasUseWith: true,
   basePrice: 70,
+  useWithMaxDistanceGrid: 2,
   useWithTileEffect: async (item: IItem, targetTile: IUseWithTargetTile, character: ICharacter): Promise<void> => {
     character.name = "Character affected by use with tile effect!";
     await character.save();

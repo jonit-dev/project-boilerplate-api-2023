@@ -206,6 +206,20 @@ describe("CharacterItemInventory.ts", () => {
     expect(updatedInventoryContainer.slots[1]).not.toBe(null);
   });
 
+  it("should properly check if an item exists on the inventory, by using a key", async () => {
+    const shortSword = await unitTestHelper.createMockItem();
+
+    inventoryContainer.slots[0] = shortSword.toJSON({ virtuals: true }); // if we dont do this, isStackable will be undefined, because its a virtual field!
+    inventoryContainer.markModified("slots");
+    await inventoryContainer.save();
+
+    const exists = await characterItemInventory.checkItemInInventoryByKey(SwordsBlueprint.ShortSword, testCharacter);
+    const dontExist = await characterItemInventory.checkItemInInventoryByKey(SwordsBlueprint.IceSword, testCharacter);
+
+    expect(exists).toBe(true);
+    expect(dontExist).toBe(false);
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });

@@ -5,7 +5,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ToolsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { IItemUseWithEntity, IUseWithItemEffect } from "@providers/useWith/useWithTypes";
+import { IItemUseWith, IUseWithItemEffect } from "@providers/useWith/useWithTypes";
 
 import { IUseWithItem } from "@rpg-engine/shared";
 
@@ -56,7 +56,7 @@ describe("UseWithItem.ts", () => {
 
   it("should fail validations | item without useWithEffect function defined", async () => {
     try {
-      const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
+      const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWith>;
 
       delete itemBlueprint.useWithItemEffect;
       // @ts-ignore
@@ -84,7 +84,7 @@ describe("UseWithItem.ts", () => {
   it("useWithEffect should throw error if invalid originItem is passed", async () => {
     try {
       originItem.key = "invalid-item";
-      const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWithEntity>;
+      const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWith>;
 
       const useWithEffect = itemBlueprint.useWithItemEffect!;
       await useWithEffect(targetItem, originItem, testCharacter);

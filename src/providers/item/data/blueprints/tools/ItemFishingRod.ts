@@ -1,12 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { container } from "@providers/inversify/container";
-import { IItemUseWithEntity, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
+import { UseWithFishingRod } from "@providers/useWith/items/UseWithFishingRod";
+import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemFishingRod: Partial<IItemUseWithEntity> = {
+export const itemFishingRod: Partial<IItemUseWith> = {
   key: ToolsBlueprint.FishingRod,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,
@@ -17,13 +17,14 @@ export const itemFishingRod: Partial<IItemUseWithEntity> = {
   weight: 0.25,
   hasUseWith: true,
   basePrice: 70,
+  useWithMaxDistanceGrid: 7,
   useWithTileEffect: async (
     originItem: IItem,
     targetTile: IUseWithTargetTile,
     character: ICharacter
   ): Promise<void> => {
-    const animationEffect = container.get<AnimationEffect>(AnimationEffect);
+    const useWithFishingRod = container.get<UseWithFishingRod>(UseWithFishingRod);
 
-    await animationEffect.sendAnimationEventToXYPosition(character, "fishing", targetTile.x, targetTile.y);
+    await useWithFishingRod.execute(character, targetTile);
   },
 };

@@ -18,6 +18,7 @@ export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
   allowedEquipSlotType: [ItemSlotType.Accessory, ItemSlotType.Inventory],
   basePrice: 20,
 
+  useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,
   animationKey: AnimationEffectKeys.Green,

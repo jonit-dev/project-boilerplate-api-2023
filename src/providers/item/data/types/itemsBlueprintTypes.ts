@@ -134,6 +134,7 @@ export enum CraftingResourcesBlueprint {
   WolfTooth = "wolf-tooth",
   Bone = "bone",
   Worm = "worm",
+  WoodenSticks = "wooden-sticks",
 }
 
 export enum ToolsBlueprint {
