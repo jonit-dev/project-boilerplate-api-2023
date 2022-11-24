@@ -3,7 +3,7 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IItemUseWith, IValidUseWithResponse } from "@providers/useWith/useWithTypes";
+import { IValidUseWithResponse } from "@providers/useWith/useWithTypes";
 import { IUseWithItem, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { UseWithHelper } from "./libs/UseWithHelper";
@@ -47,22 +47,21 @@ export class UseWithItem {
     const originItem = await this.useWithHelper.getItem(character, data.originItemId);
     const targetItem = await this.useWithHelper.getItem(character, data.targetItemId);
 
-    const itemWithUseWithEffect = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWith>;
+    const itemWithUseWithEffect =
+      itemsBlueprintIndex[originItem.baseKey].useWithItemEffect ||
+      itemsBlueprintIndex[targetItem.baseKey].useWithItemEffect;
 
-    if (!itemWithUseWithEffect || !itemWithUseWithEffect.useWithItemEffect) {
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        `Item '${targetItem.baseKey}' cannot be used with any item...`
-      );
+    if (!itemWithUseWithEffect) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this crafting interaction is not possible.");
       throw new Error(
-        `UseWithItem > targetItem '${originItem.baseKey}' does not have a useWithEffect function defined`
+        `Crafting interaction unavailable for items: Origin: ${originItem.baseKey} => Target: ${targetItem.baseKey}`
       );
     }
 
     return {
       originItem,
       targetItem,
-      useWithItemEffect: itemWithUseWithEffect.useWithItemEffect,
+      useWithItemEffect: itemWithUseWithEffect,
     };
   }
 }
