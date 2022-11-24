@@ -12,7 +12,13 @@ import { FoodsBlueprint, MagicsBlueprint } from "@providers/item/data/types/item
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { GRID_WIDTH, NPCMovementType, UISocketEvents } from "@rpg-engine/shared";
+import {
+  CharacterSocketEvents,
+  GRID_WIDTH,
+  ItemSocketEvents,
+  NPCMovementType,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { UseWithEntity } from "../UseWithEntity";
 
@@ -635,6 +641,104 @@ describe("UseWithEntityValidation.ts", () => {
 
     const target = (await NPC.findOne({ _id: testNPC._id })) as unknown as INPC;
     expect(target.health).toBe(90);
+  });
+
+  it("should remove rune from inventory after it has been used", async () => {
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const inventory = await testCharacter.inventory;
+    const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    expect(container.slots[0]).toBeNull();
+    expect(container.slots[1]).not.toBeNull();
+    expect(container.slots[1].key).toBe(MagicsBlueprint.DarkRune);
+  });
+
+  it("should update character weight", async () => {
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
+    expect(character.weight).toBe(3.5);
+    expect(character.maxWeight).toBe(15);
+  });
+
+  it("should receive refresh items event", async () => {
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const inventory = await testCharacter.inventory;
+    const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    expect(sendEventToUserMock).toBeCalled();
+    expect(sendEventToUserMock).toHaveBeenCalledWith(
+      testCharacter.channelId,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      {
+        inventory: container,
+        openEquipmentSetOnUpdate: false,
+        openInventoryOnUpdate: true,
+      }
+    );
+  });
+
+  it("should receive target character update event", async () => {
+    testCharacter.channelId = "channel-1";
+    await testCharacter.save();
+
+    targetCharacter.channelId = "channel-2";
+    await targetCharacter.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    expect(sendEventToUserMock).toBeCalled();
+
+    const character = (await Character.findById(targetCharacter.id)) as unknown as ICharacter;
+    const payload = {
+      targetId: character._id,
+      health: character.health,
+      mana: character.mana,
+    };
+
+    // for caster
+    expect(sendEventToUserMock).toHaveBeenCalledWith(
+      testCharacter.channelId,
+      CharacterSocketEvents.AttributeChanged,
+      payload
+    );
+
+    // for target
+    expect(sendEventToUserMock).toHaveBeenCalledWith(
+      targetCharacter.channelId,
+      CharacterSocketEvents.AttributeChanged,
+      payload
+    );
   });
 
   afterAll(async () => {

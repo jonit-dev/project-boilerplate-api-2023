@@ -152,7 +152,7 @@ export class UseWithEntity {
     await this.characterWeight.updateCharacterWeight(caster);
 
     await this.sendRefreshItemsEvent(caster);
-    await this.sendTargetUpdateEvents(caster);
+    await this.sendTargetUpdateEvents(caster, target);
 
     await this.sendAnimationEvents(caster, target, blueprint as IMagicItemUseWithEntity);
   }
@@ -173,11 +173,11 @@ export class UseWithEntity {
     );
   }
 
-  private async sendTargetUpdateEvents(character: ICharacter): Promise<void> {
+  private async sendTargetUpdateEvents(character: ICharacter, target: ICharacter | INPC): Promise<void> {
     const payload: ICharacterAttributeChanged = {
-      targetId: character._id,
-      health: character.health,
-      mana: character.mana,
+      targetId: target._id,
+      health: target.health,
+      mana: target.mana,
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
