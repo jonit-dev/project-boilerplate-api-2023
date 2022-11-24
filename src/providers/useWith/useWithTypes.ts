@@ -47,5 +47,5 @@ export interface IUseWithCraftingRecipe {
   outputKey: string;
   outputQtyRange: [number, number];
   requiredItems: IUseWithCraftingRecipeItem[];
-  difficulty: number; // base % chance of success
+  successChance: number; // base % chance of success
 }

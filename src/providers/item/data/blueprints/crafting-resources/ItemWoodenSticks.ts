@@ -18,7 +18,7 @@ export const itemWoodenSticks: Partial<IItemUseWith> = {
   useWithItemEffect: async (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> => {
     const useWithItemToItem = container.get<UseWithItemToItem>(UseWithItemToItem);
 
-    await useWithItemToItem.execute(targetItem, originItem, character);
+    await useWithItemToItem.execute(targetItem, originItem, character, "cutting-wood");
   },
   maxStackSize: 100,
 };

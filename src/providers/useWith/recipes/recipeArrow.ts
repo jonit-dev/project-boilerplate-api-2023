@@ -14,5 +14,5 @@ export const recipeArrow: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  difficulty: 10,
+  successChance: 50,
 };

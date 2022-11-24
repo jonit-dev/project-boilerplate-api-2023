@@ -63,16 +63,28 @@ export class UseWithItemToItem {
 
     if (!wereIngredientsConsumed) return;
 
+    // check for probability of success
+    const n = random(0, 100);
+
+    if (n > matchingRecipe.successChance) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you failed to craft the item.");
+
+      await this.animationEffect.sendAnimationEventToCharacter(character, "miss");
+
+      await this.refreshCharacterInventory(character);
+      return;
+    }
+
     // now add the recipe output on the inventory
     const wasRecipeOutputCreated = await this.createRecipeOutputOnInventory(matchingRecipe, character);
 
     if (!wasRecipeOutputCreated) return;
 
-    await this.refreshCharacterInventory(character);
-
     if (animationEffectKey) {
       await this.animationEffect.sendAnimationEventToCharacter(character, animationEffectKey);
     }
+
+    await this.refreshCharacterInventory(character);
   }
 
   private async createRecipeOutputOnInventory(
