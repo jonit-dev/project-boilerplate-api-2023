@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
 import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
@@ -17,13 +18,14 @@ export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Accessory, ItemSlotType.Inventory],
   basePrice: 20,
+  hasUseWith: true,
 
   useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,
-  animationKey: AnimationEffectKeys.Dark,
-  projectileAnimationKey: AnimationEffectKeys.Hit,
-  usableEffect: async (caster: ICharacter, target: ICharacter) => {
+  animationKey: AnimationEffectKeys.Hit,
+  projectileAnimationKey: AnimationEffectKeys.Dark,
+  usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.DarkRune, caster);
 
     ItemUsableEffect.apply(target, EffectableAttribute.Mana, -1 * points);

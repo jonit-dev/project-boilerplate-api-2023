@@ -7,9 +7,13 @@ import { provide } from "inversify-binding-decorators";
 export class AnimationEffect {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  public async sendAnimationEventToCharacter(character: ICharacter, effectKey: string): Promise<void> {
+  public async sendAnimationEventToCharacter(
+    character: ICharacter,
+    effectKey: string,
+    targetId?: string
+  ): Promise<void> {
     const payload: IAnimationEffect = {
-      targetId: character._id,
+      targetId: targetId ?? character._id,
       effectKey,
     };
 

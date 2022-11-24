@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
 import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
@@ -18,14 +19,15 @@ export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Accessory, ItemSlotType.Inventory],
   basePrice: 20,
+  hasUseWith: true,
 
   useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,
-  animationKey: AnimationEffectKeys.Blue,
-  projectileAnimationKey: AnimationEffectKeys.LifeHeal,
+  animationKey: AnimationEffectKeys.LifeHeal,
+  projectileAnimationKey: AnimationEffectKeys.Blue,
 
-  usableEffect: async (caster: ICharacter, target: ICharacter) => {
+  usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.HealRune, caster);
 
     ItemUsableEffect.apply(target, EffectableAttribute.Health, points);

@@ -2,7 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ITEM_USE_WITH_ENTITY_EFFECT_RATIO } from "@providers/constants/ItemConstants";
+import { ITEM_USE_WITH_ENTITY_MAX_LEVEL_SUPPORT } from "@providers/constants/ItemConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 import { ISkill, IUseWithItem, IUseWithTile } from "@rpg-engine/shared";
@@ -52,7 +52,5 @@ export async function calculateItemUseEffectPoints(itemKey: string, caster: ICha
 
   const minPoints = itemData.power ?? 0;
 
-  return Math.round(
-    (level + (MAX_USE_EFFECT_POINTS - minPoints)) / (level + ITEM_USE_WITH_ENTITY_EFFECT_RATIO) + minPoints
-  );
+  return minPoints + Math.floor((level / ITEM_USE_WITH_ENTITY_MAX_LEVEL_SUPPORT) * (MAX_USE_EFFECT_POINTS - minPoints));
 }

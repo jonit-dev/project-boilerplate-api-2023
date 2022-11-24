@@ -3,16 +3,21 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ITEM_USE_WITH_ENTITY_GRID_CELL_RANGE } from "@providers/constants/ItemConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
 import { FoodsBlueprint, MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { GRID_WIDTH, NPCMovementType, UISocketEvents } from "@rpg-engine/shared";
+import {
+  CharacterSocketEvents,
+  GRID_WIDTH,
+  ItemSocketEvents,
+  NPCMovementType,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { UseWithEntity } from "../UseWithEntity";
 
@@ -45,34 +50,33 @@ describe("UseWithEntityValidation.ts", () => {
   };
 
   const prepareData = async () => {
-    testCharacter = await (
-      await unitTestHelper.createMockCharacter(
-        {
-          x: 10,
-          y: 11,
-        },
-        { hasEquipment: true, hasInventory: true, hasSkills: true }
-      )
-    )
-      .populate("skills")
-      .execPopulate();
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasInventory: true,
+      hasSkills: true,
+    });
 
-    targetCharacter = await unitTestHelper.createMockCharacter(
-      {
-        x: 11,
-        y: 12,
-      },
-      { hasEquipment: true, hasInventory: true, hasSkills: true }
-    );
+    targetCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasInventory: true,
+      hasSkills: true,
+    });
 
-    testNPC = await unitTestHelper.createMockNPC(
-      {
-        x: 15,
-        y: 15,
-      },
-      null,
-      NPCMovementType.Stopped
-    );
+    await testCharacter.populate("skills").execPopulate();
+
+    testCharacter.x = 10;
+    testCharacter.y = 11;
+    await testCharacter.save();
+
+    targetCharacter.x = 11;
+    targetCharacter.y = 12;
+    await targetCharacter.save();
+
+    testNPC = await unitTestHelper.createMockNPC(null, null, NPCMovementType.Stopped);
+
+    testNPC.x = 15;
+    testNPC.y = 15;
+    await testNPC.save();
 
     inventory = await testCharacter.inventory;
     inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
@@ -420,7 +424,7 @@ describe("UseWithEntityValidation.ts", () => {
 
     const isUnderRangeMock = jest.spyOn(MovementHelper.prototype, "isUnderRange");
 
-    testNPC.x = testCharacter.x + (ITEM_USE_WITH_ENTITY_GRID_CELL_RANGE + 1) * GRID_WIDTH;
+    testNPC.x = testCharacter.x + (itemDarkRune.useWithMaxDistanceGrid! + 1) * GRID_WIDTH;
     testNPC.y = testCharacter.y;
     await testNPC.save();
 
@@ -447,7 +451,7 @@ describe("UseWithEntityValidation.ts", () => {
       testCharacter.y,
       testNPC.x,
       testNPC.y,
-      ITEM_USE_WITH_ENTITY_GRID_CELL_RANGE
+      itemDarkRune.useWithMaxDistanceGrid
     );
   });
 
@@ -527,7 +531,227 @@ describe("UseWithEntityValidation.ts", () => {
     });
   });
 
+  it("should successfully use dark rune on target character", async () => {
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
+    expect(target.health).toBe(100);
+    expect(target.mana).toBe(90);
+  });
+
+  it("should successfully use poison rune on target character", async () => {
+    const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.PoisonRune)];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    await useWithEntity.execute(
+      {
+        itemId: items[0]._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
+    expect(target.health).toBe(90);
+    expect(target.mana).toBe(100);
+  });
+
+  it("should successfully use fire rune on target character", async () => {
+    const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.FireRune)];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    await useWithEntity.execute(
+      {
+        itemId: items[0]._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
+    expect(target.health).toBe(90);
+    expect(target.mana).toBe(100);
+  });
+
+  it("should successfully use heal rune on target character", async () => {
+    const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.HealRune)];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    targetCharacter.health = 50;
+    await targetCharacter.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: items[0]._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
+    expect(target.health).toBe(60);
+    expect(target.mana).toBe(100);
+  });
+
+  it("should deal extra damage depending on magic level", async () => {
+    characterSkills.magic.level = 12;
+    await characterSkills.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
+    expect(target.health).toBe(100);
+    expect(target.mana).toBe(89);
+  });
+
+  it("should successfully use fire rune on target npc", async () => {
+    const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.FireRune)];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    await useWithEntity.execute(
+      {
+        itemId: items[0]._id,
+        entityId: testNPC._id,
+        entityType: EntityType.NPC,
+      },
+      testCharacter
+    );
+
+    const target = (await NPC.findOne({ _id: testNPC._id })) as unknown as INPC;
+    expect(target.health).toBe(90);
+  });
+
+  it("should remove rune from inventory after it has been used", async () => {
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const inventory = await testCharacter.inventory;
+    const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    expect(container.slots[0]).toBeNull();
+    expect(container.slots[1]).not.toBeNull();
+    expect(container.slots[1].key).toBe(MagicsBlueprint.DarkRune);
+  });
+
+  it("should update character weight", async () => {
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
+    expect(character.weight).toBe(3.5);
+    expect(character.maxWeight).toBe(15);
+  });
+
+  it("should receive refresh items event", async () => {
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const inventory = await testCharacter.inventory;
+    const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    expect(sendEventToUserMock).toBeCalled();
+    expect(sendEventToUserMock).toHaveBeenCalledWith(
+      testCharacter.channelId,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      {
+        inventory: container,
+        openEquipmentSetOnUpdate: false,
+        openInventoryOnUpdate: true,
+      }
+    );
+  });
+
+  it("should receive target character update event", async () => {
+    testCharacter.channelId = "channel-1";
+    await testCharacter.save();
+
+    targetCharacter.channelId = "channel-2";
+    await targetCharacter.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    expect(sendEventToUserMock).toBeCalled();
+
+    const character = (await Character.findById(targetCharacter.id)) as unknown as ICharacter;
+    const payload = {
+      targetId: character._id,
+      health: character.health,
+      mana: character.mana,
+    };
+
+    // for caster
+    expect(sendEventToUserMock).toHaveBeenCalledWith(
+      testCharacter.channelId,
+      CharacterSocketEvents.AttributeChanged,
+      payload
+    );
+
+    // for target
+    expect(sendEventToUserMock).toHaveBeenCalledWith(
+      targetCharacter.channelId,
+      CharacterSocketEvents.AttributeChanged,
+      payload
+    );
+  });
+
   afterAll(async () => {
+    /**
+     * CharacterView.getOtherElementsInView when used with .lean({virtuals true})
+     * causes a little slow down and if we close the connection right after the test
+     * the test starts failing with connection closed error
+     */
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 500);
+    });
+
     await unitTestHelper.afterAllJestHook();
   });
 });

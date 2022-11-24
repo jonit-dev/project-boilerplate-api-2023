@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 
 export enum EffectableMaxAttribute {
   Health = "maxHealth",
@@ -11,7 +12,7 @@ export enum EffectableAttribute {
 }
 
 export class ItemUsableEffect {
-  static apply(character: ICharacter, attr: EffectableAttribute, value: number): void {
+  static apply(character: ICharacter | INPC, attr: EffectableAttribute, value: number): void {
     character[attr] += value;
 
     const maxAttr = EffectableAttribute.Health === attr ? EffectableMaxAttribute.Health : EffectableMaxAttribute.Mana;
