@@ -31,6 +31,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "test/*.ts", "src/jestGlobalSetup.js"],
+  "include": ["src/**/*.ts", "test/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
