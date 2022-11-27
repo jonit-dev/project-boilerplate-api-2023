@@ -20,7 +20,7 @@ export const npcElf: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Elf",
   key: HostileNPCsBlueprint.Elf,
-  textureKey: HostileNPCsBlueprint.Elf,
+  textureKey: "elf-white-hair-1",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.MeleeRanged,
   ammoKey: RangedWeaponsBlueprint.Arrow,
