@@ -53,12 +53,10 @@ export class MapTiles {
       return true;
     }
 
-    const layerName = TiledLayerNames[mapLayer];
-
     const layer = this.getLayer(map, mapLayer);
 
     if (!layer) {
-      throw new Error(`Failed to find layer ${layerName}`);
+      return false;
     }
 
     const rawTileId = this.getRawTileId(layer, gridX, gridY);
