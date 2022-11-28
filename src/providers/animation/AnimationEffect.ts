@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { AnimationSocketEvents, IAnimationEffect } from "@rpg-engine/shared";
+import { AnimationSocketEvents, IAnimationEffect, IProjectileAnimationEffect } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(AnimationEffect)
@@ -18,6 +19,44 @@ export class AnimationEffect {
     };
 
     await this.sendAnimationEffectEvent(character, payload);
+  }
+
+  public async sendProjectileAnimationEventToCharacter(
+    character: ICharacter,
+    sourceId: string,
+    targetId: string,
+    projectileEffectKey: string,
+    effectKey?: string
+  ): Promise<void> {
+    const payload: IProjectileAnimationEffect = {
+      sourceId,
+      targetId,
+      projectileEffectKey,
+      effectKey,
+    };
+
+    await this.sendProjectileAnimationEffectEvent(character, payload);
+  }
+
+  public async sendProjectileAnimationEventToNPC(
+    npc: INPC,
+    sourceId: string,
+    targetId: string,
+    projectileEffectKey: string,
+    effectKey?: string
+  ): Promise<void> {
+    const payload: IProjectileAnimationEffect = {
+      sourceId,
+      targetId,
+      projectileEffectKey,
+      effectKey,
+    };
+
+    await this.socketMessaging.sendEventToCharactersAroundNPC(
+      npc,
+      AnimationSocketEvents.ShowProjectileAnimation,
+      payload
+    );
   }
 
   public async sendAnimationEventToXYPosition(
@@ -40,6 +79,18 @@ export class AnimationEffect {
     await this.socketMessaging.sendEventToCharactersAroundCharacter(
       character,
       AnimationSocketEvents.ShowAnimation,
+      payload
+    );
+  }
+
+  private async sendProjectileAnimationEffectEvent(
+    character: ICharacter,
+    payload: IProjectileAnimationEffect
+  ): Promise<void> {
+    this.socketMessaging.sendEventToUser(character.channelId!, AnimationSocketEvents.ShowProjectileAnimation, payload);
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(
+      character,
+      AnimationSocketEvents.ShowProjectileAnimation,
       payload
     );
   }

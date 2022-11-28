@@ -12,8 +12,10 @@ import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
+  AnimationSocketEvents,
   CharacterSocketEvents,
   GRID_WIDTH,
+  IProjectileAnimationEffect,
   ItemSocketEvents,
   NPCMovementType,
   UISocketEvents,
@@ -736,6 +738,46 @@ describe("UseWithEntityValidation.ts", () => {
     expect(sendEventToUserMock).toHaveBeenCalledWith(
       targetCharacter.channelId,
       CharacterSocketEvents.AttributeChanged,
+      payload
+    );
+  });
+
+  it("should receive projectile animation event", async () => {
+    testCharacter.channelId = "channel-1";
+    await testCharacter.save();
+
+    targetCharacter.channelId = "channel-2";
+    await targetCharacter.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    expect(sendEventToUserMock).toBeCalled();
+
+    const payload: IProjectileAnimationEffect = {
+      sourceId: testCharacter._id,
+      targetId: targetCharacter._id,
+      projectileEffectKey: itemDarkRune.projectileAnimationKey!,
+      effectKey: itemDarkRune.animationKey,
+    };
+
+    // for caster
+    expect(sendEventToUserMock).toHaveBeenCalledWith(
+      testCharacter.channelId,
+      AnimationSocketEvents.ShowProjectileAnimation,
+      payload
+    );
+
+    // for target
+    expect(sendEventToUserMock).toHaveBeenCalledWith(
+      targetCharacter.channelId,
+      AnimationSocketEvents.ShowProjectileAnimation,
       payload
     );
   });

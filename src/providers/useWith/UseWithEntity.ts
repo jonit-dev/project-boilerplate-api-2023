@@ -193,7 +193,13 @@ export class UseWithEntity {
     target: ICharacter | INPC,
     item: IMagicItemUseWithEntity
   ): Promise<void> {
-    await this.animationEffect.sendAnimationEventToCharacter(caster, item.animationKey, target._id);
+    await this.animationEffect.sendProjectileAnimationEventToCharacter(
+      caster,
+      caster._id,
+      target._id,
+      item.projectileAnimationKey,
+      item.animationKey
+    );
   }
 
   private async getEntity(entityId: string, entityType: EntityType): Promise<ICharacter | INPC> {
