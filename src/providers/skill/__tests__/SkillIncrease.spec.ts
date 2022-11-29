@@ -5,9 +5,9 @@ import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/cons
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemSelfHealing } from "@providers/item/data/blueprints/spells/ItemSelfHealing";
 import { ItemSpellCast } from "@providers/item/ItemSpellCast";
-import { calculateSPToNextLevel, calculateXPToNextLevel, ItemSubType } from "@rpg-engine/shared";
+import { BasicAttribute, calculateSPToNextLevel, calculateXPToNextLevel, ItemSubType } from "@rpg-engine/shared";
 import { Error } from "mongoose";
-import { BasicAttribute, SkillIncrease } from "../SkillIncrease";
+import { SkillIncrease } from "../SkillIncrease";
 
 type TestCase = {
   item: string;

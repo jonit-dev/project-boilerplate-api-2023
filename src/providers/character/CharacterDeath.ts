@@ -7,8 +7,9 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
+import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BattleSocketEvents, IBattleDeath } from "@rpg-engine/shared";
+import { BattleSocketEvents, IBattleDeath, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
@@ -37,7 +38,8 @@ export class CharacterDeath {
     private npcTarget: NPCTarget,
     private characterInventory: CharacterInventory,
     private itemOwnership: ItemOwnership,
-    private characterWeight: CharacterWeight
+    private characterWeight: CharacterWeight,
+    private skillDecrease: SkillDecrease
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter, character: ICharacter): Promise<void> {
@@ -73,10 +75,19 @@ export class CharacterDeath {
     await this.respawnCharacter(character);
     await this.characterWeight.updateCharacterWeight(character);
 
+    const deathPenalty = await this.skillDecrease.deathPenalty(character);
+    if (deathPenalty) {
+      // Set timeout to not overwrite the msg "You are Died"
+      setTimeout(() => {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "You received a death penalty!",
+          type: "info",
+        });
+      }, 1500);
+    }
+
     // finally, force disconnect character that is dead.
     this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, dataOfCharacterDeath);
-
-    // TODO: Add death penalty here.
   }
 
   public async generateCharacterBody(character: ICharacter): Promise<IItem | any> {

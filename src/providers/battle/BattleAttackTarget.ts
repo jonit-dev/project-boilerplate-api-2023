@@ -6,9 +6,10 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { QuestSystem } from "@providers/quest/QuestSystem";
-import { BasicAttribute, SkillIncrease } from "@providers/skill/SkillIncrease";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
+  BasicAttribute,
   BattleEventType,
   BattleSocketEvents,
   GRID_WIDTH,
