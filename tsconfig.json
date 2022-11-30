@@ -1,6 +1,8 @@
 {
   "ts-node": {
-    "swc": true
+    "swc": true,
+    "transpileOnly": true,
+    "logError": true
   },
   "compilerOptions": {
     "target": "ES2020",
