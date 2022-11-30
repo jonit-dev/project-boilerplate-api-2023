@@ -17,6 +17,7 @@ import {
   GRID_WIDTH,
   IProjectileAnimationEffect,
   ItemSocketEvents,
+  NPCAlignment,
   NPCMovementType,
   UISocketEvents,
 } from "@rpg-engine/shared";
@@ -74,7 +75,7 @@ describe("UseWithEntityValidation.ts", () => {
     targetCharacter.y = 12;
     await targetCharacter.save();
 
-    testNPC = await unitTestHelper.createMockNPC(null, null, NPCMovementType.Stopped);
+    testNPC = await unitTestHelper.createMockNPC({ alignment: NPCAlignment.Hostile }, null, NPCMovementType.Stopped);
 
     testNPC.x = 15;
     testNPC.y = 15;
@@ -421,6 +422,54 @@ describe("UseWithEntityValidation.ts", () => {
     });
   });
 
+  it("should fail validation if target npc is friendly", async () => {
+    executeEffectMock.mockImplementation();
+
+    testNPC.alignment = NPCAlignment.Friendly;
+    await testNPC.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: testNPC._id,
+        entityType: EntityType.NPC,
+      },
+      testCharacter
+    );
+
+    expect(executeEffectMock).toBeCalledTimes(0);
+    expect(sendEventToUserMock).toBeCalledTimes(1);
+
+    expect(sendEventToUserMock).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+      message: "Sorry, your target is not valid.",
+      type: "error",
+    });
+  });
+
+  it("should fail validation if target npc is neutral", async () => {
+    executeEffectMock.mockImplementation();
+
+    testNPC.alignment = NPCAlignment.Neutral;
+    await testNPC.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: testNPC._id,
+        entityType: EntityType.NPC,
+      },
+      testCharacter
+    );
+
+    expect(executeEffectMock).toBeCalledTimes(0);
+    expect(sendEventToUserMock).toBeCalledTimes(1);
+
+    expect(sendEventToUserMock).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+      message: "Sorry, your target is not valid.",
+      type: "error",
+    });
+  });
+
   it("should fail validation if target is out of reach", async () => {
     executeEffectMock.mockImplementation();
 
@@ -443,7 +492,7 @@ describe("UseWithEntityValidation.ts", () => {
     expect(sendEventToUserMock).toBeCalledTimes(1);
 
     expect(sendEventToUserMock).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
-      message: "Sorry, your taget is out of reach.",
+      message: "Sorry, your target is out of reach.",
       type: "error",
     });
 

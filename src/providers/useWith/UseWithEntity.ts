@@ -16,6 +16,7 @@ import {
   IItemContainer,
   ItemSocketEvents,
   IUseWithEntity,
+  NPCAlignment,
   UseWithSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -103,6 +104,9 @@ export class UseWithEntity {
       if (!this.characterValidation.hasBasicValidation(target as ICharacter, customMsg)) {
         return false;
       }
+    } else if ((target as INPC).alignment !== NPCAlignment.Hostile) {
+      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is not valid.");
+      return false;
     }
 
     if (caster.scene !== target.scene) {
@@ -118,7 +122,7 @@ export class UseWithEntity {
       blueprint.useWithMaxDistanceGrid
     );
     if (!isUnderRange) {
-      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your taget is out of reach.");
+      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is out of reach.");
       return false;
     }
 

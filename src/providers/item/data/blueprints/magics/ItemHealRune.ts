@@ -9,7 +9,7 @@ import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
   key: MagicsBlueprint.HealRune,
-  type: ItemType.Accessory,
+  type: ItemType.Tool,
   subType: ItemSubType.Magic,
   textureAtlas: "items",
   texturePath: "magics/heal-rune.png",
@@ -17,7 +17,7 @@ export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
   name: "Healing Rune",
   description: "An ancient healing rune.",
   weight: 0.5,
-  allowedEquipSlotType: [ItemSlotType.Accessory, ItemSlotType.Inventory],
+  allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,
 

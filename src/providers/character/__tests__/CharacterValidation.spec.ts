@@ -43,7 +43,7 @@ describe("CharacterValidation.ts", () => {
     testCharacter.isBanned = true;
     await testCharacter.save();
 
-    const customBannedMsg = "Sorry, your taget is banned.";
+    const customBannedMsg = "Sorry, your target is banned.";
     const result = characterValidation.hasBasicValidation(testCharacter, new Map([["banned", customBannedMsg]]));
 
     expect(result).toBe(false);
@@ -75,7 +75,7 @@ describe("CharacterValidation.ts", () => {
     testCharacter.health = 0;
     await testCharacter.save();
 
-    const customDeadMsg = "Sorry, your taget is dead.";
+    const customDeadMsg = "Sorry, your target is dead.";
     const result = characterValidation.hasBasicValidation(testCharacter, new Map([["not-alive", customDeadMsg]]));
 
     expect(result).toBe(false);
@@ -104,7 +104,7 @@ describe("CharacterValidation.ts", () => {
     testCharacter.isOnline = false;
     await testCharacter.save();
 
-    const customOfflineMsg = "Sorry, your taget is offline.";
+    const customOfflineMsg = "Sorry, your target is offline.";
     const result = characterValidation.hasBasicValidation(testCharacter, new Map([["not-online", customOfflineMsg]]));
 
     expect(result).toBe(false);

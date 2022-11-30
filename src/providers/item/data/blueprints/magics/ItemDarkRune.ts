@@ -9,14 +9,14 @@ import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
   key: MagicsBlueprint.DarkRune,
-  type: ItemType.Accessory,
+  type: ItemType.Tool,
   subType: ItemSubType.Magic,
   textureAtlas: "items",
   texturePath: "magics/dark-rune.png",
   name: "Dark Rune",
   description: "An ancient dark rune.",
   weight: 0.5,
-  allowedEquipSlotType: [ItemSlotType.Accessory, ItemSlotType.Inventory],
+  allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,
 
