@@ -13,7 +13,7 @@ import {
   DaggersBlueprint,
   HelmetsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ItemSpellCast } from "@providers/item/ItemSpellCast";
+import { SpellCast } from "@providers/spells/SpellCast";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
 import { UpdateCharacterDTO } from "@useCases/ModuleCharacter/character/update/UpdateCharacterDTO";
@@ -33,7 +33,7 @@ export class CharacterRepository extends CRUD {
   constructor(
     private analyticsHelper: AnalyticsHelper,
     private characterWeight: CharacterWeight,
-    private itemSpellCast: ItemSpellCast
+    private spellCast: SpellCast
   ) {
     super(analyticsHelper);
   }
@@ -82,7 +82,7 @@ export class CharacterRepository extends CRUD {
     equipment.owner = createdCharacter._id;
     await equipment.save();
 
-    await this.itemSpellCast.learnLatestSkillLevelSpells(createdCharacter._id, false);
+    await this.spellCast.learnLatestSkillLevelSpells(createdCharacter._id, false);
 
     const charObject = createdCharacter.toObject();
     const characterInventory = await createdCharacter.inventory;

@@ -1,9 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SpellCastingType } from "@rpg-engine/shared";
-import { SpellsBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemSelfHealing } from "./ItemSelfHealing";
 
-export interface IItemSpell {
+export enum SpellsBlueprint {
+  SelfHealingSpell = "self-healing-spell",
+}
+
+export interface ISpell {
   key: SpellsBlueprint;
   name: string;
   description: string;
@@ -16,7 +18,3 @@ export interface IItemSpell {
   minMagicLevelRequired: number;
   usableEffect: (character: ICharacter) => void;
 }
-
-export const spellsBlueprintsIndex = {
-  [SpellsBlueprint.SelfHealingSpell]: itemSelfHealing,
-};

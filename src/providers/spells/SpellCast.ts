@@ -7,10 +7,10 @@ import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { IItemSpell, spellsBlueprintsIndex } from "./data/blueprints/spells/index";
-
-@provide(ItemSpellCast)
-export class ItemSpellCast {
+import { spellsBlueprints } from "./data/blueprints/index";
+import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
+@provide(SpellCast)
+export class SpellCast {
   private skillIncrease: SkillIncrease;
 
   constructor(
@@ -110,27 +110,27 @@ export class ItemSpellCast {
   }
 
   private getSpell(magicWords: string): any {
-    for (const key in spellsBlueprintsIndex) {
-      const item = spellsBlueprintsIndex[key];
-      if (item.magicWords === magicWords) {
-        return item;
+    for (const key in spellsBlueprints) {
+      const spell = spellsBlueprints[key];
+      if (spell.magicWords === magicWords) {
+        return spell;
       }
     }
     return null;
   }
 
-  private getSkillLevelSpells(level): IItemSpell[] {
-    const spells: IItemSpell[] = [];
-    for (const key in spellsBlueprintsIndex) {
-      const item = spellsBlueprintsIndex[key];
-      if (item.magicWords && level === item.minLevelRequired) {
-        spells.push(item as unknown as IItemSpell);
+  private getSkillLevelSpells(level): ISpell[] {
+    const spells: ISpell[] = [];
+    for (const key in spellsBlueprints) {
+      const spell = spellsBlueprints[key];
+      if (spell.magicWords && level === spell.minLevelRequired) {
+        spells.push(spell as unknown as ISpell);
       }
     }
     return spells;
   }
 
-  private async addToCharacterLearnedSpells(character: ICharacter, spells: IItemSpell[]): Promise<void> {
+  private async addToCharacterLearnedSpells(character: ICharacter, spells: ISpell[]): Promise<void> {
     const learned = character.learnedSpells ?? [];
     spells.forEach((spell) => {
       if (!learned.includes(spell.key)) {
@@ -142,7 +142,7 @@ export class ItemSpellCast {
     await character.save();
   }
 
-  private async sendPostSpellCastEvents(character: ICharacter, spell: IItemSpell): Promise<void> {
+  private async sendPostSpellCastEvents(character: ICharacter, spell: ISpell): Promise<void> {
     const payload: ICharacterAttributeChanged = {
       targetId: character._id,
       health: character.health,
@@ -159,7 +159,7 @@ export class ItemSpellCast {
     await this.animationEffect.sendAnimationEventToCharacter(character, spell.animationKey);
   }
 
-  private sendLearnedSpellNotification(character: ICharacter, spells: IItemSpell[]): void {
+  private sendLearnedSpellNotification(character: ICharacter, spells: ISpell[]): void {
     if (!spells || spells.length < 1) {
       return;
     }

@@ -6,7 +6,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
-import { IItemSpell } from "@providers/item/data/blueprints/spells/index";
+import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { AnimationEffectKeys, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
@@ -22,7 +22,7 @@ import {
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { ItemSpellCast } from "../item/ItemSpellCast";
+import { SpellCast } from "../spells/SpellCast";
 import { SkillCalculator } from "./SkillCalculator";
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -31,7 +31,7 @@ export class SkillIncrease {
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
-    private itemSpellCast: ItemSpellCast
+    private spellCast: SpellCast
   ) {}
 
   /**
@@ -101,7 +101,7 @@ export class SkillIncrease {
     }
   }
 
-  public async increaseMagicSP(character: ICharacter, spellBluePrint: Partial<IItemSpell>): Promise<void> {
+  public async increaseMagicSP(character: ICharacter, spellBluePrint: Partial<ISpell>): Promise<void> {
     await this.increaseBasicAttributeSP(character, BasicAttribute.Magic, (skillDetails: ISkillDetails) => {
       const manaSp = Math.round((spellBluePrint.manaCost ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
       return this.calculateNewSP(skillDetails) + manaSp;
@@ -173,7 +173,7 @@ export class SkillIncrease {
       if (levelUp) {
         await this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp: record!.xp! }, character, target);
         setTimeout(async () => {
-          await this.itemSpellCast.learnLatestSkillLevelSpells(character._id, true);
+          await this.spellCast.learnLatestSkillLevelSpells(character._id, true);
         }, 5000);
       }
 

@@ -6,11 +6,11 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { AnimationSocketEvents, CharacterSocketEvents, SkillSocketEvents, UISocketEvents } from "@rpg-engine/shared";
-import { itemSelfHealing } from "../data/blueprints/spells/ItemSelfHealing";
-import { ItemSpellCast } from "../ItemSpellCast";
+import { spellSelfHealing } from "../data/blueprints/SpellSelfHealing";
+import { SpellCast } from "../SpellCast";
 
-describe("ItemSpellCast.ts", () => {
-  let itemSpellCast: ItemSpellCast;
+describe("SpellCast.ts", () => {
+  let spellCast: SpellCast;
   let testCharacter: ICharacter;
   let characterSkills: ISkill;
   let sendEventToUser: jest.SpyInstance;
@@ -18,7 +18,7 @@ describe("ItemSpellCast.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
 
-    itemSpellCast = container.get<ItemSpellCast>(ItemSpellCast);
+    spellCast = container.get<SpellCast>(SpellCast);
   });
 
   beforeEach(async () => {
@@ -26,7 +26,7 @@ describe("ItemSpellCast.ts", () => {
 
     testCharacter = await (
       await unitTestHelper.createMockCharacter(
-        { health: 50, learnedSpells: [itemSelfHealing.key] },
+        { health: 50, learnedSpells: [spellSelfHealing.key] },
         { hasEquipment: false, hasInventory: false, hasSkills: true }
       )
     )
@@ -34,8 +34,8 @@ describe("ItemSpellCast.ts", () => {
       .execPopulate();
 
     characterSkills = testCharacter.skills as unknown as ISkill;
-    characterSkills.level = itemSelfHealing.minLevelRequired!;
-    characterSkills.magic.level = itemSelfHealing.minMagicLevelRequired;
+    characterSkills.level = spellSelfHealing.minLevelRequired!;
+    characterSkills.magic.level = spellSelfHealing.minMagicLevelRequired;
     await characterSkills.save();
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
@@ -53,16 +53,16 @@ describe("ItemSpellCast.ts", () => {
 
   describe("verify message is a spell being cast", () => {
     it("should be self healing spell casting", async () => {
-      expect(await itemSpellCast.isSpellCasting("heal me now")).toBeTruthy();
+      expect(await spellCast.isSpellCasting("talas faenya")).toBeTruthy();
     });
 
     it("should not be self healing spell casting", async () => {
-      expect(await itemSpellCast.isSpellCasting("heal me now ")).toBeFalsy();
+      expect(await spellCast.isSpellCasting("talas faenya ")).toBeFalsy();
     });
   });
 
   it("should fail with spell not found", async () => {
-    expect(await itemSpellCast.castSpell("heal me now ", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell("talas faenya ", testCharacter)).toBeFalsy();
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -76,7 +76,7 @@ describe("ItemSpellCast.ts", () => {
     const characterValidationMock = jest.spyOn(CharacterValidation.prototype, "hasBasicValidation");
     characterValidationMock.mockReturnValue(false);
 
-    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
     expect(characterValidationMock).toHaveBeenLastCalledWith(testCharacter);
 
     characterValidationMock.mockRestore();
@@ -86,7 +86,7 @@ describe("ItemSpellCast.ts", () => {
     const runTest = async (): Promise<void> => {
       sendEventToUser.mockReset();
 
-      expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeFalsy();
+      expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
 
       expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -106,10 +106,10 @@ describe("ItemSpellCast.ts", () => {
   });
 
   it("should fail with not enough mana", async () => {
-    testCharacter.mana = (itemSelfHealing.manaCost ?? 1) - 1;
+    testCharacter.mana = (spellSelfHealing.manaCost ?? 1) - 1;
     await testCharacter.save();
 
-    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -120,10 +120,10 @@ describe("ItemSpellCast.ts", () => {
   });
 
   it("should fail due to lower character level", async () => {
-    characterSkills.level = (itemSelfHealing.minLevelRequired ?? 2) - 1;
+    characterSkills.level = (spellSelfHealing.minLevelRequired ?? 2) - 1;
     await characterSkills.save();
 
-    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -134,10 +134,10 @@ describe("ItemSpellCast.ts", () => {
   });
 
   it("should fail due to lower magic level", async () => {
-    characterSkills.magic.level = (itemSelfHealing.minMagicLevelRequired ?? 2) - 1;
+    characterSkills.magic.level = (spellSelfHealing.minMagicLevelRequired ?? 2) - 1;
     await characterSkills.save();
 
-    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -148,10 +148,10 @@ describe("ItemSpellCast.ts", () => {
   });
 
   it("should cast self healing spell successfully", async () => {
-    const newHealth = testCharacter.health + itemSelfHealing.manaCost!;
-    const newMana = testCharacter.mana - itemSelfHealing.manaCost!;
+    const newHealth = testCharacter.health + spellSelfHealing.manaCost!;
+    const newMana = testCharacter.mana - spellSelfHealing.manaCost!;
 
-    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeTruthy();
+    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeTruthy();
 
     const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
     expect(character.health).toBe(newHealth);
@@ -177,7 +177,7 @@ describe("ItemSpellCast.ts", () => {
 
     expect(sendEventToUser).toHaveBeenNthCalledWith(2, testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
-      effectKey: itemSelfHealing.animationKey,
+      effectKey: spellSelfHealing.animationKey,
     });
   });
 
@@ -185,19 +185,19 @@ describe("ItemSpellCast.ts", () => {
     const increaseSPMock = jest.spyOn(SkillIncrease.prototype, "increaseMagicSP");
     increaseSPMock.mockImplementation();
 
-    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeTruthy();
+    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeTruthy();
 
     expect(increaseSPMock).toHaveBeenCalledTimes(1);
-    expect(increaseSPMock).toHaveBeenLastCalledWith(testCharacter, itemSelfHealing);
+    expect(increaseSPMock).toHaveBeenLastCalledWith(testCharacter, spellSelfHealing);
 
     increaseSPMock.mockRestore();
   });
 
   it("should increase skill and send skill update event", async () => {
-    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeTruthy();
+    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeTruthy();
 
     const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills)) as unknown as ISkill;
-    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemSelfHealing.manaCost ?? 0);
+    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (spellSelfHealing.manaCost ?? 0);
     expect(updatedSkills?.magic.skillPoints).toBe(skillPoints);
 
     expect(sendEventToUser).toBeCalledTimes(3);
@@ -217,7 +217,7 @@ describe("ItemSpellCast.ts", () => {
     testCharacter.skills = undefined;
     await testCharacter.save();
 
-    expect(await itemSpellCast.castSpell("heal me now", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -229,7 +229,7 @@ describe("ItemSpellCast.ts", () => {
 
   it("should add spells to learned spells (level 2 character)", async () => {
     const runTest = async (): Promise<void> => {
-      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter._id, false);
+      await spellCast.learnLatestSkillLevelSpells(testCharacter._id, false);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
@@ -238,7 +238,7 @@ describe("ItemSpellCast.ts", () => {
 
       expect(skills.level).toBe(2);
       expect(character.learnedSpells).toBeDefined();
-      expect([...character.learnedSpells!]).toEqual([itemSelfHealing.key]);
+      expect([...character.learnedSpells!]).toEqual([spellSelfHealing.key]);
 
       expect(sendEventToUser).not.toHaveBeenCalled();
     };
@@ -250,7 +250,7 @@ describe("ItemSpellCast.ts", () => {
 
   it("should add spells to learned spells (level 2 character) and notify user", async () => {
     const runTest = async (): Promise<void> => {
-      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter._id, true);
+      await spellCast.learnLatestSkillLevelSpells(testCharacter._id, true);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
@@ -259,10 +259,10 @@ describe("ItemSpellCast.ts", () => {
 
       expect(skills.level).toBe(2);
       expect(character.learnedSpells).toBeDefined();
-      expect([...character.learnedSpells!]).toEqual([itemSelfHealing.key]);
+      expect([...character.learnedSpells!]).toEqual([spellSelfHealing.key]);
 
       expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
-        message: "You have learned new spell(s): Self Healing Spell (heal me now)",
+        message: "You have learned new spell(s): Self Healing Spell (talas faenya)",
         type: "info",
       });
     };
@@ -274,7 +274,7 @@ describe("ItemSpellCast.ts", () => {
 
   it("should not duplicate spells on append (level 2 character)", async () => {
     const runTest = async (): Promise<void> => {
-      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter._id, false);
+      await spellCast.learnLatestSkillLevelSpells(testCharacter._id, false);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
@@ -283,17 +283,17 @@ describe("ItemSpellCast.ts", () => {
 
       expect(skills.level).toBe(2);
       expect(character.learnedSpells).toBeDefined();
-      expect([...character.learnedSpells!]).toEqual([itemSelfHealing.key]);
+      expect([...character.learnedSpells!]).toEqual([spellSelfHealing.key]);
     };
 
-    testCharacter.learnedSpells = [itemSelfHealing.key!];
+    testCharacter.learnedSpells = [spellSelfHealing.key!];
     await testCharacter.save();
     await runTest();
   });
 
   it("should not add any spell to character (level 1 character)", async () => {
     const runTest = async (): Promise<void> => {
-      await itemSpellCast.learnLatestSkillLevelSpells(testCharacter._id, true);
+      await spellCast.learnLatestSkillLevelSpells(testCharacter._id, true);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
