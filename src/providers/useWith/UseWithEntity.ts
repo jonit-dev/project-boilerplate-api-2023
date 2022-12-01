@@ -26,6 +26,7 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { IMagicItemUseWithEntity } from "./useWithTypes";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 
 @provide(UseWithEntity)
 export class UseWithEntity {
@@ -38,7 +39,8 @@ export class UseWithEntity {
     private characterItemInventory: CharacterItemInventory,
     private characterWeight: CharacterWeight,
     private animationEffect: AnimationEffect,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private skillIncrease: SkillIncrease
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -156,8 +158,12 @@ export class UseWithEntity {
 
     await this.sendRefreshItemsEvent(caster);
     await this.sendTargetUpdateEvents(caster, target);
-
     await this.sendAnimationEvents(caster, target, blueprint as IMagicItemUseWithEntity);
+
+    await this.skillIncrease.increaseMagicSP(caster, blueprint.power);
+    if (target.type === EntityType.Character) {
+      await this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, blueprint.power);
+    }
   }
 
   private async sendRefreshItemsEvent(character: ICharacter): Promise<void> {

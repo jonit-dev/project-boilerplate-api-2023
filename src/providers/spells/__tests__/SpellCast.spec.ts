@@ -188,7 +188,7 @@ describe("SpellCast.ts", () => {
     expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeTruthy();
 
     expect(increaseSPMock).toHaveBeenCalledTimes(1);
-    expect(increaseSPMock).toHaveBeenLastCalledWith(testCharacter, spellSelfHealing);
+    expect(increaseSPMock).toHaveBeenLastCalledWith(testCharacter, spellSelfHealing.manaCost!);
 
     increaseSPMock.mockRestore();
   });
