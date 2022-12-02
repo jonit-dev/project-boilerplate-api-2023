@@ -11,6 +11,7 @@ import {
 } from "@entities/ModuleQuest/QuestObjectiveModel";
 import { IQuestRecord, QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { IQuestReward, QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
+import { CharacterItems, IItemByKeyResult } from "@providers/character/characterItems/CharacterItems";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -49,7 +50,8 @@ export class QuestSystem {
     private characterWeight: CharacterWeight,
     private equipmentSlots: EquipmentSlots,
     private movementHelper: MovementHelper,
-    private mathHelper: MathHelper
+    private mathHelper: MathHelper,
+    private characterItems: CharacterItems
   ) {}
 
   public async updateQuests(type: QuestType, character: ICharacter, targetKey: string): Promise<void> {
@@ -64,7 +66,7 @@ export class QuestSystem {
         updatedQuest = await this.updateKillObjective(objectivesData, targetKey);
         break;
       case QuestType.Interaction:
-        updatedQuest = await this.updateInteractionObjective(objectivesData, targetKey);
+        updatedQuest = await this.updateInteractionObjective(objectivesData, targetKey, character);
         break;
       default:
         throw new Error(`Invalid quest type ${type}`);
@@ -155,21 +157,57 @@ export class QuestSystem {
    *
    * @param data objectives data of interaction objectives
    * @param npcKey key of npc that the charater interacted with
+   * @param character character data used to check if has required items in case the interaction quest has defined 'itemsKeys' field
    */
   private async updateInteractionObjective(
     data: IGetObjectivesResult,
-    npcKey: string
+    npcKey: string,
+    character: ICharacter
   ): Promise<IQuestModel | undefined> {
     // check for each objective if the npc key is the correspondiong npc
     // If many cases, only update the first one
     for (const i in data.objectives) {
+      let objCompleted = false;
+
       const obj = data.objectives[i] as IQuestObjectiveInteraction;
+
+      // get the quest record for the character
+      const record = data.records.filter((r) => r.objective.toString() === obj._id.toString());
+      if (!record.length) {
+        throw new Error("Character hasn't started this quest");
+      }
+
       if (obj.targetNPCkey! === npcKey.split("-")[0]) {
-        // get the quest record for the character
-        const record = data.records.filter((r) => r.objective.toString() === obj._id.toString());
-        if (!record.length) {
-          throw new Error("Character hasn't started this quest");
+        objCompleted = true;
+      }
+      // check if the obj has 'itemsKeys' field defined
+      // then check if character has the required items to complete the quest
+      if (!_.isEmpty(obj.itemsKeys)) {
+        const foundItems: IItemByKeyResult[] = [];
+        for (const key of obj.itemsKeys!) {
+          // if does not have all items, no update is done
+          const foundItem = await this.characterItems.hasItemByKey(key, character, "both");
+          if (!foundItem) {
+            return;
+          }
+          foundItems.push(foundItem);
         }
+
+        // character contains all items
+        // remove them from the character's equipment and set obj as completed
+        for (const found of foundItems) {
+          // @ts-ignore
+          const removed = await this.characterItems.deleteItemFromContainer(found.itemId!, character, found.container);
+          if (!removed) {
+            return;
+          }
+        }
+        await Item.deleteMany({ _id: { $in: foundItems.map((i) => i.itemId) } });
+        objCompleted = true;
+      }
+
+      if (objCompleted) {
+        // update the quest status to Completed
         record[0].status = QuestStatus.Completed;
         await record[0].save();
         return (await Quest.findById(record[0].quest)) as IQuestModel;

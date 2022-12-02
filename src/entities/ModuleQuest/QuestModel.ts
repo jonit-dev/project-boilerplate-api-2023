@@ -37,15 +37,17 @@ questSchema.virtual("objectivesDetails").get(async function (this: IQuest) {
     _id: { $in: this.objectives },
   })) as any[];
 
-  if (_.isEmpty(killObj)) {
-    return interactionObj || [];
+  const objectives: any[] = [];
+
+  if (!_.isEmpty(killObj)) {
+    objectives.push(...killObj);
   }
 
-  if (_.isEmpty(interactionObj)) {
-    return killObj || [];
+  if (!_.isEmpty(interactionObj)) {
+    objectives.push(...interactionObj);
   }
 
-  return killObj.push(...interactionObj);
+  return objectives;
 });
 
 questSchema.methods.hasStatus = async function (

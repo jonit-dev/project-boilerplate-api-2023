@@ -41,8 +41,18 @@ import {
   itemMockBow,
   itemMeleeRangedMock,
 } from "./mock/itemMock";
-import { questInteractionObjectiveMock, questKillObjectiveMock, questMock, questRewardsMock } from "./mock/questMock";
+import {
+  questInteractionCraftObjectiveMock,
+  questInteractionObjectiveMock,
+  questKillObjectiveMock,
+  questMock,
+  questRewardsMock,
+} from "./mock/questMock";
 import { userMock } from "./mock/userMock";
+
+export enum InteractionQuestSubtype {
+  craft = "craft",
+}
 
 interface IMockCharacterOptions {
   hasEquipment?: boolean;
@@ -57,6 +67,7 @@ interface IMockNPCOptions {
 interface IMockQuestOptions {
   type?: QuestType;
   objectivesCount?: number;
+  subtype?: InteractionQuestSubtype;
 }
 
 @provide(UnitTestHelper)
@@ -502,6 +513,12 @@ export class UnitTestHelper {
     if (options && options.type) {
       switch (options.type) {
         case QuestType.Interaction:
+          if (options.subtype === InteractionQuestSubtype.craft) {
+            for (let i = 0; i < objCount; i++) {
+              await this.addQuestInteractionCraftObjectiveMock(testQuest);
+            }
+            break;
+          }
           for (let i = 0; i < objCount; i++) {
             await this.addQuestInteractionObjectiveMock(testQuest);
           }
@@ -528,6 +545,14 @@ export class UnitTestHelper {
   private async addQuestInteractionObjectiveMock(quest: IQuest): Promise<void> {
     let testQuestObjectiveInteraction = new QuestObjectiveInteraction({
       ...questInteractionObjectiveMock,
+    });
+    testQuestObjectiveInteraction = await testQuestObjectiveInteraction.save();
+    quest.objectives!.push(testQuestObjectiveInteraction._id);
+  }
+
+  private async addQuestInteractionCraftObjectiveMock(quest: IQuest): Promise<void> {
+    let testQuestObjectiveInteraction = new QuestObjectiveInteraction({
+      ...questInteractionCraftObjectiveMock,
     });
     testQuestObjectiveInteraction = await testQuestObjectiveInteraction.save();
     quest.objectives!.push(testQuestObjectiveInteraction._id);
@@ -578,6 +603,36 @@ export class UnitTestHelper {
     );
 
     return newDepot;
+  }
+
+  public async equipItemsInBackpackSlot(equipment: IEquipment, itemsKeys: string[]): Promise<IItem[]> {
+    // Add items to character's backpack
+    const backpack = equipment.inventory as unknown as IItem;
+    const backpackContainer = await this.createMockBackpackItemContainer(backpack);
+    backpack.itemContainer = backpackContainer._id;
+
+    await Item.updateOne(
+      {
+        _id: backpack._id,
+      },
+      {
+        $set: {
+          itemContainer: backpackContainer._id,
+        },
+      }
+    );
+
+    const items: IItem[] = [];
+    for (const key of itemsKeys) {
+      const item = await this.createMockItemFromBlueprint(key);
+      const slotId = backpackContainer.firstAvailableSlotId;
+      backpackContainer.slots[slotId!] = item._id;
+      items.push(item);
+    }
+
+    backpackContainer.markModified("slots");
+    await backpackContainer.save();
+    return items;
   }
 
   public async beforeAllJestHook(): Promise<void> {

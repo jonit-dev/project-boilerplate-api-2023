@@ -3,6 +3,7 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { isSameKey } from "@providers/dataStructures/KeyHelper";
 
 import { provide } from "inversify-binding-decorators";
 
@@ -49,6 +50,41 @@ export class CharacterItemEquipment {
     return false;
   }
 
+  /**
+   * checkItemEquipmentByKey returns the item id if found, otherwise returns undefined
+   * @param itemKey
+   * @param character
+   * @returns the item id if found, otherwise returns undefined
+   */
+  public async checkItemEquipmentByKey(itemKey: string, character: ICharacter): Promise<string | undefined> {
+    const equipment = await Equipment.findById(character.equipment);
+
+    if (!equipment) {
+      return;
+    }
+
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+
+    for (let [, value] of Object.entries(equipmentSlots)) {
+      if (!value) {
+        continue;
+      }
+
+      if (!value.key) {
+        value = (await Item.findById(value as any)) as unknown as IItem;
+      }
+
+      // item not found, continue
+      if (!value) {
+        continue;
+      }
+
+      if (isSameKey(value.key, itemKey)) {
+        return value._id;
+      }
+    }
+  }
+
   private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
     const equipmentSetId = character.equipment;
     const equipmentSet = await Equipment.findById(equipmentSetId);
@@ -76,6 +112,10 @@ export class CharacterItemEquipment {
       if (equipmentSet[itemSlotType] && equipmentSet[itemSlotType].toString() === item._id.toString()) {
         targetSlot = itemSlotType;
       }
+    }
+
+    if (!targetSlot) {
+      return false;
     }
 
     equipmentSet[targetSlot] = undefined;

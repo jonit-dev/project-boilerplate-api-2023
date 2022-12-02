@@ -1,7 +1,7 @@
 import { IQuest } from "@entities/ModuleQuest/QuestModel";
 import { IQuestObjectiveKill } from "@entities/ModuleQuest/QuestObjectiveModel";
 import { IQuestReward } from "@entities/ModuleQuest/QuestRewardModel";
-import { AccessoriesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { AccessoriesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { QuestsBlueprint } from "@providers/quest/data/questsBlueprintTypes";
 import { IQuestObjectiveInteraction } from "@rpg-engine/shared";
@@ -24,4 +24,8 @@ export const questKillObjectiveMock: Partial<IQuestObjectiveKill> = {
 
 export const questInteractionObjectiveMock: Partial<IQuestObjectiveInteraction> = {
   targetNPCkey: FriendlyNPCsBlueprint.Alice,
+};
+
+export const questInteractionCraftObjectiveMock: Partial<IQuestObjectiveInteraction> = {
+  itemsKeys: [CraftingResourcesBlueprint.Diamond, CraftingResourcesBlueprint.Silk],
 };

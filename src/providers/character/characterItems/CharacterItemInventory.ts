@@ -107,25 +107,30 @@ export class CharacterItemInventory {
     return await this.removeItemFromInventory(item._id, character);
   }
 
-  public async checkItemInInventoryByKey(itemKey: string, character: ICharacter): Promise<boolean> {
+  /**
+   * Returns the item id if it finds it. Otherwise, returns undefined
+   */
+  public async checkItemInInventoryByKey(itemKey: string, character: ICharacter): Promise<string | undefined> {
     const inventory = (await character.inventory) as unknown as IItem;
 
     const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
-      return false;
+      return;
     }
 
     for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
-      const slotItem = inventoryItemContainer.slots[i] as unknown as IItem;
+      let slotItem = inventoryItemContainer.slots[i] as unknown as IItem;
       if (!slotItem) continue;
 
+      if (!slotItem.key) {
+        slotItem = (await Item.findById(slotItem as any)) as unknown as IItem;
+      }
+
       if (isSameKey(slotItem.key, itemKey)) {
-        return true;
+        return slotItem._id;
       }
     }
-
-    return false;
   }
 
   public async checkItemInInventory(itemId: string, character: ICharacter): Promise<boolean> {
@@ -142,8 +147,8 @@ export class CharacterItemInventory {
     if (!inventoryItemIds) {
       return false;
     }
-
-    return !!inventoryItemIds.find((id) => String(id) === String(itemId));
+    // @ts-ignore
+    return !!inventoryItemIds.find((id) => id.toString("hex") === itemId.toString("hex"));
   }
 
   private async removeItemFromInventory(itemId: string, character: ICharacter): Promise<boolean> {
