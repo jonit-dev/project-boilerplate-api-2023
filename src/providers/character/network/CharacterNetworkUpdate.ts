@@ -54,13 +54,17 @@ export class CharacterNetworkUpdate {
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
         if (data) {
-          const isMoving = this.movementHelper.isMoving(data.x, data.y, data.newX, data.newY);
+          const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
 
           // send message back to the user telling that the requested position update is not valid!
 
           let isPositionUpdateValid = true;
 
-          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(data.x, data.y, data.direction);
+          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
+            character.x,
+            character.y,
+            data.direction
+          );
 
           if (isMoving) {
             isPositionUpdateValid = await this.checkIfValidPositionUpdate(
@@ -190,10 +194,7 @@ export class CharacterNetworkUpdate {
     }
   }
 
-  private shouldWarnCharacter(
-    emitter: ICharacter,
-    nearbyCharacter: ICharacter | ICharacterPositionUpdateFromClient
-  ): boolean {
+  private shouldWarnCharacter(emitter: ICharacter, nearbyCharacter: ICharacter): boolean {
     const charOnCharView = emitter.view.characters[nearbyCharacter.id];
 
     // if we already have a representation there, just skip!
@@ -225,8 +226,8 @@ export class CharacterNetworkUpdate {
       const nearbyCharEmitterRepresentation = nearbyCharacter.view.characters[character.id];
       if (nearbyCharEmitterRepresentation) {
         if (
-          clientPosUpdateData.x === nearbyCharEmitterRepresentation.x &&
-          clientPosUpdateData.y === nearbyCharEmitterRepresentation.y &&
+          character.x === nearbyCharEmitterRepresentation.x &&
+          character.y === nearbyCharEmitterRepresentation.y &&
           clientPosUpdateData.direction === nearbyCharEmitterRepresentation.direction
         ) {
           continue;
@@ -238,9 +239,9 @@ export class CharacterNetworkUpdate {
       await this.characterView.addToCharacterView(
         nearbyCharacter,
         {
-          id: clientPosUpdateData.id,
-          x: clientPosUpdateData.x,
-          y: clientPosUpdateData.y,
+          id: character.id,
+          x: character.x,
+          y: character.y,
           direction: clientPosUpdateData.direction,
           scene: character.scene,
         },
@@ -259,15 +260,11 @@ export class CharacterNetworkUpdate {
     dataFromClient: ICharacterPositionUpdateFromClient,
     character: ICharacter
   ): ICharacterPositionUpdateFromServer {
-    const isMoving = this.movementHelper.isMoving(
-      dataFromClient.x,
-      dataFromClient.y,
-      dataFromClient.newX,
-      dataFromClient.newY
-    );
+    const isMoving = this.movementHelper.isMoving(character.x, character.y, dataFromClient.newX, dataFromClient.newY);
 
     return {
       ...dataFromClient,
+      id: character.id,
       x: character.x,
       y: character.y,
       name: character.name,
@@ -324,8 +321,8 @@ export class CharacterNetworkUpdate {
     this.characterValidation.hasBasicValidation(character);
 
     const serverCalculatedDirection = this.movementHelper.getGridMovementDirection(
-      ToGridX(data.x),
-      ToGridY(data.y),
+      ToGridX(character.x),
+      ToGridY(character.y),
       ToGridX(data.newX),
       ToGridY(data.newY)
     );
@@ -347,12 +344,6 @@ export class CharacterNetworkUpdate {
       }
     }
 
-    if (Math.round(character.x) !== Math.round(data.x) && Math.round(character.y) !== Math.round(data.y)) {
-      console.log(`🚫 ${character.name} tried to move from a different origin position`);
-
-      return false; // mismatch between client and server position
-    }
-
     return true;
   }
 
@@ -364,7 +355,6 @@ export class CharacterNetworkUpdate {
     isMoving: boolean,
     direction: AnimationDirection
   ): Promise<void> {
-    const updatedData = data;
     const map = character.scene;
 
     const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
@@ -373,17 +363,14 @@ export class CharacterNetworkUpdate {
       // if character is moving, update the position
 
       // old position is now walkable
-      this.gridManager.setWalkable(map, ToGridX(data.x) + gridOffsetX, ToGridY(data.y) + gridOffsetY, true);
-
-      updatedData.x = newX;
-      updatedData.y = newY;
+      this.gridManager.setWalkable(map, ToGridX(character.x) + gridOffsetX, ToGridY(character.y) + gridOffsetY, true);
 
       await Character.updateOne(
         { _id: character._id },
         {
           $set: {
-            x: updatedData.x,
-            y: updatedData.y,
+            x: newX,
+            y: newY,
             direction: direction,
             lastMovement: new Date(),
           },
@@ -392,12 +379,7 @@ export class CharacterNetworkUpdate {
 
       // update our grid with solid information
 
-      this.gridManager.setWalkable(
-        map,
-        ToGridX(updatedData.x) + gridOffsetX,
-        ToGridY(updatedData.y) + gridOffsetY,
-        false
-      );
+      this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
     }
   }
 }
