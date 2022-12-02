@@ -16,6 +16,7 @@ import {
   IItemContainer,
   ItemSocketEvents,
   IUseWithEntity,
+  NPCAlignment,
   UseWithSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -25,6 +26,7 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { IMagicItemUseWithEntity } from "./useWithTypes";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 
 @provide(UseWithEntity)
 export class UseWithEntity {
@@ -37,7 +39,8 @@ export class UseWithEntity {
     private characterItemInventory: CharacterItemInventory,
     private characterWeight: CharacterWeight,
     private animationEffect: AnimationEffect,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private skillIncrease: SkillIncrease
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -103,6 +106,9 @@ export class UseWithEntity {
       if (!this.characterValidation.hasBasicValidation(target as ICharacter, customMsg)) {
         return false;
       }
+    } else if ((target as INPC).alignment !== NPCAlignment.Hostile) {
+      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is not valid.");
+      return false;
     }
 
     if (caster.scene !== target.scene) {
@@ -118,7 +124,7 @@ export class UseWithEntity {
       blueprint.useWithMaxDistanceGrid
     );
     if (!isUnderRange) {
-      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your taget is out of reach.");
+      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is out of reach.");
       return false;
     }
 
@@ -152,8 +158,12 @@ export class UseWithEntity {
 
     await this.sendRefreshItemsEvent(caster);
     await this.sendTargetUpdateEvents(caster, target);
-
     await this.sendAnimationEvents(caster, target, blueprint as IMagicItemUseWithEntity);
+
+    await this.skillIncrease.increaseMagicSP(caster, blueprint.power);
+    if (target.type === EntityType.Character) {
+      await this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, blueprint.power);
+    }
   }
 
   private async sendRefreshItemsEvent(character: ICharacter): Promise<void> {

@@ -43,6 +43,14 @@ export class MovementHelper {
       return true;
     }
 
+    if (caller instanceof NPC) {
+      const hasTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
+
+      if (hasTransition) {
+        return true;
+      }
+    }
+
     const hasNPC = await NPC.exists({
       x: FromGridX(gridX),
       y: FromGridY(gridY),
@@ -53,14 +61,6 @@ export class MovementHelper {
 
     if (hasNPC) {
       return true;
-    }
-
-    if (caller instanceof NPC) {
-      const hasTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
-
-      if (hasTransition) {
-        return true;
-      }
     }
 
     const hasCharacter = await Character.exists({

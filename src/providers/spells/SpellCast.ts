@@ -46,7 +46,7 @@ export class SpellCast {
 
     await this.sendPostSpellCastEvents(character, spell);
 
-    await this.getSkillIncreaseInstance().increaseMagicSP(character, spell);
+    await this.getSkillIncreaseInstance().increaseMagicSP(character, spell.manaCost);
 
     return true;
   }

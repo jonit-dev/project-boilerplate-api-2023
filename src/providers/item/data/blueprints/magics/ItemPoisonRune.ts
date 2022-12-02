@@ -9,14 +9,14 @@ import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
   key: MagicsBlueprint.PoisonRune,
-  type: ItemType.Accessory,
+  type: ItemType.Tool,
   subType: ItemSubType.Magic,
   textureAtlas: "items",
   texturePath: "magics/poison-rune.png",
   name: "Poison Rune",
   description: "An ancient poison rune.",
   weight: 0.5,
-  allowedEquipSlotType: [ItemSlotType.Accessory, ItemSlotType.Inventory],
+  allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,
 

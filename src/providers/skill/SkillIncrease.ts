@@ -6,7 +6,6 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
-import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { AnimationEffectKeys, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
@@ -101,11 +100,16 @@ export class SkillIncrease {
     }
   }
 
-  public async increaseMagicSP(character: ICharacter, spellBluePrint: Partial<ISpell>): Promise<void> {
-    await this.increaseBasicAttributeSP(character, BasicAttribute.Magic, (skillDetails: ISkillDetails) => {
-      const manaSp = Math.round((spellBluePrint.manaCost ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
-      return this.calculateNewSP(skillDetails) + manaSp;
-    });
+  public async increaseMagicSP(character: ICharacter, power: number): Promise<void> {
+    await this.increaseBasicAttributeSP(character, BasicAttribute.Magic, this.getMagicSkillIncreaseCalculator(power));
+  }
+
+  public async increaseMagicResistanceSP(character: ICharacter, power: number): Promise<void> {
+    await this.increaseBasicAttributeSP(
+      character,
+      BasicAttribute.MagicResistance,
+      this.getMagicSkillIncreaseCalculator(power)
+    );
   }
 
   public async increaseBasicAttributeSP(
@@ -337,5 +341,12 @@ export class SkillIncrease {
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill: skills,
     });
+  }
+
+  private getMagicSkillIncreaseCalculator(spellPower: number): Function {
+    return ((power: number, skillDetails: ISkillDetails): number => {
+      const manaSp = Math.round((power ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
+      return this.calculateNewSP(skillDetails) + manaSp;
+    }).bind(this, spellPower);
   }
 }
