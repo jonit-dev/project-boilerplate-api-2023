@@ -142,6 +142,7 @@ export enum ToolsBlueprint {
   CarpentersAxe = "carpenters-axe",
   FishingRod = "fishing-rod",
   Pickaxe = "pickaxe",
+  Hammer = "hammer",
   UseWithItemTest = "use-with-item-test",
   UseWithTileTest = "use-with-tile-test",
 }
@@ -237,7 +238,6 @@ export enum AccessoriesBlueprint {
 }
 
 export enum HammersBlueprint {
-  Hammer = "hammer",
   IronHammer = "iron-hammer",
   WarHammer = "war-hammer",
 }
