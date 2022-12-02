@@ -1,3 +1,5 @@
+import { container } from "@providers/inversify/container";
+import { UseWithPickaxe } from "@providers/useWith/items/UseWithPickaxe";
 import { IItemUseWith } from "@providers/useWith/useWithTypes";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -19,4 +21,9 @@ export const itemPickaxe: Partial<IItemUseWith> = {
   basePrice: 60,
   hasUseWith: true,
   useWithMaxDistanceGrid: 2,
+  useWithTileEffect: async (originItem, targetTile, character) => {
+    const useWithPickaxe = container.get<UseWithPickaxe>(UseWithPickaxe);
+
+    await useWithPickaxe.execute(character, targetTile);
+  },
 };
