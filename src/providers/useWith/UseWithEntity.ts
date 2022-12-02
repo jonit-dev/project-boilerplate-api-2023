@@ -160,7 +160,6 @@ export class UseWithEntity {
     await this.sendTargetUpdateEvents(caster, target);
     await this.sendAnimationEvents(caster, target, blueprint as IMagicItemUseWithEntity);
 
-    await this.skillIncrease.increaseMagicSP(caster, blueprint.power);
     if (target.type === EntityType.Character) {
       await this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, blueprint.power);
     }

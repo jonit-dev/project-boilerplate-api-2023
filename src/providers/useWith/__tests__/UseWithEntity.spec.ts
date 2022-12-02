@@ -834,25 +834,6 @@ describe("UseWithEntityValidation.ts", () => {
     );
   });
 
-  it("should call skill increase functionality to increase caster skills", async () => {
-    const increaseSPMock = jest.spyOn(SkillIncrease.prototype, "increaseMagicSP");
-    increaseSPMock.mockImplementation();
-
-    await useWithEntity.execute(
-      {
-        itemId: item1._id,
-        entityId: targetCharacter._id,
-        entityType: EntityType.Character,
-      },
-      testCharacter
-    );
-
-    expect(increaseSPMock).toHaveBeenCalledTimes(1);
-    expect(increaseSPMock).toHaveBeenLastCalledWith(testCharacter, itemDarkRune.power);
-
-    increaseSPMock.mockRestore();
-  });
-
   it("should call skill increase functionality to increase target skills", async () => {
     const increaseSPMock = jest.spyOn(SkillIncrease.prototype, "increaseMagicResistanceSP");
     increaseSPMock.mockImplementation();
@@ -912,11 +893,7 @@ describe("UseWithEntityValidation.ts", () => {
     );
 
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
-
-    const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills)) as unknown as ISkill;
     const updatedSkillsTarget: ISkill = (await Skill.findById(targetCharacter.skills)) as unknown as ISkill;
-
-    expect(updatedSkills?.magic.skillPoints).toBe(skillPoints);
     expect(updatedSkillsTarget?.magicResistance.skillPoints).toBe(skillPoints);
 
     expect(sendEventToUserMock).toHaveBeenCalled();
@@ -928,9 +905,8 @@ describe("UseWithEntityValidation.ts", () => {
       }
     });
 
-    expect(skillsCalls.length).toBe(2);
-    expect(skillsCalls[0][2]?.skill?.magic?.skillPoints).toBe(skillPoints);
-    expect(skillsCalls[1][2]?.skill?.magicResistance?.skillPoints).toBe(skillPoints);
+    expect(skillsCalls.length).toBe(1);
+    expect(skillsCalls[0][2]?.skill?.magicResistance?.skillPoints).toBe(skillPoints);
   });
 
   afterAll(async () => {
