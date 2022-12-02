@@ -10,7 +10,7 @@ export const itemHammer: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "hammers/hammer.png",
   name: "Hammer",
-  description: "A simple hammer.",
+  description: "A simple hammer used as a weapon or for blacksmithing.",
   attack: 5,
   defense: 2,
   weight: 2,
