@@ -175,10 +175,11 @@ const npcSchema = createLeanSchema(
       xpPerDamage: number;
       hasQuest: Promise<boolean>;
     }),
-    entityEffects: Type.array().of({
-      type: [String],
-      enum: EntryEffectBlueprint,
-    }),
+    entityEffects: Type.array().of(
+      Type.string({
+        typeof: EntryEffectBlueprint,
+      })
+    ),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
