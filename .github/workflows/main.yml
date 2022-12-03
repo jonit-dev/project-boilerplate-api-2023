@@ -36,9 +36,6 @@ jobs:
       # Runs a single command using the runners shell
       - name: Switch to Dev
         run: yarn env:switch:dev
-      - name: Install dependencies
-        run: yarn --prefer-offline
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
       - name: Run install
         run: yarn install
       - name: Run typescript and linter
