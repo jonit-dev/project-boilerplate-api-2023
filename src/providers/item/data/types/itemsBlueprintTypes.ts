@@ -117,6 +117,7 @@ export enum FoodsBlueprint {
   RottenMeat = "rotten-meat",
 }
 export enum CraftingResourcesBlueprint {
+  Rope = "rope",
   BlueSapphire = "blue-sapphire",
   BlueFeather = "blue-feather",
   Leather = "leather",
@@ -135,6 +136,22 @@ export enum CraftingResourcesBlueprint {
   Bone = "bone",
   Worm = "worm",
   WoodenSticks = "wooden-sticks",
+  PolishedStone = "polished-stone",
+  WaterBottle = "water-bottle",
+  SteelIngot = "steel-ingot",
+  WoodenBoard = "wooden-board",
+  PhoenixFeather = "phoenix-feather",
+  BlueLeather = "blue-leather",
+  Jade = "jade",
+  Rock = "rock",
+  SewingThread = "sewing-thread",
+  ElvenLeaf = "elven-leaf",
+  ElvenWood = "elven-wood",
+  SmallWorm = "small-worm",
+  SmallWoodenStick = "small-wooden-sticks",
+  RedShappire = "red-shappire",
+  BlueSilk = "blue-silk",
+  IronNail = "iron-nail",
 }
 
 export enum ToolsBlueprint {
@@ -234,7 +251,6 @@ export enum AccessoriesBlueprint {
   CorruptionNecklace = "corruption-necklace",
   DeathNecklace = "death-necklace",
   ElvenRing = "elven-ring",
-  Rope = "rope",
 }
 
 export enum HammersBlueprint {

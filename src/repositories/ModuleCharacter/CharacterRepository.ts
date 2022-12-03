@@ -113,7 +113,7 @@ export class CharacterRepository extends CRUD {
     const jacket = await this.generateInitialItem(ArmorsBlueprint.Jacket, ownerId);
     const cap = await this.generateInitialItem(HelmetsBlueprint.Cap, ownerId);
     const boot = await this.generateInitialItem(BootsBlueprint.Boots, ownerId);
-    const rope = await this.generateInitialItem(AccessoriesBlueprint.Rope, ownerId);
+    const bandana = await this.generateInitialItem(AccessoriesBlueprint.Bandana, ownerId);
 
     return {
       inventory: bag._id,
@@ -121,7 +121,7 @@ export class CharacterRepository extends CRUD {
       armor: jacket._id,
       head: cap._id,
       boot: boot._id,
-      accessory: rope._id,
+      accessory: bandana._id,
     };
   }
 }

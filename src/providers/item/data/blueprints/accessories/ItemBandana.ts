@@ -10,7 +10,7 @@ export const itemBandana: Partial<IItem> = {
   texturePath: "accessories/bandana.png",
   name: "Bandana",
   description: "a simple cloth bandana.",
-  defense: 0,
+  defense: 0.5,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   basePrice: 1,
