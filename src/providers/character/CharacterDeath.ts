@@ -43,8 +43,6 @@ export class CharacterDeath {
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter, character: ICharacter): Promise<void> {
-    console.log(`💀 Character ${character.name} is dead 💀`);
-
     await this.clearAttackerTarget(killer);
 
     // send event to the character that is dead

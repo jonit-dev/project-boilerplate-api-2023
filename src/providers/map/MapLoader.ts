@@ -1,5 +1,6 @@
 import { MapModel } from "@entities/ModuleSystem/MapModel";
 import { appEnv } from "@providers/config/env";
+import { UNIT_TESTING_MAPS } from "@providers/constants/MapConstants";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { InternalServerError } from "@providers/errors/InternalServerError";
 import { ITiled, MAP_REQUIRED_LAYERS } from "@rpg-engine/shared";
@@ -22,7 +23,7 @@ export class MapLoader {
   public async init(): Promise<void> {
     // get all map names
 
-    const mapNames = this.getMapNames();
+    const mapNames = appEnv.general.IS_UNIT_TEST ? UNIT_TESTING_MAPS : this.getMapNames();
     const mapToCheckTransitions: MapObject[] = [];
 
     if (!appEnv.general.IS_UNIT_TEST) {
@@ -96,8 +97,10 @@ export class MapLoader {
         await map.save();
 
         // create zip
+
         const pathToSave = `${STATIC_PATH}/maps`;
         await createZipMap(fileName, mapObject, pathToSave);
+
         return true;
       }
     } else {
@@ -106,8 +109,10 @@ export class MapLoader {
       await MapModel.create({ name: fileName, checksum: mapChecksum });
 
       // create zip
+
       const pathToSave = `${STATIC_PATH}/maps`;
       await createZipMap(fileName, mapObject, pathToSave);
+
       return true;
     }
 
