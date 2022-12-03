@@ -1,3 +1,7 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { container } from "@providers/inversify/container";
+import { IButchersKnifeUseWithEntity } from "@providers/useWith/items/UseWithButchersKnife";
 import { IItemUseWith } from "@providers/useWith/useWithTypes";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -19,4 +23,9 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
   basePrice: 45,
   hasUseWith: true,
   useWithMaxDistanceGrid: 2,
+  usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
+    const butcherKnifeUseWithEntity = container.get<IButchersKnifeUseWithEntity>(IButchersKnifeUseWithEntity);
+
+    await butcherKnifeUseWithEntity.execute(character);
+  },
 };
