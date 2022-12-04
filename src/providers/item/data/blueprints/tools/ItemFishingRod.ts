@@ -24,9 +24,9 @@ export const itemFishingRod: Partial<IItemUseWith> = {
     targetName: string,
     character: ICharacter
   ): Promise<void> => {
-    const useWithTileToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
+    const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
 
-    await useWithTileToTile.execute(character, {
+    await useWithItemToTile.execute(character, {
       targetTile,
       requiredResource: {
         key: CraftingResourcesBlueprint.Worm,
