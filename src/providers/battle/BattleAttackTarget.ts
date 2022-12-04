@@ -2,13 +2,17 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
+import { IEntityEffect } from "@providers/entities/data/blueprints/entityEffect";
+import { entitiesBlueprintsIndex } from "@providers/entities/data/index";
+import { EntityEffectUse } from "@providers/entities/EntityEffectUse";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { QuestSystem } from "@providers/quest/QuestSystem";
-import { BasicAttribute, SkillIncrease } from "@providers/skill/SkillIncrease";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
+  BasicAttribute,
   BattleEventType,
   BattleSocketEvents,
   GRID_WIDTH,
@@ -39,7 +43,8 @@ export class BattleAttackTarget {
     private npcDeath: NPCDeath,
     private skillIncrease: SkillIncrease,
     private battleRangedAttack: BattleRangedAttack,
-    private questSystem: QuestSystem
+    private questSystem: QuestSystem,
+    private entityEffectUse: EntityEffectUse
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -145,6 +150,37 @@ export class BattleAttackTarget {
       return;
     }
 
+    // check the attacher is NPC and check entity Effects
+    if (attacker.type === "NPC") {
+      const npc = attacker as INPC;
+      if (npc.entityEffects?.length) {
+        const entityEffects = npc.entityEffects;
+        const selectedEntityEffects: IEntityEffect[] = [];
+        entityEffects.forEach((effect) => {
+          const entry: IEntityEffect = entitiesBlueprintsIndex[effect];
+
+          switch (attacker.attackType) {
+            case EntityAttackType.MeleeRanged:
+              selectedEntityEffects.push(entry);
+              break;
+            case EntityAttackType.Melee:
+              if (entry.type === EntityAttackType.Melee) {
+                selectedEntityEffects.push(entry);
+              }
+              break;
+            case EntityAttackType.Ranged:
+              if (entry.type === EntityAttackType.Ranged) {
+                selectedEntityEffects.push(entry);
+              }
+              break;
+            default:
+              break;
+          }
+        });
+        // EntityEffectUse.applyEntityEffect(selectedEntityEffects);
+      }
+    }
+
     const battleEvent = await this.battleEvent.calculateEvent(attacker, target);
 
     let battleEventPayload: Partial<IBattleEventFromServer> = {
@@ -154,6 +190,41 @@ export class BattleAttackTarget {
     };
 
     if (battleEvent === BattleEventType.Hit) {
+      // check the attacher is NPC and check entity Effects
+      if (attacker.type === "NPC") {
+        const npc = attacker as INPC;
+        if (npc.entityEffects?.length) {
+          const entityEffects = npc.entityEffects;
+          const selectedEntityEffects: IEntityEffect[] = [];
+          entityEffects.forEach((effect) => {
+            const entry: IEntityEffect = entitiesBlueprintsIndex[effect];
+
+            switch (attacker.attackType) {
+              case EntityAttackType.MeleeRanged:
+                selectedEntityEffects.push(entry);
+                break;
+              case EntityAttackType.Melee:
+                if (entry.type === EntityAttackType.Melee) {
+                  selectedEntityEffects.push(entry);
+                }
+                break;
+              case EntityAttackType.Ranged:
+                if (entry.type === EntityAttackType.Ranged) {
+                  selectedEntityEffects.push(entry);
+                }
+                break;
+              default:
+                break;
+            }
+          });
+          if (selectedEntityEffects.length) {
+            const effectTarget = target;
+
+            await this.entityEffectUse.applyEntityEffects(selectedEntityEffects, effectTarget, attacker);
+          }
+        }
+      }
+
       const damage = await this.battleEvent.calculateHitDamage(attacker, target);
       if (damage > 0) {
         // Increase attacker SP for weapon used and XP (if is character)

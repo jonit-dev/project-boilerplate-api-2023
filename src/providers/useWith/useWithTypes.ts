@@ -3,7 +3,12 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { MapLayers } from "@rpg-engine/shared";
 
 export interface IUseWithTileEffect {
-  (item: IItem, targetTile: IUseWithTargetTile, character: ICharacter): Promise<void> | void;
+  (
+    item: IItem,
+    targetTile: IUseWithTargetTile,
+    targetName: string | undefined,
+    character: ICharacter
+  ): Promise<void> | void;
 }
 
 export interface IUseWithItemEffect {
@@ -16,11 +21,16 @@ export interface IItemUseWith extends IItem {
   useWithTileEffect?: IUseWithTileEffect;
 }
 
-export interface IValidUseWithResponse {
+export interface IUseWithItemValidationResponse {
   originItem: IItem;
   targetItem?: IItem;
   useWithItemEffect?: IUseWithItemEffect;
+}
+
+export interface IUseWithTileValidationResponse {
+  originItem: IItem;
   useWithTileEffect?: IUseWithTileEffect;
+  targetName?: string;
 }
 
 export interface IMagicItemUseWithEntity extends IItem {

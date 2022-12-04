@@ -3,12 +3,12 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { itemSelfHealing } from "@providers/item/data/blueprints/spells/ItemSelfHealing";
-import { ItemSpellCast } from "@providers/item/ItemSpellCast";
-import { ItemSubType } from "@rpg-engine/shared";
+import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
+import { spellSelfHealing } from "@providers/spells/data/blueprints/SpellSelfHealing";
+import { SpellCast } from "@providers/spells/SpellCast";
+import { BasicAttribute, calculateSPToNextLevel, calculateXPToNextLevel, ItemSubType } from "@rpg-engine/shared";
 import { Error } from "mongoose";
-import { calculateSPToNextLevel, calculateXPToNextLevel } from "../SkillCalculator";
-import { BasicAttribute, SkillIncrease } from "../SkillIncrease";
+import { SkillIncrease } from "../SkillIncrease";
 
 type TestCase = {
   item: string;
@@ -144,7 +144,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
     sendSkillLevelUpEvents = jest.spyOn(skillIncrease, "sendSkillLevelUpEvents" as any);
     sendExpLevelUpEvents = jest.spyOn(skillIncrease, "sendExpLevelUpEvents" as any);
-    spellLearnMock = jest.spyOn(ItemSpellCast.prototype, "learnLatestSkillLevelSpells");
+    spellLearnMock = jest.spyOn(SpellCast.prototype, "learnLatestSkillLevelSpells");
     spellLearnMock.mockImplementation();
   });
 
@@ -285,16 +285,29 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
   });
 
   it("should increase character's magic SP as per mana cost", async () => {
-    await skillIncrease.increaseMagicSP(testCharacter, itemSelfHealing);
+    await skillIncrease.increaseMagicSP(testCharacter, spellSelfHealing.manaCost!);
 
     const updatedSkills = await Skill.findById(testCharacter.skills);
 
-    // 'resistance' skill should increase
+    // 'magic' skill should increase
     expect(updatedSkills?.magic.level).toBe(initialLevel);
 
-    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemSelfHealing.manaCost ?? 0);
+    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (spellSelfHealing.manaCost ?? 0);
     expect(updatedSkills?.magic.skillPoints).toBe(skillPoints);
     expect(updatedSkills?.magic.skillPointsToNextLevel).toBe(spToLvl2 - skillPoints);
+  });
+
+  it("should increase character's magic resistance SP as per rune power", async () => {
+    await skillIncrease.increaseMagicResistanceSP(testCharacter, itemDarkRune.power!);
+
+    const updatedSkills = await Skill.findById(testCharacter.skills);
+
+    // 'magic resistance' skill should increase
+    expect(updatedSkills?.magicResistance.level).toBe(initialLevel);
+
+    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
+    expect(updatedSkills?.magicResistance.skillPoints).toBe(skillPoints);
+    expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBe(spToLvl2 - skillPoints);
   });
 
   afterAll(async () => {

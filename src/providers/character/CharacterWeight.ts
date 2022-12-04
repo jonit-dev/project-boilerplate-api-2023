@@ -71,7 +71,8 @@ export class CharacterWeight {
 
     if (inventoryContainer) {
       for (const bagItem of inventoryContainer.itemIds) {
-        const item = await Item.findById(bagItem).lean();
+        // @ts-ignore
+        const item = await Item.findById(bagItem.toString("hex")).lean();
         if (item) {
           if (item.stackQty && item.stackQty > 1) {
             // -1 because the count is include the weight of the container item.

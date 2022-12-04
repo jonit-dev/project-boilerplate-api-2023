@@ -53,16 +53,17 @@ export class NPCMovementMoveTowards {
       // change movement to MoveWay (flee) if health is low!
       if (npc.fleeOnLowHealth) {
         if (npc.health <= npc.maxHealth / 4) {
-          npc.currentMovementType = NPCMovementType.MoveAway;
-          await npc.save();
+          await NPC.updateOne({ _id: npc.id }, { currentMovementType: NPCMovementType.MoveAway });
         }
       }
 
       if (reachedTarget) {
         if (npc.pathOrientation === NPCPathOrientation.Backward) {
           // if NPC is coming back from being lured, reset its orientation to Forward
-          npc.pathOrientation = NPCPathOrientation.Forward;
-          await npc.save();
+          // npc.pathOrientation = NPCPathOrientation.Forward;
+          // await npc.save();
+
+          await NPC.updateOne({ _id: npc.id }, { pathOrientation: NPCPathOrientation.Forward });
         }
 
         await this.faceTarget(npc);

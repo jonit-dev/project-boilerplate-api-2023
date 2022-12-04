@@ -15,4 +15,5 @@ export const itemBag: Partial<IItem> = {
   isItemContainer: true,
   generateContainerSlots: 10,
   allowedEquipSlotType: [ItemSlotType.Inventory],
+  basePrice: 0,
 };

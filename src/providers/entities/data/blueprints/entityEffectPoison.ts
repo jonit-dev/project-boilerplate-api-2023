@@ -8,6 +8,7 @@ export const entityEffectPoison: Partial<IEntityEffect> = {
   key: EntryEffectBlueprint.Poison,
   totalDurationMs: 5000 * 60, // how long should it last?
   intervalMs: 2000, // interval between each effect triggering
+  value: 10,
   effect: async (target: ICharacter | INPC) => {
     target.health = -10;
     await target.save();

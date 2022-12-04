@@ -4,7 +4,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { User } from "@entities/ModuleSystem/UserModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { SpellsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   CharacterClass,
   CharacterFactions,

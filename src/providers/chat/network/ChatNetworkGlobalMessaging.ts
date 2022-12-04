@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ChatLog, IChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
-import { ItemSpellCast } from "@providers/item/ItemSpellCast";
+import { SpellCast } from "@providers/spells/SpellCast";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -25,7 +25,7 @@ export class ChatNetworkGlobalMessaging {
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
     private socketTransmissionZone: SocketTransmissionZone,
-    private itemSpellCast: ItemSpellCast,
+    private spellCast: SpellCast,
     private characterValidation: CharacterValidation
   ) {}
 
@@ -41,8 +41,8 @@ export class ChatNetworkGlobalMessaging {
             return;
           }
 
-          if (this.itemSpellCast.isSpellCasting(data.message)) {
-            await this.itemSpellCast.castSpell(data.message, character);
+          if (this.spellCast.isSpellCasting(data.message)) {
+            await this.spellCast.castSpell(data.message, character);
           }
 
           const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);

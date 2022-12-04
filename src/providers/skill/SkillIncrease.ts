@@ -6,65 +6,23 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
-import { IItemSpell } from "@providers/item/data/blueprints/spells/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { AnimationEffectKeys, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import {
+  BasicAttribute,
+  IIncreaseSPResult,
+  IIncreaseXPResult,
   ISkillDetails,
   ISkillEventFromServer,
   SkillEventType,
   SkillSocketEvents,
+  SKILLS_MAP,
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { ItemSpellCast } from "../item/ItemSpellCast";
+import { SpellCast } from "../spells/SpellCast";
 import { SkillCalculator } from "./SkillCalculator";
-
-declare enum CombatSkill {
-  First = "first",
-  Sword = "sword",
-  Dagger = "dagger",
-  Axe = "axe",
-  Distance = "distance",
-  Shielding = "shielding",
-  Club = "club",
-}
-
-export enum BasicAttribute {
-  Strength = "strength",
-  Resistance = "resistance",
-  Dexterity = "dexterity",
-  Magic = "magic",
-}
-
-const SkillsMap = new Map<ItemSubType | string, string>([
-  ["None", CombatSkill.First],
-  [ItemSubType.Sword, CombatSkill.Sword],
-  [ItemSubType.Dagger, CombatSkill.Dagger],
-  [ItemSubType.Axe, CombatSkill.Axe],
-  [ItemSubType.Ranged, CombatSkill.Distance],
-  [ItemSubType.Spear, CombatSkill.Distance],
-  [ItemSubType.Shield, CombatSkill.Shielding],
-  [ItemSubType.Mace, CombatSkill.Club],
-  [BasicAttribute.Strength, BasicAttribute.Strength],
-  [BasicAttribute.Resistance, BasicAttribute.Resistance],
-  [BasicAttribute.Dexterity, BasicAttribute.Dexterity],
-  [BasicAttribute.Magic, BasicAttribute.Magic],
-]);
-
-interface IIncreaseSPResult {
-  skillLevelUp: boolean;
-  skillLevel: number;
-  skillName: string;
-}
-
-interface IIncreaseXPResult {
-  level: number;
-  previousLevel: number;
-  exp: number;
-}
-
 @provide(SkillIncrease)
 export class SkillIncrease {
   constructor(
@@ -72,7 +30,7 @@ export class SkillIncrease {
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
-    private itemSpellCast: ItemSpellCast
+    private spellCast: SpellCast
   ) {}
 
   /**
@@ -142,11 +100,16 @@ export class SkillIncrease {
     }
   }
 
-  public async increaseMagicSP(character: ICharacter, spellBluePrint: Partial<IItemSpell>): Promise<void> {
-    await this.increaseBasicAttributeSP(character, BasicAttribute.Magic, (skillDetails: ISkillDetails) => {
-      const manaSp = Math.round((spellBluePrint.manaCost ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
-      return this.calculateNewSP(skillDetails) + manaSp;
-    });
+  public async increaseMagicSP(character: ICharacter, power: number): Promise<void> {
+    await this.increaseBasicAttributeSP(character, BasicAttribute.Magic, this.getMagicSkillIncreaseCalculator(power));
+  }
+
+  public async increaseMagicResistanceSP(character: ICharacter, power: number): Promise<void> {
+    await this.increaseBasicAttributeSP(
+      character,
+      BasicAttribute.MagicResistance,
+      this.getMagicSkillIncreaseCalculator(power)
+    );
   }
 
   public async increaseBasicAttributeSP(
@@ -214,7 +177,7 @@ export class SkillIncrease {
       if (levelUp) {
         await this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp: record!.xp! }, character, target);
         setTimeout(async () => {
-          await this.itemSpellCast.learnLatestSkillLevelSpells(character._id, true);
+          await this.spellCast.learnLatestSkillLevelSpells(character._id, true);
         }, 5000);
       }
 
@@ -300,7 +263,7 @@ export class SkillIncrease {
 
   private increaseSP(skills: ISkill, skillKey: string, skillPointsCalculator?: Function): IIncreaseSPResult {
     let skillLevelUp = false;
-    const skillToUpdate = SkillsMap.get(skillKey);
+    const skillToUpdate = SKILLS_MAP.get(skillKey);
 
     if (!skillToUpdate) {
       throw new Error(`skill not found for item subtype ${skillKey}`);
@@ -378,5 +341,12 @@ export class SkillIncrease {
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill: skills,
     });
+  }
+
+  private getMagicSkillIncreaseCalculator(spellPower: number): Function {
+    return ((power: number, skillDetails: ISkillDetails): number => {
+      const manaSp = Math.round((power ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
+      return this.calculateNewSP(skillDetails) + manaSp;
+    }).bind(this, spellPower);
   }
 }

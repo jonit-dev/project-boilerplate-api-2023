@@ -1,21 +1,27 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
 import { FoodsBlueprint, MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
+  AnimationSocketEvents,
   CharacterSocketEvents,
   GRID_WIDTH,
+  IProjectileAnimationEffect,
   ItemSocketEvents,
+  NPCAlignment,
   NPCMovementType,
+  SkillSocketEvents,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -72,7 +78,7 @@ describe("UseWithEntityValidation.ts", () => {
     targetCharacter.y = 12;
     await targetCharacter.save();
 
-    testNPC = await unitTestHelper.createMockNPC(null, null, NPCMovementType.Stopped);
+    testNPC = await unitTestHelper.createMockNPC({ alignment: NPCAlignment.Hostile }, null, NPCMovementType.Stopped);
 
     testNPC.x = 15;
     testNPC.y = 15;
@@ -419,6 +425,54 @@ describe("UseWithEntityValidation.ts", () => {
     });
   });
 
+  it("should fail validation if target npc is friendly", async () => {
+    executeEffectMock.mockImplementation();
+
+    testNPC.alignment = NPCAlignment.Friendly;
+    await testNPC.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: testNPC._id,
+        entityType: EntityType.NPC,
+      },
+      testCharacter
+    );
+
+    expect(executeEffectMock).toBeCalledTimes(0);
+    expect(sendEventToUserMock).toBeCalledTimes(1);
+
+    expect(sendEventToUserMock).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+      message: "Sorry, your target is not valid.",
+      type: "error",
+    });
+  });
+
+  it("should fail validation if target npc is neutral", async () => {
+    executeEffectMock.mockImplementation();
+
+    testNPC.alignment = NPCAlignment.Neutral;
+    await testNPC.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: testNPC._id,
+        entityType: EntityType.NPC,
+      },
+      testCharacter
+    );
+
+    expect(executeEffectMock).toBeCalledTimes(0);
+    expect(sendEventToUserMock).toBeCalledTimes(1);
+
+    expect(sendEventToUserMock).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+      message: "Sorry, your target is not valid.",
+      type: "error",
+    });
+  });
+
   it("should fail validation if target is out of reach", async () => {
     executeEffectMock.mockImplementation();
 
@@ -441,7 +495,7 @@ describe("UseWithEntityValidation.ts", () => {
     expect(sendEventToUserMock).toBeCalledTimes(1);
 
     expect(sendEventToUserMock).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
-      message: "Sorry, your taget is out of reach.",
+      message: "Sorry, your target is out of reach.",
       type: "error",
     });
 
@@ -738,6 +792,121 @@ describe("UseWithEntityValidation.ts", () => {
       CharacterSocketEvents.AttributeChanged,
       payload
     );
+  });
+
+  it("should receive projectile animation event", async () => {
+    testCharacter.channelId = "channel-1";
+    await testCharacter.save();
+
+    targetCharacter.channelId = "channel-2";
+    await targetCharacter.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    expect(sendEventToUserMock).toBeCalled();
+
+    const payload: IProjectileAnimationEffect = {
+      sourceId: testCharacter._id,
+      targetId: targetCharacter._id,
+      projectileEffectKey: itemDarkRune.projectileAnimationKey!,
+      effectKey: itemDarkRune.animationKey,
+    };
+
+    // for caster
+    expect(sendEventToUserMock).toHaveBeenCalledWith(
+      testCharacter.channelId,
+      AnimationSocketEvents.ShowProjectileAnimation,
+      payload
+    );
+
+    // for target
+    expect(sendEventToUserMock).toHaveBeenCalledWith(
+      targetCharacter.channelId,
+      AnimationSocketEvents.ShowProjectileAnimation,
+      payload
+    );
+  });
+
+  it("should call skill increase functionality to increase target skills", async () => {
+    const increaseSPMock = jest.spyOn(SkillIncrease.prototype, "increaseMagicResistanceSP");
+    increaseSPMock.mockImplementation();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    expect(increaseSPMock).toHaveBeenCalledTimes(1);
+
+    const skillUpdateEventParams = increaseSPMock.mock.calls[0];
+
+    expect(skillUpdateEventParams[0]).toBeDefined();
+    expect(skillUpdateEventParams[0]._id).toStrictEqual(targetCharacter._id);
+    expect(skillUpdateEventParams[1]).toBe(itemDarkRune.power);
+
+    increaseSPMock.mockRestore();
+  });
+
+  it("should not call skill increase functionality for target npc", async () => {
+    const increaseSPMock = jest.spyOn(SkillIncrease.prototype, "increaseMagicResistanceSP");
+    increaseSPMock.mockImplementation();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: testNPC._id,
+        entityType: EntityType.NPC,
+      },
+      testCharacter
+    );
+
+    expect(increaseSPMock).toHaveBeenCalledTimes(0);
+
+    increaseSPMock.mockRestore();
+  });
+
+  it("should increase skills and send skills update event", async () => {
+    testCharacter.channelId = "channel-1";
+    await testCharacter.save();
+
+    targetCharacter.channelId = "channel-2";
+    await targetCharacter.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
+    const updatedSkillsTarget: ISkill = (await Skill.findById(targetCharacter.skills)) as unknown as ISkill;
+    expect(updatedSkillsTarget?.magicResistance.skillPoints).toBe(skillPoints);
+
+    expect(sendEventToUserMock).toHaveBeenCalled();
+
+    const skillsCalls: any[] = [];
+    sendEventToUserMock.mock.calls.forEach((call) => {
+      if (call[1] === SkillSocketEvents.ReadInfo) {
+        skillsCalls.push(call);
+      }
+    });
+
+    expect(skillsCalls.length).toBe(1);
+    expect(skillsCalls[0][2]?.skill?.magicResistance?.skillPoints).toBe(skillPoints);
   });
 
   afterAll(async () => {

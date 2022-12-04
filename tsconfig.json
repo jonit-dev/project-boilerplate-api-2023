@@ -1,6 +1,8 @@
 {
   "ts-node": {
-    "swc": true
+    "swc": true,
+    "transpileOnly": true,
+    "logError": true
   },
   "compilerOptions": {
     "target": "ES2020",
@@ -31,6 +33,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "test/*.ts", "src/jestGlobalSetup.js"],
+
+  "include": ["src/**/*.ts", "test/*.ts", "./jestInitialSetup.ts"],
   "exclude": ["node_modules", "dist"]
 }

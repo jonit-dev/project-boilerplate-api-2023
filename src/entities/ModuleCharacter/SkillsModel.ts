@@ -3,8 +3,13 @@ import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel"
 import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { calculateExperience } from "@providers/npc/NPCExperience";
-import { calculateSPToNextLevel, calculateXPToNextLevel } from "@providers/skill/SkillCalculator";
-import { NPCAlignment, SkillType, TypeHelper } from "@rpg-engine/shared";
+import {
+  calculateSPToNextLevel,
+  calculateXPToNextLevel,
+  NPCAlignment,
+  SkillType,
+  TypeHelper,
+} from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Character } from "./CharacterModel";
 import { Equipment } from "./EquipmentModel";

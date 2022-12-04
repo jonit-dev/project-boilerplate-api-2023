@@ -2,18 +2,18 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
+  AnimationEffectKeys,
   BattleSocketEvents,
   IBattleRangedAttackFailed,
   IEquipmentAndInventoryUpdatePayload,
-  IRangedAttack,
   ItemSlotType,
-  ItemSocketEvents,
   ItemSubType,
   MapLayers,
   ToGridX,
@@ -39,7 +39,8 @@ export class BattleRangedAttack {
     private equipmentEquip: EquipmentEquip,
     private mathHelper: MathHelper,
     private movementHelper: MovementHelper,
-    private equipmentSlots: EquipmentSlots
+    private equipmentSlots: EquipmentSlots,
+    private animationEffect: AnimationEffect
   ) {}
 
   /**
@@ -147,38 +148,25 @@ export class BattleRangedAttack {
     target: ICharacter | INPC,
     ammo: IRangedAttackParams
   ): Promise<void> {
-    const payload = {
-      attackerId: attacker.id,
-      targetId: target.id,
-      direction: this.mathHelper.getDirectionFromPoint({ x: attacker.x, y: attacker.y }, { x: target.x, y: target.y }),
-      type: attacker.type,
-      ammoKey: ammo.key || undefined,
-    };
-
     switch (attacker.type) {
       case "Character":
         const character = attacker as ICharacter;
-        // send ranged attack event to all characters nearby the attacker
-        await this.socketMessaging.sendEventToCharactersAroundCharacter(
+        await this.animationEffect.sendProjectileAnimationEventToCharacter(
           character,
-          ItemSocketEvents.RangedAttack,
-          payload
-        );
-
-        this.socketMessaging.sendEventToUser<IRangedAttack>(
-          character.channelId!,
-          ItemSocketEvents.RangedAttack,
-          payload
+          attacker.id,
+          target.id,
+          ammo.key || AnimationEffectKeys.Arrow
         );
         break;
 
       case "NPC":
         const npc = attacker as INPC;
-        await this.socketMessaging.sendEventToCharactersAroundNPC(npc, ItemSocketEvents.RangedAttack, {
-          ...payload,
-          ammoKey: npc.ammoKey,
-        });
-
+        await this.animationEffect.sendProjectileAnimationEventToNPC(
+          npc,
+          attacker.id,
+          target.id,
+          npc.ammoKey || AnimationEffectKeys.Arrow
+        );
         break;
     }
   }

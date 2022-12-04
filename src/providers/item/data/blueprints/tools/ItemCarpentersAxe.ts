@@ -1,4 +1,6 @@
-import { IItemUseWith } from "@providers/useWith/useWithTypes";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
@@ -19,4 +21,8 @@ export const itemCarpentersAxe: Partial<IItemUseWith> = {
   basePrice: 50,
   hasUseWith: true,
   useWithMaxDistanceGrid: 2,
+  useWithTileEffect: (originItem: IItem, targetTile: IUseWithTargetTile, targetName: string, character: ICharacter) => {
+    // @ISLAM DO THE TASK HERE
+    console.log(originItem, targetTile);
+  },
 };

@@ -213,8 +213,14 @@ describe("CharacterItemInventory.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    const exists = await characterItemInventory.checkItemInInventoryByKey(SwordsBlueprint.ShortSword, testCharacter);
-    const dontExist = await characterItemInventory.checkItemInInventoryByKey(SwordsBlueprint.IceSword, testCharacter);
+    const exists = !!(await characterItemInventory.checkItemInInventoryByKey(
+      SwordsBlueprint.ShortSword,
+      testCharacter
+    ));
+    const dontExist = !!(await characterItemInventory.checkItemInInventoryByKey(
+      SwordsBlueprint.IceSword,
+      testCharacter
+    ));
 
     expect(exists).toBe(true);
     expect(dontExist).toBe(false);

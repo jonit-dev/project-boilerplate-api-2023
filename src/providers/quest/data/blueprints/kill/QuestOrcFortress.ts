@@ -8,7 +8,7 @@ import { IQuest, QuestType } from "@rpg-engine/shared";
 import { QuestsBlueprint } from "../../questsBlueprintTypes";
 
 export const questOrcFortress = {
-  title: "Eliminite some Orcs",
+  title: "Eliminate some Orcs",
   description:
     "Orcs are plaguing the area and they're planning a raid soon! You can find them on the Orc fortress and kill as many as you can. Be careful, though, they're evil and wouldn't hesitate to split your flash in two!",
   key: QuestsBlueprint.OrcFortress,

@@ -8,11 +8,10 @@ export const itemJacket: Partial<IItem> = {
   subType: ItemSubType.Armor,
   textureAtlas: "items",
   texturePath: "armors/jacket.png",
-
   name: "Jacket",
   description: "You see a jacket.",
   defense: 2,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.Torso],
-  basePrice: 33,
+  basePrice: 0,
 };

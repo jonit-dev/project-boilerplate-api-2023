@@ -1,7 +1,7 @@
 import type { Config } from "@jest/types";
 
 const config: Config.InitialOptions = {
-  preset: "@shelf/jest-mongodb",
+  preset: "ts-jest",
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(ts)?$",
   transform: {
     "^.+\\.(t|j)sx?$": "@swc/jest",

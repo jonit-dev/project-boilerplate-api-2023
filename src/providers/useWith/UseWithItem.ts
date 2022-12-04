@@ -3,7 +3,7 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IValidUseWithResponse } from "@providers/useWith/useWithTypes";
+import { IUseWithItemValidationResponse } from "@providers/useWith/useWithTypes";
 import { IUseWithItem, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { UseWithHelper } from "./libs/UseWithHelper";
@@ -35,7 +35,7 @@ export class UseWithItem {
    * @param data
    * @returns IValidUseWithResponse with the items that can be used with and the useWithEffect function defined for the targetItem
    */
-  private async validateData(character: ICharacter, data: IUseWithItem): Promise<IValidUseWithResponse> {
+  private async validateData(character: ICharacter, data: IUseWithItem): Promise<IUseWithItemValidationResponse> {
     // Check if character is alive and not banned
     this.useWithHelper.basicValidations(character, data);
 

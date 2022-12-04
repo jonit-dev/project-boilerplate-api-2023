@@ -9,14 +9,14 @@ import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemFireRune: Partial<IMagicItemUseWithEntity> = {
   key: MagicsBlueprint.FireRune,
-  type: ItemType.Accessory,
+  type: ItemType.Tool,
   subType: ItemSubType.Magic,
   textureAtlas: "items",
   texturePath: "magics/fire-rune.png",
   name: "Fire Rune",
   description: "An ancient fire rune.",
   weight: 0.5,
-  allowedEquipSlotType: [ItemSlotType.Accessory, ItemSlotType.Inventory],
+  allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,
 

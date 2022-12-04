@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
@@ -8,8 +8,10 @@ import { IQuest } from "@entities/ModuleQuest/QuestModel";
 import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
+import { InteractionQuestSubtype } from "@providers/unitTests/UnitTestHelper";
 import { QuestStatus, QuestType } from "@rpg-engine/shared";
 import { QuestSystem } from "../QuestSystem";
+import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 
 describe("QuestSystem.ts", () => {
   let questSystem: QuestSystem,
@@ -17,6 +19,7 @@ describe("QuestSystem.ts", () => {
     testCharacter: ICharacter,
     testKillQuest: IQuest,
     testInteractionQuest: IQuest,
+    testInteractionCraftQuest: IQuest,
     releaseRewards: any;
   const creatureKey = HostileNPCsBlueprint.Orc;
   const npcKey = FriendlyNPCsBlueprint.Alice;
@@ -38,29 +41,15 @@ describe("QuestSystem.ts", () => {
     testNPC = await unitTestHelper.createMockNPC();
     testKillQuest = await unitTestHelper.createMockQuest(testNPC.id, { objectivesCount });
     testInteractionQuest = await unitTestHelper.createMockQuest(testNPC.id, { type: QuestType.Interaction });
+    testInteractionCraftQuest = await unitTestHelper.createMockQuest(testNPC.id, {
+      type: QuestType.Interaction,
+      subtype: InteractionQuestSubtype.craft,
+    });
 
     // asign quest to the testCharacter
-    const killObjs = await testKillQuest.objectivesDetails;
-    // @ts-ignore
-    const interactObjs = await testInteractionQuest.objectivesDetails;
-
-    for (const obj of killObjs) {
-      const questRecord = new QuestRecord();
-      questRecord.quest = testKillQuest._id;
-      questRecord.character = testCharacter._id;
-      questRecord.objective = obj._id;
-      questRecord.status = QuestStatus.InProgress;
-      await questRecord.save();
-    }
-
-    for (const obj of interactObjs) {
-      const questRecord = new QuestRecord();
-      questRecord.quest = testInteractionQuest._id;
-      questRecord.character = testCharacter._id;
-      questRecord.objective = obj._id;
-      questRecord.status = QuestStatus.InProgress;
-      await questRecord.save();
-    }
+    await createQuestRecord(testKillQuest, testCharacter);
+    await createQuestRecord(testInteractionQuest, testCharacter);
+    await createQuestRecord(testInteractionCraftQuest, testCharacter);
   });
 
   it("should update quest and release rewards | type kill", async () => {
@@ -88,7 +77,34 @@ describe("QuestSystem.ts", () => {
     expect(releaseRewards).toBeCalledTimes(2);
   });
 
+  it("should update quest and release rewards | type interaction craft", async () => {
+    // Equip character with required items for completing interaction craft quest
+    const characterEquipment = (await Equipment.findById(testCharacter.equipment)
+      .populate("inventory")
+      .exec()) as IEquipment;
+    await unitTestHelper.equipItemsInBackpackSlot(characterEquipment, [
+      CraftingResourcesBlueprint.Silk,
+      CraftingResourcesBlueprint.Diamond,
+    ]);
+
+    await questSystem.updateQuests(QuestType.Interaction, testCharacter, "");
+    expect(await testInteractionCraftQuest.hasStatus(QuestStatus.Completed, testCharacter.id)).toEqual(true);
+    expect(releaseRewards).toBeCalledTimes(3);
+  });
+
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
 });
+
+async function createQuestRecord(quest: IQuest, character: ICharacter): Promise<void> {
+  const objs = await quest.objectivesDetails;
+  for (const obj of objs) {
+    const questRecord = new QuestRecord();
+    questRecord.quest = quest._id;
+    questRecord.character = character._id;
+    questRecord.objective = obj._id;
+    questRecord.status = QuestStatus.InProgress;
+    await questRecord.save();
+  }
+}

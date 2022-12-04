@@ -15,10 +15,12 @@ export const itemWoodenSticks: Partial<IItemUseWith> = {
   name: "Wooden Sticks",
   description: "Wooden sticks used for crafting.",
   weight: 1,
+  maxStackSize: 25,
+  basePrice: 1,
+  hasUseWith: true,
   useWithItemEffect: async (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> => {
     const useWithItemToItem = container.get<UseWithItemToItem>(UseWithItemToItem);
 
     await useWithItemToItem.execute(targetItem, originItem, character, "cutting-wood");
   },
-  maxStackSize: 100,
 };

@@ -117,6 +117,7 @@ export enum FoodsBlueprint {
   RottenMeat = "rotten-meat",
 }
 export enum CraftingResourcesBlueprint {
+  Rope = "rope",
   BlueSapphire = "blue-sapphire",
   BlueFeather = "blue-feather",
   Leather = "leather",
@@ -125,16 +126,43 @@ export enum CraftingResourcesBlueprint {
   ColoredFeather = "colored-feather",
   Diamond = "diamond",
   Feather = "feather",
-  GoldenIngot = "golden-ingot",
   Herb = "herb",
   GreaterWoodenLog = "greater-wooden-log",
-  IronIngot = "iron-ingot",
+
   Obsidian = "obsidian",
   Wheat = "wheat",
   WolfTooth = "wolf-tooth",
   Bone = "bone",
   Worm = "worm",
   WoodenSticks = "wooden-sticks",
+  IronOre = "iron-ore",
+  CopperOre = "copper-ore",
+  CorruptionOre = "corruption-ore",
+  GoldenOre = "golden-ore",
+  ObsidiumOre = "obsidium-ore",
+  GreenOre = "green-ore",
+  SilverOre = "silver-ore",
+  GoldenIngot = "golden-ingot",
+  SilverIngot = "silver-ingot",
+  CopperIngot = "copper-ingot",
+  IronIngot = "iron-ingot",
+  RedSapphire = "red-sapphire",
+  PolishedStone = "polished-stone",
+  WaterBottle = "water-bottle",
+  SteelIngot = "steel-ingot",
+  WoodenBoard = "wooden-board",
+  PhoenixFeather = "phoenix-feather",
+  BlueLeather = "blue-leather",
+  Jade = "jade",
+  Rock = "rock",
+  SewingThread = "sewing-thread",
+  ElvenLeaf = "elven-leaf",
+  ElvenWood = "elven-wood",
+  SmallWorm = "small-worm",
+  SmallWoodenStick = "small-wooden-sticks",
+  RedShappire = "red-shappire",
+  BlueSilk = "blue-silk",
+  IronNail = "iron-nail",
 }
 
 export enum ToolsBlueprint {
@@ -142,6 +170,7 @@ export enum ToolsBlueprint {
   CarpentersAxe = "carpenters-axe",
   FishingRod = "fishing-rod",
   Pickaxe = "pickaxe",
+  Hammer = "hammer",
   UseWithItemTest = "use-with-item-test",
   UseWithTileTest = "use-with-tile-test",
 }
@@ -233,15 +262,9 @@ export enum AccessoriesBlueprint {
   CorruptionNecklace = "corruption-necklace",
   DeathNecklace = "death-necklace",
   ElvenRing = "elven-ring",
-  Rope = "rope",
 }
 
 export enum HammersBlueprint {
-  Hammer = "hammer",
   IronHammer = "iron-hammer",
   WarHammer = "war-hammer",
-}
-
-export enum SpellsBlueprint {
-  SelfHealingSpell = "self-healing-spell",
 }

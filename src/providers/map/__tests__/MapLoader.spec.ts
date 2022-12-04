@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { STATIC_PATH } from "@providers/constants/PathConstants";
+import { UNIT_TESTING_MAPS } from "@providers/constants/MapConstants";
 import { mapLoader, unitTestHelper } from "@providers/inversify/container";
-import fs from "fs";
 import { MapLoader } from "../MapLoader";
 
 describe("MapLoader.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
+
     await mapLoader.init();
   });
 
@@ -15,7 +15,7 @@ describe("MapLoader.ts", () => {
   });
 
   it("should load the the maps", () => {
-    const mapNames = fs.readdirSync(STATIC_PATH + "/maps");
+    const mapNames = UNIT_TESTING_MAPS;
 
     for (const mapFileName of mapNames) {
       if (mapFileName.includes("_hash")) {

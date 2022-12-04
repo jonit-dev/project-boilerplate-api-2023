@@ -50,7 +50,7 @@ describe("UseWithTile.ts", () => {
     await testCharacterEquipment.save();
 
     // @ts-ignore
-    jest.spyOn(useWithTile.mapTiles, "getUseWithKey" as any).mockImplementation(() => testItem.baseKey);
+    jest.spyOn(useWithTile.mapTiles, "getPropertyFromLayer" as any).mockImplementation(() => testItem.baseKey);
   });
 
   it("should pass all validations, run the useWithTileEffect and apply expected effect", async () => {
@@ -59,7 +59,12 @@ describe("UseWithTile.ts", () => {
     expect(response).toBeDefined();
     expect(response!.originItem.id).toEqual(testItem.id);
 
-    await response?.useWithTileEffect!(response!.originItem, useWithTileData.targetTile, testCharacter);
+    await response?.useWithTileEffect!(
+      response?.originItem,
+      useWithTileData.targetTile,
+      response?.targetName,
+      testCharacter
+    );
 
     expect(testCharacter.name).toEqual("Character affected by use with tile effect!");
   });
