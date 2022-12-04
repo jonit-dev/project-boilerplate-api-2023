@@ -6,7 +6,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IItemUseWith, IValidUseWithResponse } from "@providers/useWith/useWithTypes";
+import { IItemUseWith, IUseWithTileValidationResponse } from "@providers/useWith/useWithTypes";
 import { IUseWithTile, MAP_LAYERS_TO_ID, ToGridX, ToGridY, UseWithSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { UseWithHelper } from "./libs/UseWithHelper";
@@ -30,8 +30,8 @@ export class UseWithTile {
           const useWithData = await this.validateData(character, useWithTileData);
 
           if (useWithData) {
-            const { originItem, useWithTileEffect } = useWithData;
-            await useWithTileEffect!(originItem, useWithTileData.targetTile, character);
+            const { originItem, useWithTileEffect, targetName } = useWithData;
+            await useWithTileEffect!(originItem, useWithTileData.targetTile, targetName, character);
           }
         } catch (error) {
           console.error(error);
@@ -46,7 +46,10 @@ export class UseWithTile {
    * @param data
    * @returns IValidUseWithResponse with the item that can be used with the tile and the useWithEffect function defined for it
    */
-  private async validateData(character: ICharacter, data: IUseWithTile): Promise<IValidUseWithResponse | undefined> {
+  private async validateData(
+    character: ICharacter,
+    data: IUseWithTile
+  ): Promise<IUseWithTileValidationResponse | undefined> {
     // Check if character is alive and not banned
     this.useWithHelper.basicValidations(character, data);
 
@@ -81,11 +84,12 @@ export class UseWithTile {
     }
 
     // Check if tile has useWithKey defined
-    const useWithKey = this.mapTiles.getUseWithKey(
+    const useWithKey = this.mapTiles.getPropertyFromLayer(
       data.targetTile.map,
       ToGridX(data.targetTile.x),
       ToGridY(data.targetTile.y),
-      MAP_LAYERS_TO_ID[data.targetTile.layer]
+      MAP_LAYERS_TO_ID[data.targetTile.layer],
+      "usewith_origin_item_key"
     );
     if (!useWithKey) {
       this.socketMessaging.sendErrorMessageToCharacter(
@@ -94,6 +98,14 @@ export class UseWithTile {
       );
       return;
     }
+
+    const useWithTargetName = this.mapTiles.getPropertyFromLayer(
+      data.targetTile.map,
+      ToGridX(data.targetTile.x),
+      ToGridY(data.targetTile.y),
+      MAP_LAYERS_TO_ID[data.targetTile.layer],
+      "usewith_target_item_key"
+    );
 
     if (originItem.baseKey !== useWithKey) {
       this.socketMessaging.sendErrorMessageToCharacter(
@@ -115,6 +127,6 @@ export class UseWithTile {
       );
     }
 
-    return { originItem, useWithTileEffect };
+    return { originItem, useWithTileEffect, targetName: useWithTargetName };
   }
 }

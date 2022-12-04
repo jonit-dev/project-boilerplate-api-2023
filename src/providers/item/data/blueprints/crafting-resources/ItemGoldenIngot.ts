@@ -13,9 +13,10 @@ export const itemGoldenIngot: Partial<IItemUseWith> = {
   textureAtlas: "items",
   texturePath: "crafting-resources/golden-ingot.png",
   name: "Golden Ingot",
-  description: "A precious metal and crafting resource.",
+  description:
+    "A golden ingot. You can use this material with a hammer to craft weapons, but you need to be close to an anvil.",
   weight: 1,
-  maxStackSize: 10,
+  maxStackSize: 100,
   basePrice: 3.5,
   hasUseWith: true,
   useWithItemEffect: async (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> => {

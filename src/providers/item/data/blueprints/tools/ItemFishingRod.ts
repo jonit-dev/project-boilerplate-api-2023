@@ -1,10 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
-import { UseWithFishingRod } from "@providers/useWith/items/UseWithFishingRod";
+import { UseWithItemToTile } from "@providers/useWith/abstractions/UseWithItemToTile";
 import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
-import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
+import { CraftingResourcesBlueprint, FoodsBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemFishingRod: Partial<IItemUseWith> = {
   key: ToolsBlueprint.FishingRod,
@@ -21,10 +21,53 @@ export const itemFishingRod: Partial<IItemUseWith> = {
   useWithTileEffect: async (
     originItem: IItem,
     targetTile: IUseWithTargetTile,
+    targetName: string,
     character: ICharacter
   ): Promise<void> => {
-    const useWithFishingRod = container.get<UseWithFishingRod>(UseWithFishingRod);
+    const useWithTileToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
 
-    await useWithFishingRod.execute(character, targetTile);
+    await useWithTileToTile.execute(character, {
+      targetTile,
+      requiredResource: {
+        key: CraftingResourcesBlueprint.Worm,
+        decrementQty: 1,
+        errorMessage: "Sorry, you need a worm to fish.",
+      },
+      targetTileAnimationEffectKey: "fishing",
+
+      successAnimationEffectKey: "level_up",
+      errorAnimationEffectKey: "miss",
+      errorMessages: [
+        "Hmm... Nothing here.",
+        "You didn't catch anything.",
+        "You didn't catch anything. Try again.",
+        "Oops! The fish got away.",
+        "Erm... Nothing!",
+      ],
+      successMessages: [
+        "You caught a fish!",
+        "You caught a big one!",
+        "You're getting good at this!",
+        "Woooaah! You caught a big fish!",
+      ],
+
+      rewards: [
+        {
+          key: FoodsBlueprint.WildSalmon,
+          qty: [1, 3],
+          chance: 10,
+        },
+        {
+          key: FoodsBlueprint.Tuna,
+          qty: [2, 3],
+          chance: 25,
+        },
+        {
+          key: FoodsBlueprint.BrownFish,
+          qty: [1, 2],
+          chance: 25,
+        },
+      ],
+    });
   },
 };

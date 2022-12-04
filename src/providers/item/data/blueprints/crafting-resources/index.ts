@@ -6,18 +6,25 @@ import { itemBlueSapphire } from "./ItemBlueSapphire";
 import { itemBlueSilk } from "./itemBlueSilk";
 import { itemBone } from "./ItemBone";
 import { itemColoredFeather } from "./ItemColoredFeather";
+import { itemCopperIngot } from "./ItemCopperIngot";
+import { itemCopperOre } from "./ItemCopperOre";
+import { itemCorruptionOre } from "./ItemCorruptionOre";
 import { itemDiamond } from "./ItemDiamond";
 import { itemElvenLeaf } from "./itemElvenLeaf";
 import { itemElvenWood } from "./itemElvenWood";
 import { itemFeather } from "./ItemFeather";
 import { itemGoldenIngot } from "./ItemGoldenIngot";
+import { itemGoldenOre } from "./ItemGoldenOre";
 import { itemGreaterWoodenLog } from "./ItemGreaterWoodenLog";
+import { itemGreenOre } from "./ItemGreenOre";
 import { itemHerb } from "./ItemHerb";
 import { itemIronIngot } from "./ItemIronIngot";
 import { itemIronNail } from "./itemIronNail";
+import { itemIronOre } from "./ItemIronOre";
 import { itemJade } from "./itemJade";
 import { itemLeather } from "./ItemLeather";
 import { itemObsidian } from "./ItemObsidian";
+import { itemObsidiumOre } from "./ItemObsidiumOre";
 import { itemPhoenixFeather } from "./itemPhoenixfeather";
 import { itemPolishedStone } from "./itemPolishedStone";
 import { itemRedSapphire } from "./itemRedSapphire";
@@ -25,6 +32,8 @@ import { itemRock } from "./itemRock";
 import { itemRope } from "./ItemRope";
 import { itemSewingThread } from "./itemSewingThread";
 import { itemSilk } from "./ItemSilk";
+import { itemSilverIngot } from "./ItemSilverIngot";
+import { itemSilverOre } from "./ItemSilverOre";
 import { itemSmallWoodenStick } from "./itemSmallWoodenStick";
 import { itemSmallWorm } from "./itemSmallWorm";
 import { itemSteelIngot } from "./itemSteelIngot";
@@ -54,6 +63,18 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.Bone]: itemBone,
   [CraftingResourcesBlueprint.Worm]: itemWorm,
   [CraftingResourcesBlueprint.WoodenSticks]: itemWoodenSticks,
+  [CraftingResourcesBlueprint.IronOre]: itemIronOre,
+  [CraftingResourcesBlueprint.CopperOre]: itemCopperOre,
+  [CraftingResourcesBlueprint.CorruptionOre]: itemCorruptionOre,
+  [CraftingResourcesBlueprint.GoldenOre]: itemGoldenOre,
+  [CraftingResourcesBlueprint.ObsidiumOre]: itemObsidiumOre,
+  [CraftingResourcesBlueprint.GreenOre]: itemGreenOre,
+  [CraftingResourcesBlueprint.SilverOre]: itemSilverOre,
+  [CraftingResourcesBlueprint.GoldenIngot]: itemGoldenIngot,
+  [CraftingResourcesBlueprint.SilverIngot]: itemSilverIngot,
+  [CraftingResourcesBlueprint.CopperIngot]: itemCopperIngot,
+  [CraftingResourcesBlueprint.IronIngot]: itemIronIngot,
+  [CraftingResourcesBlueprint.RedSapphire]: itemRedSapphire,
   [CraftingResourcesBlueprint.SmallWoodenStick]: itemSmallWoodenStick,
   [CraftingResourcesBlueprint.Rope]: itemRope,
   [CraftingResourcesBlueprint.PolishedStone]: itemPolishedStone,

@@ -9,9 +9,10 @@ export const itemIronIngot: Partial<IItemUseWith> = {
   textureAtlas: "items",
   texturePath: "crafting-resources/iron-ingot.png",
   name: "Iron Ingot",
-  description: "An useful and common crafting resource.",
+  description:
+    "An iron ingot. You can use this material with a hammer to craft weapons, but you need to be close to an anvil.",
   weight: 1,
-  maxStackSize: 10,
+  maxStackSize: 100,
   basePrice: 0.5,
   hasUseWith: true,
 };

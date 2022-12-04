@@ -115,7 +115,13 @@ export class MapTiles {
     return false;
   }
 
-  public getUseWithKey(map: string, gridX: number, gridY: number, mapLayer: MapLayers): string | undefined {
+  public getPropertyFromLayer(
+    map: string,
+    gridX: number,
+    gridY: number,
+    mapLayer: MapLayers,
+    property: string
+  ): string | undefined {
     const layerName = TiledLayerNames[mapLayer];
 
     const layer = this.getLayer(map, mapLayer);
@@ -138,7 +144,7 @@ export class MapTiles {
 
     if (rawTileId) {
       const tileId = rawTileId - targetTileset.firstgid;
-      return this.getTileProperty<string>(targetTileset!, tileId!, "usewith_item_key");
+      return this.getTileProperty<string>(targetTileset!, tileId!, property);
     }
   }
 
