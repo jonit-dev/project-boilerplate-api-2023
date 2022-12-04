@@ -29,9 +29,9 @@ export const itemPickaxe: Partial<IItemUseWith> = {
     targetName: string | undefined,
     character: ICharacter
   ) => {
-    const useWithTileToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
+    const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
 
-    const baseUseWithTileToTileOptions: IUseWithItemToTileOptions = {
+    const baseUseWithItemToTileOptions: IUseWithItemToTileOptions = {
       targetTile,
       targetTileAnimationEffectKey: "mining",
       errorMessages: [
@@ -55,14 +55,14 @@ export const itemPickaxe: Partial<IItemUseWith> = {
       ],
     };
 
-    let useWithTileToTileOptions: IUseWithItemToTileOptions = baseUseWithTileToTileOptions;
+    let useWithItemToTileOptions: IUseWithItemToTileOptions = baseUseWithItemToTileOptions;
 
     switch (targetName) {
       case CraftingResourcesBlueprint.IronOre:
-        useWithTileToTileOptions = {
-          ...baseUseWithTileToTileOptions,
+        useWithItemToTileOptions = {
+          ...baseUseWithItemToTileOptions,
           rewards: [
-            ...baseUseWithTileToTileOptions.rewards,
+            ...baseUseWithItemToTileOptions.rewards,
             {
               key: CraftingResourcesBlueprint.IronOre,
               qty: [5, 7],
@@ -72,10 +72,10 @@ export const itemPickaxe: Partial<IItemUseWith> = {
         };
         break;
       case CraftingResourcesBlueprint.CopperOre:
-        useWithTileToTileOptions = {
-          ...baseUseWithTileToTileOptions,
+        useWithItemToTileOptions = {
+          ...baseUseWithItemToTileOptions,
           rewards: [
-            ...baseUseWithTileToTileOptions.rewards,
+            ...baseUseWithItemToTileOptions.rewards,
             {
               key: CraftingResourcesBlueprint.CopperOre,
               qty: [3, 4],
@@ -86,10 +86,10 @@ export const itemPickaxe: Partial<IItemUseWith> = {
         break;
 
       case CraftingResourcesBlueprint.SilverOre:
-        useWithTileToTileOptions = {
-          ...baseUseWithTileToTileOptions,
+        useWithItemToTileOptions = {
+          ...baseUseWithItemToTileOptions,
           rewards: [
-            ...baseUseWithTileToTileOptions.rewards,
+            ...baseUseWithItemToTileOptions.rewards,
             {
               key: CraftingResourcesBlueprint.SilverOre,
               qty: [2, 3],
@@ -99,10 +99,10 @@ export const itemPickaxe: Partial<IItemUseWith> = {
         };
         break;
       case CraftingResourcesBlueprint.GoldenOre:
-        useWithTileToTileOptions = {
-          ...baseUseWithTileToTileOptions,
+        useWithItemToTileOptions = {
+          ...baseUseWithItemToTileOptions,
           rewards: [
-            ...baseUseWithTileToTileOptions.rewards,
+            ...baseUseWithItemToTileOptions.rewards,
             {
               key: CraftingResourcesBlueprint.GoldenOre,
               qty: [1, 2],
@@ -112,10 +112,10 @@ export const itemPickaxe: Partial<IItemUseWith> = {
         };
         break;
       case CraftingResourcesBlueprint.GreenOre:
-        useWithTileToTileOptions = {
-          ...baseUseWithTileToTileOptions,
+        useWithItemToTileOptions = {
+          ...baseUseWithItemToTileOptions,
           rewards: [
-            ...baseUseWithTileToTileOptions.rewards,
+            ...baseUseWithItemToTileOptions.rewards,
             {
               key: CraftingResourcesBlueprint.GreenOre,
               qty: [1, 2],
@@ -125,10 +125,10 @@ export const itemPickaxe: Partial<IItemUseWith> = {
         };
         break;
       case CraftingResourcesBlueprint.ObsidiumOre:
-        useWithTileToTileOptions = {
-          ...baseUseWithTileToTileOptions,
+        useWithItemToTileOptions = {
+          ...baseUseWithItemToTileOptions,
           rewards: [
-            ...baseUseWithTileToTileOptions.rewards,
+            ...baseUseWithItemToTileOptions.rewards,
             {
               key: CraftingResourcesBlueprint.ObsidiumOre,
               qty: [1, 2],
@@ -138,10 +138,10 @@ export const itemPickaxe: Partial<IItemUseWith> = {
         };
         break;
       case CraftingResourcesBlueprint.CorruptionOre:
-        useWithTileToTileOptions = {
-          ...baseUseWithTileToTileOptions,
+        useWithItemToTileOptions = {
+          ...baseUseWithItemToTileOptions,
           rewards: [
-            ...baseUseWithTileToTileOptions.rewards,
+            ...baseUseWithItemToTileOptions.rewards,
             {
               key: CraftingResourcesBlueprint.CorruptionOre,
               qty: [1, 2],
@@ -152,6 +152,6 @@ export const itemPickaxe: Partial<IItemUseWith> = {
         break;
     }
 
-    await useWithTileToTile.execute(character, useWithTileToTileOptions);
+    await useWithItemToTile.execute(character, useWithItemToTileOptions);
   },
 };
