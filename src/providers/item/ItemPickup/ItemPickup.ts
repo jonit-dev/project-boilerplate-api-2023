@@ -4,28 +4,35 @@ import { CharacterItemContainer } from "@providers/character/characterItems/Char
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentAndInventoryUpdatePayload, IItemPickup, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
+import {
+  IEquipmentAndInventoryUpdatePayload,
+  IItemContainer,
+  IItemContainerRead,
+  IItemPickup,
+  ItemSocketEvents,
+  ItemType,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemOwnership } from "../ItemOwnership";
-import { ItemView } from "../ItemView";
 
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
 import { ItemPickupMapContainer } from "./ItemPickupMapContainer";
 import { ItemPickupValidator } from "./ItemPickupValidator";
+import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterWeight: CharacterWeight,
-    private itemView: ItemView,
 
     private characterItemContainer: CharacterItemContainer,
     private equipmentSlots: EquipmentSlots,
     private itemOwnership: ItemOwnership,
     private itemPickupFromContainer: ItemPickupFromContainer,
     private itemPickupValidator: ItemPickupValidator,
-    private itemPickupMapContainer: ItemPickupMapContainer
+    private itemPickupMapContainer: ItemPickupMapContainer,
+    private itemContainerHelper: ItemContainerHelper
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
@@ -103,11 +110,16 @@ export class ItemPickup {
       return false;
     }
 
-    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-      inventory: updatedContainer,
-    };
+    if (isPickupFromMapContainer) {
+      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+        inventory: updatedContainer,
+      };
 
-    this.updateInventoryCharacter(payloadUpdate, character);
+      this.updateInventoryCharacter(payloadUpdate, character);
+    } else {
+      // RPG-1012 - reopen origin container using read to open with correct type
+      await this.sendContainerRead(updatedContainer, character);
+    }
 
     await this.finalizePickup(itemToBePicked, character);
 
@@ -137,6 +149,13 @@ export class ItemPickup {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       payloadUpdate
     );
+  }
+
+  private async sendContainerRead(itemContainer: IItemContainer, character: ICharacter): Promise<void> {
+    this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
+      itemContainer,
+      type: (await this.itemContainerHelper.getContainerType(itemContainer))!,
+    });
   }
 
   public getAllowedItemTypes(): ItemType[] {
