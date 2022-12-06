@@ -136,6 +136,7 @@ export class ItemUse {
     const payload: ICharacterAttributeChanged = {
       targetId: character._id,
       health: character.health,
+      mana: character.mana,
     };
 
     for (const nearbyCharacter of nearbyCharacters) {

@@ -36,7 +36,7 @@ describe("ItemUse.ts", () => {
 
     testCharacter = await (
       await unitTestHelper.createMockCharacter(
-        { health: 50 },
+        { health: 50, mana: 50 },
         { hasEquipment: true, hasInventory: true, hasSkills: true }
       )
     )
@@ -198,6 +198,7 @@ describe("ItemUse.ts", () => {
         {
           targetId: testCharacter._id,
           health: testCharacter.health + i,
+          mana: testCharacter.mana + i,
         }
       );
     }
@@ -229,6 +230,7 @@ describe("ItemUse.ts", () => {
     expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterSocketEvents.AttributeChanged, {
       targetId: testCharacter._id,
       health: testCharacter.health + 20,
+      mana: testCharacter.mana,
     });
 
     expect(animationEventMock).toBeCalledTimes(1);

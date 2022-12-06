@@ -22,4 +22,9 @@ export class ItemUsableEffect {
       character[attr] = 0;
     }
   }
+
+  static applyEatingEffect(character: ICharacter, increase: number): void {
+    this.apply(character, EffectableAttribute.Health, increase);
+    this.apply(character, EffectableAttribute.Mana, increase);
+  }
 }
