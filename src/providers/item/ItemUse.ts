@@ -21,6 +21,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -32,7 +33,8 @@ export class ItemUse {
     private characterWeight: CharacterWeight,
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
-    private characterItems: CharacterItems
+    private characterItems: CharacterItems,
+    private characterInventory: CharacterItemInventory
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -60,9 +62,7 @@ export class ItemUse {
 
     this.applyItemUsage(bluePrintItem, character.id);
 
-    const inventoryContainer = (await this.getInventoryContainer(character)) as unknown as IItemContainer;
-
-    await this.consumeItem(character, inventoryContainer, useItem);
+    await this.characterInventory.decrementItemFromInventory(useItem.key, character, 1);
 
     await this.characterWeight.updateCharacterWeight(character);
 
@@ -98,31 +98,6 @@ export class ItemUse {
         await this.sendItemConsumptionEvent(character);
       }
     }, intervals);
-  }
-
-  private async consumeItem(character: ICharacter, inventoryContainer: IItemContainer, item: IItem): Promise<void> {
-    let stackReduced = false;
-
-    if (item.maxStackSize > 1 && item.stackQty && item.stackQty > 1) {
-      item.stackQty -= 1;
-      await item.save();
-
-      for (let i = 0; i < inventoryContainer.slotQty; i++) {
-        const slotItem = inventoryContainer.slots?.[i];
-        if (slotItem && slotItem.key === item.key && !stackReduced) {
-          inventoryContainer.slots[i].stackQty = item.stackQty;
-          stackReduced = true;
-        }
-      }
-
-      inventoryContainer.markModified("slots");
-      await inventoryContainer.save();
-    }
-
-    if (!stackReduced) {
-      await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
-      await Item.deleteOne({ _id: item._id });
-    }
   }
 
   private async getInventoryContainer(character: ICharacter): Promise<IItemContainer | null> {
