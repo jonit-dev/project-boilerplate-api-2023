@@ -100,6 +100,8 @@ export class UseWithItemToTile {
       if (errorAnimationEffectKey) {
         await this.animationEffect.sendAnimationEventToCharacter(character, errorAnimationEffectKey);
       }
+      await this.refreshInventory(character);
+
       return;
     }
 
