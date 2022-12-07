@@ -85,7 +85,7 @@ describe("MapTiles.ts", () => {
     const tileProperty = mapTiles.getTileProperty(tileset, tileId, "description");
 
     expect(tileProperty).toBeDefined();
-    expect(tileProperty).toBe("a big rock.");
+    expect(tileProperty).toBe("a giant rock.");
   });
 
   it("should return the proper tileset, given a tileId", () => {
@@ -107,6 +107,14 @@ describe("MapTiles.ts", () => {
     expect(forestSolidTile).toBeTruthy();
     expect(villageSolidTile).toBeTruthy();
     expect(emptyTile).toBeFalsy();
+  });
+
+  it("should detect a ge_collide_all property", () => {
+    const isFullSolid = mapTiles.isSolid(mapName, 4, 6, MapLayers.Character);
+    const isNotFullSolid = mapTiles.isSolid(mapName, 6, 6, MapLayers.OverCharacter);
+
+    expect(isFullSolid).toBeTruthy();
+    expect(isNotFullSolid).toBeFalsy();
   });
 
   it("should check if a tile is solid or not, in a negative coordinate", () => {

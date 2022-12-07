@@ -19,7 +19,7 @@ describe("MapSolids.ts", () => {
   });
 
   it("should properly detect if a tile is solid or not", () => {
-    const bigRock = mapSolids.isTileSolid(mapName, 17, 22, MapLayers.OverGround);
+    const bigRock = mapSolids.isTileSolid(mapName, 17, 23, MapLayers.OverGround);
 
     const treeTop = mapSolids.isTileSolid(mapName, 23, 5, MapLayers.OverCharacter);
 
