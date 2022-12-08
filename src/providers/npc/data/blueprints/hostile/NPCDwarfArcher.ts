@@ -5,8 +5,6 @@ import {
   ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
-  GlovesBlueprint,
-  MacesBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
   ToolsBlueprint,
@@ -16,76 +14,55 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcDwarfGuard = {
+export const npcDwarfArcher: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Dwarf Guard",
-  key: HostileNPCsBlueprint.DwarfGuard,
-  textureKey: HostileNPCsBlueprint.DwarfGuard,
+  name: "Dwarf Archer",
+  key: HostileNPCsBlueprint.DwarfArcher,
+  textureKey: HostileNPCsBlueprint.DwarfArcher,
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.Melee,
+  attackType: EntityAttackType.MeleeRanged,
+  ammoKey: RangedWeaponsBlueprint.Arrow,
+  maxRangeAttack: 10,
   speed: MovementSpeed.Fast,
-  canSwitchToLowHealthTarget: true,
-  baseHealth: 79,
-  healthRandomizerDice: Dice.D4,
-  skillRandomizerDice: Dice.D4,
-  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
+  baseHealth: 100,
+  healthRandomizerDice: Dice.D12,
+  canSwitchToRandomTarget: true,
   skills: {
-    level: 7,
+    level: 12,
     strength: {
-      level: 5,
+      level: 12,
     },
     dexterity: {
-      level: 6,
+      level: 5,
     },
     resistance: {
-      level: 8,
+      level: 7,
     },
   },
   fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [15, 25],
-    },
-    {
-      itemBlueprintKey: BootsBlueprint.Boots,
-      chance: 30,
-    },
-
-    {
-      itemBlueprintKey: ToolsBlueprint.FishingRod,
-      chance: 20,
-    },
-    {
-      itemBlueprintKey: ToolsBlueprint.Pickaxe,
-      chance: 10,
-    },
-
-    {
-      itemBlueprintKey: BootsBlueprint.StuddedBoots,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: ArmorsBlueprint.IronArmor,
-      chance: 20,
-    },
-    {
-      itemBlueprintKey: GlovesBlueprint.StuddedGloves,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: MacesBlueprint.SpikedClub,
-      chance: 10,
+      chance: 40,
+      quantityRange: [30, 65],
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
+      chance: 40,
+      quantityRange: [10, 20],
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.Bolt,
+      chance: 40,
+      quantityRange: [10, 20],
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.Crossbow,
       chance: 20,
-      quantityRange: [7, 12],
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
-      chance: 1,
+      chance: 5,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.GoldenIngot,
@@ -102,5 +79,17 @@ export const npcDwarfGuard = {
       chance: 5,
       quantityRange: [3, 5],
     },
+    {
+      itemBlueprintKey: BootsBlueprint.StuddedBoots,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.IronArmor,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: ToolsBlueprint.Pickaxe,
+      chance: 10,
+    },
   ],
-} as Partial<INPC>;
+};

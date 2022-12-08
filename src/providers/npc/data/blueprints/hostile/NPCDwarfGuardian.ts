@@ -2,46 +2,42 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
-  AxesBlueprint,
-  BootsBlueprint,
   ContainersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
-  HammersBlueprint,
   HelmetsBlueprint,
-  LegsBlueprint,
+  MacesBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
+  RangedWeaponsBlueprint,
   ShieldsBlueprint,
-  SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcGiantSpider: Partial<INPC> = {
+export const npcDwarfGuardian: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Giant Spider",
-  key: HostileNPCsBlueprint.GiantSpider,
-  textureKey: HostileNPCsBlueprint.GiantSpider,
+  name: "Dwarf Guardian",
+  key: HostileNPCsBlueprint.DwarfGuardian,
+  textureKey: HostileNPCsBlueprint.DwarfGuardian,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.ExtraFast,
-  baseHealth: 600,
-  healthRandomizerDice: Dice.D20,
+  speed: MovementSpeed.Fast,
+  baseHealth: 150,
+  healthRandomizerDice: Dice.D12,
   canSwitchToRandomTarget: true,
-  canSwitchToLowHealthTarget: true,
   skills: {
-    level: 45,
+    level: 18,
     strength: {
-      level: 35,
+      level: 18,
     },
     dexterity: {
-      level: 30,
+      level: 10,
     },
     resistance: {
-      level: 20,
+      level: 10,
     },
   },
   fleeOnLowHealth: true,
@@ -53,48 +49,37 @@ export const npcGiantSpider: Partial<INPC> = {
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
-      quantityRange: [75, 200],
+      quantityRange: [30, 40],
     },
     {
-      itemBlueprintKey: BootsBlueprint.CopperBoots,
-      chance: 20,
+      itemBlueprintKey: MacesBlueprint.SpikedClub,
+      chance: 25,
     },
     {
-      itemBlueprintKey: GlovesBlueprint.PlateGloves,
-      chance: 85,
+      itemBlueprintKey: ShieldsBlueprint.ScutumShield,
+      chance: 10,
     },
     {
-      itemBlueprintKey: LegsBlueprint.StuddedLegs,
-      chance: 60,
-    },
-    {
-      itemBlueprintKey: ShieldsBlueprint.PlateShield,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: HelmetsBlueprint.SoldiersHelmet,
-      chance: 30,
-    },
-    {
-      itemBlueprintKey: AxesBlueprint.DoubleAxe,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: HammersBlueprint.WarHammer,
-      chance: 20,
-    },
-    {
-      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
-      chance: 30,
-    },
-
-    {
-      itemBlueprintKey: FoodsBlueprint.Fish,
-      chance: 80,
+      itemBlueprintKey: GlovesBlueprint.ChainGloves,
+      chance: 10,
     },
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.IronArrow,
       chance: 50,
+      quantityRange: [10, 30],
+    },
+
+    {
+      itemBlueprintKey: HelmetsBlueprint.GladiatorHelmet,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.Salmon,
+      chance: 30,
     },
   ],
 };

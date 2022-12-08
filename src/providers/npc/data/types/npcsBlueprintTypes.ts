@@ -97,4 +97,7 @@ export enum HostileNPCsBlueprint {
   StoneGolem = "stone-golem",
   Elf = "elf",
   GiantSpider = "giant-spider",
+  DwarfArcher = "dwarf-archer",
+  DwarfGuardian = "dwarf-guardian",
+  DwarfMage = "dwarf-mage",
 }

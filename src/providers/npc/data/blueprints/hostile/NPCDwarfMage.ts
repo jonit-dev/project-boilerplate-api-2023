@@ -2,46 +2,48 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
   ContainersBlueprint,
-  FoodsBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
-  HammersBlueprint,
   HelmetsBlueprint,
-  LegsBlueprint,
+  MacesBlueprint,
+  MagicsBlueprint,
   OthersBlueprint,
-  PotionsBlueprint,
-  ShieldsBlueprint,
-  SpearsBlueprint,
+  RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcGiantSpider: Partial<INPC> = {
+export const npcDwarfMage: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Giant Spider",
-  key: HostileNPCsBlueprint.GiantSpider,
-  textureKey: HostileNPCsBlueprint.GiantSpider,
+  name: "Dwarf Mage",
+  key: HostileNPCsBlueprint.DwarfMage,
+  textureKey: HostileNPCsBlueprint.DwarfMage,
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.ExtraFast,
-  baseHealth: 600,
+  attackType: EntityAttackType.Ranged,
+  ammoKey: "fireball",
+  maxRangeAttack: 10,
+  speed: MovementSpeed.Slow,
+  baseHealth: 120,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
+  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 45,
+    level: 18,
     strength: {
-      level: 35,
+      level: 10,
     },
     dexterity: {
-      level: 30,
+      level: 12,
     },
     resistance: {
-      level: 20,
+      level: 5,
     },
   },
   fleeOnLowHealth: true,
@@ -53,48 +55,51 @@ export const npcGiantSpider: Partial<INPC> = {
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,
-      quantityRange: [75, 200],
+      quantityRange: [30, 60],
     },
     {
-      itemBlueprintKey: BootsBlueprint.CopperBoots,
-      chance: 20,
-    },
-    {
-      itemBlueprintKey: GlovesBlueprint.PlateGloves,
-      chance: 85,
-    },
-    {
-      itemBlueprintKey: LegsBlueprint.StuddedLegs,
-      chance: 60,
-    },
-    {
-      itemBlueprintKey: ShieldsBlueprint.PlateShield,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: HelmetsBlueprint.SoldiersHelmet,
+      itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
     },
     {
-      itemBlueprintKey: AxesBlueprint.DoubleAxe,
+      itemBlueprintKey: AxesBlueprint.Axe,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,
       chance: 15,
     },
     {
-      itemBlueprintKey: HammersBlueprint.WarHammer,
+      itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.StuddedBoots,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: GlovesBlueprint.StuddedGloves,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: MacesBlueprint.SpikedClub,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 20,
     },
     {
-      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
-      chance: 30,
-    },
-
-    {
-      itemBlueprintKey: FoodsBlueprint.Fish,
-      chance: 80,
+      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 1,
     },
     {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 50,
+      itemBlueprintKey: MagicsBlueprint.Book,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: MagicsBlueprint.Rune,
+      chance: 10,
     },
   ],
 };
