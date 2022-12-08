@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { OthersBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CharacterItemInventory } from "../characterItems/CharacterItemInventory";
@@ -95,6 +95,10 @@ describe("CharacterItemInventory.ts", () => {
 
     const newBalance = await characterTradingBalance.getTotalGoldInInventory(testCharacter);
     expect(newBalance).toBe(0);
+
+    // verify that item was also removed
+    const item = await Item.findOne({ _id: goldCoins._id });
+    expect(item).toBeNull();
   });
 
   it("should decrement first STACKABLE item from the inventory if multiple stacks of same item", async () => {
@@ -150,6 +154,13 @@ describe("CharacterItemInventory.ts", () => {
 
     const newBalance = await characterTradingBalance.getTotalGoldInInventory(testCharacter);
     expect(newBalance).toBe(25);
+
+    // verify that first item was also removed
+    const item1 = await Item.findOne({ _id: goldCoins1._id });
+    expect(item1).toBeNull();
+
+    const item2 = await Item.findOne({ _id: goldCoins2._id });
+    expect(item2).toBeDefined();
   });
 
   it("should properly decrement a NON-STACKABLE item from the inventory", async () => {
@@ -166,6 +177,10 @@ describe("CharacterItemInventory.ts", () => {
     )) as unknown as IItemContainer;
 
     expect(updatedInventoryContainer.slots[0]).toBe(null);
+
+    // verify that items were removed from database
+    const item = await Item.findOne({ _id: shortSword._id });
+    expect(item).toBeNull();
   });
 
   it("should properly decrement multiple NON-STACKABLE items from the inventory", async () => {
@@ -185,6 +200,13 @@ describe("CharacterItemInventory.ts", () => {
 
     expect(updatedInventoryContainer.slots[0]).toBe(null);
     expect(updatedInventoryContainer.slots[1]).toBe(null);
+
+    // verify that items were removed from database
+    const item1 = await Item.findOne({ _id: shortSword1._id });
+    expect(item1).toBeNull();
+
+    const item2 = await Item.findOne({ _id: shortSword2._id });
+    expect(item2).toBeNull();
   });
 
   it("should properly decrement a NON-STACKABLE item from multiple same items in the inventory", async () => {

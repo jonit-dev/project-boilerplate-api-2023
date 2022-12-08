@@ -61,6 +61,8 @@ export class CharacterItemInventory {
             });
           } else {
             result = await this.deleteItemFromInventory(slotItem._id, character);
+            // we also need to delete item from items table
+            await Item.deleteOne({ _id: slotItem._id });
 
             // we need to fetch updated container in case some quantity remains to be substracted
             if (result && decrementQty > 0) {
@@ -74,6 +76,9 @@ export class CharacterItemInventory {
         } else {
           // if its not stackable, just remove it
           result = await this.deleteItemFromInventory(slotItem._id, character);
+          // we also need to delete item from items table
+          await Item.deleteOne({ _id: slotItem._id });
+
           decrementQty--;
         }
       }

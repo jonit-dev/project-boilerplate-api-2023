@@ -136,10 +136,10 @@ describe("ItemUse.ts", () => {
     item = (await Item.findById(testItem.id)) as unknown as IItem;
     expect(item.stackQty).toBe(1);
 
-    // await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
+    await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
 
-    // item = (await Item.findById(testItem.id)) as unknown as IItem;
-    // expect(item).toBeNull();
+    item = (await Item.findById(testItem.id)) as unknown as IItem;
+    expect(item).toBeNull();
   });
 
   it("should send an inventory update socket event", async () => {
