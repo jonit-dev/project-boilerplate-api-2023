@@ -17,9 +17,6 @@ export const spellSelfHealing: Partial<ISpell> = {
   animationKey: AnimationEffectKeys.LifeHeal,
 
   usableEffect: (character: ICharacter) => {
-    const manaCost = spellSelfHealing.manaCost ?? 0;
-
-    ItemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * manaCost);
-    ItemUsableEffect.apply(character, EffectableAttribute.Health, manaCost);
+    ItemUsableEffect.apply(character, EffectableAttribute.Health, 10);
   },
 };

@@ -1,11 +1,21 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { AnimationSocketEvents, CharacterSocketEvents, SkillSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import {
+  AnimationSocketEvents,
+  CharacterSocketEvents,
+  IItemContainer,
+  ItemSocketEvents,
+  ItemSubType,
+  SkillSocketEvents,
+  UISocketEvents,
+} from "@rpg-engine/shared";
+import { spellFoodCreation } from "../data/blueprints/SpellFoodCreation";
 import { spellSelfHealing } from "../data/blueprints/SpellSelfHealing";
 import { SpellCast } from "../SpellCast";
 
@@ -238,7 +248,7 @@ describe("SpellCast.ts", () => {
 
       expect(skills.level).toBe(2);
       expect(character.learnedSpells).toBeDefined();
-      expect([...character.learnedSpells!]).toEqual([spellSelfHealing.key]);
+      expect([...character.learnedSpells!]).toEqual([spellSelfHealing.key, spellFoodCreation.key]);
 
       expect(sendEventToUser).not.toHaveBeenCalled();
     };
@@ -259,10 +269,10 @@ describe("SpellCast.ts", () => {
 
       expect(skills.level).toBe(2);
       expect(character.learnedSpells).toBeDefined();
-      expect([...character.learnedSpells!]).toEqual([spellSelfHealing.key]);
+      expect([...character.learnedSpells!]).toEqual([spellSelfHealing.key, spellFoodCreation.key]);
 
       expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
-        message: "You have learned new spell(s): Self Healing Spell (talas faenya)",
+        message: "You have learned new spell(s): Self Healing Spell (talas faenya), Food Creation Spell (iquar klatha)",
         type: "info",
       });
     };
@@ -283,10 +293,10 @@ describe("SpellCast.ts", () => {
 
       expect(skills.level).toBe(2);
       expect(character.learnedSpells).toBeDefined();
-      expect([...character.learnedSpells!]).toEqual([spellSelfHealing.key]);
+      expect([...character.learnedSpells!]).toEqual([spellSelfHealing.key, spellFoodCreation.key]);
     };
 
-    testCharacter.learnedSpells = [spellSelfHealing.key!];
+    testCharacter.learnedSpells = [spellSelfHealing.key!, spellFoodCreation.key!];
     await testCharacter.save();
     await runTest();
   });
@@ -314,5 +324,40 @@ describe("SpellCast.ts", () => {
     await characterSkills.save();
 
     await runTest();
+  });
+
+  it("should cast food creation spell successfully", async () => {
+    // create character with inventory
+    testCharacter = await (
+      await unitTestHelper.createMockCharacter(
+        { health: 50, learnedSpells: [spellFoodCreation.key] },
+        { hasEquipment: true, hasInventory: true, hasSkills: true }
+      )
+    )
+      .populate("skills")
+      .execPopulate();
+
+    characterSkills = testCharacter.skills as unknown as ISkill;
+    characterSkills.level = spellFoodCreation.minLevelRequired!;
+    characterSkills.magic.level = spellFoodCreation.minMagicLevelRequired;
+    await characterSkills.save();
+
+    expect(await spellCast.castSpell("iquar klatha", testCharacter)).toBeTruthy();
+
+    const inventory = await testCharacter.inventory;
+    const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    const item = container.slots[0];
+    expect(item).toBeDefined();
+    expect(item?.subType).toBe(ItemSubType.Food);
+
+    expect(sendEventToUser).toHaveBeenCalledWith(
+      testCharacter.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      {
+        inventory: container,
+        openInventoryOnUpdate: false,
+      }
+    );
   });
 });

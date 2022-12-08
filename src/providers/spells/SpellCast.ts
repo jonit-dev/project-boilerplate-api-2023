@@ -9,6 +9,7 @@ import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/s
 import { provide } from "inversify-binding-decorators";
 import { spellsBlueprints } from "./data/blueprints/index";
 import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 @provide(SpellCast)
 export class SpellCast {
   private skillIncrease: SkillIncrease;
@@ -41,7 +42,9 @@ export class SpellCast {
       return false;
     }
 
-    spell.usableEffect(character);
+    await spell.usableEffect(character);
+
+    ItemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
     await character.save();
 
     await this.sendPostSpellCastEvents(character, spell);
