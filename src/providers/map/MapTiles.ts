@@ -19,13 +19,30 @@ export class MapTiles {
       throw new Error(`Failed to find layer ${layerName}`);
     }
 
-    const chunk = layer.chunks[0];
-
-    if (!chunk) {
+    if (layer.chunks.length === 0) {
       return undefined;
     }
 
-    return [chunk.x, chunk.y];
+    return [layer.chunks[0].x, layer.chunks[0].y];
+  }
+
+  public getMapLayers(map: string): string[] {
+    const mapData = MapLoader.maps.get(map);
+
+    if (!mapData) {
+      throw new Error(`Failed to find map ${map}`);
+    }
+
+    const layers = mapData.layers.map((layer) => {
+      if (layer.type === "objectgroup") {
+        return null;
+      }
+
+      return layer.name;
+    });
+
+    // return layers without null or undefined
+    return layers.filter((layer) => layer) as string[];
   }
 
   public getMapWidthHeight(
@@ -66,60 +83,48 @@ export class MapTiles {
       return false;
     }
 
+    // Check if the tile is solid on the specified layer
     const rawTileId = this.getRawTileId(layer, gridX, gridY);
-
     if (!rawTileId) {
       return false;
     }
 
     const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
-
     if (!targetTileset) {
       return false;
     }
 
-    if (rawTileId) {
-      const tileId = rawTileId - targetTileset.firstgid;
+    const tileId = rawTileId - targetTileset.firstgid;
+    const tileProperty = this.getTileProperty<boolean>(targetTileset!, tileId!, "ge_collide") || false;
 
-      const tileProperty = this.getTileProperty<boolean>(targetTileset!, tileId!, "ge_collide") || false;
-
-      if (tileProperty) {
-        return tileProperty;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  public isPassage(map: string, gridX: number, gridY: number, mapLayer: MapLayers): boolean {
-    const layerName = TiledLayerNames[mapLayer];
-
-    const layer = this.getLayer(map, mapLayer);
-
-    if (!layer) {
-      throw new Error(`Failed to find layer ${layerName}`);
-    }
-
-    const rawTileId = this.getRawTileId(layer, gridX, gridY);
-
-    if (!rawTileId) {
-      return false;
-    }
-
-    const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
-
-    if (!targetTileset) {
-      return false;
-    }
-
-    if (rawTileId) {
-      const tileId = rawTileId - targetTileset.firstgid;
-      return this.getTileProperty<boolean>(targetTileset!, tileId!, "is_passage") || false;
+    if (tileProperty) {
+      return tileProperty;
     }
 
     return false;
+  }
+
+  public isPassage(map: string, gridX: number, gridY: number, mapLayer: MapLayers): boolean {
+    const layer = this.getLayer(map, mapLayer);
+
+    if (!layer) {
+      return false;
+    }
+
+    const rawTileId = this.getRawTileId(layer, gridX, gridY);
+
+    if (!rawTileId) {
+      return false;
+    }
+
+    const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
+
+    if (!targetTileset) {
+      return false;
+    }
+
+    const tileId = rawTileId - targetTileset.firstgid;
+    return this.getTileProperty<boolean>(targetTileset!, tileId!, "is_passage") || false;
   }
 
   public getPropertyFromLayer(

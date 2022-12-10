@@ -21,6 +21,26 @@ describe("MapTiles.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
   });
 
+  it("should detect if all layers are empty", () => {
+    // @ts-ignore
+    const allLayersEmpty = mapTiles.areAllLayersTileEmpty(mapName, -10, -10);
+
+    // @ts-ignore
+    const layersAreNotEmpty = mapTiles.areAllLayersTileEmpty(mapName, 0, 0);
+
+    expect(allLayersEmpty).toBeTruthy();
+
+    expect(layersAreNotEmpty).toBeFalsy();
+  });
+
+  it("detects an is_passage property", () => {
+    const isPassage = mapTiles.isPassage(mapName, 3, 7, MapLayers.Decoration);
+
+    const notPassage = mapTiles.isPassage(mapName, 4, 7, MapLayers.OverGround);
+    expect(isPassage).toBeTruthy();
+    expect(notPassage).toBeFalsy();
+  });
+
   it("should properly get the first X and Y coordinates", () => {
     const firstXY = mapTiles.getFirstXY("unit-test-map-negative-coordinate", MapLayers.Ground);
 
@@ -160,6 +180,14 @@ describe("MapTiles.ts", () => {
 
     expect(flippedTileId).toBe(35);
     expect(solidFlippedTile).toBeTruthy();
+  });
+
+  it("should get the layers of a map", () => {
+    const layers = mapTiles.getMapLayers(mapName);
+
+    expect(layers).toContain("ground");
+    expect(layers).toContain("decoration");
+    expect(layers).toContain("over-ground");
   });
 
   afterAll(async () => {

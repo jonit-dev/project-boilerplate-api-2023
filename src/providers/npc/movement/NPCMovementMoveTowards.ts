@@ -92,7 +92,10 @@ export class NPCMovementMoveTowards {
             );
 
             if (isUnderOriginalPositionRange) {
-              await this.moveTowardsPosition(npc, targetCharacter.x, targetCharacter.y);
+              // if character is on the same scene as npc
+              if (npc.scene === targetCharacter.scene) {
+                await this.moveTowardsPosition(npc, targetCharacter.x, targetCharacter.y);
+              }
             } else {
               npc.pathOrientation = NPCPathOrientation.Backward;
               await npc.save();

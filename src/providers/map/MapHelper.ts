@@ -5,12 +5,19 @@ import { provide } from "inversify-binding-decorators";
 export class MapHelper {
   public isCoordinateValid = (value: number | undefined | null): boolean => !(!value && value !== 0);
 
+  public areAllCoordinatesValid(...args: number[][]): boolean {
+    return args.every((arg) => this.isCoordinateValid(arg[0]) && this.isCoordinateValid(arg[1]));
+  }
+
   public getHighestMapLayer = (): number => {
-    const keys = Object.keys(MapLayers).filter((k) => typeof MapLayers[k as any] === "number");
-
-    const values = keys.map((k) => Number(MapLayers[k as any]));
-
-    return Math.max(...values);
+    let highest = 0;
+    for (const key in MapLayers) {
+      const value = MapLayers[key as keyof typeof MapLayers];
+      if (typeof value === "number" && value > highest) {
+        highest = value;
+      }
+    }
+    return highest;
   };
 
   public mergeBlueprintWithTiledProps<T>(

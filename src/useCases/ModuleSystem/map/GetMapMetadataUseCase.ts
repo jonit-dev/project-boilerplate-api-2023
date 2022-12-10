@@ -4,12 +4,15 @@ import { BadRequestError } from "@providers/errors/BadRequestError";
 
 import { caveLightening, exteriorLightening } from "@providers/map/data/abstractions/mapLightening";
 import { mapsBlueprintIndex } from "@providers/map/data/index";
-import { IMapMetaData, ITiled, MAP_LAYERS } from "@rpg-engine/shared";
+import { MapTiles } from "@providers/map/MapTiles";
+import { IMapMetaData, ITiled } from "@rpg-engine/shared";
 import fs from "fs";
 import { provide } from "inversify-binding-decorators";
 
 @provide(GetMapMetadataUseCase)
 export class GetMapMetadataUseCase {
+  constructor(private mapTiles: MapTiles) {}
+
   public execute(mapName: string): object {
     try {
       const mapVersions = fs.readFileSync(`${STATIC_PATH}/config/map-versions.json`, "utf8");
@@ -22,7 +25,7 @@ export class GetMapMetadataUseCase {
 
       const map: ITiled = require(`${STATIC_PATH}/maps/${mapName}.json`);
 
-      const layers = MAP_LAYERS;
+      const layers = this.mapTiles.getMapLayers(mapName);
 
       const tilesets = map.tilesets.map((tileset) => {
         return {

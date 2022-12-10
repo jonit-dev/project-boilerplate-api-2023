@@ -8,7 +8,7 @@
     "test": "yarn jest --silent test",
     "test:ci": "yarn jest --silent test",
     "test:debug": "yarn jest test --detectOpenHandles",
-    "test:coverage": "yarn jest --silent --coverage",
+    "test:coverage": "yarn jest --silent --coverage --maxWorkers=4 --maxConcurrency=4 --forceExit",
     "test:config": "yarn jest --showConfig test",
     "dev": "yarn install && ts-node-dev --transpile-only --inspect=0.0.0.0:9229 --trace-deprecation --respawn -r tsconfig-paths/register ./src/server.ts",
     "build": "tsc -p .",
