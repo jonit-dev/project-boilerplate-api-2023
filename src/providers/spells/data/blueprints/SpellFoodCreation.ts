@@ -1,20 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { IBlueprint } from "@providers/types/temp/BlueprintTypes";
-import {
-  AnimationEffectKeys,
-  IEquipmentAndInventoryUpdatePayload,
-  IItemContainer,
-  ItemSocketEvents,
-  ItemSubType,
-  SpellCastingType,
-} from "@rpg-engine/shared";
+import { AnimationEffectKeys, ItemSubType, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 import { container } from "@providers/inversify/container";
-import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 
 export const spellFoodCreation: Partial<ISpell> = {
   key: SpellsBlueprint.FoodCreationSpell,
@@ -30,35 +21,25 @@ export const spellFoodCreation: Partial<ISpell> = {
   animationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {
-    const characterItemsContainer = container.get(CharacterItemContainer);
+    const characterItemInventory = container.get(CharacterItemInventory);
+    const characterInventory = container.get(CharacterInventory);
 
-    const inventory = await character.inventory;
-    const inventoryContainerId = inventory?.itemContainer as unknown as string;
-
-    const item = getFoodItem();
-    await item.save();
-
-    await characterItemsContainer.addItemToContainer(item, character, inventoryContainerId);
-
-    await sendItemsUpdateEvent(inventory, character);
+    const added = await characterItemInventory.addItemToInventory(getFoodItemKey(), character);
+    if (added) {
+      await characterInventory.sendInventoryUpdateEvent(character);
+    }
   },
 };
 
-function getFoodItem(): IItem {
+function getFoodItemKey(): string {
   const foodItems = getFoodItems();
   const index = Math.floor(Math.random() * foodItems.length);
   const foodItem = foodItems[index];
-
-  const item = new Item({ ...foodItem });
-  if (item.maxStackSize > 1) {
-    item.stackQty = 1;
-  }
-
-  return item;
+  return foodItem.key!;
 }
 
-function getFoodItems(): IBlueprint[] {
-  const foods: IBlueprint[] = [];
+function getFoodItems(): Partial<IItem>[] {
+  const foods: Partial<IItem>[] = [];
   for (const itemKey in itemsBlueprintIndex) {
     const item = itemsBlueprintIndex[itemKey];
     if (item.subType === ItemSubType.Food) {
@@ -66,19 +47,4 @@ function getFoodItems(): IBlueprint[] {
     }
   }
   return foods;
-}
-
-async function sendItemsUpdateEvent(inventory: IItem, character: ICharacter): Promise<void> {
-  const socketMessaging = container.get(SocketMessaging);
-
-  const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
-
-  socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
-    character.channelId!,
-    ItemSocketEvents.EquipmentAndInventoryUpdate,
-    {
-      inventory: inventoryContainer,
-      openInventoryOnUpdate: false,
-    }
-  );
 }

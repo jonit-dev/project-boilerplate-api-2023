@@ -4,6 +4,9 @@ import { SpellCastingType } from "@rpg-engine/shared";
 export enum SpellsBlueprint {
   SelfHealingSpell = "self-healing-spell",
   FoodCreationSpell = "food-creation-spell",
+  ArrowCreationSpell = "arrow-creation-spell",
+  BoltCreationSpell = "bolt-creation-spell",
+  BlankRuneCreationSpell = "blank-rune-creation-spell",
 }
 
 export interface ISpell {

@@ -9,6 +9,7 @@ import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { CharacterItemContainer } from "./CharacterItemContainer";
 import { CharacterItemSlots } from "./CharacterItemSlots";
 
 @provide(CharacterItemInventory)
@@ -16,8 +17,34 @@ export class CharacterItemInventory {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterItemSlots: CharacterItemSlots,
-    private mathHelper: MathHelper
+    private mathHelper: MathHelper,
+    private characterItemsContainer: CharacterItemContainer
   ) {}
+
+  public async addItemToInventory(itemKey: string, character: ICharacter): Promise<boolean> {
+    const inventory = await character.inventory;
+    const inventoryContainerId = inventory?.itemContainer as unknown as string;
+    if (!inventoryContainerId) {
+      return false;
+    }
+
+    const blueprint = itemsBlueprintIndex[itemKey];
+    if (!blueprint) {
+      return false;
+    }
+
+    const item = new Item({
+      ...blueprint,
+    });
+
+    if (item.maxStackSize > 1) {
+      item.stackQty = 1;
+    }
+
+    await item.save();
+
+    return await this.characterItemsContainer.addItemToContainer(item, character, inventoryContainerId);
+  }
 
   public async decrementItemFromInventory(
     itemKey: string,
