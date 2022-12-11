@@ -130,6 +130,7 @@ export class SpellCast {
       targetId: character._id,
       health: character.health,
       mana: character.mana,
+      speed: character.speed,
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);

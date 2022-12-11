@@ -24,6 +24,7 @@ import { spellFireRuneCreation } from "../data/blueprints/SpellFireRuneCreation"
 import { spellFoodCreation } from "../data/blueprints/SpellFoodCreation";
 import { spellHealRuneCreation } from "../data/blueprints/SpellHealRuneCreation";
 import { spellPoisonRuneCreation } from "../data/blueprints/SpellPoisonRuneCreation";
+import { spellSelfHaste } from "../data/blueprints/SpellSelfHaste";
 import { spellSelfHealing } from "../data/blueprints/SpellSelfHealing";
 import { ISpell } from "../data/types/SpellsBlueprintTypes";
 import { SpellCast } from "../SpellCast";
@@ -207,6 +208,7 @@ describe("SpellCast.ts", () => {
         targetId: testCharacter._id,
         health: newHealth,
         mana: newMana,
+        speed: character.speed,
       }
     );
 
@@ -447,6 +449,52 @@ describe("SpellCast.ts", () => {
           openInventoryOnUpdate: false,
         }
       );
+    });
+
+    it("should be self haste spell casting", () => {
+      expect(spellCast.isSpellCasting("talas hiz")).toBeTruthy();
+    });
+
+    it("should cast haste spell successfully", async () => {
+      jest.useFakeTimers({ advanceTimers: true });
+
+      testCharacter = await unitTestHelper.createMockCharacter(
+        { health: 50, learnedSpells: [spellSelfHaste.key] },
+        { hasEquipment: true, hasInventory: true, hasSkills: true }
+      );
+
+      await testCharacter.populate("skills").execPopulate();
+
+      characterSkills = testCharacter.skills as unknown as ISkill;
+      characterSkills.level = spellSelfHaste.minLevelRequired!;
+      characterSkills.magic.level = spellSelfHaste.minMagicLevelRequired;
+      await characterSkills.save();
+
+      const castResult = await spellCast.castSpell("talas hiz", testCharacter);
+
+      expect(castResult).toBeTruthy();
+
+      expect(testCharacter.baseSpeed).toBe(3);
+      expect(testCharacter.speed).toBe(3);
+
+      expect(sendEventToUser).toHaveBeenNthCalledWith(
+        2,
+        testCharacter.channelId,
+        CharacterSocketEvents.AttributeChanged,
+        {
+          targetId: testCharacter._id,
+          health: testCharacter.health,
+          mana: testCharacter.mana,
+          speed: testCharacter.speed,
+        }
+      );
+
+      expect(sendEventToUser).toHaveBeenNthCalledWith(4, testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
+        targetId: testCharacter._id,
+        effectKey: spellSelfHaste.animationKey,
+      });
+
+      jest.clearAllTimers();
     });
 
     describe("test rune conversion spells", () => {

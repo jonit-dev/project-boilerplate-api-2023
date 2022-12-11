@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { BattleCycle } from "@providers/battle/BattleCycle";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -34,7 +35,7 @@ export class CharacterNetworkLogout {
 
         console.log(`🚪: Character id ${data.id} has disconnected`);
 
-        await Character.updateOne({ _id: data.id }, { isOnline: false });
+        await Character.updateOne({ _id: data.id }, { isOnline: false, baseSpeed: MovementSpeed.Slow });
 
         const battleCycle = BattleCycle.battleCycles.get(data.id);
 

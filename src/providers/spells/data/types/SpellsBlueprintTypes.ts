@@ -8,6 +8,7 @@ export enum SpellsBlueprint {
   ArrowCreationSpell = "arrow-creation-spell",
   BoltCreationSpell = "bolt-creation-spell",
   BlankRuneCreationSpell = "blank-rune-creation-spell",
+  SelfHasteSpell = "self-haste-spell",
   FireRuneCreationSpell = "fire-rune-creation-spell",
   HealRuneCreationSpell = "healing-rune-creation-spell",
   PoisonRuneCreationSpell = "poison-rune-creation-spell",

@@ -7,6 +7,7 @@ import { spellFireRuneCreation } from "./SpellFireRuneCreation";
 import { spellFoodCreation } from "./SpellFoodCreation";
 import { spellHealRuneCreation } from "./SpellHealRuneCreation";
 import { spellPoisonRuneCreation } from "./SpellPoisonRuneCreation";
+import { spellSelfHaste } from "./SpellSelfHaste";
 import { spellSelfHealing } from "./SpellSelfHealing";
 
 export const spellsBlueprints = {
@@ -15,6 +16,7 @@ export const spellsBlueprints = {
   [SpellsBlueprint.ArrowCreationSpell]: spellArrowCreation,
   [SpellsBlueprint.BoltCreationSpell]: spellBoltCreation,
   [SpellsBlueprint.BlankRuneCreationSpell]: spellBlankRuneCreation,
+  [SpellsBlueprint.SelfHasteSpell]: spellSelfHaste,
   [SpellsBlueprint.FireRuneCreationSpell]: spellFireRuneCreation,
   [SpellsBlueprint.HealRuneCreationSpell]: spellHealRuneCreation,
   [SpellsBlueprint.DarkRuneCreationSpell]: spellDarkRuneCreation,
