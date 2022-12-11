@@ -21,7 +21,11 @@ export class CharacterItemInventory {
     private characterItemsContainer: CharacterItemContainer
   ) {}
 
-  public async addItemToInventory(itemKey: string, character: ICharacter): Promise<boolean> {
+  public async addItemToInventory(
+    itemKey: string,
+    character: ICharacter,
+    extraProps?: Partial<IItem>
+  ): Promise<boolean> {
     const inventory = await character.inventory;
     const inventoryContainerId = inventory?.itemContainer as unknown as string;
     if (!inventoryContainerId) {
@@ -35,11 +39,8 @@ export class CharacterItemInventory {
 
     const item = new Item({
       ...blueprint,
+      ...extraProps,
     });
-
-    if (item.maxStackSize > 1) {
-      item.stackQty = 1;
-    }
 
     await item.save();
 
@@ -57,6 +58,12 @@ export class CharacterItemInventory {
 
     if (!inventoryItemContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
+      return false;
+    }
+
+    const hasItem = await this.checkItemInInventoryByKey(itemKey, character);
+
+    if (!hasItem) {
       return false;
     }
 

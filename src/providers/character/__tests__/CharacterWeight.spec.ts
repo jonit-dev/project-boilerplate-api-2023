@@ -21,6 +21,8 @@ describe("CharacterWeight.ts", () => {
   });
 
   beforeEach(async () => {
+    await unitTestHelper.beforeEachJestHook(true);
+
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, {
         hasSkills: true,

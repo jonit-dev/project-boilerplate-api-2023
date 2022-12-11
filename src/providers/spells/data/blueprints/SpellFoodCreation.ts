@@ -1,11 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { container } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { AnimationEffectKeys, ItemSubType, SpellCastingType } from "@rpg-engine/shared";
+import { SpellItemCreation } from "../abstractions/SpellItemCreation";
 import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
-import { container } from "@providers/inversify/container";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
-import { CharacterInventory } from "@providers/character/CharacterInventory";
 
 export const spellFoodCreation: Partial<ISpell> = {
   key: SpellsBlueprint.FoodCreationSpell,
@@ -21,13 +20,13 @@ export const spellFoodCreation: Partial<ISpell> = {
   animationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {
-    const characterItemInventory = container.get(CharacterItemInventory);
-    const characterInventory = container.get(CharacterInventory);
+    const spellRuneCreation = container.get(SpellItemCreation);
 
-    const added = await characterItemInventory.addItemToInventory(getFoodItemKey(), character);
-    if (added) {
-      await characterInventory.sendInventoryUpdateEvent(character);
-    }
+    await spellRuneCreation.createItem(character, {
+      itemToCreate: {
+        key: getFoodItemKey(),
+      },
+    });
   },
 };
 

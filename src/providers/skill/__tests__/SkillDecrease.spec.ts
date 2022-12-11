@@ -17,6 +17,8 @@ describe("SkillDecrease | Call handleCharacterDeath() to check if the death pena
   });
 
   beforeEach(async () => {
+    await unitTestHelper.beforeEachJestHook(true);
+
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
     skillDecrease = container.get<SkillDecrease>(SkillDecrease);
 

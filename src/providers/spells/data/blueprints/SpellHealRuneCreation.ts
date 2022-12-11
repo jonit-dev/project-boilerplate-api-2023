@@ -1,10 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 import { container } from "@providers/inversify/container";
 import { MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
-import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
+import { SpellItemCreation } from "../abstractions/SpellItemCreation";
+import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 
 export const spellHealRuneCreation: Partial<ISpell> = {
   key: SpellsBlueprint.HealRuneCreationSpell,
@@ -22,18 +21,16 @@ export const spellHealRuneCreation: Partial<ISpell> = {
   requiredItem: MagicsBlueprint.Rune,
 
   usableEffect: async (character: ICharacter) => {
-    const characterItemInventory = container.get(CharacterItemInventory);
-    const characterInventory = container.get(CharacterInventory);
+    const spellRuneCreation = container.get(SpellItemCreation);
 
-    const removed = await characterItemInventory.decrementItemFromInventory(MagicsBlueprint.Rune, character, 1);
-    if (!removed) {
-      return;
-    }
-
-    const added = await characterItemInventory.addItemToInventory(MagicsBlueprint.HealRune, character);
-
-    if (added || removed) {
-      await characterInventory.sendInventoryUpdateEvent(character);
-    }
+    await spellRuneCreation.createItem(character, {
+      itemToCreate: {
+        key: MagicsBlueprint.HealRune,
+      },
+      itemToConsume: {
+        key: MagicsBlueprint.Rune,
+        onErrorMessage: "You do not have any blank rune to create a Heal Rune.",
+      },
+    });
   },
 };

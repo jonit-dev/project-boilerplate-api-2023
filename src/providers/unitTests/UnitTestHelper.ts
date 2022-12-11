@@ -32,14 +32,14 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
 import {
+  itemMeleeRangedMock,
   itemMock,
   itemMockArmor,
+  itemMockBow,
+  itemMockShield,
   itemTwoHandedMock,
   stackableGoldCoinMock,
   stackableItemMock,
-  itemMockShield,
-  itemMockBow,
-  itemMeleeRangedMock,
 } from "./mock/itemMock";
 import {
   questInteractionCraftObjectiveMock,

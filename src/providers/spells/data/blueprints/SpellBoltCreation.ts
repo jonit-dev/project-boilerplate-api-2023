@@ -1,10 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
+import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { container } from "@providers/inversify/container";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
-import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
+import random from "lodash/random";
+import { SpellItemCreation } from "../abstractions/SpellItemCreation";
+import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 
 export const spellBoltCreation: Partial<ISpell> = {
   key: SpellsBlueprint.BoltCreationSpell,
@@ -20,12 +21,23 @@ export const spellBoltCreation: Partial<ISpell> = {
   animationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {
-    const characterItemInventory = container.get(CharacterItemInventory);
-    const characterInventory = container.get(CharacterInventory);
+    const characterWithSkills = await character.populate("skills").execPopulate();
+    const skills = characterWithSkills.skills as unknown as ISkill;
+    const magicLevel = skills.magic.level as number;
 
-    const added = await characterItemInventory.addItemToInventory(RangedWeaponsBlueprint.Bolt, character);
-    if (added) {
-      await characterInventory.sendInventoryUpdateEvent(character);
+    let itemsToCreate = random(1, magicLevel || 3);
+
+    if (itemsToCreate > 100) {
+      itemsToCreate = 100;
     }
+
+    const spellItemCreation = container.get(SpellItemCreation);
+
+    await spellItemCreation.createItem(character, {
+      itemToCreate: {
+        key: RangedWeaponsBlueprint.Bolt,
+        createQty: itemsToCreate,
+      },
+    });
   },
 };

@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { IItemContainer as ModelIItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -495,99 +495,6 @@ describe("SpellCast.ts", () => {
       });
 
       jest.clearAllTimers();
-    });
-
-    describe("test rune conversion spells", () => {
-      beforeEach(async () => {
-        const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.Rune)];
-
-        const inventory = await testCharacter.inventory;
-        const container: ModelIItemContainer = (await ItemContainer.findById(
-          inventory.itemContainer
-        )) as unknown as ModelIItemContainer;
-
-        await unitTestHelper.addItemsToInventoryContainer(container, 6, items);
-      });
-
-      it("should cast fire rune creation spell successfully", async () => {
-        expect(await spellCast.castSpell("iquar ansr maskan", testCharacter)).toBeTruthy();
-
-        const inventory = await testCharacter.inventory;
-        const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
-
-        const item = container.slots[0];
-        expect(item).toBeDefined();
-        expect(item?.key).toBe(MagicsBlueprint.FireRune);
-
-        expect(sendEventToUser).toHaveBeenCalledWith(
-          testCharacter.channelId!,
-          ItemSocketEvents.EquipmentAndInventoryUpdate,
-          {
-            inventory: container,
-            openInventoryOnUpdate: false,
-          }
-        );
-      });
-
-      it("should cast heal rune creation spell successfully", async () => {
-        expect(await spellCast.castSpell("iquar ansr faenya", testCharacter)).toBeTruthy();
-
-        const inventory = await testCharacter.inventory;
-        const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
-
-        const item = container.slots[0];
-        expect(item).toBeDefined();
-        expect(item?.key).toBe(MagicsBlueprint.HealRune);
-
-        expect(sendEventToUser).toHaveBeenCalledWith(
-          testCharacter.channelId!,
-          ItemSocketEvents.EquipmentAndInventoryUpdate,
-          {
-            inventory: container,
-            openInventoryOnUpdate: false,
-          }
-        );
-      });
-
-      it("should cast dark rune creation spell successfully", async () => {
-        expect(await spellCast.castSpell("iquar ansr nevae", testCharacter)).toBeTruthy();
-
-        const inventory = await testCharacter.inventory;
-        const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
-
-        const item = container.slots[0];
-        expect(item).toBeDefined();
-        expect(item?.key).toBe(MagicsBlueprint.DarkRune);
-
-        expect(sendEventToUser).toHaveBeenCalledWith(
-          testCharacter.channelId!,
-          ItemSocketEvents.EquipmentAndInventoryUpdate,
-          {
-            inventory: container,
-            openInventoryOnUpdate: false,
-          }
-        );
-      });
-
-      it("should cast poison rune creation spell successfully", async () => {
-        expect(await spellCast.castSpell("iquar ansr athil", testCharacter)).toBeTruthy();
-
-        const inventory = await testCharacter.inventory;
-        const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
-
-        const item = container.slots[0];
-        expect(item).toBeDefined();
-        expect(item?.key).toBe(MagicsBlueprint.PoisonRune);
-
-        expect(sendEventToUser).toHaveBeenCalledWith(
-          testCharacter.channelId!,
-          ItemSocketEvents.EquipmentAndInventoryUpdate,
-          {
-            inventory: container,
-            openInventoryOnUpdate: false,
-          }
-        );
-      });
     });
   });
 });
