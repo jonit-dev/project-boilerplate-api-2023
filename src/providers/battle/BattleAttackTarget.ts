@@ -150,37 +150,6 @@ export class BattleAttackTarget {
       return;
     }
 
-    // check the attacher is NPC and check entity Effects
-    if (attacker.type === "NPC") {
-      const npc = attacker as INPC;
-      if (npc.entityEffects?.length) {
-        const entityEffects = npc.entityEffects;
-        const selectedEntityEffects: IEntityEffect[] = [];
-        entityEffects.forEach((effect) => {
-          const entry: IEntityEffect = entitiesBlueprintsIndex[effect];
-
-          switch (attacker.attackType) {
-            case EntityAttackType.MeleeRanged:
-              selectedEntityEffects.push(entry);
-              break;
-            case EntityAttackType.Melee:
-              if (entry.type === EntityAttackType.Melee) {
-                selectedEntityEffects.push(entry);
-              }
-              break;
-            case EntityAttackType.Ranged:
-              if (entry.type === EntityAttackType.Ranged) {
-                selectedEntityEffects.push(entry);
-              }
-              break;
-            default:
-              break;
-          }
-        });
-        // EntityEffectUse.applyEntityEffect(selectedEntityEffects);
-      }
-    }
-
     const battleEvent = await this.battleEvent.calculateEvent(attacker, target);
 
     let battleEventPayload: Partial<IBattleEventFromServer> = {
