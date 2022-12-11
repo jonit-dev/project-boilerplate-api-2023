@@ -166,6 +166,7 @@ const characterSchema = createLeanSchema(
         enum: TypeHelper.enumToStringArray(SpellsBlueprint),
       })
     ),
+    applyEntityEffect: Type.array().of(Type.string()),
     ...({} as {
       isAlive: boolean;
       type: string;

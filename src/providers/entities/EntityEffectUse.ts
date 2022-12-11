@@ -1,6 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { BattleRangedAttack } from "@providers/battle/BattleRangedAttack";
+import { MovementHelper } from "@providers/movement/MovementHelper";
+import { BattleEventType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
@@ -9,7 +11,11 @@ import { EntityEffectCycle } from "./EntityEffectCycle";
 
 @provide(EntityEffectUse)
 export class EntityEffectUse {
-  constructor(private effectsSocketEvents: EffectsSocketEvents, private animationEffect: AnimationEffect) {}
+  constructor(
+    private effectsSocketEvents: EffectsSocketEvents,
+    private movementHelper: MovementHelper,
+    private battleRangedAttack: BattleRangedAttack
+  ) {}
 
   public async applyEntityEffects(
     entryEffects: IEntityEffect[],
@@ -22,23 +28,39 @@ export class EntityEffectUse {
         // check for probability of success
         const n = random(0, 100);
         if (n < entryEffect.probability) {
-          await new EntityEffectCycle(
-            () => {
-              this.effectsSocketEvents.EntityEffect(attacker.id, entryEffect.key, {
-                targetId: target.id,
-                value: entryEffect.value,
-                targetType: target.type,
-              });
-            },
-            entryEffect.intervalMs,
-            entryEffect.totalDurationMs
-          );
-          const ChaTarget = target as ICharacter;
-          await this.animationEffect.sendAnimationEventToCharacter(
-            ChaTarget,
-            entryEffect.targetAnimationKey,
-            target.id
-          );
+          // only Characters can have channel Id. so converting target as character
+          const characterTarget = target as ICharacter;
+
+          // if channel id undefine set id as channel id.
+          let targetChannelId: string;
+          characterTarget.channelId
+            ? (targetChannelId = characterTarget.channelId)
+            : (targetChannelId = characterTarget.id);
+
+          if (!characterTarget.applyEntityEffect?.find((e) => e === entryEffect.key)) {
+            if (characterTarget.applyEntityEffect === undefined) characterTarget.applyEntityEffect = [];
+            characterTarget.applyEntityEffect.push(entryEffect.key);
+            await new EntityEffectCycle(
+              async () => {
+                await this.effectsSocketEvents.EntityEffect(
+                  targetChannelId,
+                  {
+                    targetId: target.id,
+                    targetType: target.type as "Character" | "NPC",
+                    eventType: entryEffect.key as BattleEventType,
+                    totalDamage: entryEffect.value,
+                  },
+                  target,
+                  entryEffect
+                );
+              },
+              entryEffect,
+              target,
+              attacker,
+              this.movementHelper,
+              this.battleRangedAttack
+            );
+          }
         }
       }
     }
