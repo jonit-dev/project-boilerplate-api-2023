@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer as ModelIItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -19,13 +19,19 @@ import {
 import { spellArrowCreation } from "../data/blueprints/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/SpellBlankRuneCreation";
 import { spellBoltCreation } from "../data/blueprints/SpellBoltCreation";
+import { spellDarkRuneCreation } from "../data/blueprints/SpellDarkRuneCreation";
+import { spellFireRuneCreation } from "../data/blueprints/SpellFireRuneCreation";
 import { spellFoodCreation } from "../data/blueprints/SpellFoodCreation";
+import { spellHealRuneCreation } from "../data/blueprints/SpellHealRuneCreation";
+import { spellPoisonRuneCreation } from "../data/blueprints/SpellPoisonRuneCreation";
 import { spellSelfHealing } from "../data/blueprints/SpellSelfHealing";
 import { ISpell } from "../data/types/SpellsBlueprintTypes";
 import { SpellCast } from "../SpellCast";
+import { SpellLearn } from "../SpellLearn";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;
+  let spellLearn: SpellLearn;
   let testCharacter: ICharacter;
   let characterSkills: ISkill;
   let sendEventToUser: jest.SpyInstance;
@@ -35,8 +41,19 @@ describe("SpellCast.ts", () => {
     await unitTestHelper.beforeAllJestHook();
 
     spellCast = container.get<SpellCast>(SpellCast);
+    spellLearn = container.get<SpellLearn>(SpellLearn);
 
-    level2Spells = [spellSelfHealing, spellFoodCreation, spellArrowCreation, spellBoltCreation, spellBlankRuneCreation];
+    level2Spells = [
+      spellSelfHealing,
+      spellFoodCreation,
+      spellArrowCreation,
+      spellBoltCreation,
+      spellBlankRuneCreation,
+      spellFireRuneCreation,
+      spellHealRuneCreation,
+      spellDarkRuneCreation,
+      spellPoisonRuneCreation,
+    ];
   });
 
   beforeEach(async () => {
@@ -247,7 +264,7 @@ describe("SpellCast.ts", () => {
 
   it("should add spells to learned spells (level 2 character)", async () => {
     const runTest = async (): Promise<void> => {
-      await spellCast.learnLatestSkillLevelSpells(testCharacter._id, false);
+      await spellLearn.learnLatestSkillLevelSpells(testCharacter._id, false);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
@@ -268,7 +285,7 @@ describe("SpellCast.ts", () => {
 
   it("should add spells to learned spells (level 2 character) and notify user", async () => {
     const runTest = async (): Promise<void> => {
-      await spellCast.learnLatestSkillLevelSpells(testCharacter._id, true);
+      await spellLearn.learnLatestSkillLevelSpells(testCharacter._id, true);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
@@ -293,7 +310,7 @@ describe("SpellCast.ts", () => {
 
   it("should not duplicate spells on append (level 2 character)", async () => {
     const runTest = async (): Promise<void> => {
-      await spellCast.learnLatestSkillLevelSpells(testCharacter._id, false);
+      await spellLearn.learnLatestSkillLevelSpells(testCharacter._id, false);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
@@ -312,7 +329,7 @@ describe("SpellCast.ts", () => {
 
   it("should not add any spell to character (level 1 character)", async () => {
     const runTest = async (): Promise<void> => {
-      await spellCast.learnLatestSkillLevelSpells(testCharacter._id, true);
+      await spellLearn.learnLatestSkillLevelSpells(testCharacter._id, true);
 
       const character = (await Character.findOne({ _id: testCharacter._id }).populate(
         "skills"
@@ -430,6 +447,99 @@ describe("SpellCast.ts", () => {
           openInventoryOnUpdate: false,
         }
       );
+    });
+
+    describe("test rune conversion spells", () => {
+      beforeEach(async () => {
+        const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.Rune)];
+
+        const inventory = await testCharacter.inventory;
+        const container: ModelIItemContainer = (await ItemContainer.findById(
+          inventory.itemContainer
+        )) as unknown as ModelIItemContainer;
+
+        await unitTestHelper.addItemsToInventoryContainer(container, 6, items);
+      });
+
+      it("should cast fire rune creation spell successfully", async () => {
+        expect(await spellCast.castSpell("iquar ansr maskan", testCharacter)).toBeTruthy();
+
+        const inventory = await testCharacter.inventory;
+        const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+        const item = container.slots[0];
+        expect(item).toBeDefined();
+        expect(item?.key).toBe(MagicsBlueprint.FireRune);
+
+        expect(sendEventToUser).toHaveBeenCalledWith(
+          testCharacter.channelId!,
+          ItemSocketEvents.EquipmentAndInventoryUpdate,
+          {
+            inventory: container,
+            openInventoryOnUpdate: false,
+          }
+        );
+      });
+
+      it("should cast heal rune creation spell successfully", async () => {
+        expect(await spellCast.castSpell("iquar ansr faenya", testCharacter)).toBeTruthy();
+
+        const inventory = await testCharacter.inventory;
+        const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+        const item = container.slots[0];
+        expect(item).toBeDefined();
+        expect(item?.key).toBe(MagicsBlueprint.HealRune);
+
+        expect(sendEventToUser).toHaveBeenCalledWith(
+          testCharacter.channelId!,
+          ItemSocketEvents.EquipmentAndInventoryUpdate,
+          {
+            inventory: container,
+            openInventoryOnUpdate: false,
+          }
+        );
+      });
+
+      it("should cast dark rune creation spell successfully", async () => {
+        expect(await spellCast.castSpell("iquar ansr nevae", testCharacter)).toBeTruthy();
+
+        const inventory = await testCharacter.inventory;
+        const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+        const item = container.slots[0];
+        expect(item).toBeDefined();
+        expect(item?.key).toBe(MagicsBlueprint.DarkRune);
+
+        expect(sendEventToUser).toHaveBeenCalledWith(
+          testCharacter.channelId!,
+          ItemSocketEvents.EquipmentAndInventoryUpdate,
+          {
+            inventory: container,
+            openInventoryOnUpdate: false,
+          }
+        );
+      });
+
+      it("should cast poison rune creation spell successfully", async () => {
+        expect(await spellCast.castSpell("iquar ansr athil", testCharacter)).toBeTruthy();
+
+        const inventory = await testCharacter.inventory;
+        const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+        const item = container.slots[0];
+        expect(item).toBeDefined();
+        expect(item?.key).toBe(MagicsBlueprint.PoisonRune);
+
+        expect(sendEventToUser).toHaveBeenCalledWith(
+          testCharacter.channelId!,
+          ItemSocketEvents.EquipmentAndInventoryUpdate,
+          {
+            inventory: container,
+            openInventoryOnUpdate: false,
+          }
+        );
+      });
     });
   });
 });

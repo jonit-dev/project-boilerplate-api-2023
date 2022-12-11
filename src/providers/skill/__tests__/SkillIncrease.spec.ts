@@ -5,7 +5,7 @@ import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/cons
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
 import { spellSelfHealing } from "@providers/spells/data/blueprints/SpellSelfHealing";
-import { SpellCast } from "@providers/spells/SpellCast";
+import { SpellLearn } from "@providers/spells/SpellLearn";
 import { BasicAttribute, calculateSPToNextLevel, calculateXPToNextLevel, ItemSubType } from "@rpg-engine/shared";
 import { Error } from "mongoose";
 import { SkillIncrease } from "../SkillIncrease";
@@ -144,7 +144,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
     sendSkillLevelUpEvents = jest.spyOn(skillIncrease, "sendSkillLevelUpEvents" as any);
     sendExpLevelUpEvents = jest.spyOn(skillIncrease, "sendExpLevelUpEvents" as any);
-    spellLearnMock = jest.spyOn(SpellCast.prototype, "learnLatestSkillLevelSpells");
+    spellLearnMock = jest.spyOn(SpellLearn.prototype, "learnLatestSkillLevelSpells");
     spellLearnMock.mockImplementation();
   });
 

@@ -7,6 +7,7 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SpellLearn } from "@providers/spells/SpellLearn";
 import { AnimationEffectKeys, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import {
@@ -21,7 +22,6 @@ import {
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { SpellCast } from "../spells/SpellCast";
 import { SkillCalculator } from "./SkillCalculator";
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -30,7 +30,7 @@ export class SkillIncrease {
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
-    private spellCast: SpellCast
+    private spellLearn: SpellLearn
   ) {}
 
   /**
@@ -177,7 +177,7 @@ export class SkillIncrease {
       if (levelUp) {
         await this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp: record!.xp! }, character, target);
         setTimeout(async () => {
-          await this.spellCast.learnLatestSkillLevelSpells(character._id, true);
+          await this.spellLearn.learnLatestSkillLevelSpells(character._id, true);
         }, 5000);
       }
 
