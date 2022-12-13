@@ -13,6 +13,7 @@ describe("NPCMovementStopped.ts", () => {
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
+    await unitTestHelper.initializeMapLoader();
     npcMovementStopped = container.get<NPCMovementStopped>(NPCMovementStopped);
     npcTarget = container.get<NPCTarget>(NPCTarget);
   });

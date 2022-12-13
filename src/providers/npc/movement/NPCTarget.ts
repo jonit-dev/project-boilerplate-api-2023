@@ -46,99 +46,91 @@ export class NPCTarget {
   }
 
   public async tryToSetTarget(npc: INPC): Promise<void> {
-    try {
-      if (!npc.isAlive) {
-        return;
-      }
-
-      const minDistanceCharacter = await this.npcView.getNearestCharacter(npc);
-
-      if (minDistanceCharacter) {
-        if (!npc.maxRangeInGridCells) {
-          throw new Error(
-            `NPC ${npc.key} is trying to set target, but no maxRangeInGridCells is specified (required for range)!`
-          );
-        }
-
-        const rangeThresholdDefinition = this.getRangeThreshold(npc);
-
-        if (!rangeThresholdDefinition) {
-          throw new Error(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
-        }
-
-        // check if character is under range
-        const isMovementUnderRange = this.movementHelper.isUnderRange(
-          npc.x,
-          npc.y,
-          minDistanceCharacter.x,
-          minDistanceCharacter.y,
-          rangeThresholdDefinition
-        );
-
-        if (!isMovementUnderRange) {
-          return;
-        }
-
-        const character = await Character.findById(minDistanceCharacter.id);
-
-        if (!character) {
-          throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
-        }
-
-        const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, character.x, character.y);
-        // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
-        if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
-          await this.clearTarget(npc);
-
-          return;
-        }
-
-        npc.targetCharacter = character._id;
-        await npc.save();
-      }
-    } catch (error) {
-      console.error(error);
+    if (!npc.isAlive) {
+      return;
     }
-  }
 
-  public async tryToClearOutOfRangeTargets(npc: INPC): Promise<void> {
-    try {
-      if (!npc.targetCharacter) {
-        // no target set, nothing to remove here!
-        return;
-      }
+    if (!npc.maxRangeInGridCells) {
+      throw new Error(
+        `NPC ${npc.key} is trying to set target, but no maxRangeInGridCells is specified (required for range)!`
+      );
+    }
 
-      if (!npc.maxRangeInGridCells) {
-        throw new Error(`NPC ${npc.key} is trying to verify target, but no maxRangeInGridCells is specified!`);
-      }
+    const minDistanceCharacter = await this.npcView.getNearestCharacter(npc);
 
-      const targetCharacter = await Character.findById(npc.targetCharacter);
-
-      if (!targetCharacter) {
-        throw new Error(`Error in ${npc.key}: Failed to find targetCharacter!`);
-      }
-
+    if (minDistanceCharacter) {
       const rangeThresholdDefinition = this.getRangeThreshold(npc);
 
       if (!rangeThresholdDefinition) {
         throw new Error(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
       }
 
-      const isCharacterUnderRange = this.movementHelper.isUnderRange(
+      // check if character is under range
+      const isMovementUnderRange = this.movementHelper.isUnderRange(
         npc.x,
         npc.y,
-        targetCharacter.x,
-        targetCharacter.y,
+        minDistanceCharacter.x,
+        minDistanceCharacter.y,
         rangeThresholdDefinition
       );
 
-      // if target is out of range or not online, lets remove it
-      if ((targetCharacter && !isCharacterUnderRange) || !targetCharacter.isOnline) {
-        // remove npc.targetCharacter
-        await this.clearTarget(npc);
+      if (!isMovementUnderRange) {
+        return;
       }
-    } catch (error) {
-      console.error(error);
+
+      const character = await Character.findById(minDistanceCharacter.id);
+
+      if (!character) {
+        throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
+      }
+
+      const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, character.x, character.y);
+      // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
+      if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
+        await this.clearTarget(npc);
+
+        return;
+      }
+
+      npc.targetCharacter = character._id;
+      await npc.save();
+    }
+  }
+
+  public async tryToClearOutOfRangeTargets(npc: INPC): Promise<void> {
+    if (!npc.targetCharacter) {
+      // no target set, nothing to remove here!
+      return;
+    }
+
+    if (!npc.maxRangeInGridCells) {
+      throw new Error(`NPC ${npc.key} is trying to verify target, but no maxRangeInGridCells is specified!`);
+    }
+
+    const targetCharacter = await Character.findById(npc.targetCharacter);
+
+    if (!targetCharacter) {
+      throw new Error(`Error in ${npc.key}: Failed to find targetCharacter!`);
+    }
+
+    const rangeThresholdDefinition = this.getRangeThreshold(npc);
+
+    if (!rangeThresholdDefinition) {
+      throw new Error(`NPC ${npc.key} is trying to set target, failed to calculate rangeThresholdDefinition!`);
+    }
+
+    const isCharacterUnderRange = this.movementHelper.isUnderRange(
+      npc.x,
+      npc.y,
+      targetCharacter.x,
+      targetCharacter.y,
+      rangeThresholdDefinition
+    );
+
+    // if target is out of range or not online, lets remove it
+    if ((targetCharacter && !isCharacterUnderRange) || !targetCharacter.isOnline) {
+      // remove npc.targetCharacter
+      await this.clearTarget(npc);
     }
   }
 

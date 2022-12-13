@@ -12,6 +12,7 @@ describe("NPCTarget.ts", () => {
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
+    await unitTestHelper.initializeMapLoader();
 
     npcTarget = container.get<NPCTarget>(NPCTarget);
   });
@@ -141,6 +142,44 @@ describe("NPCTarget.ts", () => {
     expect(testNPC.targetCharacter).toBeUndefined();
   });
 
+  describe("Validation", () => {
+    it("should throw an error if the NPC is dead", async () => {
+      testNPC.isAlive = false;
+      await testNPC.save();
+
+      const result = await npcTarget.tryToSetTarget(testNPC);
+
+      expect(result).toBeUndefined();
+    });
+
+    it("should throw an error if the NPC has no maxRangeInGridCells specified", async () => {
+      testNPC.maxRangeInGridCells = undefined;
+      await testNPC.save();
+
+      await expect(npcTarget.tryToSetTarget(testNPC)).rejects.toThrowError(
+        "NPC test-npc-22 is trying to set target, but no maxRangeInGridCells is specified (required for range)!"
+      );
+    });
+
+    it("clears target if tries to set it but its out of range", async () => {
+      const clearTarget = jest.spyOn(npcTarget, "clearTarget");
+
+      testCharacter = await unitTestHelper.createMockCharacter({
+        x: FromGridX(0),
+        y: FromGridY(0),
+      });
+
+      await npcTarget.setTarget(testNPC, testCharacter);
+
+      testCharacter.x = 999;
+      testCharacter.y = 999;
+      await testCharacter.save();
+
+      await npcTarget.tryToClearOutOfRangeTargets(testNPC);
+
+      expect(clearTarget).toHaveBeenCalled();
+    });
+  });
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
