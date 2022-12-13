@@ -50,12 +50,7 @@ describe("MapTiles.ts", () => {
   it("should properly calculate the correct map width and height", () => {
     const { gridOffsetX, gridOffsetY } = gridManager.getGridOffset("unit-test-map-negative-coordinate")!;
 
-    const { width, height } = mapTiles.getMapWidthHeight(
-      "unit-test-map-negative-coordinate",
-      MapLayers.Ground,
-      gridOffsetX,
-      gridOffsetY
-    );
+    const { width, height } = mapTiles.getMapWidthHeight("unit-test-map-negative-coordinate", gridOffsetX, gridOffsetY);
 
     expect(width).toEqual(48);
     expect(height).toEqual(32);

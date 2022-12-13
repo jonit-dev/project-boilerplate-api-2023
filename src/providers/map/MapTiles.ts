@@ -45,21 +45,31 @@ export class MapTiles {
     return layers.filter((layer) => layer) as string[];
   }
 
-  public getMapWidthHeight(
-    map: string,
-    layerName: MapLayers,
-    gridOffsetX: number,
-    gridOffsetY: number
-  ): { width: number; height: number } {
+  public getMapWidthHeight(map: string, gridOffsetX: number, gridOffsetY: number): { width: number; height: number } {
     const mapData = MapLoader.maps.get(map);
 
     if (!mapData) {
       throw new Error(`Failed to find map ${map}`);
     }
 
+    // Initialize the map dimensions to 0
+    let width = 0;
+    let height = 0;
+
+    // Loop through the layers in the map
+    for (const layer of mapData.layers) {
+      if (!layer.chunks) continue;
+      // Loop through the chunks in the current layer
+      for (const chunk of layer.chunks) {
+        // Update the map dimensions based on the chunk's dimensions, position, and grid offset
+        width = Math.max(width, chunk.x + chunk.width + gridOffsetX);
+        height = Math.max(height, chunk.y + chunk.height + gridOffsetY);
+      }
+    }
+
     return {
-      width: mapData.width + gridOffsetX,
-      height: mapData.height + gridOffsetY,
+      width,
+      height,
     };
   }
 

@@ -1,5 +1,4 @@
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { MapLayers } from "@rpg-engine/shared";
 import { GridManager } from "../GridManager";
 import { MapTiles } from "../MapTiles";
 
@@ -22,7 +21,7 @@ describe("GridManager", () => {
     await unitTestHelper.beforeEachJestHook(true);
   });
 
-  const checkMapSize = (mapName: string): void => {
+  const checkMapSize = (mapName: string, expectedWidth: number, expectedHeight: number): void => {
     expect(gridManager.grids.has(mapName)).toBeTruthy();
 
     const grid = gridManager.grids.get(mapName);
@@ -33,16 +32,18 @@ describe("GridManager", () => {
 
     const { gridOffsetX, gridOffsetY } = gridManager.getGridOffset(mapName)!;
 
-    const { width, height } = mapTiles.getMapWidthHeight(mapName, MapLayers.Ground, gridOffsetX, gridOffsetY);
-    console.log(`Map ${mapName} has grid offset: ${gridOffsetX}, ${gridOffsetY} and size ${width}, ${height}`);
+    const { width, height } = mapTiles.getMapWidthHeight(mapName, gridOffsetX, gridOffsetY);
 
-    expect(grid.width).toBe(width);
-    expect(grid.height).toBe(height);
+    expect(width).toBe(expectedWidth);
+    expect(height).toBe(expectedHeight);
   };
 
   it("should properly generate a grid solid map and correctly size it (width, height)", () => {
-    checkMapSize(mapName);
-    checkMapSize("example");
+    checkMapSize("unit-test-map-negative-coordinate", 48, 32);
+
+    checkMapSize("example", 80, 96);
+
+    checkMapSize("unit-test-map", 32, 32);
   });
 
   it("should return the offset x and y if a map has negative coordinates", () => {

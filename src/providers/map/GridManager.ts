@@ -14,7 +14,7 @@ export class GridManager {
   public generateGridSolids(map: string): void {
     const { gridOffsetX, gridOffsetY } = this.getGridOffset(map)!;
 
-    const { width, height } = this.mapTiles.getMapWidthHeight(map, MapLayers.Ground, gridOffsetX, gridOffsetY);
+    const { width, height } = this.mapTiles.getMapWidthHeight(map, gridOffsetX, gridOffsetY);
 
     const newGrid = new PF.Grid(width, height);
 
@@ -64,10 +64,6 @@ export class GridManager {
   }
 
   public setWalkable(map: string, gridX: number, gridY: number, walkable: boolean): void {
-    const { gridOffsetX, gridOffsetY } = this.getGridOffset(map)!;
-
-    const { width, height } = this.mapTiles.getMapWidthHeight(map, MapLayers.Ground, gridOffsetX, gridOffsetY);
-
     try {
       const grid = this.grids.get(map);
 
@@ -77,9 +73,7 @@ export class GridManager {
 
       grid.setWalkableAt(gridX, gridY, walkable);
     } catch (error) {
-      console.log(
-        `Failed to setWalkable=${walkable} for gridX ${gridX}, gridY ${gridY} on map ${map} (${width}, ${height})`
-      );
+      console.log(`Failed to setWalkable=${walkable} for gridX ${gridX}, gridY ${gridY} on map ${map}`);
       console.error(error);
     }
   }
