@@ -1,4 +1,6 @@
 import { IUser, User } from "@entities/ModuleSystem/UserModel";
+import { EMAIL_VALIDATION_REGEX } from "@providers/constants/EmailValidationConstants";
+import { BadRequestError } from "@providers/errors/BadRequestError";
 import { TS } from "@providers/translation/TranslationHelper";
 import { UserRepository } from "@repositories/ModuleSystem/user/UserRepository";
 import { provide } from "inversify-binding-decorators";
@@ -23,6 +25,10 @@ export class SignUpUseCase {
     // first, check if an user with the same e-mail already exists
     if (await User.checkIfExists(email)) {
       throw new ConflictError(TS.translate("users", "userAlreadyExists", { email }));
+    }
+
+    if (!EMAIL_VALIDATION_REGEX.test(email)) {
+      throw new BadRequestError("Sorry, your e-mail is invalid");
     }
 
     const newUser = await this.userRepository.signUp(authSignUpDTO);
