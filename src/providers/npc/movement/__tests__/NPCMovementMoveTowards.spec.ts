@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { FromGridX, FromGridY, NPCMovementType, NPCPathOrientation } from "@rpg-engine/shared";
+import { FromGridX, FromGridY, NPCAlignment, NPCMovementType, NPCPathOrientation } from "@rpg-engine/shared";
 import { NPCMovementMoveTowards } from "../NPCMovementMoveTowards";
 import { NPCTarget } from "../NPCTarget";
 describe("NPCMovementMoveTowards.ts", () => {
@@ -122,6 +122,88 @@ describe("NPCMovementMoveTowards.ts", () => {
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
 
     expect(testNPC.targetCharacter).toBeUndefined();
+  });
+
+  it("should update NPC movement type to MoveAway if NPC has low health and fleeOnLowHealth is set to true", async () => {
+    testNPC.health = 10;
+    testNPC.maxHealth = 100;
+    testNPC.currentMovementType = NPCMovementType.MoveTowards;
+    testNPC.targetCharacter = testCharacter._id;
+    testNPC.fleeOnLowHealth = true;
+    await testNPC.save();
+
+    await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+
+    const updatedNPC = await NPC.findById(testNPC._id);
+
+    expect(updatedNPC?.currentMovementType).toEqual(NPCMovementType.MoveAway);
+  });
+
+  describe("Validation", () => {
+    it("should correctly call this.initBattleCycle(npc)", async () => {
+      testNPC.alignment = NPCAlignment.Hostile;
+      testNPC.targetCharacter = testCharacter._id;
+      await testNPC.save();
+
+      testCharacter.x = FromGridX(14);
+      testCharacter.y = FromGridY(15);
+      await testCharacter.save();
+
+      //  @ts-ignore
+      const spy = jest.spyOn(npcMovementMoveTowards, "initBattleCycle");
+
+      await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+
+      expect(spy).toHaveBeenCalledWith(testNPC);
+    });
+
+    describe("NPCMovementMoveTowards", () => {
+      it("should call faceTarget if reachedTarget is true", async () => {
+        testNPC.alignment = NPCAlignment.Hostile;
+        testNPC.targetCharacter = testCharacter._id;
+        await testNPC.save();
+
+        testCharacter.x = FromGridX(14);
+        testCharacter.y = FromGridY(15);
+        await testCharacter.save();
+
+        // mock faceTarget function
+        // @ts-ignore
+        npcMovementMoveTowards.faceTarget = jest.fn();
+
+        // act
+        await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+
+        // assert
+        // @ts-ignore
+        expect(npcMovementMoveTowards.faceTarget).toHaveBeenCalledWith(testNPC);
+      });
+    });
+
+    describe("when reachedTarget...", () => {
+      it("sets the npc.pathOrientation to NPCPathOrientation.Forward when reaching the target, if previous pathOrientation was NPCPathOrientation.Forward", async () => {
+        testNPC.pathOrientation = NPCPathOrientation.Forward;
+        testNPC.x = testCharacter.x;
+        testNPC.y = testCharacter.y;
+        await testNPC.save();
+
+        // @ts-ignore
+        npcMovementMoveTowards.reachedTarget(testNPC, testCharacter);
+
+        expect(testNPC.pathOrientation).toBe(NPCPathOrientation.Forward);
+      });
+    });
+
+    it("throws an error if no maxRangeInGridCells is set", async () => {
+      testNPC.maxRangeInGridCells = undefined;
+      await testNPC.save();
+
+      // startMoveTowardsMOvement should throw error "NPC test-npc-22 is trying to set target, but no maxRangeInGridCells is specified (required for range)!"
+
+      await expect(npcMovementMoveTowards.startMoveTowardsMovement(testNPC)).rejects.toThrow(
+        "NPC test-npc-22 is trying to set target, but no maxRangeInGridCells is specified (required for range)!"
+      );
+    });
   });
 
   afterAll(async () => {

@@ -155,4 +155,16 @@ export class CharacterItemContainer {
 
     return inventoryContainer;
   }
+
+  public async clearAllSlots(container: IItemContainer): Promise<void> {
+    if (!container.slots) {
+      return;
+    }
+
+    for (let i = 0; i < container.slotQty; i++) {
+      container.slots[i] = null;
+    }
+
+    await container.save();
+  }
 }

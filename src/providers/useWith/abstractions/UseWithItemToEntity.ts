@@ -9,7 +9,8 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItemContainer, IEquipmentAndInventoryUpdatePayload, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { random, isArray } from "lodash";
+import { isArray } from "lodash";
+import random from "lodash/random";
 
 interface IUseWithItemToEntityReward {
   key: string;
@@ -117,9 +118,9 @@ export class UseWithItemToEntity {
   }
 
   private async addRewardToInventory(character: ICharacter, rewards: IUseWithItemToEntityReward[]): Promise<boolean> {
+    rewards = rewards.sort((a, b) => a.chance - b.chance);
+    const n = random(0, 100);
     for (const reward of rewards) {
-      const n = random(0, 100);
-
       if (n < reward.chance) {
         const itemBlueprint = itemsBlueprintIndex[reward.key];
 

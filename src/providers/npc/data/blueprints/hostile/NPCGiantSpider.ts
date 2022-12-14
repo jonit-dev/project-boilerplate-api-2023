@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AxesBlueprint,
   BootsBlueprint,
+  ContainersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
@@ -45,6 +46,10 @@ export const npcGiantSpider: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
+    {
+      itemBlueprintKey: ContainersBlueprint.Backpack,
+      chance: 10,
+    },
     {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 30,

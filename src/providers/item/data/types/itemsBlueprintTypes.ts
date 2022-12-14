@@ -163,6 +163,9 @@ export enum CraftingResourcesBlueprint {
   RedShappire = "red-shappire",
   BlueSilk = "blue-silk",
   IronNail = "iron-nail",
+  FoodRecipe = "food-recipe",
+  WeaponRecipe = "weapon-recipe",
+  MagicRecipe = "magic-recipe",
 }
 
 export enum ToolsBlueprint {

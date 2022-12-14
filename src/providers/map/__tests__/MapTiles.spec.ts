@@ -21,6 +21,26 @@ describe("MapTiles.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
   });
 
+  it("should detect if all layers are empty", () => {
+    // @ts-ignore
+    const allLayersEmpty = mapTiles.areAllLayersTileEmpty(mapName, -10, -10);
+
+    // @ts-ignore
+    const layersAreNotEmpty = mapTiles.areAllLayersTileEmpty(mapName, 0, 0);
+
+    expect(allLayersEmpty).toBeTruthy();
+
+    expect(layersAreNotEmpty).toBeFalsy();
+  });
+
+  it("detects an is_passage property", () => {
+    const isPassage = mapTiles.isPassage(mapName, 3, 7, MapLayers.Decoration);
+
+    const notPassage = mapTiles.isPassage(mapName, 4, 7, MapLayers.OverGround);
+    expect(isPassage).toBeTruthy();
+    expect(notPassage).toBeFalsy();
+  });
+
   it("should properly get the first X and Y coordinates", () => {
     const firstXY = mapTiles.getFirstXY("unit-test-map-negative-coordinate", MapLayers.Ground);
 
@@ -30,12 +50,7 @@ describe("MapTiles.ts", () => {
   it("should properly calculate the correct map width and height", () => {
     const { gridOffsetX, gridOffsetY } = gridManager.getGridOffset("unit-test-map-negative-coordinate")!;
 
-    const { width, height } = mapTiles.getMapWidthHeight(
-      "unit-test-map-negative-coordinate",
-      MapLayers.Ground,
-      gridOffsetX,
-      gridOffsetY
-    );
+    const { width, height } = mapTiles.getMapWidthHeight("unit-test-map-negative-coordinate", gridOffsetX, gridOffsetY);
 
     expect(width).toEqual(48);
     expect(height).toEqual(32);
@@ -85,7 +100,7 @@ describe("MapTiles.ts", () => {
     const tileProperty = mapTiles.getTileProperty(tileset, tileId, "description");
 
     expect(tileProperty).toBeDefined();
-    expect(tileProperty).toBe("a big rock.");
+    expect(tileProperty).toBe("a giant rock.");
   });
 
   it("should return the proper tileset, given a tileId", () => {
@@ -107,6 +122,14 @@ describe("MapTiles.ts", () => {
     expect(forestSolidTile).toBeTruthy();
     expect(villageSolidTile).toBeTruthy();
     expect(emptyTile).toBeFalsy();
+  });
+
+  it("should detect a ge_collide_all property", () => {
+    const isFullSolid = mapTiles.isSolid(mapName, 4, 6, MapLayers.Character);
+    const isNotFullSolid = mapTiles.isSolid(mapName, 6, 6, MapLayers.OverCharacter);
+
+    expect(isFullSolid).toBeTruthy();
+    expect(isNotFullSolid).toBeFalsy();
   });
 
   it("should check if a tile is solid or not, in a negative coordinate", () => {
@@ -152,6 +175,14 @@ describe("MapTiles.ts", () => {
 
     expect(flippedTileId).toBe(35);
     expect(solidFlippedTile).toBeTruthy();
+  });
+
+  it("should get the layers of a map", () => {
+    const layers = mapTiles.getMapLayers(mapName);
+
+    expect(layers).toContain("ground");
+    expect(layers).toContain("decoration");
+    expect(layers).toContain("over-ground");
   });
 
   afterAll(async () => {

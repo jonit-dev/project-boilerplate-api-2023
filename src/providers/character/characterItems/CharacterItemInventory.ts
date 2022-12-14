@@ -9,6 +9,7 @@ import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { CharacterItemContainer } from "./CharacterItemContainer";
 import { CharacterItemSlots } from "./CharacterItemSlots";
 
 @provide(CharacterItemInventory)
@@ -16,8 +17,35 @@ export class CharacterItemInventory {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterItemSlots: CharacterItemSlots,
-    private mathHelper: MathHelper
+    private mathHelper: MathHelper,
+    private characterItemsContainer: CharacterItemContainer
   ) {}
+
+  public async addItemToInventory(
+    itemKey: string,
+    character: ICharacter,
+    extraProps?: Partial<IItem>
+  ): Promise<boolean> {
+    const inventory = await character.inventory;
+    const inventoryContainerId = inventory?.itemContainer as unknown as string;
+    if (!inventoryContainerId) {
+      return false;
+    }
+
+    const blueprint = itemsBlueprintIndex[itemKey];
+    if (!blueprint) {
+      return false;
+    }
+
+    const item = new Item({
+      ...blueprint,
+      ...extraProps,
+    });
+
+    await item.save();
+
+    return await this.characterItemsContainer.addItemToContainer(item, character, inventoryContainerId);
+  }
 
   public async decrementItemFromInventory(
     itemKey: string,
@@ -30,6 +58,12 @@ export class CharacterItemInventory {
 
     if (!inventoryItemContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
+      return false;
+    }
+
+    const hasItem = await this.checkItemInInventoryByKey(itemKey, character);
+
+    if (!hasItem) {
       return false;
     }
 
@@ -61,6 +95,8 @@ export class CharacterItemInventory {
             });
           } else {
             result = await this.deleteItemFromInventory(slotItem._id, character);
+            // we also need to delete item from items table
+            await Item.deleteOne({ _id: slotItem._id });
 
             // we need to fetch updated container in case some quantity remains to be substracted
             if (result && decrementQty > 0) {
@@ -74,6 +110,9 @@ export class CharacterItemInventory {
         } else {
           // if its not stackable, just remove it
           result = await this.deleteItemFromInventory(slotItem._id, character);
+          // we also need to delete item from items table
+          await Item.deleteOne({ _id: slotItem._id });
+
           decrementQty--;
         }
       }

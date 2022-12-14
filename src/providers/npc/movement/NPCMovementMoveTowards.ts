@@ -53,7 +53,7 @@ export class NPCMovementMoveTowards {
       // change movement to MoveWay (flee) if health is low!
       if (npc.fleeOnLowHealth) {
         if (npc.health <= npc.maxHealth / 4) {
-          await NPC.updateOne({ _id: npc.id }, { currentMovementType: NPCMovementType.MoveAway });
+          await NPC.updateOne({ _id: npc._id }, { currentMovementType: NPCMovementType.MoveAway });
         }
       }
 
@@ -71,40 +71,39 @@ export class NPCMovementMoveTowards {
         return;
       }
 
-      try {
-        // calculate distance to original position
-        if (!npc.maxRangeInGridCells) {
-          throw new Error(`NPC ${npc.id} has no maxRangeInGridCells set!`);
-        }
+      // calculate distance to original position
+      if (!npc.maxRangeInGridCells) {
+        throw new Error(`NPC ${npc.id} has no maxRangeInGridCells set!`);
+      }
 
-        switch (npc.pathOrientation) {
-          case NPCPathOrientation.Forward:
-            if (!npc.maxAntiLuringRangeInGridCells) {
-              throw new Error(`NPC ${npc.id} has no maxAntiLuringRangeInGridCells set!`);
-            }
+      switch (npc.pathOrientation) {
+        case NPCPathOrientation.Forward:
+          if (!npc.maxAntiLuringRangeInGridCells) {
+            throw new Error(`NPC ${npc.id} has no maxAntiLuringRangeInGridCells set!`);
+          }
 
-            const isUnderOriginalPositionRange = this.movementHelper.isUnderRange(
-              npc.x,
-              npc.y,
-              npc.initialX,
-              npc.initialY,
-              npc.maxAntiLuringRangeInGridCells
-            );
+          const isUnderOriginalPositionRange = this.movementHelper.isUnderRange(
+            npc.x,
+            npc.y,
+            npc.initialX,
+            npc.initialY,
+            npc.maxAntiLuringRangeInGridCells
+          );
 
-            if (isUnderOriginalPositionRange) {
+          if (isUnderOriginalPositionRange) {
+            // if character is on the same scene as npc
+            if (npc.scene === targetCharacter.scene) {
               await this.moveTowardsPosition(npc, targetCharacter.x, targetCharacter.y);
-            } else {
-              npc.pathOrientation = NPCPathOrientation.Backward;
-              await npc.save();
             }
-            break;
-          case NPCPathOrientation.Backward:
-            await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
+          } else {
+            npc.pathOrientation = NPCPathOrientation.Backward;
+            await npc.save();
+          }
+          break;
+        case NPCPathOrientation.Backward:
+          await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
 
-            break;
-        }
-      } catch (error) {
-        console.error(error);
+          break;
       }
     } else {
       // no target character

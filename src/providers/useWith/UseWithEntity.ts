@@ -186,6 +186,7 @@ export class UseWithEntity {
       targetId: target._id,
       health: target.health,
       mana: target.mana,
+      speed: target.speed,
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);

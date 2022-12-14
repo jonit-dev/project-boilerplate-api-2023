@@ -1,4 +1,5 @@
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
+import { itemRope } from "../tools/ItemRope";
 import { itemBatsWing } from "./ItemBatsWing";
 import { itemBlueFeather } from "./ItemBlueFeather";
 import { itemBlueLeather } from "./itemBlueLeather";
@@ -13,6 +14,7 @@ import { itemDiamond } from "./ItemDiamond";
 import { itemElvenLeaf } from "./itemElvenLeaf";
 import { itemElvenWood } from "./itemElvenWood";
 import { itemFeather } from "./ItemFeather";
+import { itemFoodRecipe } from "./ItemFoodRecipe";
 import { itemGoldenIngot } from "./ItemGoldenIngot";
 import { itemGoldenOre } from "./ItemGoldenOre";
 import { itemGreaterWoodenLog } from "./ItemGreaterWoodenLog";
@@ -23,13 +25,13 @@ import { itemIronNail } from "./itemIronNail";
 import { itemIronOre } from "./ItemIronOre";
 import { itemJade } from "./itemJade";
 import { itemLeather } from "./ItemLeather";
+import { itemMagicRecipe } from "./ItemMagicRecipe";
 import { itemObsidian } from "./ItemObsidian";
 import { itemObsidiumOre } from "./ItemObsidiumOre";
 import { itemPhoenixFeather } from "./itemPhoenixfeather";
 import { itemPolishedStone } from "./itemPolishedStone";
 import { itemRedSapphire } from "./itemRedSapphire";
 import { itemRock } from "./itemRock";
-import { itemRope } from "./ItemRope";
 import { itemSewingThread } from "./itemSewingThread";
 import { itemSilk } from "./ItemSilk";
 import { itemSilverIngot } from "./ItemSilverIngot";
@@ -38,6 +40,7 @@ import { itemSmallWoodenStick } from "./itemSmallWoodenStick";
 import { itemSmallWorm } from "./itemSmallWorm";
 import { itemSteelIngot } from "./itemSteelIngot";
 import { itemWaterBottle } from "./itemWaterBottle";
+import { itemWeaponRecipe } from "./ItemWeaponRecipe";
 import { itemWheat } from "./ItemWheat";
 import { itemWolfTooth } from "./ItemWolfTooth";
 import { itemWoodenBoard } from "./itemWoodenBoard";
@@ -92,4 +95,7 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.RedShappire]: itemRedSapphire,
   [CraftingResourcesBlueprint.BlueSilk]: itemBlueSilk,
   [CraftingResourcesBlueprint.IronNail]: itemIronNail,
+  [CraftingResourcesBlueprint.FoodRecipe]: itemFoodRecipe,
+  [CraftingResourcesBlueprint.WeaponRecipe]: itemWeaponRecipe,
+  [CraftingResourcesBlueprint.MagicRecipe]: itemMagicRecipe,
 };

@@ -1,5 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import {
+  MagicsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   SwordsBlueprint,
@@ -19,6 +20,9 @@ export const npcTrader = {
   traderItems: [
     {
       key: PotionsBlueprint.LightEndurancePotion,
+    },
+    {
+      key: MagicsBlueprint.Rune,
     },
     {
       key: SwordsBlueprint.ShortSword,

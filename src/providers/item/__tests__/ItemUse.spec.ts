@@ -36,7 +36,7 @@ describe("ItemUse.ts", () => {
 
     testCharacter = await (
       await unitTestHelper.createMockCharacter(
-        { health: 50 },
+        { health: 50, mana: 50 },
         { hasEquipment: true, hasInventory: true, hasSkills: true }
       )
     )
@@ -49,7 +49,7 @@ describe("ItemUse.ts", () => {
 
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;
-    await addItemToInventory(testItem);
+    await addItemToInventory(testItem, 0);
 
     await testCharacter.save();
 
@@ -77,15 +77,15 @@ describe("ItemUse.ts", () => {
     return (await ItemContainer.findById(inventoryItemContainerId)) as unknown as IItemContainer;
   };
 
-  const getInventoryItem = async (): Promise<IItem> => {
+  const getInventoryItem = async (index: number): Promise<IItem> => {
     const container = await getInventoryContainer();
-    return container.slots[0];
+    return container.slots[index];
   };
 
-  const addItemToInventory = async (item: IItem): Promise<IItem> => {
+  const addItemToInventory = async (item: IItem, index: number): Promise<IItem> => {
     const bag = await getInventoryContainer();
     if (bag) {
-      bag.slots[0] = item;
+      bag.slots[index] = item;
       await ItemContainer.updateOne(
         {
           _id: bag.id,
@@ -106,7 +106,6 @@ describe("ItemUse.ts", () => {
   });
 
   it("should call item usage cycle", async () => {
-    // TODO: test applyItemUsage separatey
     await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
 
     expect(itemUsageMock).toBeCalledTimes(1);
@@ -114,21 +113,21 @@ describe("ItemUse.ts", () => {
   });
 
   it("should decrement item from inventory, after item is consumed", async () => {
-    let item = await getInventoryItem();
+    let item = await getInventoryItem(0);
     expect(item.stackQty).toBe(2);
 
     await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
 
-    item = await getInventoryItem();
+    item = await getInventoryItem(0);
     expect(item.stackQty).toBe(1);
 
     await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
 
-    item = await getInventoryItem();
+    item = await getInventoryItem(0);
     expect(item).toBeNull();
   });
 
-  it("should decrement stackable item from inventory, after item is consumed", async () => {
+  it("should decrement original item, after item is consumed", async () => {
     let item = (await Item.findById(testItem.id)) as unknown as IItem;
     expect(item.stackQty).toBe(2);
 
@@ -198,6 +197,7 @@ describe("ItemUse.ts", () => {
         {
           targetId: testCharacter._id,
           health: testCharacter.health + i,
+          mana: testCharacter.mana + i,
         }
       );
     }
@@ -229,6 +229,7 @@ describe("ItemUse.ts", () => {
     expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterSocketEvents.AttributeChanged, {
       targetId: testCharacter._id,
       health: testCharacter.health + 20,
+      mana: testCharacter.mana,
     });
 
     expect(animationEventMock).toBeCalledTimes(1);
@@ -295,6 +296,22 @@ describe("ItemUse.ts", () => {
       message: "Sorry, you cannot use this item.",
       type: "error",
     });
+  });
+
+  it("should decrement correct quantity if item has multiple stacks", async () => {
+    const testItem2 = new Item(stackableItemMock);
+    testItem2.stackQty = 4;
+    await testItem2.save();
+
+    await addItemToInventory(testItem2, 1);
+
+    await itemUse.performItemUse({ itemId: testItem2.id }, testCharacter);
+
+    const item1 = await getInventoryItem(0);
+    expect(item1.stackQty).toBe(1);
+
+    const item2 = await getInventoryItem(1);
+    expect(item2.stackQty).toBe(4);
   });
 });
 

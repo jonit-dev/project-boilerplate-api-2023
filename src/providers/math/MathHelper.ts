@@ -71,26 +71,28 @@ export class MathHelper {
   public getDirectionFromPoint(origin: IPoint, destination: IPoint): Direction {
     const xDiff = destination.x - origin.x;
     const yDiff = destination.y - origin.y;
-
+  
     if (xDiff === 0 && yDiff === 0) {
       throw new Error("origin and destination are the same point");
     }
-
-    return xDiff === 0 && yDiff > 0
-      ? "down"
-      : xDiff === 0 && yDiff < 0
-      ? "up"
-      : yDiff === 0 && xDiff > 0
-      ? "right"
-      : yDiff === 0 && xDiff < 0
-      ? "left"
-      : yDiff > 0 && xDiff > 0
-      ? "down_right"
-      : yDiff < 0 && xDiff > 0
-      ? "up_right"
-      : yDiff > 0 && xDiff < 0
-      ? "down_left"
-      : "up_left";
+  
+    if (xDiff === 0 && yDiff > 0) {
+      return "down";
+    } else if (xDiff === 0 && yDiff < 0) {
+      return "up";
+    } else if (yDiff === 0 && xDiff > 0) {
+      return "right";
+    } else if (yDiff === 0 && xDiff < 0) {
+      return "left";
+    } else if (yDiff > 0 && xDiff > 0) {
+      return "down_right";
+    } else if (yDiff < 0 && xDiff > 0) {
+      return "up_right";
+    } else if (yDiff > 0 && xDiff < 0) {
+      return "down_left";
+    } else {
+      return "up_left";
+    }
   }
 
   /**

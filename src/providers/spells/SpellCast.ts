@@ -1,31 +1,26 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { container } from "@providers/inversify/container";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { spellsBlueprints } from "./data/blueprints/index";
-import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
+
 @provide(SpellCast)
 export class SpellCast {
-  private skillIncrease: SkillIncrease;
-
   constructor(
     private socketMessaging: SocketMessaging,
     private characterValidation: CharacterValidation,
-    private animationEffect: AnimationEffect
+    private animationEffect: AnimationEffect,
+    private characterItems: CharacterItems,
+    private skillIncrease: SkillIncrease
   ) {}
-
-  private getSkillIncreaseInstance(): SkillIncrease {
-    // Circular Injection
-    if (!this.skillIncrease) {
-      this.skillIncrease = container.get<SkillIncrease>(SkillIncrease);
-    }
-    return this.skillIncrease;
-  }
 
   public isSpellCasting(msg: string): boolean {
     return !!this.getSpell(msg);
@@ -41,24 +36,16 @@ export class SpellCast {
       return false;
     }
 
-    spell.usableEffect(character);
+    await spell.usableEffect(character);
+
+    ItemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
     await character.save();
 
     await this.sendPostSpellCastEvents(character, spell);
 
-    await this.getSkillIncreaseInstance().increaseMagicSP(character, spell.manaCost);
+    await this.skillIncrease.increaseMagicSP(character, spell.manaCost);
 
     return true;
-  }
-
-  public async learnLatestSkillLevelSpells(characterId: string, notifyUser: boolean): Promise<void> {
-    const character = (await Character.findOne({ _id: characterId }).populate("skills")) as unknown as ICharacter;
-    const skills = character.skills as unknown as ISkill;
-
-    const spells = this.getSkillLevelSpells(skills.level);
-    await this.addToCharacterLearnedSpells(character, spells);
-
-    notifyUser && this.sendLearnedSpellNotification(character, spells);
   }
 
   private async isSpellCastingValid(spell, character: ICharacter): Promise<boolean> {
@@ -75,6 +62,25 @@ export class SpellCast {
     if (character.mana < spell.manaCost) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you do not have mana to cast this spell.");
       return false;
+    }
+
+    if (spell.requiredItem) {
+      const required = itemsBlueprintIndex[spell.requiredItem];
+      if (!required) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can not cast this spell.");
+
+        console.log(`❌ SpellCast: Missing item blueprint for key ${spell.requiredItem}`);
+        return false;
+      }
+
+      const hasItem = await this.characterItems.hasItemByKey(required.key, character, "inventory");
+      if (!hasItem) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          `Sorry, you must have a ${required.name} in inventory to cast this spell.`
+        );
+        return false;
+      }
     }
 
     const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
@@ -119,34 +125,12 @@ export class SpellCast {
     return null;
   }
 
-  private getSkillLevelSpells(level): ISpell[] {
-    const spells: ISpell[] = [];
-    for (const key in spellsBlueprints) {
-      const spell = spellsBlueprints[key];
-      if (spell.magicWords && level === spell.minLevelRequired) {
-        spells.push(spell as unknown as ISpell);
-      }
-    }
-    return spells;
-  }
-
-  private async addToCharacterLearnedSpells(character: ICharacter, spells: ISpell[]): Promise<void> {
-    const learned = character.learnedSpells ?? [];
-    spells.forEach((spell) => {
-      if (!learned.includes(spell.key)) {
-        learned.push(spell.key);
-      }
-    });
-
-    character.learnedSpells = learned;
-    await character.save();
-  }
-
   private async sendPostSpellCastEvents(character: ICharacter, spell: ISpell): Promise<void> {
     const payload: ICharacterAttributeChanged = {
       targetId: character._id,
       health: character.health,
       mana: character.mana,
+      speed: character.speed,
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
@@ -157,21 +141,5 @@ export class SpellCast {
     );
 
     await this.animationEffect.sendAnimationEventToCharacter(character, spell.animationKey);
-  }
-
-  private sendLearnedSpellNotification(character: ICharacter, spells: ISpell[]): void {
-    if (!spells || spells.length < 1) {
-      return;
-    }
-    const learned: string[] = [];
-    spells.forEach((spell) => {
-      learned.push(spell.name + " (" + spell.magicWords + ")");
-    });
-
-    this.socketMessaging.sendErrorMessageToCharacter(
-      character,
-      "You have learned new spell(s): " + learned.join(", "),
-      "info"
-    );
   }
 }

@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemRune: Partial<IItem> = {
@@ -10,8 +10,7 @@ export const itemRune: Partial<IItem> = {
   texturePath: "magics/rune.png",
 
   name: "Rune",
-  description: "An ancient carved rune.",
+  description: "An ancient carved blank rune.",
   weight: 0.5,
-  allowedEquipSlotType: [ItemSlotType.Accessory, ItemSlotType.Inventory],
   basePrice: 1,
 };

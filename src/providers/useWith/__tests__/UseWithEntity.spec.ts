@@ -777,6 +777,7 @@ describe("UseWithEntityValidation.ts", () => {
       targetId: character._id,
       health: character.health,
       mana: character.mana,
+      speed: character.speed,
     };
 
     // for caster

@@ -19,30 +19,57 @@ export class MapTiles {
       throw new Error(`Failed to find layer ${layerName}`);
     }
 
-    const chunk = layer.chunks[0];
-
-    if (!chunk) {
+    if (layer.chunks.length === 0) {
       return undefined;
     }
 
-    return [chunk.x, chunk.y];
+    return [layer.chunks[0].x, layer.chunks[0].y];
   }
 
-  public getMapWidthHeight(
-    map: string,
-    layerName: MapLayers,
-    gridOffsetX: number,
-    gridOffsetY: number
-  ): { width: number; height: number } {
+  public getMapLayers(map: string): string[] {
     const mapData = MapLoader.maps.get(map);
 
     if (!mapData) {
       throw new Error(`Failed to find map ${map}`);
     }
 
+    const layers = mapData.layers.map((layer) => {
+      if (layer.type === "objectgroup") {
+        return null;
+      }
+
+      return layer.name;
+    });
+
+    // return layers without null or undefined
+    return layers.filter((layer) => layer) as string[];
+  }
+
+  public getMapWidthHeight(map: string, gridOffsetX: number, gridOffsetY: number): { width: number; height: number } {
+    const mapData = MapLoader.maps.get(map);
+
+    if (!mapData) {
+      throw new Error(`Failed to find map ${map}`);
+    }
+
+    // Initialize the map dimensions to 0
+    let width = 0;
+    let height = 0;
+
+    // Loop through the layers in the map
+    for (const layer of mapData.layers) {
+      if (!layer.chunks) continue;
+      // Loop through the chunks in the current layer
+      for (const chunk of layer.chunks) {
+        // Update the map dimensions based on the chunk's dimensions, position, and grid offset
+        width = Math.max(width, chunk.x + chunk.width + gridOffsetX);
+        height = Math.max(height, chunk.y + chunk.height + gridOffsetY);
+      }
+    }
+
     return {
-      width: mapData.width + gridOffsetX,
-      height: mapData.height + gridOffsetY,
+      width,
+      height,
     };
   }
 
@@ -53,66 +80,61 @@ export class MapTiles {
       return true;
     }
 
+    // full solids are tiles with ge_collide_all. This means that regardless of the layer, the tile is solid.
+    const isFullSolid = this.hasPropertyInAnyLayer(map, gridX, gridY, "ge_collide_all");
+
+    if (isFullSolid) {
+      return true;
+    }
+
     const layer = this.getLayer(map, mapLayer);
 
     if (!layer) {
       return false;
     }
 
+    // Check if the tile is solid on the specified layer
     const rawTileId = this.getRawTileId(layer, gridX, gridY);
-
     if (!rawTileId) {
       return false;
     }
 
     const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
-
     if (!targetTileset) {
       return false;
     }
 
-    if (rawTileId) {
-      const tileId = rawTileId - targetTileset.firstgid;
+    const tileId = rawTileId - targetTileset.firstgid;
+    const tileProperty = this.getTileProperty<boolean>(targetTileset!, tileId!, "ge_collide") || false;
 
-      const tileProperty = this.getTileProperty<boolean>(targetTileset!, tileId!, "ge_collide") || false;
-
-      if (tileProperty) {
-        return tileProperty;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  public isPassage(map: string, gridX: number, gridY: number, mapLayer: MapLayers): boolean {
-    const layerName = TiledLayerNames[mapLayer];
-
-    const layer = this.getLayer(map, mapLayer);
-
-    if (!layer) {
-      throw new Error(`Failed to find layer ${layerName}`);
-    }
-
-    const rawTileId = this.getRawTileId(layer, gridX, gridY);
-
-    if (!rawTileId) {
-      return false;
-    }
-
-    const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
-
-    if (!targetTileset) {
-      return false;
-    }
-
-    if (rawTileId) {
-      const tileId = rawTileId - targetTileset.firstgid;
-      return this.getTileProperty<boolean>(targetTileset!, tileId!, "is_passage") || false;
+    if (tileProperty) {
+      return tileProperty;
     }
 
     return false;
+  }
+
+  public isPassage(map: string, gridX: number, gridY: number, mapLayer: MapLayers): boolean {
+    const layer = this.getLayer(map, mapLayer);
+
+    if (!layer) {
+      return false;
+    }
+
+    const rawTileId = this.getRawTileId(layer, gridX, gridY);
+
+    if (!rawTileId) {
+      return false;
+    }
+
+    const targetTileset = this.getTilesetFromRawTileId(map, rawTileId!);
+
+    if (!targetTileset) {
+      return false;
+    }
+
+    const tileId = rawTileId - targetTileset.firstgid;
+    return this.getTileProperty<boolean>(targetTileset!, tileId!, "is_passage") || false;
   }
 
   public getPropertyFromLayer(
@@ -122,12 +144,10 @@ export class MapTiles {
     mapLayer: MapLayers,
     property: string
   ): string | undefined {
-    const layerName = TiledLayerNames[mapLayer];
-
     const layer = this.getLayer(map, mapLayer);
 
     if (!layer) {
-      throw new Error(`Failed to find layer ${layerName}`);
+      return;
     }
 
     const rawTileId = this.getRawTileId(layer, gridX, gridY);
@@ -176,28 +196,6 @@ export class MapTiles {
     );
   }
 
-  public areAllLayersTileEmpty(map: string, gridX: number, gridY: number): boolean {
-    for (const layer of MAP_LAYERS) {
-      let tileId;
-
-      try {
-        tileId = this.getTileId(map, gridX, gridY, MAP_LAYERS_TO_ID[layer]);
-
-        if (tileId === undefined) {
-          continue;
-        }
-      } catch (error) {
-        continue;
-      }
-
-      if (tileId >= 0) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   public getTileId(map: string, gridX: number, gridY: number, mapLayer: MapLayers): number | undefined {
     const layerName = TiledLayerNames[mapLayer];
 
@@ -218,6 +216,40 @@ export class MapTiles {
 
       return tileId;
     }
+  }
+
+  private hasPropertyInAnyLayer(map: string, gridX: number, gridY: number, property: string): boolean {
+    for (const layer of MAP_LAYERS) {
+      const tileProperty = this.getPropertyFromLayer(map, gridX, gridY, MAP_LAYERS_TO_ID[layer], property);
+
+      if (tileProperty) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private areAllLayersTileEmpty(map: string, gridX: number, gridY: number): boolean {
+    for (const layer of MAP_LAYERS) {
+      let tileId;
+
+      try {
+        tileId = this.getTileId(map, gridX, gridY, MAP_LAYERS_TO_ID[layer]);
+
+        if (tileId === undefined) {
+          continue;
+        }
+      } catch (error) {
+        continue;
+      }
+
+      if (tileId >= 0) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private isBitwise = (n: number): boolean => {

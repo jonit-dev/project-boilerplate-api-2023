@@ -28,13 +28,13 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
 
     const baseUseWithTileToEntityOptions: IUseWithItemToEntityOptions = {
       targetEntity,
-      targetEntityAnimationEffectKey: "using-effect",
+      targetEntityAnimationEffectKey: "butchering",
       errorMessages: [
         "Hmm... Nothing here.",
         "You effort is in vain.",
         "You can't find anything.",
         "Maybe you should try somewhere else.",
-        "Mining is hard work! Nothing here!",
+        "Butchering is a hard work! Nothing here!",
       ],
       successMessages: [
         "You found some meat!",
@@ -56,11 +56,6 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
               key: FoodsBlueprint.RedMeat,
               qty: [1, 3],
               chance: 20,
-            },
-            {
-              key: FoodsBlueprint.RottenMeat,
-              chance: 40,
-              qty: [1, 6],
             },
           ],
         };

@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
+import { ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -16,6 +16,6 @@ export const itemIceMushroom: Partial<IItem> = {
   maxStackSize: 100,
   basePrice: 5,
   usableEffect: (character: ICharacter) => {
-    ItemUsableEffect.apply(character, EffectableAttribute.Health, 1.5);
+    ItemUsableEffect.applyEatingEffect(character, 1.5);
   },
 };

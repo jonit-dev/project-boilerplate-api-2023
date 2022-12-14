@@ -100,6 +100,8 @@ export class UseWithItemToTile {
       if (errorAnimationEffectKey) {
         await this.animationEffect.sendAnimationEventToCharacter(character, errorAnimationEffectKey);
       }
+      await this.refreshInventory(character);
+
       return;
     }
 
@@ -119,9 +121,9 @@ export class UseWithItemToTile {
   }
 
   private async addRewardToInventory(character: ICharacter, rewards: IUseWithItemToTileReward[]): Promise<boolean> {
+    rewards = rewards.sort((a, b) => a.chance - b.chance);
+    const n = random(0, 100);
     for (const reward of rewards) {
-      const n = random(0, 100);
-
       if (n < reward.chance) {
         const itemBlueprint = itemsBlueprintIndex[reward.key];
 

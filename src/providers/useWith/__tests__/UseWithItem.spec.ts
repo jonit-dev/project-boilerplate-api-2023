@@ -12,8 +12,6 @@ import { IUseWithItem } from "@rpg-engine/shared";
 import { UseWithItem } from "../UseWithItem";
 
 describe("UseWithItem.ts", () => {
-  const INVALID_ITEM_MSG = "Cannot read properties of undefined (reading 'useWithItemEffect')";
-
   let targetItem: IItem,
     originItem: IItem,
     testCharacter: ICharacter,
@@ -90,7 +88,7 @@ describe("UseWithItem.ts", () => {
       await useWithEffect(targetItem, originItem, testCharacter);
       throw new Error("This test should fail!");
     } catch (error: any) {
-      expect(error.message).toEqual(INVALID_ITEM_MSG);
+      expect(error.message).toContain("undefined");
     }
   });
 

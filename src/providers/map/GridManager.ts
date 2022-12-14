@@ -1,6 +1,7 @@
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { MapLayers } from "@rpg-engine/shared";
 import PF from "pathfinding";
+import { MapHelper } from "./MapHelper";
 import { MapSolids } from "./MapSolids";
 import { MapTiles } from "./MapTiles";
 
@@ -8,12 +9,12 @@ import { MapTiles } from "./MapTiles";
 export class GridManager {
   public grids: Map<string, PF.Grid> = new Map();
 
-  constructor(private mapTiles: MapTiles, private mapSolids: MapSolids) {}
+  constructor(private mapTiles: MapTiles, private mapSolids: MapSolids, private mapHelper: MapHelper) {}
 
   public generateGridSolids(map: string): void {
     const { gridOffsetX, gridOffsetY } = this.getGridOffset(map)!;
 
-    const { width, height } = this.mapTiles.getMapWidthHeight(map, MapLayers.Ground, gridOffsetX, gridOffsetY);
+    const { width, height } = this.mapTiles.getMapWidthHeight(map, gridOffsetX, gridOffsetY);
 
     const newGrid = new PF.Grid(width, height);
 
@@ -63,10 +64,6 @@ export class GridManager {
   }
 
   public setWalkable(map: string, gridX: number, gridY: number, walkable: boolean): void {
-    const { gridOffsetX, gridOffsetY } = this.getGridOffset(map)!;
-
-    const { width, height } = this.mapTiles.getMapWidthHeight(map, MapLayers.Ground, gridOffsetX, gridOffsetY);
-
     try {
       const grid = this.grids.get(map);
 
@@ -76,9 +73,7 @@ export class GridManager {
 
       grid.setWalkableAt(gridX, gridY, walkable);
     } catch (error) {
-      console.log(
-        `Failed to setWalkable=${walkable} for gridX ${gridX}, gridY ${gridY} on map ${map} (${width}, ${height})`
-      );
+      console.log(`Failed to setWalkable=${walkable} for gridX ${gridX}, gridY ${gridY} on map ${map}`);
       console.error(error);
     }
   }
@@ -116,27 +111,35 @@ export class GridManager {
     endGridX: number,
     endGridY: number
   ): number[][] | undefined {
+    // Check if grid exists for the given map
     const gridMap = this.grids.get(map);
-
     if (!gridMap) {
-      throw new Error("❌Could not find grid for map: " + map);
+      throw new Error(`❌ Could not find grid for map: ${map}`);
     }
 
-    const tempGrid = gridMap.clone(); // should be cloned, otherwise it will be modified by the finder!
-
+    // Clone the grid to avoid modifying the original
+    const tempGrid = gridMap.clone();
     if (!tempGrid) {
-      throw new Error("❌Could not clone grid for map: " + map);
+      throw new Error(`❌ Could not clone grid for map: ${map}`);
     }
 
+    // Use A* pathfinding algorithm to find shortest path
     const finder = new PF.AStarFinder();
 
-    //! According to the docs, both start and end point MUST be walkable, otherwise it will return [] and crash the pathfinding!
-    //! To avoid any issues in the main grid we'll just set this walkable in the tempGrid!
-    // remap path without offset
+    // Remap path without grid offset
     const { gridOffsetX, gridOffsetY } = this.getGridOffset(map)!;
+    const startX = startGridX + (gridOffsetX ?? 0);
+    const startY = startGridY + (gridOffsetY ?? 0);
+    const endX = endGridX + (gridOffsetX ?? 0);
+    const endY = endGridY + (gridOffsetY ?? 0);
 
-    tempGrid.setWalkableAt(startGridX + gridOffsetX, startGridY + gridOffsetY, true);
-    tempGrid.setWalkableAt(endGridX + gridOffsetX, endGridY + gridOffsetY, true);
+    if (!this.mapHelper.areAllCoordinatesValid([startX, startY], [endX, endY])) {
+      return;
+    }
+
+    // Set start and end points to walkable in temporary grid
+    tempGrid.setWalkableAt(startX, startY, true);
+    tempGrid.setWalkableAt(endX, endY, true);
 
     const path = finder.findPath(
       startGridX + gridOffsetX,

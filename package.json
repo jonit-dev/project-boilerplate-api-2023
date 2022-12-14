@@ -6,9 +6,9 @@
   "scripts": {
     "tsc": "tsc -p . --pretty --skipLibCheck --noEmit",
     "test": "yarn jest --silent test",
-    "test:ci": "yarn jest --silent test",
+    "test:ci": "yarn jest --silent --maxWorkers=4 --maxConcurrency=4 test",
     "test:debug": "yarn jest test --detectOpenHandles",
-    "test:coverage": "yarn jest --silent --coverage",
+    "test:coverage": "yarn jest --silent --coverage --maxWorkers=4 --maxConcurrency=4 --forceExit",
     "test:config": "yarn jest --showConfig test",
     "dev": "yarn install && ts-node-dev --transpile-only --inspect=0.0.0.0:9229 --trace-deprecation --respawn -r tsconfig-paths/register ./src/server.ts",
     "build": "tsc -p .",
@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
-    "@rpg-engine/shared": "^0.5.98",
+    "@rpg-engine/shared": "^0.5.99",
     "@rpg-engine/soul": "^0.1.16",
     "@shelf/jest-mongodb": "^2.2.1",
     "@swc/core": "^1.3.20",
