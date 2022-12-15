@@ -66,6 +66,7 @@ export class NPCWarn {
           mana: npc.mana,
           maxMana: npc.maxMana,
           hasQuest,
+          hasDepot: npc.hasDepot!,
           isTrader: npc.isTrader,
           traderItems: npc.traderItems,
         }

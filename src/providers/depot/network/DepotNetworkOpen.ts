@@ -14,6 +14,7 @@ import {
   IItemContainer,
   IItemContainerRead,
   ItemContainerType,
+  ItemSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
@@ -70,7 +71,7 @@ export class DepotNetworkOpen {
 
           this.socketMessaging.sendEventToUser<IItemContainerRead>(
             character.channelId!,
-            DepotSocketEvents.OpenContainer,
+            ItemSocketEvents.ContainerRead,
             {
               itemContainer,
               type: ItemContainerType.MapContainer,
@@ -105,6 +106,7 @@ export class DepotNetworkOpen {
       newDepot = await newDepot.save();
       let depotItemContainer = new ItemContainer({
         parentItem: newDepot._id,
+        name: "Depot",
       });
       depotItemContainer = await depotItemContainer.save();
 

@@ -9,4 +9,5 @@ export const npcFatBaldMan = {
   name: "Heather",
   textureKey: FriendlyNPCsBlueprint.FatBaldMan,
   gender: CharacterGender.Male,
+  hasDepot: true,
 } as Partial<INPC>;

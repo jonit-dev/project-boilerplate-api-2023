@@ -105,6 +105,7 @@ export class NPCMovement {
             mana: npc.mana,
             maxMana: npc.maxMana,
             hasQuest: await npc.hasQuest,
+            hasDepot: npc.hasDepot!,
           }
         );
       }
