@@ -25,6 +25,7 @@ import { npcSuperiorKnight } from "./NPCSuperiorKnight";
 import { npcBlackKnight2 } from "./NPCBlackKnight2";
 import { npcBlackKnight3 } from "./NPCBlackKnight3";
 import { npcBlackKnight4 } from "./NPCBlackKnight4";
+import { npcTraderHorse } from "./NPCTraderHorse";
 
 export const friendlyNPCs = {
   [FriendlyNPCsBlueprint.Agatha]: npcAgatha,
@@ -53,4 +54,5 @@ export const friendlyNPCs = {
   [FriendlyNPCsBlueprint.SeniorKnight1]: npcSeniorKnight,
   [FriendlyNPCsBlueprint.Father]: npcFather,
   [FriendlyNPCsBlueprint.Mother]: npcMother,
+  [FriendlyNPCsBlueprint.TraderHorse]: npcTraderHorse,
 };
