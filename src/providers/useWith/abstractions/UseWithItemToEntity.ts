@@ -7,12 +7,12 @@ import { CharacterItemContainer } from "@providers/character/characterItems/Char
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IItemContainer, IEquipmentAndInventoryUpdatePayload, ItemSocketEvents } from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { isArray } from "lodash";
 import random from "lodash/random";
 
-interface IUseWithItemToEntityReward {
+export interface IUseWithItemToEntityReward {
   key: string;
   qty: number[] | number;
   chance: number;

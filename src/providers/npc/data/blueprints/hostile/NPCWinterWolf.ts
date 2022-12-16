@@ -7,7 +7,7 @@ import {
   FoodsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -15,6 +15,7 @@ export const npcWinterWolf: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Winter Wolf",
   key: HostileNPCsBlueprint.WinterWolf,
+  subType: NPCSubtype.Animal,
   textureKey: HostileNPCsBlueprint.WinterWolf,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,

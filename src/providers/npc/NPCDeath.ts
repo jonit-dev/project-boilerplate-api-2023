@@ -9,8 +9,8 @@ import { BattleSocketEvents, IBattleDeath, INPCLoot } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { NPCTarget } from "./movement/NPCTarget";
 import { NPCCycle } from "./NPCCycle";
+import { NPCTarget } from "./movement/NPCTarget";
 
 @provide(NPCDeath)
 export class NPCDeath {
@@ -64,10 +64,10 @@ export class NPCDeath {
 
   public generateNPCBody(npc: INPC, character: ICharacter): Promise<IItem> {
     const blueprintData = itemsBlueprintIndex["npc-body"];
-
     const npcBody = new Item({
       ...blueprintData, // base body props
       key: `${npc.key}-body`,
+      bodyFromId: npc.id,
       owner: character.id,
       texturePath: `${npc.textureKey}/death/0.png`,
       textureKey: npc.textureKey,

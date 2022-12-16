@@ -3,9 +3,9 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -93,6 +93,7 @@ export class CharacterDeath {
 
     const charBody = new Item({
       ...blueprintData,
+      bodyFromId: character.id,
       name: `${character.name}'s body`,
       scene: character.scene,
       texturePath: `${character.textureKey}/death/0.png`,

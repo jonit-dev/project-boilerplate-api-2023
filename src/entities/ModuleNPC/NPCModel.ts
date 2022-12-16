@@ -2,6 +2,7 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Quest } from "@entities/ModuleQuest/QuestModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { EntryEffectBlueprint } from "@providers/entities/data/types/entryEffectBlueprintTypes";
+
 import {
   CharacterClass,
   CharacterGender,
@@ -9,6 +10,7 @@ import {
   NPCAlignment,
   NPCMovementType,
   NPCPathOrientation,
+  NPCSubtype,
   NPCTargetType,
   TypeHelper,
 } from "@rpg-engine/shared";
@@ -23,6 +25,11 @@ const npcSchema = createLeanSchema(
     tiledId: Type.number({ required: true }),
     key: Type.string({
       required: true,
+    }),
+    subType: Type.string({
+      required: true,
+      default: NPCSubtype.Humanoid,
+      enum: TypeHelper.enumToStringArray(NPCSubtype),
     }),
     textureKey: Type.string({
       required: true,

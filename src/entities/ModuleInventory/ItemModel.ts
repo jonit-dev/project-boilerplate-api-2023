@@ -1,8 +1,8 @@
 import { CharacterView } from "@providers/character/CharacterView";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { container } from "@providers/inversify/container";
-import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemView } from "@providers/item/ItemView";
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MapHelper } from "@providers/map/MapHelper";
 import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -28,6 +28,9 @@ const itemSchema = createLeanSchema(
     }),
     rangeType: Type.string({
       enum: TypeHelper.enumToStringArray(EntityAttackType),
+    }),
+    entityType: Type.string({
+      required: false,
     }),
     name: Type.string({ required: true }),
     description: Type.string({ required: true }),
@@ -71,6 +74,9 @@ const itemSchema = createLeanSchema(
     isTwoHanded: Type.boolean({ required: true, default: false }),
     hasUseWith: Type.boolean({ required: true, default: false }),
     basePrice: Type.number(),
+
+    hasButchered: Type.boolean(),
+    bodyFromId: Type.string(),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
