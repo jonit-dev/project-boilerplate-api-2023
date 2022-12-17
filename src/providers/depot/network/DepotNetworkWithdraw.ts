@@ -4,18 +4,18 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import {
-  DepotSocketEvents,
-  IDepotContainerOpen,
-  IItemContainerRead,
-  ItemContainerType,
-  ItemSocketEvents,
-} from "@rpg-engine/shared";
+import { DepotSocketEvents, IItemContainerRead, ItemContainerType, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "../DepotSystem";
 
-@provide(DepotNetworkOpen)
-export class DepotNetworkOpen {
+// TODO pasar a shared
+interface IDepotContainerWithdraw {
+  itemId: string;
+  npcId: string;
+}
+
+@provide(DepotNetworkWithdraw)
+export class DepotNetworkWithdraw {
   constructor(
     private socketAuth: SocketAuth,
     private movementHelper: MovementHelper,
@@ -24,11 +24,11 @@ export class DepotNetworkOpen {
     private depotSystem: DepotSystem
   ) {}
 
-  public onDepotContainerOpen(channel: SocketChannel): void {
+  public onDepotContainerWithdraw(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      DepotSocketEvents.OpenContainer,
-      async (data: IDepotContainerOpen, character) => {
+      DepotSocketEvents.Withdraw,
+      async (data: IDepotContainerWithdraw, character) => {
         try {
           // Check if character is alive and not banned
           const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
@@ -52,7 +52,7 @@ export class DepotNetworkOpen {
             return;
           }
 
-          const itemContainer = await this.depotSystem.getDepotContainer(character.id, data.npcId);
+          const itemContainer = await this.depotSystem.withdrawItem(character.id, data.npcId, data.itemId);
 
           this.socketMessaging.sendEventToUser<IItemContainerRead>(
             character.channelId!,
