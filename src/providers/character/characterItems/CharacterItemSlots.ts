@@ -246,7 +246,7 @@ export class CharacterItemSlots {
 
     if (firstAvailableSlotIndex === null) {
       if (!dropOnMapIfFull) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your inventory is full.");
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your container is full.");
         return false;
       }
 

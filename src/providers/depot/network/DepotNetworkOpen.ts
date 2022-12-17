@@ -13,6 +13,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "../DepotSystem";
+import { OpenDepot } from "../OpenDepot";
 
 @provide(DepotNetworkOpen)
 export class DepotNetworkOpen {
@@ -21,7 +22,8 @@ export class DepotNetworkOpen {
     private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
     private characterValidation: CharacterValidation,
-    private depotSystem: DepotSystem
+    private depotSystem: DepotSystem,
+    private openDepot: OpenDepot
   ) {}
 
   public onDepotContainerOpen(channel: SocketChannel): void {
@@ -52,7 +54,7 @@ export class DepotNetworkOpen {
             return;
           }
 
-          const itemContainer = await this.depotSystem.getDepotContainer(character.id, data.npcId);
+          const itemContainer = await this.openDepot.getContainer(character.id, data.npcId);
 
           this.socketMessaging.sendEventToUser<IItemContainerRead>(
             character.channelId!,

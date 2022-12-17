@@ -7,6 +7,7 @@ import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { DepotSocketEvents, IItemContainerRead, ItemContainerType, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "../DepotSystem";
+import { WithdrawItem } from "../WithdrawItem";
 
 // TODO pasar a shared
 interface IDepotContainerWithdraw {
@@ -21,7 +22,8 @@ export class DepotNetworkWithdraw {
     private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
     private characterValidation: CharacterValidation,
-    private depotSystem: DepotSystem
+    private depotSystem: DepotSystem,
+    private withdrawItem: WithdrawItem
   ) {}
 
   public onDepotContainerWithdraw(channel: SocketChannel): void {
@@ -52,7 +54,7 @@ export class DepotNetworkWithdraw {
             return;
           }
 
-          const itemContainer = await this.depotSystem.withdrawItem(character.id, data.npcId, data.itemId);
+          const itemContainer = await this.withdrawItem.withdraw(character.id, data.npcId, data.itemId);
 
           this.socketMessaging.sendEventToUser<IItemContainerRead>(
             character.channelId!,

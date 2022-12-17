@@ -1,16 +1,16 @@
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { DepotSystem } from "../DepotSystem";
+import { OpenDepot } from "../OpenDepot";
 import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { Types } from "mongoose";
 import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 
-describe("DepotSystem.ts", () => {
-  let depotSystem: DepotSystem, testNPC: INPC, testCharacter: ICharacter;
+describe("OpenDepot.ts", () => {
+  let openDepot: OpenDepot, testNPC: INPC, testCharacter: ICharacter;
 
   beforeAll(async () => {
-    depotSystem = container.get<DepotSystem>(DepotSystem);
+    openDepot = container.get<OpenDepot>(OpenDepot);
     await unitTestHelper.beforeAllJestHook();
   });
 
@@ -30,7 +30,7 @@ describe("DepotSystem.ts", () => {
 
   it("character without depot | should create new empty depot", async () => {
     // @ts-ignore
-    const depotContainer = await depotSystem.getDepotContainer(testCharacter.id, testNPC.id);
+    const depotContainer = await openDepot.getContainer(testCharacter.id, testNPC.id);
 
     expect(depotContainer).toBeDefined();
     expect(depotContainer!.slotQty).toEqual(20);
@@ -61,7 +61,7 @@ describe("DepotSystem.ts", () => {
     const characterDepot = await unitTestHelper.createMockDepot(testNPC.id, testCharacter.id);
 
     // @ts-ignore
-    const depotContainer = await depotSystem.getDepotContainer(testCharacter.id, testNPC.id);
+    const depotContainer = await openDepot.getContainer(testCharacter.id, testNPC.id);
 
     expect(depotContainer).toBeDefined();
 
@@ -70,7 +70,7 @@ describe("DepotSystem.ts", () => {
 
   it("When a Character is deleted, should remove the Depot", async () => {
     // @ts-ignore
-    const depotContainer = await depotSystem.getDepotContainer(testCharacter.id, testNPC.id);
+    const depotContainer = await openDepot.getContainer(testCharacter.id, testNPC.id);
 
     expect(depotContainer).toBeDefined();
     expect(depotContainer!.slotQty).toEqual(20);
