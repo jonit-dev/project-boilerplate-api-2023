@@ -1,10 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { EntryEffectBlueprint } from "@providers/entities/data/types/entryEffectBlueprintTypes";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { BattleEventType, FromGridX, FromGridY } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { BattleAttackTarget } from "../BattleAttackTarget";
+
+jest.mock("../../entityEffects/EntityEffectCycle.ts", () => ({
+  EntityEffectCycle: jest.fn(),
+}));
 
 describe("BattleAttackTarget.spec.ts", () => {
   let battleAttackTarget: BattleAttackTarget;
@@ -80,78 +82,6 @@ describe("BattleAttackTarget.spec.ts", () => {
 
     expect(testNPC.health).toBeLessThan(testNPC.maxHealth);
     expect(increaseSkillsOnBattle).toHaveBeenCalled();
-  });
-
-  it("should not call applyEntityEffects when battle event is a hit and attacker attack type Melee and no entity effects", async () => {
-    // entry effect poison has a melee attack type
-    testNPC.entityEffects = [];
-    // attack type
-    testNPC.attackType = EntityAttackType.Melee;
-
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
-
-    // @ts-ignore
-    const applyEntityEffects = jest.spyOn(battleAttackTarget.entityEffectUse, "applyEntityEffects" as any);
-    applyEntityEffects.mockImplementation(() => 1);
-    // @ts-ignore
-    await battleAttackTarget.hitTarget(testNPC, testCharacter);
-
-    expect(applyEntityEffects).not.toHaveBeenCalled();
-  });
-
-  it("should not call applyEntityEffects when battle event is a hit and attacker attack type Ranged and entity effects attack type Melee", async () => {
-    // entry effect poison has a melee attack type
-    testNPC.entityEffects = [EntryEffectBlueprint.Poison];
-    // attack type
-    testNPC.attackType = EntityAttackType.Ranged;
-
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
-
-    // @ts-ignore
-    const applyEntityEffects = jest.spyOn(battleAttackTarget.entityEffectUse, "applyEntityEffects" as any);
-    applyEntityEffects.mockImplementation(() => 1);
-    // @ts-ignore
-    await battleAttackTarget.hitTarget(testNPC, testCharacter);
-
-    expect(applyEntityEffects).not.toHaveBeenCalled();
-  });
-
-  it("should call applyEntityEffects when battle event is a hit and attacker attack type melee and entity effects attack type Melee", async () => {
-    // entry effect poison has a melee attack type
-    testNPC.entityEffects = [EntryEffectBlueprint.Poison];
-    // attack type
-    testNPC.attackType = EntityAttackType.Melee;
-
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
-
-    // @ts-ignore
-    const applyEntityEffects = jest.spyOn(battleAttackTarget.entityEffectUse, "applyEntityEffects" as any);
-    applyEntityEffects.mockImplementation(() => 1);
-    // @ts-ignore
-    await battleAttackTarget.hitTarget(testNPC, testCharacter);
-
-    expect(applyEntityEffects).toHaveBeenCalled();
-  });
-
-  it("should call applyEntityEffects when battle event is a hit and attacker attack type MeleeRanged and entity effects attack type Melee", async () => {
-    // entry effect poison has a melee attack type
-    testNPC.entityEffects = [EntryEffectBlueprint.Poison];
-    // attack type
-    testNPC.attackType = EntityAttackType.MeleeRanged;
-
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
-
-    // @ts-ignore
-    const applyEntityEffects = jest.spyOn(battleAttackTarget.entityEffectUse, "applyEntityEffects" as any);
-    applyEntityEffects.mockImplementation(() => 1);
-    // @ts-ignore
-    await battleAttackTarget.hitTarget(testNPC, testCharacter);
-
-    expect(applyEntityEffects).toHaveBeenCalled();
   });
 
   it("when battle event is a miss, it should not decrease the target's health", async () => {

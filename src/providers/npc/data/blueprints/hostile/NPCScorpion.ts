@@ -1,7 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EntryEffectBlueprint } from "@providers/entities/data/types/entryEffectBlueprintTypes";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { FoodsBlueprint, OthersBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
@@ -48,5 +48,5 @@ export const npcScorpion: Partial<INPC> = {
       chance: 20,
     },
   ],
-  entityEffects: [EntryEffectBlueprint.Poison],
+  entityEffects: [EntityEffectBlueprint.Poison],
 };
