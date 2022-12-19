@@ -2,21 +2,16 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { IItemPickup } from "@rpg-engine/shared";
 import { ObjectId } from "mongodb";
 import { ItemPickupFromContainer } from "../ItemPickup/ItemPickupFromContainer";
-
-// jest.mock("@entities/ModuleInventory/ItemContainerModel");
-// jest.mock("@providers/character/characterItems/CharacterItemSlots");
 
 describe("ItemPickupFromContainer.ts ", () => {
   let itemPickupFromContainer: ItemPickupFromContainer;
   let itemPickupData: IItemPickup;
   let itemToBePicked: IItem;
   let character: ICharacter;
-  let characterItemSlots: CharacterItemSlots;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
