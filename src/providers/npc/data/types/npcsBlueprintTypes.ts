@@ -25,6 +25,7 @@ export enum FriendlyNPCsBlueprint {
   HumanMale1 = "human-male-1",
   HumanMale2 = "human-male-2",
   Trader = "trader",
+  TraderHorse = "trader-horse",
   WomanBlueHair = "woman-blue-hair",
   WomanGreenHair = "woman-green-hair",
   SeniorKnight1 = "senior-knight-1",

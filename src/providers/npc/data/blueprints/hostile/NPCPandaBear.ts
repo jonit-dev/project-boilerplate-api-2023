@@ -3,7 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { CraftingResourcesBlueprint, FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -11,6 +11,7 @@ export const npcPandaBear = {
   ...generateMoveTowardsMovement(),
   name: "Panda Bear",
   key: HostileNPCsBlueprint.PandaBear,
+  subType: NPCSubtype.Animal,
   textureKey: HostileNPCsBlueprint.PandaBear,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,

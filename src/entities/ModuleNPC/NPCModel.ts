@@ -1,7 +1,7 @@
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Quest } from "@entities/ModuleQuest/QuestModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { EntryEffectBlueprint } from "@providers/entities/data/types/entryEffectBlueprintTypes";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   CharacterClass,
   CharacterGender,
@@ -9,6 +9,7 @@ import {
   NPCAlignment,
   NPCMovementType,
   NPCPathOrientation,
+  NPCSubtype,
   NPCTargetType,
   TypeHelper,
 } from "@rpg-engine/shared";
@@ -23,6 +24,11 @@ const npcSchema = createLeanSchema(
     tiledId: Type.number({ required: true }),
     key: Type.string({
       required: true,
+    }),
+    subType: Type.string({
+      required: true,
+      default: NPCSubtype.Humanoid,
+      enum: TypeHelper.enumToStringArray(NPCSubtype),
     }),
     textureKey: Type.string({
       required: true,
@@ -177,9 +183,10 @@ const npcSchema = createLeanSchema(
     }),
     entityEffects: Type.array().of(
       Type.string({
-        typeof: EntryEffectBlueprint,
+        typeof: EntityEffectBlueprint,
       })
     ),
+    appliedEntityEffects: Type.array().of(Type.mixed({})),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

@@ -113,7 +113,7 @@ describe("CharacterTradingNPCSell.ts", () => {
     expect(updatedContainer.slots[2].stackQty).toBe(40);
 
     expect(sendErrorMessageToCharacter).not.toBeCalled();
-    expect(sendEventToUser).toBeCalledTimes(1);
+    expect(sendEventToUser).toBeCalledTimes(2);
 
     expect(sendEventToUser).toHaveBeenCalledWith(
       testCharacter.channelId!,

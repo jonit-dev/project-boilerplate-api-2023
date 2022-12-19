@@ -14,7 +14,7 @@ export const spellHealRuneCreation: Partial<ISpell> = {
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar ansr faenya",
   manaCost: 40,
-  minLevelRequired: 2,
+  minLevelRequired: 4,
   minMagicLevelRequired: 3,
   animationKey: AnimationEffectKeys.LevelUp,
 

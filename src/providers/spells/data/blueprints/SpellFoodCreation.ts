@@ -15,7 +15,7 @@ export const spellFoodCreation: Partial<ISpell> = {
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar klatha",
   manaCost: 20,
-  minLevelRequired: 2,
+  minLevelRequired: 3,
   minMagicLevelRequired: 3,
   animationKey: AnimationEffectKeys.LevelUp,
 

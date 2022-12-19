@@ -1,11 +1,17 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { container } from "@providers/inversify/container";
-import { IUseWithItemToEntityOptions, UseWithItemToEntity } from "@providers/useWith/abstractions/UseWithItemToEntity";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import {
+  IUseWithItemToEntityOptions,
+  IUseWithItemToEntityReward,
+  UseWithItemToEntity,
+} from "@providers/useWith/abstractions/UseWithItemToEntity";
 import { IItemUseWith } from "@providers/useWith/useWithTypes";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
-import { FoodsBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
+import { CraftingResourcesBlueprint, FoodsBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemButchersKnife: Partial<IItemUseWith> = {
   key: ToolsBlueprint.ButchersKnife,
@@ -23,16 +29,33 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
   basePrice: 45,
   hasUseWith: true,
   useWithMaxDistanceGrid: 2,
-  usableEffect: async (character: ICharacter, targetEntity: ICharacter | INPC) => {
+  usableEffect: async (character: ICharacter, targetItem: IItem) => {
     const useWithItemToEntity = container.get<UseWithItemToEntity>(UseWithItemToEntity);
+    const socketMessaging = container.get<SocketMessaging>(SocketMessaging);
+
+    const targetEntity =
+      (await NPC.findOne({ _id: targetItem.bodyFromId })) || (await Character.findOne({ _id: targetItem.bodyFromId }));
+
+    if (!targetEntity) {
+      socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can't butcher this.");
+      return;
+    }
+
+    if (targetEntity.type === EntityType.Character) {
+      return;
+    }
+
+    if (targetItem.hasButchered) {
+      socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this body have already been butchered.");
+      return;
+    }
 
     const baseUseWithTileToEntityOptions: IUseWithItemToEntityOptions = {
       targetEntity,
-      targetEntityAnimationEffectKey: "butchering",
       errorMessages: [
         "Hmm... Nothing here.",
         "You effort is in vain.",
-        "You can't find anything.",
+        "Hmm... You didn't find anything.",
         "Maybe you should try somewhere else.",
         "Butchering is a hard work! Nothing here!",
       ],
@@ -61,13 +84,57 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
         };
         break;
       case EntityType.NPC:
+        // handle Container Item ie. StaticEntity ie. npc dead body
+        const staticEntity = targetEntity as unknown as IItem;
+        const subType = staticEntity.subType;
+        const rewards: IUseWithItemToEntityReward[] = [];
+
+        if (subType) {
+          switch (subType) {
+            case NPCSubtype.Animal:
+              rewards.push({
+                chance: 30,
+                key: FoodsBlueprint.RedMeat,
+                qty: [1, 3],
+              });
+              break;
+            case NPCSubtype.Bird:
+              rewards.push(
+                {
+                  chance: 30,
+                  key: CraftingResourcesBlueprint.Feather,
+                  qty: [1, 3],
+                },
+                {
+                  chance: 30,
+                  key: FoodsBlueprint.ChickensMeat,
+                  qty: [1, 3],
+                }
+              );
+
+              break;
+
+            // more cases for other NPCs subtypes
+            default:
+              break;
+          }
+        }
         useWithItemToEntityOptions = {
           ...baseUseWithTileToEntityOptions,
-          rewards: [...baseUseWithTileToEntityOptions.rewards],
+          rewards: [...baseUseWithTileToEntityOptions.rewards, ...rewards],
         };
         break;
     }
 
+    if (useWithItemToEntityOptions.rewards.length < 1) {
+      socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can't butcher this.");
+      return;
+    }
+
     await useWithItemToEntity.execute(character, useWithItemToEntityOptions);
+
+    // set hasButchered to true
+    targetItem.hasButchered = true;
+    await targetItem.save();
   },
 };

@@ -10,7 +10,7 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -18,6 +18,7 @@ export const npcFireFox: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Fire Fox",
   key: HostileNPCsBlueprint.FireFox,
+  subType: NPCSubtype.Animal,
   textureKey: HostileNPCsBlueprint.FireFox,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,

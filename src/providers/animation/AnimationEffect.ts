@@ -21,6 +21,15 @@ export class AnimationEffect {
     await this.sendAnimationEffectEvent(character, payload);
   }
 
+  public async sendAnimationEventToNPC(npc: INPC, effectKey: string): Promise<void> {
+    const payload: IAnimationEffect = {
+      targetId: npc._id,
+      effectKey,
+    };
+
+    await this.socketMessaging.sendEventToCharactersAroundNPC(npc, AnimationSocketEvents.ShowAnimation, payload);
+  }
+
   public async sendProjectileAnimationEventToCharacter(
     character: ICharacter,
     sourceId: string,

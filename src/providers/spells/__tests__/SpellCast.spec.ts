@@ -37,6 +37,9 @@ describe("SpellCast.ts", () => {
   let characterSkills: ISkill;
   let sendEventToUser: jest.SpyInstance;
   let level2Spells: Partial<ISpell>[] = [];
+  let level3Spells: Partial<ISpell>[] = [];
+  let level4Spells: Partial<ISpell>[] = [];
+  let level5Spells: Partial<ISpell>[] = [];
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -44,17 +47,10 @@ describe("SpellCast.ts", () => {
     spellCast = container.get<SpellCast>(SpellCast);
     spellLearn = container.get<SpellLearn>(SpellLearn);
 
-    level2Spells = [
-      spellSelfHealing,
-      spellFoodCreation,
-      spellArrowCreation,
-      spellBoltCreation,
-      spellBlankRuneCreation,
-      spellFireRuneCreation,
-      spellHealRuneCreation,
-      spellDarkRuneCreation,
-      spellPoisonRuneCreation,
-    ];
+    level2Spells = [spellSelfHealing, spellArrowCreation, spellBlankRuneCreation];
+    level3Spells = [spellBoltCreation, spellFoodCreation];
+    level4Spells = [spellDarkRuneCreation, spellFireRuneCreation, spellHealRuneCreation];
+    level5Spells = [spellPoisonRuneCreation, spellSelfHaste];
   });
 
   beforeEach(async () => {
@@ -324,7 +320,7 @@ describe("SpellCast.ts", () => {
       expect([...character.learnedSpells!]).toEqual(level2Spells.map((spell) => spell.key));
     };
 
-    testCharacter.learnedSpells = [spellSelfHealing.key!, spellFoodCreation.key!];
+    testCharacter.learnedSpells = [spellSelfHealing.key!, spellArrowCreation.key!, spellBlankRuneCreation.key!];
     await testCharacter.save();
     await runTest();
   });
@@ -358,7 +354,10 @@ describe("SpellCast.ts", () => {
     beforeEach(async () => {
       testCharacter = await (
         await unitTestHelper.createMockCharacter(
-          { health: 50, learnedSpells: level2Spells.map((spell) => spell.key) },
+          {
+            health: 50,
+            learnedSpells: level2Spells.concat(level3Spells, level4Spells, level5Spells).map((spell) => spell.key),
+          },
           { hasEquipment: true, hasInventory: true, hasSkills: true }
         )
       )

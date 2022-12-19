@@ -13,7 +13,7 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -21,6 +21,7 @@ export const npcCaveSpider: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Cave Spider",
   key: HostileNPCsBlueprint.CaveSpider,
+  subType: NPCSubtype.Insect,
   textureKey: HostileNPCsBlueprint.CaveSpider,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
