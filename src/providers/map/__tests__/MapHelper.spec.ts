@@ -36,4 +36,118 @@ describe("MapHelper", () => {
 
     expect(highestLayer).toEqual(6);
   });
+
+  it("returns the correct key in the returned object", () => {
+    const tiledData = {
+      id: 1,
+      x: 0,
+      y: 0,
+      properties: [{ name: "key", value: "test-key" }],
+    };
+    const mapName = "test-map";
+    const blueprintIndex = {
+      "test-key": { foo: "bar" },
+    };
+    const additionalProperties = { baz: "qux" };
+    // @ts-ignore
+    const result = mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, blueprintIndex, additionalProperties);
+
+    expect(result.key).toEqual("test-key-1");
+  });
+
+  it("returns the correct data in the returned object", () => {
+    const tiledData = {
+      id: 1,
+      x: 0,
+      y: 0,
+      properties: [{ name: "key", value: "test-key" }],
+    };
+    const mapName = "test-map";
+    const blueprintIndex = {
+      "test-key": { foo: "bar" },
+    };
+    const additionalProperties = { baz: "qux" };
+    // @ts-ignore
+    const result = mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, blueprintIndex, additionalProperties);
+
+    expect(result.data).toEqual({
+      foo: "bar",
+      key: "test-key-1",
+      tiledId: 1,
+      x: 0,
+      y: 0,
+      scene: "test-map",
+      baz: "qux",
+    });
+  });
+
+  it("returns the correct x and y coordinates in the returned object", () => {
+    const tiledData = {
+      id: 1,
+      x: 10,
+      y: 20,
+      properties: [{ name: "key", value: "test-key" }],
+    };
+    const mapName = "test-map";
+    const blueprintIndex = {
+      "test-key": { foo: "bar" },
+    };
+    const additionalProperties = { baz: "qux" };
+    // @ts-ignore
+    const result = mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, blueprintIndex, additionalProperties);
+
+    expect(result.data).toEqual({
+      foo: "bar",
+      key: "test-key-1",
+      tiledId: 1,
+      x: 10,
+      y: 20,
+      scene: "test-map",
+      baz: "qux",
+    });
+  });
+
+  it("returns the correct scene name in the returned object", () => {
+    const tiledData = {
+      id: 1,
+      x: 0,
+      y: 0,
+      properties: [{ name: "key", value: "test-key" }],
+    };
+    const mapName = "test-map";
+    const blueprintIndex = {
+      "test-key": { foo: "bar" },
+    };
+    const additionalProperties = { baz: "qux" };
+    // @ts-ignore
+    const result = mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, blueprintIndex, additionalProperties);
+
+    expect(result.data).toEqual({
+      foo: "bar",
+      key: "test-key-1",
+      tiledId: 1,
+      x: 0,
+      y: 0,
+      scene: "test-map",
+      baz: "qux",
+    });
+  });
+
+  it("throws an error if the mapName argument is not provided", () => {
+    const tiledData = {
+      id: 1,
+      x: 0,
+      y: 0,
+      properties: [{ name: "key", value: "test-key" }],
+    };
+    const blueprintIndex = {
+      "test-key": { foo: "bar" },
+    };
+    const additionalProperties = { baz: "qux" };
+
+    expect(() => {
+      // @ts-ignore
+      mapHelper.mergeBlueprintWithTiledProps(tiledData, null, blueprintIndex, additionalProperties);
+    }).toThrowError("NPCLoader: Map name is for map null");
+  });
 });
