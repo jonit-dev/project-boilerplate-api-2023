@@ -15,7 +15,7 @@ describe("CharacterWeight.ts", () => {
   let inventoryContainer: IItemContainer;
   let characterDeath: CharacterDeath;
   let testNPC: INPC;
-  let mockSendEventToUser = jest.fn();
+  const mockSendEventToUser = jest.fn();
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
