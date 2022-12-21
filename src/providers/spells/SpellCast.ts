@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterBonusPenalties } from "@providers/character/CharacterBonusPenalties";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -8,7 +9,7 @@ import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/It
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import { BasicAttribute, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { spellsBlueprints } from "./data/blueprints/index";
 
@@ -19,7 +20,8 @@ export class SpellCast {
     private characterValidation: CharacterValidation,
     private animationEffect: AnimationEffect,
     private characterItems: CharacterItems,
-    private skillIncrease: SkillIncrease
+    private skillIncrease: SkillIncrease,
+    private characterBonusPenalties: CharacterBonusPenalties
   ) {}
 
   public isSpellCasting(msg: string): boolean {
@@ -44,6 +46,8 @@ export class SpellCast {
     await this.sendPostSpellCastEvents(character, spell);
 
     await this.skillIncrease.increaseMagicSP(character, spell.manaCost);
+
+    await this.characterBonusPenalties.applyRaceBonusPenalties(character, BasicAttribute.Magic);
 
     return true;
   }
