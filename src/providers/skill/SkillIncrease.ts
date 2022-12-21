@@ -55,14 +55,19 @@ export class SkillIncrease {
     const weapon = await attacker.weapon;
 
     const increasedWeaponSP = this.increaseSP(skills, weapon?.subType || "None");
-    const increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
+
+    let increasedStrengthSP;
+    if (weapon?.subType !== ItemSubType.Magic) {
+      increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
+    }
+
     await this.updateSkills(skills, attacker);
 
     await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weapon?.subType || "None");
     await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, BasicAttribute.Strength);
 
     // If character strength skill level increased, send level up event
-    if (increasedStrengthSP.skillLevelUp && attacker.channelId) {
+    if (increasedStrengthSP && increasedStrengthSP.skillLevelUp && attacker.channelId) {
       await this.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
     }
 

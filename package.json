@@ -6,7 +6,7 @@
   "scripts": {
     "tsc": "tsc -p . --pretty --skipLibCheck --noEmit",
     "test": "yarn jest test",
-    "test:ci": "yarn jest test --maxWorkers=4 --maxConcurrency=4",
+    "test:ci": "yarn jest test --maxWorkers=4 --maxConcurrency=4 --forceExit",
     "test:debug": "jest test --detectOpenHandles --maxWorkers=4 --maxConcurrency=4 --max-old-space-size=20096",
     "test:coverage": "yarn jest  --coverage --maxWorkers=4 --maxConcurrency=4 --forceExit",
     "test:config": "yarn jest --showConfig test",
@@ -67,7 +67,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
-    "@rpg-engine/shared": "^0.6.7",
+    "@rpg-engine/shared": "^0.6.8",
     "@rpg-engine/soul": "^0.1.16",
     "@shelf/jest-mongodb": "^2.2.1",
     "@swc/core": "^1.3.20",

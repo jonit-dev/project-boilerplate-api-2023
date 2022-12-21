@@ -5,13 +5,17 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+
 import {
   AnimationEffectKeys,
   BattleSocketEvents,
+  CharacterSocketEvents,
   IBattleRangedAttackFailed,
+  ICharacterAttributeChanged,
   IEquipmentAndInventoryUpdatePayload,
   ItemSlotType,
   ItemSubType,
@@ -71,7 +75,7 @@ export class BattleRangedAttack {
         throw new Error(`equipment not found for character ${character.id}`);
       }
 
-      rangedAttackParams = await this.getAmmoForRangedAttack((await character.weapon) as unknown as IItem, equipment);
+      rangedAttackParams = await this.getAmmoForRangedAttack(character, equipment);
       if (!rangedAttackParams) {
         this.sendNoAmmoEvent(character, target);
         return;
@@ -171,11 +175,30 @@ export class BattleRangedAttack {
     }
   }
 
-  private async getAmmoForRangedAttack(weapon: IItem, equipment: IEquipment): Promise<IRangedAttackParams | undefined> {
+  private async getAmmoForRangedAttack(
+    character: ICharacter,
+    equipment: IEquipment
+  ): Promise<IRangedAttackParams | undefined> {
+    const weapon = (await character.weapon) as unknown as IItem;
+
     let result: IRangedAttackParams | undefined;
     // Get ranged attack weapons (bow or spear)
-
     if (weapon.rangeType === EntityAttackType.Ranged) {
+      if (weapon.subType === ItemSubType.Magic) {
+        if (character.mana < this.getRequiredManaForAttack(weapon)) {
+          return result;
+        }
+
+        const blueprint = itemsBlueprintIndex[weapon.key];
+        return {
+          location: ItemSlotType.LeftHand,
+          id: weapon.id,
+          key: blueprint?.projectileAnimationKey,
+          maxRange: weapon.maxRange || 0,
+          equipment,
+        };
+      }
+
       if (!weapon.requiredAmmoKeys || !weapon.requiredAmmoKeys.length) {
         return result;
       }
@@ -187,7 +210,13 @@ export class BattleRangedAttack {
       }
     }
     if (weapon.subType === "Spear") {
-      result = { location: "hand", id: weapon.id, key: weapon.key, maxRange: weapon.maxRange || 0, equipment };
+      result = {
+        location: ItemSlotType.LeftHand,
+        id: weapon.id,
+        key: weapon.key,
+        maxRange: weapon.maxRange || 0,
+        equipment,
+      };
     }
 
     return result;
@@ -215,7 +244,8 @@ export class BattleRangedAttack {
   public async consumeAmmo(attackParams: IRangedAttackParams, character: ICharacter): Promise<void> {
     const equipment = attackParams.equipment!;
 
-    let wasStackReduced = false;
+    let deleteItem = true;
+    let consumedMana = false;
 
     switch (attackParams.location) {
       case ItemSlotType.Accessory:
@@ -227,7 +257,7 @@ export class BattleRangedAttack {
 
         // if item stackQty > 1, just decrease stackQty by 1
         if (accessory.stackQty && accessory.stackQty > 1) {
-          wasStackReduced = true;
+          deleteItem = false;
 
           accessory.stackQty -= 1;
           await accessory.save();
@@ -238,31 +268,51 @@ export class BattleRangedAttack {
         }
 
         break;
-      case "hand":
-        // Spear item is held in hand
-        // Check which hand and remove the item
-        const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
-        rightHandItem?.subType === ItemSubType.Spear
-          ? (equipment.rightHand = undefined)
-          : (equipment.leftHand = undefined);
-        await equipment.save();
+      case ItemSlotType.LeftHand:
+        const item = equipment.rightHand ?? equipment.leftHand;
+        const handItem = await Item.findById(item);
+
+        if (handItem?.subType === ItemSubType.Magic) {
+          deleteItem = false;
+          consumedMana = true;
+          character.mana = character.mana - this.getRequiredManaForAttack(handItem);
+          await character.save();
+        } else if (handItem?.subType === ItemSubType.Spear) {
+          if (equipment.rightHand) {
+            equipment.rightHand = undefined;
+          } else {
+            equipment.leftHand = undefined;
+          }
+          await equipment.save();
+        }
+
         break;
       default:
         throw new Error("Invalid ammo location");
     }
-    if (!wasStackReduced) {
+
+    if (deleteItem) {
       await Item.deleteOne({ _id: attackParams.id });
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    if (!consumedMana) {
+      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
 
-    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-      equipment: equipmentSlots,
-      openEquipmentSetOnUpdate: false,
-      openInventoryOnUpdate: false,
-    };
+      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+        equipment: equipmentSlots,
+        openEquipmentSetOnUpdate: false,
+        openInventoryOnUpdate: false,
+      };
 
-    this.equipmentEquip.updateItemInventoryCharacter(payloadUpdate, character);
+      this.equipmentEquip.updateItemInventoryCharacter(payloadUpdate, character);
+    } else {
+      const payload: ICharacterAttributeChanged = {
+        targetId: character._id,
+        mana: character.mana,
+      };
+
+      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+    }
   }
 
   private async solidInTrajectory(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -281,5 +331,9 @@ export class BattleRangedAttack {
       }
     }
     return false;
+  }
+
+  private getRequiredManaForAttack(weapon: IItem): number {
+    return Math.round(weapon.attack! / 2);
   }
 }

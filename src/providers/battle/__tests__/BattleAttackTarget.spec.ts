@@ -1,7 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { BattleEventType, FromGridX, FromGridY } from "@rpg-engine/shared";
+import { StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { BasicAttribute, BattleEventType, FromGridX, FromGridY } from "@rpg-engine/shared";
 import { BattleAttackTarget } from "../BattleAttackTarget";
 
 jest.mock("../../entityEffects/EntityEffectCycle.ts", () => ({
@@ -206,6 +208,33 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
     await battleAttackTarget.hitTarget(attackerCharacter, targetCharacter);
 
     expect(targetCharacter.health).toBe(targetCharacter.maxHealth);
+  });
+
+  describe("magic staff ranged attack", () => {
+    beforeEach(async () => {
+      const characterEquipment = (await Equipment.findById(attackerCharacter.equipment)
+        .populate("inventory")
+        .exec()) as IEquipment;
+      const res = await unitTestHelper.createMockItemFromBlueprint(StaffsBlueprint.FireStaff);
+      characterEquipment!.rightHand = res.id;
+
+      await characterEquipment!.save();
+    });
+
+    it("when battle event is a hit, it should increase target magic resistance", async () => {
+      // @ts-ignore
+      jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
+      // @ts-ignore
+      jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
+
+      // @ts-ignore
+      const increaseSkillsOnBattle = jest.spyOn(battleAttackTarget.skillIncrease, "increaseBasicAttributeSP" as any);
+
+      // @ts-ignore
+      await battleAttackTarget.hitTarget(attackerCharacter, targetCharacter);
+
+      expect(increaseSkillsOnBattle).toHaveBeenCalledWith(targetCharacter, BasicAttribute.MagicResistance);
+    });
   });
 
   afterAll(async () => {

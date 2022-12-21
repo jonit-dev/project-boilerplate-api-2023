@@ -41,6 +41,10 @@ export interface IMagicItemUseWithEntity extends IItem {
   minMagicLevelRequired: number;
 }
 
+export interface IMagicStaff extends IItem {
+  projectileAnimationKey: string;
+}
+
 export interface IUseWithTargetTile {
   x: number;
   y: number;
