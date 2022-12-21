@@ -23,10 +23,12 @@ import {
   ItemSocketEvents,
   NPCAlignment,
   UseWithSocketEvents,
+  BasicAttribute,
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { IMagicItemUseWithEntity } from "./useWithTypes";
+import { CharacterBonusPenalties } from "@providers/character/CharacterBonusPenalties";
 
 const StaticEntity = "Item"; // <--- should be added to the EntityType enum from @rpg-engine/shared
 
@@ -42,7 +44,8 @@ export class UseWithEntity {
     private characterWeight: CharacterWeight,
     private animationEffect: AnimationEffect,
     private characterItemContainer: CharacterItemContainer,
-    private skillIncrease: SkillIncrease
+    private skillIncrease: SkillIncrease,
+    private characterBonusPenalties: CharacterBonusPenalties
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -177,6 +180,8 @@ export class UseWithEntity {
 
     if (target.type === EntityType.Character) {
       await this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, blueprint.power);
+
+      await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, BasicAttribute.MagicResistance);
     }
   }
 
