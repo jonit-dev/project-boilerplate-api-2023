@@ -17,8 +17,10 @@ import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { container, mapLoader } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { MapLoader } from "@providers/map/MapLoader";
+import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
+import { NPCCycle } from "@providers/npc/NPCCycle";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import { characterMock } from "@providers/unitTests/mock/characterMock";
 import {
   fixedPathMockNPC,
   moveAwayMockNPC,
@@ -26,6 +28,7 @@ import {
   randomMovementMockNPC,
   stoppedMovementMockNPC,
 } from "@providers/unitTests/mock/NPCMock";
+import { characterMock } from "@providers/unitTests/mock/characterMock";
 import { ISocketTransmissionZone, NPCMovementType, PeriodOfDay, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
@@ -637,6 +640,7 @@ export class UnitTestHelper {
 
   public async beforeAllJestHook(): Promise<void> {
     this.mongoServer = await MongoMemoryServer.create();
+
     await mongoose.connect(this.mongoServer.getUri(), {
       dbName: "test-database",
       useNewUrlParser: true,
@@ -652,10 +656,22 @@ export class UnitTestHelper {
   }
 
   public async afterAllJestHook(): Promise<void> {
+    jest.clearAllTimers();
+
     await mongoose.connection.dropDatabase();
     await mongoose.connection.close();
-    if (this.mongoServer) {
-      await this.mongoServer.stop();
-    }
+
+    await this.mongoServer.stop({
+      doCleanup: true,
+      force: true,
+    });
+
+    container.unload();
+
+    await mongoose.disconnect();
+
+    MapLoader.maps.clear();
+    NPCBattleCycle.npcBattleCycles.clear();
+    NPCCycle.npcCycles.clear();
   }
 }

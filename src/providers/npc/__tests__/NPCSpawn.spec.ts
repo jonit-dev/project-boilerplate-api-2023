@@ -3,10 +3,10 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { unitTestHelper } from "@providers/inversify/container";
 import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
-import { NPCTarget } from "../movement/NPCTarget";
 import { NPCSpawn } from "../NPCSpawn";
 import { NPCView } from "../NPCView";
 import { NPCWarn } from "../NPCWarn";
+import { NPCTarget } from "../movement/NPCTarget";
 
 describe("NPCSpawn", () => {
   let npc: INPC;
@@ -70,7 +70,6 @@ describe("NPCSpawn", () => {
   });
 
   it("should returns false when the nearest character is within 20 grid units of the NPC's initial position", async () => {
-    console.log(npc.initialX);
     const nearestCharacter = { x: npc.initialX, y: npc.initialY + GRID_WIDTH * 19 };
     // @ts-ignore
     characterView.getNearestCharactersFromXYPoint.mockReturnValueOnce(nearestCharacter);
