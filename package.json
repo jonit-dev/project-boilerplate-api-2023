@@ -10,6 +10,7 @@
     "test:debug": "yarn jest test --detectOpenHandles",
     "test:coverage": "yarn jest --silent --coverage --maxWorkers=4 --maxConcurrency=4 --forceExit",
     "test:config": "yarn jest --showConfig test",
+    "test:debug:inspect": "node --inspect-brk --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage",
     "dev": "yarn install && ts-node-dev --transpile-only --inspect=0.0.0.0:9229 --trace-deprecation --respawn -r tsconfig-paths/register ./src/server.ts",
     "build": "tsc -p .",
     "update:shared-deps": "yarn add @rpg-engine/shared",
