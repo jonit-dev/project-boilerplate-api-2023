@@ -4,17 +4,16 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { DepotSocketEvents, IItemContainerRead, ItemContainerType, ItemSocketEvents } from "@rpg-engine/shared";
+import {
+  DepotSocketEvents,
+  IItemContainerRead,
+  ItemContainerType,
+  ItemSocketEvents,
+  IDepotDepositItem,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { DepositItem } from "../DepositItem";
 import { DepotSystem } from "../DepotSystem";
-
-// TODO pasar a shared
-export interface IDepotDepositItem {
-  itemId: string;
-  npcId: string;
-  fromContainerId?: string;
-}
 
 @provide(DepotNetworkDeposit)
 export class DepotNetworkDeposit {

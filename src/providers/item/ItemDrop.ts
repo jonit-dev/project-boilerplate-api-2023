@@ -5,9 +5,16 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
-import { MovementHelper } from "@providers/movement/MovementHelper";
+import { MovementHelper, IPosition } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentAndInventoryUpdatePayload, IItemContainer, IItemDrop, ItemSocketEvents } from "@rpg-engine/shared";
+import {
+  IEquipmentAndInventoryUpdatePayload,
+  IItemContainer,
+  IItemDrop,
+  ItemSocketEvents,
+  FromGridX,
+  FromGridY,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
 import { ItemOwnership } from "./ItemOwnership";
@@ -258,6 +265,15 @@ export class ItemDrop {
     }
 
     return true;
+  }
+
+  public async dropItems(items: IItem[], droppintPoints: IPosition[], scene: string): Promise<void> {
+    for (const i in droppintPoints) {
+      items[i].x = FromGridX(droppintPoints[i].x);
+      items[i].y = FromGridY(droppintPoints[i].y);
+      items[i].scene = scene;
+      await items[i].save();
+    }
   }
 
   private sendRefreshItemsEvent(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {

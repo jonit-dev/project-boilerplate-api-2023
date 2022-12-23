@@ -2460,9 +2460,9 @@
     picomatch "^2.3.1"
 
 "@rpg-engine/shared@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.6.1.tgz#658cb3c562c4a7984b91e73c0a27086c1dac8b52"
-  integrity sha512-XVi9gkbX6YuvSjjB77XNzYnKYM6X2d3K9gxkMnxdccIpp/rUMLPYGllc1H8MZO+LnJV0dqyODABH1K6py223BA==
+  version "0.6.9"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.6.9.tgz#6d71a6efb525206a70994759aa7860a5c0e65d51"
+  integrity sha512-DVuIykRTVBB1Eo1BxFaoqxXFuDqDbaYL+2x3NVW/smGWAOnUSxrheE9RiIaQi4/rWZ3s0ZTiYdJAj+JS9nH9uw==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
