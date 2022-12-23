@@ -42,7 +42,7 @@ export class EntityEffectUse {
     target: ICharacter | INPC,
     attacker: INPC
   ): Promise<void> {
-    const n = random(0, 100);
+    const n = random(1, 100);
     if (n > entityEffect.probability) {
       return;
     }

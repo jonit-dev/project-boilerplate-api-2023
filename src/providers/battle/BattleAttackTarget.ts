@@ -16,6 +16,7 @@ import {
   GRID_WIDTH,
   IBattleCancelTargeting,
   IBattleEventFromServer,
+  ItemSubType,
   QuestType,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
@@ -191,7 +192,10 @@ export class BattleAttackTarget {
 
         // when target is Character, resistance SP increases
         if (target.type === "Character") {
-          await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance);
+          const weapon = await (attacker as ICharacter).weapon;
+          const attr =
+            weapon?.subType === ItemSubType.Magic ? BasicAttribute.MagicResistance : BasicAttribute.Resistance;
+          await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, attr);
 
           await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, BasicAttribute.Resistance);
         }
