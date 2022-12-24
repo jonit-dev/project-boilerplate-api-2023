@@ -7,7 +7,7 @@ import {
   PotionsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -15,6 +15,8 @@ export const npcSnake: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Snake",
   key: HostileNPCsBlueprint.Snake,
+  // eslint-disable-next-line no-undef
+  subType: NPCSubtype.Animal,
   textureKey: HostileNPCsBlueprint.Snake,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,

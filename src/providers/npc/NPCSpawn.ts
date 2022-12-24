@@ -26,6 +26,7 @@ export class NPCSpawn {
 
     npc.health = npc.maxHealth;
     npc.mana = npc.maxMana;
+    npc.appliedEntityEffects = [];
     await this.npcTarget.clearTarget(npc);
     npc.x = npc.initialX;
     npc.y = npc.initialY;

@@ -2459,10 +2459,10 @@
     estree-walker "^2.0.2"
     picomatch "^2.3.1"
 
-"@rpg-engine/shared@^0.6.1":
-  version "0.6.9"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.6.9.tgz#6d71a6efb525206a70994759aa7860a5c0e65d51"
-  integrity sha512-DVuIykRTVBB1Eo1BxFaoqxXFuDqDbaYL+2x3NVW/smGWAOnUSxrheE9RiIaQi4/rWZ3s0ZTiYdJAj+JS9nH9uw==
+"@rpg-engine/shared@^0.6.8":
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.6.8.tgz#01fbd6ac694eae47e78fee90408d16f71c828c96"
+  integrity sha512-Tu96h7JJWnZ3IEMsnzldNDrnzupoxM29aHdMONmuovZjrUZuJZChGpvfnAmhTEBQMpp0JZEl5A2swAre8KvOYg==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
@@ -2578,6 +2578,11 @@
     debug "4.3.2"
     mongodb-memory-server "7.6.3"
     uuid "8.3.2"
+
+"@side/jest-runtime@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@side/jest-runtime/-/jest-runtime-1.1.0.tgz#30c0d005231e887bb81ac2ab8611076b5e592bde"
+  integrity sha512-KikALXowNWyOxn/zdy4AUgkYq/1hASkOEEP0+bcCDv5L3KJNwDw8kmzBcx7sljnwV8yi2cLGzt9QH9EjwA9TKg==
 
 "@sinclair/typebox@^0.24.1":
   version "0.24.51"
@@ -6537,7 +6542,7 @@ jest-worker@^29.3.1:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
-jest@^29.0.0:
+jest@^29.3.1:
   version "29.3.1"
   resolved "https://registry.yarnpkg.com/jest/-/jest-29.3.1.tgz#c130c0d551ae6b5459b8963747fed392ddbde122"
   integrity sha512-6iWfL5DTT0Np6UYs/y5Niu7WIfNv/wRTtN5RSXt2DIEft3dx3zPuw/3WJQBCJfmEzvDiEKwoqMbGD9n49+qLSA==

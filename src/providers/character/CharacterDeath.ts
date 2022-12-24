@@ -3,9 +3,9 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -42,8 +42,10 @@ export class CharacterDeath {
     private skillDecrease: SkillDecrease
   ) {}
 
-  public async handleCharacterDeath(killer: INPC | ICharacter, character: ICharacter): Promise<void> {
-    await this.clearAttackerTarget(killer);
+  public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
+    if (killer) {
+      await this.clearAttackerTarget(killer);
+    }
 
     // send event to the character that is dead
     const dataOfCharacterDeath: IBattleDeath = {
@@ -93,6 +95,7 @@ export class CharacterDeath {
 
     const charBody = new Item({
       ...blueprintData,
+      bodyFromId: character.id,
       name: `${character.name}'s body`,
       scene: character.scene,
       texturePath: `${character.textureKey}/death/0.png`,
@@ -111,6 +114,8 @@ export class CharacterDeath {
     character.x = character.initialX;
     character.y = character.initialY;
     character.scene = character.initialScene;
+    character.appliedEntityEffects = [];
+
     await character.save();
   }
 

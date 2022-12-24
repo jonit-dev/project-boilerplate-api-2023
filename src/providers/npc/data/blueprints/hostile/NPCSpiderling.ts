@@ -3,13 +3,14 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { FoodsBlueprint, GlovesBlueprint, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 export const npcSpiderling: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Spiderling",
+  subType: NPCSubtype.Insect,
   key: HostileNPCsBlueprint.Spiderling,
   textureKey: HostileNPCsBlueprint.Spiderling,
   alignment: NPCAlignment.Hostile,

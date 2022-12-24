@@ -6,6 +6,7 @@ const config: Config.InitialOptions = {
   transform: {
     "^.+\\.(t|j)sx?$": "@swc/jest",
   },
+  runtime: "@side/jest-runtime",
   testEnvironment: "node",
   setupFiles: ["dotenv/config", "./jestInitialSetup.ts"],
   modulePathIgnorePatterns: ["dist", "__tests__/mock"],
@@ -17,6 +18,12 @@ const config: Config.InitialOptions = {
     "^@data/(.*)$": "<rootDir>/src/providers/data/$1",
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
+  transformIgnorePatterns: ["/node_modules/"],
+  cache: true,
+  testPathIgnorePatterns: ["/node_modules/", "/__tests__/mock/"],
+  workerIdleMemoryLimit: "1700MB",
+  silent: true,
+  logHeapUsage: true,
 };
 
 export default config;

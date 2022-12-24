@@ -22,6 +22,7 @@ import { spellBoltCreation } from "../data/blueprints/SpellBoltCreation";
 import { spellDarkRuneCreation } from "../data/blueprints/SpellDarkRuneCreation";
 import { spellFireRuneCreation } from "../data/blueprints/SpellFireRuneCreation";
 import { spellFoodCreation } from "../data/blueprints/SpellFoodCreation";
+import { spellGreaterHealing } from "../data/blueprints/SpellGreaterHealing";
 import { spellHealRuneCreation } from "../data/blueprints/SpellHealRuneCreation";
 import { spellPoisonRuneCreation } from "../data/blueprints/SpellPoisonRuneCreation";
 import { spellSelfHaste } from "../data/blueprints/SpellSelfHaste";
@@ -37,6 +38,9 @@ describe("SpellCast.ts", () => {
   let characterSkills: ISkill;
   let sendEventToUser: jest.SpyInstance;
   let level2Spells: Partial<ISpell>[] = [];
+  let level3Spells: Partial<ISpell>[] = [];
+  let level4Spells: Partial<ISpell>[] = [];
+  let level5Spells: Partial<ISpell>[] = [];
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -44,17 +48,10 @@ describe("SpellCast.ts", () => {
     spellCast = container.get<SpellCast>(SpellCast);
     spellLearn = container.get<SpellLearn>(SpellLearn);
 
-    level2Spells = [
-      spellSelfHealing,
-      spellFoodCreation,
-      spellArrowCreation,
-      spellBoltCreation,
-      spellBlankRuneCreation,
-      spellFireRuneCreation,
-      spellHealRuneCreation,
-      spellDarkRuneCreation,
-      spellPoisonRuneCreation,
-    ];
+    level2Spells = [spellSelfHealing, spellArrowCreation, spellBlankRuneCreation];
+    level3Spells = [spellBoltCreation, spellFoodCreation];
+    level4Spells = [spellDarkRuneCreation, spellFireRuneCreation, spellHealRuneCreation, spellGreaterHealing];
+    level5Spells = [spellPoisonRuneCreation, spellSelfHaste];
   });
 
   beforeEach(async () => {
@@ -62,7 +59,7 @@ describe("SpellCast.ts", () => {
 
     testCharacter = await (
       await unitTestHelper.createMockCharacter(
-        { health: 50, learnedSpells: [spellSelfHealing.key] },
+        { health: 50, learnedSpells: [spellSelfHealing.key, spellGreaterHealing.key] },
         { hasEquipment: false, hasInventory: false, hasSkills: true }
       )
     )
@@ -218,6 +215,53 @@ describe("SpellCast.ts", () => {
     });
   });
 
+  it("should cast Greater Healing spell successfully", async () => {
+    testCharacter = await unitTestHelper.createMockCharacter(
+      { health: 50, learnedSpells: [spellGreaterHealing.key] },
+      { hasEquipment: true, hasInventory: true, hasSkills: true }
+    );
+
+    const newHealth = testCharacter.health + 45;
+    const newMana = testCharacter.mana - spellGreaterHealing.manaCost!;
+
+    await testCharacter.populate("skills").execPopulate();
+
+    characterSkills = testCharacter.skills as unknown as ISkill;
+    characterSkills.level = spellGreaterHealing.minLevelRequired!;
+    characterSkills.magic.level = spellGreaterHealing.minMagicLevelRequired;
+    await characterSkills.save();
+
+    expect(await spellCast.castSpell("greater faenya", testCharacter)).toBeTruthy();
+
+    const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
+    expect(character.health).toBe(newHealth);
+    expect(character.mana).toBe(newMana);
+
+    /**
+     * 1. health changed event
+     * 2. life heal animation event
+     * 3. skill update event
+     */
+    expect(sendEventToUser).toBeCalledTimes(5);
+
+    expect(sendEventToUser).toHaveBeenNthCalledWith(
+      1,
+      testCharacter.channelId,
+      CharacterSocketEvents.AttributeChanged,
+      {
+        targetId: testCharacter._id,
+        health: newHealth,
+        mana: newMana,
+        speed: character.speed,
+      }
+    );
+
+    expect(sendEventToUser).toHaveBeenNthCalledWith(4, testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
+      targetId: testCharacter._id,
+      effectKey: spellSelfHealing.animationKey,
+    });
+  });
+
   it("should call skill increase functionality to increase character skills", async () => {
     const increaseSPMock = jest.spyOn(SkillIncrease.prototype, "increaseMagicSP");
     increaseSPMock.mockImplementation();
@@ -324,7 +368,7 @@ describe("SpellCast.ts", () => {
       expect([...character.learnedSpells!]).toEqual(level2Spells.map((spell) => spell.key));
     };
 
-    testCharacter.learnedSpells = [spellSelfHealing.key!, spellFoodCreation.key!];
+    testCharacter.learnedSpells = [spellSelfHealing.key!, spellArrowCreation.key!, spellBlankRuneCreation.key!];
     await testCharacter.save();
     await runTest();
   });
@@ -358,7 +402,10 @@ describe("SpellCast.ts", () => {
     beforeEach(async () => {
       testCharacter = await (
         await unitTestHelper.createMockCharacter(
-          { health: 50, learnedSpells: level2Spells.map((spell) => spell.key) },
+          {
+            health: 50,
+            learnedSpells: level2Spells.concat(level3Spells, level4Spells, level5Spells).map((spell) => spell.key),
+          },
           { hasEquipment: true, hasInventory: true, hasSkills: true }
         )
       )

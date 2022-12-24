@@ -1,10 +1,10 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EntryEffectBlueprint } from "@providers/entities/data/types/entryEffectBlueprintTypes";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { FoodsBlueprint, OthersBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -12,6 +12,7 @@ export const npcScorpion: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Scorpion",
   key: HostileNPCsBlueprint.Scorpion,
+  subType: NPCSubtype.Insect,
   textureKey: HostileNPCsBlueprint.Scorpion,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
@@ -47,5 +48,5 @@ export const npcScorpion: Partial<INPC> = {
       chance: 20,
     },
   ],
-  entityEffects: [EntryEffectBlueprint.Poison],
+  entityEffects: [EntityEffectBlueprint.Poison],
 };

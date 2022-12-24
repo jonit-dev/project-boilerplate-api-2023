@@ -11,7 +11,7 @@ import {
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -19,6 +19,7 @@ export const npcElderGolem: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Elder Golem",
   key: HostileNPCsBlueprint.ElderGolem,
+  subType: NPCSubtype.Elemental,
   textureKey: HostileNPCsBlueprint.ElderGolem,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,

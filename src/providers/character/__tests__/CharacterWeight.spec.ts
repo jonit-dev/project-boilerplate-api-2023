@@ -4,6 +4,8 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterSocketEvents } from "@rpg-engine/shared";
 import { CharacterDeath } from "../CharacterDeath";
 import { CharacterWeight } from "../CharacterWeight";
 
@@ -13,14 +15,17 @@ describe("CharacterWeight.ts", () => {
   let inventoryContainer: IItemContainer;
   let characterDeath: CharacterDeath;
   let testNPC: INPC;
+  const mockSendEventToUser = jest.fn();
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
+    jest.spyOn(SocketMessaging.prototype, "sendEventToUser").mockImplementation(mockSendEventToUser);
   });
 
   beforeEach(async () => {
+    mockSendEventToUser.mockReset();
     await unitTestHelper.beforeEachJestHook(true);
 
     testCharacter = await (
@@ -131,6 +136,11 @@ describe("CharacterWeight.ts", () => {
     await characterWeight.updateCharacterWeight(testCharacter);
     const beforeAddArmor = await Character.findOne(testCharacter._id).lean();
     expect(beforeAddArmor?.weight).toBe(3);
+    expect(mockSendEventToUser).toBeCalledTimes(1);
+    expect(mockSendEventToUser).toBeCalledWith(beforeAddArmor?.channelId, CharacterSocketEvents.AttributeChanged, {
+      speed: testCharacter.speed,
+      targetId: testCharacter._id,
+    });
 
     await unitTestHelper.createMockAndEquipItens(testCharacter);
     await characterWeight.updateCharacterWeight(testCharacter);

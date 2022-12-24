@@ -18,7 +18,7 @@ export const spellSelfHaste: Partial<ISpell> = {
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas hiz",
   manaCost: 40,
-  minLevelRequired: 4,
+  minLevelRequired: 5,
   minMagicLevelRequired: 5,
   animationKey: AnimationEffectKeys.LevelUp,
 

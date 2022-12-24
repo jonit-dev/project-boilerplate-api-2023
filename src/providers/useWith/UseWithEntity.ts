@@ -2,31 +2,35 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   CharacterSocketEvents,
   ICharacterAttributeChanged,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
-  ItemSocketEvents,
   IUseWithEntity,
+  ItemSocketEvents,
   NPCAlignment,
   UseWithSocketEvents,
+  BasicAttribute,
 } from "@rpg-engine/shared";
+import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { IMagicItemUseWithEntity } from "./useWithTypes";
-import { SkillIncrease } from "@providers/skill/SkillIncrease";
+import { CharacterBonusPenalties } from "@providers/character/CharacterBonusPenalties";
+
+const StaticEntity = "Item"; // <--- should be added to the EntityType enum from @rpg-engine/shared
 
 @provide(UseWithEntity)
 export class UseWithEntity {
@@ -40,7 +44,8 @@ export class UseWithEntity {
     private characterWeight: CharacterWeight,
     private animationEffect: AnimationEffect,
     private characterItemContainer: CharacterItemContainer,
-    private skillIncrease: SkillIncrease
+    private skillIncrease: SkillIncrease,
+    private characterBonusPenalties: CharacterBonusPenalties
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -59,7 +64,7 @@ export class UseWithEntity {
     const target = payload.entityId ? await this.getEntity(payload.entityId, payload.entityType) : null;
     const item = payload.itemId ? ((await Item.findById(payload.itemId)) as unknown as IItem) : null;
 
-    const isValid = await this.validateRequest(character, target, item);
+    const isValid = await this.validateRequest(character, target, item, payload.entityType);
     if (!isValid) {
       return;
     }
@@ -69,8 +74,9 @@ export class UseWithEntity {
 
   private async validateRequest(
     caster: ICharacter,
-    target: ICharacter | INPC | null,
-    item: IItem | null
+    target: ICharacter | INPC | IItem | null,
+    item: IItem | null,
+    targetType: EntityType | typeof StaticEntity
   ): Promise<boolean> {
     if (!target) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target was not found.");
@@ -83,7 +89,7 @@ export class UseWithEntity {
     }
 
     const blueprint = itemsBlueprintIndex[item.key];
-    if (!blueprint || !blueprint.power || !blueprint.usableEffect) {
+    if (!blueprint || !(!!blueprint.power || targetType === StaticEntity) || !blueprint.usableEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, `Sorry, '${item.name}' cannot be used with target.`);
       return false;
     }
@@ -92,11 +98,10 @@ export class UseWithEntity {
       return false;
     }
 
-    if (!target.isAlive) {
+    if ("isAlive" in target && !target.isAlive && targetType !== (StaticEntity as EntityType)) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is dead.");
       return false;
     }
-
     if (target.type === EntityType.Character) {
       const customMsg = new Map([
         ["not-online", "Sorry, your target is offline."],
@@ -106,7 +111,7 @@ export class UseWithEntity {
       if (!this.characterValidation.hasBasicValidation(target as ICharacter, customMsg)) {
         return false;
       }
-    } else if ((target as INPC).alignment !== NPCAlignment.Hostile) {
+    } else if ((target as INPC).alignment !== NPCAlignment.Hostile && targetType !== StaticEntity) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is not valid.");
       return false;
     }
@@ -119,8 +124,8 @@ export class UseWithEntity {
     const isUnderRange = this.movementHelper.isUnderRange(
       caster.x,
       caster.y,
-      target.x,
-      target.y,
+      target.x!,
+      target.y!,
       blueprint.useWithMaxDistanceGrid
     );
     if (!isUnderRange) {
@@ -147,21 +152,36 @@ export class UseWithEntity {
     return true;
   }
 
-  private async executeEffect(caster: ICharacter, target: ICharacter | INPC, item: IItem): Promise<void> {
+  private async executeEffect(caster: ICharacter, target: ICharacter | INPC | IItem, item: IItem): Promise<void> {
     const blueprint = itemsBlueprintIndex[item.key];
 
     await blueprint.usableEffect(caster, target);
     await target.save();
 
-    await this.characterItemInventory.decrementItemFromInventory(item.key, caster, 1);
+    // handle static item case
+    if ("isUsable" in target) {
+      if (target.isUsable) {
+        await this.characterItemInventory.decrementItemFromInventory(item.key, caster, 1);
+      }
+    } else {
+      await this.characterItemInventory.decrementItemFromInventory(item.key, caster, 1);
+    }
     await this.characterWeight.updateCharacterWeight(caster);
 
     await this.sendRefreshItemsEvent(caster);
-    await this.sendTargetUpdateEvents(caster, target);
-    await this.sendAnimationEvents(caster, target, blueprint as IMagicItemUseWithEntity);
+
+    if (blueprint.projectileAnimationKey) {
+      await this.sendAnimationEvents(caster, target, blueprint as IMagicItemUseWithEntity);
+    }
+
+    if (target.type !== StaticEntity) {
+      await this.sendTargetUpdateEvents(caster, target as ICharacter | INPC);
+    }
 
     if (target.type === EntityType.Character) {
       await this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, blueprint.power);
+
+      await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, BasicAttribute.MagicResistance);
     }
   }
 
@@ -200,7 +220,7 @@ export class UseWithEntity {
 
   private async sendAnimationEvents(
     caster: ICharacter,
-    target: ICharacter | INPC,
+    target: ICharacter | INPC | IItem,
     item: IMagicItemUseWithEntity
   ): Promise<void> {
     await this.animationEffect.sendProjectileAnimationEventToCharacter(
@@ -212,11 +232,19 @@ export class UseWithEntity {
     );
   }
 
-  private async getEntity(entityId: string, entityType: EntityType): Promise<ICharacter | INPC> {
-    if (entityType === EntityType.Character) {
-      return (await Character.findById(entityId)) as unknown as ICharacter;
-    } else {
-      return (await NPC.findById(entityId)) as unknown as INPC;
+  private async getEntity(entityId: string, entityType: EntityType): Promise<ICharacter | INPC | IItem | null> {
+    switch (entityType) {
+      case EntityType.Character:
+        return (await Character.findById(entityId)) as unknown as ICharacter;
+
+      case EntityType.NPC:
+        return (await NPC.findById(entityId)) as unknown as INPC;
+
+      case StaticEntity as EntityType:
+        return (await Item.findById(entityId)) as unknown as IItem;
+
+      default:
+        return null;
     }
   }
 }

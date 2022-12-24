@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+
 import {
   AccessoriesBlueprint,
   DaggersBlueprint,
@@ -13,7 +14,7 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -22,6 +23,8 @@ export const npcAssaultSpider: Partial<INPC> = {
   name: "Assault Spider",
   key: HostileNPCsBlueprint.AssaultSpider,
   textureKey: HostileNPCsBlueprint.AssaultSpider,
+  subType: NPCSubtype.Insect,
+
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,

@@ -1,26 +1,17 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { appEnv } from "@providers/config/env";
-import {
-  EnvType,
-  NPCAlignment,
-  NPCMovementType,
-  NPCPathOrientation,
-  SocketTypes,
-  ToGridX,
-  ToGridY,
-} from "@rpg-engine/shared";
+import { NPCAlignment, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { NPCCycle } from "./NPCCycle";
+import { NPCLoader } from "./NPCLoader";
+import { NPCView } from "./NPCView";
 import { NPCMovement } from "./movement/NPCMovement";
 import { NPCMovementFixedPath } from "./movement/NPCMovementFixedPath";
 import { NPCMovementMoveAway } from "./movement/NPCMovementMoveAway";
 import { NPCMovementMoveTowards } from "./movement/NPCMovementMoveTowards";
 import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCMovementStopped } from "./movement/NPCMovementStopped";
-import { NPCCycle } from "./NPCCycle";
-import { NPCLoader } from "./NPCLoader";
-import { NPCView } from "./NPCView";
 
 @provide(NPCManager)
 export class NPCManager {
@@ -45,21 +36,7 @@ export class NPCManager {
         continue;
       }
 
-      switch (appEnv.general.ENV) {
-        case EnvType.Development: // on development, start all NPCs at once.
-          this.startBehaviorLoop(npc);
-
-          break;
-
-        case EnvType.Production: // on production, spread NPCs over pm2 instances.
-          switch (appEnv.socket.type) {
-            case SocketTypes.TCP: // PM2 support is available only on socket.io
-              if (process.env.NODE_APP_INSTANCE === npc.pm2InstanceManager.toString()) {
-                this.startBehaviorLoop(npc);
-              }
-              break;
-          }
-      }
+      this.startBehaviorLoop(npc);
     }
   }
 

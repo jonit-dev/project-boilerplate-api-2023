@@ -145,7 +145,7 @@ describe("ItemUse.ts", () => {
   it("should send an inventory update socket event", async () => {
     await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
 
-    expect(sendEventToUser).toBeCalledTimes(1);
+    expect(sendEventToUser).toBeCalledTimes(2);
 
     const inventoryContainer = await getInventoryContainer();
 
