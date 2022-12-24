@@ -17,9 +17,9 @@ import {
   IIncreaseXPResult,
   ISkillDetails,
   ISkillEventFromServer,
+  SKILLS_MAP,
   SkillEventType,
   SkillSocketEvents,
-  SKILLS_MAP,
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -354,7 +354,7 @@ export class SkillIncrease {
     await skills.save();
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills,
+      skill: skills.toObject(),
     });
   }
 
