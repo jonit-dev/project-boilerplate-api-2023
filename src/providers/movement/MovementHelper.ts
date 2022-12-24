@@ -11,6 +11,8 @@ import {
   FromGridY,
   GRID_WIDTH,
   MapLayers,
+  ToGridX,
+  ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 export interface IPosition {
@@ -156,5 +158,28 @@ export class MovementHelper {
       case "right":
         return "left";
     }
+  }
+
+  /**
+   * Get nearby grid points that are free (not solid or with items)
+   * @param character character from which nearby grid points will be searched
+   * @param pointsAmount amount of grid points to return
+   */
+  public async getNearbyGridPoints(character: ICharacter, pointsAmount: number): Promise<IPosition[]> {
+    const result: IPosition[] = [];
+    const circundatingPoints = this.mathHelper.getCircundatingGridPoints(
+      { x: ToGridX(character.x), y: ToGridY(character.y) },
+      2
+    );
+    for (const point of circundatingPoints) {
+      const isSolid = await this.isSolid(character.scene, point.x, point.y, character.layer);
+      if (!isSolid) {
+        result.push(point);
+      }
+      if (result.length === pointsAmount) {
+        break;
+      }
+    }
+    return result;
   }
 }
