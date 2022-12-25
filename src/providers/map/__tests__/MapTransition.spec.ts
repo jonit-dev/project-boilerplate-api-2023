@@ -58,13 +58,6 @@ describe("MapTransition", () => {
     // @ts-ignore
     expect(updatedCharacter.scene).toEqual(destination.map);
   });
-  it("should change the character's scene to the destination map", async () => {
-    const destination = { map: "map2", gridX: 0, gridY: 0 };
-    await mapTransition.changeCharacterScene(testCharacter, destination);
-    const updatedCharacter = await Character.findOne({ _id: testCharacter.id });
-    // @ts-ignore
-    expect(updatedCharacter.scene).toEqual(destination.map);
-  });
 
   it("should update the character's position to the destination grid position", async () => {
     testCharacter.scene = "map1";
@@ -105,32 +98,59 @@ describe("MapTransition", () => {
     );
   });
 
-  test("changeCharacterScene cancels character targeting if they have a target set", async () => {
-    testCharacter.scene = "oldScene";
-    testCharacter.x = 10;
-    testCharacter.y = 20;
+  // test("changeCharacterScene cancels character targeting if they have a target set", async () => {
+  //   testCharacter.scene = "oldScene";
+  //   testCharacter.x = 10;
+  //   testCharacter.y = 20;
+  //   // @ts-ignore
+  //   testCharacter.target = { id: testCharacter.id, type: EntityType.Character };
+  //   await testCharacter.save();
+
+  //   const destination = { map: "newScene", gridX: 15, gridY: 25 };
+  //   const updateOneMock = jest.fn().mockResolvedValue(null);
+  //   Character.updateOne = updateOneMock;
+  //   const sendEventToUserMock = jest.fn().mockResolvedValue(null);
+  //   const stopTargetingMock = jest.fn().mockResolvedValue(null);
+  //   const mapTransition = new MapTransition(
+  //     // @ts-ignore
+  //     {}, // mock MapObjectsLoader
+  //     { sendEventToUser: sendEventToUserMock }, // mock SocketMessaging
+  //     { stopTargeting: stopTargetingMock } // mock BattleNetworkStopTargeting
+  //   );
+  //   // @ts-ignore
+  //   await mapTransition.changeCharacterScene(testCharacter, destination);
+  //   // @ts-ignore
+  //   expect(stopTargetingMock).toHaveBeenCalledWith(testCharacter);
+  //   expect(sendEventToUserMock).toHaveBeenCalledWith(testCharacter.channelId, BattleSocketEvents.CancelTargeting, {
+  //     targetId: testCharacter.target.id,
+  //     type: testCharacter.target.type,
+  //     reason: "Your battle target was lost.",
+  //   });
+  // });
+
+  it("changeCharacterScene cancels character targeting if they have a target set", async () => {
+    // Set up test character and destination
     // @ts-ignore
     testCharacter.target = { id: testCharacter.id, type: EntityType.Character };
     await testCharacter.save();
-
     const destination = { map: "newScene", gridX: 15, gridY: 25 };
-    const updateOneMock = jest.fn().mockResolvedValue(null);
-    Character.updateOne = updateOneMock;
+
+    // Mock functions
     const sendEventToUserMock = jest.fn().mockResolvedValue(null);
+    // @ts-ignore
+    mapTransition.socketMessaging.sendEventToUser = sendEventToUserMock;
     const stopTargetingMock = jest.fn().mockResolvedValue(null);
-    const mapTransition = new MapTransition(
-      // @ts-ignore
-      {}, // mock MapObjectsLoader
-      { sendEventToUser: sendEventToUserMock }, // mock SocketMessaging
-      { stopTargeting: stopTargetingMock } // mock BattleNetworkStopTargeting
-    );
     // @ts-ignore
+    mapTransition.battleNetworkStopTargeting.stopTargeting = stopTargetingMock;
+
+    // Call changeCharacterScene
     await mapTransition.changeCharacterScene(testCharacter, destination);
-    // @ts-ignore
+
+    // Assertions
     expect(stopTargetingMock).toHaveBeenCalledWith(testCharacter);
-    expect(sendEventToUserMock).toHaveBeenCalledWith(testCharacter.channelId, BattleSocketEvents.CancelTargeting, {
-      targetId: testCharacter.target.id,
-      type: testCharacter.target.type,
+    expect(sendEventToUserMock).toHaveBeenCalledWith(testCharacter.channelId!, BattleSocketEvents.CancelTargeting, {
+      targetId: testCharacter._id,
+      type: EntityType.Character,
       reason: "Your battle target was lost.",
     });
   });
@@ -203,26 +223,6 @@ describe("MapTransition", () => {
 
     // Assert that the character's target has been cleared
     expect(testCharacter.target).toEqual({});
-  });
-
-  test("teleport character to a different map", async () => {
-    testCharacter.scene = "map1";
-    const destination = {
-      map: "map2",
-      gridX: 5,
-      gridY: 5,
-    };
-    const updateOneMock = jest.fn().mockImplementation(() => {
-      throw new Error('Character Scene: "map1" and map to teleport: "map2" should be the same!');
-    });
-    Character.updateOne = updateOneMock;
-
-    // Act
-    // @ts-ignore
-    await mapTransition.teleportCharacter(testCharacter, destination);
-
-    // Assert
-    expect(updateOneMock).not.toBeCalled();
   });
 
   it("should return undefine if there are no transitions in the map", () => {

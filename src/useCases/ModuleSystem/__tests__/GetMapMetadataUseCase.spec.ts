@@ -11,10 +11,6 @@ describe("GetMapMetadataUseCase", () => {
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
-    // mapTiles = {
-    //   getMapLayers: jest.fn(() => ["Layer 1", "Layer 2"]),
-    // } as unknown as MapTiles;
-    // getMapMetadataUseCase = container.get<GetMapMetadataUseCase>(GetMapMetadataUseCase);
     mapTiles = {
       getMapLayers: jest.fn(() => ["Layer 1", "Layer 2"]),
     } as unknown as MapTiles;
