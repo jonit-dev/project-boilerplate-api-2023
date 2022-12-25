@@ -1,10 +1,27 @@
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { NPCExperience } from "../NPCExperience";
 
 describe("NPCExperience", () => {
+  let npcExperience: NPCExperience;
+  beforeAll(async () => {
+    await unitTestHelper.beforeAllJestHook();
+    npcExperience = container.get<NPCExperience>(NPCExperience);
+  });
+  beforeEach(async () => {
+    await unitTestHelper.beforeEachJestHook(true);
+  });
+  afterEach(() => {
+    jest.restoreAllMocks();
+    jest.clearAllTimers();
+  });
+
+  afterAll(async () => {
+    await unitTestHelper.afterAllJestHook();
+  });
+
   describe("calculateExperience", () => {
     it("should return the correct experience value for a given set of skills and base health", () => {
-      const npcExperience = new NPCExperience();
       const baseHealth = 50;
       const skills = {
         level: 5,

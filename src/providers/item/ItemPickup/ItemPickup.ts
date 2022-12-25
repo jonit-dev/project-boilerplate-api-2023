@@ -16,10 +16,10 @@ import { provide } from "inversify-binding-decorators";
 import { ItemOwnership } from "../ItemOwnership";
 
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
 import { ItemPickupMapContainer } from "./ItemPickupMapContainer";
 import { ItemPickupValidator } from "./ItemPickupValidator";
-import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(
@@ -152,10 +152,12 @@ export class ItemPickup {
   }
 
   private async sendContainerRead(itemContainer: IItemContainer, character: ICharacter): Promise<void> {
-    this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
-      itemContainer,
-      type: (await this.itemContainerHelper.getContainerType(itemContainer))!,
-    });
+    if (character && itemContainer) {
+      this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
+        itemContainer,
+        type: (await this.itemContainerHelper.getContainerType(itemContainer))!,
+      });
+    }
   }
 
   public getAllowedItemTypes(): ItemType[] {
