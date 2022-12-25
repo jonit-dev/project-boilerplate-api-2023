@@ -4,6 +4,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterBonusPenalties } from "@providers/character/CharacterBonusPenalties";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -16,9 +17,9 @@ import {
   IIncreaseXPResult,
   ISkillDetails,
   ISkillEventFromServer,
+  SKILLS_MAP,
   SkillEventType,
   SkillSocketEvents,
-  SKILLS_MAP,
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -30,7 +31,8 @@ export class SkillIncrease {
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
-    private spellLearn: SpellLearn
+    private spellLearn: SpellLearn,
+    private characterBonusPenalties: CharacterBonusPenalties
   ) {}
 
   /**
@@ -53,11 +55,19 @@ export class SkillIncrease {
     const weapon = await attacker.weapon;
 
     const increasedWeaponSP = this.increaseSP(skills, weapon?.subType || "None");
-    const increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
+
+    let increasedStrengthSP;
+    if (weapon?.subType !== ItemSubType.Magic) {
+      increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
+    }
+
     await this.updateSkills(skills, attacker);
 
+    await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weapon?.subType || "None");
+    await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, BasicAttribute.Strength);
+
     // If character strength skill level increased, send level up event
-    if (increasedStrengthSP.skillLevelUp && attacker.channelId) {
+    if (increasedStrengthSP && increasedStrengthSP.skillLevelUp && attacker.channelId) {
       await this.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
     }
 
@@ -97,6 +107,9 @@ export class SkillIncrease {
       if (result.skillLevelUp && character.channelId) {
         await this.sendSkillLevelUpEvents(result, character);
       }
+
+      await this.characterBonusPenalties.applyRaceBonusPenalties(character, rightHandItem!.subType);
+      await this.characterBonusPenalties.applyRaceBonusPenalties(character, leftHandItem!.subType);
     }
   }
 
@@ -297,6 +310,8 @@ export class SkillIncrease {
       skillName: skillToUpdate,
       skillLevel: updatedSkillDetails.level,
       skillLevelUp,
+      skillPoints: updatedSkillDetails.skillPoints,
+      skillPointsToNextLevel: updatedSkillDetails.skillPointsToNextLevel,
     };
   }
 
@@ -339,7 +354,7 @@ export class SkillIncrease {
     await skills.save();
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills,
+      skill: skills.toObject(),
     });
   }
 

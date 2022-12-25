@@ -30,114 +30,106 @@ export class MapTransition {
   ) {}
 
   public async changeCharacterScene(character: ICharacter, destination: TransitionDestination): Promise<void> {
-    try {
-      // fetch destination properties
-      // change character map
-      await Character.updateOne(
-        { _id: character._id },
-        {
-          $set: {
-            scene: destination.map,
-            x: FromGridX(destination.gridX),
-            y: FromGridX(destination.gridY),
-          },
-        }
+    // fetch destination properties
+    // change character map
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        $set: {
+          scene: destination.map,
+          x: FromGridX(destination.gridX),
+          y: FromGridX(destination.gridY),
+        },
+      }
+    );
+
+    if (character.target.id && character.target.type) {
+      const targetId = character.target.id as unknown as string;
+      const targetType = character.target.type as unknown as EntityType;
+      const targetReason = "Your battle target was lost.";
+
+      const dataOfCancelTargeting: IBattleCancelTargeting = {
+        targetId: targetId,
+        type: targetType,
+        reason: targetReason,
+      };
+
+      this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+        character.channelId!,
+        BattleSocketEvents.CancelTargeting,
+        dataOfCancelTargeting
       );
 
-      if (character.target.id && character.target.type) {
-        const targetId = character.target.id as unknown as string;
-        const targetType = character.target.type as unknown as EntityType;
-        const targetReason = "Your battle target was lost.";
+      await this.battleNetworkStopTargeting.stopTargeting(character);
+    }
 
-        const dataOfCancelTargeting: IBattleCancelTargeting = {
-          targetId: targetId,
-          type: targetType,
-          reason: targetReason,
-        };
-
-        this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-          character.channelId!,
-          BattleSocketEvents.CancelTargeting,
-          dataOfCancelTargeting
-        );
-
-        await this.battleNetworkStopTargeting.stopTargeting(character);
-      }
-
-      /* 
+    /* 
       Send event to client telling it to restart the map. 
       We don't need to specify which, because it will trigger a character 
       refresh and scene reload on the client side. 
       */
 
-      this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.ChangeMap);
+    this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.ChangeMap);
 
-      await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
-        character,
-        ViewSocketEvents.Destroy,
-        {
-          type: "characters",
-          id: character._id,
-        }
-      );
-    } catch (error) {
-      console.error(error);
-    }
+    await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
+      character,
+      ViewSocketEvents.Destroy,
+      {
+        type: "characters",
+        id: character._id,
+      }
+    );
   }
 
   public async teleportCharacter(character: ICharacter, destination: TransitionDestination): Promise<void> {
-    try {
-      if (character.scene !== destination.map) {
-        throw new Error(
-          `Character Scene: "${character.scene}" and map to teleport: "${destination.map}" should be the same!`
-        );
-      }
-
-      // change character map
-      await Character.updateOne(
-        { _id: character._id },
-        {
-          $set: {
-            x: FromGridX(destination.gridX),
-            y: FromGridX(destination.gridY),
-          },
-        }
+    if (character.scene !== destination.map) {
+      throw new Error(
+        `Character Scene: "${character.scene}" and map to teleport: "${destination.map}" should be the same!`
       );
-
-      if (character.target.id && character.target.type) {
-        const targetId = character.target.id as unknown as string;
-        const targetType = character.target.type as unknown as EntityType;
-        const targetReason = "Your battle target was lost.";
-
-        const dataOfCancelTargeting: IBattleCancelTargeting = {
-          targetId: targetId,
-          type: targetType,
-          reason: targetReason,
-        };
-
-        this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-          character.channelId!,
-          BattleSocketEvents.CancelTargeting,
-          dataOfCancelTargeting
-        );
-
-        await this.battleNetworkStopTargeting.stopTargeting(character);
-      }
-      // send event to client telling it that a character has been teleported?
-
-      this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.SameMapTeleport, destination);
-
-      await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
-        character,
-        ViewSocketEvents.Destroy,
-        {
-          type: "characters",
-          id: character._id,
-        }
-      );
-    } catch (error) {
-      console.error(error);
     }
+
+    // change character map
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        $set: {
+          x: FromGridX(destination.gridX),
+          y: FromGridX(destination.gridY),
+        },
+      }
+    );
+
+    if (character.target.id && character.target.type) {
+      const targetId = character.target.id as unknown as string;
+      const targetType = character.target.type as unknown as EntityType;
+      const targetReason = "Your battle target was lost.";
+
+      const dataOfCancelTargeting: IBattleCancelTargeting = {
+        targetId: targetId,
+        type: targetType,
+        reason: targetReason,
+      };
+
+      this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+        character.channelId!,
+        BattleSocketEvents.CancelTargeting,
+        dataOfCancelTargeting
+      );
+
+      await this.battleNetworkStopTargeting.stopTargeting(character);
+    }
+    // send event to client telling it that a character has been teleported?
+
+    this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.SameMapTeleport, destination);
+
+    await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
+      character,
+      ViewSocketEvents.Destroy,
+      {
+        type: "characters",
+        id: character._id,
+      }
+    );
   }
 
   public getTransitionAtXY(mapName: string, x: number, y: number): ITiledObject | undefined {

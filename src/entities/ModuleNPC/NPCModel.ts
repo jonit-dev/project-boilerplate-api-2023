@@ -120,9 +120,7 @@ const npcSchema = createLeanSchema(
       endGridX: Type.number(),
       endGridY: Type.number(),
     },
-    pm2InstanceManager: Type.number({
-      required: true,
-    }),
+
     speed: Type.number({
       default: 1.5,
       required: true,

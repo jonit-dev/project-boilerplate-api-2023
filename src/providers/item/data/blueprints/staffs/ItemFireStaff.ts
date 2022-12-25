@@ -1,12 +1,12 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IMagicStaff } from "@providers/useWith/useWithTypes";
+import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemFireStaff: Partial<IItem> = {
+export const itemFireStaff: Partial<IMagicStaff> = {
   key: StaffsBlueprint.FireStaff,
   type: ItemType.Weapon,
-  subType: ItemSubType.Sword,
+  subType: ItemSubType.Magic,
   textureAtlas: "items",
   texturePath: "staffs/fire-staff.png",
   name: "Fire Staff",
@@ -16,6 +16,8 @@ export const itemFireStaff: Partial<IItem> = {
   weight: 1,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  rangeType: EntityAttackType.Melee,
+  rangeType: EntityAttackType.Ranged,
   basePrice: 77,
+  maxRange: 7,
+  projectileAnimationKey: AnimationEffectKeys.FireBall,
 };

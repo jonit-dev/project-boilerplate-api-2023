@@ -1,5 +1,4 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { appEnv } from "@providers/config/env";
 import { AnimationDirection, CharacterClass, MapLayers, NPCMovementType, NPCPathOrientation } from "@rpg-engine/shared";
 import _ from "lodash";
 
@@ -19,7 +18,6 @@ export const generateRandomMovement = (): any => {
     originalMovementType: NPCMovementType.Random,
     currentMovementType: NPCMovementType.Random,
     maxRangeInGridCells: 5,
-    pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
 };
 
@@ -30,7 +28,6 @@ export const generateMoveTowardsMovement = (): any => {
     currentMovementType: NPCMovementType.MoveTowards,
     maxRangeInGridCells: 10,
     maxAntiLuringRangeInGridCells: 40,
-    pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
     pathOrientation: NPCPathOrientation.Forward, // must be forward!
   };
 };
@@ -41,7 +38,6 @@ export const generateStoppedMovement = (): any => {
     currentMovementType: NPCMovementType.Stopped,
     originalMovementType: NPCMovementType.Stopped,
     maxRangeInGridCells: 5,
-    pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
 };
 
@@ -51,7 +47,6 @@ export const generateMoveAwayMovement = (): any => {
     currentMovementType: NPCMovementType.MoveAway,
     originalMovementType: NPCMovementType.MoveAway,
     maxRangeInGridCells: 20,
-    pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
 };
 
@@ -62,6 +57,5 @@ export const generateFixedPathMovement = (): any => {
     originalMovementType: NPCMovementType.FixedPath,
     pathOrientation: NPCPathOrientation.Forward, // must be forward!
     maxRangeInGridCells: 20,
-    pm2InstanceManager: _.random(0, appEnv.general.MAX_PM2_INSTANCES - 1),
   };
 };

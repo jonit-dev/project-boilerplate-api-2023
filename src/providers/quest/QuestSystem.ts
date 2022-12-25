@@ -15,12 +15,10 @@ import { CharacterItems, IItemByKeyResult } from "@providers/character/character
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { MathHelper } from "@providers/math/MathHelper";
-import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
+import { ItemDrop } from "@providers/item/ItemDrop";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
-  FromGridX,
-  FromGridY,
   IEquipmentAndInventoryUpdatePayload,
   IItem,
   IItemContainer,
@@ -31,8 +29,6 @@ import {
   QuestSocketEvents,
   QuestStatus,
   QuestType,
-  ToGridX,
-  ToGridY,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -50,7 +46,7 @@ export class QuestSystem {
     private characterWeight: CharacterWeight,
     private equipmentSlots: EquipmentSlots,
     private movementHelper: MovementHelper,
-    private mathHelper: MathHelper,
+    private itemDrop: ItemDrop,
     private characterItems: CharacterItems
   ) {}
 
@@ -247,9 +243,9 @@ export class QuestSystem {
       if (!_.isEmpty(overflowingRewards)) {
         // drop items on the floor
         // 1. get nearby grid points without solids
-        const gridPoints = await this.getNearbyGridPoints(character, overflowingRewards.length);
+        const gridPoints = await this.movementHelper.getNearbyGridPoints(character, overflowingRewards.length);
         // 2. drop items on those grid points
-        await this.dropItems(overflowingRewards, gridPoints, character.scene);
+        await this.itemDrop.dropItems(overflowingRewards, gridPoints, character.scene);
       }
 
       backpackContainer.markModified("slots");
@@ -353,38 +349,6 @@ export class QuestSystem {
       npcId: quest.npcId!.toString(),
       quests: [quest],
     });
-  }
-
-  /**
-   * Get nearby grid points that are free (not solid or with items)
-   * @param character character from which nearby grid points will be searched
-   * @param pointsAmount amount of grid points to return
-   */
-  private async getNearbyGridPoints(character: ICharacter, pointsAmount: number): Promise<IPosition[]> {
-    const result: IPosition[] = [];
-    const circundatingPoints = this.mathHelper.getCircundatingGridPoints(
-      { x: ToGridX(character.x), y: ToGridY(character.y) },
-      2
-    );
-    for (const point of circundatingPoints) {
-      const isSolid = await this.movementHelper.isSolid(character.scene, point.x, point.y, character.layer);
-      if (!isSolid) {
-        result.push(point);
-      }
-      if (result.length === pointsAmount) {
-        break;
-      }
-    }
-    return result;
-  }
-
-  private async dropItems(items: IItemModel[], droppintPoints: IPosition[], scene: string): Promise<void> {
-    for (const i in droppintPoints) {
-      items[i].x = FromGridX(droppintPoints[i].x);
-      items[i].y = FromGridY(droppintPoints[i].y);
-      items[i].scene = scene;
-      await items[i].save();
-    }
   }
 
   private releaseSpellRewards(reward: IQuestReward, itemContainer: IItemContainer): void {

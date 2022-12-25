@@ -1,9 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
+import { StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { spellSelfHealing } from "@providers/spells/data/blueprints/SpellSelfHealing";
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import { BasicAttribute, calculateSPToNextLevel, calculateXPToNextLevel, ItemSubType } from "@rpg-engine/shared";
@@ -280,6 +282,29 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(updatedSkills?.sword.skillPoints).toBe(initialSkills?.sword.skillPoints);
     expect(updatedSkills?.shielding.level).toBe(initialSkills?.shielding.level);
     expect(updatedSkills?.shielding.skillPoints).toBe(initialSkills?.shielding.skillPoints);
+  });
+
+  it("should increase character's magic skill level and not strength.", async () => {
+    const characterEquipment = (await Equipment.findById(testCharacter.equipment)) as IEquipment;
+
+    const staff = await unitTestHelper.createMockItemFromBlueprint(StaffsBlueprint.FireStaff);
+    characterEquipment!.rightHand = staff.id;
+
+    await characterEquipment!.save();
+
+    await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 1);
+
+    const updatedSkills = await Skill.findById(testCharacter.skills);
+
+    // magic skill should increase
+    expect(updatedSkills?.magic.level).toBe(initialLevel);
+    expect(updatedSkills?.magic.skillPoints).toBe(SP_INCREASE_RATIO);
+    expect(updatedSkills?.magic.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO);
+
+    // strength should not increase
+    expect(updatedSkills?.strength.level).toBe(initialLevel);
+    expect(updatedSkills?.strength.skillPoints).toBe(0);
+    expect(updatedSkills?.strength.skillPointsToNextLevel).toBe(spToLvl2);
   });
 
   it("should increase character's resistance SP", async () => {

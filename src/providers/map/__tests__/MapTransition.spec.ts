@@ -58,6 +58,13 @@ describe("MapTransition", () => {
     // @ts-ignore
     expect(updatedCharacter.scene).toEqual(destination.map);
   });
+  it("should change the character's scene to the destination map", async () => {
+    const destination = { map: "map2", gridX: 0, gridY: 0 };
+    await mapTransition.changeCharacterScene(testCharacter, destination);
+    const updatedCharacter = await Character.findOne({ _id: testCharacter.id });
+    // @ts-ignore
+    expect(updatedCharacter.scene).toEqual(destination.map);
+  });
 
   it("should update the character's position to the destination grid position", async () => {
     testCharacter.scene = "map1";
@@ -79,6 +86,7 @@ describe("MapTransition", () => {
     testCharacter.scene = "oldScene";
     testCharacter.x = 10;
     testCharacter.y = 20;
+
     const destination = { map: "newScene", gridX: 15, gridY: 25 };
     const updateOneMock = jest.fn().mockResolvedValue(null);
     Character.updateOne = updateOneMock;
@@ -199,7 +207,7 @@ describe("MapTransition", () => {
 
   test("teleport character to a different map", async () => {
     testCharacter.scene = "map1";
-    destination = {
+    const destination = {
       map: "map2",
       gridX: 5,
       gridY: 5,

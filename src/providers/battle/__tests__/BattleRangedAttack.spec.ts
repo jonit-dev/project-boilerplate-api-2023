@@ -1,10 +1,15 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { itemFireStaff } from "@providers/item/data/blueprints/staffs/ItemFireStaff";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { RangedWeaponsBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  RangedWeaponsBlueprint,
+  SpearsBlueprint,
+  StaffsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, ItemSlotType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { Types } from "mongoose";
@@ -66,10 +71,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 
   it("character does not have required ammo", async () => {
     // @ts-ignore
-    const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(
-      (await testCharacter.weapon) as unknown as IItem,
-      characterEquipment
-    );
+    const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
 
     expect(rangedAttackAmmo).toBeUndefined();
   });
@@ -77,10 +79,7 @@ describe("BattleRangedAttack.spec.ts", () => {
   it("character carries required ammo in accesory slot", async () => {
     const arrowId = await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
     // @ts-ignore
-    const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(
-      (await testCharacter.weapon) as unknown as IItem,
-      characterEquipment
-    );
+    const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
 
     expect(rangedAttackAmmo).toBeDefined();
     expect(rangedAttackAmmo!.location).toEqual(ItemSlotType.Accessory);
@@ -228,6 +227,51 @@ describe("BattleRangedAttack.spec.ts", () => {
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
     expect(hitTarget).toBeCalledTimes(6);
+  });
+
+  describe("magic staff ranged attack", () => {
+    let staff: IItem;
+    beforeEach(async () => {
+      staff = await unitTestHelper.createMockItemFromBlueprint(StaffsBlueprint.FireStaff);
+      characterEquipment!.rightHand = staff.id;
+
+      await characterEquipment!.save();
+    });
+
+    it("special ammo dependant on mana availability", async () => {
+      testCharacter.mana = Math.floor(itemFireStaff.attack! / 2) - 1;
+      // @ts-ignore
+      let rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
+
+      expect(rangedAttackAmmo).not.toBeDefined();
+
+      testCharacter.mana = Math.ceil(itemFireStaff.attack! / 2) + 1;
+      // @ts-ignore
+      rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
+
+      expect(rangedAttackAmmo).toBeDefined();
+      expect(rangedAttackAmmo!.location).toEqual(ItemSlotType.LeftHand);
+      expect(rangedAttackAmmo!.id).toEqual(staff.id);
+      expect(rangedAttackAmmo!.key).toEqual(itemFireStaff.projectileAnimationKey);
+      expect(rangedAttackAmmo!.maxRange).toBe(itemFireStaff.maxRange);
+    });
+
+    it("mana should be consumed", async () => {
+      const characterMana = testCharacter.mana;
+
+      await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
+
+      // @ts-ignore
+      const rangedAttackAmmo = (await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment))!;
+      // @ts-ignore
+      await battleRangedAttack.consumeAmmo(rangedAttackAmmo, testCharacter);
+
+      expect(await Item.findById(staff.id)).toBeDefined();
+      expect(characterEquipment.accessory).toBeDefined();
+
+      const updatedCharacter = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
+      expect(updatedCharacter.mana).toBe(characterMana - Math.ceil(itemFireStaff.attack! / 2));
+    });
   });
 
   afterAll(async () => {

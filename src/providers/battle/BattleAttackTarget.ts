@@ -16,6 +16,7 @@ import {
   GRID_WIDTH,
   IBattleCancelTargeting,
   IBattleEventFromServer,
+  ItemSubType,
   QuestType,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
@@ -26,6 +27,7 @@ import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
 import { BattleRangedAttack } from "./BattleRangedAttack";
 import { BattleNetworkStopTargeting } from "./network/BattleNetworkStopTargetting";
+import { CharacterBonusPenalties } from "@providers/character/CharacterBonusPenalties";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -42,7 +44,8 @@ export class BattleAttackTarget {
     private skillIncrease: SkillIncrease,
     private battleRangedAttack: BattleRangedAttack,
     private questSystem: QuestSystem,
-    private entityEffectUse: EntityEffectUse
+    private entityEffectUse: EntityEffectUse,
+    private characterBonusPenalties: CharacterBonusPenalties
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -189,7 +192,12 @@ export class BattleAttackTarget {
 
         // when target is Character, resistance SP increases
         if (target.type === "Character") {
-          await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance);
+          const weapon = await (attacker as ICharacter).weapon;
+          const attr =
+            weapon?.subType === ItemSubType.Magic ? BasicAttribute.MagicResistance : BasicAttribute.Resistance;
+          await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, attr);
+
+          await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, BasicAttribute.Resistance);
         }
 
         /*
@@ -253,6 +261,8 @@ export class BattleAttackTarget {
     // then, increase the character's dexterity SP
     if (battleEvent === BattleEventType.Miss && target.type === "Character") {
       await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
+
+      await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, BasicAttribute.Dexterity);
     }
 
     // finally, send battleHitPayload to characters around
