@@ -8,4 +8,7 @@ export enum QuestsBlueprint {
   InteractionCraftSword = "interaction-craft-sword",
   InteractionsCraftIronArrow = "interaction-craft-iron-arrow",
   KillWolves = "kill-wolves",
+  InteractionFisherman = "interaction-fisherman",
+  InteractionStoryTeller = "interaction-story-teller",
+  InteractionCarpenter = "interaction-carpenter",
 }

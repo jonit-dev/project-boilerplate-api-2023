@@ -29,6 +29,9 @@ export enum FriendlyNPCsBlueprint {
   WomanBlueHair = "woman-blue-hair",
   WomanGreenHair = "woman-green-hair",
   SeniorKnight1 = "senior-knight-1",
+  Fisherman = "fisherman",
+  StoryTeller = "story-teller",
+  Carpenter = "carpenter",
 }
 
 export enum NeutralNPCsBlueprint {
