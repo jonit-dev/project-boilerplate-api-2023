@@ -5,7 +5,6 @@ import {
   ArmorsBlueprint,
   BootsBlueprint,
   HelmetsBlueprint,
-  OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -43,11 +42,6 @@ export const npcSkeletonKnight = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [10, 30],
-    },
     {
       itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
       chance: 25,

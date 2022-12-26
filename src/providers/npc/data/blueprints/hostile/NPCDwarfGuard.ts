@@ -7,7 +7,6 @@ import {
   CraftingResourcesBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
-  OthersBlueprint,
   RangedWeaponsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -43,11 +42,6 @@ export const npcDwarfGuard = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [15, 25],
-    },
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,

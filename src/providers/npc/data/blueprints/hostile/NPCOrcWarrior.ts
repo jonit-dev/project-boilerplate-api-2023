@@ -11,7 +11,6 @@ import {
   HelmetsBlueprint,
   LegsBlueprint,
   MacesBlueprint,
-  OthersBlueprint,
   RangedWeaponsBlueprint,
   SwordsBlueprint,
   ToolsBlueprint,
@@ -48,11 +47,6 @@ export const npcOrcWarrior = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [20, 55],
-    },
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,

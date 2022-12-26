@@ -7,7 +7,6 @@ import {
   GlovesBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -46,11 +45,7 @@ export const npcDwarfGuardian: Partial<INPC> = {
       itemBlueprintKey: ContainersBlueprint.Backpack,
       chance: 10,
     },
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [30, 40],
-    },
+
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 25,

@@ -3,7 +3,6 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -34,11 +33,6 @@ export const npcBat = {
     },
   },
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [1, 5],
-    },
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 15,

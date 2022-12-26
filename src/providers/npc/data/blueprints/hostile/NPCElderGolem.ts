@@ -7,7 +7,6 @@ import {
   CraftingResourcesBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
-  OthersBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -42,11 +41,6 @@ export const npcElderGolem: Partial<INPC> = {
     },
   },
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 25,
-      quantityRange: [25, 50],
-    },
     {
       itemBlueprintKey: HelmetsBlueprint.SaviorsHelmet,
       chance: 20,

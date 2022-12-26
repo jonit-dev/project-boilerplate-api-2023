@@ -5,7 +5,6 @@ import {
   ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
-  OthersBlueprint,
   RangedWeaponsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -41,11 +40,6 @@ export const npcDwarfArcher: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 40,
-      quantityRange: [30, 65],
-    },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 40,

@@ -39,11 +39,6 @@ export const npcDwarf = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [10, 15],
-    },
-    {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
     },

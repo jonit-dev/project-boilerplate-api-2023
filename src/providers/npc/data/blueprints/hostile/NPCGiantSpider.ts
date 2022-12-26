@@ -10,7 +10,6 @@ import {
   HammersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
@@ -51,11 +50,7 @@ export const npcGiantSpider: Partial<INPC> = {
       itemBlueprintKey: ContainersBlueprint.Backpack,
       chance: 10,
     },
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [75, 200],
-    },
+
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,

@@ -22,7 +22,6 @@ const config: Config.InitialOptions = {
   cache: true,
   testPathIgnorePatterns: ["/node_modules/", "/__tests__/mock/"],
   workerIdleMemoryLimit: "1700MB",
-  silent: true,
   logHeapUsage: true,
 };
 
