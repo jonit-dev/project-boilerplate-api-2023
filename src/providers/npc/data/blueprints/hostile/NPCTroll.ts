@@ -13,7 +13,6 @@ import {
   GlovesBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -46,11 +45,6 @@ export const npcTroll = {
   fleeOnLowHealth: true,
 
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [30, 40],
-    },
     {
       itemBlueprintKey: MacesBlueprint.Club,
       chance: 25,

@@ -7,7 +7,6 @@ import {
   DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
-  OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -42,11 +41,6 @@ export const npcIceFox: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 40,
-      quantityRange: [25, 50],
-    },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.FrostBow,
       chance: 20,

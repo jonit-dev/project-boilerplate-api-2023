@@ -15,7 +15,6 @@ import {
   HammersBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -48,11 +47,6 @@ export const npcForestTroll = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [25, 60],
-    },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 25,

@@ -8,7 +8,6 @@ import {
   FoodsBlueprint,
   GlovesBlueprint,
   LegsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
   SwordsBlueprint,
@@ -46,11 +45,6 @@ export const npcMinotaur = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [10, 40],
-    },
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
       chance: 5,

@@ -5,7 +5,6 @@ import {
   ArmorsBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
-  OthersBlueprint,
   StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -40,11 +39,6 @@ export const npcFireFox: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 40,
-      quantityRange: [25, 50],
-    },
     {
       itemBlueprintKey: SwordsBlueprint.FireSword,
       chance: 20,

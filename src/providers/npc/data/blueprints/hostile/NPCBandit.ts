@@ -10,7 +10,6 @@ import {
   HelmetsBlueprint,
   LegsBlueprint,
   MacesBlueprint,
-  OthersBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -44,11 +43,6 @@ export const npcBandit: Partial<INPC> = {
   fleeOnLowHealth: true,
 
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [5, 15],
-    },
     {
       itemBlueprintKey: SwordsBlueprint.BroadSword,
       chance: 5,

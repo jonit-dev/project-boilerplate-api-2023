@@ -7,7 +7,6 @@ import {
   BootsBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   StaffsBlueprint,
   SwordsBlueprint,
@@ -42,11 +41,6 @@ export const npcCaveSpider: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [3, 10],
-    },
     {
       itemBlueprintKey: PotionsBlueprint.ManaPotion,
       chance: 20,

@@ -7,7 +7,6 @@ import {
   DaggersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
@@ -44,11 +43,6 @@ export const npcAssaultSpider: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [3, 10],
-    },
     {
       itemBlueprintKey: PotionsBlueprint.ManaPotion,
       chance: 20,

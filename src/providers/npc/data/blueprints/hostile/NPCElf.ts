@@ -44,11 +44,6 @@ export const npcElf: Partial<INPC> = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [5, 25],
-    },
-    {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 30,
     },

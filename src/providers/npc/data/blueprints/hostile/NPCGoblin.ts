@@ -8,7 +8,6 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -48,11 +47,6 @@ export const npcGoblin = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 20,
-      quantityRange: [15, 40],
-    },
     {
       itemBlueprintKey: SwordsBlueprint.ShortSword,
       chance: 20,
