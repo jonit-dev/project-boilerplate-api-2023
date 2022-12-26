@@ -98,7 +98,7 @@ export class NPCDeath {
     const goldLoot: INPCLoot = {
       chance: 30,
       itemBlueprintKey: OthersBlueprint.GoldCoin,
-      quantityRange: [Math.floor(randomPercentage() * calculatedGold), calculatedGold],
+      quantityRange: [Math.floor(randomPercentage() * calculatedGold), Math.floor(calculatedGold)],
     };
 
     return goldLoot;
