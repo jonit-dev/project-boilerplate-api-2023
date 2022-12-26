@@ -1,16 +1,16 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { provide } from "inversify-binding-decorators";
-import { SkillCalculator } from "./SkillCalculator";
 import {
-  ISkillDetails,
-  SkillSocketEvents,
   BASIC_ATTRIBUTES,
   COMBAT_SKILLS,
+  ISkillDetails,
   SKILLS_MAP,
+  SkillSocketEvents,
   calculateSPToNextLevel,
 } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
+import { SkillCalculator } from "./SkillCalculator";
 
 @provide(SkillDecrease)
 export class SkillDecrease {
@@ -69,7 +69,7 @@ export class SkillDecrease {
     await skills.save();
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills,
+      skill: skills.toObject(),
     });
   }
 
