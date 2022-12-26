@@ -316,18 +316,6 @@ export class CharacterNetworkUpdate {
 
     this.characterValidation.hasBasicValidation(character);
 
-    const serverCalculatedDirection = this.movementHelper.getGridMovementDirection(
-      ToGridX(character.x),
-      ToGridY(character.y),
-      ToGridX(data.newX),
-      ToGridY(data.newY)
-    );
-
-    // if (clientDirection !== serverCalculatedDirection) {
-    //   console.log(`🚫 ${character.name} tried to move in a wrong facing direction!`);
-    //   return false;
-    // }
-
     if (character.lastMovement) {
       const now = dayjs(new Date());
       const lastMovement = dayjs(character.lastMovement);
