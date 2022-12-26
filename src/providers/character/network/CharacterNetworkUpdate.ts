@@ -93,7 +93,6 @@ export class CharacterNetworkUpdate {
 
           // bidirectional data retransmission
           await this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
-          await this.warnEmitterAboutCharactersAround(character);
 
           await this.npcWarn.warnCharacterAboutNPCsInView(character);
 
