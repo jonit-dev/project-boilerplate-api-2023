@@ -13,10 +13,10 @@ import {
   ISkillDetails,
   IUIShowMessage,
   LifeBringerRaces,
+  SKILLS_MAP,
   ShadowWalkerRaces,
   SkillEventType,
   SkillSocketEvents,
-  SKILLS_MAP,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -537,7 +537,7 @@ export class CharacterBonusPenalties {
     await skills.save();
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills,
+      skill: skills.toObject(),
     });
   }
 }

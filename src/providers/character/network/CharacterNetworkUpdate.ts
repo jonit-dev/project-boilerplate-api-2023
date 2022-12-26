@@ -323,10 +323,10 @@ export class CharacterNetworkUpdate {
       ToGridY(data.newY)
     );
 
-    if (clientDirection !== serverCalculatedDirection) {
-      console.log(`🚫 ${character.name} tried to move in a wrong facing direction!`);
-      return false;
-    }
+    // if (clientDirection !== serverCalculatedDirection) {
+    //   console.log(`🚫 ${character.name} tried to move in a wrong facing direction!`);
+    //   return false;
+    // }
 
     if (character.lastMovement) {
       const now = dayjs(new Date());
