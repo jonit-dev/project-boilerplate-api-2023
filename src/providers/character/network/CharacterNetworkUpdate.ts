@@ -3,7 +3,6 @@ import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHel
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
-import { MapTiles } from "@providers/map/MapTiles";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -44,8 +43,7 @@ export class CharacterNetworkUpdate {
     private gridManager: GridManager,
     private mapNonPVPZone: MapNonPVPZone,
     private characterValidation: CharacterValidation,
-    private npcWarn: NPCWarn,
-    private mapTiles: MapTiles
+    private npcWarn: NPCWarn
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -54,6 +52,7 @@ export class CharacterNetworkUpdate {
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
         if (data) {
+          // sometimes the character is just changing facing direction and not moving.. That's why we need this.
           const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
 
           // send message back to the user telling that the requested position update is not valid!
@@ -77,6 +76,27 @@ export class CharacterNetworkUpdate {
             );
           }
 
+          if (isPositionUpdateValid) {
+            // bidirectional data retransmission
+            await this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
+
+            await this.npcWarn.warnCharacterAboutNPCsInView(character);
+
+            await this.warnEmitterAboutCharactersAround(character);
+
+            await this.npcManager.startNearbyNPCsBehaviorLoop(character);
+
+            await this.itemView.warnCharacterAboutItemsInView(character);
+
+            // update emitter position from connectedPlayers
+            await this.updateServerSideEmitterInfo(data, character, newX, newY, isMoving, data.direction);
+
+            await this.handleMapTransition(character, newX, newY);
+
+            this.handleNonPVPZone(character, newX, newY);
+          }
+
+          // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.
           this.socketMessaging.sendEventToUser<ICharacterPositionUpdateConfirm>(
             character.channelId!,
             CharacterSocketEvents.CharacterPositionUpdateConfirm,
@@ -86,63 +106,51 @@ export class CharacterNetworkUpdate {
               direction: data.direction,
             }
           );
-
-          if (!isPositionUpdateValid) {
-            return;
-          }
-
-          // bidirectional data retransmission
-          await this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
-
-          await this.npcWarn.warnCharacterAboutNPCsInView(character);
-
-          await this.npcManager.startNearbyNPCsBehaviorLoop(character);
-
-          await this.itemView.warnCharacterAboutItemsInView(character);
-
-          // update emitter position from connectedPlayers
-          await this.updateServerSideEmitterInfo(data, character, newX, newY, isMoving, data.direction);
-
-          // verify if we're in a map transition. If so, we need to trigger a scene transition
-          const transition = this.mapTransition.getTransitionAtXY(character.scene, newX, newY);
-          if (transition) {
-            const map = this.mapTransition.getTransitionProperty(transition, "map");
-            const gridX = Number(this.mapTransition.getTransitionProperty(transition, "gridX"));
-            const gridY = Number(this.mapTransition.getTransitionProperty(transition, "gridY"));
-
-            if (!map || !gridX || !gridY) {
-              console.error("Failed to fetch required destination properties.");
-              return;
-            }
-
-            const destination = {
-              map,
-              gridX,
-              gridY,
-            };
-
-            /*
-            Check if we are transitioning to the same map, 
-            if so we should only teleport the character
-            */
-            if (destination.map === character.scene) {
-              await this.mapTransition.teleportCharacter(character, destination);
-            } else {
-              await this.mapTransition.changeCharacterScene(character, destination);
-            }
-          }
-
-          /* 
-          Verify if we're in a non pvp zone. If so, we need to trigger 
-          an attack stop event in case player was in a pvp combat
-          */
-          const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, newX, newY);
-          if (nonPVPZone) {
-            this.mapNonPVPZone.stopCharacterAttack(character);
-          }
         }
       }
     );
+  }
+
+  private handleNonPVPZone(character: ICharacter, newX: number, newY: number): void {
+    /* 
+          Verify if we're in a non pvp zone. If so, we need to trigger 
+          an attack stop event in case player was in a pvp combat
+          */
+    const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, newX, newY);
+    if (nonPVPZone) {
+      this.mapNonPVPZone.stopCharacterAttack(character);
+    }
+  }
+
+  private async handleMapTransition(character: ICharacter, newX: number, newY: number): Promise<void> {
+    // verify if we're in a map transition. If so, we need to trigger a scene transition
+    const transition = this.mapTransition.getTransitionAtXY(character.scene, newX, newY);
+    if (transition) {
+      const map = this.mapTransition.getTransitionProperty(transition, "map");
+      const gridX = Number(this.mapTransition.getTransitionProperty(transition, "gridX"));
+      const gridY = Number(this.mapTransition.getTransitionProperty(transition, "gridY"));
+
+      if (!map || !gridX || !gridY) {
+        console.error("Failed to fetch required destination properties.");
+        return;
+      }
+
+      const destination = {
+        map,
+        gridX,
+        gridY,
+      };
+
+      /*
+   Check if we are transitioning to the same map, 
+   if so we should only teleport the character
+   */
+      if (destination.map === character.scene) {
+        await this.mapTransition.teleportCharacter(character, destination);
+      } else {
+        await this.mapTransition.changeCharacterScene(character, destination);
+      }
+    }
   }
 
   private async warnEmitterAboutCharactersAround(character: ICharacter): Promise<void> {
@@ -196,22 +204,11 @@ export class CharacterNetworkUpdate {
   private shouldWarnCharacter(emitter: ICharacter, nearbyCharacter: ICharacter): boolean {
     const charOnCharView = emitter.view.characters[nearbyCharacter.id];
 
-    // if we already have a representation there, just skip!
-    if (charOnCharView) {
-      const doesServerCharMatchesClientChar = this.objectHelper.doesObjectAttrMatches(charOnCharView, nearbyCharacter, [
-        "id",
-        "x",
-        "y",
-        "direction",
-        "scene",
-      ]);
-
-      if (doesServerCharMatchesClientChar) {
-        return false;
-      }
+    if (!charOnCharView) {
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   private async warnCharactersAroundAboutEmitterPositionUpdate(
