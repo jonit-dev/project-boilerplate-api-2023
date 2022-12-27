@@ -321,8 +321,6 @@ export class CharacterNetworkUpdate {
       const lastMovement = dayjs(character.lastMovement);
       const movementDiff = now.diff(lastMovement, "millisecond");
 
-
-      // if character is trying to move 2x faster than the allowed interval, ban him
       if (movementDiff < character.movementIntervalMs / 2) {
         console.log(`🚫 ${character.name} tried to move too fast!`);
         await this.characterBan.addPenalty(character);

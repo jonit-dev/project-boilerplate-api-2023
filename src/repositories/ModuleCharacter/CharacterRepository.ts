@@ -1,5 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
@@ -18,16 +18,7 @@ import { SpellLearn } from "@providers/spells/SpellLearn";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
 import { UpdateCharacterDTO } from "@useCases/ModuleCharacter/character/update/UpdateCharacterDTO";
 import { provide } from "inversify-binding-decorators";
-import { Types } from "mongoose";
 
-interface IInitialItems {
-  inventory: Types.ObjectId;
-  leftHand: Types.ObjectId;
-  armor: Types.ObjectId;
-  head: Types.ObjectId;
-  boot: Types.ObjectId;
-  accessory: Types.ObjectId;
-}
 @provide(CharacterRepository)
 export class CharacterRepository extends CRUD {
   constructor(
@@ -61,7 +52,7 @@ export class CharacterRepository extends CRUD {
 
     await createdCharacter.save();
 
-    const { inventory, armor, leftHand, head, boot, accessory } = await this.generateInitialItems(createdCharacter._id);
+    const { inventory, armor, leftHand, head, boot, neck } = await this.generateInitialItems(createdCharacter._id);
 
     let equipment = new Equipment();
     equipment.inventory = inventory;
@@ -69,7 +60,7 @@ export class CharacterRepository extends CRUD {
     equipment.armor = armor;
     equipment.head = head;
     equipment.boot = boot;
-    equipment.accessory = accessory;
+    equipment.neck = neck;
     equipment = await equipment.save();
 
     createdCharacter.equipment = equipment._id;
@@ -107,7 +98,7 @@ export class CharacterRepository extends CRUD {
     return item;
   }
 
-  private async generateInitialItems(ownerId: string): Promise<IInitialItems> {
+  private async generateInitialItems(ownerId: string): Promise<Partial<IEquipment>> {
     const bag = await this.generateInitialItem(ContainersBlueprint.Bag, ownerId);
     const dagger = await this.generateInitialItem(DaggersBlueprint.Dagger, ownerId);
     const jacket = await this.generateInitialItem(ArmorsBlueprint.Jacket, ownerId);
@@ -121,7 +112,7 @@ export class CharacterRepository extends CRUD {
       armor: jacket._id,
       head: cap._id,
       boot: boot._id,
-      accessory: bandana._id,
+      neck: bandana._id,
     };
   }
 }
