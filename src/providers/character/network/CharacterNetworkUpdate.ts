@@ -78,38 +78,22 @@ export class CharacterNetworkUpdate {
 
           if (isPositionUpdateValid) {
             // bidirectional data retransmission
-            console.time("warnCharactersAroundAboutEmitterPositionUpdate");
             await this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
-            console.timeEnd("warnCharactersAroundAboutEmitterPositionUpdate");
 
-            console.time("warnCharactersAroundAboutEmitterPositionUpdate");
             await this.npcWarn.warnCharacterAboutNPCsInView(character);
-            console.timeEnd("warnCharactersAroundAboutEmitterPositionUpdate");
 
-            console.time("warnEmitterAboutCharactersAround");
             await this.warnEmitterAboutCharactersAround(character);
-            console.timeEnd("warnEmitterAboutCharactersAround");
 
-            console.time("startNearbyNPCsBehaviorLoop");
             await this.npcManager.startNearbyNPCsBehaviorLoop(character);
-            console.timeEnd("startNearbyNPCsBehaviorLoop");
 
-            console.time("warnCharacterAboutItemsInView");
             await this.itemView.warnCharacterAboutItemsInView(character);
-            console.timeEnd("warnCharacterAboutItemsInView");
 
             // update emitter position from
-            console.time("updateServerSideEmitterInfo");
             await this.updateServerSideEmitterInfo(data, character, newX, newY, isMoving, data.direction);
-            console.timeEnd("updateServerSideEmitterInfo");
 
-            console.time("handleMapTransition");
             await this.handleMapTransition(character, newX, newY);
-            console.timeEnd("handleMapTransition");
 
-            console.time("handleNonPVPZone");
             this.handleNonPVPZone(character, newX, newY);
-            console.timeEnd("handleNonPVPZone");
           }
 
           // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.
