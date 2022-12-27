@@ -82,7 +82,7 @@ export class CharacterNetworkUpdate {
 
             await this.npcWarn.warnCharacterAboutNPCsInView(character);
 
-            // await this.warnEmitterAboutCharactersAround(character);
+            await this.warnEmitterAboutCharactersAround(character);
 
             await this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
