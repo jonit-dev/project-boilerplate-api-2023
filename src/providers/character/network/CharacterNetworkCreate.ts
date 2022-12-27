@@ -144,8 +144,6 @@ export class CharacterNetworkCreate {
     dataFromServer: ICharacterCreateFromServer,
     character: ICharacter
   ): Promise<void> {
-    const pm2Instance = process.env.NODE_APP_INSTANCE;
-
     const nearbyCharacters = await this.playerView.getCharactersInView(character);
 
     if (nearbyCharacters.length > 0) {
