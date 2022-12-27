@@ -185,23 +185,7 @@ const characterSchema = createLeanSchema(
 );
 
 characterSchema.virtual("movementIntervalMs").get(function (this: ICharacter) {
-  const ratio = this.weight / this.maxWeight;
-
-  if (ratio <= 1) {
-    return this.baseMovementIntervalMs;
-  }
-
-  if (ratio > 1 && ratio <= 2) {
-    return this.baseMovementIntervalMs * 0.8;
-  }
-
-  if (ratio > 2 && ratio <= 4) {
-    return this.baseMovementIntervalMs * 0.6;
-  }
-
-  if (ratio > 4) {
-    return 0;
-  }
+  return 1000 / this.speed / 4;
 });
 
 characterSchema.virtual("speed").get(function (this: ICharacter) {
