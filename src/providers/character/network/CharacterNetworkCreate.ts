@@ -145,7 +145,6 @@ export class CharacterNetworkCreate {
     character: ICharacter
   ): Promise<void> {
     const pm2Instance = process.env.NODE_APP_INSTANCE;
-    console.log("PM2 instance id: ", pm2Instance, " - ", "sendCreationMessageToCharacters");
 
     const nearbyCharacters = await this.playerView.getCharactersInView(character);
 
@@ -158,8 +157,10 @@ export class CharacterNetworkCreate {
           dataFromServer
         );
 
+        console.log("nearbyCharacterId", nearbyCharacter.id);
+
         const nearbyCharacterPayload = {
-          id: nearbyCharacter._id,
+          id: nearbyCharacter.id.toString(),
           name: nearbyCharacter.name,
           x: nearbyCharacter.x,
           y: nearbyCharacter.y,
