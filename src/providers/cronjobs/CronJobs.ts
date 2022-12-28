@@ -1,3 +1,6 @@
+import { appEnv } from "@providers/config/env";
+import { PM2Helper } from "@providers/server/PM2Helper";
+import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterCrons } from "./CharacterCrons";
 import { ChatLogCrons } from "./ChatLogCrons";
@@ -12,7 +15,8 @@ export class Cronjob {
     private itemCrons: ItemCrons,
     private chatLogCron: ChatLogCrons,
     private npcCron: NPCCrons,
-    private controlTimeCron: ControlTimeCrons
+    private controlTimeCron: ControlTimeCrons,
+    private pm2Helper: PM2Helper
   ) {}
 
   public start(): void {
@@ -22,10 +26,25 @@ export class Cronjob {
   private scheduleCrons(): void {
     console.log("🕒 Start cronjob scheduling...");
 
-    this.characterCron.schedule();
-    this.itemCrons.schedule();
-    this.chatLogCron.schedule();
-    this.npcCron.schedule();
-    this.controlTimeCron.schedule();
+    switch (appEnv.general.ENV) {
+      case EnvType.Development:
+        this.characterCron.schedule();
+        this.itemCrons.schedule();
+        this.chatLogCron.schedule();
+        this.npcCron.schedule();
+        this.controlTimeCron.schedule();
+        break;
+      case EnvType.Staging:
+      case EnvType.Production:
+        // make sure it only runs in one instance
+        if (process.env.NODE_APP_INSTANCE === this.pm2Helper.pickRandomCPUInstance()) {
+          this.characterCron.schedule();
+          this.itemCrons.schedule();
+          this.chatLogCron.schedule();
+          this.npcCron.schedule();
+          this.controlTimeCron.schedule();
+        }
+        break;
+    }
   }
 }
