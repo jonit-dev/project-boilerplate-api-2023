@@ -11,7 +11,7 @@ import { BattleSocketEvents, IBattleDeath, INPCLoot } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import _, { random } from "lodash";
-import { NPCCycle } from "./NPCCycle";
+import { NPC_CYCLES } from "./NPCCycle";
 import { calculateGold } from "./NPCGold";
 import { NPCTarget } from "./movement/NPCTarget";
 
@@ -79,7 +79,7 @@ export class NPCDeath {
   }
 
   private async clearNPCBehavior(npc: INPC): Promise<void> {
-    const npcCycle = NPCCycle.npcCycles.get(npc.id);
+    const npcCycle = NPC_CYCLES.get(npc.id);
 
     if (npcCycle) {
       await npcCycle.clear();

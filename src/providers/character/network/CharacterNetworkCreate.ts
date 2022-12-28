@@ -155,8 +155,6 @@ export class CharacterNetworkCreate {
           dataFromServer
         );
 
-        console.log("nearbyCharacterId", nearbyCharacter.id);
-
         const nearbyCharacterPayload = {
           id: nearbyCharacter.id.toString(),
           name: nearbyCharacter.name,

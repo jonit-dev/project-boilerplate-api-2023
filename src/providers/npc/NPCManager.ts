@@ -3,7 +3,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPCAlignment, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { NPCCycle } from "./NPCCycle";
+import { NPCCycle, NPC_CYCLES } from "./NPCCycle";
 import { NPCLoader } from "./NPCLoader";
 import { NPCView } from "./NPCView";
 import { NPCMovement } from "./movement/NPCMovement";
@@ -32,7 +32,7 @@ export class NPCManager {
 
     for (const npc of nearbyNPCs) {
       // if it has no NPC cycle already...
-      if (NPCCycle.npcCycles.has(npc.id)) {
+      if (NPC_CYCLES.has(npc.id)) {
         continue;
       }
 
@@ -45,11 +45,13 @@ export class NPCManager {
 
     let npcCycle;
 
-    if (!NPCCycle.npcCycles.has(npc.id)) {
+    if (!NPC_CYCLES.has(npc.id)) {
       npcCycle = new NPCCycle(
         npc.id,
         async () => {
           try {
+            console.log(`Behavior for ${initialNPC.key} running on pm2 instance `, process.env.NODE_APP_INSTANCE);
+
             // check if actually there's a character near. If not, let's not waste server resources!
             npc = (await NPC.findById(initialNPC._id).populate("skills")) || initialNPC; // update npc instance on each behavior loop!
 
@@ -76,7 +78,7 @@ export class NPCManager {
           shouldFreezeNPC = !npc.targetCharacter;
         }
 
-        if (shouldFreezeNPC && NPCCycle.npcCycles.has(npc.id)) {
+        if (shouldFreezeNPC && NPC_CYCLES.has(npc.id)) {
           npcCycle.clear();
           clearInterval(interval);
         }

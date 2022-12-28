@@ -18,8 +18,8 @@ import { container, mapLoader } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MapLoader } from "@providers/map/MapLoader";
-import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
-import { NPCCycle } from "@providers/npc/NPCCycle";
+import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
+import { NPC_CYCLES } from "@providers/npc/NPCCycle";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
   fixedPathMockNPC,
@@ -671,7 +671,7 @@ export class UnitTestHelper {
     await mongoose.disconnect();
 
     MapLoader.maps.clear();
-    NPCBattleCycle.npcBattleCycles.clear();
-    NPCCycle.npcCycles.clear();
+    NPC_BATTLE_CYCLES.clear();
+    NPC_CYCLES.clear();
   }
 }
