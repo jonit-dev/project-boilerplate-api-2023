@@ -131,11 +131,11 @@ export class ItemView {
     }
 
     // send all updates in a single message
-    if (itemsToUpdate.length > 0) {
-      this.socketMessaging.sendEventToUser<IItemUpdateAll>(character.channelId!, ItemSocketEvents.UpdateAll, {
-        items: itemsToUpdate,
-      });
-    }
+    if (itemsToUpdate.length === 0) return;
+
+    this.socketMessaging.sendEventToUser<IItemUpdateAll>(character.channelId!, ItemSocketEvents.UpdateAll, {
+      items: itemsToUpdate,
+    });
   }
 
   public async getItemsInCharacterView(character: ICharacter): Promise<IItem[]> {

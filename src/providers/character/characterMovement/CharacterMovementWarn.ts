@@ -1,5 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { ItemView } from "@providers/item/ItemView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCWarn } from "@providers/npc/NPCWarn";
@@ -7,6 +6,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   AnimationDirection,
   CharacterSocketEvents,
+  IAllCharacterPositionUpdateFromServer,
   ICharacterPositionUpdateFromClient,
   ICharacterPositionUpdateFromServer,
 } from "@rpg-engine/shared";
@@ -20,8 +20,7 @@ export class CharacterMovementWarn {
     private characterView: CharacterView,
     private itemView: ItemView,
     private socketMessaging: SocketMessaging,
-    private movementHelper: MovementHelper,
-    private objectHelper: DataStructureHelper
+    private movementHelper: MovementHelper
   ) {}
 
   public async warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): Promise<void> {
@@ -66,6 +65,8 @@ export class CharacterMovementWarn {
   private async warnEmitterAboutCharactersAround(character: ICharacter): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
+    const nearbyCharacterDataPayloads: ICharacterPositionUpdateFromServer[] = [];
+
     for (const nearbyCharacter of nearbyCharacters) {
       await this.characterView.addToCharacterView(
         character,
@@ -79,8 +80,7 @@ export class CharacterMovementWarn {
         "characters"
       );
 
-      // TODO: Send all of this in one event only
-      const nearbyCharacterData: ICharacterPositionUpdateFromServer = {
+      nearbyCharacterDataPayloads.push({
         id: nearbyCharacter.id,
         name: nearbyCharacter.name,
         x: nearbyCharacter.x,
@@ -98,14 +98,18 @@ export class CharacterMovementWarn {
         mana: nearbyCharacter.mana,
         maxMana: nearbyCharacter.maxMana,
         textureKey: nearbyCharacter.textureKey,
-      };
-
-      this.socketMessaging.sendEventToUser<ICharacterPositionUpdateFromServer>(
-        character.channelId!,
-        CharacterSocketEvents.CharacterPositionUpdate,
-        nearbyCharacterData
-      );
+      });
     }
+
+    if (nearbyCharacterDataPayloads.length === 0) return;
+
+    this.socketMessaging.sendEventToUser<IAllCharacterPositionUpdateFromServer>(
+      character.channelId!,
+      CharacterSocketEvents.CharacterPositionUpdateAll,
+      {
+        nearbyCharacters: nearbyCharacterDataPayloads,
+      }
+    );
   }
 
   private generateDataPayloadFromServer(
