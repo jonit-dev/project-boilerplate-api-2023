@@ -39,18 +39,6 @@ export class CharacterMovementWarn {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
-      // we should only warn the nearby char, if there's a mismatch between what he's actually seeing (nearbyCharacter) vs clientPosUpdateData (latest emitter update). This is needed to avoid sending unnecessary data to the client.
-      const nearbyCharEmitterRepresentation = nearbyCharacter.view.characters[character.id];
-      if (nearbyCharEmitterRepresentation) {
-        if (
-          character.x === nearbyCharEmitterRepresentation.x &&
-          character.y === nearbyCharEmitterRepresentation.y &&
-          clientPosUpdateData.direction === nearbyCharEmitterRepresentation.direction
-        ) {
-          continue;
-        }
-      }
-
       const dataFromServer = this.generateDataPayloadFromServer(clientPosUpdateData, character);
 
       await this.characterView.addToCharacterView(
