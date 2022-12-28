@@ -50,8 +50,6 @@ export class NPCManager {
         npc.id,
         async () => {
           try {
-            console.log(`Behavior for ${initialNPC.key} running on pm2 instance `, process.env.NODE_APP_INSTANCE);
-
             // check if actually there's a character near. If not, let's not waste server resources!
             npc = (await NPC.findById(initialNPC._id).populate("skills")) || initialNPC; // update npc instance on each behavior loop!
 
