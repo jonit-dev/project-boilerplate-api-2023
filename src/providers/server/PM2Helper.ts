@@ -13,4 +13,10 @@ export class PM2Helper {
 
     return random(0, totalCPUs - 1).toString();
   }
+
+  public pickLastCPUInstance(): string {
+    const totalCPUs = this.getTotalCPUs();
+
+    return (totalCPUs - 1).toString();
+  }
 }

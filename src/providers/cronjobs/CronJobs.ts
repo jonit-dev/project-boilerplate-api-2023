@@ -37,7 +37,7 @@ export class Cronjob {
       case EnvType.Staging:
       case EnvType.Production:
         // make sure it only runs in one instance
-        if (process.env.NODE_APP_INSTANCE === this.pm2Helper.pickRandomCPUInstance()) {
+        if (process.env.NODE_APP_INSTANCE === this.pm2Helper.pickLastCPUInstance()) {
           this.characterCron.schedule();
           this.itemCrons.schedule();
           this.chatLogCron.schedule();
