@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { ItemView } from "@providers/item/ItemView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCWarn } from "@providers/npc/NPCWarn";
@@ -19,7 +20,8 @@ export class CharacterMovementWarn {
     private characterView: CharacterView,
     private itemView: ItemView,
     private socketMessaging: SocketMessaging,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private objectHelper: DataStructureHelper
   ) {}
 
   public async warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): Promise<void> {
@@ -65,10 +67,6 @@ export class CharacterMovementWarn {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
-      if (!this.shouldWarnCharacter(character, nearbyCharacter)) {
-        continue;
-      }
-
       await this.characterView.addToCharacterView(
         character,
         {
@@ -81,6 +79,7 @@ export class CharacterMovementWarn {
         "characters"
       );
 
+      // TODO: Send all of this in one event only
       const nearbyCharacterData: ICharacterPositionUpdateFromServer = {
         id: nearbyCharacter.id,
         name: nearbyCharacter.name,
@@ -133,15 +132,5 @@ export class CharacterMovementWarn {
       maxMana: character.maxMana,
       textureKey: character.textureKey,
     };
-  }
-
-  private shouldWarnCharacter(emitter: ICharacter, nearbyCharacter: ICharacter): boolean {
-    const charOnCharView = emitter.view.characters[nearbyCharacter.id];
-
-    if (!charOnCharView) {
-      return true;
-    }
-
-    return false;
   }
 }
