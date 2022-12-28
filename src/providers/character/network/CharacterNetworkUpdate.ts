@@ -1,5 +1,4 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
@@ -16,17 +15,12 @@ import {
   ICharacterPositionUpdateConfirm,
   ICharacterPositionUpdateFromClient,
   ICharacterPositionUpdateFromServer,
-  IUIShowMessage,
-  MapLayers,
   ToGridX,
   ToGridY,
-  UISocketEvents,
 } from "@rpg-engine/shared";
-import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
-import { CharacterBan } from "../CharacterBan";
-import { CharacterValidation } from "../CharacterValidation";
 import { CharacterView } from "../CharacterView";
+import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 
 @provide(CharacterNetworkUpdate)
 export class CharacterNetworkUpdate {
@@ -36,14 +30,12 @@ export class CharacterNetworkUpdate {
     private movementHelper: MovementHelper,
     private itemView: ItemView,
     private characterView: CharacterView,
-    private characterBan: CharacterBan,
-    private objectHelper: DataStructureHelper,
     private mapTransition: MapTransition,
     private npcManager: NPCManager,
     private gridManager: GridManager,
     private mapNonPVPZone: MapNonPVPZone,
-    private characterValidation: CharacterValidation,
-    private npcWarn: NPCWarn
+    private npcWarn: NPCWarn,
+    private characterMovementValidation: CharacterMovementValidation
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -66,14 +58,7 @@ export class CharacterNetworkUpdate {
           );
 
           if (isMoving) {
-            isPositionUpdateValid = await this.checkIfValidPositionUpdate(
-              data,
-              character,
-              newX,
-              newY,
-              isMoving,
-              data.direction
-            );
+            isPositionUpdateValid = await this.characterMovementValidation.isValid(character, newX, newY, isMoving);
           }
 
           if (isPositionUpdateValid) {
@@ -276,59 +261,6 @@ export class CharacterNetworkUpdate {
       maxMana: character.maxMana,
       textureKey: character.textureKey,
     };
-  }
-
-  private async checkIfValidPositionUpdate(
-    data: ICharacterPositionUpdateFromClient,
-    character: ICharacter,
-    newX: number,
-    newY: number,
-    isMoving: boolean,
-    clientDirection: AnimationDirection
-  ): Promise<boolean> {
-    if (!isMoving) {
-      return true; // if character is not moving, we dont need to check anything else!
-    }
-
-    if (!this.movementHelper.isSnappedToGrid(newX, newY)) {
-      console.log(`🚫 ${character.name} lost snapping to grid!`);
-      return false;
-    }
-
-    const isSolid = await this.movementHelper.isSolid(
-      character.scene,
-      ToGridX(newX),
-      ToGridY(newY),
-      MapLayers.Character
-    );
-
-    if (isSolid) {
-      return false;
-    }
-
-    if (character.speed === 0) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "Sorry, you're too heavy to move. Please drop something from your inventory.",
-        type: "error",
-      });
-      return false;
-    }
-
-    this.characterValidation.hasBasicValidation(character);
-
-    if (character.lastMovement) {
-      const now = dayjs(new Date());
-      const lastMovement = dayjs(character.lastMovement);
-      const movementDiff = now.diff(lastMovement, "millisecond");
-
-      if (movementDiff < character.movementIntervalMs / 2) {
-        console.log(`🚫 ${character.name} tried to move too fast!`);
-        await this.characterBan.addPenalty(character);
-        return false;
-      }
-    }
-
-    return true;
   }
 
   private async updateServerSideEmitterInfo(
