@@ -26,15 +26,21 @@ export class NPCManager {
     private npcLoader: NPCLoader
   ) {}
 
+  public async disableNPCBehaviors(): Promise<void> {
+    await NPC.updateMany({}, { $set: { behaviorEnabled: false } });
+  }
+
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
     // start behavior loop in all NPCs nearby
     const nearbyNPCs = await this.npcView.getNPCsInView(character);
 
     for (const npc of nearbyNPCs) {
       // if it has no NPC cycle already...
-      if (NPC_CYCLES.has(npc.id)) {
+      if (NPC_CYCLES.has(npc.id) && npc.isBehaviorEnabled) {
         continue;
       }
+
+      await NPC.updateOne({ _id: npc._id }, { $set: { isBehaviorEnabled: true } });
 
       this.startBehaviorLoop(npc);
     }
@@ -50,8 +56,6 @@ export class NPCManager {
         npc.id,
         async () => {
           try {
-            console.log(`Starting ${npc.key} behavior on pm2 instance ${process.env.NODE_APP_INSTANCE}`);
-
             // check if actually there's a character near. If not, let's not waste server resources!
             npc = (await NPC.findById(initialNPC._id).populate("skills")) || initialNPC; // update npc instance on each behavior loop!
 

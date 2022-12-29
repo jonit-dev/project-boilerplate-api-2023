@@ -30,6 +30,9 @@ const npcSchema = createLeanSchema(
       default: NPCSubtype.Humanoid,
       enum: TypeHelper.enumToStringArray(NPCSubtype),
     }),
+    isBehaviorEnabled: Type.boolean({
+      default: false,
+    }),
     textureKey: Type.string({
       required: true,
     }),
