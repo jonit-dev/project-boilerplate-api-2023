@@ -11,15 +11,6 @@ export class NPCCycle {
     this.id = id;
     this.interval = setInterval(() => {
       fn();
-
-      // remove any duplicate cycles
-      if (NPC_CYCLES.has(this.id)) {
-        const npcCycle = NPC_CYCLES.get(this.id);
-        if (npcCycle) {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          npcCycle.clear();
-        }
-      }
     }, intervalSpeed);
 
     if (NPC_CYCLES.has(this.id)) {
