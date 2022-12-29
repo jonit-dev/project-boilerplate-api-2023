@@ -61,7 +61,7 @@ export class NPCManager {
             console.log(err);
           }
         },
-        1500 / npc.speed
+        1250 / npc.speed
       );
 
       // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
