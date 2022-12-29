@@ -21,11 +21,19 @@ import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/enti
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Equipment, IEquipment } from "./EquipmentModel";
 import { Skill } from "./SkillsModel";
+import { profanity } from "@2toad/profanity";
 
 const characterSchema = createLeanSchema(
   {
     name: Type.string({
       required: true,
+      minlength: 3,
+      maxlength: 44,
+      validate: (value) => {
+        if (profanity.exists(value)) {
+          throw new Error("Name contains blacklisted words");
+        }
+      },
     }),
     owner: Type.objectId({
       required: true,
