@@ -24,11 +24,11 @@ export class CharacterMovementWarn {
   ) {}
 
   public async warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): Promise<void> {
+    // bi-directional warn
     await this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
+    await this.warnEmitterAboutCharactersAround(character);
 
     await this.npcWarn.warnCharacterAboutNPCsInView(character);
-
-    await this.warnEmitterAboutCharactersAround(character);
 
     await this.itemView.warnCharacterAboutItemsInView(character);
   }
@@ -68,6 +68,10 @@ export class CharacterMovementWarn {
     const nearbyCharacterDataPayloads: ICharacterPositionUpdateFromServer[] = [];
 
     for (const nearbyCharacter of nearbyCharacters) {
+      if (!this.shouldWarnCharacter(character, nearbyCharacter)) {
+        continue;
+      }
+
       await this.characterView.addToCharacterView(
         character,
         {
@@ -110,6 +114,16 @@ export class CharacterMovementWarn {
         nearbyCharacters: nearbyCharacterDataPayloads,
       }
     );
+  }
+
+  private shouldWarnCharacter(emitter: ICharacter, nearbyCharacter: ICharacter): boolean {
+    const charOnCharView = emitter.view.characters[nearbyCharacter.id];
+
+    if (!charOnCharView) {
+      return true;
+    }
+
+    return false;
   }
 
   private generateDataPayloadFromServer(
