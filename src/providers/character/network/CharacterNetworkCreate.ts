@@ -100,7 +100,7 @@ export class CharacterNetworkCreate {
 
         const dataFromServer: ICharacterCreateFromServer = {
           ...data,
-          id: character._id,
+          id: character._id.toString(),
           name: character.name,
           x: character.x!,
           y: character.y!,
