@@ -4,7 +4,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { CharacterBonusPenalties } from "@providers/character/CharacterBonusPenalties";
+import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -24,6 +24,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { SkillCalculator } from "./SkillCalculator";
+import { SkillFunctions } from "./SkillFunctions";
 @provide(SkillIncrease)
 export class SkillIncrease {
   constructor(
@@ -32,7 +33,8 @@ export class SkillIncrease {
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
     private spellLearn: SpellLearn,
-    private characterBonusPenalties: CharacterBonusPenalties
+    private characterBonusPenalties: CharacterBonusPenalties,
+    private skillFunctions: SkillFunctions
   ) {}
 
   /**
@@ -64,16 +66,19 @@ export class SkillIncrease {
     await this.updateSkills(skills, attacker);
 
     await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weapon?.subType || "None");
-    await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, BasicAttribute.Strength);
+
+    if (weapon?.subType !== ItemSubType.Magic) {
+      await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, BasicAttribute.Strength);
+    }
 
     // If character strength skill level increased, send level up event
     if (increasedStrengthSP && increasedStrengthSP.skillLevelUp && attacker.channelId) {
-      await this.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
+      await this.skillFunctions.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
     }
 
     // If character skill level increased, send level up event specifying the skill that upgraded
     if (increasedWeaponSP.skillLevelUp && attacker.channelId) {
-      await this.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
+      await this.skillFunctions.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
     }
 
     await this.recordXPinBattle(attacker, target, damage);
@@ -105,7 +110,7 @@ export class SkillIncrease {
     if (!_.isEmpty(result)) {
       await this.updateSkills(skills, character);
       if (result.skillLevelUp && character.channelId) {
-        await this.sendSkillLevelUpEvents(result, character);
+        await this.skillFunctions.sendSkillLevelUpEvents(result, character);
       }
 
       await this.characterBonusPenalties.applyRaceBonusPenalties(character, rightHandItem!.subType);
@@ -139,7 +144,7 @@ export class SkillIncrease {
     await this.updateSkills(skills, character);
 
     if (result.skillLevelUp && character.channelId) {
-      await this.sendSkillLevelUpEvents(result, character);
+      await this.skillFunctions.sendSkillLevelUpEvents(result, character);
     }
   }
 
@@ -198,32 +203,6 @@ export class SkillIncrease {
     }
 
     await target.save();
-  }
-
-  private async sendSkillLevelUpEvents(
-    skillData: IIncreaseSPResult,
-    character: ICharacter,
-    target?: INPC | ICharacter
-  ): Promise<void> {
-    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You advanced from level ${skillData.skillLevel - 1} to ${skillData.skillLevel} in ${_.startCase(
-        _.toLower(skillData.skillName)
-      )} fighting.`,
-      type: "info",
-    });
-
-    const levelUpEventPayload: ISkillEventFromServer = {
-      characterId: character.id,
-      targetId: target?.id,
-      targetType: target?.type as "Character" | "NPC",
-      eventType: SkillEventType.SkillLevelUp,
-      level: skillData.skillLevel,
-      skill: skillData.skillName,
-    };
-
-    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
-
-    await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.SkillLevelUp);
   }
 
   private async sendExpLevelUpEvents(

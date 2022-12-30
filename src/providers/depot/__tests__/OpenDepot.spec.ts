@@ -29,13 +29,12 @@ describe("OpenDepot.ts", () => {
   });
 
   it("character without depot | should create new empty depot", async () => {
-    // @ts-ignore
     const depotContainer = await openDepot.getContainer(testCharacter.id, testNPC.id);
 
     expect(depotContainer).toBeDefined();
     expect(depotContainer!.slotQty).toEqual(20);
 
-    // all quest should have status InProgress
+    // all container slots should be empty
     for (const i in depotContainer!.slots) {
       expect(depotContainer!.slots[i]).toBeNull();
     }
@@ -60,7 +59,6 @@ describe("OpenDepot.ts", () => {
     // create depot container for character
     const characterDepot = await unitTestHelper.createMockDepot(testNPC.id, testCharacter.id);
 
-    // @ts-ignore
     const depotContainer = await openDepot.getContainer(testCharacter.id, testNPC.id);
 
     expect(depotContainer).toBeDefined();
@@ -69,7 +67,6 @@ describe("OpenDepot.ts", () => {
   });
 
   it("When a Character is deleted, should remove the Depot", async () => {
-    // @ts-ignore
     const depotContainer = await openDepot.getContainer(testCharacter.id, testNPC.id);
 
     expect(depotContainer).toBeDefined();

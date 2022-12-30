@@ -28,7 +28,7 @@ import {
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { IMagicItemUseWithEntity } from "./useWithTypes";
-import { CharacterBonusPenalties } from "@providers/character/CharacterBonusPenalties";
+import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 
 const StaticEntity = "Item"; // <--- should be added to the EntityType enum from @rpg-engine/shared
 

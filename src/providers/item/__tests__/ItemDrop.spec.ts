@@ -18,6 +18,7 @@ describe("ItemDrop.ts", () => {
   let sendErrorMessageToCharacter: jest.SpyInstance;
   let inventoryItemContainerId: string;
   let characterWeight: CharacterWeight;
+  let itemDropData: IItemDrop;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -48,6 +49,16 @@ describe("ItemDrop.ts", () => {
 
     // @ts-ignore
     sendErrorMessageToCharacter = jest.spyOn(itemDrop.socketMessaging, "sendErrorMessageToCharacter" as any);
+    // @ts-ignore
+    itemDropData = {
+      itemId: testItem.id,
+      scene: testCharacter.scene,
+      x: testCharacter.x,
+      y: testCharacter.y,
+      toPosition: { x: testCharacter.x, y: testCharacter.y, scene: testCharacter.scene },
+      fromContainerId: inventoryItemContainerId,
+      source: "inventory",
+    } as IItemDrop;
   });
 
   const addItemToInventory = async (item: IItem): Promise<IItem> => {
@@ -89,6 +100,18 @@ describe("ItemDrop.ts", () => {
     const itemDropped = await dropItem(inventoryItemContainerId);
 
     expect(itemDropped).toBeTruthy();
+  });
+
+  it("should return false if the item drop is invalid", async () => {
+    // @ts-expect-error
+    const result = await itemDrop.performItemDrop(testItem, testCharacter);
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the item to be dropped is not found", async () => {
+    itemDropData.itemId = "62b792030c3f470048781135";
+    const result = await itemDrop.performItemDrop(itemDropData, testCharacter);
+    expect(result).toBe(false);
   });
 
   it("item should be created on the map after being dropped from the inventory", async () => {
@@ -227,6 +250,120 @@ describe("ItemDrop.ts", () => {
     });
   });
 
+  it("should return false if the item cannot be removed from the equipment set", async () => {
+    itemDropData.source = "equipment";
+
+    // mock tryDroppingToMap to return true
+    // @ts-expect-error
+    itemDrop.tryDroppingToMap = jest.fn().mockResolvedValue(true);
+    // mock removeItemFromEquipmentSet to return false
+    // @ts-expect-error
+    itemDrop.removeItemFromEquipmentSet = jest.fn().mockResolvedValue(false);
+    const result = await itemDrop.performItemDrop(itemDropData, testCharacter);
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the item cannot be removed from the inventory", async () => {
+    const result = await itemDrop.performItemDrop(itemDropData, testCharacter);
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the character is trying to drop an item from a container that they don't own", async () => {
+    const anotherCharacter = await (
+      await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true, hasSkills: true })
+    )
+      .populate("skills")
+      .execPopulate();
+    const anotherCharacterInventory = await anotherCharacter.inventory;
+    const anotherCharacterInventoryItemContainerId = anotherCharacterInventory.itemContainer as unknown as string;
+
+    const itemDropped = await dropItem(anotherCharacterInventoryItemContainerId);
+
+    expect(itemDropped).toBe(false);
+  });
+
+  it("should return false if the container with the given ID cannot be found", async () => {
+    // invalid container id
+    const containerId = "62b792030c3f470048781135";
+    const item = {} as IItem;
+    const character = {} as ICharacter;
+    // @ts-expect-error
+    const result = await itemDrop.removeItemFromInventory(item, character, containerId);
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the item cannot be found in the container", async () => {
+    const item = {} as IItem;
+    const character = {} as ICharacter;
+    // @ts-expect-error
+    const result = await itemDrop.removeItemFromInventory(item, character, inventoryItemContainerId);
+    expect(result).toBe(false);
+  });
+
+  // it("should return true and remove the item from the container if it can be found", async () => {
+  //   const container = new ItemContainer();
+  //   const item = {} as IItem;
+  //   container.slots = [item, {}];
+  //   const containerId = container.id;
+  //   const character = {} as ICharacter;
+  //   // @ts-expect-error
+  //   const result = await itemDrop.removeItemFromInventory(item, character, containerId);
+  //   expect(result).toBe(true);
+  //   expect(container.slots).toEqual([{}, {}]);
+  // });
+
+  // it("should return true if the item is successfully dropped from the equipment set", async () => {
+  //   itemDropData = {
+  //     itemId: testItem.id,
+  //     scene: testCharacter.scene,
+  //     x: testCharacter.x,
+  //     y: testCharacter.y,
+  //     toPosition: { x: testCharacter.x, y: testCharacter.y, scene: testCharacter.scene },
+  //     fromContainerId: "",
+  //     source: "equipment",
+  //   } as IItemDrop;
+
+  //   // Act
+  //   const result = await itemDrop.performItemDrop(itemDropData, testCharacter);
+
+  //   // Assert
+  //   expect(result).toBe(true);
+  // });
+
+  // it("should send a refresh items event to the character if the item is successfully dropped from the equipment set.", async () => {
+  //   // Add the item to the equipment set
+  //   // @ts-expect-error
+  //   const equipmentSet = testCharacter.equipment as unknown as Equipment;
+  //   equipmentSet.rightHand = testItem;
+  //   await testCharacter.save();
+
+  //   // Spy on the refresh items event function
+  //   const sendRefreshItemsEvent = jest.spyOn(itemDrop, "sendRefreshItemsEvent" as any);
+
+  //   // Drop the item from the equipment set
+  //   const itemDropped = await itemDrop.performItemDrop(
+  //     {
+  //       itemId: testItem.id,
+  //       scene: testCharacter.scene,
+  //       x: testCharacter.x,
+  //       y: testCharacter.y,
+  //       toPosition: { x: testCharacter.x, y: testCharacter.y, scene: testCharacter.scene },
+  //       source: "equipment",
+  //     } as IItemDrop,
+  //     testCharacter
+  //   );
+
+  //   // Assert that the item was successfully dropped
+  //   expect(itemDropped).toBe(true);
+
+  //   // Assert that the refresh items event function was called
+  //   expect(sendRefreshItemsEvent).toHaveBeenCalled();
+  // });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.resetAllMocks();
+  });
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });
