@@ -36,6 +36,7 @@
     }
   },
   "dependencies": {
+    "@2toad/profanity": "^2.2.0",
     "@amplitude/identify": "^1.8.2",
     "@amplitude/node": "^1.8.3",
     "@geckos.io/server": "^2.1.8",

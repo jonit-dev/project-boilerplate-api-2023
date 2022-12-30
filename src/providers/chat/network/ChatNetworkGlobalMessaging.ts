@@ -17,6 +17,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
+import { profanity } from "@2toad/profanity";
 
 @provide(ChatNetworkGlobalMessaging)
 export class ChatNetworkGlobalMessaging {
@@ -48,6 +49,17 @@ export class ChatNetworkGlobalMessaging {
           const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
           if (data.message.length > 0) {
+            // If the message contains profanity, replace it with asterisks except the first letter
+            if (profanity.exists(data.message)) {
+              const words = data.message.split(" ");
+              for (let i = 0; i < words.length; i++) {
+                if (profanity.exists(words[i])) {
+                  words[i] = words[i][0] + words[i].substring(1).replace(/[^\s]/g, "*");
+                }
+              }
+              data.message = words.join(" ");
+            }
+
             await this.saveChatLog(data, character);
             const chatLogs = await this.getChatLogsInZone(character, data.limit);
 
