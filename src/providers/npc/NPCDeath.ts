@@ -65,7 +65,7 @@ export class NPCDeath {
       ...blueprintData, // base body props
       key: `${npc.key}-body`,
       bodyFromId: npc.id,
-      owner: character ? character.id : null,
+      // owner: character ? character.id : null,
       texturePath: `${npc.textureKey}/death/0.png`,
       textureKey: npc.textureKey,
       name: `${npc.name}'s body`,
