@@ -3,18 +3,14 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
-import { NPCTarget } from "../movement/NPCTarget";
 import { NPCSpawn } from "../NPCSpawn";
 import { NPCView } from "../NPCView";
-import { NPCWarn } from "../NPCWarn";
 
 describe("NPCSpawn", () => {
   let npc: INPC;
   let npcView: NPCView;
   let mathHelper: MathHelper;
-  let npcWarn: NPCWarn;
   let characterView: CharacterView;
-  let npcTarget: NPCTarget;
   let npcSpawn: NPCSpawn;
 
   beforeAll(async () => {
@@ -23,6 +19,7 @@ describe("NPCSpawn", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
     npc = await unitTestHelper.createMockNPC(null, {});
+
     npcSpawn = container.get<NPCSpawn>(NPCSpawn);
     npcView = {
       save: jest.fn(() => Promise.resolve()),
@@ -36,14 +33,6 @@ describe("NPCSpawn", () => {
       getCharactersAroundXYPosition: jest.fn(() => []),
       getNearestCharactersFromXYPoint: jest.fn(() => undefined),
     } as unknown as CharacterView;
-
-    npcTarget = {
-      clearTarget: jest.fn(() => Promise.resolve()),
-    } as unknown as NPCTarget;
-
-    npcWarn = {
-      warnCharacterAboutNPCsInView: jest.fn(() => Promise.resolve()),
-    } as unknown as NPCWarn;
   });
   afterEach(() => {
     jest.clearAllMocks();
@@ -102,22 +91,22 @@ describe("NPCSpawn", () => {
     expect(result).toBe(true);
   });
 
-  // Need to figure out how to test this
-  // it fails
+  it("should clear the NPC's target", async () => {
+    const clearTargetMock = jest.fn().mockResolvedValue(null);
+    // @ts-ignore
+    npcSpawn.npcTarget.clearTarget = clearTargetMock;
+    await npcSpawn.spawn(npc);
+    expect(clearTargetMock).toHaveBeenCalledWith(npc);
+  });
 
-  // it("should clear the NPC's target", async () => {
-  //   await npcSpawn.spawn(npc);
-  //   expect(npcTarget.clearTarget).toHaveBeenCalledWith(npc);
-  // });
+  it("should return false when the nearest character is within 20 grid units of the NPC's initial position", async () => {
+    // @ts-ignore
+    const getNearestCharactersFromXYPointMock = jest.fn().mockResolvedValue(npc as any);
+    // @ts-ignore
+    npcSpawn.characterView.getNearestCharactersFromXYPoint = getNearestCharactersFromXYPointMock;
 
-  // it("should return false when the nearest character is within 20 grid units of the NPC's initial position", async () => {
-  //   // @ts-ignore
-  //   characterView.getNearestCharactersFromXYPoint.mockImplementation(() => ({
-  //     x: npc.initialX + GRID_WIDTH * 19,
-  //     y: npc.initialY + GRID_WIDTH * 19,
-  //   }));
-  //   // @ts-ignore
-  //   const result = await npcSpawn.canSpawn(npc);
-  //   expect(result).toBe(false);
-  // });
+    // @ts-ignore
+    const result = await npcSpawn.canSpawn(npc);
+    expect(result).toBe(false);
+  });
 });
