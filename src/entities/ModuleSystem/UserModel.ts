@@ -14,7 +14,7 @@ const userSchema = createSchema(
   {
     name: Type.string(),
     role: Type.string({
-      required: true,
+      required: false,
       default: UserTypes.Regular,
       enum: TypeHelper.enumToStringArray(UserTypes),
     }),

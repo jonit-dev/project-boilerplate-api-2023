@@ -3,8 +3,7 @@ import { IsDefined, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } fro
 import { tsDefaultDecorator } from "../../../providers/constants/ValidationConstants";
 
 export class AuthSignUpDTO {
-  @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
-  @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
+  @IsOptional()
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   @MaxLength(50, tsDefaultDecorator("validation", "maxLength"))
   name: string;
