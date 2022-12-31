@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   AccessoriesBlueprint,
   AxesBlueprint,
@@ -74,4 +75,5 @@ export const npcCaveSpider: Partial<INPC> = {
       chance: 5,
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Poison],
 };

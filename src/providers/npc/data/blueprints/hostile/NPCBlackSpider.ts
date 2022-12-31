@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   FoodsBlueprint,
   HelmetsBlueprint,
@@ -54,4 +55,5 @@ export const npcBlackSpider: Partial<INPC> = {
       chance: 20,
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Poison],
 };
