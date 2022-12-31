@@ -4,7 +4,5 @@ import { generateRandomMovement } from "../../abstractions/BaseNeutralNPC";
 
 export const npcBaseRandomPath = {
   ...generateRandomMovement(),
-  name: "Maria",
   key: FriendlyNPCsBlueprint.BaseRandomPath,
-  textureKey: "woman-1",
 } as Partial<INPC>;

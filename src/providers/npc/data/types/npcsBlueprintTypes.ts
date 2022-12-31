@@ -1,6 +1,7 @@
 export enum FriendlyNPCsBlueprint {
   BaseFixedPath = "base-fixed-path",
   BaseRandomPath = "base-random-path",
+  BaseStopped = "base-stopped",
 
   // test npcs
   Agatha = "agatha",
