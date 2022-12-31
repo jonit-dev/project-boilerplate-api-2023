@@ -6,7 +6,7 @@ import { IAuthResponse, TypeHelper, UserAuthFlow, UserTypes } from "@rpg-engine/
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import uniqueValidator from "mongoose-unique-validator";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, createSchema, typedModel } from "ts-mongoose";
 
 const mongooseHidden = require("mongoose-hidden")();
 
@@ -14,7 +14,7 @@ const userSchema = createSchema(
   {
     name: Type.string(),
     role: Type.string({
-      required: false,
+      required: true,
       default: UserTypes.Regular,
       enum: TypeHelper.enumToStringArray(UserTypes),
     }),
