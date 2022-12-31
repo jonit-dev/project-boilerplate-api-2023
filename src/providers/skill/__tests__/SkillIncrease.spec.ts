@@ -10,6 +10,7 @@ import { spellSelfHealing } from "@providers/spells/data/blueprints/SpellSelfHea
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import { BasicAttribute, calculateSPToNextLevel, calculateXPToNextLevel, ItemSubType } from "@rpg-engine/shared";
 import { Error } from "mongoose";
+import { SkillFunctions } from "../SkillFunctions";
 import { SkillIncrease } from "../SkillIncrease";
 
 type TestCase = {
@@ -132,13 +133,14 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     spToLvl2: number,
     spToLvl3: number,
     xpToLvl2: number,
-    sendSkillLevelUpEvents: any,
+    sendSkillLevelUpEvents: jest.SpyInstance,
     sendExpLevelUpEvents: any,
     spellLearnMock: jest.SpyInstance;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     skillIncrease = container.get<SkillIncrease>(SkillIncrease);
+
     initialSkills = new Skill({
       ownerType: "Character",
     }) as ISkill;
@@ -152,7 +154,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(spToLvl3).toBeGreaterThan(spToLvl2);
     expect(xpToLvl2).toBeGreaterThan(0);
 
-    sendSkillLevelUpEvents = jest.spyOn(skillIncrease, "sendSkillLevelUpEvents" as any);
+    sendSkillLevelUpEvents = jest.spyOn(SkillFunctions.prototype, "sendSkillLevelUpEvents" as any);
     sendExpLevelUpEvents = jest.spyOn(skillIncrease, "sendExpLevelUpEvents" as any);
     spellLearnMock = jest.spyOn(SpellLearn.prototype, "learnLatestSkillLevelSpells");
     spellLearnMock.mockImplementation();

@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { CharacterBonusPenalties } from "@providers/character/CharacterBonusPenalties";
+import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { itemsBlueprintIndex } from "@providers/item/data/index";

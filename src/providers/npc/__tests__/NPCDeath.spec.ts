@@ -63,7 +63,6 @@ describe("NPCDeath.ts", () => {
     });
 
     expect(npcBody).toBeDefined();
-    expect(npcBody).not.toBeNull();
 
     expect(!testNPC.isAlive).toBeTruthy();
 
@@ -122,7 +121,6 @@ describe("NPCDeath.ts", () => {
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
     const npcBody = await Item.findOne({
-      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
@@ -150,7 +148,6 @@ describe("NPCDeath.ts", () => {
     await npcDeath.handleNPCDeath(testNPC, testCharacter);
 
     const npcBody = await Item.findOne({
-      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
@@ -182,7 +179,6 @@ describe("NPCDeath.ts", () => {
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
     const npcBody = await Item.findOne({
-      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
@@ -225,7 +221,6 @@ describe("NPCDeath.ts", () => {
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
     const npcBody = await Item.findOne({
-      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
