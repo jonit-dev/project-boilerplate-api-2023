@@ -1,6 +1,7 @@
 import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { npcBaseFixedPath } from "../base/NPCBaseFixedPath";
 import { npcBaseRandomPath } from "../base/NPCBaseRandomPath";
+import { npcBaseStopped } from "../base/NPCBaseStopped";
 import { npcAgatha } from "./NPCAgatha";
 import { npcAlice } from "./NPCAlice";
 import { npcAnnie } from "./NPCAnnie";
@@ -35,6 +36,7 @@ import { npcWomanGreenHair } from "./NPCWomanGreenHair";
 export const friendlyNPCs = {
   [FriendlyNPCsBlueprint.BaseFixedPath]: npcBaseFixedPath,
   [FriendlyNPCsBlueprint.BaseRandomPath]: npcBaseRandomPath,
+  [FriendlyNPCsBlueprint.BaseStopped]: npcBaseStopped,
   [FriendlyNPCsBlueprint.Agatha]: npcAgatha,
   [FriendlyNPCsBlueprint.Alice]: npcAlice,
   [FriendlyNPCsBlueprint.Annie]: npcAnnie,
