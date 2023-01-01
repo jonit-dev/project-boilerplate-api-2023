@@ -18,8 +18,8 @@ import { container, mapLoader } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MapLoader } from "@providers/map/MapLoader";
-import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
-import { NPCCycle } from "@providers/npc/NPCCycle";
+import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
+import { NPC_CYCLES } from "@providers/npc/NPCCycle";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
   fixedPathMockNPC,
@@ -608,7 +608,11 @@ export class UnitTestHelper {
     return newDepot;
   }
 
-  public async equipItemsInBackpackSlot(equipment: IEquipment, itemsKeys: string[]): Promise<IItem[]> {
+  public async equipItemsInBackpackSlot(
+    equipment: IEquipment,
+    itemsKeys: string[],
+    isItemId: boolean = false
+  ): Promise<IItem[]> {
     // Add items to character's backpack
     const backpack = equipment.inventory as unknown as IItem;
     const backpackContainer = await this.createMockBackpackItemContainer(backpack);
@@ -626,11 +630,27 @@ export class UnitTestHelper {
     );
 
     const items: IItem[] = [];
-    for (const key of itemsKeys) {
-      const item = await this.createMockItemFromBlueprint(key);
-      const slotId = backpackContainer.firstAvailableSlotId;
-      backpackContainer.slots[slotId!] = item._id;
-      items.push(item);
+    if (!isItemId) {
+      for (const key of itemsKeys) {
+        const item = await this.createMockItemFromBlueprint(key);
+        const slotId = backpackContainer.firstAvailableSlotId;
+        backpackContainer.slots[slotId!] = item._id;
+        items.push(item);
+      }
+    } else {
+      for (const id of itemsKeys) {
+        const item = (await Item.findById(id)) as unknown as IItem;
+
+        // remove item's coordinates
+        item.x = undefined;
+        item.y = undefined;
+        item.scene = undefined;
+        await item.save();
+
+        const slotId = backpackContainer.firstAvailableSlotId;
+        backpackContainer.slots[slotId!] = item._id;
+        items.push(item);
+      }
     }
 
     backpackContainer.markModified("slots");
@@ -671,7 +691,7 @@ export class UnitTestHelper {
     await mongoose.disconnect();
 
     MapLoader.maps.clear();
-    NPCBattleCycle.npcBattleCycles.clear();
-    NPCCycle.npcCycles.clear();
+    NPC_BATTLE_CYCLES.clear();
+    NPC_CYCLES.clear();
   }
 }

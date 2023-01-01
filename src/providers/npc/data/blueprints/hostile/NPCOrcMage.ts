@@ -10,7 +10,6 @@ import {
   HelmetsBlueprint,
   MacesBlueprint,
   MagicsBlueprint,
-  OthersBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -45,11 +44,6 @@ export const npcOrcMage = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [10, 30],
-    },
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,

@@ -12,7 +12,6 @@ import {
   GlovesBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -46,11 +45,6 @@ export const npcTrollWarrior = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [30, 50],
-    },
     {
       itemBlueprintKey: MacesBlueprint.Mace,
       chance: 25,

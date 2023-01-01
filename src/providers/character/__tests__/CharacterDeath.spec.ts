@@ -4,7 +4,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { NPCBattleCycle } from "@providers/npc/NPCBattleCycle";
+import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import _ from "lodash";
 import { CharacterDeath, DROP_EQUIPMENT_CHANCE } from "../CharacterDeath";
@@ -50,7 +50,7 @@ describe("CharacterDeath.ts", () => {
     const updatedNPC = await NPC.findById(testNPC.id);
     expect(updatedNPC?.targetCharacter).toBeUndefined();
 
-    const npcBattleCycle = NPCBattleCycle.npcBattleCycles.get(testNPC.id);
+    const npcBattleCycle = NPC_BATTLE_CYCLES.get(testNPC.id);
 
     expect(npcBattleCycle).toBeUndefined();
   });

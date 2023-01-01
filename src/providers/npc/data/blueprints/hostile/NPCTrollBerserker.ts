@@ -14,7 +14,6 @@ import {
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -48,11 +47,6 @@ export const npcTrollBerserker = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [60, 80],
-    },
     {
       itemBlueprintKey: GlovesBlueprint.PlateGloves,
       chance: 30,

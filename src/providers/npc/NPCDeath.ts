@@ -1,15 +1,18 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, INPCLoot } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
-import { NPCCycle } from "./NPCCycle";
+import _, { random } from "lodash";
+import { NPC_CYCLES } from "./NPCCycle";
+import { calculateGold } from "./NPCGold";
 import { NPCTarget } from "./movement/NPCTarget";
 
 @provide(NPCDeath)
@@ -33,29 +36,23 @@ export class NPCDeath {
       }
 
       // create NPC body instance
+      let goldLoot;
       const npcBody = await this.generateNPCBody(npc, character);
 
-      // add loot in NPC dead body container
       if (npc.loots) {
-        await this.addLootToNPCBody(npcBody, npc.loots);
+        const npcSkills = await npc.populate("skills").execPopulate();
+
+        goldLoot = this.getGoldLoot(npcSkills);
+
+        // add loot in NPC dead body container
       }
+      await this.addLootToNPCBody(npcBody, [...(npc?.loots ?? []), goldLoot ?? []]);
 
-      // disable NPC behavior
-
-      const npcCycle = NPCCycle.npcCycles.get(npc.id);
-
-      if (npcCycle) {
-        await npcCycle.clear();
-      }
-
-      await this.npcTarget.clearTarget(npc);
+      await this.clearNPCBehavior(npc);
 
       npc.health = 0; // guarantee that he's dead when this method is called =)
-
       npc.nextSpawnTime = dayjs(new Date()).add(npc.spawnIntervalMin, "minutes").toDate();
-
       npc.currentMovementType = npc.originalMovementType; // restart original movement;
-
       await npc.save();
     } catch (error) {
       console.error(error);
@@ -68,7 +65,6 @@ export class NPCDeath {
       ...blueprintData, // base body props
       key: `${npc.key}-body`,
       bodyFromId: npc.id,
-      owner: character ? character.id : null,
       texturePath: `${npc.textureKey}/death/0.png`,
       textureKey: npc.textureKey,
       name: `${npc.name}'s body`,
@@ -79,6 +75,32 @@ export class NPCDeath {
     });
 
     return npcBody.save();
+  }
+
+  private async clearNPCBehavior(npc: INPC): Promise<void> {
+    const npcCycle = NPC_CYCLES.get(npc.id);
+
+    if (npcCycle) {
+      await npcCycle.clear();
+    }
+
+    await this.npcTarget.clearTarget(npc);
+  }
+
+  private getGoldLoot(npc: INPC): INPCLoot {
+    if (!npc.skills) {
+      throw new Error(`Error while calculating gold loot for NPC with key ${npc.key}: NPC has no skills.`);
+    }
+
+    const calculatedGold = calculateGold(npc.maxHealth, npc?.skills as unknown as Partial<ISkill>);
+    const randomPercentage = (): number => random(70, 100) / 100;
+    const goldLoot: INPCLoot = {
+      chance: 30,
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      quantityRange: [Math.floor(randomPercentage() * calculatedGold), Math.floor(calculatedGold)],
+    };
+
+    return goldLoot;
   }
 
   private async addLootToNPCBody(npcBody: IItem, loots: INPCLoot[]): Promise<void> {

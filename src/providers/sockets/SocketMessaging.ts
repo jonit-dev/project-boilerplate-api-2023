@@ -18,7 +18,7 @@ export class SocketMessaging {
     }
 
     this.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: appEnv.general.ENV === EnvType.Development ? message || "Sorry, not possible." : "Sorry, not possible.",
+      message: message ?? "Sorry, not possible",
       type,
     });
   }

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { FromGridX, FromGridY } from "@rpg-engine/shared";
+import { OthersBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { FromGridX, FromGridY, INPCLoot } from "@rpg-engine/shared";
 import { NPCDeath } from "../NPCDeath";
 
 describe("NPCDeath.ts", () => {
@@ -22,7 +22,7 @@ describe("NPCDeath.ts", () => {
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
 
-    testNPC = await unitTestHelper.createMockNPC();
+    testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
     testCharacter = await unitTestHelper.createMockCharacter();
 
     testNPC.x = FromGridX(0);
@@ -63,11 +63,53 @@ describe("NPCDeath.ts", () => {
     });
 
     expect(npcBody).toBeDefined();
-    expect(npcBody).not.toBeNull();
 
     expect(!testNPC.isAlive).toBeTruthy();
 
     expect(testNPC.nextSpawnTime).toBeDefined();
+  });
+
+  it("should add the correct amount of gold to the NPC's body", async () => {
+    // Set NPC's max health and skills to values that will result in a specific amount of gold drop
+
+    testNPC = await testNPC.populate("skills").execPopulate();
+
+    testNPC.maxHealth = 100;
+
+    await testNPC.save();
+
+    expect(testNPC.skills).toBeDefined();
+
+    const mockGetGoldLoot = {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 100,
+      quantityRange: [4, 4],
+    } as INPCLoot;
+
+    // @ts-expect-error
+    npcDeath.getGoldLoot = jest.fn().mockReturnValue(mockGetGoldLoot);
+
+    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+
+    // Find the NPC's body
+    const npcBody = await Item.findOne({
+      bodyFromId: testNPC._id,
+    });
+
+    expect(npcBody).not.toBeNull();
+    expect(npcBody!.itemContainer).toBeDefined();
+
+    const bodyItemContainer = (await ItemContainer.findById(npcBody!.itemContainer)) as IItemContainer;
+
+    expect(bodyItemContainer).not.toBeNull();
+
+    expect(bodyItemContainer.slots).toBeDefined();
+
+    const goldCoinItem = bodyItemContainer.slots[1];
+
+    expect(goldCoinItem.key).toBe(OthersBlueprint.GoldCoin);
+
+    expect(goldCoinItem.stackQty).toBe(4);
   });
 
   it("on NPC death, make sure loot is added to NPC body", async () => {
@@ -79,7 +121,6 @@ describe("NPCDeath.ts", () => {
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
     const npcBody = await Item.findOne({
-      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
@@ -107,7 +148,6 @@ describe("NPCDeath.ts", () => {
     await npcDeath.handleNPCDeath(testNPC, testCharacter);
 
     const npcBody = await Item.findOne({
-      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
@@ -139,7 +179,6 @@ describe("NPCDeath.ts", () => {
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
     const npcBody = await Item.findOne({
-      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,
@@ -168,12 +207,20 @@ describe("NPCDeath.ts", () => {
       },
     ];
 
+    const mockGetGoldLoot = {
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 0,
+      quantityRange: [0, 1],
+    } as INPCLoot;
+
+    // @ts-expect-error
+    npcDeath.getGoldLoot = jest.fn().mockReturnValue(mockGetGoldLoot);
+
     await npcDeath.handleNPCDeath(testNPC, testCharacter);
 
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
     const npcBody = await Item.findOne({
-      owner: testCharacter._id,
       name: `${testNPC.name}'s body`,
       x: testNPC.x,
       y: testNPC.y,

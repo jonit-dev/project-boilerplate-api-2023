@@ -4,7 +4,6 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
   FoodsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -39,11 +38,6 @@ export const npcYeti: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [25, 75],
-    },
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,

@@ -1,11 +1,12 @@
 import { appEnv } from "@providers/config/env";
-import { EnvType } from "@rpg-engine/shared/dist";
+import { PM2Helper } from "@providers/server/PM2Helper";
+import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterCrons } from "./CharacterCrons";
 import { ChatLogCrons } from "./ChatLogCrons";
+import { ControlTimeCrons } from "./ControlTimeCrons";
 import { ItemCrons } from "./ItemCrons";
 import { NPCCrons } from "./NPCCrons";
-import { ControlTimeCrons } from "./ControlTimeCrons";
 
 @provide(Cronjob)
 export class Cronjob {
@@ -14,7 +15,8 @@ export class Cronjob {
     private itemCrons: ItemCrons,
     private chatLogCron: ChatLogCrons,
     private npcCron: NPCCrons,
-    private controlTimeCron: ControlTimeCrons
+    private controlTimeCron: ControlTimeCrons,
+    private pm2Helper: PM2Helper
   ) {}
 
   public start(): void {
@@ -25,35 +27,23 @@ export class Cronjob {
     console.log("🕒 Start cronjob scheduling...");
 
     switch (appEnv.general.ENV) {
-      case EnvType.Production:
-      case EnvType.Staging:
-        switch (
-          process.env.pm_id // spread across pm2 clusters to balance workload
-        ) {
-          case "0":
-            this.characterCron.schedule();
-            break;
-          case "1":
-            this.chatLogCron.schedule();
-            break;
-          case "2":
-            this.itemCrons.schedule();
-            break;
-          case "3":
-            this.npcCron.schedule();
-            break;
-          case "4":
-            this.controlTimeCron.schedule();
-            break;
-        }
-        break;
       case EnvType.Development:
-      default:
         this.characterCron.schedule();
         this.itemCrons.schedule();
         this.chatLogCron.schedule();
         this.npcCron.schedule();
         this.controlTimeCron.schedule();
+        break;
+      case EnvType.Staging:
+      case EnvType.Production:
+        // make sure it only runs in one instance
+        if (process.env.NODE_APP_INSTANCE === this.pm2Helper.pickLastCPUInstance()) {
+          this.characterCron.schedule();
+          this.itemCrons.schedule();
+          this.chatLogCron.schedule();
+          this.npcCron.schedule();
+          this.controlTimeCron.schedule();
+        }
         break;
     }
   }

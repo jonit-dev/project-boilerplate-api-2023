@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   AxesBlueprint,
   BootsBlueprint,
@@ -10,7 +11,6 @@ import {
   HammersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
@@ -51,11 +51,7 @@ export const npcGiantSpider: Partial<INPC> = {
       itemBlueprintKey: ContainersBlueprint.Backpack,
       chance: 10,
     },
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [75, 200],
-    },
+
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,
@@ -98,4 +94,5 @@ export const npcGiantSpider: Partial<INPC> = {
       chance: 50,
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Poison],
 };

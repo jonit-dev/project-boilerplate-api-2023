@@ -21,11 +21,19 @@ import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/enti
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Equipment, IEquipment } from "./EquipmentModel";
 import { Skill } from "./SkillsModel";
+import { profanity } from "@2toad/profanity";
 
 const characterSchema = createLeanSchema(
   {
     name: Type.string({
       required: true,
+      minlength: 3,
+      maxlength: 44,
+      validate: (value) => {
+        if (profanity.exists(value)) {
+          throw new Error("Name contains blacklisted words");
+        }
+      },
     }),
     owner: Type.objectId({
       required: true,
@@ -185,23 +193,7 @@ const characterSchema = createLeanSchema(
 );
 
 characterSchema.virtual("movementIntervalMs").get(function (this: ICharacter) {
-  const ratio = this.weight / this.maxWeight;
-
-  if (ratio <= 1) {
-    return this.baseMovementIntervalMs;
-  }
-
-  if (ratio > 1 && ratio <= 2) {
-    return this.baseMovementIntervalMs * 0.8;
-  }
-
-  if (ratio > 2 && ratio <= 4) {
-    return this.baseMovementIntervalMs * 0.6;
-  }
-
-  if (ratio > 4) {
-    return 0;
-  }
+  return 1000 / this.speed / 12;
 });
 
 characterSchema.virtual("speed").get(function (this: ICharacter) {

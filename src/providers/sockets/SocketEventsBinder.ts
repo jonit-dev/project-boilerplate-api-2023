@@ -1,15 +1,15 @@
 import { BattleNetwork } from "@providers/battle/network/BattleNetwork";
 import { CharacterNetwork } from "@providers/character/network/CharacterNetwork";
 import { ChatNetwork } from "@providers/chat/network/ChatNetwork";
+import { DepotNetwork } from "@providers/depot/network/DepotNetwork";
 import { EquipmentNetwork } from "@providers/equipment/network/EquipmentNetwork";
 import { ItemNetwork } from "@providers/item/network/ItemNetwork";
 import { ItemContainerNetwork } from "@providers/itemContainer/network/ItemContainerNetwork";
 import { NPCNetwork } from "@providers/npc/network/NPCNetwork";
 import { QuestNetwork } from "@providers/quest/network/QuestNetwork";
 import { SkillNetwork } from "@providers/skill/network/SkillNetwork";
-import { DepotNetwork } from "@providers/depot/network/DepotNetwork";
-import { ViewNetwork } from "@providers/view/network/ViewNetwork";
 import { UseWithNetwork } from "@providers/useWith/network/UseWithNetwork";
+import { ViewNetwork } from "@providers/view/network/ViewNetwork";
 import { provide } from "inversify-binding-decorators";
 import { SocketChannel } from "./SocketsTypes";
 

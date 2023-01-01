@@ -4,7 +4,7 @@ import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { NPCBattleCycle } from "../NPCBattleCycle";
+import { NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 import { NPCView } from "../NPCView";
 import { NPCDirection } from "./NPCMovement";
 
@@ -19,7 +19,7 @@ export class NPCTarget {
 
     await npc.save();
 
-    const npcBattleCycle = NPCBattleCycle.npcBattleCycles.get(npc.id);
+    const npcBattleCycle = NPC_BATTLE_CYCLES.get(npc.id);
     if (npcBattleCycle) {
       await npcBattleCycle.clear();
     }

@@ -27,7 +27,7 @@ import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
 import { BattleRangedAttack } from "./BattleRangedAttack";
 import { BattleNetworkStopTargeting } from "./network/BattleNetworkStopTargetting";
-import { CharacterBonusPenalties } from "@providers/character/CharacterBonusPenalties";
+import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -197,7 +197,7 @@ export class BattleAttackTarget {
             weapon?.subType === ItemSubType.Magic ? BasicAttribute.MagicResistance : BasicAttribute.Resistance;
           await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, attr);
 
-          await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, BasicAttribute.Resistance);
+          await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, attr);
         }
 
         /*

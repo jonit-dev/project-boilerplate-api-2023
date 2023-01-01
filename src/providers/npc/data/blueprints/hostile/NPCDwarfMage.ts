@@ -11,7 +11,6 @@ import {
   HelmetsBlueprint,
   MacesBlueprint,
   MagicsBlueprint,
-  OthersBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -52,11 +51,7 @@ export const npcDwarfMage: Partial<INPC> = {
       itemBlueprintKey: ContainersBlueprint.Backpack,
       chance: 10,
     },
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [30, 60],
-    },
+
     {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,

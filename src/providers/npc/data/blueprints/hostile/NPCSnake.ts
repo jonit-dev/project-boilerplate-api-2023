@@ -1,11 +1,8 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import {
-  CraftingResourcesBlueprint,
-  OthersBlueprint,
-  PotionsBlueprint,
-} from "@providers/item/data/types/itemsBlueprintTypes";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
+import { CraftingResourcesBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -39,11 +36,6 @@ export const npcSnake: Partial<INPC> = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [3, 10],
-    },
-    {
       itemBlueprintKey: PotionsBlueprint.LightAntidote,
       chance: 10,
     },
@@ -53,4 +45,5 @@ export const npcSnake: Partial<INPC> = {
       quantityRange: [5, 10],
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Poison],
 };

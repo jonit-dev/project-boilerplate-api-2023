@@ -5,7 +5,6 @@ import {
   BootsBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -42,12 +41,6 @@ export const npcMudGolem: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [30, 70],
-    },
-
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,

@@ -8,14 +8,15 @@ import {
   cronJobs,
   db,
   mapLoader,
+  npcManager,
   seeds,
   server,
   socketAdapter,
 } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
-import { app } from "@providers/server/app";
 import { router } from "@providers/server/Router";
+import { app } from "@providers/server/app";
 import { EnvType } from "@rpg-engine/shared/dist";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
@@ -47,6 +48,8 @@ app.listen(port, async () => {
 
   // Firebase-admin setup, that push notification requires.
   PushNotificationHelper.initialize();
+
+  await npcManager.disableNPCBehaviors();
 
   await seeds.start();
 

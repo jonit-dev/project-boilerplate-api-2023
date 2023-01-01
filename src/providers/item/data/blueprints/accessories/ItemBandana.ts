@@ -12,6 +12,6 @@ export const itemBandana: Partial<IItem> = {
   description: "a simple cloth bandana.",
   defense: 0.5,
   weight: 0.1,
-  allowedEquipSlotType: [ItemSlotType.Accessory],
+  allowedEquipSlotType: [ItemSlotType.Neck],
   basePrice: 1,
 };

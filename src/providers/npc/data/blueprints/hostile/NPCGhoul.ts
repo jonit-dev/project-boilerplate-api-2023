@@ -6,7 +6,6 @@ import {
   GlovesBlueprint,
   LegsBlueprint,
   MacesBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   SpearsBlueprint,
@@ -45,11 +44,6 @@ export const npcGhoul = {
   },
   fleeOnLowHealth: false,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [10, 25],
-    },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 10,

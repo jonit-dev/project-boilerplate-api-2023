@@ -147,7 +147,7 @@ export class CharacterItemSlots {
       if (!slotItem) continue;
       if (slotItem._id.toString() === itemId.toString()) {
         // Changing item slot to undefined, thus removing it
-        targetContainer.slots[i] = undefined;
+        targetContainer.slots[i] = null;
 
         await ItemContainer.updateOne(
           {

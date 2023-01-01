@@ -2,12 +2,12 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   AccessoriesBlueprint,
   DaggersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
@@ -45,11 +45,6 @@ export const npcAssaultSpider: Partial<INPC> = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [3, 10],
-    },
-    {
       itemBlueprintKey: PotionsBlueprint.ManaPotion,
       chance: 20,
     },
@@ -82,4 +77,5 @@ export const npcAssaultSpider: Partial<INPC> = {
       chance: 10,
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Poison],
 };

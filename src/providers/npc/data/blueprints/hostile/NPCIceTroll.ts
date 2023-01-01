@@ -5,7 +5,6 @@ import {
   AxesBlueprint,
   BootsBlueprint,
   FoodsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -43,11 +42,6 @@ export const npcIceTroll: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [25, 40],
-    },
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 20,

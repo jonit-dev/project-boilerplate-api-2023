@@ -5,7 +5,6 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -39,11 +38,6 @@ export const npcGiantBat: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [5, 10],
-    },
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 15,

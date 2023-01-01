@@ -5,7 +5,6 @@ import {
   ArmorsBlueprint,
   BootsBlueprint,
   HelmetsBlueprint,
-  OthersBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -42,11 +41,6 @@ export const npcRedDragon = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 50,
-      quantityRange: [100, 225],
-    },
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
       chance: 40,

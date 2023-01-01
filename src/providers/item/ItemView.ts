@@ -5,10 +5,11 @@ import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHel
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IItemUpdate,
+  IItemUpdateAll,
+  IViewDestroyElementPayload,
   ItemSocketEvents,
   ItemSubType,
   ItemType,
-  IViewDestroyElementPayload,
   ViewSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -87,10 +88,10 @@ export class ItemView {
 
   public async warnCharacterAboutItemsInView(character: ICharacter): Promise<void> {
     const itemsNearby = await this.getItemsInCharacterView(character);
+    const itemsToUpdate: IItemUpdate[] = [];
 
     for (const item of itemsNearby) {
       // if we already have this item in the character view, with an updated payload, just skip it!
-
       const itemOnCharView = character.view.items[item.id];
 
       // if we already have a representation there, just skip!
@@ -102,7 +103,7 @@ export class ItemView {
         continue;
       }
 
-      this.socketMessaging.sendEventToUser<IItemUpdate>(character.channelId!, ItemSocketEvents.Update, {
+      itemsToUpdate.push({
         id: item.id,
         texturePath: item.texturePath,
         textureAtlas: item.textureAtlas,
@@ -128,6 +129,13 @@ export class ItemView {
         "items"
       );
     }
+
+    // send all updates in a single message
+    if (itemsToUpdate.length === 0) return;
+
+    this.socketMessaging.sendEventToUser<IItemUpdateAll>(character.channelId!, ItemSocketEvents.UpdateAll, {
+      items: itemsToUpdate,
+    });
   }
 
   public async getItemsInCharacterView(character: ICharacter): Promise<IItem[]> {

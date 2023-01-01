@@ -100,7 +100,7 @@ export class CharacterNetworkCreate {
 
         const dataFromServer: ICharacterCreateFromServer = {
           ...data,
-          id: character._id,
+          id: character._id.toString(),
           name: character.name,
           x: character.x!,
           y: character.y!,
@@ -156,7 +156,7 @@ export class CharacterNetworkCreate {
         );
 
         const nearbyCharacterPayload = {
-          id: nearbyCharacter._id,
+          id: nearbyCharacter.id.toString(),
           name: nearbyCharacter.name,
           x: nearbyCharacter.x,
           y: nearbyCharacter.y,

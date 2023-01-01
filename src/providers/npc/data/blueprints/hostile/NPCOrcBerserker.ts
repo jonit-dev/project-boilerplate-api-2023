@@ -8,7 +8,6 @@ import {
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
-  OthersBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -42,11 +41,6 @@ export const npcOrcBerserker = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [10, 40],
-    },
     {
       itemBlueprintKey: BootsBlueprint.IronBoots,
       chance: 10,

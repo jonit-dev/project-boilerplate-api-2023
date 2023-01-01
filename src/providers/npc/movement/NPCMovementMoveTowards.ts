@@ -15,7 +15,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { NPCBattleCycle } from "../NPCBattleCycle";
+import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
@@ -158,7 +158,7 @@ export class NPCMovementMoveTowards {
   }
 
   private initBattleCycle(npc: INPC): void {
-    const hasBattleCycle = NPCBattleCycle.npcBattleCycles.has(npc.id);
+    const hasBattleCycle = NPC_BATTLE_CYCLES.has(npc.id);
 
     if (!hasBattleCycle) {
       new NPCBattleCycle(

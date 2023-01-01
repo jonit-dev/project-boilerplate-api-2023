@@ -5,7 +5,6 @@ import {
   BootsBlueprint,
   ContainersBlueprint,
   FoodsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -43,11 +42,6 @@ export const npcForestWalker: Partial<INPC> = {
   fleeOnLowHealth: true,
 
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [25, 60],
-    },
     {
       itemBlueprintKey: PotionsBlueprint.LightLifePotion,
       chance: 30,

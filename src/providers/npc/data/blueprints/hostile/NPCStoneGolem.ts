@@ -6,7 +6,6 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
-  OthersBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -44,12 +43,6 @@ export const npcStoneGolem: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: OthersBlueprint.GoldCoin,
-      chance: 30,
-      quantityRange: [30, 80],
-    },
-
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,

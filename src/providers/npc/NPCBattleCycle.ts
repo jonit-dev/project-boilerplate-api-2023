@@ -2,9 +2,9 @@ import { Character } from "@entities/ModuleCharacter/CharacterModel";
 
 type SetInterval = ReturnType<typeof setInterval>;
 
-export class NPCBattleCycle {
-  public static npcBattleCycles: Map<string, NPCBattleCycle> = new Map<string, NPCBattleCycle>(); // create a map to store npc behavior intervals.
+export const NPC_BATTLE_CYCLES: Map<string, NPCBattleCycle> = new Map<string, NPCBattleCycle>();
 
+export class NPCBattleCycle {
   public interval: SetInterval;
   public id: string;
 
@@ -14,20 +14,20 @@ export class NPCBattleCycle {
       fn();
     }, intervalSpeed);
 
-    if (NPCBattleCycle.npcBattleCycles.has(this.id)) {
-      const npcCycle = NPCBattleCycle.npcBattleCycles.get(this.id);
+    if (NPC_BATTLE_CYCLES.has(this.id)) {
+      const npcCycle = NPC_BATTLE_CYCLES.get(this.id);
       if (npcCycle) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         npcCycle.clear();
       }
     } else {
-      NPCBattleCycle.npcBattleCycles.set(this.id, this);
+      NPC_BATTLE_CYCLES.set(this.id, this);
     }
   }
 
   public async clear(): Promise<void> {
     clearInterval(this.interval);
-    NPCBattleCycle.npcBattleCycles.delete(this.id);
+    NPC_BATTLE_CYCLES.delete(this.id);
 
     await Character.updateOne({ _id: this.id }, { $unset: { target: 1 } });
   }
