@@ -7,7 +7,6 @@ export class ItemCrons {
   public schedule(): void {
     nodeCron.schedule("* * * * *", async () => {
       // find all items with decay time
-      console.log("🕒 Cleaning out decayed items...");
 
       const items = await Item.find({
         decayTime: {

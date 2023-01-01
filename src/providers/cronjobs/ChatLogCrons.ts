@@ -7,8 +7,6 @@ import nodeCron from "node-cron";
 export class ChatLogCrons {
   public schedule(): void {
     nodeCron.schedule("0 0 * * 7", async () => {
-      console.log("🕒 Cleaning up chat logs...");
-
       await this.deleteOldMessages();
     });
   }
