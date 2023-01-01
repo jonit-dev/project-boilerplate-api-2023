@@ -11,6 +11,7 @@ export class NPCCrons {
   public schedule(): void {
     nodeCron.schedule("* * * * *", async () => {
       // filter all dead npcs that have a nextSpawnTime > now
+      console.log("🕒 Spawning NPCs...");
 
       const deadNPCs = await NPC.find({
         health: 0,

@@ -38,7 +38,6 @@ export class Cronjob {
       case EnvType.Production:
         // make sure it only runs in one instance
         if (process.env.pm_id === this.pm2Helper.pickLastCPUInstance()) {
-          console.log("Starting production cron jobs...");
           this.characterCron.schedule();
           this.itemCrons.schedule();
           this.chatLogCron.schedule();
