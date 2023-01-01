@@ -5,15 +5,15 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
-import { MovementHelper, IPosition } from "@providers/movement/MovementHelper";
+import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
+  FromGridX,
+  FromGridY,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
   IItemDrop,
   ItemSocketEvents,
-  FromGridX,
-  FromGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
@@ -174,13 +174,11 @@ export class ItemDrop {
     const targetContainer = await ItemContainer.findById(fromContainerId);
 
     if (!item) {
-      console.log("dropItemFromInventory: Item not found");
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
 
     if (!targetContainer) {
-      console.log("dropItemFromInventory: Character container not found");
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
