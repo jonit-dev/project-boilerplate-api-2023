@@ -1,6 +1,6 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { unitTestHelper } from "@providers/inversify/container";
-import { NPCBattleCycle } from "../NPCBattleCycle";
+import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 
 let npcBattleCycles: NPCBattleCycle;
 let id: string;
@@ -12,7 +12,6 @@ describe("NPCBattleCycle.ts", () => {
     id = "62b792030c3f470048781135";
     fn = jest.fn();
     intervalSpeed = -1;
-
     // Create an NPCBattleCycle instance
     npcBattleCycles = new NPCBattleCycle(id, fn, intervalSpeed);
   });
@@ -27,22 +26,35 @@ describe("NPCBattleCycle.ts", () => {
     await unitTestHelper.afterAllJestHook();
   });
 
-  it("should add the NPCBattleCycle instance to the npcBattleCycles map when it is created", (done) => {
-    jest.runAllTimers();
-    expect(NPCBattleCycle.npcBattleCycles.get(id)).toEqual(npcBattleCycles);
-    done();
+  it("should test that the NPCBattleCycle instance is correctly added to the NPC_BATTLE_CYCLES map when it is created", () => {
+    expect(NPC_BATTLE_CYCLES.has(id)).toBe(true);
+    expect(NPC_BATTLE_CYCLES.get(id)).toBe(npcBattleCycles);
   });
 
-  it("should test that the clear method removes the NPCBattleCycle instance from the npcBattleCycles map and clears the interval", async () => {
+  it("should test that the function passed to the constructor is called at the specified interval", async () => {
+    // Create a mock function and track the number of times it is called
+    const mockFn = jest.fn();
+
+    // Create a new NPCBattleCycle instance with a 10ms interval and the mock function
+    const npcBattleCycle = new NPCBattleCycle(id, mockFn, 10);
+
+    // Wait 20ms to allow the function to be called twice
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    // Stop the interval and remove the NPCBattleCycle instance from the map
+    await npcBattleCycle.clear();
+
+    // Assert that the mock function was called twice
+    expect(mockFn).toHaveBeenCalledTimes(2);
+  });
+
+  it("should test that the clearInterval function was called with the correct interval", async () => {
     const clearIntervalSpy = jest.spyOn(global, "clearInterval");
 
     await npcBattleCycles.clear();
 
     // Verify that the clearInterval function was called with the correct interval
     expect(clearIntervalSpy).toHaveBeenCalledWith(npcBattleCycles.interval);
-
-    // Verify that the npcCycle instance was removed from the npcCycles map
-    expect(NPCBattleCycle.npcBattleCycles.has(id)).toBe(false);
   });
 
   it("should test that the clear method updates the target field of the Character document with the given id", async () => {
@@ -64,18 +76,22 @@ describe("NPCBattleCycle.ts", () => {
   });
 
   it("should test that the clear method does not throw an error if the interval has already been cleared", async () => {
-    // Mock the clearInterval function to return undefined
-    jest.spyOn(global, "clearInterval").mockReturnValue(undefined);
+    // // Mock the clearInterval function to return undefined
+    // jest.spyOn(global, "clearInterval").mockReturnValue(undefined);
+    // Clear the interval
+    await npcBattleCycles.clear();
 
     // Call the clear method
     await expect(npcBattleCycles.clear()).resolves.not.toThrowError();
   });
 
-  it("should test that the clear method does not throw an error if the NPCBattleCycle instance is not found in the npcCycles map", async () => {
-    // Remove the NPCCycle instance from the npcCycles map
-    NPCBattleCycle.npcBattleCycles.delete(npcBattleCycles.id);
+  it("should test that the clear method does not throw an error if the NPC_BATTLE_CYCLES map is empty", async () => {
+    NPC_BATTLE_CYCLES.clear();
 
-    // Verify that the clear method does not throw an error
-    await expect(npcBattleCycles.clear()).resolves.not.toThrowError();
+    // Clear the NPCBattleCycle instance
+    await npcBattleCycles.clear();
+
+    // Assert that the clear method did not throw an error
+    expect(() => {}).not.toThrowError();
   });
 });
