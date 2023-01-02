@@ -30,10 +30,18 @@ export class SocketAdapter implements ISocket {
   }
 
   public emitToUser<T>(channel: string, eventName: string, data?: T): void {
+    if (data) {
+      data = this.applyDataMiddleware(data) as T;
+    }
+
     SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
   }
 
   public emitToAllUsers<T>(eventName: string, data?: T): void {
+    if (data) {
+      data = this.applyDataMiddleware(data) as T;
+    }
+
     SocketAdapter.socketClass?.emitToAllUsers(eventName, data);
   }
 
@@ -45,5 +53,23 @@ export class SocketAdapter implements ISocket {
 
   public async disconnect(): Promise<void> {
     await SocketAdapter.socketClass?.disconnect();
+  }
+
+  private applyDataMiddleware(data: Record<string, any>): Record<string, unknown> {
+    if (data) {
+      for (const [key, value] of Object.entries(data)) {
+        if (key === "_id" || key === "id") {
+          data[key] = value.toString();
+        }
+
+        if (typeof value === "object") {
+          if (value.toObject) {
+            data[key] = value.toObject();
+          }
+        }
+      }
+    }
+
+    return data;
   }
 }
