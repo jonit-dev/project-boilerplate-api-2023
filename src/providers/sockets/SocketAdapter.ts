@@ -61,12 +61,6 @@ export class SocketAdapter implements ISocket {
         if (key === "_id" || key === "id") {
           data[key] = value.toString();
         }
-
-        if (typeof value === "object") {
-          if (value.toObject) {
-            data[key] = value.toObject();
-          }
-        }
       }
     }
 
