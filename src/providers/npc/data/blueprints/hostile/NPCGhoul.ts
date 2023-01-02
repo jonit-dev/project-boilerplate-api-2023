@@ -49,6 +49,10 @@ export const npcGhoul = {
       chance: 10,
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.RedSapphire,
+      chance: 20,
+    },
+    {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 20,
     },

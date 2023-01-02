@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   ArmorsBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   HelmetsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -45,6 +46,10 @@ export const npcSkeletonKnight = {
     {
       itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
       chance: 25,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueSapphire,
+      chance: 30,
     },
     {
       itemBlueprintKey: ShieldsBlueprint.StuddedShield,

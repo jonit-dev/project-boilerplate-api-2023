@@ -2,6 +2,6 @@ import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlue
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { recipeBandana } from "./recipeBandana";
 
-export const recipeAccssoriesIndex: Record<string, IUseWithCraftingRecipe[]> = {
+export const recipeAccessoriesIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [CraftingResourcesBlueprint.SewingThread]: [recipeBandana],
 };

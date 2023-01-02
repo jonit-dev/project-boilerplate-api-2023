@@ -5,6 +5,7 @@ import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
@@ -49,6 +50,10 @@ export const npcOrcWarrior = {
   loots: [
     {
       itemBlueprintKey: BootsBlueprint.Boots,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueSapphire,
       chance: 30,
     },
     {

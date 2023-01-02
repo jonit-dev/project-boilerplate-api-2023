@@ -14,5 +14,5 @@ export const recipeGoldenArmor: IUseWithCraftingRecipe = {
       qty: 10,
     },
   ],
-  successChance: 45,
+  successChance: 10,
 };

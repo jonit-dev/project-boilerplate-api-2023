@@ -53,6 +53,18 @@ export const npcOrcMage = {
       chance: 30,
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueSapphire,
+      chance: 30,
+      quantityRange: [1, 3],
+    },
+
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.RedSapphire,
+      chance: 30,
+      quantityRange: [1, 3],
+    },
+
+    {
       itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,
       chance: 15,
     },

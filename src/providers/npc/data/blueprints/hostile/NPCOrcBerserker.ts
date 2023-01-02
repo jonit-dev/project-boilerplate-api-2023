@@ -5,6 +5,7 @@ import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
@@ -44,6 +45,16 @@ export const npcOrcBerserker = {
     {
       itemBlueprintKey: BootsBlueprint.IronBoots,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueSapphire,
+      chance: 30,
+      quantityRange: [1, 3],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.RedSapphire,
+      chance: 30,
+      quantityRange: [1, 3],
     },
     {
       itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
