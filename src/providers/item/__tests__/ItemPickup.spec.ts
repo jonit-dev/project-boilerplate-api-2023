@@ -3,23 +3,16 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
-import { ContainersBlueprint } from "../data/types/itemsBlueprintTypes";
-import { ItemOwnership } from "../ItemOwnership";
 import { ItemPickup } from "../ItemPickup/ItemPickup";
-import { ItemPickupFromContainer } from "../ItemPickup/ItemPickupFromContainer";
-import { ItemPickupMapContainer } from "../ItemPickup/ItemPickupMapContainer";
-import { ItemPickupValidator } from "../ItemPickup/ItemPickupValidator";
+import { ContainersBlueprint } from "../data/types/itemsBlueprintTypes";
 
 describe("ItemPickup.ts", () => {
   let itemPickup: ItemPickup;
-  let itemPickup2: ItemPickup;
   let testCharacter: ICharacter;
   let testItem: IItem;
   let inventory: IItem;
@@ -34,32 +27,11 @@ describe("ItemPickup.ts", () => {
     itemPickup = container.get<ItemPickup>(ItemPickup);
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
+    socketMessaging = container.get<SocketMessaging>(SocketMessaging);
   });
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
-
-    socketMessaging = {
-      sendEventToUser: jest.fn(),
-    } as unknown as SocketMessaging;
-
-    itemPickup2 = new ItemPickup(
-      socketMessaging,
-      // @ts-expect-error
-      new CharacterWeight(),
-      // @ts-expect-error
-      new CharacterItemContainer(),
-      // @ts-expect-error
-      new EquipmentSlots(),
-      new ItemOwnership(),
-      // @ts-expect-error
-      new ItemPickupFromContainer(),
-      // @ts-expect-error
-      new ItemPickupValidator(),
-      // @ts-expect-error
-      new ItemPickupMapContainer(),
-      new ItemContainerHelper()
-    );
 
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
@@ -267,69 +239,6 @@ describe("ItemPickup.ts", () => {
     expect(await Item.findById(stackableItem3.id)).toBeFalsy();
   });
 
-  test("test sendEventToUser spy", () => {
-    const spy = jest.spyOn(SocketMessaging.prototype, "sendEventToUser"); // create a spy on the
-
-    // sendEventToUser method
-    // @ts-expect-error
-    const socketMessaging = new SocketMessaging(); // create an instance of the SocketMessaging class
-    socketMessaging.sendEventToUser("123", "event", { data: "some data" }); // call the sendEventToUser method
-
-    expect(spy).toHaveBeenCalled(); // verify that the sendEventToUser method was called
-    expect(spy).toHaveBeenCalledWith("123", "event", { data: "some data" }); // verify that the method was
-  });
-
-  test("sends container read message for inventory container", async () => {
-    // Spy on the sendEventToUser method of the SocketMessaging class
-    const spy = jest.spyOn(socketMessaging, "sendEventToUser");
-
-    const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
-    // Call the sendContainerRead method
-    // @ts-expect-error
-    await itemPickup2.sendContainerRead(itemContainer, testCharacter);
-
-    expect(spy).toHaveBeenCalled();
-  });
-
-  it("sends container read message with correct arguments", async () => {
-    // Spy on the sendEventToUser method
-    const sendEventToUserSpy = jest.spyOn(socketMessaging, "sendEventToUser");
-
-    const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
-    // Call the sendContainerRead method
-    // @ts-expect-error
-    await itemPickup2.sendContainerRead(itemContainer, testCharacter);
-
-    // Verify that the sendEventToUser method was called
-    expect(sendEventToUserSpy).toHaveBeenCalled();
-
-    // Verify that the sendEventToUser method was called with the correct arguments
-    expect(sendEventToUserSpy).toHaveBeenCalledWith(testCharacter.channelId, "ContainerRead", {
-      itemContainer: itemContainer,
-      type: "Inventory",
-    });
-  });
-
-  it("does not send message with invalid character or container", async () => {
-    testCharacter.channelId = testCharacter.id;
-    // Spy on the sendEventToUser method
-    const sendEventToUserSpy = jest.spyOn(socketMessaging, "sendEventToUser");
-
-    const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
-    // @ts-expect-error
-    // Call the sendContainerRead method with an invalid character (null)
-    await itemPickup2.sendContainerRead(itemContainer, null);
-
-    // Verify that the sendEventToUser method was not called
-    expect(sendEventToUserSpy).not.toHaveBeenCalled();
-    // @ts-expect-error
-    // Call the sendContainerRead method with an invalid container (null)
-    await itemPickup2.sendContainerRead(null, testCharacter);
-
-    // Verify that the sendEventToUser method was not called
-    expect(sendEventToUserSpy).not.toHaveBeenCalled();
-  });
-
   it("returns the correct list of allowed item types", () => {
     const mockGetAllowedItemTypes = jest.fn().mockReturnValue(["Weapon", "Armor"]);
     itemPickup.getAllowedItemTypes = mockGetAllowedItemTypes;
@@ -340,6 +249,70 @@ describe("ItemPickup.ts", () => {
     // Verify that the returned list of types is correct
 
     expect(allowedTypes).toEqual(["Weapon", "Armor"]);
+  });
+
+  describe("Container messaging", () => {
+    let sendEventToUserSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      sendEventToUserSpy = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it("test sendEventToUser spy", () => {
+      socketMessaging.sendEventToUser("123", "event", { data: "some data" }); // call the sendEventToUser method
+
+      expect(sendEventToUserSpy).toHaveBeenCalled(); // verify that the sendEventToUser method was called
+      expect(sendEventToUserSpy).toHaveBeenCalledWith("123", "event", { data: "some data" }); // verify that the method was
+    });
+
+    it("sends container read message for inventory container", async () => {
+      const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
+
+      if (!itemContainer) {
+        throw new Error("Failed to find item container");
+      }
+
+      // @ts-expect-error
+      await itemPickup.sendContainerRead(itemContainer, testCharacter);
+
+      expect(sendEventToUserSpy).toHaveBeenCalled();
+    });
+
+    it("sends container read message with correct arguments", async () => {
+      const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
+      // Call the sendContainerRead method
+      // @ts-expect-error
+      await itemPickup.sendContainerRead(itemContainer, testCharacter);
+
+      // Verify that the sendEventToUser method was called
+      expect(sendEventToUserSpy).toHaveBeenCalled();
+
+      // Verify that the sendEventToUser method was called with the correct arguments
+      expect(sendEventToUserSpy).toHaveBeenCalledWith(testCharacter.channelId, "ContainerRead", {
+        itemContainer: itemContainer,
+        type: "Inventory",
+      });
+    });
+
+    it("does not send message with invalid character or container", async () => {
+      testCharacter.channelId = testCharacter.id;
+
+      const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
+
+      // @ts-expect-error
+      await itemPickup.sendContainerRead(itemContainer, null);
+
+      expect(sendEventToUserSpy).not.toHaveBeenCalled();
+
+      // @ts-expect-error
+      await itemPickup.sendContainerRead(null, testCharacter);
+
+      expect(sendEventToUserSpy).not.toHaveBeenCalled();
+    });
   });
 
   afterAll(async () => {

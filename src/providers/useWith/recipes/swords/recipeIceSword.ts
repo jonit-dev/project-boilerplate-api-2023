@@ -7,7 +7,7 @@ export const recipeIceSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 5,
+      qty: 3,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,

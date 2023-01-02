@@ -174,13 +174,11 @@ export class ItemDrop {
     const targetContainer = await ItemContainer.findById(fromContainerId);
 
     if (!item) {
-      console.log("dropItemFromInventory: Item not found");
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
 
     if (!targetContainer) {
-      console.log("dropItemFromInventory: Character container not found");
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }

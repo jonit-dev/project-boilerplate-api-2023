@@ -7,6 +7,7 @@ import { ChatLogCrons } from "./ChatLogCrons";
 import { ControlTimeCrons } from "./ControlTimeCrons";
 import { ItemCrons } from "./ItemCrons";
 import { NPCCrons } from "./NPCCrons";
+import { ItemDeleteCrons } from "./ItemDeleteCrons";
 
 @provide(Cronjob)
 export class Cronjob {
@@ -16,7 +17,8 @@ export class Cronjob {
     private chatLogCron: ChatLogCrons,
     private npcCron: NPCCrons,
     private controlTimeCron: ControlTimeCrons,
-    private pm2Helper: PM2Helper
+    private pm2Helper: PM2Helper,
+    private itemDeleteCrons: ItemDeleteCrons
   ) {}
 
   public start(): void {
@@ -33,16 +35,18 @@ export class Cronjob {
         this.chatLogCron.schedule();
         this.npcCron.schedule();
         this.controlTimeCron.schedule();
+        this.itemDeleteCrons.schedule();
         break;
       case EnvType.Staging:
       case EnvType.Production:
         // make sure it only runs in one instance
-        if (process.env.NODE_APP_INSTANCE === this.pm2Helper.pickLastCPUInstance()) {
+        if (process.env.pm_id === this.pm2Helper.pickLastCPUInstance()) {
           this.characterCron.schedule();
           this.itemCrons.schedule();
           this.chatLogCron.schedule();
           this.npcCron.schedule();
           this.controlTimeCron.schedule();
+          this.itemDeleteCrons.schedule();
         }
         break;
     }

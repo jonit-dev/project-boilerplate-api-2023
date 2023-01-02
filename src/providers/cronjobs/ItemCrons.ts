@@ -7,6 +7,7 @@ export class ItemCrons {
   public schedule(): void {
     nodeCron.schedule("* * * * *", async () => {
       // find all items with decay time
+
       const items = await Item.find({
         decayTime: {
           $lte: new Date(),

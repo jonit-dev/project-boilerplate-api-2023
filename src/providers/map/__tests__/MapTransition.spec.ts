@@ -23,6 +23,8 @@ describe("MapTransition", () => {
     testCharacter = await unitTestHelper.createMockCharacter(null, {});
 
     mapTransition = container.get<MapTransition>(MapTransition);
+
+    await unitTestHelper.initializeMapLoader();
   });
   afterEach(() => {
     jest.clearAllMocks();

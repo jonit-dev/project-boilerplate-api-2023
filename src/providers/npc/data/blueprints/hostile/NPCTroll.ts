@@ -50,6 +50,10 @@ export const npcTroll = {
       chance: 25,
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueSapphire,
+      chance: 30,
+    },
+    {
       itemBlueprintKey: GlovesBlueprint.LeatherGloves,
       chance: 10,
     },

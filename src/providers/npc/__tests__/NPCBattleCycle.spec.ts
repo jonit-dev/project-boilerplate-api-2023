@@ -33,6 +33,11 @@ describe("NPCBattleCycle.ts", () => {
 
   it("should test that the function passed to the constructor is called at the specified interval", async () => {
     // Create a mock function and track the number of times it is called
+
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
+
     const mockFn = jest.fn();
 
     // Create a new NPCBattleCycle instance with a 10ms interval and the mock function

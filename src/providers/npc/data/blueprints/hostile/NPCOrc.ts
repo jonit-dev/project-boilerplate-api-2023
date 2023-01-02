@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
@@ -46,6 +47,14 @@ export const npcOrc = {
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueSapphire,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.RedSapphire,
+      chance: 20,
     },
     {
       itemBlueprintKey: FoodsBlueprint.RedMushroom,

@@ -1,4 +1,8 @@
-import { CraftingResourcesBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  CraftingResourcesBlueprint,
+  MagicsBlueprint,
+  SwordsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeFireSword: IUseWithCraftingRecipe = {
@@ -12,6 +16,10 @@ export const recipeFireSword: IUseWithCraftingRecipe = {
     {
       key: CraftingResourcesBlueprint.SteelIngot,
       qty: 5,
+    },
+    {
+      key: MagicsBlueprint.FireRune,
+      qty: 1,
     },
   ],
   successChance: 25,
