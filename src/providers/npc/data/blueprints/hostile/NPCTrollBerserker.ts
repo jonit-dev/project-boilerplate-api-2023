@@ -18,6 +18,7 @@ import {
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 
 export const npcTrollBerserker = {
   ...generateMoveTowardsMovement(),
@@ -100,4 +101,5 @@ export const npcTrollBerserker = {
       quantityRange: [1, 2],
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;
