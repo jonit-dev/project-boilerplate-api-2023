@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
@@ -61,4 +62,5 @@ export const npcRaccoon: Partial<INPC> = {
       quantityRange: [1, 3],
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Bleeding],
 };

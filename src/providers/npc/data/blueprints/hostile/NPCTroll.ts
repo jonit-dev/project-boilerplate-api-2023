@@ -16,6 +16,7 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 
 export const npcTroll = {
   ...generateMoveTowardsMovement(),
@@ -85,4 +86,5 @@ export const npcTroll = {
       quantityRange: [1, 2],
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

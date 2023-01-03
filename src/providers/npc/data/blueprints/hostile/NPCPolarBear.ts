@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
@@ -59,4 +60,5 @@ export const npcPolarBear = {
       quantityRange: [5, 10],
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;
