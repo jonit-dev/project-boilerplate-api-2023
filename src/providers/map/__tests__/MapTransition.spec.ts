@@ -100,36 +100,6 @@ describe("MapTransition", () => {
     );
   });
 
-  // test("changeCharacterScene cancels character targeting if they have a target set", async () => {
-  //   testCharacter.scene = "oldScene";
-  //   testCharacter.x = 10;
-  //   testCharacter.y = 20;
-  //   // @ts-ignore
-  //   testCharacter.target = { id: testCharacter.id, type: EntityType.Character };
-  //   await testCharacter.save();
-
-  //   const destination = { map: "newScene", gridX: 15, gridY: 25 };
-  //   const updateOneMock = jest.fn().mockResolvedValue(null);
-  //   Character.updateOne = updateOneMock;
-  //   const sendEventToUserMock = jest.fn().mockResolvedValue(null);
-  //   const stopTargetingMock = jest.fn().mockResolvedValue(null);
-  //   const mapTransition = new MapTransition(
-  //     // @ts-ignore
-  //     {}, // mock MapObjectsLoader
-  //     { sendEventToUser: sendEventToUserMock }, // mock SocketMessaging
-  //     { stopTargeting: stopTargetingMock } // mock BattleNetworkStopTargeting
-  //   );
-  //   // @ts-ignore
-  //   await mapTransition.changeCharacterScene(testCharacter, destination);
-  //   // @ts-ignore
-  //   expect(stopTargetingMock).toHaveBeenCalledWith(testCharacter);
-  //   expect(sendEventToUserMock).toHaveBeenCalledWith(testCharacter.channelId, BattleSocketEvents.CancelTargeting, {
-  //     targetId: testCharacter.target.id,
-  //     type: testCharacter.target.type,
-  //     reason: "Your battle target was lost.",
-  //   });
-  // });
-
   it("changeCharacterScene cancels character targeting if they have a target set", async () => {
     // Set up test character and destination
     // @ts-ignore

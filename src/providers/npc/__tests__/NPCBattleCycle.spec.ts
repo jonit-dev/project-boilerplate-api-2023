@@ -81,8 +81,6 @@ describe("NPCBattleCycle.ts", () => {
   });
 
   it("should test that the clear method does not throw an error if the interval has already been cleared", async () => {
-    // // Mock the clearInterval function to return undefined
-    // jest.spyOn(global, "clearInterval").mockReturnValue(undefined);
     // Clear the interval
     await npcBattleCycles.clear();
 

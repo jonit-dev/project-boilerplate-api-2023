@@ -34,17 +34,5 @@ describe("NPCExperience", () => {
 
       expect(result).toBe(Math.floor(((50 + 5 + 10 + 15 + 20) * EXP_RATIO) / 5));
     });
-
-    // There are no logic to handle if skills skills object is empty
-
-    // it("should return 0 if the skills object is empty", () => {
-    //   const npcExperience = new NPCExperience();
-    //   const baseHealth = 50;
-    //   const skills = {};
-
-    //   const result = npcExperience.calculateExperience(baseHealth, skills);
-
-    //   expect(result).toBe(0);
-    // });
   });
 });
