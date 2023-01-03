@@ -15,6 +15,7 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 
 export const npcWildTroll = {
   ...generateMoveTowardsMovement(),
@@ -70,4 +71,5 @@ export const npcWildTroll = {
       chance: 30,
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;
