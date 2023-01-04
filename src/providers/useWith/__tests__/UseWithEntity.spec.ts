@@ -556,7 +556,7 @@ describe("UseWithEntityValidation.ts", () => {
     expect(sendEventToUserMock).toBeCalledTimes(1);
 
     expect(sendEventToUserMock).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
-      message: `Sorry, '${itemDarkRune.name}' can not only be used with target at magic level '${itemDarkRune.minMagicLevelRequired}' or greater.`,
+      message: `Sorry, '${itemDarkRune.name}' can not only be used at magic level '${itemDarkRune.minMagicLevelRequired}' or greater.`,
       type: "error",
     });
   });

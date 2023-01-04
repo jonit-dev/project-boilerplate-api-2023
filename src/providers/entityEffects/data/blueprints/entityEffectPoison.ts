@@ -7,13 +7,14 @@ import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EntityEffectBlueprint } from "../types/entityEffectBlueprintTypes";
 import { IEntityEffect } from "./entityEffect";
 import _ from "lodash";
+import { AnimationEffectKeys } from "@rpg-engine/shared";
 
 export const entityEffectPoison: IEntityEffect = {
   key: EntityEffectBlueprint.Poison,
   totalDurationMs: 60000,
   intervalMs: 5000,
   probability: 20, // 20% chance of triggering it for the NPC that attacks a target
-  targetAnimationKey: "poison",
+  targetAnimationKey: AnimationEffectKeys.HitPoison,
   type: EntityAttackType.Melee,
   effect: (target: ICharacter | INPC, attacker: INPC) => {
     const attackerSkills = attacker.skills as unknown as ISkill;
