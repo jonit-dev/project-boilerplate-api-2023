@@ -14,6 +14,7 @@ export const questInteractionCraftSword = {
   ],
   objectives: [
     {
+      // @ts-ignore
       itemsKeys: [CraftingResourcesBlueprint.IronIngot, CraftingResourcesBlueprint.WoodenSticks],
       type: QuestType.Interaction,
     },
