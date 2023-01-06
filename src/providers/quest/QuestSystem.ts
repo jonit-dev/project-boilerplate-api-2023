@@ -39,6 +39,11 @@ interface IGetObjectivesResult {
   records: IQuestRecord[];
 }
 
+interface IConsumeCharacterItem extends IItemByKeyResult {
+  isStackable?: boolean;
+  decrementQty?: number;
+}
+
 @provide(QuestSystem)
 export class QuestSystem {
   constructor(
@@ -176,29 +181,55 @@ export class QuestSystem {
       if (obj.targetNPCkey! === npcKey.split("-")[0]) {
         objCompleted = true;
       }
-      // check if the obj has 'itemsKeys' field defined
+      // check if the obj has 'items' field defined
       // then check if character has the required items to complete the quest
-      if (!_.isEmpty(obj.itemsKeys)) {
-        const foundItems: IItemByKeyResult[] = [];
-        for (const key of obj.itemsKeys!) {
+      if (!_.isEmpty(obj.items)) {
+        const foundItems: IConsumeCharacterItem[] = [];
+        for (const i of obj.items!) {
           // if does not have all items, no update is done
-          const foundItem = await this.characterItems.hasItemByKey(key, character, "both");
+          const foundItem = (await this.characterItems.hasItemByKey(i.itemKey, character, "both")) as
+            | IConsumeCharacterItem
+            | undefined;
           if (!foundItem) {
             return;
           }
+          const item = await Item.findById(foundItem.itemId);
+          // if is stackable item and does not have the required amount, no update is done
+          if (i.qty > 1 && (!item?.maxStackSize || item?.stackQty! < i.qty)) {
+            return;
+          }
+          foundItem.isStackable = !!item?.maxStackSize;
+          foundItem.decrementQty = i.qty;
           foundItems.push(foundItem);
         }
 
         // character contains all items
         // remove them from the character's equipment and set obj as completed
         for (const found of foundItems) {
-          // @ts-ignore
-          const removed = await this.characterItems.deleteItemFromContainer(found.itemId!, character, found.container);
+          let removed = false;
+          // for stackable items, remove only the corresponding qty
+          if (found.isStackable) {
+            removed = await this.characterItems.decrementItemFromContainer(
+              found.itemId!,
+              character,
+              // @ts-ignore
+              found.container,
+              found.decrementQty
+            );
+          } else {
+            removed = await this.characterItems.deleteItemFromContainer(
+              found.itemId!,
+              character,
+              // @ts-ignore
+              found.container
+            );
+          }
           if (!removed) {
             return;
           }
         }
-        await Item.deleteMany({ _id: { $in: foundItems.map((i) => i.itemId) } });
+        // delete if corresponds (no stackable items)
+        await Item.deleteMany({ _id: { $in: foundItems.filter((i) => !i.isStackable).map((i) => i.itemId) } });
         objCompleted = true;
       }
 

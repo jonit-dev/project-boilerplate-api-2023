@@ -37,6 +37,35 @@ export class CharacterItems {
     }
   }
 
+  /**
+   * Decrements the stackQty of stackable items. If all the stackQty is consumed, the item is deleted
+   * @param itemId
+   * @param character
+   * @param container
+   * @param decrementQty
+   * @returns
+   */
+  public async decrementItemFromContainer(
+    itemId: string,
+    character: ICharacter,
+    container: "inventory" | "equipment" | "both",
+    decrementQty: number
+  ): Promise<boolean> {
+    switch (container) {
+      case "inventory":
+        return await this.characterItemInventory.decrementItemFromInventory(itemId, character, decrementQty);
+      case "equipment":
+        return await this.characterItemEquipment.decrementItemFromEquipment(itemId, character, decrementQty);
+      case "both":
+        return (
+          (await this.characterItemInventory.decrementItemFromInventory(itemId, character, decrementQty)) ||
+          (await this.characterItemEquipment.decrementItemFromEquipment(itemId, character, decrementQty))
+        );
+      default:
+        return false;
+    }
+  }
+
   public async hasItem(
     itemId: string,
     character: ICharacter,
@@ -44,13 +73,13 @@ export class CharacterItems {
   ): Promise<boolean> {
     switch (container) {
       case "inventory":
-        return await this.characterItemInventory.checkItemInInventory(itemId, character);
+        return !!(await this.characterItemInventory.checkItemInInventory(itemId, character));
       case "equipment":
-        return await this.characterItemEquipment.checkItemEquipment(itemId, character);
+        return !!(await this.characterItemEquipment.checkItemEquipment(itemId, character));
       case "both":
         return (
-          (await this.characterItemInventory.checkItemInInventory(itemId, character)) ||
-          (await this.characterItemEquipment.checkItemEquipment(itemId, character))
+          !!(await this.characterItemInventory.checkItemInInventory(itemId, character)) ||
+          !!(await this.characterItemEquipment.checkItemEquipment(itemId, character))
         );
       default:
         return false;

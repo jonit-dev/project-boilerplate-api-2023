@@ -47,7 +47,7 @@ describe("UseWithItemToTile.ts", () => {
 
   const mockCheckItemInInventory = jest.fn();
   const mockSendErrorMessageToCharacter = jest.fn();
-  const mockDecrementItemFromInventory = jest.fn();
+  const mockDecrementItemFromInventoryByKey = jest.fn();
   const mockSendAnimationEventToXYPosition = jest.fn();
   const mockSendAnimationEventToCharacter = jest.fn();
   const mockSendEventToUser = jest.fn();
@@ -59,8 +59,8 @@ describe("UseWithItemToTile.ts", () => {
     .mockImplementation(mockCheckItemInInventory);
 
   jest
-    .spyOn(CharacterItemInventory.prototype, "decrementItemFromInventory")
-    .mockImplementation(mockDecrementItemFromInventory);
+    .spyOn(CharacterItemInventory.prototype, "decrementItemFromInventoryByKey")
+    .mockImplementation(mockDecrementItemFromInventoryByKey);
 
   jest
     .spyOn(AnimationEffect.prototype, "sendAnimationEventToXYPosition")
@@ -93,7 +93,7 @@ describe("UseWithItemToTile.ts", () => {
   function resetMocks(): void {
     mockCheckItemInInventory.mockReset();
     mockSendErrorMessageToCharacter.mockReset();
-    mockDecrementItemFromInventory.mockReset();
+    mockDecrementItemFromInventoryByKey.mockReset();
     mockSendAnimationEventToXYPosition.mockReset();
     mockSendAnimationEventToCharacter.mockReset();
     mockSendEventToUser.mockReset();
@@ -114,7 +114,7 @@ describe("UseWithItemToTile.ts", () => {
     expect(mockSendErrorMessageToCharacter).toBeCalledTimes(1);
     expect(mockSendErrorMessageToCharacter).toBeCalledWith(mockCharacter, baseOptions.requiredResource?.errorMessage);
 
-    expect(mockDecrementItemFromInventory).not.toBeCalled();
+    expect(mockDecrementItemFromInventoryByKey).not.toBeCalled();
     expect(mockAddItemToContainer).not.toBeCalled();
     expect(mockSendAnimationEventToXYPosition).not.toBeCalled();
     expect(mockSendAnimationEventToCharacter).not.toBeCalled();
@@ -124,7 +124,7 @@ describe("UseWithItemToTile.ts", () => {
   it("should decrement required resource and send the correct events", async () => {
     mockCheckItemInInventory.mockResolvedValueOnce(true);
 
-    mockDecrementItemFromInventory.mockReturnValueOnce(false);
+    mockDecrementItemFromInventoryByKey.mockReturnValueOnce(false);
 
     await useWithItemToTile.execute(mockCharacter, baseOptions);
 
@@ -135,7 +135,7 @@ describe("UseWithItemToTile.ts", () => {
 
     mockCheckItemInInventory.mockResolvedValueOnce(true);
 
-    mockDecrementItemFromInventory.mockReturnValue(true);
+    mockDecrementItemFromInventoryByKey.mockReturnValue(true);
     mockRandom.mockImplementation((from, to) => {
       if (from === 0 && to === 100) return 50;
       if (from === 0 && to === 2) return 1;
@@ -145,7 +145,7 @@ describe("UseWithItemToTile.ts", () => {
     });
     await useWithItemToTile.execute(mockCharacter, baseOptions);
 
-    expect(mockDecrementItemFromInventory).toBeCalledWith(
+    expect(mockDecrementItemFromInventoryByKey).toBeCalledWith(
       baseOptions.requiredResource?.key,
       mockCharacter,
       baseOptions.requiredResource?.decrementQty
@@ -179,7 +179,7 @@ describe("UseWithItemToTile.ts", () => {
 
   it("should add item to character inventory send the correct events", async () => {
     mockCheckItemInInventory.mockResolvedValueOnce(true);
-    mockDecrementItemFromInventory.mockReturnValue(true);
+    mockDecrementItemFromInventoryByKey.mockReturnValue(true);
     mockAddItemToContainer.mockReturnValue(true);
 
     mockRandom.mockImplementation((from, to) => {
@@ -191,7 +191,7 @@ describe("UseWithItemToTile.ts", () => {
     });
     await useWithItemToTile.execute(mockCharacter, baseOptions);
 
-    expect(mockDecrementItemFromInventory).toBeCalledWith(
+    expect(mockDecrementItemFromInventoryByKey).toBeCalledWith(
       baseOptions.requiredResource?.key,
       mockCharacter,
       baseOptions.requiredResource?.decrementQty
@@ -235,7 +235,7 @@ describe("UseWithItemToTile.ts", () => {
     mockGetRandomRewardChance.mockReturnValueOnce(9);
 
     mockCheckItemInInventory.mockResolvedValueOnce(true);
-    mockDecrementItemFromInventory.mockReturnValue(true);
+    mockDecrementItemFromInventoryByKey.mockReturnValue(true);
     mockAddItemToContainer.mockReturnValue(true);
 
     mockRandom.mockImplementation((from, to) => {
@@ -256,7 +256,7 @@ describe("UseWithItemToTile.ts", () => {
     mockGetRandomRewardChance.mockReturnValueOnce(16);
 
     mockCheckItemInInventory.mockResolvedValueOnce(true);
-    mockDecrementItemFromInventory.mockReturnValue(true);
+    mockDecrementItemFromInventoryByKey.mockReturnValue(true);
     mockAddItemToContainer.mockReturnValue(true);
 
     mockRandom.mockImplementation((from, to) => {

@@ -29,7 +29,7 @@ export class SpellItemCreation {
     const { itemToCreate, itemToConsume } = options;
 
     if (itemToConsume?.key) {
-      const removed = await this.characterItemInventory.decrementItemFromInventory(
+      const removed = await this.characterItemInventory.decrementItemFromInventoryByKey(
         itemToConsume.key,
         character,
         itemToConsume.decrementQty || 1

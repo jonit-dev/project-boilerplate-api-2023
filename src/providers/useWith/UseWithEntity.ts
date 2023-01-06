@@ -161,10 +161,10 @@ export class UseWithEntity {
     // handle static item case
     if ("isUsable" in target) {
       if (target.isUsable) {
-        await this.characterItemInventory.decrementItemFromInventory(item.key, caster, 1);
+        await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, caster, 1);
       }
     } else {
-      await this.characterItemInventory.decrementItemFromInventory(item.key, caster, 1);
+      await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, caster, 1);
     }
     await this.characterWeight.updateCharacterWeight(caster);
 

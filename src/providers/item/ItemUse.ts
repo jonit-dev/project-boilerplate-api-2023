@@ -62,7 +62,7 @@ export class ItemUse {
 
     this.applyItemUsage(bluePrintItem, character.id);
 
-    await this.characterInventory.decrementItemFromInventory(useItem.key, character, 1);
+    await this.characterInventory.decrementItemFromInventoryByKey(useItem.key, character, 1);
 
     await this.characterWeight.updateCharacterWeight(character);
 

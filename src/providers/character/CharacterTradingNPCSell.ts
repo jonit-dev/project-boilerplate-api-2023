@@ -113,7 +113,7 @@ export class CharacterTradingNPCSell {
   ): Promise<ITradeRequestItem[]> {
     const removedItems: ITradeRequestItem[] = [];
     for (const item of items) {
-      const success = await this.characterItemInventory.decrementItemFromInventory(item.key, character, item.qty);
+      const success = await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, character, item.qty);
       if (success) {
         removedItems.push(item);
       }

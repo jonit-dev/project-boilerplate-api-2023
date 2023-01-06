@@ -6,10 +6,15 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 
 import { provide } from "inversify-binding-decorators";
+import { MathHelper } from "@providers/math/MathHelper";
 
 @provide(CharacterItemEquipment)
 export class CharacterItemEquipment {
-  constructor(private equipmentSlots: EquipmentSlots, private socketMessaging: SocketMessaging) {}
+  constructor(
+    private equipmentSlots: EquipmentSlots,
+    private socketMessaging: SocketMessaging,
+    private mathHelper: MathHelper
+  ) {}
 
   public async deleteItemFromEquipment(itemId: string, character: ICharacter): Promise<boolean> {
     const item = (await Item.findById(itemId)) as unknown as IItem;
@@ -30,6 +35,86 @@ export class CharacterItemEquipment {
     }
 
     return await this.removeItemFromEquipmentSet(item, character);
+  }
+
+  public async decrementItemFromEquipment(
+    itemKey: string,
+    character: ICharacter,
+    decrementQty: number
+  ): Promise<boolean> {
+    const equipment = await Equipment.findById(character.equipment);
+
+    if (!equipment) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Your equipment was not found.");
+      return false;
+    }
+
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+
+    let item: IItem | undefined;
+    for (let [, value] of Object.entries(equipmentSlots)) {
+      if (!value) {
+        continue;
+      }
+
+      if (!value.key) {
+        value = (await Item.findById(value as any)) as unknown as IItem;
+      }
+
+      // item not found, continue
+      if (!value) {
+        continue;
+      }
+
+      if (isSameKey(value.key, itemKey)) {
+        item = value;
+      }
+    }
+
+    if (!item) {
+      return false;
+    }
+
+    let result = false;
+    if (item.maxStackSize > 1) {
+      // if its stackable, decrement the stack
+      let remaining = 0;
+
+      if (decrementQty <= item.stackQty!) {
+        remaining = this.mathHelper.fixPrecision(item.stackQty! - decrementQty);
+        decrementQty = 0;
+      } else {
+        decrementQty = this.mathHelper.fixPrecision(decrementQty - item.stackQty!);
+      }
+
+      if (remaining > 0) {
+        await Item.updateOne(
+          {
+            _id: item._id,
+          },
+          {
+            $set: {
+              stackQty: decrementQty,
+            },
+          }
+        );
+      } else {
+        result = await this.deleteItemFromEquipment(item._id, character);
+        // we also need to delete item from items table
+        await Item.deleteOne({ _id: item._id });
+      }
+    } else {
+      // if its not stackable, just remove it
+      result = await this.deleteItemFromEquipment(item._id, character);
+      // we also need to delete item from items table
+      await Item.deleteOne({ _id: item._id });
+    }
+
+    if (!result) {
+      return false;
+    }
+
+    return true;
   }
 
   public async checkItemEquipment(itemId: string, character: ICharacter): Promise<boolean> {

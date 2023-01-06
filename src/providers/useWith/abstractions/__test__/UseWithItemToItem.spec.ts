@@ -22,7 +22,7 @@ describe("UseWithItemToItem.ts", () => {
 
   const mockCheckItemInInventoryByKey = jest.fn();
   const mockSendErrorMessageToCharacter = jest.fn();
-  const mockDecrementItemFromInventory = jest.fn();
+  const mockDecrementItemFromInventoryByKey = jest.fn();
   const mockSendAnimationEventToXYPosition = jest.fn();
   const mockSendAnimationEventToCharacter = jest.fn();
   const mockSendEventToUser = jest.fn();
@@ -34,8 +34,8 @@ describe("UseWithItemToItem.ts", () => {
     .mockImplementation(mockCheckItemInInventoryByKey);
 
   jest
-    .spyOn(CharacterItemInventory.prototype, "decrementItemFromInventory")
-    .mockImplementation(mockDecrementItemFromInventory);
+    .spyOn(CharacterItemInventory.prototype, "decrementItemFromInventoryByKey")
+    .mockImplementation(mockDecrementItemFromInventoryByKey);
 
   jest
     .spyOn(AnimationEffect.prototype, "sendAnimationEventToXYPosition")
@@ -55,7 +55,7 @@ describe("UseWithItemToItem.ts", () => {
   function resetMocks(): void {
     mockCheckItemInInventoryByKey.mockReset();
     mockSendErrorMessageToCharacter.mockReset();
-    mockDecrementItemFromInventory.mockReset();
+    mockDecrementItemFromInventoryByKey.mockReset();
     mockSendAnimationEventToXYPosition.mockReset();
     mockSendAnimationEventToCharacter.mockReset();
     mockSendEventToUser.mockReset();
@@ -99,7 +99,7 @@ describe("UseWithItemToItem.ts", () => {
     );
 
     expect(mockSendAnimationEventToCharacter).not.toBeCalled();
-    expect(mockDecrementItemFromInventory).not.toBeCalled();
+    expect(mockDecrementItemFromInventoryByKey).not.toBeCalled();
     expect(mockSendEventToUser).not.toBeCalled();
   });
 
@@ -117,7 +117,7 @@ describe("UseWithItemToItem.ts", () => {
     );
 
     expect(mockSendAnimationEventToCharacter).not.toBeCalled();
-    expect(mockDecrementItemFromInventory).not.toBeCalled();
+    expect(mockDecrementItemFromInventoryByKey).not.toBeCalled();
     expect(mockSendEventToUser).not.toBeCalled();
   });
 
@@ -127,13 +127,13 @@ describe("UseWithItemToItem.ts", () => {
     resetMocks();
 
     mockCheckItemInInventoryByKey.mockReturnValue(true);
-    mockDecrementItemFromInventory.mockReturnValue(true);
+    mockDecrementItemFromInventoryByKey.mockReturnValue(true);
     mockRandom.mockImplementation((p1, p2) => (p1 === 0 && p2 === 100 ? 99 : jest.requireActual("lodash/random")));
     await useWithItemToItem.execute(mockTargetItem, mockOriginItem, mockCharacter);
 
-    expect(mockDecrementItemFromInventory).toBeCalledTimes(2);
-    expect(mockDecrementItemFromInventory).toHaveBeenCalledWith(mockTargetItem.key, mockCharacter, 5);
-    expect(mockDecrementItemFromInventory).toHaveBeenCalledWith(mockOriginItem.key, mockCharacter, 3);
+    expect(mockDecrementItemFromInventoryByKey).toBeCalledTimes(2);
+    expect(mockDecrementItemFromInventoryByKey).toHaveBeenCalledWith(mockTargetItem.key, mockCharacter, 5);
+    expect(mockDecrementItemFromInventoryByKey).toHaveBeenCalledWith(mockOriginItem.key, mockCharacter, 3);
 
     expect(mockSendErrorMessageToCharacter).toBeCalledTimes(1);
     expect(mockSendErrorMessageToCharacter).toBeCalledWith(mockCharacter, "Sorry, you failed to craft the item.");
@@ -158,7 +158,7 @@ describe("UseWithItemToItem.ts", () => {
     resetMocks();
 
     mockCheckItemInInventoryByKey.mockReturnValue(true);
-    mockDecrementItemFromInventory.mockReturnValue(true);
+    mockDecrementItemFromInventoryByKey.mockReturnValue(true);
 
     const output = recipeBread;
     mockRandom.mockImplementation((p1, p2) => {
@@ -194,7 +194,7 @@ describe("UseWithItemToItem.ts", () => {
     resetMocks();
 
     mockCheckItemInInventoryByKey.mockReturnValue(true);
-    mockDecrementItemFromInventory.mockReturnValue(true);
+    mockDecrementItemFromInventoryByKey.mockReturnValue(true);
 
     mockRandom.mockImplementation((p1, p2) => {
       if (p1 === 0 && p2 === 100) {

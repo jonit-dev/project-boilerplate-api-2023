@@ -257,7 +257,7 @@ describe("CharacterTradingNPCSell.ts", () => {
   });
 
   it("should do no further processing if no items were sold", async () => {
-    const decrementMock = jest.spyOn(CharacterItemInventory.prototype, "decrementItemFromInventory");
+    const decrementMock = jest.spyOn(CharacterItemInventory.prototype, "decrementItemFromInventoryByKey");
     decrementMock.mockImplementation();
     decrementMock.mockReturnValue(Promise.resolve(false));
 
