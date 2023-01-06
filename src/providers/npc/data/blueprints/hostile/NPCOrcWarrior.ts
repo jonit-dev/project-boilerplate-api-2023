@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  AccessoriesBlueprint,
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
@@ -13,6 +14,7 @@ import {
   LegsBlueprint,
   MacesBlueprint,
   RangedWeaponsBlueprint,
+  SpearsBlueprint,
   SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -117,6 +119,18 @@ export const npcOrcWarrior = {
       itemBlueprintKey: RangedWeaponsBlueprint.IronArrow,
       chance: 20,
       quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.SoldiersRing,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.BohemianEarspoon,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.LongSword,
+      chance: 15,
     },
   ],
 } as Partial<INPC>;

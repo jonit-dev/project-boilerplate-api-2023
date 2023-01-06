@@ -2,10 +2,12 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  AccessoriesBlueprint,
   ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   RangedWeaponsBlueprint,
+  SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -84,6 +86,14 @@ export const npcDwarfArcher: Partial<INPC> = {
     {
       itemBlueprintKey: ToolsBlueprint.Pickaxe,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.SapphireRing,
+      chance: 1,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.MithrilSword,
+      chance: 5,
     },
   ],
 };

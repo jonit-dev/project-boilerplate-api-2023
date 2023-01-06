@@ -11,6 +11,7 @@ import {
   MacesBlueprint,
   MagicsBlueprint,
   RangedWeaponsBlueprint,
+  StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -99,6 +100,10 @@ export const npcOrcMage = {
     {
       itemBlueprintKey: MagicsBlueprint.Rune,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.PoisonWand,
+      chance: 15,
     },
   ],
 } as Partial<INPC>;

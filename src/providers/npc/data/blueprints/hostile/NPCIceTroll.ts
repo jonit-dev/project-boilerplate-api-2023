@@ -77,6 +77,10 @@ export const npcIceTroll: Partial<INPC> = {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 20,
     },
+    {
+      itemBlueprintKey: SwordsBlueprint.Saber,
+      chance: 10,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 };

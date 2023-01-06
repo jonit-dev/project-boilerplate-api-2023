@@ -7,6 +7,7 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   AxesBlueprint,
   CraftingResourcesBlueprint,
@@ -17,8 +18,8 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
-import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 
 export const npcTrollBerserker = {
   ...generateMoveTowardsMovement(),
@@ -99,6 +100,10 @@ export const npcTrollBerserker = {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
       chance: 10,
       quantityRange: [1, 2],
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.Rapier,
+      chance: 10,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

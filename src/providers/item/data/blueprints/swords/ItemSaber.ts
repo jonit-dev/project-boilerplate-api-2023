@@ -1,0 +1,19 @@
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { SwordsBlueprint } from "../../types/itemsBlueprintTypes";
+
+export const itemSaber: Partial<IItem> = {
+  key: SwordsBlueprint.Saber,
+  type: ItemType.Weapon,
+  subType: ItemSubType.Sword,
+  textureAtlas: "items",
+  texturePath: "swords/saber.png",
+  name: "Saber",
+  description: "A curved sword with a single-edged blade",
+  weight: 1,
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  attack: 8,
+  defense: 1,
+  rangeType: EntityAttackType.Melee,
+  basePrice: 72,
+};

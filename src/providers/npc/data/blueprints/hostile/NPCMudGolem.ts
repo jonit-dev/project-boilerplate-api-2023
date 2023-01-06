@@ -7,6 +7,7 @@ import {
   GlovesBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
+  StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
@@ -60,6 +61,10 @@ export const npcMudGolem: Partial<INPC> = {
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.FireWand,
+      chance: 10,
     },
   ],
 };

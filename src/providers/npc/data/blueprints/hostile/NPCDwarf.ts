@@ -1,12 +1,15 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  AccessoriesBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
+  SpearsBlueprint,
+  SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -75,6 +78,22 @@ export const npcDwarf = {
       itemBlueprintKey: CraftingResourcesBlueprint.IronIngot,
       chance: 40,
       quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.IronRing,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.StoneSpear,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.GoldenSword,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.Sword,
+      chance: 5,
     },
   ],
 } as Partial<INPC>;

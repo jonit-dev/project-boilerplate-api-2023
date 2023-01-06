@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  AccessoriesBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
@@ -12,6 +13,8 @@ import {
   OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  StaffsBlueprint,
+  SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -102,6 +105,18 @@ export const npcOrc = {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 20,
       quantityRange: [3, 10],
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.OrcRing,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.Wand,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.Sword,
+      chance: 15,
     },
   ],
 } as Partial<INPC>;

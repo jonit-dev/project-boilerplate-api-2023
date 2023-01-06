@@ -1,6 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { SwordsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemDoubleEdgedSword: Partial<IItem> = {
@@ -10,11 +9,11 @@ export const itemDoubleEdgedSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/double-edged-sword.png",
   name: "Double Edged Sword",
-  description: "An iron sword sharpened on both sides with incredible edge.",
-  attack: 7,
-  defense: 4,
-  weight: 2,
+  description: "A sword with sharp edges on both sides of the blade",
+  weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  attack: 17,
+  defense: 2,
   rangeType: EntityAttackType.Melee,
-  basePrice: 69,
+  basePrice: 86,
 };

@@ -10,6 +10,7 @@ import {
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
+  StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -88,6 +89,10 @@ export const npcOrcBerserker = {
     {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.AirWand,
+      chance: 10,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
