@@ -227,6 +227,8 @@ export enum MagicsBlueprint {
   PoisonRune = "poison-rune",
   ThunderRune = "thunder-rune",
   Book = "book",
+  EnergyBoltRune = "energy-bolt-rune",
+  FireBoltRune = "fire-bolt-rune",
 }
 
 export enum OthersBlueprint {
