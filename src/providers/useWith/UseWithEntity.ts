@@ -144,7 +144,7 @@ export class UseWithEntity {
     if (casterMagicLevel < blueprint.minMagicLevelRequired) {
       this.socketMessaging.sendErrorMessageToCharacter(
         caster,
-        `Sorry, '${blueprint.name}' can not only be used with target at magic level '${blueprint.minMagicLevelRequired}' or greater.`
+        `Sorry, '${blueprint.name}' can not only be used at magic level '${blueprint.minMagicLevelRequired}' or greater.`
       );
       return false;
     }

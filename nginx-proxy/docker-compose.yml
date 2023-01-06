@@ -14,6 +14,7 @@ services:
       - dhparam:/etc/nginx/dhparam
       - certs:/etc/nginx/certs:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./europe.definya.com.conf:/etc/nginx/vhost.d/europe.definya.com:ro
     network_mode: bridge
 
   acme-companion:
@@ -27,7 +28,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     network_mode: bridge
     environment:
-      DEFAULT_EMAIL: admin@blueshipapp.com
+      DEFAULT_EMAIL: admin@definya.com
 
 volumes:
   conf:

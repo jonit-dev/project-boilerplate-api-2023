@@ -23,7 +23,7 @@ export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
   useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,
-  animationKey: AnimationEffectKeys.Hit,
+  animationKey: AnimationEffectKeys.HitDark,
   projectileAnimationKey: AnimationEffectKeys.Dark,
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.DarkRune, caster);

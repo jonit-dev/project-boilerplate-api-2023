@@ -15,6 +15,7 @@ export const questInteractionCraftIronArrow = {
   ],
   objectives: [
     {
+      // @ts-ignore
       itemsKeys: [CraftingResourcesBlueprint.IronIngot, CraftingResourcesBlueprint.WoodenSticks],
       type: QuestType.Interaction,
       // Should we Accept qty? Like 10?

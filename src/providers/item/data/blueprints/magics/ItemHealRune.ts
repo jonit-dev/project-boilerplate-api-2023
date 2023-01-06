@@ -24,8 +24,8 @@ export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
   useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,
-  animationKey: AnimationEffectKeys.LifeHeal,
-  projectileAnimationKey: AnimationEffectKeys.Blue,
+  animationKey: AnimationEffectKeys.HitHeal,
+  projectileAnimationKey: AnimationEffectKeys.Heal,
 
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.HealRune, caster);

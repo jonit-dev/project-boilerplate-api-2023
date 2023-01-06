@@ -27,5 +27,6 @@ export const questInteractionObjectiveMock: Partial<IQuestObjectiveInteraction> 
 };
 
 export const questInteractionCraftObjectiveMock: Partial<IQuestObjectiveInteraction> = {
+  // @ts-ignore
   itemsKeys: [CraftingResourcesBlueprint.Diamond, CraftingResourcesBlueprint.Silk],
 };
