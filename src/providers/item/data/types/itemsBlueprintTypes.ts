@@ -11,7 +11,6 @@ export enum SwordsBlueprint {
   IceSword = "ice-sword",
   CorruptionSword = "corruption-sword",
   DamascusSword = "damascus-sword",
-  DoubleEdgedSword = "double-edged-sword",
   EldensSword = "eldens-sword",
   EnchantedSword = "enchanted-sword",
   GoldenSword = "golden-sword",
