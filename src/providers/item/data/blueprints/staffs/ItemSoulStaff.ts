@@ -9,11 +9,12 @@ export const itemSoulStaff: Partial<IMagicStaff> = {
   textureAtlas: "items",
   texturePath: "staffs/soul-staff.png",
   name: "Soul Staff",
-  description: "A staff or rod associated with the soul or spirit, often used in spells or rituals",
+  description:
+    "A staff or rod imbued with the essence of the soul, often used in rituals or spells related to the spirit world.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 10,
-  defense: 2,
+  attack: 12,
+  defense: 3,
   rangeType: EntityAttackType.Melee,
   basePrice: 55,
 };

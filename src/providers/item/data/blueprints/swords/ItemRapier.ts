@@ -9,11 +9,12 @@ export const itemRapier: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/rapier.png",
   name: "Rapier",
-  description: "A slender, pointed sword with a sharp, thin blade",
+  description:
+    "A sleek and slender sword with a pointed and sharp blade, designed for precise and rapid thrusting attacks.",
   weight: 0.75,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 8,
-  defense: 0,
+  attack: 9,
+  defense: 1,
   rangeType: EntityAttackType.Melee,
   basePrice: 70,
 };

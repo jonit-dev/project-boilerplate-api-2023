@@ -9,11 +9,12 @@ export const itemEnchantedSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/enchanted-sword.png",
   name: "Enchanted Sword",
-  description: "A sword imbued with magical powers or enchantments",
+  description:
+    "A magical sword imbued with powerful enchantments, capable of channeling potent spells and incantations.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 12,
-  defense: 3,
+  attack: 15,
+  defense: 4,
   rangeType: EntityAttackType.Melee,
   basePrice: 78,
 };

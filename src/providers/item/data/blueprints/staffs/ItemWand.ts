@@ -9,11 +9,12 @@ export const itemWand: Partial<IMagicStaff> = {
   textureAtlas: "items",
   texturePath: "staffs/wand.png",
   name: "Wand",
-  description: "A magic wand, crafted by the dark lord Sauron",
+  description:
+    "A powerful magic wand crafted by the dark lord Sauron himself, imbued with malevolent energy and deadly magical power.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 5,
-  defense: 0,
+  attack: 7,
+  defense: 1,
   rangeType: EntityAttackType.Melee,
   basePrice: 50,
 };

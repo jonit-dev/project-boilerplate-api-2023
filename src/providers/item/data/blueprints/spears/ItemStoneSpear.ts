@@ -11,13 +11,13 @@ export const itemStoneSpear: Partial<IItem> = {
   texturePath: "spears/stone-spear.png",
   name: "Stone Spear",
   description: "Basic melee weapon made of a wooden stick and a pointed head made of stone.",
-  attack: 4,
-  defense: 1,
+  attack: 5,
+  defense: 3,
   weight: 3,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,
   rangeType: EntityAttackType.Melee,
 
-  basePrice: 7,
+  basePrice: 40,
 };

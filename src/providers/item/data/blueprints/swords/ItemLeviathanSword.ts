@@ -9,11 +9,12 @@ export const itemLeviathanSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/leviathan-sword.png",
   name: "Leviathan Sword",
-  description: "A mythical sword associated with the leviathan  a sea monster",
+  description:
+    "A mythical sword associated with the leviathan, a sea monster of enormous size and power. It is imbued with the strength and ferocity of the leviathan.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 12,
-  defense: 2,
+  attack: 14,
+  defense: 4,
   rangeType: EntityAttackType.Melee,
   basePrice: 70,
 };

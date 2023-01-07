@@ -10,9 +10,10 @@ export const itemBasiliskSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/basilisk-sword.png",
   name: "Basilisk Sword",
-  description: "A sword crafted from the remains of a basilisk.",
-  attack: 10,
-  defense: 3,
+  description:
+    "A fearsome sword crafted from the remains of a powerful basilisk, imbued with deadly venom and corrosive properties.",
+  attack: 12,
+  defense: 4,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

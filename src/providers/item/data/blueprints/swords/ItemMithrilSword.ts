@@ -9,11 +9,12 @@ export const itemMithrilSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/mithril-sword.png",
   name: "Mithril Sword",
-  description: "A sword made of mithril, a fictional metal known for its strength and light weight",
+  description:
+    "A sword made of mithril, a fictional metal known for its strength and light weight. It is a highly prized weapon for its balance of power and speed.",
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 10,
-  defense: 2,
+  attack: 12,
+  defense: 4,
   rangeType: EntityAttackType.Melee,
   basePrice: 70,
 };

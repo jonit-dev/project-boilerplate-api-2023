@@ -11,11 +11,12 @@ export const itemKatana: Partial<IItem> = {
   texturePath: "swords/katana.png",
 
   name: "Katana",
-  description: "A katana.",
-  attack: 6,
-  defense: 0,
+  description:
+    "A traditional Japanese sword with a curved, single-edged blade, known for its sharpness and versatility.",
+  attack: 8,
+  defense: 2,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  basePrice: 49,
+  basePrice: 60,
 };

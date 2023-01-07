@@ -9,11 +9,12 @@ export const itemFireWand: Partial<IMagicStaff> = {
   textureAtlas: "items",
   texturePath: "staffs/fire-wand.png",
   name: "Fire Wand",
-  description: "A wand or rod that can generate or control flames",
+  description:
+    "A wand or staff imbued with the power of flames, capable of generating and controlling intense heat and fire.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 5,
-  defense: 2,
+  attack: 7,
+  defense: 3,
   rangeType: EntityAttackType.Melee,
   basePrice: 60,
 };

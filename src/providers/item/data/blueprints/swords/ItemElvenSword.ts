@@ -10,11 +10,12 @@ export const itemElvenSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/elven-sword.png",
   name: "Elven Sword",
-  description: "A fine, light and slender sword crafted by elves.",
-  attack: 8,
-  defense: 3,
+  description:
+    "A slender, finely crafted sword made by skilled elven smiths. It is prized for its light weight and graceful design.",
+  attack: 10,
+  defense: 4,
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  basePrice: 69,
+  basePrice: 70,
 };

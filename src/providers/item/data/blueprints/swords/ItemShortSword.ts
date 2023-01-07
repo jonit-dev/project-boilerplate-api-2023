@@ -10,11 +10,12 @@ export const itemShortSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/short-sword.png",
   name: "Short Sword",
-  description: "You see a short sword. It is a single-handed sword with a handle that just features a grip.",
-  attack: 5,
-  defense: 2,
-  weight: 3,
+  description:
+    "A single-handed sword with a short, compact blade and a grip handle, suitable for quick and agile attacks.",
+  attack: 6,
+  defense: 3,
+  weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  basePrice: 49,
+  basePrice: 68,
 };

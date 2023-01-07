@@ -9,11 +9,12 @@ export const itemDamascusSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/damascus-sword.png",
   name: "Damascus Sword",
-  description: "A sword made with Damascus steel, known for its strength and beauty",
+  description:
+    "A finely crafted sword made of Damascus steel, known for its exceptional strength and beautiful patterns.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 15,
-  defense: 0,
+  attack: 17,
+  defense: 1,
   rangeType: EntityAttackType.Melee,
   basePrice: 85,
 };

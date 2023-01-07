@@ -9,11 +9,12 @@ export const itemRubyStaff: Partial<IMagicStaff> = {
   textureAtlas: "items",
   texturePath: "staffs/ruby-staff.png",
   name: "Ruby Staff",
-  description: "A staff adorned with rubies, often used as a symbol of wealth or power",
+  description:
+    "A staff adorned with sparkling rubies, symbolizing wealth and prosperity. It is also imbued with powerful magical energy.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 9,
-  defense: 5,
+  attack: 11,
+  defense: 6,
   rangeType: EntityAttackType.Melee,
   basePrice: 90,
 };

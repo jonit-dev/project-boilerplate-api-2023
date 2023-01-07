@@ -9,7 +9,8 @@ export const itemGuanDao: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "spears/guan-dao.png",
   name: "Guan Dao",
-  description: "A type of Chinese spear with a long, curved blade mounted on a pole, used by infantry and cavalry.",
+  description:
+    "A traditional Chinese spear with a long, curved blade mounted on a pole, used by both infantry and cavalry.",
   weight: 4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 8,

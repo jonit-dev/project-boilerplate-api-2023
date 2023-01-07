@@ -10,9 +10,10 @@ export const itemDragonsSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/dragon's-sword.png",
   name: "Dragon's Sword",
-  description: "A mythical sword crafted from the claws and teeth of a fallen dragon to be yielded by a great warrior.",
-  attack: 16,
-  defense: 8,
+  description:
+    "A legendary sword crafted from the remains of a mighty dragon, wielded only by the greatest of warriors.",
+  attack: 18,
+  defense: 10,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

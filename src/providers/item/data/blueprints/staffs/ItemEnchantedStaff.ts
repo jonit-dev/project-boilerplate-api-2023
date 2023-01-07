@@ -9,11 +9,12 @@ export const itemEnchantedStaff: Partial<IMagicStaff> = {
   textureAtlas: "items",
   texturePath: "staffs/enchanted-staff.png",
   name: "Enchanted Staff",
-  description: "A staff imbued with magical powers or enchantments",
+  description:
+    "A magical staff imbued with powerful enchantments, capable of channeling potent spells and incantations.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 10,
-  defense: 3,
+  attack: 12,
+  defense: 4,
   rangeType: EntityAttackType.Melee,
   basePrice: 80,
 };

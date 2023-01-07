@@ -9,11 +9,12 @@ export const itemCorruptionSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/corruption-sword.png",
   name: "Corruption Sword",
-  description: "A sword imbued with corrupting or malevolent powers",
+  description:
+    "A sinister sword imbued with corrupting energies, capable of sapping the strength and vitality of its victims.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 10,
-  defense: 0,
+  attack: 12,
+  defense: 1,
   rangeType: EntityAttackType.Melee,
   basePrice: 72,
 };

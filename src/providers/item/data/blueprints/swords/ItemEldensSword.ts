@@ -9,11 +9,12 @@ export const itemEldensSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/eldens-sword.png",
   name: "Eldens Sword",
-  description: "A mythical sword associated with the Eldens",
+  description:
+    "A mythical sword said to be associated with the Eldens, a powerful and ancient race. It is imbued with powerful magical energy.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 10,
-  defense: 5,
+  attack: 12,
+  defense: 7,
   rangeType: EntityAttackType.Melee,
-  basePrice: 72,
+  basePrice: 75,
 };

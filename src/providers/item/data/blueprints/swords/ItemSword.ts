@@ -9,11 +9,12 @@ export const itemSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/sword.png",
   name: "Sword",
-  description: "A weapon with a long, sharp blade and a hilt for grip",
+  description:
+    "A standard weapon with a long, sharp blade and a hilt for grip, suitable for a variety of combat situations.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 7,
-  defense: 0,
+  attack: 8,
+  defense: 1,
   rangeType: EntityAttackType.Melee,
   basePrice: 68,
 };
