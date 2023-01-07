@@ -10,9 +10,10 @@ export const itemIceSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/ice-sword.png",
   name: "Ice Sword",
-  description: "An ice sword with a blade so thin, that can cut a man in half. ",
-  attack: 6,
-  defense: 2,
+  description:
+    "A sharp and deadly ice sword with a blade so thin it can easily cut through flesh and bone. Its icy edge is capable of causing freezing damage to enemies.",
+  attack: 8,
+  defense: 3,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

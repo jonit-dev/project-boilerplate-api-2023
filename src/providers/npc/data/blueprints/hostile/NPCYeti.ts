@@ -6,6 +6,7 @@ import {
   FoodsBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
+  StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -54,6 +55,10 @@ export const npcYeti: Partial<INPC> = {
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 50,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.MoonsStaff,
+      chance: 15,
     },
   ],
 };

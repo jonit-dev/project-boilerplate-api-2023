@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  AccessoriesBlueprint,
   ContainersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
@@ -10,6 +11,9 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  SpearsBlueprint,
+  StaffsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -79,6 +83,22 @@ export const npcDwarfGuardian: Partial<INPC> = {
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.RubyRing,
+      chance: 2,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.Corseque,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.RoyalStaff,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.EnchantedSword,
+      chance: 15,
     },
   ],
 };

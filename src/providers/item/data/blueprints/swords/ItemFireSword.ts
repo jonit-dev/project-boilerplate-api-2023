@@ -10,11 +10,12 @@ export const itemFireSword: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "swords/fire-sword.png",
   name: "Fire Sword",
-  description: "A sword with the power of flames.",
-  attack: 12,
-  defense: 0,
+  description:
+    "A sword imbued with the power of flames, capable of unleashing fiery attacks and generating intense heat.",
+  attack: 14,
+  defense: 1,
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  basePrice: 73,
+  basePrice: 74,
 };

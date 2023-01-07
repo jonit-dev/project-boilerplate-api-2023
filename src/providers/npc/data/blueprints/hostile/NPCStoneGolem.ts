@@ -10,6 +10,7 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
@@ -91,6 +92,10 @@ export const npcStoneGolem: Partial<INPC> = {
     {
       itemBlueprintKey: ShieldsBlueprint.SilverShield,
       chance: 1,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.LightingSword,
+      chance: 20,
     },
   ],
 };

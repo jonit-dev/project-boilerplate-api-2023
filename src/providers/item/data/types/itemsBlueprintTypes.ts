@@ -9,6 +9,18 @@ export enum SwordsBlueprint {
   Katana = "katana",
   KnightsSword = "knights-sword",
   IceSword = "ice-sword",
+  CorruptionSword = "corruption-sword",
+  DamascusSword = "damascus-sword",
+  EldensSword = "eldens-sword",
+  EnchantedSword = "enchanted-sword",
+  GoldenSword = "golden-sword",
+  LeviathanSword = "leviathan-sword",
+  LightingSword = "lighting-sword",
+  LongSword = "long-sword",
+  MithrilSword = "mithril-sword",
+  Rapier = "rapier",
+  Saber = "saber",
+  Sword = "sword",
 }
 
 export enum HelmetsBlueprint {
@@ -196,6 +208,11 @@ export enum SpearsBlueprint {
   RoyalSpear = "royal-spear",
   Spear = "spear",
   StoneSpear = "stone-spear",
+  BohemianEarspoon = "BohemianEarspoon",
+  Corseque = "Corseque",
+  GuanDao = "GuanDao",
+  Javelin = "Javelin",
+  Trident = "Trident",
 }
 
 export enum PotionsBlueprint {
@@ -272,6 +289,16 @@ export enum StaffsBlueprint {
   AppendicesStaff = "appendice's-staff",
   CorruptionStaff = "corruption-staff",
   FireStaff = "fire-staff",
+  AirWand = "air-wand",
+  EnchantedStaff = "enchanted-staff",
+  FireWand = "fire-wand",
+  MoonsStaff = "moons-staff",
+  PoisonStaff = "poison-staff",
+  PoisonWand = "poison-wand",
+  RoyalStaff = "royal-staff",
+  RubyStaff = "ruby-staff",
+  SoulStaff = "soul-staff",
+  Wand = "wand",
 }
 
 export enum ShieldsBlueprint {
@@ -297,6 +324,14 @@ export enum AccessoriesBlueprint {
   CorruptionNecklace = "corruption-necklace",
   DeathNecklace = "death-necklace",
   ElvenRing = "elven-ring",
+  GoldenRing = "GoldenRing",
+  HasteRing = "HasteRing",
+  IronRing = "IronRing",
+  JadeRing = "JadeRing",
+  OrcRing = "OrcRing",
+  RubyRing = "RubyRing",
+  SapphireRing = "SapphireRing",
+  SoldiersRing = "SoldiersRing",
   AmazonsNecklace = "amazons-necklace",
   RoyalBracelet = "royal-bracelet",
   SapphireNecklace = "sapphire-necklace",

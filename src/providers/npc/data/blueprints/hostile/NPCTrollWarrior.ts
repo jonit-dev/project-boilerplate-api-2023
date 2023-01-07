@@ -7,6 +7,7 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   FoodsBlueprint,
   GlovesBlueprint,
@@ -15,6 +16,7 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
 export const npcTrollWarrior = {
@@ -89,6 +91,10 @@ export const npcTrollWarrior = {
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.PoisonStaff,
+      chance: 10,
     },
   ],
 } as Partial<INPC>;

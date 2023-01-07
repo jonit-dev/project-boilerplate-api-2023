@@ -8,6 +8,7 @@ import {
   GlovesBlueprint,
   HelmetsBlueprint,
   ShieldsBlueprint,
+  StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
@@ -65,6 +66,10 @@ export const npcElderGolem: Partial<INPC> = {
       itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodenLog,
       chance: 30,
       quantityRange: [1, 2],
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.RubyStaff,
+      chance: 10,
     },
   ],
 };

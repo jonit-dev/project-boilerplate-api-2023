@@ -8,6 +8,7 @@ import {
   GlovesBlueprint,
   MacesBlueprint,
   RangedWeaponsBlueprint,
+  SpearsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -95,6 +96,11 @@ export const npcDwarfGuard = {
       itemBlueprintKey: CraftingResourcesBlueprint.Obsidian,
       chance: 5,
       quantityRange: [3, 5],
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.Javelin,
+      chance: 5,
+      quantityRange: [2, 10],
     },
   ],
 } as Partial<INPC>;

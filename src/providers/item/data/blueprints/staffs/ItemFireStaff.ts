@@ -10,9 +10,10 @@ export const itemFireStaff: Partial<IMagicStaff> = {
   textureAtlas: "items",
   texturePath: "staffs/fire-staff.png",
   name: "Fire Staff",
-  description: "A staff with an fire ember gem at the top.",
-  attack: 9,
-  defense: 4,
+  description:
+    "A staff imbued with the power of flames, adorned with a glowing fire ember gem at its peak. It is capable of unleashing fiery attacks and generating intense heat.",
+  attack: 8,
+  defense: 5,
   weight: 1,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

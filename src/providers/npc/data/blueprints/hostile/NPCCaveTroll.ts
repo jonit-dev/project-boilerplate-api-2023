@@ -9,6 +9,7 @@ import {
   MacesBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -70,6 +71,10 @@ export const npcCaveTroll = {
       itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodenLog,
       chance: 30,
       quantityRange: [1, 2],
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
+      chance: 15,
     },
   ],
 } as Partial<INPC>;

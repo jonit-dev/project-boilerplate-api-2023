@@ -85,5 +85,13 @@ export const npcMinotaur = {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
       chance: 1,
     },
+    {
+      itemBlueprintKey: SpearsBlueprint.Trident,
+      chance: 1,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.LeviathanSword,
+      chance: 20,
+    },
   ],
 } as Partial<INPC>;

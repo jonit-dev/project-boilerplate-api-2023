@@ -7,6 +7,7 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
@@ -15,6 +16,7 @@ import {
   MacesBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
 export const npcTroll = {
@@ -86,6 +88,10 @@ export const npcTroll = {
       itemBlueprintKey: CraftingResourcesBlueprint.GreaterWoodenLog,
       chance: 30,
       quantityRange: [1, 2],
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.PoisonStaff,
+      chance: 10,
     },
   ],
 } as Partial<INPC>;

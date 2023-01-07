@@ -10,13 +10,14 @@ export const itemSpear: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "spears/spear.png",
   name: "Spear",
-  description: "A standard wooden spear with metal tip.",
-  attack: 5,
-  defense: 2,
+  description:
+    "A standard wooden spear with a metal tip, used as a basic melee weapon. It is a simple yet effective weapon that can be used for thrusting and poking attacks.",
+  attack: 6,
+  defense: 4,
   weight: 3,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,
   rangeType: EntityAttackType.Melee,
-  basePrice: 10,
+  basePrice: 45,
 };
