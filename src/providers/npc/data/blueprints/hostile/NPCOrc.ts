@@ -103,5 +103,9 @@ export const npcOrc = {
       chance: 20,
       quantityRange: [3, 10],
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.ShortBow,
+      chance: 5,
+    },
   ],
 } as Partial<INPC>;

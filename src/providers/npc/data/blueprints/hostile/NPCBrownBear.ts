@@ -2,7 +2,11 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import { CraftingResourcesBlueprint, FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  AccessoriesBlueprint,
+  CraftingResourcesBlueprint,
+  FoodsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -55,6 +59,10 @@ export const npcBrownBear = {
       itemBlueprintKey: CraftingResourcesBlueprint.Leather,
       chance: 50,
       quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.SapphireNecklace,
+      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

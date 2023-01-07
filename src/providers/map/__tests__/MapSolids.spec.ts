@@ -2,10 +2,11 @@
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { MapLayers } from "@rpg-engine/shared";
 import { MapSolids } from "../MapSolids";
+import { MapTiles } from "../MapTiles";
 
 describe("MapSolids.ts", () => {
   let mapSolids: MapSolids;
-
+  let mapTiles: MapTiles;
   const mapName = "unit-test-map";
 
   beforeAll(async () => {
@@ -13,6 +14,7 @@ describe("MapSolids.ts", () => {
 
     await unitTestHelper.initializeMapLoader();
     mapSolids = container.get<MapSolids>(MapSolids);
+    mapTiles = {} as MapTiles;
   });
 
   beforeEach(async () => {

@@ -80,6 +80,10 @@ export const npcBandit: Partial<INPC> = {
       chance: 5,
     },
     {
+      itemBlueprintKey: AxesBlueprint.Halberd,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.Silk,
       chance: 30,
       quantityRange: [5, 10],

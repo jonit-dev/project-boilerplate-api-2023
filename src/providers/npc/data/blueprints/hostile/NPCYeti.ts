@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   BootsBlueprint,
   FoodsBlueprint,
@@ -57,5 +56,4 @@ export const npcYeti: Partial<INPC> = {
       chance: 50,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
 };

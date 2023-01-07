@@ -49,6 +49,10 @@ export const npcWinterWolf: Partial<INPC> = {
       chance: 20,
     },
     {
+      itemBlueprintKey: DaggersBlueprint.HellishDagger,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.WolfTooth,
       chance: 50,
       quantityRange: [3, 5],

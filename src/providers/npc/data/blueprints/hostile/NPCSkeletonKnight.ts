@@ -75,5 +75,9 @@ export const npcSkeletonKnight = {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 10,
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.ElvenBolt,
+      chance: 5,
+    },
   ],
 } as Partial<INPC>;

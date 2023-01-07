@@ -10,12 +10,12 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 import {
   FoodsBlueprint,
   GlovesBlueprint,
+  HammersBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
-import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 
 export const npcWildTroll = {
   ...generateMoveTowardsMovement(),
@@ -61,6 +61,10 @@ export const npcWildTroll = {
       chance: 30,
     },
     {
+      itemBlueprintKey: HammersBlueprint.RoyalHammer,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.Bolt,
       chance: 50,
       quantityRange: [5, 10],
@@ -71,5 +75,4 @@ export const npcWildTroll = {
       chance: 30,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

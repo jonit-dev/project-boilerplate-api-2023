@@ -77,6 +77,10 @@ export const npcGiantSpider: Partial<INPC> = {
       chance: 15,
     },
     {
+      itemBlueprintKey: AxesBlueprint.CorruptionAxe,
+      chance: 15,
+    },
+    {
       itemBlueprintKey: HammersBlueprint.WarHammer,
       chance: 20,
     },

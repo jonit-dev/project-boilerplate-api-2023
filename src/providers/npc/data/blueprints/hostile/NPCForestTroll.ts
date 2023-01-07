@@ -19,7 +19,6 @@ import {
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
-import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 
 export const npcForestTroll = {
   ...generateMoveTowardsMovement(),
@@ -91,5 +90,4 @@ export const npcForestTroll = {
       chance: 1,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

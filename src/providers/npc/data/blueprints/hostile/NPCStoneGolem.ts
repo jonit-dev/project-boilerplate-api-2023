@@ -5,6 +5,7 @@ import {
   BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
+  HammersBlueprint,
   HelmetsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
@@ -72,6 +73,10 @@ export const npcStoneGolem: Partial<INPC> = {
       itemBlueprintKey: RangedWeaponsBlueprint.Stone,
       chance: 90,
       quantityRange: [10, 25],
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.SilverHammer,
+      chance: 10,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.IronIngot,

@@ -67,5 +67,9 @@ export const npcForestWalker: Partial<INPC> = {
       itemBlueprintKey: ShieldsBlueprint.VikingShield,
       chance: 10,
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.FireBolt,
+      chance: 5,
+    },
   ],
 };

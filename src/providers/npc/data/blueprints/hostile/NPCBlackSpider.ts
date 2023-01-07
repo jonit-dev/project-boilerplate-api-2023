@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  DaggersBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
   PotionsBlueprint,
@@ -53,6 +54,10 @@ export const npcBlackSpider: Partial<INPC> = {
     {
       itemBlueprintKey: SwordsBlueprint.ShortSword,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.SaiDagger,
+      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],

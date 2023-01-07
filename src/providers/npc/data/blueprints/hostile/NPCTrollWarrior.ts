@@ -16,7 +16,6 @@ import {
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
-import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 
 export const npcTrollWarrior = {
   ...generateMoveTowardsMovement(),
@@ -83,11 +82,13 @@ export const npcTrollWarrior = {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 20,
     },
-
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.RoyalBow,
+      chance: 5,
+    },
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

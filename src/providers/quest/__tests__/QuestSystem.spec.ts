@@ -268,6 +268,29 @@ describe("QuestSystem.ts", () => {
     expect(result).toBe(undefined);
   });
 
+  // it("should return an empty object if there are no quest records with the specified status", async () => {
+  //   // // Set up the mock functions to return the specified data
+  //   jest.spyOn(QuestRecord, "find").mockResolvedValue([]);
+  //   jest.spyOn(QuestObjectiveInteraction, "find").mockResolvedValue([]);
+  //   jest.spyOn(QuestObjectiveKill, "find").mockResolvedValue([]);
+
+  //   // Test the getObjectivesData method
+  //   // @ts-ignore
+  //   const result = await questSystem.getObjectivesData(testCharacter, QuestType.Interaction, QuestStatus.InProgress);
+
+  //   // Assert that the result is as expected
+  //   expect(result).toEqual({});
+  // });
+
+  // it("should throw an error in getObjectivesData if the quest type is invalid", async () => {
+  //   const invalidQuestType: QuestType = "invalid" as QuestType;
+
+  //   await expect(
+  //     // @ts-ignore
+  //     questSystem.getObjectivesData(testCharacter, invalidQuestType, QuestStatus.InProgress)
+  //   ).rejects.toThrowError(`invalid quest type: ${invalidQuestType}`);
+  // });
+
   afterEach(() => {
     jest.clearAllMocks();
     jest.resetAllMocks();

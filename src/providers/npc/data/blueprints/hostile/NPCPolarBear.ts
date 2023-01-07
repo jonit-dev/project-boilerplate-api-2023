@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  AccessoriesBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   PotionsBlueprint,
@@ -58,6 +59,10 @@ export const npcPolarBear = {
       itemBlueprintKey: CraftingResourcesBlueprint.Leather,
       chance: 50,
       quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.SapphireNecklace,
+      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

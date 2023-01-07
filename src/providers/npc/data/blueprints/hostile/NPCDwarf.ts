@@ -72,6 +72,10 @@ export const npcDwarf = {
       quantityRange: [5, 10],
     },
     {
+      itemBlueprintKey: RangedWeaponsBlueprint.CorruptionBow,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.IronIngot,
       chance: 40,
       quantityRange: [5, 10],

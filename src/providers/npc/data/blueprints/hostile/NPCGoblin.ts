@@ -112,6 +112,10 @@ export const npcGoblin = {
       quantityRange: [5, 15],
     },
     {
+      itemBlueprintKey: RangedWeaponsBlueprint.LongBow,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.Rope,
       chance: 30,
     },

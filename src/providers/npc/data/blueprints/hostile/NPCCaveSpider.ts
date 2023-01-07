@@ -63,6 +63,10 @@ export const npcCaveSpider: Partial<INPC> = {
       chance: 5,
     },
     {
+      itemBlueprintKey: AxesBlueprint.GoldenAxe,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: BootsBlueprint.Sandals,
       chance: 20,
     },

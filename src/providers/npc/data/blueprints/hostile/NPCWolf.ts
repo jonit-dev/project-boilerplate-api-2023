@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  AccessoriesBlueprint,
   CraftingResourcesBlueprint,
   DaggersBlueprint,
   FoodsBlueprint,
@@ -47,6 +48,14 @@ export const npcWolf = {
     {
       itemBlueprintKey: DaggersBlueprint.Dagger,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.Kunai,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.WolfToothChain,
+      chance: 10,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.WolfTooth,

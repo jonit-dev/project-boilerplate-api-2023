@@ -77,6 +77,10 @@ export const npcElf: Partial<INPC> = {
       chance: 1,
     },
     {
+      itemBlueprintKey: AccessoriesBlueprint.AmazonsNecklace,
+      chance: 3,
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 20,
       quantityRange: [3, 10],
