@@ -76,6 +76,10 @@ export const npcAssaultSpider: Partial<INPC> = {
       itemBlueprintKey: AccessoriesBlueprint.CorruptionNecklace,
       chance: 10,
     },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.StarNecklace,
+      chance: 6,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],
 };

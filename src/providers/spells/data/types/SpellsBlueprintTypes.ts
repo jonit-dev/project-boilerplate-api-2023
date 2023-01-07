@@ -14,6 +14,8 @@ export enum SpellsBlueprint {
   PoisonRuneCreationSpell = "poison-rune-creation-spell",
   DarkRuneCreationSpell = "dark-rune-creation-spell",
   GreaterHealingSpell = "greater-healing-spell",
+  EnergyBoltCreationSpell = "energy-bolt-creation-spell",
+  FireBoltCreationSpell = "fire-bolt-creation-spell",
 }
 
 export interface ISpell {

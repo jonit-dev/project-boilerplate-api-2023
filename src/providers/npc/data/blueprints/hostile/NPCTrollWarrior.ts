@@ -84,7 +84,10 @@ export const npcTrollWarrior = {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 20,
     },
-
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.RoyalBow,
+      chance: 5,
+    },
     {
       itemBlueprintKey: FoodsBlueprint.Salmon,
       chance: 30,
@@ -94,5 +97,4 @@ export const npcTrollWarrior = {
       chance: 10,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

@@ -67,5 +67,9 @@ export const npcBlackEagle = {
       chance: 30,
       quantityRange: [5, 10],
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.HorseBow,
+      chance: 5,
+    },
   ],
 } as Partial<INPC>;

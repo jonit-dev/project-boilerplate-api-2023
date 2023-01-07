@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   ArmorsBlueprint,
   AxesBlueprint,
@@ -75,6 +74,10 @@ export const npcOrcBerserker = {
       chance: 30,
     },
     {
+      itemBlueprintKey: AxesBlueprint.Hatchet,
+      chance: 7,
+    },
+    {
       itemBlueprintKey: HelmetsBlueprint.BerserkersHelmet,
       chance: 15,
     },
@@ -95,5 +98,4 @@ export const npcOrcBerserker = {
       chance: 10,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

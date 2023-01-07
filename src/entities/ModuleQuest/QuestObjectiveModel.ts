@@ -22,7 +22,10 @@ export const QuestObjectiveKill = typedModel("QuestObjectiveKill", questObjectiv
 const questObjectiveInteractionSchema = createLeanSchema(
   {
     targetNPCkey: Type.string(),
-    itemsKeys: Type.array().of(Type.string()),
+    items: Type.array().of({
+      itemKey: Type.string({ required: true }),
+      qty: Type.number({ required: true, default: 1 }),
+    }),
     type: Type.string({ required: true, default: QuestType.Interaction }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }

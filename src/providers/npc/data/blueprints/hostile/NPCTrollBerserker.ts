@@ -83,6 +83,10 @@ export const npcTrollBerserker = {
       quantityRange: [5, 10],
     },
     {
+      itemBlueprintKey: RangedWeaponsBlueprint.RoyalCrossbow,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.Bow,
       chance: 20,
     },
@@ -106,5 +110,4 @@ export const npcTrollBerserker = {
       chance: 10,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   AxesBlueprint,
   BootsBlueprint,
@@ -57,6 +56,10 @@ export const npcIceTroll: Partial<INPC> = {
       chance: 15,
     },
     {
+      itemBlueprintKey: AxesBlueprint.DwarvenWaraxe,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: ShieldsBlueprint.FrostShield,
       chance: 15,
     },
@@ -82,5 +85,4 @@ export const npcIceTroll: Partial<INPC> = {
       chance: 10,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
 };

@@ -53,7 +53,7 @@ describe("CharacterItemInventory.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    await characterItemInventory.decrementItemFromInventory(OthersBlueprint.GoldCoin, testCharacter, 20);
+    await characterItemInventory.decrementItemFromInventoryByKey(OthersBlueprint.GoldCoin, testCharacter, 20);
 
     const newBalance = await characterTradingBalance.getTotalGoldInInventory(testCharacter);
 
@@ -69,7 +69,7 @@ describe("CharacterItemInventory.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    await characterItemInventory.decrementItemFromInventory(OthersBlueprint.GoldCoin, testCharacter, 0.1);
+    await characterItemInventory.decrementItemFromInventoryByKey(OthersBlueprint.GoldCoin, testCharacter, 0.1);
 
     const newBalance = await characterTradingBalance.getTotalGoldInInventory(testCharacter);
 
@@ -85,7 +85,7 @@ describe("CharacterItemInventory.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    await characterItemInventory.decrementItemFromInventory(OthersBlueprint.GoldCoin, testCharacter, 25);
+    await characterItemInventory.decrementItemFromInventoryByKey(OthersBlueprint.GoldCoin, testCharacter, 25);
 
     const updatedInventoryContainer = (await ItemContainer.findById(
       inventory.itemContainer
@@ -114,7 +114,7 @@ describe("CharacterItemInventory.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    await characterItemInventory.decrementItemFromInventory(OthersBlueprint.GoldCoin, testCharacter, 25);
+    await characterItemInventory.decrementItemFromInventoryByKey(OthersBlueprint.GoldCoin, testCharacter, 25);
 
     const updatedInventoryContainer = (await ItemContainer.findById(
       inventory.itemContainer
@@ -142,7 +142,7 @@ describe("CharacterItemInventory.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    await characterItemInventory.decrementItemFromInventory(OthersBlueprint.GoldCoin, testCharacter, 125);
+    await characterItemInventory.decrementItemFromInventoryByKey(OthersBlueprint.GoldCoin, testCharacter, 125);
 
     const updatedInventoryContainer = (await ItemContainer.findById(
       inventory.itemContainer
@@ -170,7 +170,7 @@ describe("CharacterItemInventory.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    await characterItemInventory.decrementItemFromInventory(SwordsBlueprint.ShortSword, testCharacter, 1);
+    await characterItemInventory.decrementItemFromInventoryByKey(SwordsBlueprint.ShortSword, testCharacter, 1);
 
     const updatedInventoryContainer = (await ItemContainer.findById(
       inventory.itemContainer
@@ -192,7 +192,7 @@ describe("CharacterItemInventory.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    await characterItemInventory.decrementItemFromInventory(SwordsBlueprint.ShortSword, testCharacter, 2);
+    await characterItemInventory.decrementItemFromInventoryByKey(SwordsBlueprint.ShortSword, testCharacter, 2);
 
     const updatedInventoryContainer = (await ItemContainer.findById(
       inventory.itemContainer
@@ -218,7 +218,7 @@ describe("CharacterItemInventory.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    await characterItemInventory.decrementItemFromInventory(SwordsBlueprint.ShortSword, testCharacter, 1);
+    await characterItemInventory.decrementItemFromInventoryByKey(SwordsBlueprint.ShortSword, testCharacter, 1);
 
     const updatedInventoryContainer = (await ItemContainer.findById(
       inventory.itemContainer

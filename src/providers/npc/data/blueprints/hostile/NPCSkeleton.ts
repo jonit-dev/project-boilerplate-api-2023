@@ -72,5 +72,9 @@ export const npcSkeleton = {
       itemBlueprintKey: StaffsBlueprint.SoulStaff,
       chance: 30,
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.EldensBow,
+      chance: 7,
+    },
   ],
 } as Partial<INPC>;

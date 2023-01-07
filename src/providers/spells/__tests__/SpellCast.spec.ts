@@ -20,6 +20,8 @@ import { spellArrowCreation } from "../data/blueprints/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/SpellBlankRuneCreation";
 import { spellBoltCreation } from "../data/blueprints/SpellBoltCreation";
 import { spellDarkRuneCreation } from "../data/blueprints/SpellDarkRuneCreation";
+import { spellEnergyBoltCreation } from "../data/blueprints/SpellEnergyBoltCreation";
+import { spellFireBoltCreation } from "../data/blueprints/SpellFireBoltCreation";
 import { spellFireRuneCreation } from "../data/blueprints/SpellFireRuneCreation";
 import { spellFoodCreation } from "../data/blueprints/SpellFoodCreation";
 import { spellGreaterHealing } from "../data/blueprints/SpellGreaterHealing";
@@ -50,7 +52,14 @@ describe("SpellCast.ts", () => {
 
     level2Spells = [spellSelfHealing, spellArrowCreation, spellBlankRuneCreation];
     level3Spells = [spellBoltCreation, spellFoodCreation];
-    level4Spells = [spellDarkRuneCreation, spellFireRuneCreation, spellHealRuneCreation, spellGreaterHealing];
+    level4Spells = [
+      spellDarkRuneCreation,
+      spellFireRuneCreation,
+      spellHealRuneCreation,
+      spellGreaterHealing,
+      spellEnergyBoltCreation,
+      spellFireBoltCreation,
+    ];
     level5Spells = [spellPoisonRuneCreation, spellSelfHaste];
   });
 

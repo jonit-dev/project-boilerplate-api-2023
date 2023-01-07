@@ -66,6 +66,10 @@ export const npcFrostSalamander: Partial<INPC> = {
       quantityRange: [10, 13],
     },
     {
+      itemBlueprintKey: RangedWeaponsBlueprint.CompoundBow,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.FrostCrossbow,
       chance: 5,
     },

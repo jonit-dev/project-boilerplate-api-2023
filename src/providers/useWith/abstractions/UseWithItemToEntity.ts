@@ -67,7 +67,7 @@ export class UseWithItemToEntity {
       }
 
       if (requiredResource.decrementQty) {
-        const decrementRequiredItem = await this.characterItemInventory.decrementItemFromInventory(
+        const decrementRequiredItem = await this.characterItemInventory.decrementItemFromInventoryByKey(
           requiredResource.key,
           character,
           requiredResource.decrementQty

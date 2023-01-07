@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -48,6 +48,35 @@ export class CharacterItemInventory {
   }
 
   public async decrementItemFromInventory(
+    itemId: string,
+    character: ICharacter,
+    decrementQty: number
+  ): Promise<boolean> {
+    const inventory = (await character.inventory) as unknown as IItem;
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
+
+    if (!inventoryItemContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
+      return false;
+    }
+
+    const item = (await Item.findById(itemId)) as unknown as IItem;
+    if (!item) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Item not found.");
+      return false;
+    }
+
+    // returned value is slot index + 1
+    const slotIndex = await this.checkItemInInventory(itemId, character);
+    if (!slotIndex) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Item not found on character's inventory.");
+      return false;
+    }
+
+    return this.decrementQty(item, slotIndex - 1, inventoryItemContainer, character, decrementQty);
+  }
+
+  public async decrementItemFromInventoryByKey(
     itemKey: string,
     character: ICharacter,
     decrementQty: number
@@ -172,22 +201,25 @@ export class CharacterItemInventory {
     }
   }
 
-  public async checkItemInInventory(itemId: string, character: ICharacter): Promise<boolean> {
+  /**
+   * Returns the (slot index + 1) if it finds it. Otherwise, returns undefined
+   */
+  public async checkItemInInventory(itemId: string, character: ICharacter): Promise<number | undefined> {
     const inventory = (await character.inventory) as unknown as IItem;
-
     const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
-      return false;
+      return;
     }
 
-    const inventoryItemIds = inventoryItemContainer?.itemIds;
+    for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
+      const slotItem = inventoryItemContainer.slots?.[i];
 
-    if (!inventoryItemIds) {
-      return false;
+      if (!slotItem) continue;
+      if (slotItem._id.toString() === itemId.toString()) {
+        return i + 1;
+      }
     }
-    // @ts-ignore
-    return !!inventoryItemIds.find((id) => id.toString("hex") === itemId.toString("hex"));
   }
 
   private async removeItemFromInventory(itemId: string, character: ICharacter): Promise<boolean> {
@@ -268,5 +300,40 @@ export class CharacterItemInventory {
     await equipment.save();
 
     return equipment;
+  }
+
+  private async decrementQty(
+    slotItem: IItem,
+    slotIndex: number,
+    inventoryItemContainer: IItemContainer,
+    character: ICharacter,
+    decrementQty: number
+  ): Promise<boolean> {
+    let result = false;
+    if (slotItem.maxStackSize > 1) {
+      // if its stackable, decrement the stack
+      let remaining = 0;
+
+      if (decrementQty <= slotItem.stackQty!) {
+        remaining = this.mathHelper.fixPrecision(slotItem.stackQty! - decrementQty);
+      }
+
+      if (remaining > 0) {
+        await this.characterItemSlots.updateItemOnSlot(slotIndex, inventoryItemContainer, {
+          ...slotItem,
+          stackQty: remaining,
+        });
+      } else {
+        result = await this.deleteItemFromInventory(slotItem._id, character);
+        // we also need to delete item from items table
+        await Item.deleteOne({ _id: slotItem._id });
+      }
+    } else {
+      // if its not stackable, just remove it
+      result = await this.deleteItemFromInventory(slotItem._id, character);
+      // we also need to delete item from items table
+      await Item.deleteOne({ _id: slotItem._id });
+    }
+    return result;
   }
 }

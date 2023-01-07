@@ -62,6 +62,14 @@ export const npcDwarfMage: Partial<INPC> = {
       chance: 30,
     },
     {
+      itemBlueprintKey: AxesBlueprint.RoyalDoubleAxe,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.HellishAxe,
+      chance: 7,
+    },
+    {
       itemBlueprintKey: HelmetsBlueprint.StuddedHelmet,
       chance: 15,
     },

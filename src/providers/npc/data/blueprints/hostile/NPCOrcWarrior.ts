@@ -67,6 +67,10 @@ export const npcOrcWarrior = {
       chance: 30,
     },
     {
+      itemBlueprintKey: AxesBlueprint.Greataxe,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: SwordsBlueprint.BroadSword,
       chance: 15,
     },
@@ -94,6 +98,10 @@ export const npcOrcWarrior = {
     {
       itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.VikingAxe,
+      chance: 10,
     },
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,

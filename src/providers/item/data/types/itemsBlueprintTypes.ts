@@ -65,6 +65,10 @@ export enum DaggersBlueprint {
   Dagger = "dagger",
   FrostDagger = "frost-dagger",
   CorruptionDagger = "corruption-dagger",
+  GoldenDagger = "golden-dagger",
+  HellishDagger = "hellish-dagger",
+  SaiDagger = "sai-dagger",
+  Kunai = "kunai",
 }
 
 export enum ArmorsBlueprint {
@@ -85,6 +89,16 @@ export enum AxesBlueprint {
   Pickaxe = "pickaxe",
   FrostDoubleAxe = "frost-double-axe",
   YetiHalberd = "yeti-halberd",
+  DwarvenWaraxe = "dwarven-waraxe",
+  CorruptionAxe = "corruption-axe",
+  GoldenAxe = "golden-axe",
+  GreaterAxe = "greater-axe",
+  Greataxe = "greataxe",
+  HellishAxe = "hellish-axe",
+  RoyalDoubleAxe = "royalDouble-axe",
+  VikingAxe = "viking-axe",
+  Halberd = "Halberd",
+  Hatchet = "Hatchet",
 }
 
 export enum BootsBlueprint {
@@ -221,6 +235,21 @@ export enum RangedWeaponsBlueprint {
   FrostCrossbow = "frost-crossbow",
   IronArrow = "iron-arrow",
   AsterionsBow = "asterions-bow",
+
+  CompoundBow = "compound-bow",
+  CorruptionBolt = "corruption-bolt",
+  CorruptionBow = "corruption-bow",
+  ElvenBolt = "elven-bolt",
+  ElvenBow = "elven-bow",
+  FireBolt = "fire-bolt",
+  HellishBow = "hellish-bow",
+  HorseBow = "horse-bow",
+  HuntersBow = "hunters-bow",
+  LongBow = "long-bow",
+  EldensBow = "eldens-bow",
+  RoyalCrossbow = "royal-crossbow",
+  ShortBow = "short-bow",
+  RoyalBow = "royal-bow",
 }
 
 export enum GlovesBlueprint {
@@ -234,6 +263,7 @@ export enum MacesBlueprint {
   Club = "club",
   Mace = "mace",
   SpikedClub = "spiked-club",
+  SpikedMace = "spiked-mace",
 }
 
 export enum MagicsBlueprint {
@@ -244,6 +274,8 @@ export enum MagicsBlueprint {
   PoisonRune = "poison-rune",
   ThunderRune = "thunder-rune",
   Book = "book",
+  EnergyBoltRune = "energy-bolt-rune",
+  FireBoltRune = "fire-bolt-rune",
 }
 
 export enum OthersBlueprint {
@@ -292,6 +324,7 @@ export enum AccessoriesBlueprint {
   CorruptionNecklace = "corruption-necklace",
   DeathNecklace = "death-necklace",
   ElvenRing = "elven-ring",
+<<<<<<< HEAD
   GoldenRing = "GoldenRing",
   HasteRing = "HasteRing",
   IronRing = "IronRing",
@@ -300,9 +333,18 @@ export enum AccessoriesBlueprint {
   RubyRing = "RubyRing",
   SapphireRing = "SapphireRing",
   SoldiersRing = "SoldiersRing",
+=======
+  AmazonsNecklace = "amazons-necklace",
+  RoyalBracelet = "royal-bracelet",
+  SapphireNecklace = "sapphire-necklace",
+  StarNecklace = "star-necklace",
+  WolfToothChain = "wolf-tooth-chain",
+>>>>>>> 1c20baf086a8c953e926c9c69c5ff74960d2a421
 }
 
 export enum HammersBlueprint {
   IronHammer = "iron-hammer",
   WarHammer = "war-hammer",
+  RoyalHammer = "royal-hammer",
+  SilverHammer = "silver-hammer",
 }

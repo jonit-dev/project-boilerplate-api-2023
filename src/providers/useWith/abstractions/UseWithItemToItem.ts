@@ -123,7 +123,7 @@ export class UseWithItemToItem {
 
   private async consumeRequiredItems(matchingRecipe: IUseWithCraftingRecipe, character: ICharacter): Promise<boolean> {
     for (const requiredItem of matchingRecipe.requiredItems) {
-      const hasDecrementedFromInventory = await this.characterItemInventory.decrementItemFromInventory(
+      const hasDecrementedFromInventory = await this.characterItemInventory.decrementItemFromInventoryByKey(
         requiredItem.key,
         character,
         requiredItem.qty

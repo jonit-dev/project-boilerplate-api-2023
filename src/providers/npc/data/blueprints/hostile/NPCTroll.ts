@@ -68,7 +68,10 @@ export const npcTroll = {
       chance: 50,
       quantityRange: [5, 10],
     },
-
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.HuntersBow,
+      chance: 5,
+    },
     {
       itemBlueprintKey: HelmetsBlueprint.GladiatorHelmet,
       chance: 10,
@@ -91,5 +94,4 @@ export const npcTroll = {
       chance: 10,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

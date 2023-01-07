@@ -71,6 +71,10 @@ export const npcDwarfGuardian: Partial<INPC> = {
       chance: 50,
       quantityRange: [10, 30],
     },
+    {
+      itemBlueprintKey: MacesBlueprint.SpikedMace,
+      chance: 7,
+    },
 
     {
       itemBlueprintKey: HelmetsBlueprint.GladiatorHelmet,

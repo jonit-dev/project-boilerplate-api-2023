@@ -11,6 +11,7 @@ import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entit
 import {
   FoodsBlueprint,
   GlovesBlueprint,
+  HammersBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
@@ -61,6 +62,10 @@ export const npcWildTroll = {
       chance: 30,
     },
     {
+      itemBlueprintKey: HammersBlueprint.RoyalHammer,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.Bolt,
       chance: 50,
       quantityRange: [5, 10],
@@ -71,5 +76,4 @@ export const npcWildTroll = {
       chance: 30,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;
