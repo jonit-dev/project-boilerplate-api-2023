@@ -9,7 +9,8 @@ export const itemHasteRing: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "rings/haste-ring.png",
   name: "Haste Ring",
-  description: "A golden ring imbued with the power of speed, made by an elven master.",
+  description:
+    "A magical ring that imbues its wearer with the power of speed and quickness. It is said to grant the ability to move and react with lightning-fast reflexes.",
   attack: 6,
   defense: 3,
   weight: 0.1,

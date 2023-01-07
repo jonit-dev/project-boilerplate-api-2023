@@ -9,7 +9,8 @@ export const itemtrident: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "spears/trident.png",
   name: "Trident",
-  description: "A type of spear with three prongs or points, famously wielded by the sea god Poseidon.",
+  description:
+    "A type of spear with three prongs or points, famously wielded by the sea god Poseidon. It is a formidable weapon that can deliver powerful, multi-directional attacks.",
   weight: 8,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 12,

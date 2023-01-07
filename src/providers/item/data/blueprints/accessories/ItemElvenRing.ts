@@ -9,7 +9,8 @@ export const itemElvenRing: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "rings/elven-ring.png",
   name: "Elven Ring",
-  description: "A beautifully crafted golden ring, made by a skilled elven craftsman.",
+  description:
+    "A delicate and intricate ring crafted by the skilled hands of elven artisans. It is imbued with the magic and grace of the elven people.",
   attack: 4,
   defense: 2,
   weight: 0.1,

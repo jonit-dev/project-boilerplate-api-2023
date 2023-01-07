@@ -9,7 +9,8 @@ export const itemIronRing: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "rings/iron-ring.png",
   name: "Iron Ring",
-  description: "A sturdy iron ring, crafted by a talented dwarf artisan.",
+  description:
+    "A strong and durable ring forged from iron. It is a simple yet reliable piece of jewelry, often worn by those who value practicality and function over aesthetics.",
   attack: 4,
   defense: 2,
   weight: 0.1,

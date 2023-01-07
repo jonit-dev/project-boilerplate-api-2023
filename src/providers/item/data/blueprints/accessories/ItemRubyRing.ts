@@ -9,7 +9,8 @@ export const itemRubyRing: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "rings/ruby-ring.png",
   name: "Ruby Ring",
-  description: "A stunning ruby ring, crafted by a talented dwarf artisan.",
+  description:
+    "A stunning and elegant ring adorned with a sparkling ruby, a deep red gemstone known for its beauty and value. It is a symbol of love and passion.",
   attack: 5,
   defense: 3,
   weight: 0.2,

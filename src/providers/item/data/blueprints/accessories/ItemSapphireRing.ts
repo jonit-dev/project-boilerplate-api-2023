@@ -9,7 +9,8 @@ export const itemSapphireRing: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "rings/sapphire-ring.png",
   name: "Sapphire Ring",
-  description: "A sparkling sapphire ring, crafted by a talented dwarf artisan.",
+  description:
+    "A beautiful and radiant ring set with a sparkling sapphire, a deep blue gemstone prized for its radiance and clarity. It is a symbol of wisdom and serenity,",
   attack: 6,
   defense: 4,
   weight: 0.1,

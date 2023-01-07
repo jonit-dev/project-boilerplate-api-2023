@@ -9,7 +9,8 @@ export const itemjavelin: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "spears/javelin.png",
   name: "javelin",
-  description: "A type of spear designed for throwing, used in ancient Greek and Roman warfare.",
+  description:
+    "A type of spear designed for throwing, used in ancient Greek and Roman warfare. It has a slender, streamlined design that allows it to be thrown with great accuracy and force.",
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 9,

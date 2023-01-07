@@ -9,7 +9,8 @@ export const itemBohemianEarspoon: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "spears/bohemian-earspoon.png",
   name: "Bohemian Earspoon",
-  description: "A type of spear with a distinctive crescent-shaped blade, originally used by Czech mercenaries.",
+  description:
+    "A type of spear with a distinctive crescent-shaped blade, originally used by Czech mercenaries. It is a versatile weapon that can be used for both thrusting and slicing attacks.",
   weight: 5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 6,

@@ -324,7 +324,6 @@ export enum AccessoriesBlueprint {
   CorruptionNecklace = "corruption-necklace",
   DeathNecklace = "death-necklace",
   ElvenRing = "elven-ring",
-<<<<<<< HEAD
   GoldenRing = "GoldenRing",
   HasteRing = "HasteRing",
   IronRing = "IronRing",
@@ -333,13 +332,11 @@ export enum AccessoriesBlueprint {
   RubyRing = "RubyRing",
   SapphireRing = "SapphireRing",
   SoldiersRing = "SoldiersRing",
-=======
   AmazonsNecklace = "amazons-necklace",
   RoyalBracelet = "royal-bracelet",
   SapphireNecklace = "sapphire-necklace",
   StarNecklace = "star-necklace",
   WolfToothChain = "wolf-tooth-chain",
->>>>>>> 1c20baf086a8c953e926c9c69c5ff74960d2a421
 }
 
 export enum HammersBlueprint {

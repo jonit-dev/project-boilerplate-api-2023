@@ -10,7 +10,7 @@ export const itemDamascusSword: Partial<IItem> = {
   texturePath: "swords/damascus-sword.png",
   name: "Damascus Sword",
   description:
-    "A finely crafted sword made of Damascus steel, known for its exceptional strength and beautiful patterns.",
+    "A beautiful and exceptionally strong sword crafted from Damascus steel, prized for its intricate patterns and durability.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 17,

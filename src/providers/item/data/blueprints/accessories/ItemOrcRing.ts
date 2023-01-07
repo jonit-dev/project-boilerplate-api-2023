@@ -9,7 +9,8 @@ export const itemOrcRing: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "rings/orc-ring.png",
   name: "Orc Ring",
-  description: "A fierce golden ring, made by a skilled orcish craftsman.",
+  description:
+    "A rough and crude ring made by orcs, a race of brutish and warlike creatures. It is a symbol of strength and ferocity, often worn by orcs as a sign of their martial prowess.",
   attack: 4,
   defense: 2,
   weight: 0.1,

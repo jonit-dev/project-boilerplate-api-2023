@@ -9,7 +9,8 @@ export const itemGoldenRing: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "rings/golden-ring.png",
   name: "Golden Ring",
-  description: "An intricately crafted golden ring, made by a skilled artisan.",
+  description:
+    "A luxurious and ornate ring made of pure gold. It is a symbol of wealth and status, and is often given as a gift to show appreciation or affection.",
   attack: 5,
   defense: 3,
   weight: 0.1,

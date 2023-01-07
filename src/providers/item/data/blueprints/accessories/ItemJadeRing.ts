@@ -9,7 +9,8 @@ export const itemJadeRing: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "rings/jade-ring.png",
   name: "Jade Ring",
-  description: "A precious jade ring, believed to be crafted by the gods themselves.",
+  description:
+    "A beautiful and precious ring made of jade, a green gemstone prized for its clarity and luster. It is believed to bring good luck and prosperity to its wearer.",
   attack: 7,
   defense: 7,
   weight: 0.1,

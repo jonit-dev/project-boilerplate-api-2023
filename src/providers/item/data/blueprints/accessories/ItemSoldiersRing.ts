@@ -9,7 +9,8 @@ export const itemSoldiersRing: Partial<IItem> = {
   textureAtlas: "items",
   texturePath: "rings/soldiers-ring.png",
   name: "Soldiers Ring",
-  description: "A rugged iron ring, crafted by a talented dwarf artisan for use on the battlefield.",
+  description:
+    "A simple and utilitarian ring worn by soldiers and warriors. It is a symbol of loyalty and service, and is often given as a token of honor or recognition.",
   attack: 5,
   defense: 3,
   weight: 0.2,
