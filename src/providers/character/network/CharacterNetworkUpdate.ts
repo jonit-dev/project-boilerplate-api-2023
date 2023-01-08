@@ -1,11 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
-import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -18,7 +16,6 @@ import {
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
 
@@ -28,13 +25,10 @@ export class CharacterNetworkUpdate {
     private socketMessaging: SocketMessaging,
     private socketAuth: SocketAuth,
     private movementHelper: MovementHelper,
-    private itemView: ItemView,
-    private characterView: CharacterView,
     private mapTransition: MapTransition,
     private npcManager: NPCManager,
     private gridManager: GridManager,
     private mapNonPVPZone: MapNonPVPZone,
-    private npcWarn: NPCWarn,
     private characterMovementValidation: CharacterMovementValidation,
     private characterMovementWarn: CharacterMovementWarn
   ) {}
@@ -82,7 +76,11 @@ export class CharacterNetworkUpdate {
             {
               id: character.id,
               isValid: isPositionUpdateValid,
-              direction: data.direction,
+              position: {
+                originX: character.x,
+                originY: character.y,
+                direction: data.direction,
+              },
             }
           );
         }
