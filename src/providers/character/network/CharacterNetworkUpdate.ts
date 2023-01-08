@@ -55,6 +55,8 @@ export class CharacterNetworkUpdate {
             y: character.y,
           };
 
+          this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
+
           const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
             character.x,
             character.y,
@@ -78,9 +80,6 @@ export class CharacterNetworkUpdate {
             this.handleNonPVPZone(character, newX, newY);
           }
 
-          // @ts-ignore
-          this.checkClientServerOriginMismatch(character, serverCharacterPosition, data.originX, data.originY);
-
           // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.
           this.socketMessaging.sendEventToUser<ICharacterPositionUpdateConfirm>(
             character.channelId!,
@@ -100,7 +99,7 @@ export class CharacterNetworkUpdate {
     );
   }
 
-  private checkClientServerOriginMismatch(
+  private syncIfPositionMismatch(
     serverCharacter: ICharacter,
     serverCharacterPosition: IPosition,
     clientOriginX: number,
