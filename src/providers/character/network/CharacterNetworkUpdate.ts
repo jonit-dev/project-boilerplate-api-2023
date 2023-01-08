@@ -82,7 +82,11 @@ export class CharacterNetworkUpdate {
             {
               id: character.id,
               isValid: isPositionUpdateValid,
-              direction: data.direction,
+              position: {
+                originX: character.x,
+                originY: character.y,
+                direction: data.direction,
+              },
             }
           );
         }
