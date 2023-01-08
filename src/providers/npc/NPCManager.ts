@@ -51,7 +51,9 @@ export class NPCManager {
           try {
             npc = (await NPC.findById(initialNPC._id).populate("skills")) || initialNPC;
 
+            console.time("NPC Behavior - startCoreNPCBehavior");
             await this.startCoreNPCBehavior(npc);
+            console.timeEnd("NPC Behavior - startCoreNPCBehavior");
           } catch (err) {
             console.log(`Error in ${npc.key}`);
             console.log(err);
@@ -100,19 +102,27 @@ export class NPCManager {
   private async startCoreNPCBehavior(npc: INPC): Promise<void> {
     switch (npc.currentMovementType) {
       case NPCMovementType.MoveAway:
+        console.time("NPC Behavior - startMovementMoveAway");
         await this.npcMovementMoveAway.startMovementMoveAway(npc);
+        console.timeEnd("NPC Behavior - startMovementMoveAway");
         break;
 
       case NPCMovementType.Stopped:
+        console.time("NPC Behavior - startMovementStopped");
         await this.npcMovementStopped.startMovementStopped(npc);
+        console.timeEnd("NPC Behavior - startMovementStopped");
         break;
 
       case NPCMovementType.MoveTowards:
+        console.time("NPC Behavior - startMoveTowardsMovement");
         await this.npcMovementMoveTowards.startMoveTowardsMovement(npc);
+        console.timeEnd("NPC Behavior - startMoveTowardsMovement");
         break;
 
       case NPCMovementType.Random:
+        console.time("NPC Behavior - startRandomMovement");
         await this.npcMovementRandom.startRandomMovement(npc);
+        console.timeEnd("NPC Behavior - startRandomMovement");
         break;
       case NPCMovementType.FixedPath:
         let endGridX = npc.fixedPath.endGridX as unknown as number;
@@ -156,7 +166,9 @@ export class NPCManager {
           endGridY = ToGridY(npcData?.y!);
         }
 
+        console.time("NPC Behavior - startFixedPathMovement");
         await this.npcMovementFixedPath.startFixedPathMovement(npc, endGridX, endGridY);
+        console.timeEnd("NPC Behavior - startFixedPathMovement");
 
         break;
     }

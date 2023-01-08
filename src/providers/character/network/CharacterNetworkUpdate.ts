@@ -43,11 +43,8 @@ export class CharacterNetworkUpdate {
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
         if (data) {
-          console.log("================== PERFORMANCE ===================");
           // sometimes the character is just changing facing direction and not moving.. That's why we need this.
-          console.time("isMoving");
           const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
-          console.timeEnd("isMoving");
 
           // send message back to the user telling that the requested position update is not valid!
 
@@ -58,9 +55,7 @@ export class CharacterNetworkUpdate {
             y: character.y,
           };
 
-          console.time("syncIfPositionMismatch");
           this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
-          console.timeEnd("syncIfPositionMismatch");
 
           const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
             character.x,
@@ -69,36 +64,24 @@ export class CharacterNetworkUpdate {
           );
 
           if (isMoving) {
-            console.time("isValid");
             isPositionUpdateValid = await this.characterMovementValidation.isValid(character, newX, newY, isMoving);
-            console.timeEnd("isValid");
           }
 
           if (isPositionUpdateValid) {
-            console.time("warn");
             await this.characterMovementWarn.warn(character, data);
-            console.timeEnd("warn");
 
-            console.time("startNearbyNPCsBehaviorLoop");
             await this.npcManager.startNearbyNPCsBehaviorLoop(character);
-            console.timeEnd("startNearbyNPCsBehaviorLoop");
 
             // update emitter position from
-            console.time("updateServerSideEmitterInfo");
+
             await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
-            console.timeEnd("updateServerSideEmitterInfo");
 
-            console.time("handleMapTransition");
             await this.handleMapTransition(character, newX, newY);
-            console.timeEnd("handleMapTransition");
 
-            console.time("handleNonPVPZone");
             this.handleNonPVPZone(character, newX, newY);
-            console.timeEnd("handleNonPVPZone");
           }
 
           // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.
-          console.time("sendEventToUser");
           this.socketMessaging.sendEventToUser<ICharacterPositionUpdateConfirm>(
             character.channelId!,
             CharacterSocketEvents.CharacterPositionUpdateConfirm,
@@ -112,7 +95,6 @@ export class CharacterNetworkUpdate {
               },
             }
           );
-          console.timeEnd("sendEventToUser");
         }
       }
     );
