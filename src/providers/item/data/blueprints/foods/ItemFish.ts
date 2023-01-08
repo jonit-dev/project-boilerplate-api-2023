@@ -14,7 +14,7 @@ export const itemFish: Partial<IItem> = {
   description: "A dull fish.",
   weight: 0.2,
   maxStackSize: 100,
-  basePrice: 10,
+  basePrice: 1.5,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 1);
   },
