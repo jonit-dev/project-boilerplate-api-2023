@@ -8,6 +8,8 @@ import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { EnvType, IUIShowMessage, UIMessageType, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
+import throttle from "lodash/throttle";
+
 @provide(SocketMessaging)
 export class SocketMessaging {
   constructor(private characterView: CharacterView, private npcView: NPCView, private socketAdapter: SocketAdapter) {}
@@ -25,7 +27,10 @@ export class SocketMessaging {
 
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
     try {
-      this.socketAdapter.emitToUser(userChannel, eventName, data || {});
+      const throttleFn = throttle(() => {
+        this.socketAdapter.emitToUser(userChannel, eventName, data || {});
+      }, 100);
+      throttleFn();
     } catch (error) {
       console.error(error);
     }
