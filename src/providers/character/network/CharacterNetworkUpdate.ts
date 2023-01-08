@@ -2,7 +2,8 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapTransition } from "@providers/map/MapTransition";
-import { MovementHelper } from "@providers/movement/MovementHelper";
+import { MathHelper } from "@providers/math/MathHelper";
+import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -10,8 +11,10 @@ import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   AnimationDirection,
   CharacterSocketEvents,
+  GRID_WIDTH,
   ICharacterPositionUpdateConfirm,
   ICharacterPositionUpdateFromClient,
+  ICharacterSyncPosition,
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
@@ -30,7 +33,8 @@ export class CharacterNetworkUpdate {
     private gridManager: GridManager,
     private mapNonPVPZone: MapNonPVPZone,
     private characterMovementValidation: CharacterMovementValidation,
-    private characterMovementWarn: CharacterMovementWarn
+    private characterMovementWarn: CharacterMovementWarn,
+    private mathHelper: MathHelper
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -45,6 +49,11 @@ export class CharacterNetworkUpdate {
           // send message back to the user telling that the requested position update is not valid!
 
           let isPositionUpdateValid = true;
+
+          const serverCharacterPosition = {
+            x: character.x,
+            y: character.y,
+          };
 
           const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
             character.x,
@@ -69,6 +78,9 @@ export class CharacterNetworkUpdate {
             this.handleNonPVPZone(character, newX, newY);
           }
 
+          // @ts-ignore
+          this.checkClientServerOriginMismatch(character, serverCharacterPosition, data.originX, data.originY);
+
           // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.
           this.socketMessaging.sendEventToUser<ICharacterPositionUpdateConfirm>(
             character.channelId!,
@@ -86,6 +98,44 @@ export class CharacterNetworkUpdate {
         }
       }
     );
+  }
+
+  private checkClientServerOriginMismatch(
+    serverCharacter: ICharacter,
+    serverCharacterPosition: IPosition,
+    clientOriginX: number,
+    clientOriginY: number
+  ): void {
+    const distance = this.mathHelper.getDistanceBetweenPoints(
+      serverCharacterPosition.x,
+      serverCharacterPosition.y,
+      clientOriginX,
+      clientOriginY
+    );
+
+    console.log(serverCharacterPosition, clientOriginX, clientOriginY);
+
+    console.log(distance);
+
+    const distanceInGridCells = Math.round(distance / GRID_WIDTH);
+
+    console.log("distance in grid cells", distanceInGridCells);
+
+    if (distanceInGridCells > 2) {
+      console.log("sending resnap event");
+      this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
+        serverCharacter.channelId!,
+        CharacterSocketEvents.CharacterSyncPosition,
+        {
+          id: serverCharacter.id,
+          position: {
+            originX: serverCharacter.x,
+            originY: serverCharacter.y,
+            direction: serverCharacter.direction as AnimationDirection,
+          },
+        }
+      );
+    }
   }
 
   private handleNonPVPZone(character: ICharacter, newX: number, newY: number): void {
