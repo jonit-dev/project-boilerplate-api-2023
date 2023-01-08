@@ -41,14 +41,10 @@ export class NPCMovementMoveTowards {
     // for this, get all characters nearby and set the target to the closest one
     console.log("=================== MOVE TOWARDS ====================");
 
-    console.time("targetCharacter");
     const targetCharacter = await Character.findById(npc.targetCharacter).populate("skills");
-    console.timeEnd("targetCharacter");
 
     if (targetCharacter) {
-      console.time("npcTarget.tryToClearOutOfRangeTargets");
       await this.npcTarget.tryToClearOutOfRangeTargets(npc);
-      console.timeEnd("npcTarget.tryToClearOutOfRangeTargets");
 
       const reachedTarget = this.reachedTarget(npc, targetCharacter);
       if (npc.alignment === NPCAlignment.Hostile) {
@@ -63,7 +59,6 @@ export class NPCMovementMoveTowards {
       }
 
       if (reachedTarget) {
-        console.time("reachedTarget");
         if (npc.pathOrientation === NPCPathOrientation.Backward) {
           // if NPC is coming back from being lured, reset its orientation to Forward
           // npc.pathOrientation = NPCPathOrientation.Forward;
@@ -73,7 +68,6 @@ export class NPCMovementMoveTowards {
         }
 
         await this.faceTarget(npc);
-        console.timeEnd("reachedTarget");
 
         return;
       }
@@ -88,8 +82,6 @@ export class NPCMovementMoveTowards {
           if (!npc.maxAntiLuringRangeInGridCells) {
             throw new Error(`NPC ${npc.id} has no maxAntiLuringRangeInGridCells set!`);
           }
-
-          console.time("forward");
 
           const isUnderOriginalPositionRange = this.movementHelper.isUnderRange(
             npc.x,
@@ -114,7 +106,6 @@ export class NPCMovementMoveTowards {
 
           break;
       }
-      console.timeEnd("forward");
     } else {
       // no target character
       await this.npcTarget.tryToSetTarget(npc);
