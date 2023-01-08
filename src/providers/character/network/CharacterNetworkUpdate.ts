@@ -112,16 +112,9 @@ export class CharacterNetworkUpdate {
       clientOriginY
     );
 
-    console.log(serverCharacterPosition, clientOriginX, clientOriginY);
-
-    console.log(distance);
-
     const distanceInGridCells = Math.round(distance / GRID_WIDTH);
 
-    console.log("distance in grid cells", distanceInGridCells);
-
     if (distanceInGridCells >= 1) {
-      console.log("sending resnap event");
       this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
         serverCharacter.channelId!,
         CharacterSocketEvents.CharacterSyncPosition,
