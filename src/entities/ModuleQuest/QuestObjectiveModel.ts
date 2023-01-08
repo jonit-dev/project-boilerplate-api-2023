@@ -1,6 +1,6 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { QuestType } from "@rpg-engine/shared";
+import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 /** QUEST KILL OBJECTIVE **/
 
