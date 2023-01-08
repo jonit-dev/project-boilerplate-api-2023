@@ -8,7 +8,7 @@ import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { EnvType, IUIShowMessage, UIMessageType, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import throttle from "lodash/throttle";
+import debounce from "lodash/debounce";
 
 @provide(SocketMessaging)
 export class SocketMessaging {
@@ -27,10 +27,10 @@ export class SocketMessaging {
 
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
     try {
-      const throttleFn = throttle(() => {
+      const debounceFn = debounce(() => {
         this.socketAdapter.emitToUser(userChannel, eventName, data || {});
       }, 100);
-      throttleFn();
+      debounceFn();
     } catch (error) {
       console.error(error);
     }
