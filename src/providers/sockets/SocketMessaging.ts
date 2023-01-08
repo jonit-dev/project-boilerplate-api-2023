@@ -26,6 +26,8 @@ export class SocketMessaging {
   }
 
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
+    console.log("✉︎ Sending event to user", userChannel, eventName, JSON.stringify(data));
+
     try {
       const debounceFn = debounce(() => {
         this.socketAdapter.emitToUser(userChannel, eventName, data || {});
