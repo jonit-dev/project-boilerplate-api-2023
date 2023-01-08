@@ -25,12 +25,22 @@ export class CharacterMovementWarn {
 
   public async warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): Promise<void> {
     // bi-directional warn
+
+    console.time("warnCharactersAroundAboutEmitterPositionUpdate");
     await this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
+    console.timeEnd("warnCharactersAroundAboutEmitterPositionUpdate");
+
+    console.time("warnEmitterAboutCharactersAround");
     await this.warnEmitterAboutCharactersAround(character);
+    console.timeEnd("warnEmitterAboutCharactersAround");
 
+    console.time("warnEmitterAboutNPCsAround");
     await this.npcWarn.warnCharacterAboutNPCsInView(character);
+    console.timeEnd("warnEmitterAboutNPCsAround");
 
+    console.time("warnEmitterAboutItemsInView");
     await this.itemView.warnCharacterAboutItemsInView(character);
+    console.timeEnd("warnEmitterAboutItemsInView");
   }
 
   private async warnCharactersAroundAboutEmitterPositionUpdate(
