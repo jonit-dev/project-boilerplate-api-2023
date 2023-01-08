@@ -38,7 +38,10 @@ export class SocketMessaging {
 
   public sendEventToAllUsers<T>(eventName: string, data?: T): void {
     try {
-      this.socketAdapter.emitToAllUsers(eventName, data || {});
+      const debounceFn = debounce(() => {
+        this.socketAdapter.emitToAllUsers(eventName, data || {});
+      });
+      debounceFn();
     } catch (error) {
       console.error(error);
     }

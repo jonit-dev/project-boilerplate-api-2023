@@ -39,7 +39,6 @@ export class NPCMovementMoveTowards {
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
     // first step is setting a target
     // for this, get all characters nearby and set the target to the closest one
-    console.log("=================== MOVE TOWARDS ====================");
 
     const targetCharacter = await Character.findById(npc.targetCharacter).populate("skills");
 

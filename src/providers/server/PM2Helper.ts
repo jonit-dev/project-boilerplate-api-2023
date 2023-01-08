@@ -17,6 +17,8 @@ export class PM2Helper {
   public pickLastCPUInstance(): string {
     const totalCPUs = this.getTotalCPUs();
 
+    if (totalCPUs === 1) return "0";
+
     return (totalCPUs - 1).toString();
   }
 }
