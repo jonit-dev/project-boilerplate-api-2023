@@ -120,7 +120,7 @@ export class CharacterNetworkUpdate {
 
     console.log("distance in grid cells", distanceInGridCells);
 
-    if (distanceInGridCells > 2) {
+    if (distanceInGridCells >= 1) {
       console.log("sending resnap event");
       this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
         serverCharacter.channelId!,
