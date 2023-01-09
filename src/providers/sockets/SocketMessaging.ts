@@ -29,7 +29,7 @@ export class SocketMessaging {
     try {
       const debounceFn = debounce(() => {
         this.socketAdapter.emitToUser(userChannel, eventName, data || {});
-      }, 25);
+      }, 100);
       debounceFn();
     } catch (error) {
       console.error(error);
@@ -40,7 +40,7 @@ export class SocketMessaging {
     try {
       const debounceFn = debounce(() => {
         this.socketAdapter.emitToAllUsers(eventName, data || {});
-      });
+      }, 100);
       debounceFn();
     } catch (error) {
       console.error(error);
