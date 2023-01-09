@@ -19,6 +19,6 @@ export const itemHellishBow: Partial<IItem> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,
   requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow],
-  isTwoHanded: false,
+  isTwoHanded: true,
   basePrice: 70,
 };
