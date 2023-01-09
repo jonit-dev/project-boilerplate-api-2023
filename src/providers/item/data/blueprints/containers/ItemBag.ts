@@ -10,10 +10,10 @@ export const itemBag: Partial<IItem> = {
   texturePath: "containers/bag.png",
 
   name: "Bag",
-  description: "You see a bag. It has made using leather and it has 10 total slots.",
+  description: "You see a bag. It has made using leather and it has 20 total slots.",
   weight: 1.5,
   isItemContainer: true,
-  generateContainerSlots: 10,
+  generateContainerSlots: 20,
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 0,
 };

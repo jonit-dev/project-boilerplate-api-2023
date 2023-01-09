@@ -2,8 +2,9 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPCAlignment, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
-import { NPCCycle, NPC_CYCLES } from "./NPCCycle";
+
+import random from "lodash/random";
+import { NPCCycle } from "./NPCCycle";
 import { NPCLoader } from "./NPCLoader";
 import { NPCView } from "./NPCView";
 import { NPCMovement } from "./movement/NPCMovement";
@@ -57,7 +58,7 @@ export class NPCManager {
             console.log(err);
           }
         },
-        1250 / npc.speed
+        (2000 + random(0, 250)) / npc.speed
       );
 
       this.freezeNPCIfNoCharactersNearby(npc, npcCycle);
@@ -76,22 +77,23 @@ export class NPCManager {
 
   private freezeNPCIfNoCharactersNearby(npc: INPC, npcCycle): void {
     // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
-    const checkRange = _.random(5000, 10000);
+    const checkRange = random(5000, 10000);
 
     const interval = setInterval(async () => {
       let shouldFreezeNPC = false;
+      const nearbyCharacters = await this.npcView.getCharactersInView(npc);
       if (npc.alignment === NPCAlignment.Friendly) {
-        const nearbyCharacters = await this.npcView.getCharactersInView(npc);
         shouldFreezeNPC = !nearbyCharacters.length;
       }
 
       if (npc.alignment === NPCAlignment.Hostile) {
-        shouldFreezeNPC = !npc.targetCharacter;
+        shouldFreezeNPC = !npc.targetCharacter || !nearbyCharacters.length;
       }
 
-      if (shouldFreezeNPC && NPC_CYCLES.has(npc.id)) {
+      if (shouldFreezeNPC) {
         npcCycle.clear();
         clearInterval(interval);
+        console.log(`Freezing NPC ${npc.key} for ${checkRange}ms`);
         await this.setNPCBehavior(npc, false);
       }
     }, checkRange);

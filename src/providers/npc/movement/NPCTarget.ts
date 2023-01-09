@@ -5,6 +5,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
+import { NPC_CYCLES } from "../NPCCycle";
 import { NPCView } from "../NPCView";
 import { NPCDirection } from "./NPCMovement";
 
@@ -20,8 +21,12 @@ export class NPCTarget {
     await npc.save();
 
     const npcBattleCycle = NPC_BATTLE_CYCLES.get(npc.id);
+    const npcCycle = NPC_CYCLES.get(npc.id);
     if (npcBattleCycle) {
       await npcBattleCycle.clear();
+    }
+    if (npcCycle) {
+      await npcCycle.clear();
     }
   }
 
@@ -58,43 +63,45 @@ export class NPCTarget {
 
     const minDistanceCharacter = await this.npcView.getNearestCharacter(npc);
 
-    if (minDistanceCharacter) {
-      const rangeThresholdDefinition = this.getRangeThreshold(npc);
-
-      if (!rangeThresholdDefinition) {
-        throw new Error(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
-      }
-
-      // check if character is under range
-      const isMovementUnderRange = this.movementHelper.isUnderRange(
-        npc.x,
-        npc.y,
-        minDistanceCharacter.x,
-        minDistanceCharacter.y,
-        rangeThresholdDefinition
-      );
-
-      if (!isMovementUnderRange) {
-        return;
-      }
-
-      const character = await Character.findById(minDistanceCharacter.id);
-
-      if (!character) {
-        throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
-      }
-
-      const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, character.x, character.y);
-      // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
-      if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
-        await this.clearTarget(npc);
-
-        return;
-      }
-
-      npc.targetCharacter = character._id;
-      await npc.save();
+    if (!minDistanceCharacter) {
+      return;
     }
+
+    const rangeThresholdDefinition = this.getRangeThreshold(npc);
+
+    if (!rangeThresholdDefinition) {
+      throw new Error(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
+    }
+
+    // check if character is under range
+    const isMovementUnderRange = this.movementHelper.isUnderRange(
+      npc.x,
+      npc.y,
+      minDistanceCharacter.x,
+      minDistanceCharacter.y,
+      rangeThresholdDefinition
+    );
+
+    if (!isMovementUnderRange) {
+      return;
+    }
+
+    const character = await Character.findById(minDistanceCharacter.id);
+
+    if (!character) {
+      throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
+    }
+
+    const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, character.x, character.y);
+    // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
+    if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
+      await this.clearTarget(npc);
+
+      return;
+    }
+
+    npc.targetCharacter = character._id;
+    await npc.save();
   }
 
   public async tryToClearOutOfRangeTargets(npc: INPC): Promise<void> {

@@ -25,7 +25,9 @@ export class CharacterMovementWarn {
 
   public async warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): Promise<void> {
     // bi-directional warn
+
     await this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
+
     await this.warnEmitterAboutCharactersAround(character);
 
     await this.npcWarn.warnCharacterAboutNPCsInView(character);

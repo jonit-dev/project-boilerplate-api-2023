@@ -40,12 +40,11 @@ export class NPCMovementMoveTowards {
     // first step is setting a target
     // for this, get all characters nearby and set the target to the closest one
 
-    const targetCharacter = await Character.findById(npc.targetCharacter).populate("skills");
+    const targetCharacter = await Character.findById(npc.targetCharacter);
 
     if (targetCharacter) {
       await this.npcTarget.tryToClearOutOfRangeTargets(npc);
 
-      const reachedTarget = this.reachedTarget(npc, targetCharacter);
       if (npc.alignment === NPCAlignment.Hostile) {
         this.initBattleCycle(npc);
       }
@@ -56,6 +55,8 @@ export class NPCMovementMoveTowards {
           await NPC.updateOne({ _id: npc._id }, { currentMovementType: NPCMovementType.MoveAway });
         }
       }
+
+      const reachedTarget = this.reachedTarget(npc, targetCharacter);
 
       if (reachedTarget) {
         if (npc.pathOrientation === NPCPathOrientation.Backward) {
@@ -121,7 +122,7 @@ export class NPCMovementMoveTowards {
   }
 
   private async faceTarget(npc: INPC): Promise<void> {
-    const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills").lean()) as ICharacter;
+    const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;
 
     if (targetCharacter) {
       const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
@@ -131,6 +132,16 @@ export class NPCMovementMoveTowards {
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
       for (const nearbyCharacter of nearbyCharacters) {
+        // check if update is needed (if character is not in the same scene, it's not needed)
+        if (nearbyCharacter.scene !== npc.scene) {
+          continue;
+        }
+        const clientNpc = nearbyCharacter.view.npcs?.[npc?._id];
+
+        if (clientNpc?.direction === facingDirection) {
+          return;
+        }
+
         this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, NPCSocketEvents.NPCDataUpdate, {
           id: npc.id,
           direction: npc.direction,
@@ -170,6 +181,7 @@ export class NPCMovementMoveTowards {
           }
 
           const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
+
           const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
 
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
@@ -241,7 +253,7 @@ export class NPCMovementMoveTowards {
 
       if (!shortestPath) {
         // throw new Error("No shortest path found!");
-
+        await this.npcTarget.clearTarget(npc);
         return;
       }
 

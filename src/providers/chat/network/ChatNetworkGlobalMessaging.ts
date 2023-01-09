@@ -17,7 +17,6 @@ import {
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { Model } from "mongoose";
 
 @provide(ChatNetworkGlobalMessaging)
 export class ChatNetworkGlobalMessaging {
@@ -120,35 +119,39 @@ export class ChatNetworkGlobalMessaging {
       SOCKET_TRANSMISSION_ZONE_WIDTH
     );
 
-    // @ts-ignore
-    const chatLogsInView = await (ChatLog as Model)
-      .find({
-        $and: [
-          {
-            x: {
-              $gte: socketTransmissionZone.x,
-              $lte: socketTransmissionZone.width,
-            },
+    const chatLogsInView = await ChatLog.find({
+      $and: [
+        {
+          x: {
+            $gte: socketTransmissionZone.x,
+            $lte: socketTransmissionZone.width,
           },
-          {
-            y: {
-              $gte: socketTransmissionZone.y,
-              $lte: socketTransmissionZone.height,
-            },
+        },
+        {
+          y: {
+            $gte: socketTransmissionZone.y,
+            $lte: socketTransmissionZone.height,
           },
-          {
-            scene: character.scene,
-          },
-        ],
-      })
+        },
+        {
+          scene: character.scene,
+        },
+      ],
+    })
       .sort({ createdAt: -1 })
       .populate("emitter", "name")
-      .limit(limit)
-      .lean({ virtuals: true, defaults: true });
+      .limit(limit);
 
     chatLogsInView.reverse();
 
+    if (!chatLogsInView.length) {
+      return {
+        messages: [],
+      };
+    }
+
     const chatMessageReadPayload: IChatMessageReadPayload = {
+      // @ts-ignore
       messages: chatLogsInView,
     };
 

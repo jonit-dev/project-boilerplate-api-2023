@@ -30,6 +30,7 @@ export class SocketAdapter implements ISocket {
   }
 
   public emitToUser<T>(channel: string, eventName: string, data?: T): void {
+    console.log("🔌 Emitting to user: ", channel, eventName, JSON.stringify(data));
     SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
   }
 

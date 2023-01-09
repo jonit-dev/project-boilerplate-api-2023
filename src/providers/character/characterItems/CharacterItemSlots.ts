@@ -263,6 +263,10 @@ export class CharacterItemSlots {
     if (firstAvailableSlotIndex >= 0) {
       targetContainer.slots[firstAvailableSlotIndex] = selectedItem;
 
+      if (!selectedItem._id) {
+        return false;
+      }
+
       await ItemContainer.updateOne(
         {
           _id: targetContainer.id,

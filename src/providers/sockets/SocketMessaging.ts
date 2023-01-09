@@ -8,6 +8,8 @@ import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { EnvType, IUIShowMessage, UIMessageType, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
+import debounce from "lodash/debounce";
+
 @provide(SocketMessaging)
 export class SocketMessaging {
   constructor(private characterView: CharacterView, private npcView: NPCView, private socketAdapter: SocketAdapter) {}
@@ -25,7 +27,10 @@ export class SocketMessaging {
 
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
     try {
-      this.socketAdapter.emitToUser(userChannel, eventName, data || {});
+      const debounceFn = debounce(() => {
+        this.socketAdapter.emitToUser(userChannel, eventName, data || {});
+      }, 5);
+      debounceFn();
     } catch (error) {
       console.error(error);
     }
@@ -33,7 +38,10 @@ export class SocketMessaging {
 
   public sendEventToAllUsers<T>(eventName: string, data?: T): void {
     try {
-      this.socketAdapter.emitToAllUsers(eventName, data || {});
+      const debounceFn = debounce(() => {
+        this.socketAdapter.emitToAllUsers(eventName, data || {});
+      }, 100);
+      debounceFn();
     } catch (error) {
       console.error(error);
     }

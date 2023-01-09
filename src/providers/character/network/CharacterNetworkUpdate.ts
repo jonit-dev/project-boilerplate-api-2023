@@ -1,24 +1,24 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapTransition } from "@providers/map/MapTransition";
-import { MovementHelper } from "@providers/movement/MovementHelper";
+import { MathHelper } from "@providers/math/MathHelper";
+import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
-import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   AnimationDirection,
   CharacterSocketEvents,
+  GRID_WIDTH,
   ICharacterPositionUpdateConfirm,
   ICharacterPositionUpdateFromClient,
+  ICharacterSyncPosition,
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
 
@@ -28,15 +28,13 @@ export class CharacterNetworkUpdate {
     private socketMessaging: SocketMessaging,
     private socketAuth: SocketAuth,
     private movementHelper: MovementHelper,
-    private itemView: ItemView,
-    private characterView: CharacterView,
     private mapTransition: MapTransition,
     private npcManager: NPCManager,
     private gridManager: GridManager,
     private mapNonPVPZone: MapNonPVPZone,
-    private npcWarn: NPCWarn,
     private characterMovementValidation: CharacterMovementValidation,
-    private characterMovementWarn: CharacterMovementWarn
+    private characterMovementWarn: CharacterMovementWarn,
+    private mathHelper: MathHelper
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -51,6 +49,13 @@ export class CharacterNetworkUpdate {
           // send message back to the user telling that the requested position update is not valid!
 
           let isPositionUpdateValid = true;
+
+          const serverCharacterPosition = {
+            x: character.x,
+            y: character.y,
+          };
+
+          this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
 
           const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
             character.x,
@@ -68,6 +73,7 @@ export class CharacterNetworkUpdate {
             await this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
             // update emitter position from
+
             await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
 
             await this.handleMapTransition(character, newX, newY);
@@ -82,12 +88,47 @@ export class CharacterNetworkUpdate {
             {
               id: character.id,
               isValid: isPositionUpdateValid,
-              direction: data.direction,
+              position: {
+                originX: character.x,
+                originY: character.y,
+                direction: data.direction,
+              },
             }
           );
         }
       }
     );
+  }
+
+  private syncIfPositionMismatch(
+    serverCharacter: ICharacter,
+    serverCharacterPosition: IPosition,
+    clientOriginX: number,
+    clientOriginY: number
+  ): void {
+    const distance = this.mathHelper.getDistanceBetweenPoints(
+      serverCharacterPosition.x,
+      serverCharacterPosition.y,
+      clientOriginX,
+      clientOriginY
+    );
+
+    const distanceInGridCells = Math.round(distance / GRID_WIDTH);
+
+    if (distanceInGridCells >= 1) {
+      this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
+        serverCharacter.channelId!,
+        CharacterSocketEvents.CharacterSyncPosition,
+        {
+          id: serverCharacter.id,
+          position: {
+            originX: serverCharacter.x,
+            originY: serverCharacter.y,
+            direction: serverCharacter.direction as AnimationDirection,
+          },
+        }
+      );
+    }
   }
 
   private handleNonPVPZone(character: ICharacter, newX: number, newY: number): void {

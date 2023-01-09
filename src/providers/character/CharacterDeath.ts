@@ -47,33 +47,11 @@ export class CharacterDeath {
       await this.clearAttackerTarget(killer);
     }
 
-    // send event to the character that is dead
-    const dataOfCharacterDeath: IBattleDeath = {
-      id: character.id,
-      type: "Character",
-    };
-
-    this.socketMessaging.sendEventToUser<IBattleDeath>(
-      character.channelId!,
-      BattleSocketEvents.BattleDeath,
-      dataOfCharacterDeath
-    );
-    // communicate all players around that character is dead
-
-    await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
-      character,
-      BattleSocketEvents.BattleDeath,
-      dataOfCharacterDeath
-    );
-
     // generate character's body
     const characterBody = await this.generateCharacterBody(character);
 
     // drop equipped items and backpack items
     await this.dropCharacterItemsOnBody(characterBody, character.equipment);
-
-    await this.respawnCharacter(character);
-    await this.characterWeight.updateCharacterWeight(character);
 
     const deathPenalty = await this.skillDecrease.deathPenalty(character);
     if (deathPenalty) {
@@ -87,7 +65,22 @@ export class CharacterDeath {
     }
 
     // finally, force disconnect character that is dead.
+    const dataOfCharacterDeath: IBattleDeath = {
+      id: character.id,
+      type: "Character",
+    };
     this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, dataOfCharacterDeath);
+
+    // communicate all players around that character is dead
+
+    await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
+      character,
+      BattleSocketEvents.BattleDeath,
+      dataOfCharacterDeath
+    );
+
+    await this.respawnCharacter(character);
+    await this.characterWeight.updateCharacterWeight(character);
   }
 
   public async generateCharacterBody(character: ICharacter): Promise<IItem | any> {

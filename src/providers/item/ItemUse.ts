@@ -10,7 +10,6 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
@@ -33,7 +32,6 @@ export class ItemUse {
     private characterWeight: CharacterWeight,
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
-    private characterItems: CharacterItems,
     private characterInventory: CharacterItemInventory
   ) {}
 

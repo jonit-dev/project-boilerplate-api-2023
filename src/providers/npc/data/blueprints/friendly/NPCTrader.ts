@@ -1,7 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import {
-  MagicsBlueprint,
-  PotionsBlueprint,
+  FoodsBlueprint,
   RangedWeaponsBlueprint,
   SwordsBlueprint,
   ToolsBlueprint,
@@ -19,10 +18,13 @@ export const npcTrader = {
   isTrader: true,
   traderItems: [
     {
-      key: PotionsBlueprint.LightEndurancePotion,
+      key: FoodsBlueprint.Fish,
     },
     {
-      key: MagicsBlueprint.Rune,
+      key: FoodsBlueprint.Watermelon,
+    },
+    {
+      key: FoodsBlueprint.Cheese,
     },
     {
       key: SwordsBlueprint.ShortSword,
@@ -41,6 +43,9 @@ export const npcTrader = {
     },
     {
       key: RangedWeaponsBlueprint.Arrow,
+    },
+    {
+      key: RangedWeaponsBlueprint.Bolt,
     },
   ],
 } as Partial<INPC>;

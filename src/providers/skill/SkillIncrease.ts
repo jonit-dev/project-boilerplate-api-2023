@@ -211,7 +211,7 @@ export class SkillIncrease {
     target: INPC | ICharacter
   ): Promise<void> {
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You advanced from level ${expData.previousLevel} to level ${expData.level}.`,
+      message: `You advanced from level ${expData.level - 1} to level ${expData.level}.`,
       type: "info",
     });
 
