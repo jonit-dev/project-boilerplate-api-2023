@@ -1,12 +1,13 @@
+import { profanity } from "@2toad/profanity";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ChatLog, IChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
-import { SpellCast } from "@providers/spells/SpellCast";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
+import { SpellCast } from "@providers/spells/SpellCast";
 import {
   ChatSocketEvents,
   GRID_HEIGHT,
@@ -17,7 +18,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Model } from "mongoose";
-import { profanity } from "@2toad/profanity";
 
 @provide(ChatNetworkGlobalMessaging)
 export class ChatNetworkGlobalMessaging {
@@ -47,8 +47,8 @@ export class ChatNetworkGlobalMessaging {
           }
 
           const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
-
-          if (data.message.length > 0) {
+          // checks if the message is less than 200
+          if (data.message.length > 0 && data.message.length < 200) {
             // If the message contains profanity, replace it with asterisks except the first letter
             if (profanity.exists(data.message)) {
               const words = data.message.split(" ");
