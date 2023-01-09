@@ -132,9 +132,19 @@ export class NPCMovementMoveTowards {
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
       for (const nearbyCharacter of nearbyCharacters) {
+        // check if update is needed (if character is not in the same scene, it's not needed)
+        if (nearbyCharacter.scene !== npc.scene) {
+          continue;
+        }
+        const clientNpc = nearbyCharacter.view.npcs?.[npc?._id];
+
+        if (clientNpc?.direction === facingDirection) {
+          return;
+        }
+
         this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, NPCSocketEvents.NPCDataUpdate, {
-          id: npc.id,
-          direction: npc.direction,
+          id: clientNpc.id,
+          direction: clientNpc.direction,
         });
       }
     }
