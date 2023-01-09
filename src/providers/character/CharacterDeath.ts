@@ -53,8 +53,6 @@ export class CharacterDeath {
     // drop equipped items and backpack items
     await this.dropCharacterItemsOnBody(characterBody, character.equipment);
 
-    await this.characterWeight.updateCharacterWeight(character);
-
     const deathPenalty = await this.skillDecrease.deathPenalty(character);
     if (deathPenalty) {
       // Set timeout to not overwrite the msg "You are Died"
@@ -82,6 +80,7 @@ export class CharacterDeath {
     );
 
     await this.respawnCharacter(character);
+    await this.characterWeight.updateCharacterWeight(character);
   }
 
   public async generateCharacterBody(character: ICharacter): Promise<IItem | any> {
