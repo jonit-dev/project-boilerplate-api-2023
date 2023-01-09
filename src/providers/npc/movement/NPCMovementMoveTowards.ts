@@ -143,8 +143,8 @@ export class NPCMovementMoveTowards {
         }
 
         this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, NPCSocketEvents.NPCDataUpdate, {
-          id: clientNpc.id,
-          direction: clientNpc.direction,
+          id: npc.id,
+          direction: npc.direction,
         });
       }
     }
