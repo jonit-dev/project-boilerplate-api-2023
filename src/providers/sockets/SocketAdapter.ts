@@ -31,10 +31,19 @@ export class SocketAdapter implements ISocket {
 
   public emitToUser<T>(channel: string, eventName: string, data?: T): void {
     console.log("🔌 Emitting to user: ", channel, eventName, JSON.stringify(data));
+
+    if (data) {
+      data = this.dataIdMiddleware<T>(data);
+    }
+
     SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
   }
 
   public emitToAllUsers<T>(eventName: string, data?: T): void {
+    if (data) {
+      data = this.dataIdMiddleware<T>(data);
+    }
+
     SocketAdapter.socketClass?.emitToAllUsers(eventName, data);
   }
 
@@ -46,5 +55,13 @@ export class SocketAdapter implements ISocket {
 
   public async disconnect(): Promise<void> {
     await SocketAdapter.socketClass?.disconnect();
+  }
+
+  // This is required because mongoose sometimes returns an object with id info instead of a id string, causing issues
+  private dataIdMiddleware<T>(data): T {
+    if (data.id) {
+      data.id = data.id.toString();
+    }
+    return data;
   }
 }
