@@ -36,6 +36,7 @@ export class SocketAdapter implements ISocket {
     }
 
     if (data) {
+      //! This workaround is to avoid mongoose bjson object issue instead of string ids: https://stackoverflow.com/questions/69532987/mongoose-returns-new-objectid-in-id-field-of-the-result
       data = JSON.parse(JSON.stringify(data));
     }
 
