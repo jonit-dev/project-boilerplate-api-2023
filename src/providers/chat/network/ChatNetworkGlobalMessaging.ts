@@ -1,6 +1,6 @@
 import { profanity } from "@2toad/profanity";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ChatLog, IChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -9,6 +9,7 @@ import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZon
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { SpellCast } from "@providers/spells/SpellCast";
 import {
+  ChatMessageType,
   ChatSocketEvents,
   GRID_HEIGHT,
   GRID_WIDTH,
@@ -47,19 +48,25 @@ export class ChatNetworkGlobalMessaging {
 
           const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
+          console.log(nearbyCharacters);
+
           if (data.message.length > 0) {
             // If the message contains profanity, replace it with asterisks except the first letter
-            if (profanity.exists(data.message)) {
-              const words = data.message.split(" ");
-              for (let i = 0; i < words.length; i++) {
-                if (profanity.exists(words[i])) {
-                  words[i] = words[i][0] + words[i].substring(1).replace(/[^\s]/g, "*");
-                }
-              }
-              data.message = words.join(" ");
-            }
+            data = this.replaceProfanity(data);
 
-            await this.saveChatLog(data, character);
+            const chatLog = new ChatLog({
+              message: data.message,
+              emitter: character._id,
+              type: data.type,
+              x: character.x,
+              y: character.y,
+              scene: character.scene,
+            });
+
+            console.log(chatLog);
+
+            await chatLog.save();
+
             const chatLogs = await this.getChatLogsInZone(character, data.limit);
 
             this.sendMessagesToNearbyCharacters(chatLogs, nearbyCharacters);
@@ -72,15 +79,18 @@ export class ChatNetworkGlobalMessaging {
     );
   }
 
-  private async saveChatLog(data: IChatMessageCreatePayload, character: ICharacter): Promise<IChatLog> {
-    return await ChatLog.create({
-      message: data.message,
-      emitter: character._id,
-      type: data.type,
-      x: character.x,
-      y: character.y,
-      scene: character.scene,
-    });
+  private replaceProfanity<T>(data): T {
+    if (profanity.exists(data.message)) {
+      const words = data.message.split(" ");
+      for (let i = 0; i < words.length; i++) {
+        if (profanity.exists(words[i])) {
+          words[i] = words[i][0] + words[i].substring(1).replace(/[^\s]/g, "*");
+        }
+      }
+      data.message = words.join(" ");
+    }
+
+    return data;
   }
 
   private sendMessagesToNearbyCharacters(chatLogs: IChatMessageReadPayload, nearbyCharacters: ICharacter[]): void {
@@ -150,12 +160,23 @@ export class ChatNetworkGlobalMessaging {
       };
     }
 
-    const chatMessageReadPayload: IChatMessageReadPayload = {
-      // @ts-ignore
-      messages: chatLogsInView,
-    };
+    const chatLogs = chatLogsInView.map((chatLog) => {
+      const emitter = chatLog.emitter as unknown as ICharacter;
 
-    return chatMessageReadPayload;
+      return {
+        _id: chatLog._id,
+        message: chatLog.message,
+        emitter: {
+          _id: emitter._id as string,
+          name: emitter.name,
+        },
+        type: chatLog.type as ChatMessageType,
+      };
+    });
+
+    return {
+      messages: chatLogs,
+    };
   }
 
   private shouldCharacterReceiveMessage(target: ICharacter): Boolean {

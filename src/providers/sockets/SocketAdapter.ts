@@ -36,7 +36,7 @@ export class SocketAdapter implements ISocket {
     }
 
     if (data) {
-      data = this.dataIdMiddleware<T>(data);
+      data = this.convertAllIdsToString<T>(data);
     }
 
     SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
@@ -44,7 +44,7 @@ export class SocketAdapter implements ISocket {
 
   public emitToAllUsers<T>(eventName: string, data?: T): void {
     if (data) {
-      data = this.dataIdMiddleware<T>(data);
+      data = this.convertAllIdsToString<T>(data);
     }
 
     SocketAdapter.socketClass?.emitToAllUsers(eventName, data);
@@ -61,10 +61,15 @@ export class SocketAdapter implements ISocket {
   }
 
   // This is required because mongoose sometimes returns an object with id info instead of a id string, causing issues
-  private dataIdMiddleware<T>(data): T {
-    if (data.id) {
-      data.id = data.id.toString();
+  private convertAllIdsToString<T>(data): T {
+    for (const key in data) {
+      if (key === "_id" || key === "id") {
+        data[key] = data[key].toString();
+      } else if (typeof data[key] === "object") {
+        this.convertAllIdsToString(data[key]);
+      }
     }
+
     return data;
   }
 }
