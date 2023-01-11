@@ -48,8 +48,6 @@ export class ChatNetworkGlobalMessaging {
 
           const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
-          console.log(nearbyCharacters);
-
           if (data.message.length > 0) {
             // If the message contains profanity, replace it with asterisks except the first letter
             data = this.replaceProfanity(data);
@@ -62,8 +60,6 @@ export class ChatNetworkGlobalMessaging {
               y: character.y,
               scene: character.scene,
             });
-
-            console.log(chatLog);
 
             await chatLog.save();
 
