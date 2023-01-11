@@ -37,7 +37,7 @@ export class SocketAdapter implements ISocket {
 
     if (data) {
       //! This workaround is to avoid mongoose bjson object issue instead of string ids: https://stackoverflow.com/questions/69532987/mongoose-returns-new-objectid-in-id-field-of-the-result
-      data = JSON.parse(JSON.stringify(data));
+      data = this.dataIdToString(data);
     }
 
     SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
@@ -45,7 +45,7 @@ export class SocketAdapter implements ISocket {
 
   public emitToAllUsers<T>(eventName: string, data?: T): void {
     if (data) {
-      data = JSON.parse(JSON.stringify(data));
+      data = this.dataIdToString(data);
     }
 
     SocketAdapter.socketClass?.emitToAllUsers(eventName, data);
@@ -59,5 +59,9 @@ export class SocketAdapter implements ISocket {
 
   public async disconnect(): Promise<void> {
     await SocketAdapter.socketClass?.disconnect();
+  }
+
+  private dataIdToString<T>(data): T {
+    return JSON.parse(JSON.stringify(data));
   }
 }
