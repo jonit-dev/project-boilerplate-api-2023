@@ -14,8 +14,6 @@ import {
   socketAdapter,
 } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";
-import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
-import { NPC_CYCLES } from "@providers/npc/NPCCycle";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { router } from "@providers/server/Router";
 import { app } from "@providers/server/app";
@@ -58,13 +56,6 @@ app.listen(port, async () => {
   //! TODO: Allocate according to pm2 instances
 
   await characterConnection.resetCharacterAttributes();
-
-  setInterval(() => {
-    console.log(`
-    NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size}
-    NPC_CYCLE: ${NPC_CYCLES.size}
-    `);
-  }, 2000);
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({

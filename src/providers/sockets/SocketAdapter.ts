@@ -1,3 +1,4 @@
+import { appEnv } from "@providers/config/env";
 import { socketEventsBinder } from "@providers/inversify/container";
 import { ISocket, SocketTypes } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -30,7 +31,9 @@ export class SocketAdapter implements ISocket {
   }
 
   public emitToUser<T>(channel: string, eventName: string, data?: T): void {
-    console.log("🔌 Emitting to user: ", channel, eventName, JSON.stringify(data));
+    if (appEnv.general.DEBUG_MODE) {
+      console.log("🔌 Emitting to user: ", channel, eventName, JSON.stringify(data));
+    }
 
     if (data) {
       data = this.dataIdMiddleware<T>(data);
