@@ -10,6 +10,7 @@ import { npcBlackKnight2 } from "./NPCBlackKnight2";
 import { npcBlackKnight3 } from "./NPCBlackKnight3";
 import { npcBlackKnight4 } from "./NPCBlackKnight4";
 import { npcCarpenter } from "./NPCCarpenter";
+import { npcClimber } from "./NPCClimber";
 import { npcDynastyWoman1 } from "./NPCDynastyWoman1";
 import { npcDynastyWoman2 } from "./NPCDynastyWoman2";
 import { npcFatBaldMan } from "./NPCFatBaldMan";
@@ -26,6 +27,7 @@ import { npcMaleNobleBlackHair } from "./NPCMaleNobleBlackHair";
 import { npcMaria } from "./NPCMaria";
 import { npcMother } from "./NPCMother";
 import { npcSeniorKnight } from "./NPCSeniorKnight1";
+import { npcShaman } from "./NPCShaman";
 import { npcStoryTeller } from "./NPCStoryTeller";
 import { npcSuperiorKnight } from "./NPCSuperiorKnight";
 import { npcTrader } from "./NPCTrader";
@@ -67,4 +69,6 @@ export const friendlyNPCs = {
   [FriendlyNPCsBlueprint.Fisherman]: npcFisherman,
   [FriendlyNPCsBlueprint.StoryTeller]: npcStoryTeller,
   [FriendlyNPCsBlueprint.Carpenter]: npcCarpenter,
+  [FriendlyNPCsBlueprint.Shaman]: npcShaman,
+  [FriendlyNPCsBlueprint.Climber]: npcClimber,
 };

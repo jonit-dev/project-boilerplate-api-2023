@@ -5,6 +5,8 @@ import { questInteractionCraftIronArrow } from "./QuestInteractionIronArrow";
 import { questInteractionFisherman } from "./QuestInteractionFisherman";
 import { questInteractionStoryTeller } from "./QuestInteractionStoryTeller";
 import { questInteractionCarpenter } from "./QuestInteractionCarpenter";
+import { questInteractionClimber } from "./QuestInteractionClimber";
+import { questInteractionShaman } from "./QuestInteractionShaman";
 
 export const interactionQuests = {
   "interaction-trader": questInteractionTrader,
@@ -14,4 +16,6 @@ export const interactionQuests = {
   "interaction-fisherman": questInteractionFisherman,
   "interaction-story-teller": questInteractionStoryTeller,
   "interaction-carpenter": questInteractionCarpenter,
+  "interaction-climber": questInteractionClimber,
+  "interaction-shaman": questInteractionShaman,
 };

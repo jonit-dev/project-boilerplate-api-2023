@@ -36,6 +36,8 @@ export enum FriendlyNPCsBlueprint {
   Fisherman = "fisherman",
   StoryTeller = "story-teller",
   Carpenter = "carpenter",
+  Climber = "climber",
+  Shaman = "shaman",
 }
 
 export enum NeutralNPCsBlueprint {
