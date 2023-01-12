@@ -1,3 +1,4 @@
+import { appEnv } from "@providers/config/env";
 import { socketEventsBinder } from "@providers/inversify/container";
 import { ISocket, SocketTypes } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -30,11 +31,23 @@ export class SocketAdapter implements ISocket {
   }
 
   public emitToUser<T>(channel: string, eventName: string, data?: T): void {
-    console.log("🔌 Emitting to user: ", channel, eventName, JSON.stringify(data));
+    if (appEnv.general.DEBUG_MODE) {
+      console.log("🔌 Emitting to user: ", channel, eventName, JSON.stringify(data));
+    }
+
+    if (data) {
+      //! This workaround is to avoid mongoose bjson object issue instead of string ids: https://stackoverflow.com/questions/69532987/mongoose-returns-new-objectid-in-id-field-of-the-result
+      data = this.dataIdToString(data);
+    }
+
     SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
   }
 
   public emitToAllUsers<T>(eventName: string, data?: T): void {
+    if (data) {
+      data = this.dataIdToString(data);
+    }
+
     SocketAdapter.socketClass?.emitToAllUsers(eventName, data);
   }
 
@@ -46,5 +59,9 @@ export class SocketAdapter implements ISocket {
 
   public async disconnect(): Promise<void> {
     await SocketAdapter.socketClass?.disconnect();
+  }
+
+  private dataIdToString<T>(data): T {
+    return JSON.parse(JSON.stringify(data));
   }
 }

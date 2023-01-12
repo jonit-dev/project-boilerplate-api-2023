@@ -3,7 +3,13 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, ItemSocketEvents, ItemSubType, UISocketEvents } from "@rpg-engine/shared";
+import {
+  AnimationSocketEvents,
+  CharacterSocketEvents,
+  ItemSocketEvents,
+  ItemSubType,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { ItemCraftable } from "../ItemCraftable";
 import { CraftingResourcesBlueprint } from "../data/types/itemsBlueprintTypes";
 import { itemManaPotion } from "../data/blueprints/potions/ItemManaPotion";
@@ -14,6 +20,7 @@ import { itemHerb } from "../data/blueprints/crafting-resources/ItemHerb";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { recipeBolt } from "@providers/useWith/recipes/ranged-weapons/recipeBolt";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 
 describe("ItemCraftable.ts", () => {
   let craftableItem: ItemCraftable;
@@ -34,7 +41,7 @@ describe("ItemCraftable.ts", () => {
 
     testCharacter = await unitTestHelper.createMockCharacter(
       { health: 50, mana: 50 },
-      { hasEquipment: true, hasInventory: true }
+      { hasEquipment: true, hasInventory: true, hasSkills: true }
     );
 
     inventory = await testCharacter.inventory;
@@ -94,6 +101,11 @@ describe("ItemCraftable.ts", () => {
   });
 
   it("sould craft non stackable item", async () => {
+    const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
+    craftChanceMock.mockImplementation(() => {
+      return Promise.resolve(true);
+    });
+
     await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
 
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
@@ -107,6 +119,11 @@ describe("ItemCraftable.ts", () => {
   });
 
   it("sould craft stackable item", async () => {
+    const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
+    craftChanceMock.mockImplementation(() => {
+      return Promise.resolve(true);
+    });
+
     await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, [
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.SmallWoodenStick, { stackQty: 1 }),
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.SteelIngot, { stackQty: 1 }),
@@ -126,6 +143,11 @@ describe("ItemCraftable.ts", () => {
   });
 
   it("sould change character weight", async () => {
+    const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
+    craftChanceMock.mockImplementation(() => {
+      return Promise.resolve(true);
+    });
+
     const originalWeight = testCharacter.weight;
 
     await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
@@ -135,6 +157,11 @@ describe("ItemCraftable.ts", () => {
   });
 
   it("sould send inventory update event", async () => {
+    const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
+    craftChanceMock.mockImplementation(() => {
+      return Promise.resolve(true);
+    });
+
     await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
 
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
@@ -238,6 +265,55 @@ describe("ItemCraftable.ts", () => {
       items[2],
     ]);
     await performTest();
+  });
+
+  it("sould not craft valid item due to crafting failure", async () => {
+    const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
+    craftChanceMock.mockImplementation(() => {
+      return Promise.resolve(false);
+    });
+
+    await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
+
+    const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    expect(container.slots[0]).toBe(null);
+    expect(container.slots[1]).toBe(null);
+    expect(container.slots[2]).toBe(null);
+
+    expect(craftChanceMock).toBeCalledTimes(1);
+    expect(craftChanceMock).toBeCalledWith(
+      expect.objectContaining({
+        _id: testCharacter._id,
+      })
+    );
+
+    expect(sendEventToUser).toHaveBeenCalledTimes(1);
+    expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
+      targetId: testCharacter._id,
+      effectKey: "miss",
+    });
+  });
+
+  it("sould produce both craft success and failure", async () => {
+    const skills = await Skill.findOne({ _id: testCharacter.skills });
+    if (skills) {
+      const level = 30;
+      skills.mining.level = level;
+      skills.lumberjacking.level = level - 2;
+      skills.cooking.level = level + 4;
+      skills.alchemy.level = level - 5;
+      await skills.save();
+    }
+
+    const results: boolean[] = [];
+    for (let i = 0; i < 10; i++) {
+      const result: boolean = await (ItemCraftable.prototype as any).isCraftSuccessful(testCharacter);
+      results.push(result);
+    }
+
+    expect(results.some((r) => r)).toBeTruthy();
+    expect(results.some((r) => !r)).toBeTruthy();
   });
 
   afterEach(() => {

@@ -3,7 +3,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
 import { recipeBlueprintsIndex } from "@providers/useWith/recipes/index";
 import { IUseWithCraftingRecipe, IUseWithCraftingRecipeItem } from "@providers/useWith/useWithTypes";
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import {
   ICraftableItem,
   ICraftableItemIngredient,
@@ -17,6 +17,8 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import random from "lodash/random";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 
 @provide(ItemCraftable)
 export class ItemCraftable {
@@ -25,7 +27,8 @@ export class ItemCraftable {
     private characterItemContainer: CharacterItemContainer,
     private characterValidation: CharacterValidation,
     private characterItemInventory: CharacterItemInventory,
-    private characterWeight: CharacterWeight
+    private characterWeight: CharacterWeight,
+    private animationEffect: AnimationEffect
   ) {}
 
   public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
@@ -60,17 +63,28 @@ export class ItemCraftable {
   }
 
   private async performCrafting(recipe: IUseWithCraftingRecipe, character: ICharacter): Promise<void> {
+    let proceed = true;
+
     for (const item of recipe.requiredItems) {
       const success = await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, character, item.qty);
       if (!success) {
-        return;
+        proceed = false;
+        break;
       }
     }
 
-    await this.createItems(recipe, character);
+    if (proceed) {
+      proceed = await this.isCraftSuccessful(character);
+    }
 
-    await this.characterWeight.updateCharacterWeight(character);
-    await this.sendRefreshItemsEvent(character);
+    if (proceed) {
+      await this.createItems(recipe, character);
+
+      await this.characterWeight.updateCharacterWeight(character);
+      await this.sendRefreshItemsEvent(character);
+    } else {
+      await this.animationEffect.sendAnimationEventToCharacter(character, "miss");
+    }
   }
 
   private async createItems(recipe: IUseWithCraftingRecipe, character: ICharacter): Promise<void> {
@@ -194,5 +208,40 @@ export class ItemCraftable {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       payloadUpdate
     );
+  }
+
+  private async isCraftSuccessful(character: ICharacter): Promise<boolean> {
+    const maxChance = 1000;
+
+    const dice = random(1, maxChance);
+
+    const level = await this.getCraftingSkillsAverage(character);
+    const fityPercentProbabilityLevel = 30;
+    const curveSteepness = 0.07;
+
+    const probability = 1 - 1 / (1 + Math.pow(Math.E, curveSteepness * (level - fityPercentProbabilityLevel)));
+    const chance = probability * maxChance;
+
+    return dice <= chance;
+  }
+
+  private async getCraftingSkillsAverage(character: ICharacter): Promise<number> {
+    const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
+      "skills"
+    )) as unknown as ICharacter;
+
+    const skills = updatedCharacter.skills as unknown as ISkill;
+    if (!skills) {
+      return 0;
+    }
+
+    const craftingSkills: number[] = [
+      skills.mining.level,
+      skills.lumberjacking.level,
+      skills.cooking.level,
+      skills.alchemy.level,
+    ];
+
+    return Math.floor(craftingSkills.reduce((total, level) => total + level, 0) / craftingSkills.length);
   }
 }

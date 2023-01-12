@@ -19,6 +19,7 @@ export const appEnv = {
     SENTRY_DNS_URL: process.env.SENTRY_DNS_URL,
     MAX_PM2_INSTANCES: Number(process.env.MAX_PM2_INSTANCES)!,
     IS_UNIT_TEST: process.env.JEST_WORKER_ID !== undefined,
+    DEBUG_MODE: process.env.DEBUG_MODE === "true",
   },
   analytics: {
     mixpanelToken: process.env.MIXPANEL_TOKEN,
