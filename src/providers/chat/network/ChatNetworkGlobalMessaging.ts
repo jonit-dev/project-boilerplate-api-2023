@@ -49,7 +49,10 @@ export class ChatNetworkGlobalMessaging {
           const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
 
           if (data.message.length >= 200) {
-            this.socketMessaging.sendErrorMessageToCharacter(character, "Chat message is too long");
+            this.socketMessaging.sendErrorMessageToCharacter(
+              character,
+              "Chat message is too long, maximum is 200 characters"
+            );
             return;
           }
 
