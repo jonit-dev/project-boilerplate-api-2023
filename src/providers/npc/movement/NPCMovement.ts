@@ -106,6 +106,8 @@ export class NPCMovement {
             maxMana: npc.maxMana,
             hasQuest: await npc.hasQuest,
             hasDepot: npc.hasDepot!,
+            isTrader: npc.isTrader,
+            traderItems: npc.traderItems,
           }
         );
       }
