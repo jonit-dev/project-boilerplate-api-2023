@@ -47,8 +47,13 @@ export class ChatNetworkGlobalMessaging {
           }
 
           const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
-          // checks if the message is less than 200
-          if (data.message.length > 0 && data.message.length < 200) {
+
+          if (data.message.length >= 200) {
+            this.socketMessaging.sendErrorMessageToCharacter(character, "Chat message is too long");
+            return;
+          }
+
+          if (data.message.length > 0) {
             // If the message contains profanity, replace it with asterisks except the first letter
             data = this.replaceProfanity(data);
 
