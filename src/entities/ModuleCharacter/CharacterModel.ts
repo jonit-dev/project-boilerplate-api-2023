@@ -23,6 +23,53 @@ import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Equipment, IEquipment } from "./EquipmentModel";
 import { Skill } from "./SkillsModel";
 
+profanity.addWords([
+  "Admin",
+  "ADMIN",
+  "Adm",
+  "ADM",
+  "Admn",
+  "ADMN",
+  "Game Master",
+  "GameMaster",
+  "GMaster",
+  "Gmaster",
+  "GameM",
+  "GM",
+  "Adm",
+  "ADM",
+  "A.D.M",
+  "a.d.m",
+  "Superuser",
+  "super-user",
+  "super_user",
+  "superUser",
+  "SuperUser",
+  "Root",
+  "ROOT",
+  "r00t",
+  "rOoT",
+  "Manager",
+  "MANAGER",
+  "Mngr",
+  "mngr",
+  "Managr",
+  "managr",
+  "Administrator",
+  "administrador",
+  "administrateur",
+  "amministratore",
+  "Adminstrator",
+  "adminstrator",
+  "GameMaster",
+  "GMaster",
+  "Gmaster",
+  "GameM",
+  "GM",
+  "Gamemaster",
+  "GameMaster",
+]);
+
 const characterSchema = createLeanSchema(
   {
     name: Type.string({

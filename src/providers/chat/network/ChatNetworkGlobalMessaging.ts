@@ -5,8 +5,8 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { SpellCast } from "@providers/spells/SpellCast";
 import {
   ChatMessageType,
@@ -47,6 +47,14 @@ export class ChatNetworkGlobalMessaging {
           }
 
           const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
+
+          if (data.message.length >= 200) {
+            this.socketMessaging.sendErrorMessageToCharacter(
+              character,
+              "Chat message is too long, maximum is 200 characters"
+            );
+            return;
+          }
 
           if (data.message.length > 0) {
             // If the message contains profanity, replace it with asterisks except the first letter
