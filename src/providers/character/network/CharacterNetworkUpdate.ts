@@ -115,7 +115,7 @@ export class CharacterNetworkUpdate {
 
     const distanceInGridCells = Math.round(distance / GRID_WIDTH);
 
-    if (distanceInGridCells >= 1) {
+    if (distanceInGridCells >= 5) {
       this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
         serverCharacter.channelId!,
         CharacterSocketEvents.CharacterSyncPosition,
