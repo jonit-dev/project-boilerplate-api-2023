@@ -1,3 +1,4 @@
+import { profanity } from "@2toad/profanity";
 import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
@@ -21,7 +22,6 @@ import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/enti
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Equipment, IEquipment } from "./EquipmentModel";
 import { Skill } from "./SkillsModel";
-import { profanity } from "@2toad/profanity";
 
 const characterSchema = createLeanSchema(
   {
@@ -73,19 +73,19 @@ const characterSchema = createLeanSchema(
     }),
 
     x: Type.number({
-      default: FromGridX(33),
+      default: FromGridX(40),
       required: true,
     }),
     y: Type.number({
-      default: FromGridY(38),
+      default: FromGridY(55),
       required: true,
     }),
     initialX: Type.number({
-      default: FromGridX(33),
+      default: FromGridX(40),
       required: true,
     }),
     initialY: Type.number({
-      default: FromGridY(38),
+      default: FromGridY(55),
       required: true,
     }),
     direction: Type.string({
@@ -115,7 +115,7 @@ const characterSchema = createLeanSchema(
     }),
     initialScene: Type.string({
       required: true,
-      default: "ilya-village-interiors",
+      default: "ilya",
     }),
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),
