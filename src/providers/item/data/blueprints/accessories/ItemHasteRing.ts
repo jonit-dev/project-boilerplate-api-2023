@@ -14,6 +14,6 @@ export const itemHasteRing: Partial<IItem> = {
   attack: 6,
   defense: 3,
   weight: 0.1,
-  allowedEquipSlotType: [ItemSlotType.Accessory],
+  allowedEquipSlotType: [ItemSlotType.Ring],
   basePrice: 45,
 };

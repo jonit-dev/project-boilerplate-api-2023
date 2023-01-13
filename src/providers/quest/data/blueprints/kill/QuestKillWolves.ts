@@ -1,4 +1,4 @@
-import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { AccessoriesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { IQuest, QuestType } from "@rpg-engine/shared";
 import { QuestsBlueprint } from "../../questsBlueprintTypes";
@@ -11,11 +11,15 @@ export const questKillWolves = {
   rewards: [
     {
       itemKeys: [RangedWeaponsBlueprint.Arrow],
-      qty: 50,
+      qty: 100,
     },
     {
       itemKeys: [RangedWeaponsBlueprint.Bow],
-      qty: 50,
+      qty: 1,
+    },
+    {
+      itemKeys: [AccessoriesBlueprint.IronRing],
+      qty: 1,
     },
   ],
   objectives: [

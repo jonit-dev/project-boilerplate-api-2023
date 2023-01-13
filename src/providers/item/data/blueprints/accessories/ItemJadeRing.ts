@@ -14,6 +14,6 @@ export const itemJadeRing: Partial<IItem> = {
   attack: 7,
   defense: 7,
   weight: 0.1,
-  allowedEquipSlotType: [ItemSlotType.Accessory],
+  allowedEquipSlotType: [ItemSlotType.Ring],
   basePrice: 60,
 };

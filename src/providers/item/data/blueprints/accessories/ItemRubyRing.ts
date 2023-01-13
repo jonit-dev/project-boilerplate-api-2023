@@ -14,6 +14,6 @@ export const itemRubyRing: Partial<IItem> = {
   attack: 5,
   defense: 3,
   weight: 0.2,
-  allowedEquipSlotType: [ItemSlotType.Accessory],
+  allowedEquipSlotType: [ItemSlotType.Ring],
   basePrice: 45,
 };
