@@ -73,19 +73,19 @@ const characterSchema = createLeanSchema(
     }),
 
     x: Type.number({
-      default: FromGridX(40),
+      default: FromGridX(33),
       required: true,
     }),
     y: Type.number({
-      default: FromGridY(55),
+      default: FromGridY(38),
       required: true,
     }),
     initialX: Type.number({
-      default: FromGridX(40),
+      default: FromGridX(33),
       required: true,
     }),
     initialY: Type.number({
-      default: FromGridY(55),
+      default: FromGridY(38),
       required: true,
     }),
     direction: Type.string({
@@ -115,7 +115,7 @@ const characterSchema = createLeanSchema(
     }),
     initialScene: Type.string({
       required: true,
-      default: "ilya",
+      default: "ilya-village-interiors",
     }),
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),
