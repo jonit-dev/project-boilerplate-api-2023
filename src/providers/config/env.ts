@@ -37,7 +37,7 @@ export const appEnv = {
     MONGO_INITDB_ROOT_USERNAME: process.env.MONGO_INITDB_ROOT_USERNAME,
     MONGO_INITDB_ROOT_PASSWORD: process.env.MONGO_INITDB_ROOT_PASSWORD,
     REDIS_CONTAINER: process.env.REDIS_CONTAINER,
-    REDIS_PORT: process.env.REDIS_PORT,
+    REDIS_PORT: Number(process.env.REDIS_PORT),
   },
   encryption: {
     genericHash: process.env.GENERIC_ENCRYPTION_HASH,

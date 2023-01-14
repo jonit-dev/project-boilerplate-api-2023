@@ -28,8 +28,8 @@ export class SocketIO implements ISocket {
       case EnvType.Production:
         const pubClient = createClient({
           socket: {
-            host: "rpg-redis",
-            port: 6380,
+            host: appEnv.database.REDIS_CONTAINER,
+            port: appEnv.database.REDIS_PORT,
           },
         });
         const subClient = pubClient.duplicate();
