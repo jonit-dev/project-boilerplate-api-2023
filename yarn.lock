@@ -2739,6 +2739,16 @@
   optionalDependencies:
     pm2-sysmonit "^1.2.8"
 
+"@socket.io/redis-adapter@^8.0.1":
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/@socket.io/redis-adapter/-/redis-adapter-8.0.1.tgz#a4fee5bf73158a3b04673cb7bc3cd4c86671d062"
+  integrity sha512-qjYRaf+Xp/OEkQDqWwEXnCjcuBUtVCrV1loXTIqICF4D+HHAv4T4jgPHUagyzJQ9M/RmJL25GlG15wLjV2O37g==
+  dependencies:
+    debug "~4.3.1"
+    notepack.io "~3.0.1"
+    socket.io-adapter "~2.4.0"
+    uid2 "1.0.0"
+
 "@socket.io/sticky@^1.0.0":
   version "1.0.2"
   resolved "https://registry.npmjs.org/@socket.io/sticky/-/sticky-1.0.2.tgz"
@@ -7643,6 +7653,11 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   resolved "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
+notepack.io@~3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/notepack.io/-/notepack.io-3.0.1.tgz#2c2c9de1bd4e64a79d34e33c413081302a0d4019"
+  integrity sha512-TKC/8zH5pXIAMVQio2TvVDTtPRX+DJPHDqjRbxogtFiByHyzKmy96RA0JtCQJ+WouyyL4A10xomQzgbUT+1jCg==
+
 npm-run-path@^4.0.0, npm-run-path@^4.0.1:
   version "4.0.1"
   resolved "https://registry.npmjs.org/npm-run-path/-/npm-run-path-4.0.1.tgz"
@@ -9421,6 +9436,11 @@ tz-offset@0.0.1:
   version "0.0.1"
   resolved "https://registry.npmjs.org/tz-offset/-/tz-offset-0.0.1.tgz"
   integrity sha512-kMBmblijHJXyOpKzgDhKx9INYU4u4E1RPMB0HqmKSgWG8vEcf3exEfLh4FFfzd3xdQOw9EuIy/cP0akY6rHopQ==
+
+uid2@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/uid2/-/uid2-1.0.0.tgz#ef8d95a128d7c5c44defa1a3d052eecc17a06bfb"
+  integrity sha512-+I6aJUv63YAcY9n4mQreLUt0d4lvwkkopDNmpomkAUz0fAkEMV9pRWxN0EjhW1YfRhcuyHg2v3mwddCDW1+LFQ==
 
 unbox-primitive@^1.0.2:
   version "1.0.2"
