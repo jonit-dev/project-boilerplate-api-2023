@@ -9,7 +9,7 @@ export const itemEldensBow: Partial<IItem> = {
   rangeType: EntityAttackType.Ranged,
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
-  texturePath: "ranged-weapons/eldens-bow.png",
+  texturePath: "ranged-weapons/elden's-bow.png",
   name: "Elden's Bow",
   description:
     "A powerful, enchanted bow said to have belonged to a great hero of legend. It is said to be capable of shooting arrows with incredible speed and accuracy.",

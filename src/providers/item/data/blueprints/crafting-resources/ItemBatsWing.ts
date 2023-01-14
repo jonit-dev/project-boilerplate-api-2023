@@ -10,7 +10,7 @@ export const itemBatsWing: Partial<IItemUseWith> = {
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,
   textureAtlas: "items",
-  texturePath: "crafting-resources/bat-wing.png",
+  texturePath: "crafting-resources/bats-wing.png",
   name: "Bat Wing",
   description: "A crafting resource used for witchcraft and sorcery",
   weight: 1,
