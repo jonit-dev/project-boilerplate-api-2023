@@ -90,24 +90,10 @@ export class NPCMovement {
           NPCSocketEvents.NPCPositionUpdate,
           {
             id: npc.id,
-            name: npc.name,
             x: npc.x,
             y: npc.y,
             direction: chosenMovementDirection,
-            key: npc.key,
-            layer: npc.layer,
-            textureKey: npc.textureKey,
-            scene: npc.scene,
-            speed: npc.speed,
             alignment: npc.alignment as NPCAlignment,
-            health: npc.health,
-            maxHealth: npc.maxHealth,
-            mana: npc.mana,
-            maxMana: npc.maxMana,
-            hasQuest: await npc.hasQuest,
-            hasDepot: npc.hasDepot!,
-            isTrader: npc.isTrader,
-            traderItems: npc.traderItems,
           }
         );
       }

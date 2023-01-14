@@ -58,7 +58,7 @@ export class NPCManager {
             console.log(err);
           }
         },
-        (1400 + random(0, 250)) / npc.speed
+        (1600 + random(0, 250)) / npc.speed
       );
 
       this.freezeNPCIfNoCharactersNearby(npc, npcCycle);

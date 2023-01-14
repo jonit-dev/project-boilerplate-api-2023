@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { INPCPositionUpdatePayload, NPCAlignment, NPCSocketEvents } from "@rpg-engine/shared";
+import { INPCPositionCreatePayload, NPCAlignment, NPCSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCView } from "./NPCView";
 
@@ -46,9 +46,9 @@ export class NPCWarn {
 
       const hasQuest = await npc.hasQuest;
 
-      this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
+      this.socketMessaging.sendEventToUser<INPCPositionCreatePayload>(
         character.channelId!,
-        NPCSocketEvents.NPCPositionUpdate,
+        NPCSocketEvents.NPCPositionCreate,
         {
           id: npc.id,
           name: npc.name,

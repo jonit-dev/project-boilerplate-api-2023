@@ -18,7 +18,8 @@ export const GECKOS_CONFIG = {
 
 export const SOCKET_IO_CONFIG: Partial<ServerOptions> = {
   cors: {
-    origin: appEnv.general.ENV === EnvType.Development ? "*" : appEnv.general.APP_URL,
+    origin: "*",
+    // origin: appEnv.general.ENV === EnvType.Development ? "*" : appEnv.general.APP_URL,
     credentials: true,
   },
   transports: ["websocket"],
