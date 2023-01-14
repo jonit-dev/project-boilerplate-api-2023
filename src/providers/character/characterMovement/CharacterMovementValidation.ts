@@ -21,7 +21,11 @@ export class CharacterMovementValidation {
       return true; // if character is not moving, we dont need to check anything else!
     }
 
-    this.characterValidation.hasBasicValidation(character);
+    const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
+
+    if (!hasBasicValidation) {
+      return false;
+    }
 
     if (!this.movementHelper.isSnappedToGrid(newX, newY)) {
       console.log(`🚫 ${character.name} lost snapping to grid!`);

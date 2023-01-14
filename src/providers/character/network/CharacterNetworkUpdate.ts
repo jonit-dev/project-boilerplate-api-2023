@@ -50,13 +50,6 @@ export class CharacterNetworkUpdate {
 
           let isPositionUpdateValid = true;
 
-          const serverCharacterPosition = {
-            x: character.x,
-            y: character.y,
-          };
-
-          this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
-
           const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
             character.x,
             character.y,
@@ -68,6 +61,13 @@ export class CharacterNetworkUpdate {
           }
 
           if (isPositionUpdateValid) {
+            const serverCharacterPosition = {
+              x: character.x,
+              y: character.y,
+            };
+
+            this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
+
             await this.characterMovementWarn.warn(character, data);
 
             await this.npcManager.startNearbyNPCsBehaviorLoop(character);
