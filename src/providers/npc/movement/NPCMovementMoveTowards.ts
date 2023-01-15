@@ -46,7 +46,7 @@ export class NPCMovementMoveTowards {
     if (targetCharacter) {
       await this.npcTarget.tryToClearOutOfRangeTargets(npc);
 
-      await this.initOrClearBattleCycle(npc, targetCharacter, npc.attackType === EntityAttackType.Melee, 1);
+      await this.initOrClearBattleCycle(npc, targetCharacter, npc.attackType === EntityAttackType.Melee, 2);
       await this.initOrClearBattleCycle(
         npc,
         targetCharacter,
@@ -290,7 +290,7 @@ export class NPCMovementMoveTowards {
 
       if (!shortestPath) {
         // throw new Error("No shortest path found!");
-        await this.npcTarget.clearTarget(npc);
+        // await this.npcTarget.clearTarget(npc);
         return;
       }
 

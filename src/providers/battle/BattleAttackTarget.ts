@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
+import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCDeath } from "@providers/npc/NPCDeath";
@@ -27,7 +28,6 @@ import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
 import { BattleRangedAttack } from "./BattleRangedAttack";
 import { BattleNetworkStopTargeting } from "./network/BattleNetworkStopTargetting";
-import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -207,9 +207,12 @@ export class BattleAttackTarget {
 
         if (!target.isAlive) {
           if (target.type === "Character") {
-            await this.battleEffects.generateBloodOnGround(target);
+            // freeze target variable, so it does not receive any modifications
+            const targetCharacter = Object.freeze(target as ICharacter);
 
-            await this.characterDeath.handleCharacterDeath(attacker, target as ICharacter);
+            await this.battleEffects.generateBloodOnGround(targetCharacter);
+
+            await this.characterDeath.handleCharacterDeath(attacker, targetCharacter as ICharacter);
 
             // Attacker could be a Character (PVP battle)
             if (attacker.type === "NPC") {
