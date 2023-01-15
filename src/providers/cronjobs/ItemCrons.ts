@@ -6,8 +6,6 @@ import nodeCron from "node-cron";
 export class ItemCrons {
   public schedule(): void {
     nodeCron.schedule("*/30 * * * *", async () => {
-      // find all items with decay time
-
       const items = await Item.find({
         decayTime: {
           $lte: new Date(),
