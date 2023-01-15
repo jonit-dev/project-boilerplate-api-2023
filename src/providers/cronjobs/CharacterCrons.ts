@@ -10,7 +10,7 @@ export class CharacterCrons {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public schedule(): void {
-    nodeCron.schedule("*/10 * * * *", async () => {
+    nodeCron.schedule("* * * * *", async () => {
       await this.logoutInactiveCharacters();
     });
 
