@@ -45,6 +45,15 @@ export class CharacterView {
     return !!character?.view?.[type]?.[elementId];
   }
 
+  public async clearCharacterView(character: ICharacter): Promise<void> {
+    character.view = {
+      npcs: {},
+      items: {},
+      characters: {},
+    };
+    await Character.updateOne({ _id: character._id }, { view: character.view });
+  }
+
   public async removeFromCharacterView(
     character: ICharacter,
     elementId: string,
