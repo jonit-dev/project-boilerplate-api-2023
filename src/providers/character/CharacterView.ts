@@ -32,9 +32,7 @@ export class CharacterView {
       };
     }
 
-    const updatedElementView = Object.assign(character.view[type], {
-      [viewElement.id]: viewElement,
-    });
+    const updatedElementView = { ...character.view[type], [viewElement.id]: viewElement };
 
     character.view = {
       ...character.view,
