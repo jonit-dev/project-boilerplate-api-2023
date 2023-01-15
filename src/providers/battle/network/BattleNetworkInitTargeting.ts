@@ -187,6 +187,16 @@ export class BattleNetworkInitTargeting {
       };
     }
 
+    if (target?.type === "NPC") {
+      const npc = target as INPC;
+      if (npc.alignment === NPCAlignment.Friendly) {
+        return {
+          isValid: false,
+          reason: "You cannot attack a friendly NPC.",
+        };
+      }
+    }
+
     return {
       isValid: true,
     };
