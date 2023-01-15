@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -156,6 +156,77 @@ describe("CharacterView.ts", () => {
 
     const nearestChar = await characterView.getNearestCharactersFromXYPoint(FromGridX(0), FromGridY(0), "example");
     expect(nearestChar?._id).toEqual(char2._id);
+  });
+
+  it("should clear elements that are out of the character's view", async () => {
+    const viewElement1 = {
+      id: "testId1",
+      x: FromGridX(2),
+      y: FromGridY(2),
+      scene: "example",
+    };
+    const viewElement2 = {
+      id: "testId2",
+      x: FromGridX(3),
+      y: FromGridY(3),
+      scene: "example",
+    };
+
+    await characterView.addToCharacterView(testCharacter, viewElement1, "items");
+    await characterView.addToCharacterView(testCharacter, viewElement2, "items");
+
+    testCharacter.x = FromGridX(999);
+    testCharacter.y = FromGridY(999);
+    await testCharacter.save();
+
+    await characterView.clearOutOfViewElements(testCharacter, "items");
+
+    const updatedTestCharacter = await Character.findById(testCharacter._id);
+
+    if (!updatedTestCharacter) throw new Error("Character not found");
+
+    expect(updatedTestCharacter.view.items).toEqual({});
+  });
+
+  it("should clear elements of all types that are out of the character's view", async () => {
+    const viewElement1 = {
+      id: "testId1",
+      x: FromGridX(2),
+      y: FromGridY(2),
+      scene: "example",
+    };
+    const viewElement2 = {
+      id: "testId2",
+      x: FromGridX(3),
+      y: FromGridY(3),
+      scene: "example",
+    };
+    const viewElement3 = {
+      id: "testId3",
+      x: FromGridX(4),
+      y: FromGridY(4),
+      scene: "example",
+    };
+
+    await characterView.addToCharacterView(testCharacter, viewElement1, "items");
+    await characterView.addToCharacterView(testCharacter, viewElement2, "npcs");
+    await characterView.addToCharacterView(testCharacter, viewElement3, "characters");
+
+    testCharacter.x = FromGridX(999);
+    testCharacter.y = FromGridY(999);
+    await testCharacter.save();
+
+    await characterView.clearOutOfViewElementsAll(testCharacter);
+
+    const updatedTestCharacter = await Character.findById(testCharacter._id);
+
+    if (!updatedTestCharacter) {
+      throw new Error("Character not found");
+    }
+
+    expect(updatedTestCharacter.view.items).toEqual({});
+    expect(updatedTestCharacter.view.npcs).toEqual({});
+    expect(updatedTestCharacter.view.characters).toEqual({});
   });
 
   afterAll(async () => {

@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { CharacterView } from "@providers/character/CharacterView";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -6,6 +7,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { INPCPositionUpdatePayload, NPCAlignment, NPCSocketEvents, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCView } from "../NPCView";
+import { NPCWarn } from "../NPCWarn";
 import { NPCTarget } from "./NPCTarget";
 
 export type NPCDirection = "up" | "down" | "left" | "right";
@@ -24,7 +26,9 @@ export class NPCMovement {
     private movementHelper: MovementHelper,
     private gridManager: GridManager,
     private mapNonPVPZone: MapNonPVPZone,
-    private npcTarget: NPCTarget
+    private npcTarget: NPCTarget,
+    private characterView: CharacterView,
+    private npcWarn: NPCWarn
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -85,17 +89,23 @@ export class NPCMovement {
           await this.npcTarget.clearTarget(npc);
         }
 
-        this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
-          character.channelId!,
-          NPCSocketEvents.NPCPositionUpdate,
-          {
-            id: npc.id,
-            x: npc.x,
-            y: npc.y,
-            direction: chosenMovementDirection,
-            alignment: npc.alignment as NPCAlignment,
-          }
-        );
+        const isOnCharView = this.characterView.isOnCharacterView(character, npc._id, "npcs");
+
+        if (!isOnCharView) {
+          await this.npcWarn.warnCharacterAboutSingleNPC(npc, character);
+        } else {
+          this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
+            character.channelId!,
+            NPCSocketEvents.NPCPositionUpdate,
+            {
+              id: npc.id,
+              x: npc.x,
+              y: npc.y,
+              direction: chosenMovementDirection,
+              alignment: npc.alignment as NPCAlignment,
+            }
+          );
+        }
       }
 
       npc.x = newX;

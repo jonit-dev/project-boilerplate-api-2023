@@ -45,6 +45,49 @@ export class CharacterView {
     return !!character?.view?.[type]?.[elementId];
   }
 
+  public isOutOfCharacterView(character: ICharacter, x: number, y: number): boolean {
+    const viewWidth = SOCKET_TRANSMISSION_ZONE_WIDTH * 2;
+    const viewHeight = SOCKET_TRANSMISSION_ZONE_WIDTH * 2;
+
+    if (
+      x < character.x - viewWidth / 2 ||
+      x > character.x + viewWidth / 2 ||
+      y < character.y - viewHeight / 2 ||
+      y > character.y + viewHeight / 2
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public async clearOutOfViewElementsAll(character: ICharacter): Promise<void> {
+    const types: CharacterViewType[] = ["npcs", "items", "characters"];
+    for (const type of types) {
+      await this.clearOutOfViewElements(character, type);
+    }
+  }
+
+  public async clearOutOfViewElements(character: ICharacter, type: CharacterViewType): Promise<void> {
+    if (!character.view) {
+      return;
+    }
+
+    const elements = character.view[type];
+    const elementsToRemove: string[] = [];
+
+    for (const elementId in elements) {
+      const element = elements[elementId];
+      if (this.isOutOfCharacterView(character, element.x, element.y)) {
+        elementsToRemove.push(elementId);
+      }
+    }
+
+    for (const elementId of elementsToRemove) {
+      await this.removeFromCharacterView(character, elementId, type);
+    }
+  }
+
   public async clearCharacterView(character: ICharacter): Promise<void> {
     character.view = {
       npcs: {},
