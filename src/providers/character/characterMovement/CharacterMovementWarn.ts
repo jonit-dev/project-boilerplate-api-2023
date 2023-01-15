@@ -35,6 +35,40 @@ export class CharacterMovementWarn {
     await this.itemView.warnCharacterAboutItemsInView(character);
   }
 
+  public async warnAboutSingleCharacter(character: ICharacter, targetCharacter: ICharacter): Promise<void> {
+    await this.characterView.addToCharacterView(
+      character,
+      {
+        id: targetCharacter.id,
+        x: targetCharacter.x,
+        y: targetCharacter.y,
+        direction: targetCharacter.direction,
+        scene: targetCharacter.scene,
+      },
+      "characters"
+    );
+
+    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterPositionUpdate, {
+      id: targetCharacter.id,
+      name: targetCharacter.name,
+      x: targetCharacter.x,
+      y: targetCharacter.y,
+      newX: targetCharacter.x,
+      newY: targetCharacter.y,
+      channelId: targetCharacter.channelId!,
+      direction: targetCharacter.direction as AnimationDirection,
+      layer: targetCharacter.layer,
+      isMoving: false,
+      speed: targetCharacter.speed,
+      movementIntervalMs: targetCharacter.movementIntervalMs,
+      health: targetCharacter.health,
+      maxHealth: targetCharacter.maxHealth,
+      mana: targetCharacter.mana,
+      maxMana: targetCharacter.maxMana,
+      textureKey: targetCharacter.textureKey,
+    });
+  }
+
   private async warnCharactersAroundAboutEmitterPositionUpdate(
     character: ICharacter,
     clientPosUpdateData: ICharacterPositionUpdateFromClient

@@ -3,9 +3,11 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
+import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCDeath } from "@providers/npc/NPCDeath";
+import { NPCWarn } from "@providers/npc/NPCWarn";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { QuestSystem } from "@providers/quest/QuestSystem";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
@@ -45,7 +47,9 @@ export class BattleAttackTarget {
     private battleRangedAttack: BattleRangedAttack,
     private questSystem: QuestSystem,
     private entityEffectUse: EntityEffectUse,
-    private characterBonusPenalties: CharacterBonusPenalties
+    private characterBonusPenalties: CharacterBonusPenalties,
+    private npcWarn: NPCWarn,
+    private characterMovementWarn: CharacterMovementWarn
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -268,6 +272,8 @@ export class BattleAttackTarget {
       await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, BasicAttribute.Dexterity);
     }
 
+    await this.warnCharacterIfNotInView(attacker as ICharacter, target);
+
     // finally, send battleHitPayload to characters around
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
 
@@ -285,6 +291,26 @@ export class BattleAttackTarget {
 
     if (character.channelId) {
       this.socketMessaging.sendEventToUser(character.channelId, BattleSocketEvents.BattleEvent, battleEventPayload);
+    }
+  }
+
+  private async warnCharacterIfNotInView(character: ICharacter, target: ICharacter | INPC): Promise<void> {
+    switch (target.type) {
+      case "NPC":
+        const isNPCInView = this.characterView.isOnCharacterView(character, target._id, "npcs");
+
+        if (!isNPCInView) {
+          await this.npcWarn.warnCharacterAboutSingleNPC(target as INPC, character);
+        }
+        break;
+      case "Character":
+        const isCharacterOnCharView = this.characterView.isOnCharacterView(character, target._id, "characters");
+
+        if (!isCharacterOnCharView) {
+          await this.characterMovementWarn.warnAboutSingleCharacter(character, target as ICharacter);
+        }
+
+        break;
     }
   }
 }

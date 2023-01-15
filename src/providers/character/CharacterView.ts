@@ -12,6 +12,9 @@ export interface ICharacterDistance {
   x: number;
   y: number;
 }
+
+export type CharacterViewType = "npcs" | "items" | "characters";
+
 @provide(CharacterView)
 export class CharacterView {
   constructor(private socketTransmissionZone: SocketTransmissionZone, private mathHelper: MathHelper) {}
@@ -19,8 +22,16 @@ export class CharacterView {
   public async addToCharacterView(
     character: ICharacter,
     viewElement: IViewElement,
-    type: "npcs" | "items" | "characters"
+    type: CharacterViewType
   ): Promise<void> {
+    if (!character.view) {
+      character.view = {
+        npcs: {},
+        items: {},
+        characters: {},
+      };
+    }
+
     const updatedElementView = Object.assign(character.view[type], {
       [viewElement.id]: viewElement,
     });
@@ -32,10 +43,14 @@ export class CharacterView {
     await Character.updateOne({ _id: character._id }, { view: character.view });
   }
 
+  public isOnCharacterView(character: ICharacter, elementId: string, type: CharacterViewType): boolean {
+    return !!character?.view?.[type]?.[elementId];
+  }
+
   public async removeFromCharacterView(
     character: ICharacter,
     elementId: string,
-    type: "npcs" | "items" | "characters"
+    type: CharacterViewType
   ): Promise<void> {
     const updatedCharView = character.view[type];
 

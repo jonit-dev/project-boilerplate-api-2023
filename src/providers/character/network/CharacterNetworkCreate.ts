@@ -87,7 +87,7 @@ export class CharacterNetworkCreate {
           return;
         }
 
-        await this.npcWarn.warnCharacterAboutNPCsInView(character);
+        await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
 
         await this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
