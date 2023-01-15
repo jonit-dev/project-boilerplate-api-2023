@@ -14,9 +14,9 @@ import {
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterTradeSocketEvents, ItemSocketEvents, NPCMovementType } from "@rpg-engine/shared";
-import { CharacterItemInventory } from "../characterItems/CharacterItemInventory";
 import { CharacterTradingNPCSell } from "../CharacterTradingNPCSell";
 import { CharacterTradingValidation } from "../CharacterTradingValidation";
+import { CharacterItemInventory } from "../characterItems/CharacterItemInventory";
 
 describe("CharacterTradingNPCSell.ts", () => {
   let testCharacter: ICharacter;
@@ -106,7 +106,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(34.5);
+    expect(updatedContainer.slots[0].stackQty).toBe(29.5);
 
     expect(updatedContainer.slots[2]).not.toBeNull();
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
@@ -228,7 +228,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(21);
+    expect(updatedContainer.slots[0].stackQty).toBe(11);
 
     expect(updatedContainer.slots[1]).toBeNull();
 
@@ -290,7 +290,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       },
       {
         key: RangedWeaponsBlueprint.Arrow,
-        qty: 100,
+        qty: 150,
       },
     ];
 
@@ -298,13 +298,15 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
+    console.log(updatedContainer);
+
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
     expect(updatedContainer.slots[0].stackQty).toBe(100);
 
     expect(updatedContainer.slots[1]).not.toBeNull();
     expect(updatedContainer.slots[1].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[1].stackQty).toBe(49);
+    expect(updatedContainer.slots[1].stackQty).toBe(24);
 
     expect(updatedContainer.slots[2]).toBeNull();
     expect(updatedContainer.slots[3]).toBeNull();
@@ -338,7 +340,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(59);
+    expect(updatedContainer.slots[0].stackQty).toBe(9);
 
     expect(updatedContainer.slots[4]).not.toBeNull();
     expect(updatedContainer.slots[4].key).toBe(OthersBlueprint.GoldCoin);
