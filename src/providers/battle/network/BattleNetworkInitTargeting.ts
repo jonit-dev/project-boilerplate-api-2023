@@ -192,7 +192,7 @@ export class BattleNetworkInitTargeting {
       if (npc.alignment === NPCAlignment.Friendly) {
         return {
           isValid: false,
-          reason: "You cannot attack a friendly NPC.",
+          reason: "Sorry, you cannot attack a friendly NPC.",
         };
       }
     }
