@@ -320,9 +320,9 @@ export class CharacterItemInventory {
 
       if (remaining > 0) {
         await this.characterItemSlots.updateItemOnSlot(slotIndex, inventoryItemContainer, {
-          ...slotItem,
           stackQty: remaining,
         });
+        result = true;
       } else {
         result = await this.deleteItemFromInventory(slotItem._id, character);
         // we also need to delete item from items table
