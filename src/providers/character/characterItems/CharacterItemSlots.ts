@@ -236,6 +236,37 @@ export class CharacterItemSlots {
     return null;
   }
 
+  public async addItemOnSlot(
+    targetContainer: IItemContainer,
+    itemToBeAdded: IItem,
+    slotIndex: number
+  ): Promise<boolean> {
+    const targetContainerItem = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
+
+    if (!targetContainerItem) {
+      return false;
+    }
+
+    const slotItem = targetContainerItem.slots[slotIndex] as unknown as IItem;
+
+    if (!slotItem) {
+      await ItemContainer.updateOne(
+        {
+          _id: targetContainerItem._id,
+        },
+        {
+          $set: {
+            [`slots.${slotIndex}`]: itemToBeAdded,
+          },
+        }
+      );
+
+      return true;
+    }
+
+    return false;
+  }
+
   public async tryAddingItemOnFirstSlot(
     character: ICharacter,
     selectedItem: IItem,
