@@ -134,7 +134,7 @@ describe("CharacterTradingValidation.ts", () => {
         inventory.itemContainer
       )) as unknown as IItemContainer;
 
-      expect(updatedInventoryContainer.slots[0].stackQty).toBe(25); // gold left
+      expect(updatedInventoryContainer.slots[0].stackQty).toBe(62.5); // gold left
       expect(updatedInventoryContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Arrow); // potion bought
       expect(updatedInventoryContainer.slots[1].stackQty).toBe(25);
 

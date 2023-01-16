@@ -11,4 +11,11 @@ export enum QuestsBlueprint {
   InteractionFisherman = "interaction-fisherman",
   InteractionStoryTeller = "interaction-story-teller",
   InteractionCarpenter = "interaction-carpenter",
+  InteractionClimber = "interaction-climber",
+  InteractionShaman = "interaction-shaman",
+  KillYetis = "kill-yetis",
+  KillFrostSalamanders = "kill-frost-salamanders",
+  KillGoblins = "kill-goblins",
+  KillPolarBears = "kill-polar-bears",
+  KillWinterWolves = "kill-winter-wolves",
 }

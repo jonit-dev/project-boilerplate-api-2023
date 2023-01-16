@@ -4,6 +4,7 @@ import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
+  EntityAttackType,
   FromGridX,
   FromGridY,
   NPCAlignment,
@@ -45,9 +46,13 @@ export class NPCMovementMoveTowards {
     if (targetCharacter) {
       await this.npcTarget.tryToClearOutOfRangeTargets(npc);
 
-      if (npc.alignment === NPCAlignment.Hostile) {
-        this.initBattleCycle(npc);
-      }
+      await this.initOrClearBattleCycle(npc, targetCharacter, npc.attackType === EntityAttackType.Melee, 2);
+      await this.initOrClearBattleCycle(
+        npc,
+        targetCharacter,
+        npc.attackType === EntityAttackType.Ranged || npc.attackType === EntityAttackType.MeleeRanged,
+        npc.maxRangeAttack
+      );
 
       // change movement to MoveWay (flee) if health is low!
       if (npc.fleeOnLowHealth) {
@@ -121,6 +126,36 @@ export class NPCMovementMoveTowards {
     }
   }
 
+  private async initOrClearBattleCycle(
+    npc: INPC,
+    targetCharacter: ICharacter,
+    condition: boolean,
+    maxRangeInGridCells
+  ): Promise<void> {
+    if (npc.alignment === NPCAlignment.Hostile) {
+      // if melee, only start battle cycle if target is in melee range
+      if (condition) {
+        const isInRange = this.movementHelper.isUnderRange(
+          npc.x,
+          npc.y,
+          targetCharacter.x,
+          targetCharacter.y,
+          maxRangeInGridCells
+        );
+
+        if (isInRange) {
+          this.initBattleCycle(npc);
+        } else {
+          const battleCycle = NPC_BATTLE_CYCLES.get(npc.id);
+
+          if (battleCycle) {
+            await battleCycle.clear();
+          }
+        }
+      }
+    }
+  }
+
   private async faceTarget(npc: INPC): Promise<void> {
     const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;
 
@@ -145,6 +180,8 @@ export class NPCMovementMoveTowards {
         this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, NPCSocketEvents.NPCDataUpdate, {
           id: npc.id,
           direction: npc.direction,
+          x: npc.x,
+          y: npc.y,
         });
       }
     }
@@ -253,7 +290,7 @@ export class NPCMovementMoveTowards {
 
       if (!shortestPath) {
         // throw new Error("No shortest path found!");
-        await this.npcTarget.clearTarget(npc);
+        // await this.npcTarget.clearTarget(npc);
         return;
       }
 

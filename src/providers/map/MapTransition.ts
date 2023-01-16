@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
+import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   BattleSocketEvents,
@@ -26,7 +27,8 @@ export class MapTransition {
   constructor(
     private mapObjectsLoader: MapObjectsLoader,
     private socketMessaging: SocketMessaging,
-    private battleNetworkStopTargeting: BattleNetworkStopTargeting
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting,
+    private characterView: CharacterView
   ) {}
 
   public async changeCharacterScene(character: ICharacter, destination: TransitionDestination): Promise<void> {
@@ -63,6 +65,7 @@ export class MapTransition {
       await this.battleNetworkStopTargeting.stopTargeting(character);
     }
 
+    await this.characterView.clearCharacterView(character);
     /* 
       Send event to client telling it to restart the map. 
       We don't need to specify which, because it will trigger a character 
@@ -118,6 +121,9 @@ export class MapTransition {
 
       await this.battleNetworkStopTargeting.stopTargeting(character);
     }
+
+    await this.characterView.clearCharacterView(character);
+
     // send event to client telling it that a character has been teleported?
 
     this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.SameMapTeleport, destination);

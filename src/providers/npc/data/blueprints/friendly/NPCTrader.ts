@@ -12,7 +12,7 @@ import { generateRandomMovement } from "../../abstractions/BaseNeutralNPC";
 export const npcTrader = {
   ...generateRandomMovement(),
   key: "trader",
-  name: "Joe",
+  name: "Trader Joe",
   textureKey: FriendlyNPCsBlueprint.Trader,
   gender: CharacterGender.Male,
   isTrader: true,

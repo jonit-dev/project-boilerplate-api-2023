@@ -92,7 +92,7 @@ export class ItemView {
 
     for (const item of itemsNearby) {
       // if we already have this item in the character view, with an updated payload, just skip it!
-      const itemOnCharView = character.view.items[item.id];
+      const itemOnCharView = character?.view.items?.[item.id];
 
       // if we already have a representation there, just skip!
       if (itemOnCharView && this.objectHelper.doesObjectAttrMatches(itemOnCharView, item, ["id", "x", "y", "scene"])) {

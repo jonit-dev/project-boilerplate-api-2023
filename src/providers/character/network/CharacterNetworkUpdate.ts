@@ -19,6 +19,7 @@ import {
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
 
@@ -34,7 +35,8 @@ export class CharacterNetworkUpdate {
     private mapNonPVPZone: MapNonPVPZone,
     private characterMovementValidation: CharacterMovementValidation,
     private characterMovementWarn: CharacterMovementWarn,
-    private mathHelper: MathHelper
+    private mathHelper: MathHelper,
+    private characterView: CharacterView
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -50,13 +52,6 @@ export class CharacterNetworkUpdate {
 
           let isPositionUpdateValid = true;
 
-          const serverCharacterPosition = {
-            x: character.x,
-            y: character.y,
-          };
-
-          this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
-
           const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
             character.x,
             character.y,
@@ -68,6 +63,13 @@ export class CharacterNetworkUpdate {
           }
 
           if (isPositionUpdateValid) {
+            const serverCharacterPosition = {
+              x: character.x,
+              y: character.y,
+            };
+
+            this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
+
             await this.characterMovementWarn.warn(character, data);
 
             await this.npcManager.startNearbyNPCsBehaviorLoop(character);
@@ -79,6 +81,8 @@ export class CharacterNetworkUpdate {
             await this.handleMapTransition(character, newX, newY);
 
             this.handleNonPVPZone(character, newX, newY);
+
+            await this.characterView.clearOutOfViewElementsAll(character);
           }
 
           // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.
@@ -115,7 +119,7 @@ export class CharacterNetworkUpdate {
 
     const distanceInGridCells = Math.round(distance / GRID_WIDTH);
 
-    if (distanceInGridCells >= 1) {
+    if (distanceInGridCells >= 5) {
       this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
         serverCharacter.channelId!,
         CharacterSocketEvents.CharacterSyncPosition,

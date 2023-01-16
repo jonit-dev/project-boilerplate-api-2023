@@ -4,7 +4,7 @@ import { QuestsBlueprint } from "../../questsBlueprintTypes";
 
 export const questInteractionCraftSword = {
   title: "Get a brand new sword",
-  description: "Bring me these items and I will craft a brand new katana sword for you!",
+  description: "Bring me 5 iron ingot and 2 wooden sticks and I will craft a brand new katana sword for you!",
   key: QuestsBlueprint.InteractionCraftSword,
   rewards: [
     {
@@ -15,8 +15,8 @@ export const questInteractionCraftSword = {
   objectives: [
     {
       items: [
-        { itemKey: CraftingResourcesBlueprint.IronIngot, qty: 1 },
-        { itemKey: CraftingResourcesBlueprint.WoodenSticks, qty: 5 },
+        { itemKey: CraftingResourcesBlueprint.IronIngot, qty: 5 },
+        { itemKey: CraftingResourcesBlueprint.WoodenSticks, qty: 2 },
       ],
       type: QuestType.Interaction,
     },

@@ -12,6 +12,9 @@ export interface ICharacterDistance {
   x: number;
   y: number;
 }
+
+export type CharacterViewType = "npcs" | "items" | "characters";
+
 @provide(CharacterView)
 export class CharacterView {
   constructor(private socketTransmissionZone: SocketTransmissionZone, private mathHelper: MathHelper) {}
@@ -19,11 +22,17 @@ export class CharacterView {
   public async addToCharacterView(
     character: ICharacter,
     viewElement: IViewElement,
-    type: "npcs" | "items" | "characters"
+    type: CharacterViewType
   ): Promise<void> {
-    const updatedElementView = Object.assign(character.view[type], {
-      [viewElement.id]: viewElement,
-    });
+    if (!character.view) {
+      character.view = {
+        npcs: {},
+        items: {},
+        characters: {},
+      };
+    }
+
+    const updatedElementView = { ...character.view[type], [viewElement.id]: viewElement };
 
     character.view = {
       ...character.view,
@@ -32,10 +41,66 @@ export class CharacterView {
     await Character.updateOne({ _id: character._id }, { view: character.view });
   }
 
+  public isOnCharacterView(character: ICharacter, elementId: string, type: CharacterViewType): boolean {
+    return !!character?.view?.[type]?.[elementId];
+  }
+
+  public isOutOfCharacterView(character: ICharacter, x: number, y: number): boolean {
+    const viewWidth = SOCKET_TRANSMISSION_ZONE_WIDTH * 2;
+    const viewHeight = SOCKET_TRANSMISSION_ZONE_WIDTH * 2;
+
+    if (
+      x < character.x - viewWidth / 2 ||
+      x > character.x + viewWidth / 2 ||
+      y < character.y - viewHeight / 2 ||
+      y > character.y + viewHeight / 2
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public async clearOutOfViewElementsAll(character: ICharacter): Promise<void> {
+    const types: CharacterViewType[] = ["npcs", "items", "characters"];
+    for (const type of types) {
+      await this.clearOutOfViewElements(character, type);
+    }
+  }
+
+  public async clearOutOfViewElements(character: ICharacter, type: CharacterViewType): Promise<void> {
+    if (!character.view) {
+      return;
+    }
+
+    const elements = character.view[type];
+    const elementsToRemove: string[] = [];
+
+    for (const elementId in elements) {
+      const element = elements[elementId];
+      if (this.isOutOfCharacterView(character, element.x, element.y)) {
+        elementsToRemove.push(elementId);
+      }
+    }
+
+    for (const elementId of elementsToRemove) {
+      await this.removeFromCharacterView(character, elementId, type);
+    }
+  }
+
+  public async clearCharacterView(character: ICharacter): Promise<void> {
+    character.view = {
+      npcs: {},
+      items: {},
+      characters: {},
+    };
+    await Character.updateOne({ _id: character._id }, { view: character.view });
+  }
+
   public async removeFromCharacterView(
     character: ICharacter,
     elementId: string,
-    type: "npcs" | "items" | "characters"
+    type: CharacterViewType
   ): Promise<void> {
     const updatedCharView = character.view[type];
 

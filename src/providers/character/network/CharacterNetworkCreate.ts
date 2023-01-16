@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { ItemView } from "@providers/item/ItemView";
@@ -40,28 +40,32 @@ export class CharacterNetworkCreate {
     this.socketAuth.authCharacterOn(
       channel,
       CharacterSocketEvents.CharacterCreate,
-      async (data: ICharacterCreateFromClient, character: ICharacter) => {
-        // check if character is already logged in
+      async (data: ICharacterCreateFromClient, connectionCharacter: ICharacter) => {
+        await Character.findOneAndUpdate(
+          { _id: connectionCharacter._id },
+          {
+            isOnline: true,
+            channelId: data.channelId,
+            view: {
+              items: {},
+              npcs: {},
+              characters: {},
+            },
+          }
+        );
 
-        // if (character.isOnline) {
-        //   // then force logout the previous associated client
-        //   this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
-        //     reason: "You've been disconnected because you logged in from another location!",
-        //   });
-        //   // and then logout also the client that just connected
-        //   this.socketMessaging.sendEventToUser(String(channel.id), CharacterSocketEvents.CharacterForceDisconnect, {
-        //     reason: "You've been disconnected because you logged in from another location!",
-        //   });
-        //   return;
-        // }
+        const character = await Character.findById(connectionCharacter._id);
 
-        character.isOnline = true;
-        character.channelId = data.channelId;
-        character.view = {
-          items: {},
-          npcs: {},
-          characters: {},
-        };
+        if (!character) {
+          console.log(`🚫 ${connectionCharacter.name} tried to create its instance but it was not found!`);
+
+          this.socketMessaging.sendEventToUser(data.channelId, CharacterSocketEvents.CharacterForceDisconnect, {
+            reason: "Failed to find your character. Please contact the admin on discord.",
+          });
+
+          return;
+        }
+
         await this.battleNetworkStopTargeting.stopTargeting(character);
 
         const map = character.scene;
@@ -75,7 +79,8 @@ export class CharacterNetworkCreate {
           false
         );
 
-        await character.save();
+        // join channel specific to the user, to we can send direct later if we want.
+        await channel.join(data.channelId);
 
         if (character.isBanned) {
           console.log(`🚫 ${character.name} tried to create its instance while banned!`);
@@ -86,12 +91,6 @@ export class CharacterNetworkCreate {
 
           return;
         }
-
-        await this.npcWarn.warnCharacterAboutNPCsInView(character);
-
-        await this.npcManager.startNearbyNPCsBehaviorLoop(character);
-
-        await this.itemView.warnCharacterAboutItemsInView(character);
 
         /*
         Here we inject our server side character properties, 
@@ -115,8 +114,11 @@ export class CharacterNetworkCreate {
           textureKey: character.textureKey,
         };
 
-        // join channel specific to the user, to we can send direct later if we want.
-        await channel.join(data.channelId);
+        await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
+
+        await this.npcManager.startNearbyNPCsBehaviorLoop(character);
+
+        await this.itemView.warnCharacterAboutItemsInView(character);
 
         await this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
 

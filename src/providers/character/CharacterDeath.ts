@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
@@ -58,25 +58,24 @@ export class CharacterDeath {
       // Set timeout to not overwrite the msg "You are Died"
       setTimeout(() => {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "You received a death penalty!",
+          message: "You lost some XP and skill points.",
           type: "info",
         });
-      }, 1500);
+      }, 3000);
     }
 
-    // finally, force disconnect character that is dead.
-    const dataOfCharacterDeath: IBattleDeath = {
+    const characterDeathData: IBattleDeath = {
       id: character.id,
       type: "Character",
     };
-    this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, dataOfCharacterDeath);
+    this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, characterDeathData);
 
     // communicate all players around that character is dead
 
     await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
       character,
       BattleSocketEvents.BattleDeath,
-      dataOfCharacterDeath
+      characterDeathData
     );
 
     await this.respawnCharacter(character);
@@ -99,17 +98,22 @@ export class CharacterDeath {
     return await charBody.save();
   }
 
-  public async respawnCharacter(character: ICharacter): Promise<void> {
+  private async respawnCharacter(character: ICharacter): Promise<void> {
     await this.characterInventory.generateNewInventory(character, ContainersBlueprint.Bag, true);
 
-    character.health = character.maxHealth;
-    character.mana = character.maxMana;
-    character.x = character.initialX;
-    character.y = character.initialY;
-    character.scene = character.initialScene;
-    character.appliedEntityEffects = [];
-
-    await character.save();
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        $set: {
+          health: character.maxHealth,
+          mana: character.maxMana,
+          x: character.initialX,
+          y: character.initialY,
+          scene: character.initialScene,
+          appliedEntityEffects: [],
+        },
+      }
+    );
   }
 
   private async clearAttackerTarget(attacker: ICharacter | INPC): Promise<void> {

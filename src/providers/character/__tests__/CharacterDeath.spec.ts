@@ -58,11 +58,17 @@ describe("CharacterDeath.ts", () => {
   it("should respawn a character after its death", async () => {
     await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 
-    expect(testCharacter.health === testCharacter.maxHealth).toBeTruthy();
-    expect(testCharacter.mana === testCharacter.maxMana).toBeTruthy();
-    expect(testCharacter.x === testCharacter.initialX).toBeTruthy();
-    expect(testCharacter.y === testCharacter.initialY).toBeTruthy();
-    expect(testCharacter.scene === testCharacter.initialScene).toBeTruthy();
+    const postDeathCharacter = await Character.findById(testCharacter._id);
+
+    if (!postDeathCharacter) {
+      throw new Error("Character not found");
+    }
+
+    expect(postDeathCharacter.health === postDeathCharacter.maxHealth).toBeTruthy();
+    expect(postDeathCharacter.mana === postDeathCharacter.maxMana).toBeTruthy();
+    expect(postDeathCharacter.x === postDeathCharacter.initialX).toBeTruthy();
+    expect(postDeathCharacter.y === postDeathCharacter.initialY).toBeTruthy();
+    expect(postDeathCharacter.scene === postDeathCharacter.initialScene).toBeTruthy();
   });
 
   it("should properly warn characters around, about character's death", async () => {

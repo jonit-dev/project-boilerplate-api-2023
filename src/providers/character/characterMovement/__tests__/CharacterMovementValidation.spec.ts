@@ -48,6 +48,9 @@ describe("CharacterMovementValidation", () => {
         speed: 100,
         lastMovement: new Date(new Date().getTime() - 1000),
         movementIntervalMs: 1000,
+        isOnline: true,
+        isAlive: true,
+        isBanned: false,
       } as ICharacter;
       const isSolid = jest.fn().mockReturnValue(false);
       // @ts-ignore

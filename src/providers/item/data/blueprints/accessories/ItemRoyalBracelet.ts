@@ -14,6 +14,6 @@ export const itemRoyalBracelet: Partial<IItem> = {
   attack: 1,
   defense: 0,
   weight: 0.1,
-  allowedEquipSlotType: [ItemSlotType.Accessory],
+  allowedEquipSlotType: [ItemSlotType.Ring],
   basePrice: 42,
 };

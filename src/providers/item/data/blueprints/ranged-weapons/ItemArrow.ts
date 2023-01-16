@@ -14,5 +14,5 @@ export const itemArrow: Partial<IItem> = {
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,
-  basePrice: 2,
+  basePrice: 1,
 };

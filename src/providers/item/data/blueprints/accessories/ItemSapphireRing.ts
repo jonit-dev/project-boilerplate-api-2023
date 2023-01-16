@@ -14,6 +14,6 @@ export const itemSapphireRing: Partial<IItem> = {
   attack: 6,
   defense: 4,
   weight: 0.1,
-  allowedEquipSlotType: [ItemSlotType.Accessory],
+  allowedEquipSlotType: [ItemSlotType.Ring],
   basePrice: 55,
 };

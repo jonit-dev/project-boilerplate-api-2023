@@ -1,3 +1,4 @@
+import { profanity } from "@2toad/profanity";
 import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
@@ -21,7 +22,53 @@ import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/enti
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Equipment, IEquipment } from "./EquipmentModel";
 import { Skill } from "./SkillsModel";
-import { profanity } from "@2toad/profanity";
+
+profanity.addWords([
+  "Admin",
+  "ADMIN",
+  "Adm",
+  "ADM",
+  "Admn",
+  "ADMN",
+  "Game Master",
+  "GameMaster",
+  "GMaster",
+  "Gmaster",
+  "GameM",
+  "GM",
+  "Adm",
+  "ADM",
+  "A.D.M",
+  "a.d.m",
+  "Superuser",
+  "super-user",
+  "super_user",
+  "superUser",
+  "SuperUser",
+  "Root",
+  "ROOT",
+  "r00t",
+  "rOoT",
+  "Manager",
+  "MANAGER",
+  "Mngr",
+  "mngr",
+  "Managr",
+  "managr",
+  "Administrator",
+  "administrador",
+  "administrateur",
+  "amministratore",
+  "Adminstrator",
+  "adminstrator",
+  "GameMaster",
+  "GMaster",
+  "Gmaster",
+  "GameM",
+  "GM",
+  "Gamemaster",
+  "GameMaster",
+]);
 
 const characterSchema = createLeanSchema(
   {
@@ -73,19 +120,19 @@ const characterSchema = createLeanSchema(
     }),
 
     x: Type.number({
-      default: FromGridX(33),
+      default: FromGridX(40),
       required: true,
     }),
     y: Type.number({
-      default: FromGridY(38),
+      default: FromGridY(54),
       required: true,
     }),
     initialX: Type.number({
-      default: FromGridX(33),
+      default: FromGridX(40),
       required: true,
     }),
     initialY: Type.number({
-      default: FromGridY(38),
+      default: FromGridY(54),
       required: true,
     }),
     direction: Type.string({
@@ -111,11 +158,11 @@ const characterSchema = createLeanSchema(
     }),
     scene: Type.string({
       required: true,
-      default: "ilya-village-interiors",
+      default: "ilya",
     }),
     initialScene: Type.string({
       required: true,
-      default: "ilya-village-interiors",
+      default: "ilya",
     }),
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),

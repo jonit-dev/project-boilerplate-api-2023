@@ -11,18 +11,18 @@ import {
   ICharacterNPCTradeInitSellResponse,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
-  ItemSocketEvents,
   ITradeRequestItem,
   ITradeResponseItem,
+  ItemSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
-import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
-import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterTradingValidation } from "./CharacterTradingValidation";
 import { CharacterWeight } from "./CharacterWeight";
+import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
+import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 
 @provide(CharacterTradingNPCSell)
 export class CharacterTradingNPCSell {
@@ -210,6 +210,10 @@ export class CharacterTradingNPCSell {
       const item = itemsBlueprintIndex[itemKey];
 
       if (!item || !item.basePrice) continue;
+
+      const sellPrice = this.characterTradingBalance.getItemSellPrice(itemKey);
+
+      if (!sellPrice) continue;
 
       responseItems.push({
         key: item.key,
