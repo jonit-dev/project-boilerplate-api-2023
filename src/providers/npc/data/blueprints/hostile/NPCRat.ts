@@ -38,6 +38,11 @@ export const npcRat = {
       quantityRange: [1, 3],
     },
     {
+      itemBlueprintKey: FoodsBlueprint.CheeseSlice,
+      chance: 35,
+      quantityRange: [2, 3],
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.Worm,
       chance: 25,
       quantityRange: [5, 10],

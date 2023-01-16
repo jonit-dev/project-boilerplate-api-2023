@@ -3,7 +3,12 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { INPCPositionCreatePayload, NPCAlignment, NPCSocketEvents } from "@rpg-engine/shared";
+import {
+  INPCPositionCreatePayload,
+  INPCPositionUpdatePayload,
+  NPCAlignment,
+  NPCSocketEvents,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCView } from "./NPCView";
 
@@ -40,11 +45,11 @@ export class NPCWarn {
         }
       }
 
-      await this.warnCharacterAboutSingleNPC(npc, character);
+      await this.warnCharacterAboutSingleNPCCreation(npc, character);
     }
   }
 
-  public async warnCharacterAboutSingleNPC(npc: INPC, character: ICharacter): Promise<void> {
+  public async warnCharacterAboutSingleNPCCreation(npc: INPC, character: ICharacter): Promise<void> {
     await this.characterView.addToCharacterView(
       character,
       {
@@ -81,6 +86,20 @@ export class NPCWarn {
         hasDepot: npc.hasDepot!,
         isTrader: npc.isTrader,
         traderItems: npc.traderItems,
+      }
+    );
+  }
+
+  public warnCharacterAboutSingleNPCUpdate(npc: INPC, character: ICharacter): void {
+    this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
+      character.channelId!,
+      NPCSocketEvents.NPCPositionUpdate,
+      {
+        id: npc.id,
+        x: npc.x,
+        y: npc.y,
+        direction: npc.direction,
+        alignment: npc.alignment as NPCAlignment,
       }
     );
   }

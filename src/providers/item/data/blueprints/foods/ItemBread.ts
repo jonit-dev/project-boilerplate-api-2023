@@ -14,8 +14,8 @@ export const itemBread: Partial<IItem> = {
   name: "Bread",
   description: "A loaf of bread.",
   weight: 0.1,
-  maxStackSize: 10,
-  basePrice: 100,
+  maxStackSize: 50,
+  basePrice: 10,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 10);
   },

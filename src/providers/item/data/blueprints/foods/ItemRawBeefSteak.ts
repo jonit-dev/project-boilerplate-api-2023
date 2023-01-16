@@ -16,7 +16,7 @@ export const itemRawBeefSteak: Partial<IItem> = {
   name: "Raw Beef Steak",
   description: "A raw beef steak that can be used for cooking, but shouldn't be consumed raw.",
   weight: 3,
-  maxStackSize: 10,
+  maxStackSize: 50,
   basePrice: 20,
   hasUseWith: true,
   usableEffect: (character: ICharacter) => {

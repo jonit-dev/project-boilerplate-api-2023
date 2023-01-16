@@ -11,5 +11,5 @@ export const itemGoldCoin: Partial<IItem> = {
   name: "Gold Coin",
   description: "A pile of gold coins.",
   weight: 0.01,
-  maxStackSize: 100,
+  maxStackSize: 1000,
 };

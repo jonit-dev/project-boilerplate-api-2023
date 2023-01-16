@@ -300,7 +300,7 @@ export class BattleAttackTarget {
         const isNPCInView = this.characterView.isOnCharacterView(character, target._id, "npcs");
 
         if (!isNPCInView) {
-          await this.npcWarn.warnCharacterAboutSingleNPC(target as INPC, character);
+          await this.npcWarn.warnCharacterAboutSingleNPCCreation(target as INPC, character);
         }
         break;
       case "Character":
