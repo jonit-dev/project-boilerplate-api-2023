@@ -1,14 +1,14 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { IEntityEffect } from "./data/blueprints/entityEffect";
-import { container } from "@providers/inversify/container";
-import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterDeath } from "@providers/character/CharacterDeath";
+import { TimerWrapper } from "@providers/helpers/TimerWrapper";
+import { container } from "@providers/inversify/container";
+import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { EffectsSocketEvents, EntityType, IEntityEffectEvent } from "@rpg-engine/shared/dist/types/entity.types";
-import { CharacterDeath } from "@providers/character/CharacterDeath";
-import { NPCDeath } from "@providers/npc/NPCDeath";
+import { IEntityEffect } from "./data/blueprints/entityEffect";
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export class EntityEffectCycle {
@@ -77,16 +77,17 @@ export class EntityEffectCycle {
     entityEffect: IEntityEffect,
     effectDamage: number
   ): Promise<boolean> {
+    if (!target.isAlive) {
+      await this.handleDeath(target);
+      return false;
+    }
+
     await target.save();
 
     this.sendAnimationEvent(target, entityEffect.targetAnimationKey);
     this.sendAttributeChangedEvent(target);
     this.sendEffectsEvent(target, effectDamage);
 
-    if (!target.isAlive) {
-      await this.handleDeath(target);
-      return false;
-    }
     return true;
   }
 

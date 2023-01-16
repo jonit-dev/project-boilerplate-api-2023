@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
   ContainersBlueprint,
@@ -14,6 +15,8 @@ import {
   PotionsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
+  StaffsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
@@ -29,27 +32,35 @@ export const npcGiantSpider: Partial<INPC> = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.ExtraFast,
-  baseHealth: 600,
+  baseHealth: 800,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 45,
+    level: 60,
     strength: {
-      level: 35,
+      level: 45,
     },
     dexterity: {
-      level: 30,
+      level: 40,
     },
     resistance: {
-      level: 20,
+      level: 30,
     },
   },
   fleeOnLowHealth: true,
   loots: [
     {
+      itemBlueprintKey: StaffsBlueprint.MoonsStaff,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.DragonsSword,
+      chance: 25,
+    },
+    {
       itemBlueprintKey: ContainersBlueprint.Backpack,
-      chance: 10,
+      chance: 50,
     },
 
     {
@@ -96,6 +107,22 @@ export const npcGiantSpider: Partial<INPC> = {
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 50,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.WarHammer,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.Axe,
+      chance: 30,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],

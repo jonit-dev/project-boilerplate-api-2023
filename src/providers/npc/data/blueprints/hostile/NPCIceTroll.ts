@@ -3,9 +3,12 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
   FoodsBlueprint,
+  HammersBlueprint,
+  HelmetsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -24,21 +27,21 @@ export const npcIceTroll: Partial<INPC> = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
-  baseHealth: 180,
+  baseHealth: 350,
   healthRandomizerDice: Dice.D20,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToRandomTarget: true,
   skills: {
-    level: 15,
+    level: 25,
     strength: {
-      level: 14,
+      level: 24,
     },
     dexterity: {
-      level: 3,
+      level: 13,
     },
     resistance: {
-      level: 10,
+      level: 30,
     },
   },
   fleeOnLowHealth: true,
@@ -83,6 +86,22 @@ export const npcIceTroll: Partial<INPC> = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.Saber,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
+      chance: 50,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.WarHammer,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
       chance: 10,
     },
   ],
