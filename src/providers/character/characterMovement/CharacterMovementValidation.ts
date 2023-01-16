@@ -72,19 +72,21 @@ export class CharacterMovementValidation {
     return false;
   }
 
-  private async isCharacterMovingTooFast(character: ICharacter): Promise<boolean> {
+  private isCharacterMovingTooFast(character: ICharacter): boolean {
     if (character.lastMovement) {
       const now = dayjs(new Date());
       const lastMovement = dayjs(character.lastMovement);
       const movementDiff = now.diff(lastMovement, "millisecond");
 
       if (movementDiff < character.movementIntervalMs / 2) {
-        console.log(`🚫 ${character.name} tried to move too fast!`);
-        await this.characterBan.addPenalty(character);
+        console.log(`⚠️ ${character.name} is moving too fast!`);
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "Sorry, you're moving too fast.",
+          type: "error",
+        });
         return true;
       }
     }
-
     return false;
   }
 }
