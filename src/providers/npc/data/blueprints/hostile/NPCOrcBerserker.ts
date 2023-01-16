@@ -25,21 +25,21 @@ export const npcOrcBerserker = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.ExtraFast,
-  baseHealth: 98,
+  baseHealth: 200,
   healthRandomizerDice: Dice.D6,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 14,
+    level: 25,
     strength: {
-      level: 14,
+      level: 22,
     },
     dexterity: {
-      level: 5,
+      level: 10,
     },
     resistance: {
-      level: 10,
+      level: 25,
     },
   },
   fleeOnLowHealth: true,
