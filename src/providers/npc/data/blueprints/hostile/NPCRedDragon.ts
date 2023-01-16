@@ -23,21 +23,21 @@ export const npcRedDragon = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
-  baseHealth: 600,
+  baseHealth: 6000,
   healthRandomizerDice: Dice.D20,
   skillRandomizerDice: Dice.D20,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 70,
+    level: 200,
     strength: {
-      level: 70,
+      level: 270,
     },
     dexterity: {
-      level: 70,
+      level: 270,
     },
     resistance: {
-      level: 70,
+      level: 300,
     },
   },
   fleeOnLowHealth: true,

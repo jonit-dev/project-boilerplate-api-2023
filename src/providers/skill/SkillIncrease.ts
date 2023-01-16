@@ -113,8 +113,12 @@ export class SkillIncrease {
         await this.skillFunctions.sendSkillLevelUpEvents(result, character);
       }
 
-      await this.characterBonusPenalties.applyRaceBonusPenalties(character, rightHandItem!.subType);
-      await this.characterBonusPenalties.applyRaceBonusPenalties(character, leftHandItem!.subType);
+      if (rightHandItem) {
+        await this.characterBonusPenalties.applyRaceBonusPenalties(character, rightHandItem!.subType);
+      }
+      if (leftHandItem) {
+        await this.characterBonusPenalties.applyRaceBonusPenalties(character, leftHandItem!.subType);
+      }
     }
   }
 

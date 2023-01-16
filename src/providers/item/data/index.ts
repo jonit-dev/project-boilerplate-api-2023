@@ -10,6 +10,7 @@ import { daggersBlueprintIndex } from "./blueprints/daggers/index";
 import { effectsBlueprintsIndex } from "./blueprints/effects/index";
 import { foodsBlueprintIndex } from "./blueprints/foods/index";
 import { glovesBlueprintIndex } from "./blueprints/gloves/index";
+import { hammersBlueprintIndex } from "./blueprints/hammers";
 import { helmetsBlueprintsIndex } from "./blueprints/helmets/index";
 import { legsBlueprintIndex } from "./blueprints/legs/index";
 import { macesBlueprintIndex } from "./blueprints/maces/index";
@@ -47,4 +48,5 @@ export const itemsBlueprintIndex: IBlueprint = {
   ...accessoriesBlueprintsIndex,
   ...craftingResourcesBlueprintIndex,
   ...toolsBlueprintIndex,
+  ...hammersBlueprintIndex,
 };

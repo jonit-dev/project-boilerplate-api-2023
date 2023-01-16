@@ -5,8 +5,8 @@ import { HammersBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemRoyalHammer: Partial<IItem> = {
   key: HammersBlueprint.RoyalHammer,
-  type: ItemType.Tool,
-  subType: ItemSubType.Other,
+  type: ItemType.Weapon,
+  subType: ItemSubType.Mace,
   textureAtlas: "items",
   texturePath: "hammers/royal-hammer.png",
   name: "Royal Hammer",
