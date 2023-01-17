@@ -34,6 +34,7 @@ interface IRangedAttackParams {
   key: string;
   maxRange: number;
   equipment?: IEquipment;
+  itemSubType?: ItemSubType;
 }
 
 @provide(BattleRangedAttack)
@@ -76,6 +77,7 @@ export class BattleRangedAttack {
       }
 
       rangedAttackParams = await this.getAmmoForRangedAttack(character, equipment);
+
       if (!rangedAttackParams) {
         this.sendNoAmmoEvent(character, target);
         return;
@@ -179,7 +181,7 @@ export class BattleRangedAttack {
     character: ICharacter,
     equipment: IEquipment
   ): Promise<IRangedAttackParams | undefined> {
-    const weapon = (await character.weapon) as unknown as IItem;
+    const weapon = (await character.weapon) as IItem;
 
     let result: IRangedAttackParams | undefined;
     // Get ranged attack weapons (bow or spear)
@@ -193,6 +195,7 @@ export class BattleRangedAttack {
         return {
           location: ItemSlotType.LeftHand,
           id: weapon.id,
+          itemSubType: weapon.subType,
           key: blueprint?.projectileAnimationKey,
           maxRange: weapon.maxRange || 0,
           equipment,
@@ -204,11 +207,11 @@ export class BattleRangedAttack {
       }
 
       result = (await this.getRequiredAmmo(weapon.requiredAmmoKeys, equipment)) as IRangedAttackParams;
-
       if (!_.isEmpty(result)) {
         result.maxRange = weapon.maxRange || 0;
       }
     }
+
     if (weapon.subType === "Spear") {
       result = {
         location: ItemSlotType.LeftHand,

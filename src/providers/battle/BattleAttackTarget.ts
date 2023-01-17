@@ -74,9 +74,13 @@ export class BattleAttackTarget {
           await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
 
           if (attacker.type === "Character") {
-            await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
+            if (rangedAttackParams.itemSubType === ItemSubType.Magic) {
+              return true;
+            } else {
+              await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
 
-            return true;
+              return true;
+            }
           }
         }
         break;
