@@ -66,8 +66,8 @@ describe("ItemOwnership.ts", () => {
     const updatedShortSword = await Item.findById(shortSword._id);
     const updatedLongSword = await Item.findById(longSword._id);
 
-    expect(updatedShortSword?.owner).toBeUndefined();
-    expect(updatedLongSword?.owner).toBeUndefined();
+    expect(updatedShortSword?.owner).toBeNull();
+    expect(updatedLongSword?.owner).toBeNull();
   });
 
   it("should properly remove item ownership", async () => {
