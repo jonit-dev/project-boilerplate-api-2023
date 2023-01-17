@@ -5,16 +5,16 @@ import { provide } from "inversify-binding-decorators";
 import { CharacterCrons } from "./CharacterCrons";
 import { ChatLogCrons } from "./ChatLogCrons";
 import { ControlTimeCrons } from "./ControlTimeCrons";
-import { ItemCrons } from "./ItemCrons";
-import { NPCCrons } from "./NPCCrons";
-import { ItemDeleteCrons } from "./ItemDeleteCrons";
+import { DecayItemsCron } from "./DecayItemsCron";
 import { DeleteChatCrons } from "./DeleteChatCrons";
+import { ItemDeleteCrons } from "./ItemDeleteCrons";
+import { NPCCrons } from "./NPCCrons";
 
 @provide(Cronjob)
 export class Cronjob {
   constructor(
     private characterCron: CharacterCrons,
-    private itemCrons: ItemCrons,
+    private itemCrons: DecayItemsCron,
     private chatLogCron: ChatLogCrons,
     private npcCron: NPCCrons,
     private controlTimeCron: ControlTimeCrons,
