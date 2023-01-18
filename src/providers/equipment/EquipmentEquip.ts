@@ -128,7 +128,6 @@ export class EquipmentEquip {
 
       const allItemsInInventory = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
 
-      // chekc inside map
       const isItemInInventory = allItemsInInventory.some(
         (inventoryItem) => inventoryItem._id.toString() === item._id.toString()
       );
