@@ -2,16 +2,10 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  IEquipmentAndInventoryUpdatePayload,
-  IEquipmentSet,
-  ItemSlotType,
-  ItemSocketEvents,
-  ItemType,
-} from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, ItemSlotType, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentSlots } from "./EquipmentSlots";
 import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
@@ -132,7 +126,11 @@ export class EquipmentEquip {
     if (containerType === "inventory") {
       // if item is coming from a character's inventory, check if the character owns the item
 
-      const isItemInInventory = await this.characterItemInventory.checkItemInInventory(item._id, character);
+      const allItemsInInventory = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
+
+      const isItemInInventory = allItemsInInventory.some(
+        (inventoryItem) => inventoryItem._id.toString() === item._id.toString()
+      );
 
       if (!isItemInInventory) {
         this.socketMessaging.sendErrorMessageToCharacter(
@@ -145,31 +143,10 @@ export class EquipmentEquip {
 
     const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
-    const hasTwoHandedItemEquipped = await this.equipmentTwoHanded.hasTwoHandedItemEquipped(
-      equipmentSlots as unknown as IEquipmentSet
-    );
+    const validateItemsEquip = await this.equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, item, character);
 
-    if (hasTwoHandedItemEquipped && this.equipmentTwoHanded.isItemEquippableOnHands(item)) {
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        "Sorry, you already have a two-handed item equipped."
-      );
-
+    if (!validateItemsEquip) {
       return false;
-    }
-
-    if (item.isTwoHanded) {
-      const canEquipTwoHanded = await this.equipmentTwoHanded.checkTwoHandedEquip(
-        equipmentSlots as unknown as IEquipmentSet
-      );
-      if (!canEquipTwoHanded) {
-        this.socketMessaging.sendErrorMessageToCharacter(
-          character,
-          "Sorry, you already have an item equipped on your hands."
-        );
-
-        return false;
-      }
     }
 
     return true;

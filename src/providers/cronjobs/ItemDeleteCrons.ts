@@ -15,6 +15,7 @@ export class ItemDeleteCrons {
         "Server: Cleaning up items on the floor in 5 min. Please don't drop valuables."
       );
 
+      //! Warning: This is a very dangerous operation. It will delete all items that have a scene, x, and y value. DO NOT use $exists: true here, because it will delete items with a null value for x, y, and scene.
       setTimeout(async () => {
         const items = await Item.find({
           // @ts-ignore
