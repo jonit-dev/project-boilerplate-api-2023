@@ -2,5 +2,5 @@
 
 [![CI](https://github.com/RPGOnlineNFT/rpg-api/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/RPGOnlineNFT/rpg-api/actions/workflows/main.yml)
 
-[To get started, please check our documentation.
+[To get started, please check our docs.
 ](https://developerremotejobs-docs.atlassian.net/)

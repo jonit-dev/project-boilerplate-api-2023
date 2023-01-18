@@ -147,8 +147,10 @@ export class CharacterNetworkUpdate {
   }
 
   private async handleMapTransition(character: ICharacter, newX: number, newY: number): Promise<void> {
+    const frozenCharacter = Object.freeze(character);
+
     // verify if we're in a map transition. If so, we need to trigger a scene transition
-    const transition = this.mapTransition.getTransitionAtXY(character.scene, newX, newY);
+    const transition = this.mapTransition.getTransitionAtXY(frozenCharacter.scene, newX, newY);
     if (transition) {
       const map = this.mapTransition.getTransitionProperty(transition, "map");
       const gridX = Number(this.mapTransition.getTransitionProperty(transition, "gridX"));
@@ -169,10 +171,10 @@ export class CharacterNetworkUpdate {
    Check if we are transitioning to the same map, 
    if so we should only teleport the character
    */
-      if (destination.map === character.scene) {
-        await this.mapTransition.teleportCharacter(character, destination);
+      if (destination.map === frozenCharacter.scene) {
+        await this.mapTransition.teleportCharacter(frozenCharacter, destination);
       } else {
-        await this.mapTransition.changeCharacterScene(character, destination);
+        await this.mapTransition.changeCharacterScene(frozenCharacter, destination);
       }
     }
   }

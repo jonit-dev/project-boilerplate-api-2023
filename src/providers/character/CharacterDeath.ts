@@ -3,6 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -17,7 +18,6 @@ import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterWeight } from "./CharacterWeight";
 
-export const DROP_EQUIPMENT_CHANCE = 30; // there's a 30% chance of dropping any of the equipped items
 export const DROPPABLE_EQUIPMENT = [
   "head",
   "neck",

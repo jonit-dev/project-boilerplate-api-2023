@@ -48,6 +48,17 @@ export const npcOrc = {
   fleeOnLowHealth: true,
   loots: [
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.Wheat,
+      quantityRange: [5, 7],
+      chance: 25,
+    },
+
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WaterBottle,
+      quantityRange: [1, 2],
+      chance: 25,
+    },
+    {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
       chance: 30,
     },

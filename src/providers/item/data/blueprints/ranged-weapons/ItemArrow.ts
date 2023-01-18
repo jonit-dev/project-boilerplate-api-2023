@@ -11,7 +11,7 @@ export const itemArrow: Partial<IItem> = {
   name: "Arrow",
   description: "An iron head arrow.",
   attack: 4,
-  weight: 0.1,
+  weight: 0.025,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,
   basePrice: 1,

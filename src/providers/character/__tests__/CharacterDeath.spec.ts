@@ -3,11 +3,12 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import _ from "lodash";
-import { CharacterDeath, DROP_EQUIPMENT_CHANCE } from "../CharacterDeath";
+import { CharacterDeath } from "../CharacterDeath";
 
 describe("CharacterDeath.ts", () => {
   let characterDeath: CharacterDeath;

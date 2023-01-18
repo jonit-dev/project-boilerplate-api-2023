@@ -13,7 +13,7 @@ export const itemPineapple: Partial<IItem> = {
   name: "Pineapple",
   description: "A pineapple that can be found in tropical areas.",
   weight: 1,
-  maxStackSize: 25,
+  maxStackSize: 50,
   basePrice: 15,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 1.25);

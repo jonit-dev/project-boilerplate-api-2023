@@ -92,7 +92,7 @@ export class NPCMovement {
         const isOnCharView = this.characterView.isOnCharacterView(character, npc._id, "npcs");
 
         if (!isOnCharView) {
-          await this.npcWarn.warnCharacterAboutSingleNPC(npc, character);
+          await this.npcWarn.warnCharacterAboutSingleNPCCreation(npc, character);
         } else {
           this.socketMessaging.sendEventToUser<INPCPositionUpdatePayload>(
             character.channelId!,

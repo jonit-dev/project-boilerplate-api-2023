@@ -16,7 +16,7 @@ export const itemRottenMeat: Partial<IItem> = {
   name: "Rotten Meat",
   description: "A piece of rotten meat. Don't eat it!",
   weight: 0.25,
-  maxStackSize: 10,
+  maxStackSize: 50,
   basePrice: 1,
   usableEffect: (character: ICharacter) => {
     const socketMessaging = container.get<SocketMessaging>(SocketMessaging);

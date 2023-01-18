@@ -1,10 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
-import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { MapHelper } from "@providers/map/MapHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -103,9 +103,13 @@ export class ItemPickupValidator {
 
     if (!isItemOnMap) {
       // if item is not on the map
+      console.log(character._id);
 
-      if (item.owner && item.owner !== character._id.toString()) {
+      if (item.owner && item.owner?.toString() !== character._id.toString()) {
         // check if item is owned by someone else
+
+        console.log(item);
+
         this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not yours.");
         return false;
       }

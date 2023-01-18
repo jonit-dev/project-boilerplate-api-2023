@@ -74,9 +74,13 @@ export class BattleAttackTarget {
           await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
 
           if (attacker.type === "Character") {
-            await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
+            if (rangedAttackParams.itemSubType === ItemSubType.Magic) {
+              return true;
+            } else {
+              await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
 
-            return true;
+              return true;
+            }
           }
         }
         break;
@@ -300,7 +304,7 @@ export class BattleAttackTarget {
         const isNPCInView = this.characterView.isOnCharacterView(character, target._id, "npcs");
 
         if (!isNPCInView) {
-          await this.npcWarn.warnCharacterAboutSingleNPC(target as INPC, character);
+          await this.npcWarn.warnCharacterAboutSingleNPCCreation(target as INPC, character);
         }
         break;
       case "Character":

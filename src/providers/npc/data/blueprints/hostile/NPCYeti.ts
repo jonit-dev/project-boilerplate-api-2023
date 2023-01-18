@@ -3,11 +3,19 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  ArmorsBlueprint,
+  AxesBlueprint,
   BootsBlueprint,
   FoodsBlueprint,
+  GlovesBlueprint,
+  HammersBlueprint,
+  HelmetsBlueprint,
+  LegsBlueprint,
   PotionsBlueprint,
+  RangedWeaponsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -20,22 +28,24 @@ export const npcYeti: Partial<INPC> = {
   key: HostileNPCsBlueprint.Yeti,
   textureKey: HostileNPCsBlueprint.Yeti,
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Slow,
-  baseHealth: 400,
+  speed: MovementSpeed.Fast,
+  baseHealth: 600,
+  attackType: EntityAttackType.MeleeRanged,
+  ammoKey: RangedWeaponsBlueprint.Stone,
+  maxRangeAttack: 8,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 25,
+    level: 35,
     strength: {
-      level: 15,
+      level: 40,
     },
     dexterity: {
-      level: 14,
+      level: 40,
     },
     resistance: {
-      level: 30,
+      level: 50,
     },
   },
   fleeOnLowHealth: true,
@@ -59,7 +69,51 @@ export const npcYeti: Partial<INPC> = {
     },
     {
       itemBlueprintKey: StaffsBlueprint.MoonsStaff,
-      chance: 15,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.DragonsSword,
+      chance: 25,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.CopperBoots,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.WarHammer,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: GlovesBlueprint.PlateGloves,
+      chance: 85,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.StuddedLegs,
+      chance: 60,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.WarHammer,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.Axe,
+      chance: 30,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

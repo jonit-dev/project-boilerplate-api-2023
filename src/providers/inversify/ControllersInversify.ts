@@ -1,7 +1,9 @@
 import { ITSDecorator, TsDefaultDecorator } from "@providers/constants/ValidationConstants";
 import { CharacterController } from "@useCases/ModuleCharacter/character/CharacterController";
+import { FactionController } from "@useCases/ModuleCharacter/faction/FactionController";
 import { NPCController } from "@useCases/ModuleNPC/NPCController";
 import { ABTestController } from "@useCases/ModuleSystem/abTests/ABTestController";
+import { CacheController } from "@useCases/ModuleSystem/cache/CacheController";
 import { ReadChatLogController } from "@useCases/ModuleSystem/chat/readChatLog/ReadChatLogController";
 import { IndustriesController } from "@useCases/ModuleSystem/industries/IndustriesController";
 import { MapController } from "@useCases/ModuleSystem/map/MapController";
@@ -20,7 +22,6 @@ import { RefreshController } from "@useCases/ModuleSystem/user/refreshToken/Refr
 import { SignUpController } from "@useCases/ModuleSystem/user/signup/SignUpController";
 import { UnsubscribeUsercontroller } from "@useCases/ModuleSystem/user/unsubscribe/UnsubscribeUsercontroller";
 import { UpdateUserController } from "@useCases/ModuleSystem/user/update/UpdateUserController";
-import { FactionController } from "@useCases/ModuleCharacter/faction/FactionController";
 import { ContainerModule, interfaces } from "inversify";
 
 export const userControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
@@ -58,4 +59,5 @@ export const useCasesControllers = new ContainerModule((bind: interfaces.Bind, u
   bind<ReadChatLogController>(ReadChatLogController).toSelf();
   bind<MapController>(MapController).toSelf();
   bind<FactionController>(FactionController).toSelf();
+  bind<CacheController>(CacheController).toSelf();
 });

@@ -13,12 +13,12 @@ export const itemAsterionsBow: Partial<IItem> = {
   name: "Asterion's Bow",
   description:
     "A weapon used for shooting arrows and usually made of a strip of wood bent by a cord connecting the two end.",
-  attack: 7,
-  defense: 3,
+  attack: 9,
+  defense: 5,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,
   requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow],
   isTwoHanded: true,
-  basePrice: 120,
+  basePrice: 150,
 };

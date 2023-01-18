@@ -2,73 +2,56 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  ArmorsBlueprint,
   BootsBlueprint,
-  FoodsBlueprint,
-  GlovesBlueprint,
   LegsBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
-  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateMoveTowardsMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
-export const npcAsterion = {
+export const npcGorgok = {
   ...generateMoveTowardsMovement(),
-  name: "Asterion",
-  key: HostileNPCsBlueprint.Asterion,
-  textureKey: HostileNPCsBlueprint.Minotaur,
+  name: "Gorgok, the Chief",
+  key: HostileNPCsBlueprint.Gorgok,
+  textureKey: HostileNPCsBlueprint.Goblin,
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.Melee,
+  attackType: EntityAttackType.MeleeRanged,
+  ammoKey: RangedWeaponsBlueprint.IronArrow,
+  maxRangeAttack: 8,
   speed: MovementSpeed.Fast,
+  baseHealth: 1000,
+  healthRandomizerDice: Dice.D12,
+  canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 600,
-  healthRandomizerDice: Dice.D20,
   skills: {
-    level: 50,
+    level: 80,
     strength: {
-      level: 55,
+      level: 40,
     },
     dexterity: {
-      level: 30,
+      level: 50,
     },
     resistance: {
-      level: 40,
+      level: 30,
     },
   },
   fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 100,
+      chance: 40,
     },
     {
-      itemBlueprintKey: BootsBlueprint.CopperBoots,
+      itemBlueprintKey: ArmorsBlueprint.GoldenArmor,
       chance: 20,
     },
     {
-      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
+      itemBlueprintKey: BootsBlueprint.GoldenBoots,
       chance: 30,
-    },
-    {
-      itemBlueprintKey: GlovesBlueprint.PlateGloves,
-      chance: 85,
-    },
-    {
-      itemBlueprintKey: FoodsBlueprint.Fish,
-      chance: 30,
-    },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
-    {
-      itemBlueprintKey: RangedWeaponsBlueprint.AsterionsBow,
-      chance: 25,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.IronArrow,
