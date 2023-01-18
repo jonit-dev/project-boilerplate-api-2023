@@ -3,8 +3,9 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { UISocketEvents } from "@rpg-engine/shared";
+import { ItemSlotType } from "@rpg-engine/shared";
 import { EquipmentEquip } from "../EquipmentEquip";
+import { EquipmentTwoHanded } from "../EquipmentTwoHanded";
 
 describe("EquipmentTwoHanded.spec.ts", () => {
   let equipmentEquip: EquipmentEquip;
@@ -12,6 +13,7 @@ describe("EquipmentTwoHanded.spec.ts", () => {
   let item: IItem;
   let itemTwoHanded: IItem;
   let testCharacter: ICharacter;
+  let equipmentTwoHanded: EquipmentTwoHanded;
 
   const tryToEquipItemWithAnotherAlreadyEquipped = async (
     inventoryContainer: IItemContainer,
@@ -34,6 +36,7 @@ describe("EquipmentTwoHanded.spec.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
+    equipmentTwoHanded = container.get<EquipmentTwoHanded>(EquipmentTwoHanded);
   });
 
   beforeEach(async () => {
@@ -67,48 +70,76 @@ describe("EquipmentTwoHanded.spec.ts", () => {
     }
   });
 
-  it("Should not equip a one handed weapon, if a two handed weapon is already equipped", async () => {
-    const inventory = await testCharacter.inventory;
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
-    const equipment = await Equipment.findById(testCharacter.equipment);
+  describe("validateHandsItemEquip", () => {
+    let equipmentSlots: any;
+    let itemToBeEquipped: IItem;
+    let character: ICharacter;
 
-    // @ts-ignore
-    const equipError = jest.spyOn(equipmentEquip.socketMessaging, "sendEventToUser" as any);
+    beforeEach(() => {
+      equipmentSlots = {
+        leftHand: null,
+        rightHand: null,
+      };
+      itemToBeEquipped = {
+        isTwoHanded: false,
+      } as IItem;
+      character = {
+        channelId: "1",
+      } as ICharacter;
+    });
 
-    if (inventoryContainer && equipment) {
-      await tryToEquipItemWithAnotherAlreadyEquipped(inventoryContainer, "leftHand", equipment, itemTwoHanded, item);
+    it("should return true if the item is not equippable on hands", async () => {
+      itemToBeEquipped.allowedEquipSlotType = [ItemSlotType.Head];
+      const result = await equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, itemToBeEquipped, character);
+      expect(result).toBe(true);
+    });
 
-      expect(equipError).toHaveBeenCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
-        message: "Sorry, you already have a two-handed item equipped.",
-        type: "error",
-      });
-    }
+    it("should return true if the item is a one-handed item and no one-handed item is equipped", async () => {
+      itemToBeEquipped.isTwoHanded = false;
+      const result = await equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, itemToBeEquipped, character);
+      expect(result).toBe(true);
+    });
+
+    it("should return true if the item is a one-handed item and a one-handed item is already equipped", async () => {
+      itemToBeEquipped.isTwoHanded = false;
+      equipmentSlots.leftHand = "itemId";
+      const result = await equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, itemToBeEquipped, character);
+      expect(result).toBe(true);
+    });
+
+    it("should return false if the item is a two-handed item and a one-handed item is already equipped", async () => {
+      itemToBeEquipped.isTwoHanded = true;
+      itemToBeEquipped.allowedEquipSlotType = [ItemSlotType.LeftHand, ItemSlotType.RightHand];
+      equipmentSlots.leftHand = "itemId";
+
+      const equipmentTwoHandedMock = {
+        hasOneHandedItemEquippedOnArms: jest.fn().mockReturnValue(true),
+      };
+
+      equipmentTwoHanded.hasOneHandedItemEquippedOnArms = equipmentTwoHandedMock.hasOneHandedItemEquippedOnArms;
+
+      const result = await equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, itemToBeEquipped, character);
+      expect(result).toBe(false);
+    });
+
+    it("should return false if the item is a two-handed item and a two-handed item is already equipped", async () => {
+      itemToBeEquipped.isTwoHanded = true;
+      itemToBeEquipped.allowedEquipSlotType = [ItemSlotType.LeftHand, ItemSlotType.RightHand];
+      equipmentSlots.leftHand = "itemId";
+      equipmentSlots.rightHand = "itemId";
+
+      const equipmentTwoHandedMock = {
+        hasTwoHandedItemEquippedOnArms: jest.fn().mockReturnValue(true),
+        hasOneHandedItemEquippedOnArms: jest.fn().mockReturnValue(false),
+      };
+
+      equipmentTwoHanded.hasTwoHandedItemEquippedOnArms = equipmentTwoHandedMock.hasTwoHandedItemEquippedOnArms;
+      equipmentTwoHanded.hasOneHandedItemEquippedOnArms = equipmentTwoHandedMock.hasOneHandedItemEquippedOnArms;
+
+      const result = await equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, itemToBeEquipped, character);
+      expect(result).toBe(false);
+    });
   });
-
-  it("Should not equip two handed weapon because there is already a weapon equipped", async () => {
-    const inventory = await testCharacter.inventory;
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
-    const equipment = await Equipment.findById(testCharacter.equipment);
-
-    // @ts-ignore
-    const equipError = jest.spyOn(equipmentEquip.socketMessaging, "sendEventToUser" as any);
-
-    if (inventoryContainer && equipment) {
-      await tryToEquipItemWithAnotherAlreadyEquipped(inventoryContainer, "leftHand", equipment, item, itemTwoHanded);
-
-      const containerPostUpdate = await ItemContainer.findById(inventory.itemContainer);
-      const equipmentPostUpdate = (await Equipment.findById(testCharacter.equipment)) as IEquipment;
-
-      expect(containerPostUpdate?.slots[0]).toBeDefined();
-      expect(equipmentPostUpdate.leftHand?.toString()).toBe(item._id.toString());
-
-      expect(equipError).toHaveBeenCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
-        message: "Sorry, you already have an item equipped on your hands.",
-        type: "error",
-      });
-    }
-  });
-
   afterAll(async () => {
     await unitTestHelper.afterAllJestHook();
   });

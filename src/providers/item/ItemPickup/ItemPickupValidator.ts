@@ -108,8 +108,6 @@ export class ItemPickupValidator {
       if (item.owner && item.owner?.toString() !== character._id.toString()) {
         // check if item is owned by someone else
 
-        console.log(item);
-
         this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not yours.");
         return false;
       }

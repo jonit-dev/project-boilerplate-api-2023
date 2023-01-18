@@ -1,13 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemContainer } from "./CharacterItemContainer";
 import { CharacterItemSlots } from "./CharacterItemSlots";
@@ -20,6 +19,31 @@ export class CharacterItemInventory {
     private mathHelper: MathHelper,
     private characterItemsContainer: CharacterItemContainer
   ) {}
+
+  public async getAllItemsFromInventoryNested(character: ICharacter): Promise<IItem[]> {
+    // loop through every slot that this character has (item containers), and get all items from each slot
+    // this method is more reliable, because it get all slots inclusing NESTED SLOTS (nested bags, for example)
+
+    const items: IItem[] = [];
+
+    const itemContainers = await ItemContainer.find({ owner: character._id });
+
+    for (const itemContainer of itemContainers) {
+      const slots = itemContainer.slots as unknown as IItem[];
+
+      for (const [, slot] of Object.entries(slots)) {
+        if (slot) {
+          const item = await Item.findById(slot._id);
+          if (item) {
+            // @ts-ignore
+            items.push(item);
+          }
+        }
+      }
+    }
+
+    return items;
+  }
 
   public async addItemToInventory(
     itemKey: string,
