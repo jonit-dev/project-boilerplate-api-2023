@@ -42,6 +42,15 @@ describe("ItemDragAndDrop.ts", () => {
       },
       quantity: 1,
     };
+    jest.spyOn(Item, "findById").mockResolvedValue(null);
+    // @ts-expect-error
+    jest.spyOn(ItemContainer, "findById").mockResolvedValue({ _id: "containerId", items: [{ _id: testItem._id }] });
+    // @ts-expect-error
+    jest.spyOn(itemDragAndDrop, "sendRefreshItemsEvent").mockReturnValue();
+    // @ts-expect-error
+    jest.spyOn(itemDragAndDrop, "isItemMoveValid").mockResolvedValue(true);
+    // @ts-expect-error
+    jest.spyOn(itemDragAndDrop.socketMessaging, "sendErrorMessageToCharacter").mockReturnValue();
   });
 
   it("should move item in inventory", async () => {
@@ -49,10 +58,6 @@ describe("ItemDragAndDrop.ts", () => {
     const itemContainer = { _id: "containerId", items: [{ _id: testItem._id }] } as any;
     jest.spyOn(Item, "findById").mockResolvedValue(itemToBeMoved);
     jest.spyOn(ItemContainer, "findById").mockResolvedValue(itemContainer);
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "isItemMoveValid").mockResolvedValue(true);
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "sendRefreshItemsEvent").mockReturnValue();
 
     const result = await itemDragAndDrop.performItemMove(itemMoveData, testCharacter);
 
@@ -66,8 +71,6 @@ describe("ItemDragAndDrop.ts", () => {
   it("should return false if item move is not valid", async () => {
     // @ts-expect-error
     jest.spyOn(itemDragAndDrop, "isItemMoveValid").mockResolvedValue(false);
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "sendRefreshItemsEvent").mockReturnValue();
 
     // call the method
     const result = await itemDragAndDrop.performItemMove(itemMoveData, testCharacter);
@@ -81,15 +84,6 @@ describe("ItemDragAndDrop.ts", () => {
   });
 
   it("should return false if item to be moved is not found", async () => {
-    jest.spyOn(Item, "findById").mockResolvedValue(null);
-    // @ts-expect-error
-    jest.spyOn(ItemContainer, "findById").mockResolvedValue({ _id: "containerId", items: [{ _id: testItem._id }] });
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "isItemMoveValid").mockResolvedValue(true);
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "sendRefreshItemsEvent").mockReturnValue();
-
-    // call the method
     const result = await itemDragAndDrop.performItemMove(itemMoveData, testCharacter);
 
     // assert the result
@@ -105,14 +99,7 @@ describe("ItemDragAndDrop.ts", () => {
     jest.spyOn(Item, "findById").mockResolvedValueOnce({ _id: testItem._id } as any);
     // @ts-expect-error
     jest.spyOn(ItemContainer, "findById").mockResolvedValue({ _id: "containerId", items: [{ _id: testItem._id }] });
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "isItemMoveValid").mockResolvedValue(true);
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "sendRefreshItemsEvent").mockReturnValue();
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop.socketMessaging, "sendErrorMessageToCharacter").mockReturnValue();
 
-    // call the method
     const result = await itemDragAndDrop.performItemMove(itemMoveData, testCharacter);
 
     // assert the result
@@ -132,14 +119,7 @@ describe("ItemDragAndDrop.ts", () => {
     jest.spyOn(Item, "findById").mockResolvedValueOnce({ _id: testItem._id } as any);
     // @ts-expect-error
     jest.spyOn(ItemContainer, "findById").mockResolvedValue({ _id: "containerId", items: [{ _id: testItem._id }] });
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "isItemMoveValid").mockResolvedValue(true);
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "sendRefreshItemsEvent").mockReturnValue();
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop.socketMessaging, "sendErrorMessageToCharacter").mockReturnValue();
 
-    // call the method
     const result = await itemDragAndDrop.performItemMove(itemMoveData, testCharacter);
 
     // assert the result
@@ -155,20 +135,12 @@ describe("ItemDragAndDrop.ts", () => {
 
   it("should send an error message if an exception occurs during item move", async () => {
     // setup test data and mocks
-
     jest.spyOn(Item, "findById").mockResolvedValueOnce({ _id: testItem._id } as any);
     // @ts-expect-error
     jest.spyOn(ItemContainer, "findById").mockResolvedValue({ _id: "containerId", items: [{ _id: testItem._id }] });
     // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "isItemMoveValid").mockResolvedValue(true);
-    // @ts-expect-error
     jest.spyOn(itemDragAndDrop, "moveItemInInventory").mockRejectedValue(new Error("Some error occurred"));
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "sendRefreshItemsEvent").mockReturnValue();
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop.socketMessaging, "sendErrorMessageToCharacter").mockReturnValue();
 
-    // call the method
     const result = await itemDragAndDrop.performItemMove(itemMoveData, testCharacter);
 
     // assert the result
@@ -181,18 +153,10 @@ describe("ItemDragAndDrop.ts", () => {
 
   it("should send refresh items event after a successful move", async () => {
     // setup test data and mocks
-
     jest.spyOn(Item, "findById").mockResolvedValueOnce({ _id: testItem._id } as any);
     // @ts-expect-error
     jest.spyOn(ItemContainer, "findById").mockResolvedValue({ _id: "containerId", items: [{ _id: testItem._id }] });
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "isItemMoveValid").mockResolvedValue(true);
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "moveItemInInventory").mockResolvedValue(true);
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "sendRefreshItemsEvent").mockReturnValue();
 
-    // call the method
     const result = await itemDragAndDrop.performItemMove(itemMoveData, testCharacter);
 
     // assert the result
@@ -212,14 +176,7 @@ describe("ItemDragAndDrop.ts", () => {
     jest.spyOn(Item, "findById").mockResolvedValueOnce({ _id: testItem._id } as any);
     // @ts-expect-error
     jest.spyOn(ItemContainer, "findById").mockResolvedValue({ _id: "containerId", items: [{ _id: testItem._id }] });
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "isItemMoveValid").mockResolvedValue(true);
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "moveItemInInventory").mockResolvedValue(true);
-    // @ts-expect-error
-    jest.spyOn(itemDragAndDrop, "sendRefreshItemsEvent").mockReturnValue();
 
-    // call the method
     await itemDragAndDrop.performItemMove(itemMoveData, testCharacter);
 
     // assert the result
