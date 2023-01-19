@@ -25,10 +25,7 @@ export const spellSelfHaste: Partial<ISpell> = {
   usableEffect: (character: ICharacter) => {
     const socketMessaging = container.get(SocketMessaging);
 
-    const manaCost = spellSelfHaste.manaCost ?? 0;
     const increaseSpeed = 3;
-
-    ItemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * manaCost);
     ItemUsableEffect.apply(character, EffectableAttribute.Speed, increaseSpeed);
 
     setTimeout(async () => {
