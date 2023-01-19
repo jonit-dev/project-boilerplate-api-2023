@@ -9,6 +9,7 @@ import {
   db,
   mapLoader,
   npcManager,
+  redisHelper,
   seeds,
   server,
   socketAdapter,
@@ -34,6 +35,8 @@ app.listen(port, async () => {
   });
 
   await db.init();
+  await redisHelper.connect();
+
   await cronJobs.start();
   await socketAdapter.init(appEnv.socket.type);
 

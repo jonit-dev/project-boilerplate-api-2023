@@ -1,5 +1,6 @@
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { RedisHelper } from "@providers/database/RedisHelper";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -45,5 +46,7 @@ export const socketEventsBinder = container.get<SocketEventsBinder>(SocketEvents
 
 export const characterConnection = container.get<CharacterConnection>(CharacterConnection);
 export const characterInventory = container.get<CharacterInventory>(CharacterInventory);
+
+export const redisHelper = container.get(RedisHelper);
 
 export { container };
