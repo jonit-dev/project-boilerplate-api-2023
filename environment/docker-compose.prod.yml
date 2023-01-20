@@ -23,7 +23,7 @@ services:
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
       - "$SOCKET_PORT:$SOCKET_PORT"
-      - "$SOCKET_UDP_RANGE"
+      # - "$SOCKET_UDP_RANGE" #!COMMENT THIS IN IF USING UDP
     environment:
       FORCE_COLOR: "true"
       VIRTUAL_HOST: ${API_SUBDOMAIN}
