@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
@@ -71,13 +70,13 @@ export class CharacterNetworkUpdate {
 
             this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
 
-            await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
+            await this.characterMovementWarn.warn(character, data);
 
-            this.characterMovementWarn.warn(character, data);
-
-            this.npcManager.startNearbyNPCsBehaviorLoop(character);
+            await this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
             // update emitter position from
+
+            await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
 
             await this.handleMapTransition(character, newX, newY);
 
@@ -120,7 +119,7 @@ export class CharacterNetworkUpdate {
 
     const distanceInGridCells = Math.round(distance / GRID_WIDTH);
 
-    if (distanceInGridCells >= 9) {
+    if (distanceInGridCells >= 5) {
       this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
         serverCharacter.channelId!,
         CharacterSocketEvents.CharacterSyncPosition,
