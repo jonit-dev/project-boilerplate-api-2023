@@ -42,6 +42,6 @@ export const spellSelfHaste: Partial<ISpell> = {
       };
 
       socketMessaging.sendEventToUser(updateCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
-    }, 1000 * 60 * 3);
+    }, 1000 * 60 * 10);
   },
 };
