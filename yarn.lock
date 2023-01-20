@@ -7405,6 +7405,13 @@ mongoose-paginate-v2@^1.4.2:
   resolved "https://registry.npmjs.org/mongoose-paginate-v2/-/mongoose-paginate-v2-1.7.1.tgz"
   integrity sha512-J8DJw3zRXcXOKoZv+RvO9tt5HotRnbo2iCR3lke+TtsQsYwQvbY3EgUkPqZXw6qCX2IByvXrW5SGNdAB0od/Cw==
 
+mongoose-query-logger@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/mongoose-query-logger/-/mongoose-query-logger-0.2.3.tgz#d8f5b8e47c761a1c95195ad1af37c4200033de0e"
+  integrity sha512-IwcFO/D5Lp8bAC6HkXdd2w652+AMgNr5oicoFVId3N4X6CWdDnYRiNXav/cGMa5s0d7Bl6jNcumMlZgtkHCC1g==
+  dependencies:
+    chalk "^4.1.0"
+
 mongoose-query-parser@^1.2.1:
   version "1.3.1"
   resolved "https://registry.npmjs.org/mongoose-query-parser/-/mongoose-query-parser-1.3.1.tgz"

@@ -61,6 +61,7 @@
     "mongoose": "^5.12.3",
     "mongoose-lean-virtuals": "^0.9.1",
     "mongoose-paginate-v2": "^1.4.2",
+    "mongoose-query-logger": "^0.2.3",
     "mongoose-query-parser": "^1.2.1",
     "number-string": "^1.1.5",
     "pathfinding": "^0.4.18",
