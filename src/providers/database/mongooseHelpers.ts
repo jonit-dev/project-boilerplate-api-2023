@@ -20,10 +20,6 @@ queryLogger.setQueryLogger(customQueryLogger);
 
 queryLogger.setExplain(false);
 
-queryLogger.setQueryLogger(customQueryLogger);
-
-queryLogger.setExplain(false);
-
 type SchemaDefinition = {
   [x: string]: any;
 };
