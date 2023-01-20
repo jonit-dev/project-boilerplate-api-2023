@@ -12,7 +12,7 @@ const warning = chalk.hex("#FFA500"); // Orange color
 
 const customQueryLogger: (args: QueryLoggerArgs) => void = (args) => {
   if (args.executionTimeMS >= 30) {
-    console.log(warning(`Warning: Query took more than 50ms: ${JSON.stringify(args, null, 2)}`));
+    console.log(warning(`Warning: Query took more than 30ms: ${JSON.stringify(args, null, 2)}`));
   }
 };
 
