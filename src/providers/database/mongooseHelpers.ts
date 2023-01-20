@@ -8,11 +8,15 @@ import { GetSchemaType, createSchema } from "ts-mongoose";
 // create a wrapper function around createSchema, with mongooseLeanDefaults and mongooseLeanVirtuals and typings
 
 export const queryLogger = new MongooseQueryLogger();
-const warning = chalk.hex("#FFA500"); // Orange color
+const warning = chalk.hex("#FFA500");
+const critical = chalk.hex("#FF0000");
 
 const customQueryLogger: (args: QueryLoggerArgs) => void = (args) => {
   if (args.executionTimeMS >= 70) {
-    console.log(warning(`Warning: Query took more than 30ms: ${JSON.stringify(args, null, 2)}`));
+    console.log(warning(`Warning: Query took more than 70ms: ${JSON.stringify(args, null, 2)}`));
+  }
+  if (args.executionTimeMS >= 130) {
+    console.log(critical(`Critical: Query took more than 100ms: ${JSON.stringify(args, null, 2)}`));
   }
 };
 
