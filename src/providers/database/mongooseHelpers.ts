@@ -11,7 +11,7 @@ export const queryLogger = new MongooseQueryLogger();
 const warning = chalk.hex("#FFA500"); // Orange color
 
 const customQueryLogger: (args: QueryLoggerArgs) => void = (args) => {
-  if (args.executionTimeMS >= 30) {
+  if (args.executionTimeMS >= 50) {
     console.log(warning(`Warning: Query took more than 30ms: ${JSON.stringify(args, null, 2)}`));
   }
 };
