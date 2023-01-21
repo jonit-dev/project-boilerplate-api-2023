@@ -25,10 +25,10 @@ describe("SocketTransmissionZone", () => {
       width,
       height,
     }).toMatchObject({
-      x: -8,
-      y: -24,
-      width: 296,
-      height: 280,
+      x: -88,
+      y: -104,
+      width: 376,
+      height: 360,
     });
   });
 });

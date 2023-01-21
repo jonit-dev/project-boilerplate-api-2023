@@ -22,5 +22,9 @@ export class RedisHelper {
       .connect()
       .catch((err) => console.log("❌ Redis Client Error", err))
       .then(() => console.log("✅ Redis Client Connected"));
+
+    this.client.on("error", (err) => {
+      console.log("❌ Redis Client Error", err);
+    });
   }
 }
