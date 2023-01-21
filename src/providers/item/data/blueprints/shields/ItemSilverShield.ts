@@ -10,8 +10,8 @@ export const itemSilverShield: Partial<IItem> = {
   texturePath: "shields/silver-shield.png",
   name: "Silver Shield",
   description: "An Shield made by the capricious artisan and is covered with silver.",
-  defense: 10,
-  weight: 3,
+  defense: 17,
+  weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 65,
 };

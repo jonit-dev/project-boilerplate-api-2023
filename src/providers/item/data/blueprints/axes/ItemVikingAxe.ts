@@ -14,7 +14,7 @@ export const itemVikingAxe: Partial<IItem> = {
     "An axe with a broad, single-edged blade and a short, curved handle. It was commonly used by the Vikings in battle and is associated with Norse mythology.",
   attack: 20,
   defense: 5,
-  weight: 4,
+  weight: 3.7,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

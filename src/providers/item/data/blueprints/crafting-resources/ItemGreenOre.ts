@@ -10,7 +10,7 @@ export const itemGreenOre: Partial<IItem> = {
   texturePath: "crafting-resources/green-ore.png",
   name: "Green Ore",
   description: "Green ore that can be smelted into ingots.",
-  weight: 2,
+  weight: 1.4,
   maxStackSize: 100,
   hasUseWith: true,
 };

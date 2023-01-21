@@ -13,7 +13,7 @@ export const itemClub: Partial<IItem> = {
   description: "A simple wooden club.",
   attack: 6,
   defense: 2,
-  weight: 3,
+  weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
   basePrice: 51,

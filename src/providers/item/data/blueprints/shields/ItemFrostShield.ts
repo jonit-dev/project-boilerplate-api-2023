@@ -10,8 +10,8 @@ export const itemFrostShield: Partial<IItem> = {
   texturePath: "shields/frost-shield.png",
   name: "Frost Shield",
   description: "A defensive tool based on a magic durable ice",
-  defense: 7,
-  weight: 3,
+  defense: 10,
+  weight: 1.9,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 53,
 };

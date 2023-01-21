@@ -14,7 +14,7 @@ export const itemSilverHammer: Partial<IItem> = {
     "A hammer with a silver head and handle. It is often given as a symbol of wealth and status, and may be intricately decorated with engravings or gemstones.",
   attack: 8,
   defense: 5,
-  weight: 2,
+  weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };

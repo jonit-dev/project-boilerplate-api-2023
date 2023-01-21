@@ -10,7 +10,7 @@ export const itemSilverOre: Partial<IItem> = {
   texturePath: "crafting-resources/silver-ore.png",
   name: "Silver Ore",
   description: "Silver ore that can be smelted into ingots.",
-  weight: 2,
+  weight: 1.6,
   maxStackSize: 100,
   hasUseWith: true,
 };

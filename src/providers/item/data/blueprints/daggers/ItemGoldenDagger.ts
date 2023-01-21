@@ -12,7 +12,7 @@ export const itemGoldenDagger: Partial<IItem> = {
   name: "Golden Dagger",
   description:
     "A small, single-edged knife with a golden blade and handle. It is often given as a symbol of wealth and status, and may be intricately decorated with engravings or gemstones.",
-  weight: 2,
+  weight: 1.6,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 9,
   defense: 4,
