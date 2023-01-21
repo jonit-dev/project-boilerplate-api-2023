@@ -12,7 +12,7 @@ export const itemIronHelmet: Partial<IItem> = {
   description:
     "Iron Helmet is part of the Iron Set, and is a Lightweight helmet also known as a war hat, is a type of helmet made of iron or steel.",
   defense: 10,
-  weight: 3,
+  weight: 2.4,
   allowedEquipSlotType: [ItemSlotType.Head],
   basePrice: 65,
 };

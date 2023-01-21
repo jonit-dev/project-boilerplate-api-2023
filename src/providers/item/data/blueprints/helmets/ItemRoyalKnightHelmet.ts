@@ -11,7 +11,7 @@ export const itemRoyalKnightHelmet: Partial<IItem> = {
   name: "Royal Knight Helmet",
   description: "The Royal Knight Helmet have a red plumage on top and covers entire head with slits for eyes.",
   defense: 15,
-  weight: 3,
+  weight: 2.4,
   allowedEquipSlotType: [ItemSlotType.Head],
   basePrice: 85,
 };

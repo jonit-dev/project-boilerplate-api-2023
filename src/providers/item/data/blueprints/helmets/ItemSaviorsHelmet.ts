@@ -11,7 +11,7 @@ export const itemSaviorsHelmet: Partial<IItem> = {
   name: "Saviors Helmet",
   description: "The Salviors Helmet are made of tin and decorated with eagle feathers nas laterais.",
   defense: 17,
-  weight: 3.5,
+  weight: 3,
   allowedEquipSlotType: [ItemSlotType.Head],
   basePrice: 93,
 };

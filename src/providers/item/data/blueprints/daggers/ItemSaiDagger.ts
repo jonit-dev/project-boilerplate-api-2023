@@ -12,7 +12,7 @@ export const itemSaiDagger: Partial<IItem> = {
   name: "Sai Dagger",
   description:
     "A Japanese weapon consisting of a pointed, prong-shaped blade mounted on a long handle. It is often used for thrusting and parrying, and is known for its versatility in close combat.",
-  weight: 2,
+  weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 8,
   defense: 2,

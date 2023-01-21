@@ -12,7 +12,7 @@ export const itemCorruptionDagger: Partial<IItem> = {
 
   name: "Corruption Dagger",
   description: "An artifact from ancient times. Its blade allows it to cut in ways no other weapon could.",
-  weight: 2,
+  weight: 1.4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 7,
   defense: 3,

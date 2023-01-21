@@ -11,7 +11,7 @@ export const itemBolt: Partial<IItem> = {
   name: "Bolt",
   description: "A crossbow bolt.",
   attack: 6,
-  weight: 0.2,
+  weight: 0.018,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,
   basePrice: 2.666,

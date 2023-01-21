@@ -13,7 +13,7 @@ export const itemMace: Partial<IItem> = {
   description: "A simple iron headed mace.",
   attack: 8,
   defense: 3,
-  weight: 4,
+  weight: 2.7,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
   basePrice: 69,
