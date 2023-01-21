@@ -8,7 +8,7 @@
       "instances": "max",
       "exec_mode": "cluster",
       "node_args": "-r dotenv/config -r ./register-paths.js",
-      "max_memory_restart": "80%"
+      "max_memory_restart": "15G"
     }
   ]
 }
