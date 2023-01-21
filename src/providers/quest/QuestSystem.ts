@@ -195,7 +195,7 @@ export class QuestSystem {
           }
           const item = await Item.findById(foundItem.itemId);
           // if is stackable item and does not have the required amount, no update is done
-          if (i.qty > 1 && (!item?.maxStackSize || item?.stackQty! < i.qty)) {
+          if (i.qty > 1 && (!item?.maxStackSize || (item?.stackQty || 0) < i.qty)) {
             return;
           }
           foundItem.isStackable = !!item?.maxStackSize;

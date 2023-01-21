@@ -2,7 +2,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { IQuest } from "@entities/ModuleQuest/QuestModel";
 import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
@@ -21,6 +21,7 @@ import { QuestSystem } from "../QuestSystem";
 
 describe("QuestSystem.ts", () => {
   let questSystem: QuestSystem,
+    characterItems: CharacterItems,
     testNPC: INPC,
     testCharacter: ICharacter,
     testKillQuest: IQuest,
@@ -33,6 +34,7 @@ describe("QuestSystem.ts", () => {
 
   beforeAll(async () => {
     questSystem = container.get<QuestSystem>(QuestSystem);
+    characterItems = container.get<CharacterItems>(CharacterItems);
     releaseRewards = jest.spyOn(questSystem, "releaseRewards" as any);
     await unitTestHelper.beforeAllJestHook();
   });
@@ -83,19 +85,38 @@ describe("QuestSystem.ts", () => {
     expect(releaseRewards).toBeCalledTimes(1);
   });
 
-  it("should update quest and release rewards | type interaction craft", async () => {
+  it("should update quest and release rewards | type interaction craft - stack remaining", async () => {
     // Equip character with required items for completing interaction craft quest
     const characterEquipment = (await Equipment.findById(testCharacter.equipment)
       .populate("inventory")
       .exec()) as IEquipment;
-    await unitTestHelper.equipItemsInBackpackSlot(characterEquipment, [
-      CraftingResourcesBlueprint.Silk,
-      CraftingResourcesBlueprint.Diamond,
-    ]);
+
+    const questItemKeys = [CraftingResourcesBlueprint.Silk, CraftingResourcesBlueprint.Diamond];
+    await unitTestHelper.equipItemsInBackpackSlot(characterEquipment, questItemKeys, false, { stackQty: 10 });
 
     await questSystem.updateQuests(QuestType.Interaction, testCharacter, "");
     expect(await testInteractionCraftQuest.hasStatus(QuestStatus.Completed, testCharacter.id)).toEqual(true);
     expect(releaseRewards).toBeCalledTimes(1);
+
+    // Check remaining stackQty: 2 silk and 8 diamond
+    await assertRemainingQty(testCharacter, characterItems, questItemKeys, [2, 8]);
+  });
+
+  it("should update quest and release rewards | type interaction craft - exact qty, should remove one item", async () => {
+    // Equip character with required items for completing interaction craft quest
+    const characterEquipment = (await Equipment.findById(testCharacter.equipment)
+      .populate("inventory")
+      .exec()) as IEquipment;
+
+    const questItemKeys = [CraftingResourcesBlueprint.Silk, CraftingResourcesBlueprint.Diamond];
+    await unitTestHelper.equipItemsInBackpackSlot(characterEquipment, questItemKeys, false, { stackQty: 8 });
+
+    await questSystem.updateQuests(QuestType.Interaction, testCharacter, "");
+    expect(await testInteractionCraftQuest.hasStatus(QuestStatus.Completed, testCharacter.id)).toEqual(true);
+    expect(releaseRewards).toBeCalledTimes(1);
+
+    // Check remaining stackQty: 2 silk and 8 diamond
+    await assertRemainingQty(testCharacter, characterItems, questItemKeys, [0, 6]);
   });
 
   it("should test that the updateQuests method does not update the quest record or release rewards if objectivesData is empty", async () => {
@@ -310,5 +331,28 @@ async function createQuestRecord(quest: IQuest, character: ICharacter): Promise<
     questRecord.objective = obj._id;
     questRecord.status = QuestStatus.InProgress;
     await questRecord.save();
+  }
+}
+
+async function assertRemainingQty(
+  character: ICharacter,
+  characterItems: CharacterItems,
+  itemKeys: string[],
+  expectedQty: number[]
+): Promise<void> {
+  for (const i in itemKeys) {
+    const k = itemKeys[i];
+    const expQty = expectedQty[i];
+    const foundItem = await characterItems.hasItemByKey(k, character, "inventory");
+    // should be deleted if all stackQty is consumed
+    if (expQty === 0) {
+      expect(foundItem).toBeUndefined();
+      continue;
+    }
+    if (!foundItem) {
+      throw new Error(`Item with key ${k} not found on characters items`);
+    }
+    const item = await Item.findById(foundItem.itemId);
+    expect(item!.stackQty).toEqual(expQty);
   }
 }
