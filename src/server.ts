@@ -59,7 +59,8 @@ app.listen(port, async () => {
 
   await seeds.start();
 
-  //! TODO: Allocate according to pm2 instances
+  //! TODO: Load balance NPCs on PM2 instances
+  npcManager.listenForBehaviorTrigger();
 
   await characterConnection.resetCharacterAttributes();
 

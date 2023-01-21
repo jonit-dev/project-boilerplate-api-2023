@@ -1,7 +1,7 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import { NPCCycle } from "./NPCCycle";
@@ -28,6 +28,14 @@ export class NPCManager {
     private npcLoader: NPCLoader,
     private npcFreezer: NPCFreezer
   ) {}
+
+  public listenForBehaviorTrigger(): void {
+    process.on("message", async (data) => {
+      if (data.type === "startNPCBehavior") {
+        await this.startNearbyNPCsBehaviorLoop(data.data.character);
+      }
+    });
+  }
 
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
     const nearbyNPCs = await this.npcView.getNPCsInView(character);
