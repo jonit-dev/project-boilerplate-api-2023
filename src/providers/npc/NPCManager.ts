@@ -66,7 +66,7 @@ export class NPCManager {
             console.log(err);
           }
         },
-        (1600 + random(0, 250)) / npc.speed
+        (1500 + random(0, 200)) / npc.speed
       );
     }
 
