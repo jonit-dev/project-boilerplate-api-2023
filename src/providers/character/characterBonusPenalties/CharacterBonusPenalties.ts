@@ -34,7 +34,8 @@ export class CharacterBonusPenalties {
 
     let skillSpData: IIncreaseSPResult = {
       skillLevelUp: false,
-      skillLevel: 0,
+      skillLevelBefore: 0,
+      skillLevelAfter: 0,
       skillName: "",
       skillPoints: 0,
     };
@@ -42,8 +43,8 @@ export class CharacterBonusPenalties {
     switch (character.race) {
       case LifeBringerRaces.Dwarf: {
         // This is the % of each SP attribute that will be increased or decreased
-        // We can use positive or negative values
-        // Ex: Use 20% = 0.2 and -10% = -0.1
+        // We can use positive or negative values Ex: Use 20% = 0.2 and -10% = -0.1
+
         // Update Basic Attributes
         basicAttributes = {
           strength: 0.2,

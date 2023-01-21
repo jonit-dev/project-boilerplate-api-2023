@@ -1,3 +1,4 @@
+import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { RedisHelper } from "@providers/database/RedisHelper";
@@ -51,5 +52,7 @@ export const characterInventory = container.get<CharacterInventory>(CharacterInv
 export const redisHelper = container.get(RedisHelper);
 
 export const npcFreezer = container.get(NPCFreezer);
+
+export const characterSkillBuff = container.get<CharacterSkillBuff>(CharacterSkillBuff);
 
 export { container };

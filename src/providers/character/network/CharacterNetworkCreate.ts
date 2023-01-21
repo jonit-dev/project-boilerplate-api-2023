@@ -24,6 +24,7 @@ import {
   WeatherSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { BuffSkillFunctions } from "../CharacterBuffer/BuffSkillFunctions";
 import { CharacterView } from "../CharacterView";
 
 @provide(CharacterNetworkCreate)
@@ -37,7 +38,8 @@ export class CharacterNetworkCreate {
     private npcManager: NPCManager,
     private gridManager: GridManager,
     private npcWarn: NPCWarn,
-    private pm2Helper: PM2Helper
+    private pm2Helper: PM2Helper,
+    private buffSkillFunctions: BuffSkillFunctions
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -119,6 +121,8 @@ export class CharacterNetworkCreate {
         };
 
         await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
+
+        await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
 
         switch (appEnv.general.ENV) {
           case EnvType.Development:
