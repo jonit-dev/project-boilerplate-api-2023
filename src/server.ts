@@ -8,6 +8,7 @@ import {
   cronJobs,
   db,
   mapLoader,
+  npcFreezer,
   npcManager,
   redisHelper,
   seeds,
@@ -70,7 +71,7 @@ app.listen(port, async () => {
       NPC CYCLES: ${NPC_CYCLES.size}
       BATTLE CYCLES: ${NPC_BATTLE_CYCLES.size}
       MEMORY_USAGE ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) + "MB"}
-        
+      NPC_FREEZE_CHECK_INTERVALS: ${npcFreezer.freezeCheckIntervals.size}
     `);
   }, 3000);
 

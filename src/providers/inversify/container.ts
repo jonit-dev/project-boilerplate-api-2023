@@ -2,6 +2,7 @@ import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { RedisHelper } from "@providers/database/RedisHelper";
 import { MapLoader } from "@providers/map/MapLoader";
+import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
@@ -48,5 +49,7 @@ export const characterConnection = container.get<CharacterConnection>(CharacterC
 export const characterInventory = container.get<CharacterInventory>(CharacterInventory);
 
 export const redisHelper = container.get(RedisHelper);
+
+export const npcFreezer = container.get(NPCFreezer);
 
 export { container };

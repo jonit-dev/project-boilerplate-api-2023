@@ -1,10 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { NPCAlignment, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
-import { provide } from "inversify-binding-decorators";
+import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 
+import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import { NPCCycle } from "./NPCCycle";
+import { NPCFreezer } from "./NPCFreezer";
 import { NPCLoader } from "./NPCLoader";
 import { NPCView } from "./NPCView";
 import { NPCMovement } from "./movement/NPCMovement";
@@ -24,7 +25,8 @@ export class NPCManager {
     private npcMovementStopped: NPCMovementStopped,
     private npcMovementMoveAway: NPCMovementMoveAway,
     private npcView: NPCView,
-    private npcLoader: NPCLoader
+    private npcLoader: NPCLoader,
+    private npcFreezer: NPCFreezer
   ) {}
 
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
@@ -43,10 +45,8 @@ export class NPCManager {
   public async startBehaviorLoop(initialNPC: INPC): Promise<void> {
     let npc = initialNPC;
 
-    let npcCycle;
-
     if (!npc.isBehaviorEnabled) {
-      npcCycle = new NPCCycle(
+      new NPCCycle(
         npc.id,
         async () => {
           try {
@@ -60,11 +60,11 @@ export class NPCManager {
         },
         (1400 + random(0, 250)) / npc.speed
       );
-
-      this.freezeNPCIfNoCharactersNearby(npc, npcCycle);
     }
 
     await this.setNPCBehavior(npc, true);
+
+    this.npcFreezer.tryToFreezeNPC(npc);
   }
 
   public async disableNPCBehaviors(): Promise<void> {
@@ -73,30 +73,6 @@ export class NPCManager {
 
   public async setNPCBehavior(npc: INPC, value: boolean): Promise<void> {
     await NPC.updateOne({ _id: npc._id }, { $set: { isBehaviorEnabled: value } });
-  }
-
-  private freezeNPCIfNoCharactersNearby(npc: INPC, npcCycle): void {
-    // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
-    const checkRange = random(5000, 10000);
-
-    const interval = setInterval(async () => {
-      let shouldFreezeNPC = false;
-      const nearbyCharacters = await this.npcView.getCharactersInView(npc);
-      if (npc.alignment === NPCAlignment.Friendly) {
-        shouldFreezeNPC = !nearbyCharacters.length;
-      }
-
-      if (npc.alignment === NPCAlignment.Hostile) {
-        shouldFreezeNPC = !npc.targetCharacter || !nearbyCharacters.length;
-      }
-
-      if (shouldFreezeNPC) {
-        npcCycle.clear();
-        clearInterval(interval);
-        console.log(`Freezing NPC ${npc.key} for ${checkRange}ms`);
-        await this.setNPCBehavior(npc, false);
-      }
-    }, checkRange);
   }
 
   private async startCoreNPCBehavior(npc: INPC): Promise<void> {
