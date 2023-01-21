@@ -123,7 +123,7 @@ export class BattleAttackTarget {
       attacker.y,
       target.x,
       target.y,
-      SOCKET_TRANSMISSION_ZONE_WIDTH / GRID_WIDTH / 2
+      (SOCKET_TRANSMISSION_ZONE_WIDTH * 2) / GRID_WIDTH / 2
     );
 
     if (!isTargetClose) {
