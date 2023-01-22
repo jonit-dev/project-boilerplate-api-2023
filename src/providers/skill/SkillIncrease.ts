@@ -10,7 +10,13 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellLearn } from "@providers/spells/SpellLearn";
-import { AnimationEffectKeys, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  CharacterSocketEvents,
+  ICharacterAttributeChanged,
+  IUIShowMessage,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import {
   BasicAttribute,
@@ -24,6 +30,7 @@ import {
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { Types } from "mongoose";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
 
@@ -209,6 +216,10 @@ export class SkillIncrease {
       await this.updateSkills(skills, character);
 
       if (levelUp) {
+        const { maxHealth, maxMana } = this.increaseMaxManaMaxHealth(character.maxMana, character.maxHealth);
+        await this.updateEntitiesAttributes(character._id, "maxHealth", maxHealth);
+        await this.updateEntitiesAttributes(character._id, "maxMana", maxMana);
+
         await this.sendExpLevelUpEvents(
           { level: skills.level, previousLevel, exp: record!.xp! + record!.xp! * buff },
           character,
@@ -363,5 +374,51 @@ export class SkillIncrease {
       const manaSp = Math.round((power ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
       return this.calculateNewSP(skillDetails) + manaSp;
     }).bind(this, spellPower);
+  }
+
+  private increaseMaxManaMaxHealth(
+    currentMaxMana: number,
+    currentMaxHealth: number
+  ): { maxMana: number; maxHealth: number } {
+    let increaseRate = 1.05;
+    const maxValue = Math.max(currentMaxMana, currentMaxHealth);
+
+    if (maxValue >= 900) {
+      increaseRate = 1.01;
+    } else if (maxValue >= 700) {
+      increaseRate = 1.02;
+    } else if (maxValue >= 500) {
+      increaseRate = 1.03;
+    }
+
+    const maxMana = Math.ceil(currentMaxMana * increaseRate);
+    const maxHealth = Math.ceil(currentMaxHealth * increaseRate);
+
+    return { maxMana, maxHealth };
+  }
+
+  private async updateEntitiesAttributes(
+    characterId: Types.ObjectId,
+    entitiesType: string,
+    value: number
+  ): Promise<boolean> {
+    const character = (await Character.findById(characterId)) as ICharacter;
+
+    character[entitiesType] = value;
+    const save = await character.save();
+
+    const payload: ICharacterAttributeChanged = {
+      targetId: character._id,
+      maxHealth: entitiesType === "maxHealth" ? value : character.maxHealth,
+      maxMana: entitiesType === "maxMana" ? value : character.maxMana,
+    };
+
+    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+
+    if (save) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
