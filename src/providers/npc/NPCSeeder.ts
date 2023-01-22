@@ -19,7 +19,7 @@ export class NPCSeeder {
 
       NPCData.targetCharacter = undefined; // reset any targets
 
-      this.setInitialNPCPositionAsSolid(NPCData);
+      await this.setInitialNPCPositionAsSolid(NPCData);
 
       if (!npcFound) {
         await this.createNewNPCWithSkills(NPCData);
@@ -146,12 +146,12 @@ export class NPCSeeder {
     return NPCData.maxHealth;
   }
 
-  private setInitialNPCPositionAsSolid(NPCData: INPCSeedData): void {
-    const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(NPCData.scene)!;
+  private async setInitialNPCPositionAsSolid(NPCData: INPCSeedData): Promise<void> {
+    const { gridOffsetX, gridOffsetY } = this.gridManager.getMapOffset(NPCData.scene)!;
 
     try {
       // mark NPC initial position as solid on the map (pathfinding)
-      this.gridManager.setWalkable(
+      await this.gridManager.setWalkable(
         NPCData.scene,
         ToGridX(NPCData.x) + gridOffsetX,
         ToGridY(NPCData.y) + gridOffsetY,

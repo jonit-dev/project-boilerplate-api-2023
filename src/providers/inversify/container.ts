@@ -1,8 +1,9 @@
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { RedisHelper } from "@providers/database/RedisHelper";
+import { RedisManager } from "@providers/database/RedisManager";
 import { MapLoader } from "@providers/map/MapLoader";
+import { GridRedisSerializer } from "@providers/map/grid/GridRedisSerializer";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -49,10 +50,12 @@ export const socketEventsBinder = container.get<SocketEventsBinder>(SocketEvents
 export const characterConnection = container.get<CharacterConnection>(CharacterConnection);
 export const characterInventory = container.get<CharacterInventory>(CharacterInventory);
 
-export const redisHelper = container.get(RedisHelper);
+export const redisManager = container.get<RedisManager>(RedisManager);
 
-export const npcFreezer = container.get(NPCFreezer);
+export const npcFreezer = container.get<NPCFreezer>(NPCFreezer);
 
 export const characterSkillBuff = container.get<CharacterSkillBuff>(CharacterSkillBuff);
+
+export const gridRedisSerializer = container.get<GridRedisSerializer>(GridRedisSerializer);
 
 export { container };

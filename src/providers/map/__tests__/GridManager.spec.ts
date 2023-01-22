@@ -1,36 +1,45 @@
+import { RedisManager } from "@providers/database/RedisManager";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { GridManager } from "../GridManager";
 import { MapTiles } from "../MapTiles";
+import { GridRedisSerializer } from "../grid/GridRedisSerializer";
 
 describe("GridManager", () => {
   let gridManager: GridManager;
   let mapTiles: MapTiles;
-  const mapName = "unit-test-map-negative-coordinate";
+  let redisManager: RedisManager;
+  let gridRedisSerializer: GridRedisSerializer;
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
+    redisManager = container.get<RedisManager>(RedisManager);
+    await redisManager.connect();
 
     gridManager = container.get<GridManager>(GridManager);
+    gridRedisSerializer = container.get<GridRedisSerializer>(GridRedisSerializer);
     mapTiles = container.get<MapTiles>(MapTiles);
+
     await unitTestHelper.initializeMapLoader();
 
-    gridManager.generateGridSolids("unit-test-map-negative-coordinate");
-    gridManager.generateGridSolids("example");
+    await gridManager.generateGridSolids("unit-test-map-negative-coordinate");
+    await gridManager.generateGridSolids("example");
   });
 
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook(true);
   });
 
-  const checkMapSize = (mapName: string, expectedWidth: number, expectedHeight: number): void => {
-    expect(gridManager.grids.has(mapName)).toBeTruthy();
+  const checkMapSize = async (mapName: string, expectedWidth: number, expectedHeight: number): Promise<void> => {
+    const hasGrid = await gridManager.hasGrid(mapName);
 
-    const grid = gridManager.grids.get(mapName);
+    expect(hasGrid).toBeTruthy();
+
+    const grid = await gridManager.getGrid(mapName);
 
     if (!grid) {
       throw new Error("❌Could not find grid for map: " + mapName);
     }
 
-    const { gridOffsetX, gridOffsetY } = gridManager.getGridOffset(mapName)!;
+    const { gridOffsetX, gridOffsetY } = gridManager.getMapOffset(mapName)!;
 
     const { width, height } = mapTiles.getMapWidthHeight(mapName, gridOffsetX, gridOffsetY);
 
@@ -38,34 +47,55 @@ describe("GridManager", () => {
     expect(height).toBe(expectedHeight);
   };
 
-  it("should properly generate a grid solid map and correctly size it (width, height)", () => {
-    checkMapSize("unit-test-map-negative-coordinate", 48, 32);
+  it("gets a functional grid", async () => {
+    const matrix = [
+      [0, 1, 0],
+      [0, 1, 0],
+      [0, 0, 0],
+    ];
 
-    checkMapSize("example", 80, 96);
+    await gridRedisSerializer.saveMatrixToRedis("test", matrix);
 
-    checkMapSize("unit-test-map", 32, 32);
+    const grid = await gridManager.getGrid("test");
+
+    expect(grid).toBeDefined();
+    expect(grid.width).toBe(3);
+    expect(grid.height).toBe(3);
+
+    expect(grid.isWalkableAt(0, 0)).toBe(true);
+    expect(grid.isWalkableAt(1, 0)).toBe(false);
+    expect(grid.isWalkableAt(1, 1)).toBe(false);
+    expect(grid.isWalkableAt(1, 2)).toBe(true);
+  });
+
+  it("should properly generate a grid solid map and correctly size it (width, height)", async () => {
+    await checkMapSize("unit-test-map-negative-coordinate", 48, 32);
+
+    await checkMapSize("example", 80, 96);
+
+    await checkMapSize("unit-test-map", 32, 32);
   });
 
   it("should return the offset x and y if a map has negative coordinates", () => {
-    const { gridOffsetX, gridOffsetY } = gridManager.getGridOffset(mapName)!;
+    const { gridOffsetX, gridOffsetY } = gridManager.getMapOffset("unit-test-map-negative-coordinate")!;
 
     expect(gridOffsetX).toBe(16);
     expect(gridOffsetY).toBe(0);
 
-    const { gridOffsetX: gridOffsetX2, gridOffsetY: gridOffsetY2 } = gridManager.getGridOffset("example")!;
+    const { gridOffsetX: gridOffsetX2, gridOffsetY: gridOffsetY2 } = gridManager.getMapOffset("example")!;
 
     expect(gridOffsetX2).toBe(0);
     expect(gridOffsetY2).toBe(32);
   });
 
   it("shouldn't return a x and y offset if the map has no negative coordinates", () => {
-    const { gridOffsetX, gridOffsetY } = gridManager.getGridOffset("unit-test-map")!;
+    const { gridOffsetX, gridOffsetY } = gridManager.getMapOffset("unit-test-map")!;
 
     expect(gridOffsetX).toBe(0);
     expect(gridOffsetY).toBe(0);
   });
 
-  it("should properly set a grid solid and non-solids", () => {
+  it("should properly set a grid solid and non-solids", async () => {
     const solids = [
       [-16, 0],
       [31, 31],
@@ -76,7 +106,8 @@ describe("GridManager", () => {
     ];
 
     for (const solid of solids) {
-      expect(gridManager.isWalkable(mapName, solid[0], solid[1])).toBe(false);
+      const isSolidWalkable = await gridManager.isWalkable("unit-test-map-negative-coordinate", solid[0], solid[1]);
+      expect(isSolidWalkable).toBe(false);
     }
 
     const nonSolids = [
@@ -88,11 +119,16 @@ describe("GridManager", () => {
     ];
 
     for (const nonSolid of nonSolids) {
-      expect(gridManager.isWalkable(mapName, nonSolid[0], nonSolid[1])).toBe(true);
+      const isNonSolidWalkable = await gridManager.isWalkable(
+        "unit-test-map-negative-coordinate",
+        nonSolid[0],
+        nonSolid[1]
+      );
+      expect(isNonSolidWalkable).toBe(true);
     }
   });
 
-  it("should properly detect solids on a gridX and gridY for Example map", () => {
+  it("should properly detect solids on a gridX and gridY for Example map", async () => {
     const nonSolids = [
       [4, 4],
       [23, 4],
@@ -102,7 +138,7 @@ describe("GridManager", () => {
     ];
 
     for (const nonSolid of nonSolids) {
-      expect(gridManager.isWalkable("example", nonSolid[0], nonSolid[1])).toBe(true);
+      expect(await gridManager.isWalkable("example", nonSolid[0], nonSolid[1])).toBe(true);
     }
 
     const solids = [
@@ -118,12 +154,12 @@ describe("GridManager", () => {
     ];
 
     for (const solid of solids) {
-      expect(gridManager.isWalkable("example", solid[0], solid[1])).toBe(false);
+      expect(await gridManager.isWalkable("example", solid[0], solid[1])).toBe(false);
     }
   });
 
-  it("should properly find the shortest path between 2 points with negative coordinates", () => {
-    const path = gridManager.findShortestPath("unit-test-map-negative-coordinate", -11, 10, -8, 12);
+  it("should properly find the shortest path between 2 points with negative coordinates", async () => {
+    const path = await gridManager.findShortestPath("unit-test-map-negative-coordinate", -11, 10, -8, 12);
 
     if (!path) {
       throw new Error("❌Could not find path");
@@ -138,8 +174,8 @@ describe("GridManager", () => {
       [-8, 12],
     ]);
   });
-  it("should properly find the shortest path between 2 points WITHOUT negative coordinates", () => {
-    const path = gridManager.findShortestPath("unit-test-map-negative-coordinate", 15, 24, 17, 25);
+  it("should properly find the shortest path between 2 points WITHOUT negative coordinates", async () => {
+    const path = await gridManager.findShortestPath("unit-test-map-negative-coordinate", 15, 24, 17, 25);
 
     if (!path) {
       throw new Error("❌Could not find path");

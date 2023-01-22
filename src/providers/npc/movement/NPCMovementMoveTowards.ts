@@ -291,7 +291,7 @@ export class NPCMovementMoveTowards {
 
   private async moveTowardsPosition(npc: INPC, x: number, y: number): Promise<void> {
     try {
-      const shortestPath = this.npcMovement.getShortestPathNextPosition(
+      const shortestPath = await this.npcMovement.getShortestPathNextPosition(
         npc,
         ToGridX(npc.x),
         ToGridY(npc.y),

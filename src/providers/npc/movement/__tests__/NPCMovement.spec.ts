@@ -35,18 +35,22 @@ describe("NPCMovement.ts", () => {
     expect(isAtPosition).toBe(false);
   });
 
-  it("should get the shortest path to a gridX and gridY position", () => {
-    const { newGridX, newGridY, nextMovementDirection } = npcMovement.getShortestPathNextPosition(
+  it("should get the shortest path to a gridX and gridY position", async () => {
+    const shortestPath = await npcMovement.getShortestPathNextPosition(
       testNPC,
       ToGridX(testNPC.x),
       ToGridY(testNPC.y),
       7,
       5
-    )!;
+    );
 
-    expect(newGridX).toBe(6);
-    expect(newGridY).toBe(4);
-    expect(nextMovementDirection).toBe("right");
+    if (!shortestPath) {
+      throw new Error("No shortest path found!");
+    }
+
+    expect(shortestPath.newGridX).toBe(6);
+    expect(shortestPath.newGridY).toBe(4);
+    expect(shortestPath.nextMovementDirection).toBe("right");
   });
 
   it("should properly move NPC to a selected position", async () => {

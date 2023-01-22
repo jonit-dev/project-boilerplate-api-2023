@@ -34,6 +34,6 @@
     "forceConsistentCasingInFileNames": true
   },
 
-  "include": ["src/**/*.ts", "test/*.ts", "./jestInitialSetup.ts"],
+  "include": ["src/**/*.ts", "test/*.ts", "src/jest/jestInitialSetup.ts", "src/jest/jestSetupFilesAfterEnv.ts"],
   "exclude": ["node_modules", "dist"]
 }

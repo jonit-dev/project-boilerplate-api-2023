@@ -8,7 +8,8 @@ const config: Config.InitialOptions = {
   },
   runtime: "@side/jest-runtime",
   testEnvironment: "node",
-  setupFiles: ["dotenv/config", "./jestInitialSetup.ts"],
+  setupFiles: ["dotenv/config", "./src/jest/jestInitialSetup.ts"],
+  setupFilesAfterEnv: ["./src/jest/jestSetupFilesAfterEnv.ts"],
   modulePathIgnorePatterns: ["dist", "__tests__/mock"],
   moduleNameMapper: {
     "^@providers/(.*)$": "<rootDir>/src/providers/$1",
