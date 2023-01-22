@@ -1,11 +1,11 @@
-import nodeCron from "node-cron";
-import { provide } from "inversify-binding-decorators";
 import { Item } from "@entities/ModuleInventory/ItemModel";
+import { provide } from "inversify-binding-decorators";
+import nodeCron from "node-cron";
 
 @provide(CleanupBodyCrons)
 export class CleanupBodyCrons {
   public schedule(): void {
-    nodeCron.schedule("* * * * *", async () => {
+    nodeCron.schedule("*/30 * * * *", async () => {
       const oneHourAgo = new Date();
       oneHourAgo.setHours(oneHourAgo.getHours() - 1);
 
