@@ -8,7 +8,6 @@ import {
   cronJobs,
   db,
   mapLoader,
-  npcFreezer,
   npcManager,
   redisHelper,
   seeds,
@@ -16,8 +15,6 @@ import {
   socketAdapter,
 } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";
-import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
-import { NPC_CYCLES } from "@providers/npc/NPCCycle";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { router } from "@providers/server/Router";
 import { app } from "@providers/server/app";
@@ -63,18 +60,6 @@ app.listen(port, async () => {
   npcManager.listenForBehaviorTrigger();
 
   await characterConnection.resetCharacterAttributes();
-
-  setInterval(() => {
-    // log NPC and battle cycles
-
-    console.log(`
-      ${appEnv.general.ENV === EnvType.Production ? `PM2_INSTANCE: ${process.env.pm_id}` : ""}
-      NPC CYCLES: ${NPC_CYCLES.size}
-      BATTLE CYCLES: ${NPC_BATTLE_CYCLES.size}
-      MEMORY_USAGE ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) + "MB"}
-      NPC_FREEZE_CHECK_INTERVALS: ${npcFreezer.freezeCheckIntervals.size}
-    `);
-  }, 3000);
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({
