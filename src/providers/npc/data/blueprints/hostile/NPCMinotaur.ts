@@ -47,10 +47,6 @@ export const npcMinotaur = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 5,
-    },
-    {
       itemBlueprintKey: SwordsBlueprint.BroadSword,
       chance: 15,
     },
