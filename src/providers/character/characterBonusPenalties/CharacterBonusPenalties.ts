@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
 import {
+  CharacterClass,
   IBasicAttributesBonusAndPenalties,
   ICombatSkillsBonusAndPenalties,
   IIncreaseSPResult,
@@ -10,6 +11,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBasicAttributesBonusPenalties } from "./CharacterBasicAttributesBonusPenalties";
+import { CharacterClassBonusOrPenalties } from "./CharacterClassBonusOrPenalties";
 import { CharacterCombatBonusPenalties } from "./CharacterCombatBonusPenalties";
 
 @provide(CharacterBonusPenalties)
@@ -18,7 +20,8 @@ export class CharacterBonusPenalties {
     private characterBasicAttributesBonusPenalties: CharacterBasicAttributesBonusPenalties,
     private characterCombatBonusPenalties: CharacterCombatBonusPenalties,
     // private characterCraftingBonusPenalties: CharacterCraftingBonusPenalties,
-    private skillFunctions: SkillFunctions
+    private skillFunctions: SkillFunctions,
+    private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties
   ) {}
 
   public async applyRaceBonusPenalties(character: ICharacter, skillType: string): Promise<void> {
@@ -40,6 +43,10 @@ export class CharacterBonusPenalties {
       skillPoints: 0,
     };
 
+    const classBonusOrPenalties = this.characterClassBonusOrPenalties.getClassBonusOrPenalties(
+      character.class as CharacterClass
+    );
+
     switch (character.race) {
       case LifeBringerRaces.Dwarf: {
         // This is the % of each SP attribute that will be increased or decreased
@@ -47,11 +54,11 @@ export class CharacterBonusPenalties {
 
         // Update Basic Attributes
         basicAttributes = {
-          strength: 0.2,
-          resistance: 0.2,
-          dexterity: -0.1,
-          magic: -0.1,
-          magicResistance: 0.2,
+          strength: 0.2 + classBonusOrPenalties.basicAttributes.strength,
+          resistance: 0.2 + classBonusOrPenalties.basicAttributes.resistance,
+          dexterity: -0.1 + classBonusOrPenalties.basicAttributes.dexterity,
+          magic: -0.1 + classBonusOrPenalties.basicAttributes.magic,
+          magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
         };
 
         if (skillType in basicAttributes) {
@@ -64,13 +71,13 @@ export class CharacterBonusPenalties {
 
         // Update Combat Skills
         combatSkills = {
-          first: 0.1,
-          sword: 0.1,
-          dagger: 0.1,
-          axe: 0.2,
-          distance: -0.1,
-          shielding: 0.1,
-          club: 0.2,
+          first: 0.1 + classBonusOrPenalties.combatSkills.first,
+          sword: 0.1 + classBonusOrPenalties.combatSkills.sword,
+          dagger: 0.1 + classBonusOrPenalties.combatSkills.dagger,
+          axe: 0.2 + classBonusOrPenalties.combatSkills.axe,
+          distance: -0.1 + classBonusOrPenalties.combatSkills.distance,
+          shielding: 0.1 + classBonusOrPenalties.combatSkills.shielding,
+          club: 0.2 + classBonusOrPenalties.combatSkills.club,
         };
 
         if (skillType.toLocaleLowerCase() in combatSkills) {
@@ -86,11 +93,11 @@ export class CharacterBonusPenalties {
 
       case LifeBringerRaces.Elf: {
         basicAttributes = {
-          strength: -0.1,
-          resistance: -0.1,
-          dexterity: 0.1,
-          magic: 0.1,
-          magicResistance: 0.1,
+          strength: -0.1 + classBonusOrPenalties.basicAttributes.strength,
+          resistance: -0.1 + classBonusOrPenalties.basicAttributes.resistance,
+          dexterity: 0.1 + classBonusOrPenalties.basicAttributes.dexterity,
+          magic: 0.1 + classBonusOrPenalties.basicAttributes.magic,
+          magicResistance: 0.1 + classBonusOrPenalties.basicAttributes.magicResistance,
         };
 
         if (skillType in basicAttributes) {
@@ -103,13 +110,13 @@ export class CharacterBonusPenalties {
 
         // Update Combat Skills
         combatSkills = {
-          first: 0.1,
-          sword: 0.1,
-          dagger: 0.1,
-          axe: -0.1,
-          distance: 0.2,
-          shielding: 0.1,
-          club: -0.1,
+          first: 0.1 + classBonusOrPenalties.combatSkills.first,
+          sword: 0.1 + classBonusOrPenalties.combatSkills.sword,
+          dagger: 0.1 + classBonusOrPenalties.combatSkills.dagger,
+          axe: -0.1 + classBonusOrPenalties.combatSkills.axe,
+          distance: 0.2 + classBonusOrPenalties.combatSkills.distance,
+          shielding: 0.1 + classBonusOrPenalties.combatSkills.shielding,
+          club: -0.1 + classBonusOrPenalties.combatSkills.club,
         };
 
         if (skillType.toLocaleLowerCase() in combatSkills) {
@@ -134,11 +141,11 @@ export class CharacterBonusPenalties {
 
       case ShadowWalkerRaces.Minotaur: {
         basicAttributes = {
-          strength: 0.3,
-          resistance: 0.2,
-          dexterity: -0.2,
-          magic: -0.2,
-          magicResistance: 0.2,
+          strength: 0.3 + classBonusOrPenalties.basicAttributes.strength,
+          resistance: 0.2 + classBonusOrPenalties.basicAttributes.resistance,
+          dexterity: -0.2 + classBonusOrPenalties.basicAttributes.dexterity,
+          magic: -0.2 + classBonusOrPenalties.basicAttributes.magic,
+          magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
         };
 
         if (skillType in basicAttributes) {
@@ -151,13 +158,13 @@ export class CharacterBonusPenalties {
 
         // Update Combat Skills
         combatSkills = {
-          first: 0.1,
-          sword: 0.1,
-          dagger: 0.1,
-          axe: 0.3,
-          distance: -0.3,
-          shielding: 0.1,
-          club: 0.3,
+          first: 0.1 + classBonusOrPenalties.combatSkills.first,
+          sword: 0.1 + classBonusOrPenalties.combatSkills.sword,
+          dagger: 0.1 + classBonusOrPenalties.combatSkills.dagger,
+          axe: 0.3 + classBonusOrPenalties.combatSkills.axe,
+          distance: -0.3 + classBonusOrPenalties.combatSkills.distance,
+          shielding: 0.1 + classBonusOrPenalties.combatSkills.shielding,
+          club: 0.3 + classBonusOrPenalties.combatSkills.club,
         };
 
         if (skillType.toLocaleLowerCase() in combatSkills) {
@@ -172,11 +179,11 @@ export class CharacterBonusPenalties {
 
       case ShadowWalkerRaces.Orc: {
         basicAttributes = {
-          strength: 0.2,
-          resistance: 0.1,
-          dexterity: -0.1,
-          magic: -0.2,
-          magicResistance: 0.2,
+          strength: 0.2 + classBonusOrPenalties.basicAttributes.strength,
+          resistance: 0.1 + classBonusOrPenalties.basicAttributes.resistance,
+          dexterity: -0.1 + classBonusOrPenalties.basicAttributes.dexterity,
+          magic: -0.2 + classBonusOrPenalties.basicAttributes.magic,
+          magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
         };
 
         if (skillType in basicAttributes) {
@@ -189,13 +196,13 @@ export class CharacterBonusPenalties {
 
         // Update Combat Skills
         combatSkills = {
-          first: 0.1,
-          sword: 0.1,
-          dagger: 0.1,
-          axe: 0.2,
-          distance: -0.2,
-          shielding: 0.1,
-          club: 0.2,
+          first: 0.1 + classBonusOrPenalties.combatSkills.first,
+          sword: 0.1 + classBonusOrPenalties.combatSkills.sword,
+          dagger: 0.1 + classBonusOrPenalties.combatSkills.dagger,
+          axe: 0.2 + classBonusOrPenalties.combatSkills.axe,
+          distance: -0.2 + classBonusOrPenalties.combatSkills.distance,
+          shielding: 0.1 + classBonusOrPenalties.combatSkills.shielding,
+          club: 0.2 + classBonusOrPenalties.combatSkills.club,
         };
 
         if (skillType.toLocaleLowerCase() in combatSkills) {
