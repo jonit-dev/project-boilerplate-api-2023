@@ -91,6 +91,9 @@ export class GridManager {
       }
 
       grid.setWalkableAt(gridX, gridY, walkable);
+
+      // also save this change to redis, so it can persist. Otherwise, we'll get a brand new grid everytime we call this.getGrid
+      await this.gridRedisSerializer.updateMatrixOnRedis(map, gridX, gridY, walkable);
     } catch (error) {
       console.log(`Failed to setWalkable=${walkable} for gridX ${gridX}, gridY ${gridY} on map ${map}`);
       console.error(error);
@@ -169,6 +172,8 @@ export class GridManager {
     );
 
     const newPath = path.map(([x, y]) => [x - (gridOffsetX ?? 0), y - (gridOffsetY ?? 0)]);
+
+    console.log(newPath);
 
     return newPath;
   }
