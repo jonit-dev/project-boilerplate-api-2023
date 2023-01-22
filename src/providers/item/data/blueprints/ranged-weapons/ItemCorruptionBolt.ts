@@ -12,7 +12,7 @@ export const itemCorruptionBolt: Partial<IItem> = {
   description:
     "An arrow imbued with dark, otherworldly energy. It is said to be able to ignite the air around it and to be capable of piercing even the toughest materials with ease.",
   attack: 6,
-  weight: 0.2,
+  weight: 0.013,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,
   basePrice: 3,

@@ -43,7 +43,7 @@ describe("BattleCharacterManager.spec.ts", () => {
     expect(attackTarget).toBeFalsy();
   });
 
-  it("should return true is attackTarget succeeds", async () => {
+  it("should return true if attackTarget succeeds", async () => {
     const attackTarget = await battleCharacterManager.attackTarget(testCharacter, testNPC);
 
     expect(attackTarget).toBeTruthy();

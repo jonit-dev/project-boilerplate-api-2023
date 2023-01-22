@@ -43,23 +43,29 @@ export class NPCMovementMoveTowards {
 
     const targetCharacter = await Character.findById(npc.targetCharacter);
 
+    if (!targetCharacter) {
+      // no target character
+      await this.npcTarget.tryToSetTarget(npc);
+
+      // if not target is set and we're out of X and Y position, just move back
+      await this.moveBackToOriginalPosIfNoTarget(npc);
+    }
+
     if (targetCharacter) {
       await this.npcTarget.tryToClearOutOfRangeTargets(npc);
 
-      await this.initOrClearBattleCycle(npc, targetCharacter, npc.attackType === EntityAttackType.Melee, 2);
-      await this.initOrClearBattleCycle(
-        npc,
-        targetCharacter,
-        npc.attackType === EntityAttackType.Ranged || npc.attackType === EntityAttackType.MeleeRanged,
-        npc.maxRangeAttack
-      );
+      switch (npc.attackType) {
+        case EntityAttackType.Melee:
+          await this.initOrClearBattleCycle(npc, targetCharacter, 2);
 
-      // change movement to MoveWay (flee) if health is low!
-      if (npc.fleeOnLowHealth) {
-        if (npc.health <= npc.maxHealth / 4) {
-          await NPC.updateOne({ _id: npc._id }, { currentMovementType: NPCMovementType.MoveAway });
-        }
+          break;
+        case EntityAttackType.Ranged:
+        case EntityAttackType.MeleeRanged:
+          await this.initOrClearBattleCycle(npc, targetCharacter, npc.maxRangeAttack);
+          break;
       }
+
+      await this.fleeIfHealthIsLow(npc);
 
       const reachedTarget = this.reachedTarget(npc, targetCharacter);
 
@@ -111,46 +117,51 @@ export class NPCMovementMoveTowards {
 
           break;
       }
-    } else {
-      // no target character
-      await this.npcTarget.tryToSetTarget(npc);
+    }
+  }
 
-      // if not target is set and we're out of X and Y position, just move back
-      if (
-        !npc.targetCharacter &&
-        !this.reachedInitialPosition(npc) &&
-        npc.pathOrientation === NPCPathOrientation.Backward
-      ) {
-        await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
+  private async fleeIfHealthIsLow(npc: INPC): Promise<void> {
+    if (npc.fleeOnLowHealth) {
+      if (npc.health <= npc.maxHealth / 4) {
+        await NPC.updateOne({ _id: npc._id }, { currentMovementType: NPCMovementType.MoveAway });
       }
+    }
+  }
+
+  private async moveBackToOriginalPosIfNoTarget(npc: INPC): Promise<void> {
+    if (
+      !npc.targetCharacter &&
+      !this.reachedInitialPosition(npc) &&
+      npc.pathOrientation === NPCPathOrientation.Backward
+    ) {
+      await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
     }
   }
 
   private async initOrClearBattleCycle(
     npc: INPC,
     targetCharacter: ICharacter,
-    condition: boolean,
+
     maxRangeInGridCells
   ): Promise<void> {
     if (npc.alignment === NPCAlignment.Hostile) {
       // if melee, only start battle cycle if target is in melee range
-      if (condition) {
-        const isInRange = this.movementHelper.isUnderRange(
-          npc.x,
-          npc.y,
-          targetCharacter.x,
-          targetCharacter.y,
-          maxRangeInGridCells
-        );
 
-        if (isInRange) {
-          this.initBattleCycle(npc);
-        } else {
-          const battleCycle = NPC_BATTLE_CYCLES.get(npc.id);
+      const isInRange = this.movementHelper.isUnderRange(
+        npc.x,
+        npc.y,
+        targetCharacter.x,
+        targetCharacter.y,
+        maxRangeInGridCells
+      );
 
-          if (battleCycle) {
-            await battleCycle.clear();
-          }
+      if (isInRange) {
+        this.initBattleCycle(npc);
+      } else {
+        const battleCycle = NPC_BATTLE_CYCLES.get(npc.id);
+
+        if (battleCycle) {
+          await battleCycle.clear();
         }
       }
     }
@@ -280,7 +291,7 @@ export class NPCMovementMoveTowards {
 
   private async moveTowardsPosition(npc: INPC, x: number, y: number): Promise<void> {
     try {
-      const shortestPath = this.npcMovement.getShortestPathNextPosition(
+      const shortestPath = await this.npcMovement.getShortestPathNextPosition(
         npc,
         ToGridX(npc.x),
         ToGridY(npc.y),

@@ -13,8 +13,8 @@ export const itemCorruptionAxe: Partial<IItem> = {
   description:
     "An axe with a blade that is said to be able to cut through any material with ease. It is rumored to be cursed, causing those who wield it to become corrupt and power-hungry.",
   attack: 12,
-  defense: 4,
-  weight: 3,
+  defense: 3,
+  weight: 2,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

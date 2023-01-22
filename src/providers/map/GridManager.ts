@@ -1,32 +1,49 @@
-import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { MapLayers } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
 import PF from "pathfinding";
 import { MapHelper } from "./MapHelper";
 import { MapSolids } from "./MapSolids";
 import { MapTiles } from "./MapTiles";
+import { GridRedisSerializer } from "./grid/GridRedisSerializer";
 
-@provideSingleton(GridManager)
+@provide(GridManager)
 export class GridManager {
-  public grids: Map<string, PF.Grid> = new Map();
+  constructor(
+    private mapTiles: MapTiles,
+    private mapSolids: MapSolids,
+    private mapHelper: MapHelper,
+    private gridRedisSerializer: GridRedisSerializer
+  ) {}
 
-  constructor(private mapTiles: MapTiles, private mapSolids: MapSolids, private mapHelper: MapHelper) {}
+  public async getGrid(map: string): Promise<PF.Grid> {
+    const matrix = await this.gridRedisSerializer.getMatrixFromRedis(map);
 
-  public generateGridSolids(map: string): void {
-    const { gridOffsetX, gridOffsetY } = this.getGridOffset(map)!;
+    if (!matrix) {
+      throw new Error("❌Could not find matrix for map: " + map);
+    }
+
+    const grid = new PF.Grid(matrix);
+
+    return grid;
+  }
+
+  public async hasGrid(map: string): Promise<boolean> {
+    const grid = await this.getGrid(map);
+
+    return !!grid;
+  }
+
+  public async generateGridSolids(map: string): Promise<void> {
+    const { gridOffsetX, gridOffsetY } = this.getMapOffset(map)!;
 
     const { width, height } = this.mapTiles.getMapWidthHeight(map, gridOffsetX, gridOffsetY);
 
-    const newGrid = new PF.Grid(width, height);
+    const matrix: number[][] = [];
 
-    this.grids.set(map, newGrid);
-    const grid = this.grids.get(map);
+    for (let gridY = 0; gridY < height; gridY++) {
+      for (let gridX = 0; gridX < width; gridX++) {
+        matrix[gridY] = matrix[gridY] || [];
 
-    if (!grid) {
-      throw new Error("❌Could not find grid for map: " + map);
-    }
-
-    for (let gridX = 0; gridX < width; gridX++) {
-      for (let gridY = 0; gridY < height; gridY++) {
         // isTileSolid will get the ge_collide property directly from the json file, thats why we should use "raw coordinates", in other words, we should subtract the tileset!
         const isSolid = this.mapSolids.isTileSolid(map, gridX - gridOffsetX, gridY - gridOffsetY, MapLayers.Character);
         const isPassage = this.mapSolids.isTilePassage(
@@ -35,20 +52,22 @@ export class GridManager {
           gridY - gridOffsetY,
           MapLayers.Character
         );
-
-        this.setWalkable(map, gridX, gridY, !isSolid || isPassage);
+        const isWalkable = !isSolid || isPassage;
+        matrix[gridY][gridX] = isWalkable ? 0 : 1;
       }
     }
+
+    await this.gridRedisSerializer.saveMatrixToRedis(map, matrix);
   }
 
-  public isWalkable(map: string, gridX: number, gridY: number): boolean | undefined {
-    const { gridOffsetX, gridOffsetY } = this.getGridOffset(map)!;
+  public async isWalkable(map: string, gridX: number, gridY: number): Promise<boolean | undefined> {
+    const { gridOffsetX, gridOffsetY } = this.getMapOffset(map)!;
 
     const offsetGridX = gridX + gridOffsetX;
     const offsetGridY = gridY + gridOffsetY;
 
     try {
-      const grid = this.grids.get(map);
+      const grid = await this.getGrid(map);
 
       if (!grid) {
         throw new Error("❌Could not find grid for map: " + map);
@@ -63,9 +82,9 @@ export class GridManager {
     }
   }
 
-  public setWalkable(map: string, gridX: number, gridY: number, walkable: boolean): void {
+  public async setWalkable(map: string, gridX: number, gridY: number, walkable: boolean): Promise<void> {
     try {
-      const grid = this.grids.get(map);
+      const grid = await this.getGrid(map);
 
       if (!grid) {
         throw new Error("❌Could not find grid for map: " + map);
@@ -78,7 +97,7 @@ export class GridManager {
     }
   }
 
-  public getGridOffset(map: string): { gridOffsetX: number; gridOffsetY: number } | undefined {
+  public getMapOffset(map: string): { gridOffsetX: number; gridOffsetY: number } | undefined {
     const initialXY = this.mapTiles.getFirstXY(map, MapLayers.Ground);
 
     if (!initialXY) {
@@ -104,15 +123,15 @@ export class GridManager {
     };
   }
 
-  public findShortestPath(
+  public async findShortestPath(
     map: string,
     startGridX: number,
     startGridY: number,
     endGridX: number,
     endGridY: number
-  ): number[][] | undefined {
+  ): Promise<number[][] | undefined> {
     // Check if grid exists for the given map
-    const gridMap = this.grids.get(map);
+    const gridMap = await this.getGrid(map);
     if (!gridMap) {
       throw new Error(`❌ Could not find grid for map: ${map}`);
     }
@@ -127,7 +146,7 @@ export class GridManager {
     const finder = new PF.AStarFinder();
 
     // Remap path without grid offset
-    const { gridOffsetX, gridOffsetY } = this.getGridOffset(map)!;
+    const { gridOffsetX, gridOffsetY } = this.getMapOffset(map)!;
     const startX = startGridX + (gridOffsetX ?? 0);
     const startY = startGridY + (gridOffsetY ?? 0);
     const endX = endGridX + (gridOffsetX ?? 0);

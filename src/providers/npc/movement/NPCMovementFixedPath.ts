@@ -10,7 +10,7 @@ export class NPCMovementFixedPath {
 
   public async startFixedPathMovement(npc: INPC, endGridX: number, endGridY: number): Promise<void> {
     try {
-      const shortestPath = this.NPCMovement.getShortestPathNextPosition(
+      const shortestPath = await this.NPCMovement.getShortestPathNextPosition(
         npc,
         ToGridX(npc.x),
         ToGridY(npc.y),

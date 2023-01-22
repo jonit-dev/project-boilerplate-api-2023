@@ -12,7 +12,7 @@ export const itemBerserkersHelmet: Partial<IItem> = {
   description:
     "Berserker Helmet is an enclosed helmet designed to protect the entire head while intimidating enemies on the battlefield.",
   defense: 6,
-  weight: 1.5,
+  weight: 1,
   allowedEquipSlotType: [ItemSlotType.Head],
   basePrice: 49,
 };

@@ -1,16 +1,19 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { appEnv } from "@providers/config/env";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MathHelper } from "@providers/math/MathHelper";
 import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
+import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   AnimationDirection,
   CharacterSocketEvents,
+  EnvType,
   GRID_WIDTH,
   ICharacterPositionUpdateConfirm,
   ICharacterPositionUpdateFromClient,
@@ -36,7 +39,8 @@ export class CharacterNetworkUpdate {
     private characterMovementValidation: CharacterMovementValidation,
     private characterMovementWarn: CharacterMovementWarn,
     private mathHelper: MathHelper,
-    private characterView: CharacterView
+    private characterView: CharacterView,
+    private pm2Helper: PM2Helper
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -72,9 +76,17 @@ export class CharacterNetworkUpdate {
 
             await this.characterMovementWarn.warn(character, data);
 
-            await this.npcManager.startNearbyNPCsBehaviorLoop(character);
+            switch (appEnv.general.ENV) {
+              case EnvType.Development:
+                await this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
-            // update emitter position from
+                break;
+              case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
+                this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
+                  character,
+                });
+                break;
+            }
 
             await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
 
@@ -188,13 +200,18 @@ export class CharacterNetworkUpdate {
   ): Promise<void> {
     const map = character.scene;
 
-    const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
+    const { gridOffsetX, gridOffsetY } = this.gridManager.getMapOffset(map)!;
 
     if (isMoving) {
       // if character is moving, update the position
 
       // old position is now walkable
-      this.gridManager.setWalkable(map, ToGridX(character.x) + gridOffsetX, ToGridY(character.y) + gridOffsetY, true);
+      await this.gridManager.setWalkable(
+        map,
+        ToGridX(character.x) + gridOffsetX,
+        ToGridY(character.y) + gridOffsetY,
+        true
+      );
 
       await Character.updateOne(
         { _id: character._id },
@@ -210,7 +227,7 @@ export class CharacterNetworkUpdate {
 
       // update our grid with solid information
 
-      this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
+      await this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
     }
   }
 }

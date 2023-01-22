@@ -11,8 +11,8 @@ export const itemVikingShield: Partial<IItem> = {
   name: "Viking Shield",
   description:
     "It consists of thin planking, which forms a circular shape. In the middle is a dome of iron to protect the shield bearer's hand.",
-  defense: 6,
-  weight: 3,
+  defense: 12,
+  weight: 1.4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 49,
 };

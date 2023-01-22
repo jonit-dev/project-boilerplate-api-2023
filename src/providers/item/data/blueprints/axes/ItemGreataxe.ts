@@ -14,7 +14,7 @@ export const itemGreataxe: Partial<IItem> = {
     "A large, two-handed axe with a broad head and a long handle. It is designed for heavy chopping and slicing and is typically wielded by strong, heavily-armored warriors.",
   attack: 15,
   defense: 4,
-  weight: 3,
+  weight: 2.1,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

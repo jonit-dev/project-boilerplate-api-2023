@@ -143,7 +143,6 @@ export class CharacterItemInventory {
 
           if (remaining > 0) {
             await this.characterItemSlots.updateItemOnSlot(i, inventoryItemContainer, {
-              ...slotItem,
               stackQty: remaining,
             });
           } else {

@@ -114,7 +114,7 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
 
       expect(increasedSkills.skillLevelUp).toBe(true);
       expect(increasedSkills.skillName).toBe(test.skill);
-      expect(increasedSkills.skillLevel).toBe(initialLevel + 1);
+      expect(increasedSkills.skillLevelBefore).toBe(initialLevel + 1);
 
       expect(skills[test.skill].level).toBe(initialLevel + 1);
       expect(skills[test.skill].skillPoints).toBe(spToLvl2);

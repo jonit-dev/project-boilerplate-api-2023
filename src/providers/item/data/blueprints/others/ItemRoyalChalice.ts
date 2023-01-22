@@ -10,6 +10,6 @@ export const itemRoyalChalice: Partial<IItem> = {
   texturePath: "others/royal-chalice.png",
   name: "Royal Chalice",
   description: "A well master crafted chalice worth of a king.",
-  weight: 1,
+  weight: 0.8,
   basePrice: 1,
 };

@@ -4,11 +4,11 @@ import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { calculateExperience } from "@providers/npc/NPCExperience";
 import {
-  calculateSPToNextLevel,
-  calculateXPToNextLevel,
   NPCAlignment,
   SkillType,
   TypeHelper,
+  calculateSPToNextLevel,
+  calculateXPToNextLevel,
 } from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Character } from "./CharacterModel";
@@ -125,7 +125,7 @@ skillsSchema.virtual("attack").get(async function (this: ISkill) {
   if (this.ownerType === "Character") {
     const equipment = await Equipment.findOne({
       owner: this.owner,
-    });
+    }).lean({ virtuals: true, defaults: true });
 
     if (equipment) {
       const totalEquippedAttack = await equipment?.totalEquippedAttack;
@@ -156,7 +156,7 @@ skillsSchema.virtual("defense").get(async function (this: ISkill) {
   if (this.ownerType === "Character") {
     const equipment = await Equipment.findOne({
       owner: this.owner,
-    });
+    }).lean({ virtuals: true, defaults: true });
     if (equipment) {
       const totalEquippedDefense = await equipment?.totalEquippedDefense;
       const dataOfWeather = await MapControlTimeModel.findOne();

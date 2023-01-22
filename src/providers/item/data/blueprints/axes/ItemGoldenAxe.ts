@@ -14,7 +14,7 @@ export const itemGoldenAxe: Partial<IItem> = {
     "An axe with a golden blade and handle. It is often given as a symbol of honor or status, and is said to be a powerful weapon in the hands of a skilled warrior.",
   attack: 19,
   defense: 7,
-  weight: 3,
+  weight: 2.4,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

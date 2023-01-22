@@ -29,6 +29,6 @@ export const questInteractionObjectiveMock: Partial<IQuestObjectiveInteraction> 
 export const questInteractionCraftObjectiveMock: Partial<IQuestObjectiveInteraction> = {
   items: [
     { itemKey: CraftingResourcesBlueprint.Diamond, qty: 2 },
-    { itemKey: CraftingResourcesBlueprint.Silk, qty: 20 },
+    { itemKey: CraftingResourcesBlueprint.Silk, qty: 8 },
   ],
 };

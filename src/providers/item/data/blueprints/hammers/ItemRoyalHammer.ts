@@ -14,7 +14,7 @@ export const itemRoyalHammer: Partial<IItem> = {
     "A large hammer with an ornate handle and head, often made of gold or other precious materials. It is traditionally wielded by royalty as a symbol of their power.",
   attack: 9,
   defense: 5,
-  weight: 3,
+  weight: 1.4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };

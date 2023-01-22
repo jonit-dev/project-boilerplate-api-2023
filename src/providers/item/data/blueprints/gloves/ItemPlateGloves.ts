@@ -12,7 +12,7 @@ export const itemPlateGloves: Partial<IItem> = {
   name: "Plate Gloves",
   description: "A pair of plated gloves.",
   defense: 10,
-  weight: 2,
+  weight: 1.3,
   allowedEquipSlotType: [ItemSlotType.Ring],
   basePrice: 65,
 };
