@@ -11,6 +11,8 @@ import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entit
 import {
   BootsBlueprint,
   ContainersBlueprint,
+  CraftingResourcesBlueprint,
+  DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
@@ -19,6 +21,7 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
 export const npcForestTroll = {
@@ -53,7 +56,7 @@ export const npcForestTroll = {
       chance: 25,
     },
     {
-      itemBlueprintKey: GlovesBlueprint.LeatherGloves,
+      itemBlueprintKey: GlovesBlueprint.StuddedGloves,
       chance: 10,
     },
     {
@@ -61,17 +64,15 @@ export const npcForestTroll = {
       chance: 30,
     },
     {
-      itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
-      chance: 50,
-      quantityRange: [5, 10],
+      itemBlueprintKey: RangedWeaponsBlueprint.HuntersBow,
+      chance: 20,
     },
     {
-      itemBlueprintKey: HelmetsBlueprint.ArabicHelmet,
+      itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
       chance: 10,
     },
-
     {
-      itemBlueprintKey: FoodsBlueprint.Salmon,
+      itemBlueprintKey: FoodsBlueprint.WildSalmon,
       chance: 30,
     },
     {
@@ -79,16 +80,32 @@ export const npcForestTroll = {
       chance: 10,
     },
     {
-      itemBlueprintKey: BootsBlueprint.CopperBoots,
+      itemBlueprintKey: BootsBlueprint.PlateBoots,
       chance: 15,
     },
     {
-      itemBlueprintKey: ShieldsBlueprint.StuddedShield,
+      itemBlueprintKey: ShieldsBlueprint.KnightsShield,
       chance: 15,
     },
     {
-      itemBlueprintKey: HammersBlueprint.WarHammer,
+      itemBlueprintKey: HammersBlueprint.RoyalHammer,
       chance: 1,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.FireSword,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.ElvenBolt,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.Kunai,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.RedShappire,
+      chance: 8,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
