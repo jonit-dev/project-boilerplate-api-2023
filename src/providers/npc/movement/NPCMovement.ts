@@ -62,17 +62,17 @@ export class NPCMovement {
         "CHECK_ALL_LAYERS_BELOW",
         npc
       );
-      const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
+      const { gridOffsetX, gridOffsetY } = this.gridManager.getMapOffset(map)!;
 
       if (hasSolid) {
         // console.log(`${npc.key} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
-        this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
+        await this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
         return;
       }
 
-      this.gridManager.setWalkable(map, ToGridX(oldX) + gridOffsetX, ToGridY(oldY) + gridOffsetY, true);
+      await this.gridManager.setWalkable(map, ToGridX(oldX) + gridOffsetX, ToGridY(oldY) + gridOffsetY, true);
 
-      this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
+      await this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
 
       // warn nearby characters that the NPC moved;
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
@@ -118,15 +118,15 @@ export class NPCMovement {
     }
   }
 
-  public getShortestPathNextPosition(
+  public async getShortestPathNextPosition(
     npc: INPC,
     startGridX: number,
     startGridY: number,
     endGridX: number,
     endGridY: number
-  ): IShortestPathPositionResult | undefined {
+  ): Promise<IShortestPathPositionResult | undefined> {
     try {
-      const npcPath = this.gridManager.findShortestPath(npc.scene, startGridX, startGridY, endGridX, endGridY);
+      const npcPath = await this.gridManager.findShortestPath(npc.scene, startGridX, startGridY, endGridX, endGridY);
 
       if (!npcPath || npcPath.length <= 1) {
         return;

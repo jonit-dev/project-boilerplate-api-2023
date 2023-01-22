@@ -200,13 +200,18 @@ export class CharacterNetworkUpdate {
   ): Promise<void> {
     const map = character.scene;
 
-    const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
+    const { gridOffsetX, gridOffsetY } = this.gridManager.getMapOffset(map)!;
 
     if (isMoving) {
       // if character is moving, update the position
 
       // old position is now walkable
-      this.gridManager.setWalkable(map, ToGridX(character.x) + gridOffsetX, ToGridY(character.y) + gridOffsetY, true);
+      await this.gridManager.setWalkable(
+        map,
+        ToGridX(character.x) + gridOffsetX,
+        ToGridY(character.y) + gridOffsetY,
+        true
+      );
 
       await Character.updateOne(
         { _id: character._id },
@@ -222,7 +227,7 @@ export class CharacterNetworkUpdate {
 
       // update our grid with solid information
 
-      this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
+      await this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
     }
   }
 }

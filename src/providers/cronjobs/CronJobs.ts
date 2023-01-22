@@ -9,6 +9,8 @@ import { DecayItemsCron } from "./DecayItemsCron";
 import { DeleteChatCrons } from "./DeleteChatCrons";
 import { ItemDeleteCrons } from "./ItemDeleteCrons";
 import { NPCCrons } from "./NPCCrons";
+import { CleanupBloodCrons } from "./CleanupBloodCrons";
+import { CleanupBodyCrons } from "./CleanupBodyCrons";
 
 @provide(Cronjob)
 export class Cronjob {
@@ -20,7 +22,9 @@ export class Cronjob {
     private controlTimeCron: ControlTimeCrons,
     private pm2Helper: PM2Helper,
     private itemDeleteCrons: ItemDeleteCrons,
-    private deleteChatCrons: DeleteChatCrons
+    private deleteChatCrons: DeleteChatCrons,
+    private cleanupBloodCrons: CleanupBloodCrons,
+    private cleanupBodyCrons: CleanupBodyCrons
   ) {}
 
   public start(): void {
@@ -39,6 +43,8 @@ export class Cronjob {
         this.controlTimeCron.schedule();
         this.itemDeleteCrons.schedule();
         this.deleteChatCrons.schedule();
+        this.cleanupBloodCrons.schedule();
+        this.cleanupBodyCrons.schedule();
         break;
       case EnvType.Staging:
       case EnvType.Production:
@@ -51,6 +57,8 @@ export class Cronjob {
           this.controlTimeCron.schedule();
           this.itemDeleteCrons.schedule();
           this.deleteChatCrons.schedule();
+          this.cleanupBloodCrons.schedule();
+          this.cleanupBodyCrons.schedule();
         }
         break;
     }

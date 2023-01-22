@@ -48,7 +48,7 @@ describe("MapTiles.ts", () => {
   });
 
   it("should properly calculate the correct map width and height", () => {
-    const { gridOffsetX, gridOffsetY } = gridManager.getGridOffset("unit-test-map-negative-coordinate")!;
+    const { gridOffsetX, gridOffsetY } = gridManager.getMapOffset("unit-test-map-negative-coordinate")!;
 
     const { width, height } = mapTiles.getMapWidthHeight("unit-test-map-negative-coordinate", gridOffsetX, gridOffsetY);
 
