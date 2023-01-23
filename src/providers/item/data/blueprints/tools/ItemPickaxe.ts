@@ -1,7 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
-import { IUseWithItemToTileOptions, UseWithItemToTile } from "@providers/useWith/abstractions/UseWithItemToTile";
+import {
+  IUseWithItemToTileOptions,
+  IUseWithItemToTileReward,
+  UseWithItemToTile,
+} from "@providers/useWith/abstractions/UseWithItemToTile";
 import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -68,7 +72,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
               qty: [5, 7],
               chance: 20,
             },
-          ],
+          ] as IUseWithItemToTileReward[],
         };
         break;
       case CraftingResourcesBlueprint.CopperOre:
@@ -81,7 +85,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
               qty: [3, 4],
               chance: 15,
             },
-          ],
+          ] as IUseWithItemToTileReward[],
         };
         break;
 
@@ -95,7 +99,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
               qty: [2, 3],
               chance: 10,
             },
-          ],
+          ] as IUseWithItemToTileReward[],
         };
         break;
       case CraftingResourcesBlueprint.GoldenOre:
@@ -108,7 +112,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
               qty: [1, 2],
               chance: 7,
             },
-          ],
+          ] as IUseWithItemToTileReward[],
         };
         break;
       case CraftingResourcesBlueprint.GreenOre:
@@ -121,7 +125,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
               qty: [1, 2],
               chance: 50,
             },
-          ],
+          ] as IUseWithItemToTileReward[],
         };
         break;
       case CraftingResourcesBlueprint.ObsidiumOre:
@@ -134,7 +138,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
               qty: [1, 2],
               chance: 3,
             },
-          ],
+          ] as IUseWithItemToTileReward[],
         };
         break;
       case CraftingResourcesBlueprint.CorruptionOre:
@@ -147,7 +151,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
               qty: [1, 2],
               chance: 1,
             },
-          ],
+          ] as IUseWithItemToTileReward[],
         };
         break;
     }

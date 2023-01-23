@@ -95,12 +95,10 @@ export const npcDwarfGuard = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Obsidian,
       chance: 5,
-      quantityRange: [3, 5],
     },
     {
       itemBlueprintKey: SpearsBlueprint.Javelin,
       chance: 5,
-      quantityRange: [2, 10],
     },
   ],
 } as Partial<INPC>;
