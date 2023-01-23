@@ -12,7 +12,7 @@ export const itemKunai: Partial<IItem> = {
   name: "Kunai",
   description:
     "A Japanese knife with a blunt, triangular tip and a long, straight handle. It is often used as a throwing weapon, but can also be used in close combat.",
-  weight: 1,
+  weight: 0.7,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 10,
   defense: 4,

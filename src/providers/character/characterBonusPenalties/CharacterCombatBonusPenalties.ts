@@ -14,14 +14,16 @@ export class CharacterCombatBonusPenalties {
     bonusOrPenalties: ICombatSkillsBonusAndPenalties
   ): Promise<IIncreaseSPResult> {
     let skillLevelUp: boolean = false;
+
+    const skillTypeLowerCase = skillType.toLowerCase();
+
     let skillSpData: IIncreaseSPResult = {
       skillLevelUp: false,
-      skillLevel: 0,
+      skillLevelBefore: skills[skillTypeLowerCase].level,
+      skillLevelAfter: 0,
       skillName: "",
       skillPoints: 0,
     };
-
-    const skillTypeLowerCase = skillType.toLowerCase();
 
     switch (skillTypeLowerCase) {
       case "none": {
@@ -34,7 +36,8 @@ export class CharacterCombatBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[firstType].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[firstType].level,
           skillName: skillType,
           skillPoints: skills[firstType].skillPoints,
         };
@@ -51,7 +54,8 @@ export class CharacterCombatBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[skillTypeLowerCase].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[skillTypeLowerCase].level,
           skillName: skillType,
           skillPoints: skills[skillTypeLowerCase].skillPoints,
         };
@@ -68,8 +72,9 @@ export class CharacterCombatBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[skillTypeLowerCase].level,
-          skillName: skillTypeLowerCase,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[skillTypeLowerCase].level,
+          skillName: skillType,
           skillPoints: skills[skillTypeLowerCase].skillPoints,
         };
 
@@ -85,7 +90,8 @@ export class CharacterCombatBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[skillTypeLowerCase].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[skillTypeLowerCase].level,
           skillName: skillType,
           skillPoints: skills[skillTypeLowerCase].skillPoints,
         };
@@ -103,7 +109,8 @@ export class CharacterCombatBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[rangedType].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[rangedType].level,
           skillName: skillType,
           skillPoints: skills[rangedType].skillPoints,
         };
@@ -121,7 +128,8 @@ export class CharacterCombatBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[rangedType].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[rangedType].level,
           skillName: skillType,
           skillPoints: skills[rangedType].skillPoints,
         };
@@ -139,7 +147,8 @@ export class CharacterCombatBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[shieldType].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[shieldType].level,
           skillName: skillType,
           skillPoints: skills[shieldType].skillPoints,
         };
@@ -157,7 +166,8 @@ export class CharacterCombatBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[maceType].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[maceType].level,
           skillName: skillType,
           skillPoints: skills[maceType].skillPoints,
         };

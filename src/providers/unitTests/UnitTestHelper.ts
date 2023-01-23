@@ -611,7 +611,8 @@ export class UnitTestHelper {
   public async equipItemsInBackpackSlot(
     equipment: IEquipment,
     itemsKeys: string[],
-    isItemId: boolean = false
+    isItemId: boolean = false,
+    extraProps?: Partial<IItem>
   ): Promise<IItem[]> {
     // Add items to character's backpack
     const backpack = equipment.inventory as unknown as IItem;
@@ -632,7 +633,7 @@ export class UnitTestHelper {
     const items: IItem[] = [];
     if (!isItemId) {
       for (const key of itemsKeys) {
-        const item = await this.createMockItemFromBlueprint(key);
+        const item = await this.createMockItemFromBlueprint(key, extraProps);
         const slotId = backpackContainer.firstAvailableSlotId;
         backpackContainer.slots[slotId!] = item._id;
         items.push(item);

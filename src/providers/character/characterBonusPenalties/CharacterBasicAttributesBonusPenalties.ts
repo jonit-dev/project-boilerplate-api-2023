@@ -16,7 +16,8 @@ export class CharacterBasicAttributesBonusPenalties {
     let skillLevelUp: boolean = false;
     let skillSpData: IIncreaseSPResult = {
       skillLevelUp: false,
-      skillLevel: 0,
+      skillLevelBefore: skills[skillType].level,
+      skillLevelAfter: 0,
       skillName: "",
       skillPoints: 0,
     };
@@ -31,7 +32,8 @@ export class CharacterBasicAttributesBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[skillType].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
           skillPoints: skills[skillType].skillPoints,
         };
@@ -48,7 +50,8 @@ export class CharacterBasicAttributesBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[skillType].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
           skillPoints: skills[skillType].skillPoints,
         };
@@ -65,7 +68,8 @@ export class CharacterBasicAttributesBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[skillType].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
           skillPoints: skills[skillType].skillPoints,
         };
@@ -80,7 +84,8 @@ export class CharacterBasicAttributesBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[skillType].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
           skillPoints: skills[skillType].skillPoints,
         };
@@ -97,7 +102,8 @@ export class CharacterBasicAttributesBonusPenalties {
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
-          skillLevel: skills[skillType].level,
+          skillLevelBefore: skillSpData.skillLevelBefore,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
           skillPoints: skills[skillType].skillPoints,
         };

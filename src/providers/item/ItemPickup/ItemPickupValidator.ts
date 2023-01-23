@@ -120,7 +120,7 @@ export class ItemPickupValidator {
       character,
       isInventoryItem ? "equipment" : "inventory"
     );
-    if (characterAlreadyHasItem) {
+    if (characterAlreadyHasItem && itemPickupData.toContainerId === inventory._id.toString()) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you already have this item.");
       return false;
     }

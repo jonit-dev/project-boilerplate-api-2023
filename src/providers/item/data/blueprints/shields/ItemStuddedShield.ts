@@ -10,8 +10,8 @@ export const itemStuddedShield: Partial<IItem> = {
   texturePath: "shields/studded-shield.png",
   name: "Studded Shield",
   description: "A wooden shield covered in leather and metal studs.",
-  defense: 4,
-  weight: 3,
+  defense: 10,
+  weight: 1.4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 41,
 };

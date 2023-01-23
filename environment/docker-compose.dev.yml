@@ -46,6 +46,20 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     networks:
       - rpg-network
+  rpg-redis:
+    container_name: rpg-redis
+    restart: always
+    image: redis:latest
+    ports:
+      - "$REDIS_PORT:$REDIS_PORT"
+    expose:
+      - "$REDIS_PORT"
+    env_file: .env
+    volumes:
+      - ./config/redis.conf:/redis.conf
+    command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
+    networks:
+      - rpg-network
 
 networks:
   rpg-network:

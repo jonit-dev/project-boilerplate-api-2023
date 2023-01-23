@@ -222,6 +222,13 @@ const characterSchema = createLeanSchema(
       })
     ),
     appliedEntityEffects: Type.array().of(Type.mixed({})),
+    appliedBuffsEffects: Type.array().of(
+      Type.mixed({
+        _id: Type.objectId({ auto: true }),
+        key: Type.string({ required: true }),
+        value: Type.string({ required: true }),
+      })
+    ),
     ...({} as {
       isAlive: boolean;
       type: string;

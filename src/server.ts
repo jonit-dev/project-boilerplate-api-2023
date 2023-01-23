@@ -9,6 +9,7 @@ import {
   db,
   mapLoader,
   npcManager,
+  redisManager,
   seeds,
   server,
   socketAdapter,
@@ -34,6 +35,8 @@ app.listen(port, async () => {
   });
 
   await db.init();
+  await redisManager.connect();
+
   await cronJobs.start();
   await socketAdapter.init(appEnv.socket.type);
 
@@ -53,7 +56,8 @@ app.listen(port, async () => {
 
   await seeds.start();
 
-  //! TODO: Allocate according to pm2 instances
+  //! TODO: Load balance NPCs on PM2 instances
+  npcManager.listenForBehaviorTrigger();
 
   await characterConnection.resetCharacterAttributes();
 

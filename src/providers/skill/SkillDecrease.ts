@@ -33,36 +33,20 @@ export class SkillDecrease {
 
   private async decreaseCharacterXp(character: ICharacter): Promise<boolean> {
     const skills = await Skill.findOne({ _id: character.skills });
-
-    if (skills) {
-      const currentXP = Math.round(skills.experience);
-      const deathPenaltyXp = Math.round(currentXP * 0.2);
-      const newXpReduced = currentXP - deathPenaltyXp;
-      const currentXpLvl = this.skillCalculator.getXPForLevel(skills.level);
-
-      if (newXpReduced <= currentXpLvl && skills.level > 1 && newXpReduced > 1) {
-        skills.experience = newXpReduced;
-        skills.xpToNextLevel = currentXpLvl - newXpReduced;
-        skills.level -= 1;
-
-        await this.updateSkills(skills, character);
-
-        return true;
-      } else if (skills.level >= 1 && skills.experience > 2) {
-        const xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(newXpReduced, skills.level + 1);
-
-        skills.experience = newXpReduced;
-        skills.xpToNextLevel = xpToNextLevel;
-
-        await this.updateSkills(skills, character);
-
-        return true;
-      } else {
-        return false;
-      }
+    if (!skills) {
+      return false;
     }
 
-    return false;
+    const currentXP = Math.round(skills.experience);
+    const deathPenaltyXp = Math.round(currentXP * 0.2);
+    let newXpReduced = currentXP - deathPenaltyXp;
+    newXpReduced = Math.max(newXpReduced, 0);
+
+    skills.experience = newXpReduced;
+    skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(newXpReduced, skills.level + 1);
+
+    await this.updateSkills(skills, character);
+    return true;
   }
 
   private async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
@@ -124,23 +108,14 @@ export class SkillDecrease {
     const skill = skills[skillToUpdate] as ISkillDetails;
 
     const skillPoints = Math.round(skill.skillPoints);
-    const deathPenaltySP = Math.round(skill.skillPoints * 0.1);
-    const newSpReduced = skillPoints - deathPenaltySP;
-    const currentSpLvl = this.skillCalculator.getSPForLevel(skill.level);
+    const deathPenaltySP = Math.round(skillPoints * 0.1);
+    let newSpReduced = skillPoints - deathPenaltySP;
+
+    newSpReduced = Math.max(newSpReduced, 0);
+    skill.skillPoints = newSpReduced;
+    skill.level = Math.max(1, skill.level);
+    skill.skillPointsToNextLevel = calculateSPToNextLevel(newSpReduced, skill.level + 1);
 
     skills[skillToUpdate] = skill;
-
-    if (newSpReduced <= currentSpLvl && skill.level > 1 && newSpReduced > 1) {
-      skill.skillPoints = newSpReduced;
-      skill.skillPointsToNextLevel = currentSpLvl - newSpReduced;
-      skill.level = skill.level - 1;
-    } else if (skill.level >= 1 && skill.skillPoints > 2) {
-      const spToNextLvl = calculateSPToNextLevel(newSpReduced, skill.level + 1);
-
-      skill.skillPoints = newSpReduced;
-      skill.skillPointsToNextLevel = spToNextLvl;
-    } else {
-      // Do nothing!
-    }
   }
 }

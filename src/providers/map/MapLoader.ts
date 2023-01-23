@@ -58,7 +58,7 @@ export class MapLoader {
 
       MapLoader.maps.set(mapName, currentMap);
 
-      this.gridManager.generateGridSolids(mapName);
+      await this.gridManager.generateGridSolids(mapName);
     }
 
     if (!appEnv.general.IS_UNIT_TEST) {

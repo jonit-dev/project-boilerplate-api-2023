@@ -10,5 +10,5 @@ export const itemMap: Partial<IItem> = {
   texturePath: "others/map.png",
   name: "Map",
   description: "A map with instructions.",
-  weight: 1,
+  weight: 0.5,
 };

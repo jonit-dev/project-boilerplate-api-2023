@@ -12,7 +12,7 @@ export const itemElvenBolt: Partial<IItem> = {
   description:
     "An arrow crafted by the elves, known for their skill in archery. It is said to be incredibly accurate and able to pierce even the toughest armor.",
   attack: 9,
-  weight: 0.2,
+  weight: 0.03,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 105,
   basePrice: 7,

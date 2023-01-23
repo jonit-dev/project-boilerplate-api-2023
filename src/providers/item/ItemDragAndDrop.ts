@@ -213,6 +213,13 @@ export class ItemDragAndDrop {
       return false;
     }
 
+    const toSlotItem = inventoryContainer.slots[itemMove.to.slotIndex];
+
+    if (toSlotItem && toSlotItem.key !== itemMove.from.item.key) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot move items of different types.");
+      return false;
+    }
+
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,

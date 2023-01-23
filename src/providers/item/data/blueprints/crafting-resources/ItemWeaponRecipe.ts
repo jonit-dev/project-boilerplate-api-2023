@@ -10,5 +10,5 @@ export const itemWeaponRecipe: Partial<IItem> = {
   texturePath: "crafting-resources/weapon-recipe.png",
   name: "Weapon Recipe",
   description: "A weapon recipe scroll used for crafting.",
-  weight: 1,
+  weight: 0.6,
 };

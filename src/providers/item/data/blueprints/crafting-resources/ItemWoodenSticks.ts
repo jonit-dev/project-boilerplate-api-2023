@@ -14,7 +14,7 @@ export const itemWoodenSticks: Partial<IItemUseWith> = {
   texturePath: "crafting-resources/wooden-sticks.png",
   name: "Wooden Sticks",
   description: "Wooden sticks used for crafting.",
-  weight: 1,
+  weight: 0.4,
   maxStackSize: 25,
   basePrice: 1,
   hasUseWith: true,

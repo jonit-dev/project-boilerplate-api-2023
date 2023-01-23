@@ -14,7 +14,7 @@ export const itemRoyalDoubleAxe: Partial<IItem> = {
     "A large, two-handed axe with two parallel heads connected by a short handle. It is often given as a symbol of royal power and is wielded by elite soldiers in ceremonial guard units.",
   attack: 22,
   defense: 7,
-  weight: 5,
+  weight: 4.2,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

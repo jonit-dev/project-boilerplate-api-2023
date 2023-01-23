@@ -11,7 +11,7 @@ export const itemStuddedBoots: Partial<IItem> = {
   name: "Studded Boots",
   description: "A boot made with leather and metal studs.",
   defense: 3,
-  weight: 1,
+  weight: 0.7,
   allowedEquipSlotType: [ItemSlotType.Feet],
   basePrice: 37,
 };

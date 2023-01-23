@@ -72,21 +72,29 @@ export class SkillFunctions {
     character: ICharacter,
     target?: INPC | ICharacter
   ): Promise<void> {
-    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You advanced from level ${skillData.skillLevel - 1} to ${skillData.skillLevel} in ${_.startCase(
-        _.toLower(skillData.skillName)
-      )} fighting.`,
-      type: "info",
-    });
+    let behavior = "";
+
+    if (skillData.skillLevelBefore > skillData.skillLevelAfter) {
+      behavior = "regressed";
+    } else {
+      behavior = "advanced";
+    }
 
     const levelUpEventPayload: ISkillEventFromServer = {
       characterId: character.id,
       targetId: target?.id,
       targetType: target?.type as "Character" | "NPC",
       eventType: SkillEventType.SkillLevelUp,
-      level: skillData.skillLevel,
+      level: skillData.skillLevelBefore,
       skill: skillData.skillName,
     };
+
+    this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+      message: `You ${behavior} from level ${skillData.skillLevelBefore} to ${
+        skillData.skillLevelAfter
+      } in ${_.startCase(_.toLower(skillData.skillName))} fighting.`,
+      type: "info",
+    });
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
 

@@ -13,7 +13,7 @@ export const itemWarHammer: Partial<IItem> = {
   description: "A large war hammer.",
   attack: 7,
   defense: 4,
-  weight: 2,
+  weight: 1.2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
 };

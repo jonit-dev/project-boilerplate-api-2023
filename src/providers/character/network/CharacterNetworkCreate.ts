@@ -1,10 +1,12 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
+import { appEnv } from "@providers/config/env";
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { NPCWarn } from "@providers/npc/NPCWarn";
+import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -12,6 +14,7 @@ import {
   AnimationDirection,
   AvailableWeather,
   CharacterSocketEvents,
+  EnvType,
   ICharacterCreateFromClient,
   ICharacterCreateFromServer,
   IControlTime,
@@ -21,6 +24,7 @@ import {
   WeatherSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { BuffSkillFunctions } from "../CharacterBuffer/BuffSkillFunctions";
 import { CharacterView } from "../CharacterView";
 
 @provide(CharacterNetworkCreate)
@@ -33,7 +37,9 @@ export class CharacterNetworkCreate {
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private npcManager: NPCManager,
     private gridManager: GridManager,
-    private npcWarn: NPCWarn
+    private npcWarn: NPCWarn,
+    private pm2Helper: PM2Helper,
+    private buffSkillFunctions: BuffSkillFunctions
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -70,9 +76,9 @@ export class CharacterNetworkCreate {
 
         const map = character.scene;
 
-        const { gridOffsetX, gridOffsetY } = this.gridManager.getGridOffset(map)!;
+        const { gridOffsetX, gridOffsetY } = this.gridManager.getMapOffset(map)!;
 
-        this.gridManager.setWalkable(
+        await this.gridManager.setWalkable(
           map,
           ToGridX(character.x) + gridOffsetX,
           ToGridY(character.y) + gridOffsetY,
@@ -116,7 +122,19 @@ export class CharacterNetworkCreate {
 
         await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
 
-        await this.npcManager.startNearbyNPCsBehaviorLoop(character);
+        await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
+
+        switch (appEnv.general.ENV) {
+          case EnvType.Development:
+            await this.npcManager.startNearbyNPCsBehaviorLoop(character);
+
+            break;
+          case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
+            this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
+              character,
+            });
+            break;
+        }
 
         await this.itemView.warnCharacterAboutItemsInView(character);
 

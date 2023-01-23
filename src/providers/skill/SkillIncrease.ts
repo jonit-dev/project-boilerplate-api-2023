@@ -4,12 +4,19 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
+import { BuffSkillFunctions } from "@providers/character/CharacterBuffer/BuffSkillFunctions";
+import { CharacterView } from "@providers/character/CharacterView";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellLearn } from "@providers/spells/SpellLearn";
-import { AnimationEffectKeys, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  CharacterSocketEvents,
+  ICharacterAttributeChanged,
+  IUIShowMessage,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import {
   BasicAttribute,
@@ -23,8 +30,10 @@ import {
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { Types } from "mongoose";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
+
 @provide(SkillIncrease)
 export class SkillIncrease {
   constructor(
@@ -34,7 +43,8 @@ export class SkillIncrease {
     private animationEffect: AnimationEffect,
     private spellLearn: SpellLearn,
     private characterBonusPenalties: CharacterBonusPenalties,
-    private skillFunctions: SkillFunctions
+    private skillFunctions: SkillFunctions,
+    private buffSkillFunctions: BuffSkillFunctions
   ) {}
 
   /**
@@ -176,13 +186,22 @@ export class SkillIncrease {
 
       // Get character skills
       const skills = await Skill.findById(character.skills);
+
+      const appliedBuffEffect = character.appliedBuffsEffects;
+
+      const experience = "experience";
+      let buff = 0;
+      appliedBuffEffect
+        ? (buff = this.buffSkillFunctions.getTotalValueByKey(appliedBuffEffect, experience) / 100)
+        : (buff = 0);
+      buff < 0 ? (buff = 0) : buff;
+
       if (!skills) {
         // if attacker skills does not exist anymore
         // call again the function without this record
         return this.releaseXP(target);
       }
-
-      skills.experience += record!.xp!;
+      skills.experience += record!.xp! + record!.xp! * buff;
       skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
 
       while (skills.xpToNextLevel <= 0) {
@@ -197,13 +216,21 @@ export class SkillIncrease {
       await this.updateSkills(skills, character);
 
       if (levelUp) {
-        await this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp: record!.xp! }, character, target);
+        const { maxHealth, maxMana } = this.increaseMaxManaMaxHealth(character.maxMana, character.maxHealth);
+        await this.updateEntitiesAttributes(character._id, "maxHealth", maxHealth);
+        await this.updateEntitiesAttributes(character._id, "maxMana", maxMana);
+
+        await this.sendExpLevelUpEvents(
+          { level: skills.level, previousLevel, exp: record!.xp! + record!.xp! * buff },
+          character,
+          target
+        );
         setTimeout(async () => {
           await this.spellLearn.learnLatestSkillLevelSpells(character._id, true);
         }, 5000);
       }
 
-      await this.warnCharactersAroundAboutExpGains(character, record!.xp!);
+      await this.warnCharactersAroundAboutExpGains(character, record!.xp! + record!.xp! * buff);
     }
 
     await target.save();
@@ -214,10 +241,8 @@ export class SkillIncrease {
     character: ICharacter,
     target: INPC | ICharacter
   ): Promise<void> {
-    console.log(expData);
-
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You advanced from level ${expData.previousLevel} to level ${expData.level}.`,
+      message: `You advanced from level ${expData.level - 1} to level ${expData.level}.`,
       type: "info",
     });
 
@@ -293,7 +318,8 @@ export class SkillIncrease {
 
     return {
       skillName: skillToUpdate,
-      skillLevel: updatedSkillDetails.level,
+      skillLevelBefore: skills[skillToUpdate].level,
+      skillLevelAfter: updatedSkillDetails.level,
       skillLevelUp,
       skillPoints: updatedSkillDetails.skillPoints,
       skillPointsToNextLevel: updatedSkillDetails.skillPointsToNextLevel,
@@ -348,5 +374,51 @@ export class SkillIncrease {
       const manaSp = Math.round((power ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
       return this.calculateNewSP(skillDetails) + manaSp;
     }).bind(this, spellPower);
+  }
+
+  private increaseMaxManaMaxHealth(
+    currentMaxMana: number,
+    currentMaxHealth: number
+  ): { maxMana: number; maxHealth: number } {
+    let increaseRate = 1.05;
+    const maxValue = Math.max(currentMaxMana, currentMaxHealth);
+
+    if (maxValue >= 900) {
+      increaseRate = 1.01;
+    } else if (maxValue >= 700) {
+      increaseRate = 1.02;
+    } else if (maxValue >= 500) {
+      increaseRate = 1.03;
+    }
+
+    const maxMana = Math.ceil(currentMaxMana * increaseRate);
+    const maxHealth = Math.ceil(currentMaxHealth * increaseRate);
+
+    return { maxMana, maxHealth };
+  }
+
+  private async updateEntitiesAttributes(
+    characterId: Types.ObjectId,
+    entitiesType: string,
+    value: number
+  ): Promise<boolean> {
+    const character = (await Character.findById(characterId)) as ICharacter;
+
+    character[entitiesType] = value;
+    const save = await character.save();
+
+    const payload: ICharacterAttributeChanged = {
+      targetId: character._id,
+      maxHealth: entitiesType === "maxHealth" ? value : character.maxHealth,
+      maxMana: entitiesType === "maxMana" ? value : character.maxMana,
+    };
+
+    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+
+    if (save) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

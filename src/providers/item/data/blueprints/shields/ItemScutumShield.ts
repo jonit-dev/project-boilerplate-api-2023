@@ -10,8 +10,8 @@ export const itemScutumShield: Partial<IItem> = {
   texturePath: "shields/scutum-shield.png",
   name: "Scutum Shield",
   description: "The Scutum Shield was used by the ancient roman armies. You could build a house from these.",
-  defense: 10,
-  weight: 5,
+  defense: 18,
+  weight: 2.4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 65,
 };

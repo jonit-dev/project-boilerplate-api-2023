@@ -12,7 +12,7 @@ export const itemWingHelmet: Partial<IItem> = {
   description:
     "You see a wing helmet. It's decorated with wings and ancient depictions of the god Hermes, Mercury and of Roma.",
   defense: 12,
-  weight: 5,
+  weight: 3,
   allowedEquipSlotType: [ItemSlotType.Head],
   basePrice: 73,
 };
