@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   ArmorsBlueprint,
   AxesBlueprint,
+  BooksBlueprint,
   BootsBlueprint,
   ContainersBlueprint,
   CraftingResourcesBlueprint,
@@ -98,7 +99,7 @@ export const npcDwarfMage: Partial<INPC> = {
       chance: 1,
     },
     {
-      itemBlueprintKey: MagicsBlueprint.Book,
+      itemBlueprintKey: BooksBlueprint.Book,
       chance: 10,
     },
     {

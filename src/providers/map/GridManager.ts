@@ -1,6 +1,6 @@
 import { MapLayers } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import PF from "pathfinding";
+import PF, { DiagonalMovement } from "pathfinding";
 import { MapHelper } from "./MapHelper";
 import { MapSolids } from "./MapSolids";
 import { MapTiles } from "./MapTiles";
@@ -146,7 +146,9 @@ export class GridManager {
     }
 
     // Use A* pathfinding algorithm to find shortest path
-    const finder = new PF.AStarFinder();
+    const finder = PF.JumpPointFinder({
+      diagonalMovement: DiagonalMovement.Never,
+    });
 
     // Remap path without grid offset
     const { gridOffsetX, gridOffsetY } = this.getMapOffset(map)!;
