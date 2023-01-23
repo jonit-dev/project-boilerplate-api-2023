@@ -8,11 +8,11 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { isArray } from "lodash";
+import { isArray, isMap } from "lodash";
 import random from "lodash/random";
 import { IUseWithTargetTile } from "../useWithTypes";
 
-interface IUseWithItemToTileReward {
+export interface IUseWithItemToTileReward {
   key: string;
   qty: number[] | number;
   chance: number;
@@ -21,7 +21,7 @@ interface IUseWithItemToTileReward {
 export interface IUseWithItemToTileOptions {
   targetTile: IUseWithTargetTile;
   requiredResource?: {
-    key: string;
+    key: string | string[]; // In case is an array, it is one OR another
     decrementQty: number;
     errorMessage: string;
   };
@@ -31,7 +31,7 @@ export interface IUseWithItemToTileOptions {
   errorAnimationEffectKey?: string;
   errorMessages?: string[];
   successMessages?: string[];
-  rewards: IUseWithItemToTileReward[];
+  rewards: IUseWithItemToTileReward[] | Map<string, IUseWithItemToTileReward[]>; // Rewards can be an array of rewards, or a map where the keys correspond to the required resource item key and the value is its corresponding rewards
 }
 
 @provide(UseWithItemToTile)
@@ -48,7 +48,6 @@ export class UseWithItemToTile {
       targetTile,
       requiredResource,
       targetTileAnimationEffectKey,
-
       errorMessages,
       rewards,
       successAnimationEffectKey,
@@ -56,11 +55,28 @@ export class UseWithItemToTile {
       errorAnimationEffectKey,
     } = options;
 
+    let resourceKey = "";
+
     if (requiredResource) {
-      const hasRequiredItem = await this.characterItemInventory.checkItemInInventoryByKey(
-        requiredResource.key,
-        character
-      );
+      let hasRequiredItem: string | undefined;
+      if (typeof requiredResource.key === "string") {
+        hasRequiredItem = await this.characterItemInventory.checkItemInInventoryByKey(requiredResource.key, character);
+        resourceKey = requiredResource.key;
+      } else {
+        // requiredResource is an array
+        // check if have AT LEAST one
+        for (const k of requiredResource.key) {
+          hasRequiredItem = await this.characterItemInventory.checkItemInInventoryByKey(k, character);
+          if (hasRequiredItem) {
+            // check if have required qty
+            const item = await Item.findById(hasRequiredItem);
+            if (requiredResource.decrementQty && (item?.stackQty || 0) >= requiredResource.decrementQty) {
+              resourceKey = k;
+              break;
+            }
+          }
+        }
+      }
 
       if (!hasRequiredItem) {
         this.socketMessaging.sendErrorMessageToCharacter(character, requiredResource.errorMessage);
@@ -69,7 +85,7 @@ export class UseWithItemToTile {
 
       if (requiredResource.decrementQty) {
         const decrementRequiredItem = await this.characterItemInventory.decrementItemFromInventoryByKey(
-          requiredResource.key,
+          resourceKey,
           character,
           requiredResource.decrementQty
         );
@@ -90,7 +106,21 @@ export class UseWithItemToTile {
       );
     }
 
-    const addedRewardToInventory = await this.addRewardToInventory(character, rewards);
+    let reward: IUseWithItemToTileReward[];
+
+    if (isMap(rewards)) {
+      const fetchedReward = rewards.get(resourceKey);
+
+      if (!fetchedReward) {
+        throw new Error(`No reward found for resource key ${resourceKey}`);
+      }
+
+      reward = fetchedReward;
+    } else {
+      reward = rewards;
+    }
+
+    const addedRewardToInventory = await this.addRewardToInventory(character, reward);
 
     if (!addedRewardToInventory) {
       if (errorMessages) {
@@ -122,6 +152,7 @@ export class UseWithItemToTile {
 
   private async addRewardToInventory(character: ICharacter, rewards: IUseWithItemToTileReward[]): Promise<boolean> {
     rewards = rewards.sort((a, b) => a.chance - b.chance);
+
     const n = random(0, 100);
     for (const reward of rewards) {
       if (n < reward.chance) {
