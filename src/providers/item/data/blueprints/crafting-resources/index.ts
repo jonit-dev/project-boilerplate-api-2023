@@ -26,7 +26,6 @@ import { itemIronOre } from "./ItemIronOre";
 import { itemJade } from "./itemJade";
 import { itemLeather } from "./ItemLeather";
 import { itemMagicRecipe } from "./ItemMagicRecipe";
-import { itemObsidian } from "./ItemObsidian";
 import { itemObsidiumOre } from "./ItemObsidiumOre";
 import { itemPhoenixFeather } from "./itemPhoenixfeather";
 import { itemPolishedStone } from "./itemPolishedStone";
@@ -60,7 +59,6 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.Herb]: itemHerb,
   [CraftingResourcesBlueprint.GreaterWoodenLog]: itemGreaterWoodenLog,
   [CraftingResourcesBlueprint.IronIngot]: itemIronIngot,
-  [CraftingResourcesBlueprint.Obsidian]: itemObsidian,
   [CraftingResourcesBlueprint.Wheat]: itemWheat,
   [CraftingResourcesBlueprint.WolfTooth]: itemWolfTooth,
   [CraftingResourcesBlueprint.Bone]: itemBone,

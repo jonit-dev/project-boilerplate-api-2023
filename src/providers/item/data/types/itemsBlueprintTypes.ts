@@ -154,8 +154,6 @@ export enum CraftingResourcesBlueprint {
   Feather = "feather",
   Herb = "herb",
   GreaterWoodenLog = "greater-wooden-log",
-
-  Obsidian = "obsidian",
   Wheat = "wheat",
   WolfTooth = "wolf-tooth",
   Bone = "bone",
@@ -273,9 +271,12 @@ export enum MagicsBlueprint {
   HealRune = "heal-rune",
   PoisonRune = "poison-rune",
   ThunderRune = "thunder-rune",
-  Book = "book",
   EnergyBoltRune = "energy-bolt-rune",
   FireBoltRune = "fire-bolt-rune",
+}
+
+export enum BooksBlueprint {
+  Book = "book",
 }
 
 export enum OthersBlueprint {

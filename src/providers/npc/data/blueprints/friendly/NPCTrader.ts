@@ -1,7 +1,13 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import {
+  ArmorsBlueprint,
+  AxesBlueprint,
   FoodsBlueprint,
+  HelmetsBlueprint,
+  LegsBlueprint,
+  MacesBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
   SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -30,10 +36,28 @@ export const npcTrader = {
       key: SwordsBlueprint.ShortSword,
     },
     {
+      key: MacesBlueprint.Club,
+    },
+    {
+      key: AxesBlueprint.Axe,
+    },
+    {
       key: ToolsBlueprint.ButchersKnife,
     },
     {
       key: ToolsBlueprint.CarpentersAxe,
+    },
+    {
+      key: ShieldsBlueprint.WoodenShield,
+    },
+    {
+      key: LegsBlueprint.LeatherLegs,
+    },
+    {
+      key: HelmetsBlueprint.LeatherHelmet,
+    },
+    {
+      key: ArmorsBlueprint.Coat,
     },
     {
       key: ToolsBlueprint.FishingRod,
@@ -42,10 +66,7 @@ export const npcTrader = {
       key: ToolsBlueprint.Pickaxe,
     },
     {
-      key: RangedWeaponsBlueprint.Arrow,
-    },
-    {
-      key: RangedWeaponsBlueprint.Bolt,
+      key: RangedWeaponsBlueprint.Bow,
     },
   ],
 } as Partial<INPC>;

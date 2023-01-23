@@ -1,5 +1,5 @@
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemBook } from "./ItemBook";
+import { itemBook } from "../books/ItemBook";
 import { itemDarkRune } from "./ItemDarkRune";
 import { itemFireRune } from "./ItemFireRune";
 import { itemHealRune } from "./ItemHealRune";
