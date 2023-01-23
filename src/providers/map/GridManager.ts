@@ -173,8 +173,6 @@ export class GridManager {
 
     const newPath = path.map(([x, y]) => [x - (gridOffsetX ?? 0), y - (gridOffsetY ?? 0)]);
 
-    console.log(newPath);
-
     return newPath;
   }
 }
