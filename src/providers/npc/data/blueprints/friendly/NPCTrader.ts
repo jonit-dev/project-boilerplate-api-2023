@@ -45,6 +45,9 @@ export const npcTrader = {
       key: ToolsBlueprint.ButchersKnife,
     },
     {
+      key: ToolsBlueprint.Hammer,
+    },
+    {
       key: ToolsBlueprint.CarpentersAxe,
     },
     {
