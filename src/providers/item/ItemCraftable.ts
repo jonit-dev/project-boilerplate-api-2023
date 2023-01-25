@@ -15,10 +15,13 @@ import {
   ICraftableItemIngredient,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
+  IUIShowMessage,
   ItemSocketEvents,
+  UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
+import shuffle from "lodash/shuffle";
 
 @provide(ItemCraftable)
 export class ItemCraftable {
@@ -80,8 +83,21 @@ export class ItemCraftable {
     if (proceed) {
       await this.createItems(recipe, character);
 
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "You successfully crafted the item!",
+        type: "info",
+      });
+
       await this.characterWeight.updateCharacterWeight(character);
     } else {
+      const failureMessages = shuffle([
+        "Sorry, you failed to craft the item.",
+        "Hmm... you couldn't get it right.",
+        "You almost got the item correctly, but failed.",
+      ]);
+
+      this.socketMessaging.sendErrorMessageToCharacter(character, failureMessages[0]);
+
       await this.animationEffect.sendAnimationEventToCharacter(character, "miss");
     }
 
