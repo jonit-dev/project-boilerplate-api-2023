@@ -15,5 +15,4 @@ export const recipeGreaterLifePotion: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  successChance: 35,
 };

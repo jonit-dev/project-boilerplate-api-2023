@@ -14,5 +14,4 @@ export const recipeBroadSword: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  successChance: 35,
 };

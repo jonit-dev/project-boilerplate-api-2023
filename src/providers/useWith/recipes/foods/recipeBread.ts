@@ -14,5 +14,4 @@ export const recipeBread: IUseWithCraftingRecipe = {
       qty: 3,
     },
   ],
-  successChance: 70,
 };

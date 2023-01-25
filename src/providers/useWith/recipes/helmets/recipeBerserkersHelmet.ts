@@ -14,5 +14,4 @@ export const recipeBerserkersHelmet: IUseWithCraftingRecipe = {
       qty: 5,
     },
   ],
-  successChance: 20,
 };

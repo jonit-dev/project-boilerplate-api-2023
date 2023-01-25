@@ -97,6 +97,10 @@ describe("BattleAttackTarget.spec.ts", () => {
   });
 
   it("NPC should clear its target, after killing a character", async () => {
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
+
     // @ts-ignore
     jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
     // @ts-ignore
@@ -219,6 +223,10 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
       characterEquipment!.rightHand = res.id;
 
       await characterEquipment!.save();
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
     });
 
     it("when battle event is a hit, it should increase target magic resistance", async () => {

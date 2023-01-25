@@ -22,5 +22,4 @@ export const recipeRoyalKnightHelmet: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  successChance: 35,
 };

@@ -22,5 +22,4 @@ export const recipeFireSword: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  successChance: 25,
 };

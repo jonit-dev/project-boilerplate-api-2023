@@ -14,5 +14,4 @@ export const recipeSpear: IUseWithCraftingRecipe = {
       qty: 5,
     },
   ],
-  successChance: 85,
 };

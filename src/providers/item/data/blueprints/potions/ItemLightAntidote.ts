@@ -12,4 +12,5 @@ export const itemLightAntidote: Partial<IItem> = {
   description: "A small flask containing an elixir of antidote.",
   weight: 0.5,
   basePrice: 15,
+  maxStackSize: 100,
 };

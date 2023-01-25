@@ -15,5 +15,4 @@ export const recipeLightLifePotion: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  successChance: 35,
 };

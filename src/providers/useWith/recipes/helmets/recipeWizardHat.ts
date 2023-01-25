@@ -14,5 +14,4 @@ export const recipeWizardHat: IUseWithCraftingRecipe = {
       qty: 4,
     },
   ],
-  successChance: 65,
 };

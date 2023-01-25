@@ -18,5 +18,4 @@ export const recipeKatana: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  successChance: 35,
 };

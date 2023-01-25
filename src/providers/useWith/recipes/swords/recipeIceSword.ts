@@ -14,5 +14,4 @@ export const recipeIceSword: IUseWithCraftingRecipe = {
       qty: 5,
     },
   ],
-  successChance: 25,
 };

@@ -14,5 +14,4 @@ export const recipeCrossBow: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  successChance: 50,
 };

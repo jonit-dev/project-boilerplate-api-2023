@@ -14,5 +14,4 @@ export const recipeFireStaff: IUseWithCraftingRecipe = {
       qty: 3,
     },
   ],
-  successChance: 35,
 };

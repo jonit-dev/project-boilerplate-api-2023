@@ -18,5 +18,4 @@ export const recipeDeathNecklace: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  successChance: 35,
 };

@@ -1,7 +1,7 @@
 import { CraftingResourcesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 
-export const recipeMaceOfCorruption: IUseWithCraftingRecipe = {
+export const recipeMace: IUseWithCraftingRecipe = {
   outputKey: MacesBlueprint.Mace,
   outputQtyRange: [1, 1],
   requiredItems: [
@@ -14,5 +14,4 @@ export const recipeMaceOfCorruption: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  successChance: 35,
 };

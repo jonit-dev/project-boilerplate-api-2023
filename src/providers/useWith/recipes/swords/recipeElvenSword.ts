@@ -14,5 +14,4 @@ export const recipeElvenSword: IUseWithCraftingRecipe = {
       qty: 10,
     },
   ],
-  successChance: 35,
 };

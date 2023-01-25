@@ -14,5 +14,4 @@ export const recipeBolt: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  successChance: 100,
 };

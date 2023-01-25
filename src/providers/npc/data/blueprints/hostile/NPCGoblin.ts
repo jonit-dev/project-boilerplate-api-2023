@@ -132,5 +132,10 @@ export const npcGoblin = {
       itemBlueprintKey: SwordsBlueprint.Saber,
       chance: 5,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.PolishedStone,
+      chance: 20,
+      quantityRange: [5, 10],
+    },
   ],
 } as Partial<INPC>;

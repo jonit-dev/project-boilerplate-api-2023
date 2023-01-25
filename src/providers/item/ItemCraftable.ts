@@ -87,8 +87,6 @@ export class ItemCraftable {
         message: "You successfully crafted the item!",
         type: "info",
       });
-
-      await this.characterWeight.updateCharacterWeight(character);
     } else {
       const failureMessages = shuffle([
         "Sorry, you failed to craft the item.",
@@ -100,6 +98,7 @@ export class ItemCraftable {
 
       await this.animationEffect.sendAnimationEventToCharacter(character, "miss");
     }
+    await this.characterWeight.updateCharacterWeight(character);
 
     await this.sendRefreshItemsEvent(character);
   }
@@ -233,10 +232,10 @@ export class ItemCraftable {
     const dice = random(1, maxChance);
 
     const level = await this.getCraftingSkillsAverage(character);
-    const fityPercentProbabilityLevel = 30;
-    const curveSteepness = 0.07;
+    const probabilityLevel = 20;
+    const curveSteepness = 0.02;
 
-    const probability = 1 - 1 / (1 + Math.pow(Math.E, curveSteepness * (level - fityPercentProbabilityLevel)));
+    const probability = 1 - 1 / (1 + Math.pow(Math.E, curveSteepness * (level - probabilityLevel)));
     const chance = probability * maxChance;
 
     return dice <= chance;

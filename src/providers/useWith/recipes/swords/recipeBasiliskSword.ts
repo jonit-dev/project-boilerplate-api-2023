@@ -18,5 +18,4 @@ export const recipeBasiliskSword: IUseWithCraftingRecipe = {
       qty: 3,
     },
   ],
-  successChance: 10,
 };

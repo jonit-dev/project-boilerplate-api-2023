@@ -14,5 +14,4 @@ export const recipeBow: IUseWithCraftingRecipe = {
       qty: 5,
     },
   ],
-  successChance: 75,
 };

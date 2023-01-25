@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   ArmorsBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
   RangedWeaponsBlueprint,
@@ -75,6 +76,11 @@ export const npcSkeleton = {
     {
       itemBlueprintKey: RangedWeaponsBlueprint.EldensBow,
       chance: 7,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.IronNail,
+      chance: 30,
+      quantityRange: [1, 5],
     },
   ],
 } as Partial<INPC>;

@@ -14,5 +14,4 @@ export const recipeDoubleAxe: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  successChance: 35,
 };
