@@ -15,11 +15,11 @@ export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
   texturePath: "magics/poison-rune.png",
   name: "Poison Rune",
   description: "An ancient poison rune.",
-  weight: 0.5,
+  weight: 0.01,
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,
-
+  maxStackSize: 100,
   useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,
@@ -29,6 +29,7 @@ export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.PoisonRune, caster);
 
+    ItemUsableEffect.apply(caster, EffectableAttribute.Mana, -1 * points);
     ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
   },
 };

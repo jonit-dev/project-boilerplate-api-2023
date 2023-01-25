@@ -15,11 +15,11 @@ export const itemFireRune: Partial<IMagicItemUseWithEntity> = {
   texturePath: "magics/fire-rune.png",
   name: "Fire Rune",
   description: "An ancient fire rune.",
-  weight: 0.5,
+  weight: 0.01,
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,
-
+  maxStackSize: 100,
   useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,
@@ -29,6 +29,7 @@ export const itemFireRune: Partial<IMagicItemUseWithEntity> = {
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireRune, caster);
 
+    ItemUsableEffect.apply(caster, EffectableAttribute.Mana, -1 * points);
     ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
   },
 };

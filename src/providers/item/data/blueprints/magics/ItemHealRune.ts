@@ -16,11 +16,11 @@ export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
 
   name: "Healing Rune",
   description: "An ancient healing rune.",
-  weight: 0.5,
+  weight: 0.01,
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,
-
+  maxStackSize: 100,
   useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,
@@ -30,6 +30,7 @@ export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.HealRune, caster);
 
-    ItemUsableEffect.apply(target, EffectableAttribute.Health, points);
+    ItemUsableEffect.apply(caster, EffectableAttribute.Mana, -1 * points);
+    ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
   },
 };
