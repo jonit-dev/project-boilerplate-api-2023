@@ -288,11 +288,22 @@ describe("ItemCraftable.ts", () => {
       })
     );
 
-    expect(sendEventToUser).toHaveBeenCalledTimes(1);
+    expect(sendEventToUser).toHaveBeenCalledTimes(2);
+
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
       effectKey: "miss",
     });
+
+    expect(sendEventToUser).toHaveBeenCalledWith(
+      testCharacter.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      {
+        inventory: container,
+        openEquipmentSetOnUpdate: false,
+        openInventoryOnUpdate: true,
+      }
+    );
   });
 
   it("sould produce both craft success and failure", async () => {

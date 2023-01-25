@@ -81,10 +81,11 @@ export class ItemCraftable {
       await this.createItems(recipe, character);
 
       await this.characterWeight.updateCharacterWeight(character);
-      await this.sendRefreshItemsEvent(character);
     } else {
       await this.animationEffect.sendAnimationEventToCharacter(character, "miss");
     }
+
+    await this.sendRefreshItemsEvent(character);
   }
 
   private async createItems(recipe: IUseWithCraftingRecipe, character: ICharacter): Promise<void> {
