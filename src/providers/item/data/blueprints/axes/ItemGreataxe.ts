@@ -12,7 +12,7 @@ export const itemGreataxe: Partial<IItem> = {
   name: "Greataxe",
   description:
     "A large, two-handed axe with a broad head and a long handle. It is designed for heavy chopping and slicing and is typically wielded by strong, heavily-armored warriors.",
-  attack: 15,
+  attack: 26,
   defense: 4,
   weight: 2.1,
   isTwoHanded: true,

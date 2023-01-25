@@ -12,7 +12,7 @@ export const itemCorruptionAxe: Partial<IItem> = {
   name: "Corruption Axe",
   description:
     "An axe with a blade that is said to be able to cut through any material with ease. It is rumored to be cursed, causing those who wield it to become corrupt and power-hungry.",
-  attack: 12,
+  attack: 20,
   defense: 3,
   weight: 2,
   isTwoHanded: true,

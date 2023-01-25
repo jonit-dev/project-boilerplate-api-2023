@@ -12,7 +12,7 @@ export const itemRoyalDoubleAxe: Partial<IItem> = {
   name: "Royal Double Axe",
   description:
     "A large, two-handed axe with two parallel heads connected by a short handle. It is often given as a symbol of royal power and is wielded by elite soldiers in ceremonial guard units.",
-  attack: 22,
+  attack: 33,
   defense: 7,
   weight: 4.2,
   isTwoHanded: true,

@@ -12,7 +12,7 @@ export const itemVikingAxe: Partial<IItem> = {
   name: "Viking aAxe",
   description:
     "An axe with a broad, single-edged blade and a short, curved handle. It was commonly used by the Vikings in battle and is associated with Norse mythology.",
-  attack: 20,
+  attack: 31,
   defense: 5,
   weight: 3.7,
   isTwoHanded: true,
