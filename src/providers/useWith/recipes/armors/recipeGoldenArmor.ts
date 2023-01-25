@@ -7,10 +7,18 @@ export const recipeGoldenArmor: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 10,
+      qty: 25,
     },
     {
       key: CraftingResourcesBlueprint.Silk,
+      qty: 20,
+    },
+    {
+      key: CraftingResourcesBlueprint.IronIngot,
+      qty: 10,
+    },
+    {
+      key: CraftingResourcesBlueprint.RedSapphire,
       qty: 10,
     },
   ],

@@ -4,9 +4,9 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { BuffSkillFunctions } from "@providers/character/CharacterBuffer/BuffSkillFunctions";
 import { CharacterView } from "@providers/character/CharacterView";
+import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellLearn } from "@providers/spells/SpellLearn";
@@ -69,7 +69,7 @@ export class SkillIncrease {
     const increasedWeaponSP = this.increaseSP(skills, weapon?.subType || "None");
 
     let increasedStrengthSP;
-    if (weapon?.subType !== ItemSubType.Magic) {
+    if (weapon?.subType !== ItemSubType.Magic && weapon?.subType !== ItemSubType.Staff) {
       increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
     }
 
@@ -77,7 +77,7 @@ export class SkillIncrease {
 
     await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weapon?.subType || "None");
 
-    if (weapon?.subType !== ItemSubType.Magic) {
+    if (weapon?.subType !== ItemSubType.Magic && weapon?.subType !== ItemSubType.Staff) {
       await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, BasicAttribute.Strength);
     }
 

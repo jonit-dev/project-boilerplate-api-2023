@@ -5,7 +5,7 @@ import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 export const itemFireWand: Partial<IMagicStaff> = {
   key: StaffsBlueprint.FireWand,
   type: ItemType.Weapon,
-  subType: ItemSubType.Magic,
+  subType: ItemSubType.Staff,
   textureAtlas: "items",
   texturePath: "staffs/fire-wand.png",
   name: "Fire Wand",

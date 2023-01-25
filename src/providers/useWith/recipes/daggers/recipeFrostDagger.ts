@@ -7,15 +7,15 @@ export const recipeFrostDagger: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 2,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 1,
+      qty: 3,
     },
     {
       key: CraftingResourcesBlueprint.WolfTooth,
-      qty: 1,
+      qty: 2,
     },
   ],
   successChance: 35,

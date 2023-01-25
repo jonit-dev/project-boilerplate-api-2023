@@ -1,11 +1,17 @@
-import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
-import { recipeElvenSword } from "./itemElvenSword";
+import { recipeBasiliskSword } from "./recipeBasiliskSword";
+import { recipeBroadSword } from "./recipeBroadSword";
+import { recipeElvenSword } from "./recipeElvenSword";
 import { recipeFireSword } from "./recipeFireSword";
 import { recipeIceSword } from "./recipeIceSword";
+import { recipeKatana } from "./recipeKatana";
 
 export const recipeSwordsIndex: Record<string, IUseWithCraftingRecipe[]> = {
-  [CraftingResourcesBlueprint.BlueSapphire]: [recipeIceSword],
-  [CraftingResourcesBlueprint.RedShappire]: [recipeFireSword],
-  [CraftingResourcesBlueprint.ElvenLeaf]: [recipeElvenSword],
+  [SwordsBlueprint.ElvenSword]: [recipeElvenSword],
+  [SwordsBlueprint.FireSword]: [recipeFireSword],
+  [SwordsBlueprint.IceSword]: [recipeIceSword],
+  [SwordsBlueprint.BasiliskSword]: [recipeBasiliskSword],
+  [SwordsBlueprint.BroadSword]: [recipeBroadSword],
+  [SwordsBlueprint.Katana]: [recipeKatana],
 };

@@ -3,7 +3,6 @@ import { recipeAccessoriesIndex } from "./accessories/index";
 import { recipeArmorsIndex } from "./armors/index";
 import { recipeAxesIndex } from "./axes/index";
 import { recipeBootsIndex } from "./boots/index";
-import { recipeCraftingsIndex } from "./crafting-resources/index";
 import { recipeDaggersIndex } from "./daggers/index";
 import { recipeFoodsIndex } from "./foods/index";
 import { recipeHelmetsIndex } from "./helmets/index";
@@ -21,7 +20,6 @@ export const recipeBlueprintsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   ...recipeArmorsIndex,
   ...recipeAxesIndex,
   ...recipeBootsIndex,
-  ...recipeCraftingsIndex,
   ...recipeDaggersIndex,
   ...recipeFoodsIndex,
   ...recipeHelmetsIndex,

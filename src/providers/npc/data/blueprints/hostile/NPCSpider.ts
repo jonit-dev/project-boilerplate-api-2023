@@ -1,7 +1,12 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { FoodsBlueprint, GlovesBlueprint, LegsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  CraftingResourcesBlueprint,
+  FoodsBlueprint,
+  GlovesBlueprint,
+  LegsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -43,6 +48,11 @@ export const npcSpider = {
     {
       itemBlueprintKey: FoodsBlueprint.Banana,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SewingThread,
+      chance: 10,
+      quantityRange: [1, 3],
     },
   ],
 } as Partial<INPC>;

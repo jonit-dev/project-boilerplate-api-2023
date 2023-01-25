@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
   OthersBlueprint,
@@ -89,6 +90,16 @@ export const npcElf: Partial<INPC> = {
     {
       itemBlueprintKey: StaffsBlueprint.EnchantedStaff,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.ElvenWood,
+      chance: 20,
+      quantityRange: [1, 3],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.ElvenLeaf,
+      chance: 20,
+      quantityRange: [5, 10],
     },
   ],
 };

@@ -7,7 +7,11 @@ export const recipeStuddedLegs: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 2,
+      qty: 10,
+    },
+    {
+      key: CraftingResourcesBlueprint.IronIngot,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.SewingThread,

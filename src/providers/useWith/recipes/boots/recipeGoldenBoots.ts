@@ -7,11 +7,15 @@ export const recipeGoldenBoots: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 3,
+      qty: 20,
+    },
+    {
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 2,
+      qty: 10,
     },
   ],
   successChance: 35,

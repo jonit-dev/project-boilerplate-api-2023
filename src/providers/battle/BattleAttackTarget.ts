@@ -202,7 +202,9 @@ export class BattleAttackTarget {
         if (target.type === "Character") {
           const weapon = await (attacker as ICharacter).weapon;
           const attr =
-            weapon?.subType === ItemSubType.Magic ? BasicAttribute.MagicResistance : BasicAttribute.Resistance;
+            weapon?.subType === ItemSubType.Magic || weapon?.subType === ItemSubType.Staff
+              ? BasicAttribute.MagicResistance
+              : BasicAttribute.Resistance;
           await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, attr);
 
           await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, attr);
