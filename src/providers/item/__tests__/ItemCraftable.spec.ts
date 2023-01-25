@@ -262,7 +262,7 @@ describe("ItemCraftable.ts", () => {
     await performTest();
   });
 
-  it("sould not craft valid item due to crafting failure", async () => {
+  it("should not craft valid item due to crafting failure", async () => {
     const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
     craftChanceMock.mockImplementation(() => {
       return Promise.resolve(false);
@@ -283,7 +283,7 @@ describe("ItemCraftable.ts", () => {
       })
     );
 
-    expect(sendEventToUser).toHaveBeenCalledTimes(3);
+    expect(sendEventToUser).toHaveBeenCalledTimes(4);
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
