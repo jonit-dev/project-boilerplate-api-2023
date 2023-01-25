@@ -12,7 +12,7 @@ export const itemDwarvenWaraxe: Partial<IItem> = {
   name: "Dwarven Waraxe",
   description:
     "A waraxe designed and crafted by dwarves, known for their skill in metalworking. It is said to be incredibly durable and able to withstand heavy use in battle.",
-  attack: 17,
+  attack: 28,
   defense: 5,
   weight: 2,
   isTwoHanded: true,
