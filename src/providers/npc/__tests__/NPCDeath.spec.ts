@@ -5,18 +5,21 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { OthersBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { FromGridX, FromGridY, INPCLoot } from "@rpg-engine/shared";
+import { ItemRarity } from "@providers/item/ItemRarity";
+import { FromGridX, FromGridY, INPCLoot, ItemRarities } from "@rpg-engine/shared";
 import { NPCDeath } from "../NPCDeath";
 
 describe("NPCDeath.ts", () => {
   let npcDeath: NPCDeath;
   let testNPC: INPC;
   let testCharacter: ICharacter;
+  let itemRarity: ItemRarity;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
 
     npcDeath = container.get<NPCDeath>(NPCDeath);
+    itemRarity = container.get<ItemRarity>(ItemRarity);
   });
 
   beforeEach(async () => {
@@ -138,6 +141,35 @@ describe("NPCDeath.ts", () => {
     expect(bodyItemContainer!.slots[2]).toBeNull();
   });
 
+  it("on NPC death, make sure the rarity is setting", async () => {
+    testNPC.loots = [{ itemBlueprintKey: "bow", chance: 100 }];
+
+    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+
+    const bow = (await Item.findOne({ key: "bow", rarity: ItemRarities.Common })) as unknown as IItem;
+    bow.rarity = ItemRarities.Legendary;
+    await bow.save();
+
+    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+
+    const newNpcBody = await Item.findOne({
+      name: `${testNPC.name}'s body`,
+      x: testNPC.x,
+      y: testNPC.y,
+      scene: testNPC.scene,
+    });
+
+    expect(newNpcBody).not.toBeNull();
+    expect(newNpcBody!.itemContainer).toBeDefined();
+
+    const bodyItemContainer = await ItemContainer.findById(newNpcBody!.itemContainer);
+
+    expect(bodyItemContainer).not.toBeNull();
+    expect(bodyItemContainer!.slots).toBeDefined();
+
+    expect(bodyItemContainer!.slots[0]).toMatchObject({ key: "bow", rarity: ItemRarities.Common });
+  });
+
   it("on NPC death, make sure items are added to NPC body", async () => {
     // Add some items to the NPC's loot
     testNPC.loots = [
@@ -240,6 +272,51 @@ describe("NPCDeath.ts", () => {
     const stackableLoot = bodyItemContainer!.slots[0] as IItem;
     expect(stackableLoot.stackQty).toBeGreaterThanOrEqual(30);
     expect(stackableLoot.stackQty).toBeLessThanOrEqual(40);
+  });
+
+  it("should set the rarity 'Rare'", () => {
+    // @ts-ignore
+    jest.spyOn(itemRarity, "randomizeRarity").mockReturnValue(ItemRarities.Legendary);
+    // @ts-ignore
+    expect(itemRarity.randomizeRarity()).toBe(ItemRarities.Legendary);
+  });
+
+  it("should return value 5 for rarity 'Uncommon'", () => {
+    const stats = { attack: 4, defense: 4, rarity: ItemRarities.Uncommon };
+    // @ts-ignore
+    expect(itemRarity.randomizeRarityBuff(stats)).toEqual({
+      attack: 5,
+      defense: 5,
+      rarity: ItemRarities.Uncommon,
+    });
+  });
+
+  it("should return value 10 for rarity 'Legendary'", () => {
+    const stats = { attack: 10, defense: 10, rarity: ItemRarities.Legendary };
+    // @ts-ignore
+    expect(itemRarity.randomizeRarityBuff(stats)).toEqual({
+      attack: 13,
+      defense: 13,
+      rarity: ItemRarities.Legendary,
+    });
+  });
+
+  it("should set the rarity, attack and defense of an item", () => {
+    const item: Partial<IItem> = { attack: 22, defense: 15, rarity: ItemRarities.Common };
+    const rarity = ItemRarities.Legendary;
+    // @ts-ignore
+    itemRarity.randomizeRarity = jest.fn().mockReturnValue(rarity);
+
+    const result = itemRarity.setItemRarity(item as IItem);
+
+    expect(result).toEqual({
+      attack: 28,
+      defense: 19,
+      rarity: rarity,
+    });
+
+    // @ts-ignore
+    expect(itemRarity.randomizeRarity).toHaveBeenCalled();
   });
 
   afterAll(async () => {

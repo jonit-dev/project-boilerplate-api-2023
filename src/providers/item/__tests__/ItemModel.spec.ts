@@ -47,7 +47,7 @@ describe("ItemModel.ts", () => {
     expect(testItem.isEquipable).toBeTruthy();
     expect(testItem.maxStackSize > 1).toBeFalsy();
     expect(testItem.fullDescription).toBe(
-      `${testItem.name}: ${testItem.description} Attack: ${testItem.attack}. Defense: ${testItem.defense}. Weight: ${testItem.weight}.`
+      `${testItem.name}: ${testItem.description} Attack: ${testItem.attack}. Defense: ${testItem.defense}. Weight: ${testItem.weight}. Rarity: ${testItem.rarity}.`
     );
   });
 
@@ -55,7 +55,7 @@ describe("ItemModel.ts", () => {
     expect(testItemArmor.isEquipable).toBeTruthy();
     expect(testItemArmor.maxStackSize > 1).toBeFalsy();
     expect(testItemArmor.fullDescription).toBe(
-      `${testItemArmor.name}: ${testItemArmor.description} Defense: ${testItemArmor.defense}. Weight: ${testItemArmor.weight}.`
+      `${testItemArmor.name}: ${testItemArmor.description} Defense: ${testItemArmor.defense}. Weight: ${testItemArmor.weight}. Rarity: ${testItemArmor.rarity}.`
     );
   });
 
@@ -63,7 +63,7 @@ describe("ItemModel.ts", () => {
     expect(testItem.isEquipable).toBeTruthy();
     expect(testItem.maxStackSize > 1).toBeFalsy();
     expect(testItem.fullDescription).toBe(
-      `${testItem.name}: ${testItem.description} Attack: ${testItem.attack}. Weight: ${testItem.weight}.`
+      `${testItem.name}: ${testItem.description} Attack: ${testItem.attack}. Weight: ${testItem.weight}. Rarity: ${testItem.rarity}.`
     );
   });
 
@@ -77,7 +77,9 @@ describe("ItemModel.ts", () => {
 
     expect(testItem.isEquipable).toBeTruthy();
     expect(testItem.maxStackSize > 1).toBeFalsy();
-    expect(testItem.fullDescription).toBe(`${testItem.name}: ${testItem.description} Weight: ${testItem.weight}.`);
+    expect(testItem.fullDescription).toBe(
+      `${testItem.name}: ${testItem.description} Weight: ${testItem.weight}. Rarity: ${testItem.rarity}.`
+    );
   });
 
   it("validate isEquipable, isStackable and fullDescription Item fields | stackable item", async () => {
@@ -89,7 +91,9 @@ describe("ItemModel.ts", () => {
 
     expect(testItem.isEquipable).toBeTruthy();
     expect(testItem.maxStackSize > 1).toBeTruthy();
-    expect(testItem.fullDescription).toBe(`${testItem.name}: ${testItem.description} Weight: ${testItem.weight}.`);
+    expect(testItem.fullDescription).toBe(
+      `${testItem.name}: ${testItem.description} Weight: ${testItem.weight}. Rarity: ${testItem.rarity}.`
+    );
   });
 
   it("validate post save() Item methods are properly executed | add itemContainer and slots ", async () => {

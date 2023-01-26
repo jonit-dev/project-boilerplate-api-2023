@@ -15,6 +15,7 @@ import _, { random } from "lodash";
 import { NPC_CYCLES } from "./NPCCycle";
 import { calculateGold } from "./NPCGold";
 import { NPCTarget } from "./movement/NPCTarget";
+import { ItemRarity } from "@providers/item/ItemRarity";
 
 @provide(NPCDeath)
 export class NPCDeath {
@@ -22,7 +23,8 @@ export class NPCDeath {
     private socketMessaging: SocketMessaging,
     private characterView: CharacterView,
     private npcTarget: NPCTarget,
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private itemRarity: ItemRarity
   ) {}
 
   public async handleNPCDeath(npc: INPC, character: ICharacter | null): Promise<void> {
@@ -131,7 +133,7 @@ export class NPCDeath {
           lootQuantity = Math.round(_.random(loot.quantityRange[0], loot.quantityRange[1]));
         }
 
-        const lootItem = new Item({ ...blueprintData });
+        let lootItem = new Item({ ...blueprintData });
         // stackable items - only add 1 item and set stack qty = lootQty
         if (lootItem.maxStackSize > 1) {
           if (lootQuantity > lootItem.maxStackSize) {
@@ -142,7 +144,6 @@ export class NPCDeath {
 
           lootItem.stackQty = lootQuantity;
           await lootItem.save();
-
           const freeSlotId = itemContainer.firstAvailableSlotId;
           freeSlotAvailable = freeSlotId !== null;
 
@@ -152,8 +153,21 @@ export class NPCDeath {
           itemContainer.slots[freeSlotId!] = lootItem;
         } else {
           while (lootQuantity > 0) {
-            const lootItem = new Item({ ...blueprintData });
-            await lootItem.save();
+            if (lootItem.attack || lootItem.defense) {
+              const rarityAttributes = this.itemRarity.setItemRarity(lootItem);
+              lootItem = new Item({
+                ...blueprintData,
+                attack: rarityAttributes.attack,
+                defense: rarityAttributes.defense,
+                rarity: rarityAttributes.rarity,
+              });
+              await lootItem.save();
+            } else {
+              lootItem = new Item({
+                ...blueprintData,
+              });
+              await lootItem.save();
+            }
 
             const freeSlotId = itemContainer.firstAvailableSlotId;
             freeSlotAvailable = freeSlotId !== null;

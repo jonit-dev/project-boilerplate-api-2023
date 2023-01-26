@@ -4,7 +4,7 @@ import { container } from "@providers/inversify/container";
 import { ItemView } from "@providers/item/ItemView";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MapHelper } from "@providers/map/MapHelper";
-import { ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
+import { ItemRarities, ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { UpdateQuery } from "mongoose";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
@@ -31,6 +31,10 @@ const itemSchema = createLeanSchema(
     }),
     entityType: Type.string({
       required: false,
+    }),
+    rarity: Type.string({
+      default: ItemRarities.Common,
+      enum: TypeHelper.enumToStringArray(ItemRarities),
     }),
     name: Type.string({ required: true }),
     description: Type.string({ required: true }),
@@ -91,33 +95,19 @@ itemSchema.virtual("isEquipable").get(function (this: IItem) {
 
 itemSchema.virtual("fullDescription").get(function (this: IItem): string {
   let message: string = "";
-
-  if (!this.attack && this.defense && this.weight) {
-    message = `${this.name}: ${this.description}${` Defense: ${this.defense}. Weight: ${this.weight}.`}`;
-
-    return message;
+  message = `${this.name}: ${this.description}`;
+  if (this.attack) {
+    message += ` Attack: ${this.attack}.`;
   }
-
-  if (this.attack && !this.defense && this.weight) {
-    message = `${this.name}: ${this.description}${` Attack: ${this.attack}. Weight: ${this.weight}.`}`;
-
-    return message;
+  if (this.defense) {
+    message += ` Defense: ${this.defense}.`;
   }
-
-  if (!this.attack && !this.defense && this.weight) {
-    message = `${this.name}: ` + `${this.description}` + `${this.weight ? ` Weight: ${this.weight}.` : ""}`;
-
-    return message;
+  if (this.weight) {
+    message += ` Weight: ${this.weight}.`;
   }
-
-  if (this.attack && this.defense && this.weight) {
-    message = `${this.name}: ${
-      this.description
-    }${` Attack: ${this.attack}. Defense: ${this.defense}. Weight: ${this.weight}.`}`;
-
-    return message;
+  if (this.rarity) {
+    message += ` Rarity: ${this.rarity}.`;
   }
-
   return message;
 });
 
