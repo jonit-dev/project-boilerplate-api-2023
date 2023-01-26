@@ -11,7 +11,7 @@ export const itemDoubleAxe: Partial<IItem> = {
   texturePath: "axes/double-axe.png",
   name: "Double Axe",
   description: "An doubled headed axe.",
-  attack: 10,
+  attack: 18,
   defense: 5,
   weight: 4,
   isTwoHanded: true,

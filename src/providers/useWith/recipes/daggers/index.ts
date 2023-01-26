@@ -1,7 +1,7 @@
-import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { DaggersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
-import { recipeDagger } from "./recipeDagger";
+import { recipeFrostDagger } from "./recipeFrostDagger";
 
 export const recipeDaggersIndex: Record<string, IUseWithCraftingRecipe[]> = {
-  [CraftingResourcesBlueprint.Bone]: [recipeDagger],
+  [DaggersBlueprint.FrostDagger]: [recipeFrostDagger],
 };

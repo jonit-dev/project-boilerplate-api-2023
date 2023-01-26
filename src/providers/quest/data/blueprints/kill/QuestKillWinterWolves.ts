@@ -14,7 +14,7 @@ export const questKillWinterWolves = {
       qty: 1,
     },
     {
-      itemKeys: [BootsBlueprint.GoldenBoots],
+      itemKeys: [BootsBlueprint.IronBoots],
       qty: 1,
     },
     {

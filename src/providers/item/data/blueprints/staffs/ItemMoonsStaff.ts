@@ -1,12 +1,12 @@
 import { IMagicStaff } from "@providers/useWith/useWithTypes";
 import { AnimationEffectKeys, EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { RangedWeaponsBlueprint, StaffsBlueprint } from "../../types/itemsBlueprintTypes";
+import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemMoonsStaff: Partial<IMagicStaff> = {
   key: StaffsBlueprint.MoonsStaff,
   type: ItemType.Weapon,
   rangeType: EntityAttackType.Ranged,
-  subType: ItemSubType.Magic,
+  subType: ItemSubType.Staff,
   textureAtlas: "items",
   texturePath: "staffs/moon's-staff.png",
   name: "Moons Staff",

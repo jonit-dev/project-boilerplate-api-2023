@@ -10,9 +10,8 @@ export const recipeDeathsHelmet: IUseWithCraftingRecipe = {
       qty: 8,
     },
     {
-      key: CraftingResourcesBlueprint.Obsidian,
+      key: CraftingResourcesBlueprint.ObsidiumOre,
       qty: 2,
     },
   ],
-  successChance: 35,
 };

@@ -14,5 +14,4 @@ export const recipeTurban: IUseWithCraftingRecipe = {
       qty: 4,
     },
   ],
-  successChance: 65,
 };

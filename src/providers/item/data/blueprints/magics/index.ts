@@ -1,5 +1,4 @@
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemBook } from "./ItemBook";
 import { itemDarkRune } from "./ItemDarkRune";
 import { itemFireRune } from "./ItemFireRune";
 import { itemHealRune } from "./ItemHealRune";
@@ -16,5 +15,4 @@ export const magicsBlueprintIndex = {
   [MagicsBlueprint.PoisonRune]: itemPoisonRune,
   [MagicsBlueprint.EnergyBoltRune]: itemEnergyBoltRune,
   [MagicsBlueprint.FireBoltRune]: itemFireBoltRune,
-  [MagicsBlueprint.Book]: itemBook,
 };

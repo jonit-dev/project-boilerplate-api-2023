@@ -3,6 +3,7 @@ import { accessoriesBlueprintsIndex } from "./blueprints/accessories/index";
 import { armorsBlueprintsIndex } from "./blueprints/armors/index";
 import { axesBlueprintIndex } from "./blueprints/axes/index";
 import { bodiesBlueprintsIndex } from "./blueprints/bodies/index";
+import { booksBlueprintIndex } from "./blueprints/books";
 import { bootsBlueprintIndex } from "./blueprints/boots/index";
 import { containersBlueprintIndex } from "./blueprints/containers/index";
 import { craftingResourcesBlueprintIndex } from "./blueprints/crafting-resources/index";
@@ -26,6 +27,7 @@ import { toolsBlueprintIndex } from "./blueprints/tools/index";
 
 export const itemsBlueprintIndex: IBlueprint = {
   ...bodiesBlueprintsIndex,
+  ...booksBlueprintIndex,
   ...containersBlueprintIndex,
   ...effectsBlueprintsIndex,
   ...helmetsBlueprintsIndex,

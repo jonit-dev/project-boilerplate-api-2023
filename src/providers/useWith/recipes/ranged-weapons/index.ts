@@ -1,4 +1,4 @@
-import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { recipeArrow } from "./recipeArrow";
 import { recipeBolt } from "./recipeBolt";
@@ -6,8 +6,8 @@ import { recipeBow } from "./recipeBow";
 import { recipeCrossBow } from "./recipeCrossBow";
 
 export const recipeRangedIndex: Record<string, IUseWithCraftingRecipe[]> = {
-  [CraftingResourcesBlueprint.Feather]: [recipeArrow],
-  [CraftingResourcesBlueprint.SmallWoodenStick]: [recipeBolt],
-  [CraftingResourcesBlueprint.Rope]: [recipeBow],
-  [CraftingResourcesBlueprint.GreaterWoodenLog]: [recipeCrossBow],
+  [RangedWeaponsBlueprint.Arrow]: [recipeArrow],
+  [RangedWeaponsBlueprint.Bolt]: [recipeBolt],
+  [RangedWeaponsBlueprint.Bow]: [recipeBow],
+  [RangedWeaponsBlueprint.Crossbow]: [recipeCrossBow],
 };

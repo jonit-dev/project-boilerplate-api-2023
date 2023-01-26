@@ -186,7 +186,7 @@ export class BattleRangedAttack {
     let result: IRangedAttackParams | undefined;
     // Get ranged attack weapons (bow or spear)
     if (weapon.rangeType === EntityAttackType.Ranged) {
-      if (weapon.subType === ItemSubType.Magic) {
+      if (weapon.subType === ItemSubType.Magic || weapon.subType === ItemSubType.Staff) {
         if (character.mana < this.getRequiredManaForAttack(weapon)) {
           return result;
         }
@@ -271,11 +271,12 @@ export class BattleRangedAttack {
         }
 
         break;
+      case ItemSlotType.RightHand:
       case ItemSlotType.LeftHand:
         const item = equipment.rightHand ?? equipment.leftHand;
         const handItem = await Item.findById(item);
 
-        if (handItem?.subType === ItemSubType.Magic) {
+        if (handItem?.subType === ItemSubType.Magic || handItem?.subType === ItemSubType.Staff) {
           deleteItem = false;
           consumedMana = true;
           character.mana = character.mana - this.getRequiredManaForAttack(handItem);

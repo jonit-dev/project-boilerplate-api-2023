@@ -103,5 +103,9 @@ export const npcGhoul = {
       itemBlueprintKey: RangedWeaponsBlueprint.HellishBow,
       chance: 2,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.RedShappire,
+      chance: 8,
+    },
   ],
 } as Partial<INPC>;

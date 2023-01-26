@@ -14,5 +14,4 @@ export const recipeStuddedArmor: IUseWithCraftingRecipe = {
       qty: 8,
     },
   ],
-  successChance: 50,
 };

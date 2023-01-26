@@ -12,7 +12,7 @@ export const itemFrostDoubleAxe: Partial<IItem> = {
 
   name: "Frost Double Axe",
   description: "A large master-crafted weapon with a frosted blade.",
-  attack: 14,
+  attack: 24,
   defense: 4,
   weight: 1.8,
   isTwoHanded: true,

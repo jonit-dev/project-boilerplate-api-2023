@@ -14,5 +14,4 @@ export const recipeCorruptionStaff: IUseWithCraftingRecipe = {
       qty: 3,
     },
   ],
-  successChance: 35,
 };

@@ -14,7 +14,7 @@ export const itemWatermelon: Partial<IItem> = {
   description: "A fruit that can be found in tropical areas.",
   weight: 0.5,
   maxStackSize: 100,
-  basePrice: 1,
+  basePrice: 5,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 1);
   },

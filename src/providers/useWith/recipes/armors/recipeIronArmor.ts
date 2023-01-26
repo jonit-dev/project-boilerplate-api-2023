@@ -14,5 +14,4 @@ export const recipeIronArmor: IUseWithCraftingRecipe = {
       qty: 10,
     },
   ],
-  successChance: 50,
 };

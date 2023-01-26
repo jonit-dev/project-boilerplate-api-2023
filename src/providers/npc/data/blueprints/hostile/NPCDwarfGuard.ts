@@ -93,7 +93,7 @@ export const npcDwarfGuard = {
       quantityRange: [5, 10],
     },
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.Obsidian,
+      itemBlueprintKey: CraftingResourcesBlueprint.ObsidiumOre,
       chance: 5,
     },
     {

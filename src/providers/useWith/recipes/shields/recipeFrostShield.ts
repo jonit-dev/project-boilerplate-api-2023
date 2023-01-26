@@ -18,5 +18,4 @@ export const recipeFrostShield: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  successChance: 35,
 };

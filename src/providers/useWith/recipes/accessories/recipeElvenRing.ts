@@ -18,5 +18,4 @@ export const recipeElvenRing: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  successChance: 20,
 };

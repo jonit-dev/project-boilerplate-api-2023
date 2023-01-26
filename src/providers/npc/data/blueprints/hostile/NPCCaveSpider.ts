@@ -6,6 +6,7 @@ import {
   AccessoriesBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
   PotionsBlueprint,
@@ -77,6 +78,11 @@ export const npcCaveSpider: Partial<INPC> = {
     {
       itemBlueprintKey: AccessoriesBlueprint.DeathNecklace,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SewingThread,
+      chance: 10,
+      quantityRange: [1, 3],
     },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],

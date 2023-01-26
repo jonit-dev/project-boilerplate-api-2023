@@ -14,5 +14,4 @@ export const recipeWoodenShield: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  successChance: 65,
 };

@@ -14,5 +14,4 @@ export const recipeCopperBoots: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  successChance: 35,
 };

@@ -6,13 +6,12 @@ export const recipePlateBoots: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.IronIngot,
-      qty: 4,
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.PolishedStone,
-      qty: 2,
+      qty: 10,
     },
   ],
-  successChance: 35,
 };

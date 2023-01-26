@@ -1,7 +1,13 @@
-import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { BootsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
-import { recipeBoots } from "./recipeBoots";
+import { recipeCopperBoots } from "./recipeCopperBoots";
+import { recipeGoldenBoots } from "./recipeGoldenBoots";
+import { recipePlateBoots } from "./recipePlateBoots";
+import { recipeStuddedBoots } from "./recipeStuddedBoots";
 
 export const recipeBootsIndex: Record<string, IUseWithCraftingRecipe[]> = {
-  [CraftingResourcesBlueprint.BlueFeather]: [recipeBoots],
+  [BootsBlueprint.StuddedBoots]: [recipeStuddedBoots],
+  [BootsBlueprint.CopperBoots]: [recipeCopperBoots],
+  [BootsBlueprint.GoldenBoots]: [recipeGoldenBoots],
+  [BootsBlueprint.PlateBoots]: [recipePlateBoots],
 };

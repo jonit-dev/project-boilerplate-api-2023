@@ -14,5 +14,4 @@ export const recipeInfantryHelmet: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  successChance: 35,
 };

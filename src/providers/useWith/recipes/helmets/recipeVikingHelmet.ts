@@ -18,5 +18,4 @@ export const recipeVikingHelmet: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  successChance: 35,
 };

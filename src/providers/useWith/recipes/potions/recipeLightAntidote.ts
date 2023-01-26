@@ -14,5 +14,4 @@ export const recipeLightAntidote: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  successChance: 35,
 };

@@ -6,7 +6,7 @@ import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 export const itemCorruptionStaff: Partial<IMagicStaff> = {
   key: StaffsBlueprint.CorruptionStaff,
   type: ItemType.Weapon,
-  subType: ItemSubType.Magic,
+  subType: ItemSubType.Staff,
   textureAtlas: "items",
   texturePath: "staffs/corruption-staff.png",
   name: "Corruption Staff",

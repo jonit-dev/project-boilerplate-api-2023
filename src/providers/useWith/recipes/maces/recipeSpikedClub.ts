@@ -14,5 +14,4 @@ export const recipeSpikedClub: IUseWithCraftingRecipe = {
       qty: 4,
     },
   ],
-  successChance: 95,
 };

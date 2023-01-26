@@ -14,5 +14,4 @@ export const recipeBandana: IUseWithCraftingRecipe = {
       qty: 15,
     },
   ],
-  successChance: 75,
 };

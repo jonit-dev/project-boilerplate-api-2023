@@ -6,7 +6,7 @@ export const recipeBasiliskSword: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.Obsidian,
+      key: CraftingResourcesBlueprint.ObsidiumOre,
       qty: 5,
     },
     {
@@ -18,5 +18,4 @@ export const recipeBasiliskSword: IUseWithCraftingRecipe = {
       qty: 3,
     },
   ],
-  successChance: 10,
 };

@@ -14,5 +14,4 @@ export const recipeCarpentersAxe: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  successChance: 35,
 };

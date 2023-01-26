@@ -7,7 +7,7 @@ export const itemEldensSword: Partial<IItem> = {
   type: ItemType.Weapon,
   subType: ItemSubType.Sword,
   textureAtlas: "items",
-  texturePath: "swords/eldens-sword.png",
+  texturePath: "swords/elden's-sword.png",
   name: "Eldens Sword",
   description:
     "A mythical sword said to be associated with the Eldens, a powerful and ancient race. It is imbued with powerful magical energy.",

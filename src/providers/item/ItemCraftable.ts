@@ -15,10 +15,13 @@ import {
   ICraftableItemIngredient,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
+  IUIShowMessage,
   ItemSocketEvents,
+  UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
+import shuffle from "lodash/shuffle";
 
 @provide(ItemCraftable)
 export class ItemCraftable {
@@ -80,11 +83,24 @@ export class ItemCraftable {
     if (proceed) {
       await this.createItems(recipe, character);
 
-      await this.characterWeight.updateCharacterWeight(character);
-      await this.sendRefreshItemsEvent(character);
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "You successfully crafted the item!",
+        type: "info",
+      });
     } else {
+      const failureMessages = shuffle([
+        "Sorry, you failed to craft the item.",
+        "Hmm... you couldn't get it right.",
+        "You almost got the item correctly, but failed.",
+      ]);
+
+      this.socketMessaging.sendErrorMessageToCharacter(character, failureMessages[0]);
+
       await this.animationEffect.sendAnimationEventToCharacter(character, "miss");
     }
+    await this.characterWeight.updateCharacterWeight(character);
+
+    await this.sendRefreshItemsEvent(character);
   }
 
   private async createItems(recipe: IUseWithCraftingRecipe, character: ICharacter): Promise<void> {
@@ -216,10 +232,10 @@ export class ItemCraftable {
     const dice = random(1, maxChance);
 
     const level = await this.getCraftingSkillsAverage(character);
-    const fityPercentProbabilityLevel = 30;
-    const curveSteepness = 0.07;
+    const probabilityLevel = 20;
+    const curveSteepness = 0.02;
 
-    const probability = 1 - 1 / (1 + Math.pow(Math.E, curveSteepness * (level - fityPercentProbabilityLevel)));
+    const probability = 1 - 1 / (1 + Math.pow(Math.E, curveSteepness * (level - probabilityLevel)));
     const chance = probability * maxChance;
 
     return dice <= chance;

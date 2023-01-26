@@ -18,5 +18,4 @@ export const recipeManaPotion: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  successChance: 35,
 };

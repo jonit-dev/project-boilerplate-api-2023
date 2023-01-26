@@ -1,8 +1,12 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { recipeBolt } from "@providers/useWith/recipes/ranged-weapons/recipeBolt";
 import {
   AnimationSocketEvents,
   CharacterSocketEvents,
@@ -11,16 +15,11 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { ItemCraftable } from "../ItemCraftable";
-import { CraftingResourcesBlueprint } from "../data/types/itemsBlueprintTypes";
-import { itemManaPotion } from "../data/blueprints/potions/ItemManaPotion";
-import { itemCorruptionStaff } from "../data/blueprints/staffs/ItemCorruptionStaff";
 import { itemBlueFeather } from "../data/blueprints/crafting-resources/ItemBlueFeather";
-import { itemWaterBottle } from "../data/blueprints/crafting-resources/itemWaterBottle";
 import { itemHerb } from "../data/blueprints/crafting-resources/ItemHerb";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { recipeBolt } from "@providers/useWith/recipes/ranged-weapons/recipeBolt";
-import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { itemWaterBottle } from "../data/blueprints/crafting-resources/itemWaterBottle";
+import { itemManaPotion } from "../data/blueprints/potions/ItemManaPotion";
+import { CraftingResourcesBlueprint } from "../data/types/itemsBlueprintTypes";
 
 describe("ItemCraftable.ts", () => {
   let craftableItem: ItemCraftable;
@@ -90,10 +89,6 @@ describe("ItemCraftable.ts", () => {
             qty: 1,
           }),
         ]),
-      }),
-      expect.objectContaining({
-        key: itemCorruptionStaff.key,
-        canCraft: false,
       }),
     ]);
 
@@ -166,7 +161,7 @@ describe("ItemCraftable.ts", () => {
 
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
-    expect(sendEventToUser).toHaveBeenCalledTimes(2);
+    expect(sendEventToUser).toHaveBeenCalledTimes(3);
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId!, CharacterSocketEvents.AttributeChanged, {
       targetId: testCharacter._id,
@@ -267,7 +262,7 @@ describe("ItemCraftable.ts", () => {
     await performTest();
   });
 
-  it("sould not craft valid item due to crafting failure", async () => {
+  it("should not craft valid item due to crafting failure", async () => {
     const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
     craftChanceMock.mockImplementation(() => {
       return Promise.resolve(false);
@@ -288,11 +283,22 @@ describe("ItemCraftable.ts", () => {
       })
     );
 
-    expect(sendEventToUser).toHaveBeenCalledTimes(1);
+    expect(sendEventToUser).toHaveBeenCalledTimes(4);
+
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
       effectKey: "miss",
     });
+
+    expect(sendEventToUser).toHaveBeenCalledWith(
+      testCharacter.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      {
+        inventory: container,
+        openEquipmentSetOnUpdate: false,
+        openInventoryOnUpdate: true,
+      }
+    );
   });
 
   it("sould produce both craft success and failure", async () => {
