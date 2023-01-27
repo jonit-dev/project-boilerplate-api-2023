@@ -140,7 +140,7 @@ export class GridManager {
     }
 
     // Use A* pathfinding algorithm to find shortest path
-    const finder = new PF.BestFirstFinder();
+    const finder = new PF.BreadthFirstFinder();
 
     // Remap path without grid offset
     const { gridOffsetX, gridOffsetY } = this.getMapOffset(map)!;

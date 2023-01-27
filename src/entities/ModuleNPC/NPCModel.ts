@@ -24,6 +24,7 @@ const npcSchema = createLeanSchema(
     tiledId: Type.number({ required: true }),
     key: Type.string({
       required: true,
+      index: true,
     }),
     subType: Type.string({
       required: true,
