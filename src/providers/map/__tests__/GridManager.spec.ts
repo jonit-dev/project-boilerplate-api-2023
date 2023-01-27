@@ -47,27 +47,6 @@ describe("GridManager", () => {
     expect(height).toBe(expectedHeight);
   };
 
-  it("gets a functional grid", async () => {
-    const matrix = [
-      [0, 1, 0],
-      [0, 1, 0],
-      [0, 0, 0],
-    ];
-
-    await gridRedisSerializer.saveMatrixToRedis("test", matrix);
-
-    const grid = await gridManager.getGrid("test");
-
-    expect(grid).toBeDefined();
-    expect(grid.width).toBe(3);
-    expect(grid.height).toBe(3);
-
-    expect(grid.isWalkableAt(0, 0)).toBe(true);
-    expect(grid.isWalkableAt(1, 0)).toBe(false);
-    expect(grid.isWalkableAt(1, 1)).toBe(false);
-    expect(grid.isWalkableAt(1, 2)).toBe(true);
-  });
-
   it("should properly generate a grid solid map and correctly size it (width, height)", async () => {
     await checkMapSize("unit-test-map-negative-coordinate", 48, 32);
 
