@@ -1,39 +1,25 @@
+import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { MapLayers } from "@rpg-engine/shared";
-import { provide } from "inversify-binding-decorators";
 import PF from "pathfinding";
 import { MapHelper } from "./MapHelper";
 import { MapSolids } from "./MapSolids";
 import { MapTiles } from "./MapTiles";
-import { GridRedisSerializer } from "./grid/GridRedisSerializer";
 
-@provide(GridManager)
+@provideSingleton(GridManager)
 export class GridManager {
-  constructor(
-    private mapTiles: MapTiles,
-    private mapSolids: MapSolids,
-    private mapHelper: MapHelper,
-    private gridRedisSerializer: GridRedisSerializer
-  ) {}
+  private grids: Map<string, PF.Grid> = new Map();
 
-  public async getGrid(map: string): Promise<PF.Grid> {
-    const matrix = await this.gridRedisSerializer.getMatrixFromRedis(map);
+  constructor(private mapTiles: MapTiles, private mapSolids: MapSolids, private mapHelper: MapHelper) {}
 
-    if (!matrix) {
-      throw new Error("❌Could not find matrix for map: " + map);
-    }
-
-    const grid = new PF.Grid(matrix);
-
-    return grid;
+  public getGrid(map: string): PF.Grid {
+    return this.grids.get(map)!;
   }
 
-  public async hasGrid(map: string): Promise<boolean> {
-    const grid = await this.getGrid(map);
-
-    return !!grid;
+  public hasGrid(map: string): boolean {
+    return !!this.grids.get(map);
   }
 
-  public async generateGridSolids(map: string): Promise<void> {
+  public generateGridSolids(map: string): void {
     const { gridOffsetX, gridOffsetY } = this.getMapOffset(map)!;
 
     const { width, height } = this.mapTiles.getMapWidthHeight(map, gridOffsetX, gridOffsetY);
@@ -57,7 +43,7 @@ export class GridManager {
       }
     }
 
-    await this.gridRedisSerializer.saveMatrixToRedis(map, matrix);
+    this.grids.set(map, new PF.Grid(matrix));
   }
 
   public async isWalkable(map: string, gridX: number, gridY: number): Promise<boolean | undefined> {
@@ -93,7 +79,6 @@ export class GridManager {
       grid.setWalkableAt(gridX, gridY, walkable);
 
       // also save this change to redis, so it can persist. Otherwise, we'll get a brand new grid everytime we call this.getGrid
-      await this.gridRedisSerializer.updateMatrixOnRedis(map, gridX, gridY, walkable);
     } catch (error) {
       console.log(`Failed to setWalkable=${walkable} for gridX ${gridX}, gridY ${gridY} on map ${map}`);
       console.error(error);
@@ -134,13 +119,15 @@ export class GridManager {
     endGridY: number
   ): Promise<number[][] | undefined> {
     // Check if grid exists for the given map
-    const gridMap = await this.getGrid(map);
+    let gridMap = await this.getGrid(map);
     if (!gridMap) {
       throw new Error(`❌ Could not find grid for map: ${map}`);
     }
 
+    gridMap = gridMap.clone();
+
     // Use A* pathfinding algorithm to find shortest path
-    const finder = new PF.BreadthFirstFinder();
+    const finder = new PF.BestFirstFinder();
 
     // Remap path without grid offset
     const { gridOffsetX, gridOffsetY } = this.getMapOffset(map)!;

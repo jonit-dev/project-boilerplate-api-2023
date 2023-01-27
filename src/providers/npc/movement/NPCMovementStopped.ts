@@ -18,7 +18,10 @@ export class NPCMovementStopped {
 
   public async startMovementStopped(npc: INPC): Promise<void> {
     try {
-      const targetCharacter = await Character.findById(npc.targetCharacter);
+      const targetCharacter = await Character.findById(npc.targetCharacter).lean({
+        virtuals: true,
+        defaults: true,
+      });
 
       if (targetCharacter) {
         await this.npcTarget.tryToClearOutOfRangeTargets(npc);

@@ -93,7 +93,7 @@ export class NPCTarget {
       return;
     }
 
-    const character = await Character.findById(minDistanceCharacter.id);
+    const character = await Character.findById(minDistanceCharacter.id).lean({ virtuals: true, defaults: true });
 
     if (!character) {
       throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
@@ -121,7 +121,7 @@ export class NPCTarget {
       throw new Error(`NPC ${npc.key} is trying to verify target, but no maxRangeInGridCells is specified!`);
     }
 
-    const targetCharacter = await Character.findById(npc.targetCharacter);
+    const targetCharacter = await Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true });
 
     if (!targetCharacter) {
       throw new Error(`Error in ${npc.key}: Failed to find targetCharacter!`);
@@ -154,7 +154,7 @@ export class NPCTarget {
         return;
       }
 
-      const char = await Character.findById(character.id);
+      const char = await Character.findById(character.id).lean({ virtuals: true, defaults: true });
       if (!char) {
         throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
       }
