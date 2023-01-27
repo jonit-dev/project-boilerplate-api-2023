@@ -2,20 +2,17 @@ import { RedisManager } from "@providers/database/RedisManager";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { GridManager } from "../GridManager";
 import { MapTiles } from "../MapTiles";
-import { GridRedisSerializer } from "../grid/GridRedisSerializer";
 
 describe("GridManager", () => {
   let gridManager: GridManager;
   let mapTiles: MapTiles;
   let redisManager: RedisManager;
-  let gridRedisSerializer: GridRedisSerializer;
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     redisManager = container.get<RedisManager>(RedisManager);
     await redisManager.connect();
 
     gridManager = container.get<GridManager>(GridManager);
-    gridRedisSerializer = container.get<GridRedisSerializer>(GridRedisSerializer);
     mapTiles = container.get<MapTiles>(MapTiles);
 
     await unitTestHelper.initializeMapLoader();
