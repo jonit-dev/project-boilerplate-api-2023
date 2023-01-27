@@ -91,6 +91,7 @@ export const skillsSchema = createLeanSchema(
     lumberjacking: skillDetails(SkillType.Crafting),
     cooking: skillDetails(SkillType.Crafting),
     alchemy: skillDetails(SkillType.Crafting),
+    blacksmithing: skillDetails(SkillType.Crafting),
     ...({} as {
       attack: Promise<number>;
       defense: Promise<number>;
