@@ -43,11 +43,11 @@ export const npcGorgok = {
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 40,
+      chance: 3,
     },
     {
       itemBlueprintKey: ArmorsBlueprint.GoldenArmor,
-      chance: 20,
+      chance: 2,
     },
     {
       itemBlueprintKey: BootsBlueprint.GoldenBoots,
