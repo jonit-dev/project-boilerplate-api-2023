@@ -1,18 +1,17 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MapSolids, SolidCheckStrategy } from "@providers/map/MapSolids";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MathHelper } from "@providers/math/MathHelper";
 import {
   AnimationDirection,
-  calculateNewPositionXY,
   FromGridX,
   FromGridY,
   GRID_WIDTH,
   MapLayers,
   ToGridX,
   ToGridY,
+  calculateNewPositionXY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 export interface IPosition {
@@ -53,17 +52,17 @@ export class MovementHelper {
       }
     }
 
-    const hasNPC = await NPC.exists({
-      x: FromGridX(gridX),
-      y: FromGridY(gridY),
-      layer,
-      health: { $gt: 0 },
-      scene: map,
-    });
+    // const hasNPC = await NPC.exists({
+    //   x: FromGridX(gridX),
+    //   y: FromGridY(gridY),
+    //   layer,
+    //   health: { $gt: 0 },
+    //   scene: map,
+    // });
 
-    if (hasNPC) {
-      return true;
-    }
+    // if (hasNPC) {
+    //   return true;
+    // }
 
     const hasCharacter = await Character.exists({
       x: FromGridX(gridX),
@@ -77,16 +76,16 @@ export class MovementHelper {
       return true;
     }
 
-    const hasItem = await Item.exists({
-      x: FromGridX(gridX),
-      y: FromGridY(gridY),
-      isSolid: true,
-      scene: map,
-    });
+    // const hasItem = await Item.exists({
+    //   x: FromGridX(gridX),
+    //   y: FromGridY(gridY),
+    //   isSolid: true,
+    //   scene: map,
+    // });
 
-    if (hasItem) {
-      return true;
-    }
+    // if (hasItem) {
+    //   return true;
+    // }
 
     return false;
   };

@@ -18,7 +18,7 @@ export class NPCFreezer {
     }
 
     // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
-    const checkRange = random(10000, 20000);
+    const checkRange = random(3000, 10000);
 
     const interval = setInterval(async () => {
       const shouldFreezeNPC = await this.shouldFreezeNPC(npc);

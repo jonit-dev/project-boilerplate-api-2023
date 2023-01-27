@@ -1,5 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
@@ -14,11 +14,18 @@ export class NPCTarget {
   constructor(private npcView: NPCView, private movementHelper: MovementHelper, private mapNonPVPZone: MapNonPVPZone) {}
 
   public async clearTarget(npc: INPC): Promise<void> {
-    npc.targetCharacter = undefined;
-    npc.targetType = NPCTargetType.Default;
-    npc.currentMovementType = npc.originalMovementType;
-
-    await npc.save();
+    await NPC.updateOne(
+      { _id: npc.id },
+      {
+        $set: {
+          targetType: NPCTargetType.Default,
+          currentMovementType: npc.originalMovementType,
+        },
+        $unset: {
+          targetCharacter: "",
+        },
+      }
+    );
 
     const npcBattleCycle = NPC_BATTLE_CYCLES.get(npc.id);
     const npcCycle = NPC_CYCLES.get(npc.id);
@@ -100,8 +107,8 @@ export class NPCTarget {
       return;
     }
 
-    npc.targetCharacter = character._id;
-    await npc.save();
+    // set target using updateOne
+    await NPC.updateOne({ _id: npc._id }, { $set: { targetCharacter: character._id } });
   }
 
   public async tryToClearOutOfRangeTargets(npc: INPC): Promise<void> {
@@ -152,8 +159,7 @@ export class NPCTarget {
         throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
       }
 
-      npc.targetCharacter = char._id;
-      await npc.save();
+      await NPC.updateOne({ _id: npc._id }, { $set: { targetCharacter: char._id } });
     } catch (error) {
       console.error(error);
     }

@@ -1,5 +1,5 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, NPCMovementType } from "@rpg-engine/shared";
 import { NPCMovementStopped } from "../NPCMovementStopped";
@@ -36,6 +36,7 @@ describe("NPCMovementStopped.ts", () => {
 
   it("should properly set a new target once a player is close", async () => {
     await npcMovementStopped.startMovementStopped(testNPC);
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
 
     expect(testNPC.targetCharacter?.toString()).toBe(testCharacter.id.toString());
   });
@@ -52,9 +53,15 @@ describe("NPCMovementStopped.ts", () => {
       testCharacter.x = FromGridX(position.gridX);
       testCharacter.y = FromGridY(position.gridY);
       await testCharacter.save();
+      testNPC = (await NPC.findById(testNPC._id)) as INPC;
+      testCharacter = (await Character.findById(testCharacter._id)) as ICharacter;
 
       await npcTarget.tryToSetTarget(testNPC);
+      testNPC = (await NPC.findById(testNPC._id)) as INPC;
+
       await npcMovementStopped.startMovementStopped(testNPC);
+      testNPC = (await NPC.findById(testNPC._id)) as INPC;
+
       expect(testNPC.direction).toBe(position.expectedResult);
     }
   });

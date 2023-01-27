@@ -16,13 +16,13 @@ describe("MovementHelper.ts", () => {
     await unitTestHelper.beforeEachJestHook(true);
   });
 
-  it("should properly detect a solid NPC", async () => {
-    const npc = await unitTestHelper.createMockNPC();
+  // it("should properly detect a solid NPC", async () => {
+  //   const npc = await unitTestHelper.createMockNPC();
 
-    const hasSolidNPC = await movementHelper.isSolid(npc.scene, ToGridX(npc.x), ToGridY(npc.y), npc.layer);
+  //   const hasSolidNPC = await movementHelper.isSolid(npc.scene, ToGridX(npc.x), ToGridY(npc.y), npc.layer);
 
-    expect(hasSolidNPC).toBeTruthy();
-  });
+  //   expect(hasSolidNPC).toBeTruthy();
+  // });
 
   it("should properly detect if a position is snapped or not to grid", () => {
     const isSnappedToGrid = movementHelper.isSnappedToGrid(16, 16);

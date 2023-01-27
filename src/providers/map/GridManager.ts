@@ -139,14 +139,8 @@ export class GridManager {
       throw new Error(`❌ Could not find grid for map: ${map}`);
     }
 
-    // Clone the grid to avoid modifying the original
-    const tempGrid = gridMap.clone();
-    if (!tempGrid) {
-      throw new Error(`❌ Could not clone grid for map: ${map}`);
-    }
-
     // Use A* pathfinding algorithm to find shortest path
-    const finder = new PF.AStarFinder();
+    const finder = new PF.BestFirstFinder();
 
     // Remap path without grid offset
     const { gridOffsetX, gridOffsetY } = this.getMapOffset(map)!;
@@ -160,15 +154,15 @@ export class GridManager {
     }
 
     // Set start and end points to walkable in temporary grid
-    tempGrid.setWalkableAt(startX, startY, true);
-    tempGrid.setWalkableAt(endX, endY, true);
+    gridMap.setWalkableAt(startX, startY, true);
+    gridMap.setWalkableAt(endX, endY, true);
 
     const path = finder.findPath(
       startGridX + gridOffsetX,
       startGridY + gridOffsetY,
       endGridX + gridOffsetX,
       endGridY + gridOffsetY,
-      tempGrid
+      gridMap
     );
 
     const newPath = path.map(([x, y]) => [x - (gridOffsetX ?? 0), y - (gridOffsetY ?? 0)]);

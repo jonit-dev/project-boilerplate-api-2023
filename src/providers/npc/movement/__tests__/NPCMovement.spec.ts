@@ -1,4 +1,4 @@
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { NPCMovement } from "../NPCMovement";
@@ -55,6 +55,7 @@ describe("NPCMovement.ts", () => {
 
   it("should properly move NPC to a selected position", async () => {
     await npcMovement.moveNPC(testNPC, testNPC.x, testNPC.y, FromGridX(6), FromGridY(4), "right");
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
 
     expect(testNPC.x).toBe(FromGridX(6));
     expect(testNPC.y).toBe(FromGridY(4));

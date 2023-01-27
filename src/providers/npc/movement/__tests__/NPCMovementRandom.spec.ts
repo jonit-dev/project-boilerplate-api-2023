@@ -1,4 +1,4 @@
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { NPCMovementType } from "@rpg-engine/shared";
 import { NPCMovementRandomPath } from "../NPCMovementRandomPath";
@@ -22,6 +22,8 @@ describe("NPCMovementRandom.ts", () => {
 
   it("should properly move to a random square", async () => {
     await npcMovementRandom.startRandomMovement(testNPC);
+
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
 
     expect(testNPC.x !== testNPC.initialX || testNPC.y !== testNPC.initialY).toBe(true);
   });

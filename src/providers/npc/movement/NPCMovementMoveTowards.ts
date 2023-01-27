@@ -45,6 +45,7 @@ export class NPCMovementMoveTowards {
 
     if (!targetCharacter) {
       // no target character
+
       await this.npcTarget.tryToSetTarget(npc);
 
       // if not target is set and we're out of X and Y position, just move back
@@ -109,7 +110,7 @@ export class NPCMovementMoveTowards {
             }
           } else {
             npc.pathOrientation = NPCPathOrientation.Backward;
-            await npc.save();
+            await NPC.updateOne({ _id: npc.id }, { pathOrientation: NPCPathOrientation.Backward });
           }
           break;
         case NPCPathOrientation.Backward:
