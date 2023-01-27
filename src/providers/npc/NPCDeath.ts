@@ -4,7 +4,9 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { NPC_LOOT_CHANCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { ItemRarity } from "@providers/item/ItemRarity";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -15,7 +17,6 @@ import _, { random } from "lodash";
 import { NPC_CYCLES } from "./NPCCycle";
 import { calculateGold } from "./NPCGold";
 import { NPCTarget } from "./movement/NPCTarget";
-import { ItemRarity } from "@providers/item/ItemRarity";
 
 @provide(NPCDeath)
 export class NPCDeath {
@@ -101,7 +102,7 @@ export class NPCDeath {
     const calculatedGold = calculateGold(npc.maxHealth, npc?.skills as unknown as Partial<ISkill>);
     const randomPercentage = (): number => random(70, 100) / 100;
     const goldLoot: INPCLoot = {
-      chance: 30,
+      chance: 30 * NPC_LOOT_CHANCE_MULTIPLIER,
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       quantityRange: [1 + Math.floor(randomPercentage() * calculatedGold), Math.floor(calculatedGold)],
     };
@@ -123,7 +124,7 @@ export class NPCDeath {
       }
 
       const rand = Math.round(_.random(0, 100));
-      if (rand <= loot.chance) {
+      if (rand <= loot.chance * NPC_LOOT_CHANCE_MULTIPLIER) {
         const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
 
         let lootQuantity = 1;

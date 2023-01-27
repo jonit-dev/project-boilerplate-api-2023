@@ -1,6 +1,11 @@
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { rollDice } from "@providers/constants/DiceConstants";
+import {
+  NPC_SKILL_DEXTERITY_MULTIPLIER,
+  NPC_SKILL_LEVEL_MULTIPLIER,
+  NPC_SKILL_STRENGTH_MULTIPLIER,
+} from "@providers/constants/NPCConstants";
 import { GridManager } from "@providers/map/GridManager";
 import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ToGridX, ToGridY } from "@rpg-engine/shared";
@@ -74,8 +79,20 @@ export class NPCSeeder {
   }
 
   private async updateNPCSkills(NPCData: INPCSeedData, npc: INPC): Promise<void> {
-    const skills = this.setNPCRandomSkillLevel(NPCData);
+    const skills = this.setNPCRandomSkillLevel(NPCData) as unknown as ISkill;
 
+    if (skills?.level) {
+      skills.level = skills.level * NPC_SKILL_LEVEL_MULTIPLIER;
+    }
+    if (skills?.strength?.level) {
+      skills.strength.level = skills.strength.level * NPC_SKILL_STRENGTH_MULTIPLIER;
+    }
+    if (skills?.dexterity?.level) {
+      skills.dexterity.level = skills.dexterity.level * NPC_SKILL_DEXTERITY_MULTIPLIER;
+    }
+    if (skills?.resistance?.level) {
+      skills.resistance.level = skills.resistance.level * NPC_SKILL_DEXTERITY_MULTIPLIER;
+    }
     if (NPCData.skills) {
       await Skill.updateOne(
         {
@@ -92,6 +109,20 @@ export class NPCSeeder {
   private async createNewNPCWithSkills(NPCData: INPCSeedData): Promise<void> {
     try {
       const skills = new Skill({ ...(this.setNPCRandomSkillLevel(NPCData) as unknown as ISkill), ownerType: "NPC" }); // randomize skills present in the metadata only
+
+      if (skills.level) {
+        skills.level = skills.level * NPC_SKILL_LEVEL_MULTIPLIER;
+      }
+      if (skills.strength?.level) {
+        skills.strength.level = skills.strength.level * NPC_SKILL_STRENGTH_MULTIPLIER;
+      }
+      if (skills.dexterity?.level) {
+        skills.dexterity.level = skills.dexterity.level * NPC_SKILL_DEXTERITY_MULTIPLIER;
+      }
+      if (skills.resistance?.level) {
+        skills.resistance.level = skills.resistance.level * NPC_SKILL_DEXTERITY_MULTIPLIER;
+      }
+
       const npcHealth = this.setNPCRandomHealth(NPCData);
 
       const newNPC = new NPC({
