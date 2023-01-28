@@ -13,7 +13,7 @@ export const itemRapier: Partial<IItem> = {
     "A sleek and slender sword with a pointed and sharp blade, designed for precise and rapid thrusting attacks.",
   weight: 0.75,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 9,
+  attack: 11,
   defense: 1,
   rangeType: EntityAttackType.Melee,
   basePrice: 70,

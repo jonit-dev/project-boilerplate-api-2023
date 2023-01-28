@@ -4,8 +4,12 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   ArmorsBlueprint,
   BootsBlueprint,
+  ContainersBlueprint,
+  GlovesBlueprint,
   LegsBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
+  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateMoveTowardsMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
@@ -21,46 +25,72 @@ export const npcGorgok = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.MeleeRanged,
   ammoKey: RangedWeaponsBlueprint.IronArrow,
-  maxRangeAttack: 8,
+  maxRangeAttack: 10,
   speed: MovementSpeed.Fast,
-  baseHealth: 1000,
-  healthRandomizerDice: Dice.D12,
+  baseHealth: 1200,
+  healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
     level: 80,
     strength: {
-      level: 40,
+      level: 45,
     },
     dexterity: {
       level: 50,
     },
     resistance: {
-      level: 30,
+      level: 35,
     },
   },
   fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 40,
+      chance: 5,
     },
     {
       itemBlueprintKey: ArmorsBlueprint.GoldenArmor,
-      chance: 20,
+      chance: 10,
     },
     {
       itemBlueprintKey: BootsBlueprint.GoldenBoots,
-      chance: 30,
+      chance: 10,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.IronArrow,
       chance: 25,
       quantityRange: [10, 20],
     },
+
+    {
+      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: GlovesBlueprint.PlateGloves,
+      chance: 85,
+    },
+    {
+      itemBlueprintKey: ContainersBlueprint.Backpack,
+      chance: 50,
+    },
+
+    {
+      itemBlueprintKey: BootsBlueprint.CopperBoots,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: GlovesBlueprint.PlateGloves,
+      chance: 85,
+    },
     {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,
       chance: 60,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.PlateShield,
+      chance: 15,
     },
   ],
 } as Partial<INPC>;

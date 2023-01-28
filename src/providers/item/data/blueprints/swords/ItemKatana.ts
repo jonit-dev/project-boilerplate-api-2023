@@ -13,8 +13,8 @@ export const itemKatana: Partial<IItem> = {
   name: "Katana",
   description:
     "A traditional Japanese sword with a curved, single-edged blade, known for its sharpness and versatility.",
-  attack: 8,
-  defense: 2,
+  attack: 13,
+  defense: 3,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
