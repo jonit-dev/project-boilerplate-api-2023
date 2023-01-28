@@ -5,10 +5,11 @@
       "script": "./dist/src/server.js",
       "merge_logs": true,
       "max_restarts": 20,
-      "instances": "max",
+      "instances": "8",
       "exec_mode": "cluster",
       "node_args": "-r dotenv/config -r ./register-paths.js",
-      "max_memory_restart": "15G"
+      "max_memory_restart": "15G",
+      "watch": true
     }
   ]
 }
