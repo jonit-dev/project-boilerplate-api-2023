@@ -29,5 +29,7 @@ export const itemFireBoltRune: Partial<IMagicItemUseWithEntity> = {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireBoltRune, caster);
 
     ItemUsableEffect.apply(target, EffectableAttribute.Mana, -1 * points);
+
+    return points;
   },
 };

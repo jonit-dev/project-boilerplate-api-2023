@@ -29,5 +29,7 @@ export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.DarkRune, caster);
 
     ItemUsableEffect.apply(target, EffectableAttribute.Mana, -1 * points);
+
+    return points;
   },
 };

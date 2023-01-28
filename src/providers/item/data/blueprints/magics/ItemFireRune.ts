@@ -30,5 +30,7 @@ export const itemFireRune: Partial<IMagicItemUseWithEntity> = {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireRune, caster);
 
     ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+
+    return points;
   },
 };

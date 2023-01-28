@@ -30,5 +30,7 @@ export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.PoisonRune, caster);
 
     ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+
+    return points;
   },
 };

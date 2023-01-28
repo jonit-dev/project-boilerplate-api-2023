@@ -29,5 +29,7 @@ export const itemEnergyBoltRune: Partial<IMagicItemUseWithEntity> = {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.EnergyBoltRune, caster);
 
     ItemUsableEffect.apply(target, EffectableAttribute.Mana, -1 * points);
+
+    return points;
   },
 };

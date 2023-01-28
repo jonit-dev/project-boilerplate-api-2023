@@ -4,6 +4,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { OnTargetHit } from "@providers/battle/OnTargetHit";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -38,6 +39,7 @@ describe("UseWithEntityValidation.ts", () => {
   let inventoryContainer: IItemContainer;
   let sendEventToUserMock: jest.SpyInstance;
   let executeEffectMock: jest.SpyInstance;
+  let onHitTargetMock: jest.SpyInstance;
 
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
@@ -100,6 +102,9 @@ describe("UseWithEntityValidation.ts", () => {
 
     executeEffectMock = jest.spyOn(useWithEntity as any, "executeEffect");
     sendEventToUserMock = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
+
+    onHitTargetMock = jest.spyOn(OnTargetHit.prototype, "execute");
+    onHitTargetMock.mockImplementation();
   });
 
   afterEach(() => {
@@ -908,6 +913,50 @@ describe("UseWithEntityValidation.ts", () => {
 
     expect(skillsCalls.length).toBe(1);
     expect(skillsCalls[0][2]?.skill?.magicResistance?.skillPoints).toBe(skillPoints);
+  });
+
+  it("should execute hit post processing", async () => {
+    await useWithEntity.execute(
+      {
+        itemId: item1._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    expect(onHitTargetMock).toBeCalled();
+    expect(onHitTargetMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        _id: targetCharacter._id,
+      }),
+      testCharacter,
+      10
+    );
+  });
+
+  it("should execute hit post processing without damage data", async () => {
+    const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.HealRune)];
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+
+    await useWithEntity.execute(
+      {
+        itemId: items[0]._id,
+        entityId: targetCharacter._id,
+        entityType: EntityType.Character,
+      },
+      testCharacter
+    );
+
+    expect(onHitTargetMock).toBeCalled();
+    expect(onHitTargetMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        _id: targetCharacter._id,
+      }),
+      testCharacter,
+      undefined
+    );
   });
 
   afterAll(async () => {

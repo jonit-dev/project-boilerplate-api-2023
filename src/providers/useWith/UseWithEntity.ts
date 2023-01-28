@@ -29,6 +29,7 @@ import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { IMagicItemUseWithEntity } from "./useWithTypes";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
+import { OnTargetHit } from "@providers/battle/OnTargetHit";
 
 const StaticEntity = "Item"; // <--- should be added to the EntityType enum from @rpg-engine/shared
 
@@ -45,7 +46,8 @@ export class UseWithEntity {
     private animationEffect: AnimationEffect,
     private characterItemContainer: CharacterItemContainer,
     private skillIncrease: SkillIncrease,
-    private characterBonusPenalties: CharacterBonusPenalties
+    private characterBonusPenalties: CharacterBonusPenalties,
+    private onTargetHit: OnTargetHit
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -155,7 +157,7 @@ export class UseWithEntity {
   private async executeEffect(caster: ICharacter, target: ICharacter | INPC | IItem, item: IItem): Promise<void> {
     const blueprint = itemsBlueprintIndex[item.key];
 
-    await blueprint.usableEffect(caster, target);
+    const damage = await blueprint.usableEffect(caster, target);
     await target.save();
 
     // handle static item case
@@ -166,6 +168,7 @@ export class UseWithEntity {
     } else {
       await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, caster, 1);
     }
+
     await this.characterWeight.updateCharacterWeight(caster);
 
     await this.sendRefreshItemsEvent(caster);
@@ -175,7 +178,10 @@ export class UseWithEntity {
     }
 
     if (target.type !== StaticEntity) {
-      await this.sendTargetUpdateEvents(caster, target as ICharacter | INPC);
+      const transformedTarget = target as ICharacter | INPC;
+
+      await this.sendTargetUpdateEvents(caster, transformedTarget);
+      await this.onTargetHit.execute(transformedTarget, caster, damage);
     }
 
     if (target.type === EntityType.Character) {
