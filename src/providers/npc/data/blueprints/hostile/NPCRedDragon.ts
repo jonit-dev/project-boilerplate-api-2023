@@ -5,6 +5,7 @@ import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entit
 import {
   ArmorsBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   HelmetsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -69,6 +70,16 @@ export const npcRedDragon = {
     {
       itemBlueprintKey: ShieldsBlueprint.SilverShield,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SilverIngot,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenIngot,
+      chance: 10,
+      quantityRange: [1, 5],
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

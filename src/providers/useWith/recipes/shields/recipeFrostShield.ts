@@ -7,11 +7,11 @@ export const recipeFrostShield: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 3,
+      qty: 2,
     },
     {
-      key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 1,
+      key: CraftingResourcesBlueprint.Rock,
+      qty: 3,
     },
     {
       key: CraftingResourcesBlueprint.Leather,

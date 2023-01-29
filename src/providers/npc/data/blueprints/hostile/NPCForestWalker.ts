@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
   ContainersBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
@@ -70,6 +71,21 @@ export const npcForestWalker: Partial<INPC> = {
     {
       itemBlueprintKey: RangedWeaponsBlueprint.FireBolt,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WoodenSticks,
+      chance: 30,
+      quantityRange: [1, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SmallWoodenStick,
+      chance: 40,
+      quantityRange: [5, 15],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WoodenBoard,
+      chance: 30,
+      quantityRange: [1, 10],
     },
   ],
 };

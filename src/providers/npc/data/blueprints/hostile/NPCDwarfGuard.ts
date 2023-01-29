@@ -100,5 +100,9 @@ export const npcDwarfGuard = {
       itemBlueprintKey: SpearsBlueprint.Javelin,
       chance: 5,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
+      chance: 5,
+    },
   ],
 } as Partial<INPC>;

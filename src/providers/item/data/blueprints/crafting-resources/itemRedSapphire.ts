@@ -3,7 +3,7 @@ import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemRedSapphire: Partial<IItemUseWith> = {
-  key: CraftingResourcesBlueprint.RedShappire,
+  key: CraftingResourcesBlueprint.RedSapphire,
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,
   textureAtlas: "items",

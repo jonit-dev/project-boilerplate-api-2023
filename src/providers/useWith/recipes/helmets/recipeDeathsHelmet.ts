@@ -7,11 +7,15 @@ export const recipeDeathsHelmet: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 8,
+      qty: 6,
     },
     {
       key: CraftingResourcesBlueprint.ObsidiumOre,
       qty: 2,
+    },
+    {
+      key: CraftingResourcesBlueprint.WolfTooth,
+      qty: 3,
     },
   ],
 };

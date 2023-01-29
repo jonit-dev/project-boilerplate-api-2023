@@ -13,5 +13,9 @@ export const recipeMace: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
       qty: 1,
     },
+    {
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 1,
+    },
   ],
 };

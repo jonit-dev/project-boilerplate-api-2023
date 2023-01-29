@@ -80,13 +80,14 @@ export const npcIceFox: Partial<INPC> = {
       quantityRange: [5, 10],
     },
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
-      chance: 1,
-    },
-    {
       itemBlueprintKey: FoodsBlueprint.IceMushroom,
       chance: 10,
       quantityRange: [3, 4],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Bone,
+      chance: 40,
+      quantityRange: [1, 5],
     },
   ],
 };

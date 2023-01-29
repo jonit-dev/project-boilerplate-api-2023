@@ -91,5 +91,14 @@ export const npcDwarfArcher: Partial<INPC> = {
       itemBlueprintKey: SwordsBlueprint.MithrilSword,
       chance: 5,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SmallWoodenStick,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
   ],
 };

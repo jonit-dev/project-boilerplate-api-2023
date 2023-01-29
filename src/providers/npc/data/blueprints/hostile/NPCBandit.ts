@@ -96,5 +96,10 @@ export const npcBandit: Partial<INPC> = {
       itemBlueprintKey: SwordsBlueprint.DamascusSword,
       chance: 20,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SteelIngot,
+      chance: 20,
+      quantityRange: [5, 10],
+    },
   ],
 };

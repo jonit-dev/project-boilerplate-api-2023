@@ -7,11 +7,15 @@ export const recipeCorruptionStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Jade,
-      qty: 10,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
       qty: 3,
+    },
+    {
+      key: CraftingResourcesBlueprint.MagicRecipe,
+      qty: 6,
     },
   ],
 };

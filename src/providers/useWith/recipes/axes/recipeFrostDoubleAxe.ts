@@ -17,5 +17,9 @@ export const recipeFrostDoubleAxe: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.WolfTooth,
       qty: 2,
     },
+    {
+      key: CraftingResourcesBlueprint.WoodenSticks,
+      qty: 2,
+    },
   ],
 };

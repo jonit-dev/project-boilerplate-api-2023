@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  CraftingResourcesBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -76,6 +77,11 @@ export const npcFrostSalamander: Partial<INPC> = {
     {
       itemBlueprintKey: ShieldsBlueprint.VikingShield,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueSilk,
+      chance: 20,
+      quantityRange: [1, 5],
     },
   ],
 };

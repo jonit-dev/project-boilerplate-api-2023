@@ -8,6 +8,7 @@ import {
   FoodsBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
+  MagicsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   SwordsBlueprint,
@@ -78,6 +79,21 @@ export const npcCaveTroll = {
     {
       itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SteelIngot,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: MagicsBlueprint.FireRune,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GreenOre,
+      chance: 20,
+      quantityRange: [1, 5],
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   PotionsBlueprint,
@@ -65,6 +66,11 @@ export const npcMudGolem: Partial<INPC> = {
     {
       itemBlueprintKey: StaffsBlueprint.FireWand,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.PolishedStone,
+      chance: 10,
+      quantityRange: [1, 5],
     },
   ],
 };

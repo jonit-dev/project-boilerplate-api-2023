@@ -9,6 +9,7 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
@@ -94,6 +95,11 @@ export const npcTrollWarrior = {
     {
       itemBlueprintKey: StaffsBlueprint.PoisonStaff,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.CopperIngot,
+      chance: 20,
+      quantityRange: [1, 5],
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

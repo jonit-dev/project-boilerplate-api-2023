@@ -7,12 +7,15 @@ export const recipeLightLifePotion: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Herb,
+      qty: 5,
+    },
+    {
+      key: CraftingResourcesBlueprint.PhoenixFeather,
       qty: 1,
     },
-
     {
-      key: CraftingResourcesBlueprint.WaterBottle,
-      qty: 1,
+      key: CraftingResourcesBlueprint.GoldenOre,
+      qty: 2,
     },
   ],
 };

@@ -7,11 +7,11 @@ export const recipeIronArmor: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 20,
+      qty: 15,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 10,
+      qty: 25,
     },
   ],
 };
