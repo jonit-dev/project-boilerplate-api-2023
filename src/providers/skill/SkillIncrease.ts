@@ -73,7 +73,7 @@ export class SkillIncrease {
       increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
     }
 
-    await this.updateSkills(skills, attacker);
+    await this.skillFunctions.updateSkills(skills, attacker);
 
     await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weapon?.subType || "None");
 
@@ -118,7 +118,7 @@ export class SkillIncrease {
 
     // if character does not have a shield, shielding skills are not updated
     if (!_.isEmpty(result)) {
-      await this.updateSkills(skills, character);
+      await this.skillFunctions.updateSkills(skills, character);
       if (result.skillLevelUp && character.channelId) {
         await this.skillFunctions.sendSkillLevelUpEvents(result, character);
       }
@@ -155,7 +155,7 @@ export class SkillIncrease {
     }
 
     const result = this.increaseSP(skills, attribute, skillPointsCalculator);
-    await this.updateSkills(skills, character);
+    await this.skillFunctions.updateSkills(skills, character);
 
     if (result.skillLevelUp && character.channelId) {
       await this.skillFunctions.sendSkillLevelUpEvents(result, character);
@@ -213,7 +213,7 @@ export class SkillIncrease {
         levelUp = true;
       }
 
-      await this.updateSkills(skills, character);
+      await this.skillFunctions.updateSkills(skills, character);
 
       if (levelUp) {
         const { maxHealth, maxMana } = this.increaseMaxManaMaxHealth(character.maxMana, character.maxHealth);
@@ -359,14 +359,6 @@ export class SkillIncrease {
 
       await target.save();
     }
-  }
-
-  private async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
-    await skills.save();
-
-    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills.toObject(),
-    });
   }
 
   private getMagicSkillIncreaseCalculator(spellPower: number): Function {

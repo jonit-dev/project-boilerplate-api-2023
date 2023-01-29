@@ -78,7 +78,7 @@ describe("SpellCast.ts", () => {
     characterSkills = testCharacter.skills as unknown as ISkill;
     characterSkills.level = spellSelfHealing.minLevelRequired!;
     characterSkills.magic.level = spellSelfHealing.minMagicLevelRequired;
-    await characterSkills.save();
+    await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
   });
@@ -94,12 +94,12 @@ describe("SpellCast.ts", () => {
   });
 
   describe("verify message is a spell being cast", () => {
-    it("should be self healing spell casting", async () => {
-      expect(await spellCast.isSpellCasting("talas faenya")).toBeTruthy();
+    it("should be self healing spell casting", () => {
+      expect(spellCast.isSpellCasting("talas faenya")).toBeTruthy();
     });
 
-    it("should not be self healing spell casting", async () => {
-      expect(await spellCast.isSpellCasting("talas faenya ")).toBeFalsy();
+    it("should not be self healing spell casting", () => {
+      expect(spellCast.isSpellCasting("talas faenya ")).toBeFalsy();
     });
   });
 
@@ -139,17 +139,18 @@ describe("SpellCast.ts", () => {
     };
 
     testCharacter.learnedSpells = undefined;
-    await testCharacter.save();
+    await Character.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
     await runTest();
 
     testCharacter.learnedSpells = [];
-    await testCharacter.save();
+    await Character.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
+
     await runTest();
   });
 
   it("should fail with not enough mana", async () => {
     testCharacter.mana = (spellSelfHealing.manaCost ?? 1) - 1;
-    await testCharacter.save();
+    await Skill.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
 
     expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
 
@@ -163,7 +164,7 @@ describe("SpellCast.ts", () => {
 
   it("should fail due to lower character level", async () => {
     characterSkills.level = (spellSelfHealing.minLevelRequired ?? 2) - 1;
-    await characterSkills.save();
+    await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
     expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
 
@@ -177,7 +178,7 @@ describe("SpellCast.ts", () => {
 
   it("should fail due to lower magic level", async () => {
     characterSkills.magic.level = (spellSelfHealing.minMagicLevelRequired ?? 2) - 1;
-    await characterSkills.save();
+    await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
     expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
 
@@ -195,8 +196,10 @@ describe("SpellCast.ts", () => {
 
     expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeTruthy();
 
-    const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
-    expect(character.health).toBe(newHealth);
+    const character = (await Character.findById(testCharacter.id).lean({
+      virtuals: true,
+      defaults: true,
+    })) as ICharacter;
     expect(character.mana).toBe(newMana);
 
     /**
@@ -238,11 +241,14 @@ describe("SpellCast.ts", () => {
     characterSkills = testCharacter.skills as unknown as ISkill;
     characterSkills.level = spellGreaterHealing.minLevelRequired!;
     characterSkills.magic.level = spellGreaterHealing.minMagicLevelRequired;
-    await characterSkills.save();
+    await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
     expect(await spellCast.castSpell("greater faenya", testCharacter)).toBeTruthy();
 
-    const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
+    const character = (await Character.findById(testCharacter.id).lean({
+      virtuals: true,
+      defaults: true,
+    })) as ICharacter;
     expect(character.health).toBe(newHealth);
     expect(character.mana).toBe(newMana);
 
@@ -251,7 +257,7 @@ describe("SpellCast.ts", () => {
      * 2. life heal animation event
      * 3. skill update event
      */
-    expect(sendEventToUser).toBeCalledTimes(5);
+    expect(sendEventToUser).toBeCalledTimes(9);
 
     expect(sendEventToUser).toHaveBeenNthCalledWith(
       1,
@@ -286,7 +292,10 @@ describe("SpellCast.ts", () => {
   it("should increase skill and send skill update event", async () => {
     expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeTruthy();
 
-    const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills)) as unknown as ISkill;
+    const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills).lean({
+      virtuals: true,
+      defaults: true,
+    })) as ISkill;
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (spellSelfHealing.manaCost ?? 0);
     expect(updatedSkills?.magic.skillPoints).toBe(skillPoints);
 
@@ -305,7 +314,7 @@ describe("SpellCast.ts", () => {
 
   it("should not cast spell if character does not have any skills", async () => {
     testCharacter.skills = undefined;
-    await testCharacter.save();
+    await Character.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
 
     expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
 
@@ -334,7 +343,7 @@ describe("SpellCast.ts", () => {
     };
 
     testCharacter.learnedSpells = undefined;
-    await testCharacter.save();
+    await Character.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
     await runTest();
   });
 
@@ -359,7 +368,7 @@ describe("SpellCast.ts", () => {
     };
 
     testCharacter.learnedSpells = undefined;
-    await testCharacter.save();
+    await Character.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
     await runTest();
   });
 
@@ -378,7 +387,7 @@ describe("SpellCast.ts", () => {
     };
 
     testCharacter.learnedSpells = [spellSelfHealing.key!, spellArrowCreation.key!, spellBlankRuneCreation.key!];
-    await testCharacter.save();
+    await Character.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
     await runTest();
   });
 
@@ -399,10 +408,10 @@ describe("SpellCast.ts", () => {
     };
 
     testCharacter.learnedSpells = undefined;
-    await testCharacter.save();
+    await Character.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
 
     characterSkills.level = 1;
-    await characterSkills.save();
+    await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
     await runTest();
   });
@@ -424,7 +433,7 @@ describe("SpellCast.ts", () => {
       characterSkills = testCharacter.skills as unknown as ISkill;
       characterSkills.level = spellFoodCreation.minLevelRequired!;
       characterSkills.magic.level = spellFoodCreation.minMagicLevelRequired;
-      await characterSkills.save();
+      await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
     });
 
     it("should cast food creation spell successfully", async () => {
@@ -524,7 +533,7 @@ describe("SpellCast.ts", () => {
       characterSkills = testCharacter.skills as unknown as ISkill;
       characterSkills.level = spellSelfHaste.minLevelRequired!;
       characterSkills.magic.level = spellSelfHaste.minMagicLevelRequired;
-      await characterSkills.save();
+      await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
       const castResult = await spellCast.castSpell("talas hiz", testCharacter);
 

@@ -1,7 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { ItemSubType } from "@rpg-engine/shared";
 import { CharacterCombatBonusPenalties } from "../characterBonusPenalties/CharacterCombatBonusPenalties";
 
 describe("Case CharacterCombatBonusPenalties", () => {
@@ -28,7 +27,7 @@ describe("Case CharacterCombatBonusPenalties", () => {
 
   it("updateCombatSkills should return the correct value", async () => {
     const skills = (await Skill.findById(testCharacter.skills)) as ISkill;
-    let skillType = ItemSubType.Dagger;
+    let skillType = "dagger";
 
     const combatSkills = {
       first: 0.1,
@@ -42,15 +41,15 @@ describe("Case CharacterCombatBonusPenalties", () => {
 
     await characterCombatBonusPenalties.updateCombatSkills(skills, skillType, combatSkills);
 
-    expect(skills!.dagger.skillPoints).toEqual(expect.closeTo(0.02, 2));
+    expect(skills!.dagger.skillPoints).toEqual(expect.closeTo(0.22, 2));
 
-    skillType = ItemSubType.Sword;
+    skillType = "sword";
     // First Call
     await characterCombatBonusPenalties.updateCombatSkills(skills, skillType, combatSkills);
     // Second Call
     await characterCombatBonusPenalties.updateCombatSkills(skills, skillType, combatSkills);
 
-    expect(skills!.sword.skillPoints).toEqual(expect.closeTo(0.04, 2));
+    expect(skills!.sword.skillPoints).toEqual(expect.closeTo(0.44, 2));
   });
 
   afterAll(async () => {

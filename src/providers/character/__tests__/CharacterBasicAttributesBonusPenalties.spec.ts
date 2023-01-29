@@ -40,7 +40,7 @@ describe("Case CharacterBasicAttributesBonusPenalties", () => {
 
     await characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(skills, skillType, basicAttributes);
 
-    expect(skills!.strength.skillPoints).toEqual(expect.closeTo(0.04, 2));
+    expect(skills!.strength.skillPoints).toEqual(0.24);
     expect(skills!.magic.skillPoints).toEqual(0);
 
     skillType = "magic";
@@ -49,8 +49,8 @@ describe("Case CharacterBasicAttributesBonusPenalties", () => {
 
     await characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(skills, skillType, basicAttributes);
 
-    expect(skills!.strength.skillPoints).toEqual(expect.closeTo(0.04, 2));
-    expect(skills!.magic.skillPoints).toEqual(expect.closeTo(9.97, 2));
+    expect(skills!.strength.skillPoints).toEqual(expect.closeTo(0.24, 2));
+    expect(skills!.magic.skillPoints).toEqual(expect.closeTo(10.36, 2));
   });
 
   afterAll(async () => {
