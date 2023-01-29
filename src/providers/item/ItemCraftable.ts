@@ -256,6 +256,7 @@ export class ItemCraftable {
       skills.lumberjacking.level,
       skills.cooking.level,
       skills.alchemy.level,
+      skills.blacksmithing.level,
     ];
 
     return Math.floor(craftingSkills.reduce((total, level) => total + level, 0) / craftingSkills.length);
