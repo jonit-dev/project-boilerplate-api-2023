@@ -70,5 +70,10 @@ export const npcFireFox: Partial<INPC> = {
       chance: 20,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
+      chance: 5,
+      quantityRange: [5, 10],
+    },
   ],
 };

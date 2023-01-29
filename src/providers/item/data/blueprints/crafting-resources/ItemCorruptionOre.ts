@@ -13,4 +13,5 @@ export const itemCorruptionOre: Partial<IItem> = {
   weight: 2,
   maxStackSize: 100,
   hasUseWith: true,
+  basePrice: 25,
 };

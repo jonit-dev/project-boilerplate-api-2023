@@ -14,7 +14,7 @@ export const recipeDeathsHelmet: IUseWithCraftingRecipe = {
       qty: 2,
     },
     {
-      key: CraftingResourcesBlueprint.WolfTooth,
+      key: CraftingResourcesBlueprint.CorruptionOre,
       qty: 3,
     },
   ],

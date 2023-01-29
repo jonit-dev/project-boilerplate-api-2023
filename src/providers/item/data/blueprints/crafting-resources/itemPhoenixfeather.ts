@@ -10,8 +10,8 @@ export const itemPhoenixFeather: Partial<IItemUseWith> = {
   texturePath: "crafting-resources/phoenix-feather.png",
   name: "Phoenix Feather",
   description: "Feather from a phoenix. Can be used to craft a variety of items.",
-  weight: 1.25,
-  maxStackSize: 10,
+  weight: 0.01,
+  maxStackSize: 100,
   basePrice: 20,
   hasUseWith: true,
 };

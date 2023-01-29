@@ -11,7 +11,7 @@ export const itemRedSapphire: Partial<IItemUseWith> = {
   name: "Red Sapphire",
   description: "Red is a precious gemstone, formed from a mineral called arundu.",
   weight: 0.5,
-  maxStackSize: 20,
-  basePrice: 5,
+  maxStackSize: 100,
+  basePrice: 30,
   hasUseWith: true,
 };

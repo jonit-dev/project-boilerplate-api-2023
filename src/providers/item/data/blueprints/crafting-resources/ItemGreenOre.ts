@@ -13,4 +13,5 @@ export const itemGreenOre: Partial<IItem> = {
   weight: 1.4,
   maxStackSize: 100,
   hasUseWith: true,
+  basePrice: 60,
 };

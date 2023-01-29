@@ -10,8 +10,8 @@ export const itemRock: Partial<IItemUseWith> = {
   texturePath: "crafting-resources/rock.png",
   name: "Rock",
   description: "A piece of Rock.",
-  weight: 1,
-  maxStackSize: 20,
-  basePrice: 0.01,
+  weight: 0.1,
+  maxStackSize: 100,
+  basePrice: 1,
   hasUseWith: true,
 };

@@ -10,8 +10,16 @@ export const recipePlateArmor: IUseWithCraftingRecipe = {
       qty: 20,
     },
     {
-      key: CraftingResourcesBlueprint.PolishedStone,
-      qty: 20,
+      key: CraftingResourcesBlueprint.IronIngot,
+      qty: 15,
+    },
+    {
+      key: CraftingResourcesBlueprint.CopperIngot,
+      qty: 5,
+    },
+    {
+      key: CraftingResourcesBlueprint.SewingThread,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
