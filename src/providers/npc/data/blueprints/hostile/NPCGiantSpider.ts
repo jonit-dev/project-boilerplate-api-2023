@@ -56,7 +56,7 @@ export const npcGiantSpider: Partial<INPC> = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 25,
+      chance: 5,
     },
     {
       itemBlueprintKey: ContainersBlueprint.Backpack,

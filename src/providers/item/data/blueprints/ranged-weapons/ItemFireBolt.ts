@@ -11,7 +11,7 @@ export const itemFireBolt: Partial<IItem> = {
   name: "Fire Bolt",
   description:
     "An arrow imbued with fire magic. It is said to be able to ignite the air around it and to be capable of causing great damage when it hits its target.",
-  attack: 8,
+  attack: 9,
   weight: 0.012,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 110,

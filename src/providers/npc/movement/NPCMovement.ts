@@ -1,4 +1,4 @@
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
@@ -108,11 +108,8 @@ export class NPCMovement {
         }
       }
 
-      npc.x = newX;
-      npc.y = newY;
-      npc.direction = chosenMovementDirection;
-
-      await npc.save();
+      // use updateOne
+      await NPC.updateOne({ _id: npc._id }, { x: newX, y: newY, direction: chosenMovementDirection });
     } catch (error) {
       console.error(error);
     }

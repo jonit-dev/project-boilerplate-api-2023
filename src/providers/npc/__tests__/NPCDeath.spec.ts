@@ -4,10 +4,14 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { OthersBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemRarity } from "@providers/item/ItemRarity";
+import { OthersBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, INPCLoot, ItemRarities } from "@rpg-engine/shared";
 import { NPCDeath } from "../NPCDeath";
+
+jest.mock("@providers/constants/NPCConstants", () => ({
+  NPC_LOOT_CHANCE_MULTIPLIER: 1,
+}));
 
 describe("NPCDeath.ts", () => {
   let npcDeath: NPCDeath;

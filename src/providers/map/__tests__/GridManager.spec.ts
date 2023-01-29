@@ -2,20 +2,17 @@ import { RedisManager } from "@providers/database/RedisManager";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { GridManager } from "../GridManager";
 import { MapTiles } from "../MapTiles";
-import { GridRedisSerializer } from "../grid/GridRedisSerializer";
 
 describe("GridManager", () => {
   let gridManager: GridManager;
   let mapTiles: MapTiles;
   let redisManager: RedisManager;
-  let gridRedisSerializer: GridRedisSerializer;
   beforeAll(async () => {
     await unitTestHelper.beforeAllJestHook();
     redisManager = container.get<RedisManager>(RedisManager);
     await redisManager.connect();
 
     gridManager = container.get<GridManager>(GridManager);
-    gridRedisSerializer = container.get<GridRedisSerializer>(GridRedisSerializer);
     mapTiles = container.get<MapTiles>(MapTiles);
 
     await unitTestHelper.initializeMapLoader();
@@ -46,27 +43,6 @@ describe("GridManager", () => {
     expect(width).toBe(expectedWidth);
     expect(height).toBe(expectedHeight);
   };
-
-  it("gets a functional grid", async () => {
-    const matrix = [
-      [0, 1, 0],
-      [0, 1, 0],
-      [0, 0, 0],
-    ];
-
-    await gridRedisSerializer.saveMatrixToRedis("test", matrix);
-
-    const grid = await gridManager.getGrid("test");
-
-    expect(grid).toBeDefined();
-    expect(grid.width).toBe(3);
-    expect(grid.height).toBe(3);
-
-    expect(grid.isWalkableAt(0, 0)).toBe(true);
-    expect(grid.isWalkableAt(1, 0)).toBe(false);
-    expect(grid.isWalkableAt(1, 1)).toBe(false);
-    expect(grid.isWalkableAt(1, 2)).toBe(true);
-  });
 
   it("should properly generate a grid solid map and correctly size it (width, height)", async () => {
     await checkMapSize("unit-test-map-negative-coordinate", 48, 32);

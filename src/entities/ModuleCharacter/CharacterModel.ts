@@ -81,6 +81,7 @@ const characterSchema = createLeanSchema(
           throw new Error("Name contains blacklisted words");
         }
       },
+      index: true,
     }),
     owner: Type.objectId({
       required: true,

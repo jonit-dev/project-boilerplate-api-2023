@@ -44,7 +44,7 @@ export const npcAsterion = {
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 100,
+      chance: 10,
     },
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,

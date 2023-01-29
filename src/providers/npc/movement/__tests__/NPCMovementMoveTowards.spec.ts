@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, NPCAlignment, NPCMovementType, NPCPathOrientation } from "@rpg-engine/shared";
@@ -48,18 +48,27 @@ describe("NPCMovementMoveTowards.ts", () => {
     testCharacter.x = FromGridX(14);
     testCharacter.y = FromGridY(12);
     await testCharacter.save();
+
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
+    testCharacter = (await Character.findById(testCharacter._id)) as ICharacter;
   });
 
   it("has target correctly set", async () => {
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
 
-    expect(testNPC.targetCharacter?.toString()).toBe(testCharacter._id.toString());
+    const updatedTestNPC = await NPC.findById(testNPC._id);
+
+    expect(updatedTestNPC?.targetCharacter?.toString()).toBe(testCharacter._id.toString());
   });
 
   it("should correctly move towards the target thats within a distance range, if orientation is forwards", async () => {
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
 
     expect(testNPC.x).toBe(FromGridX(13));
     expect(testNPC.y).toBe(FromGridY(15));
@@ -86,13 +95,26 @@ describe("NPCMovementMoveTowards.ts", () => {
     testCharacter.y = FromGridY(17);
     await testCharacter.save();
 
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
+    testCharacter = (await Character.findById(testCharacter._id)) as ICharacter;
+
     // set target to character
     await npcTarget.tryToSetTarget(testNPC);
-    expect(testNPC.targetCharacter?.toString()).toBe(testCharacter._id.toString());
+
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
+
+    expect(testNPC?.targetCharacter?.toString()).toBe(testCharacter._id.toString());
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
+
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
+
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
+
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
 
     expect(testNPC.x).toBe(FromGridX(14));
     expect(testNPC.y).toBe(FromGridX(20));
@@ -101,11 +123,15 @@ describe("NPCMovementMoveTowards.ts", () => {
     testNPC.y = FromGridY(14);
     await testNPC.save();
 
+    testCharacter = (await Character.findById(testCharacter._id)) as ICharacter;
+
     testCharacter.x = FromGridX(21);
     testCharacter.y = FromGridY(12);
     await testCharacter.save();
 
     await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
+
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
 
     expect(testNPC.pathOrientation).toBe(NPCPathOrientation.Backward);
     expect(testNPC.x).toBe(FromGridX(20));

@@ -1,4 +1,4 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
@@ -12,7 +12,10 @@ export class NPCMovementMoveAway {
 
   public async startMovementMoveAway(npc: INPC): Promise<void> {
     try {
-      const targetCharacter = await Character.findById(npc.targetCharacter);
+      const targetCharacter = (await Character.findById(npc.targetCharacter).lean({
+        virtuals: true,
+        defaults: true,
+      })) as ICharacter;
 
       if (targetCharacter) {
         await this.npcTarget.tryToClearOutOfRangeTargets(npc);

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { NPCTarget } from "../movement/NPCTarget";
@@ -58,6 +58,8 @@ describe("NPCTarget.ts", () => {
 
     await npcTarget.tryToSetTarget(testNPC);
 
+    testNPC = (await NPC.findById(testNPC.id)) as INPC;
+
     expect(testNPC.targetCharacter).toBeDefined();
     expect(testNPC.targetCharacter?.toString()).toEqual(testCharacter.id.toString());
     expect(testNPC.targetCharacter?.toString()).not.toEqual(anotherCharacter.id.toString());
@@ -71,6 +73,8 @@ describe("NPCTarget.ts", () => {
 
     await npcTarget.tryToSetTarget(testNPC);
 
+    testNPC = (await NPC.findById(testNPC.id)) as INPC;
+
     expect(testNPC.targetCharacter).toBeUndefined();
   });
 
@@ -82,13 +86,19 @@ describe("NPCTarget.ts", () => {
 
     await npcTarget.tryToSetTarget(testNPC);
 
+    testNPC = (await NPC.findById(testNPC.id)) as INPC;
+
     expect(testNPC.targetCharacter).toBeDefined();
 
     testCharacter.x = 999;
     testCharacter.y = 999;
     await testCharacter.save();
 
+    testCharacter = (await Character.findById(testCharacter.id)) as ICharacter;
+
     await npcTarget.tryToClearOutOfRangeTargets(testNPC);
+
+    testNPC = (await NPC.findById(testNPC.id)) as INPC;
 
     expect(testNPC.targetCharacter).toBeUndefined();
   });
@@ -101,12 +111,16 @@ describe("NPCTarget.ts", () => {
 
     await npcTarget.tryToSetTarget(testNPC);
 
+    testNPC = (await NPC.findById(testNPC.id)) as INPC;
+
     expect(testNPC.targetCharacter).toBeDefined();
 
     testCharacter.isOnline = false;
     await testCharacter.save();
 
     await npcTarget.tryToClearOutOfRangeTargets(testNPC);
+
+    testNPC = (await NPC.findById(testNPC.id)) as INPC;
 
     expect(testNPC.targetCharacter).toBeUndefined();
   });
@@ -118,6 +132,8 @@ describe("NPCTarget.ts", () => {
     });
 
     await npcTarget.tryToSetTarget(testNPC);
+
+    testNPC = (await NPC.findById(testNPC.id)) as INPC;
 
     expect(testNPC.targetCharacter).toBeDefined();
     expect(testNPC.targetCharacter?.toString()).toBe(testCharacter.id.toString());
@@ -131,6 +147,8 @@ describe("NPCTarget.ts", () => {
 
     await npcTarget.tryToClearOutOfRangeTargets(testNPC);
 
+    testNPC = (await NPC.findById(testNPC.id)) as INPC;
+
     expect(testNPC.targetCharacter).toBeDefined();
 
     testCharacter.x = FromGridX(NPC_MAX_TALKING_DISTANCE_IN_GRID + 1);
@@ -138,6 +156,8 @@ describe("NPCTarget.ts", () => {
     await testCharacter.save();
 
     await npcTarget.tryToClearOutOfRangeTargets(testNPC);
+
+    testNPC = (await NPC.findById(testNPC.id)) as INPC;
 
     expect(testNPC.targetCharacter).toBeUndefined();
   });
@@ -174,6 +194,9 @@ describe("NPCTarget.ts", () => {
       testCharacter.x = 999;
       testCharacter.y = 999;
       await testCharacter.save();
+
+      testNPC = (await NPC.findById(testNPC.id)) as INPC;
+      testCharacter = (await Character.findById(testCharacter.id)) as ICharacter;
 
       await npcTarget.tryToClearOutOfRangeTargets(testNPC);
 

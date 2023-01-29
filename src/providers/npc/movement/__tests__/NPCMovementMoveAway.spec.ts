@@ -1,5 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, NPCMovementType } from "@rpg-engine/shared";
 import { NPCMovementMoveAway } from "../NPCMovementMoveAway";
@@ -39,12 +39,16 @@ describe("NPCMovementMoveAway.ts", () => {
     await npcTarget.tryToSetTarget(testNPC);
   });
 
-  it("should correctly set the target on the nearest character", () => {
+  it("should correctly set the target on the nearest character", async () => {
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
+
     expect(testNPC.targetCharacter?.toString()).toBe(testCharacter._id.toString());
   });
 
   it("should move away from the target", async () => {
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
     await npcMovementMoveAway.startMovementMoveAway(testNPC);
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
 
     expect(testNPC.x).toBe(FromGridX(29));
     expect(testNPC.y).toBe(FromGridY(9));

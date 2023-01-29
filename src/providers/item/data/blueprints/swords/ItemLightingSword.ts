@@ -12,7 +12,7 @@ export const itemLightingSword: Partial<IItem> = {
   description: "A sword imbued with the power of lightning, capable of generating and controlling electrical energy.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 17,
+  attack: 19,
   defense: 5,
   rangeType: EntityAttackType.Melee,
   basePrice: 78,

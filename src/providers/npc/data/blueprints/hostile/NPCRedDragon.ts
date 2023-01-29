@@ -45,7 +45,7 @@ export const npcRedDragon = {
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 40,
+      chance: 20,
     },
     {
       itemBlueprintKey: ArmorsBlueprint.GoldenArmor,

@@ -1,5 +1,5 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NPCSocketEvents } from "@rpg-engine/shared";
@@ -18,15 +18,17 @@ export class NPCMovementStopped {
 
   public async startMovementStopped(npc: INPC): Promise<void> {
     try {
-      const targetCharacter = await Character.findById(npc.targetCharacter);
+      const targetCharacter = await Character.findById(npc.targetCharacter).lean({
+        virtuals: true,
+        defaults: true,
+      });
 
       if (targetCharacter) {
         await this.npcTarget.tryToClearOutOfRangeTargets(npc);
 
         const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
 
-        npc.direction = facingDirection;
-        await npc.save();
+        await NPC.updateOne({ _id: npc.id }, { direction: facingDirection });
 
         const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 

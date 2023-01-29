@@ -74,7 +74,7 @@ export const npcYeti: Partial<INPC> = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 25,
+      chance: 10,
     },
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,

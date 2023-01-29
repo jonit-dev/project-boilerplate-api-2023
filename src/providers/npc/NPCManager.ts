@@ -30,9 +30,13 @@ export class NPCManager {
   ) {}
 
   public listenForBehaviorTrigger(): void {
-    process.on("message", async (data) => {
+    process.on("message", (data) => {
       if (data.type === "startNPCBehavior") {
-        await this.startNearbyNPCsBehaviorLoop(data.data.character);
+        const randomN = random(0, 3000);
+
+        setTimeout(async () => {
+          await this.startNearbyNPCsBehaviorLoop(data.data.character);
+        }, randomN);
       }
     });
   }
@@ -58,7 +62,9 @@ export class NPCManager {
         npc.id,
         async () => {
           try {
-            npc = (await NPC.findById(initialNPC._id).populate("skills")) || initialNPC;
+            npc =
+              (await NPC.findById(initialNPC._id).populate("skills").lean({ virtuals: true, defaults: true })) ||
+              initialNPC;
 
             await this.startCoreNPCBehavior(npc);
           } catch (err) {
@@ -66,7 +72,7 @@ export class NPCManager {
             console.log(err);
           }
         },
-        (1500 + random(0, 200)) / npc.speed
+        (1650 + random(0, 500)) / npc.speed
       );
     }
 
@@ -95,6 +101,7 @@ export class NPCManager {
 
       case NPCMovementType.MoveTowards:
         await this.npcMovementMoveTowards.startMoveTowardsMovement(npc);
+
         break;
 
       case NPCMovementType.Random:
