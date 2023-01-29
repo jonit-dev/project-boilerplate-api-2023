@@ -261,9 +261,9 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(updatedSkills?.first.skillPoints).toBe(spToAdd * SP_INCREASE_RATIO);
     expect(updatedSkills?.first.skillPointsToNextLevel).toBe(spToLvl3 - 5 * SP_INCREASE_RATIO);
 
-    expect(updatedSkills?.level).toBe(initialLevel + 4);
+    expect(updatedSkills?.level).toBe(initialLevel + 2);
     expect(updatedSkills?.experience).toBe(spToAdd * 2);
-    expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(updatedSkills?.experience!, initialLevel + 5));
+    expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(updatedSkills?.experience!, initialLevel + 3));
     expect(testNPC.xpToRelease?.length).toBe(0);
 
     expect(sendSkillLevelUpEvents).toHaveBeenCalled();
@@ -289,7 +289,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
   it("should increase character's magic skill level and not strength.", async () => {
     const characterEquipment = (await Equipment.findById(testCharacter.equipment)) as IEquipment;
 
-    const staff = await unitTestHelper.createMockItemFromBlueprint(StaffsBlueprint.FireStaff);
+    const staff = await unitTestHelper.createMockItemFromBlueprint(StaffsBlueprint.MoonsStaff);
     characterEquipment!.rightHand = staff.id;
 
     await characterEquipment!.save();
