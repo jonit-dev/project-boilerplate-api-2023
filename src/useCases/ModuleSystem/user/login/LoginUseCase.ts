@@ -13,7 +13,8 @@ export class LoginUseCase {
   constructor(private analyticsHelper: AnalyticsHelper) {}
 
   public async login(authLoginDTO: AuthLoginDTO): Promise<IAuthResponse> {
-    const { email, password } = authLoginDTO;
+    const email = authLoginDTO.email.trim();
+    const { password } = authLoginDTO;
 
     // try to find an user using these credentials
     const user = await User.findByCredentials(email, password);
