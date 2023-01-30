@@ -89,12 +89,12 @@ export class CharacterView {
   }
 
   public async clearCharacterView(character: ICharacter): Promise<void> {
-    character.view = {
+    const view = {
       npcs: {},
       items: {},
       characters: {},
     };
-    await Character.updateOne({ _id: character._id }, { view: character.view });
+    await Character.updateOne({ _id: character._id }, { view });
   }
 
   public async removeFromCharacterView(

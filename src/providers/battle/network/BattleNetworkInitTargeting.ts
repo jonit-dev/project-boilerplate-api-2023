@@ -15,7 +15,6 @@ import {
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
-import { Optional } from "ts-mongoose";
 import { BattleCharacterManager } from "../BattleCharacterManager";
 import { BattleNetworkStopTargeting } from "./BattleNetworkStopTargetting";
 
@@ -100,9 +99,19 @@ export class BattleNetworkInitTargeting {
     targetType: EntityType
   ): Promise<void> {
     await this.battleNetworkStopTargeting.stopTargeting(character);
-    character.target.id = target._id;
-    character.target.type = targetType as unknown as Optional<string>;
-    await character.save();
+
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        $set: {
+          target: {
+            id: target._id,
+            type: targetType,
+          },
+        },
+      }
+    );
+
     this.battleCharacterManager.onHandleCharacterBattleLoop(character, target);
   }
 

@@ -28,6 +28,7 @@ describe("MapTransition", () => {
   });
   afterEach(() => {
     jest.clearAllMocks();
+
     destination = null;
   });
   afterAll(async () => {
@@ -165,10 +166,15 @@ describe("MapTransition", () => {
     await testCharacter.save();
 
     const destination = { map: "map1", gridX: 5, gridY: 5 };
-    await mapTransition.changeCharacterScene(testCharacter, destination);
-    const updatedCharacter = await Character.findOne({ _id: testCharacter._id });
+
     // @ts-ignore
-    expect(updatedCharacter.target).toEqual({});
+    const stopTargetingSpy = jest.spyOn(mapTransition.battleNetworkStopTargeting, "stopTargeting");
+    await mapTransition.changeCharacterScene(testCharacter, destination);
+    expect(stopTargetingSpy).toHaveBeenCalledWith(testCharacter);
+
+    const updatedCharacter = await Character.findOne({ _id: testCharacter.id });
+    // @ts-ignore
+    expect(updatedCharacter.target.id).toBe(undefined);
   });
 
   it("should send the ChangeMap event to the character's channel", async () => {
@@ -222,6 +228,8 @@ describe("MapTransition", () => {
       gridX: 1,
       gridY: 1,
     });
+
+    testCharacter = (await Character.findOne({ _id: testCharacter._id })) as ICharacter;
 
     // Assert that the character's target has been cleared
     expect(testCharacter.target).toEqual({});
