@@ -20,6 +20,10 @@ describe("NPCDeath.ts", () => {
   let itemRarity: ItemRarity;
 
   beforeAll(async () => {
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
+
     await unitTestHelper.beforeAllJestHook();
 
     npcDeath = container.get<NPCDeath>(NPCDeath);

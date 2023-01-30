@@ -277,7 +277,7 @@ export class SkillIncrease {
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ExperienceGain, levelUpEventPayload);
 
     // refresh skills (lv, xp, xpToNextLevel)
-    const skill = await Skill.findById(character.skills);
+    const skill = await Skill.findById(character.skills).lean({ virtuals: true, defaults: true });
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill,
