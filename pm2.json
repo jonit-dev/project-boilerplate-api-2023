@@ -5,6 +5,7 @@
       "script": "./dist/src/server.js",
       "merge_logs": true,
       "max_restarts": 20,
+      "autorestart": true,
       "instances": "10",
       "exec_mode": "cluster",
       "node_args": "-r dotenv/config -r ./register-paths.js",
