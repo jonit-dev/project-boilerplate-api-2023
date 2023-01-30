@@ -153,7 +153,7 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
-    const skills = (await Skill.findById(character.skills)) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
@@ -189,7 +189,7 @@ export class SkillIncrease {
       }
 
       // Get character skills
-      const skills = await Skill.findById(character.skills);
+      const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
 
       const appliedBuffEffect = character.appliedBuffsEffects;
 

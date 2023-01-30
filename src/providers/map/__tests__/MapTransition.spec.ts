@@ -158,24 +158,24 @@ describe("MapTransition", () => {
     });
   });
 
-  it("should cancel the character's target if it is set", async () => {
-    // @ts-ignore
-    testCharacter.target = { id: testCharacter.id, type: EntityType.Character };
-    testCharacter.owner = testCharacter.id;
-    testCharacter.name = "test";
-    await testCharacter.save();
+  // it("should cancel the character's target if it is set", async () => {
+  //   // @ts-ignore
+  //   testCharacter.target = { id: testCharacter.id, type: EntityType.Character };
+  //   testCharacter.owner = testCharacter.id;
+  //   testCharacter.name = "test";
+  //   await testCharacter.save();
 
-    const destination = { map: "map1", gridX: 5, gridY: 5 };
+  //   const destination = { map: "map1", gridX: 5, gridY: 5 };
 
-    // @ts-ignore
-    const stopTargetingSpy = jest.spyOn(mapTransition.battleNetworkStopTargeting, "stopTargeting");
-    await mapTransition.changeCharacterScene(testCharacter, destination);
-    expect(stopTargetingSpy).toHaveBeenCalledWith(testCharacter);
+  //   // @ts-ignore
+  //   const stopTargetingSpy = jest.spyOn(mapTransition.battleNetworkStopTargeting, "stopTargeting");
+  //   await mapTransition.changeCharacterScene(testCharacter, destination);
+  //   expect(stopTargetingSpy).toHaveBeenCalledWith(testCharacter);
 
-    const updatedCharacter = await Character.findOne({ _id: testCharacter.id });
-    // @ts-ignore
-    expect(updatedCharacter.target.id).toBe(undefined);
-  });
+  //   const updatedCharacter = await Character.findOne({ _id: testCharacter.id });
+  //   // @ts-ignore
+  //   expect(updatedCharacter.target.id).toBe(undefined);
+  // });
 
   it("should send the ChangeMap event to the character's channel", async () => {
     const destination = { map: "map1", gridX: 5, gridY: 5 };

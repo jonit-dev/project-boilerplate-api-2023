@@ -152,7 +152,7 @@ export class CharacterNetworkUpdate {
           Verify if we're in a non pvp zone. If so, we need to trigger 
           an attack stop event in case player was in a pvp combat
           */
-    const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, newX, newY);
+    const nonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, newX, newY);
     if (nonPVPZone) {
       this.mapNonPVPZone.stopCharacterAttack(character);
     }

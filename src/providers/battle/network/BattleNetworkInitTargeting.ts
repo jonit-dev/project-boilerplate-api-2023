@@ -147,7 +147,7 @@ export class BattleNetworkInitTargeting {
 
     const npc = target as INPC;
 
-    const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(npc.scene, npc.x, npc.y);
+    const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(npc.scene, npc.x, npc.y);
 
     if (isCharInNonPVPZone && npc.type === EntityType.NPC) {
       return {
@@ -221,7 +221,7 @@ export class BattleNetworkInitTargeting {
   }
 
   private isValidNPCTarget(target: INPC): ITargetValidation {
-    const isNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(target.scene, target.x, target.y);
+    const isNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
 
     if (isNonPVPZone && target.alignment === NPCAlignment.Friendly) {
       return {
@@ -236,7 +236,7 @@ export class BattleNetworkInitTargeting {
   }
 
   private isValidCharacterTarget(target: ICharacter): ITargetValidation {
-    const isNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(target.scene, target.x, target.y);
+    const isNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
 
     if (isNonPVPZone) {
       return {

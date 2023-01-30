@@ -14,7 +14,7 @@ export class MapNonPVPZone {
     this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.NonPVPZone);
   }
 
-  public getNonPVPZoneAtXY(mapName: string, x: number, y: number): boolean | undefined {
+  public isNonPVPZoneAtXY(mapName: string, x: number, y: number): boolean | undefined {
     const map = MapLoader.maps.get(mapName);
 
     if (!map) {
