@@ -8,6 +8,10 @@ describe("Case CharacterCombatBonusPenalties", () => {
   let characterCombatBonusPenalties: CharacterCombatBonusPenalties;
 
   beforeAll(async () => {
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
+
     await unitTestHelper.beforeAllJestHook();
     characterCombatBonusPenalties = container.get<CharacterCombatBonusPenalties>(CharacterCombatBonusPenalties);
   });

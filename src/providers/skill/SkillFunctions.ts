@@ -54,10 +54,10 @@ export class SkillFunctions {
   }
 
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
-    await Skill.findByIdAndUpdate(skills._id, { ...skills });
+    await Skill.findByIdAndUpdate(skills._id, { ...skills }).lean({ virtuals: true, defaults: true });
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills.toObject(),
+      skill: skills,
     });
   }
 
