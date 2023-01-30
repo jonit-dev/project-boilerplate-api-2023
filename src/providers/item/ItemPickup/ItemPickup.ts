@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -103,7 +103,10 @@ export class ItemPickup {
     const containerToUpdateId = isPickupFromMapContainer
       ? itemPickupData.toContainerId
       : itemPickupData.fromContainerId;
-    const updatedContainer = (await ItemContainer.findById(containerToUpdateId)) as any;
+    const updatedContainer = (await ItemContainer.findById(containerToUpdateId).lean({
+      virtuals: true,
+      defaults: true,
+    })) as any;
 
     if (!updatedContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, fetch container information.");
