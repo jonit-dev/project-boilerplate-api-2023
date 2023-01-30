@@ -1,4 +1,4 @@
-import { NPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { INPCPositionRequestPayload, NPCSocketEvents } from "@rpg-engine/shared";
@@ -16,9 +16,9 @@ export class NPCPosition {
       async (data: INPCPositionRequestPayload, character) => {
         const { id, type } = data;
 
-        const npc = await NPC.findOne({
+        const npc = (await NPC.findOne({
           _id: id,
-        });
+        }).lean({ virtuals: true, defaults: true })) as INPC;
 
         if (!npc) {
           throw new Error(`NPCSocketEvents.NPCPositionRequest, but NPC id ${id} wasn't found.`);
