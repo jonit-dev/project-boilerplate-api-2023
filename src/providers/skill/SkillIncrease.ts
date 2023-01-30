@@ -54,12 +54,12 @@ export class SkillIncrease {
    */
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // Get character skills and equipment to upgrade them
-    const skills = await Skill.findById(attacker.skills);
+    const skills = (await Skill.findById(attacker.skills).lean({ virtuals: true, defaults: true })) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${attacker.id}`);
     }
 
-    const equipment = await Equipment.findById(attacker.equipment);
+    const equipment = await Equipment.findById(attacker.equipment).lean({ virtuals: true, defaults: true });
     if (!equipment) {
       throw new Error(`equipment not found for character ${attacker.id}`);
     }
@@ -95,17 +95,21 @@ export class SkillIncrease {
   }
 
   public async increaseShieldingSP(character: ICharacter): Promise<void> {
-    const skills = (await Skill.findById(character.skills)) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
-    const equipment = await Equipment.findById(character.equipment);
+    const equipment = await Equipment.findById(character.equipment).lean({ virtuals: true, defaults: true });
     if (!equipment) {
       throw new Error(`equipment not found for character ${character.id}`);
     }
 
-    const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
-    const leftHandItem = equipment.leftHand ? await Item.findById(equipment.leftHand) : undefined;
+    const rightHandItem = equipment.rightHand
+      ? await Item.findById(equipment.rightHand).lean({ virtuals: true, defaults: true })
+      : undefined;
+    const leftHandItem = equipment.leftHand
+      ? await Item.findById(equipment.leftHand).lean({ virtuals: true, defaults: true })
+      : undefined;
 
     let result = {} as IIncreaseSPResult;
     if (rightHandItem?.subType === ItemSubType.Shield) {
