@@ -24,7 +24,7 @@ export class SocketAuth {
         character = await Character.findOne({
           _id: data.socketCharId,
           owner: owner.id,
-        }).lean({ virtuals: true, defaults: true });
+        });
 
         if (!character) {
           this.socketMessaging.sendEventToUser(channel.id!, CharacterSocketEvents.CharacterForceDisconnect, {
