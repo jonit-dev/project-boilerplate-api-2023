@@ -70,20 +70,16 @@ export class MovementHelper {
     //   return true;
     // }
 
-    const isNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(map, gridX, gridY);
+    const hasCharacter = await Character.exists({
+      x: FromGridX(gridX),
+      y: FromGridY(gridY),
+      isOnline: true,
+      layer,
+      scene: map,
+    });
 
-    if (!isNonPVPZone) {
-      const hasCharacter = await Character.exists({
-        x: FromGridX(gridX),
-        y: FromGridY(gridY),
-        isOnline: true,
-        layer,
-        scene: map,
-      });
-
-      if (hasCharacter) {
-        return true;
-      }
+    if (hasCharacter) {
+      return true;
     }
 
     // const hasItem = await Item.exists({

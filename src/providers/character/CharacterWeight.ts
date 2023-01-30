@@ -28,7 +28,7 @@ export class CharacterWeight {
       }
     );
 
-    character = (await Character.findById(character._id)) || character;
+    character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, {
       speed: character.speed,

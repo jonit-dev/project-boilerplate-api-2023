@@ -25,7 +25,7 @@ export class SkillDecrease {
   }
 
   private async decreaseCharacterXp(character: ICharacter): Promise<boolean> {
-    const skills = await Skill.findOne({ _id: character.skills }).lean({ virtuals: true, defaults: true });
+    const skills = (await Skill.findOne({ _id: character.skills }).lean({ virtuals: true, defaults: true })) as ISkill;
     if (!skills) {
       return false;
     }

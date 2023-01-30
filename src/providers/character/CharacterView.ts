@@ -163,7 +163,10 @@ export class CharacterView {
     // get the character with minimum distance
     const minDistanceCharacterInfo = _.minBy(charactersDistance, "distance");
 
-    const minDistanceChar = await Character.findById(minDistanceCharacterInfo?.id);
+    const minDistanceChar = (await Character.findById(minDistanceCharacterInfo?.id).lean({
+      virtuals: true,
+      defaults: true,
+    })) as ICharacter;
 
     return minDistanceChar;
   }
