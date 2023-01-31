@@ -2267,11 +2267,6 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
-"@jonit-dev/quadtree-ts@^2.0.9":
-  version "2.0.9"
-  resolved "https://registry.yarnpkg.com/@jonit-dev/quadtree-ts/-/quadtree-ts-2.0.9.tgz#0817815332940db56c122e59e4f3a16851ac9e20"
-  integrity sha512-9oqlmm8ByU7oPJpmA9ZR4n7tt6Bwj4XmiPf56z2j0rydTXZqNL5D/hIFBItwbv/BomnVvLiE2R8VJFpt55aNuw==
-
 "@jridgewell/gen-mapping@^0.1.0":
   version "0.1.1"
   resolved "https://registry.npmjs.org/@jridgewell/gen-mapping/-/gen-mapping-0.1.1.tgz"
@@ -2839,11 +2834,6 @@
   dependencies:
     "@jest/create-cache-key-function" "^27.4.2"
     jsonc-parser "^3.2.0"
-
-"@timohausmann/quadtree-ts@^2.0.0-beta.1":
-  version "2.0.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@timohausmann/quadtree-ts/-/quadtree-ts-2.0.0-beta.1.tgz#4b8a9943d7838f688c172a3e0b3107117a91dc7f"
-  integrity sha512-zq8AnO1qoYM66OXkiC9d5wIIvNeHy3XIA0AwPtGRNkmX0uv9aktyyBRWzqPW/dZWMMkG4uLluer38QJc+QV/5w==
 
 "@tootallnate/once@1":
   version "1.1.2"
