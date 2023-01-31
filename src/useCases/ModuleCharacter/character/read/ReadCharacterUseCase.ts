@@ -19,9 +19,11 @@ export class ReadCharacterUseCase {
     const charObject = character.toObject();
 
     const inventory = await character.inventory;
+    // @ts-ignore
     delete charObject.inventory;
+    // @ts-ignore
     charObject.inventory = inventory;
-
+    // @ts-ignore
     return charObject;
   }
 
@@ -38,6 +40,7 @@ export class ReadCharacterUseCase {
 
     for (const char of characters) {
       const inventory = await char.inventory;
+      // @ts-ignore
       char.inventory = inventory;
     }
 

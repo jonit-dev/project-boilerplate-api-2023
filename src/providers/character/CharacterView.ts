@@ -172,6 +172,7 @@ export class CharacterView {
   }
 
   public async getElementsInCharView<T>(
+    // @ts-ignore
     Element: Model<T>,
     character: ICharacter,
     filter?: Record<string, unknown>

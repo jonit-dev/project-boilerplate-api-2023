@@ -100,6 +100,7 @@ userSchema.methods.generateAccessToken = async function (): Promise<IAuthRespons
   );
   const refreshToken = jwt.sign({ _id: user._id, email: user.email }, appEnv.authentication.REFRESH_TOKEN_SECRET!);
 
+  // @ts-ignore
   user.refreshTokens = [...user.refreshTokens!, { token: refreshToken }];
 
   await user.save();

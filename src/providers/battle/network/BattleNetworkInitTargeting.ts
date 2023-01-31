@@ -106,6 +106,7 @@ export class BattleNetworkInitTargeting {
         $set: {
           target: {
             id: target._id,
+            // @ts-ignore
             type: targetType,
           },
         },

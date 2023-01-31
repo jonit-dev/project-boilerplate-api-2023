@@ -20,6 +20,7 @@ export class NPCView {
   ) {}
 
   public async getElementsInNPCView<T extends IElementWithPosition>(
+    // @ts-ignore
     Element: Model<T>,
     npc: INPC,
     filter?: Record<string, unknown>

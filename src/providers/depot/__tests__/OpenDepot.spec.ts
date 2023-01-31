@@ -9,7 +9,7 @@ import { OpenDepot } from "../OpenDepot";
 describe("OpenDepot.ts", () => {
   let openDepot: OpenDepot, testNPC: INPC, testCharacter: ICharacter;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     openDepot = container.get<OpenDepot>(OpenDepot);
   });
 

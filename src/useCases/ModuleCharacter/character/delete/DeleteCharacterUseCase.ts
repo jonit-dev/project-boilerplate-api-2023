@@ -15,6 +15,7 @@ export class DeleteCharacterUseCase {
     })) as ICharacter;
 
     // compare object ids
+    // @ts-ignore
     if (!characterToDelete.owner.equals(ownerId)) {
       throw new BadRequestError("You cannot delete a character which is not yours!");
     }
