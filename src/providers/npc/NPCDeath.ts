@@ -4,14 +4,13 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
-import { appEnv } from "@providers/config/env";
 import { NPC_LOOT_CHANCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemRarity } from "@providers/item/ItemRarity";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BattleSocketEvents, IBattleDeath, INPCLoot } from "@rpg-engine/shared";
+import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemType } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
@@ -125,11 +124,15 @@ export class NPCDeath {
       }
 
       const rand = Math.round(random(0, 100));
-      //! ugly workaround because I dont have time to fix the NPC_LOOT_CHANCE_MULTIPLIER (it's not working). I'll check it out later.
-      const lootChance = loot.chance * (appEnv.general.IS_UNIT_TEST ? 1 : NPC_LOOT_CHANCE_MULTIPLIER);
-      if (rand <= lootChance) {
-        const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+      const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
 
+      let lootChance = loot.chance * NPC_LOOT_CHANCE_MULTIPLIER;
+
+      if (blueprintData.type === ItemType.CraftingResource) {
+        lootChance = loot.chance; // crafting materials not impacted by NPC_LOOT_CHANCE_MULTIPLIER
+      }
+
+      if (rand <= lootChance) {
         let lootQuantity = 1;
         // can specify a loot quantity range, e.g. 5-10 coins.
         // So need to add that quantity to the body container

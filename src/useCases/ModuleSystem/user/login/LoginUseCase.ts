@@ -1,14 +1,14 @@
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { User } from "@entities/ModuleSystem/UserModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
+import { EMAIL_VALIDATION_REGEX } from "@providers/constants/EmailValidationConstants";
+import { USER_CONTROL_ONLINE } from "@providers/constants/ServerConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { NotFoundError } from "@providers/errors/NotFoundError";
 import { TS } from "@providers/translation/TranslationHelper";
 import { IAuthResponse } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { AuthLoginDTO } from "../AuthDTO";
-import { EMAIL_VALIDATION_REGEX } from "@providers/constants/EmailValidationConstants";
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
-import { USER_CONTROL_ONLINE } from "@providers/constants/ServerConstants";
 
 @provide(LoginUseCase)
 export class LoginUseCase {
@@ -37,6 +37,8 @@ export class LoginUseCase {
       );
     }
 
+    console.log(maxCharacterOnlinePerUser);
+
     const allUsersOnline = await Character.find({ isOnline: true }).select("owner").exec();
 
     const result = allUsersOnline.map((obj) => ({ _id: obj._id, owner: obj.owner.toString() }));
@@ -46,6 +48,8 @@ export class LoginUseCase {
     }, {});
 
     const uniqueUsersOnline = Object.keys(distinctOwners).length;
+
+    console.log(uniqueUsersOnline);
 
     if (uniqueUsersOnline > USER_CONTROL_ONLINE.MAX_NUMBER_OF_PLAYERS) {
       throw new BadRequestError("Sorry, max number of online players reached. Please try again in a few minutes.");
