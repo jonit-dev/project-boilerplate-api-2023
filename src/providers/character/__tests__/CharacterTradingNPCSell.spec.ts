@@ -298,8 +298,6 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
-    console.log(updatedContainer);
-
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
     expect(updatedContainer.slots[0].stackQty).toBe(124);
