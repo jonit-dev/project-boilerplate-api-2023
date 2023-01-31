@@ -91,10 +91,7 @@ export const npcDwarf = {
       itemBlueprintKey: SpearsBlueprint.StoneSpear,
       chance: 5,
     },
-    {
-      itemBlueprintKey: SwordsBlueprint.GoldenSword,
-      chance: 10,
-    },
+
     {
       itemBlueprintKey: SwordsBlueprint.Sword,
       chance: 5,

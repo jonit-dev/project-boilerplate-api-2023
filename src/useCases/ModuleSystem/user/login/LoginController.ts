@@ -1,7 +1,9 @@
+import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
 import { IAuthResponse } from "@rpg-engine/shared";
-import { controller, httpPost, interfaces, request, requestBody } from "inversify-express-utils";
+import { controller, httpGet, httpPost, interfaces, request, requestBody } from "inversify-express-utils";
 import { AuthLoginDTO } from "../AuthDTO";
+import { LoginCharacterUseCase } from "./LoginCharacterUseCase";
 import { LoginUseCase } from "./LoginUseCase";
 
 //! Reference:
@@ -9,7 +11,7 @@ import { LoginUseCase } from "./LoginUseCase";
 //! Logic: https://medium.com/@tomanagle/google-oauth-with-node-js-4bff90180fe6
 @controller("/auth")
 export class BasicEmailPwLoginController implements interfaces.Controller {
-  constructor(private loginUseCase: LoginUseCase) {}
+  constructor(private loginUseCase: LoginUseCase, private loginCharacterUseCase: LoginCharacterUseCase) {}
 
   @httpPost("/login", DTOValidatorMiddleware(AuthLoginDTO))
   public async login(@requestBody() authLoginDTO: AuthLoginDTO, @request() req): Promise<IAuthResponse> {
@@ -19,5 +21,12 @@ export class BasicEmailPwLoginController implements interfaces.Controller {
       accessToken,
       refreshToken,
     };
+  }
+
+  @httpGet("/login/character/limit", AuthMiddleware)
+  public async loginCharacter(@request() req): Promise<boolean> {
+    const checkLoginCharacter = await this.loginCharacterUseCase.checkLimit(req.user);
+
+    return checkLoginCharacter;
   }
 }
