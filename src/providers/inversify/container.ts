@@ -7,9 +7,6 @@ import { MapLoader } from "@providers/map/MapLoader";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
-import { MapArea } from "@providers/pathfinding/MapArea";
-import { MapSolidsQuadTree } from "@providers/pathfinding/MapSolidsQuadTree";
-import { PathfindingQuadTree } from "@providers/pathfinding/PathfindingQuadTree";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
@@ -58,10 +55,6 @@ export const redisManager = container.get<RedisManager>(RedisManager);
 export const npcFreezer = container.get<NPCFreezer>(NPCFreezer);
 
 export const characterSkillBuff = container.get<CharacterSkillBuff>(CharacterSkillBuff);
-
-export const mapSolidsQuadTree = container.get(MapSolidsQuadTree);
-export const pathfindingQuadTree = container.get(PathfindingQuadTree);
-export const mapArea = container.get(MapArea);
 
 export const inMemoryRepository = container.get<InMemoryRepository>(InMemoryRepository);
 
