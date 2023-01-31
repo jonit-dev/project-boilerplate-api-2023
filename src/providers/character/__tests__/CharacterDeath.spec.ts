@@ -16,6 +16,10 @@ describe("CharacterDeath.ts", () => {
   let testNPC: INPC;
 
   beforeAll(() => {
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
+
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
   });
 

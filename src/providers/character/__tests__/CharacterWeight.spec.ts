@@ -1,13 +1,13 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
 import { CharacterDeath } from "../CharacterDeath";
 import { CharacterWeight } from "../CharacterWeight";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterSocketEvents } from "@rpg-engine/shared";
 
 describe("CharacterWeight.ts", () => {
   let testCharacter: ICharacter;
@@ -131,6 +131,10 @@ describe("CharacterWeight.ts", () => {
   });
 
   it("After death, one of equipment will drop and the weight should update.", async () => {
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
+
     await characterWeight.updateCharacterWeight(testCharacter);
     const beforeAddArmor = await Character.findOne(testCharacter._id).lean();
     expect(beforeAddArmor?.weight).toBe(3);
