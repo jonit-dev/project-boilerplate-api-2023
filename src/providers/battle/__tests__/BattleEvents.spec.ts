@@ -12,7 +12,7 @@ describe("BattleEvents.spec.ts", () => {
   let testNPC: INPC;
   let testCharacter: ICharacter;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     battleEvents = container.get<BattleEvent>(BattleEvent);
 
     // Set random as 50 to get the most likely Battle Event
