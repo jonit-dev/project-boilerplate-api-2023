@@ -13,7 +13,7 @@ describe("CharacterItemInventory.ts", () => {
   let inventoryContainer: IItemContainer;
   let characterTradingBalance: CharacterTradingBalance;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     characterItemInventory = container.get<CharacterItemInventory>(CharacterItemInventory);
     characterTradingBalance = container.get<CharacterTradingBalance>(CharacterTradingBalance);
   });
