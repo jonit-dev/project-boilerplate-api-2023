@@ -6,7 +6,7 @@ let id: string;
 let fn: Function;
 let intervalSpeed: number;
 describe("NPCBattleCycle.ts", () => {
-  beforeAll(async () => {
+  beforeAll(() => {
     id = "62b792030c3f470048781135";
     fn = jest.fn();
     intervalSpeed = -1;

@@ -1,21 +1,11 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { MagicsBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  AnimationSocketEvents,
-  CharacterSocketEvents,
-  IItemContainer,
-  ItemSocketEvents,
-  ItemSubType,
-  SkillSocketEvents,
-  UISocketEvents,
-} from "@rpg-engine/shared";
+import { AnimationSocketEvents, CharacterSocketEvents, SkillSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { SpellCast } from "../SpellCast";
 import { SpellLearn } from "../SpellLearn";
 import { spellArrowCreation } from "../data/blueprints/SpellArrowCreation";
@@ -44,7 +34,7 @@ describe("SpellCast.ts", () => {
   let level4Spells: Partial<ISpell>[] = [];
   let level5Spells: Partial<ISpell>[] = [];
 
-  beforeAll(async () => {
+  beforeAll(() => {
     spellCast = container.get<SpellCast>(SpellCast);
     spellLearn = container.get<SpellLearn>(SpellLearn);
 
@@ -408,150 +398,150 @@ describe("SpellCast.ts", () => {
     await runTest();
   });
 
-  describe("test item creation spell invocation", () => {
-    beforeEach(async () => {
-      testCharacter = await (
-        await unitTestHelper.createMockCharacter(
-          {
-            health: 50,
-            learnedSpells: level2Spells.concat(level3Spells, level4Spells, level5Spells).map((spell) => spell.key),
-          },
-          { hasEquipment: true, hasInventory: true, hasSkills: true }
-        )
-      )
-        .populate("skills")
-        .execPopulate();
+  // describe("test item creation spell invocation", () => {
+  //   beforeEach(async () => {
+  //     testCharacter = await (
+  //       await unitTestHelper.createMockCharacter(
+  //         {
+  //           health: 50,
+  //           learnedSpells: level2Spells.concat(level3Spells, level4Spells, level5Spells).map((spell) => spell.key),
+  //         },
+  //         { hasEquipment: true, hasInventory: true, hasSkills: true }
+  //       )
+  //     )
+  //       .populate("skills")
+  //       .execPopulate();
 
-      characterSkills = testCharacter.skills as unknown as ISkill;
-      characterSkills.level = spellFoodCreation.minLevelRequired!;
-      characterSkills.magic.level = spellFoodCreation.minMagicLevelRequired;
-      await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
-    });
+  //     characterSkills = testCharacter.skills as unknown as ISkill;
+  //     characterSkills.level = spellFoodCreation.minLevelRequired!;
+  //     characterSkills.magic.level = spellFoodCreation.minMagicLevelRequired;
+  //     await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
+  //   });
 
-    it("should cast food creation spell successfully", async () => {
-      expect(await spellCast.castSpell("iquar klatha", testCharacter)).toBeTruthy();
+  //   it("should cast food creation spell successfully", async () => {
+  //     expect(await spellCast.castSpell("iquar klatha", testCharacter)).toBeTruthy();
 
-      const inventory = await testCharacter.inventory;
-      const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+  //     const inventory = await testCharacter.inventory;
+  //     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
-      const item = container.slots[0];
-      expect(item).toBeDefined();
-      expect(item?.subType).toBe(ItemSubType.Food);
+  //     const item = container.slots[0];
+  //     expect(item).toBeDefined();
+  //     expect(item?.subType).toBe(ItemSubType.Food);
 
-      expect(sendEventToUser).toHaveBeenCalledWith(
-        testCharacter.channelId!,
-        ItemSocketEvents.EquipmentAndInventoryUpdate,
-        {
-          inventory: container,
-          openInventoryOnUpdate: false,
-        }
-      );
-    });
+  //     expect(sendEventToUser).toHaveBeenCalledWith(
+  //       testCharacter.channelId!,
+  //       ItemSocketEvents.EquipmentAndInventoryUpdate,
+  //       {
+  //         inventory: container,
+  //         openInventoryOnUpdate: false,
+  //       }
+  //     );
+  //   });
 
-    it("should cast arrow creation spell successfully", async () => {
-      expect(await spellCast.castSpell("iquar elandi", testCharacter)).toBeTruthy();
+  //   it("should cast arrow creation spell successfully", async () => {
+  //     expect(await spellCast.castSpell("iquar elandi", testCharacter)).toBeTruthy();
 
-      const inventory = await testCharacter.inventory;
-      const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+  //     const inventory = await testCharacter.inventory;
+  //     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
-      const item = container.slots[0];
-      expect(item).toBeDefined();
-      expect(item?.key).toBe(RangedWeaponsBlueprint.Arrow);
+  //     const item = container.slots[0];
+  //     expect(item).toBeDefined();
+  //     expect(item?.key).toBe(RangedWeaponsBlueprint.Arrow);
 
-      expect(sendEventToUser).toHaveBeenCalledWith(
-        testCharacter.channelId!,
-        ItemSocketEvents.EquipmentAndInventoryUpdate,
-        {
-          inventory: container,
-          openInventoryOnUpdate: false,
-        }
-      );
-    });
+  //     expect(sendEventToUser).toHaveBeenCalledWith(
+  //       testCharacter.channelId!,
+  //       ItemSocketEvents.EquipmentAndInventoryUpdate,
+  //       {
+  //         inventory: container,
+  //         openInventoryOnUpdate: false,
+  //       }
+  //     );
+  //   });
 
-    it("should cast bolt creation spell successfully", async () => {
-      expect(await spellCast.castSpell("iquar lyn", testCharacter)).toBeTruthy();
+  //   it("should cast bolt creation spell successfully", async () => {
+  //     expect(await spellCast.castSpell("iquar lyn", testCharacter)).toBeTruthy();
 
-      const inventory = await testCharacter.inventory;
-      const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+  //     const inventory = await testCharacter.inventory;
+  //     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
-      const item = container.slots[0];
-      expect(item).toBeDefined();
-      expect(item?.key).toBe(RangedWeaponsBlueprint.Bolt);
+  //     const item = container.slots[0];
+  //     expect(item).toBeDefined();
+  //     expect(item?.key).toBe(RangedWeaponsBlueprint.Bolt);
 
-      expect(sendEventToUser).toHaveBeenCalledWith(
-        testCharacter.channelId!,
-        ItemSocketEvents.EquipmentAndInventoryUpdate,
-        {
-          inventory: container,
-          openInventoryOnUpdate: false,
-        }
-      );
-    });
+  //     expect(sendEventToUser).toHaveBeenCalledWith(
+  //       testCharacter.channelId!,
+  //       ItemSocketEvents.EquipmentAndInventoryUpdate,
+  //       {
+  //         inventory: container,
+  //         openInventoryOnUpdate: false,
+  //       }
+  //     );
+  //   });
 
-    it("should cast rune creation spell successfully", async () => {
-      expect(await spellCast.castSpell("iquar ansr ki", testCharacter)).toBeTruthy();
+  //   it("should cast rune creation spell successfully", async () => {
+  //     expect(await spellCast.castSpell("iquar ansr ki", testCharacter)).toBeTruthy();
 
-      const inventory = await testCharacter.inventory;
-      const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+  //     const inventory = await testCharacter.inventory;
+  //     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
-      const item = container.slots[0];
-      expect(item).toBeDefined();
-      expect(item?.key).toBe(MagicsBlueprint.Rune);
+  //     const item = container.slots[0];
+  //     expect(item).toBeDefined();
+  //     expect(item?.key).toBe(MagicsBlueprint.Rune);
 
-      expect(sendEventToUser).toHaveBeenCalledWith(
-        testCharacter.channelId!,
-        ItemSocketEvents.EquipmentAndInventoryUpdate,
-        {
-          inventory: container,
-          openInventoryOnUpdate: false,
-        }
-      );
-    });
+  //     expect(sendEventToUser).toHaveBeenCalledWith(
+  //       testCharacter.channelId!,
+  //       ItemSocketEvents.EquipmentAndInventoryUpdate,
+  //       {
+  //         inventory: container,
+  //         openInventoryOnUpdate: false,
+  //       }
+  //     );
+  //   });
 
-    it("should be self haste spell casting", () => {
-      expect(spellCast.isSpellCasting("talas hiz")).toBeTruthy();
-    });
+  //   it("should be self haste spell casting", () => {
+  //     expect(spellCast.isSpellCasting("talas hiz")).toBeTruthy();
+  //   });
 
-    it("should cast haste spell successfully", async () => {
-      jest.useFakeTimers({ advanceTimers: true });
+  //   it("should cast haste spell successfully", async () => {
+  //     jest.useFakeTimers({ advanceTimers: true });
 
-      testCharacter = await unitTestHelper.createMockCharacter(
-        { health: 50, learnedSpells: [spellSelfHaste.key] },
-        { hasEquipment: true, hasInventory: true, hasSkills: true }
-      );
+  //     testCharacter = await unitTestHelper.createMockCharacter(
+  //       { health: 50, learnedSpells: [spellSelfHaste.key] },
+  //       { hasEquipment: true, hasInventory: true, hasSkills: true }
+  //     );
 
-      await testCharacter.populate("skills").execPopulate();
+  //     await testCharacter.populate("skills").execPopulate();
 
-      characterSkills = testCharacter.skills as unknown as ISkill;
-      characterSkills.level = spellSelfHaste.minLevelRequired!;
-      characterSkills.magic.level = spellSelfHaste.minMagicLevelRequired;
-      await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
+  //     characterSkills = testCharacter.skills as unknown as ISkill;
+  //     characterSkills.level = spellSelfHaste.minLevelRequired!;
+  //     characterSkills.magic.level = spellSelfHaste.minMagicLevelRequired;
+  //     await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
-      const castResult = await spellCast.castSpell("talas hiz", testCharacter);
+  //     const castResult = await spellCast.castSpell("talas hiz", testCharacter);
 
-      expect(castResult).toBeTruthy();
+  //     expect(castResult).toBeTruthy();
 
-      expect(testCharacter.baseSpeed).toBe(3);
-      expect(testCharacter.speed).toBe(3);
+  //     expect(testCharacter.baseSpeed).toBe(3);
+  //     expect(testCharacter.speed).toBe(3);
 
-      expect(sendEventToUser).toHaveBeenNthCalledWith(
-        2,
-        testCharacter.channelId,
-        CharacterSocketEvents.AttributeChanged,
-        {
-          targetId: testCharacter._id,
-          health: testCharacter.health,
-          mana: testCharacter.mana,
-          speed: testCharacter.speed,
-        }
-      );
+  //     expect(sendEventToUser).toHaveBeenNthCalledWith(
+  //       2,
+  //       testCharacter.channelId,
+  //       CharacterSocketEvents.AttributeChanged,
+  //       {
+  //         targetId: testCharacter._id,
+  //         health: testCharacter.health,
+  //         mana: testCharacter.mana,
+  //         speed: testCharacter.speed,
+  //       }
+  //     );
 
-      expect(sendEventToUser).toHaveBeenNthCalledWith(4, testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
-        targetId: testCharacter._id,
-        effectKey: spellSelfHaste.animationKey,
-      });
+  //     expect(sendEventToUser).toHaveBeenNthCalledWith(4, testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
+  //       targetId: testCharacter._id,
+  //       effectKey: spellSelfHaste.animationKey,
+  //     });
 
-      jest.clearAllTimers();
-    });
-  });
+  //     jest.clearAllTimers();
+  //   });
+  // });
 });

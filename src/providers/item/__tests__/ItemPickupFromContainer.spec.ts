@@ -52,10 +52,6 @@ describe("ItemPickupFromContainer.ts ", () => {
     // Create a mock function for the clearAllMocks function
     jest.clearAllMocks();
   });
-  afterAll(async () => {
-    // Create a mock function for the afterAllJestHook function
-    await unitTestHelper.afterAllJestHook();
-  });
 
   it("should return true if the item was successfully removed from the origin container", async () => {
     const result = await itemPickupFromContainer.pickupFromContainer(itemPickupData, testItem1, testCharacter);

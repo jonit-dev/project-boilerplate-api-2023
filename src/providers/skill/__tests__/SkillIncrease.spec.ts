@@ -153,7 +153,6 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
   afterAll(async () => {
     spellLearnMock.mockRestore();
-    await unitTestHelper.afterAllJestHook();
   });
 
   beforeEach(async () => {

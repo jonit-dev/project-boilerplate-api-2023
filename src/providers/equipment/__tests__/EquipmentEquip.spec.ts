@@ -157,7 +157,3 @@ describe("EquipmentEquip.spec.ts", () => {
     });
   });
 });
-
-afterAll(async () => {
-  await unitTestHelper.afterAllJestHook();
-});

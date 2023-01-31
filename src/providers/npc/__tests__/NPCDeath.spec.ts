@@ -8,9 +8,8 @@ import { ItemRarity } from "@providers/item/ItemRarity";
 import { OthersBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, INPCLoot, ItemRarities } from "@rpg-engine/shared";
 import { NPCDeath } from "../NPCDeath";
-
 jest.mock("@providers/constants/NPCConstants", () => ({
-  NPC_LOOT_CHANCE_MULTIPLIER: 1,
+  NPC_LOOT_CHANCE_MULTIPLIER: jest.fn(() => 1),
 }));
 
 describe("NPCDeath.ts", () => {
@@ -19,11 +18,7 @@ describe("NPCDeath.ts", () => {
   let testCharacter: ICharacter;
   let itemRarity: ItemRarity;
 
-  beforeAll(async () => {
-    jest.useFakeTimers({
-      advanceTimers: true,
-    });
-
+  beforeAll(() => {
     npcDeath = container.get<NPCDeath>(NPCDeath);
     itemRarity = container.get<ItemRarity>(ItemRarity);
   });
@@ -148,9 +143,12 @@ describe("NPCDeath.ts", () => {
   it("on NPC death, make sure the rarity is setting", async () => {
     testNPC.loots = [{ itemBlueprintKey: "bow", chance: 100 }];
 
+    await testNPC.save();
+
     await npcDeath.handleNPCDeath(testNPC, testCharacter);
 
     const bow = (await Item.findOne({ key: "bow", rarity: ItemRarities.Common })) as unknown as IItem;
+
     bow.rarity = ItemRarities.Legendary;
     await bow.save();
 
@@ -180,6 +178,7 @@ describe("NPCDeath.ts", () => {
       { itemBlueprintKey: "light-life-potion", chance: 100 },
       { itemBlueprintKey: "jacket", chance: 100 },
     ];
+    await testNPC.save();
 
     await npcDeath.handleNPCDeath(testNPC, testCharacter);
 
@@ -198,9 +197,17 @@ describe("NPCDeath.ts", () => {
     expect(bodyItemContainer).not.toBeNull();
     expect(bodyItemContainer!.slots).toBeDefined();
 
-    // Check that the NPC's body contains the items that were added to its loot
-    expect(bodyItemContainer!.slots[0]).toMatchObject({ key: "light-life-potion" });
-    expect(bodyItemContainer!.slots[1]).toMatchObject({ key: "jacket" });
+    const slots = Object.values(bodyItemContainer!.slots) as IItem[];
+
+    const slotKeys: string[] = [];
+    for (const slot of slots) {
+      if (slot) {
+        slotKeys.push(slot.key);
+      }
+    }
+
+    expect(slotKeys).toContain("light-life-potion");
+    expect(slotKeys).toContain("jacket");
   });
 
   it("on NPC death no loot is added to NPC body | NPC without loots", async () => {

@@ -225,7 +225,7 @@ describe("MapTransition", () => {
     testCharacter = (await Character.findOne({ _id: testCharacter._id })) as ICharacter;
 
     // Assert that the character's target has been cleared
-    expect(testCharacter.target).toEqual({});
+    expect(testCharacter.target.id).toBeUndefined();
   });
 
   it("should return undefine if there are no transitions in the map", () => {

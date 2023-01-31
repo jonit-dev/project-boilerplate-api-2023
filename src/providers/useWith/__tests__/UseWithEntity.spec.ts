@@ -39,7 +39,7 @@ describe("UseWithEntityValidation.ts", () => {
   let sendEventToUserMock: jest.SpyInstance;
   let executeEffectMock: jest.SpyInstance;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     useWithEntity = container.get<UseWithEntity>(UseWithEntity);
   });
 
@@ -919,7 +919,5 @@ describe("UseWithEntityValidation.ts", () => {
         resolve();
       }, 500);
     });
-
-    await unitTestHelper.afterAllJestHook();
   });
 });
