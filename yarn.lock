@@ -2267,6 +2267,11 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
+"@jonit-dev/quadtree-ts@^2.0.9":
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/@jonit-dev/quadtree-ts/-/quadtree-ts-2.0.9.tgz#0817815332940db56c122e59e4f3a16851ac9e20"
+  integrity sha512-9oqlmm8ByU7oPJpmA9ZR4n7tt6Bwj4XmiPf56z2j0rydTXZqNL5D/hIFBItwbv/BomnVvLiE2R8VJFpt55aNuw==
+
 "@jridgewell/gen-mapping@^0.1.0":
   version "0.1.1"
   resolved "https://registry.npmjs.org/@jridgewell/gen-mapping/-/gen-mapping-0.1.1.tgz"
@@ -2543,10 +2548,10 @@
     estree-walker "^2.0.2"
     picomatch "^2.3.1"
 
-"@rpg-engine/shared@^0.6.65":
-  version "0.6.65"
-  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.6.65.tgz#1a66402c9116da2c169f0994d9c4cbce1d29741d"
-  integrity sha512-vi2txQkd8zzqvQKzkpTxUZdKeiJ3nLZdwFZw8AV4Aon9NhJN5FffZjQh4s82Zu5UlmnVUWrTjI78fRwZcr7jIA==
+"@rpg-engine/shared@^0.6.66":
+  version "0.6.66"
+  resolved "https://registry.yarnpkg.com/@rpg-engine/shared/-/shared-0.6.66.tgz#7cc11afa90ea46581ae53e990ee472fb1dcbccd4"
+  integrity sha512-nGtS3PZHpl++khJwG48h/1cadlWIaHfhlNjezPy0WP34N0iefAsLZoEpiD8ANDpzB+FaYNM26BIuR5eyD4dQPA==
   dependencies:
     husky "^4.3.0"
     prettier "^2.2.1"
@@ -2834,6 +2839,11 @@
   dependencies:
     "@jest/create-cache-key-function" "^27.4.2"
     jsonc-parser "^3.2.0"
+
+"@timohausmann/quadtree-ts@^2.0.0-beta.1":
+  version "2.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@timohausmann/quadtree-ts/-/quadtree-ts-2.0.0-beta.1.tgz#4b8a9943d7838f688c172a3e0b3107117a91dc7f"
+  integrity sha512-zq8AnO1qoYM66OXkiC9d5wIIvNeHy3XIA0AwPtGRNkmX0uv9aktyyBRWzqPW/dZWMMkG4uLluer38QJc+QV/5w==
 
 "@tootallnate/once@1":
   version "1.1.2"
