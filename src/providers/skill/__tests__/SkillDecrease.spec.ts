@@ -1,4 +1,4 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SkillDecrease } from "../SkillDecrease";
@@ -8,12 +8,7 @@ describe("deathPenalty", () => {
   let mockCharacter: ICharacter;
   const deathPenalty = jest.fn();
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     skillDecrease = container.get<SkillDecrease>(SkillDecrease);
     mockCharacter = await unitTestHelper.createMockCharacter(null, {
       hasSkills: true,
@@ -62,9 +57,5 @@ describe("deathPenalty", () => {
       strength: { level: 3, skillPoints: 38, skillPointsToNextLevel: 26 },
       dexterity: { level: 3, skillPoints: 39, skillPointsToNextLevel: 25 },
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

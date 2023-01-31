@@ -7,13 +7,11 @@ describe("updateBasicAttribute", () => {
   let testCharacter: ICharacter;
   let characterSkillBuff: CharacterSkillBuff;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     characterSkillBuff = container.get<CharacterSkillBuff>(CharacterSkillBuff);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, {
         hasEquipment: true,
@@ -34,9 +32,5 @@ describe("updateBasicAttribute", () => {
       expect(skill.strength.level).toEqual(6);
       expect(result).toEqual({ _id: result._id, key: "strength", value: 5 });
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

@@ -11,12 +11,7 @@ describe("ItemModel.ts", () => {
   let testItem: IItem;
   let testItemArmor: IItem;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter({
       x: FromGridX(0),
       y: FromGridY(0),
@@ -118,9 +113,5 @@ describe("ItemModel.ts", () => {
 
     expect(item).toBeNull();
     expect(itemContainer).toBeNull();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

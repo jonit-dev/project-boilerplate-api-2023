@@ -12,15 +12,17 @@ describe("Case CharacterBonusPenalties", () => {
   let sendEventToUser: jest.SpyInstance;
   let sendSkillLevelUpEvents: jest.SpyInstance;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
+
     characterBonusPenalties = container.get<CharacterBonusPenalties>(CharacterBonusPenalties);
 
     sendSkillLevelUpEvents = jest.spyOn(SkillFunctions.prototype, "sendSkillLevelUpEvents" as any);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, {
         hasEquipment: true,
@@ -76,9 +78,5 @@ describe("Case CharacterBonusPenalties", () => {
       message: "You advanced from level 3 to 4 in Strength fighting.",
       type: "info",
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

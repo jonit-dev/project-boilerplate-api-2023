@@ -9,7 +9,6 @@ describe("InMemoryRepository", () => {
   let testCharacter: ICharacter;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     redisManager = container.get<RedisManager>(RedisManager);
     await redisManager.connect();
 
@@ -18,9 +17,7 @@ describe("InMemoryRepository", () => {
     testCharacter = await unitTestHelper.createMockCharacter();
   });
 
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-  });
+  beforeEach(async () => {});
 
   it("saves a data structure to redis", async () => {
     const savedData = await inMemoryRepository.create<ICharacter>("characters", testCharacter);
@@ -52,9 +49,5 @@ describe("InMemoryRepository", () => {
     const deletedData = await inMemoryRepository.delete("characters", testCharacter._id);
 
     expect(deletedData).toBeTruthy();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

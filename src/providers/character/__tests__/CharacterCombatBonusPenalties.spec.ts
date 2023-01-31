@@ -7,17 +7,15 @@ describe("Case CharacterCombatBonusPenalties", () => {
   let testCharacter: ICharacter;
   let characterCombatBonusPenalties: CharacterCombatBonusPenalties;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     jest.useFakeTimers({
       advanceTimers: true,
     });
 
-    await unitTestHelper.beforeAllJestHook();
     characterCombatBonusPenalties = container.get<CharacterCombatBonusPenalties>(CharacterCombatBonusPenalties);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, {
         hasEquipment: true,
@@ -54,9 +52,5 @@ describe("Case CharacterCombatBonusPenalties", () => {
     await characterCombatBonusPenalties.updateCombatSkills(skills, skillType, combatSkills);
 
     expect(skills!.sword.skillPoints).toEqual(expect.closeTo(0.44, 2));
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

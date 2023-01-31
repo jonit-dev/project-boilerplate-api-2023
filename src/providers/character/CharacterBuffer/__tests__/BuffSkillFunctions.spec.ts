@@ -12,14 +12,12 @@ describe("buffSkillFunctions", () => {
   let buffSkillFunctions: BuffSkillFunctions;
   let findByIdMock: jest.Mock;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     buffSkillFunctions = container.get<BuffSkillFunctions>(BuffSkillFunctions);
     characterBasicAttributesBuff = container.get(CharacterBasicAttributesBuff);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, {
         hasEquipment: true,
@@ -126,9 +124,5 @@ describe("buffSkillFunctions", () => {
     const percentage = -10;
     const increaseLvl = buffSkillFunctions.calculateIncreaseLvl(currentLvl, percentage);
     expect(increaseLvl).toEqual(0);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

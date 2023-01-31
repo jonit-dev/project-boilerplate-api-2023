@@ -7,13 +7,11 @@ describe("Case SkillFunctions", () => {
   let testCharacter: ICharacter;
   let skillFunctions: SkillFunctions;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     skillFunctions = container.get<SkillFunctions>(SkillFunctions);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasSkills: true,
@@ -59,9 +57,5 @@ describe("Case SkillFunctions", () => {
     expect(skill[skillType].skillPoints).toEqual(bonusOrPenalties);
     expect(skill[skillType].skillPointsToNextLevel).toBe(17);
     expect(skill[skillType].level).toEqual(2);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

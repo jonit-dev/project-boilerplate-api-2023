@@ -9,9 +9,7 @@ describe("CharacterTarget.ts", () => {
   let anotherCharacter: ICharacter;
   let characterTarget: CharacterTarget;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     characterTarget = container.get<CharacterTarget>(CharacterTarget);
   });
 
@@ -34,9 +32,5 @@ describe("CharacterTarget.ts", () => {
     const updatedAnotherCharacter = await Character.findOne({ id: anotherCharacter.id });
 
     expect(updatedAnotherCharacter?.target).toBeUndefined();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

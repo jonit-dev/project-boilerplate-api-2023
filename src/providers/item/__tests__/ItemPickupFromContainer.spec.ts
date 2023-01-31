@@ -19,13 +19,9 @@ describe("ItemPickupFromContainer.ts ", () => {
   let characterItemSlots: CharacterItemSlots;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     itemPickupFromContainer = container.get<ItemPickupFromContainer>(ItemPickupFromContainer);
   });
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasInventory: true, hasEquipment: true });
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;

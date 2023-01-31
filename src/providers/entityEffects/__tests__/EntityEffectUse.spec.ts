@@ -19,12 +19,9 @@ describe("EntityEffectUse.ts", () => {
   let poisonEntityEffect: IEntityEffect;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     entityEffectUse = container.get<EntityEffectUse>(EntityEffectUse);
   });
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testAttacker = await unitTestHelper.createMockNPC(null, {});
 
     poisonEntityEffect = entityEffectsBlueprintsIndex[EntityEffectBlueprint.Poison];
@@ -35,9 +32,6 @@ describe("EntityEffectUse.ts", () => {
   });
   afterEach(() => {
     jest.clearAllMocks();
-  });
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   it("creates a testAttacker with entityEffects (poison)", () => {

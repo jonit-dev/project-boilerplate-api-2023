@@ -10,13 +10,11 @@ describe("CharacterValidation.ts", () => {
   let sendGenericErrorMessage: jest.SpyInstance;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     testCharacter = await unitTestHelper.createMockCharacter();
     characterValidation = container.get<CharacterValidation>(CharacterValidation);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     // @ts-ignore
     sendGenericErrorMessage = jest.spyOn(characterValidation.socketMessaging, "sendEventToUser");
     testCharacter = await unitTestHelper.createMockCharacter();
@@ -113,9 +111,5 @@ describe("CharacterValidation.ts", () => {
       message: customOfflineMsg,
       type: "error",
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

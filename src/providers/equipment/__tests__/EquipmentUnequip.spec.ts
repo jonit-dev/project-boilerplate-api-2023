@@ -22,14 +22,11 @@ describe("EquipmentUnequip.spec.ts", () => {
   let socketMessaging;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     equipmentUnequip = container.get<EquipmentUnequip>(EquipmentUnequip);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testItem = (await unitTestHelper.createMockItem()) as unknown as IItem;
     testStackableItem = (await unitTestHelper.createStackableMockItem({
       stackQty: 25,
@@ -156,9 +153,5 @@ describe("EquipmentUnequip.spec.ts", () => {
       expect(inventoryContainerUpdated.slots[0]._id).toEqual(anotherStackableItem._id);
       expect(inventoryContainerUpdated.slots[0].stackQty).toBe(50);
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

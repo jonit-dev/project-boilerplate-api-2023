@@ -8,9 +8,9 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { stackableItemMock } from "@providers/unitTests/mock/itemMock";
 import { AnimationEffectKeys, CharacterSocketEvents, ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { ItemUse } from "../ItemUse";
 import { itemApple } from "../data/blueprints/foods/ItemApple";
 import { itemLightLifePotion } from "../data/blueprints/potions/ItemLightLifePotion";
-import { ItemUse } from "../ItemUse";
 import { ItemValidation } from "../validation/ItemValidation";
 
 describe("ItemUse.ts", () => {
@@ -24,16 +24,12 @@ describe("ItemUse.ts", () => {
   let equipmentEquip: EquipmentEquip;
   let animationEventMock: jest.SpyInstance;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     itemUse = container.get<ItemUse>(ItemUse);
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await (
       await unitTestHelper.createMockCharacter(
         { health: 50, mana: 50 },
@@ -67,10 +63,6 @@ describe("ItemUse.ts", () => {
     itemUsageMock.mockRestore();
     animationEventMock.mockRestore();
     jest.clearAllMocks();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   const getInventoryContainer = async (): Promise<IItemContainer> => {

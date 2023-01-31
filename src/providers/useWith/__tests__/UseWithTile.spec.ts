@@ -17,13 +17,11 @@ describe("UseWithTile.ts", () => {
     useWithTileData: IUseWithTile;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     useWithTile = container.get<UseWithTile>(UseWithTile);
     await unitTestHelper.initializeMapLoader();
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     testCharacterEquipment = (await Equipment.findById(testCharacter.equipment)
       .populate("inventory")
@@ -107,9 +105,5 @@ describe("UseWithTile.ts", () => {
     } catch (error: any) {
       expect(error.message).toEqual("UseWith > Character does not own the item that wants to use");
     }
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

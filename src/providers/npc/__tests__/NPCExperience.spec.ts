@@ -1,23 +1,16 @@
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { container } from "@providers/inversify/container";
 import { NPCExperience } from "../NPCExperience";
 
 describe("NPCExperience", () => {
   let npcExperience: NPCExperience;
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     npcExperience = container.get<NPCExperience>(NPCExperience);
   });
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-  });
+  beforeEach(async () => {});
   afterEach(() => {
     jest.restoreAllMocks();
     jest.clearAllTimers();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   describe("calculateExperience", () => {

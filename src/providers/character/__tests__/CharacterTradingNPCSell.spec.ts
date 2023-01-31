@@ -29,14 +29,8 @@ describe("CharacterTradingNPCSell.ts", () => {
   let sendEventToUser: jest.SpyInstance;
   let validationMock: jest.SpyInstance;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     characterTradingNPCSell = container.get<CharacterTradingNPCSell>(CharacterTradingNPCSell);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   const addItemsToInventory = async () => {
@@ -71,7 +65,6 @@ describe("CharacterTradingNPCSell.ts", () => {
   };
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     await prepareData();
 
     sendErrorMessageToCharacter = jest.spyOn(SocketMessaging.prototype, "sendErrorMessageToCharacter");

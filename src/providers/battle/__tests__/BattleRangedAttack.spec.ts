@@ -26,7 +26,6 @@ describe("BattleRangedAttack.spec.ts", () => {
   let bowItem: IItem;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     await unitTestHelper.initializeMapLoader();
 
     battleRangedAttack = container.get<BattleRangedAttack>(BattleRangedAttack);
@@ -35,8 +34,6 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testNPC = await unitTestHelper.createMockNPC(
       { attackType: EntityAttackType.Ranged, maxRangeAttack: 7 },
       { hasSkills: true }
@@ -272,10 +269,6 @@ describe("BattleRangedAttack.spec.ts", () => {
       const updatedCharacter = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
       expect(updatedCharacter.mana).toBe(characterMana - Math.ceil(itemFireStaff.attack! / 2));
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });
 

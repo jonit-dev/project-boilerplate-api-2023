@@ -34,14 +34,11 @@ describe("EquipmentTwoHanded.spec.ts", () => {
   };
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
     equipmentTwoHanded = container.get<EquipmentTwoHanded>(EquipmentTwoHanded);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     item = (await unitTestHelper.createMockItem({ x: 10, y: 10 })) as unknown as IItem;
     itemTwoHanded = (await unitTestHelper.createMockItemTwoHanded()) as unknown as IItem;
     testCharacter = await unitTestHelper.createMockCharacter(
@@ -139,8 +136,5 @@ describe("EquipmentTwoHanded.spec.ts", () => {
       const result = await equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, itemToBeEquipped, character);
       expect(result).toBe(false);
     });
-  });
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

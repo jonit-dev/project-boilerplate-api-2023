@@ -9,16 +9,12 @@ describe("MapTransition", () => {
   let testCharacter: ICharacter;
   let destination;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
   beforeEach(async () => {
     destination = {
       map: "map1",
       gridX: 2,
       gridY: 4,
     };
-    await unitTestHelper.beforeEachJestHook(true);
 
     testCharacter = await unitTestHelper.createMockCharacter(null, {});
 
@@ -30,9 +26,6 @@ describe("MapTransition", () => {
     jest.clearAllMocks();
 
     destination = null;
-  });
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   test("teleportCharacter updates character position correctly", async () => {

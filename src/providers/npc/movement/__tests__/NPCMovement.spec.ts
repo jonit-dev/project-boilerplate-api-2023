@@ -8,13 +8,11 @@ describe("NPCMovement.ts", () => {
   let testNPC: INPC;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     npcMovement = container.get<NPCMovement>(NPCMovement);
     await unitTestHelper.initializeMapLoader();
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testNPC = await unitTestHelper.createMockNPC({
       x: FromGridX(5),
       y: FromGridY(4),
@@ -60,9 +58,5 @@ describe("NPCMovement.ts", () => {
     expect(testNPC.x).toBe(FromGridX(6));
     expect(testNPC.y).toBe(FromGridY(4));
     expect(testNPC.direction).toBe("right");
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

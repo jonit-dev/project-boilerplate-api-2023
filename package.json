@@ -58,7 +58,7 @@
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.0.4",
     "mixpanel": "^0.13.0",
-    "mongoose": "^5.12.3",
+    "mongoose": "5.12.3",
     "mongoose-lean-virtuals": "^0.9.1",
     "mongoose-paginate-v2": "^1.4.2",
     "mongoose-query-logger": "^0.2.3",

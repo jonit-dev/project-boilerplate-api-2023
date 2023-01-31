@@ -16,6 +16,8 @@ import {
   SkillSocketEvents,
   UISocketEvents,
 } from "@rpg-engine/shared";
+import { SpellCast } from "../SpellCast";
+import { SpellLearn } from "../SpellLearn";
 import { spellArrowCreation } from "../data/blueprints/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/SpellBlankRuneCreation";
 import { spellBoltCreation } from "../data/blueprints/SpellBoltCreation";
@@ -30,8 +32,6 @@ import { spellPoisonRuneCreation } from "../data/blueprints/SpellPoisonRuneCreat
 import { spellSelfHaste } from "../data/blueprints/SpellSelfHaste";
 import { spellSelfHealing } from "../data/blueprints/SpellSelfHealing";
 import { ISpell } from "../data/types/SpellsBlueprintTypes";
-import { SpellCast } from "../SpellCast";
-import { SpellLearn } from "../SpellLearn";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;
@@ -45,8 +45,6 @@ describe("SpellCast.ts", () => {
   let level5Spells: Partial<ISpell>[] = [];
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     spellCast = container.get<SpellCast>(SpellCast);
     spellLearn = container.get<SpellLearn>(SpellLearn);
 
@@ -64,8 +62,6 @@ describe("SpellCast.ts", () => {
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await (
       await unitTestHelper.createMockCharacter(
         { health: 50, learnedSpells: [spellSelfHealing.key, spellGreaterHealing.key] },
@@ -87,10 +83,6 @@ describe("SpellCast.ts", () => {
     sendEventToUser.mockRestore();
     jest.clearAllMocks();
     jest.restoreAllMocks();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   describe("verify message is a spell being cast", () => {

@@ -9,13 +9,10 @@ describe("InterpolationParser.ts", () => {
   let testCharacter: ICharacter;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     interpolationParser = container.get<InterpolationParser>(InterpolationParser);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testNPC = await unitTestHelper.createMockNPC();
     testCharacter = await unitTestHelper.createMockCharacter();
   });
@@ -30,9 +27,5 @@ describe("InterpolationParser.ts", () => {
     expect(parsedText).toBe(
       "Hello Test Character, my name is Test NPC. How are you doing today? I'm just a demonstration of my own movement type, Random"
     );
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

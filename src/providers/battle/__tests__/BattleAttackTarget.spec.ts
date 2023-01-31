@@ -16,13 +16,11 @@ describe("BattleAttackTarget.spec.ts", () => {
   let testNPC: INPC;
   let testCharacter: ICharacter;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     battleAttackTarget = container.get<BattleAttackTarget>(BattleAttackTarget);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
@@ -119,10 +117,6 @@ describe("BattleAttackTarget.spec.ts", () => {
 
     expect(testNPC.targetCharacter).toBe(undefined);
   });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
-  });
 });
 
 describe("BattleAttackTarget.spec.ts | PVP battle", () => {
@@ -131,14 +125,11 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
   let targetCharacter: ICharacter;
   let attackerCharacter: ICharacter;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     battleAttackTarget = container.get<BattleAttackTarget>(BattleAttackTarget);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     targetCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasSkills: true,
@@ -243,9 +234,5 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
 
       expect(increaseSkillsOnBattle).toHaveBeenCalledWith(targetCharacter, BasicAttribute.MagicResistance);
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

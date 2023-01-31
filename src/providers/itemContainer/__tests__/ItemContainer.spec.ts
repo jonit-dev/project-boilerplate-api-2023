@@ -9,13 +9,7 @@ describe("ItemContainer.ts", () => {
   let testItem: IItem;
   let testContainer: IItemContainer;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     testItem = await unitTestHelper.createMockItem();
 
@@ -84,9 +78,5 @@ describe("ItemContainer.ts", () => {
     await testContainer.save();
 
     expect(testContainer.firstAvailableSlotId).toBe(1);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

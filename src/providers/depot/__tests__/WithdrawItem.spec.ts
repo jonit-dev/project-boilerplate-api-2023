@@ -1,16 +1,16 @@
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { WithdrawItem } from "../WithdrawItem";
-import { Depot } from "@entities/ModuleDepot/DepotModel";
-import { Types } from "mongoose";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { itemMock } from "@providers/unitTests/mock/itemMock";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { IItemContainer as IItemContainerModel, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { DepositItem } from "../DepositItem";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { itemMock } from "@providers/unitTests/mock/itemMock";
 import { IItemContainer } from "@rpg-engine/shared";
+import { Types } from "mongoose";
+import { DepositItem } from "../DepositItem";
+import { WithdrawItem } from "../WithdrawItem";
 
 describe("WithdrawItem.ts", () => {
   let withdrawItem: WithdrawItem,
@@ -26,11 +26,9 @@ describe("WithdrawItem.ts", () => {
     withdrawItem = container.get<WithdrawItem>(WithdrawItem);
     depositItem = container.get<DepositItem>(DepositItem);
     characterItemSlots = container.get<CharacterItemSlots>(CharacterItemSlots);
-    await unitTestHelper.beforeAllJestHook();
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     testNPC = await unitTestHelper.createMockNPC();
     item = await unitTestHelper.createMockItem();
@@ -78,10 +76,6 @@ describe("WithdrawItem.ts", () => {
     expect(foundItem).toBeDefined();
     expect(foundItem?._id.toString()).toEqual(item.id);
     expect(foundItem?.type).toEqual(itemMock.type);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });
 

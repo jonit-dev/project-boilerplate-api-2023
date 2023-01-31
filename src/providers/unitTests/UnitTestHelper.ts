@@ -17,9 +17,6 @@ import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { container, mapLoader } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { MapLoader } from "@providers/map/MapLoader";
-import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
-import { NPC_CYCLES } from "@providers/npc/NPCCycle";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
   fixedPathMockNPC,
@@ -32,7 +29,6 @@ import { characterMock } from "@providers/unitTests/mock/characterMock";
 import { ISocketTransmissionZone, NPCMovementType, PeriodOfDay, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import mongoose from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
 import {
   itemMeleeRangedMock,
@@ -657,42 +653,5 @@ export class UnitTestHelper {
     backpackContainer.markModified("slots");
     await backpackContainer.save();
     return items;
-  }
-
-  public async beforeAllJestHook(): Promise<void> {
-    this.mongoServer = await MongoMemoryServer.create();
-
-    await mongoose.connect(this.mongoServer.getUri(), {
-      dbName: "test-database",
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    });
-  }
-
-  public async beforeEachJestHook(dropDatabase?: boolean): Promise<void> {
-    if (dropDatabase) {
-      await mongoose.connection.dropDatabase();
-    }
-  }
-
-  public async afterAllJestHook(): Promise<void> {
-    jest.clearAllTimers();
-
-    await mongoose.connection.dropDatabase();
-    await mongoose.connection.close();
-
-    await this.mongoServer.stop({
-      doCleanup: true,
-      force: true,
-    });
-
-    container.unload();
-
-    await mongoose.disconnect();
-
-    MapLoader.maps.clear();
-    NPC_BATTLE_CYCLES.clear();
-    NPC_CYCLES.clear();
   }
 }

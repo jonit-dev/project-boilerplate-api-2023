@@ -42,13 +42,11 @@ describe("SpellItemCreation", () => {
   ];
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     spellItemCreation = container.get(SpellItemCreation);
     characterItemContainer = container.get(CharacterItemContainer);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     // @ts-ignore
     sendErrorMessageToCharacter = jest.spyOn(spellItemCreation.socketMessaging, "sendErrorMessageToCharacter");
 

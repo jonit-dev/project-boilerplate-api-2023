@@ -24,15 +24,11 @@ describe("NPCDeath.ts", () => {
       advanceTimers: true,
     });
 
-    await unitTestHelper.beforeAllJestHook();
-
     npcDeath = container.get<NPCDeath>(NPCDeath);
     itemRarity = container.get<ItemRarity>(ItemRarity);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
     testCharacter = await unitTestHelper.createMockCharacter();
 
@@ -325,9 +321,5 @@ describe("NPCDeath.ts", () => {
 
     // @ts-ignore
     expect(itemRarity.randomizeRarity).toHaveBeenCalled();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

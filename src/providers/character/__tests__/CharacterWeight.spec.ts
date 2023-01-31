@@ -17,8 +17,7 @@ describe("CharacterWeight.ts", () => {
   let testNPC: INPC;
   const mockSendEventToUser = jest.fn();
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
     jest.spyOn(SocketMessaging.prototype, "sendEventToUser").mockImplementation(mockSendEventToUser);
@@ -26,7 +25,6 @@ describe("CharacterWeight.ts", () => {
 
   beforeEach(async () => {
     mockSendEventToUser.mockReset();
-    await unitTestHelper.beforeEachJestHook(true);
 
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, {
@@ -160,9 +158,5 @@ describe("CharacterWeight.ts", () => {
     // When die have a % do drop a item, its random so we can't test it with ONE number fixed.
     const possibleResults = [7.5, 6.5, 2.5, 1.5];
     expect(possibleResults).toContain(weightAfterDeath?.weight);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

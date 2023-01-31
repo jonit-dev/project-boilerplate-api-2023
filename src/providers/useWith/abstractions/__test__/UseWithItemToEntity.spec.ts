@@ -1,13 +1,13 @@
-import { container, unitTestHelper } from "@providers/inversify/container";
-import random from "lodash/random";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ItemSocketEvents, MapLayers } from "@rpg-engine/shared";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { UseWithItemToEntity, IUseWithItemToEntityOptions } from "../UseWithItemToEntity";
+import { ItemSocketEvents, MapLayers } from "@rpg-engine/shared";
+import random from "lodash/random";
+import { IUseWithItemToEntityOptions, UseWithItemToEntity } from "../UseWithItemToEntity";
 
 jest.mock("lodash/random", () => jest.fn());
 
@@ -76,10 +76,6 @@ describe("UseWithItemToEntity.ts", () => {
     .mockImplementation(mockSendErrorMessageToCharacter);
   jest.spyOn(CharacterItemContainer.prototype, "addItemToContainer").mockImplementation(mockAddItemToContainer);
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
     await unitTestHelper.beforeEachJestHook();
 
@@ -98,10 +94,6 @@ describe("UseWithItemToEntity.ts", () => {
     mockSendEventToUser.mockReset();
     mockAddItemToContainer.mockReset();
   }
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
-  });
 
   it("should make sure the character has the required items", async () => {
     mockCheckItemInInventory.mockResolvedValueOnce(false);

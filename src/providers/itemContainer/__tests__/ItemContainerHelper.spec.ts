@@ -13,7 +13,6 @@ describe("ItemContainerHelper", () => {
   let inventory: IItem;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     itemContainerHelper = container.get<ItemContainerHelper>(ItemContainerHelper);
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     inventory = await testCharacter.inventory;
@@ -68,9 +67,5 @@ describe("ItemContainerHelper", () => {
 
       expect(type).toBe(ItemContainerType.MapContainer);
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

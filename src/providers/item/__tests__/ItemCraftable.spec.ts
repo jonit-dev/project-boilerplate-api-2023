@@ -30,14 +30,10 @@ describe("ItemCraftable.ts", () => {
   let items: IItem[];
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     craftableItem = container.get<ItemCraftable>(ItemCraftable);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter(
       { health: 50, mana: 50 },
       { hasEquipment: true, hasInventory: true, hasSkills: true }
@@ -324,9 +320,5 @@ describe("ItemCraftable.ts", () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

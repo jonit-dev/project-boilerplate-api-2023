@@ -10,13 +10,7 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
   let item: IItem;
   let character: ICharacter;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     item = (await unitTestHelper.createMockItem()) as unknown as IItem;
     character = await unitTestHelper.createMockCharacter(null, { hasEquipment: true });
   });
@@ -58,10 +52,6 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
     }
 
     expect(await updatedCharacter.attackType).toBe(EntityAttackType.MeleeRanged);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });
 

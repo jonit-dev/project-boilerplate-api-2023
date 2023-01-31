@@ -20,17 +20,13 @@ describe("ItemDrop.ts", () => {
   let characterWeight: CharacterWeight;
   let itemDropData: IItemDrop;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     itemDrop = container.get<ItemDrop>(ItemDrop);
     itemView = container.get<ItemView>(ItemView);
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true, hasSkills: true })
     )
@@ -303,8 +299,5 @@ describe("ItemDrop.ts", () => {
   afterEach(() => {
     jest.clearAllMocks();
     jest.resetAllMocks();
-  });
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });
