@@ -23,36 +23,39 @@ describe("Case CharacterBonusPenalties", () => {
   });
 
   beforeEach(async () => {
-    testCharacter = await (
-      await unitTestHelper.createMockCharacter(null, {
-        hasEquipment: true,
-        hasSkills: true,
-      })
-    )
-      .populate("skills")
-      .execPopulate();
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasSkills: true,
+    });
+
+    await testCharacter.populate("skills").execPopulate();
+
     testCharacter.race = "Orc";
+
+    await testCharacter.save();
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
   });
 
   it("applyRaceBonusPenalties should return the correct value", async () => {
     const skillTypeStrength = BasicAttribute.Strength;
-    const skills = (await Skill.findById(testCharacter.skills).lean({ virtuals: true, defaults: true })) as ISkill;
+    const skills = await Skill.findById(testCharacter.skills as ISkill);
 
     skills!.strength.skillPoints = 15;
     skills!.strength.level = 2;
     skills!.dagger.skillPoints = 15;
     skills!.dagger.level = 2;
 
-    await Skill.findByIdAndUpdate(skills._id, { ...skills });
+    await skills?.save();
+
+    await Skill.findByIdAndUpdate(skills?._id, { ...skills });
 
     await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, skillTypeStrength);
 
     const skillTypeDagger = ItemSubType.Dagger;
     await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, skillTypeDagger);
 
-    const newSKill = (await Skill.findById(testCharacter.skills).lean({ virtuals: true, defaults: true })) as ISkill;
+    const newSKill = (await Skill.findById(testCharacter.skills)) as ISkill;
     expect(newSKill!.strength.skillPoints).toEqual(15.48);
 
     expect(newSKill!.dagger.skillPoints).toEqual(15.44);
@@ -63,6 +66,8 @@ describe("Case CharacterBonusPenalties", () => {
     const skillType = BasicAttribute.Strength;
     skills[skillType].skillPoints = 63.5;
     skills[skillType].level = 3;
+
+    await skills.save();
 
     await Skill.findByIdAndUpdate(skills._id, { ...skills });
 
