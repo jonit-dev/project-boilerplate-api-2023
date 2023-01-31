@@ -36,6 +36,7 @@
     }
   },
   "dependencies": {
+    "newrelic": "latest",
     "@2toad/profanity": "^2.2.0",
     "@amplitude/identify": "^1.8.2",
     "@amplitude/node": "^1.8.3",

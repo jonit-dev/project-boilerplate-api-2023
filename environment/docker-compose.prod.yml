@@ -31,6 +31,8 @@ services:
       LETSENCRYPT_EMAIL: ${ADMIN_EMAIL}
       VIRTUAL_PORT: ${SERVER_PORT}
       CHOKIDAR_USEPOLLING: "true" # enables hot-reloading on windows host
+      NEW_RELIC_LICENSE_KEY: "516e9c5576725dcb5a7ee264297057d6FFFFNRAL"
+      NEW_RELIC_APP_NAME: "Definya API"
 
   rpg-db:
     container_name: rpg-db

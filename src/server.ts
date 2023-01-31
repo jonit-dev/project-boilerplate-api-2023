@@ -1,5 +1,7 @@
 import "reflect-metadata";
 
+import "newrelic";
+
 import "express-async-errors";
 
 import { appEnv } from "@providers/config/env";
