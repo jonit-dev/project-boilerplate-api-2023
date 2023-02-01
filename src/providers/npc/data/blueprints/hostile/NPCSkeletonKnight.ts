@@ -84,11 +84,7 @@ export const npcSkeletonKnight = {
       itemBlueprintKey: RangedWeaponsBlueprint.ElvenBolt,
       chance: 5,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.SilverIngot,
-      chance: 20,
-      quantityRange: [1, 5],
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Bone,
       chance: 50,

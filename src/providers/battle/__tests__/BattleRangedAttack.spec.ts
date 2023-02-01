@@ -236,13 +236,13 @@ describe("BattleRangedAttack.spec.ts", () => {
     });
 
     it("special ammo dependant on mana availability", async () => {
-      testCharacter.mana = Math.floor(itemFireStaff.attack! / 2) - 1;
+      testCharacter.mana = Math.floor(itemFireStaff.attack! / 6) - 1;
       // @ts-ignore
       let rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
 
       expect(rangedAttackAmmo).not.toBeDefined();
 
-      testCharacter.mana = Math.ceil(itemFireStaff.attack! / 2) + 1;
+      testCharacter.mana = Math.ceil(itemFireStaff.attack! / 6) + 1;
       // @ts-ignore
       rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
 
@@ -254,8 +254,6 @@ describe("BattleRangedAttack.spec.ts", () => {
     });
 
     it("mana should be consumed", async () => {
-      const characterMana = testCharacter.mana;
-
       await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
 
       // @ts-ignore
@@ -267,7 +265,7 @@ describe("BattleRangedAttack.spec.ts", () => {
       expect(characterEquipment.accessory).toBeDefined();
 
       const updatedCharacter = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
-      expect(updatedCharacter.mana).toBe(characterMana - Math.ceil(itemFireStaff.attack! / 2));
+      expect(updatedCharacter.mana).toBe(99);
     });
   });
 });

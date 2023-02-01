@@ -13,10 +13,10 @@ export const itemCheese: Partial<IItem> = {
 
   name: "Cheese",
   description: "A cheese wheel.",
-  weight: 0.6,
-  maxStackSize: 50,
-  basePrice: 10,
+  weight: 0.3,
+  maxStackSize: 100,
+  basePrice: 15,
   usableEffect: (character: ICharacter) => {
-    ItemUsableEffect.applyEatingEffect(character, 10);
+    ItemUsableEffect.applyEatingEffect(character, 5);
   },
 };

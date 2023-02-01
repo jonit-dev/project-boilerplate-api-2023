@@ -1,10 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import {
-  ArmorsBlueprint,
   AxesBlueprint,
   FoodsBlueprint,
-  HelmetsBlueprint,
-  LegsBlueprint,
   MacesBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -57,18 +54,8 @@ export const npcTrader = {
       key: ShieldsBlueprint.WoodenShield,
     },
     {
-      key: LegsBlueprint.LeatherLegs,
-    },
-    {
-      key: HelmetsBlueprint.LeatherHelmet,
-    },
-    {
-      key: ArmorsBlueprint.Coat,
-    },
-    {
       key: ToolsBlueprint.FishingRod,
     },
-
     {
       key: RangedWeaponsBlueprint.Bow,
     },

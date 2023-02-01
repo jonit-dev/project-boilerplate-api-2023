@@ -338,6 +338,6 @@ export class BattleRangedAttack {
   }
 
   private getRequiredManaForAttack(weapon: IItem): number {
-    return Math.round(weapon.attack! / 2);
+    return Math.round(weapon.attack! / 6);
   }
 }
