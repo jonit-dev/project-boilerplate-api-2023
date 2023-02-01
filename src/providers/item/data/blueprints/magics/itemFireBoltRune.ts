@@ -15,20 +15,21 @@ export const itemFireBoltRune: Partial<IMagicItemUseWithEntity> = {
   texturePath: "magics/fire-bolt-rune.png",
   name: "Fire Bolt Rune",
   description: "An ancient Fire Bolt Rune.",
-  weight: 0.1,
+  weight: 0.01,
+  maxStackSize: 100,
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,
 
   useWithMaxDistanceGrid: 7,
-  power: 15,
+  power: 13,
   minMagicLevelRequired: 1,
   animationKey: AnimationEffectKeys.Hit,
   projectileAnimationKey: AnimationEffectKeys.Red,
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireBoltRune, caster);
 
-    ItemUsableEffect.apply(target, EffectableAttribute.Mana, -1 * points);
+    ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
 
     return points;
   },
