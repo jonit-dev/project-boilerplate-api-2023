@@ -8,6 +8,14 @@ import redis from "./redisV4Mock";
 
 let mongoServer: MongoMemoryServer;
 
+// mock skill constants to always the same, to avoid having to adjust all tests whenever we change them
+jest.mock("@providers/constants/SkillConstants", () => ({
+  SP_INCREASE_RATIO: 0.2,
+  SP_MAGIC_INCREASE_TIMES_MANA: 0.4,
+  INCREASE_BONUS_FACTION: 0.1,
+  EXP_RATIO: 1,
+}));
+
 beforeAll(async () => {
   jest.mock("redis", () => redis);
 

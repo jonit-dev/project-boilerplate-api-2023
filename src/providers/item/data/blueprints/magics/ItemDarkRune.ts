@@ -18,7 +18,7 @@ export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
   weight: 0.01,
   maxStackSize: 100,
   allowedEquipSlotType: [ItemSlotType.Inventory],
-  basePrice: 100,
+
   hasUseWith: true,
   canUseOnNonPVPZone: false,
   useWithMaxDistanceGrid: 7,

@@ -18,7 +18,6 @@ export const itemFireBoltRune: Partial<IMagicItemUseWithEntity> = {
   weight: 0.01,
   maxStackSize: 100,
   allowedEquipSlotType: [ItemSlotType.Inventory],
-  basePrice: 70,
   hasUseWith: true,
   canUseOnNonPVPZone: false,
   useWithMaxDistanceGrid: 7,
