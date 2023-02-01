@@ -1,6 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { container } from "@providers/inversify/container";
+import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { provide } from "inversify-binding-decorators";
 
 export enum EffectableMaxAttribute {
   Health = "maxHealth",
@@ -13,30 +17,57 @@ export enum EffectableAttribute {
   Speed = "speed",
 }
 
+interface IItemUsableEffectOptions {
+  isRune?: boolean;
+  caster?: ICharacter | INPC;
+}
+
+@provide(ItemUsableEffect)
 export class ItemUsableEffect {
-  static apply(character: ICharacter | INPC, attr: EffectableAttribute, value: number): void {
-    character[attr] += value;
+  static apply(
+    target: ICharacter | INPC,
+    attr: EffectableAttribute,
+    value: number,
+    options?: IItemUsableEffectOptions
+  ): void {
+    const mapNonPVPZone = container.get(MapNonPVPZone);
+    const socketMessaging = container.get(SocketMessaging);
+
+    if (options?.isRune) {
+      const isTargetAtNonPVPZone = mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
+
+      if (isTargetAtNonPVPZone) {
+        socketMessaging.sendErrorMessageToCharacter(
+          options?.caster as ICharacter,
+          "You can't use this rune in a non-PVP zone!"
+        );
+
+        return;
+      }
+    }
+
+    target[attr] += value;
     switch (attr) {
       case EffectableAttribute.Health:
         const maxAttrHealth = EffectableMaxAttribute.Health;
-        if (character[attr] > character[maxAttrHealth]) {
-          character[attr] = character[maxAttrHealth];
-        } else if (character[attr] < 0) {
-          character[attr] = 0;
+        if (target[attr] > target[maxAttrHealth]) {
+          target[attr] = target[maxAttrHealth];
+        } else if (target[attr] < 0) {
+          target[attr] = 0;
         }
         break;
 
       case EffectableAttribute.Mana:
         const maxAttrMana = EffectableMaxAttribute.Mana;
-        if (character[attr] > character[maxAttrMana]) {
-          character[attr] = character[maxAttrMana];
-        } else if (character[attr] < 0) {
-          character[attr] = 0;
+        if (target[attr] > target[maxAttrMana]) {
+          target[attr] = target[maxAttrMana];
+        } else if (target[attr] < 0) {
+          target[attr] = 0;
         }
         break;
 
       case EffectableAttribute.Speed:
-        const dataCharacter = character as ICharacter;
+        const dataCharacter = target as ICharacter;
         if (dataCharacter.baseSpeed === MovementSpeed.Slow || dataCharacter.baseSpeed === MovementSpeed.ExtraSlow) {
           dataCharacter.baseSpeed = value;
         }
