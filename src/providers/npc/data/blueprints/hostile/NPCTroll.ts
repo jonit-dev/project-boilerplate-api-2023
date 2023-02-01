@@ -98,6 +98,11 @@ export const npcTroll = {
       chance: 10,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Eye,
+      chance: 10,
+      quantityRange: [1, 3],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

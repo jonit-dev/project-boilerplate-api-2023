@@ -189,6 +189,9 @@ export enum CraftingResourcesBlueprint {
   FoodRecipe = "food-recipe",
   WeaponRecipe = "weapon-recipe",
   MagicRecipe = "magic-recipe",
+  Eye = "eye",
+  Skull = "skull",
+  Bones = "bones",
 }
 
 export enum ToolsBlueprint {

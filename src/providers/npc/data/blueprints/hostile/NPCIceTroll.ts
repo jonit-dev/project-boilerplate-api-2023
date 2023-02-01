@@ -125,6 +125,11 @@ export const npcIceTroll: Partial<INPC> = {
       chance: 20,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Skull,
+      chance: 15,
+      quantityRange: [1, 3],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 };
