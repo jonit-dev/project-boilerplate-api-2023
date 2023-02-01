@@ -1,7 +1,7 @@
 import { HttpStatus, IGoogleConfig, IGoogleOAuthIdTokenResponse, IGoogleOAuthTokenPayload } from "@rpg-engine/shared";
 import axios from "axios";
 import { OAuth2Client } from "google-auth-library";
-import { google } from "googleapis";
+// import { google } from "googleapis";
 import { provide } from "inversify-binding-decorators";
 import { appEnv } from "../config/env";
 import { InternalServerError } from "../errors/InternalServerError";
@@ -28,11 +28,12 @@ export class GoogleOAuthHelper {
    * Create the google auth object which gives us access to talk to google's apis.
    */
   private createConnection(): any {
-    return new google.auth.OAuth2(
-      this.googleConfig.clientID,
-      this.googleConfig.clientSecret,
-      this.googleConfig.redirectURI
-    );
+    throw new Error("googleapis package consumes a ton of memory, so it was removed!");
+    // return new google.auth.OAuth2(
+    //   this.googleConfig.clientID,
+    //   this.googleConfig.clientSecret,
+    //   this.googleConfig.redirectURI
+    // );
   }
 
   /**
