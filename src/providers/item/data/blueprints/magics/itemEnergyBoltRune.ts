@@ -18,7 +18,7 @@ export const itemEnergyBoltRune: Partial<IMagicItemUseWithEntity> = {
   weight: 0.01,
   maxStackSize: 100,
   allowedEquipSlotType: [ItemSlotType.Inventory],
-  basePrice: 20,
+  basePrice: 80,
   hasUseWith: true,
 
   useWithMaxDistanceGrid: 7,

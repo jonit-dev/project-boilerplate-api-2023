@@ -67,7 +67,7 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
   let initialLevel: number;
   let spToLvl2: number;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     skillIncrease = container.get<SkillIncrease>(SkillIncrease);
 
     initialLevel = 1;
@@ -76,7 +76,7 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
     expect(spToLvl2).toBeGreaterThan(0);
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     skills = new Skill({
       ownerType: "Character",
     }) as ISkill;
@@ -129,7 +129,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     sendExpLevelUpEvents: any,
     spellLearnMock: jest.SpyInstance;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     skillIncrease = container.get<SkillIncrease>(SkillIncrease);
 
     initialSkills = new Skill({
@@ -151,7 +151,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     spellLearnMock.mockImplementation();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     spellLearnMock.mockRestore();
   });
 
@@ -330,8 +330,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(updatedSkills?.magicResistance.level).toBe(initialLevel);
 
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
-    expect(updatedSkills?.magicResistance.skillPoints).toBe(skillPoints);
-    expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBe(spToLvl2 - skillPoints);
+    expect(updatedSkills?.magicResistance.skillPoints).toBe(Math.round(skillPoints));
+    expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBe(Math.round(spToLvl2 - skillPoints));
   });
 });
 
