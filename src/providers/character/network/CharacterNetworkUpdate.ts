@@ -72,7 +72,7 @@ export class CharacterNetworkUpdate {
               y: character.y,
             };
 
-            this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
+            await this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
 
             await this.characterMovementWarn.warn(character, data);
 
@@ -116,12 +116,12 @@ export class CharacterNetworkUpdate {
     );
   }
 
-  private syncIfPositionMismatch(
+  private async syncIfPositionMismatch(
     serverCharacter: ICharacter,
     serverCharacterPosition: IPosition,
     clientOriginX: number,
     clientOriginY: number
-  ): void {
+  ): Promise<void> {
     const distance = this.mathHelper.getDistanceBetweenPoints(
       serverCharacterPosition.x,
       serverCharacterPosition.y,
@@ -130,6 +130,16 @@ export class CharacterNetworkUpdate {
     );
 
     const distanceInGridCells = Math.round(distance / GRID_WIDTH);
+
+    if (distanceInGridCells >= 1) {
+      await Character.updateOne(
+        { id: serverCharacter.id },
+        {
+          x: clientOriginX,
+          y: clientOriginY,
+        }
+      );
+    }
 
     if (distanceInGridCells >= 10) {
       this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
