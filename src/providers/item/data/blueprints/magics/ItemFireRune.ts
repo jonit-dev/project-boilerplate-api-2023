@@ -15,7 +15,7 @@ export const itemFireRune: Partial<IMagicItemUseWithEntity> = {
   texturePath: "magics/fire-rune.png",
   name: "Fire Rune",
   description: "An ancient fire rune.",
-  weight: 0.5,
+  weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,

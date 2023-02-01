@@ -15,7 +15,7 @@ export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
   texturePath: "magics/dark-rune.png",
   name: "Dark Rune",
   description: "An ancient dark rune.",
-  weight: 0.5,
+  weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,

@@ -15,7 +15,7 @@ export const itemEnergyBoltRune: Partial<IMagicItemUseWithEntity> = {
   texturePath: "magics/energy-bolt-rune.png",
   name: "Energy Bolt Rune",
   description: "An ancient Energy Bolt Rune.",
-  weight: 0.5,
+  weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,

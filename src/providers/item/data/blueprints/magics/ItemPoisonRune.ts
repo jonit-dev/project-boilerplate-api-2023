@@ -15,7 +15,7 @@ export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
   texturePath: "magics/poison-rune.png",
   name: "Poison Rune",
   description: "An ancient poison rune.",
-  weight: 0.5,
+  weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 20,
   hasUseWith: true,

@@ -11,6 +11,6 @@ export const itemRune: Partial<IItem> = {
 
   name: "Rune",
   description: "An ancient carved blank rune.",
-  weight: 0.5,
+  weight: 0.1,
   basePrice: 1,
 };
