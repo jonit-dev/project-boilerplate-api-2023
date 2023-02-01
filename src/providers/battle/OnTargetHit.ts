@@ -7,8 +7,8 @@ import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { EffectsSocketEvents, EntityType, IEntityEffectEvent, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { BattleEffects } from "./BattleEffects";
 import _ from "lodash";
+import { BattleEffects } from "./BattleEffects";
 
 @provide(OnTargetHit)
 export class OnTargetHit {
@@ -24,7 +24,7 @@ export class OnTargetHit {
   async execute(target: ICharacter | INPC, attacker: ICharacter | INPC, damage: number): Promise<void> {
     if (damage) {
       await this.sendDamageEvent(target, damage);
-      await this.generateBlookOnGround(target);
+      await this.generateBloodOnGround(target);
     }
 
     if (!target.isAlive) {
@@ -81,7 +81,7 @@ export class OnTargetHit {
     }
   }
 
-  private async generateBlookOnGround(target: ICharacter | INPC): Promise<void> {
+  private async generateBloodOnGround(target: ICharacter | INPC): Promise<void> {
     const n = _.random(0, 100);
 
     if (n <= 30) {

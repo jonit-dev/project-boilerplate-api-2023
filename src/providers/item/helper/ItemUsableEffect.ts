@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { container } from "@providers/inversify/container";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 export enum EffectableMaxAttribute {
@@ -18,7 +19,7 @@ export enum EffectableAttribute {
 }
 
 interface IItemUsableEffectOptions {
-  isRune?: boolean;
+  canUseInNonPVPZone?: boolean;
   caster?: ICharacter | INPC;
 }
 
@@ -33,10 +34,11 @@ export class ItemUsableEffect {
     const mapNonPVPZone = container.get(MapNonPVPZone);
     const socketMessaging = container.get(SocketMessaging);
 
-    if (options?.isRune) {
+    if (options?.canUseInNonPVPZone === false) {
+      const isTargetCharacter = target.type === EntityType.Character;
       const isTargetAtNonPVPZone = mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
 
-      if (isTargetAtNonPVPZone) {
+      if (isTargetAtNonPVPZone && isTargetCharacter) {
         socketMessaging.sendErrorMessageToCharacter(
           options?.caster as ICharacter,
           "You can't use this rune in a non-PVP zone!"

@@ -20,7 +20,7 @@ export const itemEnergyBoltRune: Partial<IMagicItemUseWithEntity> = {
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 80,
   hasUseWith: true,
-
+  canUseOnNonPVPZone: false,
   useWithMaxDistanceGrid: 7,
   power: 15,
   minMagicLevelRequired: 1,
@@ -29,7 +29,10 @@ export const itemEnergyBoltRune: Partial<IMagicItemUseWithEntity> = {
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.EnergyBoltRune, caster);
 
-    ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+    ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points, {
+      canUseInNonPVPZone: false,
+      caster,
+    });
 
     return points;
   },

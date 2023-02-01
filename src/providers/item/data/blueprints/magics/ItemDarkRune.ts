@@ -20,7 +20,7 @@ export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 100,
   hasUseWith: true,
-
+  canUseOnNonPVPZone: false,
   useWithMaxDistanceGrid: 7,
   power: 17,
   minMagicLevelRequired: 2,
@@ -29,7 +29,10 @@ export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.DarkRune, caster);
 
-    ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+    ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points, {
+      canUseInNonPVPZone: false,
+      caster,
+    });
 
     return points;
   },

@@ -20,7 +20,7 @@ export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 60,
   hasUseWith: true,
-
+  canUseOnNonPVPZone: false,
   useWithMaxDistanceGrid: 7,
   power: 11,
   minMagicLevelRequired: 2,
@@ -30,7 +30,10 @@ export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.PoisonRune, caster);
 
-    ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+    ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points, {
+      canUseInNonPVPZone: false,
+      caster,
+    });
 
     return points;
   },

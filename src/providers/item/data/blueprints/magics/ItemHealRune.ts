@@ -21,7 +21,7 @@ export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
   allowedEquipSlotType: [ItemSlotType.Inventory],
   basePrice: 80,
   hasUseWith: true,
-
+  canUseOnNonPVPZone: true,
   useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,

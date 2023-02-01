@@ -81,6 +81,8 @@ const itemSchema = createLeanSchema(
 
     hasButchered: Type.boolean(),
     bodyFromId: Type.string(),
+
+    canUseOnNonPVPZone: Type.boolean({ required: true, default: true }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
