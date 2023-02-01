@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { IQuest } from "@entities/ModuleQuest/QuestModel";
-import { QuestStatus, QuestType } from "@rpg-engine/shared";
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { QuestStatus, QuestType } from "@rpg-engine/shared";
 import { QuestNetworkGet } from "../network/QuestNetworkGet";
 
 describe("QuestNetworkGet.ts", () => {
@@ -17,11 +17,9 @@ describe("QuestNetworkGet.ts", () => {
 
   beforeAll(async () => {
     questNetworkGet = container.get<QuestNetworkGet>(QuestNetworkGet);
-    await unitTestHelper.beforeAllJestHook();
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasSkills: true,
@@ -143,9 +141,5 @@ describe("QuestNetworkGet.ts", () => {
     );
 
     expect(pendingQuests).toBeUndefined();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

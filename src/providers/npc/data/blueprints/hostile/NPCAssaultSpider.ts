@@ -5,6 +5,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   AccessoriesBlueprint,
+  CraftingResourcesBlueprint,
   DaggersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
@@ -79,6 +80,11 @@ export const npcAssaultSpider: Partial<INPC> = {
     {
       itemBlueprintKey: AccessoriesBlueprint.StarNecklace,
       chance: 6,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.MagicRecipe,
+      chance: 10,
+      quantityRange: [1, 5],
     },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],

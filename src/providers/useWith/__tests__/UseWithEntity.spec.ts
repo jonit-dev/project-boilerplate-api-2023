@@ -41,8 +41,7 @@ describe("UseWithEntityValidation.ts", () => {
   let executeEffectMock: jest.SpyInstance;
   let onHitTargetMock: jest.SpyInstance;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     useWithEntity = container.get<UseWithEntity>(UseWithEntity);
   });
 
@@ -97,7 +96,6 @@ describe("UseWithEntityValidation.ts", () => {
   };
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     await prepareData();
 
     executeEffectMock = jest.spyOn(useWithEntity as any, "executeEffect");
@@ -970,7 +968,5 @@ describe("UseWithEntityValidation.ts", () => {
         resolve();
       }, 500);
     });
-
-    await unitTestHelper.afterAllJestHook();
   });
 });

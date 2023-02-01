@@ -13,4 +13,5 @@ export const itemIronOre: Partial<IItem> = {
   weight: 2,
   maxStackSize: 100,
   hasUseWith: true,
+  basePrice: 7,
 };

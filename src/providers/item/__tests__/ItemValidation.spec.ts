@@ -1,9 +1,9 @@
-import { container, unitTestHelper } from "@providers/inversify/container";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { UISocketEvents } from "@rpg-engine/shared";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { UISocketEvents } from "@rpg-engine/shared";
 import { ItemValidation } from "../validation/ItemValidation";
 
 describe("ItemValidation.ts", () => {
@@ -15,15 +15,11 @@ describe("ItemValidation.ts", () => {
   let inventoryItemContainerId: string;
   let sendEventToUser: jest.SpyInstance;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     itemValidation = container.get<ItemValidation>(ItemValidation);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true, hasSkills: true })
     )
@@ -46,10 +42,6 @@ describe("ItemValidation.ts", () => {
   afterEach(() => {
     sendEventToUser.mockRestore();
     jest.clearAllMocks();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   const addItemToInventory = async (item: IItem): Promise<IItem> => {

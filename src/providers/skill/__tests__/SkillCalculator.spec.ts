@@ -14,10 +14,10 @@ describe("SkillCalculator.ts", () => {
     const SPForLevel10 = skillCalculator.getSPForLevel(10);
     const SPForLevel20 = skillCalculator.getSPForLevel(20);
 
-    expect(SPForLevel1).toBe(5);
-    expect(SPForLevel5).toBe(625);
-    expect(SPForLevel10).toBe(5000);
-    expect(SPForLevel20).toBe(40000);
+    expect(SPForLevel1).toBe(1);
+    expect(SPForLevel5).toBe(125);
+    expect(SPForLevel10).toBe(1000);
+    expect(SPForLevel20).toBe(8000);
   });
 
   it("should properly calculate all XP required for level 1, 5, 10", () => {

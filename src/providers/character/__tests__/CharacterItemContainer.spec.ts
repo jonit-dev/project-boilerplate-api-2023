@@ -10,10 +10,6 @@ describe("CharacterItemContainer.ts", () => {
   let inventoryContainer: IItemContainer;
   let characterItemContainer: CharacterItemContainer;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
 
@@ -60,9 +56,5 @@ describe("CharacterItemContainer.ts", () => {
     expect(updatedAnotherItem.x).toEqual(testCharacter.x);
     expect(updatedAnotherItem.y).toEqual(testCharacter.y);
     expect(updatedAnotherItem.scene).toEqual(testCharacter.scene);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

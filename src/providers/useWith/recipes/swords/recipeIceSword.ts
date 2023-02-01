@@ -10,7 +10,11 @@ export const recipeIceSword: IUseWithCraftingRecipe = {
       qty: 3,
     },
     {
-      key: CraftingResourcesBlueprint.SteelIngot,
+      key: CraftingResourcesBlueprint.SilverIngot,
+      qty: 6,
+    },
+    {
+      key: CraftingResourcesBlueprint.GreenOre,
       qty: 5,
     },
   ],

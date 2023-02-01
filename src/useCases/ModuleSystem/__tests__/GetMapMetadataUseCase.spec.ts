@@ -10,7 +10,6 @@ describe("GetMapMetadataUseCase", () => {
   let mapTiles: MapTiles;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     mapTiles = {
       getMapLayers: jest.fn(() => ["Layer 1", "Layer 2"]),
     } as unknown as MapTiles;
@@ -19,15 +18,10 @@ describe("GetMapMetadataUseCase", () => {
     getMapMetadataUseCase = new GetMapMetadataUseCase(mapTiles);
   });
 
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-  });
+  beforeEach(async () => {});
 
   afterEach(() => {
     jest.clearAllMocks();
-  });
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   it("should throw a BadRequestError for an invalid map name", () => {

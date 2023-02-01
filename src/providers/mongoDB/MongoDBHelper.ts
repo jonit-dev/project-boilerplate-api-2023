@@ -17,6 +17,7 @@ export class MongoDBHelper {
           useCreateIndex: true,
           useUnifiedTopology: true,
           dbName: process.env.MONGO_INITDB_DATABASE,
+          useFindAndModify: false,
         },
         (err) => {
           if (err) {

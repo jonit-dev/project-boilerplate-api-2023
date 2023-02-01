@@ -12,6 +12,6 @@ export const itemElvenLeaf: Partial<IItemUseWith> = {
   description: "A leaf from the Elven Tree.",
   weight: 0.02,
   maxStackSize: 100,
-  basePrice: 1,
+  basePrice: 8,
   hasUseWith: true,
 };

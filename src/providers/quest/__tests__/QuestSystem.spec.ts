@@ -6,12 +6,12 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { IQuest } from "@entities/ModuleQuest/QuestModel";
 import { QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
-import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemDrop } from "@providers/item/ItemDrop";
+import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -36,11 +36,9 @@ describe("QuestSystem.ts", () => {
     questSystem = container.get<QuestSystem>(QuestSystem);
     characterItems = container.get<CharacterItems>(CharacterItems);
     releaseRewards = jest.spyOn(questSystem, "releaseRewards" as any);
-    await unitTestHelper.beforeAllJestHook();
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasSkills: true,
@@ -315,10 +313,6 @@ describe("QuestSystem.ts", () => {
   afterEach(() => {
     jest.clearAllMocks();
     jest.resetAllMocks();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });
 

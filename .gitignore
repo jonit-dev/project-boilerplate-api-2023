@@ -7,6 +7,8 @@ src/providers/data/nasdaqlisted.txt
 src/providers/data/otherlisted.txt
 yarn-error.log
 .DS_Store
+
+newrelic_agent.log
  
  
 

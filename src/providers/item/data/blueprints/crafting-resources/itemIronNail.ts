@@ -12,6 +12,7 @@ export const itemIronNail: Partial<IItemUseWith> = {
   description: "An useful and common crafting resource.",
   weight: 0.01,
   maxStackSize: 100,
-  basePrice: 0.1,
+
   hasUseWith: true,
+  basePrice: 2,
 };

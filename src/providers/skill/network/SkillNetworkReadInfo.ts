@@ -14,7 +14,7 @@ export class SkillNetworkReadInfo {
     this.socketAuth.authCharacterOn(channel, SkillSocketEvents.ReadInfo, async (data, character: ICharacter) => {
       const skill = await Skill.findOne({
         owner: character.id,
-      });
+      }).lean({ virtuals: true, defaults: true });
 
       if (!skill) {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {

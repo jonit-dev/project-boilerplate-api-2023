@@ -12,14 +12,12 @@ describe("NPCMovementStopped.ts", () => {
   let testCharacter: ICharacter;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     await unitTestHelper.initializeMapLoader();
     npcMovementStopped = container.get<NPCMovementStopped>(NPCMovementStopped);
     npcTarget = container.get<NPCTarget>(NPCTarget);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testNPC = await unitTestHelper.createMockNPC(
       {
         x: FromGridX(0),
@@ -64,9 +62,5 @@ describe("NPCMovementStopped.ts", () => {
 
       expect(testNPC.direction).toBe(position.expectedResult);
     }
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

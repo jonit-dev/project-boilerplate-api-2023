@@ -5,12 +5,7 @@ import { IUser } from "../UserModel";
 describe("UserModel.ts", () => {
   let testUser: IUser;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testUser = await unitTestHelper.createMockUser();
   });
 
@@ -42,9 +37,5 @@ describe("UserModel.ts", () => {
     expect(user.email).toEqual(testUser.email);
     expect(user.address).toEqual(testUser.address);
     expect(user.phone).toEqual(testUser.phone);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

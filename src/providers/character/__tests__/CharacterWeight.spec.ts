@@ -1,13 +1,13 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
 import { CharacterDeath } from "../CharacterDeath";
 import { CharacterWeight } from "../CharacterWeight";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterSocketEvents } from "@rpg-engine/shared";
 
 describe("CharacterWeight.ts", () => {
   let testCharacter: ICharacter;
@@ -17,8 +17,7 @@ describe("CharacterWeight.ts", () => {
   let testNPC: INPC;
   const mockSendEventToUser = jest.fn();
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
     jest.spyOn(SocketMessaging.prototype, "sendEventToUser").mockImplementation(mockSendEventToUser);
@@ -26,7 +25,6 @@ describe("CharacterWeight.ts", () => {
 
   beforeEach(async () => {
     mockSendEventToUser.mockReset();
-    await unitTestHelper.beforeEachJestHook(true);
 
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, {
@@ -133,6 +131,10 @@ describe("CharacterWeight.ts", () => {
   });
 
   it("After death, one of equipment will drop and the weight should update.", async () => {
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
+
     await characterWeight.updateCharacterWeight(testCharacter);
     const beforeAddArmor = await Character.findOne(testCharacter._id).lean();
     expect(beforeAddArmor?.weight).toBe(3);
@@ -160,9 +162,5 @@ describe("CharacterWeight.ts", () => {
     // When die have a % do drop a item, its random so we can't test it with ONE number fixed.
     const possibleResults = [7.5, 6.5, 2.5, 1.5];
     expect(possibleResults).toContain(weightAfterDeath?.weight);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

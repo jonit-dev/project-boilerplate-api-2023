@@ -9,14 +9,11 @@ describe("BattleEffects.spec.ts", () => {
   let testNPC: INPC;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     battleEffects = container.get<BattleEffects>(BattleEffects);
     testNPC = await unitTestHelper.createMockNPC();
   });
 
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-  });
+  beforeEach(async () => {});
 
   it("should properly generate blood on the ground", async () => {
     await battleEffects.generateBloodOnGround(testNPC);
@@ -34,9 +31,5 @@ describe("BattleEffects.spec.ts", () => {
     });
 
     expect(hasBlood).toBeTruthy();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

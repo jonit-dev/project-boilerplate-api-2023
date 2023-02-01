@@ -2,18 +2,12 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IControlTime } from "@entities/ModuleSystem/MapControlTimeModel";
 import { unitTestHelper } from "@providers/inversify/container";
-import { CharacterFactions, ShadowWalkerRaces, LifeBringerRaces, PeriodOfDay } from "@rpg-engine/shared";
+import { CharacterFactions, LifeBringerRaces, PeriodOfDay, ShadowWalkerRaces } from "@rpg-engine/shared";
 
 describe("SkillBonusLifeBringer.ts", () => {
   let characterLifeBringer: ICharacter;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     characterLifeBringer = await unitTestHelper.createMockCharacter(
       {
         faction: CharacterFactions.LifeBringer,
@@ -121,22 +115,12 @@ describe("SkillBonusLifeBringer.ts", () => {
     // 20 + 1 = 21
     expect(totalDefenseLifeBringer).toEqual(21);
   });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
-  });
 });
 
 describe("SkillBonusShadowWalker.ts", () => {
   let characterShadowWalker: ICharacter;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     characterShadowWalker = await unitTestHelper.createMockCharacter(
       {
         faction: CharacterFactions.ShadowWalker,
@@ -238,9 +222,5 @@ describe("SkillBonusShadowWalker.ts", () => {
     expect(totalAttack).toEqual(21);
     // 20 + 1 = 21
     expect(totalDefense).toEqual(21);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

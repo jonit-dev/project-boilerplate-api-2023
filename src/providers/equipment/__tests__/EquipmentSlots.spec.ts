@@ -16,12 +16,10 @@ describe("EquipmentSlots.ts", () => {
   let inventoryContainer: IItemContainer;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasInventory: true, hasEquipment: true });
     equipment = (await Equipment.findById(testCharacter.equipment)) as unknown as IEquipment;
     // @ts-ignore
@@ -180,9 +178,5 @@ describe("EquipmentSlots.ts", () => {
 
       expect(socketMessaging).toBeCalledWith(testCharacter, "Sorry, you don't have any available slots for this item.");
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

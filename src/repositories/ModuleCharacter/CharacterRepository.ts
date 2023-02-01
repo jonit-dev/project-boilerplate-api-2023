@@ -77,8 +77,9 @@ export class CharacterRepository extends CRUD {
 
     const charObject = createdCharacter.toObject();
     const characterInventory = await createdCharacter.inventory;
+    // @ts-ignore
     charObject.inventory = characterInventory;
-
+    // @ts-ignore
     return charObject;
   }
 

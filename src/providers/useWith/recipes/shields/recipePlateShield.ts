@@ -14,5 +14,13 @@ export const recipePlateShield: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.PolishedStone,
       qty: 2,
     },
+    {
+      key: CraftingResourcesBlueprint.GreaterWoodenLog,
+      qty: 1,
+    },
+    {
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 1,
+    },
   ],
 };

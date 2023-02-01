@@ -79,7 +79,7 @@ export class BattleCharacterManager {
     }
 
     if (target.type === "Character") {
-      const isNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(target.scene, target.x, target.y);
+      const isNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
       if (isNonPVPZone) {
         // clear battle cycle when target enter in a pvp zone.
         await this.battleNetworkStopTargeting.stopTargeting(attacker as unknown as ICharacter);

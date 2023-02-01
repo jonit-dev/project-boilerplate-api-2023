@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   ArmorsBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
   StaffsBlueprint,
@@ -58,6 +59,21 @@ export const npcFireFox: Partial<INPC> = {
     {
       itemBlueprintKey: HelmetsBlueprint.VikingHelmet,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Leather,
+      chance: 40,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.MagicRecipe,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
+      chance: 5,
+      quantityRange: [5, 10],
     },
   ],
 };

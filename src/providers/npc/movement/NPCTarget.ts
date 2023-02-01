@@ -99,7 +99,7 @@ export class NPCTarget {
       throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
     }
 
-    const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, character.x, character.y);
+    const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
     // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
     if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
       await this.clearTarget(npc);

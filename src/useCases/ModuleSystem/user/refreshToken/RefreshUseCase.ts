@@ -30,6 +30,7 @@ export class RefreshUseCase {
     if (!user.refreshTokens) {
       throw new BadRequestError(TS.translate("auth", "dontHaveRefreshTokens"));
     }
+    // @ts-ignore
     if (!user.refreshTokens.find((item) => item.token === refreshToken)) {
       throw new BadRequestError(TS.translate("auth", "refreshTokenInvalid"));
     }

@@ -103,7 +103,6 @@ export class ItemPickupValidator {
 
     if (!isItemOnMap) {
       // if item is not on the map
-      console.log(character._id);
 
       if (item.owner && item.owner?.toString() !== character._id.toString()) {
         // check if item is owned by someone else

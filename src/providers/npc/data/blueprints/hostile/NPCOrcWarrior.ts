@@ -150,5 +150,19 @@ export const npcOrcWarrior = {
       itemBlueprintKey: SwordsBlueprint.LongSword,
       chance: 15,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueFeather,
+      chance: 1,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WoodenSticks,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Rope,
+      chance: 20,
+    },
   ],
 } as Partial<INPC>;

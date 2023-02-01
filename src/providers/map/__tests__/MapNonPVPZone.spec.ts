@@ -61,7 +61,7 @@ describe("MapNonPVPZone", () => {
       mapNonPVPZone.mapObjectsLoader = mapObjectsLoader as any;
 
       // call the getNonPVPZoneAtXY method with the mocked map data and the coordinates inside the non-PvP zone
-      const result = mapNonPVPZone.getNonPVPZoneAtXY(map.name, 15, 15);
+      const result = mapNonPVPZone.isNonPVPZoneAtXY(map.name, 15, 15);
 
       // assert that the result is true
       expect(result).toBe(true);
@@ -76,7 +76,7 @@ describe("MapNonPVPZone", () => {
       // call the getNonPVPZoneAtXY method with a map name that does not exist in the maps
 
       // expect to throw an error
-      expect(() => mapNonPVPZone.getNonPVPZoneAtXY("nonExistingMap", 0, 0)).toThrowError(
+      expect(() => mapNonPVPZone.isNonPVPZoneAtXY("nonExistingMap", 0, 0)).toThrowError(
         'MapNonPVPZone: Map "nonExistingMap" is not found!'
       );
     });
@@ -96,7 +96,7 @@ describe("MapNonPVPZone", () => {
       mapNonPVPZone.mapObjectsLoader = mapObjectsLoader as any;
 
       // call the getNonPVPZoneAtXY method with the name of an existing map and some coordinates
-      const result = mapNonPVPZone.getNonPVPZoneAtXY("existingMap", 0, 0);
+      const result = mapNonPVPZone.isNonPVPZoneAtXY("existingMap", 0, 0);
 
       // assert that the getObjectLayerData method was called with the expected arguments
       expect(mapObjectsLoader.getObjectLayerData).toHaveBeenCalledWith("NonPVPZones", {});

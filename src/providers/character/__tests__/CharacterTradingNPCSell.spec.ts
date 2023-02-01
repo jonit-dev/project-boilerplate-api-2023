@@ -29,14 +29,8 @@ describe("CharacterTradingNPCSell.ts", () => {
   let sendEventToUser: jest.SpyInstance;
   let validationMock: jest.SpyInstance;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     characterTradingNPCSell = container.get<CharacterTradingNPCSell>(CharacterTradingNPCSell);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   const addItemsToInventory = async () => {
@@ -71,7 +65,6 @@ describe("CharacterTradingNPCSell.ts", () => {
   };
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     await prepareData();
 
     sendErrorMessageToCharacter = jest.spyOn(SocketMessaging.prototype, "sendErrorMessageToCharacter");
@@ -297,8 +290,6 @@ describe("CharacterTradingNPCSell.ts", () => {
     await characterTradingNPCSell.sellItemsToNPC(testCharacter, testNPCTrader, sellItems);
 
     const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
-
-    console.log(updatedContainer);
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);

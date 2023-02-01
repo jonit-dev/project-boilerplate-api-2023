@@ -54,12 +54,12 @@ export class SkillIncrease {
    */
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // Get character skills and equipment to upgrade them
-    const skills = await Skill.findById(attacker.skills);
+    const skills = (await Skill.findById(attacker.skills).lean({ virtuals: true, defaults: true })) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${attacker.id}`);
     }
 
-    const equipment = await Equipment.findById(attacker.equipment);
+    const equipment = await Equipment.findById(attacker.equipment).lean({ virtuals: true, defaults: true });
     if (!equipment) {
       throw new Error(`equipment not found for character ${attacker.id}`);
     }
@@ -73,7 +73,7 @@ export class SkillIncrease {
       increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
     }
 
-    await this.updateSkills(skills, attacker);
+    await this.skillFunctions.updateSkills(skills, attacker);
 
     await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weapon?.subType || "None");
 
@@ -95,17 +95,21 @@ export class SkillIncrease {
   }
 
   public async increaseShieldingSP(character: ICharacter): Promise<void> {
-    const skills = (await Skill.findById(character.skills)) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
-    const equipment = await Equipment.findById(character.equipment);
+    const equipment = await Equipment.findById(character.equipment).lean({ virtuals: true, defaults: true });
     if (!equipment) {
       throw new Error(`equipment not found for character ${character.id}`);
     }
 
-    const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
-    const leftHandItem = equipment.leftHand ? await Item.findById(equipment.leftHand) : undefined;
+    const rightHandItem = equipment.rightHand
+      ? await Item.findById(equipment.rightHand).lean({ virtuals: true, defaults: true })
+      : undefined;
+    const leftHandItem = equipment.leftHand
+      ? await Item.findById(equipment.leftHand).lean({ virtuals: true, defaults: true })
+      : undefined;
 
     let result = {} as IIncreaseSPResult;
     if (rightHandItem?.subType === ItemSubType.Shield) {
@@ -118,7 +122,7 @@ export class SkillIncrease {
 
     // if character does not have a shield, shielding skills are not updated
     if (!_.isEmpty(result)) {
-      await this.updateSkills(skills, character);
+      await this.skillFunctions.updateSkills(skills, character);
       if (result.skillLevelUp && character.channelId) {
         await this.skillFunctions.sendSkillLevelUpEvents(result, character);
       }
@@ -149,13 +153,13 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
-    const skills = (await Skill.findById(character.skills)) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
 
     const result = this.increaseSP(skills, attribute, skillPointsCalculator);
-    await this.updateSkills(skills, character);
+    await this.skillFunctions.updateSkills(skills, character);
 
     if (result.skillLevelUp && character.channelId) {
       await this.skillFunctions.sendSkillLevelUpEvents(result, character);
@@ -185,7 +189,7 @@ export class SkillIncrease {
       }
 
       // Get character skills
-      const skills = await Skill.findById(character.skills);
+      const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
 
       const appliedBuffEffect = character.appliedBuffsEffects;
 
@@ -213,7 +217,7 @@ export class SkillIncrease {
         levelUp = true;
       }
 
-      await this.updateSkills(skills, character);
+      await this.skillFunctions.updateSkills(skills, character);
 
       if (levelUp) {
         const { maxHealth, maxMana } = this.increaseMaxManaMaxHealth(character.maxMana, character.maxHealth);
@@ -277,7 +281,7 @@ export class SkillIncrease {
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ExperienceGain, levelUpEventPayload);
 
     // refresh skills (lv, xp, xpToNextLevel)
-    const skill = await Skill.findById(character.skills);
+    const skill = await Skill.findById(character.skills).lean({ virtuals: true, defaults: true });
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill,
@@ -359,14 +363,6 @@ export class SkillIncrease {
 
       await target.save();
     }
-  }
-
-  private async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
-    await skills.save();
-
-    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills.toObject(),
-    });
   }
 
   private getMagicSkillIncreaseCalculator(spellPower: number): Function {

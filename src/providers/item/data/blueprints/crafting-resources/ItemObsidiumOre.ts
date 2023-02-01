@@ -13,4 +13,5 @@ export const itemObsidiumOre: Partial<IItem> = {
   weight: 0.5,
   maxStackSize: 100,
   hasUseWith: true,
+  basePrice: 50,
 };

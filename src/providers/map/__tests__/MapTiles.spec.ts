@@ -10,16 +10,12 @@ describe("MapTiles.ts", () => {
   const mapName = "unit-test-map";
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     await unitTestHelper.initializeMapLoader();
     mapTiles = container.get<MapTiles>(MapTiles);
     gridManager = container.get<GridManager>(GridManager);
   });
 
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-  });
+  beforeEach(async () => {});
 
   it("should detect if all layers are empty", () => {
     // @ts-ignore
@@ -183,9 +179,5 @@ describe("MapTiles.ts", () => {
     expect(layers).toContain("ground");
     expect(layers).toContain("decoration");
     expect(layers).toContain("over-ground");
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

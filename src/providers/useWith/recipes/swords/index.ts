@@ -6,6 +6,7 @@ import { recipeElvenSword } from "./recipeElvenSword";
 import { recipeFireSword } from "./recipeFireSword";
 import { recipeIceSword } from "./recipeIceSword";
 import { recipeKatana } from "./recipeKatana";
+import { recipeMithrilSword } from "./recipeMithrilSword";
 
 export const recipeSwordsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [SwordsBlueprint.ElvenSword]: [recipeElvenSword],
@@ -14,4 +15,5 @@ export const recipeSwordsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [SwordsBlueprint.BasiliskSword]: [recipeBasiliskSword],
   [SwordsBlueprint.BroadSword]: [recipeBroadSword],
   [SwordsBlueprint.Katana]: [recipeKatana],
+  [SwordsBlueprint.MithrilSword]: [recipeMithrilSword],
 };

@@ -8,15 +8,11 @@ describe("MapSolids.ts", () => {
   const mapName = "unit-test-map";
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     await unitTestHelper.initializeMapLoader();
     mapSolids = container.get<MapSolids>(MapSolids);
   });
 
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-  });
+  beforeEach(async () => {});
 
   it("should properly detect if a tile is solid or not", () => {
     const bigRock = mapSolids.isTileSolid(mapName, 17, 23, MapLayers.OverGround);
@@ -235,9 +231,5 @@ describe("MapSolids.ts", () => {
 
     // Assert that the result is as expected
     expect(result).toBe(false);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapSolids, SolidCheckStrategy } from "@providers/map/MapSolids";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MathHelper } from "@providers/math/MathHelper";
@@ -21,7 +22,12 @@ export interface IPosition {
 
 @provide(MovementHelper)
 export class MovementHelper {
-  constructor(private mathHelper: MathHelper, private mapSolids: MapSolids, private mapTransition: MapTransition) {}
+  constructor(
+    private mathHelper: MathHelper,
+    private mapSolids: MapSolids,
+    private mapTransition: MapTransition,
+    private mapNonPVPZone: MapNonPVPZone
+  ) {}
 
   public isSnappedToGrid(x: number, y: number): boolean {
     return x % GRID_WIDTH === 0 && y % GRID_WIDTH === 0;

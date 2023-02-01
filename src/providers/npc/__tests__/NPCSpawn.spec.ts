@@ -13,11 +13,7 @@ describe("NPCSpawn", () => {
   let characterView: CharacterView;
   let npcSpawn: NPCSpawn;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     npc = await unitTestHelper.createMockNPC(null, {});
 
     npcSpawn = container.get<NPCSpawn>(NPCSpawn);
@@ -36,9 +32,6 @@ describe("NPCSpawn", () => {
   });
   afterEach(() => {
     jest.clearAllMocks();
-  });
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   it("should not spawn the NPC if it is too close to the nearest character", async () => {

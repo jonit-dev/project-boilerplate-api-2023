@@ -10,7 +10,7 @@ export const recipeFireSword: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.RedShappire,
+      key: CraftingResourcesBlueprint.RedSapphire,
       qty: 5,
     },
     {
@@ -19,7 +19,7 @@ export const recipeFireSword: IUseWithCraftingRecipe = {
     },
     {
       key: MagicsBlueprint.FireRune,
-      qty: 1,
+      qty: 8,
     },
   ],
 };

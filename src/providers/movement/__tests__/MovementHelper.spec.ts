@@ -7,14 +7,11 @@ describe("MovementHelper.ts", () => {
   let movementHelper: MovementHelper;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     await unitTestHelper.initializeMapLoader();
     movementHelper = container.get<MovementHelper>(MovementHelper);
   });
 
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-  });
+  beforeEach(async () => {});
 
   // it("should properly detect a solid NPC", async () => {
   //   const npc = await unitTestHelper.createMockNPC();
@@ -64,9 +61,5 @@ describe("MovementHelper.ts", () => {
   it("should properly detect if position is out of range", () => {
     const isUnderRange = movementHelper.isUnderRange(FromGridX(0), FromGridY(0), FromGridX(11), FromGridY(0), 10);
     expect(isUnderRange).toBeFalsy();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

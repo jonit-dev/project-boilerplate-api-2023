@@ -11,15 +11,12 @@ describe("NPCMovementMoveAway.ts", () => {
   let npcTarget: NPCTarget;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     npcMovementMoveAway = container.get<NPCMovementMoveAway>(NPCMovementMoveAway);
     npcTarget = container.get<NPCTarget>(NPCTarget);
     await unitTestHelper.initializeMapLoader();
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter({
       x: FromGridX(22),
       y: FromGridY(9),
@@ -52,9 +49,5 @@ describe("NPCMovementMoveAway.ts", () => {
 
     expect(testNPC.x).toBe(FromGridX(29));
     expect(testNPC.y).toBe(FromGridY(9));
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

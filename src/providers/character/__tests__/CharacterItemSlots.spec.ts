@@ -14,15 +14,11 @@ describe("CharacterItemSlots.ts", () => {
   let inventoryItemContainerId: string;
   let inventoryContainer: IItemContainer;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     characterItemSlots = container.get<CharacterItemSlots>(CharacterItemSlots);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true, hasSkills: true })
     )
@@ -293,9 +289,5 @@ describe("CharacterItemSlots.ts", () => {
     );
 
     expect(result).toBeTruthy();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

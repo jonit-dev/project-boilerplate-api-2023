@@ -13,7 +13,7 @@ export const itemDoubleEdgedSword: Partial<IItem> = {
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 19,
-  defense: 3,
+  defense: 5,
   rangeType: EntityAttackType.Melee,
   basePrice: 86,
 };

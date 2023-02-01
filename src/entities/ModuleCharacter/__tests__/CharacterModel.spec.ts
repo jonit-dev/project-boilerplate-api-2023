@@ -23,13 +23,10 @@ describe("CharacterModel.ts", () => {
   let bowItem: IItem;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     characterItems = container.get<CharacterItems>(CharacterItems);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, {
         hasEquipment: true,
@@ -202,9 +199,5 @@ describe("CharacterModel.ts", () => {
 
     const characterAfterDelete = await User.find({ characters: testCharacter._id });
     expect(characterAfterDelete).toHaveLength(0);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

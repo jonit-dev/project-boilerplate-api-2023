@@ -90,7 +90,6 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.ElvenWood]: itemElvenWood,
   [CraftingResourcesBlueprint.SmallWorm]: itemSmallWorm,
   [CraftingResourcesBlueprint.SewingThread]: itemSewingThread,
-  [CraftingResourcesBlueprint.RedShappire]: itemRedSapphire,
   [CraftingResourcesBlueprint.BlueSilk]: itemBlueSilk,
   [CraftingResourcesBlueprint.IronNail]: itemIronNail,
   [CraftingResourcesBlueprint.FoodRecipe]: itemFoodRecipe,
