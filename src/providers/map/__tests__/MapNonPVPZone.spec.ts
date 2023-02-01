@@ -67,18 +67,13 @@ describe("MapNonPVPZone", () => {
       expect(result).toBe(true);
     });
 
-    it("should return false if there is no map with the given name", () => {
+    it("should return undefined if there is no map with the given name", () => {
       // mock the map data
       const maps = new Map();
 
       MapLoader.maps = maps;
 
-      // call the getNonPVPZoneAtXY method with a map name that does not exist in the maps
-
-      // expect to throw an error
-      expect(() => mapNonPVPZone.isNonPVPZoneAtXY("nonExistingMap", 0, 0)).toThrowError(
-        'MapNonPVPZone: Map "nonExistingMap" is not found!'
-      );
+      expect(mapNonPVPZone.isNonPVPZoneAtXY("nonExistingMap", 0, 0)).toBeUndefined();
     });
 
     it("should return false if there is no non-PvP zone data for the given map", () => {

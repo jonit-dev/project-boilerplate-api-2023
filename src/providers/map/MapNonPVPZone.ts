@@ -18,7 +18,7 @@ export class MapNonPVPZone {
     const map = MapLoader.maps.get(mapName);
 
     if (!map) {
-      throw new Error(`MapNonPVPZone: Map "${mapName}" is not found!`);
+      return;
     }
     const nonPVPZones = this.mapObjectsLoader.getObjectLayerData("NonPVPZones", map);
 
