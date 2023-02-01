@@ -13,5 +13,9 @@ export const recipeSpikedClub: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
       qty: 4,
     },
+    {
+      key: CraftingResourcesBlueprint.Skull,
+      qty: 1,
+    },
   ],
 };

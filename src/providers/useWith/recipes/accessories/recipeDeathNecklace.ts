@@ -17,5 +17,9 @@ export const recipeDeathNecklace: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.WolfTooth,
       qty: 1,
     },
+    {
+      key: CraftingResourcesBlueprint.Bone,
+      qty: 1,
+    },
   ],
 };
