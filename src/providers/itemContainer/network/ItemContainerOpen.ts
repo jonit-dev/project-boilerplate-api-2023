@@ -9,8 +9,8 @@ import {
   IItemContainer,
   IItemContainerOpen,
   IItemContainerRead,
-  ItemSocketEvents,
   IUIShowMessage,
+  ItemSocketEvents,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -53,7 +53,7 @@ export class ItemContainerOpen {
   }
 
   public async openContainer(data: IItemContainerOpen, character: ICharacter): Promise<void> {
-    const item = await Item.findById(data.itemId);
+    const item = await Item.findById(data.itemId).lean({ virtuals: true, defaults: true });
 
     if (!item) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -108,7 +108,7 @@ export class ItemContainerOpen {
       }
     }
 
-    const parentItem = await Item.findById(itemContainer.parentItem);
+    const parentItem = await Item.findById(itemContainer.parentItem).lean({ virtuals: true, defaults: true });
 
     if (!parentItem) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {

@@ -1,6 +1,6 @@
 import { ItemType, TypeHelper } from "@rpg-engine/shared";
 import { Types } from "mongoose";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, createSchema, typedModel } from "ts-mongoose";
 import { IItem, Item } from "./ItemModel";
 
 const itemContainerSchema = createSchema(
@@ -51,7 +51,7 @@ itemContainerSchema.virtual("items").get(function (this: IItemContainer) {
 
   return Item.find({
     _id: { $in: this.itemIds.map((id) => Types.ObjectId(id)) },
-  });
+  }).lean({ virtuals: true, defaults: true });
 });
 
 itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer) {

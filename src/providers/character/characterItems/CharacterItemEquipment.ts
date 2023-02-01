@@ -1,12 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { isSameKey } from "@providers/dataStructures/KeyHelper";
 
-import { provide } from "inversify-binding-decorators";
 import { MathHelper } from "@providers/math/MathHelper";
+import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterItemEquipment)
 export class CharacterItemEquipment {
@@ -17,7 +17,7 @@ export class CharacterItemEquipment {
   ) {}
 
   public async deleteItemFromEquipment(itemId: string, character: ICharacter): Promise<boolean> {
-    const item = (await Item.findById(itemId)) as unknown as IItem;
+    const item = (await Item.findById(itemId).lean({ virtuals: true, defaults: true })) as unknown as IItem;
 
     if (!item) {
       this.socketMessaging.sendErrorMessageToCharacter(
@@ -58,7 +58,7 @@ export class CharacterItemEquipment {
       }
 
       if (!value.key) {
-        value = (await Item.findById(value as any)) as unknown as IItem;
+        value = (await Item.findById(value as any).lean({ virtuals: true, defaults: true })) as unknown as IItem;
       }
 
       // item not found, continue
@@ -156,7 +156,7 @@ export class CharacterItemEquipment {
       }
 
       if (!value.key) {
-        value = (await Item.findById(value as any)) as unknown as IItem;
+        value = (await Item.findById(value as any).lean({ virtuals: true, defaults: true })) as unknown as IItem;
       }
 
       // item not found, continue

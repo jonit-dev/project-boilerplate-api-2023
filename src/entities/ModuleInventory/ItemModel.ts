@@ -15,6 +15,7 @@ const itemSchema = createLeanSchema(
     tiledId: Type.number(),
     owner: Type.objectId({
       ref: "Character",
+      index: true,
     }),
     type: Type.string({
       required: true,

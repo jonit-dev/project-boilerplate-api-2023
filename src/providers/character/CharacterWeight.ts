@@ -67,7 +67,7 @@ export class CharacterWeight {
       ];
 
       for (const slot of slots) {
-        const item = await Item.findById(slot).lean();
+        const item = await Item.findById(slot).lean({ virtuals: true, defaults: true });
         if (item) {
           if (item.stackQty && item.stackQty > 1) {
             // -1 because the count is include the weight of the container item.
@@ -82,7 +82,7 @@ export class CharacterWeight {
     if (inventoryContainer) {
       for (const bagItem of inventoryContainer.itemIds) {
         // @ts-ignore
-        const item = await Item.findById(bagItem.toString("hex")).lean();
+        const item = await Item.findById(bagItem.toString("hex")).lean({ virtuals: true, defaults: true });
         if (item) {
           if (item.stackQty && item.stackQty > 1) {
             // -1 because the count is include the weight of the container item.
