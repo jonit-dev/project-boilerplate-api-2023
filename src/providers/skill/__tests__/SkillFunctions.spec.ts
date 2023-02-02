@@ -53,9 +53,9 @@ describe("Case SkillFunctions", () => {
 
     const skillLevelUp = skillFunctions.updateSkillByType(skill, skillType, bonusOrPenalties);
 
-    expect(skillLevelUp).toEqual(true);
+    expect(skillLevelUp).toEqual(false);
     expect(skill[skillType].skillPoints).toEqual(bonusOrPenalties);
-    expect(skill[skillType].skillPointsToNextLevel).toBe(17);
-    expect(skill[skillType].level).toEqual(2);
+    expect(skill[skillType].skillPointsToNextLevel).toBe(12);
+    expect(skill[skillType].level).toEqual(1);
   });
 });

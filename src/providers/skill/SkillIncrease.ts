@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { BuffSkillFunctions } from "@providers/character/CharacterBuffer/BuffSkillFunctions";
@@ -95,21 +95,32 @@ export class SkillIncrease {
   }
 
   public async increaseShieldingSP(character: ICharacter): Promise<void> {
-    const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
-    if (!skills) {
-      throw new Error(`skills not found for character ${character.id}`);
-    }
-    const equipment = await Equipment.findById(character.equipment).lean({ virtuals: true, defaults: true });
-    if (!equipment) {
-      throw new Error(`equipment not found for character ${character.id}`);
+    const characterWithRelations = await Character.findById(character.id)
+      .populate({
+        path: "skills",
+        model: "Skill",
+        options: { virtuals: true, defaults: true },
+      })
+      .populate({
+        path: "equipment",
+        model: "Equipment",
+        options: { virtuals: true, defaults: true },
+        populate: {
+          path: "rightHand leftHand",
+          model: "Item",
+          options: { virtuals: true, defaults: true },
+        },
+      });
+
+    if (!characterWithRelations) {
+      throw new Error(`character not found for id ${character.id}`);
     }
 
-    const rightHandItem = equipment.rightHand
-      ? await Item.findById(equipment.rightHand).lean({ virtuals: true, defaults: true })
-      : undefined;
-    const leftHandItem = equipment.leftHand
-      ? await Item.findById(equipment.leftHand).lean({ virtuals: true, defaults: true })
-      : undefined;
+    const skills = characterWithRelations.skills as ISkill;
+    const equipment = characterWithRelations.equipment as IEquipment;
+
+    const rightHandItem = equipment?.rightHand as IItem;
+    const leftHandItem = equipment?.leftHand as IItem;
 
     let result = {} as IIncreaseSPResult;
     if (rightHandItem?.subType === ItemSubType.Shield) {
@@ -120,18 +131,17 @@ export class SkillIncrease {
       }
     }
 
-    // if character does not have a shield, shielding skills are not updated
     if (!_.isEmpty(result)) {
       await this.skillFunctions.updateSkills(skills, character);
-      if (result.skillLevelUp && character.channelId) {
-        await this.skillFunctions.sendSkillLevelUpEvents(result, character);
+      if (result.skillLevelUp && characterWithRelations.channelId) {
+        await this.skillFunctions.sendSkillLevelUpEvents(result, characterWithRelations);
       }
 
       if (rightHandItem) {
-        await this.characterBonusPenalties.applyRaceBonusPenalties(character, rightHandItem!.subType);
+        await this.characterBonusPenalties.applyRaceBonusPenalties(characterWithRelations, rightHandItem.subType);
       }
       if (leftHandItem) {
-        await this.characterBonusPenalties.applyRaceBonusPenalties(character, leftHandItem!.subType);
+        await this.characterBonusPenalties.applyRaceBonusPenalties(characterWithRelations, leftHandItem.subType);
       }
     }
   }
@@ -398,10 +408,15 @@ export class SkillIncrease {
     entitiesType: string,
     value: number
   ): Promise<boolean> {
-    const character = (await Character.findById(characterId)) as ICharacter;
+    const character = await Character.findOneAndUpdate(
+      { _id: characterId },
+      { $set: { [entitiesType]: value } },
+      { new: true }
+    );
 
-    character[entitiesType] = value;
-    const save = await character.save();
+    if (!character) {
+      return false;
+    }
 
     const payload: ICharacterAttributeChanged = {
       targetId: character._id,
@@ -411,10 +426,6 @@ export class SkillIncrease {
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
 
-    if (save) {
-      return true;
-    } else {
-      return false;
-    }
+    return true;
   }
 }

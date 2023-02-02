@@ -239,7 +239,7 @@ describe("SpellCast.ts", () => {
      * 2. life heal animation event
      * 3. skill update event
      */
-    expect(sendEventToUser).toBeCalledTimes(9);
+    expect(sendEventToUser).toBeCalledTimes(5);
 
     expect(sendEventToUser).toHaveBeenNthCalledWith(
       1,

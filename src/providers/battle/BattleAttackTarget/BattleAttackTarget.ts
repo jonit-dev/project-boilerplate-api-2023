@@ -254,14 +254,6 @@ export class BattleAttackTarget {
             await this.entityEffectUse.applyEntityEffects(target, attacker as INPC);
           }
         }
-      } else {
-        // if damage is 0, then the attack was blocked
-        battleEventPayload.eventType = BattleEventType.Block;
-
-        // Increase shielding SP in target (if is Character)
-        if (target.type === "Character") {
-          await this.skillIncrease.increaseShieldingSP(target as ICharacter);
-        }
       }
     }
 
