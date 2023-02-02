@@ -71,7 +71,7 @@ export class BattleRangedAttack {
     } else {
       const character = attacker as ICharacter;
       // Get equipment to validate if character has ranged attack ammo (bow -> arrow or spear)
-      equipment = (await Equipment.findById(character.equipment).populate("inventory").lean().exec()) as IEquipment;
+      equipment = (await Equipment.findById(character.equipment).populate("inventory").exec()) as IEquipment;
       if (!equipment) {
         throw new Error(`equipment not found for character ${character.id}`);
       }
