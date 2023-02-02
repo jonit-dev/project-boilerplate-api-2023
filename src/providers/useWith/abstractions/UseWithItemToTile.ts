@@ -6,7 +6,7 @@ import { CharacterItemContainer } from "@providers/character/characterItems/Char
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItem, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { isArray, isMap } from "lodash";
 import random from "lodash/random";
@@ -69,7 +69,10 @@ export class UseWithItemToTile {
           hasRequiredItem = await this.characterItemInventory.checkItemInInventoryByKey(k, character);
           if (hasRequiredItem) {
             // check if have required qty
-            const item = await Item.findById(hasRequiredItem);
+            const item = (await Item.findById(hasRequiredItem).lean({
+              virtuals: true,
+              defaults: true,
+            })) as IItem;
             if (requiredResource.decrementQty && (item?.stackQty || 0) >= requiredResource.decrementQty) {
               resourceKey = k;
               break;
