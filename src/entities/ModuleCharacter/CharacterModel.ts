@@ -121,7 +121,7 @@ const characterSchema = createLeanSchema(
     }),
 
     x: Type.number({
-      default: FromGridX(40),
+      default: FromGridX(56),
       required: true,
     }),
     y: Type.number({
@@ -129,7 +129,7 @@ const characterSchema = createLeanSchema(
       required: true,
     }),
     initialX: Type.number({
-      default: FromGridX(40),
+      default: FromGridX(56),
       required: true,
     }),
     initialY: Type.number({
