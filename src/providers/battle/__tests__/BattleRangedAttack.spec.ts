@@ -13,7 +13,7 @@ import {
 import { FromGridX, FromGridY, ItemSlotType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { Types } from "mongoose";
-import { BattleAttackTarget } from "../BattleAttackTarget";
+import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleRangedAttack } from "../BattleRangedAttack";
 
 describe("BattleRangedAttack.spec.ts", () => {

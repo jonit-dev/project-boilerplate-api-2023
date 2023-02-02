@@ -114,10 +114,10 @@ export class SkillIncrease {
     let result = {} as IIncreaseSPResult;
     if (rightHandItem?.subType === ItemSubType.Shield) {
       result = this.increaseSP(skills, rightHandItem.subType);
-    }
-
-    if (leftHandItem?.subType === ItemSubType.Shield) {
-      result = this.increaseSP(skills, leftHandItem.subType);
+    } else {
+      if (leftHandItem?.subType === ItemSubType.Shield) {
+        result = this.increaseSP(skills, leftHandItem.subType);
+      }
     }
 
     // if character does not have a shield, shielding skills are not updated

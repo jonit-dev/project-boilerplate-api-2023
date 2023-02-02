@@ -4,7 +4,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { provide } from "inversify-binding-decorators";
-import { BattleAttackTarget } from "./BattleAttackTarget";
+import { BattleAttackTarget } from "./BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "./BattleCycle";
 
 @provide(BattleCharacterManager)
