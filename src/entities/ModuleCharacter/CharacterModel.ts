@@ -81,11 +81,11 @@ const characterSchema = createLeanSchema(
           throw new Error("Name contains blacklisted words");
         }
       },
-      index: true,
     }),
     owner: Type.objectId({
       required: true,
       ref: "User",
+      index: true,
     }),
     health: Type.number({
       default: 100,
@@ -280,7 +280,7 @@ characterSchema.virtual("type").get(function (this: ICharacter) {
 });
 
 characterSchema.virtual("inventory").get(async function (this: ICharacter) {
-  const equipment = await Equipment.findById(this.equipment).populate("inventory").exec();
+  const equipment = await Equipment.findById(this.equipment).populate("inventory").lean().exec();
 
   if (equipment) {
     const inventory = equipment.inventory! as unknown as IItem;
@@ -306,7 +306,7 @@ characterSchema.virtual("attackType").get(async function (this: ICharacter): Pro
 });
 
 characterSchema.virtual("weapon").get(async function (this: ICharacter): Promise<IItem | undefined> {
-  const equipment = (await Equipment.findById(this.equipment)) as IEquipment;
+  const equipment = (await Equipment.findById(this.equipment).lean({ virtuals: true, defaults: true })) as IEquipment;
 
   if (!equipment) {
     return undefined;

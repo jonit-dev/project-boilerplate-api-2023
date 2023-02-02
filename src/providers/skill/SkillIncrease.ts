@@ -95,12 +95,13 @@ export class SkillIncrease {
   }
 
   public async increaseShieldingSP(character: ICharacter): Promise<void> {
-    const characterWithRelations = await Character.findById(character.id)
+    const characterWithRelations = (await Character.findById(character.id)
       .populate({
         path: "skills",
         model: "Skill",
         options: { virtuals: true, defaults: true },
       })
+      .lean({ virtuals: true, defaults: true })
       .populate({
         path: "equipment",
         model: "Equipment",
@@ -110,7 +111,8 @@ export class SkillIncrease {
           model: "Item",
           options: { virtuals: true, defaults: true },
         },
-      });
+      })
+      .lean({ virtuals: true, defaults: true })) as ICharacter;
 
     if (!characterWithRelations) {
       throw new Error(`character not found for id ${character.id}`);
