@@ -64,7 +64,7 @@ describe("UseWithTile.ts", () => {
       testCharacter
     );
 
-    expect(testCharacter.name).toEqual("Character affected by use with tile effect!");
+    expect(testCharacter.name).toEqual("Impacted by effect");
   });
 
   it("should fail validations | item without useWithTileEffect function defined", async () => {
