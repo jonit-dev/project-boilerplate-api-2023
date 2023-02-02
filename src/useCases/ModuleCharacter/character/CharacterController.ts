@@ -4,7 +4,6 @@ import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddl
 import { IAuthenticatedRequest } from "@providers/types/ExpressTypes";
 import {
   controller,
-  httpDelete,
   httpGet,
   httpPatch,
   httpPost,
@@ -15,7 +14,6 @@ import {
 } from "inversify-express-utils";
 import { CreateCharacterDTO } from "./create/CreateCharacterDTO";
 import { CreateCharacterUseCase } from "./create/CreateCharacterUseCase";
-import { DeleteCharacterUseCase } from "./delete/DeleteCharacterUseCase";
 import { ReadCharacterUseCase } from "./read/ReadCharacterUseCase";
 import { UpdateCharacterDTO } from "./update/UpdateCharacterDTO";
 import { UpdateCharacterUseCase } from "./update/UpdateCharacterUseCase";
@@ -25,8 +23,7 @@ export class CharacterController implements interfaces.Controller {
   constructor(
     private createCharacterUseCase: CreateCharacterUseCase,
     private readCharacterUseCase: ReadCharacterUseCase,
-    private updateCharacterUseCase: UpdateCharacterUseCase,
-    private deleteCharacterUseCase: DeleteCharacterUseCase
+    private updateCharacterUseCase: UpdateCharacterUseCase
   ) {}
 
   @httpPost("/", DTOValidatorMiddleware(CreateCharacterDTO))
@@ -60,15 +57,5 @@ export class CharacterController implements interfaces.Controller {
     const ownerId = request.user.id;
 
     return await this.updateCharacterUseCase.updateCharacter(id, updateCharacter, ownerId);
-  }
-
-  @httpDelete("/:id")
-  private async deleteCharacter(
-    @requestParam("id") id: string,
-    @request() request: IAuthenticatedRequest
-  ): Promise<boolean> {
-    const ownerId = request.user.id;
-
-    return await this.deleteCharacterUseCase.delete(id, ownerId);
   }
 }

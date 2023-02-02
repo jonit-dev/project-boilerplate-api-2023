@@ -22,7 +22,7 @@ describe("CharacterModel.ts", () => {
   let inventory: IItem;
   let bowItem: IItem;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     characterItems = container.get<CharacterItems>(CharacterItems);
   });
 

@@ -1,4 +1,6 @@
 import { IBlueprint } from "@providers/types/temp/BlueprintTypes";
+import { ItemType } from "@rpg-engine/shared";
+import fs from "fs";
 import { accessoriesBlueprintsIndex } from "./blueprints/accessories/index";
 import { armorsBlueprintsIndex } from "./blueprints/armors/index";
 import { axesBlueprintIndex } from "./blueprints/axes/index";
@@ -52,3 +54,15 @@ export const itemsBlueprintIndex: IBlueprint = {
   ...toolsBlueprintIndex,
   ...hammersBlueprintIndex,
 };
+
+for (const [key, entry] of Object.entries(itemsBlueprintIndex)) {
+  if (entry.type === ItemType.Weapon) {
+    const output = `${key} Atk: ${entry.attack} Def: ${entry.defense} Weight: ${entry.weight}`;
+
+    // append in a JSON file
+    fs.appendFile("output.txt", `${output} \n`, function (err) {
+      if (err) throw err;
+      console.log("Saved!");
+    });
+  }
+}
