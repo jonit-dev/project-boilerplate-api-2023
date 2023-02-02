@@ -1,4 +1,4 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapSolids, SolidCheckStrategy } from "@providers/map/MapSolids";
@@ -33,14 +33,14 @@ export class MovementHelper {
     return x % GRID_WIDTH === 0 && y % GRID_WIDTH === 0;
   }
 
-  public isSolid = async (
+  public isSolid = (
     map: string,
     gridX: number,
     gridY: number,
     layer: MapLayers,
     strategy: SolidCheckStrategy = "CHECK_ALL_LAYERS_BELOW",
     caller: INPC | ICharacter | undefined = undefined
-  ): Promise<boolean> => {
+  ): boolean => {
     // check for characters and NPCs
 
     const hasSolid = this.mapSolids.isTileSolid(map, gridX, gridY, layer, strategy);
@@ -70,17 +70,17 @@ export class MovementHelper {
     //   return true;
     // }
 
-    const hasCharacter = await Character.exists({
-      x: FromGridX(gridX),
-      y: FromGridY(gridY),
-      isOnline: true,
-      layer,
-      scene: map,
-    });
+    // const hasCharacter = await Character.exists({
+    //   x: FromGridX(gridX),
+    //   y: FromGridY(gridY),
+    //   isOnline: true,
+    //   layer,
+    //   scene: map,
+    // });
 
-    if (hasCharacter) {
-      return true;
-    }
+    // if (hasCharacter) {
+    //   return true;
+    // }
 
     // const hasItem = await Item.exists({
     //   x: FromGridX(gridX),
