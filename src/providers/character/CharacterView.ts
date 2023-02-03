@@ -225,7 +225,7 @@ export class CharacterView {
           ...filter,
         },
       ],
-    }).lean({ virtuals: true, defaults: true });
+    }).lean({ virtuals: true, defaults: true }); //! Required until we have quadtrees
 
     return otherCharactersInView as unknown as T[];
   }
