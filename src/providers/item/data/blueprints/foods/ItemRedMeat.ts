@@ -15,6 +15,8 @@ export const itemRedMeat: Partial<IItem> = {
   weight: 2,
   maxStackSize: 100,
   basePrice: 10,
+  canSell: false,
+
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 1);
   },

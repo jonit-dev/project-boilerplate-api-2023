@@ -3,6 +3,7 @@ import {
   AxesBlueprint,
   FoodsBlueprint,
   MacesBlueprint,
+  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -21,14 +22,24 @@ export const npcTrader = {
   isTrader: true,
   traderItems: [
     {
+      key: PotionsBlueprint.LightLifePotion,
+    },
+    {
+      key: PotionsBlueprint.GreaterLifePotion,
+    },
+    {
+      key: PotionsBlueprint.ManaPotion,
+    },
+    {
+      key: FoodsBlueprint.Cheese,
+    },
+    {
       key: FoodsBlueprint.Fish,
     },
     {
       key: FoodsBlueprint.Watermelon,
     },
-    {
-      key: FoodsBlueprint.Cheese,
-    },
+
     {
       key: SwordsBlueprint.ShortSword,
     },

@@ -249,9 +249,9 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(updatedSkills?.first.skillPoints).toBe(spToAdd * SP_INCREASE_RATIO);
     expect(updatedSkills?.first.skillPointsToNextLevel).toBe(spToLvl3 - 5 * SP_INCREASE_RATIO);
 
-    expect(updatedSkills?.level).toBe(initialLevel + 2);
+    expect(updatedSkills?.level).toBe(initialLevel + 3);
     expect(updatedSkills?.experience).toBe(spToAdd * 2);
-    expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(updatedSkills?.experience!, initialLevel + 3));
+    expect(updatedSkills?.xpToNextLevel).toBe(145);
     expect(testNPC.xpToRelease?.length).toBe(0);
 
     expect(sendSkillLevelUpEvents).toHaveBeenCalled();

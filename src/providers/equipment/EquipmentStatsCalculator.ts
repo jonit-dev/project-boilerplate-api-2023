@@ -12,7 +12,7 @@ export class EquipmentStatsCalculator {
 export const getTotalEquipmentStats = async (equipmentId: string, type: "attack" | "defense"): Promise<number> => {
   const equipment = await Equipment.findById(equipmentId)
     .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
-    .exec();
+    .lean();
 
   if (equipment) {
     const head = equipment.head! as unknown as IItem;

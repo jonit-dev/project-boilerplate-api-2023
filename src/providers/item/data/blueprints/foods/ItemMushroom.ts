@@ -15,6 +15,8 @@ export const itemMushroom: Partial<IItem> = {
   weight: 0.25,
   maxStackSize: 100,
   basePrice: 10,
+  canSell: false,
+
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 1);
   },

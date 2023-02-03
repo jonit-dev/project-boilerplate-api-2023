@@ -16,6 +16,8 @@ export const itemBlueberry: Partial<IItem> = {
   weight: 0.01,
   maxStackSize: 100,
   basePrice: 5,
+  canSell: false,
+
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 0.5);
   },

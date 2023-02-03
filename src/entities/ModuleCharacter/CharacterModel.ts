@@ -75,17 +75,17 @@ const characterSchema = createLeanSchema(
     name: Type.string({
       required: true,
       minlength: 3,
-      maxlength: 44,
+      maxlength: 20,
       validate: (value) => {
         if (profanity.exists(value)) {
           throw new Error("Name contains blacklisted words");
         }
       },
-      index: true,
     }),
     owner: Type.objectId({
       required: true,
       ref: "User",
+      index: true,
     }),
     health: Type.number({
       default: 100,
@@ -121,7 +121,7 @@ const characterSchema = createLeanSchema(
     }),
 
     x: Type.number({
-      default: FromGridX(40),
+      default: FromGridX(56),
       required: true,
     }),
     y: Type.number({
@@ -129,7 +129,7 @@ const characterSchema = createLeanSchema(
       required: true,
     }),
     initialX: Type.number({
-      default: FromGridX(40),
+      default: FromGridX(56),
       required: true,
     }),
     initialY: Type.number({

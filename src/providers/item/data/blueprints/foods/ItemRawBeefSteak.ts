@@ -19,6 +19,8 @@ export const itemRawBeefSteak: Partial<IItem> = {
   maxStackSize: 50,
   basePrice: 20,
   hasUseWith: true,
+  canSell: false,
+
   usableEffect: (character: ICharacter) => {
     const socketMessaging = container.get<SocketMessaging>(SocketMessaging);
 

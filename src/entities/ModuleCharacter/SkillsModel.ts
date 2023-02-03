@@ -122,62 +122,40 @@ skillsSchema.post("save", async function (this: ISkill) {
   }
 });
 
-skillsSchema.virtual("attack").get(async function (this: ISkill) {
-  if (this.ownerType === "Character") {
-    const equipment = await Equipment.findOne({
-      owner: this.owner,
-    }).lean({ virtuals: true, defaults: true });
+async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean): Promise<void> {
+  const equipment = await Equipment.findOne({ owner: skill.owner }).lean({ virtuals: true, defaults: true });
+  const [dataOfWeather, character] = await Promise.all([
+    MapControlTimeModel.findOne().lean({ virtuals: true, defaults: true }),
+    Character.findById(skill.owner).lean({ virtuals: true, defaults: true }),
+  ]);
 
-    if (equipment) {
-      const totalEquippedAttack = await equipment?.totalEquippedAttack;
-      const dataOfWeather = await MapControlTimeModel.findOne();
-      const character = await Character.findById(this.owner);
-      const totalAttackNoBonus = this.strength.level + this.level + totalEquippedAttack;
-      const totalAttackWithBonus = totalAttackNoBonus + totalAttackNoBonus * INCREASE_BONUS_FACTION;
+  if (skill.ownerType === "Character" && equipment) {
+    const totalEquipped = isAttack ? await equipment.totalEquippedAttack : await equipment.totalEquippedDefense;
+    const baseValue = isAttack ? skill.strength.level : skill.resistance.level;
+    const totalValueNoBonus = baseValue + skill.level + totalEquipped;
+    const totalValueWithBonus = totalValueNoBonus + totalValueNoBonus * INCREASE_BONUS_FACTION;
 
-      // TODO: This should also take into consideration the weapon proficiency of the character.
-
-      if (character?.faction === "Life Bringer" && dataOfWeather?.period === "Morning") {
-        return totalAttackWithBonus || 0;
-      }
-
-      if (character?.faction === "Shadow Walker" && dataOfWeather?.period === "Night") {
-        return totalAttackWithBonus || 0;
-      }
-
-      return totalAttackNoBonus || 0;
+    if (character?.faction === "Life Bringer" && dataOfWeather?.period === "Morning") {
+      return totalValueWithBonus || 0;
     }
+
+    if (character?.faction === "Shadow Walker" && dataOfWeather?.period === "Night") {
+      return totalValueWithBonus || 0;
+    }
+
+    return totalValueNoBonus || 0;
   }
 
   // for regular NPCs
-  return this.strength.level + this.level;
+  return isAttack ? skill.strength.level + skill.level : skill.resistance.level + skill.level;
+}
+
+skillsSchema.virtual("attack").get(async function (this: ISkill) {
+  return await getTotalAttackOrDefense(this, true);
 });
 
 skillsSchema.virtual("defense").get(async function (this: ISkill) {
-  if (this.ownerType === "Character") {
-    const equipment = await Equipment.findOne({
-      owner: this.owner,
-    }).lean({ virtuals: true, defaults: true });
-    if (equipment) {
-      const totalEquippedDefense = await equipment?.totalEquippedDefense;
-      const dataOfWeather = await MapControlTimeModel.findOne();
-      const character = await Character.findById(this.owner);
-      const totalDefenseNoBonus = this.resistance.level + this.level + totalEquippedDefense;
-      const totalDefenseWithBonus = totalDefenseNoBonus + totalDefenseNoBonus * INCREASE_BONUS_FACTION;
-
-      if (character?.faction === "Life Bringer" && dataOfWeather?.period === "Morning") {
-        return totalDefenseWithBonus || 0;
-      }
-
-      if (character?.faction === "Shadow Walker" && dataOfWeather?.period === "Night") {
-        return totalDefenseWithBonus || 0;
-      }
-
-      return totalDefenseNoBonus || 0;
-    }
-  }
-  // for regular NPCs
-  return this.resistance.level + this.level;
+  return await getTotalAttackOrDefense(this, false);
 });
 
 export type ISkill = ExtractDoc<typeof skillsSchema>;

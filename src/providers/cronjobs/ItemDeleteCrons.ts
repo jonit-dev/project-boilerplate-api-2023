@@ -1,6 +1,6 @@
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { UISocketEvents } from "@rpg-engine/shared";
+import { ItemSubType, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 
@@ -9,7 +9,7 @@ export class ItemDeleteCrons {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public schedule(): void {
-    nodeCron.schedule("0 0 * * *", () => {
+    nodeCron.schedule("0 * * * *", () => {
       this.socketMessaging.sendEventToAllUsers(
         UISocketEvents.ShowMessage,
         "Server: Cleaning up items on the floor in 5 min. Please don't drop valuables."
@@ -25,6 +25,11 @@ export class ItemDeleteCrons {
         });
 
         for (const item of items) {
+          // if item has "body" on its name, dont delete
+          if (item.subType === ItemSubType.DeadBody) {
+            continue;
+          }
+
           await item.delete();
         }
       }, 60 * 1000 * 5);

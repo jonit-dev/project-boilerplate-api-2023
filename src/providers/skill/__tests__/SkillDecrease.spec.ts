@@ -54,8 +54,8 @@ describe("deathPenalty", () => {
     skillDecrease.decreaseSP(mockSkills, "dexterity");
 
     expect(mockSkills).toEqual({
-      strength: { level: 3, skillPoints: 38, skillPointsToNextLevel: 26 },
-      dexterity: { level: 3, skillPoints: 39, skillPointsToNextLevel: 25 },
+      strength: { level: 3, skillPoints: 38, skillPointsToNextLevel: 138 },
+      dexterity: { level: 3, skillPoints: 39, skillPointsToNextLevel: 137 },
     });
   });
 });

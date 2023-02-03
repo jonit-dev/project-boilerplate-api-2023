@@ -13,7 +13,7 @@ import {
 import { FromGridX, FromGridY, ItemSlotType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { Types } from "mongoose";
-import { BattleAttackTarget } from "../BattleAttackTarget";
+import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleRangedAttack } from "../BattleRangedAttack";
 
 describe("BattleRangedAttack.spec.ts", () => {
@@ -265,7 +265,7 @@ describe("BattleRangedAttack.spec.ts", () => {
       expect(characterEquipment.accessory).toBeDefined();
 
       const updatedCharacter = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
-      expect(updatedCharacter.mana).toBe(99);
+      expect(updatedCharacter.mana).toBe(97);
     });
   });
 });

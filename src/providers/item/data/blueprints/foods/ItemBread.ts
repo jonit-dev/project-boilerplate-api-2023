@@ -16,6 +16,8 @@ export const itemBread: Partial<IItem> = {
   weight: 0.1,
   maxStackSize: 50,
   basePrice: 10,
+  canSell: false,
+
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 10);
   },
