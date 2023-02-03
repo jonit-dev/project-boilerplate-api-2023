@@ -313,6 +313,7 @@ characterSchema.virtual("weapon").get(async function (this: ICharacter): Promise
   }
   // Get right and left hand items
   // What if has weapons on both hands? for now, only one weapon per character is allowed
+  //! Virtuals required here!
   const rightHandItem = equipment.rightHand
     ? ((await Item.findById(equipment.rightHand).lean({ virtuals: true, defaults: true })) as IItem)
     : undefined;

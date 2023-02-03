@@ -51,7 +51,7 @@ itemContainerSchema.virtual("items").get(function (this: IItemContainer) {
 
   return Item.find({
     _id: { $in: this.itemIds.map((id) => Types.ObjectId(id)) },
-  }).lean({ virtuals: true, defaults: true });
+  }).lean();
 });
 
 itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer) {
