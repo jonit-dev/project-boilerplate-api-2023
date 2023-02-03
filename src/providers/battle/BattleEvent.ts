@@ -1,6 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
+import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
 import { BattleEventType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -42,16 +44,38 @@ export class BattleEvent {
   }
 
   public async calculateHitDamage(attacker: BattleParticipant, target: BattleParticipant): Promise<number> {
-    const attackerSkills = attacker.skills as unknown as ISkill;
-    const defenderSkills = target.skills as unknown as ISkill;
+    const attackerSkills = attacker.skills as ISkill;
+    const defenderSkills = target.skills as ISkill;
     const attackerTotalAttack = await attackerSkills.attack;
     const defenderTotalDefense = await defenderSkills.defense;
+    let totalAttackWithBonus = attackerTotalAttack;
+    let totalDefenseWithBonus = defenderTotalDefense;
 
-    const totalPotentialAttackerDamage = _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));
+    const weatherData = await MapControlTimeModel.findOne({}, { period: 1, _id: 0 }).limit(1).lean({ virtuals: true });
+    const weatherPeriod = weatherData?.period;
+    const isAttackerCharacter = attacker.type === "Character";
+    const isTargetCharacter = target.type === "Character";
 
+    if (isAttackerCharacter) {
+      const character = attacker as ICharacter;
+      if (character.faction === "Life Bringer" && weatherPeriod === "Morning") {
+        totalAttackWithBonus += attackerTotalAttack * INCREASE_BONUS_FACTION;
+      } else if (character.faction === "Shadow Walker" && weatherPeriod === "Night") {
+        totalAttackWithBonus += attackerTotalAttack * INCREASE_BONUS_FACTION;
+      }
+    }
+
+    if (isTargetCharacter) {
+      const character = target as ICharacter;
+      if (character.faction === "Life Bringer" && weatherPeriod === "Morning") {
+        totalDefenseWithBonus += defenderTotalDefense * INCREASE_BONUS_FACTION;
+      } else if (character.faction === "Shadow Walker" && weatherPeriod === "Night") {
+        totalDefenseWithBonus += defenderTotalDefense * INCREASE_BONUS_FACTION;
+      }
+    }
+
+    const totalPotentialAttackerDamage = Math.round(totalAttackWithBonus * (100 / (100 + totalDefenseWithBonus)));
     const damage = Math.round(_.random(0, totalPotentialAttackerDamage));
-
-    // damage cannot be higher than target's remaining health
     return damage > target.health ? target.health : damage;
   }
 }
