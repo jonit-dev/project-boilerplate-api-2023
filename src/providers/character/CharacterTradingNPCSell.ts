@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -207,9 +207,9 @@ export class CharacterTradingNPCSell {
     }
 
     for (const itemKey of uniqueItems) {
-      const item = itemsBlueprintIndex[itemKey];
+      const item = itemsBlueprintIndex[itemKey] as IItem;
 
-      if (!item || !item.basePrice) continue;
+      if (!item || !item.basePrice || item.canSell === false) continue;
 
       const sellPrice = this.characterTradingBalance.getItemSellPrice(itemKey);
 

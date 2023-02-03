@@ -16,6 +16,7 @@ export const itemLightLifePotion: Partial<IItem> = {
   weight: 0.5,
   basePrice: 40,
   maxStackSize: 100,
+  canSell: false,
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.apply(character, EffectableAttribute.Health, 35);
   },
