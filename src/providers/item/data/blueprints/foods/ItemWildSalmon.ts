@@ -15,6 +15,8 @@ export const itemWildSalmon: Partial<IItem> = {
   weight: 1,
   maxStackSize: 100,
   basePrice: 10,
+  canSell: false,
+
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 1.5);
   },

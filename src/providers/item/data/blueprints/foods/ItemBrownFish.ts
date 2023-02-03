@@ -15,6 +15,8 @@ export const itemBrownFish: Partial<IItem> = {
   weight: 1,
   maxStackSize: 100,
   basePrice: 7,
+  canSell: false,
+
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 1.25);
   },
