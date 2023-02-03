@@ -4,9 +4,10 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
-import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ItemDrop } from "@providers/item/ItemDrop";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -39,7 +40,8 @@ export class CharacterDeath {
     private characterInventory: CharacterInventory,
     private itemOwnership: ItemOwnership,
     private characterWeight: CharacterWeight,
-    private skillDecrease: SkillDecrease
+    private skillDecrease: SkillDecrease,
+    private itemDrop: ItemDrop
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
@@ -144,10 +146,10 @@ export class CharacterDeath {
       throw new Error(`No equipment found for id ${equipmentId}`);
     }
 
-    // drop all backpack items (inventory field)
+    // drop backpack
     const inventory = equipment.inventory as unknown as IItem;
     if (inventory) {
-      await this.dropInventoryItemsOnBody(itemContainer, inventory);
+      await this.dropContainerOnBody(itemContainer, inventory);
     }
 
     // there's a chance of dropping any of the equipped items
@@ -158,45 +160,53 @@ export class CharacterDeath {
     await itemContainer.save();
   }
 
-  private async dropInventoryItemsOnBody(bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
-
-    if (!inventoryContainer) {
-      throw new Error(`Inventory without item container. Item id ${inventory._id}`);
-    }
-
-    if (inventoryContainer.emptySlotsQty === inventoryContainer.slotQty) {
-      return;
-    }
-
-    for (const i in inventoryContainer.slots) {
-      if (inventoryContainer.slots[i] !== null) {
-        const freeSlotId = bodyContainer.firstAvailableSlotId;
-        // if there's space in body item container, then add the backpack item
-        // otherwise, leave the for loop
-        if (freeSlotId === null) {
-          break;
-        }
-
-        const itemId = inventoryContainer.slots[i]._id;
-
-        let item = (await Item.findById(itemId)) as IItem;
-
-        if (item) {
-          item = await this.clearItem(item);
-
-          bodyContainer.slots[Number(freeSlotId)] = item;
-          inventoryContainer.slots[Number(i)] = null;
-
-          bodyContainer.markModified("slots");
-          await bodyContainer.save();
-
-          inventoryContainer.markModified("slots");
-          await inventoryContainer.save();
-        }
-      }
-    }
+  private async dropContainerOnBody(bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
+    const freeSlotId = bodyContainer.firstAvailableSlotId;
+    let item = (await Item.findById(inventory._id)) as IItem;
+    item = await this.clearItem(item);
+    bodyContainer.slots[Number(freeSlotId)] = item;
+    await bodyContainer.save();
   }
+
+  // private async dropInventoryItemsOnBody(bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
+  //   const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+
+  //   if (!inventoryContainer) {
+  //     throw new Error(`Inventory without item container. Item id ${inventory._id}`);
+  //   }
+
+  //   if (inventoryContainer.emptySlotsQty === inventoryContainer.slotQty) {
+  //     return;
+  //   }
+
+  //   for (const i in inventoryContainer.slots) {
+  //     if (inventoryContainer.slots[i] !== null) {
+  //       const freeSlotId = bodyContainer.firstAvailableSlotId;
+  //       // if there's space in body item container, then add the backpack item
+  //       // otherwise, leave the for loop
+  //       if (freeSlotId === null) {
+  //         break;
+  //       }
+
+  //       const itemId = inventoryContainer.slots[i]._id;
+
+  //       let item = (await Item.findById(itemId)) as IItem;
+
+  //       if (item) {
+  //         item = await this.clearItem(item);
+
+  //         bodyContainer.slots[Number(freeSlotId)] = item;
+  //         inventoryContainer.slots[Number(i)] = null;
+
+  //         bodyContainer.markModified("slots");
+  //         await bodyContainer.save();
+
+  //         inventoryContainer.markModified("slots");
+  //         await inventoryContainer.save();
+  //       }
+  //     }
+  //   }
+  // }
 
   private async dropEquippedItemOnBody(bodyContainer: IItemContainer, equipment: IEquipment): Promise<void> {
     for (const slot of DROPPABLE_EQUIPMENT) {

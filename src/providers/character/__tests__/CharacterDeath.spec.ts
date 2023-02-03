@@ -133,7 +133,7 @@ describe("CharacterDeath.ts | Character with items", () => {
     );
   });
 
-  it("should drop all character's backpack items on its dead body", async () => {
+  it("should drop character's backpack items  as a container on its dead body", async () => {
     // @ts-ignore
     const spyDropCharacterItemsOnBody = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
 
@@ -157,23 +157,14 @@ describe("CharacterDeath.ts | Character with items", () => {
 
     expect(characterBody).not.toBeNull();
 
-    // body should have the 2 items that were in backpack
+    // body should have the only one item
     expect(characterBody!.itemContainer).toBeDefined();
     expect(bodyItemContainer.slots).toBeDefined();
     expect(bodyItemContainer.slots[0]).not.toBeNull();
-    expect(bodyItemContainer.slots[1]).not.toBeNull();
+    expect(bodyItemContainer.slots[1]).toBeNull();
 
-    // backpack should be empty
-    backpackContainer = (await ItemContainer.findById(backpackContainer._id)) as IItemContainer;
-
-    expect(backpackContainer.slots).toBeDefined();
-    for (let i = 0; i < backpackContainer.slotQty; i++) {
-      expect(backpackContainer.slots[i]).toBeNull();
-    }
-
-    // items ownership should be null after death
+    // backpack ownership should be null after death
     expect(bodyItemContainer.slots[0].owner).toBeUndefined();
-    expect(bodyItemContainer.slots[1].owner).toBeUndefined();
   });
 
   it("should drop equipment item on character's dead body", async () => {
