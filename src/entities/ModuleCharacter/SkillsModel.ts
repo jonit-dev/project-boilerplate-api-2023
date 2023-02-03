@@ -123,10 +123,10 @@ skillsSchema.post("save", async function (this: ISkill) {
 });
 
 async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean): Promise<void> {
-  const equipment = await Equipment.findOne({ owner: skill.owner }).lean({ virtuals: true, defaults: true });
+  const equipment = await Equipment.findOne({ owner: skill.owner }).lean({ virtuals: true, defaults: true }); //! Requires virtuals
   const [dataOfWeather, character] = await Promise.all([
-    MapControlTimeModel.findOne().lean({ virtuals: true, defaults: true }),
-    Character.findById(skill.owner).lean({ virtuals: true, defaults: true }),
+    MapControlTimeModel.findOne().lean(),
+    Character.findById(skill.owner).lean(),
   ]);
 
   if (skill.ownerType === "Character" && equipment) {

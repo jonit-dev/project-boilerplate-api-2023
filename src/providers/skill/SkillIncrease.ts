@@ -54,12 +54,12 @@ export class SkillIncrease {
    */
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // Get character skills and equipment to upgrade them
-    const skills = (await Skill.findById(attacker.skills).lean({ virtuals: true, defaults: true })) as ISkill;
+    const skills = (await Skill.findById(attacker.skills).lean()) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${attacker.id}`);
     }
 
-    const equipment = await Equipment.findById(attacker.equipment).lean({ virtuals: true, defaults: true });
+    const equipment = await Equipment.findById(attacker.equipment).lean();
     if (!equipment) {
       throw new Error(`equipment not found for character ${attacker.id}`);
     }
@@ -99,7 +99,6 @@ export class SkillIncrease {
       .populate({
         path: "skills",
         model: "Skill",
-        options: { virtuals: true, defaults: true },
       })
       .lean({ virtuals: true, defaults: true })
       .populate({
