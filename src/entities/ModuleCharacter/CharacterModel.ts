@@ -75,7 +75,7 @@ const characterSchema = createLeanSchema(
     name: Type.string({
       required: true,
       minlength: 3,
-      maxlength: 44,
+      maxlength: 20,
       validate: (value) => {
         if (profanity.exists(value)) {
           throw new Error("Name contains blacklisted words");
