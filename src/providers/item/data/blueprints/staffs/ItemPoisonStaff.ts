@@ -14,7 +14,7 @@ export const itemPoisonStaff: Partial<IMagicStaff> = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 15,
-  defense: 4,
+  defense: 10,
   rangeType: EntityAttackType.Ranged,
   basePrice: 85,
   maxRange: 5,

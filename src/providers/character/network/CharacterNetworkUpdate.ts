@@ -78,7 +78,8 @@ export class CharacterNetworkUpdate {
 
             switch (appEnv.general.ENV) {
               case EnvType.Development:
-                await this.npcManager.startNearbyNPCsBehaviorLoop(character);
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
                 break;
               case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod

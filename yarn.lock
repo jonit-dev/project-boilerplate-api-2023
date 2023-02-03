@@ -4360,6 +4360,11 @@ countries-cities@^0.0.11:
   resolved "https://registry.npmjs.org/countries-cities/-/countries-cities-0.0.11.tgz"
   integrity sha512-5AbUqMaUDCXZwQG+CmtuO2WsUQNtBfVOWIalpeHjWPxgjG18k+9w9BIyJ+iIVs7TKZw/VsqxQ9I+5uDq6kkusg==
 
+cpu-percentage@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/cpu-percentage/-/cpu-percentage-1.0.3.tgz#868fd9092f439d1ef95f4a85e5fa4b9f07efc95c"
+  integrity sha512-LP7N2+hS7optwpkMisZoDfswnLeCzyETNOogkjw7v2YteQSPDd0vEv3nSbU8FVu58fXCkVAWtXaeSXEedT1a5g==
+
 create-require@^1.1.0:
   version "1.1.1"
   resolved "https://registry.npmjs.org/create-require/-/create-require-1.1.1.tgz"

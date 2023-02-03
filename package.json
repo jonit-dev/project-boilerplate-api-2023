@@ -93,6 +93,7 @@
     "class-validator": "^0.12.2",
     "compress-json": "^2.0.1",
     "cors": "^2.8.5",
+    "cpu-percentage": "^1.0.3",
     "crypto-random-string": "^3.3.0",
     "cryptr": "^6.0.2",
     "dayjs": "^1.10.4",

@@ -15,7 +15,6 @@ export const itemAppendicesStaff: Partial<IMagicStaff> = {
   attack: 7,
   defense: 3,
   weight: 1,
-  isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Ranged,
   basePrice: 60,
