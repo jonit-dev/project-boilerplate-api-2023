@@ -168,46 +168,6 @@ export class CharacterDeath {
     await bodyContainer.save();
   }
 
-  // private async dropInventoryItemsOnBody(bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
-  //   const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
-
-  //   if (!inventoryContainer) {
-  //     throw new Error(`Inventory without item container. Item id ${inventory._id}`);
-  //   }
-
-  //   if (inventoryContainer.emptySlotsQty === inventoryContainer.slotQty) {
-  //     return;
-  //   }
-
-  //   for (const i in inventoryContainer.slots) {
-  //     if (inventoryContainer.slots[i] !== null) {
-  //       const freeSlotId = bodyContainer.firstAvailableSlotId;
-  //       // if there's space in body item container, then add the backpack item
-  //       // otherwise, leave the for loop
-  //       if (freeSlotId === null) {
-  //         break;
-  //       }
-
-  //       const itemId = inventoryContainer.slots[i]._id;
-
-  //       let item = (await Item.findById(itemId)) as IItem;
-
-  //       if (item) {
-  //         item = await this.clearItem(item);
-
-  //         bodyContainer.slots[Number(freeSlotId)] = item;
-  //         inventoryContainer.slots[Number(i)] = null;
-
-  //         bodyContainer.markModified("slots");
-  //         await bodyContainer.save();
-
-  //         inventoryContainer.markModified("slots");
-  //         await inventoryContainer.save();
-  //       }
-  //     }
-  //   }
-  // }
-
   private async dropEquippedItemOnBody(bodyContainer: IItemContainer, equipment: IEquipment): Promise<void> {
     for (const slot of DROPPABLE_EQUIPMENT) {
       const itemId = await equipment[slot];
