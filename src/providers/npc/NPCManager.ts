@@ -60,6 +60,7 @@ export class NPCManager {
           try {
             this.npcFreezer.tryToFreezeNPC(npc);
 
+            //! Requires virtual
             npc =
               (await NPC.findById(initialNPC._id).populate("skills").lean({ virtuals: true, defaults: true })) ||
               initialNPC;
