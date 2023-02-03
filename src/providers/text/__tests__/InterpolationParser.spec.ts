@@ -8,7 +8,7 @@ describe("InterpolationParser.ts", () => {
   let testNPC: INPC;
   let testCharacter: ICharacter;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     interpolationParser = container.get<InterpolationParser>(InterpolationParser);
   });
 

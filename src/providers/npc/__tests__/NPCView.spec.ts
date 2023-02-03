@@ -13,7 +13,7 @@ describe("NPCView.ts", () => {
   let farAwayCharacter: ICharacter;
   let npcWarn: NPCWarn;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     npcView = container.get<NPCView>(NPCView);
     npcWarn = container.get<NPCWarn>(NPCWarn);
   });
@@ -25,6 +25,7 @@ describe("NPCView.ts", () => {
         y: FromGridY(0),
         health: 100,
         scene: "example",
+        isBehaviorEnabled: true,
       },
       { hasSkills: true }
     );

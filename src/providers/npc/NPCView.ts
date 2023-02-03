@@ -11,6 +11,10 @@ interface IElementWithPosition {
   y: number;
 }
 
+interface IGetNPCsInViewOptions {
+  isBehaviorEnabled?: boolean;
+}
+
 @provide(NPCView)
 export class NPCView {
   constructor(
@@ -68,9 +72,10 @@ export class NPCView {
     return await this.characterView.getNearestCharactersFromXYPoint(npc.x, npc.y, npc.scene);
   }
 
-  public async getNPCsInView(character: ICharacter): Promise<INPC[]> {
+  public async getNPCsInView(character: ICharacter, options?: IGetNPCsInViewOptions): Promise<INPC[]> {
     const npcsInView = await this.playerView.getElementsInCharView(NPC, character, {
       health: { $gt: 0 },
+      isBehaviorEnabled: options?.isBehaviorEnabled ?? true,
     });
 
     return npcsInView;
