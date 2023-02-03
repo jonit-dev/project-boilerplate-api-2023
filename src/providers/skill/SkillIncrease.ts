@@ -139,11 +139,12 @@ export class SkillIncrease {
         await this.skillFunctions.sendSkillLevelUpEvents(result, characterWithRelations);
       }
 
-      if (rightHandItem) {
-        await this.characterBonusPenalties.applyRaceBonusPenalties(characterWithRelations, rightHandItem.subType);
-      }
-      if (leftHandItem) {
-        await this.characterBonusPenalties.applyRaceBonusPenalties(characterWithRelations, leftHandItem.subType);
+      if (rightHandItem?.subType === ItemSubType.Shield) {
+        await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
+      } else {
+        if (leftHandItem?.subType === ItemSubType.Shield) {
+          await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
+        }
       }
     }
   }
