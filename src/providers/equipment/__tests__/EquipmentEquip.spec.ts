@@ -16,12 +16,7 @@ describe("EquipmentEquip.spec.ts", () => {
   let shieldItem: IItem;
   let sendEventToUser;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     bowItem = await unitTestHelper.createItemBow();
     swordItem = await unitTestHelper.createMockItem();
@@ -161,8 +156,4 @@ describe("EquipmentEquip.spec.ts", () => {
       expect(await characterAttackType?.weapon).toBeUndefined();
     });
   });
-});
-
-afterAll(async () => {
-  await unitTestHelper.afterAllJestHook();
 });

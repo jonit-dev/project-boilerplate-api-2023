@@ -61,5 +61,10 @@ export const npcSparrow: Partial<INPC> = {
       chance: 20,
       quantityRange: [5, 10],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
+      chance: 5,
+      quantityRange: [5, 10],
+    },
   ],
 };

@@ -15,14 +15,15 @@ describe("CharacterDeath.ts", () => {
   let testCharacter: ICharacter;
   let testNPC: INPC;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
+
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testNPC = await unitTestHelper.createMockNPC();
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
@@ -80,10 +81,6 @@ describe("CharacterDeath.ts", () => {
 
     expect(spySocketMessaging).toHaveBeenCalled();
   });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
-  });
 });
 
 describe("CharacterDeath.ts | Character with items", () => {
@@ -93,14 +90,11 @@ describe("CharacterDeath.ts | Character with items", () => {
   let characterEquipment: IEquipment;
   let testNPC: INPC;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testNPC = await unitTestHelper.createMockNPC();
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
@@ -224,9 +218,5 @@ describe("CharacterDeath.ts | Character with items", () => {
     const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
 
     expect(await characterAttackTypeAfterEquip?.attackType).toEqual(EntityAttackType.Melee);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

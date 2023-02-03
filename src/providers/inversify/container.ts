@@ -1,6 +1,7 @@
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { InMemoryRepository } from "@providers/database/InMemoryRepository";
 import { RedisManager } from "@providers/database/RedisManager";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
@@ -54,5 +55,7 @@ export const redisManager = container.get<RedisManager>(RedisManager);
 export const npcFreezer = container.get<NPCFreezer>(NPCFreezer);
 
 export const characterSkillBuff = container.get<CharacterSkillBuff>(CharacterSkillBuff);
+
+export const inMemoryRepository = container.get<InMemoryRepository>(InMemoryRepository);
 
 export { container };

@@ -28,6 +28,7 @@ export class ItemContainerRepository extends CRUD {
       slots[Number(i)] = null;
     }
     newItemContainer.slots = slots;
+    // @ts-ignore
     newItemContainer.parentItem.id;
     await newItemContainer.save();
 

@@ -15,31 +15,28 @@ export class CharacterCombatBonusPenalties {
   ): Promise<IIncreaseSPResult> {
     let skillLevelUp: boolean = false;
 
-    const skillTypeLowerCase = skillType.toLowerCase();
-
     let skillSpData: IIncreaseSPResult = {
       skillLevelUp: false,
-      skillLevelBefore: skills[skillTypeLowerCase].level,
+      skillLevelBefore: skills[skillType].level,
       skillLevelAfter: 0,
       skillName: "",
       skillPoints: 0,
     };
 
-    switch (skillTypeLowerCase) {
-      case "none": {
-        const firstType = "first";
+    switch (skillType) {
+      case "first": {
         skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.first)
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.first, skills[skillType].level)
         );
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[firstType].level,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
-          skillPoints: skills[firstType].skillPoints,
+          skillPoints: skills[skillType].skillPoints,
         };
 
         break;
@@ -49,15 +46,15 @@ export class CharacterCombatBonusPenalties {
         skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.sword)
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.sword, skills[skillType].level)
         );
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[skillTypeLowerCase].level,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
-          skillPoints: skills[skillTypeLowerCase].skillPoints,
+          skillPoints: skills[skillType].skillPoints,
         };
 
         break;
@@ -67,15 +64,15 @@ export class CharacterCombatBonusPenalties {
         skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.dagger)
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.dagger, skills[skillType].level)
         );
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[skillTypeLowerCase].level,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
-          skillPoints: skills[skillTypeLowerCase].skillPoints,
+          skillPoints: skills[skillType].skillPoints,
         };
 
         break;
@@ -85,91 +82,69 @@ export class CharacterCombatBonusPenalties {
         skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.axe)
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.axe, skills[skillType].level)
         );
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[skillTypeLowerCase].level,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
-          skillPoints: skills[skillTypeLowerCase].skillPoints,
+          skillPoints: skills[skillType].skillPoints,
         };
 
         break;
       }
 
-      case "ranged": {
-        const rangedType = "distance";
+      case "distance": {
         skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.distance)
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.distance, skills[skillType].level)
         );
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[rangedType].level,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
-          skillPoints: skills[rangedType].skillPoints,
+          skillPoints: skills[skillType].skillPoints,
         };
 
         break;
       }
 
-      case "spear": {
-        const rangedType = "distance";
+      case "shielding": {
         skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.distance)
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.distance, skills[skillType].level)
         );
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[rangedType].level,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
-          skillPoints: skills[rangedType].skillPoints,
+          skillPoints: skills[skillType].skillPoints,
         };
 
         break;
       }
 
-      case "shield": {
-        const shieldType = "shielding";
+      case "club": {
         skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.shielding)
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.distance, skills[skillType].level)
         );
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[shieldType].level,
+          skillLevelAfter: skills[skillType].level,
           skillName: skillType,
-          skillPoints: skills[shieldType].skillPoints,
-        };
-
-        break;
-      }
-
-      case "mace": {
-        const maceType = "club";
-        skillLevelUp = this.skillFunctions.updateSkillByType(
-          skills,
-          skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.club)
-        );
-
-        skillSpData = {
-          skillLevelUp: skillLevelUp,
-          skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[maceType].level,
-          skillName: skillType,
-          skillPoints: skills[maceType].skillPoints,
+          skillPoints: skills[skillType].skillPoints,
         };
 
         break;

@@ -9,8 +9,8 @@ export const itemBatsWing: Partial<IItemUseWith> = {
   texturePath: "crafting-resources/bats-wing.png",
   name: "Bat Wing",
   description: "A crafting resource used for witchcraft and sorcery",
-  weight: 1,
-  maxStackSize: 50,
+  weight: 0.01,
+  maxStackSize: 100,
   basePrice: 0.5,
   hasUseWith: true,
 };

@@ -27,7 +27,7 @@ export class CharacterBasicAttributesBonusPenalties {
         skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.strength)
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.strength, skills[skillType].level)
         );
 
         skillSpData = {
@@ -45,7 +45,7 @@ export class CharacterBasicAttributesBonusPenalties {
         skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.resistance)
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.resistance, skills[skillType].level)
         );
 
         skillSpData = {
@@ -63,7 +63,7 @@ export class CharacterBasicAttributesBonusPenalties {
         skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.dexterity)
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.dexterity, skills[skillType].level)
         );
 
         skillSpData = {
@@ -78,7 +78,10 @@ export class CharacterBasicAttributesBonusPenalties {
       }
 
       case "magic": {
-        const bonusOrPenaltiesMagic = this.skillFunctions.calculateBonusOrPenaltiesMagicSP(bonusOrPenalties.magic);
+        const bonusOrPenaltiesMagic = this.skillFunctions.calculateBonusOrPenaltiesMagicSP(
+          bonusOrPenalties.magic,
+          skills.magic.level
+        );
 
         skillLevelUp = this.skillFunctions.updateSkillByType(skills, skillType, bonusOrPenaltiesMagic);
 
@@ -95,7 +98,8 @@ export class CharacterBasicAttributesBonusPenalties {
 
       case "magicResistance": {
         const bonusOrPenaltiesMagic = this.skillFunctions.calculateBonusOrPenaltiesMagicSP(
-          bonusOrPenalties.magicResistance
+          bonusOrPenalties.magicResistance,
+          skills.magicResistance.level
         );
 
         skillLevelUp = this.skillFunctions.updateSkillByType(skills, skillType, bonusOrPenaltiesMagic);

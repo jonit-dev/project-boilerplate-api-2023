@@ -10,8 +10,8 @@ export const itemBlueLeather: Partial<IItemUseWith> = {
   texturePath: "crafting-resources/blue-leather.png",
   name: "Blue Leather",
   description: "A craft blue leather. Made from a Snow Wolf.",
-  weight: 0.9,
-  maxStackSize: 50,
+  weight: 0.01,
+  maxStackSize: 100,
   basePrice: 1.5,
   hasUseWith: true,
 };

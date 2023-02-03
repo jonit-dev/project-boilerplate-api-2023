@@ -12,14 +12,10 @@ describe("ItemOwnership.ts", () => {
   let itemOwnership: ItemOwnership;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     itemOwnership = container.get<ItemOwnership>(ItemOwnership);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter();
 
     backpack = await unitTestHelper.createMockItemFromBlueprint(ContainersBlueprint.Backpack);
@@ -80,9 +76,5 @@ describe("ItemOwnership.ts", () => {
 
     expect(updatedBackpack?.owner).toBeNull();
     expect(updatedBackpackContainer?.owner).toBeNull();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

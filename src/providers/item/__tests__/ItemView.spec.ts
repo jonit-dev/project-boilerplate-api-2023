@@ -12,15 +12,12 @@ describe("ItemView.ts", () => {
   let spyWarnCharactersAboutItemRemovalInView: any;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     itemView = container.get<ItemView>(ItemView);
 
     spyWarnCharactersAboutItemRemovalInView = jest.spyOn(itemView, "warnCharactersAboutItemRemovalInView" as any);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter({
       x: FromGridX(0),
       y: FromGridY(0),
@@ -78,9 +75,5 @@ describe("ItemView.ts", () => {
       expect(error).toBeInstanceOf(Error);
       expect(error).toHaveProperty("message", "You cannot call this method without an item x, y and scene.");
     }
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

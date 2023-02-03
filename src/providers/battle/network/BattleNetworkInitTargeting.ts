@@ -15,7 +15,6 @@ import {
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
-import { Optional } from "ts-mongoose";
 import { BattleCharacterManager } from "../BattleCharacterManager";
 import { BattleNetworkStopTargeting } from "./BattleNetworkStopTargetting";
 
@@ -100,9 +99,20 @@ export class BattleNetworkInitTargeting {
     targetType: EntityType
   ): Promise<void> {
     await this.battleNetworkStopTargeting.stopTargeting(character);
-    character.target.id = target._id;
-    character.target.type = targetType as unknown as Optional<string>;
-    await character.save();
+
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        $set: {
+          target: {
+            id: target._id,
+            // @ts-ignore
+            type: targetType,
+          },
+        },
+      }
+    );
+
     this.battleCharacterManager.onHandleCharacterBattleLoop(character, target);
   }
 
@@ -138,7 +148,7 @@ export class BattleNetworkInitTargeting {
 
     const npc = target as INPC;
 
-    const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(npc.scene, npc.x, npc.y);
+    const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(npc.scene, npc.x, npc.y);
 
     if (isCharInNonPVPZone && npc.type === EntityType.NPC) {
       return {
@@ -212,7 +222,7 @@ export class BattleNetworkInitTargeting {
   }
 
   private isValidNPCTarget(target: INPC): ITargetValidation {
-    const isNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(target.scene, target.x, target.y);
+    const isNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
 
     if (isNonPVPZone && target.alignment === NPCAlignment.Friendly) {
       return {
@@ -227,7 +237,7 @@ export class BattleNetworkInitTargeting {
   }
 
   private isValidCharacterTarget(target: ICharacter): ITargetValidation {
-    const isNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(target.scene, target.x, target.y);
+    const isNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
 
     if (isNonPVPZone) {
       return {

@@ -9,13 +9,5 @@ export const recipeGreaterLifePotion: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.Herb,
       qty: 5,
     },
-    {
-      key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 1,
-    },
-    {
-      key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 2,
-    },
   ],
 };

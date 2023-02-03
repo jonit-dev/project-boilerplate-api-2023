@@ -42,6 +42,7 @@ export class NPCSeeder {
         await NPC.updateOne(
           { key: key },
           {
+            // @ts-ignore
             $set: {
               ...updateData,
             },

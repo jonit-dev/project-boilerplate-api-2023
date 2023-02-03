@@ -10,12 +10,8 @@ export const recipeOrcRing: IUseWithCraftingRecipe = {
       qty: 2,
     },
     {
-      key: CraftingResourcesBlueprint.GreenOre,
-      qty: 2,
-    },
-    {
-      key: CraftingResourcesBlueprint.PolishedStone,
-      qty: 2,
+      key: CraftingResourcesBlueprint.Jade,
+      qty: 1,
     },
   ],
 };

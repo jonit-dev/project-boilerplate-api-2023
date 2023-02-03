@@ -18,6 +18,8 @@ export const itemRottenMeat: Partial<IItem> = {
   weight: 0.25,
   maxStackSize: 50,
   basePrice: 1,
+  canSell: false,
+
   usableEffect: (character: ICharacter) => {
     const socketMessaging = container.get<SocketMessaging>(SocketMessaging);
 

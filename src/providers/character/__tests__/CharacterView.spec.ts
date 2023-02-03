@@ -11,14 +11,11 @@ describe("CharacterView.ts", () => {
   let characterView: CharacterView;
   let testCharacter: ICharacter;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     characterView = container.get<CharacterView>(CharacterView);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter({
       x: FromGridX(0),
       y: FromGridY(0),
@@ -227,9 +224,5 @@ describe("CharacterView.ts", () => {
     expect(updatedTestCharacter.view.items).toEqual({});
     expect(updatedTestCharacter.view.npcs).toEqual({});
     expect(updatedTestCharacter.view.characters).toEqual({});
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

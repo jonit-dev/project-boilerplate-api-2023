@@ -22,8 +22,6 @@ describe("ItemPickup.ts", () => {
   let socketMessaging: SocketMessaging;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     itemPickup = container.get<ItemPickup>(ItemPickup);
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
@@ -31,8 +29,6 @@ describe("ItemPickup.ts", () => {
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasInventory: true,
@@ -313,9 +309,5 @@ describe("ItemPickup.ts", () => {
 
       expect(sendEventToUserSpy).not.toHaveBeenCalled();
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

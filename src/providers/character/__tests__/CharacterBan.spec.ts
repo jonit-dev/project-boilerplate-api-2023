@@ -7,15 +7,11 @@ describe("CharacterBan.ts", () => {
   let characterBan: CharacterBan;
   let testCharacter: ICharacter;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     characterBan = container.get<CharacterBan>(CharacterBan);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter();
   });
 
@@ -46,9 +42,5 @@ describe("CharacterBan.ts", () => {
     const banRemovalDate = dayjs(testCharacter.banRemovalDate);
 
     expect(banRemovalDate.diff(today, "day")).toBe(9);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

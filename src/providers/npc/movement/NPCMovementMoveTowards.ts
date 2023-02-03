@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget";
+import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -17,6 +17,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
+import { NPCFreezer } from "../NPCFreezer";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
@@ -34,7 +35,8 @@ export class NPCMovementMoveTowards {
     private npcTarget: NPCTarget,
     private battleAttackTarget: BattleAttackTarget,
     private socketMessaging: SocketMessaging,
-    private npcView: NPCView
+    private npcView: NPCView,
+    private npcFreezer: NPCFreezer
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
@@ -312,6 +314,8 @@ export class NPCMovementMoveTowards {
       if (!shortestPath) {
         // throw new Error("No shortest path found!");
         // await this.npcTarget.clearTarget(npc);
+        await this.npcFreezer.freezeNPC(npc, true);
+
         return;
       }
 

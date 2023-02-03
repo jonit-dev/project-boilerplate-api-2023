@@ -19,13 +19,9 @@ describe("ItemPickupFromContainer.ts ", () => {
   let characterItemSlots: CharacterItemSlots;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     itemPickupFromContainer = container.get<ItemPickupFromContainer>(ItemPickupFromContainer);
   });
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasInventory: true, hasEquipment: true });
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;
@@ -55,10 +51,6 @@ describe("ItemPickupFromContainer.ts ", () => {
   afterEach(() => {
     // Create a mock function for the clearAllMocks function
     jest.clearAllMocks();
-  });
-  afterAll(async () => {
-    // Create a mock function for the afterAllJestHook function
-    await unitTestHelper.afterAllJestHook();
   });
 
   it("should return true if the item was successfully removed from the origin container", async () => {

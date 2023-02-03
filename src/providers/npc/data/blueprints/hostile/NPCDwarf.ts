@@ -78,11 +78,7 @@ export const npcDwarf = {
       itemBlueprintKey: RangedWeaponsBlueprint.CorruptionBow,
       chance: 5,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.IronIngot,
-      chance: 40,
-      quantityRange: [5, 10],
-    },
+
     {
       itemBlueprintKey: AccessoriesBlueprint.IronRing,
       chance: 10,
@@ -91,10 +87,7 @@ export const npcDwarf = {
       itemBlueprintKey: SpearsBlueprint.StoneSpear,
       chance: 5,
     },
-    {
-      itemBlueprintKey: SwordsBlueprint.GoldenSword,
-      chance: 10,
-    },
+
     {
       itemBlueprintKey: SwordsBlueprint.Sword,
       chance: 5,
@@ -102,11 +95,6 @@ export const npcDwarf = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
       chance: 20,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenIngot,
-      chance: 40,
-      quantityRange: [1, 5],
     },
   ],
 } as Partial<INPC>;

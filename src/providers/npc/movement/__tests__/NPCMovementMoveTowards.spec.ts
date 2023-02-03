@@ -11,15 +11,12 @@ describe("NPCMovementMoveTowards.ts", () => {
   let testCharacter: ICharacter;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     npcMovementMoveTowards = container.get<NPCMovementMoveTowards>(NPCMovementMoveTowards);
     await unitTestHelper.initializeMapLoader();
     npcTarget = container.get<NPCTarget>(NPCTarget);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter({
       x: FromGridX(14),
       y: FromGridY(12),
@@ -230,9 +227,5 @@ describe("NPCMovementMoveTowards.ts", () => {
         "NPC test-npc-22 is trying to set target, but no maxRangeInGridCells is specified (required for range)!"
       );
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

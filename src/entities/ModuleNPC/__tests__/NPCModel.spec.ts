@@ -6,12 +6,7 @@ describe("NPCModel.ts", () => {
   let testNPCwithQuest: INPC;
   let testNPCNoQuest: INPC;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testNPCNoQuest = await unitTestHelper.createMockNPC();
     testNPCwithQuest = await unitTestHelper.createMockNPC();
     await unitTestHelper.createMockQuest(testNPCwithQuest.id);
@@ -20,9 +15,5 @@ describe("NPCModel.ts", () => {
   it("validate hasQuest function", async () => {
     expect(await testNPCwithQuest.hasQuest).toEqual(true);
     expect(await testNPCNoQuest.hasQuest).toEqual(false);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

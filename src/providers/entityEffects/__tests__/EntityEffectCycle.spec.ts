@@ -1,12 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { unitTestHelper } from "@providers/inversify/container";
+import { EntityType } from "@rpg-engine/shared";
 import { EntityEffectCycle } from "../EntityEffectCycle";
 import { entityEffectsBlueprintsIndex } from "../data";
 import { IEntityEffect } from "../data/blueprints/entityEffect";
 import { EntityEffectBlueprint } from "../data/types/entityEffectBlueprintTypes";
-import { TimerWrapper } from "@providers/helpers/TimerWrapper";
-import { EntityType } from "@rpg-engine/shared";
 
 jest.useFakeTimers({ advanceTimers: true });
 describe("EntityEffectCycle", () => {
@@ -14,12 +14,7 @@ describe("EntityEffectCycle", () => {
   let testTarget: ICharacter;
   let entityEffect: IEntityEffect;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     entityEffect = entityEffectsBlueprintsIndex[EntityEffectBlueprint.Poison];
 
     entityEffect.effect = jest.fn().mockImplementation(() => Promise.resolve(1));
@@ -34,10 +29,6 @@ describe("EntityEffectCycle", () => {
   afterEach(() => {
     jest.restoreAllMocks();
     jest.clearAllTimers();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   it("executes the effect intervals properly", async () => {

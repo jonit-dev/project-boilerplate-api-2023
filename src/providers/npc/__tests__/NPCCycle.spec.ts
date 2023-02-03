@@ -1,5 +1,4 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
-import { unitTestHelper } from "@providers/inversify/container";
 import { NPCCycle } from "../NPCCycle";
 
 let npcCycle: NPCCycle;
@@ -8,7 +7,6 @@ let fn: Function;
 let intervalSpeed: number;
 describe("NPCCycle.ts", () => {
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     id = "62b792030c3f470048781135";
     fn = jest.fn();
     intervalSpeed = -1;
@@ -16,15 +14,10 @@ describe("NPCCycle.ts", () => {
     // Create an NPCCycle instance
     npcCycle = new NPCCycle(id, fn, intervalSpeed);
   });
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-  });
+  beforeEach(async () => {});
   afterEach(() => {
     jest.clearAllMocks();
     jest.resetAllMocks();
-  });
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   it("should test that the clearInterval function was called with the correct interval", async () => {

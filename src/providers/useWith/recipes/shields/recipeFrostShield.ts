@@ -10,12 +10,12 @@ export const recipeFrostShield: IUseWithCraftingRecipe = {
       qty: 2,
     },
     {
-      key: CraftingResourcesBlueprint.Rock,
+      key: CraftingResourcesBlueprint.BlueSapphire,
       qty: 3,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 2,
+      key: CraftingResourcesBlueprint.GreaterWoodenLog,
+      qty: 1,
     },
   ],
 };

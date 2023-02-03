@@ -12,6 +12,6 @@ export const itemSewingThread: Partial<IItemUseWith> = {
   description: "A spool of simple Sewing Thread for crafts.",
   weight: 0.3,
   maxStackSize: 40,
-  basePrice: 2,
+  basePrice: 4,
   hasUseWith: true,
 };

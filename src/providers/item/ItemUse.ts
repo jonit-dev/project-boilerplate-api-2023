@@ -10,6 +10,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
@@ -20,7 +21,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -45,7 +45,7 @@ export class ItemUse {
       return false;
     }
 
-    const useItem = (await Item.findById(itemUse.itemId)) as IItem;
+    const useItem = (await Item.findById(itemUse.itemId).lean({ virtuals: true, defaults: true })) as IItem;
 
     if (!useItem) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");

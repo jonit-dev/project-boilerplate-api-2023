@@ -116,6 +116,11 @@ export const npcTrollBerserker = {
       chance: 10,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
+      chance: 5,
+      quantityRange: [5, 10],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

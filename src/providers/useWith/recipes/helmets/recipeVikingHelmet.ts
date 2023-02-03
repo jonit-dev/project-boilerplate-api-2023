@@ -17,5 +17,9 @@ export const recipeVikingHelmet: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.Leather,
       qty: 2,
     },
+    {
+      key: CraftingResourcesBlueprint.Skull,
+      qty: 2,
+    },
   ],
 };

@@ -26,10 +26,10 @@ import {
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { BattleEffects } from "./BattleEffects";
-import { BattleEvent } from "./BattleEvent";
-import { BattleRangedAttack } from "./BattleRangedAttack";
-import { BattleNetworkStopTargeting } from "./network/BattleNetworkStopTargetting";
+import { BattleEffects } from "../BattleEffects";
+import { BattleEvent } from "../BattleEvent";
+import { BattleRangedAttack } from "../BattleRangedAttack";
+import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -253,14 +253,6 @@ export class BattleAttackTarget {
           if (hasEntityEffects) {
             await this.entityEffectUse.applyEntityEffects(target, attacker as INPC);
           }
-        }
-      } else {
-        // if damage is 0, then the attack was blocked
-        battleEventPayload.eventType = BattleEventType.Block;
-
-        // Increase shielding SP in target (if is Character)
-        if (target.type === "Character") {
-          await this.skillIncrease.increaseShieldingSP(target as ICharacter);
         }
       }
     }

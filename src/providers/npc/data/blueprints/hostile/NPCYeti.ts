@@ -56,6 +56,10 @@ export const npcYeti: Partial<INPC> = {
       chance: 20,
     },
     {
+      itemBlueprintKey: SwordsBlueprint.GoldenSword,
+      chance: 4,
+    },
+    {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,
       chance: 30,
     },
@@ -116,11 +120,7 @@ export const npcYeti: Partial<INPC> = {
       itemBlueprintKey: AxesBlueprint.Axe,
       chance: 30,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.CopperIngot,
-      chance: 30,
-      quantityRange: [2, 10],
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Rock,
       chance: 20,

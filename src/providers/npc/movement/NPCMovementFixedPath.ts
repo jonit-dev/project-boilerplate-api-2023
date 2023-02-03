@@ -2,11 +2,12 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 // eslint-disable-next-line no-unused-vars
+import { NPCFreezer } from "../NPCFreezer";
 import { NPCMovement } from "./NPCMovement";
 
 @provide(NPCMovementFixedPath)
 export class NPCMovementFixedPath {
-  constructor(private NPCMovement: NPCMovement) {}
+  constructor(private NPCMovement: NPCMovement, private npcFreezer: NPCFreezer) {}
 
   public async startFixedPathMovement(npc: INPC, endGridX: number, endGridY: number): Promise<void> {
     try {
@@ -20,6 +21,9 @@ export class NPCMovementFixedPath {
 
       if (!shortestPath) {
         // throw new Error("No shortest path found!");
+
+        await this.npcFreezer.freezeNPC(npc);
+
         return;
       }
 

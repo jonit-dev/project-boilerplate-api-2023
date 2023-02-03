@@ -8,13 +8,11 @@ describe("NPCMovementFixedPath.ts", () => {
   let testNPC: INPC;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     npcMovementFixedPath = container.get<NPCMovementFixedPath>(NPCMovementFixedPath);
     await unitTestHelper.initializeMapLoader();
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testNPC = await unitTestHelper.createMockNPC(
       {
         x: FromGridX(8),
@@ -76,9 +74,5 @@ describe("NPCMovementFixedPath.ts", () => {
       expect(testNPC.x).toBe(FromGridX(path.gridX));
       expect(testNPC.y).toBe(FromGridY(path.gridY));
     }
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

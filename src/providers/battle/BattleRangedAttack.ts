@@ -231,7 +231,7 @@ export class BattleRangedAttack {
     equipment: IEquipment
   ): Promise<Partial<IRangedAttackParams> | undefined> {
     // check if character has enough required ammo in accessory slot
-    const accessory = await Item.findById(equipment.accessory);
+    const accessory = await Item.findById(equipment.accessory).lean({ virtuals: true, defaults: true });
 
     for (const ammoKey of requiredAmmoKeys) {
       if (accessory && accessory.key === ammoKey) {
@@ -338,6 +338,6 @@ export class BattleRangedAttack {
   }
 
   private getRequiredManaForAttack(weapon: IItem): number {
-    return Math.round(weapon.attack! / 2);
+    return Math.round(weapon.attack! / 6);
   }
 }

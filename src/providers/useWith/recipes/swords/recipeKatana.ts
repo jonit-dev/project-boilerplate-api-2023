@@ -7,15 +7,15 @@ export const recipeKatana: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 5,
-    },
-    {
-      key: CraftingResourcesBlueprint.GoldenIngot,
       qty: 2,
     },
     {
-      key: CraftingResourcesBlueprint.Diamond,
-      qty: 1,
+      key: CraftingResourcesBlueprint.IronIngot,
+      qty: 5,
+    },
+    {
+      key: CraftingResourcesBlueprint.WoodenSticks,
+      qty: 2,
     },
   ],
 };

@@ -11,7 +11,7 @@ export const itemGreaterWoodenLog: Partial<IItemUseWith> = {
   name: "Greater Wooden Log",
   description: "A heavy crafting resource that is generally split into smaller logs before usage.",
   weight: 1.5,
-  maxStackSize: 20,
-  basePrice: 0.5,
+  maxStackSize: 100,
+  basePrice: 5,
   hasUseWith: true,
 };

@@ -10,8 +10,8 @@ export const itemBlueFeather: Partial<IItemUseWith> = {
   texturePath: "crafting-resources/blue-feather.png",
   name: "Blue Feather",
   description: "A craft material used to make arrows.",
-  weight: 0.1,
-  maxStackSize: 50,
+  weight: 0.01,
+  maxStackSize: 100,
   basePrice: 0.5,
   hasUseWith: true,
 };

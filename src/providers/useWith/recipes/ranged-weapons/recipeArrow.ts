@@ -13,9 +13,5 @@ export const recipeArrow: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.SmallWoodenStick,
       qty: 1,
     },
-    {
-      key: CraftingResourcesBlueprint.IronIngot,
-      qty: 1,
-    },
   ],
 };

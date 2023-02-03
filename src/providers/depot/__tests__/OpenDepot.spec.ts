@@ -1,21 +1,19 @@
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { OpenDepot } from "../OpenDepot";
 import { Depot } from "@entities/ModuleDepot/DepotModel";
-import { Types } from "mongoose";
 import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { Types } from "mongoose";
+import { OpenDepot } from "../OpenDepot";
 
 describe("OpenDepot.ts", () => {
   let openDepot: OpenDepot, testNPC: INPC, testCharacter: ICharacter;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     openDepot = container.get<OpenDepot>(OpenDepot);
-    await unitTestHelper.beforeAllJestHook();
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter();
     testNPC = await unitTestHelper.createMockNPC();
 
@@ -99,9 +97,5 @@ describe("OpenDepot.ts", () => {
     });
 
     expect(depotAfterDelete).toBeNull();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

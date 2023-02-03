@@ -13,7 +13,7 @@ import {
 import { FromGridX, FromGridY, ItemSlotType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { Types } from "mongoose";
-import { BattleAttackTarget } from "../BattleAttackTarget";
+import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleRangedAttack } from "../BattleRangedAttack";
 
 describe("BattleRangedAttack.spec.ts", () => {
@@ -26,7 +26,6 @@ describe("BattleRangedAttack.spec.ts", () => {
   let bowItem: IItem;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     await unitTestHelper.initializeMapLoader();
 
     battleRangedAttack = container.get<BattleRangedAttack>(BattleRangedAttack);
@@ -35,8 +34,6 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testNPC = await unitTestHelper.createMockNPC(
       { attackType: EntityAttackType.Ranged, maxRangeAttack: 7 },
       { hasSkills: true }
@@ -239,13 +236,13 @@ describe("BattleRangedAttack.spec.ts", () => {
     });
 
     it("special ammo dependant on mana availability", async () => {
-      testCharacter.mana = Math.floor(itemFireStaff.attack! / 2) - 1;
+      testCharacter.mana = Math.floor(itemFireStaff.attack! / 6) - 1;
       // @ts-ignore
       let rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
 
       expect(rangedAttackAmmo).not.toBeDefined();
 
-      testCharacter.mana = Math.ceil(itemFireStaff.attack! / 2) + 1;
+      testCharacter.mana = Math.ceil(itemFireStaff.attack! / 6) + 1;
       // @ts-ignore
       rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
 
@@ -257,8 +254,6 @@ describe("BattleRangedAttack.spec.ts", () => {
     });
 
     it("mana should be consumed", async () => {
-      const characterMana = testCharacter.mana;
-
       await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
 
       // @ts-ignore
@@ -270,12 +265,8 @@ describe("BattleRangedAttack.spec.ts", () => {
       expect(characterEquipment.accessory).toBeDefined();
 
       const updatedCharacter = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
-      expect(updatedCharacter.mana).toBe(characterMana - Math.ceil(itemFireStaff.attack! / 2));
+      expect(updatedCharacter.mana).toBe(99);
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });
 

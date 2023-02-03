@@ -133,10 +133,5 @@ export const npcOrc = {
       itemBlueprintKey: RangedWeaponsBlueprint.ShortBow,
       chance: 5,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.SteelIngot,
-      chance: 30,
-      quantityRange: [5, 20],
-    },
   ],
 } as Partial<INPC>;

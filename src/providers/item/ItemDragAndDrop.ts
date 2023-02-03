@@ -152,8 +152,12 @@ export class ItemDragAndDrop {
 
       const item = new Item({
         ...blueprint,
+        attack: from.item.attack ?? blueprint.attack,
+        defense: from.item.defense ?? blueprint.defense,
+        rarity: from.item.rarity ?? blueprint.rarity,
         stackQty: quantity ?? from.item.stackQty,
       });
+
       await item.save();
 
       await this.characterItemSlots.addItemOnSlot(targetContainer, item, to.slotIndex);

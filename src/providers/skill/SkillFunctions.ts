@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { SP_INCREASE_RATIO } from "@providers/constants/SkillConstants";
+import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   AnimationEffectKeys,
@@ -12,7 +12,6 @@ import {
   IUIShowMessage,
   SkillEventType,
   SkillSocketEvents,
-  SKILLS_MAP,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -29,13 +28,8 @@ export class SkillFunctions {
 
   public updateSkillByType(skills: ISkill, skillType: string, bonusOrPenalties: number): boolean {
     let skillLevelUp = false;
-    const skillToUpdate = SKILLS_MAP.get(skillType);
 
-    if (!skillToUpdate) {
-      throw new Error(`skill not found for item subtype ${skillType}`);
-    }
-
-    const skill = skills[skillToUpdate] as ISkillDetails;
+    const skill = skills[skillType] as ISkillDetails;
 
     if (bonusOrPenalties > 0 && skill.skillPoints >= 0) skill.skillPoints += bonusOrPenalties;
     if (bonusOrPenalties < 0 && skill.skillPoints > 0) skill.skillPoints -= bonusOrPenalties * -1;
@@ -51,19 +45,19 @@ export class SkillFunctions {
     return skillLevelUp;
   }
 
-  public calculateBonusOrPenaltiesSP(bonusOrPenalties: number): number {
-    return SP_INCREASE_RATIO * bonusOrPenalties;
+  public calculateBonusOrPenaltiesSP(bonusOrPenalties: number, skillLevel: number): number {
+    return Math.round(skillLevel * (1 + bonusOrPenalties) * SP_INCREASE_RATIO * 100) / 100;
   }
 
-  public calculateBonusOrPenaltiesMagicSP(magicBonusOrPenalties: number): number {
-    return (magicBonusOrPenalties / 10) * 3;
+  public calculateBonusOrPenaltiesMagicSP(magicBonusOrPenalties: number, skillLevel: number): number {
+    return Math.round(skillLevel * (1 + magicBonusOrPenalties) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
   }
 
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
-    await skills.save();
+    await Skill.findByIdAndUpdate(skills._id, { ...skills });
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills.toObject(),
+      skill: skills,
     });
   }
 
@@ -90,7 +84,7 @@ export class SkillFunctions {
     };
 
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You ${behavior} from level ${skillData.skillLevelBefore} to ${
+      message: `You ${behavior} from level ${skillData.skillLevelAfter - 1} to ${
         skillData.skillLevelAfter
       } in ${_.startCase(_.toLower(skillData.skillName))} fighting.`,
       type: "info",

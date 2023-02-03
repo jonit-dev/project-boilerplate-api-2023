@@ -7,7 +7,7 @@ import { provide } from "inversify-binding-decorators";
 export class ItemContainerHelper {
   public async getContainerType(itemContainer: IItemContainer): Promise<ItemContainerType | undefined> {
     try {
-      const item = await Item.findById(itemContainer.parentItem);
+      const item = await Item.findById(itemContainer.parentItem).lean({ virtuals: true, defaults: true });
 
       if (!item) {
         throw new Error("Failed to get item type: item not found");

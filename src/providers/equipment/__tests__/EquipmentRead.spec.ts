@@ -12,13 +12,11 @@ describe("EquipmentRead.ts", () => {
   let equipmentSlots: EquipmentSlots;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     equipmentSetRead = container.get<EquipmentRead>(EquipmentRead);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true });
   });
 
@@ -78,9 +76,5 @@ describe("EquipmentRead.ts", () => {
         equipment: slots,
       }
     );
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

@@ -8,14 +8,11 @@ describe("BattleCharacterManager.spec.ts", () => {
   let testNPC: INPC;
   let testCharacter: ICharacter;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     battleCharacterManager = container.get<BattleCharacterManager>(BattleCharacterManager);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testNPC = await unitTestHelper.createMockNPC();
     testNPC.health = 100;
     await testNPC.save();
@@ -68,10 +65,6 @@ describe("BattleCharacterManager.spec.ts", () => {
     const result = await battleCharacterManager.canAttack(testCharacter, testNPC);
 
     expect(result).toBe(true);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   // Out of range not working,

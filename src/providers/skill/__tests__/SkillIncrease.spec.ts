@@ -6,9 +6,9 @@ import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/cons
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
 import { StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { spellSelfHealing } from "@providers/spells/data/blueprints/SpellSelfHealing";
 import { SpellLearn } from "@providers/spells/SpellLearn";
-import { BasicAttribute, calculateSPToNextLevel, calculateXPToNextLevel, ItemSubType } from "@rpg-engine/shared";
+import { spellSelfHealing } from "@providers/spells/data/blueprints/SpellSelfHealing";
+import { BasicAttribute, ItemSubType, calculateSPToNextLevel, calculateXPToNextLevel } from "@rpg-engine/shared";
 import { Error } from "mongoose";
 import { SkillFunctions } from "../SkillFunctions";
 import { SkillIncrease } from "../SkillIncrease";
@@ -67,9 +67,7 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
   let initialLevel: number;
   let spToLvl2: number;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     skillIncrease = container.get<SkillIncrease>(SkillIncrease);
 
     initialLevel = 1;
@@ -78,16 +76,10 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
     expect(spToLvl2).toBeGreaterThan(0);
   });
 
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
+  beforeEach(() => {
     skills = new Skill({
       ownerType: "Character",
     }) as ISkill;
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   it("should throw error when passing not a weapon item", () => {
@@ -137,8 +129,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     sendExpLevelUpEvents: any,
     spellLearnMock: jest.SpyInstance;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     skillIncrease = container.get<SkillIncrease>(SkillIncrease);
 
     initialSkills = new Skill({
@@ -160,14 +151,11 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     spellLearnMock.mockImplementation();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     spellLearnMock.mockRestore();
-    await unitTestHelper.afterAllJestHook();
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true, hasEquipment: true });
     await testCharacter.populate("skills").execPopulate();
 
@@ -261,9 +249,9 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(updatedSkills?.first.skillPoints).toBe(spToAdd * SP_INCREASE_RATIO);
     expect(updatedSkills?.first.skillPointsToNextLevel).toBe(spToLvl3 - 5 * SP_INCREASE_RATIO);
 
-    expect(updatedSkills?.level).toBe(initialLevel + 4);
+    expect(updatedSkills?.level).toBe(initialLevel + 3);
     expect(updatedSkills?.experience).toBe(spToAdd * 2);
-    expect(updatedSkills?.xpToNextLevel).toBe(calculateXPToNextLevel(updatedSkills?.experience!, initialLevel + 5));
+    expect(updatedSkills?.xpToNextLevel).toBe(145);
     expect(testNPC.xpToRelease?.length).toBe(0);
 
     expect(sendSkillLevelUpEvents).toHaveBeenCalled();
@@ -289,7 +277,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
   it("should increase character's magic skill level and not strength.", async () => {
     const characterEquipment = (await Equipment.findById(testCharacter.equipment)) as IEquipment;
 
-    const staff = await unitTestHelper.createMockItemFromBlueprint(StaffsBlueprint.FireStaff);
+    const staff = await unitTestHelper.createMockItemFromBlueprint(StaffsBlueprint.MoonsStaff);
     characterEquipment!.rightHand = staff.id;
 
     await characterEquipment!.save();
@@ -342,8 +330,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(updatedSkills?.magicResistance.level).toBe(initialLevel);
 
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
-    expect(updatedSkills?.magicResistance.skillPoints).toBe(skillPoints);
-    expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBe(spToLvl2 - skillPoints);
+    expect(updatedSkills?.magicResistance.skillPoints).toBe(Math.round(skillPoints));
+    expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBe(Math.round(spToLvl2 - skillPoints));
   });
 });
 

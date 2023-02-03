@@ -12,8 +12,8 @@ export const itemRoyalStaff: Partial<IMagicStaff> = {
   description: "A regal staff befitting of royalty or nobility, often used as a symbol of power and prestige.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 12,
-  defense: 6,
+  attack: 17,
+  defense: 10,
   rangeType: EntityAttackType.Melee,
   basePrice: 90,
 };

@@ -15,6 +15,8 @@ export const itemPineapple: Partial<IItem> = {
   weight: 1,
   maxStackSize: 50,
   basePrice: 15,
+  canSell: false,
+
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 1.25);
   },

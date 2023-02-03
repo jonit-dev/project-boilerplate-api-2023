@@ -75,17 +75,17 @@ const characterSchema = createLeanSchema(
     name: Type.string({
       required: true,
       minlength: 3,
-      maxlength: 44,
+      maxlength: 20,
       validate: (value) => {
         if (profanity.exists(value)) {
           throw new Error("Name contains blacklisted words");
         }
       },
-      index: true,
     }),
     owner: Type.objectId({
       required: true,
       ref: "User",
+      index: true,
     }),
     health: Type.number({
       default: 100,
@@ -121,7 +121,7 @@ const characterSchema = createLeanSchema(
     }),
 
     x: Type.number({
-      default: FromGridX(40),
+      default: FromGridX(56),
       required: true,
     }),
     y: Type.number({
@@ -129,7 +129,7 @@ const characterSchema = createLeanSchema(
       required: true,
     }),
     initialX: Type.number({
-      default: FromGridX(40),
+      default: FromGridX(56),
       required: true,
     }),
     initialY: Type.number({
@@ -313,8 +313,12 @@ characterSchema.virtual("weapon").get(async function (this: ICharacter): Promise
   }
   // Get right and left hand items
   // What if has weapons on both hands? for now, only one weapon per character is allowed
-  const rightHandItem = equipment.rightHand ? await Item.findById(equipment.rightHand) : undefined;
-  const leftHandItem = equipment.leftHand ? await Item.findById(equipment.leftHand) : undefined;
+  const rightHandItem = equipment.rightHand
+    ? ((await Item.findById(equipment.rightHand).lean({ virtuals: true, defaults: true })) as IItem)
+    : undefined;
+  const leftHandItem = equipment.leftHand
+    ? ((await Item.findById(equipment.leftHand).lean({ virtuals: true, defaults: true })) as IItem)
+    : undefined;
 
   // ItemSubType Shield is of type Weapon, so check that the weapon is not subType Shield (because cannot attack with Shield)
   if (rightHandItem?.type === ItemType.Weapon && rightHandItem?.subType !== ItemSubType.Shield) {

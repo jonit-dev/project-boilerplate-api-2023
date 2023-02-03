@@ -6,6 +6,7 @@ export const equipmentSchema = createLeanSchema(
   {
     owner: Type.objectId({
       refPath: "ownerRef", // ownerRef can be a Character or NPC!
+      index: true,
     }),
     ownerRef: Type.string({
       enum: ["Character", "NPC"],

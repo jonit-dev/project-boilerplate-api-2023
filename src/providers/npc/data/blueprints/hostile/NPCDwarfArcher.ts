@@ -60,16 +60,6 @@ export const npcDwarfArcher: Partial<INPC> = {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
       chance: 5,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenIngot,
-      chance: 10,
-      quantityRange: [1, 3],
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.IronIngot,
-      chance: 40,
-      quantityRange: [5, 10],
-    },
 
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
