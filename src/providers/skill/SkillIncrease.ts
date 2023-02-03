@@ -100,18 +100,17 @@ export class SkillIncrease {
         path: "skills",
         model: "Skill",
       })
-      .lean({ virtuals: true, defaults: true })
+      .lean()
       .populate({
         path: "equipment",
         model: "Equipment",
-        options: { virtuals: true, defaults: true },
+
         populate: {
           path: "rightHand leftHand",
           model: "Item",
-          options: { virtuals: true, defaults: true },
         },
       })
-      .lean({ virtuals: true, defaults: true })) as ICharacter;
+      .lean()) as ICharacter;
 
     if (!characterWithRelations) {
       throw new Error(`character not found for id ${character.id}`);
