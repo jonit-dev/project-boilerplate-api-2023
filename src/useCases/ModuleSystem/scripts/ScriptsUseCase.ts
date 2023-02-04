@@ -32,6 +32,7 @@ export class ScriptsUseCase {
             y: FromGridY(44),
             initialX: FromGridX(35),
             initialY: FromGridY(44),
+            scene: "ilya",
           },
         }
       );
