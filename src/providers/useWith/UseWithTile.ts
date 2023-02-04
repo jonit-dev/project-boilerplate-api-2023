@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { TILE_MAX_REACH_DISTANCE_IN_GRID } from "@providers/constants/TileConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { MapTiles } from "@providers/map/MapTiles";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -18,7 +19,8 @@ export class UseWithTile {
     private socketMessaging: SocketMessaging,
     private mapTiles: MapTiles,
     private useWithHelper: UseWithHelper,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private itemCraftable: ItemCraftable
   ) {}
 
   public onUseWithTile(channel: SocketChannel): void {
@@ -31,7 +33,7 @@ export class UseWithTile {
 
           if (useWithData) {
             const { originItem, useWithTileEffect, targetName } = useWithData;
-            await useWithTileEffect!(originItem, useWithTileData.targetTile, targetName, character);
+            await useWithTileEffect!(originItem, useWithTileData.targetTile, targetName, character, this.itemCraftable);
           }
         } catch (error) {
           console.error(error);

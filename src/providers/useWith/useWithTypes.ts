@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { MapLayers } from "@rpg-engine/shared";
 
 export interface IUseWithTileEffect {
@@ -7,7 +8,8 @@ export interface IUseWithTileEffect {
     item: IItem,
     targetTile: IUseWithTargetTile,
     targetName: string | undefined,
-    character: ICharacter
+    character: ICharacter,
+    itemCraftable: ItemCraftable
   ): Promise<void> | void;
 }
 

@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { container } from "@providers/inversify/container";
+import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IUseWithItemToEntityOptions,
@@ -29,7 +30,7 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
   basePrice: 45,
   hasUseWith: true,
   useWithMaxDistanceGrid: 2,
-  usableEffect: async (character: ICharacter, targetItem: IItem) => {
+  usableEffect: async (character: ICharacter, targetItem: IItem, itemCraftable: ItemCraftable) => {
     const useWithItemToEntity = container.get<UseWithItemToEntity>(UseWithItemToEntity);
     const socketMessaging = container.get<SocketMessaging>(SocketMessaging);
 
@@ -78,7 +79,7 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
             {
               key: FoodsBlueprint.RedMeat,
               qty: [1, 3],
-              chance: 20,
+              chance: await itemCraftable.getCraftChance(character, 20),
             },
           ],
         };
@@ -93,7 +94,7 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
           switch (subType) {
             case NPCSubtype.Animal:
               rewards.push({
-                chance: 30,
+                chance: await itemCraftable.getCraftChance(character, 30),
                 key: FoodsBlueprint.RedMeat,
                 qty: [1, 3],
               });
@@ -101,12 +102,12 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
             case NPCSubtype.Bird:
               rewards.push(
                 {
-                  chance: 30,
+                  chance: await itemCraftable.getCraftChance(character, 30),
                   key: CraftingResourcesBlueprint.Feather,
                   qty: [1, 3],
                 },
                 {
-                  chance: 30,
+                  chance: await itemCraftable.getCraftChance(character, 30),
                   key: FoodsBlueprint.ChickensMeat,
                   qty: [1, 3],
                 }

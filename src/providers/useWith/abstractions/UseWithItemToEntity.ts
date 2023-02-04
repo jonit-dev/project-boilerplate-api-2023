@@ -16,7 +16,7 @@ import random from "lodash/random";
 export interface IUseWithItemToEntityReward {
   key: string;
   qty: number[] | number;
-  chance: number;
+  chance: number | ((character: ICharacter) => Promise<boolean>);
 }
 
 export interface IUseWithItemToEntityOptions {
@@ -122,10 +122,17 @@ export class UseWithItemToEntity {
   }
 
   private async addRewardToInventory(character: ICharacter, rewards: IUseWithItemToEntityReward[]): Promise<boolean> {
-    rewards = rewards.sort((a, b) => a.chance - b.chance);
-    const n = random(0, 100);
     for (const reward of rewards) {
-      if (n < reward.chance) {
+      let addReward = false;
+
+      if (typeof reward.chance === "function") {
+        addReward = await reward.chance(character);
+      } else {
+        const n = random(0, 100);
+        addReward = n < reward.chance;
+      }
+
+      if (addReward) {
         const itemBlueprint = itemsBlueprintIndex[reward.key];
 
         const item = new Item({

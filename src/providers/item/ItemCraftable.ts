@@ -65,6 +65,20 @@ export class ItemCraftable {
     await this.performCrafting(recipe, character);
   }
 
+  /**
+   * getCraftChance returns the chance for a successful craft based on a baseChance.
+   * If the avg crafting skills are higher than the baseChance, then the isCraftSuccessful function
+   * @param character
+   * @param baseChance chance to use in case characters avg crafting skills < baseChance
+   * @returns
+   */
+  public async getCraftChance(
+    character: ICharacter,
+    baseChance: number
+  ): Promise<number | ((character: ICharacter) => Promise<boolean>)> {
+    return (await this.getCraftingSkillsAverage(character)) > baseChance ? this.isCraftSuccessful : baseChance;
+  }
+
   private async performCrafting(recipe: IUseWithCraftingRecipe, character: ICharacter): Promise<void> {
     let proceed = true;
 

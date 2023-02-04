@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
+import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { UseWithItemToTile } from "@providers/useWith/abstractions/UseWithItemToTile";
 import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
@@ -27,7 +28,8 @@ export const itemCarpentersAxe: Partial<IItemUseWith> = {
     originItem: IItem,
     targetTile: IUseWithTargetTile,
     targetName: string,
-    character: ICharacter
+    character: ICharacter,
+    itemCraftable: ItemCraftable
   ): Promise<void> => {
     const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
 
@@ -40,22 +42,22 @@ export const itemCarpentersAxe: Partial<IItemUseWith> = {
         {
           key: CraftingResourcesBlueprint.GreaterWoodenLog,
           qty: [3, 4],
-          chance: 30,
+          chance: await itemCraftable.getCraftChance(character, 30),
         },
         {
           key: CraftingResourcesBlueprint.WoodenSticks,
           qty: [2, 3],
-          chance: 10,
+          chance: await itemCraftable.getCraftChance(character, 10),
         },
         {
           key: CraftingResourcesBlueprint.SmallWoodenStick,
           qty: [2, 3],
-          chance: 10,
+          chance: await itemCraftable.getCraftChance(character, 10),
         },
         {
           key: CraftingResourcesBlueprint.ElvenWood,
           qty: [1, 2],
-          chance: 5,
+          chance: await itemCraftable.getCraftChance(character, 5),
         },
       ],
     });
