@@ -9,6 +9,7 @@ import { IndustriesController } from "@useCases/ModuleSystem/industries/Industri
 import { MapController } from "@useCases/ModuleSystem/map/MapController";
 import { PushNotificationController } from "@useCases/ModuleSystem/operation/pushNotification/PushNotificationController";
 import { PlacesController } from "@useCases/ModuleSystem/places/PlacesController";
+import { ScriptsController } from "@useCases/ModuleSystem/scripts/ScriptsController";
 import { AppleOAuthController } from "@useCases/ModuleSystem/user/appleOAuth/AppleOAuthController";
 import { ChangePasswordController } from "@useCases/ModuleSystem/user/changePassword/ChangePasswordController";
 import { ForgotPasswordController } from "@useCases/ModuleSystem/user/forgotPassword/ForgotPasswordController";
@@ -60,4 +61,5 @@ export const useCasesControllers = new ContainerModule((bind: interfaces.Bind, u
   bind<MapController>(MapController).toSelf();
   bind<FactionController>(FactionController).toSelf();
   bind<CacheController>(CacheController).toSelf();
+  bind<ScriptsController>(ScriptsController).toSelf();
 });

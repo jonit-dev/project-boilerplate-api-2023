@@ -205,7 +205,7 @@ const characterSchema = createLeanSchema(
     },
     attackIntervalSpeed: Type.number({
       required: true,
-      default: 1000,
+      default: 1500,
     }),
     view: Type.mixed({
       default: {
