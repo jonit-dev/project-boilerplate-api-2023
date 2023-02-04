@@ -101,15 +101,15 @@ export const skillsSchema = createLeanSchema(
 );
 
 skillsSchema.post("save", async function (this: ISkill) {
-  const npc = (await NPC.findById(this.owner)) as unknown as INPC;
+  const npc = (await NPC.findById(this.owner)) as INPC;
 
   if (!npc || npc?.experience) {
     return;
   }
 
   if (npc?.alignment === NPCAlignment.Hostile || npc?.alignment === NPCAlignment.Neutral) {
-    const skills = await Skill.findById(this._id);
-    const experience = calculateExperience(npc.baseHealth, skills as unknown as ISkill);
+    const skills = (await Skill.findById(this._id).lean({ virtuals: true, default: true })) as ISkill;
+    const experience = calculateExperience(npc.baseHealth, skills);
 
     await NPC.updateOne(
       {
@@ -151,11 +151,31 @@ async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean): Promis
 }
 
 skillsSchema.virtual("attack").get(async function (this: ISkill) {
-  return await getTotalAttackOrDefense(this, true);
+  if (this.ownerType === "Character") {
+    const equipment = await Equipment.findOne({ owner: this.owner }, { totalEquippedAttack: 1, _id: 0 })
+      .limit(1)
+      .lean({ virtuals: true, index: true });
+
+    if (equipment) {
+      return this.strength.level + this.level + (await equipment.totalEquippedAttack) || 0;
+    }
+  }
+  // for regular NPCs
+  return this.strength.level + this.level;
 });
 
 skillsSchema.virtual("defense").get(async function (this: ISkill) {
-  return await getTotalAttackOrDefense(this, false);
+  if (this.ownerType === "Character") {
+    const equipment = await Equipment.findOne({ owner: this.owner }, { totalEquippedDefense: 1, _id: 0 })
+      .limit(1)
+      .lean({ virtuals: true, index: true });
+
+    if (equipment) {
+      return this.resistance.level + this.level + (await equipment.totalEquippedDefense) || 0;
+    }
+  }
+  // for regular NPCs
+  return this.strength.level + this.level;
 });
 
 export type ISkill = ExtractDoc<typeof skillsSchema>;
