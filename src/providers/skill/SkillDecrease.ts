@@ -25,7 +25,7 @@ export class SkillDecrease {
   }
 
   private async decreaseCharacterXp(character: ICharacter): Promise<boolean> {
-    const skills = (await Skill.findOne({ _id: character.skills }).lean({ virtuals: true, defaults: true })) as ISkill;
+    const skills = (await Skill.findOne({ _id: character.skills }).lean()) as ISkill;
     if (!skills) {
       return false;
     }
@@ -43,7 +43,7 @@ export class SkillDecrease {
   }
 
   private async decreaseBasicAttributeSP(character: ICharacter): Promise<boolean> {
-    const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
@@ -64,7 +64,7 @@ export class SkillDecrease {
   }
 
   private async decreaseCombatSkillsSP(character: ICharacter): Promise<boolean> {
-    const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }

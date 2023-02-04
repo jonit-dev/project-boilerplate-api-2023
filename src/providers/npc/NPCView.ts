@@ -58,7 +58,7 @@ export class NPCView {
           ...filter,
         },
       ],
-    }).lean({ virtuals: true, defaults: true });
+    }).lean({ virtuals: true, defaults: true }); //! Virtual required until we have quadtrees
     return otherElementsInView as unknown as T[];
   }
 

@@ -53,7 +53,7 @@ export class ItemContainerOpen {
   }
 
   public async openContainer(data: IItemContainerOpen, character: ICharacter): Promise<void> {
-    const item = await Item.findById(data.itemId).lean({ virtuals: true, defaults: true });
+    const item = await Item.findById(data.itemId).lean();
 
     if (!item) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -108,7 +108,7 @@ export class ItemContainerOpen {
       }
     }
 
-    const parentItem = await Item.findById(itemContainer.parentItem).lean({ virtuals: true, defaults: true });
+    const parentItem = await Item.findById(itemContainer.parentItem).lean();
 
     if (!parentItem) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
