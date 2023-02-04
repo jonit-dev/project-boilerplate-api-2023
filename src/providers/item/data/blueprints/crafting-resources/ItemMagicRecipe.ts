@@ -10,5 +10,6 @@ export const itemMagicRecipe: Partial<IItem> = {
   texturePath: "crafting-resources/magic-recipe.png",
   name: "Magic Recipe",
   description: "A magic recipe scroll used for crafting.",
-  weight: 1,
+  weight: 0.01,
+  maxStackSize: 100,
 };

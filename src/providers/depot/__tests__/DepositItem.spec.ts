@@ -1,14 +1,14 @@
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { DepositItem } from "../DepositItem";
-import { Depot } from "@entities/ModuleDepot/DepotModel";
-import { Types } from "mongoose";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { itemMock } from "@providers/unitTests/mock/itemMock";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { itemMock } from "@providers/unitTests/mock/itemMock";
+import { Types } from "mongoose";
+import { DepositItem } from "../DepositItem";
 
 describe("DepositItem.ts", () => {
   let depositItem: DepositItem,
@@ -20,11 +20,9 @@ describe("DepositItem.ts", () => {
   beforeAll(async () => {
     depositItem = container.get<DepositItem>(DepositItem);
     characterItemSlots = container.get<CharacterItemSlots>(CharacterItemSlots);
-    await unitTestHelper.beforeAllJestHook();
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     testNPC = await unitTestHelper.createMockNPC();
     item = await unitTestHelper.createMockItem();
@@ -86,10 +84,6 @@ describe("DepositItem.ts", () => {
 
     const foundItem = await characterItemSlots.findItemOnSlots(characterItemContainer as IItemContainer, item.id!);
     expect(foundItem).toBeUndefined();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });
 

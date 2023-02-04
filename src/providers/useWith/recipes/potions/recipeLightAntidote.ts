@@ -11,6 +11,10 @@ export const recipeLightAntidote: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.WaterBottle,
+      qty: 2,
+    },
+    {
+      key: CraftingResourcesBlueprint.PhoenixFeather,
       qty: 1,
     },
   ],

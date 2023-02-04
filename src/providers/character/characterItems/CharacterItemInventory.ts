@@ -84,7 +84,7 @@ export class CharacterItemInventory {
       return false;
     }
 
-    const item = (await Item.findById(itemId)) as unknown as IItem;
+    const item = (await Item.findById(itemId).lean()) as unknown as IItem;
     if (!item) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Item not found.");
       return false;

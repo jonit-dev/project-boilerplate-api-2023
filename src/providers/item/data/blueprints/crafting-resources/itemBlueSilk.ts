@@ -12,6 +12,6 @@ export const itemBlueSilk: Partial<IItemUseWith> = {
   description: "A crafting resource used for making clothes and other items",
   weight: 0.05,
   maxStackSize: 100,
-  basePrice: 0.5,
+  basePrice: 10,
   hasUseWith: true,
 };

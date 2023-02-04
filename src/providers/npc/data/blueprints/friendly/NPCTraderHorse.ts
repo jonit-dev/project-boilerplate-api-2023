@@ -1,11 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import {
-  MagicsBlueprint,
-  PotionsBlueprint,
-  RangedWeaponsBlueprint,
-  SwordsBlueprint,
-  ToolsBlueprint,
-} from "@providers/item/data/types/itemsBlueprintTypes";
+import { MagicsBlueprint, PotionsBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { CharacterGender } from "@rpg-engine/shared";
 import { generateFixedPathMovement } from "../../abstractions/BaseNeutralNPC";
@@ -22,25 +16,22 @@ export const npcTraderHorse = {
       key: PotionsBlueprint.LightEndurancePotion,
     },
     {
+      key: PotionsBlueprint.ManaPotion,
+    },
+    {
       key: MagicsBlueprint.Rune,
     },
     {
-      key: SwordsBlueprint.DoubleEdgedSword,
+      key: MagicsBlueprint.FireBoltRune,
     },
     {
-      key: ToolsBlueprint.ButchersKnife,
+      key: MagicsBlueprint.PoisonRune,
     },
     {
-      key: ToolsBlueprint.CarpentersAxe,
+      key: StaffsBlueprint.FireStaff,
     },
     {
-      key: ToolsBlueprint.FishingRod,
-    },
-    {
-      key: ToolsBlueprint.Pickaxe,
-    },
-    {
-      key: RangedWeaponsBlueprint.Arrow,
+      key: StaffsBlueprint.CorruptionStaff,
     },
   ],
 } as Partial<INPC>;

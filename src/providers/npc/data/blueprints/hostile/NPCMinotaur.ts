@@ -90,6 +90,16 @@ export const npcMinotaur = {
       itemBlueprintKey: SwordsBlueprint.LeviathanSword,
       chance: 20,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.IronNail,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Jade,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

@@ -104,8 +104,18 @@ export const npcForestTroll = {
       chance: 15,
     },
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.RedShappire,
+      itemBlueprintKey: CraftingResourcesBlueprint.RedSapphire,
       chance: 8,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WoodenSticks,
+      chance: 20,
+      quantityRange: [1, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SmallWoodenStick,
+      chance: 40,
+      quantityRange: [5, 10],
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

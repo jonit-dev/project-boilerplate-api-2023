@@ -1,5 +1,4 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
-import { unitTestHelper } from "@providers/inversify/container";
 import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 
 let npcBattleCycles: NPCBattleCycle;
@@ -7,23 +6,17 @@ let id: string;
 let fn: Function;
 let intervalSpeed: number;
 describe("NPCBattleCycle.ts", () => {
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     id = "62b792030c3f470048781135";
     fn = jest.fn();
     intervalSpeed = -1;
     // Create an NPCBattleCycle instance
     npcBattleCycles = new NPCBattleCycle(id, fn, intervalSpeed);
   });
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-  });
+  beforeEach(async () => {});
   afterEach(() => {
     jest.clearAllMocks();
     jest.resetAllMocks();
-  });
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   it("should test that the NPCBattleCycle instance is correctly added to the NPC_BATTLE_CYCLES map when it is created", () => {

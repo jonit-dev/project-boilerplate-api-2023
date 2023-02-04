@@ -12,12 +12,7 @@ describe("QuestModel.ts", () => {
   let testQuest: IQuest;
   let testCharacter: ICharacter;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testNPC = await unitTestHelper.createMockNPC();
     testQuest = await unitTestHelper.createMockQuest(testNPC.id);
     testCharacter = await unitTestHelper.createMockCharacter();
@@ -72,9 +67,5 @@ describe("QuestModel.ts", () => {
         expect(await testQuest.hasStatus(QuestStatus.Completed, testCharacter.id)).toEqual(true);
       }
     }
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

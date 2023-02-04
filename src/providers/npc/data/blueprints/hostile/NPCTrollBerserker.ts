@@ -15,6 +15,7 @@ import {
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
+  MagicsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -109,6 +110,16 @@ export const npcTrollBerserker = {
     {
       itemBlueprintKey: SwordsBlueprint.Rapier,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: MagicsBlueprint.FireRune,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
+      chance: 5,
+      quantityRange: [5, 10],
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

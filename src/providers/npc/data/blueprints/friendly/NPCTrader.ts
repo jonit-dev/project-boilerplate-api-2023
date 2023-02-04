@@ -1,11 +1,9 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import {
-  ArmorsBlueprint,
   AxesBlueprint,
   FoodsBlueprint,
-  HelmetsBlueprint,
-  LegsBlueprint,
   MacesBlueprint,
+  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -24,14 +22,24 @@ export const npcTrader = {
   isTrader: true,
   traderItems: [
     {
+      key: PotionsBlueprint.LightLifePotion,
+    },
+    {
+      key: PotionsBlueprint.GreaterLifePotion,
+    },
+    {
+      key: PotionsBlueprint.ManaPotion,
+    },
+    {
+      key: FoodsBlueprint.Cheese,
+    },
+    {
       key: FoodsBlueprint.Fish,
     },
     {
       key: FoodsBlueprint.Watermelon,
     },
-    {
-      key: FoodsBlueprint.Cheese,
-    },
+
     {
       key: SwordsBlueprint.ShortSword,
     },
@@ -48,25 +56,16 @@ export const npcTrader = {
       key: ToolsBlueprint.Hammer,
     },
     {
+      key: ToolsBlueprint.Pickaxe,
+    },
+    {
       key: ToolsBlueprint.CarpentersAxe,
     },
     {
       key: ShieldsBlueprint.WoodenShield,
     },
     {
-      key: LegsBlueprint.LeatherLegs,
-    },
-    {
-      key: HelmetsBlueprint.LeatherHelmet,
-    },
-    {
-      key: ArmorsBlueprint.Coat,
-    },
-    {
       key: ToolsBlueprint.FishingRod,
-    },
-    {
-      key: ToolsBlueprint.Pickaxe,
     },
     {
       key: RangedWeaponsBlueprint.Bow,

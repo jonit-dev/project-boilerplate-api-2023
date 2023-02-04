@@ -1,5 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
 import {
   CharacterClass,
@@ -8,6 +8,7 @@ import {
   IIncreaseSPResult,
   LifeBringerRaces,
   ShadowWalkerRaces,
+  SKILLS_MAP,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBasicAttributesBonusPenalties } from "./CharacterBasicAttributesBonusPenalties";
@@ -19,16 +20,20 @@ export class CharacterBonusPenalties {
   constructor(
     private characterBasicAttributesBonusPenalties: CharacterBasicAttributesBonusPenalties,
     private characterCombatBonusPenalties: CharacterCombatBonusPenalties,
-    // private characterCraftingBonusPenalties: CharacterCraftingBonusPenalties,
+    // private characterCraftincharacterClassBonusOrPenaltiesgBonusPenalties: CharacterCraftingBonusPenalties,
     private skillFunctions: SkillFunctions,
     private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties
   ) {}
 
   public async applyRaceBonusPenalties(character: ICharacter, skillType: string): Promise<void> {
-    const skills = await Skill.findById(character.skills);
-
+    const skills = (await Skill.findById(character.skills)) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
+    }
+
+    const skillToUpdate = SKILLS_MAP.get(skillType);
+    if (!skillToUpdate) {
+      throw new Error(`skill not found for item subtype ${skillType}`);
     }
 
     let basicAttributes: IBasicAttributesBonusAndPenalties;
@@ -61,10 +66,10 @@ export class CharacterBonusPenalties {
           magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
         };
 
-        if (skillType in basicAttributes) {
+        if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
             skills,
-            skillType,
+            skillToUpdate,
             basicAttributes
           );
         }
@@ -80,8 +85,12 @@ export class CharacterBonusPenalties {
           club: 0.2 + classBonusOrPenalties.combatSkills.club,
         };
 
-        if (skillType.toLocaleLowerCase() in combatSkills) {
-          skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(skills, skillType, combatSkills);
+        if (skillToUpdate in combatSkills) {
+          skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            skills,
+            skillToUpdate,
+            combatSkills
+          );
         }
 
         // Update Crafting and Gathering Skills
@@ -100,10 +109,10 @@ export class CharacterBonusPenalties {
           magicResistance: 0.1 + classBonusOrPenalties.basicAttributes.magicResistance,
         };
 
-        if (skillType in basicAttributes) {
+        if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
             skills,
-            skillType,
+            skillToUpdate,
             basicAttributes
           );
         }
@@ -119,8 +128,12 @@ export class CharacterBonusPenalties {
           club: -0.1 + classBonusOrPenalties.combatSkills.club,
         };
 
-        if (skillType.toLocaleLowerCase() in combatSkills) {
-          skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(skills, skillType, combatSkills);
+        if (skillToUpdate in combatSkills) {
+          skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            skills,
+            skillToUpdate,
+            combatSkills
+          );
         }
 
         // Update Crafting and Gathering Skills
@@ -148,10 +161,10 @@ export class CharacterBonusPenalties {
           magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
         };
 
-        if (skillType in basicAttributes) {
+        if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
             skills,
-            skillType,
+            skillToUpdate,
             basicAttributes
           );
         }
@@ -167,8 +180,12 @@ export class CharacterBonusPenalties {
           club: 0.3 + classBonusOrPenalties.combatSkills.club,
         };
 
-        if (skillType.toLocaleLowerCase() in combatSkills) {
-          skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(skills, skillType, combatSkills);
+        if (skillToUpdate in combatSkills) {
+          skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            skills,
+            skillToUpdate,
+            combatSkills
+          );
         }
 
         // Update Crafting and Gathering Skills
@@ -186,10 +203,10 @@ export class CharacterBonusPenalties {
           magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
         };
 
-        if (skillType in basicAttributes) {
+        if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
             skills,
-            skillType,
+            skillToUpdate,
             basicAttributes
           );
         }
@@ -205,8 +222,12 @@ export class CharacterBonusPenalties {
           club: 0.2 + classBonusOrPenalties.combatSkills.club,
         };
 
-        if (skillType.toLocaleLowerCase() in combatSkills) {
-          skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(skills, skillType, combatSkills);
+        if (skillToUpdate in combatSkills) {
+          skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            skills,
+            skillToUpdate,
+            combatSkills
+          );
         }
 
         // Update Crafting and Gathering Skills

@@ -6,8 +6,8 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY, IItemPickup } from "@rpg-engine/shared";
 import { Types } from "mongoose";
-import { BodiesBlueprint, OthersBlueprint } from "../data/types/itemsBlueprintTypes";
 import { ItemPickupValidator } from "../ItemPickup/ItemPickupValidator";
+import { BodiesBlueprint, OthersBlueprint } from "../data/types/itemsBlueprintTypes";
 
 describe("ItemPickupValidator.ts", () => {
   let testCharacter: ICharacter;
@@ -18,9 +18,7 @@ describe("ItemPickupValidator.ts", () => {
 
   let itemPickupValidator: ItemPickupValidator;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     itemPickupValidator = container.get<ItemPickupValidator>(ItemPickupValidator);
 
     // @ts-ignore
@@ -28,8 +26,6 @@ describe("ItemPickupValidator.ts", () => {
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await await unitTestHelper.createMockCharacter(null, {
       hasEquipment: true,
       hasInventory: true,
@@ -253,9 +249,5 @@ describe("ItemPickupValidator.ts", () => {
 
     expect(sendErrorMessageToCharacter).toHaveBeenCalled();
     expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, your container is full.");
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

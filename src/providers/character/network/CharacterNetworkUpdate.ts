@@ -72,13 +72,14 @@ export class CharacterNetworkUpdate {
               y: character.y,
             };
 
-            this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
+            await this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
 
             await this.characterMovementWarn.warn(character, data);
 
             switch (appEnv.general.ENV) {
               case EnvType.Development:
-                await this.npcManager.startNearbyNPCsBehaviorLoop(character);
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
                 break;
               case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
@@ -116,12 +117,12 @@ export class CharacterNetworkUpdate {
     );
   }
 
-  private syncIfPositionMismatch(
+  private async syncIfPositionMismatch(
     serverCharacter: ICharacter,
     serverCharacterPosition: IPosition,
     clientOriginX: number,
     clientOriginY: number
-  ): void {
+  ): Promise<void> {
     const distance = this.mathHelper.getDistanceBetweenPoints(
       serverCharacterPosition.x,
       serverCharacterPosition.y,
@@ -130,6 +131,16 @@ export class CharacterNetworkUpdate {
     );
 
     const distanceInGridCells = Math.round(distance / GRID_WIDTH);
+
+    if (distanceInGridCells >= 1) {
+      await Character.updateOne(
+        { id: serverCharacter.id },
+        {
+          x: clientOriginX,
+          y: clientOriginY,
+        }
+      );
+    }
 
     if (distanceInGridCells >= 10) {
       this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
@@ -152,7 +163,7 @@ export class CharacterNetworkUpdate {
           Verify if we're in a non pvp zone. If so, we need to trigger 
           an attack stop event in case player was in a pvp combat
           */
-    const nonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, newX, newY);
+    const nonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, newX, newY);
     if (nonPVPZone) {
       this.mapNonPVPZone.stopCharacterAttack(character);
     }

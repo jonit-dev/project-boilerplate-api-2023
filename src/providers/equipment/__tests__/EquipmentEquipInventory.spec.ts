@@ -14,14 +14,11 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
   let equipmentSlots: EquipmentSlots;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     equipmentEquipInventory = container.get<EquipmentEquipInventory>(EquipmentEquipInventory);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     inventoryItem = (await unitTestHelper.createMockItemFromBlueprint(ContainersBlueprint.Bag)) as unknown as IItem;
     character = await unitTestHelper.createMockCharacter(null, { hasEquipment: true });
     equipment = (await Equipment.findById(character.equipment)) as unknown as IEquipment;
@@ -49,9 +46,5 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
     const equipped = await equipmentEquipInventory.equipInventory(character, inventoryItem);
 
     expect(equipped).toBe(false);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

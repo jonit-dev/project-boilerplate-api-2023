@@ -4,7 +4,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { provide } from "inversify-binding-decorators";
-import { BattleAttackTarget } from "./BattleAttackTarget";
+import { BattleAttackTarget } from "./BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "./BattleCycle";
 
 @provide(BattleCharacterManager)
@@ -79,7 +79,7 @@ export class BattleCharacterManager {
     }
 
     if (target.type === "Character") {
-      const isNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(target.scene, target.x, target.y);
+      const isNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
       if (isNonPVPZone) {
         // clear battle cycle when target enter in a pvp zone.
         await this.battleNetworkStopTargeting.stopTargeting(attacker as unknown as ICharacter);

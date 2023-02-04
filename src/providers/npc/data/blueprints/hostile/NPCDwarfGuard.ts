@@ -82,22 +82,17 @@ export const npcDwarfGuard = {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
       chance: 1,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenIngot,
-      chance: 10,
-      quantityRange: [1, 3],
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.IronIngot,
-      chance: 40,
-      quantityRange: [5, 10],
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.ObsidiumOre,
       chance: 5,
     },
     {
       itemBlueprintKey: SpearsBlueprint.Javelin,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
       chance: 5,
     },
   ],

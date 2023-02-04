@@ -13,6 +13,7 @@ export class UpdateCharacterUseCase {
       _id: id,
     })) as ICharacter;
 
+    // @ts-ignore
     if (!characterToUpdate.owner.equals(ownerId)) {
       throw new BadRequestError("You cannot update a character which is not yours!");
     }

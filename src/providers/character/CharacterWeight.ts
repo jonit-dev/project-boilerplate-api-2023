@@ -28,7 +28,8 @@ export class CharacterWeight {
       }
     );
 
-    character = (await Character.findById(character._id)) || character;
+    //! Requires virtuals
+    character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, {
       speed: character.speed,
@@ -81,15 +82,21 @@ export class CharacterWeight {
 
     if (inventoryContainer) {
       for (const bagItem of inventoryContainer.itemIds) {
-        // @ts-ignore
-        const item = await Item.findById(bagItem.toString("hex")).lean();
-        if (item) {
-          if (item.stackQty && item.stackQty > 1) {
-            // -1 because the count is include the weight of the container item.
-            // 100 arrows x 0.1 = 10 weight, but the result will be 10.1 without the -1.
-            totalWeight += item.weight * (item.stackQty - 1);
+        let item;
+        try {
+          // @ts-ignore
+          item = await Item.findById(bagItem.toString("hex"));
+          if (item) {
+            if (item.stackQty && item.stackQty > 1) {
+              // -1 because the count is include the weight of the container item.
+              // 100 arrows x 0.1 = 10 weight, but the result will be 10.1 without the -1.
+              totalWeight += item.weight * (item.stackQty - 1);
+            }
+            totalWeight += item.weight;
           }
-          totalWeight += item.weight;
+        } catch (error) {
+          console.log("Item with problems: ", item.key);
+          console.error(error);
         }
       }
     }

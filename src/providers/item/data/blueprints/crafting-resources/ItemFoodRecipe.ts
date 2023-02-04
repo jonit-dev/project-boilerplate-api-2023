@@ -11,4 +11,6 @@ export const itemFoodRecipe: Partial<IItem> = {
   name: "Food Recipe",
   description: "A food recipe scroll used for crafting.",
   weight: 1,
+  basePrice: 10,
+  maxStackSize: 100,
 };

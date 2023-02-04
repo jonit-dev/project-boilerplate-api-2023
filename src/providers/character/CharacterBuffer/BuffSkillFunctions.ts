@@ -227,6 +227,7 @@ export class BuffSkillFunctions {
     array: { _id: Types.ObjectId; key: string; value: number }[],
     buffId: Types.ObjectId
   ): number {
+    // @ts-ignore
     const result = array.filter((element) => element._id.equals(buffId));
     return result.length > 0 ? result[0].value : 0;
   }

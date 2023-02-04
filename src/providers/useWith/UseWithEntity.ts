@@ -3,18 +3,22 @@ import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { OnTargetHit } from "@providers/battle/OnTargetHit";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
+import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
+  BasicAttribute,
   CharacterSocketEvents,
   ICharacterAttributeChanged,
   IEquipmentAndInventoryUpdatePayload,
@@ -23,12 +27,10 @@ import {
   ItemSocketEvents,
   NPCAlignment,
   UseWithSocketEvents,
-  BasicAttribute,
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { IMagicItemUseWithEntity } from "./useWithTypes";
-import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 
 const StaticEntity = "Item"; // <--- should be added to the EntityType enum from @rpg-engine/shared
 
@@ -45,7 +47,9 @@ export class UseWithEntity {
     private animationEffect: AnimationEffect,
     private characterItemContainer: CharacterItemContainer,
     private skillIncrease: SkillIncrease,
-    private characterBonusPenalties: CharacterBonusPenalties
+    private characterBonusPenalties: CharacterBonusPenalties,
+    private onTargetHit: OnTargetHit,
+    private mapNonPVPZone: MapNonPVPZone
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -153,9 +157,19 @@ export class UseWithEntity {
   }
 
   private async executeEffect(caster: ICharacter, target: ICharacter | INPC | IItem, item: IItem): Promise<void> {
+    if (item.canUseOnNonPVPZone === false && target?.type === EntityType.Character) {
+      const character = target as ICharacter;
+      const isTargetAtNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
+
+      if (isTargetAtNonPVPZone) {
+        this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, you can't use this item at non-PVP zone.");
+        return;
+      }
+    }
+
     const blueprint = itemsBlueprintIndex[item.key];
 
-    await blueprint.usableEffect(caster, target);
+    const damage = await blueprint.usableEffect(caster, target, item);
     await target.save();
 
     // handle static item case
@@ -166,6 +180,7 @@ export class UseWithEntity {
     } else {
       await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, caster, 1);
     }
+
     await this.characterWeight.updateCharacterWeight(caster);
 
     await this.sendRefreshItemsEvent(caster);
@@ -175,7 +190,10 @@ export class UseWithEntity {
     }
 
     if (target.type !== StaticEntity) {
-      await this.sendTargetUpdateEvents(caster, target as ICharacter | INPC);
+      const transformedTarget = target as ICharacter | INPC;
+
+      await this.sendTargetUpdateEvents(caster, transformedTarget);
+      await this.onTargetHit.execute(transformedTarget, caster, damage);
     }
 
     if (target.type === EntityType.Character) {

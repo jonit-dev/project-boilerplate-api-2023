@@ -121,7 +121,11 @@ export class EntityEffectCycle {
         payload
       );
     } else {
-      socketMessaging.sendEventToCharactersAroundNPC(target as INPC, CharacterSocketEvents.AttributeChanged, payload);
+      await socketMessaging.sendEventToCharactersAroundNPC(
+        target as INPC,
+        CharacterSocketEvents.AttributeChanged,
+        payload
+      );
     }
   }
 
@@ -140,7 +144,7 @@ export class EntityEffectCycle {
       socketMessaging.sendEventToUser(character.channelId!, EffectsSocketEvents.EntityEffect, payload);
       await socketMessaging.sendEventToCharactersAroundCharacter(character, EffectsSocketEvents.EntityEffect, payload);
     } else {
-      socketMessaging.sendEventToCharactersAroundNPC(target as INPC, EffectsSocketEvents.EntityEffect, payload);
+      await socketMessaging.sendEventToCharactersAroundNPC(target as INPC, EffectsSocketEvents.EntityEffect, payload);
     }
   }
 

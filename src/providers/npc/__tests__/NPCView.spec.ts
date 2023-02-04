@@ -13,22 +13,19 @@ describe("NPCView.ts", () => {
   let farAwayCharacter: ICharacter;
   let npcWarn: NPCWarn;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     npcView = container.get<NPCView>(NPCView);
     npcWarn = container.get<NPCWarn>(NPCWarn);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testNPC = await unitTestHelper.createMockNPC(
       {
         x: FromGridX(0),
         y: FromGridY(0),
         health: 100,
         scene: "example",
+        isBehaviorEnabled: true,
       },
       { hasSkills: true }
     );
@@ -101,9 +98,5 @@ describe("NPCView.ts", () => {
     await npcWarn.warnCharacterAboutNPCsInView(testCharacter);
 
     expect(spyOnSocketMessaging).toHaveBeenCalled();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

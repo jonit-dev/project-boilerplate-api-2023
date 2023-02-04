@@ -93,13 +93,13 @@ export class NPCTarget {
       return;
     }
 
-    const character = await Character.findById(minDistanceCharacter.id).lean({ virtuals: true, defaults: true });
+    const character = await Character.findById(minDistanceCharacter.id).lean();
 
     if (!character) {
       throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
     }
 
-    const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, character.x, character.y);
+    const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
     // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
     if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
       await this.clearTarget(npc);
@@ -121,7 +121,7 @@ export class NPCTarget {
       throw new Error(`NPC ${npc.key} is trying to verify target, but no maxRangeInGridCells is specified!`);
     }
 
-    const targetCharacter = await Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true });
+    const targetCharacter = await Character.findById(npc.targetCharacter).lean();
 
     if (!targetCharacter) {
       throw new Error(`Error in ${npc.key}: Failed to find targetCharacter!`);
@@ -154,7 +154,7 @@ export class NPCTarget {
         return;
       }
 
-      const char = await Character.findById(character.id).lean({ virtuals: true, defaults: true });
+      const char = await Character.findById(character.id).lean();
       if (!char) {
         throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
       }

@@ -1,5 +1,5 @@
 import { profanity } from "@2toad/profanity";
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
@@ -43,7 +43,9 @@ export class ChatNetworkGlobalMessaging {
           }
 
           if (this.spellCast.isSpellCasting(data.message)) {
-            await this.spellCast.castSpell(data.message, character);
+            const spellCharacter = (await Character.findById(character._id)) as ICharacter;
+
+            await this.spellCast.castSpell(data.message, spellCharacter);
           }
 
           const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);

@@ -13,15 +13,11 @@ describe("CharacterItemStack.ts", () => {
   let inventory: IItem;
   let inventoryItemContainerId: string;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     itemPickup = container.get<ItemPickup>(ItemPickup);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true, hasSkills: true })
     )
@@ -133,11 +129,5 @@ describe("CharacterItemStack.ts", () => {
     const itemFirstSlot = updatedInventoryContainer?.slots[0];
 
     expect(itemFirstSlot.stackQty).toBe(25);
-  });
-
-  it("should fail if no slots are available for creating the difference stack", async () => {});
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

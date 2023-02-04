@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget";
+import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -17,6 +17,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
+import { NPCFreezer } from "../NPCFreezer";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
@@ -34,7 +35,8 @@ export class NPCMovementMoveTowards {
     private npcTarget: NPCTarget,
     private battleAttackTarget: BattleAttackTarget,
     private socketMessaging: SocketMessaging,
-    private npcView: NPCView
+    private npcView: NPCView,
+    private npcFreezer: NPCFreezer
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
@@ -160,7 +162,7 @@ export class NPCMovementMoveTowards {
       );
 
       if (isInRange) {
-        this.initBattleCycle(npc);
+        await this.initBattleCycle(npc);
       } else {
         const battleCycle = NPC_BATTLE_CYCLES.get(npc.id);
 
@@ -223,21 +225,29 @@ export class NPCMovementMoveTowards {
     return false;
   }
 
-  private initBattleCycle(npc: INPC): void {
+  private async initBattleCycle(npc: INPC): Promise<void> {
     const hasBattleCycle = NPC_BATTLE_CYCLES.has(npc.id);
+
+    if (!npc.targetCharacter) {
+      // try to reset target, if somehow its lost
+      await this.npcTarget.tryToSetTarget(npc);
+    }
 
     if (!hasBattleCycle) {
       new NPCBattleCycle(
         npc.id,
         async () => {
-          if (!npc.targetCharacter) {
-            // try to reset target, if somehow its lost
-            await this.npcTarget.tryToSetTarget(npc);
-          }
+          const result = await Promise.all([
+            NPC.findById(npc.id).populate("skills"),
+            Character.findById(npc.targetCharacter).populate("skills"),
+          ]);
 
-          const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
+          const targetCharacter = result[1] as ICharacter;
+          const updatedNPC = result[0] as INPC;
 
-          const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
+          // const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
+
+          // const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
 
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
             // if reached target and alignment is enemy, lets hit it
@@ -246,7 +256,7 @@ export class NPCMovementMoveTowards {
 
           await this.tryToSwitchToRandomTarget(npc);
         },
-        1000
+        1500
       );
     }
   }
@@ -312,6 +322,8 @@ export class NPCMovementMoveTowards {
       if (!shortestPath) {
         // throw new Error("No shortest path found!");
         // await this.npcTarget.clearTarget(npc);
+        await this.npcFreezer.freezeNPC(npc, true);
+
         return;
       }
 

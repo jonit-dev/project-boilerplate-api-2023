@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { BattleSocketEvents } from "@rpg-engine/shared";
@@ -18,9 +18,7 @@ export class BattleNetworkStopTargeting {
   public async stopTargeting(character: ICharacter): Promise<void> {
     try {
       if (character) {
-        // @ts-ignore
-        character.target = undefined;
-        await character.save();
+        await Character.updateOne({ _id: character._id }, { $unset: { target: 1 } });
 
         const battleCycle = BattleCycle.battleCycles.get(character.id);
 

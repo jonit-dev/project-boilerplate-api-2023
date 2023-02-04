@@ -6,10 +6,10 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IItemUpdate,
   IItemUpdateAll,
-  IViewDestroyElementPayload,
   ItemSocketEvents,
   ItemSubType,
   ItemType,
+  IViewDestroyElementPayload,
   ViewSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -112,10 +112,8 @@ export class ItemView {
         name: item.name,
         x: item.x,
         y: item.y,
-        scene: item.scene,
         layer: item.layer,
         stackQty: item.stackQty || 0,
-        isStackable: item.maxStackSize > 1,
       });
 
       await this.characterView.addToCharacterView(

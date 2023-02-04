@@ -11,11 +11,11 @@ export const recipeBasiliskSword: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 2,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.GreenOre,
-      qty: 3,
+      qty: 8,
     },
   ],
 };

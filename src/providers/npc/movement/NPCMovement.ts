@@ -78,7 +78,7 @@ export class NPCMovement {
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
       for (const character of nearbyCharacters) {
-        const isCharInNonPVPZone = this.mapNonPVPZone.getNonPVPZoneAtXY(character.scene, character.x, character.y);
+        const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
 
         /*
         This is to prevent the NPC from attacking the player if they are in a non-PVP zone. 

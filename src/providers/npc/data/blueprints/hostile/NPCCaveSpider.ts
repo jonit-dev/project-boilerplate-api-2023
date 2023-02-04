@@ -84,6 +84,11 @@ export const npcCaveSpider: Partial<INPC> = {
       chance: 10,
       quantityRange: [1, 3],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GreenOre,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],
 };

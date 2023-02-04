@@ -11,7 +11,7 @@ export const itemFeather: Partial<IItemUseWith> = {
   name: "Feather",
   description: "A common crafting resource, used mainly for making projectiles",
   weight: 0.01,
-  maxStackSize: 70,
-  basePrice: 0.5,
+  maxStackSize: 100,
+  basePrice: 2,
   hasUseWith: true,
 };

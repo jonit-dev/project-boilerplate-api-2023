@@ -14,16 +14,12 @@ describe("ItemContainerOpen.ts", () => {
   let inventory: IItem;
   let itemContainerHelper: ItemContainerHelper;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     itemContainerOpen = container.get<ItemContainerOpen>(ItemContainerOpen);
     itemContainerHelper = container.get<ItemContainerHelper>(ItemContainerHelper);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     inventory = await testCharacter.inventory;
   });
@@ -258,9 +254,5 @@ describe("ItemContainerOpen.ts", () => {
 
       expect(sendEventToUserMock).toBeCalledWith(characterWithoutInventory, "Sorry, you don’t have an inventory.");
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

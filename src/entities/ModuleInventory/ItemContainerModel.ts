@@ -1,12 +1,13 @@
 import { ItemType, TypeHelper } from "@rpg-engine/shared";
 import { Types } from "mongoose";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, createSchema, typedModel } from "ts-mongoose";
 import { IItem, Item } from "./ItemModel";
 
 const itemContainerSchema = createSchema(
   {
     owner: Type.objectId({
       ref: "Character",
+      index: true,
     }),
     isOwnerRestricted: Type.boolean(),
     parentItem: Type.objectId({
@@ -51,7 +52,7 @@ itemContainerSchema.virtual("items").get(function (this: IItemContainer) {
 
   return Item.find({
     _id: { $in: this.itemIds.map((id) => Types.ObjectId(id)) },
-  });
+  }).lean();
 });
 
 itemContainerSchema.virtual("totalItemsQty").get(function (this: IItemContainer) {

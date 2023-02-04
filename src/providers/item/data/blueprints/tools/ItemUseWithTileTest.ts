@@ -22,7 +22,7 @@ export const itemUseWithTileTest: Partial<IItemUseWith> = {
     source,
     character: ICharacter
   ): Promise<void> => {
-    character.name = "Character affected by use with tile effect!";
+    character.name = "Impacted by effect";
     await character.save();
   },
 };

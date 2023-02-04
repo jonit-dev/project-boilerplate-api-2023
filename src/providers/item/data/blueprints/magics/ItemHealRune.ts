@@ -16,11 +16,11 @@ export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
 
   name: "Healing Rune",
   description: "An ancient healing rune.",
-  weight: 0.5,
+  weight: 0.01,
+  maxStackSize: 100,
   allowedEquipSlotType: [ItemSlotType.Inventory],
-  basePrice: 20,
   hasUseWith: true,
-
+  canUseOnNonPVPZone: true,
   useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,

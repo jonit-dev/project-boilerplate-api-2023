@@ -12,15 +12,11 @@ describe("CharacterTradingBalance.ts", () => {
   let inventoryContainer: IItemContainer;
   let characterTradingBalance: CharacterTradingBalance;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     characterTradingBalance = container.get<CharacterTradingBalance>(CharacterTradingBalance);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasInventory: true,
 
@@ -74,9 +70,5 @@ describe("CharacterTradingBalance.ts", () => {
     const totalPrice = await characterTradingBalance.calculateItemsTotalPrice(testNPC, transactionItems);
 
     expect(totalPrice).toBe(22.5);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

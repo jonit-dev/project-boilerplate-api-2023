@@ -15,6 +15,7 @@ const itemSchema = createLeanSchema(
     tiledId: Type.number(),
     owner: Type.objectId({
       ref: "Character",
+      index: true,
     }),
     type: Type.string({
       required: true,
@@ -78,9 +79,12 @@ const itemSchema = createLeanSchema(
     isTwoHanded: Type.boolean({ required: true, default: false }),
     hasUseWith: Type.boolean({ required: true, default: false }),
     basePrice: Type.number(),
+    canSell: Type.boolean({ required: true, default: true }),
 
     hasButchered: Type.boolean(),
     bodyFromId: Type.string(),
+
+    canUseOnNonPVPZone: Type.boolean({ required: true, default: true }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

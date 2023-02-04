@@ -24,9 +24,7 @@ describe("CharacterTradingValidation.ts", () => {
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
+  beforeAll(() => {
     characterTradingNPCBuy = container.get<CharacterTradingNPCBuy>(CharacterTradingNPCBuy);
 
     transactionItems = [
@@ -38,8 +36,6 @@ describe("CharacterTradingValidation.ts", () => {
   });
 
   const prepareTransaction = async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await unitTestHelper.createMockCharacter(
       {
         x: 0,
@@ -273,9 +269,5 @@ describe("CharacterTradingValidation.ts", () => {
       expect(purchasedItem?.y).toBe(testCharacter.y);
       expect(purchasedItem?.scene).toBe(testCharacter.scene);
     });
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

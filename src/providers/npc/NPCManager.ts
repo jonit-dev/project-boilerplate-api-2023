@@ -34,23 +34,19 @@ export class NPCManager {
       if (data.type === "startNPCBehavior") {
         const randomN = random(0, 3000);
 
-        setTimeout(async () => {
-          await this.startNearbyNPCsBehaviorLoop(data.data.character);
+        setTimeout(() => {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          this.startNearbyNPCsBehaviorLoop(data.data.character);
         }, randomN);
       }
     });
   }
 
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
-    const nearbyNPCs = await this.npcView.getNPCsInView(character);
-
+    const nearbyNPCs = await this.npcView.getNPCsInView(character, { isBehaviorEnabled: false });
     for (const npc of nearbyNPCs) {
-      if (npc.isBehaviorEnabled) {
-        // void starting a new behavior loop if it's already enabled
-        continue;
-      }
-
-      await this.startBehaviorLoop(npc);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      this.startBehaviorLoop(npc);
     }
   }
 
@@ -62,9 +58,17 @@ export class NPCManager {
         npc.id,
         async () => {
           try {
+            this.npcFreezer.tryToFreezeNPC(npc);
+
+            //! Requires virtual
             npc =
               (await NPC.findById(initialNPC._id).populate("skills").lean({ virtuals: true, defaults: true })) ||
               initialNPC;
+
+            if (!npc.isBehaviorEnabled) {
+              await this.npcFreezer.freezeNPC(npc);
+              return;
+            }
 
             await this.startCoreNPCBehavior(npc);
           } catch (err) {
@@ -75,10 +79,7 @@ export class NPCManager {
         (1650 + random(0, 500)) / npc.speed
       );
     }
-
     await this.setNPCBehavior(npc, true);
-
-    this.npcFreezer.tryToFreezeNPC(npc);
   }
 
   public async disableNPCBehaviors(): Promise<void> {

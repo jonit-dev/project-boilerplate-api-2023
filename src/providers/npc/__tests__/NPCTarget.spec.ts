@@ -11,14 +11,12 @@ describe("NPCTarget.ts", () => {
   let testCharacter: ICharacter;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     await unitTestHelper.initializeMapLoader();
 
     npcTarget = container.get<NPCTarget>(NPCTarget);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testNPC = await unitTestHelper.createMockNPC(
       {
         x: FromGridX(0),
@@ -202,8 +200,5 @@ describe("NPCTarget.ts", () => {
 
       expect(clearTarget).toHaveBeenCalled();
     });
-  });
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

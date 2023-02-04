@@ -101,5 +101,21 @@ export const npcElf: Partial<INPC> = {
       chance: 20,
       quantityRange: [5, 10],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Wheat,
+      chance: 10,
+      quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WoodenBoard,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Herb,
+      chance: 30,
+      quantityRange: [5, 10],
+    },
   ],
 };

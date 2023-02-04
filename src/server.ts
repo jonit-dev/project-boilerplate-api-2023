@@ -24,6 +24,11 @@ import * as Tracing from "@sentry/tracing";
 
 const port = appEnv.general.SERVER_PORT || 3002;
 
+// load new relic if in production
+if (appEnv.general.ENV === EnvType.Production) {
+  require("newrelic");
+}
+
 app.listen(port, async () => {
   server.showBootstrapMessage({
     appName: appEnv.general.APP_NAME!,

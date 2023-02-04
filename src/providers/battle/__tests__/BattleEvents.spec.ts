@@ -12,8 +12,7 @@ describe("BattleEvents.spec.ts", () => {
   let testNPC: INPC;
   let testCharacter: ICharacter;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     battleEvents = container.get<BattleEvent>(BattleEvent);
 
     // Set random as 50 to get the most likely Battle Event
@@ -21,8 +20,6 @@ describe("BattleEvents.spec.ts", () => {
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
     await testNPC.populate("skills").execPopulate();
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true, hasEquipment: true });
@@ -100,9 +97,5 @@ describe("BattleEvents.spec.ts", () => {
     const hit = await battleEvents.calculateHitDamage(testCharacter, testNPC);
 
     expect(hit).toBe(testNPC.health);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

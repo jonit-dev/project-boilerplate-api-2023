@@ -184,12 +184,14 @@ export enum CraftingResourcesBlueprint {
   ElvenWood = "elven-wood",
   SmallWorm = "small-worm",
   SmallWoodenStick = "small-wooden-sticks",
-  RedShappire = "red-shappire",
   BlueSilk = "blue-silk",
   IronNail = "iron-nail",
   FoodRecipe = "food-recipe",
   WeaponRecipe = "weapon-recipe",
   MagicRecipe = "magic-recipe",
+  Eye = "eye",
+  Skull = "skull",
+  Bones = "bones",
 }
 
 export enum ToolsBlueprint {

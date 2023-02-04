@@ -14,6 +14,7 @@ export class Database {
             useCreateIndex: true,
             useUnifiedTopology: true,
             dbName: process.env.MONGO_INITDB_DATABASE,
+            poolSize: 10,
           },
           (err) => {
             if (err) {

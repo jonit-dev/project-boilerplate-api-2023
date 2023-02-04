@@ -6,6 +6,7 @@ import {
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
@@ -103,6 +104,31 @@ export const npcIceTroll: Partial<INPC> = {
     {
       itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueLeather,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Rock,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
+      chance: 20,
+      quantityRange: [1, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Skull,
+      chance: 15,
+      quantityRange: [1, 3],
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

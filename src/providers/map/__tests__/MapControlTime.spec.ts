@@ -1,6 +1,6 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { container } from "@providers/inversify/container";
 import { AvailableWeather, IControlTime, PeriodOfDay, WeatherSocketEvents } from "@rpg-engine/shared";
 import { MapControlTime } from "../MapControlTime";
 
@@ -11,11 +11,9 @@ describe("MapControlTime", () => {
   let find: jest.SpyInstance;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     mapControlTime = container.get<MapControlTime>(MapControlTime);
   });
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     // @ts-expect-error
     sendEventToUser = jest.spyOn(mapControlTime.socketMessaging, "sendEventToUser");
     create = jest.spyOn(MapControlTimeModel, "create");
@@ -23,9 +21,6 @@ describe("MapControlTime", () => {
   });
   afterEach(() => {
     jest.clearAllMocks();
-  });
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 
   it("should return a random weather type", () => {

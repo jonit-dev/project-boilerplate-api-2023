@@ -10,12 +10,12 @@ export const recipeLightEndurancePotion: IUseWithCraftingRecipe = {
       qty: 3,
     },
     {
-      key: CraftingResourcesBlueprint.Jade,
-      qty: 1,
+      key: CraftingResourcesBlueprint.GreenOre,
+      qty: 2,
     },
     {
       key: CraftingResourcesBlueprint.WaterBottle,
-      qty: 1,
+      qty: 2,
     },
   ],
 };

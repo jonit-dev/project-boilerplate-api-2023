@@ -6,11 +6,15 @@ export const recipeFireStaff: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.RedShappire,
-      qty: 10,
+      key: CraftingResourcesBlueprint.RedSapphire,
+      qty: 4,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
+      qty: 3,
+    },
+    {
+      key: CraftingResourcesBlueprint.SteelIngot,
       qty: 3,
     },
   ],

@@ -12,10 +12,9 @@ export const itemFireStaff: Partial<IMagicStaff> = {
   name: "Fire Staff",
   description:
     "A staff imbued with the power of flames, adorned with a glowing fire ember gem at its peak. It is capable of unleashing fiery attacks and generating intense heat.",
-  attack: 8,
-  defense: 5,
+  attack: 15,
+  defense: 8,
   weight: 1,
-  isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Ranged,
   basePrice: 77,

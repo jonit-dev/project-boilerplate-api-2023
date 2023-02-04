@@ -7,11 +7,15 @@ export const recipeElvenSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 5,
+      qty: 3,
     },
     {
-      key: CraftingResourcesBlueprint.ElvenLeaf,
-      qty: 10,
+      key: CraftingResourcesBlueprint.Diamond,
+      qty: 2,
+    },
+    {
+      key: CraftingResourcesBlueprint.GoldenIngot,
+      qty: 3,
     },
   ],
 };

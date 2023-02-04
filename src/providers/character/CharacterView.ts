@@ -89,12 +89,12 @@ export class CharacterView {
   }
 
   public async clearCharacterView(character: ICharacter): Promise<void> {
-    character.view = {
+    const view = {
       npcs: {},
       items: {},
       characters: {},
     };
-    await Character.updateOne({ _id: character._id }, { view: character.view });
+    await Character.updateOne({ _id: character._id }, { view });
   }
 
   public async removeFromCharacterView(
@@ -163,12 +163,16 @@ export class CharacterView {
     // get the character with minimum distance
     const minDistanceCharacterInfo = _.minBy(charactersDistance, "distance");
 
-    const minDistanceChar = await Character.findById(minDistanceCharacterInfo?.id);
+    const minDistanceChar = (await Character.findById(minDistanceCharacterInfo?.id).lean({
+      virtuals: true,
+      defaults: true,
+    })) as ICharacter;
 
     return minDistanceChar;
   }
 
   public async getElementsInCharView<T>(
+    // @ts-ignore
     Element: Model<T>,
     character: ICharacter,
     filter?: Record<string, unknown>
@@ -221,7 +225,7 @@ export class CharacterView {
           ...filter,
         },
       ],
-    }).lean({ virtuals: true, defaults: true });
+    }).lean({ virtuals: true, defaults: true }); //! Required until we have quadtrees
 
     return otherCharactersInView as unknown as T[];
   }

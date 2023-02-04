@@ -10,10 +10,10 @@ import { ItemRarity } from "@providers/item/ItemRarity";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BattleSocketEvents, IBattleDeath, INPCLoot } from "@rpg-engine/shared";
+import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemType } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
-import _, { random } from "lodash";
+import random from "lodash/random";
 import { NPC_CYCLES } from "./NPCCycle";
 import { calculateGold } from "./NPCGold";
 import { NPCTarget } from "./movement/NPCTarget";
@@ -42,7 +42,7 @@ export class NPCDeath {
 
       // create NPC body instance
       let goldLoot;
-      const npcBody = await this.generateNPCBody(npc, character);
+      const npcBody = await this.generateNPCBody(npc);
 
       if (npc.loots) {
         const npcSkills = await npc.populate("skills").execPopulate();
@@ -66,7 +66,7 @@ export class NPCDeath {
     }
   }
 
-  public generateNPCBody(npc: INPC, character: ICharacter | null): Promise<IItem> {
+  public generateNPCBody(npc: INPC): Promise<IItem> {
     const blueprintData = itemsBlueprintIndex["npc-body"];
     const npcBody = new Item({
       ...blueprintData, // base body props
@@ -123,15 +123,21 @@ export class NPCDeath {
         break;
       }
 
-      const rand = Math.round(_.random(0, 100));
-      if (rand <= loot.chance * NPC_LOOT_CHANCE_MULTIPLIER) {
-        const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+      const rand = Math.round(random(0, 100));
+      const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
 
+      let lootChance = loot.chance * NPC_LOOT_CHANCE_MULTIPLIER;
+
+      if (blueprintData.type === ItemType.CraftingResource) {
+        lootChance = loot.chance; // crafting materials not impacted by NPC_LOOT_CHANCE_MULTIPLIER
+      }
+
+      if (rand <= lootChance) {
         let lootQuantity = 1;
         // can specify a loot quantity range, e.g. 5-10 coins.
         // So need to add that quantity to the body container
         if (loot.quantityRange && loot.quantityRange.length === 2) {
-          lootQuantity = Math.round(_.random(loot.quantityRange[0], loot.quantityRange[1]));
+          lootQuantity = Math.round(random(loot.quantityRange[0], loot.quantityRange[1]));
         }
 
         let lootItem = new Item({ ...blueprintData });

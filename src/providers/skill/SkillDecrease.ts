@@ -1,20 +1,13 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  BASIC_ATTRIBUTES,
-  COMBAT_SKILLS,
-  ISkillDetails,
-  SKILLS_MAP,
-  SkillSocketEvents,
-  calculateSPToNextLevel,
-} from "@rpg-engine/shared";
+import { BASIC_ATTRIBUTES, COMBAT_SKILLS, ISkillDetails, SKILLS_MAP, calculateSPToNextLevel } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SkillCalculator } from "./SkillCalculator";
+import { SkillFunctions } from "./SkillFunctions";
 
 @provide(SkillDecrease)
 export class SkillDecrease {
-  constructor(private skillCalculator: SkillCalculator, private socketMessaging: SocketMessaging) {}
+  constructor(private skillCalculator: SkillCalculator, private skillFunctions: SkillFunctions) {}
 
   public async deathPenalty(character: ICharacter): Promise<boolean> {
     try {
@@ -32,7 +25,7 @@ export class SkillDecrease {
   }
 
   private async decreaseCharacterXp(character: ICharacter): Promise<boolean> {
-    const skills = await Skill.findOne({ _id: character.skills });
+    const skills = (await Skill.findOne({ _id: character.skills }).lean()) as ISkill;
     if (!skills) {
       return false;
     }
@@ -45,20 +38,12 @@ export class SkillDecrease {
     skills.experience = newXpReduced;
     skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(newXpReduced, skills.level + 1);
 
-    await this.updateSkills(skills, character);
+    await this.skillFunctions.updateSkills(skills, character);
     return true;
   }
 
-  private async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
-    await skills.save();
-
-    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills.toObject(),
-    });
-  }
-
   private async decreaseBasicAttributeSP(character: ICharacter): Promise<boolean> {
-    const skills = (await Skill.findById(character.skills)) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
@@ -67,7 +52,7 @@ export class SkillDecrease {
     try {
       for (let i = 0; i < BASIC_ATTRIBUTES.length; i++) {
         this.decreaseSP(skills, BASIC_ATTRIBUTES[i]);
-        await this.updateSkills(skills, character);
+        await this.skillFunctions.updateSkills(skills, character);
       }
 
       return true;
@@ -79,7 +64,7 @@ export class SkillDecrease {
   }
 
   private async decreaseCombatSkillsSP(character: ICharacter): Promise<boolean> {
-    const skills = (await Skill.findById(character.skills)) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
@@ -87,7 +72,7 @@ export class SkillDecrease {
     try {
       for (let i = 0; i < COMBAT_SKILLS.length; i++) {
         this.decreaseSP(skills, COMBAT_SKILLS[i]);
-        await this.updateSkills(skills, character);
+        await this.skillFunctions.updateSkills(skills, character);
       }
 
       return true;

@@ -7,12 +7,10 @@ describe("EquipmentStatsCalculator.spec.ts", () => {
   let equipment: IEquipment;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     equipmentStatsCalculator = container.get<EquipmentStatsCalculator>(EquipmentStatsCalculator);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     equipment = await unitTestHelper.createEquipment();
   });
 
@@ -26,9 +24,5 @@ describe("EquipmentStatsCalculator.spec.ts", () => {
     const result = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "defense");
 
     expect(result).toBe(16);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

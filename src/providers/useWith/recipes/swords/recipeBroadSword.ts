@@ -6,11 +6,15 @@ export const recipeBroadSword: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.IronIngot,
-      qty: 3,
+      key: CraftingResourcesBlueprint.CopperIngot,
+      qty: 5,
     },
     {
-      key: CraftingResourcesBlueprint.WoodenSticks,
+      key: CraftingResourcesBlueprint.ElvenWood,
+      qty: 5,
+    },
+    {
+      key: CraftingResourcesBlueprint.PhoenixFeather,
       qty: 2,
     },
   ],

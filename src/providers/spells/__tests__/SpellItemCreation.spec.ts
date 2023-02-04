@@ -41,14 +41,12 @@ describe("SpellItemCreation", () => {
     spellPoisonRuneCreation,
   ];
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
+  beforeAll(() => {
     spellItemCreation = container.get(SpellItemCreation);
     characterItemContainer = container.get(CharacterItemContainer);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     // @ts-ignore
     sendErrorMessageToCharacter = jest.spyOn(spellItemCreation.socketMessaging, "sendErrorMessageToCharacter");
 
@@ -120,8 +118,7 @@ describe("SpellItemCreation", () => {
       "You do not have any blank rune to create a Dark Rune."
     );
   });
-  afterAll(async () => {
+  afterAll(() => {
     jest.clearAllMocks();
-    await unitTestHelper.afterAllJestHook();
   });
 });

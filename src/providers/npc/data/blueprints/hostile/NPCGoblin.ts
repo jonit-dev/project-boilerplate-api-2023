@@ -137,5 +137,20 @@ export const npcGoblin = {
       chance: 20,
       quantityRange: [5, 10],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Wheat,
+      chance: 20,
+      quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Rock,
+      chance: 30,
+      quantityRange: [1, 5],
+    },
   ],
 } as Partial<INPC>;

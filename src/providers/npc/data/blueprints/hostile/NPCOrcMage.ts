@@ -106,5 +106,15 @@ export const npcOrcMage = {
       itemBlueprintKey: StaffsBlueprint.PoisonWand,
       chance: 15,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Jade,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Herb,
+      chance: 40,
+      quantityRange: [5, 10],
+    },
   ],
 } as Partial<INPC>;

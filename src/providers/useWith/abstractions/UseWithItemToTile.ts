@@ -2,11 +2,12 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItem, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { isArray, isMap } from "lodash";
 import random from "lodash/random";
@@ -40,7 +41,8 @@ export class UseWithItemToTile {
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
     private socketMessaging: SocketMessaging,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private characterWeight: CharacterWeight
   ) {}
 
   public async execute(character: ICharacter, options: IUseWithItemToTileOptions): Promise<void> {
@@ -69,7 +71,7 @@ export class UseWithItemToTile {
           hasRequiredItem = await this.characterItemInventory.checkItemInInventoryByKey(k, character);
           if (hasRequiredItem) {
             // check if have required qty
-            const item = await Item.findById(hasRequiredItem);
+            const item = (await Item.findById(hasRequiredItem).lean()) as IItem;
             if (requiredResource.decrementQty && (item?.stackQty || 0) >= requiredResource.decrementQty) {
               resourceKey = k;
               break;
@@ -134,6 +136,8 @@ export class UseWithItemToTile {
 
       return;
     }
+
+    await this.characterWeight.updateCharacterWeight(character);
 
     if (successAnimationEffectKey) {
       await this.animationEffect.sendAnimationEventToCharacter(character, successAnimationEffectKey);

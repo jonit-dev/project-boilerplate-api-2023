@@ -1,4 +1,3 @@
-import { RedisManager } from "@providers/database/RedisManager";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { GridManager } from "../GridManager";
 import { MapTiles } from "../MapTiles";
@@ -6,12 +5,7 @@ import { MapTiles } from "../MapTiles";
 describe("GridManager", () => {
   let gridManager: GridManager;
   let mapTiles: MapTiles;
-  let redisManager: RedisManager;
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-    redisManager = container.get<RedisManager>(RedisManager);
-    await redisManager.connect();
-
     gridManager = container.get<GridManager>(GridManager);
     mapTiles = container.get<MapTiles>(MapTiles);
 
@@ -21,9 +15,7 @@ describe("GridManager", () => {
     await gridManager.generateGridSolids("example");
   });
 
-  beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-  });
+  beforeEach(async () => {});
 
   const checkMapSize = async (mapName: string, expectedWidth: number, expectedHeight: number): Promise<void> => {
     const hasGrid = await gridManager.hasGrid(mapName);
@@ -163,9 +155,5 @@ describe("GridManager", () => {
       [16, 25],
       [17, 25],
     ]);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

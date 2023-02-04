@@ -12,6 +12,6 @@ export const itemJade: Partial<IItemUseWith> = {
   description: "A piece of jade. The eye of Dursed Dragon.",
   weight: 3,
   maxStackSize: 10,
-  basePrice: 15,
   hasUseWith: true,
+  basePrice: 35,
 };

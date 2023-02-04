@@ -12,7 +12,6 @@ describe("ItemDragAndDrop.ts", () => {
   let testItem: IItem;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     itemDragAndDrop = container.get<ItemDragAndDrop>(ItemDragAndDrop);
 
     testCharacter = await unitTestHelper.createMockCharacter(null, {
@@ -25,8 +24,6 @@ describe("ItemDragAndDrop.ts", () => {
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     itemMoveData = {
       from: {
         containerId: "containerId",
@@ -195,9 +192,5 @@ describe("ItemDragAndDrop.ts", () => {
   afterEach(() => {
     jest.clearAllMocks();
     jest.resetAllMocks();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

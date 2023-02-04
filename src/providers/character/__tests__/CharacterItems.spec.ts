@@ -18,8 +18,6 @@ describe("CharacterItems.ts", () => {
   let characterItems: CharacterItems;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-
     characterItems = container.get<CharacterItems>(CharacterItems);
 
     // itemSelled = container.get<ItemPickup>(ItemPickup);
@@ -28,8 +26,6 @@ describe("CharacterItems.ts", () => {
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
-
     testCharacter = await (
       await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true, hasSkills: true })
     )
@@ -99,9 +95,5 @@ describe("CharacterItems.ts", () => {
     const result = await characterItems.deleteItemFromContainer(testItem.id, testCharacter, "equipment");
 
     expect(result).toBeTruthy();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

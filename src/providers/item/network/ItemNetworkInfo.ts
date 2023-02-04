@@ -14,7 +14,7 @@ export class ItemNetworkInfo {
       channel,
       ItemSocketEvents.GetItemInfo,
       async (data: IGetItemInfo, character: ICharacter) => {
-        const item = await Item.findById(data.id);
+        const item = await Item.findById(data.id).lean({ virtuals: true, defaults: true });
         if (item) {
           for (const field of data.fields) {
             if (item[field] && item[field].length > 1) {

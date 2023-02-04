@@ -71,5 +71,15 @@ export const npcElderGolem: Partial<INPC> = {
       itemBlueprintKey: StaffsBlueprint.RubyStaff,
       chance: 10,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.PolishedStone,
+      chance: 30,
+      quantityRange: [5, 20],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
   ],
 };

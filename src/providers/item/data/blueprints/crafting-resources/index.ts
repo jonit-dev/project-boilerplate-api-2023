@@ -6,6 +6,7 @@ import { itemBlueLeather } from "./itemBlueLeather";
 import { itemBlueSapphire } from "./ItemBlueSapphire";
 import { itemBlueSilk } from "./itemBlueSilk";
 import { itemBone } from "./ItemBone";
+import { itemBones } from "./ItemBones";
 import { itemColoredFeather } from "./ItemColoredFeather";
 import { itemCopperIngot } from "./ItemCopperIngot";
 import { itemCopperOre } from "./ItemCopperOre";
@@ -13,6 +14,7 @@ import { itemCorruptionOre } from "./ItemCorruptionOre";
 import { itemDiamond } from "./ItemDiamond";
 import { itemElvenLeaf } from "./itemElvenLeaf";
 import { itemElvenWood } from "./itemElvenWood";
+import { itemEye } from "./ItemEye";
 import { itemFeather } from "./ItemFeather";
 import { itemFoodRecipe } from "./ItemFoodRecipe";
 import { itemGoldenIngot } from "./ItemGoldenIngot";
@@ -35,6 +37,7 @@ import { itemSewingThread } from "./itemSewingThread";
 import { itemSilk } from "./ItemSilk";
 import { itemSilverIngot } from "./ItemSilverIngot";
 import { itemSilverOre } from "./ItemSilverOre";
+import { itemSkull } from "./ItemSkull";
 import { itemSmallWoodenStick } from "./itemSmallWoodenStick";
 import { itemSmallWorm } from "./itemSmallWorm";
 import { itemSteelIngot } from "./itemSteelIngot";
@@ -90,10 +93,12 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.ElvenWood]: itemElvenWood,
   [CraftingResourcesBlueprint.SmallWorm]: itemSmallWorm,
   [CraftingResourcesBlueprint.SewingThread]: itemSewingThread,
-  [CraftingResourcesBlueprint.RedShappire]: itemRedSapphire,
   [CraftingResourcesBlueprint.BlueSilk]: itemBlueSilk,
   [CraftingResourcesBlueprint.IronNail]: itemIronNail,
   [CraftingResourcesBlueprint.FoodRecipe]: itemFoodRecipe,
   [CraftingResourcesBlueprint.WeaponRecipe]: itemWeaponRecipe,
   [CraftingResourcesBlueprint.MagicRecipe]: itemMagicRecipe,
+  [CraftingResourcesBlueprint.Eye]: itemEye,
+  [CraftingResourcesBlueprint.Skull]: itemSkull,
+  [CraftingResourcesBlueprint.Bones]: itemBones,
 };

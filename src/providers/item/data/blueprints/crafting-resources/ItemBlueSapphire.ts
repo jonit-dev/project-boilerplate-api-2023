@@ -10,8 +10,8 @@ export const itemBlueSapphire: Partial<IItemUseWith> = {
   texturePath: "crafting-resources/blue-sapphire.png",
   name: "Blue Sapphire",
   description: "Sapphire is a precious gemstone, formed from a mineral called corundum.",
-  weight: 0.5,
-  maxStackSize: 35,
-  basePrice: 5,
+  weight: 0.1,
+  maxStackSize: 100,
+  basePrice: 25,
   hasUseWith: true,
 };

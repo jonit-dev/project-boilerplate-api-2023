@@ -5,12 +5,7 @@ import { PeriodOfDay } from "@rpg-engine/shared";
 describe("MapControlTimeModel.ts", () => {
   let testWeather: IControlTime;
 
-  beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
-  });
-
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testWeather = await unitTestHelper.createWeatherControlMock("06:00", PeriodOfDay.Morning, "Standard");
   });
 
@@ -24,9 +19,5 @@ describe("MapControlTimeModel.ts", () => {
     expect(controlTime.time).toEqual(testWeather.time);
     expect(controlTime.period).toEqual(testWeather.period);
     expect(controlTime.weather).toEqual(testWeather.weather);
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

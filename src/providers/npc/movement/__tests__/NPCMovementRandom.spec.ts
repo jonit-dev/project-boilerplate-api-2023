@@ -9,14 +9,12 @@ describe("NPCMovementRandom.ts", () => {
   let testNPC: INPC;
 
   beforeAll(async () => {
-    await unitTestHelper.beforeAllJestHook();
     await unitTestHelper.initializeMapLoader();
 
     npcMovementRandom = container.get<NPCMovementRandomPath>(NPCMovementRandomPath);
   });
 
   beforeEach(async () => {
-    await unitTestHelper.beforeEachJestHook(true);
     testNPC = await unitTestHelper.createMockNPC(null, null, NPCMovementType.Random);
   });
 
@@ -43,9 +41,5 @@ describe("NPCMovementRandom.ts", () => {
     const isRandomMovementCompleted = await npcMovementRandom.startRandomMovement(outOfRangeNPC);
 
     expect(isRandomMovementCompleted).toBeFalsy();
-  });
-
-  afterAll(async () => {
-    await unitTestHelper.afterAllJestHook();
   });
 });

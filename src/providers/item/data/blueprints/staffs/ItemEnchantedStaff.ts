@@ -13,8 +13,8 @@ export const itemEnchantedStaff: Partial<IMagicStaff> = {
     "A magical staff imbued with powerful enchantments, capable of channeling potent spells and incantations.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 12,
-  defense: 4,
+  attack: 14,
+  defense: 7,
   rangeType: EntityAttackType.Melee,
   basePrice: 80,
 };
