@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -40,7 +41,8 @@ export class UseWithItemToTile {
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
     private socketMessaging: SocketMessaging,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private characterWeight: CharacterWeight
   ) {}
 
   public async execute(character: ICharacter, options: IUseWithItemToTileOptions): Promise<void> {
@@ -134,6 +136,8 @@ export class UseWithItemToTile {
 
       return;
     }
+
+    await this.characterWeight.updateCharacterWeight(character);
 
     if (successAnimationEffectKey) {
       await this.animationEffect.sendAnimationEventToCharacter(character, successAnimationEffectKey);

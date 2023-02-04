@@ -3,6 +3,7 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -40,7 +41,8 @@ export class UseWithItemToEntity {
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
     private socketMessaging: SocketMessaging,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private characterWeight: CharacterWeight
   ) {}
 
   public async execute(character: ICharacter, options: IUseWithItemToEntityOptions): Promise<void> {
@@ -101,6 +103,8 @@ export class UseWithItemToEntity {
       }
       return;
     }
+
+    await this.characterWeight.updateCharacterWeight(character);
 
     if (successAnimationEffectKey) {
       await this.animationEffect.sendAnimationEventToCharacter(character, successAnimationEffectKey);
