@@ -17,9 +17,5 @@ export const recipeDeathsHelmet: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.CorruptionOre,
       qty: 3,
     },
-    {
-      key: CraftingResourcesBlueprint.Bones,
-      qty: 2,
-    },
   ],
 };

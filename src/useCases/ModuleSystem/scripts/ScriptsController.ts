@@ -17,4 +17,15 @@ export class ScriptsController implements interfaces.Controller {
       message: "Attack speed adjusted succesfully",
     });
   }
+
+  @httpGet("/initial-coordinates")
+  public async initialCoordinates(@response() res): Promise<void> {
+    // update all initial coordinates from users performatically
+
+    await this.scriptsUserCase.adjustInitialCoordinates();
+
+    return res.status(200).send({
+      message: "Initial coordinates adjusted succesfully",
+    });
+  }
 }

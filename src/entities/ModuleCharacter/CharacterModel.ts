@@ -121,19 +121,19 @@ const characterSchema = createLeanSchema(
     }),
 
     x: Type.number({
-      default: FromGridX(56),
+      default: FromGridX(35),
       required: true,
     }),
     y: Type.number({
-      default: FromGridY(54),
+      default: FromGridY(44),
       required: true,
     }),
     initialX: Type.number({
-      default: FromGridX(56),
+      default: FromGridX(35),
       required: true,
     }),
     initialY: Type.number({
-      default: FromGridY(54),
+      default: FromGridY(44),
       required: true,
     }),
     direction: Type.string({
