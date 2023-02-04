@@ -19,10 +19,7 @@ export class ItemValidation {
       return false;
     }
 
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer).lean({
-      virtuals: true,
-      defaults: true,
-    })) as IItemContainer;
+    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer).lean()) as IItemContainer;
 
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory container not found.");

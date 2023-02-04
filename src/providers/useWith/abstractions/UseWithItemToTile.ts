@@ -69,10 +69,7 @@ export class UseWithItemToTile {
           hasRequiredItem = await this.characterItemInventory.checkItemInInventoryByKey(k, character);
           if (hasRequiredItem) {
             // check if have required qty
-            const item = (await Item.findById(hasRequiredItem).lean({
-              virtuals: true,
-              defaults: true,
-            })) as IItem;
+            const item = (await Item.findById(hasRequiredItem).lean()) as IItem;
             if (requiredResource.decrementQty && (item?.stackQty || 0) >= requiredResource.decrementQty) {
               resourceKey = k;
               break;

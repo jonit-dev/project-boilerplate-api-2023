@@ -143,10 +143,9 @@ export class UseWithItemToEntity {
 
   private async refreshInventory(character: ICharacter): Promise<void> {
     const inventory = await character.inventory;
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer).lean({
-      virtuals: true,
-      defaults: true,
-    })) as unknown as IItemContainer;
+    const inventoryContainer = (await ItemContainer.findById(
+      inventory.itemContainer
+    ).lean()) as unknown as IItemContainer;
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: inventoryContainer,
