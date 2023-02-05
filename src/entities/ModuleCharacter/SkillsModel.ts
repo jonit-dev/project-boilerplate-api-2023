@@ -151,31 +151,11 @@ async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean): Promis
 }
 
 skillsSchema.virtual("attack").get(async function (this: ISkill) {
-  if (this.ownerType === "Character") {
-    const equipment = await Equipment.findOne({ owner: this.owner }, { totalEquippedAttack: 1, _id: 0 })
-      .limit(1)
-      .lean({ virtuals: true, index: true });
-
-    if (equipment) {
-      return this.strength.level + this.level + (await equipment.totalEquippedAttack) || 0;
-    }
-  }
-  // for regular NPCs
-  return this.strength.level + this.level;
+  return await getTotalAttackOrDefense(this, true);
 });
 
 skillsSchema.virtual("defense").get(async function (this: ISkill) {
-  if (this.ownerType === "Character") {
-    const equipment = await Equipment.findOne({ owner: this.owner }, { totalEquippedDefense: 1, _id: 0 })
-      .limit(1)
-      .lean({ virtuals: true, index: true });
-
-    if (equipment) {
-      return this.resistance.level + this.level + (await equipment.totalEquippedDefense) || 0;
-    }
-  }
-  // for regular NPCs
-  return this.strength.level + this.level;
+  return await getTotalAttackOrDefense(this, false);
 });
 
 export type ISkill = ExtractDoc<typeof skillsSchema>;

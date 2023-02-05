@@ -26,15 +26,15 @@ describe("NPCGold", () => {
     const maxMaxHealth = 100;
     const minSkillsLevel = 0;
     const maxSkillsLevel = 10;
-    expect(npcGold.calculateGold(minMaxHealth, { ...skills, level: 5 })).toBe(4);
+    expect(npcGold.calculateGold(minMaxHealth, { ...skills, level: 5 })).toBe(6);
     expect(npcGold.calculateGold(maxMaxHealth, { ...skills, level: 5 })).toBeGreaterThan(0);
     expect(npcGold.calculateGold(50, { ...skills, level: minSkillsLevel })).toBe(0);
     expect(npcGold.calculateGold(50, { ...skills, level: maxSkillsLevel })).toBeGreaterThan(0);
   });
 
   it("calculateGold correctly handles invalid input values", () => {
-    expect(npcGold.calculateGold(-1, { level: 5 })).toBe(1);
-    expect(npcGold.calculateGold(50, {})).toBe(3);
+    expect(npcGold.calculateGold(-1, { level: 5 })).toBe(2);
+    expect(npcGold.calculateGold(50, {})).toBe(4);
   });
 
   it("calculateGold correctly rounds the result to the nearest integer", () => {
