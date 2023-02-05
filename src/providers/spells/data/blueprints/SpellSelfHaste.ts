@@ -11,6 +11,8 @@ import {
 } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 
+const HASTE_CONTROL: Map<string, any> = new Map();
+
 export const spellSelfHaste: Partial<ISpell> = {
   key: SpellsBlueprint.SelfHasteSpell,
   name: "Self Haste Spell",
@@ -28,20 +30,27 @@ export const spellSelfHaste: Partial<ISpell> = {
     const increaseSpeed = 3;
     ItemUsableEffect.apply(character, EffectableAttribute.Speed, increaseSpeed);
 
-    setTimeout(async () => {
-      // This is needed for update channelId for eventListener
-      const updateCharacter = await Character.findById(character._id);
-      if (!updateCharacter) return;
+    if (HASTE_CONTROL.has(character._id)) {
+      clearTimeout(HASTE_CONTROL.get(character._id)!);
+    }
 
-      updateCharacter.baseSpeed = MovementSpeed.Slow;
-      await updateCharacter.save();
+    HASTE_CONTROL.set(
+      character._id,
+      setTimeout(async () => {
+        // This is needed for update channelId for eventListener
+        const updateCharacter = await Character.findById(character._id);
+        if (!updateCharacter) return;
 
-      const payload: ICharacterAttributeChanged = {
-        targetId: updateCharacter._id,
-        speed: updateCharacter.speed,
-      };
+        updateCharacter.baseSpeed = MovementSpeed.Slow;
+        await updateCharacter.save();
 
-      socketMessaging.sendEventToUser(updateCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
-    }, 1000 * 60 * 10);
+        const payload: ICharacterAttributeChanged = {
+          targetId: updateCharacter._id,
+          speed: updateCharacter.speed,
+        };
+
+        socketMessaging.sendEventToUser(updateCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+      }, 1000 * 45)
+    );
   },
 };
