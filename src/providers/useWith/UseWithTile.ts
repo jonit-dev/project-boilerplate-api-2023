@@ -1,8 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { TILE_MAX_REACH_DISTANCE_IN_GRID } from "@providers/constants/TileConstants";
+import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { MapTiles } from "@providers/map/MapTiles";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -18,7 +20,9 @@ export class UseWithTile {
     private socketMessaging: SocketMessaging,
     private mapTiles: MapTiles,
     private useWithHelper: UseWithHelper,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private itemCraftable: ItemCraftable,
+    private skillIncrease: SkillIncrease
   ) {}
 
   public onUseWithTile(channel: SocketChannel): void {
@@ -31,7 +35,14 @@ export class UseWithTile {
 
           if (useWithData) {
             const { originItem, useWithTileEffect, targetName } = useWithData;
-            await useWithTileEffect!(originItem, useWithTileData.targetTile, targetName, character);
+            await useWithTileEffect!(
+              originItem,
+              useWithTileData.targetTile,
+              targetName,
+              character,
+              this.itemCraftable,
+              this.skillIncrease
+            );
           }
         } catch (error) {
           console.error(error);

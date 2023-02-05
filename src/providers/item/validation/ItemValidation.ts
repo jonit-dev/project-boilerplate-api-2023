@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { IItemContainer } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ItemValidation)
@@ -18,14 +19,16 @@ export class ItemValidation {
       return false;
     }
 
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer).lean()) as IItemContainer;
 
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory container not found.");
       return false;
     }
 
-    const hasItemInInventory = inventoryContainer?.itemIds?.find((citemId) => String(citemId) === String(itemId));
+    const hasItemInInventory = Object.values(inventoryContainer.slots).find(
+      (citemId) => String(citemId?._id) === String(itemId)
+    );
 
     if (!hasItemInInventory) {
       this.socketMessaging.sendErrorMessageToCharacter(

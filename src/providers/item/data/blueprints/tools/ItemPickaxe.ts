@@ -1,6 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
+import { ItemCraftable } from "@providers/item/ItemCraftable";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import {
   IUseWithItemToTileOptions,
   IUseWithItemToTileReward,
@@ -31,7 +33,9 @@ export const itemPickaxe: Partial<IItemUseWith> = {
     originItem: IItem,
     targetTile: IUseWithTargetTile,
     targetName: string | undefined,
-    character: ICharacter
+    character: ICharacter,
+    itemCraftable: ItemCraftable,
+    skillIncrease: SkillIncrease
   ) => {
     const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
 
@@ -54,7 +58,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
         {
           key: RangedWeaponsBlueprint.Stone,
           qty: [3, 5],
-          chance: 30,
+          chance: await itemCraftable.getCraftChance(character, 30),
         },
       ],
     };
@@ -70,7 +74,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
             {
               key: CraftingResourcesBlueprint.IronOre,
               qty: [5, 7],
-              chance: 20,
+              chance: await itemCraftable.getCraftChance(character, 20),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -83,7 +87,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
             {
               key: CraftingResourcesBlueprint.CopperOre,
               qty: [3, 4],
-              chance: 15,
+              chance: await itemCraftable.getCraftChance(character, 15),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -97,7 +101,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
             {
               key: CraftingResourcesBlueprint.SilverOre,
               qty: [2, 3],
-              chance: 10,
+              chance: await itemCraftable.getCraftChance(character, 10),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -110,7 +114,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
             {
               key: CraftingResourcesBlueprint.GoldenOre,
               qty: [1, 2],
-              chance: 7,
+              chance: await itemCraftable.getCraftChance(character, 7),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -123,7 +127,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
             {
               key: CraftingResourcesBlueprint.GreenOre,
               qty: [1, 2],
-              chance: 50,
+              chance: await itemCraftable.getCraftChance(character, 50),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -136,7 +140,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
             {
               key: CraftingResourcesBlueprint.ObsidiumOre,
               qty: [1, 2],
-              chance: 3,
+              chance: await itemCraftable.getCraftChance(character, 3),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -149,13 +153,13 @@ export const itemPickaxe: Partial<IItemUseWith> = {
             {
               key: CraftingResourcesBlueprint.CorruptionOre,
               qty: [1, 2],
-              chance: 1,
+              chance: await itemCraftable.getCraftChance(character, 1),
             },
           ] as IUseWithItemToTileReward[],
         };
         break;
     }
 
-    await useWithItemToTile.execute(character, useWithItemToTileOptions);
+    await useWithItemToTile.execute(character, useWithItemToTileOptions, skillIncrease);
   },
 };

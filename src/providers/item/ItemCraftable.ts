@@ -22,6 +22,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 
 @provide(ItemCraftable)
 export class ItemCraftable {
@@ -31,7 +32,8 @@ export class ItemCraftable {
     private characterValidation: CharacterValidation,
     private characterItemInventory: CharacterItemInventory,
     private characterWeight: CharacterWeight,
-    private animationEffect: AnimationEffect
+    private animationEffect: AnimationEffect,
+    private skillIncrease: SkillIncrease
   ) {}
 
   public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
@@ -65,6 +67,20 @@ export class ItemCraftable {
     await this.performCrafting(recipe, character);
   }
 
+  /**
+   * getCraftChance returns the chance for a successful craft based on a baseChance.
+   * If the avg crafting skills are higher than the baseChance, then the isCraftSuccessful function
+   * @param character
+   * @param baseChance chance to use in case characters avg crafting skills < baseChance
+   * @returns
+   */
+  public async getCraftChance(
+    character: ICharacter,
+    baseChance: number
+  ): Promise<number | ((character: ICharacter) => Promise<boolean>)> {
+    return (await this.getCraftingSkillsAverage(character)) > baseChance ? this.isCraftSuccessful : baseChance;
+  }
+
   private async performCrafting(recipe: IUseWithCraftingRecipe, character: ICharacter): Promise<void> {
     let proceed = true;
 
@@ -82,6 +98,8 @@ export class ItemCraftable {
 
     if (proceed) {
       await this.createItems(recipe, character);
+      // update crafting skills
+      await this.skillIncrease.increaseCraftingSP(character, recipe.outputKey);
 
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "You successfully crafted the item!",

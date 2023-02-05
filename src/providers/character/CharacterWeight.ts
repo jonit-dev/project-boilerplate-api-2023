@@ -28,6 +28,7 @@ export class CharacterWeight {
       }
     );
 
+    //! Requires virtuals
     character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, {
@@ -67,7 +68,7 @@ export class CharacterWeight {
       ];
 
       for (const slot of slots) {
-        const item = await Item.findById(slot).lean({ virtuals: true, defaults: true });
+        const item = await Item.findById(slot).lean();
         if (item) {
           if (item.stackQty && item.stackQty > 1) {
             // -1 because the count is include the weight of the container item.

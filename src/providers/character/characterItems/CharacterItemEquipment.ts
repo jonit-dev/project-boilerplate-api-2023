@@ -17,7 +17,7 @@ export class CharacterItemEquipment {
   ) {}
 
   public async deleteItemFromEquipment(itemId: string, character: ICharacter): Promise<boolean> {
-    const item = (await Item.findById(itemId).lean({ virtuals: true, defaults: true })) as unknown as IItem;
+    const item = (await Item.findById(itemId).lean()) as unknown as IItem;
 
     if (!item) {
       this.socketMessaging.sendErrorMessageToCharacter(
@@ -58,7 +58,7 @@ export class CharacterItemEquipment {
       }
 
       if (!value.key) {
-        value = (await Item.findById(value as any).lean({ virtuals: true, defaults: true })) as unknown as IItem;
+        value = (await Item.findById(value as any).lean()) as unknown as IItem;
       }
 
       // item not found, continue
@@ -156,7 +156,7 @@ export class CharacterItemEquipment {
       }
 
       if (!value.key) {
-        value = (await Item.findById(value as any).lean({ virtuals: true, defaults: true })) as unknown as IItem;
+        value = (await Item.findById(value as any).lean()) as unknown as IItem;
       }
 
       // item not found, continue

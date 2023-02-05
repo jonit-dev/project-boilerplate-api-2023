@@ -1,5 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { ItemCraftable } from "@providers/item/ItemCraftable";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ToolsBlueprint } from "../../types/itemsBlueprintTypes";
@@ -20,7 +22,9 @@ export const itemUseWithTileTest: Partial<IItemUseWith> = {
     item: IItem,
     targetTile: IUseWithTargetTile,
     source,
-    character: ICharacter
+    character: ICharacter,
+    itemCraftable: ItemCraftable,
+    skillIncrease: SkillIncrease
   ): Promise<void> => {
     character.name = "Impacted by effect";
     await character.save();

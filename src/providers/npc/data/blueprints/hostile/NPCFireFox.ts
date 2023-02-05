@@ -6,6 +6,7 @@ import {
   CraftingResourcesBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
+  RangedWeaponsBlueprint,
   StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -64,6 +65,11 @@ export const npcFireFox: Partial<INPC> = {
       itemBlueprintKey: CraftingResourcesBlueprint.Leather,
       chance: 40,
       quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.FireBolt,
+      chance: 10,
+      quantityRange: [2, 5],
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.MagicRecipe,

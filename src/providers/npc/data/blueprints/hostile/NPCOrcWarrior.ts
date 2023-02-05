@@ -68,11 +68,7 @@ export const npcOrcWarrior = {
       itemBlueprintKey: CraftingResourcesBlueprint.BlueSapphire,
       chance: 30,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.Bones,
-      chance: 20,
-      quantityRange: [1, 3],
-    },
+
     {
       itemBlueprintKey: ToolsBlueprint.ButchersKnife,
       chance: 15,

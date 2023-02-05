@@ -53,9 +53,13 @@ export class BattleAttackTarget {
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
+    if (!target.isAlive) {
+      return false;
+    }
+
     switch (await attacker?.attackType) {
       case EntityAttackType.Melee: {
-        const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1);
+        const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1.5);
 
         if (isUnderMeleeRange) {
           await this.hitTarget(attacker, target);

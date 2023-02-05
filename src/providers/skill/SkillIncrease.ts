@@ -33,6 +33,7 @@ import _ from "lodash";
 import { Types } from "mongoose";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
+import { CraftingSkillsMap } from "./constants";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -54,12 +55,12 @@ export class SkillIncrease {
    */
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // Get character skills and equipment to upgrade them
-    const skills = (await Skill.findById(attacker.skills).lean({ virtuals: true, defaults: true })) as ISkill;
+    const skills = (await Skill.findById(attacker.skills).lean()) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${attacker.id}`);
     }
 
-    const equipment = await Equipment.findById(attacker.equipment).lean({ virtuals: true, defaults: true });
+    const equipment = await Equipment.findById(attacker.equipment).lean();
     if (!equipment) {
       throw new Error(`equipment not found for character ${attacker.id}`);
     }
@@ -99,20 +100,18 @@ export class SkillIncrease {
       .populate({
         path: "skills",
         model: "Skill",
-        options: { virtuals: true, defaults: true },
       })
-      .lean({ virtuals: true, defaults: true })
+      .lean()
       .populate({
         path: "equipment",
         model: "Equipment",
-        options: { virtuals: true, defaults: true },
+
         populate: {
           path: "rightHand leftHand",
           model: "Item",
-          options: { virtuals: true, defaults: true },
         },
       })
-      .lean({ virtuals: true, defaults: true })) as ICharacter;
+      .lean()) as ICharacter;
 
     if (!characterWithRelations) {
       throw new Error(`character not found for id ${character.id}`);
@@ -139,11 +138,12 @@ export class SkillIncrease {
         await this.skillFunctions.sendSkillLevelUpEvents(result, characterWithRelations);
       }
 
-      if (rightHandItem) {
-        await this.characterBonusPenalties.applyRaceBonusPenalties(characterWithRelations, rightHandItem.subType);
-      }
-      if (leftHandItem) {
-        await this.characterBonusPenalties.applyRaceBonusPenalties(characterWithRelations, leftHandItem.subType);
+      if (rightHandItem?.subType === ItemSubType.Shield) {
+        await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
+      } else {
+        if (leftHandItem?.subType === ItemSubType.Shield) {
+          await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
+        }
       }
     }
   }
@@ -165,7 +165,7 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
-    const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
@@ -173,6 +173,24 @@ export class SkillIncrease {
     const result = this.increaseSP(skills, attribute, skillPointsCalculator);
     await this.skillFunctions.updateSkills(skills, character);
 
+    if (result.skillLevelUp && character.channelId) {
+      await this.skillFunctions.sendSkillLevelUpEvents(result, character);
+    }
+  }
+
+  public async increaseCraftingSP(character: ICharacter, craftedItemKey: string): Promise<void> {
+    const skillToUpdate = CraftingSkillsMap.get(craftedItemKey);
+    // if no crafting skill to update, return without error
+    if (!skillToUpdate) {
+      return;
+    }
+
+    const skills = (await Skill.findById(character.skills)) as ISkill;
+    if (!skills) {
+      throw new Error(`skills not found for character ${character.id}`);
+    }
+    const result = this.increaseSP(skills, craftedItemKey, undefined, CraftingSkillsMap);
+    await this.skillFunctions.updateSkills(skills, character);
     if (result.skillLevelUp && character.channelId) {
       await this.skillFunctions.sendSkillLevelUpEvents(result, character);
     }
@@ -201,7 +219,7 @@ export class SkillIncrease {
       }
 
       // Get character skills
-      const skills = (await Skill.findById(character.skills).lean({ virtuals: true, defaults: true })) as ISkill;
+      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
       const appliedBuffEffect = character.appliedBuffsEffects;
 
@@ -217,6 +235,7 @@ export class SkillIncrease {
         // call again the function without this record
         return this.releaseXP(target);
       }
+
       skills.experience += record!.xp! + record!.xp! * buff;
       skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
 
@@ -233,8 +252,7 @@ export class SkillIncrease {
 
       if (levelUp) {
         const { maxHealth, maxMana } = this.increaseMaxManaMaxHealth(character.maxMana, character.maxHealth);
-        await this.updateEntitiesAttributes(character._id, "maxHealth", maxHealth);
-        await this.updateEntitiesAttributes(character._id, "maxMana", maxMana);
+        await this.updateEntitiesAttributes(character._id, { maxHealth, maxMana });
 
         await this.sendExpLevelUpEvents(
           { level: skills.level, previousLevel, exp: record!.xp! + record!.xp! * buff },
@@ -293,16 +311,21 @@ export class SkillIncrease {
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ExperienceGain, levelUpEventPayload);
 
     // refresh skills (lv, xp, xpToNextLevel)
-    const skill = await Skill.findById(character.skills).lean({ virtuals: true, defaults: true });
+    const skill = await Skill.findById(character.skills).lean();
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill,
     });
   }
 
-  private increaseSP(skills: ISkill, skillKey: string, skillPointsCalculator?: Function): IIncreaseSPResult {
+  private increaseSP(
+    skills: ISkill,
+    skillKey: string,
+    skillPointsCalculator?: Function,
+    skillsMap: Map<string, string> = SKILLS_MAP
+  ): IIncreaseSPResult {
     let skillLevelUp = false;
-    const skillToUpdate = SKILLS_MAP.get(skillKey);
+    const skillToUpdate = skillsMap.get(skillKey);
 
     if (!skillToUpdate) {
       throw new Error(`skill not found for item subtype ${skillKey}`);
@@ -384,12 +407,8 @@ export class SkillIncrease {
     }).bind(this, spellPower);
   }
 
-  private increaseMaxManaMaxHealth(
-    currentMaxMana: number,
-    currentMaxHealth: number
-  ): { maxMana: number; maxHealth: number } {
+  private calculateIncreaseRate(maxValue: number): number {
     let increaseRate = 1.05;
-    const maxValue = Math.max(currentMaxMana, currentMaxHealth);
 
     if (maxValue >= 900) {
       increaseRate = 1.01;
@@ -399,6 +418,16 @@ export class SkillIncrease {
       increaseRate = 1.03;
     }
 
+    return increaseRate;
+  }
+
+  private increaseMaxManaMaxHealth(
+    currentMaxMana: number,
+    currentMaxHealth: number
+  ): { maxMana: number; maxHealth: number } {
+    const maxValue = Math.max(currentMaxMana, currentMaxHealth);
+    const increaseRate = this.calculateIncreaseRate(maxValue);
+
     const maxMana = Math.ceil(currentMaxMana * increaseRate);
     const maxHealth = Math.ceil(currentMaxHealth * increaseRate);
 
@@ -407,14 +436,15 @@ export class SkillIncrease {
 
   private async updateEntitiesAttributes(
     characterId: Types.ObjectId,
-    entitiesType: string,
-    value: number
+    updateAttributes: { maxHealth: number; maxMana: number }
   ): Promise<boolean> {
+    const { maxHealth, maxMana } = Object.freeze(updateAttributes);
+
     const character = await Character.findOneAndUpdate(
       { _id: characterId },
-      { $set: { [entitiesType]: value } },
+      { $set: { maxHealth, maxMana } },
       { new: true }
-    );
+    ).lean();
 
     if (!character) {
       return false;
@@ -422,8 +452,8 @@ export class SkillIncrease {
 
     const payload: ICharacterAttributeChanged = {
       targetId: character._id,
-      maxHealth: entitiesType === "maxHealth" ? value : character.maxHealth,
-      maxMana: entitiesType === "maxMana" ? value : character.maxMana,
+      maxHealth,
+      maxMana,
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);

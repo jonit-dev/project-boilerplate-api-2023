@@ -3,9 +3,11 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -15,7 +17,7 @@ import random from "lodash/random";
 export interface IUseWithItemToEntityReward {
   key: string;
   qty: number[] | number;
-  chance: number;
+  chance: number | ((character: ICharacter) => Promise<boolean>);
 }
 
 export interface IUseWithItemToEntityOptions {
@@ -40,10 +42,15 @@ export class UseWithItemToEntity {
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
     private socketMessaging: SocketMessaging,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private characterWeight: CharacterWeight
   ) {}
 
-  public async execute(character: ICharacter, options: IUseWithItemToEntityOptions): Promise<void> {
+  public async execute(
+    character: ICharacter,
+    options: IUseWithItemToEntityOptions,
+    skillIncrease: SkillIncrease
+  ): Promise<void> {
     const {
       targetEntity,
       requiredResource,
@@ -102,8 +109,15 @@ export class UseWithItemToEntity {
       return;
     }
 
+    await this.characterWeight.updateCharacterWeight(character);
+
     if (successAnimationEffectKey) {
       await this.animationEffect.sendAnimationEventToCharacter(character, successAnimationEffectKey);
+    }
+
+    // update crafting skills if corresponds
+    for (const r of rewards) {
+      await skillIncrease.increaseCraftingSP(character, r.key);
     }
 
     if (successMessages) {
@@ -118,10 +132,17 @@ export class UseWithItemToEntity {
   }
 
   private async addRewardToInventory(character: ICharacter, rewards: IUseWithItemToEntityReward[]): Promise<boolean> {
-    rewards = rewards.sort((a, b) => a.chance - b.chance);
-    const n = random(0, 100);
     for (const reward of rewards) {
-      if (n < reward.chance) {
+      let addReward = false;
+
+      if (typeof reward.chance === "function") {
+        addReward = await reward.chance(character);
+      } else {
+        const n = random(0, 100);
+        addReward = n < reward.chance;
+      }
+
+      if (addReward) {
         const itemBlueprint = itemsBlueprintIndex[reward.key];
 
         const item = new Item({
@@ -143,7 +164,9 @@ export class UseWithItemToEntity {
 
   private async refreshInventory(character: ICharacter): Promise<void> {
     const inventory = await character.inventory;
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    const inventoryContainer = (await ItemContainer.findById(
+      inventory.itemContainer
+    ).lean()) as unknown as IItemContainer;
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: inventoryContainer,

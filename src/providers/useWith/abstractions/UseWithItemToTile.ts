@@ -2,11 +2,13 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItem, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { isArray, isMap } from "lodash";
 import random from "lodash/random";
@@ -15,7 +17,7 @@ import { IUseWithTargetTile } from "../useWithTypes";
 export interface IUseWithItemToTileReward {
   key: string;
   qty: number[] | number;
-  chance: number;
+  chance: number | ((character: ICharacter) => Promise<boolean>); // can use a function to calculate the change, e.g.: isCraftSuccessful() from ItemCraftable.ts
 }
 
 export interface IUseWithItemToTileOptions {
@@ -40,10 +42,15 @@ export class UseWithItemToTile {
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
     private socketMessaging: SocketMessaging,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private characterWeight: CharacterWeight
   ) {}
 
-  public async execute(character: ICharacter, options: IUseWithItemToTileOptions): Promise<void> {
+  public async execute(
+    character: ICharacter,
+    options: IUseWithItemToTileOptions,
+    skillIncrease: SkillIncrease
+  ): Promise<void> {
     const {
       targetTile,
       requiredResource,
@@ -69,7 +76,7 @@ export class UseWithItemToTile {
           hasRequiredItem = await this.characterItemInventory.checkItemInInventoryByKey(k, character);
           if (hasRequiredItem) {
             // check if have required qty
-            const item = await Item.findById(hasRequiredItem);
+            const item = (await Item.findById(hasRequiredItem).lean()) as IItem;
             if (requiredResource.decrementQty && (item?.stackQty || 0) >= requiredResource.decrementQty) {
               resourceKey = k;
               break;
@@ -135,8 +142,15 @@ export class UseWithItemToTile {
       return;
     }
 
+    await this.characterWeight.updateCharacterWeight(character);
+
     if (successAnimationEffectKey) {
       await this.animationEffect.sendAnimationEventToCharacter(character, successAnimationEffectKey);
+    }
+
+    // update crafting skills if corresponds
+    for (const r of reward) {
+      await skillIncrease.increaseCraftingSP(character, r.key);
     }
 
     if (successMessages) {
@@ -151,11 +165,17 @@ export class UseWithItemToTile {
   }
 
   private async addRewardToInventory(character: ICharacter, rewards: IUseWithItemToTileReward[]): Promise<boolean> {
-    rewards = rewards.sort((a, b) => a.chance - b.chance);
-
-    const n = random(0, 100);
     for (const reward of rewards) {
-      if (n < reward.chance) {
+      let addReward = false;
+
+      if (typeof reward.chance === "function") {
+        addReward = await reward.chance(character);
+      } else {
+        const n = random(0, 100);
+        addReward = n < reward.chance;
+      }
+
+      if (addReward) {
         const itemBlueprint = itemsBlueprintIndex[reward.key];
 
         const item = new Item({

@@ -1,6 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
+import { ItemCraftable } from "@providers/item/ItemCraftable";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import {
   IUseWithItemToTileOptions,
   IUseWithItemToTileReward,
@@ -31,7 +33,9 @@ export const itemHammer: Partial<IItemUseWith> = {
     originItem: IItem,
     targetTile: IUseWithTargetTile,
     targetName: string | undefined,
-    character: ICharacter
+    character: ICharacter,
+    itemCraftable: ItemCraftable,
+    skillIncrease: SkillIncrease
   ) => {
     const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
     const rewards = new Map<string, IUseWithItemToTileReward[]>([
@@ -41,7 +45,7 @@ export const itemHammer: Partial<IItemUseWith> = {
           {
             key: CraftingResourcesBlueprint.IronIngot,
             qty: [2, 5],
-            chance: 60,
+            chance: await itemCraftable.getCraftChance(character, 60),
           },
         ],
       ],
@@ -51,7 +55,7 @@ export const itemHammer: Partial<IItemUseWith> = {
           {
             key: CraftingResourcesBlueprint.CopperIngot,
             qty: [2, 5],
-            chance: 70,
+            chance: await itemCraftable.getCraftChance(character, 70),
           },
         ],
       ],
@@ -61,7 +65,7 @@ export const itemHammer: Partial<IItemUseWith> = {
           {
             key: CraftingResourcesBlueprint.GoldenIngot,
             qty: [2, 5],
-            chance: 40,
+            chance: await itemCraftable.getCraftChance(character, 40),
           },
         ],
       ],
@@ -71,7 +75,7 @@ export const itemHammer: Partial<IItemUseWith> = {
           {
             key: CraftingResourcesBlueprint.SilverIngot,
             qty: [2, 5],
-            chance: 50,
+            chance: await itemCraftable.getCraftChance(character, 50),
           },
         ],
       ],
@@ -100,6 +104,6 @@ export const itemHammer: Partial<IItemUseWith> = {
       rewards,
     };
 
-    await useWithItemToTile.execute(character, options);
+    await useWithItemToTile.execute(character, options, skillIncrease);
   },
 };

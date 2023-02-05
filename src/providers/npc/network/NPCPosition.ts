@@ -18,7 +18,7 @@ export class NPCPosition {
 
         const npc = (await NPC.findOne({
           _id: id,
-        }).lean({ virtuals: true, defaults: true })) as INPC;
+        }).lean()) as INPC;
 
         if (!npc) {
           throw new Error(`NPCSocketEvents.NPCPositionRequest, but NPC id ${id} wasn't found.`);

@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -154,6 +155,28 @@ describe("EquipmentEquip.spec.ts", () => {
 
       expect(await characterAttackType?.attackType).toEqual(EntityAttackType.Melee);
       expect(await characterAttackType?.weapon).toBeUndefined();
+    });
+
+    it("properly calculates the totalEquippedAttack and totalEquippedDefense", async () => {
+      inventoryContainer.slots[0] = swordItem;
+      inventoryContainer.markModified("slots");
+      await inventoryContainer.save();
+
+      const equip = await equipmentEquip.equip(testCharacter, swordItem._id, inventoryContainer.id);
+
+      expect(equip).toBeTruthy();
+
+      const equipment = await Equipment.findById(testCharacter.equipment);
+
+      if (!equipment) throw new Error("Equipment not found");
+
+      const totalEquippedAttack = await equipment?.totalEquippedAttack;
+
+      expect(totalEquippedAttack).toEqual(5);
+
+      const totalEquippedDefense = await equipment?.totalEquippedDefense;
+
+      expect(totalEquippedDefense).toEqual(0);
     });
   });
 });

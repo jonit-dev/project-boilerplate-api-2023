@@ -101,15 +101,15 @@ export const skillsSchema = createLeanSchema(
 );
 
 skillsSchema.post("save", async function (this: ISkill) {
-  const npc = (await NPC.findById(this.owner)) as unknown as INPC;
+  const npc = (await NPC.findById(this.owner)) as INPC;
 
   if (!npc || npc?.experience) {
     return;
   }
 
   if (npc?.alignment === NPCAlignment.Hostile || npc?.alignment === NPCAlignment.Neutral) {
-    const skills = await Skill.findById(this._id);
-    const experience = calculateExperience(npc.baseHealth, skills as unknown as ISkill);
+    const skills = (await Skill.findById(this._id).lean({ virtuals: true, default: true })) as ISkill;
+    const experience = calculateExperience(npc.baseHealth, skills);
 
     await NPC.updateOne(
       {
@@ -123,10 +123,10 @@ skillsSchema.post("save", async function (this: ISkill) {
 });
 
 async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean): Promise<void> {
-  const equipment = await Equipment.findOne({ owner: skill.owner }).lean({ virtuals: true, defaults: true });
+  const equipment = await Equipment.findOne({ owner: skill.owner }).lean({ virtuals: true, defaults: true }); //! Requires virtuals
   const [dataOfWeather, character] = await Promise.all([
-    MapControlTimeModel.findOne().lean({ virtuals: true, defaults: true }),
-    Character.findById(skill.owner).lean({ virtuals: true, defaults: true }),
+    MapControlTimeModel.findOne().lean(),
+    Character.findById(skill.owner).lean(),
   ]);
 
   if (skill.ownerType === "Character" && equipment) {

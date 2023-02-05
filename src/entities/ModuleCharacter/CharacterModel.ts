@@ -121,19 +121,19 @@ const characterSchema = createLeanSchema(
     }),
 
     x: Type.number({
-      default: FromGridX(56),
+      default: FromGridX(35),
       required: true,
     }),
     y: Type.number({
-      default: FromGridY(54),
+      default: FromGridY(44),
       required: true,
     }),
     initialX: Type.number({
-      default: FromGridX(56),
+      default: FromGridX(35),
       required: true,
     }),
     initialY: Type.number({
-      default: FromGridY(54),
+      default: FromGridY(44),
       required: true,
     }),
     direction: Type.string({
@@ -205,7 +205,7 @@ const characterSchema = createLeanSchema(
     },
     attackIntervalSpeed: Type.number({
       required: true,
-      default: 1000,
+      default: 1700,
     }),
     view: Type.mixed({
       default: {
@@ -313,6 +313,7 @@ characterSchema.virtual("weapon").get(async function (this: ICharacter): Promise
   }
   // Get right and left hand items
   // What if has weapons on both hands? for now, only one weapon per character is allowed
+  //! Virtuals required here!
   const rightHandItem = equipment.rightHand
     ? ((await Item.findById(equipment.rightHand).lean({ virtuals: true, defaults: true })) as IItem)
     : undefined;
