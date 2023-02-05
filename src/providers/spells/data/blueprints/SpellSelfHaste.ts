@@ -32,6 +32,7 @@ export const spellSelfHaste: Partial<ISpell> = {
 
     if (HASTE_CONTROL.has(character._id)) {
       clearTimeout(HASTE_CONTROL.get(character._id)!);
+      HASTE_CONTROL.delete(character._id);
     }
 
     HASTE_CONTROL.set(
