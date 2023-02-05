@@ -6,7 +6,7 @@ import { IAuthResponse, TypeHelper, UserAuthFlow, UserTypes } from "@rpg-engine/
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import uniqueValidator from "mongoose-unique-validator";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, createSchema, typedModel } from "ts-mongoose";
 
 const mongooseHidden = require("mongoose-hidden")();
 
@@ -73,7 +73,6 @@ userSchema.plugin(mongooseHidden, {
 userSchema.pre("save", async function (next): Promise<void> {
   // @ts-ignore
   const user = this as IUser;
-  user.email = user.email.toLocaleLowerCase();
   const salt = await bcrypt.genSalt();
 
   if (user.isModified("password")) {
@@ -115,7 +114,7 @@ userSchema.methods.generateAccessToken = async function (): Promise<IAuthRespons
 export const User = typedModel("User", userSchema, undefined, undefined, {
   // Static methods ========================================
   checkIfExists: async (email: string): Promise<boolean> => {
-    const exists = await User.findOne({ email: email.toLocaleLowerCase() });
+    const exists = await User.findOne({ email });
 
     if (exists) {
       return true;
@@ -124,7 +123,7 @@ export const User = typedModel("User", userSchema, undefined, undefined, {
     return false;
   },
   findByCredentials: async (email: string, password: string) => {
-    const user = await User.findOne({ email: email.toLocaleLowerCase() });
+    const user = await User.findOne({ email });
 
     if (!user) {
       throw new NotFoundError(TS.translate("users", "userNotFound"));
