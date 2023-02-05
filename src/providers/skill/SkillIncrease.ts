@@ -216,6 +216,7 @@ export class SkillIncrease {
         // call again the function without this record
         return this.releaseXP(target);
       }
+
       skills.experience += record!.xp! + record!.xp! * buff;
       skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
 
@@ -232,8 +233,7 @@ export class SkillIncrease {
 
       if (levelUp) {
         const { maxHealth, maxMana } = this.increaseMaxManaMaxHealth(character.maxMana, character.maxHealth);
-        await this.updateEntitiesAttributes(character._id, "maxHealth", maxHealth);
-        await this.updateEntitiesAttributes(character._id, "maxMana", maxMana);
+        await this.updateEntitiesAttributes(character._id, { maxHealth, maxMana });
 
         await this.sendExpLevelUpEvents(
           { level: skills.level, previousLevel, exp: record!.xp! + record!.xp! * buff },
@@ -383,12 +383,8 @@ export class SkillIncrease {
     }).bind(this, spellPower);
   }
 
-  private increaseMaxManaMaxHealth(
-    currentMaxMana: number,
-    currentMaxHealth: number
-  ): { maxMana: number; maxHealth: number } {
+  private calculateIncreaseRate(maxValue: number): number {
     let increaseRate = 1.05;
-    const maxValue = Math.max(currentMaxMana, currentMaxHealth);
 
     if (maxValue >= 900) {
       increaseRate = 1.01;
@@ -398,6 +394,16 @@ export class SkillIncrease {
       increaseRate = 1.03;
     }
 
+    return increaseRate;
+  }
+
+  private increaseMaxManaMaxHealth(
+    currentMaxMana: number,
+    currentMaxHealth: number
+  ): { maxMana: number; maxHealth: number } {
+    const maxValue = Math.max(currentMaxMana, currentMaxHealth);
+    const increaseRate = this.calculateIncreaseRate(maxValue);
+
     const maxMana = Math.ceil(currentMaxMana * increaseRate);
     const maxHealth = Math.ceil(currentMaxHealth * increaseRate);
 
@@ -406,14 +412,15 @@ export class SkillIncrease {
 
   private async updateEntitiesAttributes(
     characterId: Types.ObjectId,
-    entitiesType: string,
-    value: number
+    updateAttributes: { maxHealth: number; maxMana: number }
   ): Promise<boolean> {
+    const { maxHealth, maxMana } = Object.freeze(updateAttributes);
+
     const character = await Character.findOneAndUpdate(
       { _id: characterId },
-      { $set: { [entitiesType]: value } },
+      { $set: { maxHealth, maxMana } },
       { new: true }
-    );
+    ).lean();
 
     if (!character) {
       return false;
@@ -421,8 +428,8 @@ export class SkillIncrease {
 
     const payload: ICharacterAttributeChanged = {
       targetId: character._id,
-      maxHealth: entitiesType === "maxHealth" ? value : character.maxHealth,
-      maxMana: entitiesType === "maxMana" ? value : character.maxMana,
+      maxHealth,
+      maxMana,
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
