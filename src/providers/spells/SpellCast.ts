@@ -1,9 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
@@ -122,7 +122,7 @@ export class SpellCast {
   private getSpell(magicWords: string): any {
     for (const key in spellsBlueprints) {
       const spell = spellsBlueprints[key];
-      if (spell.magicWords === magicWords) {
+      if (spell.magicWords === magicWords.toLocaleLowerCase()) {
         return spell;
       }
     }

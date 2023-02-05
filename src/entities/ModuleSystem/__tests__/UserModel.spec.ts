@@ -1,3 +1,4 @@
+import { User } from "@entities/ModuleSystem/UserModel";
 import { unitTestHelper } from "@providers/inversify/container";
 import { UserAuthFlow, UserTypes } from "@rpg-engine/shared";
 import { IUser } from "../UserModel";
@@ -37,5 +38,20 @@ describe("UserModel.ts", () => {
     expect(user.email).toEqual(testUser.email);
     expect(user.address).toEqual(testUser.address);
     expect(user.phone).toEqual(testUser.phone);
+  });
+
+  it("should return true if user with email exists and email is case insensitive", async () => {
+    // case sensitive
+    const result1 = await User.checkIfExists("user-mock@test.com");
+    expect(result1).toBe(true);
+
+    // case insensitive
+    const result2 = await User.checkIfExists("User-Mock@test.com");
+    expect(result2).toBe(true);
+  });
+
+  it("should return false if user with email does not exists", async () => {
+    const result = await User.checkIfExists("invalid@email.com");
+    expect(result).toBe(false);
   });
 });

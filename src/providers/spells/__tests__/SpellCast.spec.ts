@@ -6,8 +6,6 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { AnimationSocketEvents, CharacterSocketEvents, SkillSocketEvents, UISocketEvents } from "@rpg-engine/shared";
-import { SpellCast } from "../SpellCast";
-import { SpellLearn } from "../SpellLearn";
 import { spellArrowCreation } from "../data/blueprints/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/SpellBlankRuneCreation";
 import { spellBoltCreation } from "../data/blueprints/SpellBoltCreation";
@@ -22,6 +20,8 @@ import { spellPoisonRuneCreation } from "../data/blueprints/SpellPoisonRuneCreat
 import { spellSelfHaste } from "../data/blueprints/SpellSelfHaste";
 import { spellSelfHealing } from "../data/blueprints/SpellSelfHealing";
 import { ISpell } from "../data/types/SpellsBlueprintTypes";
+import { SpellCast } from "../SpellCast";
+import { SpellLearn } from "../SpellLearn";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;
@@ -94,6 +94,11 @@ describe("SpellCast.ts", () => {
       message: "Sorry, spell not found.",
       type: "error",
     });
+  });
+  // to edit the spell
+  it("should cast spell with case case insensitive spell", async () => {
+    // talas faenya as TalAs faenya
+    expect(await spellCast.castSpell("TalAs faenya", testCharacter)).toBeTruthy();
   });
 
   it("should call character validation", async () => {
