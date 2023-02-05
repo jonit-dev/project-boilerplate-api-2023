@@ -22,6 +22,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 
 @provide(ItemCraftable)
 export class ItemCraftable {
@@ -31,7 +32,8 @@ export class ItemCraftable {
     private characterValidation: CharacterValidation,
     private characterItemInventory: CharacterItemInventory,
     private characterWeight: CharacterWeight,
-    private animationEffect: AnimationEffect
+    private animationEffect: AnimationEffect,
+    private skillIncrease: SkillIncrease
   ) {}
 
   public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
@@ -96,6 +98,8 @@ export class ItemCraftable {
 
     if (proceed) {
       await this.createItems(recipe, character);
+      // update crafting skills
+      await this.skillIncrease.increaseCraftingSP(character, recipe.outputKey);
 
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "You successfully crafted the item!",

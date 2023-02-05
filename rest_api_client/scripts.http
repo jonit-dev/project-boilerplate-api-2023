@@ -3,7 +3,7 @@ GET {{baseUrl}}/scripts/attack-speed HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
-### Scripts :: Adjust attack speed
+### Scripts :: Initial coordinates
 GET {{baseUrl}}/scripts/initial-coordinates HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json

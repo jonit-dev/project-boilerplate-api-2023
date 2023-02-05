@@ -14,8 +14,7 @@ export const itemWildSalmon: Partial<IItem> = {
   description: "A common fish that can be caught in rivers and it's the favorite food of bears.",
   weight: 1,
   maxStackSize: 100,
-  basePrice: 10,
-  canSell: false,
+  basePrice: 7,
 
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 1.5);

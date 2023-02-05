@@ -5,8 +5,9 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ToolsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ItemCraftable } from "@providers/item/ItemCraftable";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 
+import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { FromGridX, FromGridY, IUseWithTile, MapLayers } from "@rpg-engine/shared";
 import { UseWithTile } from "../UseWithTile";
 
@@ -15,12 +16,15 @@ describe("UseWithTile.ts", () => {
     testCharacter: ICharacter,
     testCharacterEquipment: IEquipment,
     useWithTile: UseWithTile,
-    itemCraftable: ItemCraftable,
-    useWithTileData: IUseWithTile;
+    useWithTileData: IUseWithTile,
+    skillIncrease: SkillIncrease,
+    itemCraftable: ItemCraftable;
 
   beforeAll(async () => {
     useWithTile = container.get<UseWithTile>(UseWithTile);
+    skillIncrease = container.get<SkillIncrease>(SkillIncrease);
     itemCraftable = container.get<ItemCraftable>(ItemCraftable);
+
     await unitTestHelper.initializeMapLoader();
   });
 
@@ -65,7 +69,8 @@ describe("UseWithTile.ts", () => {
       useWithTileData.targetTile,
       response?.targetName,
       testCharacter,
-      itemCraftable
+      itemCraftable,
+      skillIncrease
     );
 
     expect(testCharacter.name).toEqual("Impacted by effect");

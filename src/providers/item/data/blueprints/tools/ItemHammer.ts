@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
 import { ItemCraftable } from "@providers/item/ItemCraftable";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import {
   IUseWithItemToTileOptions,
   IUseWithItemToTileReward,
@@ -33,7 +34,8 @@ export const itemHammer: Partial<IItemUseWith> = {
     targetTile: IUseWithTargetTile,
     targetName: string | undefined,
     character: ICharacter,
-    itemCraftable: ItemCraftable
+    itemCraftable: ItemCraftable,
+    skillIncrease: SkillIncrease
   ) => {
     const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
     const rewards = new Map<string, IUseWithItemToTileReward[]>([
@@ -102,6 +104,6 @@ export const itemHammer: Partial<IItemUseWith> = {
       rewards,
     };
 
-    await useWithItemToTile.execute(character, options);
+    await useWithItemToTile.execute(character, options, skillIncrease);
   },
 };

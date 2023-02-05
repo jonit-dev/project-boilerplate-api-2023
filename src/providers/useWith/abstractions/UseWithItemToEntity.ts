@@ -7,6 +7,7 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -45,7 +46,11 @@ export class UseWithItemToEntity {
     private characterWeight: CharacterWeight
   ) {}
 
-  public async execute(character: ICharacter, options: IUseWithItemToEntityOptions): Promise<void> {
+  public async execute(
+    character: ICharacter,
+    options: IUseWithItemToEntityOptions,
+    skillIncrease: SkillIncrease
+  ): Promise<void> {
     const {
       targetEntity,
       requiredResource,
@@ -108,6 +113,11 @@ export class UseWithItemToEntity {
 
     if (successAnimationEffectKey) {
       await this.animationEffect.sendAnimationEventToCharacter(character, successAnimationEffectKey);
+    }
+
+    // update crafting skills if corresponds
+    for (const r of rewards) {
+      await skillIncrease.increaseCraftingSP(character, r.key);
     }
 
     if (successMessages) {

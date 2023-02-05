@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
 import { ItemCraftable } from "@providers/item/ItemCraftable";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { UseWithItemToTile } from "@providers/useWith/abstractions/UseWithItemToTile";
 import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
@@ -29,37 +30,42 @@ export const itemCarpentersAxe: Partial<IItemUseWith> = {
     targetTile: IUseWithTargetTile,
     targetName: string,
     character: ICharacter,
-    itemCraftable: ItemCraftable
+    itemCraftable: ItemCraftable,
+    skillIncrease: SkillIncrease
   ): Promise<void> => {
     const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
 
-    await useWithItemToTile.execute(character, {
-      targetTile,
-      targetTileAnimationEffectKey: "cutting-wood",
-      errorMessages: ["Hmm... Nothing here.", "Maybe you should try somewhere else.", "You can't find anything."],
-      successMessages: ["You found some wood!", "You're getting good at this!"],
-      rewards: [
-        {
-          key: CraftingResourcesBlueprint.GreaterWoodenLog,
-          qty: [3, 4],
-          chance: await itemCraftable.getCraftChance(character, 30),
-        },
-        {
-          key: CraftingResourcesBlueprint.WoodenSticks,
-          qty: [2, 3],
-          chance: await itemCraftable.getCraftChance(character, 10),
-        },
-        {
-          key: CraftingResourcesBlueprint.SmallWoodenStick,
-          qty: [2, 3],
-          chance: await itemCraftable.getCraftChance(character, 10),
-        },
-        {
-          key: CraftingResourcesBlueprint.ElvenWood,
-          qty: [1, 2],
-          chance: await itemCraftable.getCraftChance(character, 5),
-        },
-      ],
-    });
+    await useWithItemToTile.execute(
+      character,
+      {
+        targetTile,
+        targetTileAnimationEffectKey: "cutting-wood",
+        errorMessages: ["Hmm... Nothing here.", "Maybe you should try somewhere else.", "You can't find anything."],
+        successMessages: ["You found some wood!", "You're getting good at this!"],
+        rewards: [
+          {
+            key: CraftingResourcesBlueprint.GreaterWoodenLog,
+            qty: [3, 4],
+            chance: await itemCraftable.getCraftChance(character, 30),
+          },
+          {
+            key: CraftingResourcesBlueprint.WoodenSticks,
+            qty: [2, 3],
+            chance: await itemCraftable.getCraftChance(character, 10),
+          },
+          {
+            key: CraftingResourcesBlueprint.SmallWoodenStick,
+            qty: [2, 3],
+            chance: await itemCraftable.getCraftChance(character, 10),
+          },
+          {
+            key: CraftingResourcesBlueprint.ElvenWood,
+            qty: [1, 2],
+            chance: await itemCraftable.getCraftChance(character, 5),
+          },
+        ],
+      },
+      skillIncrease
+    );
   },
 };

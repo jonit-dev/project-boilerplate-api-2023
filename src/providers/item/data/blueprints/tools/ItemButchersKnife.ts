@@ -3,6 +3,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { container } from "@providers/inversify/container";
 import { ItemCraftable } from "@providers/item/ItemCraftable";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IUseWithItemToEntityOptions,
@@ -30,7 +31,12 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
   basePrice: 45,
   hasUseWith: true,
   useWithMaxDistanceGrid: 2,
-  usableEffect: async (character: ICharacter, targetItem: IItem, itemCraftable: ItemCraftable) => {
+  usableEffect: async (
+    character: ICharacter,
+    targetItem: IItem,
+    itemCraftable: ItemCraftable,
+    skillIncrease: SkillIncrease
+  ) => {
     const useWithItemToEntity = container.get<UseWithItemToEntity>(UseWithItemToEntity);
     const socketMessaging = container.get<SocketMessaging>(SocketMessaging);
 
@@ -132,7 +138,7 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
       return;
     }
 
-    await useWithItemToEntity.execute(character, useWithItemToEntityOptions);
+    await useWithItemToEntity.execute(character, useWithItemToEntityOptions, skillIncrease);
 
     // set hasButchered to true
     targetItem.hasButchered = true;

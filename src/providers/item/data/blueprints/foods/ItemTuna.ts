@@ -14,8 +14,7 @@ export const itemTuna: Partial<IItem> = {
   description: "Tuna is widely consumed by humans, and is one of the most popular seafoods in the world.",
   weight: 0.25,
   maxStackSize: 100,
-  basePrice: 5,
-  canSell: false,
+  basePrice: 2.5,
 
   usableEffect: (character: ICharacter) => {
     ItemUsableEffect.applyEatingEffect(character, 1);
