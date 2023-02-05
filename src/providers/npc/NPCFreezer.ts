@@ -7,6 +7,7 @@ import { NPC_CYCLES } from "./NPCCycle";
 import { NPCView } from "./NPCView";
 
 import { appEnv } from "@providers/config/env";
+import { PM2Helper } from "@providers/server/PM2Helper";
 import CPUusage from "cpu-percentage";
 import round from "lodash/round";
 
@@ -14,44 +15,12 @@ import round from "lodash/round";
 export class NPCFreezer {
   public freezeCheckIntervals: Map<string, NodeJS.Timeout> = new Map();
 
-  constructor(private npcView: NPCView) {
+  constructor(private npcView: NPCView, private pm2Helper: PM2Helper) {
     if (appEnv.general.IS_UNIT_TEST) {
       return;
     }
 
-    const start = CPUusage();
-
-    setInterval(async () => {
-      console.log("Checking to freeze NPCs...");
-
-      console.log(`
-        NPC_CYCLES: ${NPC_CYCLES.size}
-        NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size}
-      `);
-
-      const end = CPUusage(start);
-      const usage = round(end.percent);
-
-      const totalActiveNPCS = await NPC.countDocuments({ isBehaviorEnabled: true });
-
-      console.log(`Total active NPCs: ${totalActiveNPCS}`);
-
-      console.log(`CPU usage is ${usage}%`);
-
-      if (usage > 100) {
-        for (let i = 0; i <= totalActiveNPCS * 0.5; i++) {
-          await this.freezeRandomNPC(usage);
-        }
-      } else if (usage > 80 && usage < 100) {
-        for (let i = 0; i <= totalActiveNPCS * 0.3; i++) {
-          await this.freezeRandomNPC(usage);
-        }
-      } else if (usage > 60 && usage < 80) {
-        for (let i = 0; i <= totalActiveNPCS * 0.1; i++) {
-          await this.freezeRandomNPC(usage);
-        }
-      }
-    }, 5000);
+    this.setCPUUsageCheckInterval();
   }
 
   public tryToFreezeNPC(npc: INPC): void {
@@ -94,6 +63,30 @@ export class NPCFreezer {
     }
 
     this.freezeCheckIntervals.delete(npc.id);
+  }
+
+  // This works like a security measure to prevent the server from crashing due to high CPU usage if there are too many NPCs active at the same time.
+  private setCPUUsageCheckInterval(): void {
+    const start = CPUusage();
+    const checkInterval = 10000;
+    const maxCPUUsagePerInstance = 80;
+
+    setInterval(async () => {
+      const end = CPUusage(start);
+      const totalCPUUsage = round(end.percent);
+      console.log(
+        `NPC_CYCLES: ${NPC_CYCLES.size} NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size} CPU_USAGE: ${totalCPUUsage}%`
+      );
+
+      const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
+
+      if (totalCPUUsage >= maxCPUUsagePerInstance) {
+        const freezeCount = Math.ceil(totalActiveNPCs * 0.3);
+        for (let i = 0; i < freezeCount; i++) {
+          await this.freezeRandomNPC(totalCPUUsage);
+        }
+      }
+    }, checkInterval);
   }
 
   private async shouldFreezeNPC(npc: INPC): Promise<boolean> {
