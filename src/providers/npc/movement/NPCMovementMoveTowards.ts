@@ -256,7 +256,7 @@ export class NPCMovementMoveTowards {
 
           await this.tryToSwitchToRandomTarget(npc);
         },
-        1500
+        1700
       );
     }
   }

@@ -11,7 +11,7 @@ export class ScriptsUseCase {
         {},
         {
           $set: {
-            attackIntervalSpeed: 1500,
+            attackIntervalSpeed: 1700,
           },
         }
       );
