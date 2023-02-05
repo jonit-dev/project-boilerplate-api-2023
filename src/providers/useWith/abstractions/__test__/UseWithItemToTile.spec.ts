@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { MapLayers } from "@rpg-engine/shared";
 import { IUseWithItemToTileOptions, UseWithItemToTile } from "../UseWithItemToTile";
 
@@ -8,6 +9,7 @@ jest.mock("lodash/random", () => jest.fn());
 
 describe("UseWithItemToTile.ts", () => {
   let useWithItemToTile: UseWithItemToTile;
+  let skillIncrease: SkillIncrease;
   let mockCharacter: ICharacter;
   const baseOptions: IUseWithItemToTileOptions = {
     rewards: [

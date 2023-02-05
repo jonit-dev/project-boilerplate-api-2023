@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import {
   IUseWithItemToTileOptions,
   IUseWithItemToTileReward,
@@ -31,7 +32,8 @@ export const itemPickaxe: Partial<IItemUseWith> = {
     originItem: IItem,
     targetTile: IUseWithTargetTile,
     targetName: string | undefined,
-    character: ICharacter
+    character: ICharacter,
+    skillIncrease: SkillIncrease
   ) => {
     const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
 
@@ -156,6 +158,6 @@ export const itemPickaxe: Partial<IItemUseWith> = {
         break;
     }
 
-    await useWithItemToTile.execute(character, useWithItemToTileOptions);
+    await useWithItemToTile.execute(character, useWithItemToTileOptions, skillIncrease);
   },
 };

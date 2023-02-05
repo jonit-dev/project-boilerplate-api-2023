@@ -1,0 +1,38 @@
+import {
+  ArmorsBlueprint,
+  AxesBlueprint,
+  CraftingResourcesBlueprint,
+  FoodsBlueprint,
+  RangedWeaponsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared/dist/types/skills.types";
+
+export const CraftingSkillsMap = new Map<string, string>([
+  [CraftingResourcesBlueprint.IronOre, CraftingSkill.Mining],
+  [CraftingResourcesBlueprint.CopperOre, CraftingSkill.Mining],
+  [CraftingResourcesBlueprint.GoldenOre, CraftingSkill.Mining],
+  [CraftingResourcesBlueprint.SilverOre, CraftingSkill.Mining],
+  [CraftingResourcesBlueprint.GreenOre, CraftingSkill.Mining],
+  [CraftingResourcesBlueprint.ObsidiumOre, CraftingSkill.Mining],
+  [CraftingResourcesBlueprint.CorruptionOre, CraftingSkill.Mining],
+  [RangedWeaponsBlueprint.Stone, CraftingSkill.Mining],
+  [CraftingResourcesBlueprint.IronIngot, CraftingSkill.Blacksmithing],
+  [CraftingResourcesBlueprint.CopperIngot, CraftingSkill.Blacksmithing],
+  [CraftingResourcesBlueprint.GoldenIngot, CraftingSkill.Blacksmithing],
+  [CraftingResourcesBlueprint.SilverIngot, CraftingSkill.Blacksmithing],
+  [ArmorsBlueprint.IronArmor, CraftingSkill.Blacksmithing],
+  [ArmorsBlueprint.GoldenArmor, CraftingSkill.Blacksmithing],
+  [ArmorsBlueprint.BronzeArmor, CraftingSkill.Blacksmithing],
+  [ArmorsBlueprint.PlateArmor, CraftingSkill.Blacksmithing],
+  [AxesBlueprint.Axe, CraftingSkill.Blacksmithing],
+  [AxesBlueprint.DoubleAxe, CraftingSkill.Blacksmithing],
+  [AxesBlueprint.FrostDoubleAxe, CraftingSkill.Blacksmithing],
+  [CraftingResourcesBlueprint.GreaterWoodenLog, CraftingSkill.Lumberjacking],
+  [CraftingResourcesBlueprint.WoodenSticks, CraftingSkill.Lumberjacking],
+  [CraftingResourcesBlueprint.SmallWoodenStick, CraftingSkill.Lumberjacking],
+  [CraftingResourcesBlueprint.ElvenWood, CraftingSkill.Lumberjacking],
+  [FoodsBlueprint.WildSalmon, CraftingSkill.Fishing],
+  [FoodsBlueprint.Tuna, CraftingSkill.Fishing],
+  [FoodsBlueprint.BrownFish, CraftingSkill.Fishing],
+  [FoodsBlueprint.Bread, CraftingSkill.Cooking],
+]);

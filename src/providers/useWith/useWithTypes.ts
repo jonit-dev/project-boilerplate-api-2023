@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { MapLayers } from "@rpg-engine/shared";
 
 export interface IUseWithTileEffect {
@@ -7,12 +8,13 @@ export interface IUseWithTileEffect {
     item: IItem,
     targetTile: IUseWithTargetTile,
     targetName: string | undefined,
-    character: ICharacter
+    character: ICharacter,
+    skillIncrease: SkillIncrease
   ): Promise<void> | void;
 }
 
 export interface IUseWithItemEffect {
-  (targetItem: IItem, originItem: IItem, character: ICharacter): Promise<void> | void;
+  (targetItem: IItem, originItem: IItem, character: ICharacter, skillIncrease: SkillIncrease): Promise<void> | void;
 }
 
 export interface IItemUseWith extends IItem {
