@@ -33,6 +33,7 @@ import _ from "lodash";
 import { Types } from "mongoose";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
+import { CraftingSkillsMap } from "./constants";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -177,6 +178,24 @@ export class SkillIncrease {
     }
   }
 
+  public async increaseCraftingSP(character: ICharacter, craftedItemKey: string): Promise<void> {
+    const skillToUpdate = CraftingSkillsMap.get(craftedItemKey);
+    // if no crafting skill to update, return without error
+    if (!skillToUpdate) {
+      return;
+    }
+
+    const skills = (await Skill.findById(character.skills)) as ISkill;
+    if (!skills) {
+      throw new Error(`skills not found for character ${character.id}`);
+    }
+    const result = this.increaseSP(skills, craftedItemKey, undefined, CraftingSkillsMap);
+    await this.skillFunctions.updateSkills(skills, character);
+    if (result.skillLevelUp && character.channelId) {
+      await this.skillFunctions.sendSkillLevelUpEvents(result, character);
+    }
+  }
+
   /**
    * This function distributes
    * the xp stored in the xpToRelease array to the corresponding
@@ -299,9 +318,14 @@ export class SkillIncrease {
     });
   }
 
-  private increaseSP(skills: ISkill, skillKey: string, skillPointsCalculator?: Function): IIncreaseSPResult {
+  private increaseSP(
+    skills: ISkill,
+    skillKey: string,
+    skillPointsCalculator?: Function,
+    skillsMap: Map<string, string> = SKILLS_MAP
+  ): IIncreaseSPResult {
     let skillLevelUp = false;
-    const skillToUpdate = SKILLS_MAP.get(skillKey);
+    const skillToUpdate = skillsMap.get(skillKey);
 
     if (!skillToUpdate) {
       throw new Error(`skill not found for item subtype ${skillKey}`);
