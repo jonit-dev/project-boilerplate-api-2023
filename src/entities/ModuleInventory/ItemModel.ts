@@ -85,6 +85,8 @@ const itemSchema = createLeanSchema(
     bodyFromId: Type.string(),
 
     canUseOnNonPVPZone: Type.boolean({ required: true, default: true }),
+
+    isBeingPickedUp: Type.boolean({ required: true, default: false }), // lock mechanism to avoid item duplication
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );

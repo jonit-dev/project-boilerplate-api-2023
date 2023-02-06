@@ -84,13 +84,12 @@ export class CharacterDeath {
       characterDeathData
     );
 
-    await this.characterWeight.updateCharacterWeight(character);
-
     await character.unlockField("x");
     await character.unlockField("y");
     await character.unlockField("scene");
 
     await this.respawnCharacter(character);
+    await this.characterWeight.updateCharacterWeight(character);
   }
 
   public async generateCharacterBody(character: ICharacter): Promise<IItem | any> {

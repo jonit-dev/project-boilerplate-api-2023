@@ -15,7 +15,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { ItemOwnership } from "../ItemOwnership";
 
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
 import { ItemPickupMapContainer } from "./ItemPickupMapContainer";
@@ -42,6 +42,14 @@ export class ItemPickup {
     if (!itemToBePicked) {
       return false;
     }
+
+    // this prevents item duplication (2 chars trying to pick up the same item at the same time)
+    if (itemToBePicked.isBeingPickedUp) {
+      this.socketMessaging.sendErrorMessageToCharacter(character);
+      return false;
+    }
+
+    await Item.updateOne({ _id: itemToBePicked.id }, { isBeingPickedUp: true }); // lock it until we finalize the pickup!
 
     const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
     const isPickupFromMapContainer =
@@ -134,6 +142,8 @@ export class ItemPickup {
 
     // whenever a new item is added, we need to update the character weight
     await this.characterWeight.updateCharacterWeight(character);
+
+    await Item.updateOne({ _id: itemToBePicked.id }, { isBeingPickedUp: false });
   }
 
   private async refreshEquipmentIfInventoryItem(character: ICharacter): Promise<void> {
