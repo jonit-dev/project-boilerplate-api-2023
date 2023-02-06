@@ -7,3 +7,8 @@ Content-Type: application/json
 GET {{baseUrl}}/scripts/initial-coordinates HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
+
+### Scripts :: Update emails
+GET {{baseUrl}}/scripts/update-emails-lowercase HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json

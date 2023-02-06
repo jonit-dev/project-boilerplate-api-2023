@@ -28,4 +28,13 @@ export class ScriptsController implements interfaces.Controller {
       message: "Initial coordinates adjusted succesfully",
     });
   }
+
+  @httpGet("/update-emails-lowercase")
+  public async updateEmailsLowercase(@response() res): Promise<void> {
+    await this.scriptsUserCase.setAllEmailsToLowerCase();
+
+    return res.status(200).send({
+      message: "Emails adjusted succesfully",
+    });
+  }
 }
