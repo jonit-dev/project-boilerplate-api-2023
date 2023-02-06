@@ -1,4 +1,5 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { User } from "@entities/ModuleSystem/UserModel";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -40,6 +41,19 @@ export class ScriptsUseCase {
       console.error(error);
 
       throw new BadRequestError("Failed to execute script!");
+    }
+  }
+
+  public async setAllEmailsToLowerCase(): Promise<void> {
+    try {
+      const users = await User.find({});
+
+      for (const user of users) {
+        user.email = user.email.toLowerCase();
+        await user.save();
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 }

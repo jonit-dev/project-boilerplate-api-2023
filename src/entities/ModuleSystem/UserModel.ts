@@ -73,6 +73,7 @@ userSchema.plugin(mongooseHidden, {
 userSchema.pre("save", async function (next): Promise<void> {
   // @ts-ignore
   const user = this as IUser;
+  user.email = user.email.toLowerCase();
   const salt = await bcrypt.genSalt();
 
   if (user.isModified("password")) {
