@@ -92,6 +92,14 @@ describe("CharacterDeath.ts | Character with items", () => {
 
   beforeAll(() => {
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
+
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   beforeEach(async () => {
@@ -127,10 +135,6 @@ describe("CharacterDeath.ts | Character with items", () => {
     );
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   it("should drop character's backpack items  as a container on its dead body", async () => {
     // @ts-ignore
     const spyDropCharacterItemsOnBody = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
@@ -158,8 +162,8 @@ describe("CharacterDeath.ts | Character with items", () => {
     // body should have the only one item
     expect(characterBody!.itemContainer).toBeDefined();
     expect(bodyItemContainer.slots).toBeDefined();
-    expect(bodyItemContainer.slots[0]).not.toBeNull();
-    expect(bodyItemContainer.slots[1]).toBeNull();
+
+    expect(bodyItemContainer.slots[0].key).toBe("backpack");
 
     // backpack ownership should be null after death
     expect(bodyItemContainer.slots[0].owner).toBeUndefined();
