@@ -45,6 +45,10 @@ export class CharacterDeath {
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
+    await character.lockField("x");
+    await character.lockField("y");
+    await character.lockField("scene");
+
     if (killer) {
       await this.clearAttackerTarget(killer);
     }
@@ -80,8 +84,13 @@ export class CharacterDeath {
       characterDeathData
     );
 
-    await this.respawnCharacter(character);
     await this.characterWeight.updateCharacterWeight(character);
+
+    await character.unlockField("x");
+    await character.unlockField("y");
+    await character.unlockField("scene");
+
+    await this.respawnCharacter(character);
   }
 
   public async generateCharacterBody(character: ICharacter): Promise<IItem | any> {
