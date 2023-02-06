@@ -32,6 +32,7 @@ export class CharacterMovementWarn {
 
     await this.npcWarn.warnCharacterAboutNPCsInView(character);
 
+    //! Disabled because it some "players" spam items on the ground, it will cause the emissor to get stuck.
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.itemView.warnCharacterAboutItemsInView(character);
   }
