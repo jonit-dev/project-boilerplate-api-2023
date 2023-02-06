@@ -14,15 +14,15 @@ export const spellFoodCreation: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar klatha",
-  manaCost: 5,
+  manaCost: 8,
   minLevelRequired: 3,
   minMagicLevelRequired: 3,
   animationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {
-    const spellRuneCreation = container.get(SpellItemCreation);
+    const spellItemCreation = container.get(SpellItemCreation);
 
-    await spellRuneCreation.createItem(character, {
+    await spellItemCreation.createItem(character, {
       itemToCreate: {
         key: getFoodItemKey(),
       },
