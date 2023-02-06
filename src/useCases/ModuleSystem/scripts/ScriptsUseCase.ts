@@ -45,15 +45,16 @@ export class ScriptsUseCase {
   }
 
   public async setAllEmailsToLowerCase(): Promise<void> {
-    try {
-      const users = await User.find({});
+    const users = await User.find({});
 
-      for (const user of users) {
+    for (const user of users) {
+      try {
         user.email = user.email.toLowerCase();
         await user.save();
+      } catch (error) {
+        console.error(error);
+        continue;
       }
-    } catch (error) {
-      console.error(error);
     }
   }
 }
