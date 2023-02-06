@@ -7266,6 +7266,11 @@ mongoose-legacy-pluralize@1.0.2:
   resolved "https://registry.npmjs.org/mongoose-legacy-pluralize/-/mongoose-legacy-pluralize-1.0.2.tgz"
   integrity sha512-Yo/7qQU4/EyIS8YDFSeenIvXxZN+ld7YdV9LqFVQJzTLye8unujAWPZ4NWKfFA+RNjh+wvTWKY9Z3E5XM6ZZiQ==
 
+mongoose-locks@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/mongoose-locks/-/mongoose-locks-0.3.0.tgz#79ecb3cd1abc26b612058ab0a24087883b96c76e"
+  integrity sha512-1wial4Gd4BU2/EXiblOR3x0o5r1SbkXi5gDRtPL4oP9eS8NwRCB3Z1P84QF2yQ23CEjpbIucWziiyOyMaX/Zpw==
+
 mongoose-paginate-v2@^1.4.2:
   version "1.7.1"
   resolved "https://registry.npmjs.org/mongoose-paginate-v2/-/mongoose-paginate-v2-1.7.1.tgz"
