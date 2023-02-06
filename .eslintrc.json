@@ -17,7 +17,9 @@
       "parserOptions": { "project": "./tsconfig.json" }
     }
   ],
-
+  "globals": {
+    "NodeJS": true
+  },
   "plugins": ["@typescript-eslint", "unused-imports", "promise"],
   "rules": {
     "semi": ["warn", "always"],
