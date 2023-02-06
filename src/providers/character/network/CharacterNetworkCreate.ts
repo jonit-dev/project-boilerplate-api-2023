@@ -120,8 +120,6 @@ export class CharacterNetworkCreate {
           textureKey: character.textureKey,
         };
 
-        await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
-
         await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
 
         switch (appEnv.general.ENV) {
@@ -135,6 +133,8 @@ export class CharacterNetworkCreate {
             });
             break;
         }
+
+        await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
 
         await this.itemView.warnCharacterAboutItemsInView(character);
 

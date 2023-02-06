@@ -36,7 +36,7 @@ describe("MapTransition", () => {
       gridY: 4,
     };
     // @ts-ignore
-    await mapTransition.teleportCharacter(testCharacter, destination);
+    await mapTransition.sameMapTeleport(testCharacter, destination);
     const updatedCharacter = await Character.findOne({ _id: testCharacter._id });
     // @ts-ignore
     expect(updatedCharacter.x).toEqual(FromGridX(destination.gridX));
@@ -186,7 +186,7 @@ describe("MapTransition", () => {
     expect(sendSpy).toHaveBeenCalled;
   });
 
-  test("teleport character within the same map", async () => {
+  it("teleport character within the same map", async () => {
     testCharacter.scene = "map1";
     const destination = {
       map: "map1",
@@ -198,7 +198,7 @@ describe("MapTransition", () => {
 
     // Act
     // @ts-ignore
-    await mapTransition.teleportCharacter(testCharacter, destination);
+    await mapTransition.sameMapTeleport(testCharacter, destination);
 
     // Assert
     expect(updateOneMock).toHaveBeenCalledWith(
@@ -207,6 +207,7 @@ describe("MapTransition", () => {
         $set: {
           x: FromGridX(5),
           y: FromGridX(5),
+          scene: "map1",
         },
       }
     );
@@ -216,7 +217,7 @@ describe("MapTransition", () => {
     // @ts-ignore
     testCharacter.target = { id: testCharacter.id, type: EntityType.Character };
 
-    await mapTransition.teleportCharacter(testCharacter, {
+    await mapTransition.sameMapTeleport(testCharacter, {
       map: testCharacter.scene,
       gridX: 1,
       gridY: 1,

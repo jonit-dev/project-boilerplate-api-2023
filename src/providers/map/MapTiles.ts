@@ -1,17 +1,22 @@
 import {
+  FromGridX,
+  FromGridY,
   ITiledChunk,
   ITiledLayer,
   ITileset,
-  MapLayers,
   MAP_LAYERS,
   MAP_LAYERS_TO_ID,
+  MapLayers,
   TiledLayerNames,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MapLoader } from "./MapLoader";
+import { MapTransition } from "./MapTransition";
 
 @provide(MapTiles)
 export class MapTiles {
+  constructor(private mapTransition: MapTransition) {}
+
   public getFirstXY(map: string, layerName: MapLayers): [number, number] | undefined {
     const layer = this.getLayer(map, layerName);
 
@@ -134,7 +139,12 @@ export class MapTiles {
     }
 
     const tileId = rawTileId - targetTileset.firstgid;
-    return this.getTileProperty<boolean>(targetTileset!, tileId!, "is_passage") || false;
+
+    const isTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY)) !== undefined;
+
+    const isPassage = this.getTileProperty<boolean>(targetTileset!, tileId!, "is_passage");
+
+    return isTransition || isPassage || false;
   }
 
   public getPropertyFromLayer(

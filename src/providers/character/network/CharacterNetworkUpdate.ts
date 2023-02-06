@@ -22,6 +22,7 @@ import {
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
@@ -91,11 +92,17 @@ export class CharacterNetworkUpdate {
 
             await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
 
-            await this.handleMapTransition(character, newX, newY);
-
             this.handleNonPVPZone(character, newX, newY);
 
             await this.characterView.clearOutOfViewElementsAll(character);
+
+            // try to avoid the teleport bug, by locking the fields before the map transition
+            await character.lockField("x");
+            await character.lockField("y");
+            await character.lockField("scene");
+
+            // leave it for last!
+            await this.handleMapTransition(character, newX, newY);
           }
 
           // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.
@@ -194,8 +201,13 @@ export class CharacterNetworkUpdate {
    Check if we are transitioning to the same map, 
    if so we should only teleport the character
    */
+
+      await character.unlockField("x");
+      await character.unlockField("y");
+      await character.unlockField("scene");
+
       if (destination.map === frozenCharacter.scene) {
-        await this.mapTransition.teleportCharacter(frozenCharacter, destination);
+        await this.mapTransition.sameMapTeleport(frozenCharacter, destination);
       } else {
         await this.mapTransition.changeCharacterScene(frozenCharacter, destination);
       }

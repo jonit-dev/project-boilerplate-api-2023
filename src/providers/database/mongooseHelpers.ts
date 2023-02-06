@@ -7,6 +7,8 @@ import { QueryLoggerArgs } from "mongoose-query-logger/dist/types";
 import { GetSchemaType, createSchema } from "ts-mongoose";
 // create a wrapper function around createSchema, with mongooseLeanDefaults and mongooseLeanVirtuals and typings
 
+import locks from "mongoose-locks";
+
 export const queryLogger = new MongooseQueryLogger();
 const warning = chalk.hex("#FFA500");
 const critical = chalk.hex("#FF0000");
@@ -41,5 +43,6 @@ export function createLeanSchema<T extends SchemaDefinition, O extends SchemaOpt
   return createSchema(definition, options)
     .plugin(mongooseLeanDefaults)
     .plugin(mongooseLeanVirtuals)
-    .plugin(queryLogger.getPlugin());
+    .plugin(queryLogger.getPlugin())
+    .plugin(locks, { helpers: true, throw: true });
 }

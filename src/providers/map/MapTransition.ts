@@ -84,7 +84,7 @@ export class MapTransition {
     );
   }
 
-  public async teleportCharacter(character: ICharacter, destination: TransitionDestination): Promise<void> {
+  public async sameMapTeleport(character: ICharacter, destination: TransitionDestination): Promise<void> {
     if (character.scene !== destination.map) {
       throw new Error(
         `Character Scene: "${character.scene}" and map to teleport: "${destination.map}" should be the same!`
@@ -98,6 +98,7 @@ export class MapTransition {
         $set: {
           x: FromGridX(destination.gridX),
           y: FromGridX(destination.gridY),
+          scene: destination.map,
         },
       }
     );
