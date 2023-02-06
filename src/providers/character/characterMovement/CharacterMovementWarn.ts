@@ -32,7 +32,8 @@ export class CharacterMovementWarn {
 
     await this.npcWarn.warnCharacterAboutNPCsInView(character);
 
-    await this.itemView.warnCharacterAboutItemsInView(character);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    this.itemView.warnCharacterAboutItemsInView(character);
   }
 
   public async warnAboutSingleCharacter(character: ICharacter, targetCharacter: ICharacter): Promise<void> {
