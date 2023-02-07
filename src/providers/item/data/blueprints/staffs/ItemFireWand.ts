@@ -1,11 +1,13 @@
 import { IMagicStaff } from "@providers/useWith/useWithTypes";
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemFireWand: Partial<IMagicStaff> = {
   key: StaffsBlueprint.FireWand,
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
+  rangeType: EntityAttackType.Ranged,
+  projectileAnimationKey: AnimationEffectKeys.Red,
   textureAtlas: "items",
   texturePath: "staffs/fire-wand.png",
   name: "Fire Wand",
@@ -15,6 +17,6 @@ export const itemFireWand: Partial<IMagicStaff> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 7,
   defense: 3,
-  rangeType: EntityAttackType.Melee,
+  maxRange: 4,
   basePrice: 60,
 };

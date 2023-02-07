@@ -1,11 +1,13 @@
 import { IMagicStaff } from "@providers/useWith/useWithTypes";
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemPoisonStaff: Partial<IMagicStaff> = {
   key: StaffsBlueprint.PoisonStaff,
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
+  rangeType: EntityAttackType.Ranged,
+  projectileAnimationKey: AnimationEffectKeys.Energy,
   textureAtlas: "items",
   texturePath: "staffs/poison-staff.png",
   name: "Poison Staff",
@@ -15,7 +17,6 @@ export const itemPoisonStaff: Partial<IMagicStaff> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 15,
   defense: 10,
-  rangeType: EntityAttackType.Ranged,
   basePrice: 85,
-  maxRange: 5,
+  maxRange: 6,
 };

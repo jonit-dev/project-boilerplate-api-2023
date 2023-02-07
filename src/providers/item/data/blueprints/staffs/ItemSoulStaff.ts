@@ -1,11 +1,13 @@
 import { IMagicStaff } from "@providers/useWith/useWithTypes";
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemSoulStaff: Partial<IMagicStaff> = {
   key: StaffsBlueprint.SoulStaff,
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
+  rangeType: EntityAttackType.Ranged,
+  projectileAnimationKey: AnimationEffectKeys.Blue,
   textureAtlas: "items",
   texturePath: "staffs/soul-staff.png",
   name: "Soul Staff",
@@ -15,6 +17,6 @@ export const itemSoulStaff: Partial<IMagicStaff> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 12,
   defense: 3,
-  rangeType: EntityAttackType.Melee,
+  maxRange: 6,
   basePrice: 55,
 };

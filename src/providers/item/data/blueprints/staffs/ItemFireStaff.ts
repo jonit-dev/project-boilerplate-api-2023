@@ -1,12 +1,13 @@
 import { IMagicStaff } from "@providers/useWith/useWithTypes";
-import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { AnimationEffectKeys, EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemFireStaff: Partial<IMagicStaff> = {
   key: StaffsBlueprint.FireStaff,
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
+  rangeType: EntityAttackType.Ranged,
+  projectileAnimationKey: AnimationEffectKeys.FireBall,
   textureAtlas: "items",
   texturePath: "staffs/fire-staff.png",
   name: "Fire Staff",
@@ -16,8 +17,6 @@ export const itemFireStaff: Partial<IMagicStaff> = {
   defense: 8,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  rangeType: EntityAttackType.Ranged,
   basePrice: 77,
   maxRange: 7,
-  projectileAnimationKey: AnimationEffectKeys.FireBall,
 };

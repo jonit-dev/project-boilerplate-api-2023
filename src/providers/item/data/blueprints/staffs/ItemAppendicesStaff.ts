@@ -1,12 +1,13 @@
 import { IMagicStaff } from "@providers/useWith/useWithTypes";
-import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { AnimationEffectKeys, EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemAppendicesStaff: Partial<IMagicStaff> = {
   key: StaffsBlueprint.AppendicesStaff,
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
+  rangeType: EntityAttackType.Ranged,
+  projectileAnimationKey: AnimationEffectKeys.Dark,
   textureAtlas: "items",
   texturePath: "staffs/appendice's-staff.png",
   name: "Appendice's Staff",
@@ -16,8 +17,6 @@ export const itemAppendicesStaff: Partial<IMagicStaff> = {
   defense: 3,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  rangeType: EntityAttackType.Ranged,
   basePrice: 60,
-  maxRange: 4,
-  projectileAnimationKey: AnimationEffectKeys.Dark,
+  maxRange: 5,
 };

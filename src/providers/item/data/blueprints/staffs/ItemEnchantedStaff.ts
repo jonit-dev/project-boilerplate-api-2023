@@ -1,11 +1,13 @@
 import { IMagicStaff } from "@providers/useWith/useWithTypes";
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemEnchantedStaff: Partial<IMagicStaff> = {
   key: StaffsBlueprint.EnchantedStaff,
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
+  rangeType: EntityAttackType.Ranged,
+  projectileAnimationKey: AnimationEffectKeys.Energy,
   textureAtlas: "items",
   texturePath: "staffs/enchanted-staff.png",
   name: "Enchanted Staff",
@@ -15,6 +17,6 @@ export const itemEnchantedStaff: Partial<IMagicStaff> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 14,
   defense: 7,
-  rangeType: EntityAttackType.Melee,
+  maxRange: 8,
   basePrice: 80,
 };

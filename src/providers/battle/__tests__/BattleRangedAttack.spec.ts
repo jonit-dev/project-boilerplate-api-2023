@@ -11,7 +11,7 @@ import {
   StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, ItemSlotType } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { Types } from "mongoose";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleRangedAttack } from "../BattleRangedAttack";
@@ -188,7 +188,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 
   it("should hit a target | NPC ranged attack ", async () => {
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(2);
+    expect(hitTarget).toBeCalledTimes(1);
   });
 
   it("should hit a target | NPC hybrid attack type", async () => {
@@ -197,7 +197,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 
     // Ranged attack
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(3);
+    expect(hitTarget).toBeCalledTimes(2);
 
     // Melee attack (not passing maxRangeAttack field on purpose to check is doing melee attack)
     testNPC.maxRangeAttack = undefined;
@@ -207,7 +207,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     await testNPC.save();
 
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(4);
+    expect(hitTarget).toBeCalledTimes(3);
   });
 
   it("should hit a target, required ammo and target is in range | with multiple ammo keys", async () => {
@@ -218,12 +218,12 @@ describe("BattleRangedAttack.spec.ts", () => {
     await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(5);
+    expect(hitTarget).toBeCalledTimes(4);
 
     await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Stone);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(6);
+    expect(hitTarget).toBeCalledTimes(5);
   });
 
   describe("magic staff ranged attack", () => {
@@ -238,17 +238,19 @@ describe("BattleRangedAttack.spec.ts", () => {
     it("special ammo dependant on mana availability", async () => {
       testCharacter.mana = Math.floor(itemFireStaff.attack! / 6) - 1;
       // @ts-ignore
-      let rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
-
-      expect(rangedAttackAmmo).not.toBeDefined();
+      const validadeMagicAttack = await battleAttackTarget.validateMagicAttack(testCharacter._id, {
+        targetId: testNPC._id,
+        targetType: testNPC.type as EntityType,
+      });
+      expect(validadeMagicAttack).toBeTruthy();
 
       testCharacter.mana = Math.ceil(itemFireStaff.attack! / 6) + 1;
       // @ts-ignore
-      rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
+      const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
 
       expect(rangedAttackAmmo).toBeDefined();
-      expect(rangedAttackAmmo!.location).toEqual(ItemSlotType.LeftHand);
-      expect(rangedAttackAmmo!.id).toEqual(staff.id);
+      expect(rangedAttackAmmo!.location).toEqual(ItemSlotType.RightHand);
+      expect(rangedAttackAmmo!.id.toString()).toEqual(staff.id);
       expect(rangedAttackAmmo!.key).toEqual(itemFireStaff.projectileAnimationKey);
       expect(rangedAttackAmmo!.maxRange).toBe(itemFireStaff.maxRange);
     });
@@ -259,7 +261,10 @@ describe("BattleRangedAttack.spec.ts", () => {
       // @ts-ignore
       const rangedAttackAmmo = (await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment))!;
       // @ts-ignore
-      await battleRangedAttack.consumeAmmo(rangedAttackAmmo, testCharacter);
+      await battleRangedAttack.consumeMana(rangedAttackAmmo, testCharacter._id, {
+        targetId: testNPC._id,
+        targetType: testNPC.type as EntityType,
+      });
 
       expect(await Item.findById(staff.id)).toBeDefined();
       expect(characterEquipment.accessory).toBeDefined();

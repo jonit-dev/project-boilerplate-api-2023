@@ -1,12 +1,13 @@
 import { IMagicStaff } from "@providers/useWith/useWithTypes";
-import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { AnimationEffectKeys, EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemCorruptionStaff: Partial<IMagicStaff> = {
   key: StaffsBlueprint.CorruptionStaff,
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
+  rangeType: EntityAttackType.Ranged,
+  projectileAnimationKey: AnimationEffectKeys.Blue,
   textureAtlas: "items",
   texturePath: "staffs/corruption-staff.png",
   name: "Corruption Staff",
@@ -15,8 +16,6 @@ export const itemCorruptionStaff: Partial<IMagicStaff> = {
   defense: 6,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  rangeType: EntityAttackType.Ranged,
   basePrice: 69,
   maxRange: 6,
-  projectileAnimationKey: AnimationEffectKeys.Green,
 };

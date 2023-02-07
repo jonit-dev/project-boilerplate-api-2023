@@ -5,8 +5,9 @@ import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 export const itemMoonsStaff: Partial<IMagicStaff> = {
   key: StaffsBlueprint.MoonsStaff,
   type: ItemType.Weapon,
-  rangeType: EntityAttackType.Ranged,
   subType: ItemSubType.Staff,
+  rangeType: EntityAttackType.Ranged,
+  projectileAnimationKey: AnimationEffectKeys.Blue,
   textureAtlas: "items",
   texturePath: "staffs/moon's-staff.png",
   name: "Moons Staff",
@@ -18,5 +19,4 @@ export const itemMoonsStaff: Partial<IMagicStaff> = {
   defense: 10,
   basePrice: 80,
   maxRange: 7,
-  projectileAnimationKey: AnimationEffectKeys.Blue,
 };
