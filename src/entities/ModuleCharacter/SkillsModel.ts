@@ -123,7 +123,7 @@ skillsSchema.post("save", async function (this: ISkill) {
 });
 
 async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean): Promise<void> {
-  const equipment = await Equipment.findOne({ owner: skill.owner });
+  const equipment = await Equipment.findOne({ owner: skill.owner }).lean({ virtuals: true, default: true });
   const [dataOfWeather, character] = await Promise.all([
     MapControlTimeModel.findOne().lean(),
     Character.findById(skill.owner).lean(),

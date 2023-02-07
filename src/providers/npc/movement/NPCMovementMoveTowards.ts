@@ -43,10 +43,7 @@ export class NPCMovementMoveTowards {
     // first step is setting a target
     // for this, get all characters nearby and set the target to the closest one
 
-    const targetCharacter = (await Character.findById(npc.targetCharacter).lean({
-      virtuals: true,
-      defaults: true,
-    })) as ICharacter;
+    const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;
 
     if (!targetCharacter) {
       // no target character
@@ -174,10 +171,7 @@ export class NPCMovementMoveTowards {
   }
 
   private async faceTarget(npc: INPC): Promise<void> {
-    const targetCharacter = (await Character.findById(npc.targetCharacter).lean({
-      virtuals: true,
-      defaults: true,
-    })) as ICharacter;
+    const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;
 
     if (targetCharacter) {
       const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
@@ -245,10 +239,6 @@ export class NPCMovementMoveTowards {
           const targetCharacter = result[1] as ICharacter;
           const updatedNPC = result[0] as INPC;
 
-          // const targetCharacter = (await Character.findById(npc.targetCharacter).populate("skills")) as ICharacter;
-
-          // const updatedNPC = (await NPC.findById(npc.id).populate("skills")) as INPC;
-
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
             // if reached target and alignment is enemy, lets hit it
             await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
@@ -285,10 +275,7 @@ export class NPCMovementMoveTowards {
         }
 
         const minHealthCharacterInfo = _.minBy(charactersHealth, "health");
-        const minHealthCharacter = (await Character.findById(minHealthCharacterInfo?.id).lean({
-          virtuals: true,
-          defaults: true,
-        })) as ICharacter;
+        const minHealthCharacter = (await Character.findById(minHealthCharacterInfo?.id).lean()) as ICharacter;
 
         // Only set as target if the minimum health character is with 25% of it's health
         if (minHealthCharacter.health <= minHealthCharacter.maxHealth / 4) {

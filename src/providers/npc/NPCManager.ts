@@ -2,6 +2,8 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
+import { PM2Helper } from "@providers/server/PM2Helper";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import { NPCCycle } from "./NPCCycle";
@@ -26,18 +28,26 @@ export class NPCManager {
     private npcMovementMoveAway: NPCMovementMoveAway,
     private npcView: NPCView,
     private npcLoader: NPCLoader,
-    private npcFreezer: NPCFreezer
+    private npcFreezer: NPCFreezer,
+    private pm2Helper: PM2Helper
   ) {}
 
   public listenForBehaviorTrigger(): void {
-    process.on("message", (data) => {
-      if (data.type === "startNPCBehavior") {
-        const randomN = random(0, 3000);
+    process.on("message", async (data) => {
+      const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
 
-        setTimeout(() => {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          this.startNearbyNPCsBehaviorLoop(data.data.character);
-        }, randomN);
+      // if we still have room for more NPCs, start the behavior loop, if not, just repass the signal to another pm2 instance
+      if (totalActiveNPCs <= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
+        if (data.type === "startNPCBehavior") {
+          const randomN = random(0, 3000);
+
+          setTimeout(() => {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            this.startNearbyNPCsBehaviorLoop(data.data.character);
+          }, randomN);
+        }
+      } else {
+        this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", { character: data.data.character });
       }
     });
   }
@@ -45,8 +55,16 @@ export class NPCManager {
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
     const nearbyNPCs = await this.npcView.getNPCsInView(character, { isBehaviorEnabled: false });
     for (const npc of nearbyNPCs) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.startBehaviorLoop(npc);
+      const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
+
+      if (totalActiveNPCs <= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
+        // watch out for max NPCs active limit so we don't fry our CPU
+
+        await this.startBehaviorLoop(npc);
+
+        // wait 200 ms
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
     }
   }
 

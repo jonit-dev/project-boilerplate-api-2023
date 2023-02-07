@@ -7,6 +7,7 @@ import { NPC_CYCLES } from "./NPCCycle";
 import { NPCView } from "./NPCView";
 
 import { appEnv } from "@providers/config/env";
+import { NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
 import { PM2Helper } from "@providers/server/PM2Helper";
 import CPUusage from "cpu-percentage";
 import round from "lodash/round";
@@ -79,6 +80,16 @@ export class NPCFreezer {
       );
 
       const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
+
+      if (totalActiveNPCs >= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
+        const diff = totalActiveNPCs - NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE;
+
+        for (let i = 0; i < diff; i++) {
+          await this.freezeRandomNPC(totalCPUUsage);
+        }
+
+        return;
+      }
 
       if (totalCPUUsage >= maxCPUUsagePerInstance) {
         const freezeCount = Math.ceil(totalActiveNPCs * 0.3);

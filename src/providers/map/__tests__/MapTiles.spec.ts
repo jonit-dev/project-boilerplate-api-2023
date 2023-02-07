@@ -17,6 +17,11 @@ describe("MapTiles.ts", () => {
 
   beforeEach(async () => {});
 
+  const getMapOffset = (mapName) => {
+    const xy = mapTiles.getFirstXY("unit-test-map-negative-coordinate", MapLayers.Ground)!;
+    return (gridManager as any).getMapOffset(xy[0], xy[1]);
+  };
+
   it("should detect if all layers are empty", () => {
     // @ts-ignore
     const allLayersEmpty = mapTiles.areAllLayersTileEmpty(mapName, -10, -10);
@@ -44,7 +49,7 @@ describe("MapTiles.ts", () => {
   });
 
   it("should properly calculate the correct map width and height", () => {
-    const { gridOffsetX, gridOffsetY } = gridManager.getMapOffset("unit-test-map-negative-coordinate")!;
+    const { gridOffsetX, gridOffsetY } = getMapOffset("unit-test-map-negative-coordinate")!;
 
     const { width, height } = mapTiles.getMapWidthHeight("unit-test-map-negative-coordinate", gridOffsetX, gridOffsetY);
 

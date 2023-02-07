@@ -76,14 +76,7 @@ export class CharacterNetworkCreate {
 
         const map = character.scene;
 
-        const { gridOffsetX, gridOffsetY } = this.gridManager.getMapOffset(map)!;
-
-        await this.gridManager.setWalkable(
-          map,
-          ToGridX(character.x) + gridOffsetX,
-          ToGridY(character.y) + gridOffsetY,
-          false
-        );
+        await this.gridManager.setWalkable(map, ToGridX(character.x), ToGridY(character.y), false);
 
         // join channel specific to the user, to we can send direct later if we want.
         await channel.join(data.channelId);

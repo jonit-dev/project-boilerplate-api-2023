@@ -62,17 +62,16 @@ export class NPCMovement {
         "CHECK_ALL_LAYERS_BELOW",
         npc
       );
-      const { gridOffsetX, gridOffsetY } = this.gridManager.getMapOffset(map)!;
 
       if (hasSolid) {
         // console.log(`${npc.key} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
-        await this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
+        await this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false);
         return;
       }
 
-      await this.gridManager.setWalkable(map, ToGridX(oldX) + gridOffsetX, ToGridY(oldY) + gridOffsetY, true);
+      await this.gridManager.setWalkable(map, ToGridX(oldX), ToGridY(oldY), true);
 
-      await this.gridManager.setWalkable(map, ToGridX(newX) + gridOffsetX, ToGridY(newY) + gridOffsetY, false);
+      await this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false);
 
       // warn nearby characters that the NPC moved;
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);

@@ -179,16 +179,9 @@ export class NPCSeeder {
   }
 
   private async setInitialNPCPositionAsSolid(NPCData: INPCSeedData): Promise<void> {
-    const { gridOffsetX, gridOffsetY } = this.gridManager.getMapOffset(NPCData.scene)!;
-
     try {
       // mark NPC initial position as solid on the map (pathfinding)
-      await this.gridManager.setWalkable(
-        NPCData.scene,
-        ToGridX(NPCData.x) + gridOffsetX,
-        ToGridY(NPCData.y) + gridOffsetY,
-        false
-      );
+      await this.gridManager.setWalkable(NPCData.scene, ToGridX(NPCData.x), ToGridY(NPCData.y), false);
     } catch (error) {
       console.log(
         `❌ Failed to set NPC ${NPCData.key} initial position (${NPCData.x}, ${NPCData.y}) as solid on the map (${NPCData.scene})`

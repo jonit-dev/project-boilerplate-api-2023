@@ -12,10 +12,7 @@ export class NPCMovementMoveAway {
 
   public async startMovementMoveAway(npc: INPC): Promise<void> {
     try {
-      const targetCharacter = (await Character.findById(npc.targetCharacter).lean({
-        virtuals: true,
-        defaults: true,
-      })) as ICharacter;
+      const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;
 
       if (targetCharacter) {
         await this.npcTarget.tryToClearOutOfRangeTargets(npc);
