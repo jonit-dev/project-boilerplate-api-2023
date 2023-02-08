@@ -35,106 +35,116 @@ export class ItemPickup {
     private itemContainerHelper: ItemContainerHelper
   ) {}
 
-  public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean> {
-    const inventory = await character.inventory;
-    const itemToBePicked = (await this.itemPickupValidator.isItemPickupValid(itemPickupData, character)) as IItem;
+  public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | undefined> {
+    const session = await Item.startSession();
 
-    if (!itemToBePicked) {
-      return false;
-    }
+    session.startTransaction();
 
-    // this prevents item duplication (2 chars trying to pick up the same item at the same time)
-    if (itemToBePicked.isBeingPickedUp) {
-      this.socketMessaging.sendErrorMessageToCharacter(character);
-      return false;
-    }
+    try {
+      const inventory = await character.inventory;
+      const itemToBePicked = (await this.itemPickupValidator.isItemPickupValid(itemPickupData, character)) as IItem;
 
-    await Item.updateOne({ _id: itemToBePicked.id }, { isBeingPickedUp: true }); // lock it until we finalize the pickup!
+      if (!itemToBePicked) {
+        return false;
+      }
 
-    const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
-    const isPickupFromMapContainer =
-      itemToBePicked.x !== undefined && itemToBePicked.y !== undefined && itemToBePicked.scene !== undefined;
+      // this prevents item duplication (2 chars trying to pick up the same item at the same time)
+      if (itemToBePicked.isBeingPickedUp) {
+        this.socketMessaging.sendErrorMessageToCharacter(character);
+        return false;
+      }
+      itemToBePicked.isBeingPickedUp = true;
+      await itemToBePicked.save();
+      await session.commitTransaction();
 
-    itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
-    await itemToBePicked.save();
+      const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
+      const isPickupFromMapContainer =
+        itemToBePicked.x !== undefined && itemToBePicked.y !== undefined && itemToBePicked.scene !== undefined;
 
-    if (itemPickupData.fromContainerId && !isPickupFromMapContainer) {
-      const pickupFromContainer = await this.itemPickupFromContainer.pickupFromContainer(
-        itemPickupData,
+      itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
+      await itemToBePicked.save();
+
+      if (itemPickupData.fromContainerId && !isPickupFromMapContainer) {
+        const pickupFromContainer = await this.itemPickupFromContainer.pickupFromContainer(
+          itemPickupData,
+          itemToBePicked,
+          character
+        );
+
+        if (!pickupFromContainer) {
+          return false;
+        }
+      }
+
+      // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
+      if (isPickupFromMapContainer) {
+        const pickupFromMap = await this.itemPickupMapContainer.pickupFromMapContainer(itemToBePicked, character);
+
+        if (!pickupFromMap) {
+          return false;
+        }
+      }
+
+      const addToContainer = await this.characterItemContainer.addItemToContainer(
         itemToBePicked,
-        character
+        character,
+        itemPickupData.toContainerId,
+        isInventoryItem
       );
 
-      if (!pickupFromContainer) {
+      if (!addToContainer) {
         return false;
       }
-    }
 
-    // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
-    if (isPickupFromMapContainer) {
-      const pickupFromMap = await this.itemPickupMapContainer.pickupFromMapContainer(itemToBePicked, character);
+      if (isInventoryItem) {
+        await this.refreshEquipmentIfInventoryItem(character);
 
-      if (!pickupFromMap) {
+        await this.finalizePickup(itemToBePicked, character);
+
+        return true;
+      }
+
+      if (!itemPickupData.fromContainerId && !isInventoryItem && !isPickupFromMapContainer) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, failed to remove item from container. Origin container not found."
+        );
         return false;
       }
-    }
 
-    const addToContainer = await this.characterItemContainer.addItemToContainer(
-      itemToBePicked,
-      character,
-      itemPickupData.toContainerId,
-      isInventoryItem
-    );
+      // if the origin container is a MapContainer we should update the char inventory = toContainerId
+      //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map) = fromContainerId
+      const containerToUpdateId = isPickupFromMapContainer
+        ? itemPickupData.toContainerId
+        : itemPickupData.fromContainerId;
+      const updatedContainer = (await ItemContainer.findById(containerToUpdateId).lean({
+        virtuals: true,
+        defaults: true,
+      })) as any;
 
-    if (!addToContainer) {
-      return false;
-    }
+      if (!updatedContainer) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, fetch container information.");
+        return false;
+      }
 
-    if (isInventoryItem) {
-      await this.refreshEquipmentIfInventoryItem(character);
+      if (isPickupFromMapContainer) {
+        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+          inventory: updatedContainer,
+        };
+
+        this.updateInventoryCharacter(payloadUpdate, character);
+      } else {
+        // RPG-1012 - reopen origin container using read to open with correct type
+        await this.sendContainerRead(updatedContainer, character);
+      }
 
       await this.finalizePickup(itemToBePicked, character);
 
       return true;
+    } catch (error) {
+      await session.abortTransaction();
+      console.error(error);
     }
-
-    if (!itemPickupData.fromContainerId && !isInventoryItem && !isPickupFromMapContainer) {
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        "Sorry, failed to remove item from container. Origin container not found."
-      );
-      return false;
-    }
-
-    // if the origin container is a MapContainer we should update the char inventory = toContainerId
-    //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map) = fromContainerId
-    const containerToUpdateId = isPickupFromMapContainer
-      ? itemPickupData.toContainerId
-      : itemPickupData.fromContainerId;
-    const updatedContainer = (await ItemContainer.findById(containerToUpdateId).lean({
-      virtuals: true,
-      defaults: true,
-    })) as any;
-
-    if (!updatedContainer) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, fetch container information.");
-      return false;
-    }
-
-    if (isPickupFromMapContainer) {
-      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-        inventory: updatedContainer,
-      };
-
-      this.updateInventoryCharacter(payloadUpdate, character);
-    } else {
-      // RPG-1012 - reopen origin container using read to open with correct type
-      await this.sendContainerRead(updatedContainer, character);
-    }
-
-    await this.finalizePickup(itemToBePicked, character);
-
-    return true;
   }
 
   private async finalizePickup(itemToBePicked: IItem, character: ICharacter): Promise<void> {

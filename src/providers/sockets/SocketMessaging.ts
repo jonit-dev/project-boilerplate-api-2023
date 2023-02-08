@@ -20,7 +20,7 @@ export class SocketMessaging {
     }
 
     this.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: message ?? "Sorry, not possible",
+      message: message ?? "Sorry, not possible.",
       type,
     });
   }
