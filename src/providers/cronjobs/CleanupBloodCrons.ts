@@ -1,5 +1,6 @@
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { EffectsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 
@@ -13,6 +14,7 @@ export class CleanupBloodCrons {
       const expiredGroundBlood = await Item.find({
         createdAt: { $lt: fiveMinAgo },
         key: EffectsBlueprint.GroundBlood,
+        subType: { $ne: ItemSubType.DeadBody },
       });
 
       for (const groundBlood of expiredGroundBlood) {

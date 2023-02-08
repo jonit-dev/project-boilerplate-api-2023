@@ -1,4 +1,5 @@
 import { Item } from "@entities/ModuleInventory/ItemModel";
+import { ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 
@@ -11,7 +12,7 @@ export class CleanupBodyCrons {
 
       const charBodies = await Item.find({
         createdAt: { $lt: oneHourAgo },
-        name: { $regex: /.*'s body$/ },
+        subType: ItemSubType.DeadBody,
       });
 
       for (const charBody of charBodies) {

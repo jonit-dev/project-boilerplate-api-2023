@@ -4,19 +4,17 @@ import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterCrons } from "./CharacterCrons";
 import { ChatLogCrons } from "./ChatLogCrons";
+import { CleanupBloodCrons } from "./CleanupBloodCrons";
+import { CleanupBodyCrons } from "./CleanupBodyCrons";
 import { ControlTimeCrons } from "./ControlTimeCrons";
-import { DecayItemsCron } from "./DecayItemsCron";
 import { DeleteChatCrons } from "./DeleteChatCrons";
 import { ItemDeleteCrons } from "./ItemDeleteCrons";
 import { NPCCrons } from "./NPCCrons";
-import { CleanupBloodCrons } from "./CleanupBloodCrons";
-import { CleanupBodyCrons } from "./CleanupBodyCrons";
 
 @provide(Cronjob)
 export class Cronjob {
   constructor(
     private characterCron: CharacterCrons,
-    private itemCrons: DecayItemsCron,
     private chatLogCron: ChatLogCrons,
     private npcCron: NPCCrons,
     private controlTimeCron: ControlTimeCrons,
@@ -37,7 +35,6 @@ export class Cronjob {
     switch (appEnv.general.ENV) {
       case EnvType.Development:
         this.characterCron.schedule();
-        this.itemCrons.schedule();
         this.chatLogCron.schedule();
         this.npcCron.schedule();
         this.controlTimeCron.schedule();
@@ -51,7 +48,6 @@ export class Cronjob {
         // make sure it only runs in one instance
         if (process.env.pm_id === this.pm2Helper.pickLastCPUInstance()) {
           this.characterCron.schedule();
-          this.itemCrons.schedule();
           this.chatLogCron.schedule();
           this.npcCron.schedule();
           this.controlTimeCron.schedule();

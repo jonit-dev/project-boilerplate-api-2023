@@ -63,7 +63,7 @@ export class NPCManager {
         await this.startBehaviorLoop(npc);
 
         // wait 200 ms
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 25));
       }
     }
   }

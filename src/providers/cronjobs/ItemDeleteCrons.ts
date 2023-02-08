@@ -22,6 +22,7 @@ export class ItemDeleteCrons {
           x: { $ne: null },
           y: { $ne: null },
           scene: { $ne: null },
+          subType: { $ne: ItemSubType.DeadBody },
         });
 
         for (const item of items) {
