@@ -38,7 +38,7 @@ export class ItemPickup {
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | undefined> {
     const session = await Item.startSession();
 
-    session.startTransaction();
+    session.startTransaction(); // start transaction to prevent duplicates
 
     try {
       const inventory = await character.inventory;
