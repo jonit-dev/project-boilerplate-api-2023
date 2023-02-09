@@ -24,7 +24,7 @@ export const SOCKET_IO_CONFIG: Partial<ServerOptions> = {
   transports: ["websocket"],
 
   // try to avoid disconnects
-  maxHttpBufferSize: 100000000,
-  pingTimeout: 600000, // 10 minutes
-  pingInterval: 120000, // 2 minutes
+  maxHttpBufferSize: 1e8,
+  pingTimeout: 1000 * 60 * 60,
+  pingInterval: 1000 * 60 * 30,
 };
