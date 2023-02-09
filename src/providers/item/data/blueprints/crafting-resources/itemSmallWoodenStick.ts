@@ -7,7 +7,7 @@ export const itemSmallWoodenStick: Partial<IItemUseWith> = {
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,
   textureAtlas: "items",
-  texturePath: "crafting-resources/small-wooden-sticks.png",
+  texturePath: "crafting-resources/small-wood-sticks.png",
   name: "Small Wooden Sticks",
   description: "Small Wooden sticks used for crafting.",
   weight: 1,
