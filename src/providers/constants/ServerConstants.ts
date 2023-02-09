@@ -5,7 +5,7 @@ export const USER_CONTROL_ONLINE = {
   MAX_NUMBER_ACC_PER_USER: 20,
 };
 
-export const USER_EXHAUST_TIMEOUT = 2000;
+export const USER_EXHAUST_TIMEOUT = 1000;
 
 export const EXHAUSTABLE_EVENTS = [
   ChatSocketEvents.GlobalChatMessageCreate,
