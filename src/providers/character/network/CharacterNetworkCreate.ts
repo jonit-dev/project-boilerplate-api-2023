@@ -129,25 +129,12 @@ export class CharacterNetworkCreate {
 
         await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
 
-        await this.itemView.warnCharacterAboutItemsInView(character);
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        this.itemView.warnCharacterAboutItemsInView(character); // dont await this because if there's a ton of garbage in the server, the character will be stuck waiting for this to finish
 
         await this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
 
-        // how we keep only one record in registry, we have just one do find.
-        const lastTimeWeatherChanged = await MapControlTimeModel.findOne();
-        if (lastTimeWeatherChanged) {
-          const dataOfWeather: IControlTime = {
-            time: lastTimeWeatherChanged.time,
-            period: lastTimeWeatherChanged.period as PeriodOfDay,
-            weather: lastTimeWeatherChanged.weather as AvailableWeather,
-          };
-
-          this.socketMessaging.sendEventToUser<IControlTime>(
-            dataFromServer.channelId!,
-            WeatherSocketEvents.TimeWeatherControl,
-            dataOfWeather
-          );
-        }
+        await this.warnAboutWeatherStatus(character.channelId!);
       }
     );
   }
@@ -194,6 +181,24 @@ export class CharacterNetworkCreate {
           nearbyCharacterPayload
         );
       }
+    }
+  }
+
+  private async warnAboutWeatherStatus(channelId: string): Promise<void> {
+    // how we keep only one record in registry, we have just one do find.
+    const lastTimeWeatherChanged = await MapControlTimeModel.findOne();
+    if (lastTimeWeatherChanged) {
+      const dataOfWeather: IControlTime = {
+        time: lastTimeWeatherChanged.time,
+        period: lastTimeWeatherChanged.period as PeriodOfDay,
+        weather: lastTimeWeatherChanged.weather as AvailableWeather,
+      };
+
+      this.socketMessaging.sendEventToUser<IControlTime>(
+        channelId!,
+        WeatherSocketEvents.TimeWeatherControl,
+        dataOfWeather
+      );
     }
   }
 }
