@@ -1,4 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
@@ -27,13 +29,11 @@ import {
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { Types } from "mongoose";
 import { BattleEffects } from "../BattleEffects";
 import { BattleEvent } from "../BattleEvent";
 import { BattleRangedAttack, IRangedAttackParams } from "../BattleRangedAttack";
 import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { Types } from "mongoose";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -192,6 +192,8 @@ export class BattleAttackTarget {
       : await this.battleEvent.calculateEvent(attacker, target);
 
     let battleEventPayload: Partial<IBattleEventFromServer> = {
+      attackerId: attacker.id,
+      attackerType: attacker.type as "Character" | "NPC",
       targetId: target.id,
       targetType: target.type as "Character" | "NPC",
       eventType: battleEvent,

@@ -3,9 +3,9 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { NPCTarget } from "./movement/NPCTarget";
 import { NPCView } from "./NPCView";
 import { NPCWarn } from "./NPCWarn";
+import { NPCTarget } from "./movement/NPCTarget";
 
 @provide(NPCSpawn)
 export class NPCSpawn {
@@ -32,12 +32,12 @@ export class NPCSpawn {
     npc.y = npc.initialY;
     await npc.save();
 
-    // re add behavior loop
-
     const nearbyCharacters = await this.characterView.getCharactersAroundXYPosition(npc.x, npc.y, npc.scene);
 
     for (const nearbyCharacter of nearbyCharacters) {
-      await this.npcWarn.warnCharacterAboutNPCsInView(nearbyCharacter);
+      await this.npcWarn.warnCharacterAboutNPCsInView(nearbyCharacter, {
+        always: true,
+      });
     }
   }
 
