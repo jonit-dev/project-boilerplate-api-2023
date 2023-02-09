@@ -26,5 +26,5 @@ export const SOCKET_IO_CONFIG: Partial<ServerOptions> = {
   // try to avoid disconnects
   maxHttpBufferSize: 1e10,
   pingTimeout: 1000 * 60 * 60,
-  pingInterval: 1000 * 60 * 30,
+  pingInterval: 1000 * 60 * 3,
 };
