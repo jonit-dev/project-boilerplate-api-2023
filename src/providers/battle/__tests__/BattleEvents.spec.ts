@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { BattleEventType } from "@rpg-engine/shared";
+import { BattleEventType, ISkill } from "@rpg-engine/shared";
 import _ from "lodash";
 import { BattleEvent } from "../BattleEvent";
 
@@ -84,6 +84,44 @@ describe("BattleEvents.spec.ts", () => {
     jest.spyOn(_, "random").mockImplementation(() => 10);
 
     const hit = await battleEvents.calculateHitDamage(testCharacter, testNPC);
+
+    expect(hit).toBe(10);
+  });
+
+  it("should properly calculate a hit damage with damage reduction", async () => {
+    await testNPC.populate("skills").execPopulate();
+    await testCharacter.populate("skills").execPopulate();
+    const skills = await Skill.findById(testCharacter.skills);
+
+    skills!.level = 25;
+    skills!.resistance.level = 25;
+    skills!.shielding.level = 30;
+    await skills!.save();
+
+    await testCharacter.populate("skills").execPopulate();
+
+    jest.spyOn(_, "random").mockImplementation(() => 30);
+
+    const hit = await battleEvents.calculateHitDamage(testNPC, testCharacter);
+
+    expect(hit).toBe(17);
+  });
+
+  it("If damage is low and shield lvl high, should not reduce and take the normal damage", async () => {
+    await testNPC.populate("skills").execPopulate();
+    await testCharacter.populate("skills").execPopulate();
+    const skills = await Skill.findById(testCharacter.skills);
+
+    skills!.level = 25;
+    skills!.resistance.level = 25;
+    skills!.shielding.level = 30;
+    await skills!.save();
+
+    await testCharacter.populate("skills").execPopulate();
+
+    jest.spyOn(_, "random").mockImplementation(() => 10);
+
+    const hit = await battleEvents.calculateHitDamage(testNPC, testCharacter);
 
     expect(hit).toBe(10);
   });

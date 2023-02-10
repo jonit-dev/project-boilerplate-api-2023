@@ -44,38 +44,40 @@ export class BattleEvent {
   }
 
   public async calculateHitDamage(attacker: BattleParticipant, target: BattleParticipant): Promise<number> {
-    const attackerSkills = attacker.skills as ISkill;
-    const defenderSkills = target.skills as ISkill;
+    const attackerSkills = attacker.skills as unknown as ISkill;
+    const defenderSkills = target.skills as unknown as ISkill;
     const attackerTotalAttack = await attackerSkills.attack;
     const defenderTotalDefense = await defenderSkills.defense;
-    let totalAttackWithBonus = attackerTotalAttack;
-    let totalDefenseWithBonus = defenderTotalDefense;
 
-    const weatherData = await MapControlTimeModel.findOne({}, { period: 1, _id: 0 }).limit(1).lean({ virtuals: true });
-    const weatherPeriod = weatherData?.period;
-    const isAttackerCharacter = attacker.type === "Character";
-    const isTargetCharacter = target.type === "Character";
+    const totalPotentialAttackerDamage = _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));
 
-    if (isAttackerCharacter) {
-      const character = attacker as ICharacter;
-      if (character.faction === "Life Bringer" && weatherPeriod === "Morning") {
-        totalAttackWithBonus += attackerTotalAttack * INCREASE_BONUS_FACTION;
-      } else if (character.faction === "Shadow Walker" && weatherPeriod === "Night") {
-        totalAttackWithBonus += attackerTotalAttack * INCREASE_BONUS_FACTION;
-      }
+    let damage = Math.round(_.random(0, totalPotentialAttackerDamage));
+
+    if (defenderSkills.shielding.level > 1 && target.type === "Character") {
+      damage = this.calculateDamageReduction(
+        damage,
+        this.calculateCharacterDefense(
+          defenderSkills.level,
+          defenderSkills.resistance.level,
+          defenderSkills.shielding.level
+        )
+      );
     }
 
-    if (isTargetCharacter) {
-      const character = target as ICharacter;
-      if (character.faction === "Life Bringer" && weatherPeriod === "Morning") {
-        totalDefenseWithBonus += defenderTotalDefense * INCREASE_BONUS_FACTION;
-      } else if (character.faction === "Shadow Walker" && weatherPeriod === "Night") {
-        totalDefenseWithBonus += defenderTotalDefense * INCREASE_BONUS_FACTION;
-      }
-    }
-
-    const totalPotentialAttackerDamage = Math.round(totalAttackWithBonus * (100 / (100 + totalDefenseWithBonus)));
-    const damage = Math.round(_.random(0, totalPotentialAttackerDamage));
+    // damage cannot be higher than target's remaining health
     return damage > target.health ? target.health : damage;
+  }
+
+  private calculateCharacterDefense(level: number, resistanceLevel: number, shieldLevel: number): number {
+    return resistanceLevel + level + Math.floor(shieldLevel / 2);
+  }
+
+  private calculateDamageReduction(damage: number, characterDefense: number): number {
+    let realDamage = 0;
+    realDamage = damage - Math.floor(characterDefense / 5);
+    if (realDamage < damage && realDamage > 0) {
+      return realDamage;
+    }
+    return realDamage > 0 ? realDamage : damage;
   }
 }
