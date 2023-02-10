@@ -121,6 +121,7 @@
     "mongoose-lean-defaults": "^2.2.0",
     "mongoose-locks": "^0.3.0",
     "mongoose-unique-validator": "2.0.3",
+    "mongoose-update-if-current": "^1.4.0",
     "morgan": "^1.10.0",
     "node-cron": "^2.0.3",
     "pluralize": "^8.0.0",

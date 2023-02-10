@@ -36,13 +36,10 @@ export class ItemPickup {
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | undefined> {
-    const session = await Item.startSession();
-
-    session.startTransaction(); // start transaction to prevent duplicates
-
     try {
-      const inventory = await character.inventory;
       const itemToBePicked = (await this.itemPickupValidator.isItemPickupValid(itemPickupData, character)) as IItem;
+
+      const inventory = await character.inventory;
 
       if (!itemToBePicked) {
         return false;
@@ -55,7 +52,6 @@ export class ItemPickup {
       }
       itemToBePicked.isBeingPickedUp = true;
       await itemToBePicked.save();
-      await session.commitTransaction();
 
       const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
       const isPickupFromMapContainer =
@@ -142,7 +138,6 @@ export class ItemPickup {
 
       return true;
     } catch (error) {
-      await session.abortTransaction();
       console.error(error);
     }
   }
@@ -153,7 +148,7 @@ export class ItemPickup {
     // whenever a new item is added, we need to update the character weight
     await this.characterWeight.updateCharacterWeight(character);
 
-    await Item.updateOne({ _id: itemToBePicked.id }, { isBeingPickedUp: false });
+    await Item.updateOne({ _id: itemToBePicked._id }, { isBeingPickedUp: false }); // unlock item
   }
 
   private async refreshEquipmentIfInventoryItem(character: ICharacter): Promise<void> {

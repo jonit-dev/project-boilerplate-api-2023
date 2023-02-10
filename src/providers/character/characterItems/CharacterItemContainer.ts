@@ -85,12 +85,13 @@ export class CharacterItemContainer {
       return true;
     }
 
-    const targetContainer = (await ItemContainer.findById(toContainerId)) as unknown as IItemContainer;
+    const targetContainer = await ItemContainer.findOne({ _id: toContainerId });
 
     if (!targetContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The target container was not found.");
       return false;
     }
+    await targetContainer.lockField("slots");
 
     if (targetContainer) {
       let isNewItem = true;
@@ -113,6 +114,7 @@ export class CharacterItemContainer {
       await this.itemMap.clearItemCoordinates(itemToBeAdded, targetContainer);
 
       if (itemToBeAdded.maxStackSize > 1) {
+        await targetContainer.unlockField("slots");
         const wasStacked = await this.characterItemStack.tryAddingItemToStack(
           character,
           targetContainer,
@@ -128,6 +130,7 @@ export class CharacterItemContainer {
 
       // Check's done, need to create new item on char inventory
       if (isNewItem) {
+        await targetContainer.unlockField("slots");
         const result = await this.characterItemSlots.tryAddingItemOnFirstSlot(
           character,
           itemToBeAdded,
@@ -138,6 +141,7 @@ export class CharacterItemContainer {
           return false;
         }
       }
+      await targetContainer.unlockField("slots");
 
       return true;
     }

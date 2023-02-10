@@ -16,6 +16,10 @@ jest.mock("@providers/constants/SkillConstants", () => ({
   EXP_RATIO: 1,
 }));
 
+jest.mock("mongoose-update-if-current", () => ({
+  updateIfCurrentPlugin: jest.fn(), // mock the plugin because otherwise it will break many tests
+}));
+
 beforeAll(async () => {
   jest.mock("redis", () => redis);
 

@@ -6,6 +6,7 @@ import { MongooseQueryLogger } from "mongoose-query-logger";
 import { QueryLoggerArgs } from "mongoose-query-logger/dist/types";
 import { GetSchemaType, createSchema } from "ts-mongoose";
 // create a wrapper function around createSchema, with mongooseLeanDefaults and mongooseLeanVirtuals and typings
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 import locks from "mongoose-locks";
 
@@ -44,5 +45,6 @@ export function createLeanSchema<T extends SchemaDefinition, O extends SchemaOpt
     .plugin(mongooseLeanDefaults)
     .plugin(mongooseLeanVirtuals)
     .plugin(queryLogger.getPlugin())
-    .plugin(locks, { helpers: true, throw: true });
+    .plugin(locks, { helpers: true, throw: true })
+    .plugin(updateIfCurrentPlugin);
 }

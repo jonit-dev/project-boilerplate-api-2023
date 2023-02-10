@@ -1,5 +1,7 @@
 import { ItemType, TypeHelper } from "@rpg-engine/shared";
 import { Types } from "mongoose";
+import locks from "mongoose-locks";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { ExtractDoc, Type, createSchema, typedModel } from "ts-mongoose";
 import { IItem, Item } from "./ItemModel";
 
@@ -33,7 +35,9 @@ const itemContainerSchema = createSchema(
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
-);
+)
+  .plugin(locks, { helpers: true, throw: true })
+  .plugin(updateIfCurrentPlugin);
 
 itemContainerSchema.virtual("itemIds").get(function (this: IItemContainer) {
   if (!this.slots) {
