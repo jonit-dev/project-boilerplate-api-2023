@@ -31,7 +31,7 @@ export const npcOrcWarrior = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
-  baseHealth: 90,
+  baseHealth: 120,
   healthRandomizerDice: Dice.D8,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],

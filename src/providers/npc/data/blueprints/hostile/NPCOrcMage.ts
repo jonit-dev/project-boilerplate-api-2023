@@ -35,15 +35,15 @@ export const npcOrcMage = {
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 14,
+    level: 20,
     strength: {
-      level: 10,
+      level: 15,
     },
     dexterity: {
-      level: 7,
+      level: 8,
     },
     resistance: {
-      level: 2,
+      level: 4,
     },
   },
   fleeOnLowHealth: true,
@@ -107,6 +107,14 @@ export const npcOrcMage = {
     {
       itemBlueprintKey: StaffsBlueprint.PoisonWand,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.FireStaff,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.CorruptionStaff,
+      chance: 5,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Jade,
