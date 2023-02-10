@@ -10,6 +10,8 @@ import { UpdateQuery } from "mongoose";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { ItemContainer } from "./ItemContainerModel";
 
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+
 const itemSchema = createLeanSchema(
   {
     tiledId: Type.number(),
@@ -89,7 +91,7 @@ const itemSchema = createLeanSchema(
     isBeingPickedUp: Type.boolean({ required: true, default: false }), // lock mechanism to avoid item duplication
   },
   { timestamps: { createdAt: true, updatedAt: true } }
-);
+).plugin(updateIfCurrentPlugin);
 
 itemSchema.virtual("baseKey").get(function (this: IItem) {
   return this.key.replace(/-\d+$/, "");
