@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { Item, IItem as IModelItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -56,7 +56,7 @@ export class ItemDragAndDrop {
       switch (source) {
         case "Inventory":
           await this.moveItemInInventory(
-            itemMoveData.from,
+            Object.assign({}, itemMoveData.from, { item: itemToBeMoved }),
             itemMoveData.to,
             character,
             itemMoveData.from.containerId,
@@ -112,39 +112,43 @@ export class ItemDragAndDrop {
       return false;
     }
 
-    if (!quantity && !to.item) {
+    let totalMove = false;
+
+    const moveItem = async (): Promise<void> => {
       await this.characterItemSlots.deleteItemOnSlot(targetContainer, from.item._id);
-      await Item.findByIdAndDelete(from.item._id);
+      await this.characterItemSlots.addItemOnSlot(targetContainer, from.item as unknown as IModelItem, to.slotIndex);
+      totalMove = true;
+    };
+
+    if (!quantity && !to.item) {
+      await moveItem();
     } else if (quantity && from.item.stackQty) {
       if (to.item && to.item.stackQty) {
-        const futureQuantity = Math.min(to.item.stackQty + quantity, to.item.maxStackSize);
+        const toStackQty = to.item.stackQty;
 
+        const futureQuantity = Math.min(toStackQty + quantity, to.item.maxStackSize);
         await this.characterItemSlots.updateItemOnSlot(to.slotIndex, targetContainer, {
-          ...to.item,
           stackQty: futureQuantity,
         } as IItem);
 
-        if (from.item.stackQty - (futureQuantity - to.item.stackQty) <= 0) {
+        if (from.item.stackQty - (futureQuantity - toStackQty) <= 0) {
           await this.characterItemSlots.deleteItemOnSlot(targetContainer, from.item._id);
           await Item.findByIdAndDelete(from.item._id);
         } else {
           await this.characterItemSlots.updateItemOnSlot(from.slotIndex, targetContainer, {
-            ...from.item,
-            stackQty: from.item.stackQty - (futureQuantity - to.item.stackQty),
+            stackQty: from.item.stackQty - (futureQuantity - toStackQty),
           } as IItem);
         }
       } else if (quantity >= from.item.stackQty) {
-        await this.characterItemSlots.deleteItemOnSlot(targetContainer, from.item._id);
-        await Item.findByIdAndDelete(from.item._id);
+        await moveItem();
       } else {
         await this.characterItemSlots.updateItemOnSlot(from.slotIndex, targetContainer, {
-          ...from.item,
           stackQty: from.item.stackQty - quantity,
         } as IItem);
       }
     }
 
-    if (!to.item) {
+    if (!to.item && !totalMove) {
       const blueprint = itemsBlueprintIndex[from.item.key];
       if (!blueprint) {
         return false;
@@ -156,6 +160,7 @@ export class ItemDragAndDrop {
         defense: from.item.defense ?? blueprint.defense,
         rarity: from.item.rarity ?? blueprint.rarity,
         stackQty: quantity ?? from.item.stackQty,
+        owner: character._id,
       });
 
       await item.save();

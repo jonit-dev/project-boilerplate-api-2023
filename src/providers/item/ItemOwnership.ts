@@ -67,14 +67,18 @@ export class ItemOwnership {
     }
 
     await this.loopThroughAllItemsInContainerAndCallback(itemContainer, async (item, slotIndex) => {
-      await Item.updateOne(
-        {
-          _id: item._id,
-        },
-        {
-          owner,
-        }
-      );
+      if (item.itemContainer) {
+        await this.addItemOwnership(item, { _id: owner } as unknown as ICharacter);
+      } else {
+        await Item.updateOne(
+          {
+            _id: item._id,
+          },
+          {
+            owner,
+          }
+        );
+      }
 
       await this.characterItemSlot.updateItemOnSlot(slotIndex, itemContainer, {
         owner,
@@ -90,16 +94,20 @@ export class ItemOwnership {
     }
 
     await this.loopThroughAllItemsInContainerAndCallback(itemContainer, async (item, slotIndex) => {
-      await Item.updateOne(
-        {
-          _id: item._id,
-        },
-        {
-          $unset: {
-            owner: "",
+      if (item.itemContainer) {
+        await this.removeItemOwnership(item);
+      } else {
+        await Item.updateOne(
+          {
+            _id: item._id,
           },
-        }
-      );
+          {
+            $unset: {
+              owner: "",
+            },
+          }
+        );
+      }
 
       await this.characterItemSlot.updateItemOnSlot(slotIndex, itemContainer, {
         owner: undefined,

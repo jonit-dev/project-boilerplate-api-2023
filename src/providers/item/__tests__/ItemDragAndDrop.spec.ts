@@ -170,7 +170,8 @@ describe("ItemDragAndDrop.ts", () => {
   });
 
   it("should call isItemMoveValid method and moveItemInInventory", async () => {
-    jest.spyOn(Item, "findById").mockResolvedValueOnce({ _id: testItem._id } as any);
+    const mockItem = { _id: testItem._id };
+    jest.spyOn(Item, "findById").mockResolvedValueOnce(mockItem as any);
     // @ts-expect-error
     jest.spyOn(ItemContainer, "findById").mockResolvedValue({ _id: "containerId", items: [{ _id: testItem._id }] });
 
@@ -181,7 +182,7 @@ describe("ItemDragAndDrop.ts", () => {
     expect(itemDragAndDrop.isItemMoveValid).toHaveBeenCalledWith(itemMoveData, testCharacter);
     // @ts-expect-error
     expect(itemDragAndDrop.moveItemInInventory).toHaveBeenCalledWith(
-      itemMoveData.from,
+      Object.assign({}, itemMoveData.from, { item: mockItem }),
       itemMoveData.to,
       testCharacter,
       itemMoveData.from.containerId,
