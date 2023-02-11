@@ -1,7 +1,7 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { getTotalEquipmentStats } from "@providers/equipment/EquipmentStatsCalculator";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
-
+import { container } from "@providers/inversify/container";
+import { EquipmentStatsCalculator } from "@providers/equipment/EquipmentStatsCalculator";
 export const equipmentSchema = createLeanSchema(
   {
     owner: Type.objectId({
@@ -50,11 +50,13 @@ export const equipmentSchema = createLeanSchema(
 );
 
 equipmentSchema.virtual("totalEquippedAttack").get(async function (this: IEquipment) {
-  return (await getTotalEquipmentStats(this._id, "attack")) || 0;
+  const equipamentStatsCalculator = container.get(EquipmentStatsCalculator);
+  return (await equipamentStatsCalculator.getTotalEquipmentStats(this._id, "attack")) || 0;
 });
 
 equipmentSchema.virtual("totalEquippedDefense").get(async function (this: IEquipment) {
-  return (await getTotalEquipmentStats(this._id, "defense")) || 0;
+  const equipamentStatsCalculator = container.get(EquipmentStatsCalculator);
+  return (await equipamentStatsCalculator.getTotalEquipmentStats(this._id, "defense")) || 0;
 });
 
 export type IEquipment = ExtractDoc<typeof equipmentSchema>;
