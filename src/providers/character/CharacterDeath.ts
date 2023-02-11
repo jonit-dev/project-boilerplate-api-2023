@@ -45,6 +45,10 @@ export class CharacterDeath {
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
+    await character.lockField("x");
+    await character.lockField("y");
+    await character.lockField("scene");
+
     if (killer) {
       await this.clearAttackerTarget(killer);
     }
@@ -79,6 +83,10 @@ export class CharacterDeath {
       BattleSocketEvents.BattleDeath,
       characterDeathData
     );
+
+    await character.unlockField("x");
+    await character.unlockField("y");
+    await character.unlockField("scene");
 
     await this.respawnCharacter(character);
     await this.characterWeight.updateCharacterWeight(character);
