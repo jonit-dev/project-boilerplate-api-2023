@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { PVP_MIN_REQUIRED_LV } from "@providers/constants/PVPConstants";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
@@ -24,7 +25,18 @@ export class BattleCharacterAttackValidation {
     }
 
     if (target.type === "Character") {
-      const pvpLvRestrictedReason = this.isCharactersLevelRestrictedForPVP(attacker, target);
+      let attackerSkills = attacker?.skills as ISkill;
+      let targetSkills = target?.skills as ISkill;
+
+      if (!attackerSkills?.level) {
+        attackerSkills = await Skill.findById(attacker.skills).lean();
+      }
+
+      if (!targetSkills?.level) {
+        targetSkills = await Skill.findById(target.skills).lean();
+      }
+
+      const pvpLvRestrictedReason = this.isCharactersLevelRestrictedForPVP(attackerSkills, targetSkills);
 
       if (pvpLvRestrictedReason) {
         await this.battleTargeting.cancelTargeting(
@@ -36,8 +48,20 @@ export class BattleCharacterAttackValidation {
         return false;
       }
 
-      const isNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
-      if (isNonPVPZone) {
+      const isAttackerAtNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(attacker.scene, attacker.x, attacker.y);
+
+      if (isAttackerAtNonPVPZone) {
+        await this.battleTargeting.cancelTargeting(
+          attacker as unknown as ICharacter,
+          "Sorry, you can't attack a target while inside a non-PVP zone.",
+          target.id,
+          target.type as EntityType
+        );
+        return false;
+      }
+
+      const isTargetAtNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
+      if (isTargetAtNonPVPZone) {
         await this.battleTargeting.cancelTargeting(
           attacker as unknown as ICharacter,
           "Sorry, you can't attack a target in a non-PVP zone.",
@@ -52,15 +76,12 @@ export class BattleCharacterAttackValidation {
     return true;
   }
 
-  private isCharactersLevelRestrictedForPVP(attacker: ICharacter | INPC, target: ICharacter | INPC): boolean | string {
-    const attackerSkills = attacker?.skills as ISkill;
-    const defenderSkills = target?.skills as ISkill;
-
-    if (attackerSkills.level < PVP_MIN_REQUIRED_LV) {
+  private isCharactersLevelRestrictedForPVP(attackerSkills: ISkill, defenderSkills: ISkill): boolean | string {
+    if (attackerSkills?.level < PVP_MIN_REQUIRED_LV) {
       return `PVP is restricted to level ${PVP_MIN_REQUIRED_LV} and above.`;
     }
 
-    if (defenderSkills.level < PVP_MIN_REQUIRED_LV) {
+    if (defenderSkills?.level < PVP_MIN_REQUIRED_LV) {
       return `You can't attack a target that's below level ${PVP_MIN_REQUIRED_LV}.`;
     }
 
