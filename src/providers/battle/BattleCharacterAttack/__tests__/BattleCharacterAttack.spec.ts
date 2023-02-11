@@ -3,15 +3,19 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { PVP_MIN_REQUIRED_LV } from "@providers/constants/PVPConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { EntityAttackType } from "@rpg-engine/shared";
-import { BattleCharacterManager } from "../BattleCharacterManager";
+import { BattleCharacterAttack } from "../BattleCharacterAttack";
+import { BattleCharacterAttackValidation } from "../BattleCharacterAttackValidation";
 
-describe("BattleCharacterManager.spec.ts", () => {
-  let battleCharacterManager: BattleCharacterManager;
+describe("BattleCharacterAttack.spec.ts", () => {
+  let battleCharacterAttack: BattleCharacterAttack;
+  let battleCharacterAttackValidation: BattleCharacterAttackValidation;
+
   let testNPC: INPC;
   let testCharacter: ICharacter;
 
   beforeAll(() => {
-    battleCharacterManager = container.get<BattleCharacterManager>(BattleCharacterManager);
+    battleCharacterAttack = container.get<BattleCharacterAttack>(BattleCharacterAttack);
+    battleCharacterAttackValidation = container.get<BattleCharacterAttackValidation>(BattleCharacterAttackValidation);
   });
 
   beforeEach(async () => {
@@ -28,7 +32,7 @@ describe("BattleCharacterManager.spec.ts", () => {
     testNPC.health = 0;
     await testNPC.save();
 
-    const attackTarget = await battleCharacterManager.attackTarget(testCharacter, testNPC);
+    const attackTarget = await battleCharacterAttack.attackTarget(testCharacter, testNPC);
 
     expect(attackTarget).toBeFalsy();
   });
@@ -37,25 +41,24 @@ describe("BattleCharacterManager.spec.ts", () => {
     testCharacter.health = 0;
     await testCharacter.save();
 
-    const attackTarget = await battleCharacterManager.attackTarget(testCharacter, testNPC);
+    const attackTarget = await battleCharacterAttack.attackTarget(testCharacter, testNPC);
 
     expect(attackTarget).toBeFalsy();
   });
 
   it("should return true if attackTarget succeeds", async () => {
-    const attackTarget = await battleCharacterManager.attackTarget(testCharacter, testNPC);
+    const attackTarget = await battleCharacterAttack.attackTarget(testCharacter, testNPC);
 
     expect(attackTarget).toBeTruthy();
   });
 
   it("returns false if the target is the same as the attacker", async () => {
-    const result = await battleCharacterManager.attackTarget(testCharacter, testCharacter);
+    const result = await battleCharacterAttack.attackTarget(testCharacter, testCharacter);
     expect(result).toBe(false);
   });
 
   it("returns false if the target is a character and is in a non-PVP zone", async () => {
-    // @ts-expect-error
-    const result = await battleCharacterManager.canAttack(testCharacter, testCharacter);
+    const result = await battleCharacterAttackValidation.canAttack(testCharacter, testCharacter);
 
     expect(result).toBe(false);
   });
@@ -63,14 +66,15 @@ describe("BattleCharacterManager.spec.ts", () => {
   it("returns true if the attacker and target are alive, different, and in a PVP zone", async () => {
     testCharacter.isAlive = true;
     testNPC.isAlive = true;
-    // @ts-expect-error
-    const result = await battleCharacterManager.canAttack(testCharacter, testNPC);
+
+    const result = await battleCharacterAttackValidation.canAttack(testCharacter, testNPC);
 
     expect(result).toBe(true);
   });
 
   it("returns true if the attacker's level is too low to attack the target", async () => {
-    const cancelTargetingSpy = jest.spyOn(battleCharacterManager, "cancelTargeting");
+    // @ts-ignore
+    const cancelTargetingSpy = jest.spyOn(battleCharacterAttackValidation.battleTargeting, "cancelTargeting");
 
     const attacker = {
       id: "123",
@@ -90,7 +94,7 @@ describe("BattleCharacterManager.spec.ts", () => {
       type: "Character",
     } as unknown as ICharacter;
 
-    const result = await battleCharacterManager.attackTarget(attacker, target);
+    const result = await battleCharacterAttackValidation.canAttack(attacker, target);
 
     expect(result).toBe(false);
 
@@ -103,7 +107,8 @@ describe("BattleCharacterManager.spec.ts", () => {
   });
 
   it("returns true if the target's level is too low to be attacked by the attacker", async () => {
-    const cancelTargetingSpy = jest.spyOn(battleCharacterManager, "cancelTargeting");
+    // @ts-ignore
+    const cancelTargetingSpy = jest.spyOn(battleCharacterAttackValidation.battleTargeting, "cancelTargeting");
 
     const attacker = {
       id: "123",
@@ -123,7 +128,7 @@ describe("BattleCharacterManager.spec.ts", () => {
       type: "Character",
     } as unknown as ICharacter;
 
-    const result = await battleCharacterManager.attackTarget(attacker, target);
+    const result = await battleCharacterAttackValidation.canAttack(attacker, target);
 
     expect(result).toBe(false);
 
@@ -163,9 +168,9 @@ describe("BattleCharacterManager.spec.ts", () => {
     } as unknown as ICharacter;
 
     // @ts-ignore
-    battleCharacterManager.battleAttackTarget.hitTarget = jest.fn();
+    battleCharacterAttack.battleAttackTarget.hitTarget = jest.fn();
 
-    const result = await battleCharacterManager.attackTarget(attacker, target);
+    const result = await battleCharacterAttackValidation.canAttack(attacker, target);
 
     expect(result).toBe(true);
   });

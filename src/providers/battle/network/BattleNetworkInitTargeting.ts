@@ -15,7 +15,7 @@ import {
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
-import { BattleCharacterManager } from "../BattleCharacterManager";
+import { BattleCharacterAttack } from "../BattleCharacterAttack/BattleCharacterAttack";
 import { BattleNetworkStopTargeting } from "./BattleNetworkStopTargetting";
 
 interface ITargetValidation {
@@ -29,7 +29,7 @@ export class BattleNetworkInitTargeting {
     private socketAuth: SocketAuth,
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
-    private battleCharacterManager: BattleCharacterManager,
+    private battleCharacterManager: BattleCharacterAttack,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private mapNonPVPZone: MapNonPVPZone
   ) {}
