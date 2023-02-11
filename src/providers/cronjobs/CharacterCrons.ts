@@ -45,8 +45,7 @@ export class CharacterCrons {
 
     for (const character of onlineCharacters) {
       const lastActivity = dayjs(character.updatedAt);
-      const now = dayjs();
-      const diff = now.diff(lastActivity, "minute");
+      const diff = dayjs().minute() - lastActivity.minute();
 
       if (diff >= 10) {
         console.log(`🚪: Character id ${character.id} has disconnected due to inactivity...`);
