@@ -1,6 +1,7 @@
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ItemSubType, UISocketEvents } from "@rpg-engine/shared";
+import { IUIShowMessage, ItemSubType, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 
@@ -9,29 +10,24 @@ export class ItemDeleteCrons {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public schedule(): void {
-    nodeCron.schedule("0 * * * *", () => {
-      this.socketMessaging.sendEventToAllUsers(
-        UISocketEvents.ShowMessage,
-        "Server: Cleaning up items on the floor in 5 min. Please don't drop valuables."
-      );
+    nodeCron.schedule("0 * * * *", async () => {
+      const allOnlineCharacters = await Character.find({ isOnline: true });
 
-      //! Warning: This is a very dangerous operation. It will delete all items that have a scene, x, and y value. DO NOT use $exists: true here, because it will delete items with a null value for x, y, and scene.
+      for (const character of allOnlineCharacters) {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "Server: Cleaning up items on the floor in 5 min. Please don't drop any item!",
+          type: "info",
+        });
+      }
+
       setTimeout(async () => {
         const items = await Item.find({
-          // @ts-ignore
-          x: { $ne: null },
-          y: { $ne: null },
-          scene: { $ne: null },
+          $or: [{ owner: { $exists: false } }, { owner: { $eq: null } }],
           subType: { $ne: ItemSubType.DeadBody },
         });
 
         for (const item of items) {
-          // if item has "body" on its name, dont delete
-          if (item.subType === ItemSubType.DeadBody) {
-            continue;
-          }
-
-          await item.delete();
+          await item.remove();
         }
       }, 60 * 1000 * 5);
     });
