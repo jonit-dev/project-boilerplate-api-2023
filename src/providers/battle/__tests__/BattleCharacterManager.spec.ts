@@ -1,6 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { PVP_MIN_REQUIRED_LV } from "@providers/constants/PVPConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { EntityAttackType } from "@rpg-engine/shared";
 import { BattleCharacterManager } from "../BattleCharacterManager";
 
 describe("BattleCharacterManager.spec.ts", () => {
@@ -63,6 +65,107 @@ describe("BattleCharacterManager.spec.ts", () => {
     testNPC.isAlive = true;
     // @ts-expect-error
     const result = await battleCharacterManager.canAttack(testCharacter, testNPC);
+
+    expect(result).toBe(true);
+  });
+
+  it("returns true if the attacker's level is too low to attack the target", async () => {
+    const cancelTargetingSpy = jest.spyOn(battleCharacterManager, "cancelTargeting");
+
+    const attacker = {
+      id: "123",
+      isAlive: true,
+      skills: {
+        level: 2,
+      },
+      type: "Character",
+    } as unknown as ICharacter;
+
+    const target = {
+      id: "321",
+      isAlive: true,
+      skills: {
+        level: 10,
+      },
+      type: "Character",
+    } as unknown as ICharacter;
+
+    const result = await battleCharacterManager.attackTarget(attacker, target);
+
+    expect(result).toBe(false);
+
+    expect(cancelTargetingSpy).toBeCalledWith(
+      attacker,
+      `PVP is restricted to level ${PVP_MIN_REQUIRED_LV} and above.`,
+      target.id,
+      "Character"
+    );
+  });
+
+  it("returns true if the target's level is too low to be attacked by the attacker", async () => {
+    const cancelTargetingSpy = jest.spyOn(battleCharacterManager, "cancelTargeting");
+
+    const attacker = {
+      id: "123",
+      isAlive: true,
+      skills: {
+        level: 12,
+      },
+      type: "Character",
+    } as unknown as ICharacter;
+
+    const target = {
+      id: "321",
+      isAlive: true,
+      skills: {
+        level: 5,
+      },
+      type: "Character",
+    } as unknown as ICharacter;
+
+    const result = await battleCharacterManager.attackTarget(attacker, target);
+
+    expect(result).toBe(false);
+
+    expect(cancelTargetingSpy).toBeCalledWith(
+      attacker,
+      `You can't attack a target that's below level ${PVP_MIN_REQUIRED_LV}.`,
+      target.id,
+      "Character"
+    );
+  });
+
+  it("returns false if the attacker's level is within range to attack the target", async () => {
+    const attacker = {
+      id: "123",
+      isAlive: true,
+      skills: {
+        level: 12,
+      },
+      type: "Character",
+      x: 0,
+      y: 0,
+      scene: "test",
+      attackType: EntityAttackType.Melee,
+    } as unknown as ICharacter;
+
+    const target = {
+      id: "321",
+      isAlive: true,
+      skills: {
+        level: 12,
+      },
+      type: "Character",
+      x: 16,
+      y: 0,
+      scene: "test",
+      attackType: EntityAttackType.Melee,
+    } as unknown as ICharacter;
+
+    // @ts-ignore
+    battleCharacterManager.battleAttackTarget.hitTarget = jest.fn();
+
+    const result = await battleCharacterManager.attackTarget(attacker, target);
 
     expect(result).toBe(true);
   });

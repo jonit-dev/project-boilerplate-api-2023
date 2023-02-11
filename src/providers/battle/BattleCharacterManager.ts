@@ -1,8 +1,12 @@
 /* eslint-disable no-new */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
+import { PVP_MIN_REQUIRED_LV } from "@providers/constants/PVPConstants";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { BattleSocketEvents, EntityType, IBattleCancelTargeting } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "./BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "./BattleCycle";
@@ -12,7 +16,8 @@ export class BattleCharacterManager {
   constructor(
     private battleAttackTarget: BattleAttackTarget,
     private mapNonPVPZone: MapNonPVPZone,
-    private battleNetworkStopTargeting: BattleNetworkStopTargeting
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting,
+    private socketMessaging: SocketMessaging
   ) {}
 
   public onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): void {
@@ -65,6 +70,25 @@ export class BattleCharacterManager {
     }
   }
 
+  public async cancelTargeting(
+    attacker: ICharacter,
+    reason: string,
+    targetId: string,
+    targetType: EntityType
+  ): Promise<void> {
+    await this.battleNetworkStopTargeting.stopTargeting(attacker as unknown as ICharacter);
+
+    this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+      attacker.channelId!,
+      BattleSocketEvents.CancelTargeting,
+      {
+        targetId,
+        type: targetType,
+        reason,
+      }
+    );
+  }
+
   private async canAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
     if (!target.isAlive) {
       return false;
@@ -79,17 +103,46 @@ export class BattleCharacterManager {
     }
 
     if (target.type === "Character") {
+      const pvpLvRestrictedReason = this.isCharactersLevelRestrictedForPVP(attacker, target);
+
+      if (pvpLvRestrictedReason) {
+        await this.cancelTargeting(
+          attacker as unknown as ICharacter,
+          pvpLvRestrictedReason as string,
+          target.id,
+          target.type as EntityType
+        );
+        return false;
+      }
+
       const isNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
       if (isNonPVPZone) {
-        // clear battle cycle when target enter in a pvp zone.
-        await this.battleNetworkStopTargeting.stopTargeting(attacker as unknown as ICharacter);
-        // and send a event to Client revert targeting
-        this.mapNonPVPZone.stopCharacterAttack(attacker as unknown as ICharacter);
+        await this.cancelTargeting(
+          attacker as unknown as ICharacter,
+          "Sorry, you can't attack a target in a non-PVP zone.",
+          target.id,
+          target.type as EntityType
+        );
 
         return false;
       }
     }
 
     return true;
+  }
+
+  private isCharactersLevelRestrictedForPVP(attacker: ICharacter | INPC, target: ICharacter | INPC): boolean | string {
+    const attackerSkills = attacker?.skills as ISkill;
+    const defenderSkills = target?.skills as ISkill;
+
+    if (attackerSkills.level < PVP_MIN_REQUIRED_LV) {
+      return `PVP is restricted to level ${PVP_MIN_REQUIRED_LV} and above.`;
+    }
+
+    if (defenderSkills.level < PVP_MIN_REQUIRED_LV) {
+      return `You can't attack a target that's below level ${PVP_MIN_REQUIRED_LV}.`;
+    }
+
+    return false;
   }
 }
