@@ -28,6 +28,9 @@ export class NPCFreezer {
     if (this.freezeCheckIntervals.has(npc.id)) {
       return; // interval is already, running, lets not create another one!
     }
+    if (!npc.isBehaviorEnabled) {
+      return;
+    }
 
     // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
     const checkRange = random(2000, 4000);
