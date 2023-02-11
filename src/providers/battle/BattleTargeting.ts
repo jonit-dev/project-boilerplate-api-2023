@@ -17,16 +17,23 @@ export class BattleTargeting {
     targetId: string,
     targetType: EntityType
   ): Promise<void> {
-    await this.battleNetworkStopTargeting.stopTargeting(attacker as unknown as ICharacter);
+    // if attacker has a target, cancel it and send message.
+    if (attacker.target?.id?.toString() === targetId) {
+      await this.battleNetworkStopTargeting.stopTargeting(attacker as unknown as ICharacter);
 
-    this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-      attacker.channelId!,
-      BattleSocketEvents.CancelTargeting,
-      {
-        targetId,
-        type: targetType,
-        reason,
-      }
-    );
+      this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+        attacker.channelId!,
+        BattleSocketEvents.CancelTargeting,
+        {
+          targetId,
+          type: targetType,
+          reason,
+        }
+      );
+    } else {
+      // otherwise, just send error message
+
+      this.socketMessaging.sendErrorMessageToCharacter(attacker, reason);
+    }
   }
 }

@@ -34,6 +34,7 @@ describe("UseWithEntityValidation.ts", () => {
   let targetCharacter: ICharacter;
   let testNPC: INPC;
   let characterSkills: ISkill;
+  let targetCharacterSkills: ISkill;
   let item1: IItem;
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
@@ -70,6 +71,7 @@ describe("UseWithEntityValidation.ts", () => {
     });
 
     await testCharacter.populate("skills").execPopulate();
+    await targetCharacter.populate("skills").execPopulate();
 
     testCharacter.x = 10;
     testCharacter.y = 11;
@@ -90,7 +92,12 @@ describe("UseWithEntityValidation.ts", () => {
 
     characterSkills = testCharacter.skills as unknown as ISkill;
     characterSkills.magic.level = itemDarkRune.minMagicLevelRequired!;
+    characterSkills.level = 10;
     await characterSkills.save();
+
+    targetCharacterSkills = targetCharacter.skills as unknown as ISkill;
+    targetCharacterSkills.level = 10;
+    await targetCharacterSkills.save();
 
     await addItemsToInventory();
   };

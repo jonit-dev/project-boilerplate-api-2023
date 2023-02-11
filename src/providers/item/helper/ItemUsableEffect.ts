@@ -1,10 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { container } from "@providers/inversify/container";
-import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 export enum EffectableMaxAttribute {
@@ -18,36 +14,9 @@ export enum EffectableAttribute {
   Speed = "speed",
 }
 
-interface IItemUsableEffectOptions {
-  canUseInNonPVPZone?: boolean;
-  caster?: ICharacter | INPC;
-}
-
 @provide(ItemUsableEffect)
 export class ItemUsableEffect {
-  public apply(
-    target: ICharacter | INPC,
-    attr: EffectableAttribute,
-    value: number,
-    options?: IItemUsableEffectOptions
-  ): void {
-    const mapNonPVPZone = container.get(MapNonPVPZone);
-    const socketMessaging = container.get(SocketMessaging);
-
-    if (options?.canUseInNonPVPZone === false) {
-      const isTargetCharacter = target.type === EntityType.Character;
-      const isTargetAtNonPVPZone = mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
-
-      if (isTargetAtNonPVPZone && isTargetCharacter) {
-        socketMessaging.sendErrorMessageToCharacter(
-          options?.caster as ICharacter,
-          "You can't use this rune in a non-PVP zone!"
-        );
-
-        return;
-      }
-    }
-
+  public apply(target: ICharacter | INPC, attr: EffectableAttribute, value: number): void {
     target[attr] += value;
     switch (attr) {
       case EffectableAttribute.Health:

@@ -20,7 +20,6 @@ export const itemFireBoltRune: Partial<IMagicItemUseWithEntity> = {
   maxStackSize: 100,
   allowedEquipSlotType: [ItemSlotType.Inventory],
   hasUseWith: true,
-  canUseOnNonPVPZone: false,
   useWithMaxDistanceGrid: 7,
   power: 13,
   minMagicLevelRequired: 1,
@@ -31,10 +30,7 @@ export const itemFireBoltRune: Partial<IMagicItemUseWithEntity> = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireBoltRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points, {
-      canUseInNonPVPZone: false,
-      caster,
-    });
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
 
     return points;
   },

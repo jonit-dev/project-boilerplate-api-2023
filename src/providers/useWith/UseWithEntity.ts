@@ -3,6 +3,7 @@ import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 import { OnTargetHit } from "@providers/battle/OnTargetHit";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
@@ -11,7 +12,6 @@ import { CharacterItemContainer } from "@providers/character/characterItems/Char
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
-import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -49,7 +49,7 @@ export class UseWithEntity {
     private skillIncrease: SkillIncrease,
     private characterBonusPenalties: CharacterBonusPenalties,
     private onTargetHit: OnTargetHit,
-    private mapNonPVPZone: MapNonPVPZone
+    private battleCharacterAttackValidation: BattleCharacterAttackValidation
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -157,12 +157,10 @@ export class UseWithEntity {
   }
 
   private async executeEffect(caster: ICharacter, target: ICharacter | INPC | IItem, item: IItem): Promise<void> {
-    if (item.canUseOnNonPVPZone === false && target?.type === EntityType.Character) {
-      const character = target as ICharacter;
-      const isTargetAtNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
+    if (item.canUseOnNonPVPZone !== true && target?.type === EntityType.Character) {
+      const isUseValid = await this.battleCharacterAttackValidation.canAttack(caster, target as ICharacter);
 
-      if (isTargetAtNonPVPZone) {
-        this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, you can't use this item at non-PVP zone.");
+      if (!isUseValid) {
         return;
       }
     }
