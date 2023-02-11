@@ -33,14 +33,14 @@ export class MovementHelper {
     return x % GRID_WIDTH === 0 && y % GRID_WIDTH === 0;
   }
 
-  public isSolid = (
+  public async isSolid(
     map: string,
     gridX: number,
     gridY: number,
     layer: MapLayers,
     strategy: SolidCheckStrategy = "CHECK_ALL_LAYERS_BELOW",
     caller: INPC | ICharacter | undefined = undefined
-  ): boolean => {
+  ): Promise<boolean> {
     // check for characters and NPCs
 
     const hasSolid = this.mapSolids.isTileSolid(map, gridX, gridY, layer, strategy);
@@ -54,6 +54,18 @@ export class MovementHelper {
       const hasTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
 
       if (hasTransition) {
+        return true;
+      }
+
+      const hasNPC = await NPC.exists({
+        x: FromGridX(gridX),
+        y: FromGridY(gridY),
+        layer,
+        health: { $gt: 0 },
+        scene: map,
+      });
+
+      if (hasNPC) {
         return true;
       }
     }
@@ -94,7 +106,7 @@ export class MovementHelper {
     // }
 
     return false;
-  };
+  }
 
   public isMoving(startX: number, startY: number, endX: number, endY: number): boolean {
     const xDiff = endX - startX;
