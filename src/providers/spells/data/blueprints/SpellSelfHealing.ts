@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
@@ -17,6 +18,8 @@ export const spellSelfHealing: Partial<ISpell> = {
   animationKey: AnimationEffectKeys.LifeHeal,
 
   usableEffect: (character: ICharacter) => {
-    ItemUsableEffect.apply(character, EffectableAttribute.Health, 10);
+    const itemUsableEffect = container.get(ItemUsableEffect);
+
+    itemUsableEffect.apply(character, EffectableAttribute.Health, 10);
   },
 };

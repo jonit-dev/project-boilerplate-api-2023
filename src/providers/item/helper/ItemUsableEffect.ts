@@ -25,7 +25,7 @@ interface IItemUsableEffectOptions {
 
 @provide(ItemUsableEffect)
 export class ItemUsableEffect {
-  static apply(
+  public apply(
     target: ICharacter | INPC,
     attr: EffectableAttribute,
     value: number,
@@ -80,7 +80,7 @@ export class ItemUsableEffect {
     }
   }
 
-  static applyEatingEffect(character: ICharacter, increase: number): void {
+  public applyEatingEffect(character: ICharacter, increase: number): void {
     this.apply(character, EffectableAttribute.Health, increase);
     this.apply(character, EffectableAttribute.Mana, increase);
   }

@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
@@ -18,6 +19,8 @@ export const itemLightLifePotion: Partial<IItem> = {
   maxStackSize: 100,
   canSell: false,
   usableEffect: (character: ICharacter) => {
-    ItemUsableEffect.apply(character, EffectableAttribute.Health, 35);
+    const itemUsableEffect = container.get(ItemUsableEffect);
+
+    itemUsableEffect.apply(character, EffectableAttribute.Health, 35);
   },
 };
