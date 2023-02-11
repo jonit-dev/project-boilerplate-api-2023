@@ -19,4 +19,5 @@ export const itemSoulStaff: Partial<IMagicStaff> = {
   defense: 3,
   maxRange: 6,
   basePrice: 55,
+  isTwoHanded: true,
 };

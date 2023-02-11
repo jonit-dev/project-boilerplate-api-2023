@@ -19,4 +19,5 @@ export const itemEnchantedStaff: Partial<IMagicStaff> = {
   defense: 7,
   maxRange: 8,
   basePrice: 80,
+  isTwoHanded: true,
 };

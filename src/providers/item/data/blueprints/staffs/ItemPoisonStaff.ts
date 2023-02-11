@@ -19,4 +19,5 @@ export const itemPoisonStaff: Partial<IMagicStaff> = {
   defense: 10,
   basePrice: 85,
   maxRange: 6,
+  isTwoHanded: true,
 };

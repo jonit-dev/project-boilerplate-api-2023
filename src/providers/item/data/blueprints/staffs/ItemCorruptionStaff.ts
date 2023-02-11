@@ -18,4 +18,5 @@ export const itemCorruptionStaff: Partial<IMagicStaff> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 69,
   maxRange: 6,
+  isTwoHanded: true,
 };

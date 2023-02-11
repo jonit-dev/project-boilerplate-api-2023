@@ -18,4 +18,5 @@ export const itemPoisonWand: Partial<IMagicStaff> = {
   defense: 3,
   maxRange: 5,
   basePrice: 75,
+  isTwoHanded: true,
 };

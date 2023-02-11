@@ -19,4 +19,5 @@ export const itemAirWand: Partial<IMagicStaff> = {
   defense: 3,
   basePrice: 70,
   maxRange: 4,
+  isTwoHanded: true,
 };

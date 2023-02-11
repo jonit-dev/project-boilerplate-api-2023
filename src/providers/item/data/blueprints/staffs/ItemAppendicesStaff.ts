@@ -19,4 +19,5 @@ export const itemAppendicesStaff: Partial<IMagicStaff> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 60,
   maxRange: 5,
+  isTwoHanded: true,
 };

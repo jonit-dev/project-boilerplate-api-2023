@@ -19,4 +19,5 @@ export const itemFireStaff: Partial<IMagicStaff> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 77,
   maxRange: 7,
+  isTwoHanded: true,
 };

@@ -18,4 +18,5 @@ export const itemRoyalStaff: Partial<IMagicStaff> = {
   defense: 10,
   maxRange: 7,
   basePrice: 90,
+  isTwoHanded: true,
 };

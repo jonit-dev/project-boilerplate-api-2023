@@ -19,4 +19,5 @@ export const itemWand: Partial<IMagicStaff> = {
   defense: 1,
   maxRange: 4,
   basePrice: 50,
+  isTwoHanded: true,
 };

@@ -19,4 +19,5 @@ export const itemRubyStaff: Partial<IMagicStaff> = {
   defense: 6,
   maxRange: 6,
   basePrice: 90,
+  isTwoHanded: true,
 };

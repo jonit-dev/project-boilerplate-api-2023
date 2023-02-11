@@ -19,4 +19,5 @@ export const itemMoonsStaff: Partial<IMagicStaff> = {
   defense: 10,
   basePrice: 80,
   maxRange: 7,
+  isTwoHanded: true,
 };
