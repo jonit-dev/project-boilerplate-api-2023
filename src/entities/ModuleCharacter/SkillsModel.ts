@@ -95,6 +95,8 @@ export const skillsSchema = createLeanSchema(
     ...({} as {
       attack: Promise<number>;
       defense: Promise<number>;
+      magicAttack: Promise<number>;
+      magicDefense: Promise<number>;
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
@@ -122,7 +124,7 @@ skillsSchema.post("save", async function (this: ISkill) {
   }
 });
 
-async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean): Promise<void> {
+async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean, isMagic: boolean = false): Promise<void> {
   const equipment = await Equipment.findOne({ owner: skill.owner }).lean({ virtuals: true, default: true });
   const [dataOfWeather, character] = await Promise.all([
     MapControlTimeModel.findOne().lean(),
@@ -130,8 +132,19 @@ async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean): Promis
   ]);
 
   if (skill.ownerType === "Character" && equipment) {
-    const totalEquipped = isAttack ? await equipment.totalEquippedAttack : await equipment.totalEquippedDefense;
-    const baseValue = isAttack ? skill.strength.level : skill.resistance.level;
+    const totalEquipped = isMagic
+      ? 0
+      : isAttack
+      ? await equipment.totalEquippedAttack
+      : await equipment.totalEquippedDefense;
+    const baseValue =
+      isAttack && !isMagic
+        ? skill.strength.level
+        : !isAttack && !isMagic
+        ? skill.resistance.level
+        : isAttack && isMagic
+        ? skill.magic.level
+        : skill.magicResistance.level;
     const totalValueNoBonus = baseValue + skill.level + totalEquipped;
     const totalValueWithBonus = totalValueNoBonus + totalValueNoBonus * INCREASE_BONUS_FACTION;
 
@@ -154,8 +167,16 @@ skillsSchema.virtual("attack").get(async function (this: ISkill) {
   return await getTotalAttackOrDefense(this, true);
 });
 
+skillsSchema.virtual("magicAttack").get(async function (this: ISkill) {
+  return await getTotalAttackOrDefense(this, true, true);
+});
+
 skillsSchema.virtual("defense").get(async function (this: ISkill) {
   return await getTotalAttackOrDefense(this, false);
+});
+
+skillsSchema.virtual("magicDefense").get(async function (this: ISkill) {
+  return await getTotalAttackOrDefense(this, false, true);
 });
 
 export type ISkill = ExtractDoc<typeof skillsSchema>;

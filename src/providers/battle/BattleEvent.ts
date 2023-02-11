@@ -1,8 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
-import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
 import { BattleEventType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -43,11 +41,15 @@ export class BattleEvent {
     return n <= chance;
   }
 
-  public async calculateHitDamage(attacker: BattleParticipant, target: BattleParticipant): Promise<number> {
+  public async calculateHitDamage(
+    attacker: BattleParticipant,
+    target: BattleParticipant,
+    isMagicAttack: boolean = false
+  ): Promise<number> {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
-    const attackerTotalAttack = await attackerSkills.attack;
-    const defenderTotalDefense = await defenderSkills.defense;
+    const attackerTotalAttack = isMagicAttack ? await attackerSkills.magicAttack : await attackerSkills.attack;
+    const defenderTotalDefense = isMagicAttack ? await attackerSkills.magicDefense : await defenderSkills.defense;
 
     const totalPotentialAttackerDamage = _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));
 
@@ -58,7 +60,7 @@ export class BattleEvent {
         damage,
         this.calculateCharacterDefense(
           defenderSkills.level,
-          defenderSkills.resistance.level,
+          isMagicAttack ? defenderSkills.magicResistance.level : defenderSkills.resistance.level,
           defenderSkills.shielding.level
         )
       );

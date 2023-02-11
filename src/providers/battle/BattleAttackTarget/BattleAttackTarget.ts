@@ -206,7 +206,7 @@ export class BattleAttackTarget {
     };
 
     if (battleEvent === BattleEventType.Hit) {
-      const damage = await this.battleEvent.calculateHitDamage(attacker, target);
+      const damage = await this.battleEvent.calculateHitDamage(attacker, target, magicAttack);
       if (damage > 0) {
         // Increase attacker SP for weapon used and XP (if is character)
         if (attacker.type === "Character") {
