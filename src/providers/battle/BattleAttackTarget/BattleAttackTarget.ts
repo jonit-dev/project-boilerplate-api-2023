@@ -105,6 +105,12 @@ export class BattleAttackTarget {
 
               return true;
             }
+          } else {
+            attacker as INPC;
+            await this.hitTarget(attacker, target);
+            await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+
+            return true;
           }
         }
         break;

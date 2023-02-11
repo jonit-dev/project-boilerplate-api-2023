@@ -188,7 +188,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 
   it("should hit a target | NPC ranged attack ", async () => {
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(1);
+    expect(hitTarget).toBeCalledTimes(2);
   });
 
   it("should hit a target | NPC hybrid attack type", async () => {
@@ -197,7 +197,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 
     // Ranged attack
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(2);
+    expect(hitTarget).toBeCalledTimes(3);
 
     // Melee attack (not passing maxRangeAttack field on purpose to check is doing melee attack)
     testNPC.maxRangeAttack = undefined;
@@ -207,7 +207,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     await testNPC.save();
 
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(3);
+    expect(hitTarget).toBeCalledTimes(4);
   });
 
   it("should hit a target, required ammo and target is in range | with multiple ammo keys", async () => {
@@ -218,12 +218,12 @@ describe("BattleRangedAttack.spec.ts", () => {
     await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(4);
+    expect(hitTarget).toBeCalledTimes(5);
 
     await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Stone);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(5);
+    expect(hitTarget).toBeCalledTimes(6);
   });
 
   describe("magic staff ranged attack", () => {
