@@ -4,7 +4,6 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
-import { ItemDrop } from "@providers/item/ItemDrop";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -40,8 +39,7 @@ export class CharacterDeath {
     private characterInventory: CharacterInventory,
     private itemOwnership: ItemOwnership,
     private characterWeight: CharacterWeight,
-    private skillDecrease: SkillDecrease,
-    private itemDrop: ItemDrop
+    private skillDecrease: SkillDecrease
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
