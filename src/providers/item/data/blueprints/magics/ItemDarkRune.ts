@@ -4,6 +4,7 @@ import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/It
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
 import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 
+import { container } from "@providers/inversify/container";
 import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -27,9 +28,11 @@ export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
   animationKey: AnimationEffectKeys.HitDark,
   projectileAnimationKey: AnimationEffectKeys.Dark,
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
+    const itemUsableEffect = container.get(ItemUsableEffect);
+
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.DarkRune, caster);
 
-    ItemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points, {
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points, {
       canUseInNonPVPZone: false,
       caster,
     });

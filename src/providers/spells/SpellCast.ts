@@ -1,9 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
@@ -21,7 +21,8 @@ export class SpellCast {
     private animationEffect: AnimationEffect,
     private characterItems: CharacterItems,
     private skillIncrease: SkillIncrease,
-    private characterBonusPenalties: CharacterBonusPenalties
+    private characterBonusPenalties: CharacterBonusPenalties,
+    private itemUsableEffect: ItemUsableEffect
   ) {}
 
   public isSpellCasting(msg: string): boolean {
@@ -40,7 +41,7 @@ export class SpellCast {
 
     await spell.usableEffect(character);
 
-    ItemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
+    this.itemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
     await character.save();
 
     await this.sendPostSpellCastEvents(character, spell);

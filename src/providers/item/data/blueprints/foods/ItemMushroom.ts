@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { container } from "@providers/inversify/container";
 import { ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
@@ -18,6 +19,8 @@ export const itemMushroom: Partial<IItem> = {
   canSell: false,
 
   usableEffect: (character: ICharacter) => {
-    ItemUsableEffect.applyEatingEffect(character, 1);
+    const itemUsableEffect = container.get(ItemUsableEffect);
+
+    itemUsableEffect.applyEatingEffect(character, 1);
   },
 };

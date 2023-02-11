@@ -26,9 +26,10 @@ export const spellSelfHaste: Partial<ISpell> = {
 
   usableEffect: (character: ICharacter) => {
     const socketMessaging = container.get(SocketMessaging);
+    const itemUsableEffect = container.get(ItemUsableEffect);
 
     const increaseSpeed = 3;
-    ItemUsableEffect.apply(character, EffectableAttribute.Speed, increaseSpeed);
+    itemUsableEffect.apply(character, EffectableAttribute.Speed, increaseSpeed);
 
     if (HASTE_CONTROL.has(character._id)) {
       clearTimeout(HASTE_CONTROL.get(character._id)!);

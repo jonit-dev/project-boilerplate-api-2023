@@ -23,6 +23,7 @@ export const itemRawBeefSteak: Partial<IItem> = {
 
   usableEffect: (character: ICharacter) => {
     const socketMessaging = container.get<SocketMessaging>(SocketMessaging);
+    const itemUsableEffect = container.get(ItemUsableEffect);
 
     const randomMessages = shuffle([
       "You shouldn't eat this raw beef!",
@@ -32,6 +33,6 @@ export const itemRawBeefSteak: Partial<IItem> = {
 
     socketMessaging.sendErrorMessageToCharacter(character, randomMessages[0]);
 
-    ItemUsableEffect.applyEatingEffect(character, -1);
+    itemUsableEffect.applyEatingEffect(character, -2.5);
   },
 };
