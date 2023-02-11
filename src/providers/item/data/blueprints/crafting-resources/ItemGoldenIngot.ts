@@ -13,6 +13,6 @@ export const itemGoldenIngot: Partial<IItemUseWith> = {
     "A golden ingot. You can use this material with a hammer to craft weapons, but you need to be close to an anvil.",
   weight: 1,
   maxStackSize: 100,
-  basePrice: 50,
+  basePrice: 25,
   hasUseWith: true,
 };

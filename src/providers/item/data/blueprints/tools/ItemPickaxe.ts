@@ -127,7 +127,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
             {
               key: CraftingResourcesBlueprint.GreenOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 50),
+              chance: await itemCraftable.getCraftChance(character, 3),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -140,7 +140,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
             {
               key: CraftingResourcesBlueprint.ObsidiumOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 3),
+              chance: await itemCraftable.getCraftChance(character, 1.5),
             },
           ] as IUseWithItemToTileReward[],
         };

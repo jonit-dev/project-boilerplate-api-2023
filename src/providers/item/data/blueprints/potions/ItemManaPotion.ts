@@ -14,7 +14,7 @@ export const itemManaPotion: Partial<IItem> = {
   name: "Mana Potion",
   description: "A flask containing blue liquid of a mana potion.",
   weight: 0.5,
-  basePrice: 40,
+  basePrice: 20,
   maxStackSize: 100,
   canSell: false,
   usableEffect: (character: ICharacter) => {
