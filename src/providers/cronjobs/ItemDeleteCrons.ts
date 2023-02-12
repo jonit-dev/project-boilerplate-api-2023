@@ -22,7 +22,10 @@ export class ItemDeleteCrons {
 
       setTimeout(async () => {
         const items = await Item.find({
-          $or: [{ owner: { $exists: false } }, { owner: { $eq: null } }],
+          // @ts-ignore
+          x: { $ne: null },
+          y: { $ne: null },
+          scene: { $ne: null },
           subType: { $ne: ItemSubType.DeadBody },
         });
 
