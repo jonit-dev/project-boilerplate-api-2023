@@ -77,6 +77,8 @@ export class EquipmentEquip {
       await this.itemOwnership.addItemOwnership(item, character);
     }
 
+    await Item.updateOne({ _id: item._id }, { isEquipped: true });
+
     // make sure it does not save coordinates here
     if (item.x || item.y || item.scene) {
       await Item.updateOne({ _id: item._id }, { $unset: { x: "", y: "", scene: "" } });

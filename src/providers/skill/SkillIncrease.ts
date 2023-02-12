@@ -33,6 +33,7 @@ import _ from "lodash";
 import { Types } from "mongoose";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
+import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
 
 @provide(SkillIncrease)
@@ -45,7 +46,8 @@ export class SkillIncrease {
     private spellLearn: SpellLearn,
     private characterBonusPenalties: CharacterBonusPenalties,
     private skillFunctions: SkillFunctions,
-    private buffSkillFunctions: BuffSkillFunctions
+    private buffSkillFunctions: BuffSkillFunctions,
+    private skillGainValidation: SkillGainValidation
   ) {}
 
   /**
@@ -66,6 +68,18 @@ export class SkillIncrease {
     }
 
     const weapon = await attacker.weapon;
+
+    const skillName = SKILLS_MAP.get(weapon?.subType || "None");
+
+    if (!skillName) {
+      throw new Error(`Skill not found for weapon ${weapon?.subType}`);
+    }
+
+    const canIncreaseSP = this.skillGainValidation.canUpdateSkills(skills, skillName);
+
+    if (!canIncreaseSP) {
+      return;
+    }
 
     const increasedWeaponSP = this.increaseSP(skills, weapon?.subType || "None");
 
@@ -116,8 +130,14 @@ export class SkillIncrease {
     if (!characterWithRelations) {
       throw new Error(`character not found for id ${character.id}`);
     }
-
     const skills = characterWithRelations.skills as ISkill;
+
+    const canIncreaseSP = this.skillGainValidation.canUpdateSkills(skills as ISkill, "shielding");
+
+    if (!canIncreaseSP) {
+      return;
+    }
+
     const equipment = characterWithRelations.equipment as IEquipment;
 
     const rightHandItem = equipment?.rightHand as IItem;
@@ -132,8 +152,8 @@ export class SkillIncrease {
       }
     }
 
+    await this.skillFunctions.updateSkills(skills, character);
     if (!_.isEmpty(result)) {
-      await this.skillFunctions.updateSkills(skills, character);
       if (result.skillLevelUp && characterWithRelations.channelId) {
         await this.skillFunctions.sendSkillLevelUpEvents(result, characterWithRelations);
       }
@@ -170,6 +190,12 @@ export class SkillIncrease {
       throw new Error(`skills not found for character ${character.id}`);
     }
 
+    const canIncreaseSP = this.skillGainValidation.canUpdateSkills(skills as ISkill, attribute);
+
+    if (!canIncreaseSP) {
+      return;
+    }
+
     const result = this.increaseSP(skills, attribute, skillPointsCalculator);
     await this.skillFunctions.updateSkills(skills, character);
 
@@ -189,6 +215,13 @@ export class SkillIncrease {
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
+
+    const canIncreaseSP = this.skillGainValidation.canUpdateSkills(skills as ISkill, skillToUpdate);
+
+    if (!canIncreaseSP) {
+      return;
+    }
+
     const result = this.increaseSP(skills, craftedItemKey, undefined, CraftingSkillsMap);
     await this.skillFunctions.updateSkills(skills, character);
     if (result.skillLevelUp && character.channelId) {

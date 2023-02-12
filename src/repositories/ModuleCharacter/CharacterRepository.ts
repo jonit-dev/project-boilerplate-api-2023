@@ -94,6 +94,7 @@ export class CharacterRepository extends CRUD {
     const item = new Item({
       ...blueprintData,
       owner: ownerId,
+      isEquipped: true,
     });
     await item.save();
     return item;

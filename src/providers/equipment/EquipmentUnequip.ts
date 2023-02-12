@@ -1,10 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
-import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
-import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
+import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -83,6 +83,8 @@ export class EquipmentUnequip {
       equipment: equipmentSlots,
       inventory: inventoryContainer,
     });
+
+    await Item.updateOne({ _id: item._id }, { isEquipped: false });
 
     return true;
   }

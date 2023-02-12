@@ -33,6 +33,10 @@ const skillDetails = (type: SkillType): Record<string, any> => {
       required: true,
       default: calculateSPToNextLevel(0, 2),
     }),
+    lastSkillGain: Type.date({
+      required: true,
+      default: new Date(),
+    }),
   };
 };
 
