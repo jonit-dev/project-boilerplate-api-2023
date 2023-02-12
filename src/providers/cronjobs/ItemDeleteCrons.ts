@@ -30,6 +30,7 @@ export class ItemDeleteCrons {
           scene: { $ne: null },
           subType: { $ne: ItemSubType.DeadBody },
           isEquipped: { $ne: true },
+          itemContainer: { $exists: false },
         });
 
         for (const item of items) {
