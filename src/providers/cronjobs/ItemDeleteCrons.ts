@@ -20,6 +20,8 @@ export class ItemDeleteCrons {
         });
       }
 
+      //! THIS IS ONE OF THE MOST DANGEROUS CRON JOBS ON THE SYSTEM. DO NOT TOUCH THIS SHIT IF YOU DONT KNOW WHAT YOU ARE DOING.
+
       setTimeout(async () => {
         const items = await Item.find({
           // @ts-ignore
