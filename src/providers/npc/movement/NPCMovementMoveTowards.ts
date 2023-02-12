@@ -21,6 +21,7 @@ import { NPCFreezer } from "../NPCFreezer";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
+import { MapHelper } from "@providers/map/MapHelper";
 
 export interface ICharacterHealth {
   id: string;
@@ -36,7 +37,8 @@ export class NPCMovementMoveTowards {
     private battleAttackTarget: BattleAttackTarget,
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
-    private npcFreezer: NPCFreezer
+    private npcFreezer: NPCFreezer,
+    private mapHelper: MapHelper
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
@@ -314,8 +316,9 @@ export class NPCMovementMoveTowards {
       }
 
       const { newGridX, newGridY, nextMovementDirection } = shortestPath;
+      const validCoordinates = this.mapHelper.areAllCoordinatesValid([newGridX, newGridY]);
 
-      if (newGridX && newGridY && nextMovementDirection) {
+      if (validCoordinates && nextMovementDirection) {
         await this.npcMovement.moveNPC(
           npc,
           npc.x,
