@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
+import { MapHelper } from "@providers/map/MapHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -21,7 +22,6 @@ import { NPCFreezer } from "../NPCFreezer";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
-import { MapHelper } from "@providers/map/MapHelper";
 
 export interface ICharacterHealth {
   id: string;
@@ -307,17 +307,13 @@ export class NPCMovementMoveTowards {
         ToGridX(x),
         ToGridY(y)
       );
-
       if (!shortestPath) {
         // throw new Error("No shortest path found!");
         // await this.npcTarget.clearTarget(npc);
-
         return;
       }
-
       const { newGridX, newGridY, nextMovementDirection } = shortestPath;
       const validCoordinates = this.mapHelper.areAllCoordinatesValid([newGridX, newGridY]);
-
       if (validCoordinates && nextMovementDirection) {
         await this.npcMovement.moveNPC(
           npc,
