@@ -4,6 +4,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, ItemSlotType, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -19,7 +20,8 @@ export class EquipmentEquip {
     private characterItemInventory: CharacterItemInventory,
     private equipmentSlots: EquipmentSlots,
     private characterValidation: CharacterValidation,
-    private equipmentTwoHanded: EquipmentTwoHanded
+    private equipmentTwoHanded: EquipmentTwoHanded,
+    private itemOwnership: ItemOwnership
   ) {}
 
   public async equip(character: ICharacter, itemId: string, fromItemContainerId: string): Promise<boolean> {
@@ -69,6 +71,16 @@ export class EquipmentEquip {
     };
 
     this.updateItemInventoryCharacter(payloadUpdate, character);
+
+    // if no owner, add item ownership
+    if (!item.owner) {
+      await this.itemOwnership.addItemOwnership(item, character);
+    }
+
+    // make sure it does not save coordinates here
+    if (item.x || item.y || item.scene) {
+      await Item.updateOne({ _id: item._id }, { $unset: { x: "", y: "", scene: "" } });
+    }
 
     return true;
   }

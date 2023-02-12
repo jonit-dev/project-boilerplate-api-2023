@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { ItemSubType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -177,6 +177,23 @@ describe("EquipmentEquip.spec.ts", () => {
       const totalEquippedDefense = await equipment?.totalEquippedDefense;
 
       expect(totalEquippedDefense).toEqual(0);
+    });
+
+    it("makes sure ownership is added after equipping and item, and coordinates are wiped out", async () => {
+      inventoryContainer.slots[0] = swordItem;
+      inventoryContainer.markModified("slots");
+      await inventoryContainer.save();
+
+      const equip = await equipmentEquip.equip(testCharacter, swordItem._id, inventoryContainer.id);
+
+      expect(equip).toBeTruthy();
+
+      swordItem = (await Item.findById(swordItem._id)) as IItem;
+
+      expect(swordItem.owner).toEqual(testCharacter._id);
+      expect(swordItem.x).toBeUndefined();
+      expect(swordItem.y).toBeUndefined();
+      expect(swordItem.scene).toBeUndefined();
     });
   });
 });
