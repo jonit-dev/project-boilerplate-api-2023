@@ -16,7 +16,9 @@ describe("GridManager", () => {
     await gridManager.generateGridSolids("example");
   });
 
-  beforeEach(async () => {});
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
 
   const getMapOffset = (mapName: string): { gridOffsetX: number; gridOffsetY: number } => {
     const initialXY = mapTiles.getFirstXY(mapName, MapLayers.Ground)!;
@@ -392,5 +394,29 @@ describe("GridManager", () => {
       [30, 30],
       [31, 30],
     ]);
+  });
+
+  it("should return correct bounds with offset for grid with x > 0", () => {
+    const mapDimensSpy = jest.spyOn(gridManager as any, "getMapDimensions");
+    mapDimensSpy.mockImplementation();
+    mapDimensSpy.mockReturnValue({
+      startX: 256,
+      startY: -32,
+      width: 384,
+      height: 160,
+    });
+
+    const bounds = (gridManager as any).getSubGridBounds("map", {
+      start: { x: 365, y: 71 },
+      end: { x: 361, y: 66 },
+      offset: 10,
+    });
+
+    expect(bounds).toEqual({
+      startX: 351,
+      startY: 56,
+      width: 25,
+      height: 26,
+    });
   });
 });

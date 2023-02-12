@@ -250,21 +250,22 @@ export class GridManager {
     let height = Math.abs(end.y - start.y) + 1;
 
     if (gridCourse.offset && gridCourse.offset > 0) {
-      const bounds = this.getMapDimensions(map);
+      const mapDimens = this.getMapDimensions(map);
 
-      const minX = bounds.startX;
-      const minY = bounds.startY;
-      const maxWidth = bounds.width;
-      const maxHeight = bounds.height;
+      const minGridX = mapDimens.startX;
+      const minGridY = mapDimens.startY;
+
+      const maxGridX = mapDimens.width + minGridX;
+      const maxGridY = mapDimens.height + minGridY;
 
       const newX = startX - gridCourse.offset;
       const newY = startY - gridCourse.offset;
 
-      startX = newX < minX ? minX : newX;
-      startY = newY < minY ? minY : newY;
+      startX = newX < minGridX ? minGridX : newX;
+      startY = newY < minGridY ? minGridY : newY;
 
-      const availableWidth = maxWidth - (startX + Math.abs(minX));
-      const availableHeight = maxHeight - (startY + Math.abs(minY));
+      const availableWidth = Math.abs(maxGridX - startX);
+      const availableHeight = Math.abs(maxGridY - startY);
 
       const newWidth = width + gridCourse.offset * 2;
       const newHeight = height + gridCourse.offset * 2;

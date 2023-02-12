@@ -4,10 +4,11 @@ import { provide } from "inversify-binding-decorators";
 // eslint-disable-next-line no-unused-vars
 import { NPCFreezer } from "../NPCFreezer";
 import { NPCMovement } from "./NPCMovement";
+import { MapHelper } from "@providers/map/MapHelper";
 
 @provide(NPCMovementFixedPath)
 export class NPCMovementFixedPath {
-  constructor(private NPCMovement: NPCMovement, private npcFreezer: NPCFreezer) {}
+  constructor(private NPCMovement: NPCMovement, private npcFreezer: NPCFreezer, private mapHelper: MapHelper) {}
 
   public async startFixedPathMovement(npc: INPC, endGridX: number, endGridY: number): Promise<void> {
     try {
@@ -28,8 +29,9 @@ export class NPCMovementFixedPath {
       }
 
       const { newGridX, newGridY, nextMovementDirection } = shortestPath;
+      const validCoordinates = this.mapHelper.areAllCoordinatesValid([newGridX, newGridY]);
 
-      if (newGridX && newGridY && nextMovementDirection) {
+      if (validCoordinates && nextMovementDirection) {
         await this.NPCMovement.moveNPC(
           npc,
           npc.x,
