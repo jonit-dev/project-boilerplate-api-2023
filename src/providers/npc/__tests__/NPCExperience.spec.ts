@@ -4,7 +4,7 @@ import { NPCExperience } from "../NPCExperience";
 
 describe("NPCExperience", () => {
   let npcExperience: NPCExperience;
-  beforeAll(async () => {
+  beforeAll(() => {
     npcExperience = container.get<NPCExperience>(NPCExperience);
   });
   beforeEach(async () => {});
