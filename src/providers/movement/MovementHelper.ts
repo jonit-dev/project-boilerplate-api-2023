@@ -50,7 +50,7 @@ export class MovementHelper {
       return true;
     }
 
-    if (caller instanceof NPC) {
+    if (caller?.type === "NPC") {
       const hasTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
 
       if (hasTransition) {
