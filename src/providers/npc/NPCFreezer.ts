@@ -72,8 +72,8 @@ export class NPCFreezer {
   // This works like a security measure to prevent the server from crashing due to high CPU usage if there are too many NPCs active at the same time.
   private setCPUUsageCheckInterval(): void {
     const start = CPUusage();
-    const checkInterval = 10000;
-    const maxCPUUsagePerInstance = 80;
+    const checkInterval = 5000;
+    const maxCPUUsagePerInstance = 70;
 
     setInterval(async () => {
       const end = CPUusage(start);

@@ -14,12 +14,10 @@ const warning = chalk.hex("#FFA500");
 const critical = chalk.hex("#FF0000");
 
 const customQueryLogger: (args: QueryLoggerArgs) => void = (args) => {
-  if (args.executionTimeMS >= 500) {
-    console.log(warning(`Warning: Query took more than 500ms: ${JSON.stringify(args, null, 2)}`));
-  } else {
-    if (args.executionTimeMS >= 1000) {
-      console.log(critical(`Critical: Query took more than 1000ms: ${JSON.stringify(args, null, 2)}`));
-    }
+  if (args.executionTimeMS >= 1000) {
+    console.log(warning(`Warning: Query took more than 1000ms: ${JSON.stringify(args, null, 2)}`));
+  } else if (args.executionTimeMS >= 1500) {
+    console.log(critical(`Critical: Query took more than 1500ms: ${JSON.stringify(args, null, 2)}`));
   }
 };
 
