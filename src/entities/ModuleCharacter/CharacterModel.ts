@@ -241,6 +241,8 @@ const characterSchema = createLeanSchema(
   },
   {
     timestamps: { createdAt: true, updatedAt: true },
+    toObject: { virtuals: true, getters: true },
+    toJSON: { virtuals: true, getters: true },
   }
 );
 
