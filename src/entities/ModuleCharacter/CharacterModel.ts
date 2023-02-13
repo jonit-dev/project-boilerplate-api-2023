@@ -306,7 +306,7 @@ characterSchema.virtual("attackType").get(async function (this: ICharacter): Pro
 });
 
 characterSchema.virtual("weapon").get(async function (this: ICharacter): Promise<IItem | undefined> {
-  const equipment = (await Equipment.findById(this.equipment)) as IEquipment;
+  const equipment = (await Equipment.findById(this.equipment).lean()) as IEquipment;
 
   if (!equipment) {
     return undefined;
