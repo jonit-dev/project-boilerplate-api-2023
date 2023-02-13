@@ -6,6 +6,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { INPCPositionUpdatePayload, NPCAlignment, NPCSocketEvents, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { NPCFreezer } from "../NPCFreezer";
 import { NPCView } from "../NPCView";
 import { NPCWarn } from "../NPCWarn";
 import { NPCTarget } from "./NPCTarget";
@@ -28,7 +29,8 @@ export class NPCMovement {
     private mapNonPVPZone: MapNonPVPZone,
     private npcTarget: NPCTarget,
     private characterView: CharacterView,
-    private npcWarn: NPCWarn
+    private npcWarn: NPCWarn,
+    private npcFreezer: NPCFreezer
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -125,6 +127,8 @@ export class NPCMovement {
       const npcPath = await this.gridManager.findShortestPath(npc.scene, startGridX, startGridY, endGridX, endGridY);
 
       if (!npcPath || npcPath.length <= 1) {
+        await this.npcFreezer.freezeNPC(npc, true);
+
         return;
         // throw new Error("Failed to calculate shortest path! No output!");
       }

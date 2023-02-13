@@ -2,9 +2,9 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 // eslint-disable-next-line no-unused-vars
+import { MapHelper } from "@providers/map/MapHelper";
 import { NPCFreezer } from "../NPCFreezer";
 import { NPCMovement } from "./NPCMovement";
-import { MapHelper } from "@providers/map/MapHelper";
 
 @provide(NPCMovementFixedPath)
 export class NPCMovementFixedPath {
