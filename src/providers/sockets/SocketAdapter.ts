@@ -32,7 +32,7 @@ export class SocketAdapter implements ISocket {
 
   public emitToUser<T>(channel: string, eventName: string, data?: T): void {
     if (appEnv.general.DEBUG_MODE && !appEnv.general.IS_UNIT_TEST) {
-      console.log("🔌 Emitting to user: ", channel, eventName, JSON.stringify(data));
+      console.log("⬆️ (SENDING): ", channel, eventName, JSON.stringify(data));
     }
 
     if (data) {

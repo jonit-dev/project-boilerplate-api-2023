@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IUser } from "@entities/ModuleSystem/UserModel";
+import { appEnv } from "@providers/config/env";
 import { EXHAUSTABLE_EVENTS, USER_EXHAUST_TIMEOUT } from "@providers/constants/ServerConstants";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { CharacterSocketEvents, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
@@ -38,6 +39,10 @@ export class SocketAuth {
             reason: "You don't own this character!",
           });
           return;
+        }
+
+        if (appEnv.general.DEBUG_MODE && !appEnv.general.IS_UNIT_TEST) {
+          console.log("⬇️ (RECEIVED): ", character.name, character.channelId!, event);
         }
 
         // console.log(`📨 Received ${event} from ${character.name}(${character._id}): ${JSON.stringify(data)}`);

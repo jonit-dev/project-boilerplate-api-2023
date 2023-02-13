@@ -10,7 +10,7 @@ export class ItemDeleteCrons {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public schedule(): void {
-    nodeCron.schedule("0 0 * * *", async () => {
+    nodeCron.schedule("0 */4 * * *", async () => {
       const allOnlineCharacters = await Character.find({ isOnline: true });
 
       for (const character of allOnlineCharacters) {
