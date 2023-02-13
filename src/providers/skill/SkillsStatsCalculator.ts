@@ -9,7 +9,49 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(SkillStatsCalculator)
 export class SkillStatsCalculator {
-  public async getTotalAttackOrDefense(skill: ISkill, isAttack: boolean, isMagic: boolean = false): Promise<void> {
+  /*
+  skillsSchema.virtual("attack").get(async function (this: ISkill) {
+  const skillStatsCalculator = container.get(SkillStatsCalculator);
+
+  return await skillStatsCalculator.getTotalAttackOrDefense(this, true);
+});
+
+skillsSchema.virtual("magicAttack").get(async function (this: ISkill) {
+  const skillStatsCalculator = container.get(SkillStatsCalculator);
+
+  return await skillStatsCalculator.getTotalAttackOrDefense(this, true, true);
+});
+
+skillsSchema.virtual("defense").get(async function (this: ISkill) {
+  const skillStatsCalculator = container.get(SkillStatsCalculator);
+
+  return await skillStatsCalculator.getTotalAttackOrDefense(this, false);
+});
+
+skillsSchema.virtual("magicDefense").get(async function (this: ISkill) {
+  const skillStatsCalculator = container.get(SkillStatsCalculator);
+
+  return await skillStatsCalculator.getTotalAttackOrDefense(this, false, true);
+});
+  */
+
+  public async getAttack(skill: ISkill): Promise<number> {
+    return await this.getTotalAttackOrDefense(skill, true);
+  }
+
+  public async getMagicAttack(skill: ISkill): Promise<number> {
+    return await this.getTotalAttackOrDefense(skill, true, true);
+  }
+
+  public async getDefense(skill: ISkill): Promise<number> {
+    return await this.getTotalAttackOrDefense(skill, false);
+  }
+
+  public async getMagicDefense(skill: ISkill): Promise<number> {
+    return await this.getTotalAttackOrDefense(skill, false, true);
+  }
+
+  private async getTotalAttackOrDefense(skill: ISkill, isAttack: boolean, isMagic: boolean = false): Promise<number> {
     const equipment = await Equipment.findOne({ owner: skill.owner }).lean();
     const [dataOfWeather, character] = await Promise.all([
       MapControlTimeModel.findOne().lean(),

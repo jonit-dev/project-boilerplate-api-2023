@@ -1,10 +1,17 @@
-import { unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { ArmorsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
 import { ICharacter } from "../CharacterModel";
 import { Equipment } from "../EquipmentModel";
 import { Skill } from "../SkillsModel";
 
 describe("SkillsModel", () => {
+  let skillStatsCalculator;
+
+  beforeAll(() => {
+    skillStatsCalculator = container.get(SkillStatsCalculator);
+  });
+
   it("properly calculates attack and defense of a character", async () => {
     const testCharacter = (await unitTestHelper.createMockCharacter(null, {
       hasSkills: true,
@@ -31,8 +38,8 @@ describe("SkillsModel", () => {
 
     const skills = await Skill.findById(testCharacter.skills);
 
-    const attack = await skills?.attack;
-    const defense = await skills?.defense;
+    const attack = await skillStatsCalculator.getAttack(skills);
+    const defense = await skillStatsCalculator.getDefense(skills);
 
     expect(attack).toBe(7);
     expect(defense).toBe(40);

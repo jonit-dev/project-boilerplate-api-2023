@@ -1,11 +1,18 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IControlTime } from "@entities/ModuleSystem/MapControlTimeModel";
-import { unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { CharacterFactions, LifeBringerRaces, PeriodOfDay, ShadowWalkerRaces } from "@rpg-engine/shared";
+import { SkillStatsCalculator } from "../SkillsStatsCalculator";
 
 describe("SkillBonusLifeBringer.ts", () => {
   let characterLifeBringer: ICharacter;
+
+  let skillStatsCalculator: SkillStatsCalculator;
+
+  beforeAll(() => {
+    skillStatsCalculator = container.get(SkillStatsCalculator);
+  });
 
   beforeEach(async () => {
     characterLifeBringer = await unitTestHelper.createMockCharacter(
@@ -107,8 +114,12 @@ describe("SkillBonusLifeBringer.ts", () => {
     lifeBringerSkills.strength.level = 20;
     lifeBringerSkills.resistance.level = 20;
     lifeBringerSkills.level = 1;
-    const totalAttackLifeBringer = await lifeBringerSkills.attack;
-    const totalDefenseLifeBringer = await lifeBringerSkills.defense;
+
+    const lifeBringerAttack = await skillStatsCalculator.getAttack(lifeBringerSkills);
+    const lifeBringerDefense = await skillStatsCalculator.getDefense(lifeBringerSkills);
+
+    const totalAttackLifeBringer = lifeBringerAttack;
+    const totalDefenseLifeBringer = lifeBringerDefense;
 
     // 20 + 1 = 21
     expect(totalAttackLifeBringer).toEqual(21);
@@ -119,6 +130,12 @@ describe("SkillBonusLifeBringer.ts", () => {
 
 describe("SkillBonusShadowWalker.ts", () => {
   let characterShadowWalker: ICharacter;
+
+  let skillStatsCalculator: SkillStatsCalculator;
+
+  beforeAll(() => {
+    skillStatsCalculator = container.get(SkillStatsCalculator);
+  });
 
   beforeEach(async () => {
     characterShadowWalker = await unitTestHelper.createMockCharacter(
@@ -216,8 +233,12 @@ describe("SkillBonusShadowWalker.ts", () => {
     characterSkills.strength.level = 20;
     characterSkills.resistance.level = 20;
     characterSkills.level = 1;
-    const totalAttack = await characterSkills.attack;
-    const totalDefense = await characterSkills.defense;
+
+    const attack = await skillStatsCalculator.getAttack(characterSkills);
+    const defense = await skillStatsCalculator.getDefense(characterSkills);
+
+    const totalAttack = attack;
+    const totalDefense = defense;
 
     // 20 + 1 = 21
     expect(totalAttack).toEqual(21);

@@ -1,8 +1,6 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { container } from "@providers/inversify/container";
 import { calculateExperience } from "@providers/npc/NPCExperience";
-import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
 import {
   NPCAlignment,
   SkillType,
@@ -94,12 +92,6 @@ export const skillsSchema = createLeanSchema(
     cooking: skillDetails(SkillType.Crafting),
     alchemy: skillDetails(SkillType.Crafting),
     blacksmithing: skillDetails(SkillType.Crafting),
-    ...({} as {
-      attack: Promise<number>;
-      defense: Promise<number>;
-      magicAttack: Promise<number>;
-      magicDefense: Promise<number>;
-    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
@@ -124,30 +116,6 @@ skillsSchema.post("save", async function (this: ISkill) {
       }
     );
   }
-});
-
-skillsSchema.virtual("attack").get(async function (this: ISkill) {
-  const skillStatsCalculator = container.get(SkillStatsCalculator);
-
-  return await skillStatsCalculator.getTotalAttackOrDefense(this, true);
-});
-
-skillsSchema.virtual("magicAttack").get(async function (this: ISkill) {
-  const skillStatsCalculator = container.get(SkillStatsCalculator);
-
-  return await skillStatsCalculator.getTotalAttackOrDefense(this, true, true);
-});
-
-skillsSchema.virtual("defense").get(async function (this: ISkill) {
-  const skillStatsCalculator = container.get(SkillStatsCalculator);
-
-  return await skillStatsCalculator.getTotalAttackOrDefense(this, false);
-});
-
-skillsSchema.virtual("magicDefense").get(async function (this: ISkill) {
-  const skillStatsCalculator = container.get(SkillStatsCalculator);
-
-  return await skillStatsCalculator.getTotalAttackOrDefense(this, false, true);
 });
 
 export type ISkill = ExtractDoc<typeof skillsSchema>;

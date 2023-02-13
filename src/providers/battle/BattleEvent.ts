@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
 import { BattleEventType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -9,12 +10,14 @@ type BattleParticipant = ICharacter | INPC;
 
 @provide(BattleEvent)
 export class BattleEvent {
+  constructor(private skillStatsCalculator: SkillStatsCalculator) {}
+
   public async calculateEvent(attacker: BattleParticipant, target: BattleParticipant): Promise<BattleEventType> {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
 
-    const defenderDefense = await defenderSkills.defense;
-    const attackerAttack = await attackerSkills.attack;
+    const defenderDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
+    const attackerAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
 
     const defenderModifiers = defenderDefense + defenderSkills.dexterity.level;
     const attackerModifiers = attackerAttack + attackerSkills.dexterity.level;
@@ -48,8 +51,14 @@ export class BattleEvent {
   ): Promise<number> {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
-    const attackerTotalAttack = isMagicAttack ? await attackerSkills.magicAttack : await attackerSkills.attack;
-    const defenderTotalDefense = isMagicAttack ? await attackerSkills.magicDefense : await defenderSkills.defense;
+
+    const attackerMagicAttack = await this.skillStatsCalculator.getMagicAttack(attackerSkills);
+    const attackerMagicDefense = await this.skillStatsCalculator.getMagicDefense(defenderSkills);
+    const attackerAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
+    const defenderDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
+
+    const attackerTotalAttack = isMagicAttack ? attackerMagicAttack : attackerAttack;
+    const defenderTotalDefense = isMagicAttack ? attackerMagicDefense : defenderDefense;
 
     const totalPotentialAttackerDamage = _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));
 
