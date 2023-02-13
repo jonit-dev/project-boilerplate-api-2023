@@ -2,10 +2,12 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { ItemSubType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EquipmentEquip } from "../EquipmentEquip";
+import { EquipmentStatsCalculator } from "../EquipmentStatsCalculator";
 
 describe("EquipmentEquip.spec.ts", () => {
   let testCharacter: ICharacter;
@@ -16,6 +18,13 @@ describe("EquipmentEquip.spec.ts", () => {
   let swordItem: IItem;
   let shieldItem: IItem;
   let sendEventToUser;
+  let equipmentStatsCalculator: EquipmentStatsCalculator;
+  let characterWeapon: CharacterWeapon;
+
+  beforeAll(() => {
+    equipmentStatsCalculator = container.get<EquipmentStatsCalculator>(EquipmentStatsCalculator);
+    characterWeapon = container.get<CharacterWeapon>(CharacterWeapon);
+  });
 
   beforeEach(async () => {
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
@@ -153,8 +162,10 @@ describe("EquipmentEquip.spec.ts", () => {
     it("should have attack type of Melee when unarmed | Unarmed[Melee] ", async () => {
       const characterAttackType = await Character.findById({ _id: testCharacter._id });
 
+      const weapon = await characterWeapon.getWeapon(testCharacter as ICharacter);
+
       expect(await characterAttackType?.attackType).toEqual(EntityAttackType.Melee);
-      expect(await characterAttackType?.weapon).toBeUndefined();
+      expect(weapon).toBeUndefined();
     });
 
     it("properly calculates the totalEquippedAttack and totalEquippedDefense", async () => {
@@ -170,11 +181,11 @@ describe("EquipmentEquip.spec.ts", () => {
 
       if (!equipment) throw new Error("Equipment not found");
 
-      const totalEquippedAttack = await equipment?.totalEquippedAttack;
+      const totalEquippedAttack = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "attack");
+
+      const totalEquippedDefense = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "defense");
 
       expect(totalEquippedAttack).toEqual(5);
-
-      const totalEquippedDefense = await equipment?.totalEquippedDefense;
 
       expect(totalEquippedDefense).toEqual(0);
     });

@@ -3,6 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -46,7 +47,8 @@ export class BattleRangedAttack {
     private mathHelper: MathHelper,
     private movementHelper: MovementHelper,
     private equipmentSlots: EquipmentSlots,
-    private animationEffect: AnimationEffect
+    private animationEffect: AnimationEffect,
+    private characterWeapon: CharacterWeapon
   ) {}
 
   /**
@@ -199,7 +201,11 @@ export class BattleRangedAttack {
     character: ICharacter,
     equipment: IEquipment
   ): Promise<IRangedAttackParams | undefined> {
-    const weapon = (await character.weapon) as IItem;
+    const weapon = await this.characterWeapon.getWeapon(character);
+
+    if (!weapon) {
+      return;
+    }
 
     let result: IRangedAttackParams | undefined;
     // Get ranged attack weapons (bow or spear)

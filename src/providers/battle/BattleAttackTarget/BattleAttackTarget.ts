@@ -4,6 +4,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
@@ -53,7 +54,8 @@ export class BattleAttackTarget {
     private entityEffectUse: EntityEffectUse,
     private characterBonusPenalties: CharacterBonusPenalties,
     private npcWarn: NPCWarn,
-    private characterMovementWarn: CharacterMovementWarn
+    private characterMovementWarn: CharacterMovementWarn,
+    private characterWeapon: CharacterWeapon
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -238,7 +240,7 @@ export class BattleAttackTarget {
 
         // when target is Character, resistance SP increases
         if (target.type === "Character") {
-          const weapon = await (attacker as ICharacter).weapon;
+          const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
           const attr =
             weapon?.subType === ItemSubType.Magic || weapon?.subType === ItemSubType.Staff
               ? BasicAttribute.MagicResistance
