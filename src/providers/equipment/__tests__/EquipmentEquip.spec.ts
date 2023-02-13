@@ -6,6 +6,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { ItemSubType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EquipmentEquip } from "../EquipmentEquip";
+import { EquipmentStatsCalculator } from "../EquipmentStatsCalculator";
 
 describe("EquipmentEquip.spec.ts", () => {
   let testCharacter: ICharacter;
@@ -16,6 +17,11 @@ describe("EquipmentEquip.spec.ts", () => {
   let swordItem: IItem;
   let shieldItem: IItem;
   let sendEventToUser;
+  let equipmentStatsCalculator: EquipmentStatsCalculator;
+
+  beforeAll(() => {
+    equipmentStatsCalculator = container.get<EquipmentStatsCalculator>(EquipmentStatsCalculator);
+  });
 
   beforeEach(async () => {
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
@@ -170,11 +176,11 @@ describe("EquipmentEquip.spec.ts", () => {
 
       if (!equipment) throw new Error("Equipment not found");
 
-      const totalEquippedAttack = await equipment?.totalEquippedAttack;
+      const totalEquippedAttack = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "attack");
+
+      const totalEquippedDefense = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "defense");
 
       expect(totalEquippedAttack).toEqual(5);
-
-      const totalEquippedDefense = await equipment?.totalEquippedDefense;
 
       expect(totalEquippedDefense).toEqual(0);
     });

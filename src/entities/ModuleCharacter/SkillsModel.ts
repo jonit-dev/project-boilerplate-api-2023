@@ -2,6 +2,8 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
+import { EquipmentStatsCalculator } from "@providers/equipment/EquipmentStatsCalculator";
+import { container } from "@providers/inversify/container";
 import { calculateExperience } from "@providers/npc/NPCExperience";
 import {
   NPCAlignment,
@@ -129,18 +131,18 @@ skillsSchema.post("save", async function (this: ISkill) {
 });
 
 async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean, isMagic: boolean = false): Promise<void> {
-  const equipment = await Equipment.findOne({ owner: skill.owner }).lean({ virtuals: true, default: true });
+  const equipment = await Equipment.findOne({ owner: skill.owner }).lean();
   const [dataOfWeather, character] = await Promise.all([
     MapControlTimeModel.findOne().lean(),
     Character.findById(skill.owner).lean(),
   ]);
 
   if (skill.ownerType === "Character" && equipment) {
-    const totalEquipped = isMagic
-      ? 0
-      : isAttack
-      ? await equipment.totalEquippedAttack
-      : await equipment.totalEquippedDefense;
+    const equipmentStatsCalculator = container.get<EquipmentStatsCalculator>(EquipmentStatsCalculator);
+
+    const totalEquippedAttack = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "attack");
+    const totalEquippedDefense = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "defense");
+    const totalEquipped = isMagic ? 0 : isAttack ? totalEquippedAttack : totalEquippedDefense;
     const baseValue =
       isAttack && !isMagic
         ? skill.strength.level

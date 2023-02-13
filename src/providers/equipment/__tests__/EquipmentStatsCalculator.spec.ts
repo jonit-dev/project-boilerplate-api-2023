@@ -6,7 +6,7 @@ describe("EquipmentStatsCalculator.spec.ts", () => {
   let equipmentStatsCalculator: EquipmentStatsCalculator;
   let equipment: IEquipment;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     equipmentStatsCalculator = container.get<EquipmentStatsCalculator>(EquipmentStatsCalculator);
   });
 

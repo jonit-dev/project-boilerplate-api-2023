@@ -1,5 +1,4 @@
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
 import { IItem, ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
