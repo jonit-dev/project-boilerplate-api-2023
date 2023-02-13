@@ -6,6 +6,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { BuffSkillFunctions } from "@providers/character/CharacterBuffer/BuffSkillFunctions";
 import { CharacterView } from "@providers/character/CharacterView";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -47,7 +48,8 @@ export class SkillIncrease {
     private characterBonusPenalties: CharacterBonusPenalties,
     private skillFunctions: SkillFunctions,
     private buffSkillFunctions: BuffSkillFunctions,
-    private skillGainValidation: SkillGainValidation
+    private skillGainValidation: SkillGainValidation,
+    private characterWeapon: CharacterWeapon
   ) {}
 
   /**
@@ -67,7 +69,7 @@ export class SkillIncrease {
       throw new Error(`equipment not found for character ${attacker.id}`);
     }
 
-    const weapon = await attacker.weapon;
+    const weapon = await this.characterWeapon.getWeapon(attacker);
 
     const skillName = SKILLS_MAP.get(weapon?.subType || "None");
 

@@ -13,8 +13,6 @@ import {
   CharacterFactions,
   FromGridX,
   FromGridY,
-  ItemSubType,
-  ItemType,
   LifeBringerRaces,
   MapLayers,
   ShadowWalkerRaces,
@@ -22,7 +20,7 @@ import {
 } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
-import { Equipment, IEquipment } from "./EquipmentModel";
+import { Equipment } from "./EquipmentModel";
 import { Skill } from "./SkillsModel";
 
 profanity.addWords([
@@ -238,7 +236,6 @@ const characterSchema = createLeanSchema(
       inventory: Promise<IItem>;
       speed: number;
       movementIntervalMs: number;
-      weapon: Promise<IItem | undefined>;
       attackType: Promise<EntityAttackType>;
     }),
   },
@@ -307,32 +304,6 @@ characterSchema.virtual("attackType").get(async function (this: ICharacter): Pro
   const rangeType = weapon?.rangeType as unknown as EntityAttackType;
 
   return rangeType;
-});
-
-characterSchema.virtual("weapon").get(async function (this: ICharacter): Promise<IItem | undefined> {
-  const equipment = (await Equipment.findById(this.equipment).lean()) as IEquipment;
-
-  if (!equipment) {
-    return undefined;
-  }
-  // Get right and left hand items
-  // What if has weapons on both hands? for now, only one weapon per character is allowed
-  //! Virtuals required here!
-  const rightHandItem = equipment.rightHand
-    ? ((await Item.findById(equipment.rightHand).lean({ virtuals: true, defaults: true })) as IItem)
-    : undefined;
-  const leftHandItem = equipment.leftHand
-    ? ((await Item.findById(equipment.leftHand).lean({ virtuals: true, defaults: true })) as IItem)
-    : undefined;
-
-  // ItemSubType Shield is of type Weapon, so check that the weapon is not subType Shield (because cannot attack with Shield)
-  if (rightHandItem?.type === ItemType.Weapon && rightHandItem?.subType !== ItemSubType.Shield) {
-    return rightHandItem;
-  }
-
-  if (leftHandItem?.type === ItemType.Weapon && leftHandItem?.subType !== ItemSubType.Shield) {
-    return leftHandItem;
-  }
 });
 
 characterSchema.post("remove", async function (this: ICharacter) {
