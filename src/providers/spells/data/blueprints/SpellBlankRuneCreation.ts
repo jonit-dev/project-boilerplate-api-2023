@@ -1,10 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { container } from "@providers/inversify/container";
 import { MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
-import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
+import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 
 export const spellBlankRuneCreation: Partial<ISpell> = {
   key: SpellsBlueprint.BlankRuneCreationSpell,
@@ -14,7 +14,7 @@ export const spellBlankRuneCreation: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar ansr ki",
-  manaCost: 5,
+  manaCost: 15,
   minLevelRequired: 2,
   minMagicLevelRequired: 3,
   animationKey: AnimationEffectKeys.LevelUp,
