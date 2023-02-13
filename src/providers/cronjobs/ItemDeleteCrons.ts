@@ -1,7 +1,7 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUIShowMessage, ItemSubType, UISocketEvents } from "@rpg-engine/shared";
+import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 
@@ -23,14 +23,16 @@ export class ItemDeleteCrons {
       //! THIS IS ONE OF THE MOST DANGEROUS CRON JOBS ON THE SYSTEM. DO NOT TOUCH THIS SHIT IF YOU DONT KNOW WHAT YOU ARE DOING.
 
       setTimeout(async () => {
+        // query items that are dropped on the scene (x,y,scene), not equipped, are not in a container and has no owner
+
         const items = await Item.find({
           // @ts-ignore
           x: { $ne: null },
           y: { $ne: null },
           scene: { $ne: null },
-          subType: { $ne: ItemSubType.DeadBody },
           isEquipped: { $ne: true },
           itemContainer: { $exists: false },
+          $or: [{ owner: null }, { owner: { $exists: false } }],
         });
 
         for (const item of items) {
