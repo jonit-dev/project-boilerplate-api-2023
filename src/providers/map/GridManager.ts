@@ -210,20 +210,19 @@ export class GridManager {
 
     const bounds = this.getSubGridBounds(map, gridCourse);
 
-    const toKey = (x: number, y: number): string => `${x}-${y}`;
+    const solids = new Set();
 
-    const solids: Set<string> = new Set();
-    const solidPredicate = (x: number, y: number): any => solids.has(toKey(x, y));
-
-    for (let y = bounds.startY + offset.gridOffsetY, yi = 0; yi < bounds.height; y++, yi++) {
-      for (let x = bounds.startX + offset.gridOffsetX, xi = 0; xi < bounds.width; x++, xi++) {
+    for (let y = bounds.startY + offset.gridOffsetY; y < bounds.startY + bounds.height + offset.gridOffsetY; y++) {
+      for (let x = bounds.startX + offset.gridOffsetX; x < bounds.startX + bounds.width + offset.gridOffsetX; x++) {
         if (tree[y][x] === 1) {
-          solids.add(toKey(x, y));
+          solids.add(`${x}-${y}`);
         }
       }
     }
 
-    const matrix = this.generateMatrixBetweenPoints(bounds, solidPredicate);
+    const matrix = this.generateMatrixBetweenPoints(bounds, (gridX, gridY) =>
+      solids.has(`${gridX + offset.gridOffsetX}-${gridY + offset.gridOffsetY}`)
+    );
 
     const pf = new PF.Grid(matrix);
 
@@ -276,21 +275,27 @@ export class GridManager {
     bounds: IGridBounds,
     isSolidFn: (gridX: number, gridY: number) => boolean
   ): number[][] {
-    const matrix: number[][] = [];
+    const matrix = new Int8Array(bounds.width * bounds.height);
+    const matrixRowLength = bounds.width;
 
     for (let gridY = 0; gridY < bounds.height; gridY++) {
-      for (let gridX = 0; gridX < bounds.width; gridX++) {
-        matrix[gridY] = matrix[gridY] || [];
+      const matrixRowIndex = gridY * matrixRowLength;
 
+      for (let gridX = 0; gridX < bounds.width; gridX++) {
         const isWalkable = !isSolidFn(gridX + bounds.startX, gridY + bounds.startY);
-        matrix[gridY][gridX] = isWalkable ? 0 : 1;
+        matrix[matrixRowIndex + gridX] = isWalkable ? 0 : 1;
       }
     }
 
-    if (!matrix.length) {
+    const result: number[][] = [];
+    for (let i = 0; i < matrix.length; i += matrixRowLength) {
+      result.push(Array.from(matrix.subarray(i, i + matrixRowLength)));
+    }
+
+    if (!result.length) {
       throw new Error("Failed to generate pathfinding grid");
     }
 
-    return matrix;
+    return result;
   }
 }
