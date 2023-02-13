@@ -32,10 +32,8 @@ export class GridManager {
 
   constructor(private mapTiles: MapTiles, private mapSolids: MapSolids, private mapHelper: MapHelper) {}
 
-  public getGrid(map: string): Promise<number[][]> {
-    return new Promise((resolve) => {
-      resolve(this.grids.get(map)!);
-    });
+  public getGrid(map: string): number[][] {
+    return this.grids.get(map)!;
   }
 
   public hasGrid(map: string): boolean {
@@ -150,18 +148,18 @@ export class GridManager {
     };
   }
 
-  public async findShortestPath(
+  public findShortestPath(
     map: string,
     startGridX: number,
     startGridY: number,
     endGridX: number,
     endGridY: number
-  ): Promise<number[][] | undefined> {
+  ): number[][] | undefined {
     if (!this.mapHelper.areAllCoordinatesValid([startGridX, startGridY], [endGridX, endGridY])) {
       return;
     }
 
-    return await this.findShortestPathBetweenPoints(map, {
+    return this.findShortestPathBetweenPoints(map, {
       start: {
         x: startGridX,
         y: startGridY,
@@ -173,16 +171,12 @@ export class GridManager {
     });
   }
 
-  private async findShortestPathBetweenPoints(
-    map: string,
-    gridCourse: IGridCourse,
-    retries?: number
-  ): Promise<number[][]> {
+  private findShortestPathBetweenPoints(map: string, gridCourse: IGridCourse, retries?: number): number[][] {
     if (!retries) {
       retries = 0;
     }
 
-    const data = await this.generateGridBetweenPoints(map, gridCourse);
+    const data = this.generateGridBetweenPoints(map, gridCourse);
     const grid = data.grid;
 
     // translate co-ordinates to sub grid co-ordinates
@@ -205,8 +199,8 @@ export class GridManager {
     return pathWithoutOffset;
   }
 
-  private async generateGridBetweenPoints(map: string, gridCourse: IGridCourse): Promise<any> {
-    const tree = await this.getGrid(map);
+  private generateGridBetweenPoints(map: string, gridCourse: IGridCourse): any {
+    const tree = this.getGrid(map);
     if (!tree) {
       throw new Error(`❌ Could not find grid for map: ${map}`);
     }
@@ -216,23 +210,18 @@ export class GridManager {
 
     const bounds = this.getSubGridBounds(map, gridCourse);
 
-    const toKey = (x: number, y: number): string => {
-      return [x, y].join("-");
-    };
+    const solids = new Set();
 
-    const solids: Map<string, boolean> = new Map();
-
-    for (let y = bounds.startY + offset.gridOffsetY, yi = 0; yi < bounds.height; y++, yi++) {
-      for (let x = bounds.startX + offset.gridOffsetX, xi = 0; xi < bounds.width; x++, xi++) {
+    for (let y = bounds.startY + offset.gridOffsetY; y < bounds.startY + bounds.height + offset.gridOffsetY; y++) {
+      for (let x = bounds.startX + offset.gridOffsetX; x < bounds.startX + bounds.width + offset.gridOffsetX; x++) {
         if (tree[y][x] === 1) {
-          solids.set(toKey(x, y), true);
+          solids.add(`${x}-${y}`);
         }
       }
     }
 
-    const matrix = this.generateMatrixBetweenPoints(
-      bounds,
-      (gridX, gridY) => !!solids.get(toKey(gridX + offset.gridOffsetX, gridY + offset.gridOffsetY))
+    const matrix = this.generateMatrixBetweenPoints(bounds, (gridX, gridY) =>
+      solids.has(`${gridX + offset.gridOffsetX}-${gridY + offset.gridOffsetY}`)
     );
 
     const pf = new PF.Grid(matrix);
@@ -286,21 +275,27 @@ export class GridManager {
     bounds: IGridBounds,
     isSolidFn: (gridX: number, gridY: number) => boolean
   ): number[][] {
-    const matrix: number[][] = [];
+    const matrix = new Int8Array(bounds.width * bounds.height);
+    const matrixRowLength = bounds.width;
 
     for (let gridY = 0; gridY < bounds.height; gridY++) {
-      for (let gridX = 0; gridX < bounds.width; gridX++) {
-        matrix[gridY] = matrix[gridY] || [];
+      const matrixRowIndex = gridY * matrixRowLength;
 
+      for (let gridX = 0; gridX < bounds.width; gridX++) {
         const isWalkable = !isSolidFn(gridX + bounds.startX, gridY + bounds.startY);
-        matrix[gridY][gridX] = isWalkable ? 0 : 1;
+        matrix[matrixRowIndex + gridX] = isWalkable ? 0 : 1;
       }
     }
 
-    if (!matrix.length) {
+    const result: number[][] = [];
+    for (let i = 0; i < matrix.length; i += matrixRowLength) {
+      result.push(Array.from(matrix.subarray(i, i + matrixRowLength)));
+    }
+
+    if (!result.length) {
       throw new Error("Failed to generate pathfinding grid");
     }
 
-    return matrix;
+    return result;
   }
 }
