@@ -11,4 +11,5 @@ export const EXHAUSTABLE_EVENTS = [
   ChatSocketEvents.GlobalChatMessageCreate,
   ChatSocketEvents.GlobalChatMessageRead,
   ItemSocketEvents.UseWith,
+  "CastSpell",
 ] as string[];
