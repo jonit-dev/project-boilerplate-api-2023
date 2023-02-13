@@ -1,10 +1,8 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
-import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { EquipmentStatsCalculator } from "@providers/equipment/EquipmentStatsCalculator";
 import { container } from "@providers/inversify/container";
 import { calculateExperience } from "@providers/npc/NPCExperience";
+import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
 import {
   NPCAlignment,
   SkillType,
@@ -13,8 +11,6 @@ import {
   calculateXPToNextLevel,
 } from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
-import { Character } from "./CharacterModel";
-import { Equipment } from "./EquipmentModel";
 
 const skillDetails = (type: SkillType): Record<string, any> => {
   return {
@@ -130,59 +126,28 @@ skillsSchema.post("save", async function (this: ISkill) {
   }
 });
 
-async function getTotalAttackOrDefense(skill: ISkill, isAttack: boolean, isMagic: boolean = false): Promise<void> {
-  const equipment = await Equipment.findOne({ owner: skill.owner }).lean();
-  const [dataOfWeather, character] = await Promise.all([
-    MapControlTimeModel.findOne().lean(),
-    Character.findById(skill.owner).lean(),
-  ]);
-
-  if (skill.ownerType === "Character" && equipment) {
-    const equipmentStatsCalculator = container.get<EquipmentStatsCalculator>(EquipmentStatsCalculator);
-
-    const totalEquippedAttack = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "attack");
-    const totalEquippedDefense = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "defense");
-    const totalEquipped = isMagic ? 0 : isAttack ? totalEquippedAttack : totalEquippedDefense;
-    const baseValue =
-      isAttack && !isMagic
-        ? skill.strength.level
-        : !isAttack && !isMagic
-        ? skill.resistance.level
-        : isAttack && isMagic
-        ? skill.magic.level
-        : skill.magicResistance.level;
-    const totalValueNoBonus = baseValue + skill.level + totalEquipped;
-    const totalValueWithBonus = totalValueNoBonus + totalValueNoBonus * INCREASE_BONUS_FACTION;
-
-    if (character?.faction === "Life Bringer" && dataOfWeather?.period === "Morning") {
-      return totalValueWithBonus || 0;
-    }
-
-    if (character?.faction === "Shadow Walker" && dataOfWeather?.period === "Night") {
-      return totalValueWithBonus || 0;
-    }
-
-    return totalValueNoBonus || 0;
-  }
-
-  // for regular NPCs
-  return isAttack ? skill.strength.level + skill.level : skill.resistance.level + skill.level;
-}
-
 skillsSchema.virtual("attack").get(async function (this: ISkill) {
-  return await getTotalAttackOrDefense(this, true);
+  const skillStatsCalculator = container.get(SkillStatsCalculator);
+
+  return await skillStatsCalculator.getTotalAttackOrDefense(this, true);
 });
 
 skillsSchema.virtual("magicAttack").get(async function (this: ISkill) {
-  return await getTotalAttackOrDefense(this, true, true);
+  const skillStatsCalculator = container.get(SkillStatsCalculator);
+
+  return await skillStatsCalculator.getTotalAttackOrDefense(this, true, true);
 });
 
 skillsSchema.virtual("defense").get(async function (this: ISkill) {
-  return await getTotalAttackOrDefense(this, false);
+  const skillStatsCalculator = container.get(SkillStatsCalculator);
+
+  return await skillStatsCalculator.getTotalAttackOrDefense(this, false);
 });
 
 skillsSchema.virtual("magicDefense").get(async function (this: ISkill) {
-  return await getTotalAttackOrDefense(this, false, true);
+  const skillStatsCalculator = container.get(SkillStatsCalculator);
+
+  return await skillStatsCalculator.getTotalAttackOrDefense(this, false, true);
 });
 
 export type ISkill = ExtractDoc<typeof skillsSchema>;
