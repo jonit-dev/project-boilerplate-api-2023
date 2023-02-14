@@ -275,6 +275,7 @@ export enum MagicsBlueprint {
   ThunderRune = "thunder-rune",
   EnergyBoltRune = "energy-bolt-rune",
   FireBoltRune = "fire-bolt-rune",
+  CorruptionRune = "corruption-rune",
 }
 
 export enum BooksBlueprint {

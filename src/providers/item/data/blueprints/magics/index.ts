@@ -1,11 +1,12 @@
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
+import { itemCorruptionRune } from "./ItemCorruptionRune";
 import { itemDarkRune } from "./ItemDarkRune";
+import { itemEnergyBoltRune } from "./itemEnergyBoltRune";
+import { itemFireBoltRune } from "./itemFireBoltRune";
 import { itemFireRune } from "./ItemFireRune";
 import { itemHealRune } from "./ItemHealRune";
 import { itemPoisonRune } from "./ItemPoisonRune";
 import { itemRune } from "./ItemRune";
-import { itemEnergyBoltRune } from "./itemEnergyBoltRune";
-import { itemFireBoltRune } from "./itemFireBoltRune";
 
 export const magicsBlueprintIndex = {
   [MagicsBlueprint.Rune]: itemRune,
@@ -15,4 +16,5 @@ export const magicsBlueprintIndex = {
   [MagicsBlueprint.PoisonRune]: itemPoisonRune,
   [MagicsBlueprint.EnergyBoltRune]: itemEnergyBoltRune,
   [MagicsBlueprint.FireBoltRune]: itemFireBoltRune,
+  [MagicsBlueprint.CorruptionRune]: itemCorruptionRune,
 };

@@ -68,11 +68,11 @@ export const npcIceFox: Partial<INPC> = {
     },
     {
       itemBlueprintKey: DaggersBlueprint.GoldenDagger,
-      chance: 12,
+      chance: 3,
     },
     {
       itemBlueprintKey: DaggersBlueprint.FrostDagger,
-      chance: 20,
+      chance: 10,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Silk,

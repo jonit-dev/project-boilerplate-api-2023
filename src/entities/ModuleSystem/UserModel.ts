@@ -6,7 +6,7 @@ import { IAuthResponse, TypeHelper, UserAuthFlow, UserTypes } from "@rpg-engine/
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import uniqueValidator from "mongoose-unique-validator";
-import { ExtractDoc, Type, createSchema, typedModel } from "ts-mongoose";
+import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const mongooseHidden = require("mongoose-hidden")();
 

@@ -135,6 +135,10 @@ describe("CharacterDeath.ts | Character with items", () => {
     );
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("should drop character's backpack items  as a container on its dead body", async () => {
     // @ts-ignore
     const spyDropCharacterItemsOnBody = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");

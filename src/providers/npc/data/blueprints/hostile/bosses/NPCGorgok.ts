@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   ArmorsBlueprint,
+  AxesBlueprint,
   BootsBlueprint,
   ContainersBlueprint,
   GlovesBlueprint,
@@ -91,6 +92,10 @@ export const npcGorgok = {
     {
       itemBlueprintKey: ShieldsBlueprint.PlateShield,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.GoldenAxe,
+      chance: 1,
     },
   ],
 } as Partial<INPC>;

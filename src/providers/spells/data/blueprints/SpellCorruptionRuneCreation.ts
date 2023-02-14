@@ -5,18 +5,17 @@ import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
 import { SpellItemCreation } from "../abstractions/SpellItemCreation";
 import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 
-export const spellDarkRuneCreation: Partial<ISpell> = {
-  key: SpellsBlueprint.DarkRuneCreationSpell,
+export const spellCorruptionRuneCreation: Partial<ISpell> = {
+  key: SpellsBlueprint.CorruptionRuneCreationSpell,
 
-  name: "Dark Rune Creation Spell",
-  description: "A spell that converts a blank rune, in your inventory, into dark rune.",
-
+  name: "Corruption Rune Creation Spell",
+  description: "A spell that converts a blank rune, in your inventory, into corruption rune.",
   castingType: SpellCastingType.SelfCasting,
-  magicWords: "iquar ansr nevae",
-  manaCost: 40,
-  minLevelRequired: 4,
-  minMagicLevelRequired: 3,
-  animationKey: AnimationEffectKeys.HitDark,
+  magicWords: "iquar ansr umbra",
+  manaCost: 50,
+  minLevelRequired: 8,
+  minMagicLevelRequired: 6,
+  animationKey: AnimationEffectKeys.HitCorruption,
   projectileAnimationKey: AnimationEffectKeys.Dark,
 
   requiredItem: MagicsBlueprint.Rune,
@@ -26,11 +25,11 @@ export const spellDarkRuneCreation: Partial<ISpell> = {
 
     await spellRuneCreation.createItem(character, {
       itemToCreate: {
-        key: MagicsBlueprint.DarkRune,
+        key: MagicsBlueprint.CorruptionRune,
       },
       itemToConsume: {
         key: MagicsBlueprint.Rune,
-        onErrorMessage: "You do not have any blank rune to create a Dark Rune.",
+        onErrorMessage: "You do not have any blank rune to create a Corruption Rune.",
       },
     });
   },

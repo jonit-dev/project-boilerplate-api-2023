@@ -5,18 +5,18 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { NPC_LOOT_CHANCE_MULTIPLIER } from "@providers/constants/NPCConstants";
-import { ItemOwnership } from "@providers/item/ItemOwnership";
-import { ItemRarity } from "@providers/item/ItemRarity";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { ItemRarity } from "@providers/item/ItemRarity";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemType } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
+import { NPCTarget } from "./movement/NPCTarget";
 import { NPC_CYCLES } from "./NPCCycle";
 import { calculateGold } from "./NPCGold";
-import { NPCTarget } from "./movement/NPCTarget";
 
 @provide(NPCDeath)
 export class NPCDeath {
@@ -66,7 +66,7 @@ export class NPCDeath {
     }
   }
 
-  public generateNPCBody(npc: INPC): Promise<IItem> {
+  public async generateNPCBody(npc: INPC): Promise<IItem> {
     const blueprintData = itemsBlueprintIndex["npc-body"];
     const npcBody = new Item({
       ...blueprintData, // base body props
@@ -81,7 +81,7 @@ export class NPCDeath {
       y: npc.y,
     });
 
-    return npcBody.save();
+    return await npcBody.save();
   }
 
   private async clearNPCBehavior(npc: INPC): Promise<void> {
@@ -184,7 +184,6 @@ export class NPCDeath {
             }
 
             itemContainer.slots[freeSlotId!] = lootItem;
-
             lootQuantity--;
           }
         }
