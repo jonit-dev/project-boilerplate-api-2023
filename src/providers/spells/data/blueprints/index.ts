@@ -2,6 +2,7 @@ import { SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 import { spellArrowCreation } from "./SpellArrowCreation";
 import { spellBlankRuneCreation } from "./SpellBlankRuneCreation";
 import { spellBoltCreation } from "./SpellBoltCreation";
+import { spellCorruptionRuneCreation } from "./SpellCorruptionRuneCreation";
 import { spellDarkRuneCreation } from "./SpellDarkRuneCreation";
 import { spellEnergyBoltCreation } from "./SpellEnergyBoltCreation";
 import { spellFireBoltCreation } from "./SpellFireBoltCreation";
@@ -27,4 +28,5 @@ export const spellsBlueprints = {
   [SpellsBlueprint.GreaterHealingSpell]: spellGreaterHealing,
   [SpellsBlueprint.FireBoltCreationSpell]: spellFireBoltCreation,
   [SpellsBlueprint.EnergyBoltCreationSpell]: spellEnergyBoltCreation,
+  [SpellsBlueprint.CorruptionRuneCreationSpell]: spellCorruptionRuneCreation,
 };

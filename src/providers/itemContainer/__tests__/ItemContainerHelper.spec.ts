@@ -12,24 +12,27 @@ describe("ItemContainerHelper", () => {
   let testCharacter: ICharacter;
   let inventory: IItem;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     itemContainerHelper = container.get<ItemContainerHelper>(ItemContainerHelper);
+  });
+
+  beforeEach(async () => {
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     inventory = await testCharacter.inventory;
+    await inventory.save();
   });
 
   describe("itemContainer type detection", () => {
-    // it("should properly detect an inventory itemContainer", async () => {
-    //   const inventoryItemContainer = await ItemContainer.findById(inventory.itemContainer);
-
-    //   const type = await itemContainerHelper.getContainerType(inventoryItemContainer as unknown as IItemContainer);
-    //   expect(type).toBe(ItemContainerType.Inventory);
-    // });
+    it("should properly detect an inventory itemContainer", async () => {
+      const itemContainer = { parentItem: inventory.id } as IItemContainer;
+      const result = await itemContainerHelper.getContainerType(itemContainer);
+      expect(result).toBe(ItemContainerType.Inventory);
+    });
 
     it("should properly detect a loot itemContainer", async () => {
       const blueprintData = itemsBlueprintIndex[BodiesBlueprint.CharacterBody];
 
-      const charBody = new Item({
+      const charBody = await Item.create({
         ...blueprintData,
         owner: testCharacter.id,
         name: `${testCharacter.name}'s body`,
@@ -39,12 +42,10 @@ describe("ItemContainerHelper", () => {
         generateContainerSlots: 20,
         isItemContainer: true,
       });
-      await charBody.save();
 
-      const lootContainer = new ItemContainer({
+      const lootContainer = await ItemContainer.create({
         parentItem: charBody.id,
       });
-      await lootContainer.save();
 
       const type = await itemContainerHelper.getContainerType(lootContainer as unknown as IItemContainer);
 
