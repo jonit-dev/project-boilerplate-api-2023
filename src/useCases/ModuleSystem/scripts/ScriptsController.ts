@@ -37,4 +37,13 @@ export class ScriptsController implements interfaces.Controller {
       message: "Emails adjusted succesfully",
     });
   }
+
+  @httpGet("/is-battle-active")
+  public async isBattleActive(@response() res): Promise<void> {
+    await this.scriptsUserCase.isBattleActive();
+
+    return res.status(200).send({
+      message: "Battle adjusted succesfully",
+    });
+  }
 }

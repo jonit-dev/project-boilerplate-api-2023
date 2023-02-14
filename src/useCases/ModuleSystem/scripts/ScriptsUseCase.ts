@@ -44,6 +44,23 @@ export class ScriptsUseCase {
     }
   }
 
+  public async isBattleActive(): Promise<void> {
+    try {
+      await Character.updateMany(
+        {},
+        {
+          $set: {
+            isBattleActive: false,
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+
+      throw new BadRequestError("Failed to execute script!");
+    }
+  }
+
   public async setAllEmailsToLowerCase(): Promise<void> {
     const users = await User.find({});
 
