@@ -113,7 +113,7 @@ export class BattleNetworkInitTargeting {
       }
     );
 
-    this.battleCharacterManager.onHandleCharacterBattleLoop(character, target);
+    await this.battleCharacterManager.onHandleCharacterBattleLoop(character, target);
   }
 
   private isValidTarget(target: INPC | ICharacter | null, character: ICharacter): ITargetValidation {

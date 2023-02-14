@@ -19,6 +19,7 @@ import {
   TypeHelper,
 } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { Equipment } from "./EquipmentModel";
 import { Skill } from "./SkillsModel";
@@ -222,6 +223,10 @@ const characterSchema = createLeanSchema(
         enum: TypeHelper.enumToStringArray(SpellsBlueprint),
       })
     ),
+    isBattleActive: Type.boolean({
+      default: false,
+      required: true,
+    }),
     appliedEntityEffects: Type.array().of(Type.mixed({})),
     appliedBuffsEffects: Type.array().of(
       Type.mixed({
@@ -244,7 +249,7 @@ const characterSchema = createLeanSchema(
     toObject: { virtuals: true, getters: true },
     toJSON: { virtuals: true, getters: true },
   }
-);
+).plugin(updateIfCurrentPlugin);
 
 characterSchema.virtual("movementIntervalMs").get(function (this: ICharacter) {
   return 1000 / this.speed / 12;

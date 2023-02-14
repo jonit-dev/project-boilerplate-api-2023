@@ -10,6 +10,7 @@ export class BattleCycle {
 
   constructor(id: string, fn: Function, intervalSpeed: number) {
     this.id = id;
+
     this.interval = setInterval(() => {
       fn();
     }, intervalSpeed);
@@ -29,6 +30,6 @@ export class BattleCycle {
     clearInterval(this.interval);
     BattleCycle.battleCycles.delete(this.id);
 
-    await Character.updateOne({ _id: this.id }, { $unset: { target: 1 } });
+    await Character.updateOne({ _id: this.id }, { $unset: { target: 1 }, $set: { isBattleActive: false } });
   }
 }

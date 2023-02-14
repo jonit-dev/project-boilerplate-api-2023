@@ -1,6 +1,7 @@
 /* eslint-disable no-new */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
@@ -10,10 +11,19 @@ import { BattleCharacterAttackValidation } from "./BattleCharacterAttackValidati
 export class BattleCharacterAttack {
   constructor(
     private battleAttackTarget: BattleAttackTarget,
-    private battleCharacterAttackValidation: BattleCharacterAttackValidation
+    private battleCharacterAttackValidation: BattleCharacterAttackValidation,
+    private socketMessaging: SocketMessaging
   ) {}
 
-  public onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): void {
+  public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
+    if (!character.isBattleActive) {
+      character.isBattleActive = true;
+      await character.save();
+    } else {
+      this.socketMessaging.sendErrorMessageToCharacter(character);
+      return;
+    }
+
     new BattleCycle(
       character.id,
       async () => {
