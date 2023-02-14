@@ -50,6 +50,8 @@ export class CharacterNetworkCreate {
         await Character.findOneAndUpdate(
           { _id: connectionCharacter._id },
           {
+            isBattleActive: false,
+            target: undefined,
             isOnline: true,
             channelId: data.channelId,
             view: {
