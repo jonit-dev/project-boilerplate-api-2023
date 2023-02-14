@@ -146,27 +146,10 @@ export class BattleNetworkInitTargeting {
       };
     }
 
-    const npc = target as INPC;
-
-    const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(npc.scene, npc.x, npc.y);
-
-    if (isCharInNonPVPZone && npc.type === EntityType.NPC) {
-      return {
-        isValid: false,
-        reason: "You cannot attack a NPC inside a Non-PVP Zone!",
-      };
-    }
-
     // Apply specific validations by target type
     const specificTargetValidation = this.checkBySpecificType(target);
     if (!specificTargetValidation?.isValid) {
       return specificTargetValidation;
-    }
-
-    // Cannot attack inside a NoN PvP Zone a target outside a NoN PvP Zone
-    const specificCharacterValidation = this.checkBySpecificType(character);
-    if (!specificCharacterValidation?.isValid) {
-      return specificCharacterValidation;
     }
 
     const isCharacterOnline = character.isOnline;

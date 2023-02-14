@@ -18,11 +18,13 @@ import {
   ICharacterPositionUpdateConfirm,
   ICharacterPositionUpdateFromClient,
   ICharacterSyncPosition,
+  NPCAlignment,
   ToGridX,
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
+import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
@@ -92,7 +94,7 @@ export class CharacterNetworkUpdate {
 
             await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
 
-            this.handleNonPVPZone(character, newX, newY);
+            await this.handleNonPVPZone(character, newX, newY);
 
             await this.characterView.clearOutOfViewElementsAll(character);
 
@@ -165,7 +167,19 @@ export class CharacterNetworkUpdate {
     }
   }
 
-  private handleNonPVPZone(character: ICharacter, newX: number, newY: number): void {
+  private async handleNonPVPZone(character: ICharacter, newX: number, newY: number): Promise<void> {
+    if (!character.target?.id) {
+      return;
+    }
+
+    if (String(character.target.type) === "NPC") {
+      const npc = await NPC.findById(character.target.id).lean();
+
+      if (npc?.alignment !== NPCAlignment.Friendly) {
+        return;
+      }
+    }
+
     /* 
           Verify if we're in a non pvp zone. If so, we need to trigger 
           an attack stop event in case player was in a pvp combat
