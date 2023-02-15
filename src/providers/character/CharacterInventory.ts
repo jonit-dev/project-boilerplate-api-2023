@@ -13,7 +13,7 @@ export class CharacterInventory {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public async getInventory(character: ICharacter): Promise<IItem | null> {
-    const equipment = await Equipment.findById(character.equipment).populate("inventory").exec();
+    const equipment = await Equipment.findById(character.equipment).populate("inventory").exec(); //! if set to lean, causes a inventory bug. I should investigate it later.
 
     if (equipment) {
       const inventory = equipment.inventory! as unknown as IItem;
@@ -23,7 +23,7 @@ export class CharacterInventory {
       }
     }
 
-    return null;
+    return null; //! some areas of the codebase strictly check for null, so return it instead of undefined
   }
 
   public async generateNewInventory(
