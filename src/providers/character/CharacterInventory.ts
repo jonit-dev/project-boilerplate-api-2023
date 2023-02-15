@@ -12,16 +12,14 @@ import { provide } from "inversify-binding-decorators";
 export class CharacterInventory {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  public async getInventory(character: ICharacter): Promise<IItem> {
+  public async getInventory(character: ICharacter): Promise<IItem | undefined> {
     const equipment = await Equipment.findById(character.equipment).lean();
 
-    if (!equipment) {
-      throw new Error("Equipment not found");
+    if (equipment) {
+      const inventory = await Item.findById(equipment.inventory).lean();
+
+      return inventory as unknown as IItem;
     }
-
-    const inventory = await Item.findById(equipment.inventory).lean();
-
-    return inventory as unknown as IItem;
   }
 
   public async generateNewInventory(
@@ -58,8 +56,8 @@ export class CharacterInventory {
   }
 
   public async sendInventoryUpdateEvent(character: ICharacter): Promise<void> {
-    const inventory = await character.inventory;
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    const inventory = await this.getInventory(character);
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
 
     this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
       character.channelId!,

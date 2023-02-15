@@ -71,6 +71,8 @@ interface IMockQuestOptions {
 
 @provide(UnitTestHelper)
 export class UnitTestHelper {
+  constructor(private characterInventory: CharacterInventory) {}
+
   private mongoServer: MongoMemoryServer;
   private characterItems: CharacterItems;
 
@@ -290,9 +292,9 @@ export class UnitTestHelper {
     const itemArmor = await this.createMockArmor();
     const equipmentEquip: EquipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
 
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
 
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
 
     inventoryContainer.slots[0] = itemSword;
     inventoryContainer.slots[1] = itemArmor;

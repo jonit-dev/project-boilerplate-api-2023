@@ -22,7 +22,7 @@ export class CharacterTradingBalance {
   public async getTotalGoldInInventory(character: ICharacter): Promise<number> {
     const inventory = await this.characterInventory.getInventory(character);
 
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryContainer) {
       throw new Error("Character inventory not found");

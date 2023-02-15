@@ -5,6 +5,7 @@ import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInve
 import { ItemMap } from "@providers/item/ItemMap";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
+import { CharacterInventory } from "../CharacterInventory";
 import { CharacterItemSlots } from "./CharacterItemSlots";
 import { CharacterItemStack } from "./CharacterItemStack";
 
@@ -15,7 +16,8 @@ export class CharacterItemContainer {
     private characterItemStack: CharacterItemStack,
     private characterItemSlots: CharacterItemSlots,
     private equipmentEquipInventory: EquipmentEquipInventory,
-    private itemMap: ItemMap
+    private itemMap: ItemMap,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async removeItemFromContainer(
@@ -150,7 +152,7 @@ export class CharacterItemContainer {
   }
 
   public async getItemContainer(character: ICharacter): Promise<IItemContainer | null> {
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryContainer) {

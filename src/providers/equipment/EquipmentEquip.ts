@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
@@ -21,7 +22,8 @@ export class EquipmentEquip {
     private equipmentSlots: EquipmentSlots,
     private characterValidation: CharacterValidation,
     private equipmentTwoHanded: EquipmentTwoHanded,
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async equip(character: ICharacter, itemId: string, fromItemContainerId: string): Promise<boolean> {
@@ -68,9 +70,14 @@ export class EquipmentEquip {
       return false;
     }
 
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
 
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as any;
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
+
+    if (!inventoryContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character);
+      return false;
+    }
 
     const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {

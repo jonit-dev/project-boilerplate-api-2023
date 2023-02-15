@@ -18,7 +18,7 @@ describe("CharacterInventory", () => {
     const inventory = await characterInventory.getInventory(testCharacter);
 
     expect(inventory).toBeDefined();
-    expect(inventory.owner).toEqual(testCharacter._id);
-    expect(inventory.isItemContainer).toBeTruthy();
+    expect(inventory?.owner).toEqual(testCharacter._id);
+    expect(inventory?.isItemContainer).toBeTruthy();
   });
 });

@@ -78,7 +78,7 @@ export class CharacterTradingNPCBuy {
 
   public async buyItemsFromNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<boolean> {
     const inventory = await this.characterInventory.getInventory(character);
-    const inventoryContainerId = inventory.itemContainer as unknown as string;
+    const inventoryContainerId = inventory?.itemContainer as unknown as string;
 
     if (!inventoryContainerId) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "You don't have an inventory.");
@@ -174,7 +174,7 @@ export class CharacterTradingNPCBuy {
     // finally, update character's weight
     await this.characterWeight.updateCharacterWeight(character);
 
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: inventoryContainer,

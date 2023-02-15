@@ -8,6 +8,7 @@ import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTy
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
+import { CharacterInventory } from "../CharacterInventory";
 import { CharacterItemContainer } from "./CharacterItemContainer";
 import { CharacterItemSlots } from "./CharacterItemSlots";
 
@@ -17,7 +18,8 @@ export class CharacterItemInventory {
     private socketMessaging: SocketMessaging,
     private characterItemSlots: CharacterItemSlots,
     private mathHelper: MathHelper,
-    private characterItemsContainer: CharacterItemContainer
+    private characterItemsContainer: CharacterItemContainer,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async getAllItemsFromInventoryNested(character: ICharacter): Promise<IItem[]> {
@@ -50,7 +52,7 @@ export class CharacterItemInventory {
     character: ICharacter,
     extraProps?: Partial<IItem>
   ): Promise<boolean> {
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainerId = inventory?.itemContainer as unknown as string;
     if (!inventoryContainerId) {
       return false;
@@ -76,7 +78,7 @@ export class CharacterItemInventory {
     character: ICharacter,
     decrementQty: number
   ): Promise<boolean> {
-    const inventory = (await character.inventory) as unknown as IItem;
+    const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
     const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
@@ -105,7 +107,7 @@ export class CharacterItemInventory {
     character: ICharacter,
     decrementQty: number
   ): Promise<boolean> {
-    const inventory = (await character.inventory) as unknown as IItem;
+    const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
     let inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
@@ -202,7 +204,7 @@ export class CharacterItemInventory {
    * Returns the item id if it finds it. Otherwise, returns undefined
    */
   public async checkItemInInventoryByKey(itemKey: string, character: ICharacter): Promise<string | undefined> {
-    const inventory = (await character.inventory) as unknown as IItem;
+    const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
     const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
@@ -228,7 +230,7 @@ export class CharacterItemInventory {
    * Returns the (slot index + 1) if it finds it. Otherwise, returns undefined
    */
   public async checkItemInInventory(itemId: string, character: ICharacter): Promise<number | undefined> {
-    const inventory = (await character.inventory) as unknown as IItem;
+    const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
     const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
@@ -253,7 +255,7 @@ export class CharacterItemInventory {
       return false;
     }
 
-    const inventory = (await character.inventory) as unknown as IItem;
+    const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
     if (!inventory) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The character does not have an inventory.");

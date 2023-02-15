@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -22,7 +23,8 @@ export class ItemContainerOpen {
     private socketAuth: SocketAuth,
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
-    private itemContainerHelper: ItemContainerHelper
+    private itemContainerHelper: ItemContainerHelper,
+    private characterInventory: CharacterInventory
   ) {}
 
   public onOpen(channel: SocketChannel): void {
@@ -42,7 +44,7 @@ export class ItemContainerOpen {
   }
 
   public async openInventory(character: ICharacter): Promise<void> {
-    const inventory = (await character.inventory) as unknown as IItem;
+    const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
     if (!inventory || !inventory.itemContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you don’t have an inventory.");

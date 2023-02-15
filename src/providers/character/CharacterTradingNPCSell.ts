@@ -127,7 +127,7 @@ export class CharacterTradingNPCSell {
   private async addGoldToInventory(items: ITradeRequestItem[], character: ICharacter): Promise<void> {
     const blueprint = itemsBlueprintIndex[OthersBlueprint.GoldCoin];
     const inventory = await this.characterInventory.getInventory(character);
-    const inventoryContainerId = inventory.itemContainer as unknown as string;
+    const inventoryContainerId = inventory?.itemContainer as unknown as string;
 
     let qty = this.getGoldQuantity(items);
     let success = true;
@@ -169,7 +169,7 @@ export class CharacterTradingNPCSell {
 
   private async sendRefreshItemsEvent(character: ICharacter): Promise<void> {
     const inventory = await this.characterInventory.getInventory(character);
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: inventoryContainer,
