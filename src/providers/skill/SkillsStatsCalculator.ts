@@ -37,15 +37,26 @@ export class SkillStatsCalculator {
 
       const totalEquippedAttack = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "attack");
       const totalEquippedDefense = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "defense");
-      const totalEquipped = isMagic ? 0 : isAttack ? totalEquippedAttack : totalEquippedDefense;
-      const baseValue =
-        isAttack && !isMagic
-          ? skill.strength.level
-          : !isAttack && !isMagic
-          ? skill.resistance.level
-          : isAttack && isMagic
-          ? skill.magic.level
-          : skill.magicResistance.level;
+
+      const totalEquipped = isAttack ? totalEquippedAttack : totalEquippedDefense;
+      let baseValue = 0;
+      switch (true) {
+        case isAttack && !isMagic:
+          baseValue = skill.strength.level;
+          break;
+        case !isAttack && !isMagic:
+          baseValue = skill.resistance.level;
+          break;
+        case isAttack && isMagic:
+          baseValue = skill.magic.level;
+          break;
+        case !isAttack && isMagic:
+          baseValue = skill.magicResistance.level;
+          break;
+        default:
+          break;
+      }
+
       const totalValueNoBonus = baseValue + skill.level + totalEquipped;
       const totalValueWithBonus = totalValueNoBonus + totalValueNoBonus * INCREASE_BONUS_FACTION;
 
