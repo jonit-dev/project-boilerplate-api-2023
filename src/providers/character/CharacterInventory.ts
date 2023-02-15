@@ -16,7 +16,7 @@ export class CharacterInventory {
     const equipment = await Equipment.findById(character.equipment).lean();
 
     if (equipment) {
-      const inventory = await Item.findById(equipment.inventory).lean();
+      const inventory = await Item.findById(equipment.inventory);
 
       return inventory as unknown as IItem;
     }

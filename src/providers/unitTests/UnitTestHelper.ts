@@ -337,6 +337,10 @@ export class UnitTestHelper {
     }
 
     await testCharacter.save();
+
+    // @ts-ignore
+    testCharacter.inventory = await this.characterInventory.getInventory(testCharacter);
+
     return testCharacter;
   }
 

@@ -21,7 +21,7 @@ describe("ItemPickup.ts", () => {
   let equipmentSlots: EquipmentSlots;
   let socketMessaging: SocketMessaging;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     itemPickup = container.get<ItemPickup>(ItemPickup);
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
