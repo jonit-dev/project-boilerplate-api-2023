@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
@@ -28,7 +29,8 @@ export class ItemDrop {
     private characterValidation: CharacterValidation,
     private movementHelper: MovementHelper,
     private characterWeight: CharacterWeight,
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private characterInventory: CharacterInventory
   ) {}
 
   //! For now, only a drop from inventory or equipment set is allowed.
@@ -217,7 +219,7 @@ export class ItemDrop {
 
     character: ICharacter
   ): Promise<boolean> {
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
 
     if (!inventory) {
       this.socketMessaging.sendErrorMessageToCharacter(

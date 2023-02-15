@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
@@ -43,7 +44,8 @@ export class UseWithItemToTile {
     private characterItemInventory: CharacterItemInventory,
     private socketMessaging: SocketMessaging,
     private characterItemContainer: CharacterItemContainer,
-    private characterWeight: CharacterWeight
+    private characterWeight: CharacterWeight,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async execute(
@@ -184,8 +186,8 @@ export class UseWithItemToTile {
         });
         await item.save();
 
-        const inventory = await character.inventory;
-        const inventoryContainerId = inventory.itemContainer as unknown as string;
+        const inventory = await this.characterInventory.getInventory(character);
+        const inventoryContainerId = inventory?.itemContainer as unknown as string;
 
         // add it to the character's inventory
         return await this.characterItemContainer.addItemToContainer(item, character, inventoryContainerId);
@@ -196,8 +198,8 @@ export class UseWithItemToTile {
   }
 
   private async refreshInventory(character: ICharacter): Promise<void> {
-    const inventory = await character.inventory;
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    const inventory = await this.characterInventory.getInventory(character);
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: inventoryContainer,

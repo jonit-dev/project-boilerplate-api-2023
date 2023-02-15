@@ -10,6 +10,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import {
   AnimationEffectKeys,
@@ -32,7 +33,8 @@ export class ItemUse {
     private characterWeight: CharacterWeight,
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
-    private characterInventory: CharacterItemInventory
+    private characterItemInventory: CharacterItemInventory,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -60,7 +62,7 @@ export class ItemUse {
 
     this.applyItemUsage(bluePrintItem, character.id);
 
-    await this.characterInventory.decrementItemFromInventoryByKey(useItem.key, character, 1);
+    await this.characterItemInventory.decrementItemFromInventoryByKey(useItem.key, character, 1);
 
     await this.characterWeight.updateCharacterWeight(character);
 
@@ -99,8 +101,8 @@ export class ItemUse {
   }
 
   private async getInventoryContainer(character: ICharacter): Promise<IItemContainer | null> {
-    const inventory = await character.inventory;
-    return await ItemContainer.findById(inventory.itemContainer);
+    const inventory = await this.characterInventory.getInventory(character);
+    return await ItemContainer.findById(inventory?.itemContainer);
   }
 
   private async sendItemConsumptionEvent(character: ICharacter): Promise<void> {

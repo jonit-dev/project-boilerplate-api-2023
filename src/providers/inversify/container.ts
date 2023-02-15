@@ -1,6 +1,5 @@
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
-import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { InMemoryRepository } from "@providers/database/InMemoryRepository";
 import { RedisManager } from "@providers/database/RedisManager";
 import { MapLoader } from "@providers/map/MapLoader";
@@ -48,7 +47,6 @@ export const unitTestHelper = container.get<UnitTestHelper>(UnitTestHelper);
 export const socketEventsBinder = container.get<SocketEventsBinder>(SocketEventsBinder);
 
 export const characterConnection = container.get<CharacterConnection>(CharacterConnection);
-export const characterInventory = container.get<CharacterInventory>(CharacterInventory);
 
 export const redisManager = container.get<RedisManager>(RedisManager);
 
