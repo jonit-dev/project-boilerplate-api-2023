@@ -6,8 +6,9 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ITradeRequestItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
+import { CharacterInventory } from "./CharacterInventory";
 import { CharacterValidation } from "./CharacterValidation";
+import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 
 @provide(CharacterTradingValidation)
 export class CharacterTradingValidation {
@@ -15,7 +16,8 @@ export class CharacterTradingValidation {
     private characterValidation: CharacterValidation,
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
-    private characterItemSlots: CharacterItemSlots
+    private characterItemSlots: CharacterItemSlots,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async validateAndReturnTraderNPC(npcId: string, character: ICharacter): Promise<INPC | undefined> {
@@ -86,7 +88,7 @@ export class CharacterTradingValidation {
       return false;
     }
 
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryContainer) {

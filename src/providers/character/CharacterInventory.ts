@@ -21,10 +21,6 @@ export class CharacterInventory {
 
     const inventory = await Item.findById(equipment.inventory).lean();
 
-    if (!inventory) {
-      throw new Error("Inventory not found");
-    }
-
     return inventory as unknown as IItem;
   }
 
