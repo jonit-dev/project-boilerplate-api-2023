@@ -18,7 +18,7 @@ describe("MapTiles.ts", () => {
   beforeEach(async () => {});
 
   const getMapOffset = (mapName) => {
-    const xy = mapTiles.getFirstXY("unit-test-map-negative-coordinate", MapLayers.Ground)!;
+    const xy = mapTiles.getFirstXY("unit-test-map-negative-coordinate")!;
     return (gridManager as any).getMapOffset(xy[0], xy[1]);
   };
 
@@ -43,7 +43,7 @@ describe("MapTiles.ts", () => {
   });
 
   it("should properly get the first X and Y coordinates", () => {
-    const firstXY = mapTiles.getFirstXY("unit-test-map-negative-coordinate", MapLayers.Ground);
+    const firstXY = mapTiles.getFirstXY("unit-test-map-negative-coordinate");
 
     expect(firstXY).toEqual([-16, 0]);
   });

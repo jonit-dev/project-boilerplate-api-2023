@@ -110,7 +110,7 @@ export class GridManager {
       return dimens;
     }
 
-    const initialXY = this.mapTiles.getFirstXY(map, MapLayers.Ground);
+    const initialXY = this.mapTiles.getFirstXY(map);
 
     if (!initialXY) {
       throw new Error(`❌ Failed to get first XY for ${map}`);
