@@ -8,14 +8,20 @@ import { MathHelper } from "@providers/math/MathHelper";
 import { ITradeRequestItem } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
+import { CharacterInventory } from "./CharacterInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 
 @provide(CharacterTradingBalance)
 export class CharacterTradingBalance {
-  constructor(private characterItemSlots: CharacterItemSlots, private mathHelper: MathHelper) {}
+  constructor(
+    private characterItemSlots: CharacterItemSlots,
+    private mathHelper: MathHelper,
+    private characterInventory: CharacterInventory
+  ) {}
 
   public async getTotalGoldInInventory(character: ICharacter): Promise<number> {
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
+
     const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
 
     if (!inventoryContainer) {

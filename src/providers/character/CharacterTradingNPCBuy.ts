@@ -10,17 +10,18 @@ import {
   ICharacterNPCTradeInitBuyResponse,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
-  ItemSocketEvents,
   ITradeRequestItem,
   ITradeResponseItem,
+  ItemSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
-import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterTradingValidation } from "./CharacterTradingValidation";
 import { CharacterWeight } from "./CharacterWeight";
+import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
+import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 
 @provide(CharacterTradingNPCBuy)
 export class CharacterTradingNPCBuy {
@@ -31,7 +32,8 @@ export class CharacterTradingNPCBuy {
     private characterItemInventory: CharacterItemInventory,
     private characterWeight: CharacterWeight,
     private characterTradingValidation: CharacterTradingValidation,
-    private characterTarget: CharacterTarget
+    private characterTarget: CharacterTarget,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async initializeBuy(npcId: string, character: ICharacter): Promise<void> {
@@ -75,7 +77,7 @@ export class CharacterTradingNPCBuy {
   }
 
   public async buyItemsFromNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<boolean> {
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainerId = inventory.itemContainer as unknown as string;
 
     if (!inventoryContainerId) {

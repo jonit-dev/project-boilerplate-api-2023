@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -11,6 +11,22 @@ import { provide } from "inversify-binding-decorators";
 @provide(CharacterInventory)
 export class CharacterInventory {
   constructor(private socketMessaging: SocketMessaging) {}
+
+  public async getInventory(character: ICharacter): Promise<IItem> {
+    const equipment = await Equipment.findById(character.equipment).lean();
+
+    if (!equipment) {
+      throw new Error("Equipment not found");
+    }
+
+    const inventory = await Item.findById(equipment.inventory).lean();
+
+    if (!inventory) {
+      throw new Error("Inventory not found");
+    }
+
+    return inventory as unknown as IItem;
+  }
 
   public async generateNewInventory(
     character: ICharacter,
