@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
@@ -20,13 +21,14 @@ export class ItemPickupValidator {
     private characterWeight: CharacterWeight,
     private movementHelper: MovementHelper,
     private characterItems: CharacterItems,
-    private characterValidation: CharacterValidation
+    private characterValidation: CharacterValidation,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async isItemPickupValid(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | IItem> {
     const item = (await Item.findById(itemPickupData.itemId)) as unknown as IItem;
 
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
 
     if (!item) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the item to be picked up was not found.");
@@ -119,7 +121,7 @@ export class ItemPickupValidator {
       character,
       isInventoryItem ? "equipment" : "inventory"
     );
-    if (characterAlreadyHasItem && itemPickupData.toContainerId === inventory._id.toString()) {
+    if (characterAlreadyHasItem && itemPickupData.toContainerId === inventory?._id.toString()) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you already have this item.");
       return false;
     }

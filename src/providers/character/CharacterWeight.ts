@@ -8,10 +8,12 @@ import { CharacterSocketEvents } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
+import { CharacterInventory } from "./CharacterInventory";
 
 @provide(CharacterWeight)
 export class CharacterWeight {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private characterInventory: CharacterInventory, private socketMessaging: SocketMessaging) {}
+
   public async updateCharacterWeight(character: ICharacter): Promise<void> {
     const weight = await this.getWeight(character);
     const maxWeight = await this.getMaxWeight(character);
@@ -48,7 +50,7 @@ export class CharacterWeight {
 
   public async getWeight(character: ICharacter): Promise<number> {
     const equipment = await Equipment.findById(character.equipment);
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     let totalWeight = 0;

@@ -1,10 +1,13 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { IItemContainer, ItemContainerType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ItemContainerHelper)
 export class ItemContainerHelper {
+  constructor(private characterInventory: CharacterInventory) {}
+
   public async getContainerType(itemContainer: IItemContainer): Promise<ItemContainerType | undefined> {
     try {
       const item = await Item.findById(itemContainer.parentItem).lean();
@@ -22,7 +25,7 @@ export class ItemContainerHelper {
       }
 
       const owner = (await Character.findById(item.owner)) as unknown as ICharacter;
-      const inventory = await owner?.inventory;
+      const inventory = await this.characterInventory.getInventory(owner);
 
       if (item?._id.toString() === inventory?._id.toString()) {
         return ItemContainerType.Inventory;

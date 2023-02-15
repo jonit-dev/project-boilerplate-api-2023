@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
@@ -99,12 +100,14 @@ export class NPCTarget {
       throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
     }
 
-    const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
-    // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
-    if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
-      await this.clearTarget(npc);
+    if (!NPC_CAN_ATTACK_IN_NON_PVP_ZONE) {
+      const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
+      // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
+      if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
+        await this.clearTarget(npc);
 
-      return;
+        return;
+      }
     }
 
     // set target using updateOne

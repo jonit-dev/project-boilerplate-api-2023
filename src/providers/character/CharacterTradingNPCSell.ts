@@ -16,6 +16,7 @@ import {
   ItemSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterTradingValidation } from "./CharacterTradingValidation";
@@ -35,7 +36,8 @@ export class CharacterTradingNPCSell {
     private mathHelper: MathHelper,
     private characterItemSlots: CharacterItemSlots,
     private characterTradingBalance: CharacterTradingBalance,
-    private characterTarget: CharacterTarget
+    private characterTarget: CharacterTarget,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async initializeSell(npcId: string, character: ICharacter): Promise<void> {
@@ -124,8 +126,8 @@ export class CharacterTradingNPCSell {
 
   private async addGoldToInventory(items: ITradeRequestItem[], character: ICharacter): Promise<void> {
     const blueprint = itemsBlueprintIndex[OthersBlueprint.GoldCoin];
-    const inventory = await character.inventory;
-    const inventoryContainerId = inventory.itemContainer as unknown as string;
+    const inventory = await this.characterInventory.getInventory(character);
+    const inventoryContainerId = inventory?.itemContainer as unknown as string;
 
     let qty = this.getGoldQuantity(items);
     let success = true;
@@ -166,8 +168,8 @@ export class CharacterTradingNPCSell {
   }
 
   private async sendRefreshItemsEvent(character: ICharacter): Promise<void> {
-    const inventory = await character.inventory;
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    const inventory = await this.characterInventory.getInventory(character);
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: inventoryContainer,
