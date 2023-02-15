@@ -17,18 +17,37 @@ import { MapTransition } from "./MapTransition";
 export class MapTiles {
   constructor(private mapTransition: MapTransition) {}
 
-  public getFirstXY(map: string, layerName: MapLayers): [number, number] | undefined {
-    const layer = this.getLayer(map, layerName);
+  public getFirstXY(map: string): [number, number] | undefined {
+    const mapData = MapLoader.maps.get(map);
 
-    if (!layer) {
-      throw new Error(`Failed to find layer ${layerName}`);
+    if (!mapData) {
+      throw new Error(`Failed to find map ${map}`);
     }
 
-    if (layer.chunks.length === 0) {
+    const x: number[] = [];
+    const y: number[] = [];
+
+    // Loop through the layers in the map
+    for (const layer of mapData.layers) {
+      if (!layer.chunks) continue;
+
+      const layerX: number[] = [];
+      const layerY: number[] = [];
+
+      for (const chunk of layer.chunks) {
+        layerX.push(chunk.x);
+        layerY.push(chunk.y);
+      }
+
+      x.push(Math.min(...layerX));
+      y.push(Math.min(...layerY));
+    }
+
+    if (x.length < 1) {
       return undefined;
     }
 
-    return [layer.chunks[0].x, layer.chunks[0].y];
+    return [Math.min(...x), Math.min(...y)];
   }
 
   public getMapLayers(map: string): string[] {

@@ -1,5 +1,6 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -79,15 +80,17 @@ export class NPCMovement {
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
       for (const character of nearbyCharacters) {
-        const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
+        if (!NPC_CAN_ATTACK_IN_NON_PVP_ZONE) {
+          const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
 
-        /*
-        This is to prevent the NPC from attacking the player if they are in a non-PVP zone. 
-        And when the player leaves the zone, the NPC will attack them again.
-        */
+          /*
+          This is to prevent the NPC from attacking the player if they are in a non-PVP zone.
+          And when the player leaves the zone, the NPC will attack them again.
+          */
 
-        if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
-          await this.npcTarget.clearTarget(npc);
+          if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
+            await this.npcTarget.clearTarget(npc);
+          }
         }
 
         const isOnCharView = this.characterView.isOnCharacterView(character, npc._id, "npcs");

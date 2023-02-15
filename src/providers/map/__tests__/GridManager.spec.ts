@@ -21,7 +21,7 @@ describe("GridManager", () => {
   });
 
   const getMapOffset = (mapName: string): { gridOffsetX: number; gridOffsetY: number } => {
-    const initialXY = mapTiles.getFirstXY(mapName, MapLayers.Ground)!;
+    const initialXY = mapTiles.getFirstXY(mapName)!;
     return (gridManager as any).getMapOffset(initialXY[0], initialXY[1])!;
   };
 
