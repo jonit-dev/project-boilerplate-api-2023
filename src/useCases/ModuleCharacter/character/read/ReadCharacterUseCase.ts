@@ -1,9 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { provide } from "inversify-binding-decorators";
 @provide(ReadCharacterUseCase)
 export class ReadCharacterUseCase {
-  constructor(private characterRepository: CharacterRepository) {}
+  constructor(private characterRepository: CharacterRepository, private characterInventory: CharacterInventory) {}
 
   public async read(id: string): Promise<ICharacter> {
     const character = await this.characterRepository.readOne(
@@ -18,7 +19,7 @@ export class ReadCharacterUseCase {
     //! TODO: Temporary ugly hack until we figure out a better way to do this
     const charObject = character.toObject();
 
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
     // @ts-ignore
     delete charObject.inventory;
     // @ts-ignore

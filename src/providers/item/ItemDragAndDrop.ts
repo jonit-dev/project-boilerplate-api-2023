@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item, IItem as IModelItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem as IModelItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -19,7 +20,8 @@ export class ItemDragAndDrop {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterValidation: CharacterValidation,
-    private characterItemSlots: CharacterItemSlots
+    private characterItemSlots: CharacterItemSlots,
+    private characterInventory: CharacterInventory
   ) {}
 
   //! For now, only a move on inventory is allowed.
@@ -182,7 +184,7 @@ export class ItemDragAndDrop {
       return false;
     }
 
-    const inventory = await character.inventory;
+    const inventory = await this.characterInventory.getInventory(character);
     if (!inventory) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,

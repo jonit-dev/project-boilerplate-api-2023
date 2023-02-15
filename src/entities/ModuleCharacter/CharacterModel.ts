@@ -282,20 +282,6 @@ characterSchema.virtual("type").get(function (this: ICharacter) {
   return "Character";
 });
 
-characterSchema.virtual("inventory").get(async function (this: ICharacter) {
-  const equipment = await Equipment.findById(this.equipment).populate("inventory").exec();
-
-  if (equipment) {
-    const inventory = equipment.inventory! as unknown as IItem;
-
-    if (inventory) {
-      return inventory;
-    }
-  }
-
-  return null;
-});
-
 characterSchema.virtual("attackType").get(async function (this: ICharacter): Promise<EntityAttackType> {
   const characterWeapon = container.get(CharacterWeapon);
 

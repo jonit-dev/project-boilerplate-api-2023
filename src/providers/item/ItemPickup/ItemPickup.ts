@@ -16,6 +16,7 @@ import { provide } from "inversify-binding-decorators";
 import { ItemOwnership } from "../ItemOwnership";
 
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
 import { ItemPickupMapContainer } from "./ItemPickupMapContainer";
@@ -32,14 +33,15 @@ export class ItemPickup {
     private itemPickupFromContainer: ItemPickupFromContainer,
     private itemPickupValidator: ItemPickupValidator,
     private itemPickupMapContainer: ItemPickupMapContainer,
-    private itemContainerHelper: ItemContainerHelper
+    private itemContainerHelper: ItemContainerHelper,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | undefined> {
     try {
       const itemToBePicked = (await this.itemPickupValidator.isItemPickupValid(itemPickupData, character)) as IItem;
 
-      const inventory = await character.inventory;
+      const inventory = await this.characterInventory.getInventory(character);
 
       if (!itemToBePicked) {
         return false;

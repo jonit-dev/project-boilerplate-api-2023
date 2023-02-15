@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -11,6 +11,16 @@ import { provide } from "inversify-binding-decorators";
 @provide(CharacterInventory)
 export class CharacterInventory {
   constructor(private socketMessaging: SocketMessaging) {}
+
+  public async getInventory(character: ICharacter): Promise<IItem | undefined> {
+    const equipment = await Equipment.findById(character.equipment).lean();
+
+    if (equipment) {
+      const inventory = await Item.findById(equipment.inventory);
+
+      return inventory as unknown as IItem;
+    }
+  }
 
   public async generateNewInventory(
     character: ICharacter,
@@ -46,8 +56,8 @@ export class CharacterInventory {
   }
 
   public async sendInventoryUpdateEvent(character: ICharacter): Promise<void> {
-    const inventory = await character.inventory;
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    const inventory = await this.getInventory(character);
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
 
     this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
       character.channelId!,

@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -23,7 +24,11 @@ export type EquipmentSlotTypes =
 
 @provide(EquipmentSlots)
 export class EquipmentSlots {
-  constructor(private socketMessaging: SocketMessaging, private characterItemContainer: CharacterItemContainer) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterItemContainer: CharacterItemContainer,
+    private characterInventory: CharacterInventory
+  ) {}
 
   private slots: EquipmentSlotTypes[] = [
     "head",
@@ -102,11 +107,11 @@ export class EquipmentSlots {
 
           // then add it to the inventory
 
-          const inventory = await character.inventory;
-          const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+          const inventory = await this.characterInventory.getInventory(character);
+          const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
           if (!inventoryContainer) {
-            throw new Error(`Item container ${inventory._id} not found`);
+            throw new Error(`Item container ${inventory?._id} not found`);
           }
 
           const addDiffToContainer = await this.characterItemContainer.addItemToContainer(
