@@ -94,7 +94,7 @@ export class NPCManager {
             console.log(err);
           }
         },
-        (1550 + random(0, 200)) / npc.speed
+        (1450 + random(0, 100)) / npc.speed
       );
     }
     await this.setNPCBehavior(npc, true);
