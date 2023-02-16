@@ -75,7 +75,7 @@ export class EquipmentEquip {
     const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
 
     if (!inventoryContainer) {
-      this.socketMessaging.sendErrorMessageToCharacter(character);
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Failed to equip item.");
       return false;
     }
 

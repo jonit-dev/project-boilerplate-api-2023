@@ -41,8 +41,6 @@ export class ItemPickup {
     try {
       const itemToBePicked = (await this.itemPickupValidator.isItemPickupValid(itemPickupData, character)) as IItem;
 
-      const inventory = await this.characterInventory.getInventory(character);
-
       if (!itemToBePicked) {
         return false;
       }
@@ -54,6 +52,8 @@ export class ItemPickup {
       }
       itemToBePicked.isBeingPickedUp = true;
       await itemToBePicked.save();
+
+      const inventory = await this.characterInventory.getInventory(character);
 
       const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
       const isPickupFromMapContainer =
@@ -120,6 +120,8 @@ export class ItemPickup {
         defaults: true,
       })) as any;
 
+      console.log(">>> ", updatedContainer.name);
+
       if (!updatedContainer) {
         this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, fetch container information.");
         return false;
@@ -173,9 +175,16 @@ export class ItemPickup {
 
   private async sendContainerRead(itemContainer: IItemContainer, character: ICharacter): Promise<void> {
     if (character && itemContainer) {
+      const type = await this.itemContainerHelper.getContainerType(itemContainer);
+
+      if (!type) {
+        this.socketMessaging.sendErrorMessageToCharacter(character);
+        return;
+      }
+
       this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
         itemContainer,
-        type: (await this.itemContainerHelper.getContainerType(itemContainer))!,
+        type,
       });
     }
   }

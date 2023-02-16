@@ -40,7 +40,8 @@ export class ReadCharacterUseCase {
     );
 
     for (const char of characters) {
-      const inventory = await char.inventory;
+      const inventory = await this.characterInventory.getInventory(char);
+
       // @ts-ignore
       char.inventory = inventory;
     }

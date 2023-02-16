@@ -3,6 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
@@ -24,7 +25,8 @@ export class CharacterRepository extends CRUD {
   constructor(
     private analyticsHelper: AnalyticsHelper,
     private characterWeight: CharacterWeight,
-    private spellLearn: SpellLearn
+    private spellLearn: SpellLearn,
+    private characterInventory: CharacterInventory
   ) {
     super(analyticsHelper);
   }
@@ -76,7 +78,7 @@ export class CharacterRepository extends CRUD {
     await this.spellLearn.learnLatestSkillLevelSpells(createdCharacter._id, false);
 
     const charObject = createdCharacter.toObject();
-    const characterInventory = await createdCharacter.inventory;
+    const characterInventory = await this.characterInventory.getInventory(createdCharacter);
     // @ts-ignore
     charObject.inventory = characterInventory;
     // @ts-ignore
