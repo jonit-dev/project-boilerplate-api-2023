@@ -1,5 +1,4 @@
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { Quest } from "@entities/ModuleQuest/QuestModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
@@ -181,7 +180,6 @@ const npcSchema = createLeanSchema(
       isAlive: boolean;
       type: string;
       xpPerDamage: number;
-      hasQuest: Promise<boolean>;
     }),
     entityEffects: Type.array().of(
       Type.string({
@@ -206,11 +204,6 @@ npcSchema.virtual("type").get(function (this: INPC) {
 npcSchema.virtual("xpPerDamage").get(function (this: INPC) {
   // initial health = 100, xpPerDamage = experience / initial health
   return this.experience ? this.experience / this.maxHealth : 0;
-});
-
-npcSchema.virtual("hasQuest").get(async function (this: INPC) {
-  const npcQuests = await Quest.find({ npcId: this._id });
-  return !!npcQuests.length;
 });
 
 npcSchema.post("remove", async function (this: INPC) {

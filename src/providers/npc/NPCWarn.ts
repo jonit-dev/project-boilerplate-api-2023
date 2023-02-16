@@ -10,6 +10,7 @@ import {
   NPCSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { NPCQuest } from "./NPCQuest";
 import { NPCView } from "./NPCView";
 
 interface INPCWarnOptions {
@@ -22,7 +23,8 @@ export class NPCWarn {
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
     private characterView: CharacterView,
-    private objectHelper: DataStructureHelper
+    private objectHelper: DataStructureHelper,
+    private npcQuest: NPCQuest
   ) {}
 
   public async warnCharacterAboutNPCsInView(character: ICharacter, options?: INPCWarnOptions): Promise<void> {
@@ -61,7 +63,7 @@ export class NPCWarn {
       "npcs"
     );
 
-    const hasQuest = await npc.hasQuest;
+    const hasQuest = await this.npcQuest.hasQuest(npc);
 
     this.socketMessaging.sendEventToUser<INPCPositionCreatePayload>(
       character.channelId!,
