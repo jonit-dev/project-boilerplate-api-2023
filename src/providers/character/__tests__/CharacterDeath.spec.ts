@@ -9,6 +9,7 @@ import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import _ from "lodash";
 import { CharacterDeath } from "../CharacterDeath";
+import { CharacterWeapon } from "../CharacterWeapon";
 
 describe("CharacterDeath.ts", () => {
   let characterDeath: CharacterDeath;
@@ -89,9 +90,12 @@ describe("CharacterDeath.ts | Character with items", () => {
   let backpackContainer: IItemContainer;
   let characterEquipment: IEquipment;
   let testNPC: INPC;
+  let characterWeapon: CharacterWeapon;
 
   beforeAll(() => {
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
+
+    characterWeapon = container.get<CharacterWeapon>(CharacterWeapon);
 
     jest.useFakeTimers({
       advanceTimers: true,
@@ -215,7 +219,11 @@ describe("CharacterDeath.ts | Character with items", () => {
 
     const characterAttackTypeBeforeEquip = await Character.findById({ _id: testCharacter._id });
 
-    expect(await characterAttackTypeBeforeEquip?.attackType).toEqual(EntityAttackType.Ranged);
+    if (!characterAttackTypeBeforeEquip) throw new Error("Character not found");
+
+    const attackType = await characterWeapon.getAttackType(characterAttackTypeBeforeEquip);
+
+    expect(attackType).toEqual(EntityAttackType.Ranged);
 
     for (let i = 0; i < 3; i++) {
       jest.spyOn(_, "random").mockImplementation(() => DROP_EQUIPMENT_CHANCE);
@@ -229,6 +237,10 @@ describe("CharacterDeath.ts | Character with items", () => {
 
     const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
 
-    expect(await characterAttackTypeAfterEquip?.attackType).toEqual(EntityAttackType.Melee);
+    if (!characterAttackTypeAfterEquip) throw new Error("Character not found");
+
+    const attackTypeAfterEquip = await characterWeapon.getAttackType(characterAttackTypeAfterEquip);
+
+    expect(attackTypeAfterEquip).toEqual(EntityAttackType.Melee);
   });
 });

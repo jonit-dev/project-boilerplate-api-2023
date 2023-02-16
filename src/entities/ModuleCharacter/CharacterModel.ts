@@ -3,10 +3,8 @@ import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { User } from "@entities/ModuleSystem/UserModel";
-import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { container } from "@providers/inversify/container";
 import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   CharacterClass,
@@ -280,20 +278,6 @@ characterSchema.virtual("isAlive").get(function (this: ICharacter) {
 
 characterSchema.virtual("type").get(function (this: ICharacter) {
   return "Character";
-});
-
-characterSchema.virtual("attackType").get(async function (this: ICharacter): Promise<EntityAttackType> {
-  const characterWeapon = container.get(CharacterWeapon);
-
-  const weapon = await characterWeapon.getWeapon(this);
-
-  if (!weapon) {
-    return EntityAttackType.Melee;
-  }
-
-  const rangeType = weapon?.rangeType as unknown as EntityAttackType;
-
-  return rangeType;
 });
 
 characterSchema.post("remove", async function (this: ICharacter) {

@@ -77,15 +77,23 @@ describe("EquipmentEquip.spec.ts", () => {
 
       expect(equip).toBeTruthy();
 
-      const characterAttackType = await Character.findById({ _id: testCharacter._id });
+      const char = await Character.findById({ _id: testCharacter._id });
 
-      expect(await characterAttackType?.attackType).toEqual(EntityAttackType.Melee);
+      if (!char) throw new Error("Character not found");
+
+      const attackType = await characterWeapon.getAttackType(char);
+
+      expect(attackType).toEqual(EntityAttackType.Melee);
     });
 
     it("should successfully update the attack type, after equipping an item | Ranged", async () => {
       const characterAttackTypeBeforeEquip = await Character.findById({ _id: testCharacter._id });
 
-      expect(EntityAttackType.Melee).toEqual(await characterAttackTypeBeforeEquip?.attackType);
+      if (!characterAttackTypeBeforeEquip) throw new Error("Character not found");
+
+      const attackType = await characterWeapon.getAttackType(characterAttackTypeBeforeEquip);
+
+      expect(EntityAttackType.Melee).toEqual(attackType);
 
       inventoryContainer.slots[0] = bowItem;
       inventoryContainer.markModified("slots");
@@ -97,7 +105,11 @@ describe("EquipmentEquip.spec.ts", () => {
 
       const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
 
-      expect(await characterAttackTypeAfterEquip?.attackType).toEqual(EntityAttackType.Ranged);
+      if (!characterAttackTypeAfterEquip) throw new Error("Character not found");
+
+      const attackTypeAfterEquip = await characterWeapon.getAttackType(characterAttackTypeAfterEquip);
+
+      expect(attackTypeAfterEquip).toEqual(EntityAttackType.Ranged);
     });
 
     it("should successfully update the attack type, after equipping an item | Sword/Sword", async () => {
@@ -108,7 +120,11 @@ describe("EquipmentEquip.spec.ts", () => {
 
       const characterAttackTypeBeforeEquip = await Character.findById({ _id: testCharacter._id });
 
-      expect(EntityAttackType.Melee).toEqual(await characterAttackTypeBeforeEquip?.attackType);
+      if (!characterAttackTypeBeforeEquip) throw new Error("Character not found");
+
+      const attackTypeBeforeEquip = await characterWeapon.getAttackType(characterAttackTypeBeforeEquip);
+
+      expect(EntityAttackType.Melee).toEqual(attackTypeBeforeEquip);
 
       const equipSword = await equipmentEquip.equip(testCharacter, swordItem._id, inventoryContainer.id);
 
@@ -118,7 +134,11 @@ describe("EquipmentEquip.spec.ts", () => {
 
       const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
 
-      expect(await characterAttackTypeAfterEquip?.attackType).toEqual(EntityAttackType.Melee);
+      if (!characterAttackTypeAfterEquip) throw new Error("Character not found");
+
+      const attackTypeAfterEquip = await characterWeapon.getAttackType(characterAttackTypeAfterEquip);
+
+      expect(attackTypeAfterEquip).toEqual(EntityAttackType.Melee);
     });
 
     it("should successfully update the attack type, after equipping an item | Sword and Shield", async () => {
@@ -129,7 +149,11 @@ describe("EquipmentEquip.spec.ts", () => {
 
       const characterAttackTypeBeforeEquip = await Character.findById({ _id: testCharacter._id });
 
-      expect(await characterAttackTypeBeforeEquip?.attackType).toEqual(EntityAttackType.Melee);
+      if (!characterAttackTypeBeforeEquip) throw new Error("Character not found");
+
+      const attackTypeBeforeEquip = await characterWeapon.getAttackType(characterAttackTypeBeforeEquip);
+
+      expect(attackTypeBeforeEquip).toEqual(EntityAttackType.Melee);
 
       const equipShield = await equipmentEquip.equip(testCharacter, shieldItem._id, inventoryContainer.id);
       const equipSword = await equipmentEquip.equip(testCharacter, swordItem._id, inventoryContainer.id);
@@ -139,7 +163,11 @@ describe("EquipmentEquip.spec.ts", () => {
 
       const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
 
-      expect(await characterAttackTypeAfterEquip?.attackType).toEqual(EntityAttackType.Melee);
+      if (!characterAttackTypeAfterEquip) throw new Error("Character not found");
+
+      const attackTypeAfterEquip = await characterWeapon.getAttackType(characterAttackTypeAfterEquip);
+
+      expect(attackTypeAfterEquip).toEqual(EntityAttackType.Melee);
     });
 
     it("should successfully update the attack type, after equipping an item | Shield/Shield", async () => {
@@ -156,7 +184,11 @@ describe("EquipmentEquip.spec.ts", () => {
 
       const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
 
-      expect(await characterAttackTypeAfterEquip?.attackType).toEqual(EntityAttackType.Melee);
+      if (!characterAttackTypeAfterEquip) throw new Error("Character not found");
+
+      const attackTypeAfterEquip = await characterWeapon.getAttackType(characterAttackTypeAfterEquip);
+
+      expect(attackTypeAfterEquip).toEqual(EntityAttackType.Melee);
     });
 
     it("should have attack type of Melee when unarmed | Unarmed[Melee] ", async () => {
@@ -164,7 +196,9 @@ describe("EquipmentEquip.spec.ts", () => {
 
       const weapon = await characterWeapon.getWeapon(testCharacter as ICharacter);
 
-      expect(await characterAttackType?.attackType).toEqual(EntityAttackType.Melee);
+      const attackType = await characterWeapon.getAttackType(characterAttackType as ICharacter);
+
+      expect(attackType).toEqual(EntityAttackType.Melee);
       expect(weapon).toBeUndefined();
     });
 

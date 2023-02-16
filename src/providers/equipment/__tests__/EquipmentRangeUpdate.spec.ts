@@ -1,7 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { unitTestHelper } from "@providers/inversify/container";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { rangedWeaponsBlueprintIndex } from "@providers/item/data/blueprints/ranged-weapons/index";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -9,10 +10,12 @@ import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 describe("EquipmentRangeUpdate.spec.ts", () => {
   let item: IItem;
   let character: ICharacter;
+  let characterWeapon: CharacterWeapon;
 
   beforeEach(async () => {
     item = (await unitTestHelper.createMockItem()) as unknown as IItem;
     character = await unitTestHelper.createMockCharacter(null, { hasEquipment: true });
+    characterWeapon = container.get(CharacterWeapon);
   });
 
   it("should properly detect melee equipped items", async () => {
@@ -24,7 +27,9 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
       throw new Error("Character not found");
     }
 
-    expect(await updatedCharacter.attackType).toBe(EntityAttackType.Melee);
+    const attackType = await characterWeapon.getAttackType(updatedCharacter);
+
+    expect(attackType).toBe(EntityAttackType.Melee);
   });
 
   it("should properly detect a ranged equipped item", async () => {
@@ -38,7 +43,9 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
       throw new Error("Character not found");
     }
 
-    expect(await updatedCharacter.attackType).toBe(EntityAttackType.Ranged);
+    const attackType = await characterWeapon.getAttackType(updatedCharacter);
+
+    expect(attackType).toBe(EntityAttackType.Ranged);
   });
 
   it("should properly detect a hybrid attack type (MeleeRanged)", async () => {
@@ -51,7 +58,9 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
       throw new Error("Character not found");
     }
 
-    expect(await updatedCharacter.attackType).toBe(EntityAttackType.MeleeRanged);
+    const attackType = await characterWeapon.getAttackType(updatedCharacter);
+
+    expect(attackType).toBe(EntityAttackType.MeleeRanged);
   });
 });
 

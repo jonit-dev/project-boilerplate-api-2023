@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType, ItemSubType, ItemType } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
 
@@ -29,5 +29,17 @@ export class CharacterWeapon {
     if (leftHandItem?.type === ItemType.Weapon && leftHandItem?.subType !== ItemSubType.Shield) {
       return leftHandItem;
     }
+  }
+
+  public async getAttackType(character: ICharacter): Promise<EntityAttackType | undefined> {
+    const weapon = await this.getWeapon(character);
+
+    if (!weapon) {
+      return EntityAttackType.Melee;
+    }
+
+    const rangeType = weapon?.rangeType as unknown as EntityAttackType;
+
+    return rangeType;
   }
 }

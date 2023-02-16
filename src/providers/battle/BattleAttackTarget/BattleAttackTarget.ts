@@ -63,7 +63,9 @@ export class BattleAttackTarget {
       return false;
     }
 
-    switch (await attacker?.attackType) {
+    const attackerType = attacker.attackType || (await this.characterWeapon.getAttackType(attacker as ICharacter));
+
+    switch (attackerType) {
       case EntityAttackType.Melee: {
         const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1.5);
 

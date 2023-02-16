@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -20,10 +21,12 @@ describe("EquipmentUnequip.spec.ts", () => {
   let inventoryContainer: IItemContainer;
   let equipmentSlots: EquipmentSlots;
   let socketMessaging;
+  let characterWeapon: CharacterWeapon;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     equipmentUnequip = container.get<EquipmentUnequip>(EquipmentUnequip);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
+    characterWeapon = container.get<CharacterWeapon>(CharacterWeapon);
   });
 
   beforeEach(async () => {
@@ -87,12 +90,15 @@ describe("EquipmentUnequip.spec.ts", () => {
     equipment.leftHand = rangedItem._id;
     await equipment.save();
 
-    expect(await testCharacter.attackType).toBe(EntityAttackType.Ranged);
+    const attackType = await characterWeapon.getAttackType(testCharacter);
+    expect(attackType).toBe(EntityAttackType.Ranged);
 
     const unequip = await equipmentUnequip.unequip(testCharacter, inventory, rangedItem);
     expect(unequip).toBeTruthy();
 
-    expect(await testCharacter.attackType).toBe(EntityAttackType.Melee);
+    const attackTypePostUnequip = await characterWeapon.getAttackType(testCharacter);
+
+    expect(attackTypePostUnequip).toBe(EntityAttackType.Melee);
   });
 
   describe("Validation cases", () => {
