@@ -23,7 +23,7 @@ export class NPCLoader {
         continue;
       }
 
-      const npcKeys = getNpcKeys(NPCs);
+      const npcKeys = getNpcKeys(NPCs, mapName);
 
       const uniqueArrayKeys = Array.from(new Set(npcKeys));
       checkIfNpcBlueprintsExists(uniqueArrayKeys, mapName);
@@ -62,8 +62,14 @@ export class NPCLoader {
   }
 }
 
-function getNpcKeys(NPCs: any[]): string[] {
+function getNpcKeys(NPCs: any[], mapName: string): string[] {
   return NPCs.map((npc) => {
+    if (!npc.properties) {
+      console.log(mapName);
+      console.log(npc);
+      throw new Error(`❌ NPCLoader: NPC ${npc.key} has no properties`);
+    }
+
     const key = npc.properties.find((p) => p.name === "key")?.value;
 
     return key;
