@@ -120,8 +120,6 @@ export class ItemPickup {
         defaults: true,
       })) as any;
 
-      console.log(">>> ", updatedContainer.name);
-
       if (!updatedContainer) {
         this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, fetch container information.");
         return false;
