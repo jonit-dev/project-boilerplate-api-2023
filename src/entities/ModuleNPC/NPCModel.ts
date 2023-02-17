@@ -13,6 +13,7 @@ import {
   TypeHelper,
 } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const npcSchema = createLeanSchema(
@@ -189,7 +190,7 @@ const npcSchema = createLeanSchema(
     appliedEntityEffects: Type.array().of(Type.mixed({})),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
-);
+).plugin(updateIfCurrentPlugin);
 
 export type INPC = ExtractDoc<typeof npcSchema>;
 
