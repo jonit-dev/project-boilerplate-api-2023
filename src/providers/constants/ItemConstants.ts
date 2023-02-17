@@ -4,5 +4,5 @@ export const ITEM_USE_WITH_ENTITY_MAX_LEVEL_SUPPORT = 1000;
 
 // Item spamming prevention
 
-export const ITEM_CLEANUP_WARNING_THRESHOLD = 1;
-export const ITEM_CLEANUP_THRESHOLD = 2;
+export const ITEM_CLEANUP_WARNING_THRESHOLD = 20;
+export const ITEM_CLEANUP_THRESHOLD = 40;
