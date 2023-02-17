@@ -17,4 +17,5 @@ export const itemIronArrow: Partial<IItem> = {
   basePrice: 3,
   attack: 6,
   rangeType: EntityAttackType.Melee,
+  canSell: false,
 };

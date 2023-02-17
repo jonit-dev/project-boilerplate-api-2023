@@ -91,6 +91,10 @@ const itemSchema = createLeanSchema(
     isBeingPickedUp: Type.boolean({ required: true, default: false }), // lock mechanism to avoid item duplication
 
     isEquipped: Type.boolean({ required: true, default: false }),
+
+    droppedBy: Type.objectId({
+      ref: "Character",
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 ).plugin(updateIfCurrentPlugin);

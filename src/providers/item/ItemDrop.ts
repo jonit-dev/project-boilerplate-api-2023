@@ -18,6 +18,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
+import { ItemCleanup } from "./ItemCleanup";
 import { ItemOwnership } from "./ItemOwnership";
 
 @provide(ItemDrop)
@@ -30,7 +31,8 @@ export class ItemDrop {
     private movementHelper: MovementHelper,
     private characterWeight: CharacterWeight,
     private itemOwnership: ItemOwnership,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private itemCleanup: ItemCleanup
   ) {}
 
   //! For now, only a drop from inventory or equipment set is allowed.
@@ -142,9 +144,12 @@ export class ItemDrop {
           x: targetX,
           y: targetY,
           scene: character.scene,
+          droppedBy: character._id,
         },
       }
     );
+
+    await this.itemCleanup.tryCharacterDroppedItemsCleanup(character);
 
     await this.itemOwnership.removeItemOwnership(dropItem);
 
@@ -272,6 +277,7 @@ export class ItemDrop {
       items[i].x = FromGridX(droppintPoints[i].x);
       items[i].y = FromGridY(droppintPoints[i].y);
       items[i].scene = scene;
+
       await items[i].save();
     }
   }

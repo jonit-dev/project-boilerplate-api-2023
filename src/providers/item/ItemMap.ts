@@ -12,6 +12,7 @@ export class ItemMap {
     item.x = undefined;
     item.y = undefined;
     item.scene = undefined;
+    item.droppedBy = undefined;
     await item.save();
 
     const itemSlotIndex = await this.characterItemSlots.findItemSlotIndex(targetContainer, item._id);
@@ -22,6 +23,7 @@ export class ItemMap {
         x: undefined,
         y: undefined,
         scene: undefined,
+        droppedBy: undefined,
       });
     }
   }

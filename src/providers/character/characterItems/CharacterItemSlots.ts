@@ -2,13 +2,14 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
+import { ItemCleanup } from "@providers/item/ItemCleanup";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterItemSlots)
 export class CharacterItemSlots {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging, private itemCleanup: ItemCleanup) {}
 
   public async getTotalQty(targetContainer: IItemContainer, itemKey: string): Promise<number> {
     const allItemsSameKey = await this.getAllItemsFromKey(targetContainer, itemKey);
@@ -286,7 +287,10 @@ export class CharacterItemSlots {
       selectedItem.x = character.x;
       selectedItem.y = character.y;
       selectedItem.scene = character.scene;
+      selectedItem.droppedBy = character._id;
       await selectedItem.save();
+
+      await this.itemCleanup.tryCharacterDroppedItemsCleanup(character);
 
       return true;
     }

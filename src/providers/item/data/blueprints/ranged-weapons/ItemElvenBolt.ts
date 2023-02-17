@@ -16,4 +16,5 @@ export const itemElvenBolt: Partial<IItem> = {
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 105,
   basePrice: 7,
+  canSell: false,
 };

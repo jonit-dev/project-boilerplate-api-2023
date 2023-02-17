@@ -15,4 +15,5 @@ export const itemBolt: Partial<IItem> = {
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,
   basePrice: 2.666,
+  canSell: false,
 };

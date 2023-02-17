@@ -24,6 +24,10 @@ export class CharacterView {
     viewElement: IViewElement,
     type: CharacterViewType
   ): Promise<void> {
+    if (this.isOnCharacterView(character, viewElement.id, type)) {
+      return;
+    }
+
     if (!character.view) {
       character.view = {
         npcs: {},

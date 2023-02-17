@@ -16,4 +16,5 @@ export const itemFireBolt: Partial<IItem> = {
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 110,
   basePrice: 15,
+  canSell: false,
 };
