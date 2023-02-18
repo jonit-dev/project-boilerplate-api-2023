@@ -1,10 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
+import { CharacterSocketEvents, ItemType } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
@@ -77,7 +77,7 @@ export class CharacterWeight {
 
       if (nestedBags.length > 0) {
         for (const item of nestedBags) {
-          if (item.name === "Bag" || item.name === "Backpack") {
+          if (item.type === ItemType.Container) {
             const inventoryContainer = await ItemContainer.findById(item?.itemContainer);
             for (const bagItem of inventoryContainer!.itemIds) {
               totalWeight += await this.getWeithFromItemContainer(bagItem);
