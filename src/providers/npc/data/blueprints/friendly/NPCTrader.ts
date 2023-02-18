@@ -1,13 +1,11 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import {
   AxesBlueprint,
-  DaggersBlueprint,
   FoodsBlueprint,
   MacesBlueprint,
   MagicsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
-  ShieldsBlueprint,
   SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -32,21 +30,7 @@ export const npcTrader = {
     {
       key: PotionsBlueprint.ManaPotion,
     },
-    {
-      key: AxesBlueprint.WoodenAxe,
-    },
-    {
-      key: DaggersBlueprint.WoodenDagger,
-    },
-    {
-      key: MacesBlueprint.WoodenMace,
-    },
-    {
-      key: ShieldsBlueprint.WoodenShield,
-    },
-    {
-      key: SwordsBlueprint.WoodenSword,
-    },
+
     {
       key: FoodsBlueprint.Cheese,
     },
