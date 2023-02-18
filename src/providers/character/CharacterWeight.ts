@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
@@ -9,10 +9,15 @@ import { CharacterSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { CharacterInventory } from "./CharacterInventory";
+import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 
 @provide(CharacterWeight)
 export class CharacterWeight {
-  constructor(private characterInventory: CharacterInventory, private socketMessaging: SocketMessaging) {}
+  constructor(
+    private characterInventory: CharacterInventory,
+    private socketMessaging: SocketMessaging,
+    private characterItemInventory: CharacterItemInventory
+  ) {}
 
   public async updateCharacterWeight(character: ICharacter): Promise<void> {
     const weight = await this.getWeight(character);
@@ -49,7 +54,7 @@ export class CharacterWeight {
   }
 
   public async getWeight(character: ICharacter): Promise<number> {
-    const equipment = await Equipment.findById(character.equipment);
+    const equipment = await Equipment.findById(character.equipment).lean();
     const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
@@ -68,6 +73,18 @@ export class CharacterWeight {
         armor!,
         inventory!,
       ];
+      const nestedBags = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
+
+      if (nestedBags.length > 0) {
+        for (const item of nestedBags) {
+          if (item.name === "Bag" || item.name === "Backpack") {
+            const inventoryContainer = await ItemContainer.findById(item?.itemContainer);
+            for (const bagItem of inventoryContainer!.itemIds) {
+              totalWeight += await this.getWeithFromItemContainer(bagItem);
+            }
+          }
+        }
+      }
 
       for (const slot of slots) {
         const item = await Item.findById(slot).lean();
@@ -83,26 +100,10 @@ export class CharacterWeight {
     }
 
     if (inventoryContainer) {
-      for (const bagItem of inventoryContainer.itemIds) {
-        let item;
-        try {
-          // @ts-ignore
-          item = await Item.findById(bagItem.toString("hex"));
-          if (item) {
-            if (item.stackQty && item.stackQty > 1) {
-              // -1 because the count is include the weight of the container item.
-              // 100 arrows x 0.1 = 10 weight, but the result will be 10.1 without the -1.
-              totalWeight += item.weight * (item.stackQty - 1);
-            }
-            totalWeight += item.weight;
-          }
-        } catch (error) {
-          console.log("Item with problems: ", item.key);
-          console.error(error);
-        }
+      for (const bagItem of inventoryContainer!.itemIds) {
+        totalWeight += await this.getWeithFromItemContainer(bagItem);
       }
     }
-
     return totalWeight;
   }
 
@@ -111,5 +112,23 @@ export class CharacterWeight {
     const maxWeight = await this.getMaxWeight(character);
 
     return (weight + item.weight) / maxWeight;
+  }
+
+  private async getWeithFromItemContainer(bagItem: string): Promise<number> {
+    let totalWeight = 0;
+    try {
+      // @ts-ignore
+      const item = await Item.findById(bagItem.toString("hex"));
+      if (item) {
+        if (item.stackQty && item.stackQty > 1) {
+          totalWeight += item.weight * (item.stackQty - 1);
+        }
+        totalWeight += item.weight;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    return totalWeight;
   }
 }

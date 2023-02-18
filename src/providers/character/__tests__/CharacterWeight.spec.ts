@@ -8,6 +8,8 @@ import { CharacterDeath } from "../CharacterDeath";
 import { CharacterWeight } from "../CharacterWeight";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
+import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 
 describe("CharacterWeight.ts", () => {
   let testCharacter: ICharacter;
@@ -15,11 +17,14 @@ describe("CharacterWeight.ts", () => {
   let inventoryContainer: IItemContainer;
   let characterDeath: CharacterDeath;
   let testNPC: INPC;
+  let characterItemContainer: CharacterItemContainer;
   const mockSendEventToUser = jest.fn();
 
   beforeAll(() => {
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
+    characterItemContainer = container.get<CharacterItemContainer>(CharacterItemContainer);
+
     jest.spyOn(SocketMessaging.prototype, "sendEventToUser").mockImplementation(mockSendEventToUser);
   });
 
@@ -37,6 +42,9 @@ describe("CharacterWeight.ts", () => {
       .execPopulate();
 
     testNPC = await unitTestHelper.createMockNPC();
+
+    const inventory = await testCharacter.inventory;
+    inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
   });
 
   it("should properly calculate the character maxWeight", async () => {
@@ -62,8 +70,6 @@ describe("CharacterWeight.ts", () => {
       maxStackSize: 100,
     });
 
-    const inventory = await testCharacter.inventory;
-    inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
     inventoryContainer = await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 1, [goldCoins]);
 
     const afterAddGoldCoins = await characterWeight.getWeight(testCharacter);
@@ -89,8 +95,6 @@ describe("CharacterWeight.ts", () => {
       maxStackSize: 100,
     });
 
-    const inventory = await testCharacter.inventory;
-    inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
     inventoryContainer = await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 1, [apples]);
 
     // Check Weight after add apples
@@ -162,5 +166,30 @@ describe("CharacterWeight.ts", () => {
     // When die have a % do drop a item, its random so we can't test it with ONE number fixed.
     const possibleResults = [7.5, 6.5, 2.5, 1.5];
     expect(possibleResults).toContain(weightAfterDeath?.weight);
+  });
+
+  it("Should calculate the Weight if have nested bags with itens on inventory", async () => {
+    const nestedBackpack = await unitTestHelper.createMockItemFromBlueprint(ContainersBlueprint.Backpack);
+    const nestedContainer = (await ItemContainer.findById(nestedBackpack.itemContainer)) as IItemContainer;
+
+    const fisrtSword = await unitTestHelper.createMockItem();
+    const secondSword = await unitTestHelper.createMockItem();
+
+    nestedContainer.slotQty = 2;
+    nestedContainer.slots = {
+      0: fisrtSword.toJSON({ virtuals: true }),
+      1: secondSword.toJSON({ virtuals: true }),
+    };
+
+    await nestedContainer.save();
+
+    expect(await characterWeight.getWeight(testCharacter)).toBe(3);
+
+    const nestedItem = (await Item.findOne({ _id: nestedContainer.parentItem })) as IItem;
+    const result = await characterItemContainer.addItemToContainer(nestedItem, testCharacter, inventoryContainer._id);
+
+    expect(result).toBe(true);
+
+    expect(await characterWeight.getWeight(testCharacter)).toBe(8);
   });
 });
