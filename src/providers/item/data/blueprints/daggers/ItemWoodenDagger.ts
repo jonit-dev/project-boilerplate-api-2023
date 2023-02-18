@@ -8,7 +8,7 @@ export const itemWoodenDagger: Partial<IItem> = {
   subType: ItemSubType.Dagger,
   textureAtlas: "items",
   texturePath: "daggers/wooden-dagger.png",
-  name: "wooden-dagger",
+  name: "Training Dagger",
   description: "A short-bladed weapon with a sharp point used for stabbing, thrusting, or throwing.",
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

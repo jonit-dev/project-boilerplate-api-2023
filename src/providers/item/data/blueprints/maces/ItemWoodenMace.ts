@@ -8,7 +8,7 @@ export const itemWoodenMace: Partial<IItem> = {
   subType: ItemSubType.Mace,
   textureAtlas: "items",
   texturePath: "maces/wooden-mace.png",
-  name: "wooden-mace",
+  name: "Training Mace",
   description: "A club-like weapon with a heavy head, often spiked or flanged, used for striking in combat.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

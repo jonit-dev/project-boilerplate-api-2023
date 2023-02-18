@@ -8,7 +8,7 @@ export const itemWoodenSword: Partial<IItem> = {
   subType: ItemSubType.Sword,
   textureAtlas: "items",
   texturePath: "swords/wooden-sword.png",
-  name: "wooden-sword",
+  name: "Training Sword",
   description:
     "A weapon with a long, pointed blade used for thrusting and cutting, often with a handle and guard made of wood.",
   weight: 0.75,

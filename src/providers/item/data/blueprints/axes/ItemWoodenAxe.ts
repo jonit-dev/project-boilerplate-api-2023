@@ -8,7 +8,7 @@ export const itemWoodenAxe: Partial<IItem> = {
   subType: ItemSubType.Axe,
   textureAtlas: "items",
   texturePath: "axes/wooden-axe.png",
-  name: "wooden-axe",
+  name: "Training Axe",
   description: "A woodcutting tool with a sharp blade used for chopping wood or as a weapon in combat.",
   weight: 1,
   isTwoHanded: true,
