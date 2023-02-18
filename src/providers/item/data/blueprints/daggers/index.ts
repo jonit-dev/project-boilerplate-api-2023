@@ -6,6 +6,7 @@ import { itemGoldenDagger } from "./ItemGoldenDagger";
 import { itemHellishDagger } from "./ItemHellishDagger";
 import { itemKunai } from "./ItemKunai";
 import { itemSaiDagger } from "./ItemSaiDagger";
+import { itemWoodenDagger } from "./ItemWoodenDagger";
 
 export const daggersBlueprintIndex = {
   [DaggersBlueprint.Dagger]: itemDagger,
@@ -15,4 +16,5 @@ export const daggersBlueprintIndex = {
   [DaggersBlueprint.HellishDagger]: itemHellishDagger,
   [DaggersBlueprint.Kunai]: itemKunai,
   [DaggersBlueprint.SaiDagger]: itemSaiDagger,
+  [DaggersBlueprint.WoodenDagger]: itemWoodenDagger,
 };

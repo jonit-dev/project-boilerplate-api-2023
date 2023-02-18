@@ -22,6 +22,7 @@ export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
   hasUseWith: true,
   useWithMaxDistanceGrid: 7,
   power: 11,
+  canSell: false,
   minMagicLevelRequired: 2,
   animationKey: AnimationEffectKeys.HitPoison,
   projectileAnimationKey: AnimationEffectKeys.Green,

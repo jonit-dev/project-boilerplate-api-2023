@@ -21,6 +21,7 @@ import { itemRapier } from "./ItemRapier";
 import { itemSaber } from "./ItemSaber";
 import { itemShortSword } from "./ItemShortSword";
 import { itemSword } from "./ItemSword";
+import { itemWoodenSword } from "./ItemWoodenSword";
 
 export const swordsBlueprintIndex = {
   [SwordsBlueprint.ShortSword]: itemShortSword,
@@ -46,4 +47,5 @@ export const swordsBlueprintIndex = {
   [SwordsBlueprint.Rapier]: itemRapier,
   [SwordsBlueprint.Saber]: itemSaber,
   [SwordsBlueprint.Sword]: itemSword,
+  [SwordsBlueprint.WoodenSword]: itemWoodenSword,
 };

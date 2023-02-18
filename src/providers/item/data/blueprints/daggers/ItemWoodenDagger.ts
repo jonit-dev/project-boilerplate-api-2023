@@ -1,0 +1,19 @@
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { DaggersBlueprint } from "../../types/itemsBlueprintTypes";
+
+export const itemWoodenDagger: Partial<IItem> = {
+  key: DaggersBlueprint.WoodenDagger,
+  type: ItemType.Weapon,
+  subType: ItemSubType.Dagger,
+  textureAtlas: "items",
+  texturePath: "daggers/wooden-dagger.png",
+  name: "wooden-dagger",
+  description: "A short-bladed weapon with a sharp point used for stabbing, thrusting, or throwing.",
+  weight: 0.5,
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
+  attack: 1,
+  defense: 1,
+  rangeType: EntityAttackType.Melee,
+  basePrice: 14,
+};

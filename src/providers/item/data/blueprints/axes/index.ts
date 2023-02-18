@@ -12,6 +12,7 @@ import { itemHatchet } from "./ItemHatchet";
 import { itemHellishAxe } from "./ItemHellishAxe";
 import { itemRoyalDoubleAxe } from "./ItemRoyalDoubleAxe";
 import { itemVikingAxe } from "./ItemVikingAxe";
+import { itemWoodenAxe } from "./ItemWoodenAxe";
 import { itemYetiHalberd } from "./ItemYetiHalberd";
 
 export const axesBlueprintIndex = {
@@ -29,4 +30,5 @@ export const axesBlueprintIndex = {
   [AxesBlueprint.HellishAxe]: itemHellishAxe,
   [AxesBlueprint.RoyalDoubleAxe]: itemRoyalDoubleAxe,
   [AxesBlueprint.VikingAxe]: itemVikingAxe,
+  [AxesBlueprint.WoodenAxe]: itemWoodenAxe,
 };

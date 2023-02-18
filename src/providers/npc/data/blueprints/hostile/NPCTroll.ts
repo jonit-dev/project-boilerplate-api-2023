@@ -13,6 +13,7 @@ import {
   FoodsBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
@@ -102,6 +103,10 @@ export const npcTroll = {
       itemBlueprintKey: CraftingResourcesBlueprint.Eye,
       chance: 10,
       quantityRange: [1, 3],
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.BronzeLegs,
+      chance: 15,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

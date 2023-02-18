@@ -79,6 +79,36 @@ export const itemHammer: Partial<IItemUseWith> = {
           },
         ],
       ],
+      [
+        CraftingResourcesBlueprint.GreenOre,
+        [
+          {
+            key: CraftingResourcesBlueprint.GreenIngot,
+            qty: [2, 5],
+            chance: await itemCraftable.getCraftChance(character, 30),
+          },
+        ],
+      ],
+      [
+        CraftingResourcesBlueprint.CorruptionOre,
+        [
+          {
+            key: CraftingResourcesBlueprint.CorruptionIngot,
+            qty: [2, 5],
+            chance: await itemCraftable.getCraftChance(character, 30),
+          },
+        ],
+      ],
+      [
+        CraftingResourcesBlueprint.ObsidiumOre,
+        [
+          {
+            key: CraftingResourcesBlueprint.ObsidiumIngot,
+            qty: [2, 5],
+            chance: await itemCraftable.getCraftChance(character, 30),
+          },
+        ],
+      ],
     ]);
     const options: IUseWithItemToTileOptions = {
       targetTile,

@@ -23,6 +23,7 @@ export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
   hasUseWith: true,
   useWithMaxDistanceGrid: 7,
   power: 17,
+  canSell: false,
   minMagicLevelRequired: 2,
   animationKey: AnimationEffectKeys.HitDark,
   projectileAnimationKey: AnimationEffectKeys.Dark,

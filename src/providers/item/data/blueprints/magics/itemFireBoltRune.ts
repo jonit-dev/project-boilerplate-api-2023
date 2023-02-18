@@ -23,6 +23,7 @@ export const itemFireBoltRune: Partial<IMagicItemUseWithEntity> = {
   useWithMaxDistanceGrid: 7,
   power: 13,
   minMagicLevelRequired: 1,
+  canSell: false,
   animationKey: AnimationEffectKeys.Hit,
   projectileAnimationKey: AnimationEffectKeys.Red,
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {

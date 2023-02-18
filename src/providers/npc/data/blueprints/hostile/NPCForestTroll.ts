@@ -17,6 +17,7 @@ import {
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
@@ -51,6 +52,10 @@ export const npcForestTroll = {
   },
   fleeOnLowHealth: true,
   loots: [
+    {
+      itemBlueprintKey: LegsBlueprint.BronzeLegs,
+      chance: 2,
+    },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 25,

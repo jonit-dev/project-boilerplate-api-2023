@@ -25,6 +25,7 @@ export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
   useWithMaxDistanceGrid: 7,
   power: 10,
   minMagicLevelRequired: 2,
+  canSell: false,
   animationKey: AnimationEffectKeys.HitHeal,
   projectileAnimationKey: AnimationEffectKeys.Heal,
 

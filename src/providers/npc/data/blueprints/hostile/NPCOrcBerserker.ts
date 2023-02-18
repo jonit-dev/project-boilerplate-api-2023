@@ -10,6 +10,7 @@ import {
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -52,6 +53,10 @@ export const npcOrcBerserker = {
       itemBlueprintKey: CraftingResourcesBlueprint.BlueSapphire,
       chance: 30,
       quantityRange: [1, 3],
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.BronzeLegs,
+      chance: 2,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.RedSapphire,

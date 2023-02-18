@@ -1,8 +1,10 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import {
   AxesBlueprint,
+  DaggersBlueprint,
   FoodsBlueprint,
   MacesBlueprint,
+  MagicsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
@@ -31,13 +33,32 @@ export const npcTrader = {
       key: PotionsBlueprint.ManaPotion,
     },
     {
+      key: AxesBlueprint.WoodenAxe,
+    },
+    {
+      key: DaggersBlueprint.WoodenDagger,
+    },
+    {
+      key: MacesBlueprint.WoodenMace,
+    },
+    {
+      key: ShieldsBlueprint.WoodenShield,
+    },
+    {
+      key: SwordsBlueprint.WoodenSword,
+    },
+    {
       key: FoodsBlueprint.Cheese,
     },
+
     {
-      key: FoodsBlueprint.Fish,
+      key: MagicsBlueprint.Rune,
     },
     {
-      key: FoodsBlueprint.Watermelon,
+      key: MagicsBlueprint.FireBoltRune,
+    },
+    {
+      key: MagicsBlueprint.PoisonRune,
     },
 
     {
@@ -62,13 +83,19 @@ export const npcTrader = {
       key: ToolsBlueprint.CarpentersAxe,
     },
     {
-      key: ShieldsBlueprint.WoodenShield,
-    },
-    {
       key: ToolsBlueprint.FishingRod,
     },
     {
       key: RangedWeaponsBlueprint.Bow,
+    },
+    {
+      key: RangedWeaponsBlueprint.Crossbow,
+    },
+    {
+      key: RangedWeaponsBlueprint.Arrow,
+    },
+    {
+      key: RangedWeaponsBlueprint.Bolt,
     },
   ],
 } as Partial<INPC>;

@@ -21,6 +21,7 @@ export enum SwordsBlueprint {
   Rapier = "rapier",
   Saber = "saber",
   Sword = "sword",
+  WoodenSword = "wooden-sword",
 }
 
 export enum HelmetsBlueprint {
@@ -69,6 +70,7 @@ export enum DaggersBlueprint {
   HellishDagger = "hellish-dagger",
   SaiDagger = "sai-dagger",
   Kunai = "kunai",
+  WoodenDagger = "wooden-dagger",
 }
 
 export enum ArmorsBlueprint {
@@ -80,6 +82,7 @@ export enum ArmorsBlueprint {
   LeatherJacket = "leather-jacket",
   PlateArmor = "plate-armor",
   StuddedArmor = "studded-armor",
+  MithrilArmor = "mithril-armor",
 }
 
 export enum AxesBlueprint {
@@ -99,6 +102,7 @@ export enum AxesBlueprint {
   VikingAxe = "viking-axe",
   Halberd = "Halberd",
   Hatchet = "Hatchet",
+  WoodenAxe = "wooden-axe",
 }
 
 export enum BootsBlueprint {
@@ -192,6 +196,9 @@ export enum CraftingResourcesBlueprint {
   Eye = "eye",
   Skull = "skull",
   Bones = "bones",
+  GreenIngot = "green-ingot",
+  ObsidiumIngot = "obsidium-ingot",
+  CorruptionIngot = "corruption-ingot",
 }
 
 export enum ToolsBlueprint {
@@ -264,6 +271,7 @@ export enum MacesBlueprint {
   Mace = "mace",
   SpikedClub = "spiked-club",
   SpikedMace = "spiked-mace",
+  WoodenMace = "wooden-mace",
 }
 
 export enum MagicsBlueprint {
@@ -320,6 +328,9 @@ export enum ShieldsBlueprint {
 export enum LegsBlueprint {
   LeatherLegs = "leather-legs",
   StuddedLegs = "studded-legs",
+  BronzeLegs = "bronze-legs",
+  GoldenLegs = "golden-legs",
+  MithrilLegs = "mithril-legs",
 }
 
 export enum AccessoriesBlueprint {

@@ -10,7 +10,7 @@ export const itemWoodenShield: Partial<IItem> = {
   texturePath: "shields/wooden-shield.png",
   name: "Wooden Shield",
   description: "A simple round wooden shield for protection.",
-  defense: 6,
+  defense: 1,
   weight: 1.4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 37,

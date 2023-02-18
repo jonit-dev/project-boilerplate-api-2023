@@ -23,6 +23,7 @@ export const itemCorruptionRune: Partial<IMagicItemUseWithEntity> = {
   canUseOnNonPVPZone: false,
   useWithMaxDistanceGrid: 8,
   power: 23,
+  canSell: false,
   minMagicLevelRequired: 2,
   animationKey: AnimationEffectKeys.HitCorruption,
   projectileAnimationKey: AnimationEffectKeys.Dark,

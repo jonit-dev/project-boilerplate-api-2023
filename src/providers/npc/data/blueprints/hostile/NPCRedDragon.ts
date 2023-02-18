@@ -6,6 +6,7 @@ import {
   ArmorsBlueprint,
   BootsBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -51,6 +52,18 @@ export const npcRedDragon = {
       chance: 20,
     },
     {
+      itemBlueprintKey: ArmorsBlueprint.MithrilArmor,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.MithrilLegs,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.GoldenLegs,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: BootsBlueprint.GoldenBoots,
       chance: 30,
     },
@@ -58,6 +71,7 @@ export const npcRedDragon = {
       itemBlueprintKey: HelmetsBlueprint.RoyalHelmet,
       chance: 30,
     },
+
     {
       itemBlueprintKey: HelmetsBlueprint.SaviorsHelmet,
       chance: 5,
