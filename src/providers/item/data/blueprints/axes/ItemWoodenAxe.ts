@@ -11,7 +11,6 @@ export const itemWoodenAxe: Partial<IItem> = {
   name: "Training Axe",
   description: "A woodcutting tool with a sharp blade used for chopping wood or as a weapon in combat.",
   weight: 1,
-  isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 1,
   defense: 1,
