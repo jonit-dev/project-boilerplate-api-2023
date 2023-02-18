@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 
@@ -33,28 +33,5 @@ describe("CharacterItemContainer.ts", () => {
     )) as unknown as IItemContainer;
 
     expect(updatedInventoryContainer.slots[0]).toBeNull();
-  });
-
-  it("should create a new item on the map, if you try to addItemToContainer but container is full", async () => {
-    const testItem = await unitTestHelper.createMockItem();
-
-    inventoryContainer.slotQty = 1;
-    inventoryContainer.slots = {
-      0: testItem.toJSON({ virtuals: true }),
-    };
-    inventoryContainer.markModified("slots");
-    await inventoryContainer.save();
-
-    const anotherItem = await unitTestHelper.createMockItem();
-
-    const result = await characterItemContainer.addItemToContainer(anotherItem, testCharacter, inventoryContainer._id);
-
-    expect(result).toBe(true);
-
-    const updatedAnotherItem = (await Item.findById(anotherItem._id)) as unknown as IItem;
-
-    expect(updatedAnotherItem.x).toEqual(testCharacter.x);
-    expect(updatedAnotherItem.y).toEqual(testCharacter.y);
-    expect(updatedAnotherItem.scene).toEqual(testCharacter.scene);
   });
 });

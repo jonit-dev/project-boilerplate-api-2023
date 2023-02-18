@@ -68,7 +68,8 @@ export class CharacterItemContainer {
     item: IItem,
     character: ICharacter,
     toContainerId: string,
-    isInventoryItem: boolean = false
+    isInventoryItem: boolean = false,
+    dropOnMapIfFull: boolean = false
   ): Promise<boolean> {
     const itemToBeAdded = item;
 
@@ -136,7 +137,8 @@ export class CharacterItemContainer {
         const result = await this.characterItemSlots.tryAddingItemOnFirstSlot(
           character,
           itemToBeAdded,
-          targetContainer
+          targetContainer,
+          dropOnMapIfFull
         );
 
         if (!result) {
