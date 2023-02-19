@@ -1,14 +1,14 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterSocketEvents } from "@rpg-engine/shared";
 import { CharacterDeath } from "../CharacterDeath";
 import { CharacterWeight } from "../CharacterWeight";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
-import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 
 describe("CharacterWeight.ts", () => {
@@ -26,6 +26,9 @@ describe("CharacterWeight.ts", () => {
     characterItemContainer = container.get<CharacterItemContainer>(CharacterItemContainer);
 
     jest.spyOn(SocketMessaging.prototype, "sendEventToUser").mockImplementation(mockSendEventToUser);
+
+    // @ts-ignore
+    jest.spyOn(characterDeath.characterDeathCalculator, "calculateInventoryDropChance").mockImplementation(() => 100);
   });
 
   beforeEach(async () => {

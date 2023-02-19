@@ -13,7 +13,7 @@ import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { random } from "lodash";
+import _ from "lodash";
 import { Types } from "mongoose";
 import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
@@ -171,7 +171,7 @@ export class CharacterDeath {
   }
 
   private async dropInventory(character: ICharacter, bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
-    const n = random(0, 100);
+    const n = _.random(0, 100);
 
     const skills = (await Skill.findById(character.skills)) as ISkill;
 
@@ -205,7 +205,7 @@ export class CharacterDeath {
       let item = (await Item.findById(itemId)) as IItem;
 
       if (item) {
-        const n = random(0, 100);
+        const n = _.random(0, 100);
 
         if (n <= DROP_EQUIPMENT_CHANCE) {
           const freeSlotId = bodyContainer.firstAvailableSlotId;
