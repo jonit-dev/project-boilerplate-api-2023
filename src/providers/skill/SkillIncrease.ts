@@ -77,6 +77,8 @@ export class SkillIncrease {
       throw new Error(`Skill not found for weapon ${weapon?.subType}`);
     }
 
+    await this.recordXPinBattle(attacker, target, damage);
+
     const canIncreaseSP = this.skillGainValidation.canUpdateSkills(skills, skillName);
 
     if (!canIncreaseSP) {
@@ -107,8 +109,6 @@ export class SkillIncrease {
     if (increasedWeaponSP.skillLevelUp && attacker.channelId) {
       await this.skillFunctions.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
     }
-
-    await this.recordXPinBattle(attacker, target, damage);
   }
 
   public async increaseShieldingSP(character: ICharacter): Promise<void> {

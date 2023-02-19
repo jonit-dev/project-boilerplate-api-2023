@@ -1,4 +1,4 @@
-export const EXP_RATIO = 2;
+export const EXP_RATIO = 1.5;
 
 export const SP_INCREASE_RATIO = 0.7;
 export const SP_MAGIC_INCREASE_TIMES_MANA = 0.15;
