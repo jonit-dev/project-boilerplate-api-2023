@@ -42,7 +42,7 @@ export class CharacterView {
       ...character.view,
       [type]: updatedElementView,
     };
-    await Character.updateOne({ _id: character._id }, { view: character.view });
+    await Character.updateOne({ _id: character._id }, { $set: { view: character.view } });
   }
 
   public isOnCharacterView(character: ICharacter, elementId: string, type: CharacterViewType): boolean {
@@ -113,9 +113,11 @@ export class CharacterView {
     await Character.updateOne(
       { _id: character._id },
       {
-        view: {
-          ...character.view,
-          [type]: updatedCharView,
+        $set: {
+          view: {
+            ...character.view,
+            [type]: updatedCharView,
+          },
         },
       }
     );

@@ -105,6 +105,8 @@ export class CharacterNetworkUpdate {
 
             // leave it for last!
             await this.handleMapTransition(character, newX, newY);
+
+            await this.characterView.clearOutOfViewElementsAll(character);
           }
 
           // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.
