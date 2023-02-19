@@ -100,6 +100,9 @@ describe("CharacterDeath.ts | Character with items", () => {
     jest.useFakeTimers({
       advanceTimers: true,
     });
+
+    // @ts-ignore
+    jest.spyOn(characterDeath.characterDeathCalculator, "calculateInventoryDropChance").mockImplementation(() => 100);
   });
 
   afterEach(() => {

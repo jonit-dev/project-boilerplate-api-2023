@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
@@ -12,8 +13,9 @@ import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+import { random } from "lodash";
 import { Types } from "mongoose";
+import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterWeight } from "./CharacterWeight";
@@ -39,7 +41,8 @@ export class CharacterDeath {
     private characterInventory: CharacterInventory,
     private itemOwnership: ItemOwnership,
     private characterWeight: CharacterWeight,
-    private skillDecrease: SkillDecrease
+    private skillDecrease: SkillDecrease,
+    private characterDeathCalculator: CharacterDeathCalculator
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
@@ -55,7 +58,7 @@ export class CharacterDeath {
     const characterBody = await this.generateCharacterBody(character);
 
     // drop equipped items and backpack items
-    await this.dropCharacterItemsOnBody(characterBody, character.equipment);
+    await this.dropCharacterItemsOnBody(character, characterBody, character.equipment);
 
     const deathPenalty = await this.skillDecrease.deathPenalty(character);
     if (deathPenalty) {
@@ -65,7 +68,7 @@ export class CharacterDeath {
           message: "You lost some XP and skill points.",
           type: "info",
         });
-      }, 3000);
+      }, 2000);
     }
 
     const characterDeathData: IBattleDeath = {
@@ -107,8 +110,6 @@ export class CharacterDeath {
   }
 
   private async respawnCharacter(character: ICharacter): Promise<void> {
-    await this.characterInventory.generateNewInventory(character, ContainersBlueprint.Bag, true);
-
     await Character.updateOne(
       { _id: character._id },
       {
@@ -135,7 +136,11 @@ export class CharacterDeath {
     }
   }
 
-  private async dropCharacterItemsOnBody(characterBody: IItem, equipmentId: Types.ObjectId | undefined): Promise<void> {
+  private async dropCharacterItemsOnBody(
+    character: ICharacter,
+    characterBody: IItem,
+    equipmentId: Types.ObjectId | undefined
+  ): Promise<void> {
     if (!equipmentId) {
       return;
     }
@@ -155,23 +160,40 @@ export class CharacterDeath {
     // drop backpack
     const inventory = equipment.inventory as unknown as IItem;
     if (inventory) {
-      await this.dropContainerOnBody(itemContainer, inventory);
+      await this.dropInventory(character, itemContainer, inventory);
     }
 
     // there's a chance of dropping any of the equipped items
-    // default chances: 30%
     await this.dropEquippedItemOnBody(itemContainer, equipment);
 
     itemContainer.markModified("slots");
     await itemContainer.save();
   }
 
-  private async dropContainerOnBody(bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
-    const freeSlotId = bodyContainer.firstAvailableSlotId;
-    let item = (await Item.findById(inventory._id)) as IItem;
-    item = await this.clearItem(item);
-    bodyContainer.slots[Number(freeSlotId)] = item;
-    await bodyContainer.save();
+  private async dropInventory(character: ICharacter, bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
+    const n = random(0, 100);
+
+    const skills = (await Skill.findById(character.skills)) as ISkill;
+
+    const dropInventoryChance = this.characterDeathCalculator.calculateInventoryDropChance(skills);
+
+    if (n <= dropInventoryChance) {
+      // drop current inventory
+      const freeSlotId = bodyContainer.firstAvailableSlotId;
+      let item = (await Item.findById(inventory._id)) as IItem;
+      item = await this.clearItem(item);
+      bodyContainer.slots[Number(freeSlotId)] = item;
+      await bodyContainer.save();
+
+      setTimeout(() => {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "You dropped your inventory.",
+          type: "info",
+        });
+      }, 4000);
+
+      await this.characterInventory.generateNewInventory(character, ContainersBlueprint.Bag, true);
+    }
   }
 
   private async dropEquippedItemOnBody(bodyContainer: IItemContainer, equipment: IEquipment): Promise<void> {
@@ -183,9 +205,7 @@ export class CharacterDeath {
       let item = (await Item.findById(itemId)) as IItem;
 
       if (item) {
-        await this.itemOwnership.removeItemOwnership(item);
-
-        const n = _.random(0, 100);
+        const n = random(0, 100);
 
         if (n <= DROP_EQUIPMENT_CHANCE) {
           const freeSlotId = bodyContainer.firstAvailableSlotId;
@@ -212,6 +232,8 @@ export class CharacterDeath {
     item.scene = undefined;
     item.tiledId = undefined;
     await item.save();
+
+    await this.itemOwnership.removeItemOwnership(item);
 
     return item;
   }
