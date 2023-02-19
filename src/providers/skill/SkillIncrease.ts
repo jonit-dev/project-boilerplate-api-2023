@@ -204,6 +204,8 @@ export class SkillIncrease {
     if (result.skillLevelUp && character.channelId) {
       await this.skillFunctions.sendSkillLevelUpEvents(result, character);
     }
+
+    await this.characterBonusPenalties.applyRaceBonusPenalties(character, attribute);
   }
 
   public async increaseCraftingSP(character: ICharacter, craftedItemKey: string): Promise<void> {

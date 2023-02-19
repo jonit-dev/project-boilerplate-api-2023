@@ -248,8 +248,6 @@ export class BattleAttackTarget {
               ? BasicAttribute.MagicResistance
               : BasicAttribute.Resistance;
           await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, attr);
-
-          await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, attr);
         }
 
         /*
@@ -308,8 +306,6 @@ export class BattleAttackTarget {
     // then, increase the character's dexterity SP
     if (battleEvent === BattleEventType.Miss && target.type === "Character") {
       await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
-
-      await this.characterBonusPenalties.applyRaceBonusPenalties(target as ICharacter, BasicAttribute.Dexterity);
     }
 
     await this.warnCharacterIfNotInView(attacker as ICharacter, target);
