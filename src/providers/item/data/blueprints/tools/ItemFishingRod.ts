@@ -5,7 +5,7 @@ import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { UseWithItemToTile } from "@providers/useWith/abstractions/UseWithItemToTile";
 import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint, FoodsBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemFishingRod: Partial<IItemUseWith> = {
@@ -41,7 +41,7 @@ export const itemFishingRod: Partial<IItemUseWith> = {
         },
         targetTileAnimationEffectKey: "fishing",
 
-        successAnimationEffectKey: "level_up",
+        successAnimationEffectKey: AnimationEffectKeys.LevelUp,
         errorAnimationEffectKey: "miss",
         errorMessages: [
           "Hmm... Nothing here.",
