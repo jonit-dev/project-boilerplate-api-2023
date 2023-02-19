@@ -1,5 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IEquipItemPayload, ItemSocketEvents } from "@rpg-engine/shared";
@@ -19,7 +19,7 @@ export class EquipmentEquipNetwork {
         const result = await this.equipmentEquip.equip(character, itemId, itemContainerId);
 
         if (!result) {
-          await Equipment.updateOne({ _id: character.equipment }, { $set: { isEquipping: false } });
+          await Item.updateOne({ _id: itemId }, { $set: { isBeingEquipped: false } });
         }
       }
     );

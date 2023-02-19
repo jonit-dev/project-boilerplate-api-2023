@@ -56,13 +56,13 @@ export class EquipmentEquip {
       return false;
     }
 
-    if (equipment.isEquipping) {
+    if (item.isBeingEquipped) {
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
 
-    equipment.isEquipping = true;
-    await equipment.save();
+    item.isBeingEquipped = true;
+    await item.save();
 
     const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
 
@@ -99,8 +99,8 @@ export class EquipmentEquip {
       await Item.updateOne({ _id: item._id }, { $unset: { x: "", y: "", scene: "" } });
     }
 
-    // set isEquipping to false
-    await Equipment.updateOne({ _id: equipment._id }, { $set: { isEquipping: false } });
+    // set isBeingEquipped to false (lock mechanism)
+    await Item.updateOne({ _id: item._id }, { $set: { isBeingEquipped: false } });
 
     return true;
   }

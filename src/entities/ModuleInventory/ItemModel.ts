@@ -90,6 +90,8 @@ const itemSchema = createLeanSchema(
 
     isBeingPickedUp: Type.boolean({ required: true, default: false }), // lock mechanism to avoid item duplication
 
+    isBeingEquipped: Type.boolean({ required: true, default: false }), // lock mechanism to avoid item equip duplication
+
     isEquipped: Type.boolean({ required: true, default: false }),
 
     droppedBy: Type.objectId({

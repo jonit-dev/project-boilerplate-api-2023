@@ -1,8 +1,6 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
-import { updateIfCurrentPlugin } from "mongoose-update-if-current";
-
 export const equipmentSchema = createLeanSchema(
   {
     owner: Type.objectId({
@@ -42,11 +40,9 @@ export const equipmentSchema = createLeanSchema(
     inventory: Type.objectId({
       ref: "Item",
     }),
-
-    isEquipping: Type.boolean({ default: false }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
-).plugin(updateIfCurrentPlugin);
+);
 
 export type IEquipment = ExtractDoc<typeof equipmentSchema>;
 
