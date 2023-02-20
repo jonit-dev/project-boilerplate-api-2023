@@ -25,11 +25,11 @@ export class OnTargetHit {
     if (damage) {
       await this.sendDamageEvent(target, damage);
       await this.generateBloodOnGround(target);
+      await this.handleSkillIncrease(attacker as ICharacter, target, damage);
     }
 
     if (!target.isAlive) {
       await this.handleDeath(target, attacker);
-      await this.handleSkillIncrease(target);
       await this.updateQuests(target, attacker);
     }
   }
@@ -67,12 +67,12 @@ export class OnTargetHit {
     }
   }
 
-  private async handleSkillIncrease(target: ICharacter | INPC): Promise<void> {
-    if (target.type !== EntityType.NPC) {
-      return;
-    }
+  private async handleSkillIncrease(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
+    await this.skillIncrease.recordXPinBattle(attacker, target, damage);
 
-    await this.skillIncrease.releaseXP(target as INPC);
+    if (target.type === EntityType.NPC && !target.isAlive) {
+      await this.skillIncrease.releaseXP(target as INPC);
+    }
   }
 
   private async updateQuests(target: ICharacter | INPC, attacker: ICharacter | INPC): Promise<void> {
