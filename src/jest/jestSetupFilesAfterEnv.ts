@@ -1,4 +1,4 @@
-import { container } from "@providers/inversify/container";
+import { container, redisManager } from "@providers/inversify/container";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
 import { NPC_CYCLES } from "@providers/npc/NPCCycle";
@@ -37,6 +37,8 @@ beforeAll(async () => {
   });
 
   await mongoose.connection.db.dropDatabase();
+
+  await redisManager.connect();
 });
 
 afterAll(async () => {

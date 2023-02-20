@@ -1,14 +1,12 @@
-import { container, redisManager } from "@providers/inversify/container";
+import { container } from "@providers/inversify/container";
 
 import { InMemoryHashTable } from "../InMemoryHashTable";
 
 describe("InMemoryHashTable", () => {
   let inMemoryHashTable: InMemoryHashTable;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     inMemoryHashTable = container.get(InMemoryHashTable);
-
-    await redisManager.connect();
   });
 
   it("gets a value", async () => {
