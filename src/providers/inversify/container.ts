@@ -1,5 +1,6 @@
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { InMemoryRepository } from "@providers/database/InMemoryRepository";
 import { RedisManager } from "@providers/database/RedisManager";
 import { MapLoader } from "@providers/map/MapLoader";
@@ -55,5 +56,7 @@ export const npcFreezer = container.get<NPCFreezer>(NPCFreezer);
 export const characterSkillBuff = container.get<CharacterSkillBuff>(CharacterSkillBuff);
 
 export const inMemoryRepository = container.get<InMemoryRepository>(InMemoryRepository);
+
+export const inMemoryHashTable = container.get<InMemoryHashTable>(InMemoryHashTable);
 
 export { container };

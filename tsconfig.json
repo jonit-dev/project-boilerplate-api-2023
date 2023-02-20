@@ -15,6 +15,7 @@
     "strict": true,
     "noImplicitAny": false,
     "strictFunctionTypes": false,
+    "useUnknownInCatchVariables": false,
     "strictBindCallApply": false,
     "strictPropertyInitialization": false,
     "resolveJsonModule": true,
