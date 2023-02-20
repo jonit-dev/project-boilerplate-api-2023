@@ -407,7 +407,7 @@ export class SkillIncrease {
    * Calculates the xp gained by a character every time it causes damage in battle
    * In case the target is NPC, it stores the character's xp gained in the xpToRelease array
    */
-  public async recordXPinBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
+  private async recordXPinBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // For now, only supported increasing XP when target is NPC
     if (target.type === "NPC" && damage > 0) {
       target = target as INPC;
