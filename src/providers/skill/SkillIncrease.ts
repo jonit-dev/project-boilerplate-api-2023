@@ -2,7 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { BuffSkillFunctions } from "@providers/character/CharacterBuffer/BuffSkillFunctions";
 import { CharacterView } from "@providers/character/CharacterView";
@@ -241,6 +241,9 @@ export class SkillIncrease {
   public async releaseXP(target: INPC): Promise<void> {
     let levelUp = false;
     let previousLevel = 0;
+    // The xp gained is released once the NPC dies.
+    // Store the xp in the xpToRelease array
+    // before adding the character to the array, check if the character already caused some damage
     while (target.xpToRelease && target.xpToRelease.length) {
       const record = target.xpToRelease.shift();
 
@@ -430,7 +433,7 @@ export class SkillIncrease {
         target.xpToRelease = [{ charId: attacker.id, xp: target.xpPerDamage * damage }];
       }
 
-      await NPC.findOneAndUpdate({ _id: target._id }, { xpToRelease: target.xpToRelease });
+      await target.save();
     }
   }
 
