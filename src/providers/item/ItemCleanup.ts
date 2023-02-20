@@ -15,9 +15,9 @@ export class ItemCleanup {
     if (appEnv.general.IS_UNIT_TEST) return;
 
     setTimeout(async () => {
-      const droppedItems = await Item.find({ droppedBy: character._id });
+      const totalDroppedItems = await Item.countDocuments({ droppedBy: character._id });
 
-      if (droppedItems.length === ITEM_CLEANUP_WARNING_THRESHOLD) {
+      if (totalDroppedItems === ITEM_CLEANUP_WARNING_THRESHOLD) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
           "Please STOP dropping items on the ground, otherwise your character may get banned."
@@ -25,12 +25,12 @@ export class ItemCleanup {
         return;
       }
 
-      if (droppedItems.length >= ITEM_CLEANUP_THRESHOLD) {
-        await this.characterBan.addPenalty(character);
+      if (totalDroppedItems < ITEM_CLEANUP_THRESHOLD) return;
 
-        for (const item of droppedItems) {
-          await item.remove();
-        }
+      const lastDroppedItem = await Item.findOne({ droppedBy: character._id }).sort({ createdAt: 1 }).limit(1);
+
+      if (lastDroppedItem) {
+        await lastDroppedItem.remove();
       }
     }, 1000);
   }
