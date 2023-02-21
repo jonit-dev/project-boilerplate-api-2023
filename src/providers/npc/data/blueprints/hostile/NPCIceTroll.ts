@@ -131,5 +131,5 @@ export const npcIceTroll: Partial<INPC> = {
       quantityRange: [1, 3],
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
+  entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],
 };
