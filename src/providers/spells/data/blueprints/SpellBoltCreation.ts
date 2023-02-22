@@ -25,7 +25,7 @@ export const spellBoltCreation: Partial<ISpell> = {
     const skills = characterWithSkills.skills as unknown as ISkill;
     const magicLevel = skills.magic.level as number;
 
-    let itemsToCreate = random(1, magicLevel || 3);
+    let itemsToCreate = random(1, magicLevel / 4);
 
     if (itemsToCreate > 100) {
       itemsToCreate = 100;

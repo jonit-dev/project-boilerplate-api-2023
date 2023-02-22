@@ -11,11 +11,10 @@ export const itemIronArrow: Partial<IItem> = {
   texturePath: "ranged-weapons/iron-arrow.png",
   name: "Iron Arrow",
   description: "Description",
-  weight: 0.05,
+  weight: 0.06,
   maxStackSize: 100,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   basePrice: 3,
-  attack: 6,
+  attack: 1.5,
   rangeType: EntityAttackType.Melee,
-  canSell: false,
 };
