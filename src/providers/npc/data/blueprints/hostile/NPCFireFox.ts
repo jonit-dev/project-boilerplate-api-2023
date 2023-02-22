@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   ArmorsBlueprint,
   CraftingResourcesBlueprint,
@@ -82,4 +83,5 @@ export const npcFireFox: Partial<INPC> = {
       quantityRange: [5, 10],
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Burning],
 };

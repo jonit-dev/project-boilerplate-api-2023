@@ -85,5 +85,5 @@ export const npcRedDragon = {
       chance: 30,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
+  entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Burning],
 } as Partial<INPC>;
