@@ -26,6 +26,23 @@ export class CharacterItemSlots {
     return qty;
   }
 
+  public getTotalQtyByKey(items: IItem[]): Map<string, number> {
+    const res: Map<string, number> = new Map();
+    for (const item of items) {
+      const itemKey = item.baseKey;
+      let existing = res.get(itemKey);
+      if (!existing) {
+        existing = 0;
+      }
+      if (item.stackQty) {
+        res.set(itemKey, existing + item.stackQty);
+      } else {
+        res.set(itemKey, existing + 1);
+      }
+    }
+    return res;
+  }
+
   public async getAllItemsFromKey(targetContainer: IItemContainer, itemKey: string): Promise<IItem[]> {
     const items: IItem[] = [];
 

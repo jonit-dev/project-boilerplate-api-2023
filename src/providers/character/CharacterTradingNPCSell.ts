@@ -115,7 +115,11 @@ export class CharacterTradingNPCSell {
   ): Promise<ITradeRequestItem[]> {
     const removedItems: ITradeRequestItem[] = [];
     for (const item of items) {
-      const success = await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, character, item.qty);
+      const success = await this.characterItemInventory.decrementItemFromNestedInventoryByKey(
+        item.key,
+        character,
+        item.qty
+      );
       if (success) {
         removedItems.push(item);
       }
@@ -190,23 +194,22 @@ export class CharacterTradingNPCSell {
 
   private async getCharacterItemsToSell(character: ICharacter): Promise<ITradeResponseItem[] | undefined> {
     const responseItems: ITradeResponseItem[] = [];
+    const uniqueItems: string[] = [];
 
     const container = await this.characterItemContainer.getItemContainer(character);
     if (!container) {
       return;
     }
 
-    const uniqueItems: string[] = [];
-    for (let i = 0; i < container.slotQty; i++) {
-      const slotItem = container.slots[i];
-      if (!slotItem) {
-        continue;
-      }
+    const items = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
 
-      if (!uniqueItems.includes(slotItem.key)) {
-        uniqueItems.push(slotItem.key);
+    for (const item of items) {
+      if (!uniqueItems.includes(item.baseKey)) {
+        uniqueItems.push(item.baseKey);
       }
     }
+
+    const itemsQty = this.characterItemSlots.getTotalQtyByKey(items);
 
     for (const itemKey of uniqueItems) {
       const item = itemsBlueprintIndex[itemKey] as IItem;
@@ -222,7 +225,7 @@ export class CharacterTradingNPCSell {
         price: this.characterTradingBalance.getItemSellPrice(item.key),
         name: item.name,
         texturePath: item.texturePath,
-        qty: await this.characterItemSlots.getTotalQty(container, itemKey),
+        qty: itemsQty.get(itemKey),
       });
     }
     return responseItems;

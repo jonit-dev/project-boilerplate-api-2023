@@ -8,7 +8,7 @@ import { MathHelper } from "@providers/math/MathHelper";
 import { ITradeRequestItem } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
-import { CharacterInventory } from "./CharacterInventory";
+import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 
 @provide(CharacterTradingBalance)
@@ -16,21 +16,16 @@ export class CharacterTradingBalance {
   constructor(
     private characterItemSlots: CharacterItemSlots,
     private mathHelper: MathHelper,
-    private characterInventory: CharacterInventory
+    private characterItemInventory: CharacterItemInventory
   ) {}
 
   public async getTotalGoldInInventory(character: ICharacter): Promise<number> {
-    const inventory = await this.characterInventory.getInventory(character);
+    const items = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
 
-    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
+    const itemsQty = this.characterItemSlots.getTotalQtyByKey(items);
+    const totalGold = itemsQty.get(OthersBlueprint.GoldCoin);
 
-    if (!inventoryContainer) {
-      throw new Error("Character inventory not found");
-    }
-
-    const totalGold = await this.characterItemSlots.getTotalQty(inventoryContainer, OthersBlueprint.GoldCoin);
-
-    return totalGold;
+    return totalGold || 0;
   }
 
   public calculateItemsTotalPrice(npc: INPC, items: ITradeRequestItem[]): number {

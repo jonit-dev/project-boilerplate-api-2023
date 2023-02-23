@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   ArmorsBlueprint,
   AxesBlueprint,
@@ -127,4 +128,5 @@ export const npcOrcMage = {
       quantityRange: [5, 10],
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Burning],
 } as Partial<INPC>;

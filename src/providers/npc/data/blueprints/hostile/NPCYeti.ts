@@ -132,5 +132,5 @@ export const npcYeti: Partial<INPC> = {
       quantityRange: [1, 5],
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
+  entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],
 };
