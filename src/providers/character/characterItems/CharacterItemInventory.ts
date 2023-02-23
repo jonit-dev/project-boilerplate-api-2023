@@ -109,7 +109,7 @@ export class CharacterItemInventory {
   ): Promise<boolean> {
     const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
-    let inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
@@ -122,61 +122,30 @@ export class CharacterItemInventory {
       return false;
     }
 
-    for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
-      if (decrementQty <= 0) break;
+    return this.decrementItemFromContainerByKey(inventoryItemContainer, itemKey, decrementQty);
+  }
 
-      const slotItem = inventoryItemContainer.slots[i] as unknown as IItem;
-      if (!slotItem) continue;
+  public async decrementItemFromNestedInventoryByKey(
+    itemKey: string,
+    character: ICharacter,
+    decrementQty: number
+  ): Promise<boolean> {
+    const itemContainers = await ItemContainer.find({ owner: character._id });
 
-      let result = true;
+    if (!itemContainers) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
+      return false;
+    }
 
-      if (isSameKey(slotItem.key, itemKey)) {
-        if (slotItem.maxStackSize > 1) {
-          // if its stackable, decrement the stack
-
-          let remaining = 0;
-
-          if (decrementQty <= slotItem.stackQty!) {
-            remaining = this.mathHelper.fixPrecision(slotItem.stackQty! - decrementQty);
-            decrementQty = 0;
-          } else {
-            decrementQty = this.mathHelper.fixPrecision(decrementQty - slotItem.stackQty!);
-          }
-
-          if (remaining > 0) {
-            await this.characterItemSlots.updateItemOnSlot(i, inventoryItemContainer, {
-              stackQty: remaining,
-            });
-          } else {
-            result = await this.deleteItemFromInventory(slotItem._id, character);
-            // we also need to delete item from items table
-            await Item.deleteOne({ _id: slotItem._id });
-
-            // we need to fetch updated container in case some quantity remains to be substracted
-            if (result && decrementQty > 0) {
-              inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
-              if (!inventoryItemContainer) {
-                result = false;
-                break;
-              }
-            }
-          }
-        } else {
-          // if its not stackable, just remove it
-          result = await this.deleteItemFromInventory(slotItem._id, character);
-          // we also need to delete item from items table
-          await Item.deleteOne({ _id: slotItem._id });
-
-          decrementQty--;
-        }
-      }
-
-      if (!result) {
-        return false;
+    let hasItem = false;
+    for (const container of itemContainers) {
+      hasItem = !!(await this.checkItemInContainerByKey(itemKey, container));
+      if (hasItem) {
+        return this.decrementItemFromContainerByKey(container, itemKey, decrementQty);
       }
     }
 
-    return true;
+    return false;
   }
 
   public async deleteItemFromInventory(itemId: string, character: ICharacter): Promise<boolean> {
@@ -212,8 +181,12 @@ export class CharacterItemInventory {
       return;
     }
 
-    for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
-      let slotItem = inventoryItemContainer.slots[i] as unknown as IItem;
+    return this.checkItemInContainerByKey(itemKey, inventoryItemContainer);
+  }
+
+  private async checkItemInContainerByKey(itemKey: string, container: IItemContainer): Promise<string | undefined> {
+    for (let i = 0; i < container.slotQty; i++) {
+      let slotItem = container.slots[i] as unknown as IItem;
       if (!slotItem) continue;
 
       if (!slotItem.key) {
@@ -237,14 +210,80 @@ export class CharacterItemInventory {
       return;
     }
 
-    for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
-      const slotItem = inventoryItemContainer.slots?.[i];
+    return this.checkItemInContainer(itemId, inventoryItemContainer);
+  }
+
+  private checkItemInContainer(itemId: string, container: IItemContainer): number | undefined {
+    for (let i = 0; i < container.slotQty; i++) {
+      const slotItem = container.slots?.[i];
 
       if (!slotItem) continue;
       if (slotItem._id.toString() === itemId.toString()) {
         return i + 1;
       }
     }
+  }
+
+  private async decrementItemFromContainerByKey(
+    container: IItemContainer,
+    itemKey: string,
+    decrementQty: number
+  ): Promise<boolean> {
+    for (let i = 0; i < container.slotQty; i++) {
+      if (decrementQty <= 0) break;
+
+      const slotItem = container.slots[i] as unknown as IItem;
+      if (!slotItem) continue;
+
+      let result = true;
+
+      if (isSameKey(slotItem.key, itemKey)) {
+        if (slotItem.maxStackSize > 1) {
+          // if its stackable, decrement the stack
+
+          let remaining = 0;
+
+          if (decrementQty <= slotItem.stackQty!) {
+            remaining = this.mathHelper.fixPrecision(slotItem.stackQty! - decrementQty);
+            decrementQty = 0;
+          } else {
+            decrementQty = this.mathHelper.fixPrecision(decrementQty - slotItem.stackQty!);
+          }
+
+          if (remaining > 0) {
+            await this.characterItemSlots.updateItemOnSlot(i, container, {
+              stackQty: remaining,
+            });
+          } else {
+            result = await this.removeItemFromContainer(slotItem, container);
+            // we also need to delete item from items table
+            await Item.deleteOne({ _id: slotItem._id });
+
+            // we need to fetch updated container in case some quantity remains to be substracted
+            if (result && decrementQty > 0) {
+              const updatedCont = await ItemContainer.findById(container.id);
+              if (!updatedCont) {
+                result = false;
+                break;
+              }
+              container = updatedCont;
+            }
+          }
+        } else {
+          // if its not stackable, just remove it
+          result = await this.removeItemFromContainer(slotItem, container);
+          // we also need to delete item from items table
+          await Item.deleteOne({ _id: slotItem._id });
+
+          decrementQty--;
+        }
+      }
+
+      if (!result) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private async removeItemFromInventory(itemId: string, character: ICharacter): Promise<boolean> {
@@ -269,29 +308,9 @@ export class CharacterItemInventory {
       return false;
     }
 
-    for (let i = 0; i < inventoryItemContainer.slotQty; i++) {
-      const slotItem = inventoryItemContainer.slots?.[i];
-
-      if (!slotItem) continue;
-      if (slotItem._id.toString() === item._id.toString()) {
-        // Changing item slot to null, thus removing it
-        inventoryItemContainer.slots[i] = null;
-
-        await ItemContainer.updateOne(
-          {
-            _id: inventoryItemContainer._id,
-          },
-          {
-            $set: {
-              slots: {
-                ...inventoryItemContainer.slots,
-              },
-            },
-          }
-        );
-
-        return true;
-      }
+    const removed = await this.removeItemFromContainer(item, inventoryItemContainer);
+    if (removed) {
+      return true;
     }
 
     this.socketMessaging.sendErrorMessageToCharacter(
@@ -299,6 +318,33 @@ export class CharacterItemInventory {
       "Oops! Something went wrong while trying to remove the item from the inventory."
     );
 
+    return false;
+  }
+
+  private async removeItemFromContainer(item: IItem, container: IItemContainer): Promise<boolean> {
+    for (let i = 0; i < container.slotQty; i++) {
+      const slotItem = container.slots?.[i];
+
+      if (!slotItem) continue;
+      if (slotItem._id.toString() === item._id.toString()) {
+        // Changing item slot to null, thus removing it
+        container.slots[i] = null;
+
+        await ItemContainer.updateOne(
+          {
+            _id: container._id,
+          },
+          {
+            $set: {
+              slots: {
+                ...container.slots,
+              },
+            },
+          }
+        );
+        return true;
+      }
+    }
     return false;
   }
 

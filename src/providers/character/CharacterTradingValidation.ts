@@ -1,14 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ITradeRequestItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterInventory } from "./CharacterInventory";
+import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 import { CharacterValidation } from "./CharacterValidation";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
+import { CharacterInventory } from "./CharacterInventory";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 
 @provide(CharacterTradingValidation)
 export class CharacterTradingValidation {
@@ -17,7 +18,8 @@ export class CharacterTradingValidation {
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
     private characterItemSlots: CharacterItemSlots,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private characterItemInventory: CharacterItemInventory
   ) {}
 
   public async validateAndReturnTraderNPC(npcId: string, character: ICharacter): Promise<INPC | undefined> {
@@ -96,17 +98,20 @@ export class CharacterTradingValidation {
       return false;
     }
 
+    const charItems = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
+    const itemsQty = this.characterItemSlots.getTotalQtyByKey(charItems);
+
     for (const item of items) {
       const itemBlueprint = itemsBlueprintIndex[item.key];
-      const qty = await this.characterItemSlots.getTotalQty(inventoryContainer, item.key);
+      const qty = itemsQty.get(item.key);
 
       if (!itemBlueprint.basePrice) {
         this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, ${itemBlueprint.name} can not be sold.`);
         return false;
-      } else if (qty < 1 || qty < item.qty) {
+      } else if (!qty || qty < 1 || qty < item.qty) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
-          `Sorry, You can not sell ${item.qty} ${itemBlueprint.name}. You only have ${qty}.`
+          `Sorry, You can not sell ${item.qty} ${itemBlueprint.name}. You only have ${qty || 0}.`
         );
         return false;
       }
