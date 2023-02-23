@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
 import { BasicAttribute, IAppliedBuffsEffect, IIncreaseSPResult } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -9,11 +8,7 @@ import { BuffSkillFunctions } from "./BuffSkillFunctions";
 
 @provide(CharacterBasicAttributesBuff)
 export class CharacterBasicAttributesBuff {
-  constructor(
-    private skillFunctions: SkillFunctions,
-    private buffSkillFunctions: BuffSkillFunctions,
-    private inMemoryHashTable: InMemoryHashTable
-  ) {}
+  constructor(private skillFunctions: SkillFunctions, private buffSkillFunctions: BuffSkillFunctions) {}
 
   public async updateBasicAttribute(
     character: ICharacter,
@@ -83,14 +78,6 @@ export class CharacterBasicAttributesBuff {
       );
 
       await this.skillFunctions.sendSkillLevelUpEvents(skillLevelUpEvents, character);
-    }
-
-    // If we have a change in Basic Attributes(except dexterity), we clean the records in redis,
-    // because Basic Attributes influence on totalAttack or totalDefense
-
-    if (skills.owner && appliedBuffsEffect.key !== BasicAttribute.Dexterity) {
-      await this.inMemoryHashTable.delete(skills.owner.toString(), "totalAttack");
-      await this.inMemoryHashTable.delete(skills.owner.toString(), "totalDefense");
     }
 
     await this.skillFunctions.updateSkills(skills, character);

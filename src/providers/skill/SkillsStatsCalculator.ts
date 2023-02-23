@@ -3,15 +3,12 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentStatsCalculator } from "@providers/equipment/EquipmentStatsCalculator";
 import { container } from "@providers/inversify/container";
 import { provide } from "inversify-binding-decorators";
 
 @provide(SkillStatsCalculator)
 export class SkillStatsCalculator {
-  constructor(private inMemoryHashTable: InMemoryHashTable) {}
-
   public async getAttack(skill: ISkill): Promise<number> {
     return await this.getTotalAttackOrDefense(skill, true);
   }
@@ -29,19 +26,6 @@ export class SkillStatsCalculator {
   }
 
   private async getTotalAttackOrDefense(skill: ISkill, isAttack: boolean, isMagic: boolean = false): Promise<number> {
-    if (!skill.owner) {
-      return 0;
-    }
-
-    const redisAttack = await this.inMemoryHashTable.get(skill.owner.toString(), "totalAttack");
-    const redisDefense = await this.inMemoryHashTable.get(skill.owner.toString(), "totalDefense");
-
-    if (redisAttack && isAttack && skill.ownerType === "Character") {
-      return redisAttack.attack;
-    } else if (redisDefense && isAttack === false && skill.ownerType === "Character") {
-      return redisDefense.defense;
-    }
-
     const equipment = await Equipment.findOne({ owner: skill.owner }).lean({ virtuals: true, default: true });
     const [dataOfWeather, character] = await Promise.all([
       MapControlTimeModel.findOne().lean(),
@@ -77,33 +61,17 @@ export class SkillStatsCalculator {
       const totalValueWithBonus = totalValueNoBonus + totalValueNoBonus * INCREASE_BONUS_FACTION;
 
       if (character?.faction === "Life Bringer" && dataOfWeather?.period === "Morning") {
-        await this.updateValuesRedis(isAttack, skill.owner.toString(), totalValueWithBonus);
-
         return totalValueWithBonus || 0;
       }
 
       if (character?.faction === "Shadow Walker" && dataOfWeather?.period === "Night") {
-        await this.updateValuesRedis(isAttack, skill.owner.toString(), totalValueWithBonus);
         return totalValueWithBonus || 0;
       }
 
-      await this.updateValuesRedis(isAttack, skill.owner.toString(), totalValueNoBonus);
       return totalValueNoBonus || 0;
     }
 
     // for regular NPCs
     return isAttack ? skill.strength.level + skill.level : skill.resistance.level + skill.level;
-  }
-
-  private async updateValuesRedis(isAttack: boolean, ownerSkill: string, value: number): Promise<void> {
-    if (isAttack) {
-      await this.inMemoryHashTable.set(ownerSkill, "totalAttack", {
-        attack: value,
-      });
-    } else {
-      await this.inMemoryHashTable.set(ownerSkill, "totalDefense", {
-        defense: value,
-      });
-    }
   }
 }

@@ -36,7 +36,6 @@ import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -50,8 +49,7 @@ export class SkillIncrease {
     private skillFunctions: SkillFunctions,
     private buffSkillFunctions: BuffSkillFunctions,
     private skillGainValidation: SkillGainValidation,
-    private characterWeapon: CharacterWeapon,
-    private inMemoryHashTable: InMemoryHashTable
+    private characterWeapon: CharacterWeapon
   ) {}
 
   /**
@@ -204,12 +202,6 @@ export class SkillIncrease {
     await this.skillFunctions.updateSkills(skills, character);
 
     if (result.skillLevelUp && character.channelId) {
-      // If BasicAttribute(except dexterity) level up we clean the data from Redis
-      if (attribute !== BasicAttribute.Dexterity && skills.owner) {
-        await this.inMemoryHashTable.delete(skills.owner.toString(), "totalAttack");
-        await this.inMemoryHashTable.delete(skills.owner.toString(), "totalDefense");
-      }
-
       await this.skillFunctions.sendSkillLevelUpEvents(result, character);
     }
 

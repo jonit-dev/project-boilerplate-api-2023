@@ -1,7 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { BattleCycle } from "@providers/battle/BattleCycle";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -16,8 +15,7 @@ export class CharacterNetworkLogout {
     private socketMessagingHelper: SocketMessaging,
     private socketAuth: SocketAuth,
     private socketConnection: SocketConnection,
-    private characterView: CharacterView,
-    private inMemoryHashTable: InMemoryHashTable
+    private characterView: CharacterView
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -38,8 +36,6 @@ export class CharacterNetworkLogout {
         console.log(`🚪: Character id ${data.id} has disconnected`);
 
         await Character.updateOne({ _id: data.id }, { isOnline: false, baseSpeed: MovementSpeed.Slow });
-
-        await this.inMemoryHashTable.deleteAll(data.id.toString());
 
         const battleCycle = BattleCycle.battleCycles.get(data.id);
 
