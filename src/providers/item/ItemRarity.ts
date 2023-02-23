@@ -5,7 +5,21 @@ import _ from "lodash";
 
 @provide(ItemRarity)
 export class ItemRarity {
-  constructor() {}
+  private readonly buffItemRarities = {
+    [ItemRarities.Common]: 0,
+    [ItemRarities.Uncommon]: 0.1,
+    [ItemRarities.Rare]: 0.15,
+    [ItemRarities.Epic]: 0.2,
+    [ItemRarities.Legendary]: 0.25,
+  };
+
+  private readonly buffItemRaritiesLowStatus = {
+    [ItemRarities.Common]: 0,
+    [ItemRarities.Uncommon]: 1,
+    [ItemRarities.Rare]: 3,
+    [ItemRarities.Epic]: 4,
+    [ItemRarities.Legendary]: 6,
+  };
 
   public setItemRarity(item: IItem): { attack: number; defense: number; rarity: ItemRarities } {
     let rarity = this.randomizeRarity();
@@ -43,21 +57,9 @@ export class ItemRarity {
   }): { attack: number; defense: number; rarity: ItemRarities } {
     let rarityBuff = { attack: 0, defense: 0, rarity: ItemRarities.Common };
 
-    const buffItemRarities = {
-      [ItemRarities.Common]: 0,
-      [ItemRarities.Uncommon]: 0.1,
-      [ItemRarities.Rare]: 0.15,
-      [ItemRarities.Epic]: 0.2,
-      [ItemRarities.Legendary]: 0.25,
-    };
-
-    stats.attack
-      ? (stats.attack = Math.ceil(stats.attack + stats.attack * buffItemRarities[stats.rarity]))
-      : (stats.attack = 0);
-    stats.defense
-      ? (stats.defense = Math.ceil(stats.defense + stats.defense * buffItemRarities[stats.rarity]))
-      : (stats.defense = 0);
     stats.rarity ? stats.rarity : (stats.rarity = ItemRarities.Common);
+    stats.attack ? (stats.attack = this.getItemRarityBuffStats(stats.attack, stats.rarity)) : (stats.attack = 0);
+    stats.defense ? (stats.defense = this.getItemRarityBuffStats(stats.defense, stats.rarity)) : (stats.defense = 0);
 
     rarityBuff = {
       attack: stats.attack,
@@ -66,5 +68,15 @@ export class ItemRarity {
     };
 
     return rarityBuff;
+  }
+
+  private getItemRarityBuffStats(defaultValue: number | 0, rarity: ItemRarities) {
+    let buffedValue = 0;
+    if (defaultValue >= 15) {
+      buffedValue = Math.ceil(defaultValue + defaultValue * this.buffItemRarities[rarity]);
+    } else {
+      buffedValue = Math.ceil(defaultValue + this.buffItemRaritiesLowStatus[rarity]);
+    }
+    return buffedValue;
   }
 }
