@@ -21,7 +21,7 @@ export class SkillDecrease {
       const decreaseCombatSkills = await this.decreaseCombatSkillsSP(character);
       // Crafting Skills penalty here ( not implemented yet )
 
-      return decreaseXp && decreaseBasicAttributes && decreaseCombatSkills;
+      return decreaseXp ?? decreaseBasicAttributes ?? decreaseCombatSkills;
     } catch (error) {
       console.log(error);
 
@@ -46,7 +46,7 @@ export class SkillDecrease {
     skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(newXpReduced, skills.level + 1);
 
     await this.skillFunctions.updateSkills(skills, character);
-    return true;
+    return xpLossOnDeath > 0;
   }
 
   private async decreaseBasicAttributeSP(character: ICharacter): Promise<boolean> {
@@ -56,13 +56,19 @@ export class SkillDecrease {
       throw new Error(`skills not found for character ${character.id}`);
     }
 
+    let hasDecreasedSP = false;
+
     try {
       for (let i = 0; i < BASIC_ATTRIBUTES.length; i++) {
-        this.decreaseSP(skills, BASIC_ATTRIBUTES[i]);
+        const decreasedSP = this.decreaseSP(skills, BASIC_ATTRIBUTES[i]);
         await this.skillFunctions.updateSkills(skills, character);
+
+        if (decreasedSP) {
+          hasDecreasedSP = true;
+        }
       }
 
-      return true;
+      return hasDecreasedSP;
     } catch (error) {
       console.log(error);
 
@@ -76,13 +82,19 @@ export class SkillDecrease {
       throw new Error(`skills not found for character ${character.id}`);
     }
 
+    let hasDecreasedSP = false;
     try {
       for (let i = 0; i < COMBAT_SKILLS.length; i++) {
-        this.decreaseSP(skills, COMBAT_SKILLS[i]);
+        const decreasedSP = this.decreaseSP(skills, COMBAT_SKILLS[i]);
+
+        if (decreasedSP) {
+          hasDecreasedSP = true;
+        }
+
         await this.skillFunctions.updateSkills(skills, character);
       }
 
-      return true;
+      return hasDecreasedSP;
     } catch (error) {
       console.log(error);
 
@@ -90,7 +102,7 @@ export class SkillDecrease {
     }
   }
 
-  private decreaseSP(skills: ISkill, skillKey: string): void {
+  private decreaseSP(skills: ISkill, skillKey: string): boolean {
     const skillToUpdate = SKILLS_MAP.get(skillKey);
 
     if (!skillToUpdate) {
@@ -111,5 +123,7 @@ export class SkillDecrease {
     skill.skillPointsToNextLevel = calculateSPToNextLevel(newSpReduced, skill.level + 1);
 
     skills[skillToUpdate] = skill;
+
+    return spLossOnDeath > 0;
   }
 }
