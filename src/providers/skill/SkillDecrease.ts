@@ -101,10 +101,8 @@ export class SkillDecrease {
 
     const spLossOnDeath = this.characterDeathCalculator.calculateSkillLoss(skills);
 
-    console.log("spLossOnDeath", spLossOnDeath);
-
     const skillPoints = Math.round(skill.skillPoints);
-    const deathPenaltySP = Math.round((skillPoints * spLossOnDeath) / 100);
+    const deathPenaltySP = Math.round(skillPoints * (spLossOnDeath / 100));
     let newSpReduced = skillPoints - deathPenaltySP;
 
     newSpReduced = Math.max(newSpReduced, 0);
