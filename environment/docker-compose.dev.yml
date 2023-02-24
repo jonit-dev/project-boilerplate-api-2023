@@ -24,6 +24,7 @@ services:
       - rpg-db
     depends_on:
       - rpg-db
+      - rpg-redis
     networks:
       - rpg-network
   rpg-db:
