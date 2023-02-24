@@ -4,7 +4,6 @@ import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
 import { NPC_CYCLES } from "@providers/npc/NPCCycle";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
-import redis from "./redisV4Mock";
 
 let mongoServer: MongoMemoryServer;
 
@@ -16,16 +15,11 @@ jest.mock("@providers/constants/SkillConstants", () => ({
   EXP_RATIO: 1,
 }));
 
-jest.mock("@providers/constants/DeathConstants", () => ({
-  DROP_EQUIPMENT_CHANCE: 15,
-}));
 jest.mock("mongoose-update-if-current", () => ({
   updateIfCurrentPlugin: jest.fn(), // mock the plugin because otherwise it will break many tests
 }));
 
 beforeAll(async () => {
-  jest.mock("redis", () => redis);
-
   mongoServer = await MongoMemoryServer.create();
 
   await mongoose.connect(mongoServer.getUri(), {
@@ -59,6 +53,8 @@ afterAll(async () => {
   MapLoader.maps.clear();
   NPC_BATTLE_CYCLES.clear();
   NPC_CYCLES.clear();
+
+  await redisManager.client.flushAll();
 });
 
 beforeEach(async () => {

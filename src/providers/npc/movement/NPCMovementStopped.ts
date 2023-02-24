@@ -31,7 +31,9 @@ export class NPCMovementStopped {
 
         for (const nearbyCharacter of nearbyCharacters) {
           // client representation of the NPC
-          const clientNPC = nearbyCharacter.view.npcs?.[npc.id];
+
+          const clientNPC = await this.characterView.getElementOnView(nearbyCharacter, npc.id, "npcs");
+
           if (clientNPC?.direction !== facingDirection) {
             // update serverside info (to avoid submitting the same package all the time!)
 

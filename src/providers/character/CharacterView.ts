@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { GRID_HEIGHT, GRID_WIDTH, IViewElement, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
@@ -17,36 +18,26 @@ export type CharacterViewType = "npcs" | "items" | "characters";
 
 @provide(CharacterView)
 export class CharacterView {
-  constructor(private socketTransmissionZone: SocketTransmissionZone, private mathHelper: MathHelper) {}
+  constructor(
+    private socketTransmissionZone: SocketTransmissionZone,
+    private mathHelper: MathHelper,
+    private inMemoryHashTable: InMemoryHashTable
+  ) {}
 
   public async addToCharacterView(
     character: ICharacter,
     viewElement: IViewElement,
     type: CharacterViewType
   ): Promise<void> {
-    if (this.isOnCharacterView(character, viewElement.id, type)) {
+    if (await this.isOnCharacterView(character, viewElement.id, type)) {
       return;
     }
 
-    if (!character.view) {
-      character.view = {
-        npcs: {},
-        items: {},
-        characters: {},
-      };
-    }
-
-    const updatedElementView = { ...character.view[type], [viewElement.id]: viewElement };
-
-    character.view = {
-      ...character.view,
-      [type]: updatedElementView,
-    };
-    await Character.updateOne({ _id: character._id }, { $set: { view: character.view } });
+    await this.inMemoryHashTable.set(`character-view-${type}:${character._id}`, viewElement.id, viewElement);
   }
 
-  public isOnCharacterView(character: ICharacter, elementId: string, type: CharacterViewType): boolean {
-    return !!character?.view?.[type]?.[elementId];
+  public async isOnCharacterView(character: ICharacter, elementId: string, type: CharacterViewType): Promise<boolean> {
+    return await this.inMemoryHashTable.has(`character-view-${type}:${character._id}`, elementId);
   }
 
   public isOutOfCharacterView(character: ICharacter, x: number, y: number): boolean {
@@ -65,7 +56,7 @@ export class CharacterView {
     return false;
   }
 
-  public async clearOutOfViewElementsAll(character: ICharacter): Promise<void> {
+  public async clearAllOutOfViewElements(character: ICharacter): Promise<void> {
     const types: CharacterViewType[] = ["npcs", "items", "characters"];
     for (const type of types) {
       await this.clearOutOfViewElements(character, type);
@@ -73,15 +64,24 @@ export class CharacterView {
   }
 
   public async clearOutOfViewElements(character: ICharacter, type: CharacterViewType): Promise<void> {
-    if (!character.view) {
+    const hasView = await this.inMemoryHashTable.hasAll(`character-view-${type}:${character._id}`);
+
+    if (!hasView) {
       return;
     }
 
-    const elements = character.view[type];
+    const elementsOnView = await this.inMemoryHashTable.getAll(`character-view-${type}:${character._id}`);
+
+    if (!elementsOnView) {
+      return;
+    }
+
+    const elementsIds = Object.keys(elementsOnView);
     const elementsToRemove: string[] = [];
 
-    for (const elementId in elements) {
-      const element = elements[elementId];
+    for (const elementId of elementsIds) {
+      const element = elementsOnView[elementId] as unknown as IViewElement;
+
       if (this.isOutOfCharacterView(character, element.x, element.y)) {
         elementsToRemove.push(elementId);
       }
@@ -92,13 +92,41 @@ export class CharacterView {
     }
   }
 
+  public async getElementOnView(
+    character: ICharacter,
+    elementId: string,
+    type: CharacterViewType
+  ): Promise<IViewElement | undefined> {
+    const query = (await this.inMemoryHashTable.get(
+      `character-view-${type}:${character._id}`,
+      elementId
+    )) as IViewElement;
+
+    if (!query) {
+      return;
+    }
+
+    return query;
+  }
+
+  public async getAllElementsOnView(
+    character: ICharacter,
+    type: CharacterViewType
+  ): Promise<Record<string, IViewElement> | undefined> {
+    return await this.inMemoryHashTable.getAll<IViewElement>(`character-view-${type}:${character._id}`);
+  }
+
+  public async hasElementOnView(character: ICharacter, elementId: string, type: CharacterViewType): Promise<boolean> {
+    const result = await this.inMemoryHashTable.has(`character-view-${type}:${character._id}`, elementId);
+
+    return result;
+  }
+
   public async clearCharacterView(character: ICharacter): Promise<void> {
-    const view = {
-      npcs: {},
-      items: {},
-      characters: {},
-    };
-    await Character.updateOne({ _id: character._id }, { view });
+    const types: CharacterViewType[] = ["npcs", "items", "characters"];
+    for (const type of types) {
+      await this.inMemoryHashTable.deleteAll(`character-view-${type}:${character._id}`);
+    }
   }
 
   public async removeFromCharacterView(
@@ -106,21 +134,7 @@ export class CharacterView {
     elementId: string,
     type: CharacterViewType
   ): Promise<void> {
-    const updatedCharView = character.view[type];
-
-    delete updatedCharView[elementId];
-
-    await Character.updateOne(
-      { _id: character._id },
-      {
-        $set: {
-          view: {
-            ...character.view,
-            [type]: updatedCharView,
-          },
-        },
-      }
-    );
+    await this.inMemoryHashTable.delete(`character-view-${type}:${character._id}`, elementId);
   }
 
   public async getCharactersAroundXYPosition(

@@ -23,7 +23,7 @@ describe("ItemDragAndDrop.ts", () => {
     await testItem.save();
   });
 
-  beforeEach(async () => {
+  beforeEach(() => {
     itemMoveData = {
       from: {
         containerId: "containerId",

@@ -32,7 +32,7 @@ export class NPCWarn {
 
     for (const npc of npcsInView) {
       if (!options?.always) {
-        const npcOnCharView = character.view.npcs[npc.id];
+        const npcOnCharView = await this.characterView.getElementOnView(character, npc.id, "npcs");
 
         // if we already have a representation there, just skip!
         if (npcOnCharView) {

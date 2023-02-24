@@ -5,18 +5,18 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { NPC_LOOT_CHANCE_MULTIPLIER } from "@providers/constants/NPCConstants";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemRarity } from "@providers/item/ItemRarity";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemType } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
-import { NPCTarget } from "./movement/NPCTarget";
 import { NPC_CYCLES } from "./NPCCycle";
 import { calculateGold } from "./NPCGold";
+import { NPCTarget } from "./movement/NPCTarget";
 
 @provide(NPCDeath)
 export class NPCDeath {
@@ -128,7 +128,7 @@ export class NPCDeath {
 
       let lootChance = loot.chance * NPC_LOOT_CHANCE_MULTIPLIER;
 
-      if (blueprintData.type === ItemType.CraftingResource) {
+      if (blueprintData?.type === ItemType.CraftingResource) {
         lootChance = loot.chance; // crafting materials not impacted by NPC_LOOT_CHANCE_MULTIPLIER
       }
 

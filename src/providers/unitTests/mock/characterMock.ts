@@ -19,9 +19,4 @@ export const characterMock: Partial<ICharacter> = {
   name: "Test Character",
   owner: "6233ff328f3b09002fe32f9b" as unknown as Types.ObjectId,
   channelId: "mock-inexistent-channel-id",
-  view: {
-    characters: {},
-    npcs: {},
-    items: {},
-  },
 };

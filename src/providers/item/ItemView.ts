@@ -6,10 +6,10 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IItemUpdate,
   IItemUpdateAll,
+  IViewDestroyElementPayload,
   ItemSocketEvents,
   ItemSubType,
   ItemType,
-  IViewDestroyElementPayload,
   ViewSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -92,7 +92,8 @@ export class ItemView {
 
     for (const item of itemsNearby) {
       // if we already have this item in the character view, with an updated payload, just skip it!
-      const itemOnCharView = character?.view.items?.[item.id];
+
+      const itemOnCharView = await this.characterView.getElementOnView(character, item._id, "items");
 
       // if we already have a representation there, just skip!
       if (itemOnCharView && this.objectHelper.doesObjectAttrMatches(itemOnCharView, item, ["id", "x", "y", "scene"])) {

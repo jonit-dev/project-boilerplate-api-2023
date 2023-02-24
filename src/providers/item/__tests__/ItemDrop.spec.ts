@@ -3,6 +3,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, IItemDrop } from "@rpg-engine/shared";
@@ -19,11 +20,13 @@ describe("ItemDrop.ts", () => {
   let inventoryItemContainerId: string;
   let characterWeight: CharacterWeight;
   let itemDropData: IItemDrop;
+  let characterView: CharacterView;
 
   beforeAll(() => {
     itemDrop = container.get<ItemDrop>(ItemDrop);
     itemView = container.get<ItemView>(ItemView);
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
+    characterView = container.get<CharacterView>(CharacterView);
   });
 
   beforeEach(async () => {
@@ -157,9 +160,11 @@ describe("ItemDrop.ts", () => {
 
     const updatedChar = await Character.findOne({ _id: testCharacter.id });
 
-    const droppedItemsInView = Object.keys(updatedChar?.view.items);
+    if (!updatedChar) throw new Error("Failed to find character after drop!");
 
-    expect(droppedItemsInView).toContain(testItem.id);
+    const hasItemOnView = await characterView.getElementOnView(updatedChar, testItem.id, "items");
+
+    expect(hasItemOnView).toBeTruthy();
   });
 
   describe("Item drop validation", () => {

@@ -51,7 +51,7 @@ describe("InMemoryHashTable", () => {
 
     expect(query).toBe(true);
 
-    const query2 = await inMemoryHashTable.has("character-view:123", "player-2");
+    const query2 = await inMemoryHashTable.has("character-view:non-existant-id", "player-2");
 
     expect(query2).toBe(false);
   });

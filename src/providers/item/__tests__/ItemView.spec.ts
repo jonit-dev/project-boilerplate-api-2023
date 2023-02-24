@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterView } from "@providers/character/CharacterView";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { ItemView } from "../ItemView";
@@ -10,11 +10,14 @@ describe("ItemView.ts", () => {
   let testItem: IItem;
   let itemView: ItemView;
   let spyWarnCharactersAboutItemRemovalInView: any;
+  let characterView: CharacterView;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     itemView = container.get<ItemView>(ItemView);
 
     spyWarnCharactersAboutItemRemovalInView = jest.spyOn(itemView, "warnCharactersAboutItemRemovalInView" as any);
+
+    characterView = container.get<CharacterView>(CharacterView);
   });
 
   beforeEach(async () => {
@@ -58,13 +61,19 @@ describe("ItemView.ts", () => {
   it("should add item in character's view when calling warnCharacterAboutItemsInView and remove it when calling the method warnCharactersAboutItemRemovalInView", async () => {
     await itemView.warnCharacterAboutItemsInView(testCharacter);
 
-    expect(testCharacter.view.items[testItem._id]).toBeDefined();
+    const hasItem = await characterView.hasElementOnView(testCharacter, testItem._id, "items");
+
+    expect(hasItem).toBeTruthy();
 
     await itemView.warnCharactersAboutItemRemovalInView(testItem, testItem.x!, testItem.y!, testItem.scene!);
 
     const character = await Character.findById(testCharacter._id);
 
-    expect(character!.view.items[testItem._id]).not.toBeDefined();
+    if (!character) throw new Error("Character not found.");
+
+    const hasntItem = await characterView.hasElementOnView(character, testItem._id, "items");
+
+    expect(hasntItem).toBeFalsy();
   });
 
   it("should throw error if a we try to remove an item from a map without a scene", async () => {
