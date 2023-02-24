@@ -3,6 +3,30 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterDeathCalculator)
 export class CharacterDeathCalculator {
+  public calculateSkillLoss(skills: ISkill): number {
+    // Define the XP/SP loss based on character level
+    const skillLossPercentageLevel = {
+      5: 0,
+      8: 2,
+      10: 3,
+      12: 4,
+      14: 5,
+      16: 6,
+      18: 8,
+      20: 10,
+    };
+
+    const level = skills.level;
+
+    for (const [threshold, xpLoss] of Object.entries(skillLossPercentageLevel)) {
+      if (level <= Number(threshold)) {
+        return xpLoss;
+      }
+    }
+
+    return 10;
+  }
+
   public calculateInventoryDropChance(skills: ISkill): number {
     // Define the chances of dropping inventory based on character level
     const chancesByLevel = {
