@@ -29,6 +29,8 @@ export class CharacterView {
     viewElement: IViewElement,
     type: CharacterViewType
   ): Promise<void> {
+    if (!character._id) return;
+
     if (await this.isOnCharacterView(character, viewElement.id, type)) {
       return;
     }

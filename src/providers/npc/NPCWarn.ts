@@ -55,7 +55,7 @@ export class NPCWarn {
     await this.characterView.addToCharacterView(
       character,
       {
-        id: npc.id,
+        id: npc._id,
         x: npc.x,
         y: npc.y,
         scene: npc.scene,
@@ -69,7 +69,7 @@ export class NPCWarn {
       character.channelId!,
       NPCSocketEvents.NPCPositionCreate,
       {
-        id: npc.id,
+        id: npc._id,
         name: npc.name,
         x: npc.x,
         y: npc.y,
@@ -97,7 +97,7 @@ export class NPCWarn {
       character.channelId!,
       NPCSocketEvents.NPCPositionUpdate,
       {
-        id: npc.id,
+        id: npc._id,
         x: npc.x,
         y: npc.y,
         direction: npc.direction,
