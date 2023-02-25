@@ -7,9 +7,11 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { recipeBolt } from "@providers/useWith/recipes/ranged-weapons/recipeBolt";
+import { recipeSpikedClub } from "@providers/useWith/recipes/maces/recipeSpikedClub";
 import {
   AnimationSocketEvents,
   CharacterSocketEvents,
+  ItemRarities,
   ItemSocketEvents,
   ItemSubType,
   UISocketEvents,
@@ -20,6 +22,7 @@ import { itemHerb } from "../data/blueprints/crafting-resources/ItemHerb";
 import { itemWaterBottle } from "../data/blueprints/crafting-resources/itemWaterBottle";
 import { itemManaPotion } from "../data/blueprints/potions/ItemManaPotion";
 import { CraftingResourcesBlueprint } from "../data/types/itemsBlueprintTypes";
+import { ItemRarity } from "../ItemRarity";
 
 describe("ItemCraftable.ts", () => {
   let craftableItem: ItemCraftable;
@@ -29,7 +32,7 @@ describe("ItemCraftable.ts", () => {
   let sendEventToUser: jest.SpyInstance;
   let items: IItem[];
 
-  beforeAll(async () => {
+  beforeAll(() => {
     craftableItem = container.get<ItemCraftable>(ItemCraftable);
   });
 
@@ -127,10 +130,40 @@ describe("ItemCraftable.ts", () => {
     expect(container.slots[1]).toBe(null);
 
     const bolt = container.slots[0];
+
     expect(bolt).not.toBe(null);
     expect(bolt.key).toEqual(recipeBolt.outputKey);
     expect(bolt.stackQty).toBeGreaterThanOrEqual(recipeBolt.outputQtyRange[0]);
     expect(bolt.stackQty).toBeLessThanOrEqual(recipeBolt.outputQtyRange[1]);
+  });
+
+  it("sould craft item and have Legendary rarity", async () => {
+    const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
+    craftChanceMock.mockImplementation(() => {
+      return Promise.resolve(true);
+    });
+
+    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, [
+      await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.IronNail, { stackQty: 20 }),
+      await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.GreaterWoodenLog, { stackQty: 4 }),
+      await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.Skull, { stackQty: 1 }),
+    ]);
+
+    await Skill.findByIdAndUpdate(testCharacter.skills, { blacksmithing: { level: 1000 } });
+
+    await craftableItem.craftItem(recipeSpikedClub.outputKey!, testCharacter);
+
+    const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    expect(container.slots[1]).toBe(null);
+
+    const spikedClub = container.slots[0];
+
+    expect(spikedClub).not.toBe(null);
+    expect(spikedClub.key).toEqual(recipeSpikedClub.outputKey);
+    expect(spikedClub.rarity).toEqual(ItemRarities.Legendary);
+    expect(spikedClub.attack).toEqual(11);
+    expect(spikedClub.defense).toEqual(8);
   });
 
   it("sould change character weight", async () => {

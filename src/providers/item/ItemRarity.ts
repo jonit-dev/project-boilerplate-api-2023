@@ -1,7 +1,9 @@
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemRarities } from "@rpg-engine/shared/dist/types/item.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { Types } from "mongoose";
 
 @provide(ItemRarity)
 export class ItemRarity {
@@ -21,10 +23,12 @@ export class ItemRarity {
     [ItemRarities.Legendary]: 6,
   };
 
-  public setItemRarity(item: IItem): { attack: number; defense: number; rarity: ItemRarities } {
+  public setItemRarityOnLootDrop(item: IItem): { attack: number; defense: number; rarity: ItemRarities } {
     let rarity = this.randomizeRarity();
 
-    if (!item.rarity) rarity = ItemRarities.Common;
+    if (!item.rarity) {
+      rarity = ItemRarities.Common;
+    }
 
     const stats = { attack: item.attack, defense: item.defense, rarity: rarity };
     const rarityAttackDefense = this.randomizeRarityBuff(stats);
@@ -32,8 +36,37 @@ export class ItemRarity {
     return rarityAttackDefense;
   }
 
-  private randomizeRarity(): ItemRarities {
-    const rarity = _.random(0, 100, true);
+  public async setItemRarityOnCraft(
+    item: IItem,
+    skillId: Types.ObjectId
+  ): Promise<{ attack: number; defense: number; rarity: ItemRarities }> {
+    const skills = await Skill.findById(skillId).lean();
+
+    if (!skills) {
+      return { attack: 0, defense: 0, rarity: ItemRarities.Common };
+    }
+
+    const proficiency = skills.blacksmithing.level / 10;
+
+    let rarity = this.randomizeRarity(true, proficiency);
+    if (!item.rarity) {
+      rarity = ItemRarities.Common;
+    }
+
+    const stats = { attack: item.attack, defense: item.defense, rarity: rarity };
+    const rarityAttackDefense = this.randomizeRarityBuff(stats);
+
+    return rarityAttackDefense;
+  }
+
+  private randomizeRarity(isCraft?: boolean, proficiency?: number): ItemRarities {
+    let variable = 0;
+    if (isCraft && proficiency) {
+      proficiency > 0 ? (variable = proficiency) : (variable = 0);
+    }
+
+    const rarity = _.random(variable, 100, true);
+
     switch (true) {
       case rarity <= 90:
         return ItemRarities.Common;
@@ -70,7 +103,7 @@ export class ItemRarity {
     return rarityBuff;
   }
 
-  private getItemRarityBuffStats(defaultValue: number | 0, rarity: ItemRarities) {
+  private getItemRarityBuffStats(defaultValue: number | 0, rarity: ItemRarities): number {
     let buffedValue = 0;
     if (defaultValue >= 15) {
       buffedValue = Math.ceil(defaultValue + defaultValue * this.buffItemRarities[rarity]);

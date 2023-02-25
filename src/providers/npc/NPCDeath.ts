@@ -161,7 +161,7 @@ export class NPCDeath {
         } else {
           while (lootQuantity > 0) {
             if (lootItem.attack || lootItem.defense) {
-              const rarityAttributes = this.itemRarity.setItemRarity(lootItem);
+              const rarityAttributes = this.itemRarity.setItemRarityOnLootDrop(lootItem);
               lootItem = new Item({
                 ...blueprintData,
                 attack: rarityAttributes.attack,
