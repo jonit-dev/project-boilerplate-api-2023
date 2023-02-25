@@ -54,11 +54,6 @@ export class CharacterNetworkCreate {
             target: undefined,
             isOnline: true,
             channelId: data.channelId,
-            view: {
-              items: {},
-              npcs: {},
-              characters: {},
-            },
           }
         );
 
