@@ -6,6 +6,7 @@ import { CharacterCrons } from "./CharacterCrons";
 import { ChatLogCrons } from "./ChatLogCrons";
 import { CleanupBloodCrons } from "./CleanupBloodCrons";
 import { CleanupBodyCrons } from "./CleanupBodyCrons";
+import { CleanupEmptyBodyCrons } from "./CleanupEmptyBodies";
 import { ControlTimeCrons } from "./ControlTimeCrons";
 import { DeleteChatCrons } from "./DeleteChatCrons";
 import { ItemDeleteCrons } from "./ItemDeleteCrons";
@@ -22,7 +23,8 @@ export class Cronjob {
     private itemDeleteCrons: ItemDeleteCrons,
     private deleteChatCrons: DeleteChatCrons,
     private cleanupBloodCrons: CleanupBloodCrons,
-    private cleanupBodyCrons: CleanupBodyCrons
+    private cleanupBodyCrons: CleanupBodyCrons,
+    private cleanupEmptyBodyCrons: CleanupEmptyBodyCrons
   ) {}
 
   public start(): void {
@@ -42,6 +44,7 @@ export class Cronjob {
         this.deleteChatCrons.schedule();
         this.cleanupBloodCrons.schedule();
         this.cleanupBodyCrons.schedule();
+        this.cleanupEmptyBodyCrons.schedule();
         break;
       case EnvType.Staging:
       case EnvType.Production:
@@ -55,6 +58,7 @@ export class Cronjob {
           this.deleteChatCrons.schedule();
           this.cleanupBloodCrons.schedule();
           this.cleanupBodyCrons.schedule();
+          this.cleanupEmptyBodyCrons.schedule();
         }
         break;
     }
