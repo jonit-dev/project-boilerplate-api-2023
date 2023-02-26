@@ -13,7 +13,7 @@ import { provide } from "inversify-binding-decorators";
 import { NPCQuest } from "./NPCQuest";
 import { NPCView } from "./NPCView";
 
-interface INPCWarnOptions {
+export interface IWarnOptions {
   always?: boolean;
 }
 
@@ -27,7 +27,7 @@ export class NPCWarn {
     private npcQuest: NPCQuest
   ) {}
 
-  public async warnCharacterAboutNPCsInView(character: ICharacter, options?: INPCWarnOptions): Promise<void> {
+  public async warnCharacterAboutNPCsInView(character: ICharacter, options?: IWarnOptions): Promise<void> {
     const npcsInView = await this.npcView.getNPCsInView(character);
 
     for (const npc of npcsInView) {

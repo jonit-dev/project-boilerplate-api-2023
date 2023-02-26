@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
+import { IWarnOptions } from "@providers/npc/NPCWarn";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IItemUpdate,
@@ -86,7 +87,7 @@ export class ItemView {
     }
   }
 
-  public async warnCharacterAboutItemsInView(character: ICharacter): Promise<void> {
+  public async warnCharacterAboutItemsInView(character: ICharacter, options?: IWarnOptions): Promise<void> {
     const itemsNearby = await this.getItemsInCharacterView(character);
     const itemsToUpdate: IItemUpdate[] = [];
 
@@ -95,9 +96,14 @@ export class ItemView {
 
       const itemOnCharView = await this.characterView.getElementOnView(character, item._id, "items");
 
-      // if we already have a representation there, just skip!
-      if (itemOnCharView && this.objectHelper.doesObjectAttrMatches(itemOnCharView, item, ["id", "x", "y", "scene"])) {
-        continue;
+      if (!options?.always) {
+        // if we already have a representation there, just skip!
+        if (
+          itemOnCharView &&
+          this.objectHelper.doesObjectAttrMatches(itemOnCharView, item, ["id", "x", "y", "scene"])
+        ) {
+          continue;
+        }
       }
 
       if (item.x === undefined || item.y === undefined || !item.scene || !item.layer) {
