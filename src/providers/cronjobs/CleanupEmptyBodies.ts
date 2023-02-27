@@ -7,7 +7,7 @@ import nodeCron from "node-cron";
 @provide(CleanupEmptyBodyCrons)
 export class CleanupEmptyBodyCrons {
   public schedule(): void {
-    nodeCron.schedule("* * * * *", async () => {
+    nodeCron.schedule("*/3 * * * *", async () => {
       const threeMinAgo = new Date();
       threeMinAgo.setMinutes(threeMinAgo.getMinutes() - 3);
 
