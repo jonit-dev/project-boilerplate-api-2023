@@ -106,7 +106,7 @@ export class CharacterMovementWarn {
     const nearbyCharacterDataPayloads: ICharacterPositionUpdateFromServer[] = [];
 
     for (const nearbyCharacter of nearbyCharacters) {
-      if (!this.shouldWarnCharacter(character, nearbyCharacter)) {
+      if (!(await this.shouldWarnCharacter(character, nearbyCharacter))) {
         continue;
       }
 
@@ -154,8 +154,8 @@ export class CharacterMovementWarn {
     );
   }
 
-  private shouldWarnCharacter(emitter: ICharacter, nearbyCharacter: ICharacter): boolean {
-    const charOnCharView = emitter.view.characters[nearbyCharacter.id];
+  private async shouldWarnCharacter(emitter: ICharacter, nearbyCharacter: ICharacter): Promise<boolean> {
+    const charOnCharView = await this.characterView.getElementOnView(emitter, nearbyCharacter._id, "characters");
 
     if (!charOnCharView) {
       return true;

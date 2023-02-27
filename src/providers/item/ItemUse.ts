@@ -79,6 +79,7 @@ export class ItemUse {
         allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
         isEmpty: updatedInventoryContainer!.isEmpty,
       },
+      openInventoryOnUpdate: false,
     };
 
     this.updateInventoryCharacter(payloadUpdate, character);

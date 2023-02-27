@@ -13,6 +13,8 @@ describe("deathPenalty", () => {
     mockCharacter = await unitTestHelper.createMockCharacter(null, {
       hasSkills: true,
     });
+    // @ts-ignore
+    jest.spyOn(skillDecrease.characterDeathCalculator, "calculateSkillLoss").mockImplementation(() => 20);
   });
 
   it("should call deathPenalty", async () => {
@@ -43,6 +45,9 @@ describe("deathPenalty", () => {
   });
 
   it("should decrease character's strength/dextery", () => {
+    // @ts-ignore
+    jest.spyOn(skillDecrease.characterDeathCalculator, "calculateSkillLoss").mockImplementation(() => 10);
+
     const mockSkills = {
       strength: { level: 3, skillPoints: 42 },
       dexterity: { level: 3, skillPoints: 43 },

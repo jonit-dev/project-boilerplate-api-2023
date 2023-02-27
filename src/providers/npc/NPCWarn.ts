@@ -13,7 +13,7 @@ import { provide } from "inversify-binding-decorators";
 import { NPCQuest } from "./NPCQuest";
 import { NPCView } from "./NPCView";
 
-interface INPCWarnOptions {
+export interface IWarnOptions {
   always?: boolean;
 }
 
@@ -27,12 +27,12 @@ export class NPCWarn {
     private npcQuest: NPCQuest
   ) {}
 
-  public async warnCharacterAboutNPCsInView(character: ICharacter, options?: INPCWarnOptions): Promise<void> {
+  public async warnCharacterAboutNPCsInView(character: ICharacter, options?: IWarnOptions): Promise<void> {
     const npcsInView = await this.npcView.getNPCsInView(character);
 
     for (const npc of npcsInView) {
       if (!options?.always) {
-        const npcOnCharView = character.view.npcs[npc.id];
+        const npcOnCharView = await this.characterView.getElementOnView(character, npc.id, "npcs");
 
         // if we already have a representation there, just skip!
         if (npcOnCharView) {
@@ -55,7 +55,7 @@ export class NPCWarn {
     await this.characterView.addToCharacterView(
       character,
       {
-        id: npc.id,
+        id: npc._id,
         x: npc.x,
         y: npc.y,
         scene: npc.scene,
@@ -69,7 +69,7 @@ export class NPCWarn {
       character.channelId!,
       NPCSocketEvents.NPCPositionCreate,
       {
-        id: npc.id,
+        id: npc._id,
         name: npc.name,
         x: npc.x,
         y: npc.y,
@@ -97,7 +97,7 @@ export class NPCWarn {
       character.channelId!,
       NPCSocketEvents.NPCPositionUpdate,
       {
-        id: npc.id,
+        id: npc._id,
         x: npc.x,
         y: npc.y,
         direction: npc.direction,

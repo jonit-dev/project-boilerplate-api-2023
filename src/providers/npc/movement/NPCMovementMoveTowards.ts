@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
+import { CharacterView } from "@providers/character/CharacterView";
 import { MapHelper } from "@providers/map/MapHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -18,7 +19,6 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
-import { NPCFreezer } from "../NPCFreezer";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
@@ -37,8 +37,8 @@ export class NPCMovementMoveTowards {
     private battleAttackTarget: BattleAttackTarget,
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
-    private npcFreezer: NPCFreezer,
-    private mapHelper: MapHelper
+    private mapHelper: MapHelper,
+    private characterView: CharacterView
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
@@ -187,7 +187,7 @@ export class NPCMovementMoveTowards {
         if (nearbyCharacter.scene !== npc.scene) {
           continue;
         }
-        const clientNpc = nearbyCharacter.view.npcs?.[npc?._id];
+        const clientNpc = await this.characterView.getElementOnView(nearbyCharacter, npc._id, "npcs");
 
         if (clientNpc?.direction === facingDirection) {
           return;

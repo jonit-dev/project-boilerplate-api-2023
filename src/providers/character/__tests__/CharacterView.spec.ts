@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -32,9 +31,9 @@ describe("CharacterView.ts", () => {
 
     await characterView.addToCharacterView(testCharacter, viewElement, "items");
 
-    expect(testCharacter.view.items).toEqual({
-      [viewElement.id]: viewElement,
-    });
+    const hasItems = await characterView.hasElementOnView(testCharacter, "testId", "items");
+
+    expect(hasItems).toEqual(true);
   });
 
   it("should remove a view element from the character view", async () => {
@@ -49,7 +48,9 @@ describe("CharacterView.ts", () => {
 
     await characterView.removeFromCharacterView(testCharacter, "testId", "items");
 
-    expect(testCharacter.view.items).toEqual({});
+    const hasItems = await characterView.hasElementOnView(testCharacter, "testId", "items");
+
+    expect(hasItems).toEqual(false);
   });
 
   it("should fetch all characters around a XY position, and not the far away ones", async () => {
@@ -108,7 +109,7 @@ describe("CharacterView.ts", () => {
       scene: "example",
     };
     await characterView.addToCharacterView(testCharacter, viewElement, "items");
-    const isOnView = characterView.isOnCharacterView(testCharacter, "testId", "items");
+    const isOnView = await characterView.isOnCharacterView(testCharacter, "testId", "items");
     expect(isOnView).toBeTruthy();
   });
 
@@ -120,8 +121,33 @@ describe("CharacterView.ts", () => {
       scene: "example",
     };
     await characterView.addToCharacterView(testCharacter, viewElement, "items");
-    const isOnView = characterView.isOnCharacterView(testCharacter, "testId2", "items");
+    const isOnView = await characterView.isOnCharacterView(testCharacter, "testId2", "items");
     expect(isOnView).toBeFalsy();
+  });
+
+  it("checks if has element on view", async () => {
+    const viewElement = {
+      id: "testId",
+      x: 1,
+      y: 1,
+      scene: "example",
+    };
+    await characterView.addToCharacterView(testCharacter, viewElement, "items");
+    const hasElement = await characterView.hasElementOnView(testCharacter, viewElement.id, "items");
+    expect(hasElement).toBeTruthy();
+  });
+
+  it("gets an element on the character view", async () => {
+    const viewElement = {
+      id: "testId",
+      x: 1,
+      y: 1,
+      scene: "example",
+    };
+    await characterView.addToCharacterView(testCharacter, viewElement, "items");
+    const element = await characterView.getElementOnView(testCharacter, viewElement.id, "items");
+    expect(element).toBeTruthy();
+    expect(element).toMatchObject(viewElement);
   });
 
   it("should return undefined when trying to get nearest characters and there are no characters around", async () => {
@@ -182,7 +208,11 @@ describe("CharacterView.ts", () => {
 
     if (!updatedTestCharacter) throw new Error("Character not found");
 
-    expect(updatedTestCharacter.view.items).toEqual({});
+    const hasTestId1 = await characterView.hasElementOnView(updatedTestCharacter, "testId1", "items");
+    const hasTestId2 = await characterView.hasElementOnView(updatedTestCharacter, "testId2", "items");
+
+    expect(hasTestId1).toEqual(false);
+    expect(hasTestId2).toEqual(false);
   });
 
   it("should clear elements of all types that are out of the character's view", async () => {
@@ -213,16 +243,23 @@ describe("CharacterView.ts", () => {
     testCharacter.y = FromGridY(999);
     await testCharacter.save();
 
-    await characterView.clearOutOfViewElementsAll(testCharacter);
+    const characterViewItems = await characterView.getAllElementsOnView(testCharacter, "items");
+    const characterViewNpcs = await characterView.getAllElementsOnView(testCharacter, "npcs");
+    const characterViewCharacters = await characterView.getAllElementsOnView(testCharacter, "characters");
 
-    const updatedTestCharacter = await Character.findById(testCharacter._id);
+    // match any object with { id: "testId1" }
+    expect(characterViewItems).toMatchObject({ testId1: viewElement1 });
+    expect(characterViewNpcs).toMatchObject({ testId2: viewElement2 });
+    expect(characterViewCharacters).toMatchObject({ testId3: viewElement3 });
 
-    if (!updatedTestCharacter) {
-      throw new Error("Character not found");
-    }
+    await characterView.clearAllOutOfViewElements(testCharacter);
 
-    expect(updatedTestCharacter.view.items).toEqual({});
-    expect(updatedTestCharacter.view.npcs).toEqual({});
-    expect(updatedTestCharacter.view.characters).toEqual({});
+    const hasItems = await characterView.hasElementOnView(testCharacter, "testId1", "items");
+    const hasNpcs = await characterView.hasElementOnView(testCharacter, "testId2", "npcs");
+    const hasCharacters = await characterView.hasElementOnView(testCharacter, "testId3", "characters");
+
+    expect(hasItems).toEqual(false);
+    expect(hasNpcs).toEqual(false);
+    expect(hasCharacters).toEqual(false);
   });
 });

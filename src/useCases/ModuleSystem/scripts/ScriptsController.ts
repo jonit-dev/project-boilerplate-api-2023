@@ -46,4 +46,13 @@ export class ScriptsController implements interfaces.Controller {
       message: "Battle adjusted succesfully",
     });
   }
+
+  @httpGet("/clear-views")
+  public async clearViews(@response() res): Promise<void> {
+    await this.scriptsUserCase.removeAllCharacterViews();
+
+    return res.status(200).send({
+      message: "Views cleared succesfully",
+    });
+  }
 }

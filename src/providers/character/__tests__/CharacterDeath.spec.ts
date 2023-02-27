@@ -11,6 +11,10 @@ import _ from "lodash";
 import { CharacterDeath } from "../CharacterDeath";
 import { CharacterWeapon } from "../CharacterWeapon";
 
+jest.mock("@providers/constants/DeathConstants", () => ({
+  DROP_EQUIPMENT_CHANCE: 15,
+}));
+
 describe("CharacterDeath.ts", () => {
   let characterDeath: CharacterDeath;
   let testCharacter: ICharacter;

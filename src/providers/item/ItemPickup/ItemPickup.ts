@@ -110,28 +110,33 @@ export class ItemPickup {
         return false;
       }
 
-      // if the origin container is a MapContainer we should update the char inventory = toContainerId
-      //    otherwise will update the origin container (Loot, NPC Shop, Bag on Map) = fromContainerId
-      const containerToUpdateId = isPickupFromMapContainer
-        ? itemPickupData.toContainerId
-        : itemPickupData.fromContainerId;
-      const updatedContainer = (await ItemContainer.findById(containerToUpdateId).lean({
+      const containerToUpdateId = itemPickupData.fromContainerId;
+      const updatedContainer =
+        !isPickupFromMapContainer &&
+        ((await ItemContainer.findById(containerToUpdateId).lean({
+          virtuals: true,
+          defaults: true,
+        })) as any);
+
+      const inventoryContainerToUpdateId = itemPickupData.toContainerId;
+      const updatedInventoryContainer = (await ItemContainer.findById(inventoryContainerToUpdateId).lean({
         virtuals: true,
         defaults: true,
       })) as any;
 
-      if (!updatedContainer) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, fetch container information.");
+      if ((!updatedContainer && !isPickupFromMapContainer) || !updatedInventoryContainer) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, error in fetching container information.");
         return false;
       }
 
-      if (isPickupFromMapContainer) {
-        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-          inventory: updatedContainer,
-        };
+      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+        inventory: updatedInventoryContainer,
+        openInventoryOnUpdate: isPickupFromMapContainer,
+      };
 
-        this.updateInventoryCharacter(payloadUpdate, character);
-      } else {
+      this.updateInventoryCharacter(payloadUpdate, character);
+
+      if (!isPickupFromMapContainer) {
         // RPG-1012 - reopen origin container using read to open with correct type
         await this.sendContainerRead(updatedContainer, character);
       }

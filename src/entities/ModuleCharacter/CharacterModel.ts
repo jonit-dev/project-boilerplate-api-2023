@@ -205,13 +205,6 @@ const characterSchema = createLeanSchema(
       required: true,
       default: 1700,
     }),
-    view: Type.mixed({
-      default: {
-        items: {},
-        characters: {},
-        npcs: {},
-      },
-    }),
     equipment: Type.objectId({
       ref: "Equipment",
     }),

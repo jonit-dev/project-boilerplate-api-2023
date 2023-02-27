@@ -17,3 +17,8 @@ Content-Type: application/json
 GET {{baseUrl}}/scripts/is-battle-active HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
+
+### Scripts :: Clear views
+GET {{baseUrl}}/scripts/clear-views HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json

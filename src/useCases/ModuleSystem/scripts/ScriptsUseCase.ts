@@ -74,4 +74,21 @@ export class ScriptsUseCase {
       }
     }
   }
+
+  public async removeAllCharacterViews(): Promise<void> {
+    try {
+      await Character.updateMany(
+        {},
+        {
+          $unset: {
+            view: 1,
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+
+      throw new BadRequestError("Failed to execute script!");
+    }
+  }
 }
