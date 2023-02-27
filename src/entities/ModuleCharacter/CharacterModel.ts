@@ -242,7 +242,7 @@ const characterSchema = createLeanSchema(
 );
 
 characterSchema.virtual("movementIntervalMs").get(function (this: ICharacter) {
-  return 1000 / this.speed / 12;
+  return 1000 / this.speed / 48;
 });
 
 characterSchema.virtual("speed").get(function (this: ICharacter) {
