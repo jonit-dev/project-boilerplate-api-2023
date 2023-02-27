@@ -152,6 +152,7 @@ describe("ItemUse.ts", () => {
         allowedItemTypes: equipmentEquip.getAllowedItemTypes(),
         isEmpty: inventoryContainer!.isEmpty,
       },
+      openInventoryOnUpdate: false,
     });
   });
 

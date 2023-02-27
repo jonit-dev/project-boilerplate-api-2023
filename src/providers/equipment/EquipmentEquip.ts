@@ -11,6 +11,7 @@ import { IEquipmentAndInventoryUpdatePayload, ItemSlotType, ItemSocketEvents, It
 import { provide } from "inversify-binding-decorators";
 import { EquipmentSlots } from "./EquipmentSlots";
 import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 export type SourceEquipContainerType = "inventory" | "container";
 
@@ -23,7 +24,8 @@ export class EquipmentEquip {
     private characterValidation: CharacterValidation,
     private equipmentTwoHanded: EquipmentTwoHanded,
     private itemOwnership: ItemOwnership,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public async equip(character: ICharacter, itemId: string, fromItemContainerId: string): Promise<boolean> {
@@ -102,6 +104,9 @@ export class EquipmentEquip {
     // set isBeingEquipped to false (lock mechanism)
     await Item.updateOne({ _id: item._id }, { $set: { isBeingEquipped: false } });
 
+    // When Equip remove data from redis
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
     return true;
   }
 

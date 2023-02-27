@@ -207,7 +207,7 @@ export class UseWithEntity {
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: container,
       openEquipmentSetOnUpdate: false,
-      openInventoryOnUpdate: true,
+      openInventoryOnUpdate: false,
     };
 
     this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(

@@ -9,6 +9,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentSlots } from "./EquipmentSlots";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(EquipmentUnequip)
 export class EquipmentUnequip {
@@ -18,7 +19,8 @@ export class EquipmentUnequip {
     private socketMessaging: SocketMessaging,
     private characterItems: CharacterItems,
     private characterItemSlots: CharacterItemSlots,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public async unequip(character: ICharacter, inventory: IItem, item: IItem): Promise<boolean> {
@@ -85,6 +87,10 @@ export class EquipmentUnequip {
     });
 
     await Item.updateOne({ _id: item._id }, { isEquipped: false });
+
+    // When unequip remove data from redis
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
 
     return true;
   }
