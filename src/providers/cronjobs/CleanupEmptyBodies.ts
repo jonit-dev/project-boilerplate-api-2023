@@ -8,11 +8,11 @@ import nodeCron from "node-cron";
 export class CleanupEmptyBodyCrons {
   public schedule(): void {
     nodeCron.schedule("* * * * *", async () => {
-      const oneMinAgo = new Date();
-      oneMinAgo.setMinutes(oneMinAgo.getMinutes() - 1);
+      const threeMinAgo = new Date();
+      threeMinAgo.setMinutes(threeMinAgo.getMinutes() - 3);
 
       const charBodies = await Item.find({
-        createdAt: { $lt: oneMinAgo },
+        createdAt: { $lt: threeMinAgo },
         subType: ItemSubType.DeadBody,
       })
         .populate({ path: "itemContainer", select: "slots slotQty" })
