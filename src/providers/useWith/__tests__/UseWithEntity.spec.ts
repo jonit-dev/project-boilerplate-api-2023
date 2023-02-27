@@ -762,7 +762,7 @@ describe("UseWithEntityValidation.ts", () => {
       {
         inventory: container,
         openEquipmentSetOnUpdate: false,
-        openInventoryOnUpdate: true,
+        openInventoryOnUpdate: false,
       }
     );
   });
