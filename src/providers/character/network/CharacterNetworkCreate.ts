@@ -39,7 +39,8 @@ export class CharacterNetworkCreate {
     private gridManager: GridManager,
     private npcWarn: NPCWarn,
     private pm2Helper: PM2Helper,
-    private buffSkillFunctions: BuffSkillFunctions
+    private buffSkillFunctions: BuffSkillFunctions,
+    private characterView: CharacterView
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -54,11 +55,6 @@ export class CharacterNetworkCreate {
             target: undefined,
             isOnline: true,
             channelId: data.channelId,
-            view: {
-              items: {},
-              npcs: {},
-              characters: {},
-            },
           }
         );
 
@@ -73,6 +69,7 @@ export class CharacterNetworkCreate {
 
           return;
         }
+        await this.characterView.clearCharacterView(character);
 
         await this.battleNetworkStopTargeting.stopTargeting(character);
 
@@ -132,7 +129,7 @@ export class CharacterNetworkCreate {
         await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        this.itemView.warnCharacterAboutItemsInView(character); // dont await this because if there's a ton of garbage in the server, the character will be stuck waiting for this to finish
+        this.itemView.warnCharacterAboutItemsInView(character, { always: true }); // dont await this because if there's a ton of garbage in the server, the character will be stuck waiting for this to finish
 
         await this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
 
