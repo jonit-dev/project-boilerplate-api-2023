@@ -57,7 +57,7 @@ const itemSchema = createLeanSchema(
     y: Type.number(),
     scene: Type.string(),
     layer: Type.number({
-      default: MapLayers.OverGround,
+      default: MapLayers.Decoration + 0.5,
     }),
     isItemContainer: Type.boolean({
       default: false,
