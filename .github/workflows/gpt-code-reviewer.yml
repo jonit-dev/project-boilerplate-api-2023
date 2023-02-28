@@ -8,8 +8,12 @@ on:
   pull_request:
     types: [opened, reopened]
     branches: ["master"]
+    tags:
+      - "chatgpt-review"
   push:
     branches: ["master"]
+    tags:
+      - "chatgpt-review"
 
 jobs:
   chatgpt-pr-review:
