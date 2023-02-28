@@ -5,13 +5,7 @@ permissions:
   pull-requests: write
 
 on:
-  pull_request:
-    types: [opened, reopened]
-    branches: ["master"]
-    tags:
-      - "chatgpt-review"
   push:
-    branches: ["master"]
     tags:
       - "chatgpt-review"
 
