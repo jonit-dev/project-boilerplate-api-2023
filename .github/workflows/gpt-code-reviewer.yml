@@ -5,12 +5,12 @@ permissions:
   pull-requests: write
 
 on:
-  push:
-    tags:
-      - "chatgpt-review"
+  pull_request:
+    types: [labeled]
 
 jobs:
   chatgpt-pr-review:
+    if: ${{ github.event.label.name == 'chatgpt-review' }}
     runs-on: ubuntu-latest
     steps:
       - uses: anc95/ChatGPT-CodeReview@v1
