@@ -17,6 +17,8 @@ export enum SpellsBlueprint {
   EnergyBoltCreationSpell = "energy-bolt-creation-spell",
   FireBoltCreationSpell = "fire-bolt-creation-spell",
   CorruptionRuneCreationSpell = "corruption-rune-creation-spell",
+  SpellMagicShield = "spell-magic-shield",
+  SpellPhysicalShield = "spell-physical-shield",
 }
 
 export interface ISpell {

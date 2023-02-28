@@ -10,6 +10,8 @@ import { spellFireRuneCreation } from "./SpellFireRuneCreation";
 import { spellFoodCreation } from "./SpellFoodCreation";
 import { spellGreaterHealing } from "./SpellGreaterHealing";
 import { spellHealRuneCreation } from "./SpellHealRuneCreation";
+import { spellMagicShield } from "./SpellMagicShield";
+import { spellPhysicalShield } from "./SpellPhysicalShield";
 import { spellPoisonRuneCreation } from "./SpellPoisonRuneCreation";
 import { spellSelfHaste } from "./SpellSelfHaste";
 import { spellSelfHealing } from "./SpellSelfHealing";
@@ -29,4 +31,6 @@ export const spellsBlueprints = {
   [SpellsBlueprint.FireBoltCreationSpell]: spellFireBoltCreation,
   [SpellsBlueprint.EnergyBoltCreationSpell]: spellEnergyBoltCreation,
   [SpellsBlueprint.CorruptionRuneCreationSpell]: spellCorruptionRuneCreation,
+  [SpellsBlueprint.SpellMagicShield]: spellMagicShield,
+  [SpellsBlueprint.SpellPhysicalShield]: spellPhysicalShield,
 };

@@ -1,7 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
+import { ItemUseCycle } from "@providers/item/ItemUseCycle";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   AnimationEffectKeys,
@@ -22,11 +24,12 @@ export const spellSelfHaste: Partial<ISpell> = {
   manaCost: 40,
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
-  animationKey: AnimationEffectKeys.LevelUp,
+  animationKey: AnimationEffectKeys.HasteSpell,
 
   usableEffect: (character: ICharacter) => {
     const socketMessaging = container.get(SocketMessaging);
     const itemUsableEffect = container.get(ItemUsableEffect);
+    const animationEffect = container.get(AnimationEffect);
 
     const increaseSpeed = 3;
     itemUsableEffect.apply(character, EffectableAttribute.Speed, increaseSpeed);
@@ -52,6 +55,12 @@ export const spellSelfHaste: Partial<ISpell> = {
         };
 
         socketMessaging.sendEventToUser(updateCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+
+        new ItemUseCycle(async () => {
+          if (character) {
+            await animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.HasteSpell);
+          }
+        }, 1000 * 45);
       }, 1000 * 45)
     );
   },
