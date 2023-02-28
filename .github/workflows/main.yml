@@ -48,3 +48,5 @@ jobs:
         env:
           NODE_OPTIONS: "--max-old-space-size=20480"
         run: yarn test:ci
+      - name: ChatGPT CodeReviewer
+        uses: anc95/ChatGPT-CodeReview@v1
