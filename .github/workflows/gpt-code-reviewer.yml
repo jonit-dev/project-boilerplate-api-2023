@@ -12,7 +12,7 @@ on:
     branches: ["master"]
 
 jobs:
-  test:
+  chatgpt-pr-review:
     runs-on: ubuntu-latest
     steps:
       - uses: anc95/ChatGPT-CodeReview@v1
