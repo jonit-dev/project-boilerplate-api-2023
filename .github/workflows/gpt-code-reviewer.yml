@@ -1,33 +1,16 @@
-name: Code Review (ChatGPT)
+name: Code Review
 
 permissions:
   contents: read
   pull-requests: write
 
 on:
-  workflow_dispatch:
   pull_request:
-    types: [labeled, unlabeled, opened, reopened, synchronize]
-    branches: ["master"]
+    types: [labeled]
 
 jobs:
-  check-chatgpt-review-label:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check for chatgpt-review label
-        if: contains(github.event.pull_request.labels.*.name, 'chatgpt-review')
-        run: |
-          echo "chatgpt-review label found on pull request #${{ github.event.number }}"
-          echo "::set-output name=label_present::true"
-      - name: Skip if no chatgpt-review label
-        if: contains(github.event.pull_request.labels.*.name, 'chatgpt-review') == false
-        run: |
-          echo "chatgpt-review label not found on pull request #${{ github.event.number }}; skipping workflow"
-          echo "::set-output name=label_present::false"
-
-  chatgpt-pr-review:
-    needs: check-chatgpt-review-label
-    if: ${{ needs.check-chatgpt-review-label.outputs.label_present == 'true' }}
+  test:
+    if: contains(github.event.pull_request.labels.*.name, 'chatgpt-review')
     runs-on: ubuntu-latest
     steps:
       - uses: anc95/ChatGPT-CodeReview@v1
