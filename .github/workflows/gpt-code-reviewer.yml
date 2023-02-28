@@ -5,8 +5,9 @@ permissions:
   pull-requests: write
 
 on:
+  workflow_dispatch:
   pull_request:
-    types: [opened, reopened]
+    types: [labeled, unlabeled, opened, reopened, synchronize]
     branches: ["master"]
 
 jobs:
@@ -32,4 +33,4 @@ jobs:
       - uses: anc95/ChatGPT-CodeReview@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
