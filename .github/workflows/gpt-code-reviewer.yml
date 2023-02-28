@@ -15,10 +15,12 @@ jobs:
     steps:
       - name: Check for chatgpt-review label
         if: contains(github.event.pull_request.labels.*.name, 'chatgpt-review')
-        run: echo "chatgpt-review label found on pull request #${{ github.event.number }}"
+        run: |
+          echo "chatgpt-review label found on pull request #${{ github.event.number }}"
       - name: Skip if no chatgpt-review label
         if: contains(github.event.pull_request.labels.*.name, 'chatgpt-review') == false
-        run: echo "chatgpt-review label not found on pull request #${{ github.event.number }}; skipping workflow"
+        run: |
+          echo "chatgpt-review label not found on pull request #${{ github.event.number }}; skipping workflow"
         continue-on-error: true
 
   chatgpt-pr-review:
@@ -28,4 +30,4 @@ jobs:
       - uses: anc95/ChatGPT-CodeReview@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
