@@ -13,8 +13,8 @@ export const itemCorruptionSword: Partial<IItem> = {
     "A sinister sword imbued with corrupting energies, capable of sapping the strength and vitality of its victims.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 15,
-  defense: 7,
+  attack: 10,
+  defense: 5,
   rangeType: EntityAttackType.Melee,
   basePrice: 72,
 };

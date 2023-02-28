@@ -12,8 +12,8 @@ export const itemSpikedMace: Partial<IItem> = {
   name: "Spiked Mace",
   description:
     "A mace with a heavy, spiked head mounted on a long handle. It is used for crushing and bludgeoning in close combat, and is often wielded by heavily-armored warriors.",
-  attack: 9,
-  defense: 4,
+  attack: 6,
+  defense: 3,
   weight: 2.9,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

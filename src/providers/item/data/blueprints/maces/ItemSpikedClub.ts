@@ -12,8 +12,8 @@ export const itemSpikedClub: Partial<IItem> = {
 
   name: "Spiked club",
   description: "A simple wooden club with metal spikes.",
-  attack: 7,
-  defense: 3,
+  attack: 5,
+  defense: 2,
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

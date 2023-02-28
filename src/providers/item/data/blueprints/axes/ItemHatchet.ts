@@ -12,8 +12,8 @@ export const itemHatchet: Partial<IItem> = {
   name: "Hatchet",
   description:
     "A small, single-handed axe with a short handle and a narrow, pointed head. It is often used for chopping and splitting wood, but can also be used as a weapon in close combat.",
-  attack: 19,
-  defense: 5,
+  attack: 12,
+  defense: 3,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

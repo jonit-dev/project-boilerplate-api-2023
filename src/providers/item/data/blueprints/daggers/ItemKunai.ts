@@ -1,6 +1,6 @@
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { DaggersBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemKunai: Partial<IItem> = {
@@ -14,8 +14,8 @@ export const itemKunai: Partial<IItem> = {
     "A Japanese knife with a blunt, triangular tip and a long, straight handle. It is often used as a throwing weapon, but can also be used in close combat.",
   weight: 0.7,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 10,
-  defense: 4,
+  attack: 7,
+  defense: 3,
   rangeType: EntityAttackType.Melee,
   basePrice: 59,
 };

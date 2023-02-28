@@ -11,7 +11,7 @@ export const itemBardiche: Partial<IItem> = {
   texturePath: "axes/bardiche.png",
   name: "Bardiche",
   description: "A polearm with a large blade at one end.",
-  attack: 5,
+  attack: 4,
   defense: 2,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

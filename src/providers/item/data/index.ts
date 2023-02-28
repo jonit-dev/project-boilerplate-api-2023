@@ -1,6 +1,4 @@
-import { MELEE_WEAPONS, MELEE_WEAPONS_MODIFIER } from "@providers/constants/WeaponsConstants";
 import { IBlueprint } from "@providers/types/temp/BlueprintTypes";
-import { ItemType } from "@rpg-engine/shared";
 import { accessoriesBlueprintsIndex } from "./blueprints/accessories/index";
 import { armorsBlueprintsIndex } from "./blueprints/armors/index";
 import { axesBlueprintIndex } from "./blueprints/axes/index";
@@ -54,20 +52,5 @@ const itemsBlueprintIndex: IBlueprint = {
   ...toolsBlueprintIndex,
   ...hammersBlueprintIndex,
 };
-
-// before exporting, add modifiers
-
-//! Temporary modifiers to balance the game! Will be removed once people feel the game is balanced
-for (const item of Object.values(itemsBlueprintIndex)) {
-  if (item.type === ItemType.Weapon && MELEE_WEAPONS.includes(item.subType)) {
-    if (item.attack) {
-      item.attack = Math.round(item.attack * MELEE_WEAPONS_MODIFIER);
-    }
-
-    if (item.defense) {
-      item.defense = Math.round(item.defense * MELEE_WEAPONS_MODIFIER);
-    }
-  }
-}
 
 export { itemsBlueprintIndex };

@@ -13,8 +13,8 @@ export const itemEldensSword: Partial<IItem> = {
     "A mythical sword said to be associated with the Eldens, a powerful and ancient race. It is imbued with powerful magical energy.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 14,
-  defense: 7,
+  attack: 9,
+  defense: 5,
   rangeType: EntityAttackType.Melee,
   basePrice: 75,
 };

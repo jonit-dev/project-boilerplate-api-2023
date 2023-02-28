@@ -12,8 +12,8 @@ export const itemShortSword: Partial<IItem> = {
   name: "Short Sword",
   description:
     "A single-handed sword with a short, compact blade and a grip handle, suitable for quick and agile attacks.",
-  attack: 6,
-  defense: 3,
+  attack: 4,
+  defense: 2,
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
