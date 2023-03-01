@@ -4,6 +4,7 @@ import { container } from "@providers/inversify/container";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
 import random from "lodash/random";
+import round from "lodash/round";
 import { SpellItemCreation } from "../abstractions/SpellItemCreation";
 import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 
@@ -25,7 +26,7 @@ export const spellArrowCreation: Partial<ISpell> = {
     const skills = characterWithSkills.skills as unknown as ISkill;
     const magicLevel = skills.magic.level as number;
 
-    let itemsToCreate = random(1, magicLevel / 3);
+    let itemsToCreate = round(random(1, magicLevel / 3));
 
     if (itemsToCreate > 100) {
       itemsToCreate = 100;

@@ -3,7 +3,7 @@ import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
-import { BattleEventType } from "@rpg-engine/shared";
+import { BattleEventType, EntityAttackType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 
@@ -23,26 +23,29 @@ export class BattleEvent {
     const defenderModifiers = defenderDefense + defenderSkills.dexterity.level;
     const attackerModifiers = attackerAttack + attackerSkills.dexterity.level;
 
-    const hasHitSucceeded = this.hasBattleEventSucceeded(attackerModifiers, defenderModifiers);
+    const hasHitSucceeded = await this.hasBattleEventSucceeded(
+      attacker as ICharacter,
+      attackerModifiers,
+      defenderModifiers,
+      "attack"
+    );
 
     if (hasHitSucceeded) {
       return BattleEventType.Hit;
     }
 
-    const hasBlockSucceeded = this.hasBattleEventSucceeded(defenderModifiers, attackerModifiers);
+    const hasBlockSucceeded = await this.hasBattleEventSucceeded(
+      target as ICharacter,
+      defenderModifiers,
+      attackerModifiers,
+      "defense"
+    );
 
     if (hasBlockSucceeded) {
       return BattleEventType.Block;
     }
 
     return BattleEventType.Miss;
-  }
-
-  private hasBattleEventSucceeded(actionModifier: number, oppositeActionModifier: number): boolean {
-    const chance = (actionModifier / (oppositeActionModifier + actionModifier)) * 100;
-    const n = _.random(0, 100);
-
-    return n <= chance;
   }
 
   public async calculateHitDamage(
@@ -53,38 +56,120 @@ export class BattleEvent {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
 
-    const attackerMagicAttack = await this.skillStatsCalculator.getMagicAttack(attackerSkills);
-    const attackerMagicDefense = await this.skillStatsCalculator.getMagicDefense(defenderSkills);
-    const attackerAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
-    const defenderDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
-
-    const attackerTotalAttack = isMagicAttack ? attackerMagicAttack : attackerAttack;
-    const defenderTotalDefense = isMagicAttack ? attackerMagicDefense : defenderDefense;
-
-    const totalPotentialAttackerDamage = _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));
+    const totalPotentialAttackerDamage = await this.calculateTotalPotentialDamage(
+      attackerSkills,
+      defenderSkills,
+      isMagicAttack
+    );
 
     const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
     let damage = weapon?.isTraining
       ? Math.round(_.random(0, 1))
       : Math.round(_.random(0, totalPotentialAttackerDamage));
 
-    if (defenderSkills.shielding.level > 1 && target.type === "Character") {
-      damage = this.calculateDamageReduction(
-        damage,
-        this.calculateCharacterDefense(
-          defenderSkills.level,
-          isMagicAttack ? defenderSkills.magicResistance.level : defenderSkills.resistance.level,
-          defenderSkills.shielding.level
-        )
-      );
-    }
+    damage = await this.implementDamageReduction(defenderSkills, target, damage, isMagicAttack);
 
     // damage cannot be higher than target's remaining health
     return damage > target.health ? target.health : damage;
   }
 
-  private calculateCharacterDefense(level: number, resistanceLevel: number, shieldLevel: number): number {
-    return resistanceLevel + level + Math.floor(shieldLevel / 2);
+  private async implementDamageReduction(
+    defenderSkills: ISkill,
+    target: ICharacter | INPC,
+    damage: number,
+    isMagicAttack: boolean
+  ): Promise<number> {
+    if (target.type === "Character") {
+      const character = target as ICharacter;
+
+      const hasShield = await this.characterWeapon.hasShield(character);
+
+      // we only take into account the shielding skill if the defender has a shield equipped.
+      if (hasShield) {
+        if (defenderSkills.shielding.level > 1) {
+          damage = this.calculateDamageReduction(
+            damage,
+            this.calculateCharacterShieldingDefense(
+              defenderSkills.level,
+              defenderSkills.resistance.level,
+              defenderSkills.shielding.level
+            )
+          );
+        }
+      }
+
+      // if no shield or magic attack, we just take the defender level and resistance when reducing the damage.
+      if (!hasShield && !isMagicAttack) {
+        damage = this.calculateDamageReduction(
+          damage,
+          this.calculateCharacterRegularDefense(defenderSkills.level, defenderSkills.resistance.level)
+        );
+      }
+
+      // if magic attack, we take the defender level and magic resistance when reducing the damage.
+      if (isMagicAttack) {
+        damage = this.calculateDamageReduction(
+          damage,
+          this.calculateCharacterRegularDefense(defenderSkills.level, defenderSkills.magicResistance.level)
+        );
+      }
+    }
+
+    return damage;
+  }
+
+  private async calculateTotalPotentialDamage(
+    attackerSkills: ISkill,
+    defenderSkills: ISkill,
+    isMagicAttack: boolean
+  ): Promise<number> {
+    let attackerTotalAttack, defenderTotalDefense;
+
+    if (isMagicAttack) {
+      attackerTotalAttack = await this.skillStatsCalculator.getMagicAttack(attackerSkills);
+      defenderTotalDefense = await this.skillStatsCalculator.getMagicDefense(defenderSkills);
+    } else {
+      attackerTotalAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
+      defenderTotalDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
+    }
+
+    return _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));
+  }
+
+  private async hasBattleEventSucceeded(
+    character: ICharacter,
+    actionModifier: number,
+    oppositeActionModifier: number,
+    type: "attack" | "defense"
+  ): Promise<boolean> {
+    if (type === "attack") {
+      const attackType = await this.characterWeapon.getAttackType(character);
+      if (!attackType) {
+        return false;
+      }
+      actionModifier = this.calculateActionModifier(attackType, actionModifier);
+    }
+
+    const chance = (actionModifier / (oppositeActionModifier + actionModifier)) * 100;
+    const n = _.random(0, 100);
+
+    return n <= chance;
+  }
+
+  private calculateActionModifier(attackType: EntityAttackType, actionModifier: number): number {
+    // make it easier to hit when you're ranged
+    if (attackType === EntityAttackType.Ranged) {
+      actionModifier *= 1.5;
+    }
+    return actionModifier;
+  }
+
+  private calculateCharacterShieldingDefense(level: number, resistanceLevel: number, shieldingLevel: number): number {
+    return this.calculateCharacterRegularDefense(level, resistanceLevel) + Math.floor(shieldingLevel / 2);
+  }
+
+  private calculateCharacterRegularDefense(level: number, resistanceLevel: number): number {
+    return resistanceLevel + level;
   }
 
   private calculateDamageReduction(damage: number, characterDefense: number): number {
