@@ -94,6 +94,8 @@ const itemSchema = createLeanSchema(
 
     isEquipped: Type.boolean({ required: true, default: false }),
 
+    isTraining: Type.boolean({ required: true, default: false }), // For training items which gives a max damage of 1
+
     droppedBy: Type.objectId({
       ref: "Character",
     }),

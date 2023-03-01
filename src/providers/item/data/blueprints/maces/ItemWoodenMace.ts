@@ -16,4 +16,5 @@ export const itemWoodenMace: Partial<IItem> = {
   defense: 1,
   rangeType: EntityAttackType.Melee,
   basePrice: 50,
+  isTraining: true,
 };

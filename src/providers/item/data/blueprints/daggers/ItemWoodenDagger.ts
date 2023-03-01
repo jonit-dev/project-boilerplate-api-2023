@@ -16,4 +16,5 @@ export const itemWoodenDagger: Partial<IItem> = {
   defense: 1,
   rangeType: EntityAttackType.Melee,
   basePrice: 14,
+  isTraining: true,
 };

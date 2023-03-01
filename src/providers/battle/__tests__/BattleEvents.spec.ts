@@ -88,6 +88,22 @@ describe("BattleEvents.spec.ts", () => {
     expect(hit).toBe(10);
   });
 
+  it("should give a max damage of 1 for a training item", async () => {
+    await testNPC.populate("skills").execPopulate();
+    await testCharacter.populate("skills").execPopulate();
+
+    jest.spyOn(_, "random").mockRestore();
+    // @ts-ignore
+    const spy = jest.spyOn(battleEvents.characterWeapon, "getWeapon" as any).mockImplementation(() => {
+      return { isTraining: true };
+    });
+
+    const hit = await battleEvents.calculateHitDamage(testCharacter, testNPC);
+
+    expect(hit).toBeLessThanOrEqual(1);
+    spy.mockReset();
+  });
+
   it("should properly calculate a hit damage with damage reduction", async () => {
     await testNPC.populate("skills").execPopulate();
     await testCharacter.populate("skills").execPopulate();

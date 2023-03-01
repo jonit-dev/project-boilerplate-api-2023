@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
 import { BattleEventType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -10,7 +11,7 @@ type BattleParticipant = ICharacter | INPC;
 
 @provide(BattleEvent)
 export class BattleEvent {
-  constructor(private skillStatsCalculator: SkillStatsCalculator) {}
+  constructor(private skillStatsCalculator: SkillStatsCalculator, private characterWeapon: CharacterWeapon) {}
 
   public async calculateEvent(attacker: BattleParticipant, target: BattleParticipant): Promise<BattleEventType> {
     const attackerSkills = attacker.skills as unknown as ISkill;
@@ -62,7 +63,10 @@ export class BattleEvent {
 
     const totalPotentialAttackerDamage = _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));
 
-    let damage = Math.round(_.random(0, totalPotentialAttackerDamage));
+    const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
+    let damage = weapon?.isTraining
+      ? Math.round(_.random(0, 1))
+      : Math.round(_.random(0, totalPotentialAttackerDamage));
 
     if (defenderSkills.shielding.level > 1 && target.type === "Character") {
       damage = this.calculateDamageReduction(
