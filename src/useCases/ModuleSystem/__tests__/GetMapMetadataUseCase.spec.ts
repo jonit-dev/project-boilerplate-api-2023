@@ -51,7 +51,7 @@ describe("GetMapMetadataUseCase", () => {
 
     expect(mapMetadata).toEqual({
       key: "example",
-      lightening: { type: "Static", value: 0.8 },
+      lightening: { type: "Static", value: 0.95 },
       name: "example",
       version: 1,
       layers: ["layer1", "layer2"],
