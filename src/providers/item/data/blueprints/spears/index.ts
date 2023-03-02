@@ -6,7 +6,7 @@ import { itemjavelin } from "./ItemJavelin";
 import { itemRoyalSpear } from "./ItemRoyalSpear";
 import { itemSpear } from "./ItemSpear";
 import { itemStoneSpear } from "./ItemStoneSpear";
-import { itemtrident } from "./ItemTrident";
+import { itemTrident } from "./ItemTrident";
 
 export const spearsBlueprintsIndex = {
   [SpearsBlueprint.RoyalSpear]: itemRoyalSpear,
@@ -16,5 +16,5 @@ export const spearsBlueprintsIndex = {
   [SpearsBlueprint.Corseque]: itemCorseque,
   [SpearsBlueprint.GuanDao]: itemGuanDao,
   [SpearsBlueprint.Javelin]: itemjavelin,
-  [SpearsBlueprint.Trident]: itemtrident,
+  [SpearsBlueprint.Trident]: itemTrident,
 };

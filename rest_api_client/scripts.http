@@ -1,24 +1,6 @@
 ### Scripts :: Adjust attack speed
-GET {{baseUrl}}/scripts/attack-speed HTTP/1.1
+GET {{baseUrl}}/scripts/adjust-speed HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
-### Scripts :: Initial coordinates
-GET {{baseUrl}}/scripts/initial-coordinates HTTP/1.1
-Authorization: Bearer {{authToken}}
-Content-Type: application/json
-
-### Scripts :: Update emails
-GET {{baseUrl}}/scripts/update-emails-lowercase HTTP/1.1
-Authorization: Bearer {{authToken}}
-Content-Type: application/json
-
-### Scripts :: Update emails
-GET {{baseUrl}}/scripts/is-battle-active HTTP/1.1
-Authorization: Bearer {{authToken}}
-Content-Type: application/json
-
-### Scripts :: Clear views
-GET {{baseUrl}}/scripts/clear-views HTTP/1.1
-Authorization: Bearer {{authToken}}
-Content-Type: application/json
+ 

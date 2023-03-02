@@ -15,6 +15,7 @@ export const itemGuanDao: Partial<IItem> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 8,
   defense: 2,
+  isTwoHanded: true,
   rangeType: EntityAttackType.Melee,
   basePrice: 65,
   isTwoHanded: true,

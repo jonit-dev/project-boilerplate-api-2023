@@ -15,6 +15,7 @@ export const itemjavelin: Partial<IItem> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 9,
   defense: 2,
+  isTwoHanded: true,
   rangeType: EntityAttackType.Ranged,
   basePrice: 75,
 };

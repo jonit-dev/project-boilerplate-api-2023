@@ -2,7 +2,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { SpearsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemtrident: Partial<IItem> = {
+export const itemTrident: Partial<IItem> = {
   key: SpearsBlueprint.Trident,
   type: ItemType.Weapon,
   subType: ItemSubType.Spear,
@@ -15,6 +15,7 @@ export const itemtrident: Partial<IItem> = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 12,
   defense: 4,
+  isTwoHanded: true,
   rangeType: EntityAttackType.Melee,
   basePrice: 80,
 };

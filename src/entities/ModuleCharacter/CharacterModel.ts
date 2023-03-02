@@ -166,7 +166,7 @@ const characterSchema = createLeanSchema(
     channelId: Type.string(),
     otherEntitiesInView: Type.mixed(),
     baseSpeed: Type.number({
-      default: MovementSpeed.Slow,
+      default: MovementSpeed.Standard,
       required: true,
     }),
     weight: Type.number({
@@ -256,11 +256,11 @@ characterSchema.virtual("speed").get(function (this: ICharacter) {
     return this.baseSpeed * 0.8;
   }
 
-  if (ratio > 2 && ratio <= 4) {
+  if (ratio > 2 && ratio <= 6) {
     return this.baseSpeed * 0.6;
   }
 
-  if (ratio > 4) {
+  if (ratio > 6) {
     return 0;
   }
 });

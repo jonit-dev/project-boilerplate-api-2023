@@ -6,8 +6,8 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { recipeBolt } from "@providers/useWith/recipes/ranged-weapons/recipeBolt";
 import { recipeSpikedClub } from "@providers/useWith/recipes/maces/recipeSpikedClub";
+import { recipeBolt } from "@providers/useWith/recipes/ranged-weapons/recipeBolt";
 import {
   AnimationSocketEvents,
   CharacterSocketEvents,
@@ -22,7 +22,6 @@ import { itemHerb } from "../data/blueprints/crafting-resources/ItemHerb";
 import { itemWaterBottle } from "../data/blueprints/crafting-resources/itemWaterBottle";
 import { itemManaPotion } from "../data/blueprints/potions/ItemManaPotion";
 import { CraftingResourcesBlueprint } from "../data/types/itemsBlueprintTypes";
-import { ItemRarity } from "../ItemRarity";
 
 describe("ItemCraftable.ts", () => {
   let craftableItem: ItemCraftable;
@@ -194,7 +193,7 @@ describe("ItemCraftable.ts", () => {
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId!, CharacterSocketEvents.AttributeChanged, {
       targetId: testCharacter._id,
-      speed: MovementSpeed.Slow,
+      speed: MovementSpeed.Standard,
     });
 
     expect(sendEventToUser).toHaveBeenCalledWith(
