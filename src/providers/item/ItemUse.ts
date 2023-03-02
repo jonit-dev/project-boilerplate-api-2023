@@ -60,7 +60,7 @@ export class ItemUse {
       return false;
     }
 
-    await this.applyItemUsage(bluePrintItem, character.id);
+    this.applyItemUsage(bluePrintItem, character.id);
 
     await this.characterItemInventory.decrementItemFromInventoryByKey(useItem.key, character, 1);
 
@@ -87,11 +87,12 @@ export class ItemUse {
     return true;
   }
 
-  private async applyItemUsage(bluePrintItem: Partial<IItem>, characterId: string): Promise<void> {
+  private applyItemUsage(bluePrintItem: Partial<IItem>, characterId: string): void {
     const intervals = bluePrintItem.subType === ItemSubType.Food ? 5 : 1;
 
-    const character = await Character.findOne({ _id: characterId });
     new ItemUseCycle(async () => {
+      const character = await Character.findOne({ _id: characterId });
+
       if (character) {
         bluePrintItem.usableEffect(character);
         await character.save();
