@@ -72,7 +72,7 @@ export class SpellCast {
     }
 
     const hasteActivated = await this.characterEntitiesBuff.checkHasteActivated(character);
-    if (hasteActivated) {
+    if (hasteActivated && spell.magicWords === "talas hiz") {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, Haste Speed is already activated.");
       return false;
     }

@@ -14,7 +14,7 @@ export const spellSelfHaste: Partial<ISpell> = {
   manaCost: 40,
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
-  animationKey: AnimationEffectKeys.ManaHeal,
+  animationKey: AnimationEffectKeys.HasteSpell,
 
   usableEffect: async (character: ICharacter) => {
     const characterSkillBuff = container.get(CharacterSkillBuff);
