@@ -17,4 +17,5 @@ export const itemGuanDao: Partial<IItem> = {
   defense: 2,
   rangeType: EntityAttackType.Melee,
   basePrice: 65,
+  isTwoHanded: true,
 };

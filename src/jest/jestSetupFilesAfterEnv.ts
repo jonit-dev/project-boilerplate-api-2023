@@ -15,6 +15,17 @@ jest.mock("@providers/constants/SkillConstants", () => ({
   EXP_RATIO: 1,
 }));
 
+jest.mock("@providers/constants/LootConstants", () => ({
+  LOOT_GOLD_LEVEL_WEIGHT: 1.5,
+  LOOT_GOLD_MAX_HEALTH_WEIGHT: 0.25,
+  LOOT_GOLD_QTY_RATIO: 1.5,
+  LOOT_GOLD_RESISTANCE_WEIGHT: 1.5,
+  LOOT_GOLD_STRENGTH_WEIGHT: 1,
+  LOOT_CRAFTING_MATERIAL_DROP_CHANCE: 1,
+  LOOT_GOLD_DROP_CHANCE: 1,
+  NPC_LOOT_CHANCE_MULTIPLIER: 1,
+}));
+
 jest.mock("mongoose-update-if-current", () => ({
   updateIfCurrentPlugin: jest.fn(), // mock the plugin because otherwise it will break many tests
 }));

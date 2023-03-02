@@ -1,9 +1,9 @@
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import {
+  LOOT_GOLD_LEVEL_WEIGHT,
   LOOT_GOLD_MAX_HEALTH_WEIGHT,
-  LOOT_GOLD_RATIO,
+  LOOT_GOLD_QTY_RATIO,
   LOOT_GOLD_RESISTANCE_WEIGHT,
-  LOOT_GOLD_SKILLS_WEIGHT,
   LOOT_GOLD_STRENGTH_WEIGHT,
 } from "@providers/constants/LootConstants";
 import { provide } from "inversify-binding-decorators";
@@ -25,9 +25,9 @@ export const calculateGold = (maxHealth: number, skills: Partial<ISkill>): numbe
 
   const total =
     maxHealth * LOOT_GOLD_MAX_HEALTH_WEIGHT +
-    level * LOOT_GOLD_SKILLS_WEIGHT +
+    level * LOOT_GOLD_LEVEL_WEIGHT +
     strength * LOOT_GOLD_STRENGTH_WEIGHT +
     resistance * LOOT_GOLD_RESISTANCE_WEIGHT;
 
-  return Math.floor((total * LOOT_GOLD_RATIO) / 5);
+  return Math.floor((total * LOOT_GOLD_QTY_RATIO) / 5);
 };

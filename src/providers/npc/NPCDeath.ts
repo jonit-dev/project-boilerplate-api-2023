@@ -4,7 +4,12 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
-import { NPC_LOOT_CHANCE_MULTIPLIER } from "@providers/constants/NPCConstants";
+import {
+  LOOT_CRAFTING_MATERIAL_DROP_CHANCE,
+  LOOT_GOLD_DROP_CHANCE,
+  NPC_LOOT_CHANCE_MULTIPLIER,
+} from "@providers/constants/LootConstants";
+
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemRarity } from "@providers/item/ItemRarity";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -102,7 +107,7 @@ export class NPCDeath {
     const calculatedGold = calculateGold(npc.maxHealth, npc?.skills as unknown as Partial<ISkill>);
     const randomPercentage = (): number => random(70, 100) / 100;
     const goldLoot: INPCLoot = {
-      chance: 30 * NPC_LOOT_CHANCE_MULTIPLIER,
+      chance: LOOT_GOLD_DROP_CHANCE,
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       quantityRange: [1 + Math.floor(randomPercentage() * calculatedGold), Math.floor(calculatedGold)],
     };
@@ -129,7 +134,7 @@ export class NPCDeath {
       let lootChance = loot.chance * NPC_LOOT_CHANCE_MULTIPLIER;
 
       if (blueprintData?.type === ItemType.CraftingResource) {
-        lootChance = loot.chance; // crafting materials not impacted by NPC_LOOT_CHANCE_MULTIPLIER
+        lootChance = loot.chance * LOOT_CRAFTING_MATERIAL_DROP_CHANCE; // crafting materials not impacted by NPC_LOOT_CHANCE_MULTIPLIER
       }
 
       if (rand <= lootChance) {
