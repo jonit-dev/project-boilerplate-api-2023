@@ -19,7 +19,7 @@ export class CharacterBasicAttributesBuff {
     character: ICharacter,
     basicAttribute: BasicAttribute,
     percentageOfBuff: number,
-    id?: Types.ObjectId
+    buffId?: Types.ObjectId
   ): Promise<IAppliedBuffsEffect> {
     const isAdding = percentageOfBuff > 0;
 
@@ -28,7 +28,7 @@ export class CharacterBasicAttributesBuff {
       basicAttribute,
       isAdding,
       percentageOfBuff,
-      id
+      buffId
     );
     return appliedBuffEffect;
   }

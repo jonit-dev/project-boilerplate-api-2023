@@ -13,12 +13,18 @@ export class CharacterCombatSkillBuff {
   public async updateCombatSkill(
     character: ICharacter,
     combatSkill: CombatSkill,
-    buff: number,
-    buddIf?: Types.ObjectId
+    percentageOfBuff: number,
+    buffId?: Types.ObjectId
   ): Promise<IAppliedBuffsEffect> {
-    const isAdding = buff > 0;
+    const isAdding = percentageOfBuff > 0;
 
-    const appliedBuffsEffect = await this.combatSkillHandler(character, combatSkill, isAdding, buff, buddIf);
+    const appliedBuffsEffect = await this.combatSkillHandler(
+      character,
+      combatSkill,
+      isAdding,
+      percentageOfBuff,
+      buffId
+    );
 
     return appliedBuffsEffect;
   }

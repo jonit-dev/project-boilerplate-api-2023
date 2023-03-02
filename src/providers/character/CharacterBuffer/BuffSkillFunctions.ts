@@ -1,13 +1,23 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SkillCalculator } from "@providers/skill/SkillCalculator";
-import { BasicAttribute, CombatSkill, IAppliedBuffsEffect, ISkillDetails, SkillType } from "@rpg-engine/shared";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import {
+  BasicAttribute,
+  CharacterEntities,
+  CharacterSocketEvents,
+  CombatSkill,
+  IAppliedBuffsEffect,
+  ICharacterAttributeChanged,
+  ISkillDetails,
+  SkillType,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 
 @provide(BuffSkillFunctions)
 export class BuffSkillFunctions {
-  constructor(private skillCalculator: SkillCalculator) {}
+  constructor(private skillCalculator: SkillCalculator, private socketMessaging: SocketMessaging) {}
 
   /**
    * Positive buff will add level, negative buff will remove level
@@ -37,6 +47,88 @@ export class BuffSkillFunctions {
 
     const save = await skills.save();
     if (save) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public async updateBuffEntities(
+    character: ICharacter,
+    skillType: string,
+    buffedLvl: number,
+    isAdding: boolean
+  ): Promise<boolean> {
+    // const character = await Character.findById(character._id) as ICharacter;
+    if (buffedLvl === 0) {
+      return false;
+    }
+
+    if (isAdding && skillType) {
+      character[skillType] = character[skillType] + buffedLvl;
+    } else {
+      character[skillType] = Math.max(character[skillType] - buffedLvl, 1);
+    }
+
+    let payload: ICharacterAttributeChanged = {
+      targetId: "",
+    };
+
+    switch (skillType) {
+      case CharacterEntities.MaxHealth: {
+        if (character[skillType] < character.health) {
+          character.health = character[skillType];
+          payload = {
+            targetId: character._id,
+            maxHealth: character[skillType],
+            health: character[skillType],
+          };
+        } else {
+          payload = {
+            targetId: character._id,
+            maxHealth: character[skillType],
+          };
+        }
+
+        break;
+      }
+
+      case CharacterEntities.MaxMana: {
+        if (character[skillType] < character.mana) {
+          character.mana = character[skillType];
+          payload = {
+            targetId: character._id,
+            maxMana: character[skillType],
+            mana: character[skillType],
+          };
+        } else {
+          payload = {
+            targetId: character._id,
+            maxMana: character[skillType],
+          };
+        }
+        break;
+      }
+
+      case CharacterEntities.Speed: {
+        character.baseSpeed = character[skillType];
+
+        payload = {
+          targetId: character._id,
+          speed: character.speed,
+        };
+
+        break;
+      }
+
+      default: {
+        break;
+      }
+    }
+
+    const save = await character.save();
+    if (save) {
+      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
       return true;
     } else {
       return false;
@@ -154,14 +246,22 @@ export class BuffSkillFunctions {
 
     const skills = (await Skill.findById(character.skills)) as ISkill;
     const appliedBuffsEffects = character.appliedBuffsEffects;
-
     if (appliedBuffsEffects) {
       const isAdding = false;
       const totalValues = this.sumBuffEffects(appliedBuffsEffects);
 
       for (let i = 0; i < totalValues.length; i++) {
-        if (totalValues[i].key !== "experience") {
-          await this.updateBuffSkillLevel(skills, totalValues[i].key, totalValues[i].value, isAdding);
+        if (
+          totalValues[i].key.includes(totalValues[i].key as CharacterEntities) ||
+          totalValues[i].key.indexOf(totalValues[i].key as CharacterEntities) !== -1
+        ) {
+          if (totalValues[i].key !== CharacterEntities.Speed) {
+            await this.updateBuffEntities(character, totalValues[i].key, totalValues[i].value, isAdding);
+          }
+        } else {
+          if (totalValues[i].key !== "experience") {
+            await this.updateBuffSkillLevel(skills, totalValues[i].key, totalValues[i].value, isAdding);
+          }
         }
       }
     }
@@ -195,6 +295,12 @@ export class BuffSkillFunctions {
       CombatSkill.Club,
     ];
 
+    const characterEntities: CharacterEntities[] = [
+      CharacterEntities.Speed,
+      CharacterEntities.MaxMana,
+      CharacterEntities.MaxHealth,
+    ];
+
     if (
       basicAttributes.includes(skillType as BasicAttribute) ||
       basicAttributes.indexOf(skillType as BasicAttribute) !== -1
@@ -204,6 +310,13 @@ export class BuffSkillFunctions {
 
     if (combatSkills.includes(skillType as CombatSkill) || combatSkills.indexOf(skillType as CombatSkill) !== -1) {
       return (skillTypeDefinition = SkillType.Combat);
+    }
+
+    if (
+      characterEntities.includes(skillType as CharacterEntities) ||
+      characterEntities.indexOf(skillType as CharacterEntities) !== -1
+    ) {
+      return (skillTypeDefinition = SkillType.Character);
     }
 
     return skillTypeDefinition;

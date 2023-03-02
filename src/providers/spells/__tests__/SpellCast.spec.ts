@@ -204,7 +204,6 @@ describe("SpellCast.ts", () => {
         targetId: testCharacter._id,
         health: newHealth,
         mana: newMana,
-        speed: character.speed,
       }
     );
 
@@ -254,7 +253,6 @@ describe("SpellCast.ts", () => {
         targetId: testCharacter._id,
         health: newHealth,
         mana: newMana,
-        speed: character.speed,
       }
     );
 

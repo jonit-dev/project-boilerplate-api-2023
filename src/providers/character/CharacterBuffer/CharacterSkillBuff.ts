@@ -1,16 +1,18 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { BasicAttribute, CombatSkill, IAppliedBuffsEffect, SkillType } from "@rpg-engine/shared";
+import { BasicAttribute, CharacterEntities, CombatSkill, IAppliedBuffsEffect, SkillType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { BuffSkillFunctions } from "./BuffSkillFunctions";
 import { CharacterBasicAttributesBuff } from "./CharacterBasicAttributesBuff";
 import { CharacterCombatSkillBuff } from "./CharacterCombatSkillBuff";
+import { CharacterEntitiesBuff } from "./CharacterEntitiesBuff";
 
 @provide(CharacterSkillBuff)
 export class CharacterSkillBuff {
   constructor(
     private characterBasicAttributesBuff: CharacterBasicAttributesBuff,
     private characterCombatSkillBuff: CharacterCombatSkillBuff,
+    private characterEntitiesBuff: CharacterEntitiesBuff,
     private buffSkillFunctions: BuffSkillFunctions
   ) {}
 
@@ -199,6 +201,33 @@ export class CharacterSkillBuff {
         break;
       }
 
+      case SkillType.Character: {
+        const buffSkill = await this.characterEntitiesBuff.updateCharacterEntities(
+          character,
+          skillType as CharacterEntities,
+          buff
+        );
+
+        setTimeout(async () => {
+          const refreshCharacter = await Character.findById(character._id);
+          if (refreshCharacter && refreshCharacter.appliedBuffsEffects) {
+            const appliedBuffsEffect = this.buffSkillFunctions.getValueByBuffId(
+              refreshCharacter?.appliedBuffsEffects,
+              buffSkill._id
+            );
+            if (appliedBuffsEffect) {
+              await this.characterEntitiesBuff.updateCharacterEntities(
+                refreshCharacter,
+                skillType as CharacterEntities,
+                buff * -1,
+                buffSkill._id
+              );
+            }
+          }
+        }, 1000 * timeOutInSecs);
+
+        break;
+      }
       default: {
         break;
       }

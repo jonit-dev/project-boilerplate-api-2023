@@ -8,6 +8,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { CharacterSocketEvents, ICharacterLogout } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { BuffSkillFunctions } from "../CharacterBuffer/BuffSkillFunctions";
 import { CharacterView } from "../CharacterView";
 
 @provide(CharacterNetworkLogout)
@@ -17,7 +18,8 @@ export class CharacterNetworkLogout {
     private socketAuth: SocketAuth,
     private socketConnection: SocketConnection,
     private characterView: CharacterView,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private buffSkillFunctions: BuffSkillFunctions
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -38,6 +40,8 @@ export class CharacterNetworkLogout {
         console.log(`🚪: Character id ${data.id} has disconnected`);
 
         await Character.updateOne({ _id: data.id }, { isOnline: false, baseSpeed: MovementSpeed.Slow });
+
+        await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());
 

@@ -1,19 +1,9 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { container } from "@providers/inversify/container";
-import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { ItemUseCycle } from "@providers/item/ItemUseCycle";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  AnimationEffectKeys,
-  CharacterSocketEvents,
-  ICharacterAttributeChanged,
-  SpellCastingType,
-} from "@rpg-engine/shared";
+import { AnimationEffectKeys, CharacterEntities, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
-
-const HASTE_CONTROL: Map<string, any> = new Map();
 
 export const spellSelfHaste: Partial<ISpell> = {
   key: SpellsBlueprint.SelfHasteSpell,
@@ -24,44 +14,15 @@ export const spellSelfHaste: Partial<ISpell> = {
   manaCost: 40,
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
-  animationKey: AnimationEffectKeys.HasteSpell,
+  animationKey: AnimationEffectKeys.ManaHeal,
 
-  usableEffect: (character: ICharacter) => {
-    const socketMessaging = container.get(SocketMessaging);
-    const itemUsableEffect = container.get(ItemUsableEffect);
-    const animationEffect = container.get(AnimationEffect);
+  usableEffect: async (character: ICharacter) => {
+    const characterSkillBuff = container.get(CharacterSkillBuff);
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
-    const increaseSpeed = 3;
-    itemUsableEffect.apply(character, EffectableAttribute.Speed, increaseSpeed);
+    const timeout = Math.min(Math.max(skills.magic.level * 8, 0), 120);
+    const skillType = CharacterEntities.Speed;
 
-    if (HASTE_CONTROL.has(character._id)) {
-      clearTimeout(HASTE_CONTROL.get(character._id)!);
-      HASTE_CONTROL.delete(character._id);
-    }
-
-    HASTE_CONTROL.set(
-      character._id,
-      setTimeout(async () => {
-        // This is needed for update channelId for eventListener
-        const updateCharacter = await Character.findById(character._id);
-        if (!updateCharacter) return;
-
-        updateCharacter.baseSpeed = MovementSpeed.Slow;
-        await updateCharacter.save();
-
-        const payload: ICharacterAttributeChanged = {
-          targetId: updateCharacter._id,
-          speed: updateCharacter.speed,
-        };
-
-        socketMessaging.sendEventToUser(updateCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
-
-        new ItemUseCycle(async () => {
-          if (character) {
-            await animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.HasteSpell);
-          }
-        }, 1000 * 45);
-      }, 1000 * 45)
-    );
+    await characterSkillBuff.enableTemporaryBuff(character, skillType, 30, timeout);
   },
 };

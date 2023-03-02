@@ -12,6 +12,7 @@ import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { BasicAttribute, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { spellsBlueprints } from "./data/blueprints/index";
+import { CharacterEntitiesBuff } from "@providers/character/CharacterBuffer/CharacterEntitiesBuff";
 
 @provide(SpellCast)
 export class SpellCast {
@@ -22,7 +23,8 @@ export class SpellCast {
     private characterItems: CharacterItems,
     private skillIncrease: SkillIncrease,
     private characterBonusPenalties: CharacterBonusPenalties,
-    private itemUsableEffect: ItemUsableEffect
+    private itemUsableEffect: ItemUsableEffect,
+    private characterEntitiesBuff: CharacterEntitiesBuff
   ) {}
 
   public isSpellCasting(msg: string): boolean {
@@ -66,6 +68,12 @@ export class SpellCast {
 
     if (character.mana < spell.manaCost) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you do not have mana to cast this spell.");
+      return false;
+    }
+
+    const hasteActivated = await this.characterEntitiesBuff.checkHasteActivated(character);
+    if (hasteActivated) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, Haste Speed is already activated.");
       return false;
     }
 
@@ -131,20 +139,22 @@ export class SpellCast {
   }
 
   private async sendPostSpellCastEvents(character: ICharacter, spell: ISpell): Promise<void> {
+    const updatedCharacter = (await Character.findById(character._id).lean()) as ICharacter;
+
     const payload: ICharacterAttributeChanged = {
-      targetId: character._id,
-      health: character.health,
-      mana: character.mana,
-      speed: character.speed,
+      targetId: updatedCharacter._id,
+      health: updatedCharacter.health,
+      mana: updatedCharacter.mana,
+      speed: updatedCharacter.speed,
     };
 
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+    this.socketMessaging.sendEventToUser(updatedCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
     await this.socketMessaging.sendEventToCharactersAroundCharacter(
-      character,
+      updatedCharacter,
       CharacterSocketEvents.AttributeChanged,
       payload
     );
 
-    await this.animationEffect.sendAnimationEventToCharacter(character, spell.animationKey);
+    await this.animationEffect.sendAnimationEventToCharacter(updatedCharacter, spell.animationKey);
   }
 }
