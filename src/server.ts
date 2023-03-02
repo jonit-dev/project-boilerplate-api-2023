@@ -7,8 +7,10 @@ import {
   characterConnection,
   cronJobs,
   db,
+  heapMonitor,
   mapLoader,
   npcManager,
+  pm2Helper,
   redisManager,
   seeds,
   server,
@@ -81,5 +83,9 @@ app.listen(port, async () => {
       // We recommend adjusting this value in production
       tracesSampleRate: 1.0,
     });
+
+    if (process.env.pm_id === pm2Helper.pickLastCPUInstance()) {
+      heapMonitor.monitor();
+    }
   }
 });

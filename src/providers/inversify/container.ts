@@ -7,6 +7,8 @@ import { MapLoader } from "@providers/map/MapLoader";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
+import { HeapMonitor } from "@providers/server/HeapMonitor";
+import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
@@ -58,5 +60,9 @@ export const characterSkillBuff = container.get<CharacterSkillBuff>(CharacterSki
 export const inMemoryRepository = container.get<InMemoryRepository>(InMemoryRepository);
 
 export const inMemoryHashTable = container.get<InMemoryHashTable>(InMemoryHashTable);
+
+export const heapMonitor = container.get<HeapMonitor>(HeapMonitor);
+
+export const pm2Helper = container.get<PM2Helper>(PM2Helper);
 
 export { container };
