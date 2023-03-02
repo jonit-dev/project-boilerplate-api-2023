@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { container } from "@providers/inversify/container";
-import { ItemUseCycle } from "@providers/item/ItemUseCycle";
 import { AnimationEffectKeys, BasicAttribute, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 
@@ -21,14 +21,13 @@ export const spellPhysicalShield: Partial<ISpell> = {
     const characterSkillBuff = container.get(CharacterSkillBuff);
     const animationEffect = container.get(AnimationEffect);
 
-    const timeout = 300;
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+    const timeout = Math.min(Math.max(skills.magic.level * 5, 0), 180);
 
     await characterSkillBuff.enableTemporaryBuff(character, BasicAttribute.Resistance, 30, timeout);
 
-    new ItemUseCycle(async () => {
-      if (character) {
-        await animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.PhysicalShield);
-      }
-    }, timeout / 10);
+    if (character) {
+      await animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.PhysicalShield);
+    }
   },
 };
