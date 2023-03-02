@@ -1,5 +1,5 @@
 import { tsDefaultDecorator, tsEnumDecorator } from "@providers/constants/ValidationConstants";
-import { CharacterFactions } from "@rpg-engine/shared";
+import { CharacterClass, CharacterFactions } from "@rpg-engine/shared";
 import { IsDefined, IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateCharacterDTO {
@@ -22,4 +22,7 @@ export class CreateCharacterDTO {
   @IsNotEmpty(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   textureKey: string;
+
+  @IsEnum(CharacterClass, tsEnumDecorator("validation", "isEnum", CharacterClass))
+  class: string;
 }

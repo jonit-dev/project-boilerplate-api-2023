@@ -5,6 +5,13 @@ Content-Type: application/json
 
 ###
 
+#Factions :: Get Casses
+GET {{baseUrl}}/factions/classes HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
 #Factions :: Get Sprites by Faction and Race
 GET {{baseUrl}}/factions/sprites?faction=Life Bringer&race=Human HTTP/1.1
 Authorization: Bearer {{authToken}}
@@ -21,7 +28,7 @@ Content-Type: application/json
   "name": "Jonit",
   "faction": "Life Bringer",
   "race": "Human",
-  "textureKey": "kid-1"
+  "textureKey": "purple-hair-hero-1"
 }
 
 ###
