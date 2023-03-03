@@ -28,7 +28,8 @@ Content-Type: application/json
   "name": "Jonit",
   "faction": "Life Bringer",
   "race": "Human",
-  "textureKey": "purple-hair-hero-1"
+  "textureKey": "purple-hair-hero-1",
+  "class": "Warrior"
 }
 
 ###
