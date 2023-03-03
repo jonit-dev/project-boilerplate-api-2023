@@ -3,10 +3,16 @@ import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
 import { controller, httpGet, interfaces, queryParam } from "inversify-express-utils";
 import { ReadFactionRacesUseCase } from "./read/ReadFactionRacesUseCase";
 import { ReadSpriteUseCase } from "./read/ReadSpriteUseCase";
+import { TypeHelper, CharacterClass } from "@rpg-engine/shared";
 
 @controller("/factions", AuthMiddleware)
 export class FactionController implements interfaces.Controller {
   constructor(private readFactionRacesUseCase: ReadFactionRacesUseCase, private readSpriteUseCase: ReadSpriteUseCase) {}
+
+  @httpGet("/classes")
+  private getFactionClasses(): string[] {
+    return TypeHelper.enumToStringArray(CharacterClass);
+  }
 
   @httpGet("/races")
   private getFactionRaces(@queryParam("faction") faction: string): string[] {
