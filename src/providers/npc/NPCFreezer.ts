@@ -9,6 +9,7 @@ import { NPCView } from "./NPCView";
 import { appEnv } from "@providers/config/env";
 import { NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
 import { PM2Helper } from "@providers/server/PM2Helper";
+import { EnvType } from "@rpg-engine/shared";
 import CPUusage from "cpu-percentage";
 import round from "lodash/round";
 
@@ -51,7 +52,9 @@ export class NPCFreezer {
   }
 
   public async freezeNPC(npc: INPC, isForced?: boolean): Promise<void> {
-    console.log(`Freezing NPC ${npc.key} (${npc.id}) ${isForced ? "(FORCED)" : ""}`);
+    if (appEnv.general.ENV === EnvType.Development) {
+      console.log(`Freezing NPC ${npc.key} (${npc.id}) ${isForced ? "(FORCED)" : ""}`);
+    }
 
     await NPC.updateOne({ _id: npc._id }, { isBehaviorEnabled: false });
     const npcCycle = NPC_CYCLES.get(npc.id);
@@ -78,9 +81,12 @@ export class NPCFreezer {
     setInterval(async () => {
       const end = CPUusage(start);
       const totalCPUUsage = round(end.percent);
-      console.log(
-        `NPC_CYCLES: ${NPC_CYCLES.size} NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size} CPU_USAGE: ${totalCPUUsage}%`
-      );
+
+      if (appEnv.general.ENV === EnvType.Development) {
+        console.log(
+          `NPC_CYCLES: ${NPC_CYCLES.size} NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size} CPU_USAGE: ${totalCPUUsage}%`
+        );
+      }
 
       const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
 
