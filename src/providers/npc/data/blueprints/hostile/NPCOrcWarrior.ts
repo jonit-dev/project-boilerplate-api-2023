@@ -14,7 +14,6 @@ import {
   LegsBlueprint,
   MacesBlueprint,
   RangedWeaponsBlueprint,
-  SpearsBlueprint,
   SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -143,14 +142,7 @@ export const npcOrcWarrior = {
       itemBlueprintKey: AccessoriesBlueprint.SoldiersRing,
       chance: 10,
     },
-    {
-      itemBlueprintKey: SpearsBlueprint.BohemianEarspoon,
-      chance: 20,
-    },
-    {
-      itemBlueprintKey: SwordsBlueprint.LongSword,
-      chance: 15,
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.BlueFeather,
       chance: 1,

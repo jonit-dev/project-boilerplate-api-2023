@@ -7,10 +7,12 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
+  HelmetsBlueprint,
   MacesBlueprint,
   MagicsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -48,6 +50,18 @@ export const npcCaveTroll = {
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 25,
+    },
+    {
+      itemBlueprintKey: HelmetsBlueprint.WingHelmet,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.BohemianEarspoon,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.LongSword,
+      chance: 15,
     },
     {
       itemBlueprintKey: GlovesBlueprint.ChainGloves,

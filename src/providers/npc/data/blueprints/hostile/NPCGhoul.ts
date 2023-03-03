@@ -69,10 +69,7 @@ export const npcGhoul = {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,
       chance: 5,
     },
-    {
-      itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
-      chance: 15,
-    },
+
     {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,
       chance: 20,

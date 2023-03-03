@@ -56,7 +56,7 @@ export const npcFrostSalamander: Partial<INPC> = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
-      chance: 15,
+      chance: 1,
     },
     {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,

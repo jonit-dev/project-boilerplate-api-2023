@@ -53,6 +53,10 @@ export const npcForestTroll = {
   fleeOnLowHealth: true,
   loots: [
     {
+      itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
+      chance: 15,
+    },
+    {
       itemBlueprintKey: LegsBlueprint.BronzeLegs,
       chance: 2,
     },
