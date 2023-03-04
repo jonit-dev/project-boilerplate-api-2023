@@ -24,7 +24,7 @@ export class CreateCharacterDTO {
   @IsString(tsDefaultDecorator("validation", "isType", { type: "string" }))
   textureKey: string;
 
-  @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
+  // @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsIn(ReadCharacterClass.getPlayingCharacterClasses())
   class: string;
 }

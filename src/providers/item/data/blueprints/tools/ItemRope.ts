@@ -13,4 +13,5 @@ export const itemRope: Partial<IItemUseWith> = {
   weight: 0.7,
   maxStackSize: 15,
   basePrice: 0.8,
+  canSell: false,
 };

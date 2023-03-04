@@ -16,10 +16,11 @@ export const itemFishingRod: Partial<IItemUseWith> = {
   texturePath: "tools/fishing-rod.png",
   name: "Fishing Rod",
   description: "A tool primarily used to catch fish. It requires a worm as bait to be effective.",
-  weight: 0.25,
+  weight: 0.1,
   hasUseWith: true,
   basePrice: 70,
   useWithMaxDistanceGrid: 7,
+  canSell: false,
   useWithTileEffect: async (
     originItem: IItem,
     targetTile: IUseWithTargetTile,

@@ -13,4 +13,5 @@ export const itemWorm: Partial<IItemUseWith> = {
   weight: 0.01,
   maxStackSize: 100,
   basePrice: 0.5,
+  canSell: false,
 };

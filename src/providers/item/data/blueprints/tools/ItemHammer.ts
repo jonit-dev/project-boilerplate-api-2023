@@ -23,11 +23,12 @@ export const itemHammer: Partial<IItemUseWith> = {
   description: "A simple hammer used as a weapon or for blacksmithing.",
   attack: 5,
   defense: 2,
-  weight: 2,
+  weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
   basePrice: 60,
   hasUseWith: true,
+  canSell: false,
   useWithMaxDistanceGrid: 2,
   useWithTileEffect: async (
     originItem: IItem,

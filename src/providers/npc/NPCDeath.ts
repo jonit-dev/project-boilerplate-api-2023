@@ -6,6 +6,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import {
   LOOT_CRAFTING_MATERIAL_DROP_CHANCE,
+  LOOT_FOOD_DROP_CHANCE,
   LOOT_GOLD_DROP_CHANCE,
   NPC_LOOT_CHANCE_MULTIPLIER,
 } from "@providers/constants/LootConstants";
@@ -15,7 +16,7 @@ import { ItemRarity } from "@providers/item/ItemRarity";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemType } from "@rpg-engine/shared";
+import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemSubType, ItemType } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
@@ -107,7 +108,7 @@ export class NPCDeath {
     const calculatedGold = calculateGold(npc.maxHealth, npc?.skills as unknown as Partial<ISkill>);
     const randomPercentage = (): number => random(70, 100) / 100;
     const goldLoot: INPCLoot = {
-      chance: LOOT_GOLD_DROP_CHANCE,
+      chance: LOOT_GOLD_DROP_CHANCE * 100,
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       quantityRange: [1 + Math.floor(randomPercentage() * calculatedGold), Math.floor(calculatedGold)],
     };
@@ -131,10 +132,16 @@ export class NPCDeath {
       const rand = Math.round(random(0, 100));
       const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
 
-      let lootChance = loot.chance * NPC_LOOT_CHANCE_MULTIPLIER;
+      let lootChance = loot.chance;
 
-      if (blueprintData?.type === ItemType.CraftingResource) {
+      if (loot.itemBlueprintKey === OthersBlueprint.GoldCoin) {
+        lootChance = loot.chance;
+      } else if (blueprintData?.type === ItemType.CraftingResource) {
         lootChance = loot.chance * LOOT_CRAFTING_MATERIAL_DROP_CHANCE; // crafting materials not impacted by NPC_LOOT_CHANCE_MULTIPLIER
+      } else if (blueprintData?.type === ItemSubType.Food) {
+        lootChance = loot.chance * LOOT_FOOD_DROP_CHANCE;
+      } else {
+        lootChance = loot.chance * NPC_LOOT_CHANCE_MULTIPLIER;
       }
 
       if (rand <= lootChance) {

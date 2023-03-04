@@ -23,11 +23,12 @@ export const itemPickaxe: Partial<IItemUseWith> = {
   description: "A tool used for mining, breaking rocks or even as a weapon.",
   attack: 4,
   defense: 2,
-  weight: 2,
+  weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
   basePrice: 60,
   hasUseWith: true,
+  canSell: false,
   useWithMaxDistanceGrid: 2,
   useWithTileEffect: async (
     originItem: IItem,
