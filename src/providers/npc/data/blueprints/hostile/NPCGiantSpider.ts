@@ -19,7 +19,7 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
+import { AnimationEffectKeys, NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -30,9 +30,11 @@ export const npcGiantSpider: Partial<INPC> = {
   subType: NPCSubtype.Insect,
   textureKey: HostileNPCsBlueprint.GiantSpider,
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.Melee,
+  attackType: EntityAttackType.MeleeRanged,
   speed: MovementSpeed.ExtraFast,
-  baseHealth: 800,
+  ammoKey: AnimationEffectKeys.Green,
+  maxRangeAttack: 6,
+  baseHealth: 1000,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
@@ -46,6 +48,9 @@ export const npcGiantSpider: Partial<INPC> = {
     },
     resistance: {
       level: 30,
+    },
+    magicResistance: {
+      level: 20,
     },
   },
   fleeOnLowHealth: true,

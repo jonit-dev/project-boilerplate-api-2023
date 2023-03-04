@@ -96,8 +96,6 @@ export class CharacterNetworkUpdate {
 
             await this.handleNonPVPZone(character, newX, newY);
 
-            await this.characterView.clearAllOutOfViewElements(character);
-
             // try to avoid the teleport bug, by locking the fields before the map transition
             await character.lockField("x");
             await character.lockField("y");
@@ -106,7 +104,8 @@ export class CharacterNetworkUpdate {
             // leave it for last!
             await this.handleMapTransition(character, newX, newY);
 
-            await this.characterView.clearAllOutOfViewElements(character);
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            this.characterView.clearAllOutOfViewElements(character);
           }
 
           // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.

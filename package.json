@@ -24,7 +24,7 @@
     "configure:first-time": "./environment/first-time-setup.sh",
     "configure": "./environment/configure.sh",
     "db:export": "./environment/db-export.sh",
-    "db:import": "echo 'Please activate this command manually by adding ./environment/db-import.sh'",
+    "db:import": "./environment/db-import.sh",
     "db:download": "./environment/db-download.sh",
     "cache:clear": "sudo rm -rf ./src/providers/data/cache/**"
   },

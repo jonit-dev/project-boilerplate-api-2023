@@ -11,7 +11,7 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
+import { AnimationEffectKeys, NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -22,23 +22,28 @@ export const npcRedDragon = {
   subType: NPCSubtype.Animal,
   textureKey: HostileNPCsBlueprint.RedDragon,
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Fast,
+  attackType: EntityAttackType.MeleeRanged,
+  ammoKey: AnimationEffectKeys.FireBall,
+  maxRangeAttack: 8,
+  speed: MovementSpeed.ExtraFast,
   baseHealth: 6000,
   healthRandomizerDice: Dice.D20,
   skillRandomizerDice: Dice.D20,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 200,
+    level: 120,
     strength: {
-      level: 270,
+      level: 120,
     },
     dexterity: {
-      level: 270,
+      level: 90,
     },
     resistance: {
-      level: 300,
+      level: 70,
+    },
+    magicResistance: {
+      level: 80,
     },
   },
   fleeOnLowHealth: true,
