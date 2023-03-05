@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import {
   AxesBlueprint,
+  CraftingResourcesBlueprint,
   DaggersBlueprint,
   FoodsBlueprint,
   MacesBlueprint,
@@ -27,7 +28,13 @@ export const npcTrader = {
       key: PotionsBlueprint.LightLifePotion,
     },
     {
+      key: PotionsBlueprint.LightAntidote,
+    },
+    {
       key: PotionsBlueprint.GreaterLifePotion,
+    },
+    {
+      key: CraftingResourcesBlueprint.Bandage,
     },
     {
       key: PotionsBlueprint.ManaPotion,

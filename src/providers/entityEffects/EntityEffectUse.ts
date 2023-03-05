@@ -1,15 +1,18 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { UISocketEvents } from "@rpg-engine/shared";
+import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import { EntityEffectCycle } from "./EntityEffectCycle";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 import { entityEffectsBlueprintsIndex } from "./data/index";
+import { EntityEffectBlueprint } from "./data/types/entityEffectBlueprintTypes";
 
 @provide(EntityEffectUse)
 export class EntityEffectUse {
-  constructor() {}
+  constructor(private socketMessaging: SocketMessaging) {}
 
   public async applyEntityEffects(target: ICharacter | INPC, attacker: INPC): Promise<void> {
     const entityEffects = this.getApplicableEntityEffects(attacker);
@@ -19,6 +22,37 @@ export class EntityEffectUse {
 
     for (const entityEffect of entityEffects) {
       await this.applyEntityEffect(entityEffect, target, attacker);
+    }
+  }
+
+  public async clearEntityEffect(effectKey: EntityEffectBlueprint, target: ICharacter | INPC): Promise<void> {
+    if (!target.appliedEntityEffects) {
+      return;
+    }
+
+    const hasEntityEffect = target.appliedEntityEffects.some((effect) => effect.key === effectKey);
+
+    if (!hasEntityEffect) {
+      return;
+    }
+
+    target.appliedEntityEffects = target.appliedEntityEffects.filter((effect) => effect.key !== effectKey);
+
+    if (target.type === EntityType.Character) {
+      const character = target as ICharacter;
+      await Character.updateOne(
+        { _id: character._id },
+        { $set: { appliedEntityEffects: character.appliedEntityEffects } }
+      );
+
+      this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
+        message: `The following effect was cured: ${effectKey.toLowerCase()}.`,
+      });
+      return;
+    }
+
+    if (target.type === EntityType.NPC) {
+      await NPC.updateOne({ _id: target._id }, { $set: { appliedEntityEffects: target.appliedEntityEffects } });
     }
   }
 

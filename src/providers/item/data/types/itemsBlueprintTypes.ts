@@ -199,6 +199,7 @@ export enum CraftingResourcesBlueprint {
   GreenIngot = "green-ingot",
   ObsidiumIngot = "obsidium-ingot",
   CorruptionIngot = "corruption-ingot",
+  Bandage = "bandage",
 }
 
 export enum ToolsBlueprint {

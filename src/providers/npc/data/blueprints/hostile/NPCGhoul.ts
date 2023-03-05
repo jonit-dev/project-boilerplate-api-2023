@@ -57,6 +57,11 @@ export const npcGhoul = {
       chance: 20,
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.Bandage,
+      chance: 20,
+      quantityRange: [1, 3],
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.Worm,
       chance: 50,
       quantityRange: [10, 15],

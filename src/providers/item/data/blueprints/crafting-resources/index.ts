@@ -1,5 +1,6 @@
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemRope } from "../tools/ItemRope";
+import { itemBandage } from "./ItemBandage";
 import { itemBatsWing } from "./ItemBatsWing";
 import { itemBlueFeather } from "./ItemBlueFeather";
 import { itemBlueLeather } from "./itemBlueLeather";
@@ -107,4 +108,5 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.GreenIngot]: itemGreenIngot,
   [CraftingResourcesBlueprint.ObsidiumIngot]: itemObsidiumIngot,
   [CraftingResourcesBlueprint.CorruptionIngot]: itemCorruptionIngot,
+  [CraftingResourcesBlueprint.Bandage]: itemBandage,
 };

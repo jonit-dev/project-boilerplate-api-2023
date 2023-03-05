@@ -45,6 +45,11 @@ export const npcGhost = {
       quantityRange: [3, 10],
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.Bandage,
+      chance: 20,
+      quantityRange: [1, 3],
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.CorruptionBolt,
       chance: 7,
     },
