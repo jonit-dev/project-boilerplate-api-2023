@@ -46,7 +46,6 @@ export const npcRedDragon = {
       level: 80,
     },
   },
-  fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
