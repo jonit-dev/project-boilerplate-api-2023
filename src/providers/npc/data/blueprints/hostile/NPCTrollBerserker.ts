@@ -51,7 +51,6 @@ export const npcTrollBerserker = {
       level: 800,
     },
   },
-  fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: GlovesBlueprint.PlateGloves,
