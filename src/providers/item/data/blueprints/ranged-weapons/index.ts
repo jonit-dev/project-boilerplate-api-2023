@@ -31,6 +31,7 @@ import { itemRuneBow } from "./ItemRuneBow";
 import { itemRuneCrossbow } from "./ItemRuneCrossbow";
 import { itemShockArrow } from "./ItemShockArrow";
 import { itemShortBow } from "./ItemShortBow";
+import { itemShuriken } from "./ItemShuriken";
 import { itemSlingshot } from "./ItemSlingshot";
 import { itemStone } from "./ItemStone";
 import { itemStormBow } from "./ItemStormBow";
@@ -41,6 +42,7 @@ import { itemZephyrusBow } from "./ItemZephyrusBow";
 export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.Slingshot]: itemSlingshot,
   [RangedWeaponsBlueprint.Stone]: itemStone,
+  [RangedWeaponsBlueprint.Shuriken]: itemShuriken,
   [RangedWeaponsBlueprint.Arrow]: itemArrow,
   [RangedWeaponsBlueprint.Crossbow]: itemCrossbow,
   [RangedWeaponsBlueprint.Bolt]: itemBolt,

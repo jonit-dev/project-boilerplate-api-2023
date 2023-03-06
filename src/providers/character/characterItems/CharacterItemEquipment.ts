@@ -40,7 +40,8 @@ export class CharacterItemEquipment {
   public async decrementItemFromEquipment(
     itemKey: string,
     character: ICharacter,
-    decrementQty: number
+    decrementQty: number,
+    equipmentSlot?: string
   ): Promise<boolean> {
     const equipment = await Equipment.findById(character.equipment);
 
@@ -49,25 +50,51 @@ export class CharacterItemEquipment {
       return false;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
-
     let item: IItem | undefined;
-    for (let [, value] of Object.entries(equipmentSlots)) {
-      if (!value) {
-        continue;
-      }
 
+    // decrement from a specific equipment slot
+    if (equipmentSlot) {
+      let value = (await Item.findById(equipment[equipmentSlot])) as unknown as IItem;
+      if (!value) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          `Oops! Nothing found on equipment slot ${equipmentSlot}.`
+        );
+        return false;
+      }
       if (!value.key) {
         value = (await Item.findById(value as any).lean()) as unknown as IItem;
       }
-
-      // item not found, continue
       if (!value) {
-        continue;
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          `Oops! Nothing found on equipment slot ${equipmentSlot}.`
+        );
+        return false;
       }
-
       if (isSameKey(value.key, itemKey)) {
         item = value;
+      }
+    } else {
+      // decrement from the first slot where it finds the item
+      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+      for (let [, value] of Object.entries(equipmentSlots)) {
+        if (!value) {
+          continue;
+        }
+
+        if (!value.key) {
+          value = (await Item.findById(value as any).lean()) as unknown as IItem;
+        }
+
+        // item not found, continue
+        if (!value) {
+          continue;
+        }
+
+        if (isSameKey(value.key, itemKey)) {
+          item = value;
+        }
       }
     }
 
@@ -94,10 +121,11 @@ export class CharacterItemEquipment {
           },
           {
             $set: {
-              stackQty: decrementQty,
+              stackQty: remaining,
             },
           }
         );
+        result = true;
       } else {
         result = await this.deleteItemFromEquipment(item._id, character);
         // we also need to delete item from items table

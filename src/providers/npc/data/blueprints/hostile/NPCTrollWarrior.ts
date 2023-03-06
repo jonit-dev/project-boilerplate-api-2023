@@ -95,6 +95,11 @@ export const npcTrollWarrior = {
       itemBlueprintKey: StaffsBlueprint.PoisonStaff,
       chance: 10,
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.Shuriken,
+      chance: 10,
+      quantityRange: [5, 10],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

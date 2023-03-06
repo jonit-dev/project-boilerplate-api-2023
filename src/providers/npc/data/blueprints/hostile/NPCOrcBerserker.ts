@@ -43,7 +43,6 @@ export const npcOrcBerserker = {
       level: 25,
     },
   },
-  fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: BootsBlueprint.IronBoots,

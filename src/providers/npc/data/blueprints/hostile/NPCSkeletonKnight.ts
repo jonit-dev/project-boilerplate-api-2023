@@ -41,7 +41,6 @@ export const npcSkeletonKnight = {
       level: 5,
     },
   },
-  fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: ArmorsBlueprint.StuddedArmor,

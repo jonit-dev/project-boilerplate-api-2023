@@ -39,9 +39,9 @@ describe("CharacterWeapon.spec.ts", () => {
   it("should return the correct weapon", async () => {
     const weapon = await characterWeapon.getWeapon(testCharacter);
 
-    if (!weapon) throw new Error("Weapon not found");
+    if (!weapon || !weapon.item) throw new Error("Weapon not found");
 
-    expect(weapon.key).toBe(SwordsBlueprint.ShortSword);
+    expect(weapon.item.key).toBe(SwordsBlueprint.ShortSword);
   });
 
   it("should return hasShield as true, if it has a shield", async () => {

@@ -90,5 +90,10 @@ export const npcDwarfArcher: Partial<INPC> = {
       chance: 20,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.Shuriken,
+      chance: 10,
+      quantityRange: [5, 10],
+    },
   ],
 };

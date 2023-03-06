@@ -1,13 +1,18 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { EntityAttackType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType, ItemSubType, ItemType, ItemSlotType } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
 
+interface ICharacterWeaponResult {
+  item: IItem;
+  location: ItemSlotType;
+}
+
 @provide(CharacterWeapon)
 export class CharacterWeapon {
-  public async getWeapon(character: ICharacter): Promise<IItem | undefined> {
+  public async getWeapon(character: ICharacter): Promise<ICharacterWeaponResult | undefined> {
     const equipment = (await Equipment.findById(character.equipment).lean()) as IEquipment;
 
     if (!equipment) {
@@ -23,11 +28,11 @@ export class CharacterWeapon {
 
     // ItemSubType Shield is of type Weapon, so check that the weapon is not subType Shield (because cannot attack with Shield)
     if (rightHandItem?.type === ItemType.Weapon && rightHandItem?.subType !== ItemSubType.Shield) {
-      return rightHandItem;
+      return { item: rightHandItem, location: ItemSlotType.RightHand };
     }
 
     if (leftHandItem?.type === ItemType.Weapon && leftHandItem?.subType !== ItemSubType.Shield) {
-      return leftHandItem;
+      return { item: leftHandItem, location: ItemSlotType.LeftHand };
     }
   }
 
@@ -56,11 +61,11 @@ export class CharacterWeapon {
   public async getAttackType(character: ICharacter): Promise<EntityAttackType | undefined> {
     const weapon = await this.getWeapon(character);
 
-    if (!weapon) {
+    if (!weapon || !weapon.item) {
       return EntityAttackType.Melee;
     }
 
-    const rangeType = weapon?.rangeType as unknown as EntityAttackType;
+    const rangeType = weapon?.item.rangeType as unknown as EntityAttackType;
 
     return rangeType;
   }

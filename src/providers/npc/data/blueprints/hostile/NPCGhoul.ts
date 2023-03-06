@@ -42,7 +42,6 @@ export const npcGhoul = {
       level: 5,
     },
   },
-  fleeOnLowHealth: false,
   loots: [
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,

@@ -73,8 +73,20 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(rangedAttackAmmo).toBeUndefined();
   });
 
+  it("character carries reanged weapon in hand slot", async () => {
+    const itemId = await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Shuriken, "rightHand", 1);
+    // @ts-ignore
+    const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
+
+    expect(rangedAttackAmmo).toBeDefined();
+    expect(rangedAttackAmmo!.location).toEqual(ItemSlotType.RightHand);
+    expect(rangedAttackAmmo!.id).toEqual(itemId);
+    expect(rangedAttackAmmo!.key).toEqual(RangedWeaponsBlueprint.Shuriken);
+    expect(rangedAttackAmmo!.maxRange).toBeGreaterThan(1);
+  });
+
   it("character carries required ammo in accesory slot", async () => {
-    const arrowId = await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
+    const arrowId = await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Arrow, "accessory", 1);
     // @ts-ignore
     const rangedAttackAmmo = await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment);
 
@@ -85,8 +97,58 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(rangedAttackAmmo!.maxRange).toBeGreaterThan(1);
   });
 
+  it("all ammo should be consumed | Hand slot", async () => {
+    const itemId = await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Shuriken, "rightHand", 1);
+    await battleRangedAttack.consumeAmmo(
+      {
+        location: ItemSlotType.RightHand,
+        id: itemId,
+        key: RangedWeaponsBlueprint.Shuriken,
+        maxRange: 7,
+        equipment: characterEquipment,
+      },
+      testCharacter
+    );
+
+    const updatedEquipment = await Equipment.findById(characterEquipment.id);
+    expect(await Item.findById(itemId)).toBeNull();
+    expect(updatedEquipment).toBeDefined();
+    expect(updatedEquipment!.rightHand).toBeUndefined();
+  });
+
+  it("some ammo should be consumed & should update stackQty | Hand slot", async () => {
+    const initialQty = 10;
+    const consumedCount = 5;
+    const itemId = await equipAmmoInEquipmentSlot(
+      characterEquipment,
+      RangedWeaponsBlueprint.Shuriken,
+      "rightHand",
+      initialQty
+    );
+
+    for (let i = 0; i < consumedCount; i++) {
+      await battleRangedAttack.consumeAmmo(
+        {
+          location: ItemSlotType.RightHand,
+          id: itemId,
+          key: RangedWeaponsBlueprint.Shuriken,
+          maxRange: 7,
+          equipment: characterEquipment,
+        },
+        testCharacter
+      );
+    }
+
+    const updatedEquipment = await Equipment.findById(characterEquipment.id);
+    const updatedItem = await Item.findById(itemId);
+    expect(updatedItem).toBeDefined();
+    expect(updatedItem?.stackQty).toEqual(initialQty - consumedCount);
+    expect(updatedEquipment).toBeDefined();
+    expect(updatedEquipment!.rightHand).toBeDefined();
+  });
+
   it("ammo should be consumed | Accessory slot", async () => {
-    const arrowId = await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
+    const arrowId = await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Arrow, "accessory", 1);
 
     await battleRangedAttack.consumeAmmo(
       {
@@ -99,8 +161,10 @@ describe("BattleRangedAttack.spec.ts", () => {
       testCharacter
     );
 
+    const updatedEquipment = await Equipment.findById(characterEquipment.id);
     expect(await Item.findById(arrowId)).toBeNull();
-    expect(characterEquipment.accessory).toBeUndefined();
+    expect(updatedEquipment).toBeDefined();
+    expect(updatedEquipment!.accessory).toBeUndefined();
   });
 
   it("ammo should NOT be consumed | Inventory slot", async () => {
@@ -132,7 +196,7 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 
   it("should NOT hit a target if attacker, target is out of range", async () => {
-    await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
+    await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Arrow, "accessory", 1);
 
     const attacker = testCharacter;
     attacker.x = FromGridX(0);
@@ -164,31 +228,38 @@ describe("BattleRangedAttack.spec.ts", () => {
     expect(hitTarget).not.toHaveBeenCalled();
   });
 
-  it("should hit a target if attacker has ranged attack type, required ammo and target is in range | ammo in accesory slot", async () => {
-    await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
+  it("should hit a target if attacker has ranged attack type, required ammo and target is in range | ammo in right hand slot", async () => {
+    await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Shuriken, "rightHand", 1);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
     expect(hitTarget).toHaveBeenCalled();
+  });
+
+  it("should hit a target if attacker has ranged attack type, required ammo and target is in range | ammo in accesory slot", async () => {
+    await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Arrow, "accessory", 1);
+    await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
+
+    expect(hitTarget).toBeCalledTimes(2);
   });
 
   it("should hit NOT a target if attacker has ranged attack type, required ammo and target is in range | ammo in backpack slot", async () => {
     await equipArrowInBackpackSlot(characterEquipment);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(1);
+    expect(hitTarget).toBeCalledTimes(2);
   });
 
   it("should hit a target if attacker has ranged attack type and target is in range | Spear weapon", async () => {
-    await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
+    await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Arrow, "accessory", 1);
     await equipWithSpear(characterEquipment);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
-    expect(hitTarget).toBeCalledTimes(1);
+    expect(hitTarget).toBeCalledTimes(2);
   });
 
   it("should hit a target | NPC ranged attack ", async () => {
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(2);
+    expect(hitTarget).toBeCalledTimes(3);
   });
 
   it("should hit a target | NPC hybrid attack type", async () => {
@@ -197,7 +268,7 @@ describe("BattleRangedAttack.spec.ts", () => {
 
     // Ranged attack
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(3);
+    expect(hitTarget).toBeCalledTimes(4);
 
     // Melee attack (not passing maxRangeAttack field on purpose to check is doing melee attack)
     testNPC.maxRangeAttack = undefined;
@@ -207,7 +278,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     await testNPC.save();
 
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
-    expect(hitTarget).toBeCalledTimes(4);
+    expect(hitTarget).toBeCalledTimes(5);
   });
 
   it("should hit a target, required ammo and target is in range | with multiple ammo keys", async () => {
@@ -215,15 +286,15 @@ describe("BattleRangedAttack.spec.ts", () => {
     // So now can use 2 types of ammo, arrows and stones
     bowItem.requiredAmmoKeys?.push(RangedWeaponsBlueprint.Stone);
     await bowItem.save();
-    await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
-    await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
-
-    expect(hitTarget).toBeCalledTimes(5);
-
-    await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Stone);
+    await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Arrow, "accessory", 1);
     await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
 
     expect(hitTarget).toBeCalledTimes(6);
+
+    await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Stone, "accessory", 1);
+    await battleAttackTarget.checkRangeAndAttack(testCharacter, testNPC);
+
+    expect(hitTarget).toBeCalledTimes(7);
   });
 
   describe("magic staff ranged attack", () => {
@@ -256,7 +327,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     });
 
     it("mana should be consumed", async () => {
-      await equipAmmoInAccessorySlot(characterEquipment, RangedWeaponsBlueprint.Arrow);
+      await equipAmmoInEquipmentSlot(characterEquipment, RangedWeaponsBlueprint.Arrow, "accessory", 1);
 
       // @ts-ignore
       const rangedAttackAmmo = (await battleRangedAttack.getAmmoForRangedAttack(testCharacter, characterEquipment))!;
@@ -275,22 +346,27 @@ describe("BattleRangedAttack.spec.ts", () => {
   });
 });
 
-async function createItem(itemKey: RangedWeaponsBlueprint): Promise<Types.ObjectId> {
+async function createItem(itemKey: RangedWeaponsBlueprint, qty?: number): Promise<Types.ObjectId> {
   const itemData = itemsBlueprintIndex[itemKey];
   if (!itemData) {
     throw new Error(`Unsupported item key '${itemKey}'`);
   }
   const newItem = new Item({ ...itemData });
+  if (qty && newItem.maxStackSize) {
+    newItem.stackQty = qty;
+  }
   const res = await newItem.save();
   return res._id;
 }
 
-async function equipAmmoInAccessorySlot(
+async function equipAmmoInEquipmentSlot(
   equipment: IEquipment,
-  ammoKey: RangedWeaponsBlueprint
+  ammoKey: RangedWeaponsBlueprint,
+  equipmentSlot: string,
+  qty?: number
 ): Promise<Types.ObjectId> {
-  const ammoId = await createItem(ammoKey);
-  equipment!.accessory = ammoId;
+  const ammoId = await createItem(ammoKey, qty);
+  equipment![equipmentSlot] = ammoId;
   await equipment.save();
   return ammoId;
 }

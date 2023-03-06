@@ -1,6 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   AxesBlueprint,
   CraftingResourcesBlueprint,
@@ -90,4 +91,5 @@ export const npcIceFox: Partial<INPC> = {
       quantityRange: [1, 5],
     },
   ],
+  entityEffects: [EntityEffectBlueprint.Freezing],
 };
