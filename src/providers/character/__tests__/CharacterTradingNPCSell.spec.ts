@@ -41,7 +41,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
     ];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
   };
 
   const prepareData = async () => {
@@ -194,7 +194,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
     ];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     const sellItems = [
       {
@@ -252,7 +252,7 @@ describe("CharacterTradingNPCSell.ts", () => {
   it("should do no further processing if no items were sold", async () => {
     const decrementMock = jest.spyOn(CharacterItemInventory.prototype, "decrementItemFromNestedInventoryByKey");
     decrementMock.mockImplementation();
-    decrementMock.mockReturnValue(Promise.resolve(false));
+    decrementMock.mockReturnValue(Promise.resolve({ success: false, updatedQty: 0 }));
 
     await characterTradingNPCSell.sellItemsToNPC(testCharacter, testNPCTrader, [
       {
@@ -293,7 +293,9 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(124);
+    // character is equipped with 100 arrows
+    // can only sell up to 100 arrows
+    expect(updatedContainer.slots[0].stackQty).toBe(99);
 
     expect(updatedContainer.slots[1]).toBeNull();
     expect(updatedContainer.slots[2]).toBeNull();
@@ -309,7 +311,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 10 }),
     ];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     const sellItems = [
       {
@@ -411,7 +413,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 95 }),
     ];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
@@ -462,7 +464,7 @@ describe("CharacterTradingNPCSell.ts", () => {
   });
 
   it("should return no items if inventory is empty", async () => {
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, []);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, []);
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
@@ -485,7 +487,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
     ];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
@@ -515,7 +517,7 @@ describe("CharacterTradingNPCSell.ts", () => {
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
     ];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 

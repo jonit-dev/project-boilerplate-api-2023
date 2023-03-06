@@ -50,7 +50,7 @@ describe("ItemCraftable.ts", () => {
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.WaterBottle, { stackQty: 1 }),
     ];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
   });
@@ -117,7 +117,7 @@ describe("ItemCraftable.ts", () => {
       return Promise.resolve(true);
     });
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, [
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, [
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.SmallWoodenStick, { stackQty: 1 }),
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.SteelIngot, { stackQty: 1 }),
     ]);
@@ -142,7 +142,7 @@ describe("ItemCraftable.ts", () => {
       return Promise.resolve(true);
     });
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, [
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, [
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.IronNail, { stackQty: 20 }),
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.GreaterWoodenLog, { stackQty: 4 }),
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.Skull, { stackQty: 1 }),
@@ -273,16 +273,16 @@ describe("ItemCraftable.ts", () => {
       sendEventToUser.mockReset();
     };
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, []);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, []);
     await performTest();
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, [items[1]]);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, [items[1]]);
     await performTest();
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, [items[1], items[2]]);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, [items[1], items[2]]);
     await performTest();
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, [
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, [
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.Herb, { stackQty: 2 }),
       items[1],
       items[2],

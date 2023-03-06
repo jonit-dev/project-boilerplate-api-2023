@@ -112,13 +112,13 @@ export class CharacterTradingNPCBuy {
 
       const decrementQty = itemPrice * purchasedItem.qty;
 
-      const isGoldDecremented = await this.characterItemInventory.decrementItemFromInventoryByKey(
+      const decrementedGold = await this.characterItemInventory.decrementItemFromNestedInventoryByKey(
         OthersBlueprint.GoldCoin,
         character,
         decrementQty
       );
 
-      if (!isGoldDecremented) {
+      if (!decrementedGold.success) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
           "An error occurred while processing your purchase."
