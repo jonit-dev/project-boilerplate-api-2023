@@ -13,8 +13,8 @@ export const itemGoldenSword: Partial<IItem> = {
     "A luxurious sword made of gleaming gold, often associated with wealth, power, and nobility. It is imbued with magical energy and is highly prized for its beauty and rarity.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 14,
-  defense: 7,
+  attack: 22,
+  defense: 10,
   rangeType: EntityAttackType.Melee,
   basePrice: 220,
 };

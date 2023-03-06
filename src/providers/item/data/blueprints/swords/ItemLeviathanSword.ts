@@ -13,8 +13,8 @@ export const itemLeviathanSword: Partial<IItem> = {
     "A mythical sword associated with the leviathan, a sea monster of enormous size and power. It is imbued with the strength and ferocity of the leviathan.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 10,
-  defense: 3,
+  attack: 25,
+  defense: 10,
   rangeType: EntityAttackType.Melee,
   basePrice: 70,
 };

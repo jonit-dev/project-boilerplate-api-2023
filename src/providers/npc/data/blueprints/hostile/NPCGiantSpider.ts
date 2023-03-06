@@ -16,7 +16,6 @@ import {
   ShieldsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
-  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { AnimationEffectKeys, NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
@@ -59,10 +58,7 @@ export const npcGiantSpider: Partial<INPC> = {
       itemBlueprintKey: StaffsBlueprint.MoonsStaff,
       chance: 30,
     },
-    {
-      itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 5,
-    },
+
     {
       itemBlueprintKey: ContainersBlueprint.Backpack,
       chance: 50,

@@ -17,8 +17,10 @@ import { itemLeviathanSword } from "./ItemLeviathanSword";
 import { itemLightingSword } from "./ItemLightingSword";
 import { itemLongSword } from "./ItemLongSword";
 import { itemMithrilSword } from "./ItemMithrilSword";
+import { itemPoisonSword } from "./ItemPoisonSword";
 import { itemRapier } from "./ItemRapier";
 import { itemSaber } from "./ItemSaber";
+import { itemShadowSword } from "./ItemShadowSword";
 import { itemShortSword } from "./ItemShortSword";
 import { itemSword } from "./ItemSword";
 import { itemWoodenSword } from "./ItemWoodenSword";
@@ -48,4 +50,6 @@ export const swordsBlueprintIndex = {
   [SwordsBlueprint.Saber]: itemSaber,
   [SwordsBlueprint.Sword]: itemSword,
   [SwordsBlueprint.WoodenSword]: itemWoodenSword,
+  [SwordsBlueprint.PoisonSword]: itemPoisonSword,
+  [SwordsBlueprint.ShadowSword]: itemShadowSword,
 };

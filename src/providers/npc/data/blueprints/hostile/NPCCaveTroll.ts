@@ -12,6 +12,7 @@ import {
   MagicsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
   SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -56,6 +57,10 @@ export const npcCaveTroll = {
       chance: 5,
     },
     {
+      itemBlueprintKey: ShieldsBlueprint.KiteShield,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: SpearsBlueprint.BohemianEarspoon,
       chance: 20,
     },
@@ -94,11 +99,14 @@ export const npcCaveTroll = {
       itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
       chance: 15,
     },
-
     {
       itemBlueprintKey: MagicsBlueprint.FireRune,
       chance: 10,
       quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.SpikedShield,
+      chance: 20,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.GreenOre,

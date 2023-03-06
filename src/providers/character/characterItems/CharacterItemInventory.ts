@@ -14,6 +14,11 @@ import { CharacterInventory } from "../CharacterInventory";
 import { CharacterItemContainer } from "./CharacterItemContainer";
 import { CharacterItemSlots } from "./CharacterItemSlots";
 
+interface IDecrementItemByKeyResult {
+  success: boolean;
+  updatedQty: number;
+}
+
 @provide(CharacterItemInventory)
 export class CharacterItemInventory {
   constructor(
@@ -134,30 +139,49 @@ export class CharacterItemInventory {
       return false;
     }
 
-    return this.decrementItemFromContainerByKey(inventoryItemContainer, itemKey, decrementQty);
+    return (await this.decrementItemFromContainerByKey(inventoryItemContainer, itemKey, decrementQty)).success;
   }
 
+  /**
+   * decrements item by key from nested item containers
+   * @param itemKey
+   * @param character
+   * @param decrementQty
+   * @returns true if was successful and the updated decrementQty
+   */
   public async decrementItemFromNestedInventoryByKey(
     itemKey: string,
     character: ICharacter,
     decrementQty: number
-  ): Promise<boolean> {
+  ): Promise<IDecrementItemByKeyResult> {
     const itemContainers = await ItemContainer.find({ owner: character._id });
 
     if (!itemContainers) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
-      return false;
+      return { success: false, updatedQty: decrementQty };
     }
 
     let hasItem = false;
     for (const container of itemContainers) {
       hasItem = !!(await this.checkItemInContainerByKey(itemKey, container));
       if (hasItem) {
-        return this.decrementItemFromContainerByKey(container, itemKey, decrementQty);
+        const { success, updatedQty: remainingQty } = await this.decrementItemFromContainerByKey(
+          container,
+          itemKey,
+          decrementQty
+        );
+        if (!success || (success && remainingQty === 0)) {
+          return { success, updatedQty: remainingQty };
+        }
+        decrementQty = remainingQty;
       }
     }
 
-    return false;
+    if (hasItem && decrementQty > 0) {
+      return { success: true, updatedQty: decrementQty };
+    }
+
+    return { success: false, updatedQty: decrementQty };
   }
 
   public async deleteItemFromInventory(itemId: string, character: ICharacter): Promise<boolean> {
@@ -240,7 +264,7 @@ export class CharacterItemInventory {
     container: IItemContainer,
     itemKey: string,
     decrementQty: number
-  ): Promise<boolean> {
+  ): Promise<IDecrementItemByKeyResult> {
     for (let i = 0; i < container.slotQty; i++) {
       if (decrementQty <= 0) break;
 
@@ -267,6 +291,8 @@ export class CharacterItemInventory {
               stackQty: remaining,
             });
           } else {
+            // all stackable items qty consumed
+            // remove it from container
             result = await this.removeItemFromContainer(slotItem, container);
             // we also need to delete item from items table
             await Item.deleteOne({ _id: slotItem._id });
@@ -292,10 +318,10 @@ export class CharacterItemInventory {
       }
 
       if (!result) {
-        return false;
+        return { success: false, updatedQty: decrementQty };
       }
     }
-    return true;
+    return { success: true, updatedQty: decrementQty };
   }
 
   private async removeItemFromInventory(itemId: string, character: ICharacter): Promise<boolean> {

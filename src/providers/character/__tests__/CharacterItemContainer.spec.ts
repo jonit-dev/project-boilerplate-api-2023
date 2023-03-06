@@ -22,7 +22,7 @@ describe("CharacterItemContainer.ts", () => {
   it("should successfully remove an item from a container", async () => {
     const testItem = await unitTestHelper.createMockItem();
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 10, [testItem]);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 10, [testItem]);
 
     expect(inventoryContainer.slots[0]._id).toEqual(testItem._id);
 

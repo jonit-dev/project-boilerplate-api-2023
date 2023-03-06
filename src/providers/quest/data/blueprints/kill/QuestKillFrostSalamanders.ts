@@ -1,8 +1,4 @@
-import {
-  AxesBlueprint,
-  CraftingResourcesBlueprint,
-  SwordsBlueprint,
-} from "@providers/item/data/types/itemsBlueprintTypes";
+import { AxesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { IQuest, QuestType } from "@rpg-engine/shared";
 import { QuestsBlueprint } from "../../questsBlueprintTypes";
@@ -14,15 +10,7 @@ export const questKillFrostSalamanders = {
   key: QuestsBlueprint.KillFrostSalamanders,
   rewards: [
     {
-      itemKeys: [SwordsBlueprint.DoubleEdgedSword],
-      qty: 1,
-    },
-    {
-      itemKeys: [AxesBlueprint.VikingAxe],
-      qty: 1,
-    },
-    {
-      itemKeys: [CraftingResourcesBlueprint.BlueSilk],
+      itemKeys: [AxesBlueprint.NordicAxe],
       qty: 1,
     },
   ],

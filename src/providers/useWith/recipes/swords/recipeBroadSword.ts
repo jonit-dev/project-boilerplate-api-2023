@@ -13,9 +13,5 @@ export const recipeBroadSword: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.ElvenWood,
       qty: 5,
     },
-    {
-      key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 2,
-    },
   ],
 };

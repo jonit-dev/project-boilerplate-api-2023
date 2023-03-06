@@ -12,8 +12,8 @@ export const itemBasiliskSword: Partial<IItem> = {
   name: "Basilisk Sword",
   description:
     "A fearsome sword crafted from the remains of a powerful basilisk, imbued with deadly venom and corrosive properties.",
-  attack: 9,
-  defense: 4,
+  attack: 16,
+  defense: 7,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

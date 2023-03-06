@@ -73,7 +73,7 @@ describe("SpellItemCreation", () => {
 
   const addBlankRune = async (): Promise<void> => {
     const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.Rune)];
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
   };
 
   it("should cast rune creation spell successfully", async () => {

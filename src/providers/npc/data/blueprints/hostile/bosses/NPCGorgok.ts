@@ -28,7 +28,7 @@ export const npcGorgok = {
   ammoKey: RangedWeaponsBlueprint.IronArrow,
   maxRangeAttack: 10,
   speed: MovementSpeed.Fast,
-  baseHealth: 1200,
+  baseHealth: 1500,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
@@ -43,12 +43,31 @@ export const npcGorgok = {
     resistance: {
       level: 35,
     },
+    magicResistance: {
+      level: 35,
+    },
   },
   fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 5,
+      chance: 1,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.TowerShield,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.LeviathanSword,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.LightingSword,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.PoisonSword,
+      chance: 20,
     },
     {
       itemBlueprintKey: ArmorsBlueprint.GoldenArmor,

@@ -13,8 +13,8 @@ export const itemEnchantedSword: Partial<IItem> = {
     "A magical sword imbued with powerful enchantments, capable of channeling potent spells and incantations.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 11,
-  defense: 3,
+  attack: 14,
+  defense: 7,
   rangeType: EntityAttackType.Melee,
   basePrice: 78,
 };

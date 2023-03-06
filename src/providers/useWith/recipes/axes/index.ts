@@ -3,9 +3,13 @@ import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { recipeAxe } from "./recipeAxe";
 import { recipeDoubleAxe } from "./recipeDoubleAxe";
 import { recipeFrostDoubleAxe } from "./recipeFrostDoubleAxe";
+import { recipeRuneAxe } from "./recipeRuneAxe";
+import { recipeShadowAxe } from "./recipeShadowAxe";
 
 export const recipeAxesIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [AxesBlueprint.Axe]: [recipeAxe],
   [AxesBlueprint.DoubleAxe]: [recipeDoubleAxe],
   [AxesBlueprint.FrostDoubleAxe]: [recipeFrostDoubleAxe],
+  [AxesBlueprint.RuneAxe]: [recipeRuneAxe],
+  [AxesBlueprint.ShadowAxe]: [recipeShadowAxe],
 };

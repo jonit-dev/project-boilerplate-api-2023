@@ -13,8 +13,8 @@ export const itemHorseBow: Partial<IItem> = {
   name: "Horse Bow",
   description:
     "A small, lightweight bow designed for use on horseback. It is typically used for hunting and skirmishing, and is known for its speed and accuracy.",
-  attack: 5,
-  defense: 2,
+  attack: 6,
+  defense: 4,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,

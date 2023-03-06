@@ -12,7 +12,6 @@ import {
   PotionsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
-  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
@@ -65,10 +64,7 @@ export const npcAssaultSpider: Partial<INPC> = {
       itemBlueprintKey: DaggersBlueprint.CorruptionDagger,
       chance: 15,
     },
-    {
-      itemBlueprintKey: SwordsBlueprint.Katana,
-      chance: 20,
-    },
+
     {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,
       chance: 2.5,

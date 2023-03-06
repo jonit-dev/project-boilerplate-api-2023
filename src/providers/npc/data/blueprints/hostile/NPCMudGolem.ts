@@ -7,6 +7,7 @@ import {
   FoodsBlueprint,
   GlovesBlueprint,
   PotionsBlueprint,
+  ShieldsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -54,6 +55,10 @@ export const npcMudGolem: Partial<INPC> = {
     {
       itemBlueprintKey: GlovesBlueprint.PlateGloves,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.StoneShield,
+      chance: 20,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Fish,

@@ -13,8 +13,8 @@ export const itemSword: Partial<IItem> = {
     "A standard weapon with a long, sharp blade and a hilt for grip, suitable for a variety of combat situations.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 10,
-  defense: 1,
+  attack: 13,
+  defense: 3,
   rangeType: EntityAttackType.Melee,
   basePrice: 68,
 };

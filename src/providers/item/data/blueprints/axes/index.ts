@@ -10,7 +10,10 @@ import { itemGreataxe } from "./ItemGreataxe";
 import { itemHalberd } from "./ItemHalberd";
 import { itemHatchet } from "./ItemHatchet";
 import { itemHellishAxe } from "./ItemHellishAxe";
+import { itemNordicAxe } from "./ItemNordicAxe";
 import { itemRoyalDoubleAxe } from "./ItemRoyalDoubleAxe";
+import { itemRuneAxe } from "./ItemRuneAxe";
+import { itemShadowAxe } from "./ItemShadowAxe";
 import { itemVikingAxe } from "./ItemVikingAxe";
 import { itemWoodenAxe } from "./ItemWoodenAxe";
 import { itemYetiHalberd } from "./ItemYetiHalberd";
@@ -31,4 +34,7 @@ export const axesBlueprintIndex = {
   [AxesBlueprint.RoyalDoubleAxe]: itemRoyalDoubleAxe,
   [AxesBlueprint.VikingAxe]: itemVikingAxe,
   [AxesBlueprint.WoodenAxe]: itemWoodenAxe,
+  [AxesBlueprint.NordicAxe]: itemNordicAxe,
+  [AxesBlueprint.RuneAxe]: itemRuneAxe,
+  [AxesBlueprint.ShadowAxe]: itemShadowAxe,
 };

@@ -13,8 +13,8 @@ export const itemDamascusSword: Partial<IItem> = {
     "A beautiful and exceptionally strong sword crafted from Damascus steel, prized for its intricate patterns and durability.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 10,
-  defense: 3,
+  attack: 17,
+  defense: 8,
   rangeType: EntityAttackType.Melee,
   basePrice: 85,
 };

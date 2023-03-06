@@ -135,7 +135,7 @@ describe("ItemPickup.ts", () => {
 
     const newItem = await unitTestHelper.createMockItem();
 
-    await unitTestHelper.addItemsToInventoryContainer(newInventoryContainer, 10, [newItem]);
+    await unitTestHelper.addItemsToContainer(newInventoryContainer, 10, [newItem]);
 
     expect(newInventoryContainer.slots[0]._id).toEqual(newItem._id);
 

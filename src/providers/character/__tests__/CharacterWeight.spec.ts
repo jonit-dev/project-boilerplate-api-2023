@@ -73,7 +73,7 @@ describe("CharacterWeight.ts", () => {
       maxStackSize: 100,
     });
 
-    inventoryContainer = await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 1, [goldCoins]);
+    inventoryContainer = await unitTestHelper.addItemsToContainer(inventoryContainer, 1, [goldCoins]);
 
     const afterAddGoldCoins = await characterWeight.getWeight(testCharacter);
     expect(afterAddGoldCoins).toBe(4);
@@ -98,7 +98,7 @@ describe("CharacterWeight.ts", () => {
       maxStackSize: 100,
     });
 
-    inventoryContainer = await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 1, [apples]);
+    inventoryContainer = await unitTestHelper.addItemsToContainer(inventoryContainer, 1, [apples]);
 
     // Check Weight after add apples
     const afterAddApples = await characterWeight.getWeight(testCharacter);

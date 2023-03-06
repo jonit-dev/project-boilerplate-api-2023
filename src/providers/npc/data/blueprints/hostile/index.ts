@@ -53,7 +53,7 @@ import { npcTrollWarrior } from "./NPCTrollWarrior";
 import { npcWildTroll } from "./NPCWildTroll";
 import { npcWinterWolf } from "./NPCWinterWolf";
 import { npcWolf } from "./NPCWolf";
-import { npcYeti } from "./NPCYeti";
+import { npcYeti } from "./bosses/NPCYeti";
 
 export const hostileNPCs = {
   [HostileNPCsBlueprint.Orc]: npcOrc,

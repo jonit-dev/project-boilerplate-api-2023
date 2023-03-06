@@ -13,8 +13,8 @@ export const itemLongBow: Partial<IItem> = {
   name: "Long Bow",
   description:
     "A tall, traditional bow with a long, narrow limb and a long string. It is known for its ability to shoot arrows with great speed and distance.",
-  attack: 4,
-  defense: 3,
+  attack: 7,
+  defense: 4,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 8,

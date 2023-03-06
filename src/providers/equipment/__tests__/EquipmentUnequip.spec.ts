@@ -119,7 +119,7 @@ describe("EquipmentUnequip.spec.ts", () => {
     it("should fail if the inventory container is full", async () => {
       const anotherItem = (await unitTestHelper.createMockItem()) as unknown as IItem;
 
-      inventoryContainer = await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 1, [anotherItem]);
+      inventoryContainer = await unitTestHelper.addItemsToContainer(inventoryContainer, 1, [anotherItem]);
 
       const unequip = await equipmentUnequip.unequip(testCharacter, inventory, testItem);
 
@@ -141,9 +141,7 @@ describe("EquipmentUnequip.spec.ts", () => {
         maxStackSize: 50,
       })) as unknown as IItem;
 
-      inventoryContainer = await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 1, [
-        anotherStackableItem,
-      ]);
+      inventoryContainer = await unitTestHelper.addItemsToContainer(inventoryContainer, 1, [anotherStackableItem]);
 
       const unequip = await equipmentUnequip.unequip(testCharacter, inventory, testStackableItem);
       expect(unequip).toBeTruthy();

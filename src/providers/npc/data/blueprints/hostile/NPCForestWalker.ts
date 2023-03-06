@@ -48,6 +48,10 @@ export const npcForestWalker: Partial<INPC> = {
       chance: 30,
     },
     {
+      itemBlueprintKey: ShieldsBlueprint.SpikedShield,
+      chance: 20,
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 50,
       quantityRange: [10, 20],

@@ -48,6 +48,7 @@ import {
   questRewardsMock,
 } from "./mock/questMock";
 import { userMock } from "./mock/userMock";
+import { Types } from "mongoose";
 
 export enum InteractionQuestSubtype {
   craft = "craft",
@@ -143,20 +144,30 @@ export class UnitTestHelper {
     return testNPC;
   }
 
-  public async addItemsToInventoryContainer(
+  public async addItemsToContainer(
     container: IItemContainer,
     slotQty: number,
-    items: IItem[]
+    items: IItem[],
+    availableSlots?: number[]
   ): Promise<IItemContainer> {
     container.slotQty = slotQty;
 
-    const slots = {};
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      slots[i] = item.toJSON({ virtuals: true });
+    if (availableSlots && availableSlots.length === items.length) {
+      for (const i in availableSlots) {
+        const availableSlot = availableSlots[i];
+        const item = items[i];
+        container.slots[availableSlot] = item.toJSON({ virtuals: true });
+      }
+    } else {
+      const slots = {};
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        slots[i] = item.toJSON({ virtuals: true });
+      }
+
+      container.slots = slots;
     }
 
-    container.slots = slots;
     container.markModified("slots");
     await container.save();
 
@@ -659,5 +670,27 @@ export class UnitTestHelper {
     backpackContainer.markModified("slots");
     await backpackContainer.save();
     return items;
+  }
+
+  /**
+   * Helper function to add nested containers
+   * @param characterId
+   * @param parentContainer
+   * @param availableSlot
+   * @returns the created nested item container
+   */
+  async addNestedContainer(
+    characterId: Types.ObjectId,
+    parentContainer: IItemContainer,
+    availableSlot: number
+  ): Promise<IItemContainer> {
+    const bag = await this.createMockItemFromBlueprint("bag", { owner: characterId });
+
+    const bagCont = await ItemContainer.findById(bag.itemContainer);
+    expect(bagCont).toBeDefined();
+
+    await this.addItemsToContainer(parentContainer, 1, [bag], [availableSlot]);
+
+    return bagCont!;
   }
 }

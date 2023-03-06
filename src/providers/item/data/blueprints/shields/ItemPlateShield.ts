@@ -2,7 +2,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ShieldsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemPlaceShield: Partial<IItem> = {
+export const itemPlateShield: Partial<IItem> = {
   key: ShieldsBlueprint.PlateShield,
   type: ItemType.Armor,
   subType: ItemSubType.Shield,
@@ -10,7 +10,7 @@ export const itemPlaceShield: Partial<IItem> = {
   texturePath: "shields/plate-shield.png",
   name: "Plate Shield",
   description: "A large metal shield.",
-  defense: 17,
+  defense: 20,
   weight: 2.3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 77,

@@ -13,8 +13,8 @@ export const itemCorruptionBow: Partial<IItem> = {
   name: "Corruption Bow",
   description:
     "A bow imbued with dark, otherworldly energy. It is said to be able to ignite the air around it and to be capable of shooting corruption bolts with great force and accuracy.",
-  attack: 6,
-  defense: 3,
+  attack: 10,
+  defense: 5,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 9,

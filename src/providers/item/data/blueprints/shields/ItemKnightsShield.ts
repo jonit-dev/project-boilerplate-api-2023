@@ -10,7 +10,7 @@ export const itemKnightsShield: Partial<IItem> = {
   texturePath: "shields/knights-shield.png",
   name: "Knights Shield",
   description: "A well made shield used by the knights of the realm.",
-  defense: 13,
+  defense: 17,
   weight: 2.1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 60,

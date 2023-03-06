@@ -51,6 +51,10 @@ export const npcMinotaur = {
       chance: 15,
     },
     {
+      itemBlueprintKey: SwordsBlueprint.Katana,
+      chance: 15,
+    },
+    {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,
     },
@@ -87,8 +91,8 @@ export const npcMinotaur = {
       chance: 1,
     },
     {
-      itemBlueprintKey: SwordsBlueprint.LeviathanSword,
-      chance: 20,
+      itemBlueprintKey: SwordsBlueprint.KnightsSword,
+      chance: 10,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.IronNail,

@@ -12,8 +12,8 @@ export const itemElvenSword: Partial<IItem> = {
   name: "Elven Sword",
   description:
     "A slender, finely crafted sword made by skilled elven smiths. It is prized for its light weight and graceful design.",
-  attack: 7,
-  defense: 3,
+  attack: 12,
+  defense: 8,
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

@@ -54,7 +54,7 @@ describe("UseWithEntityValidation.ts", () => {
 
     item1 = items[1];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
   };
 
   const prepareData = async () => {
@@ -613,7 +613,7 @@ describe("UseWithEntityValidation.ts", () => {
   it("should successfully use poison rune on target character", async () => {
     const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.PoisonRune)];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     await useWithEntity.execute(
       {
@@ -632,7 +632,7 @@ describe("UseWithEntityValidation.ts", () => {
   it("should successfully use fire rune on target character", async () => {
     const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.FireRune)];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     await useWithEntity.execute(
       {
@@ -651,7 +651,7 @@ describe("UseWithEntityValidation.ts", () => {
   it("should successfully use heal rune on target character", async () => {
     const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.HealRune)];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     targetCharacter.health = 50;
     await targetCharacter.save();
@@ -691,7 +691,7 @@ describe("UseWithEntityValidation.ts", () => {
   it("should successfully use fire rune on target npc", async () => {
     const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.FireRune)];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     await useWithEntity.execute(
       {
@@ -950,7 +950,7 @@ describe("UseWithEntityValidation.ts", () => {
   it("should execute hit post processing without damage data", async () => {
     const items = [await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.HealRune)];
 
-    await unitTestHelper.addItemsToInventoryContainer(inventoryContainer, 6, items);
+    await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     await useWithEntity.execute(
       {

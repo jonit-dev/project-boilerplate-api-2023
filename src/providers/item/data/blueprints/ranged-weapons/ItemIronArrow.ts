@@ -15,6 +15,6 @@ export const itemIronArrow: Partial<IItem> = {
   maxStackSize: 100,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   basePrice: 3,
-  attack: 1.5,
+  attack: 5,
   rangeType: EntityAttackType.Melee,
 };

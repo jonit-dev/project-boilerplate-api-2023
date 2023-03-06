@@ -13,8 +13,8 @@ export const itemHuntersBow: Partial<IItem> = {
   name: "Hunters Bow",
   description:
     "A bow designed for hunting. It is typically shorter and more compact than other bows, making it easier to carry and use in confined spaces.",
-  attack: 6,
-  defense: 2,
+  attack: 9,
+  defense: 4,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 5,
