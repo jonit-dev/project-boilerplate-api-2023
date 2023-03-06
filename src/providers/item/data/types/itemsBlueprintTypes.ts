@@ -22,6 +22,8 @@ export enum SwordsBlueprint {
   Saber = "saber",
   Sword = "sword",
   WoodenSword = "wooden-sword",
+  PoisonSword = "poison-sword",
+  ShadowSword = "shadow-sword",
 }
 
 export enum HelmetsBlueprint {
@@ -103,6 +105,9 @@ export enum AxesBlueprint {
   Halberd = "Halberd",
   Hatchet = "Hatchet",
   WoodenAxe = "wooden-axe",
+  NordicAxe = "nordic-axe",
+  RuneAxe = "rune-axe",
+  ShadowAxe = "shadow-axe",
 }
 
 export enum BootsBlueprint {
@@ -200,6 +205,8 @@ export enum CraftingResourcesBlueprint {
   ObsidiumIngot = "obsidium-ingot",
   CorruptionIngot = "corruption-ingot",
   Bandage = "bandage",
+  DragonHead = "dragon-head",
+  DragonTooth = "dragon-tooth",
 }
 
 export enum ToolsBlueprint {
@@ -258,6 +265,19 @@ export enum RangedWeaponsBlueprint {
   RoyalCrossbow = "royal-crossbow",
   ShortBow = "short-bow",
   RoyalBow = "royal-bow",
+  DragonBow = "dragon-bow",
+  GoldenArrow = "golden-arrow",
+  HadesBow = "hades-bow",
+  LightningCrossbow = "lightning-crossbow",
+  PhoenixBow = "phoenix-bow",
+  PoisonArrow = "poison-arrow",
+  RuneCrossbow = "rune-crossbow",
+  ShockArrow = "shock-arrow",
+  RuneBow = "rune-bow",
+  StormBow = "storm-bow",
+  SunstoneBow = "sunstone-bow",
+  ValkyriesBow = "valkyries-bow",
+  ZephyrusBow = "zephyrus-bow",
 }
 
 export enum GlovesBlueprint {
@@ -324,6 +344,17 @@ export enum ShieldsBlueprint {
   VikingShield = "viking-shield",
   WoodenShield = "wooden-shield",
   YetiShield = "yeti-shield",
+  DarkShield = "dark-shield",
+  DemonShield = "demon-shield",
+  EnergyShield = "energy-shield",
+  ForceShield = "force-shield",
+  HeaterShield = "heater-shield",
+  HolyShield = "holy-shield",
+  KiteShield = "kite-shield",
+  PaviseShield = "pavise-shield",
+  SpikedShield = "spiked-shield",
+  StoneShield = "stone-shield",
+  TowerShield = "tower-shield",
 }
 
 export enum LegsBlueprint {

@@ -5,6 +5,7 @@ import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entit
 import {
   ArmorsBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
   ShieldsBlueprint,
@@ -53,7 +54,20 @@ export const npcRedDragon = {
       chance: 20,
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.DragonHead,
+      chance: 50,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.DragonTooth,
+      chance: 50,
+      quantityRange: [1, 3],
+    },
+    {
       itemBlueprintKey: ArmorsBlueprint.GoldenArmor,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.DemonShield,
       chance: 20,
     },
     {
@@ -79,6 +93,10 @@ export const npcRedDragon = {
 
     {
       itemBlueprintKey: HelmetsBlueprint.SaviorsHelmet,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.CorruptionSword,
       chance: 5,
     },
     {

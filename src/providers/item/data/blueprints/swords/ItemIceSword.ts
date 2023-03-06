@@ -12,8 +12,8 @@ export const itemIceSword: Partial<IItem> = {
   name: "Ice Sword",
   description:
     "A sharp and deadly ice sword with a blade so thin it can easily cut through flesh and bone. Its icy edge is capable of causing freezing damage to enemies.",
-  attack: 7,
-  defense: 1,
+  attack: 16,
+  defense: 7,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

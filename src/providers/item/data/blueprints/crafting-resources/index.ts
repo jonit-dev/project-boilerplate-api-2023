@@ -14,6 +14,8 @@ import { itemCopperOre } from "./ItemCopperOre";
 import { itemCorruptionIngot } from "./ItemCorruptionIngot";
 import { itemCorruptionOre } from "./ItemCorruptionOre";
 import { itemDiamond } from "./ItemDiamond";
+import { itemDragonHead } from "./ItemDragonHead";
+import { itemDragonTooth } from "./ItemDragonTooth";
 import { itemElvenLeaf } from "./itemElvenLeaf";
 import { itemElvenWood } from "./itemElvenWood";
 import { itemEye } from "./ItemEye";
@@ -109,4 +111,6 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.ObsidiumIngot]: itemObsidiumIngot,
   [CraftingResourcesBlueprint.CorruptionIngot]: itemCorruptionIngot,
   [CraftingResourcesBlueprint.Bandage]: itemBandage,
+  [CraftingResourcesBlueprint.DragonHead]: itemDragonHead,
+  [CraftingResourcesBlueprint.DragonTooth]: itemDragonTooth,
 };

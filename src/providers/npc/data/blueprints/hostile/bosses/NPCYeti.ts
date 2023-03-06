@@ -14,6 +14,7 @@ import {
   LegsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
   SwordsBlueprint,
@@ -21,7 +22,7 @@ import {
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
+import { generateMoveTowardsMovement } from "../../../abstractions/BaseNeutralNPC";
 
 export const npcYeti: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
@@ -30,7 +31,7 @@ export const npcYeti: Partial<INPC> = {
   textureKey: HostileNPCsBlueprint.Yeti,
   alignment: NPCAlignment.Hostile,
   speed: MovementSpeed.Fast,
-  baseHealth: 600,
+  baseHealth: 800,
   attackType: EntityAttackType.MeleeRanged,
   ammoKey: RangedWeaponsBlueprint.Stone,
   maxRangeAttack: 8,
@@ -60,6 +61,10 @@ export const npcYeti: Partial<INPC> = {
       chance: 4,
     },
     {
+      itemBlueprintKey: ShieldsBlueprint.TowerShield,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,
       chance: 30,
     },
@@ -75,10 +80,6 @@ export const npcYeti: Partial<INPC> = {
     {
       itemBlueprintKey: StaffsBlueprint.MoonsStaff,
       chance: 30,
-    },
-    {
-      itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 10,
     },
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,

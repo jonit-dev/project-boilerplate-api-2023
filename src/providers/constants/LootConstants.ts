@@ -1,5 +1,5 @@
 // General Loot
-export const NPC_LOOT_CHANCE_MULTIPLIER = 0.35;
+export const NPC_LOOT_CHANCE_MULTIPLIER = 0.2;
 
 // Gold
 export const LOOT_GOLD_QTY_RATIO = 1.5; // when it drops, ratio that regulates how much gold it would be

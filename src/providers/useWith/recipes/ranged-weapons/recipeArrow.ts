@@ -3,15 +3,15 @@ import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 
 export const recipeArrow: IUseWithCraftingRecipe = {
   outputKey: RangedWeaponsBlueprint.Arrow,
-  outputQtyRange: [1, 3],
+  outputQtyRange: [2, 5],
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Feather,
-      qty: 1,
+      qty: 2,
     },
     {
       key: CraftingResourcesBlueprint.SmallWoodenStick,
-      qty: 1,
+      qty: 2,
     },
   ],
 };

@@ -62,6 +62,14 @@ export const npcTrollBerserker = {
       chance: 5,
     },
     {
+      itemBlueprintKey: ShieldsBlueprint.PaviseShield,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.TowerShield,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: LegsBlueprint.MithrilLegs,
       chance: 5,
     },

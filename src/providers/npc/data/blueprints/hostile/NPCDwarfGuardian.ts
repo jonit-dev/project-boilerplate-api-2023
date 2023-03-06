@@ -4,7 +4,6 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
   ContainersBlueprint,
-  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
@@ -100,12 +99,6 @@ export const npcDwarfGuardian: Partial<INPC> = {
     {
       itemBlueprintKey: SwordsBlueprint.EnchantedSword,
       chance: 15,
-    },
-
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
-      chance: 20,
-      quantityRange: [1, 5],
     },
   ],
 };

@@ -12,8 +12,8 @@ export const itemDragonsSword: Partial<IItem> = {
   name: "Dragon's Sword",
   description:
     "A legendary sword crafted from the remains of a mighty dragon, wielded only by the greatest of warriors.",
-  attack: 12,
-  defense: 7,
+  attack: 35,
+  defense: 15,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

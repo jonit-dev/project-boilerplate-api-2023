@@ -12,8 +12,8 @@ export const itemFireSword: Partial<IItem> = {
   name: "Fire Sword",
   description:
     "A sword imbued with the power of flames, capable of unleashing fiery attacks and generating intense heat.",
-  attack: 10,
-  defense: 5,
+  attack: 18,
+  defense: 8,
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

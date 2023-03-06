@@ -12,8 +12,8 @@ export const itemDoubleEdgedSword: Partial<IItem> = {
   description: "A sword with sharp edges on both sides of the blade, allowing for versatile and deadly attacks.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 12,
-  defense: 3,
+  attack: 16,
+  defense: 7,
   rangeType: EntityAttackType.Melee,
   basePrice: 86,
 };

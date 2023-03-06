@@ -12,8 +12,8 @@ export const itemSaber: Partial<IItem> = {
   description: "A curved sword with a single-edged blade, optimized for fast and agile combat.",
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 7,
-  defense: 1,
+  attack: 12,
+  defense: 4,
   rangeType: EntityAttackType.Melee,
   basePrice: 72,
 };

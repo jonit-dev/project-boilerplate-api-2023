@@ -124,10 +124,7 @@ export const npcGoblin = {
       itemBlueprintKey: AccessoriesBlueprint.GoldenRing,
       chance: 5,
     },
-    {
-      itemBlueprintKey: SwordsBlueprint.CorruptionSword,
-      chance: 15,
-    },
+
     {
       itemBlueprintKey: SwordsBlueprint.Saber,
       chance: 5,
@@ -142,11 +139,7 @@ export const npcGoblin = {
       chance: 20,
       quantityRange: [5, 10],
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
-      chance: 10,
-      quantityRange: [1, 5],
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Rock,
       chance: 30,

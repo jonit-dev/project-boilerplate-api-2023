@@ -9,7 +9,6 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   SpearsBlueprint,
-  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateMoveTowardsMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -26,10 +25,10 @@ export const npcAsterion = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 600,
+  baseHealth: 1000,
   healthRandomizerDice: Dice.D20,
   skills: {
-    level: 50,
+    level: 70,
     strength: {
       level: 55,
     },
@@ -39,13 +38,12 @@ export const npcAsterion = {
     resistance: {
       level: 40,
     },
+    magicResistance: {
+      level: 40,
+    },
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 10,
-    },
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,
@@ -68,7 +66,7 @@ export const npcAsterion = {
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.AsterionsBow,
-      chance: 25,
+      chance: 40,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.IronArrow,

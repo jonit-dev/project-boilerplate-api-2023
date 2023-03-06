@@ -1,7 +1,7 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemFrostCrossbow: Partial<IItem> = {
   key: RangedWeaponsBlueprint.FrostCrossbow,
@@ -13,11 +13,11 @@ export const itemFrostCrossbow: Partial<IItem> = {
   name: "Frost Crossbow",
   description: "The Ice Crossbow is a two-handed crossbow-type ranged weapon.",
   weight: 3,
-  attack: 8,
-  defense: 4,
+  attack: 10,
+  defense: 5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 10,
-  requiredAmmoKeys: [RangedWeaponsBlueprint.Bolt],
+  requiredAmmoKeys: [RangedWeaponsBlueprint.Bolt, RangedWeaponsBlueprint.ElvenBolt],
   isTwoHanded: true,
   basePrice: 93,
 };
