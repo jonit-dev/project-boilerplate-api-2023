@@ -73,10 +73,11 @@ export class SkillIncrease {
 
     const weapon = await this.characterWeapon.getWeapon(attacker);
 
-    const skillName = SKILLS_MAP.get(weapon?.subType || "None");
+    const weaponSubType = weapon?.item ? weapon?.item.subType || "None" : "None";
+    const skillName = SKILLS_MAP.get(weaponSubType);
 
     if (!skillName) {
-      throw new Error(`Skill not found for weapon ${weapon?.subType}`);
+      throw new Error(`Skill not found for weapon ${weaponSubType}`);
     }
 
     await this.recordXPinBattle(attacker, target, damage);
@@ -87,18 +88,18 @@ export class SkillIncrease {
       return;
     }
 
-    const increasedWeaponSP = this.increaseSP(skills, weapon?.subType || "None");
+    const increasedWeaponSP = this.increaseSP(skills, weaponSubType);
 
     let increasedStrengthSP;
-    if (weapon?.subType !== ItemSubType.Magic && weapon?.subType !== ItemSubType.Staff) {
+    if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
       increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
     }
 
     await this.skillFunctions.updateSkills(skills, attacker);
 
-    await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weapon?.subType || "None");
+    await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weaponSubType);
 
-    if (weapon?.subType !== ItemSubType.Magic && weapon?.subType !== ItemSubType.Staff) {
+    if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
       await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, BasicAttribute.Strength);
     }
 

@@ -244,7 +244,8 @@ export class BattleAttackTarget {
         if (target.type === "Character") {
           const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
           const attr =
-            weapon?.subType === ItemSubType.Magic || weapon?.subType === ItemSubType.Staff
+            (weapon?.item && weapon?.item.subType === ItemSubType.Magic) ||
+            (weapon?.item && weapon?.item.subType === ItemSubType.Staff)
               ? BasicAttribute.MagicResistance
               : BasicAttribute.Resistance;
           await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, attr);

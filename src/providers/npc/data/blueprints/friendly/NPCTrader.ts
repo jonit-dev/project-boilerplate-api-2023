@@ -107,5 +107,8 @@ export const npcTrader = {
     {
       key: RangedWeaponsBlueprint.IronArrow,
     },
+    {
+      key: RangedWeaponsBlueprint.Shuriken,
+    },
   ],
 } as Partial<INPC>;

@@ -3,10 +3,12 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterItemEquipment } from "@providers/character/characterItems/CharacterItemEquipment";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -39,6 +41,8 @@ export interface IRangedAttackParams {
   projectileAnimationKey?: AnimationEffectKeys;
 }
 
+const rangedWeaponsWithoutAmmo: string[] = [RangedWeaponsBlueprint.Shuriken];
+
 @provide(BattleRangedAttack)
 export class BattleRangedAttack {
   constructor(
@@ -48,7 +52,8 @@ export class BattleRangedAttack {
     private movementHelper: MovementHelper,
     private equipmentSlots: EquipmentSlots,
     private animationEffect: AnimationEffect,
-    private characterWeapon: CharacterWeapon
+    private characterWeapon: CharacterWeapon,
+    private characterItemEquipment: CharacterItemEquipment
   ) {}
 
   /**
@@ -203,61 +208,54 @@ export class BattleRangedAttack {
   ): Promise<IRangedAttackParams | undefined> {
     const weapon = await this.characterWeapon.getWeapon(character);
 
-    if (!weapon) {
+    if (!weapon || !weapon.item) {
       return;
     }
 
     let result: IRangedAttackParams | undefined;
     // Get ranged attack weapons (bow or spear)
-    if (weapon.rangeType === EntityAttackType.Ranged && weapon.subType !== ItemSubType.Staff) {
-      if (!weapon.requiredAmmoKeys || !weapon.requiredAmmoKeys.length) {
+    if (weapon.item.rangeType === EntityAttackType.Ranged && weapon.item.subType !== ItemSubType.Staff) {
+      if (rangedWeaponsWithoutAmmo.includes(weapon.item.baseKey)) {
+        result = {
+          location: weapon.location,
+          id: weapon.item._id,
+          key: weapon.item.baseKey,
+          maxRange: weapon.item.maxRange || 0,
+          itemSubType: weapon.item.subType as ItemSubType,
+          equipment,
+        };
         return result;
       }
 
-      result = (await this.getRequiredAmmo(weapon.requiredAmmoKeys, equipment)) as IRangedAttackParams;
+      if (!weapon.item.requiredAmmoKeys || !weapon.item.requiredAmmoKeys.length) {
+        return result;
+      }
+
+      result = (await this.getRequiredAmmo(weapon.item.requiredAmmoKeys, equipment)) as IRangedAttackParams;
       if (!_.isEmpty(result)) {
-        result.maxRange = weapon.maxRange || 0;
+        result.maxRange = weapon.item.maxRange || 0;
       }
     }
 
-    if (weapon.subType === "Staff") {
-      const itemStaffOrWand = itemsBlueprintIndex[weapon.key];
-      let itemHand: ItemSlotType;
-      let id: Types.ObjectId = new Types.ObjectId();
-
-      if (equipment.leftHand) {
-        const validateEquipment = await Item.findById(equipment.leftHand).lean();
-        if (validateEquipment?.subType === "Staff") {
-          itemHand = ItemSlotType.LeftHand;
-          id = equipment.leftHand;
-        }
-      }
-
-      if (equipment.rightHand) {
-        const validateEquipment = await Item.findById(equipment.rightHand).lean();
-        if (validateEquipment?.subType === "Staff") {
-          itemHand = ItemSlotType.RightHand;
-          id = equipment.rightHand;
-        }
-      }
-
+    if (weapon.item.subType === "Staff") {
+      const itemStaffOrWand = itemsBlueprintIndex[weapon.item.key];
       result = {
-        location: itemHand!,
-        id: id,
+        location: weapon.location,
+        id: weapon.item._id,
         key: itemStaffOrWand.projectileAnimationKey,
-        maxRange: weapon.maxRange || 0,
+        maxRange: weapon.item.maxRange || 0,
         itemSubType: itemStaffOrWand.subType,
         equipment,
       };
     }
 
-    if (weapon.subType === "Spear") {
+    if (weapon.item.subType === "Spear") {
       result = {
-        location: ItemSlotType.LeftHand,
-        id: weapon.id,
-        key: weapon.key,
-        maxRange: weapon.maxRange || 0,
-        itemSubType: ItemSubType.Spear,
+        location: weapon.location,
+        id: weapon.item._id,
+        key: weapon.item.key,
+        maxRange: weapon.item.maxRange || 0,
+        itemSubType: weapon.item.subType as ItemSubType,
         equipment,
       };
     }
@@ -293,37 +291,29 @@ export class BattleRangedAttack {
   public async consumeAmmo(attackParams: IRangedAttackParams, character: ICharacter): Promise<void> {
     const equipment = attackParams.equipment!;
 
-    let itemDelete = false;
-
+    let equipmentSlot: string | undefined;
     switch (attackParams.location) {
       case ItemSlotType.Accessory:
-        const accessory = (await Item.findById(equipment.accessory)) as unknown as IItem;
-
-        if (!accessory) {
-          return;
-        }
-        // if item stackQty > 1, just decrease stackQty by 1
-        if (accessory.stackQty && accessory.stackQty > 1) {
-          accessory.stackQty -= 1;
-          await accessory.save();
-        } else {
-          itemDelete = true;
-          // if item stackQty === 1, remove item from equipment accessory slot
-          equipment.accessory = undefined;
-          await equipment.save();
-        }
-
+        equipmentSlot = "accessory";
         break;
       case ItemSlotType.RightHand:
+        equipmentSlot = "rightHand";
         break;
       case ItemSlotType.LeftHand:
+        equipmentSlot = "leftHand";
         break;
       default:
         throw new Error("Invalid ammo location");
     }
 
-    if (itemDelete) {
-      await Item.deleteOne({ _id: attackParams.id });
+    const success = await this.characterItemEquipment.decrementItemFromEquipment(
+      attackParams.key,
+      character,
+      1,
+      equipmentSlot
+    );
+    if (!success) {
+      return;
     }
 
     const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);

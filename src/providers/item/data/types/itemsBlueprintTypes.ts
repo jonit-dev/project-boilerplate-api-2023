@@ -245,6 +245,7 @@ export enum RangedWeaponsBlueprint {
   Crossbow = "crossbow",
   Slingshot = "slingshot",
   Stone = "stone",
+  Shuriken = "shuriken",
   OrcishBow = "orcish-bow",
   FrostBow = "frost-bow",
   FrostCrossbow = "frost-crossbow",
