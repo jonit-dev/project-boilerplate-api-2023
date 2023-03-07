@@ -5,11 +5,11 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 import { OnTargetHit } from "@providers/battle/OnTargetHit";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -23,8 +23,8 @@ import {
   ICharacterAttributeChanged,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
-  IUseWithEntity,
   ItemSocketEvents,
+  IUseWithEntity,
   NPCAlignment,
   UseWithSocketEvents,
 } from "@rpg-engine/shared";
@@ -187,7 +187,7 @@ export class UseWithEntity {
       await this.sendAnimationEvents(caster, target, blueprint as IMagicItemUseWithEntity);
     }
 
-    if (target.type !== StaticEntity) {
+    if (target.type === EntityType.Character || target.type === EntityType.NPC) {
       const transformedTarget = target as ICharacter | INPC;
 
       await this.sendTargetUpdateEvents(caster, transformedTarget);
