@@ -146,7 +146,7 @@ export class CharacterSkillBuff {
         );
 
         setTimeout(async () => {
-          const updatedCharacter = await Character.findById(character._id);
+          const updatedCharacter = (await Character.findById(character._id).lean()) as ICharacter;
           if (updatedCharacter && updatedCharacter.appliedBuffsEffects) {
             const appliedBuffsEffect = this.buffSkillFunctions.getValueByBuffId(
               updatedCharacter?.appliedBuffsEffects,
@@ -175,7 +175,7 @@ export class CharacterSkillBuff {
         );
 
         setTimeout(async () => {
-          const refreshCharacter = await Character.findById(character._id);
+          const refreshCharacter = (await Character.findById(character._id).lean()) as ICharacter;
           if (refreshCharacter && refreshCharacter.appliedBuffsEffects) {
             const appliedBuffsEffect = this.buffSkillFunctions.getValueByBuffId(
               refreshCharacter?.appliedBuffsEffects,
@@ -209,7 +209,7 @@ export class CharacterSkillBuff {
         );
 
         setTimeout(async () => {
-          const refreshCharacter = await Character.findById(character._id);
+          const refreshCharacter = (await Character.findById(character._id).lean()) as ICharacter;
           if (refreshCharacter && refreshCharacter.appliedBuffsEffects) {
             const appliedBuffsEffect = this.buffSkillFunctions.getValueByBuffId(
               refreshCharacter?.appliedBuffsEffects,

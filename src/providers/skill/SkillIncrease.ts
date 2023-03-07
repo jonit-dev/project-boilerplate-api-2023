@@ -257,7 +257,7 @@ export class SkillIncrease {
       const record = target.xpToRelease.shift();
 
       // Get attacker character data
-      const character = await Character.findById(record!.charId);
+      const character = (await Character.findById(record!.charId)) as ICharacter;
       if (!character) {
         // if attacker does not exist anymore
         // call again the function without this record
@@ -403,7 +403,7 @@ export class SkillIncrease {
 
     return {
       skillName: skillToUpdate,
-      skillLevelBefore: skills[skillToUpdate].level,
+      skillLevelBefore: updatedSkillDetails.level - 1,
       skillLevelAfter: updatedSkillDetails.level,
       skillLevelUp,
       skillPoints: updatedSkillDetails.skillPoints,

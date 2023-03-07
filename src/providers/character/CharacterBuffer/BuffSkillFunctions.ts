@@ -15,6 +15,30 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 
+const basicAttributes: BasicAttribute[] = [
+  BasicAttribute.Strength,
+  BasicAttribute.Resistance,
+  BasicAttribute.Dexterity,
+  BasicAttribute.Magic,
+  BasicAttribute.MagicResistance,
+];
+
+const combatSkills: CombatSkill[] = [
+  CombatSkill.First,
+  CombatSkill.Sword,
+  CombatSkill.Dagger,
+  CombatSkill.Axe,
+  CombatSkill.Distance,
+  CombatSkill.Shielding,
+  CombatSkill.Club,
+];
+
+const characterEntities: CharacterEntities[] = [
+  CharacterEntities.Speed,
+  CharacterEntities.MaxMana,
+  CharacterEntities.MaxHealth,
+];
+
 @provide(BuffSkillFunctions)
 export class BuffSkillFunctions {
   constructor(private skillCalculator: SkillCalculator, private socketMessaging: SocketMessaging) {}
@@ -252,8 +276,8 @@ export class BuffSkillFunctions {
 
       for (let i = 0; i < totalValues.length; i++) {
         if (
-          totalValues[i].key.includes(totalValues[i].key as CharacterEntities) ||
-          totalValues[i].key.indexOf(totalValues[i].key as CharacterEntities) !== -1
+          characterEntities.includes(totalValues[i].key as CharacterEntities) ||
+          characterEntities.indexOf(totalValues[i].key as CharacterEntities) !== -1
         ) {
           if (totalValues[i].key !== CharacterEntities.Speed) {
             await this.updateBuffEntities(character, totalValues[i].key, totalValues[i].value, isAdding);
@@ -276,30 +300,6 @@ export class BuffSkillFunctions {
    */
   public getSkillTypeDefinition(skillType: string): string {
     let skillTypeDefinition = "";
-
-    const basicAttributes: BasicAttribute[] = [
-      BasicAttribute.Strength,
-      BasicAttribute.Resistance,
-      BasicAttribute.Dexterity,
-      BasicAttribute.Magic,
-      BasicAttribute.MagicResistance,
-    ];
-
-    const combatSkills: CombatSkill[] = [
-      CombatSkill.First,
-      CombatSkill.Sword,
-      CombatSkill.Dagger,
-      CombatSkill.Axe,
-      CombatSkill.Distance,
-      CombatSkill.Shielding,
-      CombatSkill.Club,
-    ];
-
-    const characterEntities: CharacterEntities[] = [
-      CharacterEntities.Speed,
-      CharacterEntities.MaxMana,
-      CharacterEntities.MaxHealth,
-    ];
 
     if (
       basicAttributes.includes(skillType as BasicAttribute) ||

@@ -84,7 +84,7 @@ export class SkillFunctions {
     };
 
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You ${behavior} from level ${skillData.skillLevelAfter - 1} to ${
+      message: `You ${behavior} from level ${skillData.skillLevelBefore} to ${
         skillData.skillLevelAfter
       } in ${_.startCase(_.toLower(skillData.skillName))} fighting.`,
       type: "info",
