@@ -7,6 +7,7 @@ import { itemFireRune } from "./ItemFireRune";
 import { itemHealRune } from "./ItemHealRune";
 import { itemPoisonRune } from "./ItemPoisonRune";
 import { itemRune } from "./ItemRune";
+import { itemThunderRune } from "./ItemThunderRune";
 
 export const magicsBlueprintIndex = {
   [MagicsBlueprint.Rune]: itemRune,
@@ -17,4 +18,5 @@ export const magicsBlueprintIndex = {
   [MagicsBlueprint.EnergyBoltRune]: itemEnergyBoltRune,
   [MagicsBlueprint.FireBoltRune]: itemFireBoltRune,
   [MagicsBlueprint.CorruptionRune]: itemCorruptionRune,
+  [MagicsBlueprint.ThunderRune]: itemThunderRune,
 };

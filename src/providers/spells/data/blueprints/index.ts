@@ -15,6 +15,7 @@ import { spellPhysicalShield } from "./SpellPhysicalShield";
 import { spellPoisonRuneCreation } from "./SpellPoisonRuneCreation";
 import { spellSelfHaste } from "./SpellSelfHaste";
 import { spellSelfHealing } from "./SpellSelfHealing";
+import { spellThunderRuneCreation } from "./SpellThunderRuneCreation";
 
 export const spellsBlueprints = {
   [SpellsBlueprint.SelfHealingSpell]: spellSelfHealing,
@@ -33,4 +34,5 @@ export const spellsBlueprints = {
   [SpellsBlueprint.CorruptionRuneCreationSpell]: spellCorruptionRuneCreation,
   [SpellsBlueprint.SpellMagicShield]: spellMagicShield,
   [SpellsBlueprint.SpellPhysicalShield]: spellPhysicalShield,
+  [SpellsBlueprint.ThunderRuneCreationSpell]: spellThunderRuneCreation,
 };
