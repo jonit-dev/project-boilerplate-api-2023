@@ -94,7 +94,6 @@ export class CharacterItemContainer {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The target container was not found.");
       return false;
     }
-    await targetContainer.lockField("slots");
 
     if (targetContainer) {
       let isNewItem = true;

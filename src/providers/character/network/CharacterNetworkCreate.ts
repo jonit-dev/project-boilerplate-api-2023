@@ -130,7 +130,8 @@ export class CharacterNetworkCreate {
         await this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
 
         await this.warnAboutWeatherStatus(character.channelId!);
-      }
+      },
+      false
     );
   }
 

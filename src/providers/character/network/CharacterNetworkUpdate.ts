@@ -108,21 +108,25 @@ export class CharacterNetworkUpdate {
             this.characterView.clearAllOutOfViewElements(character);
           }
 
-          // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.
-          this.socketMessaging.sendEventToUser<ICharacterPositionUpdateConfirm>(
-            character.channelId!,
-            CharacterSocketEvents.CharacterPositionUpdateConfirm,
-            {
-              id: character.id,
-              isValid: isPositionUpdateValid,
-              position: {
-                originX: character.x,
-                originY: character.y,
-                direction: data.direction,
-              },
-            }
-          );
+          this.sendConfirmation(character, data.direction, isPositionUpdateValid);
         }
+      }
+    );
+  }
+
+  private sendConfirmation(character: ICharacter, direction: AnimationDirection, isPositionUpdateValid: boolean): void {
+    // lets make sure we send the confirmation back to the user only after all the other pre-requirements above are done.
+    this.socketMessaging.sendEventToUser<ICharacterPositionUpdateConfirm>(
+      character.channelId!,
+      CharacterSocketEvents.CharacterPositionUpdateConfirm,
+      {
+        id: character.id,
+        isValid: isPositionUpdateValid,
+        position: {
+          originX: character.x,
+          originY: character.y,
+          direction: direction,
+        },
       }
     );
   }

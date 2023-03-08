@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IUser } from "@entities/ModuleSystem/UserModel";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { appEnv } from "@providers/config/env";
 import { EXHAUSTABLE_EVENTS, USER_EXHAUST_TIMEOUT } from "@providers/constants/ServerConstants";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
@@ -10,13 +11,14 @@ import { SocketMessaging } from "./SocketMessaging";
 export class SocketAuth {
   private isExhausted: Map<string, boolean> = new Map();
 
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging, private characterValidation: CharacterValidation) {}
 
   // this event makes sure that the user who's triggering the request actually owns the character!
   public authCharacterOn(
     channel,
     event: string,
-    callback: (data, character: ICharacter, owner: IUser) => Promise<any>
+    callback: (data, character: ICharacter, owner: IUser) => Promise<any>,
+    runBasicCharacterValidation: boolean = true
   ): void {
     channel.on(event, async (data: any) => {
       let owner, character;
@@ -39,6 +41,14 @@ export class SocketAuth {
             reason: "You don't own this character!",
           });
           return;
+        }
+
+        if (runBasicCharacterValidation) {
+          const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
+
+          if (!hasBasicValidation) {
+            return;
+          }
         }
 
         if (appEnv.general.DEBUG_MODE && !appEnv.general.IS_UNIT_TEST) {

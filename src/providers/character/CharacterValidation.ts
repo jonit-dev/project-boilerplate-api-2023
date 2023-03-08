@@ -9,15 +9,17 @@ export class CharacterValidation {
 
   public hasBasicValidation(character: ICharacter, msg?: Map<string, string>): boolean {
     if (!character.isOnline) {
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        msg?.get("not-online") ?? "Sorry, you are not online."
-      );
+      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+        reason: msg?.get("not-online") ?? "Sorry, you are not online.",
+      });
       return false;
     }
 
     if (!character.isAlive) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, msg?.get("not-alive") ?? "Sorry, you are dead.");
+      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+        reason: msg?.get("not-alive") ?? "Sorry, you are dead.",
+      });
+
       return false;
     }
 

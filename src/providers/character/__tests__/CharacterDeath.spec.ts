@@ -188,7 +188,7 @@ describe("CharacterDeath.ts | Character with items", () => {
     // @ts-ignore
     const characterBody = (await characterDeath.generateCharacterBody(testCharacter)) as IItem;
 
-    const bodyItemContainer = (await ItemContainer.findById(characterBody.itemContainer)) as IItemContainer;
+    let bodyItemContainer = (await ItemContainer.findById(characterBody.itemContainer)) as IItemContainer;
 
     // character is equipped with 2 items (head and neck)
     expect(characterEquipment.neck).toBeDefined();
@@ -201,7 +201,7 @@ describe("CharacterDeath.ts | Character with items", () => {
       jest.spyOn(_, "random").mockImplementation(() => DROP_EQUIPMENT_CHANCE);
 
       // @ts-ignore
-      await characterDeath.dropEquippedItemOnBody(bodyItemContainer, characterEquipment);
+      await characterDeath.dropEquippedItemOnBody(testCharacter, bodyItemContainer, characterEquipment);
     }
 
     const updatedEquipment = (await Equipment.findById(characterEquipment._id)) as IEquipment;
@@ -209,6 +209,8 @@ describe("CharacterDeath.ts | Character with items", () => {
     // character equipment is empty
     expect(updatedEquipment.neck).not.toBeDefined();
     expect(updatedEquipment.head).not.toBeDefined();
+
+    bodyItemContainer = (await ItemContainer.findById(characterBody.itemContainer)) as IItemContainer;
 
     // dead body contains the items
     expect(bodyItemContainer!.slots).toBeDefined();
@@ -235,7 +237,7 @@ describe("CharacterDeath.ts | Character with items", () => {
     for (let i = 0; i < 3; i++) {
       jest.spyOn(_, "random").mockImplementation(() => DROP_EQUIPMENT_CHANCE);
       // @ts-ignore
-      await characterDeath.dropEquippedItemOnBody(bodyItemContainer, characterEquipment);
+      await characterDeath.dropEquippedItemOnBody(testCharacter, bodyItemContainer, characterEquipment);
     }
 
     const updatedEquipment = (await Equipment.findById(characterEquipment._id)) as IEquipment;

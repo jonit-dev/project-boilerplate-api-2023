@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { CharacterSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { CharacterSocketEvents } from "@rpg-engine/shared";
 import { CharacterValidation } from "../CharacterValidation";
 
 describe("CharacterValidation.ts", () => {
@@ -63,10 +63,13 @@ describe("CharacterValidation.ts", () => {
 
     expect(result).toBe(false);
     expect(sendGenericErrorMessage).toBeCalled();
-    expect(sendGenericErrorMessage).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
-      message: "Sorry, you are dead.",
-      type: "error",
-    });
+    expect(sendGenericErrorMessage).toBeCalledWith(
+      testCharacter.channelId!,
+      CharacterSocketEvents.CharacterForceDisconnect,
+      {
+        reason: "Sorry, you are dead.",
+      }
+    );
   });
 
   it("should throw a custom error if character is dead", async () => {
@@ -78,10 +81,13 @@ describe("CharacterValidation.ts", () => {
 
     expect(result).toBe(false);
     expect(sendGenericErrorMessage).toBeCalled();
-    expect(sendGenericErrorMessage).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
-      message: customDeadMsg,
-      type: "error",
-    });
+    expect(sendGenericErrorMessage).toBeCalledWith(
+      testCharacter.channelId!,
+      CharacterSocketEvents.CharacterForceDisconnect,
+      {
+        reason: customDeadMsg,
+      }
+    );
   });
 
   it("should throw an error if character is offline", async () => {
@@ -92,10 +98,13 @@ describe("CharacterValidation.ts", () => {
 
     expect(result).toBe(false);
     expect(sendGenericErrorMessage).toBeCalled();
-    expect(sendGenericErrorMessage).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
-      message: "Sorry, you are not online.",
-      type: "error",
-    });
+    expect(sendGenericErrorMessage).toBeCalledWith(
+      testCharacter.channelId!,
+      CharacterSocketEvents.CharacterForceDisconnect,
+      {
+        reason: "Sorry, you are not online.",
+      }
+    );
   });
 
   it("should throw a custom error if character is offline", async () => {
@@ -107,9 +116,12 @@ describe("CharacterValidation.ts", () => {
 
     expect(result).toBe(false);
     expect(sendGenericErrorMessage).toBeCalled();
-    expect(sendGenericErrorMessage).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
-      message: customOfflineMsg,
-      type: "error",
-    });
+    expect(sendGenericErrorMessage).toBeCalledWith(
+      testCharacter.channelId!,
+      CharacterSocketEvents.CharacterForceDisconnect,
+      {
+        reason: customOfflineMsg,
+      }
+    );
   });
 });

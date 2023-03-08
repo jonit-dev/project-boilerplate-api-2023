@@ -19,6 +19,7 @@ import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterWeight } from "./CharacterWeight";
+import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 
 export const DROPPABLE_EQUIPMENT = [
   "head",
@@ -42,17 +43,39 @@ export class CharacterDeath {
     private itemOwnership: ItemOwnership,
     private characterWeight: CharacterWeight,
     private skillDecrease: SkillDecrease,
-    private characterDeathCalculator: CharacterDeathCalculator
+    private characterDeathCalculator: CharacterDeathCalculator,
+    private characterItemContainer: CharacterItemContainer
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
+    // lock character positioning fields, so it does not change while we are handling death (causes teleport bug)
     await character.lockField("x");
     await character.lockField("y");
     await character.lockField("scene");
 
+    if (character.health > 0) {
+      // if by any reason the char is not dead, make sure it is.
+      character.health = 0;
+      await character.save();
+    }
+
     if (killer) {
       await this.clearAttackerTarget(killer);
     }
+
+    const characterDeathData: IBattleDeath = {
+      id: character.id,
+      type: "Character",
+    };
+    this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, characterDeathData);
+
+    // communicate all players around that character is dead
+
+    await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
+      character,
+      BattleSocketEvents.BattleDeath,
+      characterDeathData
+    );
 
     // generate character's body
     const characterBody = await this.generateCharacterBody(character);
@@ -71,26 +94,12 @@ export class CharacterDeath {
       }, 2000);
     }
 
-    const characterDeathData: IBattleDeath = {
-      id: character.id,
-      type: "Character",
-    };
-    this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, characterDeathData);
-
-    // communicate all players around that character is dead
-
-    await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
-      character,
-      BattleSocketEvents.BattleDeath,
-      characterDeathData
-    );
+    await this.respawnCharacter(character);
+    await this.characterWeight.updateCharacterWeight(character);
 
     await character.unlockField("x");
     await character.unlockField("y");
     await character.unlockField("scene");
-
-    await this.respawnCharacter(character);
-    await this.characterWeight.updateCharacterWeight(character);
   }
 
   public async generateCharacterBody(character: ICharacter): Promise<IItem | any> {
@@ -106,7 +115,9 @@ export class CharacterDeath {
       y: character.y,
     });
 
-    return await charBody.save();
+    await charBody.save();
+
+    return charBody;
   }
 
   private async respawnCharacter(character: ICharacter): Promise<void> {
@@ -145,29 +156,26 @@ export class CharacterDeath {
       return;
     }
 
-    // get item container associated with characterBody
-    const itemContainer = await ItemContainer.findById(characterBody.itemContainer);
-
-    if (!itemContainer) {
-      throw new Error(`Error fetching itemContainer for Item with key ${characterBody.key}`);
-    }
-
     const equipment = await Equipment.findById(equipmentId).populate("inventory").exec();
     if (!equipment) {
       throw new Error(`No equipment found for id ${equipmentId}`);
     }
 
+    // get item container associated with characterBody
+    const bodyContainer = await ItemContainer.findById(characterBody.itemContainer);
+
+    if (!bodyContainer) {
+      throw new Error(`Error fetching itemContainer for Item with key ${characterBody.key}`);
+    }
+
     // drop backpack
     const inventory = equipment.inventory as unknown as IItem;
     if (inventory) {
-      await this.dropInventory(character, itemContainer, inventory);
+      await this.dropInventory(character, bodyContainer, inventory);
     }
 
     // there's a chance of dropping any of the equipped items
-    await this.dropEquippedItemOnBody(itemContainer, equipment);
-
-    itemContainer.markModified("slots");
-    await itemContainer.save();
+    await this.dropEquippedItemOnBody(character, bodyContainer, equipment);
   }
 
   private async dropInventory(character: ICharacter, bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
@@ -178,12 +186,12 @@ export class CharacterDeath {
     const dropInventoryChance = this.characterDeathCalculator.calculateInventoryDropChance(skills);
 
     if (n <= dropInventoryChance) {
-      // drop current inventory
-      const freeSlotId = bodyContainer.firstAvailableSlotId;
       let item = (await Item.findById(inventory._id)) as IItem;
+
       item = await this.clearItem(item);
-      bodyContainer.slots[Number(freeSlotId)] = item;
-      await bodyContainer.save();
+
+      // now that the slot is clear, lets drop the item on the body
+      await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id);
 
       setTimeout(() => {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -196,32 +204,53 @@ export class CharacterDeath {
     }
   }
 
-  private async dropEquippedItemOnBody(bodyContainer: IItemContainer, equipment: IEquipment): Promise<void> {
+  private async dropEquippedItemOnBody(
+    character: ICharacter,
+    bodyContainer: IItemContainer,
+    equipment: IEquipment
+  ): Promise<void> {
     for (const slot of DROPPABLE_EQUIPMENT) {
-      const itemId = await equipment[slot];
+      const itemId = equipment[slot];
 
       if (!itemId) continue;
 
       let item = (await Item.findById(itemId)) as IItem;
 
-      if (item) {
-        const n = _.random(0, 100);
-
-        if (n <= DROP_EQUIPMENT_CHANCE) {
-          const freeSlotId = bodyContainer.firstAvailableSlotId;
-          if (freeSlotId !== null) {
-            item = await this.clearItem(item);
-            bodyContainer.slots[Number(freeSlotId)] = item;
-            equipment[slot] = undefined;
-
-            bodyContainer.markModified("slots");
-            await bodyContainer.save();
-
-            equipment.markModified(slot);
-            await equipment.save();
-          }
-        }
+      if (!item) {
+        throw new Error(`Error fetching item with id ${itemId}`);
       }
+
+      const n = _.random(0, 100);
+
+      if (n <= DROP_EQUIPMENT_CHANCE) {
+        const removeEquipmentFromSlot = await this.removeItemFromEquipmentSlot(equipment, slot);
+
+        if (!removeEquipmentFromSlot) {
+          throw new Error(`Error removing item from equipment slot ${slot}`);
+        }
+
+        item = await this.clearItem(item);
+
+        // now that the slot is clear, lets drop the item on the body
+        await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id);
+      }
+    }
+  }
+
+  private async removeItemFromEquipmentSlot(equipment: IEquipment, slot: string): Promise<boolean> {
+    try {
+      await Equipment.updateOne(
+        { _id: equipment._id },
+        {
+          $unset: {
+            [slot]: 1,
+          },
+        }
+      );
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   }
 
