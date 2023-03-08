@@ -25,6 +25,8 @@ export class ItemDeleteCrons {
       setTimeout(async () => {
         // query items that are dropped on the scene (x,y,scene), not equipped, are not in a container and has no owner
 
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
         const items = await Item.find({
           // @ts-ignore
           x: { $ne: null },
@@ -33,6 +35,7 @@ export class ItemDeleteCrons {
           isEquipped: { $ne: true },
           itemContainer: { $exists: false },
           $or: [{ owner: null }, { owner: { $exists: false } }],
+          createdAt: { $lt: oneHourAgo },
         });
 
         for (const item of items) {
