@@ -24,6 +24,8 @@ describe("ItemUse.ts", () => {
   let equipmentEquip: EquipmentEquip;
   let animationEventMock: jest.SpyInstance;
 
+  let canApplyItemUsageMock: jest.SpyInstance;
+
   beforeAll(() => {
     itemUse = container.get<ItemUse>(ItemUse);
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
@@ -53,6 +55,8 @@ describe("ItemUse.ts", () => {
 
     animationEventMock = jest.spyOn(AnimationEffect.prototype, "sendAnimationEventToCharacter");
     animationEventMock.mockImplementation();
+
+    canApplyItemUsageMock = jest.spyOn(itemUse, "canApplyItemUsage" as any).mockImplementation(() => true);
 
     itemUsageMock = jest.spyOn(itemUse as any, "applyItemUsage");
     itemUsageMock.mockImplementation();

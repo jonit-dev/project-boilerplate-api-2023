@@ -1,5 +1,6 @@
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
+import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { InMemoryRepository } from "@providers/database/InMemoryRepository";
 import { RedisManager } from "@providers/database/RedisManager";
@@ -64,5 +65,7 @@ export const inMemoryHashTable = container.get<InMemoryHashTable>(InMemoryHashTa
 export const heapMonitor = container.get<HeapMonitor>(HeapMonitor);
 
 export const pm2Helper = container.get<PM2Helper>(PM2Helper);
+
+export const characterFoodConsumption = container.get<CharacterFoodConsumption>(CharacterFoodConsumption);
 
 export { container };

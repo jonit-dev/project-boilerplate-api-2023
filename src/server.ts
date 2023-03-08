@@ -5,6 +5,7 @@ import "express-async-errors";
 import { appEnv } from "@providers/config/env";
 import {
   characterConnection,
+  characterFoodConsumption,
   cronJobs,
   db,
   heapMonitor,
@@ -88,4 +89,6 @@ app.listen(port, async () => {
       heapMonitor.monitor();
     }
   }
+
+  await characterFoodConsumption.clearAllFoodConsumption();
 });

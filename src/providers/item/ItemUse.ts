@@ -10,6 +10,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import {
@@ -34,7 +35,8 @@ export class ItemUse {
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private characterFoodConsumption: CharacterFoodConsumption
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -57,6 +59,12 @@ export class ItemUse {
     const bluePrintItem = itemsBlueprintIndex[useItem.key];
     if (!bluePrintItem || !bluePrintItem.usableEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
+      return false;
+    }
+
+    const canApplyItemUsage = await this.canApplyItemUsage(bluePrintItem, character);
+
+    if (!canApplyItemUsage) {
       return false;
     }
 
@@ -83,6 +91,16 @@ export class ItemUse {
     };
 
     this.updateInventoryCharacter(payloadUpdate, character);
+
+    return true;
+  }
+
+  private async canApplyItemUsage(bluePrintItem: Partial<IItem>, character: ICharacter): Promise<boolean> {
+    if (bluePrintItem.subType === ItemSubType.Food) {
+      const canConsumeFood = await this.characterFoodConsumption.tryConsumingFood(character);
+
+      if (!canConsumeFood) return false;
+    }
 
     return true;
   }
