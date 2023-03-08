@@ -351,18 +351,14 @@ describe("CharacterTradingNPCSell.ts", () => {
       type: "sell",
       characterItems: [
         {
-          key: slingShot.key,
+          ...slingShot,
           price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
-          name: slingShot.name,
-          texturePath: slingShot.texturePath,
-          qty: 2,
+          stackQty: 2,
         },
         {
-          key: arrow.key,
+          ...arrow,
           price: arrow.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
-          name: arrow.name,
-          texturePath: arrow.texturePath,
-          qty: 100,
+          stackQty: 100,
         },
       ],
       characterAvailableGold: 0,
@@ -500,11 +496,9 @@ describe("CharacterTradingNPCSell.ts", () => {
       type: "sell",
       characterItems: [
         {
-          key: slingShot.key,
+          ...slingShot,
           price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
-          name: slingShot.name,
-          texturePath: slingShot.texturePath,
-          qty: 1,
+          stackQty: 1,
         },
       ],
       characterAvailableGold: 0,
@@ -530,11 +524,9 @@ describe("CharacterTradingNPCSell.ts", () => {
       type: "sell",
       characterItems: [
         {
-          key: slingShot.key,
+          ...slingShot,
           price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
-          name: slingShot.name,
-          texturePath: slingShot.texturePath,
-          qty: 1,
+          stackQty: 1,
         },
       ],
       characterAvailableGold: 10,

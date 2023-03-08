@@ -1,11 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
+import Shared, {
   CharacterTradeSocketEvents,
   ICharacterNPCTradeInitBuyResponse,
   IEquipmentAndInventoryUpdatePayload,
@@ -46,16 +46,11 @@ export class CharacterTradingNPCBuy {
     const traderItems: ITradeResponseItem[] = [];
 
     npc?.traderItems?.forEach(({ key }) => {
-      const item = itemsBlueprintIndex[key] as IItem;
+      const item = itemsBlueprintIndex[key] as Shared.IItem;
       const price = this.characterTradingBalance.getItemBuyPrice(key);
 
       if (price) {
-        traderItems.push({
-          key,
-          price,
-          texturePath: item.texturePath,
-          name: item.name,
-        });
+        traderItems.push({...item, price});
       }
     });
 
@@ -70,7 +65,7 @@ export class CharacterTradingNPCBuy {
       {
         npcId: npc._id,
         type: "buy",
-        traderItems: traderItems || [],
+        traderItems: traderItems,
         characterAvailableGold,
       }
     );

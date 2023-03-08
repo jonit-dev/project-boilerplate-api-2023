@@ -10,7 +10,7 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { recipeBlueprintsIndex } from "@providers/useWith/recipes/index";
 import { IUseWithCraftingRecipe, IUseWithCraftingRecipeItem } from "@providers/useWith/useWithTypes";
-import {
+import Shared, {
   ICraftableItem,
   ICraftableItemIngredient,
   IEquipmentAndInventoryUpdatePayload,
@@ -38,7 +38,7 @@ export class ItemCraftable {
 
   public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
     const inventoryInfo = await this.getCharacterInventoryItems(character);
-    const recipes = this.getRecipes(itemSubType).map(this.getCraftableItem.bind(this, inventoryInfo));
+    const recipes = this.getRecipes(itemSubType).map(this.getCraftableItem.bind(this, inventoryInfo)) as ICraftableItem[];
     this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, recipes);
   }
 
@@ -149,17 +149,15 @@ export class ItemCraftable {
   }
 
   private getCraftableItem(inventoryInfo: Map<string, number>, recipe: IUseWithCraftingRecipe): ICraftableItem {
-    const item = itemsBlueprintIndex[recipe.outputKey];
+    const item = itemsBlueprintIndex[recipe.outputKey] as Shared.IItem;
 
     const ingredients: ICraftableItemIngredient[] = recipe.requiredItems.map(
       this.getCraftableItemIngredient.bind(this)
     );
 
     return {
-      key: recipe.outputKey,
-      name: item.name,
+      ...item,
       canCraft: this.canCraftRecipe(inventoryInfo, recipe),
-      texturePath: item.texturePath,
       ingredients: ingredients,
     };
   }

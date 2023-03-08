@@ -6,7 +6,7 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
+import Shared, {
   CharacterTradeSocketEvents,
   ICharacterNPCTradeInitSellResponse,
   IEquipmentAndInventoryUpdatePayload,
@@ -226,11 +226,9 @@ export class CharacterTradingNPCSell {
       if (!sellPrice) continue;
 
       responseItems.push({
-        key: item.key,
+        ...item as unknown as Shared.IItem,
         price: this.characterTradingBalance.getItemSellPrice(item.key),
-        name: item.name,
-        texturePath: item.texturePath,
-        qty: itemsQty.get(itemKey),
+        stackQty: itemsQty.get(itemKey)
       });
     }
     return responseItems;
