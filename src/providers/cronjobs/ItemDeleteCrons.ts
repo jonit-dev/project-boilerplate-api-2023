@@ -35,7 +35,7 @@ export class ItemDeleteCrons {
           isEquipped: { $ne: true },
           itemContainer: { $exists: false },
           $or: [{ owner: null }, { owner: { $exists: false } }],
-          createdAt: { $lt: oneHourAgo }, // delete items that are older than 1 hour
+          updatedAt: { $lt: oneHourAgo }, // delete items that are older than 1 hour
         });
 
         for (const item of items) {
