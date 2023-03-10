@@ -6,6 +6,7 @@ import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { SpellLearn } from "@providers/spells/SpellLearn";
 import { CharacterSocketEvents, ICharacterLogout } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BuffSkillFunctions } from "../CharacterBuffer/BuffSkillFunctions";
@@ -19,7 +20,8 @@ export class CharacterNetworkLogout {
     private socketConnection: SocketConnection,
     private characterView: CharacterView,
     private inMemoryHashTable: InMemoryHashTable,
-    private buffSkillFunctions: BuffSkillFunctions
+    private buffSkillFunctions: BuffSkillFunctions,
+    private spellLearn: SpellLearn
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -45,6 +47,11 @@ export class CharacterNetworkLogout {
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());
 
+        const spellLeveling = await this.spellLearn.levelingSpells(character._id, character.skills!);
+
+        if (spellLeveling) {
+          console.log(`- Spells have been updated in Character: ${character._id}`);
+        }
         const battleCycle = BattleCycle.battleCycles.get(data.id);
 
         if (battleCycle) {
