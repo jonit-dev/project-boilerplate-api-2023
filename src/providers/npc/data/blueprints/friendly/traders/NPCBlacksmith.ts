@@ -26,9 +26,6 @@ export const npcBlacksmith = {
       key: ArmorsBlueprint.StuddedArmor,
     },
     {
-      key: ShieldsBlueprint.WoodenShield,
-    },
-    {
       key: MacesBlueprint.Club,
     },
     {
