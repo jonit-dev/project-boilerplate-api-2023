@@ -1,7 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ISkill } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
+import { Types } from "mongoose";
 import { spellsBlueprints } from "./data/blueprints/index";
 import { ISpell } from "./data/types/SpellsBlueprintTypes";
 
@@ -10,8 +13,8 @@ export class SpellLearn {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public async learnLatestSkillLevelSpells(characterId: string, notifyUser: boolean): Promise<void> {
-    const character = (await Character.findOne({ _id: characterId }).populate("skills")) as unknown as ICharacter;
-    const skills = character.skills as unknown as ISkill;
+    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
     const spells = this.getSkillLevelSpells(skills.level);
     await this.addToCharacterLearnedSpells(character, spells);
@@ -35,12 +38,20 @@ export class SpellLearn {
     );
   }
 
-  private getSkillLevelSpells(level): ISpell[] {
+  private getSkillLevelSpells(skillLevel: number, levelingSpells: boolean = false): ISpell[] {
     const spells: ISpell[] = [];
+
     for (const key in spellsBlueprints) {
       const spell = spellsBlueprints[key];
-      if (spell.magicWords && level === spell.minLevelRequired) {
-        spells.push(spell as unknown as ISpell);
+
+      if (levelingSpells) {
+        if (spell.magicWords && skillLevel >= spell.minLevelRequired) {
+          spells.push(spell as ISpell);
+        }
+      } else {
+        if (spell.magicWords && skillLevel === spell.minLevelRequired) {
+          spells.push(spell as ISpell);
+        }
       }
     }
     return spells;
@@ -54,7 +65,34 @@ export class SpellLearn {
       }
     });
 
-    character.learnedSpells = learned;
-    await character.save();
+    await Character.findByIdAndUpdate(
+      {
+        _id: character._id,
+      },
+      {
+        learnedSpells: learned,
+      }
+    );
+  }
+
+  public async levelingSpells(characterId: Types.ObjectId, skillId: Types.ObjectId): Promise<boolean> {
+    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const skills = (await Skill.findById(skillId).lean()) as ISkill;
+
+    const characterSpells = character.learnedSpells;
+    if (!characterSpells) {
+      return false;
+    }
+
+    const spells = this.getSkillLevelSpells(skills.level, true);
+    const spellsKeys = _.map(spells, "key");
+
+    const isEqual = _.isEqual(characterSpells.sort(), spellsKeys.sort());
+
+    if (isEqual === false) {
+      await this.addToCharacterLearnedSpells(character, spells);
+      return true;
+    }
+    return false;
   }
 }
