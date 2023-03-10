@@ -111,4 +111,11 @@ export enum HostileNPCsBlueprint {
   DwarfArcher = "dwarf-archer",
   DwarfGuardian = "dwarf-guardian",
   DwarfMage = "dwarf-mage",
+  Kobold = "kobold",
+  Wraith = "wraith",
+  DragonKnight = "dragon-knight",
+  IceThing = "ice-thing",
+  BlueDragon = "blue-dragon-01",
+  YellowDragon = "yellow-dragon-01",
+  OrcArcher = "orc-archer",
 }

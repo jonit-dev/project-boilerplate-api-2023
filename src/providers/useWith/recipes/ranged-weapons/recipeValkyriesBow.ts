@@ -17,5 +17,9 @@ export const recipeValkyriesBow: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.PhoenixFeather,
       qty: 15,
     },
+    {
+      key: CraftingResourcesBlueprint.DragonTooth,
+      qty: 2,
+    },
   ],
 };

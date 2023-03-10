@@ -29,5 +29,9 @@ export const recipeHolyShield: IUseWithCraftingRecipe = {
       key: MagicsBlueprint.HealRune,
       qty: 5,
     },
+    {
+      key: CraftingResourcesBlueprint.DragonTooth,
+      qty: 2,
+    },
   ],
 };

@@ -25,10 +25,12 @@ import { npcGiantBat } from "./NPCGiantBat";
 import { npcGiantSpider } from "./NPCGiantSpider";
 import { npcGoblin } from "./NPCGoblin";
 import { npcIceFox } from "./NPCIceFox";
+import { npcIceThing } from "./NPCIceThing";
 import { npcIceTroll } from "./NPCIceTroll";
 import { npcMinotaur } from "./NPCMinotaur";
 import { npcMudGolem } from "./NPCMudGolem";
 import { npcOrc } from "./NPCOrc";
+import { npcOrcArcher } from "./NPCOrcArcher";
 import { npcOrcBerserker } from "./NPCOrcBerserker";
 import { npcOrcMage } from "./NPCOrcMage";
 import { npcOrcWarrior } from "./NPCOrcWarrior";
@@ -53,13 +55,17 @@ import { npcTrollWarrior } from "./NPCTrollWarrior";
 import { npcWildTroll } from "./NPCWildTroll";
 import { npcWinterWolf } from "./NPCWinterWolf";
 import { npcWolf } from "./NPCWolf";
+import { npcKobold } from "./NpcKobold";
 import { npcYeti } from "./bosses/NPCYeti";
+import { npcDragonKnight } from "./npcDragonKnight";
+import { npcWraith } from "./npcWraith";
 
 export const hostileNPCs = {
   [HostileNPCsBlueprint.Orc]: npcOrc,
   [HostileNPCsBlueprint.OrcWarrior]: npcOrcWarrior,
   [HostileNPCsBlueprint.OrcBerserker]: npcOrcBerserker,
   [HostileNPCsBlueprint.OrcMage]: npcOrcMage,
+  [HostileNPCsBlueprint.OrcArcher]: npcOrcArcher,
   [HostileNPCsBlueprint.Skeleton]: npcSkeleton,
   [HostileNPCsBlueprint.Rat]: npcRat,
   [HostileNPCsBlueprint.SkeletonKnight]: npcSkeletonKnight,
@@ -111,4 +117,8 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.DwarfArcher]: npcDwarfArcher,
   [HostileNPCsBlueprint.DwarfGuardian]: npcDwarfGuardian,
   [HostileNPCsBlueprint.DwarfMage]: npcDwarfMage,
+  [HostileNPCsBlueprint.Kobold]: npcKobold,
+  [HostileNPCsBlueprint.Wraith]: npcWraith,
+  [HostileNPCsBlueprint.DragonKnight]: npcDragonKnight,
+  [HostileNPCsBlueprint.IceThing]: npcIceThing,
 };

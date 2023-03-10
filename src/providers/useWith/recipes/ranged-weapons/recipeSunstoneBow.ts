@@ -25,5 +25,9 @@ export const recipeSunstoneBow: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.PolishedStone,
       qty: 10,
     },
+    {
+      key: CraftingResourcesBlueprint.DragonTooth,
+      qty: 2,
+    },
   ],
 };

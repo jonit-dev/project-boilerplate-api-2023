@@ -18,8 +18,8 @@ export const recipeDarkShield: IUseWithCraftingRecipe = {
       qty: 20,
     },
     {
-      key: CraftingResourcesBlueprint.Skull,
-      qty: 20,
+      key: CraftingResourcesBlueprint.DragonTooth,
+      qty: 2,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,

@@ -7,6 +7,7 @@ import {
   AxesBlueprint,
   BootsBlueprint,
   ContainersBlueprint,
+  CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
@@ -72,10 +73,7 @@ export const npcGiantSpider: Partial<INPC> = {
       itemBlueprintKey: GlovesBlueprint.PlateGloves,
       chance: 85,
     },
-    {
-      itemBlueprintKey: LegsBlueprint.StuddedLegs,
-      chance: 60,
-    },
+
     {
       itemBlueprintKey: ShieldsBlueprint.PlateShield,
       chance: 15,
@@ -122,8 +120,27 @@ export const npcGiantSpider: Partial<INPC> = {
       chance: 10,
     },
     {
-      itemBlueprintKey: AxesBlueprint.Axe,
-      chance: 30,
+      itemBlueprintKey: ArmorsBlueprint.MithrilArmor,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.MithrilLegs,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Silk,
+      chance: 80,
+      quantityRange: [1, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Bones,
+      chance: 80,
+      quantityRange: [1, 10],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.RedSapphire,
+      chance: 50,
+      quantityRange: [1, 10],
     },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],
