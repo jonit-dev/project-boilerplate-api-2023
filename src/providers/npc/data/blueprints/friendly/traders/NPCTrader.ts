@@ -14,7 +14,7 @@ import {
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { CharacterGender } from "@rpg-engine/shared";
-import { generateRandomMovement } from "../../abstractions/BaseNeutralNPC";
+import { generateRandomMovement } from "../../../abstractions/BaseNeutralNPC";
 
 export const npcTrader = {
   ...generateRandomMovement(),

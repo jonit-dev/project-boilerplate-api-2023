@@ -60,7 +60,7 @@ import { npcYeti } from "./bosses/NPCYeti";
 import { npcDragonKnight } from "./npcDragonKnight";
 import { npcWraith } from "./npcWraith";
 
-export const hostileNPCs = {
+export const hostileNPCsIndex = {
   [HostileNPCsBlueprint.Orc]: npcOrc,
   [HostileNPCsBlueprint.OrcWarrior]: npcOrcWarrior,
   [HostileNPCsBlueprint.OrcBerserker]: npcOrcBerserker,

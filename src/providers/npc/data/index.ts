@@ -1,12 +1,12 @@
 import { IBlueprint } from "@providers/types/temp/BlueprintTypes";
-import { friendlyNPCs } from "./blueprints/friendly/index";
-import { bossesBlueprints } from "./blueprints/hostile/bosses/index";
-import { hostileNPCs } from "./blueprints/hostile/index";
-import { neutralNPCs } from "./blueprints/neutral/index";
+import { friendlyNPCsIndex } from "./blueprints/friendly/index";
+import { bossesNPCsIndex } from "./blueprints/hostile/bosses/index";
+import { hostileNPCsIndex } from "./blueprints/hostile/index";
+import { neutralNPCsIndex } from "./blueprints/neutral/index";
 
 export const npcsBlueprintIndex: IBlueprint = {
-  ...friendlyNPCs,
-  ...neutralNPCs,
-  ...hostileNPCs,
-  ...bossesBlueprints,
+  ...friendlyNPCsIndex,
+  ...neutralNPCsIndex,
+  ...hostileNPCsIndex,
+  ...bossesNPCsIndex,
 };

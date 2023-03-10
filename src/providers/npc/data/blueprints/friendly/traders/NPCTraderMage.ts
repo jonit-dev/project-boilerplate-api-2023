@@ -1,7 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MagicsBlueprint, PotionsBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { generateRandomMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
 import { CharacterGender } from "@rpg-engine/shared";
-import { generateRandomMovement } from "../../abstractions/BaseNeutralNPC";
 
 export const npcTraderMage = {
   ...generateRandomMovement(),
@@ -22,12 +22,6 @@ export const npcTraderMage = {
     },
     {
       key: MagicsBlueprint.Rune,
-    },
-    {
-      key: MagicsBlueprint.FireBoltRune,
-    },
-    {
-      key: MagicsBlueprint.PoisonRune,
     },
     {
       key: StaffsBlueprint.FireStaff,

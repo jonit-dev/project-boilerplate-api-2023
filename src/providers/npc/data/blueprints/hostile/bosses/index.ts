@@ -1,8 +1,8 @@
 import { npcAsterion } from "./NPCAsterion";
-import { npcGorgok } from "./NPCGorgok";
 import { npcBlueDragon } from "./NPCBlueDragon";
+import { npcGorgok } from "./NPCGorgok";
 
-export const bossesBlueprints = {
+export const bossesNPCsIndex = {
   asterion: npcAsterion,
   gorgok: npcGorgok,
   npcBlueDragon: npcBlueDragon,

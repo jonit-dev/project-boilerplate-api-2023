@@ -30,12 +30,11 @@ import { npcSeniorKnight } from "./NPCSeniorKnight1";
 import { npcShaman } from "./NPCShaman";
 import { npcStoryTeller } from "./NPCStoryTeller";
 import { npcSuperiorKnight } from "./NPCSuperiorKnight";
-import { npcTrader } from "./NPCTrader";
-import { npcTraderMage } from "./NPCTraderMage";
 import { npcWomanBlueHair } from "./NPCWomanBlueHair";
 import { npcWomanGreenHair } from "./NPCWomanGreenHair";
+import { npcTradersIndex } from "./traders";
 
-export const friendlyNPCs = {
+export const friendlyNPCsIndex = {
   [FriendlyNPCsBlueprint.BaseFixedPath]: npcBaseFixedPath,
   [FriendlyNPCsBlueprint.BaseRandomPath]: npcBaseRandomPath,
   [FriendlyNPCsBlueprint.BaseStopped]: npcBaseStopped,
@@ -50,7 +49,7 @@ export const friendlyNPCs = {
   [FriendlyNPCsBlueprint.BlackKnight4]: npcBlackKnight4,
   [FriendlyNPCsBlueprint.SuperiorKnight]: npcSuperiorKnight,
   [FriendlyNPCsBlueprint.WomanBlueHair]: npcWomanBlueHair,
-  [FriendlyNPCsBlueprint.Trader]: npcTrader,
+
   [FriendlyNPCsBlueprint.FatBaldMan]: npcFatBaldMan,
   [FriendlyNPCsBlueprint.MaleNobleBlackHair]: npcMaleNobleBlackHair,
   [FriendlyNPCsBlueprint.DynastyWoman1]: npcDynastyWoman1,
@@ -65,10 +64,10 @@ export const friendlyNPCs = {
   [FriendlyNPCsBlueprint.SeniorKnight1]: npcSeniorKnight,
   [FriendlyNPCsBlueprint.Father]: npcFather,
   [FriendlyNPCsBlueprint.Mother]: npcMother,
-  [FriendlyNPCsBlueprint.TraderHorse]: npcTraderMage,
   [FriendlyNPCsBlueprint.Fisherman]: npcFisherman,
   [FriendlyNPCsBlueprint.StoryTeller]: npcStoryTeller,
   [FriendlyNPCsBlueprint.Carpenter]: npcCarpenter,
   [FriendlyNPCsBlueprint.Shaman]: npcShaman,
   [FriendlyNPCsBlueprint.Climber]: npcClimber,
+  ...npcTradersIndex,
 };
