@@ -1,14 +1,13 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MagicsBlueprint, PotionsBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { CharacterGender } from "@rpg-engine/shared";
-import { generateFixedPathMovement } from "../../abstractions/BaseNeutralNPC";
+import { generateRandomMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcTraderHorse = {
-  ...generateFixedPathMovement(),
-  key: "trader-horse",
-  name: "John Trader",
-  textureKey: FriendlyNPCsBlueprint.TraderHorse,
+export const npcTraderMage = {
+  ...generateRandomMovement(),
+  key: "trader-mage",
+  name: "Lucius Shadowmoon",
+  textureKey: "blue-mage-1",
   gender: CharacterGender.Male,
   isTrader: true,
   traderItems: [

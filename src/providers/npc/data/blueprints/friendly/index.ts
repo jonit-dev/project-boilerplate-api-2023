@@ -31,7 +31,7 @@ import { npcShaman } from "./NPCShaman";
 import { npcStoryTeller } from "./NPCStoryTeller";
 import { npcSuperiorKnight } from "./NPCSuperiorKnight";
 import { npcTrader } from "./NPCTrader";
-import { npcTraderHorse } from "./NPCTraderHorse";
+import { npcTraderMage } from "./NPCTraderMage";
 import { npcWomanBlueHair } from "./NPCWomanBlueHair";
 import { npcWomanGreenHair } from "./NPCWomanGreenHair";
 
@@ -65,7 +65,7 @@ export const friendlyNPCs = {
   [FriendlyNPCsBlueprint.SeniorKnight1]: npcSeniorKnight,
   [FriendlyNPCsBlueprint.Father]: npcFather,
   [FriendlyNPCsBlueprint.Mother]: npcMother,
-  [FriendlyNPCsBlueprint.TraderHorse]: npcTraderHorse,
+  [FriendlyNPCsBlueprint.TraderHorse]: npcTraderMage,
   [FriendlyNPCsBlueprint.Fisherman]: npcFisherman,
   [FriendlyNPCsBlueprint.StoryTeller]: npcStoryTeller,
   [FriendlyNPCsBlueprint.Carpenter]: npcCarpenter,
