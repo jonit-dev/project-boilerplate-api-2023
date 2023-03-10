@@ -6,12 +6,8 @@ export const recipeLightAntidote: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.Herb,
-      qty: 3,
-    },
-    {
       key: CraftingResourcesBlueprint.WaterBottle,
-      qty: 2,
+      qty: 1,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,

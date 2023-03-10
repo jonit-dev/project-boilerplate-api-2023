@@ -3,14 +3,18 @@ import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { recipeArrow } from "./recipeArrow";
 import { recipeBolt } from "./recipeBolt";
 import { recipeBow } from "./recipeBow";
+import { recipeCorruptionBolt } from "./recipeCorruptionBolt";
 import { recipeCrossBow } from "./recipeCrossBow";
 import { recipeDragonBow } from "./recipeDragonBow";
+import { recipeElvenBolt } from "./recipeElvenBolt";
+import { recipeFireBolt } from "./recipeFireBolt";
 import { recipeGoldenArrow } from "./recipeGoldenArrow";
 import { recipeHadesBow } from "./recipeHadesBow";
 import { recipeIronArrow } from "./recipeIronArrow";
 import { recipeLightingCrossbow } from "./recipeLightingCrossbow";
 import { recipePhoenixBow } from "./recipePhoenixBow";
 import { recipePoisonArrow } from "./recipePoisonArrow";
+import { recipeRoyalBow } from "./recipeRoyalBow";
 import { recipeRuneBow } from "./recipeRuneBow";
 import { recipeShockArrow } from "./recipeShockArrow";
 import { recipeStormBow } from "./recipeStormBow";
@@ -23,6 +27,9 @@ export const recipeRangedIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [RangedWeaponsBlueprint.IronArrow]: [recipeIronArrow],
   [RangedWeaponsBlueprint.PoisonArrow]: [recipePoisonArrow],
   [RangedWeaponsBlueprint.Bolt]: [recipeBolt],
+  [RangedWeaponsBlueprint.CorruptionBolt]: [recipeCorruptionBolt],
+  [RangedWeaponsBlueprint.FireBolt]: [recipeFireBolt],
+  [RangedWeaponsBlueprint.ElvenBolt]: [recipeElvenBolt],
   [RangedWeaponsBlueprint.Bow]: [recipeBow],
   [RangedWeaponsBlueprint.DragonBow]: [recipeDragonBow],
   [RangedWeaponsBlueprint.HadesBow]: [recipeHadesBow],
@@ -36,4 +43,5 @@ export const recipeRangedIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [RangedWeaponsBlueprint.SunstoneBow]: [recipeSunstoneBow],
   [RangedWeaponsBlueprint.ValkyriesBow]: [recipeValkyriesBow],
   [RangedWeaponsBlueprint.ZephyrusBow]: [recipeZephyrusBow],
+  [RangedWeaponsBlueprint.RoyalBow]: [recipeRoyalBow],
 };

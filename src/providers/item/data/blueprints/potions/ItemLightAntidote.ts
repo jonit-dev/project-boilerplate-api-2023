@@ -9,11 +9,11 @@ import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 export const itemLightAntidote: Partial<IItem> = {
   key: PotionsBlueprint.LightAntidote,
   type: ItemType.Consumable,
-  subType: ItemSubType.Magic,
+  subType: ItemSubType.Potion,
   textureAtlas: "items",
   texturePath: "potions/light-antidote.png",
   name: "Light Antidote",
-  description: "A small flask containing an elixir of antidote.",
+  description: "A small flask containing antidote against poison.",
   weight: 0.04,
   basePrice: 15,
   maxStackSize: 100,

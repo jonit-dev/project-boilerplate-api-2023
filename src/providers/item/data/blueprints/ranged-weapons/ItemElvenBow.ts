@@ -13,8 +13,8 @@ export const itemElvenBow: Partial<IItem> = {
   name: "Elven Bow",
   description:
     "A bow crafted by the elves, known for their skill in archery. It is said to be incredibly accurate and able to shoot arrows with great speed and distance.",
-  attack: 8,
-  defense: 2,
+  attack: 12,
+  defense: 3,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,

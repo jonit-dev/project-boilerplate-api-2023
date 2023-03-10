@@ -13,8 +13,8 @@ export const itemHellishBow: Partial<IItem> = {
   name: "Hellish Bow",
   description:
     "A bow imbued with dark, otherworldly energy. It is said to be able to ignite the air around it and to be capable of shooting hellish bolts with great force and accuracy.",
-  attack: 10,
-  defense: 5,
+  attack: 14,
+  defense: 6,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,

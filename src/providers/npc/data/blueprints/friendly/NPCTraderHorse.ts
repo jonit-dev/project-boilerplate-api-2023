@@ -13,10 +13,13 @@ export const npcTraderHorse = {
   isTrader: true,
   traderItems: [
     {
-      key: PotionsBlueprint.LightEndurancePotion,
+      key: PotionsBlueprint.LightAntidote,
     },
     {
-      key: PotionsBlueprint.ManaPotion,
+      key: PotionsBlueprint.LightLifePotion,
+    },
+    {
+      key: PotionsBlueprint.LightManaPotion,
     },
     {
       key: MagicsBlueprint.Rune,

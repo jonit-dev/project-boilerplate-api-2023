@@ -7,11 +7,11 @@ export const itemFireBolt: Partial<IItem> = {
   type: ItemType.Weapon,
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
-  texturePath: "'ranged-weapons/fire-bolt.png",
+  texturePath: "ranged-weapons/fire-bolt.png",
   name: "Fire Bolt",
   description:
     "An arrow imbued with fire magic. It is said to be able to ignite the air around it and to be capable of causing great damage when it hits its target.",
-  attack: 9,
+  attack: 18,
   weight: 0.012,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 110,

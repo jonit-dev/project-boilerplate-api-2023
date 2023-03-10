@@ -1,6 +1,6 @@
+import { DYNAMIC_MAP_DARKNESS } from "@providers/constants/MapConstants";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
-import { unitTestHelper } from "@providers/inversify/container";
 import { MapTiles } from "@providers/map/MapTiles";
 import fs from "fs";
 import { GetMapMetadataUseCase } from "../map/GetMapMetadataUseCase";
@@ -9,7 +9,7 @@ describe("GetMapMetadataUseCase", () => {
   let getMapMetadataUseCase: GetMapMetadataUseCase;
   let mapTiles: MapTiles;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     mapTiles = {
       getMapLayers: jest.fn(() => ["Layer 1", "Layer 2"]),
     } as unknown as MapTiles;
@@ -51,7 +51,7 @@ describe("GetMapMetadataUseCase", () => {
 
     expect(mapMetadata).toEqual({
       key: "example",
-      lightening: { type: "Static", value: 0.95 },
+      lightening: { type: "Static", value: DYNAMIC_MAP_DARKNESS },
       name: "example",
       version: 1,
       layers: ["layer1", "layer2"],

@@ -5,7 +5,7 @@ import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 export const itemLightEndurancePotion: Partial<IItem> = {
   key: PotionsBlueprint.LightEndurancePotion,
   type: ItemType.Consumable,
-  subType: ItemSubType.Magic,
+  subType: ItemSubType.Potion,
   textureAtlas: "items",
   texturePath: "potions/light-endurance-potion.png",
 

@@ -13,7 +13,7 @@ export const itemEldensBow: Partial<IItem> = {
   name: "Elden's Bow",
   description:
     "A powerful, enchanted bow said to have belonged to a great hero of legend. It is said to be capable of shooting arrows with incredible speed and accuracy.",
-  attack: 8,
+  attack: 12,
   defense: 6,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

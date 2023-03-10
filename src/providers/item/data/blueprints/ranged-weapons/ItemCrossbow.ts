@@ -13,7 +13,8 @@ export const itemCrossbow: Partial<IItem> = {
   name: "Crossbow",
   description:
     "A weapon used for shooting bolts and usually made of a strip of wood bent by a cord connecting the two end.",
-  attack: 7,
+  attack: 12,
+  defense: 5,
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 6,

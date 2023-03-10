@@ -49,6 +49,11 @@ export const npcSnake: Partial<INPC> = {
       chance: 20,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Herb,
+      chance: 30,
+      quantityRange: [5, 10],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],
 };

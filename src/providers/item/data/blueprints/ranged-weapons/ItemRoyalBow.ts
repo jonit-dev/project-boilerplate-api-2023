@@ -13,8 +13,8 @@ export const itemRoyalBow: Partial<IItem> = {
   name: "Royal Bow",
   description:
     " powerful, ornate bow often given as a symbol of royal power. It is often made of gold or other precious materials and may be intricately decorated with engravings or gemstones.",
-  attack: 5,
-  defense: 2,
+  attack: 18,
+  defense: 8,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand],
   maxRange: 7,

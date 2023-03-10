@@ -160,7 +160,7 @@ export class BattleEvent {
   private calculateActionModifier(attackType: EntityAttackType, actionModifier: number): number {
     // make it easier to hit when you're ranged
     if (attackType === EntityAttackType.Ranged) {
-      actionModifier *= 1.5;
+      actionModifier *= 2;
     }
     return actionModifier;
   }

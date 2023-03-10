@@ -1,17 +1,17 @@
 import { CraftingResourcesBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 
-export const recipeLightLifePotion: IUseWithCraftingRecipe = {
-  outputKey: PotionsBlueprint.LightLifePotion,
-  outputQtyRange: [1, 2],
+export const recipeGreaterManaPotion: IUseWithCraftingRecipe = {
+  outputKey: PotionsBlueprint.GreaterManaPotion,
+  outputQtyRange: [1, 3],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.Herb,
+      key: CraftingResourcesBlueprint.BlueFeather,
       qty: 3,
     },
     {
       key: CraftingResourcesBlueprint.WaterBottle,
-      qty: 1,
+      qty: 2,
     },
   ],
 };

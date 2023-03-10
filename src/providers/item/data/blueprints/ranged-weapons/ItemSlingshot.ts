@@ -13,8 +13,8 @@ export const itemSlingshot: Partial<IItem> = {
   name: "Wooden Slingshot",
   description:
     "A weapon used for shooting stones and usually made of a strip of wood bent by a cord connecting the two end.",
-  attack: 3,
-  defense: 2,
+  attack: 6,
+  defense: 4,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 4,

@@ -90,6 +90,11 @@ export const npcIceFox: Partial<INPC> = {
       chance: 40,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueFeather,
+      chance: 40,
+      quantityRange: [3, 5],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Freezing],
 };

@@ -13,7 +13,7 @@ export const itemCompoundBow: Partial<IItem> = {
   name: "Compound Bow",
   description:
     "A bow that uses a system of pulleys and cables to reduce the effort needed to draw the string back, allowing for greater accuracy and speed when shooting arrows.",
-  attack: 7,
+  attack: 11,
   defense: 3,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

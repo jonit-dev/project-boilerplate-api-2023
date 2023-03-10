@@ -31,6 +31,6 @@ export const recipeBlueprintsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   ...recipeSpearsIndex,
   ...recipeStaffsIndex,
   ...recipeSwordsIndex,
-  ...recipePotionsIndex,
   ...recipeCraftingResources,
+  ...recipePotionsIndex,
 };

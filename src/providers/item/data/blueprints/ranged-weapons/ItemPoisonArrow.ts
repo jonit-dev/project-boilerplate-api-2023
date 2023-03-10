@@ -10,7 +10,7 @@ export const itemPoisonArrow: Partial<IItem> = {
   texturePath: "ranged-weapons/poison-arrow.png",
   name: "Poison Arrow",
   description: "An arrow coated with poison.",
-  attack: 7,
+  attack: 18,
   weight: 0.025,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,

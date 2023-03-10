@@ -13,8 +13,8 @@ export const itemShortBow: Partial<IItem> = {
   name: "Short Bow",
   description:
     "A small, lightweight bow with a short limb and a short string. It is easy to handle and use, making it popular among beginners and skilled archers alike.",
-  attack: 6,
-  defense: 1,
+  attack: 11,
+  defense: 2,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,

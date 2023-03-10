@@ -10,7 +10,7 @@ export const itemStone: Partial<IItem> = {
   texturePath: "ranged-weapons/stone.png",
   name: "Stone",
   description: "A stone.",
-  attack: 3,
+  attack: 8,
   weight: 0.15,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,

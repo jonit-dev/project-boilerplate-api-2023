@@ -10,7 +10,7 @@ export const SP_INCREASE_SECONDS_COOLDOWN = 8;
 export const CUSTOM_SKILL_COOLDOWNS = {
   shielding: 14,
   resistance: 10,
-  distance: 5,
+  distance: 3,
   magic: 5,
   fishing: 5,
 

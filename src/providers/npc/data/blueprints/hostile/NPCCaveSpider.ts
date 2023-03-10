@@ -48,6 +48,11 @@ export const npcCaveSpider: Partial<INPC> = {
       chance: 20,
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.Herb,
+      chance: 30,
+      quantityRange: [5, 10],
+    },
+    {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,
       chance: 5,
     },
@@ -61,10 +66,6 @@ export const npcCaveSpider: Partial<INPC> = {
     },
     {
       itemBlueprintKey: AxesBlueprint.Bardiche,
-      chance: 5,
-    },
-    {
-      itemBlueprintKey: AxesBlueprint.GoldenAxe,
       chance: 5,
     },
     {

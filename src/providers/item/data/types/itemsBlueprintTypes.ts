@@ -232,8 +232,11 @@ export enum SpearsBlueprint {
 
 export enum PotionsBlueprint {
   GreaterLifePotion = "greater-life-potion",
+  GreaterManaPotion = "greater-mana-potion",
+  LightManaPotion = "light-mana-potion",
   LightEndurancePotion = "light-endurance-potion",
   LightLifePotion = "light-life-potion",
+  LifePotion = "life-potion",
   ManaPotion = "mana-potion",
   LightAntidote = "light-antidote",
 }

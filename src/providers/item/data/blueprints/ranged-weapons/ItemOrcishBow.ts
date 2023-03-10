@@ -13,8 +13,8 @@ export const itemOrcishBow: Partial<IItem> = {
   name: "Orcish Bow",
   description:
     "A bow with some decorative tooths and very long string. It is used by orcs for hunting or during battles.",
-  attack: 6,
-  defense: 4,
+  attack: 16,
+  defense: 6,
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 10,

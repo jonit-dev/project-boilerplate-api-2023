@@ -38,7 +38,9 @@ export class ItemCraftable {
 
   public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
     const inventoryInfo = await this.getCharacterInventoryItems(character);
-    const recipes = this.getRecipes(itemSubType).map(this.getCraftableItem.bind(this, inventoryInfo)) as ICraftableItem[];
+    const recipes = this.getRecipes(itemSubType).map(
+      this.getCraftableItem.bind(this, inventoryInfo)
+    ) as ICraftableItem[];
     this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, recipes);
   }
 

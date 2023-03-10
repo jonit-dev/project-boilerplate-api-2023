@@ -10,7 +10,7 @@ export const itemShockArrow: Partial<IItem> = {
   texturePath: "ranged-weapons/shock-arrow.png",
   name: "Shock Arrow",
   description: "An arrow infused with electricity that deals heavy damage.",
-  attack: 7,
+  attack: 16,
   weight: 0.05,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   maxStackSize: 100,

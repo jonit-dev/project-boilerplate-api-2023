@@ -5,7 +5,6 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
-import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -52,7 +51,6 @@ export class BattleAttackTarget {
     private battleRangedAttack: BattleRangedAttack,
     private questSystem: QuestSystem,
     private entityEffectUse: EntityEffectUse,
-    private characterBonusPenalties: CharacterBonusPenalties,
     private npcWarn: NPCWarn,
     private characterMovementWarn: CharacterMovementWarn,
     private characterWeapon: CharacterWeapon

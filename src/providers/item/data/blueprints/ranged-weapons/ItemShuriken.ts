@@ -12,7 +12,7 @@ export const itemShuriken: Partial<IItem> = {
   texturePath: "ranged-weapons/shuriken-qty-1.png",
   name: "Shuriken",
   description: "A weapon in the form of a star with projecting blades",
-  attack: 5,
+  attack: 12,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxStackSize: 50,

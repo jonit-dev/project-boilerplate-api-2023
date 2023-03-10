@@ -84,6 +84,11 @@ export const npcFrostSalamander: Partial<INPC> = {
       chance: 20,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueFeather,
+      chance: 40,
+      quantityRange: [3, 5],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Freezing],
 };

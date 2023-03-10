@@ -11,8 +11,8 @@ export const itemRuneCrossbow: Partial<IItem> = {
   texturePath: "ranged-weapons/rune-crossbow.png",
   name: "Rune Crossbow",
   description: "A crossbow with rune inscriptions that increases attack speed and accuracy.",
-  attack: 14,
-  weight: 4,
+  attack: 20,
+  weight: 7,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: 7,
   requiredAmmoKeys: [

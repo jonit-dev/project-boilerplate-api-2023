@@ -6,12 +6,8 @@ export const recipeManaPotion: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.Herb,
-      qty: 3,
-    },
-    {
       key: CraftingResourcesBlueprint.BlueFeather,
-      qty: 1,
+      qty: 2,
     },
     {
       key: CraftingResourcesBlueprint.WaterBottle,

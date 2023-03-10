@@ -3,12 +3,13 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import round from "lodash/round";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemGreaterLifePotion: Partial<IItem> = {
   key: PotionsBlueprint.GreaterLifePotion,
   type: ItemType.Consumable,
-  subType: ItemSubType.Magic,
+  subType: ItemSubType.Potion,
   textureAtlas: "items",
   texturePath: "potions/greater-life-potion.png",
 
@@ -21,6 +22,8 @@ export const itemGreaterLifePotion: Partial<IItem> = {
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, 70);
+    const characterHealthPercentage = round(character.health * 0.15); // 15% of char health
+
+    itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
   },
 };

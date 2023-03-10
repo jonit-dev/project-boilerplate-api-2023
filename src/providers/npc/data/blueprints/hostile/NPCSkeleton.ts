@@ -92,5 +92,10 @@ export const npcSkeleton = {
       chance: 20,
       quantityRange: [1, 3],
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WaterBottle,
+      chance: 20,
+      quantityRange: [2, 3],
+    },
   ],
 } as Partial<INPC>;
