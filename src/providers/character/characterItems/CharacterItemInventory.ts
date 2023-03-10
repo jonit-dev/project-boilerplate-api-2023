@@ -3,9 +3,9 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
+import { ItemRarity } from "@providers/item/ItemRarity";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ItemRarity } from "@providers/item/ItemRarity";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
@@ -32,7 +32,7 @@ export class CharacterItemInventory {
 
   public async getAllItemsFromInventoryNested(character: ICharacter): Promise<IItem[]> {
     // loop through every slot that this character has (item containers), and get all items from each slot
-    // this method is more reliable, because it get all slots inclusing NESTED SLOTS (nested bags, for example)
+    // this method is more reliable, because it get all slots including NESTED SLOTS (nested bags, for example)
 
     const items: IItem[] = [];
 

@@ -77,6 +77,12 @@ export class CharacterWeight {
 
       if (nestedBags.length > 0) {
         for (const item of nestedBags) {
+          // check if nestedBag is actually on the inventory top level
+
+          const isInInventory = await this.characterItemInventory.checkItemInInventory(item._id, character);
+
+          if (!isInInventory) continue;
+
           if (item.type === ItemType.Container) {
             const inventoryContainer = await ItemContainer.findById(item?.itemContainer);
             for (const bagItem of inventoryContainer!.itemIds) {
