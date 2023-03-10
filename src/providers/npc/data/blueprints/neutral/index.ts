@@ -9,7 +9,7 @@ import { npcPig } from "./NPCPig";
 import { npcRedDeer } from "./NPCRedDeer";
 import { npcWhiteSheep } from "./NPCWhiteSheep";
 
-export const neutralNPCsIndex = {
+export const neutralNPCs = {
   [NeutralNPCsBlueprint.Deer]: npcDeer,
   [NeutralNPCsBlueprint.Pig]: npcPig,
   [NeutralNPCsBlueprint.GiantBrownRabbit]: npcGiantBrownRabbit,

@@ -13,6 +13,16 @@ export enum FriendlyNPCsBlueprint {
   Mother = "mother",
 
   // real npcs
+
+  Trader = "trader",
+  TraderMage = "trader-mage",
+  TraderFood = "trader-food",
+  TraderArcher = "trader-archer",
+  TraderAlchemist = "trader-alchemist",
+  Blacksmith = "blacksmith",
+
+  Banker = "banker",
+
   FatBaldMan = "fat-bald-man",
   BlackKnight = "black-knight",
   BlackKnight2 = "black-knight-2",
@@ -28,10 +38,7 @@ export enum FriendlyNPCsBlueprint {
   HumanGirl4 = "human-girl-4",
   HumanMale1 = "human-male-1",
   HumanMale2 = "human-male-2",
-  Trader = "trader",
-  TraderMage = "trader-mage",
-  TraderFood = "trader-food",
-  Blacksmith = "blacksmith",
+
   WomanBlueHair = "woman-blue-hair",
   WomanGreenHair = "woman-green-hair",
   SeniorKnight1 = "senior-knight-1",
@@ -120,4 +127,6 @@ export enum HostileNPCsBlueprint {
   BlueDragon = "blue-dragon-01",
   YellowDragon = "yellow-dragon-01",
   OrcArcher = "orc-archer",
+  DarkKnight = "dark-knight",
+  Litch = "litch",
 }

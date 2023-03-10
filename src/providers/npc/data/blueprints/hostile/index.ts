@@ -1,4 +1,5 @@
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
+import { npcYeti } from "./bosses/NPCYeti";
 import { npcAssaultSpider } from "./NPCAssaultSpider";
 import { npcBandit } from "./NPCBandit";
 import { npcBat } from "./NPCBat";
@@ -8,6 +9,8 @@ import { npcBrownBear } from "./NPCBrownBear";
 import { npcCaveSpider } from "./NPCCaveSpider";
 import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcCentipede } from "./NPCCentipede";
+import { npcDarkKnight } from "./NPCDarkKnight";
+import { npcDragonKnight } from "./npcDragonKnight";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfArcher } from "./NPCDwarfArcher";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
@@ -27,6 +30,8 @@ import { npcGoblin } from "./NPCGoblin";
 import { npcIceFox } from "./NPCIceFox";
 import { npcIceThing } from "./NPCIceThing";
 import { npcIceTroll } from "./NPCIceTroll";
+import { npcKobold } from "./NpcKobold";
+import { npcLitch } from "./NPCLitch";
 import { npcMinotaur } from "./NPCMinotaur";
 import { npcMudGolem } from "./NPCMudGolem";
 import { npcOrc } from "./NPCOrc";
@@ -55,12 +60,9 @@ import { npcTrollWarrior } from "./NPCTrollWarrior";
 import { npcWildTroll } from "./NPCWildTroll";
 import { npcWinterWolf } from "./NPCWinterWolf";
 import { npcWolf } from "./NPCWolf";
-import { npcKobold } from "./NpcKobold";
-import { npcYeti } from "./bosses/NPCYeti";
-import { npcDragonKnight } from "./npcDragonKnight";
 import { npcWraith } from "./npcWraith";
 
-export const hostileNPCsIndex = {
+export const hostileNPCs = {
   [HostileNPCsBlueprint.Orc]: npcOrc,
   [HostileNPCsBlueprint.OrcWarrior]: npcOrcWarrior,
   [HostileNPCsBlueprint.OrcBerserker]: npcOrcBerserker,
@@ -121,4 +123,6 @@ export const hostileNPCsIndex = {
   [HostileNPCsBlueprint.Wraith]: npcWraith,
   [HostileNPCsBlueprint.DragonKnight]: npcDragonKnight,
   [HostileNPCsBlueprint.IceThing]: npcIceThing,
+  [HostileNPCsBlueprint.DarkKnight]: npcDarkKnight,
+  [HostileNPCsBlueprint.Litch]: npcLitch,
 };

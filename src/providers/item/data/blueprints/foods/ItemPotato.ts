@@ -15,7 +15,7 @@ export const itemPotato: Partial<IItem> = {
   name: "Potato",
   description:
     "The Potato is a vegetable that grows underground in the form of a tuber. It comes in a variety of colors, sizes, and shapes, depending on the type of potato.",
-  weight: 10,
+  weight: 1,
   maxStackSize: 100,
   basePrice: 10,
   canSell: false,

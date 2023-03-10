@@ -10,7 +10,7 @@ export const itemDarkWizardHat: Partial<IItem> = {
   texturePath: "helmets/dark-wizard-hat.png",
   name: "Dark Wizard Hat",
   description: "Black mage hide their faces in the shadows of their Black  Hats.",
-  defense: 3,
+  defense: 7,
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Head],
   basePrice: 37,

@@ -1,5 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { MagicsBlueprint, PotionsBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { HelmetsBlueprint, MagicsBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateRandomMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
 import { CharacterGender } from "@rpg-engine/shared";
 
@@ -12,22 +12,16 @@ export const npcTraderMage = {
   isTrader: true,
   traderItems: [
     {
-      key: PotionsBlueprint.LightAntidote,
-    },
-    {
-      key: PotionsBlueprint.LightLifePotion,
-    },
-    {
-      key: PotionsBlueprint.LightManaPotion,
-    },
-    {
       key: MagicsBlueprint.Rune,
     },
     {
-      key: StaffsBlueprint.FireStaff,
+      key: StaffsBlueprint.AirWand,
     },
     {
-      key: StaffsBlueprint.CorruptionStaff,
+      key: StaffsBlueprint.Wand,
+    },
+    {
+      key: HelmetsBlueprint.WizardHat,
     },
   ],
 } as Partial<INPC>;

@@ -8,14 +8,13 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateRandomMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
-import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { CharacterGender } from "@rpg-engine/shared";
 
 export const npcBlacksmith = {
   ...generateRandomMovement(),
   key: "blacksmith",
   name: "Thorne Forgehammer",
-  textureKey: FriendlyNPCsBlueprint.Blacksmith,
+  textureKey: "fat-bald-man",
   gender: CharacterGender.Male,
   isTrader: true,
   traderItems: [
