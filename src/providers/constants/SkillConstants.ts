@@ -1,6 +1,8 @@
 export const EXP_RATIO = 1.5;
 
-export const SP_INCREASE_RATIO = 0.8;
+export const SP_INCREASE_RATIO = 0.7;
+export const SP_CRAFTING_INCREASE_RATIO = SP_INCREASE_RATIO * 5;
+
 export const SP_MAGIC_INCREASE_TIMES_MANA = 0.15;
 
 export const INCREASE_BONUS_FACTION = 0.1;

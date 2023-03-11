@@ -8,7 +8,12 @@ import { BuffSkillFunctions } from "@providers/character/CharacterBuffer/BuffSki
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
-import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
+import {
+  SP_CRAFTING_INCREASE_RATIO,
+  SP_INCREASE_RATIO,
+  SP_MAGIC_INCREASE_TIMES_MANA,
+} from "@providers/constants/SkillConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import {
@@ -36,7 +41,6 @@ import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -235,7 +239,11 @@ export class SkillIncrease {
       return;
     }
 
-    const result = this.increaseSP(skills, craftedItemKey, undefined, CraftingSkillsMap);
+    const craftSkillPointsCalculator = (skillDetails: ISkillDetails): number => {
+      return this.calculateNewCraftSP(skillDetails);
+    };
+
+    const result = this.increaseSP(skills, craftedItemKey, craftSkillPointsCalculator, CraftingSkillsMap);
     await this.skillFunctions.updateSkills(skills, character);
     if (result.skillLevelUp && character.channelId) {
       await this.skillFunctions.sendSkillLevelUpEvents(result, character);
@@ -413,6 +421,10 @@ export class SkillIncrease {
 
   private calculateNewSP(skillDetails: ISkillDetails): number {
     return Math.round((skillDetails.skillPoints + SP_INCREASE_RATIO) * 100) / 100;
+  }
+
+  private calculateNewCraftSP(skillDetails: ISkillDetails): number {
+    return Math.round((skillDetails.skillPoints + SP_CRAFTING_INCREASE_RATIO) * 100) / 100;
   }
 
   /**
