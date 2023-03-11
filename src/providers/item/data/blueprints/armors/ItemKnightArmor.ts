@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ArmorsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemKnightArmor: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemKnightArmor: Partial<IItem> = {
     "Crafted from durable and sturdy materials such as steel or iron, Knight Armor is designed to offer a high degree of protection against physical attacks, while also providing a regal and imposing appearance.",
   weight: 3,
   defense: 25,
+  allowedEquipSlotType: [ItemSlotType.Torso],
 };
