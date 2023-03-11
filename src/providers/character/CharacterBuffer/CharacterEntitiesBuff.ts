@@ -11,14 +11,14 @@ export class CharacterEntitiesBuff {
   constructor(private buffSkillFunctions: BuffSkillFunctions, private socketMessaging: SocketMessaging) {}
 
   public async updateCharacterEntities(
-    character: ICharacter,
+    characterId: Types.ObjectId,
     characterEntities: CharacterEntities,
     buff: number,
     buffId?: Types.ObjectId
   ): Promise<IAppliedBuffsEffect> {
     const isAdding = buff > 0;
     const appliedBuffsEffect = await this.characterEntitiesHandler(
-      character,
+      characterId,
       characterEntities,
       isAdding,
       buff,
@@ -29,12 +29,13 @@ export class CharacterEntitiesBuff {
   }
 
   private async characterEntitiesHandler(
-    character: ICharacter,
+    characterId: Types.ObjectId,
     characterEntities: CharacterEntities,
     isAdding: boolean,
     buff: number,
     buffId?: Types.ObjectId
   ): Promise<IAppliedBuffsEffect> {
+    const character = (await Character.findById(characterId).lean()) as ICharacter;
     let diffLvl = 0;
     let appliedBuffsEffect: { _id: Types.ObjectId; key: string; value: number } = {
       _id: new Types.ObjectId(),
@@ -59,7 +60,7 @@ export class CharacterEntitiesBuff {
     }
 
     const updateSuccess = await this.buffSkillFunctions.updateBuffEntities(
-      character,
+      character._id,
       characterEntities,
       diffLvl,
       isAdding
@@ -67,7 +68,7 @@ export class CharacterEntitiesBuff {
 
     if (updateSuccess) {
       appliedBuffsEffect = await this.buffSkillFunctions.updateBuffEffectOnCharacter(
-        character,
+        character._id,
         characterEntities,
         diffLvl,
         isAdding,
@@ -78,8 +79,8 @@ export class CharacterEntitiesBuff {
     return appliedBuffsEffect;
   }
 
-  public async checkHasteActivated(character: ICharacter): Promise<boolean> {
-    const refreshCharacter = (await Character.findById(character._id).lean()) as ICharacter;
+  public async checkHasteActivated(characterId: Types.ObjectId): Promise<boolean> {
+    const refreshCharacter = (await Character.findById(characterId).lean()) as ICharacter;
     const appliedBuffEffect = refreshCharacter.appliedBuffsEffects;
     let hasteSpeed = 0;
 

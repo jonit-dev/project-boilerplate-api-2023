@@ -41,7 +41,7 @@ export class CharacterNetworkLogout {
 
         console.log(`🚪: Character id ${data.id} has disconnected`);
 
-        await Character.updateOne({ _id: data.id }, { isOnline: false, baseSpeed: MovementSpeed.Slow });
+        await Character.updateOne({ _id: data.id }, { isOnline: false, baseSpeed: MovementSpeed.Standard });
 
         await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
 

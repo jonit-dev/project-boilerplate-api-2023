@@ -69,7 +69,15 @@ export class BuffSkillFunctions {
     }
     skill.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(skill.skillPoints, skill.level + 1);
 
-    const save = await skills.save();
+    const save = await Skill.findByIdAndUpdate(
+      {
+        _id: skills._id,
+      },
+      {
+        ...skills,
+      }
+    );
+
     if (save) {
       return true;
     } else {
@@ -78,12 +86,12 @@ export class BuffSkillFunctions {
   }
 
   public async updateBuffEntities(
-    character: ICharacter,
+    characterId: Types.ObjectId,
     skillType: string,
     buffedLvl: number,
     isAdding: boolean
   ): Promise<boolean> {
-    // const character = await Character.findById(character._id) as ICharacter;
+    const character = (await Character.findById(characterId)) as ICharacter;
     if (buffedLvl === 0) {
       return false;
     }
@@ -150,7 +158,8 @@ export class BuffSkillFunctions {
       }
     }
 
-    const save = await character.save();
+    const save = (await Character.findByIdAndUpdate({ _id: character._id }, { ...character })) as ICharacter;
+
     if (save) {
       this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
       return true;
@@ -171,7 +180,7 @@ export class BuffSkillFunctions {
    * @returns an object of type appliedBuffsEffect
    */
   public async updateBuffEffectOnCharacter(
-    character: ICharacter,
+    characterId: Types.ObjectId,
     skillType: string,
     diffLvl: number,
     isAdding: boolean,
@@ -191,7 +200,7 @@ export class BuffSkillFunctions {
     if (isAdding) {
       await Character.updateOne(
         {
-          _id: character._id,
+          _id: characterId,
         },
         {
           $push: {
@@ -202,7 +211,7 @@ export class BuffSkillFunctions {
     } else {
       await Character.updateOne(
         {
-          _id: character._id,
+          _id: characterId,
         },
         {
           $pull: {
@@ -280,7 +289,7 @@ export class BuffSkillFunctions {
           characterEntities.indexOf(totalValues[i].key as CharacterEntities) !== -1
         ) {
           if (totalValues[i].key !== CharacterEntities.Speed) {
-            await this.updateBuffEntities(character, totalValues[i].key, totalValues[i].value, isAdding);
+            await this.updateBuffEntities(character._id, totalValues[i].key, totalValues[i].value, isAdding);
           }
         } else {
           if (totalValues[i].key !== "experience") {

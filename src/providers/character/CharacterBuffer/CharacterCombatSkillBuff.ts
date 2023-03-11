@@ -68,7 +68,7 @@ export class CharacterCombatSkillBuff {
       };
 
       appliedBuffsEffect = await this.buffSkillFunctions.updateBuffEffectOnCharacter(
-        character,
+        character._id,
         combatSkill,
         diffLvl,
         isAdding,

@@ -203,13 +203,14 @@ export class CharacterSkillBuff {
 
       case SkillType.Character: {
         const buffSkill = await this.characterEntitiesBuff.updateCharacterEntities(
-          character,
+          character._id,
           skillType as CharacterEntities,
           buff
         );
 
         setTimeout(async () => {
-          const refreshCharacter = (await Character.findById(character._id).lean()) as ICharacter;
+          const refreshCharacter = (await Character.findById(character._id).lean({ virtuals: true })) as ICharacter;
+
           if (refreshCharacter && refreshCharacter.appliedBuffsEffects) {
             const appliedBuffsEffect = this.buffSkillFunctions.getValueByBuffId(
               refreshCharacter?.appliedBuffsEffects,
@@ -217,7 +218,7 @@ export class CharacterSkillBuff {
             );
             if (appliedBuffsEffect) {
               await this.characterEntitiesBuff.updateCharacterEntities(
-                refreshCharacter,
+                refreshCharacter._id,
                 skillType as CharacterEntities,
                 buff * -1,
                 buffSkill._id

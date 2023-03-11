@@ -75,7 +75,7 @@ export class CharacterBasicAttributesBuff {
       };
 
       appliedBuffsEffect = await this.buffSkillFunctions.updateBuffEffectOnCharacter(
-        character,
+        character._id,
         basicAttribute,
         diffLvl,
         isAdding,
