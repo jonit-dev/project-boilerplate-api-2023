@@ -15,6 +15,7 @@ export const spellMagicShield: Partial<ISpell> = {
   minLevelRequired: 8,
   minMagicLevelRequired: 8,
   animationKey: AnimationEffectKeys.MagicShield,
+  attribute: BasicAttribute.MagicResistance,
 
   usableEffect: async (character: ICharacter) => {
     const characterSkillBuff = container.get(CharacterSkillBuff);

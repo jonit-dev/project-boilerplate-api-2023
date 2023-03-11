@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SkillCalculator } from "@providers/skill/SkillCalculator";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -41,7 +42,11 @@ const characterEntities: CharacterEntities[] = [
 
 @provide(BuffSkillFunctions)
 export class BuffSkillFunctions {
-  constructor(private skillCalculator: SkillCalculator, private socketMessaging: SocketMessaging) {}
+  constructor(
+    private skillCalculator: SkillCalculator,
+    private socketMessaging: SocketMessaging,
+    private inMemoryHashTable: InMemoryHashTable
+  ) {}
 
   /**
    * Positive buff will add level, negative buff will remove level
@@ -62,10 +67,17 @@ export class BuffSkillFunctions {
     }
 
     const skill = skills[skillType] as ISkillDetails;
+
+    const namespace = `character-skill-buff:${skills._id}`;
+    const key = skillType;
+    const value = skill;
+
     if (isAdding) {
       skill.level += buffedLvl;
+      await this.inMemoryHashTable.set(namespace, key, value);
     } else {
       skill.level = Math.max(Math.round(skill.level - buffedLvl), 1);
+      await this.inMemoryHashTable.delete(namespace, key);
     }
     skill.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(skill.skillPoints, skill.level + 1);
 
@@ -96,10 +108,16 @@ export class BuffSkillFunctions {
       return false;
     }
 
+    const namespace = `character-skill-buff:${character.skills}`;
+    const key = skillType;
+    const value = buffedLvl;
+
     if (isAdding && skillType) {
       character[skillType] = character[skillType] + buffedLvl;
+      await this.inMemoryHashTable.set(namespace, key, value);
     } else {
       character[skillType] = Math.max(character[skillType] - buffedLvl, 1);
+      await this.inMemoryHashTable.delete(namespace, key);
     }
 
     let payload: ICharacterAttributeChanged = {
@@ -277,6 +295,8 @@ export class BuffSkillFunctions {
       throw new Error("Character not found");
     }
 
+    const namespace = `character-skill-buff:${character.skills}`;
+
     const skills = (await Skill.findById(character.skills)) as ISkill;
     const appliedBuffsEffects = character.appliedBuffsEffects;
     if (appliedBuffsEffects) {
@@ -296,6 +316,9 @@ export class BuffSkillFunctions {
             await this.updateBuffSkillLevel(skills, totalValues[i].key, totalValues[i].value, isAdding);
           }
         }
+
+        const key = totalValues[i].key;
+        await this.inMemoryHashTable.delete(namespace, key);
       }
     }
 

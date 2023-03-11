@@ -15,6 +15,7 @@ export const spellSelfHaste: Partial<ISpell> = {
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
   animationKey: AnimationEffectKeys.HasteSpell,
+  attribute: CharacterEntities.Speed,
 
   usableEffect: async (character: ICharacter) => {
     const characterSkillBuff = container.get(CharacterSkillBuff);

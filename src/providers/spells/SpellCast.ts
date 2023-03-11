@@ -12,7 +12,7 @@ import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { BasicAttribute, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { spellsBlueprints } from "./data/blueprints/index";
-import { CharacterEntitiesBuff } from "@providers/character/CharacterBuffer/CharacterEntitiesBuff";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(SpellCast)
 export class SpellCast {
@@ -24,7 +24,7 @@ export class SpellCast {
     private skillIncrease: SkillIncrease,
     private characterBonusPenalties: CharacterBonusPenalties,
     private itemUsableEffect: ItemUsableEffect,
-    private characterEntitiesBuff: CharacterEntitiesBuff
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public isSpellCasting(msg: string): boolean {
@@ -38,6 +38,15 @@ export class SpellCast {
 
     const spell = this.getSpell(magicWords);
     if (!(await this.isSpellCastingValid(spell, character))) {
+      return false;
+    }
+
+    const namespace = `character-skill-buff:${character.skills}`;
+    const key = spell.attribute;
+    const buffActivated = await this.inMemoryHashTable.get(namespace, key);
+
+    if (buffActivated) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, ${spell.name} is already activated.`);
       return false;
     }
 
@@ -68,12 +77,6 @@ export class SpellCast {
 
     if (character.mana < spell.manaCost) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you do not have mana to cast this spell.");
-      return false;
-    }
-
-    const hasteActivated = await this.characterEntitiesBuff.checkHasteActivated(character._id);
-    if (hasteActivated && spell.magicWords === "talas hiz") {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, Haste Speed is already activated.");
       return false;
     }
 

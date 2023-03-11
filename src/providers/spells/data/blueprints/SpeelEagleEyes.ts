@@ -15,6 +15,7 @@ export const speelEagleEyes: Partial<ISpell> = {
   minLevelRequired: 8,
   minMagicLevelRequired: 8,
   animationKey: AnimationEffectKeys.ManaHeal,
+  attribute: CombatSkill.Distance,
 
   usableEffect: async (character: ICharacter) => {
     const characterSkillBuff = container.get(CharacterSkillBuff);

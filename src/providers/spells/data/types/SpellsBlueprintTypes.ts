@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { SpellCastingType } from "@rpg-engine/shared";
+import { BasicAttribute, CharacterEntities, CombatSkill, CraftingSkill, SpellCastingType } from "@rpg-engine/shared";
 
 export enum SpellsBlueprint {
   SelfHealingSpell = "self-healing-spell",
@@ -35,5 +35,6 @@ export interface ISpell {
   minLevelRequired: number;
   minMagicLevelRequired: number;
   requiredItem?: MagicsBlueprint;
+  attribute?: BasicAttribute | CombatSkill | CraftingSkill | CharacterEntities;
   usableEffect: (character: ICharacter) => void;
 }
