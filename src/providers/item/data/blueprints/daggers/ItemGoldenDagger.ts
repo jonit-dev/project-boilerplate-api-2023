@@ -14,8 +14,8 @@ export const itemGoldenDagger: Partial<IItem> = {
     "A small, single-edged knife with a golden blade and handle. It is often given as a symbol of wealth and status, and may be intricately decorated with engravings or gemstones.",
   weight: 1.6,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 10,
-  defense: 5,
+  attack: 20,
+  defense: 8,
   rangeType: EntityAttackType.Melee,
   basePrice: 52,
 };

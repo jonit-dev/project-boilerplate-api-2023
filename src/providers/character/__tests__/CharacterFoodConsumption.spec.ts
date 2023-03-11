@@ -38,6 +38,10 @@ describe("CharacterFoodConsumption", () => {
     await characterFoodConsumption.consumeFood(character._id);
     // @ts-ignore
     await characterFoodConsumption.consumeFood(character._id);
+    // @ts-ignore
+    await characterFoodConsumption.consumeFood(character._id);
+    // @ts-ignore
+    await characterFoodConsumption.consumeFood(character._id);
 
     // Act
     const result = await characterFoodConsumption.tryConsumingFood(character);

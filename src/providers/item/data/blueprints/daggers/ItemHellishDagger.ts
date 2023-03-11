@@ -14,8 +14,8 @@ export const itemHellishDagger: Partial<IItem> = {
     "A small knife imbued with dark, otherworldly energy. It is said to be able to ignite the air around it and to be capable of cutting through even the toughest materials with ease.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 8,
-  defense: 5,
+  attack: 16,
+  defense: 6,
   rangeType: EntityAttackType.Melee,
   basePrice: 57,
 };

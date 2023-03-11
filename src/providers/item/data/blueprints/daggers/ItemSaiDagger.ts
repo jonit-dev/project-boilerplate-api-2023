@@ -14,8 +14,8 @@ export const itemSaiDagger: Partial<IItem> = {
     "A Japanese weapon consisting of a pointed, prong-shaped blade mounted on a long handle. It is often used for thrusting and parrying, and is known for its versatility in close combat.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 5,
-  defense: 1,
+  attack: 11,
+  defense: 6,
   rangeType: EntityAttackType.Melee,
   basePrice: 49,
 };

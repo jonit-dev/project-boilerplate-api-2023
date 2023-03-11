@@ -152,8 +152,8 @@ describe("ItemCraftable.ts", () => {
     expect(spikedClub).not.toBe(null);
     expect(spikedClub.key).toEqual(recipeSpikedClub.outputKey);
     expect(spikedClub.rarity).toEqual(ItemRarities.Legendary);
-    expect(spikedClub.attack).toEqual(11);
-    expect(spikedClub.defense).toEqual(8);
+    expect(spikedClub.attack).toEqual(19);
+    expect(spikedClub.defense).toEqual(10);
   });
 
   it("should change character weight", async () => {

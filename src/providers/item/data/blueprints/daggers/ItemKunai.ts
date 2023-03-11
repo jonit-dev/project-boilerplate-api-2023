@@ -14,7 +14,7 @@ export const itemKunai: Partial<IItem> = {
     "A Japanese knife with a blunt, triangular tip and a long, straight handle. It is often used as a throwing weapon, but can also be used in close combat.",
   weight: 0.7,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 7,
+  attack: 12,
   defense: 3,
   rangeType: EntityAttackType.Melee,
   basePrice: 59,

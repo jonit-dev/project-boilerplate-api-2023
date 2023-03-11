@@ -22,7 +22,7 @@ export const itemLightManaPotion: Partial<IItem> = {
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    const characterManaPercentage = round(character.mana * 0.05); // 5% of char mana
+    const characterManaPercentage = round(character.maxMana * 0.05); // 5% of char max mana
 
     itemUsableEffect.apply(character, EffectableAttribute.Mana, characterManaPercentage);
   },

@@ -22,7 +22,7 @@ export const itemLifePotion: Partial<IItem> = {
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    const characterHealthPercentage = round(character.health * 0.1); // 10% of char health
+    const characterHealthPercentage = round(character.maxHealth * 0.1); // 10% of char max health
 
     itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
   },
