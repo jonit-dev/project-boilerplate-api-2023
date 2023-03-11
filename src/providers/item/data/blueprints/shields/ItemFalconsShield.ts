@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ShieldsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemFalconsShield: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemFalconsShield: Partial<IItem> = {
     "The Falcon's Shield is a noble and striking piece of defensive equipment often used by knights and other chivalrous warriors who embody the virtues of bravery, honor, and loyalty.",
   weight: 1,
   defense: 23,
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };

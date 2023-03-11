@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { BootsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemFarmersBoot: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemFarmersBoot: Partial<IItem> = {
     "The boots also provide some protection against environmental hazards such as mud or shallow water, making them a practical choice for farmers or other characters who spend a lot of time outdoors.",
   weight: 1,
   defense: 3,
+  allowedEquipSlotType: [ItemSlotType.Feet],
 };

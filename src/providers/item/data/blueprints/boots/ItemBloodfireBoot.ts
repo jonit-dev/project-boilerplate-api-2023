@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { BootsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemBloodfireBoot: Partial<IItem> = {
@@ -14,4 +14,5 @@ export const itemBloodfireBoot: Partial<IItem> = {
   defense: 8,
   weight: 1,
   basePrice: 90,
+  allowedEquipSlotType: [ItemSlotType.Feet],
 };

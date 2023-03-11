@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ShieldsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemBanditShield: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemBanditShield: Partial<IItem> = {
     "The Bandit Shield is a rugged and functional piece of defensive equipment often used by thieves, brigands, and other outlaws who live by the sword.",
   weight: 1,
   defense: 17,
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };

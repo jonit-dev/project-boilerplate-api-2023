@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ShieldsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemDwarvenShield: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemDwarvenShield: Partial<IItem> = {
     "The Dwarven Shield is a sturdy and resilient piece of defensive equipment that is often used by dwarves and other stout-hearted warriors who value strength and durability in battle.",
   weight: 1,
   defense: 17,
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };

@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { HelmetsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemGlacialCrown: Partial<IItem> = {
@@ -12,4 +12,5 @@ export const itemGlacialCrown: Partial<IItem> = {
   description: "The Glacial Crown is a magnificent headpiece crafted from ice and imbued with ancient magic. ",
   weight: 1,
   defense: 18,
+  allowedEquipSlotType: [ItemSlotType.Head],
 };

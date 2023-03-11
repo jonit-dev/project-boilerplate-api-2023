@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { HelmetsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemHuntersCap: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemHuntersCap: Partial<IItem> = {
     "The Hunter's Cap is a lightweight and durable headpiece that is perfect for those who roam the wilderness in search of prey. ",
   weight: 1,
   defense: 4,
+  allowedEquipSlotType: [ItemSlotType.Head],
 };

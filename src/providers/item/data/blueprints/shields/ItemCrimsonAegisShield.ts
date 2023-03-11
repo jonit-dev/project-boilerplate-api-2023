@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { ShieldsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemCrimsonAegisShield: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemCrimsonAegisShield: Partial<IItem> = {
     "The Crimson Aegis Shield is a powerful and imposing piece of defensive equipment often used by elite warriors and knights who serve as protectors of the realm",
   weight: 1,
   defense: 24,
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };

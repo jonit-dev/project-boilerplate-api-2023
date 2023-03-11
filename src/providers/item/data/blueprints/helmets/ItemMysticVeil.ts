@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { HelmetsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemMysticVeil: Partial<IItem> = {
@@ -12,4 +12,5 @@ export const itemMysticVeil: Partial<IItem> = {
   description: "The Mystic Veil is a mysterious and enchanting headpiece that is shrouded in magic and intrigue.",
   weight: 1,
   defense: 10,
+  allowedEquipSlotType: [ItemSlotType.Head],
 };

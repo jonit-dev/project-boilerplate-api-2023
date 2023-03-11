@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { HelmetsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemSorcerersVeil: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemSorcerersVeil: Partial<IItem> = {
     "The Sorcerer's Veil is a dark and foreboding headpiece that is steeped in ancient magic and occult lore.",
   weight: 1,
   defense: 12,
+  allowedEquipSlotType: [ItemSlotType.Head],
 };

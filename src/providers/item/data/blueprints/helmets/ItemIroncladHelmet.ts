@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { HelmetsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemIroncladHelmet: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemIroncladHelmet: Partial<IItem> = {
     "The Ironclad Helmet is a formidable piece of armor that provides its wearer with unparalleled protection on the battlefield",
   weight: 1,
   defense: 16,
+  allowedEquipSlotType: [ItemSlotType.Head],
 };

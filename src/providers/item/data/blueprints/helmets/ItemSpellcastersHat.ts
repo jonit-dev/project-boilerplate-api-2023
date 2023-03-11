@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { HelmetsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemSpellcastersHat: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemSpellcastersHat: Partial<IItem> = {
     "The Spellcaster's Hat is a distinctive and stylish headpiece that is favored by those who practice the arcane arts.",
   weight: 1,
   defense: 16,
+  allowedEquipSlotType: [ItemSlotType.Head],
 };

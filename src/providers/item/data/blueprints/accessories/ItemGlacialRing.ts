@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { AccessoriesBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemGlacialRing: Partial<IItem> = {
@@ -14,4 +14,5 @@ export const itemGlacialRing: Partial<IItem> = {
   weight: 1,
   attack: 6,
   defense: 4,
+  allowedEquipSlotType: [ItemSlotType.Ring],
 };

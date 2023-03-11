@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { HelmetsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemCrownHelmet: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemCrownHelmet: Partial<IItem> = {
     "A crown helmet is a regal headpiece adorned with intricate gold and jewel designs, fit for a king or queen.",
   weight: 1,
   defense: 22,
+  allowedEquipSlotType: [ItemSlotType.Head],
 };
