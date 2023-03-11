@@ -10,6 +10,7 @@ import {
   HelmetsBlueprint,
   LegsBlueprint,
   MacesBlueprint,
+  ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -62,6 +63,10 @@ export const npcBandit: Partial<INPC> = {
     {
       itemBlueprintKey: HelmetsBlueprint.RedHoodie,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.BanditShield,
+      chance: 20,
     },
     {
       itemBlueprintKey: HelmetsBlueprint.Turban,

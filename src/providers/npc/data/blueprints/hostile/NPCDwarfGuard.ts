@@ -8,6 +8,7 @@ import {
   GlovesBlueprint,
   MacesBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
   SpearsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -90,6 +91,10 @@ export const npcDwarfGuard = {
     {
       itemBlueprintKey: SpearsBlueprint.Javelin,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.DwarvenShield,
+      chance: 20,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,

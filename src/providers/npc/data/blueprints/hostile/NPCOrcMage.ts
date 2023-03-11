@@ -114,6 +114,10 @@ export const npcOrcMage = {
       chance: 5,
     },
     {
+      itemBlueprintKey: HelmetsBlueprint.AmethystHelmet,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: StaffsBlueprint.CorruptionStaff,
       chance: 5,
     },

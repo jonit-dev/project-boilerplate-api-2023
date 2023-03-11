@@ -11,7 +11,7 @@ export const itemMithrilLegs: Partial<IItem> = {
   name: "Mithril Leg",
   description: "A leg armor made of a rare, incredibly strong metal known as mithril",
   weight: 1,
-  defense: 12,
+  defense: 22,
   allowedEquipSlotType: [ItemSlotType.Legs],
-  basePrice: 54,
+  basePrice: 1000,
 };

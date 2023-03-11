@@ -1,8 +1,11 @@
 import { BootsBlueprint } from "../../types/itemsBlueprintTypes";
+import { itemBloodfireBoot } from "./ItemBloodfireBoot";
 import { itemBoots } from "./ItemBoots";
 import { itemCopperBoots } from "./ItemCopperBoots";
+import { itemFarmersBoot } from "./ItemFarmersBoot";
 import { itemGoldenBoots } from "./ItemGoldenBoots";
 import { itemIronBoots } from "./ItemIronBoots";
+import { itemJadeEmperorsBoot } from "./ItemJadeEmperorsBoot";
 import { itemPlateBoots } from "./ItemPlateBoots";
 import { itemReforcedBoots } from "./ItemReforcedBoots";
 import { itemRoyalBoots } from "./ItemRoyalBoots";
@@ -21,4 +24,7 @@ export const bootsBlueprintIndex = {
   [BootsBlueprint.Sandals]: itemSandals,
   [BootsBlueprint.SilverBoots]: itemSilverBoots,
   [BootsBlueprint.StuddedBoots]: itemStuddedBoots,
+  [BootsBlueprint.BloodfireBoot]: itemBloodfireBoot,
+  [BootsBlueprint.FarmersBoot]: itemFarmersBoot,
+  [BootsBlueprint.JadeEmperorsBoot]: itemJadeEmperorsBoot,
 };

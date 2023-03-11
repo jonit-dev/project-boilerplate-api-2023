@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  AccessoriesBlueprint,
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
@@ -31,23 +32,26 @@ export const npcYeti: Partial<INPC> = {
   textureKey: HostileNPCsBlueprint.Yeti,
   alignment: NPCAlignment.Hostile,
   speed: MovementSpeed.Fast,
-  baseHealth: 800,
+  baseHealth: 1200,
   attackType: EntityAttackType.MeleeRanged,
   ammoKey: RangedWeaponsBlueprint.Stone,
-  maxRangeAttack: 8,
+  maxRangeAttack: 10,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 35,
+    level: 50,
     strength: {
-      level: 40,
+      level: 50,
     },
     dexterity: {
       level: 40,
     },
     resistance: {
-      level: 50,
+      level: 80,
+    },
+    magicResistance: {
+      level: 80,
     },
   },
   fleeOnLowHealth: true,
@@ -118,10 +122,29 @@ export const npcYeti: Partial<INPC> = {
       chance: 10,
     },
     {
+      itemBlueprintKey: HelmetsBlueprint.GlacialCrown,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.GlacialAxe,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.GlacialLegs,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.GlacialSword,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: AxesBlueprint.Axe,
       chance: 30,
     },
-
+    {
+      itemBlueprintKey: AccessoriesBlueprint.GlacialRing,
+      chance: 5,
+    },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Rock,
       chance: 20,

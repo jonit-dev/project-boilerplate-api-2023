@@ -5,6 +5,8 @@ import { itemCorruptionAxe } from "./ItemCorruptionAxe";
 import { itemDoubleAxe } from "./itemDoubleAxe";
 import { itemDwarvenWaraxe } from "./ItemDwarvenWaraxe";
 import { itemFrostDoubleAxe } from "./ItemFrostDoubleAxe";
+import { itemGlacialAxe } from "./ItemGlacialAxe";
+import { itemGlacialHatchet } from "./ItemGlacialHatchet";
 import { itemGoldenAxe } from "./ItemGoldenAxe";
 import { itemGreataxe } from "./ItemGreataxe";
 import { itemHalberd } from "./ItemHalberd";
@@ -37,4 +39,6 @@ export const axesBlueprintIndex = {
   [AxesBlueprint.NordicAxe]: itemNordicAxe,
   [AxesBlueprint.RuneAxe]: itemRuneAxe,
   [AxesBlueprint.ShadowAxe]: itemShadowAxe,
+  [AxesBlueprint.GlacialAxe]: itemGlacialAxe,
+  [AxesBlueprint.GlacialHatchet]: itemGlacialHatchet,
 };

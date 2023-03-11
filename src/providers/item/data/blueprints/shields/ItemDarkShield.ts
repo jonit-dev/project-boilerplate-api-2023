@@ -10,7 +10,7 @@ export const itemDarkShield: Partial<IItem> = {
   texturePath: "shields/dark-shield.png",
   name: "Dark Shield",
   description: "A shield imbued with dark magic of shadowlands.",
-  defense: 20,
+  defense: 25,
   weight: 1.2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 65,

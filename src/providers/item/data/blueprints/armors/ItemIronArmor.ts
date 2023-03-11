@@ -8,7 +8,6 @@ export const itemIronArmor: Partial<IItem> = {
   subType: ItemSubType.Armor,
   textureAtlas: "items",
   texturePath: "armors/iron-armor.png",
-
   name: "Iron Armor",
   description: "An iron plated armor.",
   defense: 14,

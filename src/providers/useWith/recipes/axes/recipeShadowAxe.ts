@@ -11,15 +11,15 @@ export const recipeShadowAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CorruptionIngot,
-      qty: 3,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 2,
+      qty: 5,
     },
     {
       key: MagicsBlueprint.CorruptionRune,
-      qty: 1,
+      qty: 5,
     },
   ],
 };

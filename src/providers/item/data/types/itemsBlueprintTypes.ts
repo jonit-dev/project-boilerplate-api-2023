@@ -24,6 +24,8 @@ export enum SwordsBlueprint {
   WoodenSword = "wooden-sword",
   PoisonSword = "poison-sword",
   ShadowSword = "shadow-sword",
+  FalconsSword = "falcons-sword",
+  GlacialSword = "glacial-sword",
 }
 
 export enum HelmetsBlueprint {
@@ -48,6 +50,18 @@ export enum HelmetsBlueprint {
   VikingHelmet = "viking-helmet",
   WingHelmet = "wing-helmet",
   WizardHat = "wizard-hat",
+  AmethystHelmet = "amethyst-helmet",
+  BloodfireHelmet = "bloodfire-helmet",
+  CrownHelmet = "crown-helmet",
+  FarmerHelmet = "farmer-helmet",
+  GlacialCrown = "glacial-crown",
+  GuardianHelmet = "guardian-helmet",
+  HuntersCap = "hunters-cap",
+  IroncladHelmet = "ironclad-helmet",
+  JadeEmperorsHelm = "jade-emperors-helm",
+  MysticVeil = "mystic-veil",
+  SorcerersVeil = "sorcerers-veil",
+  SpellcastersHat = "spellcasters-hat",
 }
 
 export enum EffectsBlueprint {
@@ -80,11 +94,24 @@ export enum ArmorsBlueprint {
   Coat = "coat",
   GoldenArmor = "golden-armor",
   IronArmor = "iron-armor",
+  IroncladArmor = "ironclad-armor",
   Jacket = "jacket",
   LeatherJacket = "leather-jacket",
   PlateArmor = "plate-armor",
   StuddedArmor = "studded-armor",
   MithrilArmor = "mithril-armor",
+  BloodfireArmor = "bloodfire-armor",
+  BlueCape = "blue-cape",
+  BrassArmor = "brass-armor",
+  CrownArmor = "crown-armor",
+  FalconsArmor = "falcons-armor",
+  FarmersJacket = "farmers-jacket",
+  GlacialArmor = "glacial-armor",
+  JadeEmperorsArmor = "jade-emperors-armor",
+  KnightArmor = "knight-armor",
+  MysticCape = "mystic-cape",
+  SorcerersCape = "sorcerers-cape",
+  SpellcastersCape = "spellcasters-cape",
 }
 
 export enum AxesBlueprint {
@@ -108,6 +135,8 @@ export enum AxesBlueprint {
   NordicAxe = "nordic-axe",
   RuneAxe = "rune-axe",
   ShadowAxe = "shadow-axe",
+  GlacialAxe = "glacial-axe",
+  GlacialHatchet = "glacial-hatchet",
 }
 
 export enum BootsBlueprint {
@@ -121,6 +150,9 @@ export enum BootsBlueprint {
   Sandals = "sandals",
   SilverBoots = "silver-boots",
   StuddedBoots = "studded-boots",
+  BloodfireBoot = "bloodfire-boot",
+  FarmersBoot = "farmers-boot",
+  JadeEmperorsBoot = "jade-emperors-boot",
 }
 
 export enum FoodsBlueprint {
@@ -359,6 +391,10 @@ export enum ShieldsBlueprint {
   SpikedShield = "spiked-shield",
   StoneShield = "stone-shield",
   TowerShield = "tower-shield",
+  BanditShield = "bandit-shield",
+  CrimsonAegisShield = "crimson-aegis-shield",
+  DwarvenShield = "dwarven-shield",
+  FalconsShield = "falcons-shield",
 }
 
 export enum LegsBlueprint {
@@ -367,6 +403,9 @@ export enum LegsBlueprint {
   BronzeLegs = "bronze-legs",
   GoldenLegs = "golden-legs",
   MithrilLegs = "mithril-legs",
+  BloodfireLegs = "bloodfire-legs",
+  FalconsLegs = "falcons-legs",
+  GlacialLegs = "glacial-legs",
 }
 
 export enum AccessoriesBlueprint {
@@ -388,6 +427,12 @@ export enum AccessoriesBlueprint {
   SapphireNecklace = "sapphire-necklace",
   StarNecklace = "star-necklace",
   WolfToothChain = "wolf-tooth-chain",
+  AmuletOfDeath = "amulet-of-death",
+  AmuletOfLuck = "amulet-of-luck",
+  PendantOfLife = "pendant-of-life",
+  PendantOfMana = "pendant-of-mana",
+  FalconsRing = "falcons-ring",
+  GlacialRing = "glacial-ring",
 }
 
 export enum HammersBlueprint {

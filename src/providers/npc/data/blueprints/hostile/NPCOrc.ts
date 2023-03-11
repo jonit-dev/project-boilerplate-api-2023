@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
+  ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
@@ -132,6 +133,14 @@ export const npcOrc = {
     {
       itemBlueprintKey: RangedWeaponsBlueprint.ShortBow,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.FarmersJacket,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.FarmersBoot,
+      chance: 20,
     },
   ],
 } as Partial<INPC>;

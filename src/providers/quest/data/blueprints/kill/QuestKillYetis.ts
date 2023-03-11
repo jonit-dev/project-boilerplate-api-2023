@@ -1,4 +1,4 @@
-import { BootsBlueprint, DaggersBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ArmorsBlueprint, AxesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { IQuest, QuestType } from "@rpg-engine/shared";
 import { QuestsBlueprint } from "../../questsBlueprintTypes";
@@ -10,15 +10,11 @@ export const questKillYetis = {
   key: QuestsBlueprint.KillYetis,
   rewards: [
     {
-      itemKeys: [SwordsBlueprint.LightingSword],
+      itemKeys: [ArmorsBlueprint.GlacialArmor],
       qty: 1,
     },
     {
-      itemKeys: [DaggersBlueprint.GoldenDagger],
-      qty: 1,
-    },
-    {
-      itemKeys: [BootsBlueprint.SilverBoots],
+      itemKeys: [AxesBlueprint.GlacialAxe],
       qty: 1,
     },
   ],

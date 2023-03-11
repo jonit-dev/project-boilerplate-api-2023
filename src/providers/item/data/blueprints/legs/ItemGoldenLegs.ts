@@ -11,7 +11,7 @@ export const itemGoldenLegs: Partial<IItem> = {
   name: "Golden Legs",
   description: "A Leg armor made of gold.",
   weight: 2,
-  defense: 14,
+  defense: 30,
   allowedEquipSlotType: [ItemSlotType.Legs],
-  basePrice: 60,
+  basePrice: 5000,
 };

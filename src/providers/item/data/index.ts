@@ -1,6 +1,6 @@
 import { IBlueprint } from "@providers/types/temp/BlueprintTypes";
-import { accessoriesBlueprintsIndex } from "./blueprints/accessories/index";
-import { armorsBlueprintsIndex } from "./blueprints/armors/index";
+import { accessoriesBlueprintIndex } from "./blueprints/accessories/index";
+import { armorsBlueprintIndex } from "./blueprints/armors/index";
 import { axesBlueprintIndex } from "./blueprints/axes/index";
 import { bodiesBlueprintsIndex } from "./blueprints/bodies/index";
 import { booksBlueprintIndex } from "./blueprints/books";
@@ -12,7 +12,7 @@ import { effectsBlueprintsIndex } from "./blueprints/effects/index";
 import { foodsBlueprintIndex } from "./blueprints/foods/index";
 import { glovesBlueprintIndex } from "./blueprints/gloves/index";
 import { hammersBlueprintIndex } from "./blueprints/hammers";
-import { helmetsBlueprintsIndex } from "./blueprints/helmets/index";
+import { helmetsBlueprintIndex } from "./blueprints/helmets/index";
 import { legsBlueprintIndex } from "./blueprints/legs/index";
 import { macesBlueprintIndex } from "./blueprints/maces/index";
 import { magicsBlueprintIndex } from "./blueprints/magics/index";
@@ -30,10 +30,10 @@ const itemsBlueprintIndex: IBlueprint = {
   ...booksBlueprintIndex,
   ...containersBlueprintIndex,
   ...effectsBlueprintsIndex,
-  ...helmetsBlueprintsIndex,
+  ...helmetsBlueprintIndex,
   ...swordsBlueprintIndex,
   ...daggersBlueprintIndex,
-  ...armorsBlueprintsIndex,
+  ...armorsBlueprintIndex,
   ...axesBlueprintIndex,
   ...bootsBlueprintIndex,
   ...foodsBlueprintIndex,
@@ -47,7 +47,7 @@ const itemsBlueprintIndex: IBlueprint = {
   ...staffsBlueprintIndex,
   ...shieldsBlueprintIndex,
   ...legsBlueprintIndex,
-  ...accessoriesBlueprintsIndex,
+  ...accessoriesBlueprintIndex,
   ...craftingResourcesBlueprintIndex,
   ...toolsBlueprintIndex,
   ...hammersBlueprintIndex,

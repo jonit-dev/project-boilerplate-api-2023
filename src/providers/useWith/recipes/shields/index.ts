@@ -1,6 +1,6 @@
 import { ShieldsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
-import { recipeWoodenShield } from "./recipWoodenShield";
+import { recipeCrimsonAegisShield } from "./recipeCrimsonAegisShield";
 import { recipeDarkShield } from "./recipeDarkShield";
 import { recipeEnergyShield } from "./recipeEnergyShield";
 import { recipeForceShield } from "./recipeForceShield";
@@ -12,7 +12,6 @@ import { recipePlateShield } from "./recipePlateShield";
 import { recipeStoneShield } from "./recipeStoneShield";
 
 export const recipeShieldsIndex: Record<string, IUseWithCraftingRecipe[]> = {
-  [ShieldsBlueprint.WoodenShield]: [recipeWoodenShield],
   [ShieldsBlueprint.FrostShield]: [recipeFrostShield],
   [ShieldsBlueprint.PlateShield]: [recipePlateShield],
   [ShieldsBlueprint.DarkShield]: [recipeDarkShield],
@@ -22,4 +21,5 @@ export const recipeShieldsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [ShieldsBlueprint.HolyShield]: [recipeHolyShield],
   [ShieldsBlueprint.StoneShield]: [recipeStoneShield],
   [ShieldsBlueprint.PaviseShield]: [recipePaviseShield],
+  [ShieldsBlueprint.CrimsonAegisShield]: [recipeCrimsonAegisShield],
 };

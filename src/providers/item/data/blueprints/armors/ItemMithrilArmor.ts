@@ -8,11 +8,11 @@ export const itemMithrilArmor: Partial<IItem> = {
   subType: ItemSubType.Armor,
   textureAtlas: "items",
   texturePath: "armors/mithril-armor.png",
-  name: "mithril armor",
+  name: "Mithril armor",
   description:
     "A legendary armor forged from a rare, incredibly strong metal that is light, durable, and highly sought after.",
   defense: 30,
-  weight: 2,
+  weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Torso],
   basePrice: 160,
 };

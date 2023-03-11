@@ -12,8 +12,8 @@ export const itemHalberd: Partial<IItem> = {
   name: "Halberd",
   description:
     "A weapon consisting of an ax blade balanced by a spearhead on a long wooden or metal shaft. It is often used by infantry to defend against cavalry.",
-  attack: 11,
-  defense: 4,
+  attack: 32,
+  defense: 6,
   weight: 2.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,

@@ -10,16 +10,16 @@ export const recipeRuneAxe: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.IronIngot,
-      qty: 3,
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 2,
+      qty: 10,
     },
     {
       key: MagicsBlueprint.DarkRune,
-      qty: 1,
+      qty: 5,
     },
   ],
 };

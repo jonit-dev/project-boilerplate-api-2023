@@ -128,6 +128,18 @@ export const npcGiantSpider: Partial<INPC> = {
       chance: 10,
     },
     {
+      itemBlueprintKey: ArmorsBlueprint.JadeEmperorsArmor,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.JadeEmperorsBoot,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.KnightArmor,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.Silk,
       chance: 80,
       quantityRange: [1, 10],

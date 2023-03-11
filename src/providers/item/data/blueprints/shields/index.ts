@@ -1,7 +1,11 @@
 import { ShieldsBlueprint } from "../../types/itemsBlueprintTypes";
+import { itemBanditShield } from "./ItemBanditShield";
+import { itemCrimsonAegisShield } from "./ItemCrimsonAegisShield";
 import { itemDarkShield } from "./ItemDarkShield";
 import { itemDemonShield } from "./ItemDemonShield";
+import { itemDwarvenShield } from "./ItemDwarvenShield";
 import { itemEnergyShield } from "./ItemEnergyShield";
+import { itemFalconsShield } from "./ItemFalconsShield";
 import { itemForceShield } from "./ItemForceShield";
 import { itemFrostShield } from "./ItemFrostShield";
 import { itemHeaterShield } from "./ItemHeaterShield";
@@ -41,4 +45,8 @@ export const shieldsBlueprintIndex = {
   [ShieldsBlueprint.SpikedShield]: itemSpikedShield,
   [ShieldsBlueprint.StoneShield]: itemStoneShield,
   [ShieldsBlueprint.TowerShield]: itemTowerShield,
+  [ShieldsBlueprint.BanditShield]: itemBanditShield,
+  [ShieldsBlueprint.CrimsonAegisShield]: itemCrimsonAegisShield,
+  [ShieldsBlueprint.DwarvenShield]: itemDwarvenShield,
+  [ShieldsBlueprint.FalconsShield]: itemFalconsShield,
 };
