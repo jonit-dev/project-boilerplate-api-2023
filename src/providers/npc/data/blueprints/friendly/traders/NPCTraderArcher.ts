@@ -21,10 +21,13 @@ export const npcTraderArcher = {
       key: RangedWeaponsBlueprint.Bow,
     },
     {
+      key: RangedWeaponsBlueprint.Crossbow,
+    },
+    {
       key: RangedWeaponsBlueprint.Arrow,
     },
     {
-      key: RangedWeaponsBlueprint.IronArrow,
+      key: RangedWeaponsBlueprint.Bolt,
     },
     {
       key: RangedWeaponsBlueprint.Shuriken,
