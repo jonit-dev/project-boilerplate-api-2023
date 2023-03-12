@@ -2,8 +2,9 @@ import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { SpellLearn } from "@providers/spells/SpellLearn";
-import { FromGridX, FromGridY } from "@rpg-engine/shared";
+import { FromGridX, FromGridY, ICharacter } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 
 @provide(ScriptsUseCase)
 export class ScriptsUseCase {
@@ -49,7 +50,20 @@ export class ScriptsUseCase {
     const characters = await Character.find({});
 
     for (const character of characters) {
-      await this.spellLearn.replaceWrongNameEaglesEye(character._id);
+      const characterSpells = character.learnedSpells;
+
+      const removeWrongName = _.filter(characterSpells, (item) => {
+        return item !== "speel-eagle-eyes";
+      });
+
+      if (_.isEqual(removeWrongName, characterSpells)) {
+        return;
+      }
+
+      (await Character.findByIdAndUpdate(
+        { _id: character._id },
+        { learnedSpells: removeWrongName }
+      )) as unknown as ICharacter;
     }
   }
 }

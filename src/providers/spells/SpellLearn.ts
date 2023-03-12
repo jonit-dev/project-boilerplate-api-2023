@@ -76,22 +76,6 @@ export class SpellLearn {
     );
   }
 
-  public async replaceWrongNameEaglesEye(characterId: Types.ObjectId): Promise<void> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
-
-    const characterSpells = character.learnedSpells;
-
-    const removeWrongName = _.filter(characterSpells, (item) => {
-      return item !== "speel-eagle-eyes";
-    });
-
-    if (_.isEqual(removeWrongName, characterSpells)) {
-      return;
-    }
-
-    (await Character.findByIdAndUpdate({ _id: character._id }, { learnedSpells: removeWrongName })) as ICharacter;
-  }
-
   public async levelingSpells(characterId: Types.ObjectId, skillId: Types.ObjectId): Promise<boolean> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
     const skills = (await Skill.findById(skillId).lean()) as ISkill;
