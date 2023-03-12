@@ -26,4 +26,15 @@ export class ScriptsController implements interfaces.Controller {
       message: "Initial coordinates adjusted succesfully",
     });
   }
+
+  @httpGet("/fix-eagles-eye")
+  public async eaglesEyeFix(@response() res): Promise<void> {
+    // update all initial coordinates from users performatically
+
+    await this.scriptsUserCase.eaglesEyeFix();
+
+    return res.status(200).send({
+      message: "Eagles Eye Fixes",
+    });
+  }
 }

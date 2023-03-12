@@ -1,11 +1,14 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
+import { SpellLearn } from "@providers/spells/SpellLearn";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ScriptsUseCase)
 export class ScriptsUseCase {
+  constructor(private spellLearn: SpellLearn) {}
+
   public async setAllBaseSpeedsToStandard(): Promise<void> {
     try {
       await Character.updateMany(
@@ -39,6 +42,14 @@ export class ScriptsUseCase {
       console.error(error);
 
       throw new BadRequestError("Failed to execute script!");
+    }
+  }
+
+  public async eaglesEyeFix(): Promise<void> {
+    const characters = await Character.find({});
+
+    for (const character of characters) {
+      await this.spellLearn.replaceWrongNameEaglesEye(character._id);
     }
   }
 }

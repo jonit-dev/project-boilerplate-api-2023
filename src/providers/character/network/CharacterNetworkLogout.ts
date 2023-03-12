@@ -47,8 +47,6 @@ export class CharacterNetworkLogout {
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());
 
-        await this.spellLearn.replaceWrongNameEaglesEye(character._id);
-
         const spellLeveling = await this.spellLearn.levelingSpells(character._id, character.skills!);
 
         if (spellLeveling) {
