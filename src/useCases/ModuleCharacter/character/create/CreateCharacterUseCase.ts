@@ -18,11 +18,7 @@ export class CreateCharacterUseCase {
       throw new BadRequestError("Character creation error: User not found!");
     }
 
-    const isValidTextureKey = await this.factionRepository.exists(
-      newCharacter.faction,
-      newCharacter.race,
-      newCharacter.textureKey
-    );
+    const isValidTextureKey = await this.factionRepository.exists(newCharacter.race, newCharacter.textureKey);
     if (!isValidTextureKey) {
       throw new BadRequestError(
         TS.translate("validation", "requiredResourceCreate", {

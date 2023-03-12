@@ -1,168 +1,210 @@
 [
   {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Human",
     "textureKey": "purple-hair-hero-1",
     "textureDisplayName": "Purple Hair Hero 1"
   },
   {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Human",
     "textureKey": "pink-hair-hero-1",
     "textureDisplayName": "Pink Hair Hero 1"
   },
   {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Human",
     "textureKey": "pink-hair-girl-1",
     "textureDisplayName": "Pink Hair Girl 1"
   },
   {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Human",
     "textureKey": "orange-hair-hero-2",
     "textureDisplayName": "Orange Hair Hero 2"
   },
   {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Human",
     "textureKey": "orange-hair-hero-1",
     "textureDisplayName": "Orange Hair Hero 1"
   },
   {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Human",
     "textureKey": "orange-hair-girl-2",
     "textureDisplayName": "Orange Hair Girl 2"
   },
   {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Human",
     "textureKey": "navy-blue-hair-hero",
     "textureDisplayName": "Navy Blue Hair Hero"
   },
   {
-    "faction": "Life Bringer",
-    "race": "Human",
-    "textureKey": "male-noble-black-hair",
-    "textureDisplayName": "Male Noble Black Hair"
-  },
-  {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Human",
     "textureKey": "green-hair-hero-2",
     "textureDisplayName": "Green Hair Hero 2"
   },
   {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Human",
     "textureKey": "green-hair-hero-1",
     "textureDisplayName": "Green Hair Hero 1"
   },
   {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Human",
     "textureKey": "brown-hair-hero-2",
     "textureDisplayName": "Brown Hair Hero 2"
   },
   {
-    "faction": "Life Bringer",
+    "class": "Warrior",
+    "race": "Human",
+    "textureKey": "black-knight",
+    "textureDisplayName": "Black Knight"
+  },
+  {
+    "class": "Warrior",
+    "race": "Human",
+    "textureKey": "black-knight-2",
+    "textureDisplayName": "Black Knight 2"
+  },
+  {
+    "class": "Warrior",
+    "race": "Human",
+    "textureKey": "black-knight-3",
+    "textureDisplayName": "Black Knight 3"
+  },
+  {
+    "class": "Warrior",
+    "race": "Human",
+    "textureKey": "black-knight-4",
+    "textureDisplayName": "Black Knight 4"
+  },
+  {
+    "class": "Warrior",
+    "race": "Human",
+    "textureKey": "dragon-knight",
+    "textureDisplayName": "Dragon Knight"
+  },
+  {
+    "class": "Warrior",
     "race": "Human",
     "textureKey": "senior-knight-1",
     "textureDisplayName": "Senior Knight 1"
   },
   {
-    "faction": "Shadow Walker",
-    "race": "Human",
-    "textureKey": "purple-hair-hero-1",
-    "textureDisplayName": "Purple Hair Hero 1"
-  },
-  {
-    "faction": "Shadow Walker",
-    "race": "Human",
-    "textureKey": "pink-hair-hero-1",
-    "textureDisplayName": "Pink Hair Hero 1"
-  },
-  {
-    "faction": "Shadow Walker",
-    "race": "Human",
-    "textureKey": "pink-hair-girl-1",
-    "textureDisplayName": "Pink Hair Girl 1"
-  },
-  {
-    "faction": "Shadow Walker",
-    "race": "Human",
-    "textureKey": "orange-hair-hero-2",
-    "textureDisplayName": "Orange Hair Hero 2"
-  },
-  {
-    "faction": "Shadow Walker",
-    "race": "Human",
-    "textureKey": "orange-hair-hero-1",
-    "textureDisplayName": "Orange Hair Hero 1"
-  },
-  {
-    "faction": "Shadow Walker",
-    "race": "Human",
-    "textureKey": "orange-hair-girl-2",
-    "textureDisplayName": "Orange Hair Girl 2"
-  },
-  {
-    "faction": "Shadow Walker",
-    "race": "Human",
-    "textureKey": "navy-blue-hair-hero",
-    "textureDisplayName": "Navy Blue Hair Hero"
-  },
-  {
-    "faction": "Shadow Walker",
+    "class": "Druid",
     "race": "Human",
     "textureKey": "male-noble-black-hair",
     "textureDisplayName": "Male Noble Black Hair"
   },
   {
-    "faction": "Shadow Walker",
+    "class": "Druid",
     "race": "Human",
-    "textureKey": "green-hair-hero-2",
-    "textureDisplayName": "Green Hair Hero 2"
+    "textureKey": "dynasty-woman-1",
+    "textureDisplayName": "Dynasty Woman 1"
   },
   {
-    "faction": "Shadow Walker",
+    "class": "Druid",
     "race": "Human",
-    "textureKey": "green-hair-hero-1",
-    "textureDisplayName": "Green Hair Hero 1"
+    "textureKey": "dynasty-woman-2",
+    "textureDisplayName": "Dynasty Woman 2"
   },
   {
-    "faction": "Shadow Walker",
+    "class": "Sorcerer",
     "race": "Human",
-    "textureKey": "brown-hair-hero-2",
-    "textureDisplayName": "Brown Hair Hero 2"
+    "textureKey": "blue-mage-1",
+    "textureDisplayName": "Blue Mage 1"
   },
   {
-    "faction": "Shadow Walker",
+    "class": "Sorcerer",
     "race": "Human",
-    "textureKey": "senior-knight-1",
-    "textureDisplayName": "Senior Knight 1"
+    "textureKey": "green-mage-1",
+    "textureDisplayName": "Green Mage 1"
   },
   {
-    "faction": "Life Bringer",
+    "class": "Sorcerer",
+    "race": "Human",
+    "textureKey": "pink-mage-1",
+    "textureDisplayName": "Pink Mage 1"
+  },
+  {
+    "class": "Sorcerer",
+    "race": "Human",
+    "textureKey": "red-mage-1",
+    "textureDisplayName": "Red Mage 1"
+  },
+  {
+    "class": "Rogue",
+    "race": "Human",
+    "textureKey": "fat-bald-man",
+    "textureDisplayName": "Fat Bald Man"
+  },
+  {
+    "class": "None",
     "race": "Elf",
     "textureKey": "elf-white-hair-1",
     "textureDisplayName": "Elf White Hair 1"
   },
   {
-    "faction": "Life Bringer",
+    "class": "None",
     "race": "Dwarf",
     "textureKey": "dwarf",
     "textureDisplayName": "Dwarf"
   },
   {
-    "faction": "Shadow Walker",
+    "class": "Warrior",
+    "race": "Dwarf",
+    "textureKey": "dwarf-guard",
+    "textureDisplayName": "Dwarf Guard"
+  },
+  {
+    "class": "Hunter",
+    "race": "Dwarf",
+    "textureKey": "dwarf-archer",
+    "textureDisplayName": "Dwarf Archer"
+  },
+  {
+    "class": "Druid",
+    "race": "Dwarf",
+    "textureKey": "dwarf-guardian",
+    "textureDisplayName": "Dwarf Guardian"
+  },
+  {
+    "class": "Sorcerer",
+    "race": "Dwarf",
+    "textureKey": "dwarf-mage",
+    "textureDisplayName": "Dwarf Mage"
+  },
+  {
+    "class": "None",
     "race": "Orc",
     "textureKey": "orc",
     "textureDisplayName": "Orc"
   },
   {
-    "faction": "Shadow Walker",
+    "class": "Warrior",
+    "race": "Orc",
+    "textureKey": "orc-warrior",
+    "textureDisplayName": "Orc Warrior"
+  },
+  {
+    "class": "Berserker",
+    "race": "Orc",
+    "textureKey": "orc-berserker",
+    "textureDisplayName": "Orc Berserker"
+  },
+  {
+    "class": "Sorcerer",
+    "race": "Orc",
+    "textureKey": "orc-mage",
+    "textureDisplayName": "Orc Mage"
+  },
+  {
+    "class": "None",
     "race": "Minotaur",
     "textureKey": "minotaur",
     "textureDisplayName": "Minotaur"

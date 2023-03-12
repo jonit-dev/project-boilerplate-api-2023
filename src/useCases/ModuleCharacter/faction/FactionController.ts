@@ -4,6 +4,7 @@ import { controller, httpGet, interfaces, queryParam } from "inversify-express-u
 import { ReadFactionRacesUseCase } from "./read/ReadFactionRacesUseCase";
 import { ReadSpriteUseCase } from "./read/ReadSpriteUseCase";
 import { ReadCharacterClass } from "./read/ReadCharacterClass";
+import { CharacterClass } from "@rpg-engine/shared";
 
 @controller("/factions", AuthMiddleware)
 export class FactionController implements interfaces.Controller {
@@ -21,9 +22,13 @@ export class FactionController implements interfaces.Controller {
 
   @httpGet("/sprites")
   private async getSprites(
-    @queryParam("faction") faction: string,
+    @queryParam("class") clas: string,
     @queryParam("race") race: string
   ): Promise<ICharacterTexture[]> {
-    return await this.readSpriteUseCase.readAll(faction, race);
+    let results = await this.readSpriteUseCase.readAll(clas || CharacterClass.None, race);
+    if (results.length < 1) {
+      results = await this.readSpriteUseCase.readAll(CharacterClass.None, race);
+    }
+    return results;
   }
 }

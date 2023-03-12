@@ -13,7 +13,7 @@ Content-Type: application/json
 ###
 
 #Factions :: Get Sprites by Faction and Race
-GET {{baseUrl}}/factions/sprites?faction=Life Bringer&race=Human HTTP/1.1
+GET {{baseUrl}}/factions/sprites?class=Warrior&race=Human HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 

@@ -1,5 +1,5 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { CharacterFactions, LifeBringerRaces, ShadowWalkerRaces, TypeHelper } from "@rpg-engine/shared";
+import { CharacterFactions, LifeBringerRaces, ShadowWalkerRaces, TypeHelper, CharacterClass } from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const characterTextureSchema = createLeanSchema({
@@ -10,7 +10,7 @@ const characterTextureSchema = createLeanSchema({
     required: true,
   }),
   faction: Type.string({
-    required: true,
+    required: false,
     enum: TypeHelper.enumToStringArray(CharacterFactions),
   }),
   race: Type.string({
@@ -18,6 +18,10 @@ const characterTextureSchema = createLeanSchema({
     enum: Array.from(
       new Set(TypeHelper.enumToStringArray(LifeBringerRaces).concat(TypeHelper.enumToStringArray(ShadowWalkerRaces)))
     ),
+  }),
+  class: Type.string({
+    required: true,
+    enum: TypeHelper.enumToStringArray(CharacterClass),
   }),
 });
 

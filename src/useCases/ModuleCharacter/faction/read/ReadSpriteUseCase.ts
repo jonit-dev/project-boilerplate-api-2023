@@ -8,15 +8,15 @@ import { provide } from "inversify-binding-decorators";
 export class ReadSpriteUseCase {
   constructor(private factionRepository: FactionRepository) {}
 
-  public async readAll(faction: string, race: string): Promise<ICharacterTexture[]> {
-    if (!faction || !race) {
+  public async readAll(clas: string, race: string): Promise<ICharacterTexture[]> {
+    if (!clas || !race) {
       throw new BadRequestError(
         TS.translate("validation", "isNotEmpty", {
-          field: !faction ? "faction" : "race",
+          field: !clas ? "class" : "race",
         })
       );
     }
 
-    return await this.factionRepository.readSprites(faction, race);
+    return await this.factionRepository.readSprites(clas, race);
   }
 }

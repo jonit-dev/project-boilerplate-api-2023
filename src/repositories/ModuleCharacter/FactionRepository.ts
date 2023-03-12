@@ -9,18 +9,12 @@ export class FactionRepository extends CRUD {
     super(analyticsHelper);
   }
 
-  public async readSprites(faction: string, race: string): Promise<ICharacterTexture[]> {
-    return await this.readAll(CharacterTexture, { faction: faction, race: race }, false, null, true);
+  public async readSprites(clas: string, race: string): Promise<ICharacterTexture[]> {
+    return await this.readAll(CharacterTexture, { class: clas, race: race }, false, null, true);
   }
 
-  public async exists(faction: string, race: string, textureKey: string): Promise<boolean> {
-    const textures = await this.readAll(
-      CharacterTexture,
-      { faction: faction, race: race, textureKey: textureKey },
-      false,
-      null,
-      true
-    );
+  public async exists(race: string, textureKey: string): Promise<boolean> {
+    const textures = await this.readAll(CharacterTexture, { race: race, textureKey: textureKey }, false, null, true);
     return textures.length > 0;
   }
 }
