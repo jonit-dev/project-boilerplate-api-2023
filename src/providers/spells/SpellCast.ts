@@ -43,11 +43,14 @@ export class SpellCast {
 
     const namespace = `character-skill-buff:${character.skills}`;
     const key = spell.attribute;
-    const buffActivated = await this.inMemoryHashTable.get(namespace, key);
 
-    if (buffActivated) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, ${spell.name} is already activated.`);
-      return false;
+    if (key) {
+      const buffActivated = await this.inMemoryHashTable.get(namespace, key);
+
+      if (buffActivated) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, ${spell.name} is already activated.`);
+        return false;
+      }
     }
 
     await spell.usableEffect(character);
