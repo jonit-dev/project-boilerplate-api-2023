@@ -19,7 +19,7 @@ export enum SpellsBlueprint {
   CorruptionRuneCreationSpell = "corruption-rune-creation-spell",
   SpellMagicShield = "spell-magic-shield",
   SpellPhysicalShield = "spell-physical-shield",
-  SpeelEagleEyes = "speel-eagle-eyes",
+  SpellEagleEyes = "spell-eagle-eyes",
   ThunderRuneCreationSpell = "thunder-rune-creation-spell",
 }
 

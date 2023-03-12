@@ -5,8 +5,8 @@ import { container } from "@providers/inversify/container";
 import { AnimationEffectKeys, CombatSkill, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 
-export const speelEagleEyes: Partial<ISpell> = {
-  key: SpellsBlueprint.SpeelEagleEyes,
+export const spellEagleEyes: Partial<ISpell> = {
+  key: SpellsBlueprint.SpellEagleEyes,
   name: "Eagle Eyes",
   description: "A Self Eagle's Eye.",
   castingType: SpellCastingType.SelfCasting,

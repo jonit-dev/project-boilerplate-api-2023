@@ -1,5 +1,5 @@
 import { SpellsBlueprint } from "../types/SpellsBlueprintTypes";
-import { speelEagleEyes } from "./SpeelEagleEyes";
+import { spellEagleEyes } from "./SpeelEagleEyes";
 import { spellArrowCreation } from "./SpellArrowCreation";
 import { spellBlankRuneCreation } from "./SpellBlankRuneCreation";
 import { spellBoltCreation } from "./SpellBoltCreation";
@@ -35,6 +35,6 @@ export const spellsBlueprints = {
   [SpellsBlueprint.CorruptionRuneCreationSpell]: spellCorruptionRuneCreation,
   [SpellsBlueprint.SpellMagicShield]: spellMagicShield,
   [SpellsBlueprint.SpellPhysicalShield]: spellPhysicalShield,
-  [SpellsBlueprint.SpeelEagleEyes]: speelEagleEyes,
+  [SpellsBlueprint.SpellEagleEyes]: spellEagleEyes,
   [SpellsBlueprint.ThunderRuneCreationSpell]: spellThunderRuneCreation,
 };
