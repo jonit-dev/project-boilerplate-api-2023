@@ -17,7 +17,7 @@ export class SpellLearn {
     const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
     const spells = this.getSkillLevelSpells(skills.level);
-    await this.addToCharacterLearnedSpells(character, spells);
+    await this.addToCharacterLearnedSpells(character._id, spells);
 
     notifyUser && this.sendLearnedSpellNotification(character, spells);
   }
@@ -57,7 +57,8 @@ export class SpellLearn {
     return spells;
   }
 
-  private async addToCharacterLearnedSpells(character: ICharacter, spells: ISpell[]): Promise<void> {
+  private async addToCharacterLearnedSpells(characterId: Types.ObjectId, spells: ISpell[]): Promise<void> {
+    const character = (await Character.findById(characterId).lean()) as ICharacter;
     const learned = character.learnedSpells ?? [];
     spells.forEach((spell) => {
       if (!learned.includes(spell.key)) {
@@ -75,6 +76,22 @@ export class SpellLearn {
     );
   }
 
+  public async replaceWrongNameEaglesEye(characterId: Types.ObjectId): Promise<void> {
+    const character = (await Character.findById(characterId).lean()) as ICharacter;
+
+    const characterSpells = character.learnedSpells;
+
+    const removeWrongName = _.filter(characterSpells, (item) => {
+      return item !== "speel-eagle-eyes";
+    });
+
+    if (_.isEqual(removeWrongName, characterSpells)) {
+      return;
+    }
+
+    (await Character.findByIdAndUpdate({ _id: character._id }, { learnedSpells: removeWrongName })) as ICharacter;
+  }
+
   public async levelingSpells(characterId: Types.ObjectId, skillId: Types.ObjectId): Promise<boolean> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
     const skills = (await Skill.findById(skillId).lean()) as ISkill;
@@ -90,7 +107,10 @@ export class SpellLearn {
     const isEqual = _.isEqual(characterSpells.sort(), spellsKeys.sort());
 
     if (isEqual === false) {
-      await this.addToCharacterLearnedSpells(character, spells);
+      await Character.findByIdAndUpdate({ _id: character._id }, { learnedSpells: [] });
+
+      await this.addToCharacterLearnedSpells(character._id, spells);
+
       return true;
     }
     return false;
