@@ -62,6 +62,17 @@ services:
     networks:
       - rpg-network
 
+  redis-commander:
+    container_name: redis-commander
+    restart: always
+    image: rediscommander/redis-commander:latest
+    ports:
+      - "8081:8081"
+    environment:
+      REDIS_HOSTS: "redis:rpg-redis:6380"
+    networks:
+      - rpg-network
+
 networks:
   rpg-network:
     external: true
