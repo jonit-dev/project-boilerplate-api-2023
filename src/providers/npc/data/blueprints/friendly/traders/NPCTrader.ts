@@ -20,9 +20,6 @@ export const npcTrader = {
       key: CraftingResourcesBlueprint.Bandage,
     },
     {
-      key: CraftingResourcesBlueprint.Rope,
-    },
-    {
       key: ToolsBlueprint.ButchersKnife,
     },
     {
