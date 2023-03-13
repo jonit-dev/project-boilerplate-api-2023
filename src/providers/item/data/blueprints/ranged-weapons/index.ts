@@ -40,6 +40,8 @@ import { itemStone } from "./ItemStone";
 import { itemStormBow } from "./ItemStormBow";
 import { itemSunstoneBow } from "./ItemSunstoneBow";
 import { itemValkyriesBow } from "./ItemValkyriesBow";
+import { itemWoodenArrow } from "./ItemWoodenArrow";
+import { itemWoodenBow } from "./ItemWoodenBow";
 import { itemZephyrusBow } from "./ItemZephyrusBow";
 
 export const rangedWeaponsBlueprintIndex = {
@@ -82,6 +84,8 @@ export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.DragonBow]: itemDragonBow,
   [RangedWeaponsBlueprint.SunstoneBow]: itemSunstoneBow,
   [RangedWeaponsBlueprint.HadesBow]: itemHadesBow,
+  [RangedWeaponsBlueprint.WoodenArrow]: itemWoodenArrow,
+  [RangedWeaponsBlueprint.WoodenBow]: itemWoodenBow,
   [RangedWeaponsBlueprint.RedwoodLongbow]: itemRedwoodLongbow,
   [RangedWeaponsBlueprint.ElmReflexBow]: itemElmReflexBow,
   [RangedWeaponsBlueprint.EbonyLongbow]: itemEbonyLongbow,

@@ -328,6 +328,8 @@ export enum RangedWeaponsBlueprint {
   SunstoneBow = "sunstone-bow",
   ValkyriesBow = "valkyries-bow",
   ZephyrusBow = "zephyrus-bow",
+  WoodenArrow = "wooden-arrow",
+  WoodenBow = "wooden-bow",
   RedwoodLongbow = "redwood-longbow",
   ElmReflexBow = "elm-reflex-bow",
   EbonyLongbow = "ebony-longbow",
@@ -388,6 +390,7 @@ export enum StaffsBlueprint {
   RubyStaff = "ruby-staff",
   SoulStaff = "soul-staff",
   Wand = "wand",
+  WoodenStaff = "wooden-staff",
 }
 
 export enum ShieldsBlueprint {
