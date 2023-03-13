@@ -1,5 +1,9 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { CraftingResourcesBlueprint, ToolsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  CraftingResourcesBlueprint,
+  RangedWeaponsBlueprint,
+  ToolsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { CharacterGender } from "@rpg-engine/shared";
 import { generateRandomMovement } from "../../../abstractions/BaseNeutralNPC";
@@ -29,6 +33,12 @@ export const npcTrader = {
     },
     {
       key: ToolsBlueprint.CarpentersAxe,
+    },
+    {
+      key: RangedWeaponsBlueprint.WoodenArrow,
+    },
+    {
+      key: RangedWeaponsBlueprint.WoodenBow,
     },
   ],
 } as Partial<INPC>;

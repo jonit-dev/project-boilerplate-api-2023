@@ -12,6 +12,7 @@ import { itemRoyalStaff } from "./ItemRoyalStaff";
 import { itemRubyStaff } from "./ItemRubyStaff";
 import { itemSoulStaff } from "./ItemSoulStaff";
 import { itemWand } from "./ItemWand";
+import { itemWoodenStaff } from "./ItemWoodenStaff";
 
 export const staffsBlueprintIndex = {
   [StaffsBlueprint.AppendicesStaff]: itemAppendicesStaff,
@@ -27,4 +28,5 @@ export const staffsBlueprintIndex = {
   [StaffsBlueprint.RubyStaff]: itemRubyStaff,
   [StaffsBlueprint.SoulStaff]: itemSoulStaff,
   [StaffsBlueprint.Wand]: itemWand,
+  [StaffsBlueprint.WoodenStaff]: itemWoodenStaff,
 };
