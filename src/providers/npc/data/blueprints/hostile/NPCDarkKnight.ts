@@ -79,7 +79,7 @@ export const npcDarkKnight: Partial<INPC> = {
 
     {
       itemBlueprintKey: CraftingResourcesBlueprint.DragonHead,
-      chance: 50,
+      chance: 10,
       quantityRange: [1, 2],
     },
     {
@@ -89,7 +89,7 @@ export const npcDarkKnight: Partial<INPC> = {
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.DragonTooth,
-      chance: 50,
+      chance: 10,
       quantityRange: [1, 3],
     },
     {

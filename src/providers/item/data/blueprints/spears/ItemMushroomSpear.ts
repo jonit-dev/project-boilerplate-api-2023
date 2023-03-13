@@ -2,20 +2,20 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { SpearsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemBohemianEarspoon: Partial<IItem> = {
-  key: SpearsBlueprint.BohemianEarspoon,
+export const itemMushroomSpear: Partial<IItem> = {
+  key: SpearsBlueprint.MushroomSpear,
   type: ItemType.Weapon,
   subType: ItemSubType.Spear,
   textureAtlas: "items",
-  texturePath: "spears/bohemian-earspoon.png",
-  name: "Bohemian Earspoon",
+  texturePath: "spears/mushroom-spear.png",
+  name: "Mushroom Spear",
   description:
-    "A type of spear with a distinctive crescent-shaped blade, originally used by Czech mercenaries. It is a versatile weapon that can be used for both thrusting and slicing attacks.",
+    "A spear tipped with a mushroom cap for poison damage, making it effective against enemies with high health.",
   weight: 5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 16,
-  defense: 8,
+  attack: 20,
+  defense: 13,
   isTwoHanded: true,
   rangeType: EntityAttackType.Melee,
-  basePrice: 50,
+  basePrice: 60,
 };

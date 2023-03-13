@@ -12,8 +12,8 @@ export const itemRoyalSpear: Partial<IItem> = {
   name: "Royal Spear",
   description:
     "A regal spear fit for a king or queen, with a stunning and intricate design. It is imbued with powerful magical energy and is prized for its elegance and grace.",
-  defense: 5,
-  attack: 9,
+  attack: 22,
+  defense: 10,
   weight: 5,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

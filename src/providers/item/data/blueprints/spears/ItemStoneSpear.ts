@@ -11,13 +11,12 @@ export const itemStoneSpear: Partial<IItem> = {
   texturePath: "spears/stone-spear.png",
   name: "Stone Spear",
   description:
-    "BA primitive melee weapon made of a wooden stick and a pointed head made of stone. It is a basic but effective weapon that can be used for thrusting and stabbing attacks.",
-  attack: 5,
-  defense: 3,
+    "A primitive melee weapon made of a wooden stick and a pointed head made of stone. It is a basic but effective weapon that can be used for thrusting and stabbing attacks.",
+  attack: 10,
+  defense: 4,
   weight: 3,
   isTwoHanded: true,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  maxRange: 7,
   rangeType: EntityAttackType.Melee,
 
   basePrice: 40,

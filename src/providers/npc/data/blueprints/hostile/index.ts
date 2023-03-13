@@ -1,5 +1,4 @@
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { npcYeti } from "./bosses/NPCYeti";
 import { npcAssaultSpider } from "./NPCAssaultSpider";
 import { npcBandit } from "./NPCBandit";
 import { npcBat } from "./NPCBat";
@@ -10,7 +9,7 @@ import { npcCaveSpider } from "./NPCCaveSpider";
 import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcCentipede } from "./NPCCentipede";
 import { npcDarkKnight } from "./NPCDarkKnight";
-import { npcDragonKnight } from "./npcDragonKnight";
+import { npcDragonKnight } from "./NPCDragonKnight";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfArcher } from "./NPCDwarfArcher";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
@@ -30,7 +29,7 @@ import { npcGoblin } from "./NPCGoblin";
 import { npcIceFox } from "./NPCIceFox";
 import { npcIceThing } from "./NPCIceThing";
 import { npcIceTroll } from "./NPCIceTroll";
-import { npcKobold } from "./NpcKobold";
+import { npcKobold } from "./NPCKobold";
 import { npcLitch } from "./NPCLitch";
 import { npcMinotaur } from "./NPCMinotaur";
 import { npcMudGolem } from "./NPCMudGolem";
@@ -60,7 +59,8 @@ import { npcTrollWarrior } from "./NPCTrollWarrior";
 import { npcWildTroll } from "./NPCWildTroll";
 import { npcWinterWolf } from "./NPCWinterWolf";
 import { npcWolf } from "./NPCWolf";
-import { npcWraith } from "./npcWraith";
+import { npcWraith } from "./NPCWraith";
+import { npcYeti } from "./bosses/NPCYeti";
 
 export const hostileNPCs = {
   [HostileNPCsBlueprint.Orc]: npcOrc,

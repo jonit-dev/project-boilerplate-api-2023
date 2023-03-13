@@ -1,13 +1,17 @@
 import { CraftingResourcesBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
-export const recipeSpear: IUseWithCraftingRecipe = {
-  outputKey: SpearsBlueprint.Spear,
+export const recipeMushroomSpear: IUseWithCraftingRecipe = {
+  outputKey: SpearsBlueprint.MushroomSpear,
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.IronIngot,
-      qty: 3,
+      key: CraftingResourcesBlueprint.GreenIngot,
+      qty: 5,
+    },
+    {
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,

@@ -1,6 +1,7 @@
 import { AxesBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemAxe } from "./ItemAxe";
 import { itemBardiche } from "./itemBardiche";
+import { itemCopperAxe } from "./ItemCopperAxe";
 import { itemCorruptionAxe } from "./ItemCorruptionAxe";
 import { itemDoubleAxe } from "./itemDoubleAxe";
 import { itemDwarvenWaraxe } from "./ItemDwarvenWaraxe";
@@ -16,7 +17,10 @@ import { itemNordicAxe } from "./ItemNordicAxe";
 import { itemRoyalDoubleAxe } from "./ItemRoyalDoubleAxe";
 import { itemRuneAxe } from "./ItemRuneAxe";
 import { itemShadowAxe } from "./ItemShadowAxe";
+import { itemSilverAxe } from "./ItemSilverAxe";
 import { itemVikingAxe } from "./ItemVikingAxe";
+import { itemVikingBattleAxe } from "./ItemVikingBattleAxe";
+import { itemWhiteRavenAxe } from "./ItemWhiteRavenAxe";
 import { itemWoodenAxe } from "./ItemWoodenAxe";
 import { itemYetiHalberd } from "./ItemYetiHalberd";
 
@@ -39,6 +43,10 @@ export const axesBlueprintIndex = {
   [AxesBlueprint.NordicAxe]: itemNordicAxe,
   [AxesBlueprint.RuneAxe]: itemRuneAxe,
   [AxesBlueprint.ShadowAxe]: itemShadowAxe,
+  [AxesBlueprint.VikingBattleAxe]: itemVikingBattleAxe,
+  [AxesBlueprint.CopperAxe]: itemCopperAxe,
+  [AxesBlueprint.SilverAxe]: itemSilverAxe,
+  [AxesBlueprint.WhiteRavenAxe]: itemWhiteRavenAxe,
   [AxesBlueprint.GlacialAxe]: itemGlacialAxe,
   [AxesBlueprint.GlacialHatchet]: itemGlacialHatchet,
 };

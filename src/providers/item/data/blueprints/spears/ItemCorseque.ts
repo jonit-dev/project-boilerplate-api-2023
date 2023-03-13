@@ -13,7 +13,7 @@ export const itemCorseque: Partial<IItem> = {
     "A type of spear with a curved, hook-like blade, typically used for grappling and disarming opponents. Its design allows for quick and agile movements in close combat.",
   weight: 6,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 7,
+  attack: 17,
   defense: 6,
   isTwoHanded: true,
   rangeType: EntityAttackType.Melee,

@@ -1,12 +1,16 @@
 import { SpearsBlueprint } from "../../types/itemsBlueprintTypes";
+import { itemBlueAuroraSpear } from "./ItemBlueAuroraSpear";
 import { itemBohemianEarspoon } from "./ItemBohemianEarspoon";
 import { itemCorseque } from "./ItemCorseque";
+import { itemEarthbinderSpear } from "./ItemEarthbinderSpear";
 import { itemGuanDao } from "./ItemGuanDao";
 import { itemjavelin } from "./ItemJavelin";
+import { itemMushroomSpear } from "./ItemMushroomSpear";
 import { itemRoyalSpear } from "./ItemRoyalSpear";
 import { itemSpear } from "./ItemSpear";
 import { itemStoneSpear } from "./ItemStoneSpear";
 import { itemTrident } from "./ItemTrident";
+import { itemWhiteDragonSpear } from "./ItemWhiteDragonSpear";
 
 export const spearsBlueprintsIndex = {
   [SpearsBlueprint.RoyalSpear]: itemRoyalSpear,
@@ -17,4 +21,8 @@ export const spearsBlueprintsIndex = {
   [SpearsBlueprint.GuanDao]: itemGuanDao,
   [SpearsBlueprint.Javelin]: itemjavelin,
   [SpearsBlueprint.Trident]: itemTrident,
+  [SpearsBlueprint.BlueAuroraSpear]: itemBlueAuroraSpear,
+  [SpearsBlueprint.EarthbinderSpear]: itemEarthbinderSpear,
+  [SpearsBlueprint.MushroomSpear]: itemMushroomSpear,
+  [SpearsBlueprint.WhiteDragonSpear]: itemWhiteDragonSpear,
 };

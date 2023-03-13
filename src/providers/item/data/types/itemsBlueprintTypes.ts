@@ -24,6 +24,12 @@ export enum SwordsBlueprint {
   WoodenSword = "wooden-sword",
   PoisonSword = "poison-sword",
   ShadowSword = "shadow-sword",
+  CopperBroadsword = "copper-broadsword",
+  IceShardLongsword = "ice-shard-longsword",
+  FrostguardSword = "frostguard-sword",
+  TungstenSword = "tungsten-sword",
+  FrostbiteBlade = "frostbite-blade",
+  IronwoodTanto = "ironwood-tanto",
   FalconsSword = "falcons-sword",
   GlacialSword = "glacial-sword",
 }
@@ -135,6 +141,10 @@ export enum AxesBlueprint {
   NordicAxe = "nordic-axe",
   RuneAxe = "rune-axe",
   ShadowAxe = "shadow-axe",
+  VikingBattleAxe = "viking-battle-axe",
+  CopperAxe = "copper-axe",
+  SilverAxe = "silver-axe",
+  WhiteRavenAxe = "white-raven-axe",
   GlacialAxe = "glacial-axe",
   GlacialHatchet = "glacial-hatchet",
 }
@@ -260,6 +270,10 @@ export enum SpearsBlueprint {
   GuanDao = "GuanDao",
   Javelin = "Javelin",
   Trident = "Trident",
+  BlueAuroraSpear = "blue-aurora-spear",
+  EarthbinderSpear = "earthbinder-spear",
+  MushroomSpear = "mushroom-spear",
+  WhiteDragonSpear = "white-dragon-spear",
 }
 
 export enum PotionsBlueprint {
@@ -314,6 +328,9 @@ export enum RangedWeaponsBlueprint {
   SunstoneBow = "sunstone-bow",
   ValkyriesBow = "valkyries-bow",
   ZephyrusBow = "zephyrus-bow",
+  RedwoodLongbow = "redwood-longbow",
+  ElmReflexBow = "elm-reflex-bow",
+  EbonyLongbow = "ebony-longbow",
 }
 
 export enum GlovesBlueprint {
@@ -329,6 +346,9 @@ export enum MacesBlueprint {
   SpikedClub = "spiked-club",
   SpikedMace = "spiked-mace",
   WoodenMace = "wooden-mace",
+  RusticFlail = "rustic-flail",
+  BloodstainedCenser = "bloodstained-censer",
+  SilverBulbMace = "silver-bulb-mace",
 }
 
 export enum MagicsBlueprint {

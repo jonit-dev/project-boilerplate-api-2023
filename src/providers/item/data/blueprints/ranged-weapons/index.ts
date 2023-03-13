@@ -8,7 +8,9 @@ import { itemCorruptionBolt } from "./ItemCorruptionBolt";
 import { itemCorruptionBow } from "./ItemCorruptionBow";
 import { itemCrossbow } from "./ItemCrossbow";
 import { itemDragonBow } from "./ItemDragonBow";
+import { itemEbonyLongbow } from "./ItemEbonyLongbow";
 import { itemEldensBow } from "./ItemEldensBow";
+import { itemElmReflexBow } from "./ItemElmReflexBow";
 import { itemElvenBolt } from "./ItemElvenBolt";
 import { itemElvenBow } from "./ItemElvenBow";
 import { itemFireBolt } from "./ItemFireBolt";
@@ -25,6 +27,7 @@ import { itemLongBow } from "./ItemLongBow";
 import { itemOrcishBow } from "./ItemOrcishBow";
 import { itemPhoenixBow } from "./ItemPhoenixBow";
 import { itemPoisonArrow } from "./ItemPoisonArrow";
+import { itemRedwoodLongbow } from "./ItemRedwoodLongbow";
 import { itemRoyalBow } from "./ItemRoyalBow";
 import { itemRoyalCrossbow } from "./ItemRoyalCrossbow";
 import { itemRuneBow } from "./ItemRuneBow";
@@ -79,4 +82,7 @@ export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.DragonBow]: itemDragonBow,
   [RangedWeaponsBlueprint.SunstoneBow]: itemSunstoneBow,
   [RangedWeaponsBlueprint.HadesBow]: itemHadesBow,
+  [RangedWeaponsBlueprint.RedwoodLongbow]: itemRedwoodLongbow,
+  [RangedWeaponsBlueprint.ElmReflexBow]: itemElmReflexBow,
+  [RangedWeaponsBlueprint.EbonyLongbow]: itemEbonyLongbow,
 };

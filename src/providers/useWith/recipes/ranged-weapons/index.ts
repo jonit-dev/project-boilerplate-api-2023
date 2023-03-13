@@ -6,6 +6,8 @@ import { recipeBow } from "./recipeBow";
 import { recipeCorruptionBolt } from "./recipeCorruptionBolt";
 import { recipeCrossBow } from "./recipeCrossBow";
 import { recipeDragonBow } from "./recipeDragonBow";
+import { recipeEbonyLongbow } from "./recipeEbonyLongbow";
+import { recipeElmReflexBow } from "./recipeElmReflexBow";
 import { recipeElvenBolt } from "./recipeElvenBolt";
 import { recipeFireBolt } from "./recipeFireBolt";
 import { recipeGoldenArrow } from "./recipeGoldenArrow";
@@ -14,6 +16,7 @@ import { recipeIronArrow } from "./recipeIronArrow";
 import { recipeLightingCrossbow } from "./recipeLightingCrossbow";
 import { recipePhoenixBow } from "./recipePhoenixBow";
 import { recipePoisonArrow } from "./recipePoisonArrow";
+import { recipeRedwoodLongbow } from "./recipeRedwoodLongbow";
 import { recipeRoyalBow } from "./recipeRoyalBow";
 import { recipeRuneBow } from "./recipeRuneBow";
 import { recipeShockArrow } from "./recipeShockArrow";
@@ -44,4 +47,7 @@ export const recipeRangedIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [RangedWeaponsBlueprint.ValkyriesBow]: [recipeValkyriesBow],
   [RangedWeaponsBlueprint.ZephyrusBow]: [recipeZephyrusBow],
   [RangedWeaponsBlueprint.RoyalBow]: [recipeRoyalBow],
+  [RangedWeaponsBlueprint.EbonyLongbow]: [recipeEbonyLongbow],
+  [RangedWeaponsBlueprint.ElmReflexBow]: [recipeElmReflexBow],
+  [RangedWeaponsBlueprint.RedwoodLongbow]: [recipeRedwoodLongbow],
 };
