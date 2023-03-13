@@ -16,6 +16,7 @@ export enum FriendlyNPCsBlueprint {
 
   Trader = "trader",
   TraderMage = "trader-mage",
+  TraderTraining = "trader-training",
   TraderFood = "trader-food",
   TraderArcher = "trader-archer",
   TraderAlchemist = "trader-alchemist",
