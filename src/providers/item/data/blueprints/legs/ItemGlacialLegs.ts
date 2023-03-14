@@ -1,5 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { LegsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemGlacialLegs: Partial<IItem> = {
@@ -13,4 +13,5 @@ export const itemGlacialLegs: Partial<IItem> = {
     "The Glacial Legs are a set of formidable leg armor that is said to have been forged from the icy glaciers of the far north",
   weight: 1,
   defense: 17,
+  allowedEquipSlotType: [ItemSlotType.Legs],
 };
