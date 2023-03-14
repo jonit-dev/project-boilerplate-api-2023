@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
+import { RangedWeaponRange } from "@providers/item/data/types/RangedWeaponTypes";
 import {
   AccessoriesBlueprint,
   ArmorsBlueprint,
@@ -11,6 +12,7 @@ import {
   HelmetsBlueprint,
   LegsBlueprint,
   OthersBlueprint,
+  RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -25,8 +27,10 @@ export const npcDarkKnight: Partial<INPC> = {
   key: HostileNPCsBlueprint.DarkKnight,
   textureKey: "superior-knight",
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Fast,
+  attackType: EntityAttackType.MeleeRanged,
+  speed: MovementSpeed.ExtraFast,
+  ammoKey: RangedWeaponsBlueprint.Bolt,
+  maxRangeAttack: RangedWeaponRange.High,
   baseHealth: 1200,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,

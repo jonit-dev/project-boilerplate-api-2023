@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
+import { RangedWeaponRange } from "@providers/item/data/types/RangedWeaponTypes";
 import {
   AxesBlueprint,
   CraftingResourcesBlueprint,
@@ -12,7 +13,7 @@ import {
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
+import { AnimationEffectKeys, NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -23,21 +24,26 @@ export const npcIceFox: Partial<INPC> = {
   subType: NPCSubtype.Animal,
   textureKey: HostileNPCsBlueprint.IceFox,
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.Melee,
+  attackType: EntityAttackType.MeleeRanged,
+  ammoKey: AnimationEffectKeys.Blue,
+  maxRangeAttack: RangedWeaponRange.High,
   speed: MovementSpeed.ExtraFast,
-  baseHealth: 150,
+  baseHealth: 300,
   healthRandomizerDice: Dice.D6,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 17,
+    level: 40,
     strength: {
-      level: 20,
+      level: 40,
     },
     dexterity: {
       level: 25,
     },
     resistance: {
-      level: 15,
+      level: 25,
+    },
+    magicResistance: {
+      level: 20,
     },
   },
   fleeOnLowHealth: true,
