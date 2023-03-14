@@ -67,10 +67,7 @@ export const npcKobold: Partial<INPC> = {
       itemBlueprintKey: BootsBlueprint.IronBoots,
       chance: 10,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.DragonTooth,
-      chance: 10,
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.BlueSapphire,
       chance: 30,

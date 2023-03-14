@@ -11,4 +11,5 @@ export const itemDragonHead: Partial<IItem> = {
   name: "Dragon Head",
   description: "A dragon head skull used to craft magic items.",
   weight: 1,
+  maxStackSize: 100,
 };

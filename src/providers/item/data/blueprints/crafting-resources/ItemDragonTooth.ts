@@ -11,4 +11,5 @@ export const itemDragonTooth: Partial<IItem> = {
   name: "Dragon Tooth",
   description: "A dragon tooth  used to craft magic items.",
   weight: 1,
+  maxStackSize: 100,
 };

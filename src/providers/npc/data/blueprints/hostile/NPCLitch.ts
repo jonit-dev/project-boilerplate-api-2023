@@ -52,11 +52,6 @@ export const npcLitch: Partial<INPC> = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.DragonTooth,
-      chance: 50,
-      quantityRange: [1, 3],
-    },
-    {
       itemBlueprintKey: CraftingResourcesBlueprint.ObsidiumOre,
       chance: 20,
       quantityRange: [2, 6],
