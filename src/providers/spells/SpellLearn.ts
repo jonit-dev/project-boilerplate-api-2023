@@ -7,10 +7,11 @@ import _ from "lodash";
 import { Types } from "mongoose";
 import { spellsBlueprints } from "./data/blueprints/index";
 import { ISpell } from "./data/types/SpellsBlueprintTypes";
+import { SpellValidation } from "./SpellValidation";
 
 @provide(SpellLearn)
 export class SpellLearn {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging, private spellValidation: SpellValidation) {}
 
   public async learnLatestSkillLevelSpells(characterId: string, notifyUser: boolean): Promise<void> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
@@ -61,7 +62,7 @@ export class SpellLearn {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
     const learned = character.learnedSpells ?? [];
     spells.forEach((spell) => {
-      if (!learned.includes(spell.key)) {
+      if (!learned.includes(spell.key) && this.spellValidation.isAvailableForCharacterClass(spell, character)) {
         learned.push(spell.key);
       }
     });
