@@ -2,6 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
+  ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
@@ -25,21 +26,24 @@ export const npcMudGolem: Partial<INPC> = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
-  baseHealth: 300,
+  baseHealth: 1500,
   healthRandomizerDice: Dice.D6,
   canSwitchToRandomTarget: true,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 18,
+    level: 40,
     strength: {
-      level: 15,
+      level: 40,
     },
     dexterity: {
-      level: 5,
+      level: 10,
     },
     resistance: {
-      level: 25,
+      level: 100,
+    },
+    magicResistance: {
+      level: 40,
     },
   },
   fleeOnLowHealth: true,
@@ -59,6 +63,10 @@ export const npcMudGolem: Partial<INPC> = {
     {
       itemBlueprintKey: ShieldsBlueprint.StoneShield,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.FalconsArmor,
+      chance: 1,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Fish,

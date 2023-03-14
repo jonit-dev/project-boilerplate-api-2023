@@ -1,7 +1,9 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { RangedWeaponRange } from "@providers/item/data/types/RangedWeaponTypes";
 import {
+  ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
@@ -23,23 +25,28 @@ export const npcStoneGolem: Partial<INPC> = {
   subType: NPCSubtype.Elemental,
   textureKey: HostileNPCsBlueprint.StoneGolem,
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.Melee,
+  attackType: EntityAttackType.MeleeRanged,
   speed: MovementSpeed.Slow,
-  baseHealth: 300,
+  baseHealth: 1500,
+  ammoKey: RangedWeaponsBlueprint.Stone,
+  maxRangeAttack: RangedWeaponRange.High,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 22,
+    level: 50,
     strength: {
-      level: 22,
+      level: 50,
     },
     dexterity: {
-      level: 2,
+      level: 10,
     },
     resistance: {
-      level: 30,
+      level: 100,
+    },
+    magicResistance: {
+      level: 40,
     },
   },
   fleeOnLowHealth: true,
@@ -56,6 +63,10 @@ export const npcStoneGolem: Partial<INPC> = {
     {
       itemBlueprintKey: HelmetsBlueprint.WingHelmet,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: ArmorsBlueprint.FalconsArmor,
+      chance: 1,
     },
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,

@@ -40,10 +40,10 @@ export const npcDarkKnight: Partial<INPC> = {
       level: 60,
     },
     resistance: {
-      level: 40,
+      level: 100,
     },
     magicResistance: {
-      level: 40,
+      level: 100,
     },
   },
   loots: [
