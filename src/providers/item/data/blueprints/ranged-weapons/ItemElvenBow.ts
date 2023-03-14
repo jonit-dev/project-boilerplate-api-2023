@@ -1,6 +1,7 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { RangedWeaponRange } from "../../types/RangedWeaponTypes";
 import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemElvenBow: Partial<IItem> = {
@@ -17,7 +18,7 @@ export const itemElvenBow: Partial<IItem> = {
   defense: 3,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  maxRange: 7,
+  maxRange: RangedWeaponRange.Short,
   requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow],
   isTwoHanded: true,
   basePrice: 80,

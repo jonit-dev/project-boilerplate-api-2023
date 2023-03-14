@@ -1,12 +1,13 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { RangedWeaponRange } from "../../types/RangedWeaponTypes";
 import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemShuriken: Partial<IItem> = {
   key: RangedWeaponsBlueprint.Shuriken,
   type: ItemType.Weapon,
   rangeType: EntityAttackType.Ranged,
-  maxRange: 7,
+  maxRange: RangedWeaponRange.Short,
   subType: ItemSubType.Ranged,
   textureAtlas: "items",
   texturePath: "ranged-weapons/shuriken-qty-1.png",

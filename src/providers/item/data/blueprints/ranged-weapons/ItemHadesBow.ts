@@ -1,5 +1,6 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { RangedWeaponRange } from "../../types/RangedWeaponTypes";
 import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemHadesBow: Partial<IItem> = {
@@ -15,7 +16,7 @@ export const itemHadesBow: Partial<IItem> = {
   defense: 6,
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  maxRange: 7,
+  maxRange: RangedWeaponRange.High,
   requiredAmmoKeys: [
     RangedWeaponsBlueprint.Arrow,
     RangedWeaponsBlueprint.IronArrow,
