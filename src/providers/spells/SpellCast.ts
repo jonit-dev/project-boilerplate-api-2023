@@ -12,6 +12,8 @@ import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { BasicAttribute, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { spellsBlueprints } from "./data/blueprints/index";
+import { CharacterEntitiesBuff } from "@providers/character/CharacterBuffer/CharacterEntitiesBuff";
+import { SpellValidation } from "./SpellValidation";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(SpellCast)
@@ -24,6 +26,8 @@ export class SpellCast {
     private skillIncrease: SkillIncrease,
     private characterBonusPenalties: CharacterBonusPenalties,
     private itemUsableEffect: ItemUsableEffect,
+    private characterEntitiesBuff: CharacterEntitiesBuff,
+    private spellValidation: SpellValidation,
     private inMemoryHashTable: InMemoryHashTable
   ) {}
 
@@ -78,6 +82,12 @@ export class SpellCast {
       return false;
     }
 
+    const cannotCastMsg = "Sorry, you can not cast this spell.";
+    if (!this.spellValidation.isAvailableForCharacterClass(spell, character)) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, cannotCastMsg);
+      return false;
+    }
+
     if (character.mana < spell.manaCost) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you do not have mana to cast this spell.");
       return false;
@@ -86,7 +96,7 @@ export class SpellCast {
     if (spell.requiredItem) {
       const required = itemsBlueprintIndex[spell.requiredItem];
       if (!required) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can not cast this spell.");
+        this.socketMessaging.sendErrorMessageToCharacter(character, cannotCastMsg);
 
         console.log(`❌ SpellCast: Missing item blueprint for key ${spell.requiredItem}`);
         return false;
