@@ -36,40 +36,46 @@ export class NPCDeath {
 
   public async handleNPCDeath(npc: INPC, character: ICharacter | null): Promise<void> {
     try {
-      // warn characters around about the NPC's death
-      const nearbyCharacters = await this.characterView.getCharactersAroundXYPosition(npc.x, npc.y, npc.scene);
-
-      for (const nearbyCharacter of nearbyCharacters) {
-        this.socketMessaging.sendEventToUser<IBattleDeath>(nearbyCharacter.channelId!, BattleSocketEvents.BattleDeath, {
-          id: npc.id,
-          type: "NPC",
-        });
-      }
-
-      // create NPC body instance
-      let goldLoot;
+      await this.notifyCharactersOfNPCDeath(npc);
       const npcBody = await this.generateNPCBody(npc);
 
-      if (npc.loots) {
-        const npcSkills = await npc.populate("skills").execPopulate();
+      const npcWithSkills = await this.getNPCWithSkills(npc);
 
-        goldLoot = this.getGoldLoot(npcSkills);
+      const goldLoot = this.getGoldLoot(npcWithSkills) ?? [];
 
-        // add loot in NPC dead body container
-      }
-      await this.addLootToNPCBody(npcBody, [...(npc?.loots ?? []), goldLoot ?? []]);
+      const npcLoots = (npc.loots as unknown as INPCLoot[]) ?? [];
+
+      await this.addLootToNPCBody(npcBody, [...npcLoots, goldLoot ?? []]);
 
       await this.itemOwnership.removeItemOwnership(npcBody.id);
-
       await this.clearNPCBehavior(npc);
 
-      npc.health = 0; // guarantee that he's dead when this method is called =)
-      npc.nextSpawnTime = dayjs(new Date()).add(npc.spawnIntervalMin, "minutes").toDate();
-      npc.currentMovementType = npc.originalMovementType; // restart original movement;
-      await npc.save();
+      await this.updateNPCAfterDeath(npc);
     } catch (error) {
       console.error(error);
     }
+  }
+
+  private async notifyCharactersOfNPCDeath(npc: INPC): Promise<void> {
+    const nearbyCharacters = await this.characterView.getCharactersAroundXYPosition(npc.x, npc.y, npc.scene);
+
+    for (const nearbyCharacter of nearbyCharacters) {
+      this.socketMessaging.sendEventToUser<IBattleDeath>(nearbyCharacter.channelId!, BattleSocketEvents.BattleDeath, {
+        id: npc.id,
+        type: "NPC",
+      });
+    }
+  }
+
+  private async getNPCWithSkills(npc: INPC): Promise<INPC> {
+    return await npc.populate("skills").execPopulate();
+  }
+
+  private async updateNPCAfterDeath(npc: INPC): Promise<void> {
+    npc.health = 0;
+    npc.nextSpawnTime = dayjs(new Date()).add(npc.spawnIntervalMin, "minutes").toDate();
+    npc.currentMovementType = npc.originalMovementType;
+    await npc.save();
   }
 
   public async generateNPCBody(npc: INPC): Promise<IItem> {
