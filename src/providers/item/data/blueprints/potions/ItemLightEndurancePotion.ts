@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IBaseItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemLightEndurancePotion: Partial<IItem> = {
+export const itemLightEndurancePotion: IBaseItemBlueprint = {
   key: PotionsBlueprint.LightEndurancePotion,
   type: ItemType.Consumable,
   subType: ItemSubType.Potion,

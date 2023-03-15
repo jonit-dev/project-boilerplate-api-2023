@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType, IEquippableWeaponBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { MacesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemSilverBulbMace: Partial<IItem> = {
+export const itemSilverBulbMace: IEquippableWeaponBlueprint = {
   key: MacesBlueprint.SilverBulbMace,
   type: ItemType.Weapon,
   subType: ItemSubType.Mace,

@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemDragonHead: Partial<IItem> = {
+export const itemDragonHead: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.DragonHead,
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,

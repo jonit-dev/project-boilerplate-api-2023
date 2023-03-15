@@ -276,7 +276,8 @@ describe("ItemUse.ts", () => {
   });
 
   it("should fail if item does not have usable effect", async () => {
-    const appleUsableEffect: Function = itemApple.usableEffect;
+    const appleUsableEffect = itemApple.usableEffect;
+    // @ts-ignore
     itemApple.usableEffect = null;
 
     const result = await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);

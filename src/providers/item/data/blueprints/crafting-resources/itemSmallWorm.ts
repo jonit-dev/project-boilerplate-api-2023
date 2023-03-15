@@ -1,8 +1,7 @@
-import { IItemUseWith } from "@providers/useWith/useWithTypes";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemSmallWorm: Partial<IItemUseWith> = {
+export const itemSmallWorm: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.SmallWorm,
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,

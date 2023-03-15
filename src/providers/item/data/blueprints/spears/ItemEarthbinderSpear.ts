@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType, IEquippableWeaponBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { SpearsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemEarthbinderSpear: Partial<IItem> = {
+export const itemEarthbinderSpear: IEquippableWeaponBlueprint = {
   key: SpearsBlueprint.EarthbinderSpear,
   type: ItemType.Weapon,
   subType: ItemSubType.Spear,

@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IEquippableItemBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { OthersBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemCandle: Partial<IItem> = {
+export const itemCandle: IEquippableItemBlueprint = {
   key: OthersBlueprint.Candle,
   type: ItemType.Other,
   subType: ItemSubType.Other,
@@ -11,6 +10,6 @@ export const itemCandle: Partial<IItem> = {
   name: "Candle",
   description: "A wax candle.",
   weight: 0.05,
-  allowedEquipSlotType: [ItemSlotType.Ring],
+  allowedEquipSlotType: [ItemSlotType.Accessory],
   basePrice: 1,
 };

@@ -2,13 +2,19 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
-import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  IRuneItemBlueprint,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+  RunePower,
+} from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
+export const itemDarkRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.DarkRune,
   type: ItemType.Tool,
   subType: ItemSubType.Magic,
@@ -18,13 +24,13 @@ export const itemDarkRune: Partial<IMagicItemUseWithEntity> = {
   description: "An ancient dark rune.",
   weight: 0.01,
   maxStackSize: 100,
-  allowedEquipSlotType: [ItemSlotType.Inventory],
 
+  canUseOnNonPVPZone: false,
   hasUseWith: true,
-  useWithMaxDistanceGrid: 7,
-  power: 17,
+  useWithMaxDistanceGrid: RangeTypes.High,
+  power: RunePower.High,
   canSell: false,
-  minMagicLevelRequired: 2,
+  minMagicLevelRequired: 10,
   animationKey: AnimationEffectKeys.HitDark,
   projectileAnimationKey: AnimationEffectKeys.Dark,
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {

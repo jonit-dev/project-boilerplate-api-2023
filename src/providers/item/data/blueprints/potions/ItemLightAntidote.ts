@@ -1,12 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { container } from "@providers/inversify/container";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemLightAntidote: Partial<IItem> = {
+export const itemLightAntidote: IConsumableItemBlueprint = {
   key: PotionsBlueprint.LightAntidote,
   type: ItemType.Consumable,
   subType: ItemSubType.Potion,

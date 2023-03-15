@@ -1,9 +1,8 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IEquippableRangedWeaponTwoHandedBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemRoyalCrossbow: Partial<IItem> = {
+export const itemRoyalCrossbow: IEquippableRangedWeaponTwoHandedBlueprint = {
   key: RangedWeaponsBlueprint.RoyalCrossbow,
   type: ItemType.Weapon,
   rangeType: EntityAttackType.Ranged,

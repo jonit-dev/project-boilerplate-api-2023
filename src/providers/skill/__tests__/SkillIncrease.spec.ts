@@ -10,10 +10,10 @@ import { SpellLearn } from "@providers/spells/SpellLearn";
 import { spellSelfHealing } from "@providers/spells/data/blueprints/SpellSelfHealing";
 import {
   BasicAttribute,
+  CharacterClass,
   ItemSubType,
   calculateSPToNextLevel,
   calculateXPToNextLevel,
-  CharacterClass,
 } from "@rpg-engine/shared";
 import { Error } from "mongoose";
 import { SkillFunctions } from "../SkillFunctions";
@@ -336,9 +336,12 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     // 'magic resistance' skill should increase
     expect(updatedSkills.magicResistance.level).toBe(initialLevel);
 
+    // @ts-ignore
+    itemDarkRune.power = 20;
+
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
-    expect(updatedSkills.magicResistance.skillPoints).toBe(Math.round(skillPoints));
-    expect(updatedSkills.magicResistance.skillPointsToNextLevel).toBe(Math.round(spToLvl2 - skillPoints));
+    expect(updatedSkills?.magicResistance.skillPoints).toBeCloseTo(skillPoints);
+    expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBeCloseTo(spToLvl2 - skillPoints);
   });
 });
 

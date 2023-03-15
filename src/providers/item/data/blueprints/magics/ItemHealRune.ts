@@ -2,13 +2,19 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
-import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  IRuneItemBlueprint,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+  RunePower,
+} from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
+export const itemHealRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.HealRune,
   type: ItemType.Tool,
   subType: ItemSubType.Magic,
@@ -19,12 +25,12 @@ export const itemHealRune: Partial<IMagicItemUseWithEntity> = {
   description: "An ancient healing rune.",
   weight: 0.01,
   maxStackSize: 100,
-  allowedEquipSlotType: [ItemSlotType.Inventory],
+
   hasUseWith: true,
   canUseOnNonPVPZone: true,
-  useWithMaxDistanceGrid: 7,
-  power: 10,
-  minMagicLevelRequired: 2,
+  useWithMaxDistanceGrid: RangeTypes.Short,
+  power: RunePower.Low,
+  minMagicLevelRequired: 8,
   canSell: false,
   animationKey: AnimationEffectKeys.HitHeal,
   projectileAnimationKey: AnimationEffectKeys.Heal,

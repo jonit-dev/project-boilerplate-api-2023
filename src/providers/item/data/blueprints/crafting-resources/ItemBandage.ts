@@ -1,13 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemBandage: Partial<IItem> = {
+export const itemBandage: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.Bandage,
   type: ItemType.Consumable,
   subType: ItemSubType.CraftingResource,

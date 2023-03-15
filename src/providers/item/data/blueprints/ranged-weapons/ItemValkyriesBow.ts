@@ -1,9 +1,14 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { RangedWeaponRange } from "../../types/RangedWeaponTypes";
+import {
+  EntityAttackType,
+  IEquippableRangedWeaponTwoHandedBlueprint,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+} from "@rpg-engine/shared";
+import { RangeTypes } from "../../types/RangedWeaponTypes";
 import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemValkyriesBow: Partial<IItem> = {
+export const itemValkyriesBow: IEquippableRangedWeaponTwoHandedBlueprint = {
   key: RangedWeaponsBlueprint.ValkyriesBow,
   type: ItemType.Weapon,
   rangeType: EntityAttackType.Ranged,
@@ -16,7 +21,7 @@ export const itemValkyriesBow: Partial<IItem> = {
   defense: 8,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  maxRange: RangedWeaponRange.High,
+  maxRange: RangeTypes.High,
   requiredAmmoKeys: [
     RangedWeaponsBlueprint.Arrow,
     RangedWeaponsBlueprint.IronArrow,

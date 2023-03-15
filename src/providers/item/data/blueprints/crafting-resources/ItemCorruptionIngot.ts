@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemCorruptionIngot: Partial<IItem> = {
+export const itemCorruptionIngot: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.CorruptionIngot,
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,
@@ -13,4 +12,5 @@ export const itemCorruptionIngot: Partial<IItem> = {
   weight: 1,
   maxStackSize: 100,
   basePrice: 25,
+  canSell: false,
 };

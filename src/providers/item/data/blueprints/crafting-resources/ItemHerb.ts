@@ -1,8 +1,7 @@
-import { IItemUseWith } from "@providers/useWith/useWithTypes";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemHerb: Partial<IItemUseWith> = {
+export const itemHerb: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.Herb,
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,
@@ -12,6 +11,5 @@ export const itemHerb: Partial<IItemUseWith> = {
   description: "A crafting resource used for making healing potions and antidotes.",
   weight: 0.01,
   maxStackSize: 100,
-  hasUseWith: true,
   basePrice: 5,
 };

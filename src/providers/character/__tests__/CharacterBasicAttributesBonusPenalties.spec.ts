@@ -31,7 +31,7 @@ describe("Case CharacterBasicAttributesBonusPenalties", () => {
       dexterity: -0.1,
       magic: -0.1,
       magicResistance: 0.2,
-    };
+    } as any;
 
     await characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
       skills,

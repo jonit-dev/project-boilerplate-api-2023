@@ -2,13 +2,19 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
-import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  IRuneItemBlueprint,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+  RunePower,
+} from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemThunderRune: Partial<IMagicItemUseWithEntity> = {
+export const itemThunderRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.ThunderRune,
   type: ItemType.Tool,
   subType: ItemSubType.Magic,
@@ -18,12 +24,13 @@ export const itemThunderRune: Partial<IMagicItemUseWithEntity> = {
   description: "An ancient thunder rune.",
   weight: 0.01,
   maxStackSize: 100,
-  allowedEquipSlotType: [ItemSlotType.Inventory],
+
+  canUseOnNonPVPZone: false,
   hasUseWith: true,
-  useWithMaxDistanceGrid: 7,
-  power: 11,
+  useWithMaxDistanceGrid: RangeTypes.Medium,
+  power: RunePower.Medium,
   canSell: false,
-  minMagicLevelRequired: 2,
+  minMagicLevelRequired: 5,
   animationKey: AnimationEffectKeys.Energy,
   projectileAnimationKey: AnimationEffectKeys.Green,
 

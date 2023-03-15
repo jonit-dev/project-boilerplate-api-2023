@@ -10,12 +10,11 @@ import {
   IUseWithItemToEntityReward,
   UseWithItemToEntity,
 } from "@providers/useWith/abstractions/UseWithItemToEntity";
-import { IItemUseWith } from "@providers/useWith/useWithTypes";
-import { ItemSlotType, ItemSubType, ItemType, NPCSubtype } from "@rpg-engine/shared";
+import { IToolItemBlueprint, ItemSlotType, ItemSubType, ItemType, NPCSubtype, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { CraftingResourcesBlueprint, FoodsBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemButchersKnife: Partial<IItemUseWith> = {
+export const itemButchersKnife: IToolItemBlueprint = {
   key: ToolsBlueprint.ButchersKnife,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,
@@ -30,7 +29,7 @@ export const itemButchersKnife: Partial<IItemUseWith> = {
   rangeType: EntityAttackType.Melee,
   basePrice: 45,
   hasUseWith: true,
-  useWithMaxDistanceGrid: 2,
+  useWithMaxDistanceGrid: RangeTypes.Short,
   canSell: false,
   usableEffect: async (
     character: ICharacter,
