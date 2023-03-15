@@ -107,11 +107,11 @@ itemContainerSchema.virtual("isEmpty").get(function (this: IItemContainer) {
   return this.totalItemsQty === 0;
 });
 
-itemContainerSchema.post("save", async function (this: IItemContainer) {
+itemContainerSchema.pre("save", async function (this: IItemContainer) {
   if (!this.slots) {
     const slots = {};
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < this.slotQty; i++) {
       slots[Number(i)] = null;
     }
 

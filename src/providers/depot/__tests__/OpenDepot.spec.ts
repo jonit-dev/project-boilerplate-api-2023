@@ -30,7 +30,7 @@ describe("OpenDepot.ts", () => {
     const depotContainer = await openDepot.getContainer(testCharacter.id, testNPC.id);
 
     expect(depotContainer).toBeDefined();
-    expect(depotContainer!.slotQty).toEqual(20);
+    expect(depotContainer!.slotQty).toEqual(40);
 
     // all container slots should be empty
     for (const i in depotContainer!.slots) {
@@ -68,7 +68,7 @@ describe("OpenDepot.ts", () => {
     const depotContainer = await openDepot.getContainer(testCharacter.id, testNPC.id);
 
     expect(depotContainer).toBeDefined();
-    expect(depotContainer!.slotQty).toEqual(20);
+    expect(depotContainer!.slotQty).toEqual(40);
 
     const newDepot = await Depot.findOne({
       owner: Types.ObjectId(testCharacter.id),
