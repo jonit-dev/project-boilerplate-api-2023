@@ -1,4 +1,6 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { Depot } from "@entities/ModuleDepot/DepotModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { SpellLearn } from "@providers/spells/SpellLearn";
@@ -64,6 +66,27 @@ export class ScriptsUseCase {
         { _id: character._id },
         { learnedSpells: removeWrongName }
       )) as unknown as ICharacter;
+    }
+  }
+
+  public async fixWrongDepot(): Promise<void> {
+    const characters = await Character.find({});
+
+    for (const character of characters) {
+      const depots = await Depot.find({ owner: character._id });
+
+      for (const depot of depots) {
+        const itemContainer = await ItemContainer.findById(depot.itemContainer);
+
+        if (!itemContainer) {
+          await depot.remove();
+        }
+
+        if (!itemContainer?.slots) {
+          await depot.remove();
+          await itemContainer?.remove();
+        }
+      }
     }
   }
 }

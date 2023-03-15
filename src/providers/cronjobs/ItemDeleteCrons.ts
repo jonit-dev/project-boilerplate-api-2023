@@ -31,6 +31,7 @@ export class ItemDeleteCrons {
           // @ts-ignore
           x: { $ne: null },
           y: { $ne: null },
+          name: { $ne: "Depot" },
           scene: { $ne: null },
           isEquipped: { $ne: true },
           itemContainer: { $exists: false },

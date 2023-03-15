@@ -37,4 +37,15 @@ export class ScriptsController implements interfaces.Controller {
       message: "Eagles Eye Fixes",
     });
   }
+
+  @httpGet("/fix-bugged-depots")
+  public async buggedDepots(@response() res): Promise<void> {
+    // update all initial coordinates from users performatically
+
+    await this.scriptsUserCase.fixWrongDepot();
+
+    return res.status(200).send({
+      message: "Depot fixed",
+    });
+  }
 }

@@ -9,3 +9,9 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
  
+### Scripts :: Fix depot
+GET {{baseUrl}}/scripts/fix-bugged-depots HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+ 
