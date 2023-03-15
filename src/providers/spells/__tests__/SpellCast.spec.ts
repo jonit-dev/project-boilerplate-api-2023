@@ -5,7 +5,13 @@ import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/cons
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { AnimationSocketEvents, CharacterSocketEvents, SkillSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import {
+  AnimationSocketEvents,
+  CharacterClass,
+  CharacterSocketEvents,
+  SkillSocketEvents,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { spellArrowCreation } from "../data/blueprints/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/SpellBlankRuneCreation";
 import { spellBoltCreation } from "../data/blueprints/SpellBoltCreation";
@@ -52,19 +58,17 @@ describe("SpellCast.ts", () => {
   });
 
   beforeEach(async () => {
-    testCharacter = await (
-      await unitTestHelper.createMockCharacter(
-        { health: 50, learnedSpells: [spellSelfHealing.key, spellGreaterHealing.key] },
-        { hasEquipment: false, hasInventory: false, hasSkills: true }
-      )
-    )
-      .populate("skills")
-      .execPopulate();
+    testCharacter = await await unitTestHelper.createMockCharacter(
+      { health: 50, learnedSpells: [spellSelfHealing.key, spellGreaterHealing.key] },
+      { hasEquipment: false, hasInventory: false, hasSkills: true }
+    );
 
-    characterSkills = testCharacter.skills as unknown as ISkill;
+    await Character.findByIdAndUpdate(testCharacter.id, { class: CharacterClass.Rogue });
+    const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+    characterSkills = skills;
     characterSkills.level = spellSelfHealing.minLevelRequired!;
     characterSkills.magic.level = spellSelfHealing.minMagicLevelRequired;
-    await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
+    (await Skill.findByIdAndUpdate(characterSkills._id, characterSkills).lean()) as ISkill;
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
   });
@@ -214,17 +218,19 @@ describe("SpellCast.ts", () => {
   });
 
   it("should cast Greater Healing spell successfully", async () => {
-    testCharacter = await unitTestHelper.createMockCharacter(
+    testCharacter = await await unitTestHelper.createMockCharacter(
       { health: 50, learnedSpells: [spellGreaterHealing.key] },
-      { hasEquipment: true, hasInventory: true, hasSkills: true }
+      { hasEquipment: false, hasInventory: false, hasSkills: true }
     );
+
+    testCharacter.class = CharacterClass.Druid;
+    await Character.findByIdAndUpdate(testCharacter.id, testCharacter);
 
     const newHealth = testCharacter.health + 45;
     const newMana = testCharacter.mana - spellGreaterHealing.manaCost!;
 
-    await testCharacter.populate("skills").execPopulate();
-
-    characterSkills = testCharacter.skills as unknown as ISkill;
+    const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+    characterSkills = skills;
     characterSkills.level = spellGreaterHealing.minLevelRequired!;
     characterSkills.magic.level = spellGreaterHealing.minMagicLevelRequired;
     await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
@@ -277,10 +283,8 @@ describe("SpellCast.ts", () => {
   it("should increase skill and send skill update event", async () => {
     expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeTruthy();
 
-    const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills).lean({
-      virtuals: true,
-      defaults: true,
-    })) as ISkill;
+    const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (spellSelfHealing.manaCost ?? 0);
     expect(updatedSkills?.magic.skillPoints).toBe(skillPoints);
 

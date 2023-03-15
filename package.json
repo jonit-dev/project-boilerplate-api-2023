@@ -68,7 +68,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
-    "@rpg-engine/shared": "^0.6.95",
+    "@rpg-engine/shared": "^0.6.96",
     "@rpg-engine/soul": "^0.1.16",
     "@shelf/jest-mongodb": "^2.2.1",
     "@swc/core": "^1.3.20",

@@ -245,6 +245,9 @@ export class SkillIncrease {
 
     const result = this.increaseSP(skills, craftedItemKey, craftSkillPointsCalculator, CraftingSkillsMap);
     await this.skillFunctions.updateSkills(skills, character);
+
+    await this.characterBonusPenalties.applyRaceBonusPenalties(character, skillToUpdate);
+
     if (result.skillLevelUp && character.channelId) {
       await this.skillFunctions.sendSkillLevelUpEvents(result, character);
     }

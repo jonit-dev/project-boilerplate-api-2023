@@ -46,11 +46,13 @@ export class SkillFunctions {
   }
 
   public calculateBonusOrPenaltiesSP(bonusOrPenalties: number, skillLevel: number): number {
-    return Math.round(skillLevel * (1 + bonusOrPenalties) * SP_INCREASE_RATIO * 100) / 100;
+    return Number((skillLevel * (1 + Number(bonusOrPenalties.toFixed(2))) * SP_INCREASE_RATIO).toFixed(2));
   }
 
   public calculateBonusOrPenaltiesMagicSP(magicBonusOrPenalties: number, skillLevel: number): number {
-    return Math.round(skillLevel * (1 + magicBonusOrPenalties) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
+    return Number(
+      (skillLevel * (1 + Number(magicBonusOrPenalties.toFixed(2))) * SP_MAGIC_INCREASE_TIMES_MANA).toFixed(2)
+    );
   }
 
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {

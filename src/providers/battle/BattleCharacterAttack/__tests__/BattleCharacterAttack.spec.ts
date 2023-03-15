@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { PVP_MIN_REQUIRED_LV } from "@providers/constants/PVPConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -25,7 +25,7 @@ describe("BattleCharacterAttack.spec.ts", () => {
 
     testCharacter = await unitTestHelper.createMockCharacter();
     testCharacter.health = 100;
-    await testCharacter.save();
+    (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
   });
 
   it("should avoid attacking dead targets", async () => {
@@ -39,7 +39,7 @@ describe("BattleCharacterAttack.spec.ts", () => {
 
   it("should avoid attacking if attacker is dead", async () => {
     testCharacter.health = 0;
-    await testCharacter.save();
+    (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
 
     const attackTarget = await battleCharacterAttack.attackTarget(testCharacter, testNPC);
 

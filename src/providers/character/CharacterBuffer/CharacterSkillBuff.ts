@@ -1,10 +1,18 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { BasicAttribute, CharacterEntities, CombatSkill, IAppliedBuffsEffect, SkillType } from "@rpg-engine/shared";
+import {
+  BasicAttribute,
+  CharacterEntities,
+  CombatSkill,
+  CraftingSkill,
+  IAppliedBuffsEffect,
+  SkillType,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { BuffSkillFunctions } from "./BuffSkillFunctions";
 import { CharacterBasicAttributesBuff } from "./CharacterBasicAttributesBuff";
 import { CharacterCombatSkillBuff } from "./CharacterCombatSkillBuff";
+import { CharacterCraftingSkillBuff } from "./CharacterCraftingSkillBuff";
 import { CharacterEntitiesBuff } from "./CharacterEntitiesBuff";
 
 @provide(CharacterSkillBuff)
@@ -13,6 +21,7 @@ export class CharacterSkillBuff {
     private characterBasicAttributesBuff: CharacterBasicAttributesBuff,
     private characterCombatSkillBuff: CharacterCombatSkillBuff,
     private characterEntitiesBuff: CharacterEntitiesBuff,
+    private characterCraftingSkillBuff: CharacterCraftingSkillBuff,
     private buffSkillFunctions: BuffSkillFunctions
   ) {}
 
@@ -59,8 +68,13 @@ export class CharacterSkillBuff {
         break;
       }
 
-      case SkillType.Gathering: {
-        // update the character gathering skill
+      case SkillType.Crafting: {
+        appliedBuffsEffect = await this.characterCraftingSkillBuff.updateCraftingSkill(
+          character,
+          skillType as CraftingSkill,
+          buff
+        );
+
         break;
       }
 
@@ -110,8 +124,14 @@ export class CharacterSkillBuff {
         break;
       }
 
-      case SkillType.Gathering: {
-        // update the character crafting gathering skill
+      case SkillType.Crafting: {
+        await this.characterCraftingSkillBuff.updateCraftingSkill(
+          character,
+          skillType as CraftingSkill,
+          debuff,
+          buffId
+        );
+
         break;
       }
 
@@ -197,7 +217,31 @@ export class CharacterSkillBuff {
       }
 
       case SkillType.Crafting: {
-        // update the character crafting gathering skill
+        const buffSkill = await this.characterCraftingSkillBuff.updateCraftingSkill(
+          character,
+          skillType as CraftingSkill,
+          buff
+        );
+
+        setTimeout(async () => {
+          const refreshCharacter = (await Character.findById(character._id).lean()) as ICharacter;
+          if (refreshCharacter && refreshCharacter.appliedBuffsEffects) {
+            const appliedBuffsEffect = this.buffSkillFunctions.getValueByBuffId(
+              refreshCharacter?.appliedBuffsEffects,
+              buffSkill._id
+            );
+
+            if (appliedBuffsEffect) {
+              await this.characterCraftingSkillBuff.updateCraftingSkill(
+                refreshCharacter,
+                skillType as CraftingSkill,
+                buff * -1,
+                buffSkill._id
+              );
+            }
+          }
+        }, 1000 * timeOutInSecs);
+
         break;
       }
 

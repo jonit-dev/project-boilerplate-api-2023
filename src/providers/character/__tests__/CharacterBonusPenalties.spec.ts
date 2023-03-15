@@ -1,9 +1,16 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BasicAttribute, ItemSubType, UISocketEvents } from "@rpg-engine/shared";
+import {
+  BasicAttribute,
+  CharacterClass,
+  CraftingSkill,
+  ItemSubType,
+  ShadowWalkerRaces,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { CharacterBonusPenalties } from "../characterBonusPenalties/CharacterBonusPenalties";
 
 describe("Case CharacterBonusPenalties", () => {
@@ -13,12 +20,7 @@ describe("Case CharacterBonusPenalties", () => {
   let sendSkillLevelUpEvents: jest.SpyInstance;
 
   beforeAll(() => {
-    jest.useFakeTimers({
-      advanceTimers: true,
-    });
-
     characterBonusPenalties = container.get<CharacterBonusPenalties>(CharacterBonusPenalties);
-
     sendSkillLevelUpEvents = jest.spyOn(SkillFunctions.prototype, "sendSkillLevelUpEvents" as any);
   });
 
@@ -28,58 +30,72 @@ describe("Case CharacterBonusPenalties", () => {
       hasSkills: true,
     });
 
-    await testCharacter.populate("skills").execPopulate();
+    testCharacter.race = ShadowWalkerRaces.Orc;
+    testCharacter.class = CharacterClass.Berserker;
 
-    testCharacter.race = "Orc";
-
-    await testCharacter.save();
+    (await Character.findByIdAndUpdate(testCharacter._id, { ...testCharacter }).lean()) as ICharacter;
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
   });
 
   it("applyRaceBonusPenalties should return the correct value", async () => {
-    const skillTypeStrength = BasicAttribute.Strength;
-    const skills = await Skill.findById(testCharacter.skills as ISkill);
+    const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
-    skills!.strength.skillPoints = 15;
-    skills!.strength.level = 2;
-    skills!.dagger.skillPoints = 15;
-    skills!.dagger.level = 2;
+    skills.strength.skillPoints = 15;
+    skills.strength.level = 2;
 
-    await skills?.save();
+    skills.dagger.skillPoints = 15;
+    skills.dagger.level = 2;
 
-    await Skill.findByIdAndUpdate(skills?._id, { ...skills });
+    skills.fishing.skillPoints = 15;
+    skills.fishing.level = 2;
 
-    await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, skillTypeStrength);
+    skills.lumberjacking.skillPoints = 15;
+    skills.lumberjacking.level = 2;
 
-    const skillTypeDagger = ItemSubType.Dagger;
-    await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, skillTypeDagger);
+    (await Skill.findByIdAndUpdate(skills._id, { ...skills }).lean()) as ISkill;
+
+    await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, BasicAttribute.Strength);
+    await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, ItemSubType.Dagger);
+    await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, CraftingSkill.Fishing);
+    await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, CraftingSkill.Lumberjacking);
 
     const newSKill = (await Skill.findById(testCharacter.skills)) as ISkill;
-    expect(newSKill!.strength.skillPoints).toEqual(15.48);
 
-    expect(newSKill!.dagger.skillPoints).toEqual(15.44);
+    expect(newSKill!.strength.skillPoints).toEqual(15.64);
+    expect(newSKill!.dagger.skillPoints).toEqual(15.32);
+    expect(newSKill!.fishing.skillPoints).toEqual(15.44);
+    expect(newSKill!.lumberjacking.skillPoints).toEqual(15.52);
   });
 
   it("applyRaceBonusPenalties should lvl up and send event", async () => {
-    const skills = (await Skill.findById(testCharacter.skills)) as ISkill;
-    const skillType = BasicAttribute.Strength;
-    skills[skillType].skillPoints = 74;
-    skills[skillType].level = 2;
-    await skills.save();
+    testCharacter.class = CharacterClass.Sorcerer;
+    const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
-    await Skill.findByIdAndUpdate(skills._id, { ...skills });
+    skills[BasicAttribute.Magic].skillPoints = 74;
+    skills[BasicAttribute.Magic].level = 2;
 
-    await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, skillType);
+    skills[CraftingSkill.Alchemy].skillPoints = 74;
+    skills[CraftingSkill.Alchemy].level = 2;
 
-    const skillsAfterUpdate = (await Skill.findById(testCharacter.skills)) as ISkill;
-    expect(skillsAfterUpdate!.strength.skillPoints).toEqual(expect.closeTo(74.48, 2));
-    expect(skillsAfterUpdate!.strength.level).toEqual(3);
-    expect(skillsAfterUpdate!.strength.skillPointsToNextLevel).toEqual(101.52);
+    (await Skill.findByIdAndUpdate(skills._id, { ...skills }).lean()) as ISkill;
+
+    await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, BasicAttribute.Magic);
+    await characterBonusPenalties.applyRaceBonusPenalties(testCharacter, CraftingSkill.Alchemy);
+
+    const skillsAfterUpdate = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+
+    expect(skillsAfterUpdate.magic.skillPoints).toEqual(74.96);
+    expect(skillsAfterUpdate.magic.level).toEqual(3);
+    expect(skillsAfterUpdate.magic.skillPointsToNextLevel).toEqual(101.04);
+
+    expect(skillsAfterUpdate.alchemy.skillPoints).toEqual(74.4);
+    expect(skillsAfterUpdate.alchemy.level).toEqual(3);
+    expect(skillsAfterUpdate.alchemy.skillPointsToNextLevel).toEqual(101.6);
 
     expect(sendSkillLevelUpEvents).toHaveBeenCalled();
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
-      message: "You advanced from level 2 to 3 in Strength fighting.",
+      message: "You advanced from level 2 to 3 in Magic fighting.",
       type: "info",
     });
   });

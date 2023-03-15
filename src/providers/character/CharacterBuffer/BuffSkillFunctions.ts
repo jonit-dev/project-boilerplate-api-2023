@@ -8,6 +8,7 @@ import {
   CharacterEntities,
   CharacterSocketEvents,
   CombatSkill,
+  CraftingSkill,
   IAppliedBuffsEffect,
   ICharacterAttributeChanged,
   ISkillDetails,
@@ -32,6 +33,15 @@ const combatSkills: CombatSkill[] = [
   CombatSkill.Distance,
   CombatSkill.Shielding,
   CombatSkill.Club,
+];
+
+const craftingSkill: CraftingSkill[] = [
+  CraftingSkill.Alchemy,
+  CraftingSkill.Blacksmithing,
+  CraftingSkill.Cooking,
+  CraftingSkill.Fishing,
+  CraftingSkill.Mining,
+  CraftingSkill.Lumberjacking,
 ];
 
 const characterEntities: CharacterEntities[] = [
@@ -342,6 +352,13 @@ export class BuffSkillFunctions {
 
     if (combatSkills.includes(skillType as CombatSkill) || combatSkills.indexOf(skillType as CombatSkill) !== -1) {
       return (skillTypeDefinition = SkillType.Combat);
+    }
+
+    if (
+      craftingSkill.includes(skillType as CraftingSkill) ||
+      craftingSkill.indexOf(skillType as CraftingSkill) !== -1
+    ) {
+      return (skillTypeDefinition = SkillType.Crafting);
     }
 
     if (

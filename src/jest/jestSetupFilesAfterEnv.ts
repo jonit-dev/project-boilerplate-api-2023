@@ -1,3 +1,4 @@
+import { CLASS_BONUS_OR_PENALTIES } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
 import { container, redisManager } from "@providers/inversify/container";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
@@ -13,6 +14,7 @@ jest.mock("@providers/constants/SkillConstants", () => ({
   SP_MAGIC_INCREASE_TIMES_MANA: 0.4,
   INCREASE_BONUS_FACTION: 0.1,
   EXP_RATIO: 1,
+  CLASS_BONUS_OR_PENALTIES,
 }));
 
 jest.mock("@providers/constants/LootConstants", () => ({

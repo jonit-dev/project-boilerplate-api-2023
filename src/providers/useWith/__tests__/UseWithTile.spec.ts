@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -38,7 +38,7 @@ describe("UseWithTile.ts", () => {
     // Locate character close to the tile
     testCharacter.x = FromGridX(0);
     testCharacter.y = FromGridY(1);
-    await testCharacter.save();
+    (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
 
     useWithTileData = {
       originItemId: testItem.id,
@@ -93,7 +93,7 @@ describe("UseWithTile.ts", () => {
   it("should fail validations | character too far away from tile", async () => {
     testCharacter.x = FromGridX(5);
     testCharacter.y = FromGridY(5);
-    await testCharacter.save();
+    (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
 
     // @ts-ignore
     const sendErrorMsg = jest.spyOn(useWithTile.socketMessaging, "sendErrorMessageToCharacter" as any);

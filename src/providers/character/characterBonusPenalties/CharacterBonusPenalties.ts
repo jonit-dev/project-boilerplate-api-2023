@@ -5,6 +5,7 @@ import {
   CharacterClass,
   IBasicAttributesBonusAndPenalties,
   ICombatSkillsBonusAndPenalties,
+  ICraftingSkillsBonusAndPenalties,
   IIncreaseSPResult,
   LifeBringerRaces,
   ShadowWalkerRaces,
@@ -14,13 +15,14 @@ import { provide } from "inversify-binding-decorators";
 import { CharacterBasicAttributesBonusPenalties } from "./CharacterBasicAttributesBonusPenalties";
 import { CharacterClassBonusOrPenalties } from "./CharacterClassBonusOrPenalties";
 import { CharacterCombatBonusPenalties } from "./CharacterCombatBonusPenalties";
+import { CharacterCraftingBonusPenalties } from "./CharacterCraftingBonusPenalties";
 
 @provide(CharacterBonusPenalties)
 export class CharacterBonusPenalties {
   constructor(
     private characterBasicAttributesBonusPenalties: CharacterBasicAttributesBonusPenalties,
     private characterCombatBonusPenalties: CharacterCombatBonusPenalties,
-    // private characterCraftincharacterClassBonusOrPenaltiesgBonusPenalties: CharacterCraftingBonusPenalties,
+    private characterCraftingBonusPenalties: CharacterCraftingBonusPenalties,
     private skillFunctions: SkillFunctions,
     private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties
   ) {}
@@ -32,13 +34,13 @@ export class CharacterBonusPenalties {
     }
 
     const skillToUpdate = SKILLS_MAP.get(skillType);
+
     if (!skillToUpdate) {
       throw new Error(`skill not found for item subtype ${skillType}`);
     }
-
     let basicAttributes: IBasicAttributesBonusAndPenalties;
     let combatSkills: ICombatSkillsBonusAndPenalties;
-    // let craftingGatheringSkills: ICraftingGatheringSkillsBonusAndPenalties;
+    let craftingSkills: ICraftingSkillsBonusAndPenalties;
 
     let skillSpData: IIncreaseSPResult = {
       skillLevelUp: false,
@@ -59,6 +61,7 @@ export class CharacterBonusPenalties {
 
         // Update Basic Attributes
         basicAttributes = {
+          stamina: 0.1 + classBonusOrPenalties.basicAttributes.stamina,
           strength: 0.2 + classBonusOrPenalties.basicAttributes.strength,
           resistance: 0.2 + classBonusOrPenalties.basicAttributes.resistance,
           dexterity: -0.1 + classBonusOrPenalties.basicAttributes.dexterity,
@@ -94,14 +97,29 @@ export class CharacterBonusPenalties {
         }
 
         // Update Crafting and Gathering Skills
-        // craftingGatheringSkills = {};
-        // this.updateCraftingGatheringSkills(craftingGatheringSkills);
+        craftingSkills = {
+          fishing: -0.1 + classBonusOrPenalties.craftingSkills.fishing,
+          mining: 0.2 + classBonusOrPenalties.craftingSkills.mining,
+          lumberjacking: 0.2 + classBonusOrPenalties.craftingSkills.lumberjacking,
+          cooking: 0.1 + classBonusOrPenalties.craftingSkills.cooking,
+          alchemy: 0.1 + classBonusOrPenalties.craftingSkills.alchemy,
+          blacksmithing: 0 + classBonusOrPenalties.craftingSkills.blacksmithing,
+        };
+
+        if (skillToUpdate in craftingSkills) {
+          skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            skills,
+            skillToUpdate,
+            craftingSkills
+          );
+        }
 
         break;
       }
 
       case LifeBringerRaces.Elf: {
         basicAttributes = {
+          stamina: 0 + classBonusOrPenalties.basicAttributes.stamina,
           strength: -0.1 + classBonusOrPenalties.basicAttributes.strength,
           resistance: -0.1 + classBonusOrPenalties.basicAttributes.resistance,
           dexterity: 0.1 + classBonusOrPenalties.basicAttributes.dexterity,
@@ -136,9 +154,23 @@ export class CharacterBonusPenalties {
           );
         }
 
-        // Update Crafting and Gathering Skills
-        // craftingGatheringSkills = {};
-        // this.updateCraftingGatheringSkills(craftingGatheringSkills);
+        // Update Crafting Skills
+        craftingSkills = {
+          fishing: 0.1 + classBonusOrPenalties.craftingSkills.fishing,
+          mining: 0.1 + classBonusOrPenalties.craftingSkills.mining,
+          lumberjacking: 0.1 + classBonusOrPenalties.craftingSkills.lumberjacking,
+          cooking: 0.1 + classBonusOrPenalties.craftingSkills.cooking,
+          alchemy: 0.1 + classBonusOrPenalties.craftingSkills.alchemy,
+          blacksmithing: 0.1 + classBonusOrPenalties.craftingSkills.blacksmithing,
+        };
+
+        if (skillToUpdate in craftingSkills) {
+          skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            skills,
+            skillToUpdate,
+            craftingSkills
+          );
+        }
         break;
       }
 
@@ -154,6 +186,7 @@ export class CharacterBonusPenalties {
 
       case ShadowWalkerRaces.Minotaur: {
         basicAttributes = {
+          stamina: 0 + classBonusOrPenalties.basicAttributes.stamina,
           strength: 0.3 + classBonusOrPenalties.basicAttributes.strength,
           resistance: 0.2 + classBonusOrPenalties.basicAttributes.resistance,
           dexterity: -0.2 + classBonusOrPenalties.basicAttributes.dexterity,
@@ -189,13 +222,28 @@ export class CharacterBonusPenalties {
         }
 
         // Update Crafting and Gathering Skills
-        // craftingGatheringSkills = {};
-        // this.updateCraftingGatheringSkills(craftingGatheringSkills);
+        craftingSkills = {
+          fishing: 0.1 + classBonusOrPenalties.craftingSkills.fishing,
+          mining: 0.1 + classBonusOrPenalties.craftingSkills.mining,
+          lumberjacking: 0.1 + classBonusOrPenalties.craftingSkills.lumberjacking,
+          cooking: 0.1 + classBonusOrPenalties.craftingSkills.cooking,
+          alchemy: 0.1 + classBonusOrPenalties.craftingSkills.alchemy,
+          blacksmithing: 0.1 + classBonusOrPenalties.craftingSkills.blacksmithing,
+        };
+
+        if (skillToUpdate in craftingSkills) {
+          skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            skills,
+            skillToUpdate,
+            craftingSkills
+          );
+        }
         break;
       }
 
       case ShadowWalkerRaces.Orc: {
         basicAttributes = {
+          stamina: 0 + classBonusOrPenalties.basicAttributes.stamina,
           strength: 0.2 + classBonusOrPenalties.basicAttributes.strength,
           resistance: 0.1 + classBonusOrPenalties.basicAttributes.resistance,
           dexterity: -0.1 + classBonusOrPenalties.basicAttributes.dexterity,
@@ -230,9 +278,23 @@ export class CharacterBonusPenalties {
           );
         }
 
-        // Update Crafting and Gathering Skills
-        // craftingGatheringSkills = {};
-        // this.updateCraftingGatheringSkills(craftingGatheringSkills);
+        // Update Crafting Skills
+        craftingSkills = {
+          fishing: 0.2 + classBonusOrPenalties.craftingSkills.fishing,
+          mining: 0.1 + classBonusOrPenalties.craftingSkills.mining,
+          lumberjacking: 0.1 + classBonusOrPenalties.craftingSkills.lumberjacking,
+          cooking: -0.1 + classBonusOrPenalties.craftingSkills.cooking,
+          alchemy: -0.2 + classBonusOrPenalties.craftingSkills.alchemy,
+          blacksmithing: 0 + classBonusOrPenalties.craftingSkills.blacksmithing,
+        };
+
+        if (skillToUpdate in craftingSkills) {
+          skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            skills,
+            skillToUpdate,
+            craftingSkills
+          );
+        }
         break;
       }
 

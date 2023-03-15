@@ -1,9 +1,9 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { BasicAttribute, BattleEventType, FromGridX, FromGridY } from "@rpg-engine/shared";
+import { BasicAttribute, BattleEventType, CharacterClass, FromGridX, FromGridY } from "@rpg-engine/shared";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 
 jest.mock("../../entityEffects/EntityEffectCycle.ts", () => ({
@@ -26,16 +26,14 @@ describe("BattleAttackTarget.spec.ts", () => {
       hasEquipment: true,
       hasSkills: true,
     });
-    await testNPC.populate("skills").execPopulate();
-    await testCharacter.populate("skills").execPopulate();
 
     testCharacter.x = FromGridX(0);
     testCharacter.y = FromGridX(0);
-    await testCharacter.save();
+    (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
 
     testNPC.x = FromGridX(1);
     testNPC.y = FromGridX(1);
-    await testNPC.save();
+    (await NPC.findByIdAndUpdate(testNPC._id, testNPC).lean()) as INPC;
   });
 
   it("should NOT hit a target if attacker has melee attack type and target is out of range", async () => {
@@ -44,12 +42,12 @@ describe("BattleAttackTarget.spec.ts", () => {
     const attacker = testCharacter;
     attacker.x = FromGridX(0);
     attacker.y = FromGridY(0);
-    await attacker.save();
+    (await Character.findByIdAndUpdate(attacker._id, attacker).lean()) as ICharacter;
 
     const defender = testNPC;
     defender.x = FromGridX(5);
     defender.y = FromGridY(5);
-    await defender.save();
+    (await Character.findByIdAndUpdate(defender._id, defender).lean()) as ICharacter;
 
     await battleAttackTarget.checkRangeAndAttack(attacker, defender);
 
@@ -59,6 +57,9 @@ describe("BattleAttackTarget.spec.ts", () => {
   });
 
   it("should hit a target if attacker has melee attack type and target is in range", async () => {
+    await testNPC.populate("skills").execPopulate();
+    await testCharacter.populate("skills").execPopulate();
+
     await battleAttackTarget.checkRangeAndAttack(testNPC, testCharacter);
 
     // expect battleAttackTarget to not have been called
@@ -108,7 +109,7 @@ describe("BattleAttackTarget.spec.ts", () => {
     const charDeath = jest.spyOn(battleAttackTarget.characterDeath, "handleCharacterDeath");
 
     testCharacter.health = 1;
-    await testCharacter.save();
+    (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
 
     // @ts-ignore
     await battleAttackTarget.hitTarget(testNPC, testCharacter);
@@ -138,16 +139,18 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
       hasEquipment: true,
       hasSkills: true,
     });
-    await targetCharacter.populate("skills").execPopulate();
-    await attackerCharacter.populate("skills").execPopulate();
 
     attackerCharacter.x = FromGridX(0);
     attackerCharacter.y = FromGridX(0);
-    await attackerCharacter.save();
+    attackerCharacter.class = CharacterClass.Hunter;
+
+    (await Character.findByIdAndUpdate(attackerCharacter._id, attackerCharacter).lean()) as ICharacter;
 
     targetCharacter.x = FromGridX(1);
     targetCharacter.y = FromGridX(1);
-    await targetCharacter.save();
+    targetCharacter.class = CharacterClass.Warrior;
+
+    (await Character.findByIdAndUpdate(targetCharacter._id, targetCharacter).lean()) as ICharacter;
   });
 
   it("should NOT hit a target if attacker has melee attack type and target is out of range", async () => {
@@ -156,12 +159,14 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
     const attacker = attackerCharacter;
     attacker.x = FromGridX(0);
     attacker.y = FromGridY(0);
-    await attacker.save();
+
+    (await Character.findByIdAndUpdate(attacker._id, attacker).lean()) as ICharacter;
 
     const defender = targetCharacter;
     defender.x = FromGridX(5);
     defender.y = FromGridY(5);
-    await defender.save();
+
+    (await Character.findByIdAndUpdate(defender._id, defender).lean()) as ICharacter;
 
     await battleAttackTarget.checkRangeAndAttack(attacker, defender);
 
@@ -171,6 +176,9 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
   });
 
   it("should hit a target if attacker has melee attack type and target is in range", async () => {
+    await targetCharacter.populate("skills").execPopulate();
+    await attackerCharacter.populate("skills").execPopulate();
+
     // expect battleAttackTarget to have been called
     const hitTarget = jest.spyOn(battleAttackTarget, "hitTarget" as any);
 
@@ -207,13 +215,11 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
 
   describe("magic staff ranged attack", () => {
     beforeEach(async () => {
-      const characterEquipment = (await Equipment.findById(attackerCharacter.equipment)
-        .populate("inventory")
-        .exec()) as IEquipment;
+      const characterEquipment = (await Equipment.findById(attackerCharacter.equipment).lean()) as IEquipment;
       const res = await unitTestHelper.createMockItemFromBlueprint(StaffsBlueprint.FireStaff);
-      characterEquipment!.rightHand = res.id;
+      characterEquipment.rightHand = res.id;
 
-      await characterEquipment!.save();
+      (await Equipment.findByIdAndUpdate(characterEquipment._id, characterEquipment).lean()) as IEquipment;
     });
 
     afterEach(() => {

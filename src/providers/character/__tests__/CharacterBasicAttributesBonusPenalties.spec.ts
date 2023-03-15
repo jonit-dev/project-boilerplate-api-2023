@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { BasicAttribute } from "@rpg-engine/shared/dist/types/skills.types";
 import { CharacterBasicAttributesBonusPenalties } from "../characterBonusPenalties/CharacterBasicAttributesBonusPenalties";
 
 describe("Case CharacterBasicAttributesBonusPenalties", () => {
@@ -8,31 +9,23 @@ describe("Case CharacterBasicAttributesBonusPenalties", () => {
   let characterBasicAttributesBonusPenalties: CharacterBasicAttributesBonusPenalties;
 
   beforeAll(() => {
-    jest.useFakeTimers({
-      advanceTimers: true,
-    });
-
     characterBasicAttributesBonusPenalties = container.get<CharacterBasicAttributesBonusPenalties>(
       CharacterBasicAttributesBonusPenalties
     );
   });
 
   beforeEach(async () => {
-    testCharacter = await (
-      await unitTestHelper.createMockCharacter(null, {
-        hasEquipment: true,
-        hasSkills: true,
-      })
-    )
-      .populate("skills")
-      .execPopulate();
+    testCharacter = await await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasSkills: true,
+    });
   });
 
   it("updateBasicAttributesSkills should return the correct value", async () => {
-    const skills = (await Skill.findById(testCharacter.skills)) as ISkill;
+    const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
-    let skillType = "strength";
     const basicAttributes = {
+      stamina: 0.1,
       strength: 0.2,
       resistance: 0.2,
       dexterity: -0.1,
@@ -40,18 +33,25 @@ describe("Case CharacterBasicAttributesBonusPenalties", () => {
       magicResistance: 0.2,
     };
 
-    await characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(skills, skillType, basicAttributes);
+    await characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+      skills,
+      BasicAttribute.Strength,
+      basicAttributes
+    );
 
-    expect(skills!.strength.skillPoints).toEqual(0.24);
-    expect(skills!.magic.skillPoints).toEqual(0);
+    expect(skills.strength.skillPoints).toEqual(0.24);
+    expect(skills.magic.skillPoints).toEqual(0);
 
-    skillType = "magic";
-    skills!.magic.skillPoints = 10;
-    expect(skills!.magic.skillPoints).toEqual(10);
+    skills.magic.skillPoints = 10;
+    expect(skills.magic.skillPoints).toEqual(10);
 
-    await characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(skills, skillType, basicAttributes);
+    await characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+      skills,
+      BasicAttribute.Magic,
+      basicAttributes
+    );
 
-    expect(skills!.strength.skillPoints).toEqual(expect.closeTo(0.24, 2));
-    expect(skills!.magic.skillPoints).toEqual(expect.closeTo(10.36, 2));
+    expect(skills.strength.skillPoints).toEqual(expect.closeTo(0.24, 2));
+    expect(skills.magic.skillPoints).toEqual(expect.closeTo(10.36, 2));
   });
 });
