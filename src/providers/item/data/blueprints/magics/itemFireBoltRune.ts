@@ -2,13 +2,13 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
-import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, IRuneItemBlueprint, ItemSubType, ItemType, RunePower } from "@rpg-engine/shared";
+import { RangeTypes } from "../../types/RangedWeaponTypes";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemFireBoltRune: Partial<IMagicItemUseWithEntity> = {
+export const itemFireBoltRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.FireBoltRune,
   type: ItemType.Tool,
   subType: ItemSubType.Magic,
@@ -18,11 +18,12 @@ export const itemFireBoltRune: Partial<IMagicItemUseWithEntity> = {
   description: "An ancient Fire Bolt Rune.",
   weight: 0.01,
   maxStackSize: 100,
-  allowedEquipSlotType: [ItemSlotType.Inventory],
   hasUseWith: true,
-  useWithMaxDistanceGrid: 7,
-  power: 13,
-  minMagicLevelRequired: 1,
+
+  canUseOnNonPVPZone: false,
+  useWithMaxDistanceGrid: RangeTypes.Medium,
+  power: RunePower.Medium,
+  minMagicLevelRequired: 5,
   canSell: false,
   animationKey: AnimationEffectKeys.Hit,
   projectileAnimationKey: AnimationEffectKeys.Red,

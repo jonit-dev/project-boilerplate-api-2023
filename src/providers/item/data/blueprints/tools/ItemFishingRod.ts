@@ -4,11 +4,19 @@ import { container } from "@providers/inversify/container";
 import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { UseWithItemToTile } from "@providers/useWith/abstractions/UseWithItemToTile";
-import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
-import { AnimationEffectKeys, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IUseWithTargetTile } from "@providers/useWith/useWithTypes";
+import {
+  AnimationEffectKeys,
+  EntityAttackType,
+  IToolItemBlueprint,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+} from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint, FoodsBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemFishingRod: Partial<IItemUseWith> = {
+export const itemFishingRod: IToolItemBlueprint = {
   key: ToolsBlueprint.FishingRod,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,
@@ -17,9 +25,11 @@ export const itemFishingRod: Partial<IItemUseWith> = {
   name: "Fishing Rod",
   description: "A tool primarily used to catch fish. It requires a worm as bait to be effective.",
   weight: 0.1,
+  allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   hasUseWith: true,
   basePrice: 70,
-  useWithMaxDistanceGrid: 7,
+  rangeType: EntityAttackType.Melee,
+  useWithMaxDistanceGrid: RangeTypes.Medium,
   canSell: false,
   useWithTileEffect: async (
     originItem: IItem,

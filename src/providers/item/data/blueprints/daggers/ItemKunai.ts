@@ -1,9 +1,8 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IEquippableWeaponBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { DaggersBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemKunai: Partial<IItem> = {
+export const itemKunai: IEquippableWeaponBlueprint = {
   key: DaggersBlueprint.Kunai,
   type: ItemType.Weapon,
   subType: ItemSubType.Dagger,

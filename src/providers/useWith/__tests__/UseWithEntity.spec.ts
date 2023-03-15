@@ -906,9 +906,13 @@ describe("UseWithEntityValidation.ts", () => {
       testCharacter
     );
 
+    // use jest to mock itemDarkRune.power property
+    // @ts-ignore
+    itemDarkRune.power = 20;
+
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
     const updatedSkillsTarget: ISkill = (await Skill.findById(targetCharacter.skills)) as unknown as ISkill;
-    expect(updatedSkillsTarget?.magicResistance.skillPoints).toBe(Math.round(skillPoints));
+    expect(updatedSkillsTarget?.magicResistance.skillPoints).toBeCloseTo(skillPoints, 1);
 
     expect(sendEventToUserMock).toHaveBeenCalled();
 
@@ -920,7 +924,7 @@ describe("UseWithEntityValidation.ts", () => {
     });
 
     expect(skillsCalls.length).toBe(1);
-    expect(skillsCalls[0][2]?.skill?.magicResistance?.skillPoints).toBe(Math.round(skillPoints));
+    expect(skillsCalls[0][2]?.skill?.magicResistance?.skillPoints).toBeCloseTo(skillPoints, 1);
   });
 
   it("should execute hit post processing", async () => {

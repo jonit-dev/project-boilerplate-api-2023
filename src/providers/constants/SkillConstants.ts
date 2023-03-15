@@ -27,6 +27,34 @@ export const CUSTOM_SKILL_COOLDOWNS = {
 
 export const CLASS_BONUS_OR_PENALTIES = [
   {
+    class: CharacterClass.None,
+    basicAttributes: {
+      stamina: 0,
+      magic: 0,
+      magicResistance: 0,
+      strength: 0,
+      resistance: 0,
+      dexterity: 0,
+    },
+    combatSkills: {
+      first: 0,
+      club: 0,
+      sword: 0,
+      axe: 0,
+      distance: 0,
+      shielding: 0,
+      dagger: 0,
+    },
+    craftingSkills: {
+      fishing: 0,
+      mining: 0,
+      lumberjacking: 0,
+      cooking: 0,
+      alchemy: 0,
+      blacksmithing: 0,
+    },
+  },
+  {
     class: CharacterClass.Warrior,
     basicAttributes: {
       stamina: 0.3,

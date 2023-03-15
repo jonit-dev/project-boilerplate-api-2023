@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IEquippableArmorBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { BootsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemCopperBoots: Partial<IItem> = {
+export const itemCopperBoots: IEquippableArmorBlueprint = {
   key: BootsBlueprint.CopperBoots,
   type: ItemType.Armor,
   subType: ItemSubType.Boot,

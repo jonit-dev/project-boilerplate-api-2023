@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemObsidiumIngot: Partial<IItem> = {
+export const itemObsidiumIngot: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.ObsidiumIngot,
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,
@@ -13,4 +12,5 @@ export const itemObsidiumIngot: Partial<IItem> = {
   weight: 1,
   maxStackSize: 100,
   basePrice: 28,
+  canSell: false,
 };

@@ -8,8 +8,8 @@ import {
   ICraftingSkillsBonusAndPenalties,
   IIncreaseSPResult,
   LifeBringerRaces,
-  ShadowWalkerRaces,
   SKILLS_MAP,
+  ShadowWalkerRaces,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBasicAttributesBonusPenalties } from "./CharacterBasicAttributesBonusPenalties";
@@ -67,7 +67,7 @@ export class CharacterBonusPenalties {
           dexterity: -0.1 + classBonusOrPenalties.basicAttributes.dexterity,
           magic: -0.1 + classBonusOrPenalties.basicAttributes.magic,
           magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
-        };
+        } as any;
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
@@ -125,7 +125,7 @@ export class CharacterBonusPenalties {
           dexterity: 0.1 + classBonusOrPenalties.basicAttributes.dexterity,
           magic: 0.1 + classBonusOrPenalties.basicAttributes.magic,
           magicResistance: 0.1 + classBonusOrPenalties.basicAttributes.magicResistance,
-        };
+        } as any;
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
@@ -192,7 +192,7 @@ export class CharacterBonusPenalties {
           dexterity: -0.2 + classBonusOrPenalties.basicAttributes.dexterity,
           magic: -0.2 + classBonusOrPenalties.basicAttributes.magic,
           magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
-        };
+        } as any;
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
@@ -249,7 +249,7 @@ export class CharacterBonusPenalties {
           dexterity: -0.1 + classBonusOrPenalties.basicAttributes.dexterity,
           magic: -0.2 + classBonusOrPenalties.basicAttributes.magic,
           magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
-        };
+        } as any;
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(

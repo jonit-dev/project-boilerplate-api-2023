@@ -1,8 +1,14 @@
-import { IMagicStaff } from "@providers/useWith/useWithTypes";
-import { AnimationEffectKeys, EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  EntityAttackType,
+  IEquippableStaffBlueprint,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+} from "@rpg-engine/shared";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemSoulStaff: Partial<IMagicStaff> = {
+export const itemSoulStaff: IEquippableStaffBlueprint = {
   key: StaffsBlueprint.SoulStaff,
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,

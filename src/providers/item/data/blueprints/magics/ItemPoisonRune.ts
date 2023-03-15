@@ -2,13 +2,19 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
-import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  IRuneItemBlueprint,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+  RunePower,
+} from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
+export const itemPoisonRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.PoisonRune,
   type: ItemType.Tool,
   subType: ItemSubType.Magic,
@@ -18,10 +24,11 @@ export const itemPoisonRune: Partial<IMagicItemUseWithEntity> = {
   description: "An ancient poison rune.",
   weight: 0.01,
   maxStackSize: 100,
-  allowedEquipSlotType: [ItemSlotType.Inventory],
+
+  canUseOnNonPVPZone: false,
   hasUseWith: true,
-  useWithMaxDistanceGrid: 7,
-  power: 11,
+  useWithMaxDistanceGrid: RangeTypes.Medium,
+  power: RunePower.Low,
   canSell: false,
   minMagicLevelRequired: 2,
   animationKey: AnimationEffectKeys.HitPoison,

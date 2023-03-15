@@ -4,12 +4,12 @@ import { container } from "@providers/inversify/container";
 import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { UseWithItemToTile } from "@providers/useWith/abstractions/UseWithItemToTile";
-import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IUseWithTargetTile } from "@providers/useWith/useWithTypes";
+import { IToolItemBlueprint, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { CraftingResourcesBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemCarpentersAxe: Partial<IItemUseWith> = {
+export const itemCarpentersAxe: IToolItemBlueprint = {
   key: ToolsBlueprint.CarpentersAxe,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,
@@ -24,7 +24,7 @@ export const itemCarpentersAxe: Partial<IItemUseWith> = {
   rangeType: EntityAttackType.Melee,
   basePrice: 50,
   hasUseWith: true,
-  useWithMaxDistanceGrid: 2,
+  useWithMaxDistanceGrid: RangeTypes.Short,
   canSell: false,
   useWithTileEffect: async (
     originItem: IItem,

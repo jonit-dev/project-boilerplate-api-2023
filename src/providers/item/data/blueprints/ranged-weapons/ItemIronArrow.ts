@@ -1,9 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import { IEquippableRangedAmmoBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemIronArrow: Partial<IItem> = {
+export const itemIronArrow: IEquippableRangedAmmoBlueprint = {
   key: RangedWeaponsBlueprint.IronArrow,
   type: ItemType.Weapon,
   subType: ItemSubType.Ranged,
@@ -16,5 +14,4 @@ export const itemIronArrow: Partial<IItem> = {
   allowedEquipSlotType: [ItemSlotType.Accessory],
   basePrice: 3,
   attack: 12,
-  rangeType: EntityAttackType.Melee,
 };

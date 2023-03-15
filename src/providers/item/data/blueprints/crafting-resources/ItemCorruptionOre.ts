@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemCorruptionOre: Partial<IItem> = {
+export const itemCorruptionOre: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.CorruptionOre,
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,
@@ -12,6 +11,6 @@ export const itemCorruptionOre: Partial<IItem> = {
   description: "Corruption ore that can be smelted into ingots.",
   weight: 2,
   maxStackSize: 100,
-  hasUseWith: true,
   basePrice: 25,
+  canSell: false,
 };

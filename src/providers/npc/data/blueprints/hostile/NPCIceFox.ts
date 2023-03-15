@@ -2,7 +2,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import { RangedWeaponRange } from "@providers/item/data/types/RangedWeaponTypes";
+import { RangeTypes } from "@providers/item/data/types/RangedWeaponTypes";
 import {
   AxesBlueprint,
   CraftingResourcesBlueprint,
@@ -26,7 +26,7 @@ export const npcIceFox: Partial<INPC> = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.MeleeRanged,
   ammoKey: AnimationEffectKeys.Blue,
-  maxRangeAttack: RangedWeaponRange.High,
+  maxRangeAttack: RangeTypes.High,
   speed: MovementSpeed.ExtraFast,
   baseHealth: 300,
   healthRandomizerDice: Dice.D6,

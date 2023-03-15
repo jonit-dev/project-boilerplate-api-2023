@@ -8,12 +8,12 @@ import {
   IUseWithItemToTileReward,
   UseWithItemToTile,
 } from "@providers/useWith/abstractions/UseWithItemToTile";
-import { IItemUseWith, IUseWithTargetTile } from "@providers/useWith/useWithTypes";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IUseWithTargetTile } from "@providers/useWith/useWithTypes";
+import { IToolItemBlueprint, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemPickaxe: Partial<IItemUseWith> = {
+export const itemPickaxe: IToolItemBlueprint = {
   key: ToolsBlueprint.Pickaxe,
   type: ItemType.Tool,
   subType: ItemSubType.Tool,
@@ -29,7 +29,7 @@ export const itemPickaxe: Partial<IItemUseWith> = {
   basePrice: 60,
   hasUseWith: true,
   canSell: false,
-  useWithMaxDistanceGrid: 2,
+  useWithMaxDistanceGrid: RangeTypes.UltraShort,
   useWithTileEffect: async (
     originItem: IItem,
     targetTile: IUseWithTargetTile,

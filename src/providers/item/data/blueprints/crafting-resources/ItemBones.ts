@@ -1,8 +1,7 @@
-import { IItemUseWith } from "@providers/useWith/useWithTypes";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemBones: Partial<IItemUseWith> = {
+export const itemBones: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.Bones,
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,
@@ -13,5 +12,4 @@ export const itemBones: Partial<IItemUseWith> = {
   weight: 0.29,
   maxStackSize: 100,
   basePrice: 8,
-  hasUseWith: true,
 };

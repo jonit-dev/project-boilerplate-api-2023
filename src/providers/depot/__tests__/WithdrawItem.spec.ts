@@ -81,7 +81,7 @@ describe("WithdrawItem.ts", () => {
 
 function assertDepotContainer(depotContainer: IItemContainer): void {
   expect(depotContainer).toBeDefined();
-  expect(depotContainer!.slotQty).toEqual(20);
+  expect(depotContainer!.slotQty).toEqual(40);
   // container must contain the deposited item
   // all other slots should be empty
   for (const i in depotContainer!.slots) {

@@ -1,13 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
 import { ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import shuffle from "lodash/shuffle";
 import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemRawBeefSteak: Partial<IItem> = {
+export const itemRawBeefSteak: IConsumableItemBlueprint = {
   key: FoodsBlueprint.RawBeefSteak,
   type: ItemType.Consumable,
   subType: ItemSubType.Food,
@@ -18,7 +17,6 @@ export const itemRawBeefSteak: Partial<IItem> = {
   weight: 3,
   maxStackSize: 50,
   basePrice: 20,
-  hasUseWith: true,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {

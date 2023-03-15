@@ -1,12 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import round from "lodash/round";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemManaPotion: Partial<IItem> = {
+export const itemManaPotion: IConsumableItemBlueprint = {
   key: PotionsBlueprint.ManaPotion,
   type: ItemType.Consumable,
   subType: ItemSubType.Potion,

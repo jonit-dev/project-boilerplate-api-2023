@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IBaseItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { OthersBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemRoyalChalice: Partial<IItem> = {
+export const itemRoyalChalice: IBaseItemBlueprint = {
   key: OthersBlueprint.RoyalChalice,
   type: ItemType.Other,
   subType: ItemSubType.Other,

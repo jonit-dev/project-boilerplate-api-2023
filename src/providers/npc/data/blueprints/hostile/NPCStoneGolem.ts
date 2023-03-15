@@ -1,7 +1,7 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { RangedWeaponRange } from "@providers/item/data/types/RangedWeaponTypes";
+import { RangeTypes } from "@providers/item/data/types/RangedWeaponTypes";
 import {
   ArmorsBlueprint,
   BootsBlueprint,
@@ -29,7 +29,7 @@ export const npcStoneGolem: Partial<INPC> = {
   speed: MovementSpeed.Slow,
   baseHealth: 1500,
   ammoKey: RangedWeaponsBlueprint.Stone,
-  maxRangeAttack: RangedWeaponRange.High,
+  maxRangeAttack: RangeTypes.High,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   skillRandomizerDice: Dice.D4,

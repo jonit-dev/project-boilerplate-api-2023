@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemSilverIngot: Partial<IItem> = {
+export const itemSilverIngot: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.SilverIngot,
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,
@@ -13,4 +12,5 @@ export const itemSilverIngot: Partial<IItem> = {
     "A silver ingot. You can use this material with a hammer to craft weapons, but you need to be close to an anvil.",
   weight: 1,
   maxStackSize: 100,
+  canSell: false,
 };

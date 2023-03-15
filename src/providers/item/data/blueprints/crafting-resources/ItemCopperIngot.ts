@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemCopperIngot: Partial<IItem> = {
+export const itemCopperIngot: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.CopperIngot,
   type: ItemType.CraftingResource,
   subType: ItemSubType.CraftingResource,
@@ -14,4 +13,5 @@ export const itemCopperIngot: Partial<IItem> = {
   weight: 1,
   maxStackSize: 100,
   basePrice: 20,
+  canSell: false,
 };

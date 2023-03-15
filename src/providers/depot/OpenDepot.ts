@@ -37,6 +37,7 @@ export class OpenDepot {
       let depotItemContainer = new ItemContainer({
         parentItem: newDepot._id,
         name: "Depot",
+        slotQty: 40,
       });
       depotItemContainer = await depotItemContainer.save();
 

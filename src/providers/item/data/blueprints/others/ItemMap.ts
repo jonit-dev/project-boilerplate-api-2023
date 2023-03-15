@@ -1,8 +1,7 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IBaseItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { OthersBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemMap: Partial<IItem> = {
+export const itemMap: IBaseItemBlueprint = {
   key: OthersBlueprint.Map,
   type: ItemType.Other,
   subType: ItemSubType.Other,

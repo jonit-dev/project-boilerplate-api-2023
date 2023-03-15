@@ -3,7 +3,7 @@ import { ItemContainer, IItemContainer as IItemContainerModel } from "@entities/
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { ItemDrop } from "@providers/item/ItemDrop";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { IItemContainer, IDepotContainerWithdraw } from "@rpg-engine/shared";
+import { IItemContainer, IDepotContainerWithdraw, IEquipmentAndInventoryUpdatePayload } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "./DepotSystem";
 import { OpenDepot } from "./OpenDepot";
@@ -55,6 +55,12 @@ export class WithdrawItem {
       // 2. drop items on those grid points
       await this.itemDrop.dropItems([item], gridPoints, character.scene);
     }
+
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      inventory: toContainer as any,
+    };
+
+    this.depotSystem.updateInventoryCharacter(payloadUpdate, character);
 
     return itemContainer;
   }

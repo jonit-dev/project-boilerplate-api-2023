@@ -1,10 +1,9 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IEquippableRangedWeaponTwoHandedBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { RangedWeaponRange } from "../../types/RangedWeaponTypes";
+import { RangeTypes } from "../../types/RangedWeaponTypes";
 import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemSlingshot: Partial<IItem> = {
+export const itemSlingshot: IEquippableRangedWeaponTwoHandedBlueprint = {
   key: RangedWeaponsBlueprint.Slingshot,
   type: ItemType.Weapon,
   subType: ItemSubType.Ranged,
@@ -18,7 +17,7 @@ export const itemSlingshot: Partial<IItem> = {
   defense: 4,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  maxRange: RangedWeaponRange.Short,
+  maxRange: RangeTypes.Short,
   requiredAmmoKeys: [RangedWeaponsBlueprint.Stone],
   isTwoHanded: true,
   basePrice: 49,

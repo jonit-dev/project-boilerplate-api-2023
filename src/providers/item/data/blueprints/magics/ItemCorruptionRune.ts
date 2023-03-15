@@ -3,11 +3,17 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
-import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
-import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  IRuneItemBlueprint,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+  RunePower,
+} from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemCorruptionRune: Partial<IMagicItemUseWithEntity> = {
+export const itemCorruptionRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.CorruptionRune,
   type: ItemType.Tool,
   subType: ItemSubType.Magic,
@@ -17,14 +23,13 @@ export const itemCorruptionRune: Partial<IMagicItemUseWithEntity> = {
   description: "The forbidden Corruption of Xoranth, the dark God, corrupts all who succumb to its influence",
   weight: 0.01,
   maxStackSize: 100,
-  allowedEquipSlotType: [ItemSlotType.Inventory],
 
   hasUseWith: true,
   canUseOnNonPVPZone: false,
-  useWithMaxDistanceGrid: 8,
-  power: 23,
+  useWithMaxDistanceGrid: RangeTypes.High,
+  power: RunePower.UltraHigh,
   canSell: false,
-  minMagicLevelRequired: 2,
+  minMagicLevelRequired: 10,
   animationKey: AnimationEffectKeys.HitCorruption,
   projectileAnimationKey: AnimationEffectKeys.Dark,
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {

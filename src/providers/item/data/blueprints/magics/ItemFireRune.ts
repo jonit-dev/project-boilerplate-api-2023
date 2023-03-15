@@ -2,13 +2,19 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
-import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  IRuneItemBlueprint,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+  RunePower,
+} from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemFireRune: Partial<IMagicItemUseWithEntity> = {
+export const itemFireRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.FireRune,
   type: ItemType.Tool,
   subType: ItemSubType.Magic,
@@ -18,10 +24,11 @@ export const itemFireRune: Partial<IMagicItemUseWithEntity> = {
   description: "An ancient fire rune.",
   weight: 0.01,
   maxStackSize: 100,
-  allowedEquipSlotType: [ItemSlotType.Inventory],
+
+  canUseOnNonPVPZone: false,
   hasUseWith: true,
-  useWithMaxDistanceGrid: 7,
-  power: 10,
+  useWithMaxDistanceGrid: RangeTypes.Medium,
+  power: RunePower.Low,
   canSell: false,
   minMagicLevelRequired: 2,
   animationKey: AnimationEffectKeys.HitFire,

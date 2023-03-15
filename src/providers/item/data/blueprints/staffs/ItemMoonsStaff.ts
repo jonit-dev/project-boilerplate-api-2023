@@ -1,8 +1,15 @@
-import { IMagicStaff } from "@providers/useWith/useWithTypes";
-import { AnimationEffectKeys, EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  EntityAttackType,
+  IEquippableStaffBlueprint,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+} from "@rpg-engine/shared";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemMoonsStaff: Partial<IMagicStaff> = {
+export const itemMoonsStaff: IEquippableStaffBlueprint = {
   key: StaffsBlueprint.MoonsStaff,
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
@@ -18,6 +25,6 @@ export const itemMoonsStaff: Partial<IMagicStaff> = {
   attack: 16,
   defense: 10,
   basePrice: 80,
-  maxRange: 7,
+  maxRange: RangeTypes.Medium,
   isTwoHanded: true,
 };

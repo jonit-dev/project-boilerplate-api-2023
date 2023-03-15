@@ -1,12 +1,21 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  EntityAttackType,
+  IEquippableStaffBlueprint,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+} from "@rpg-engine/shared";
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemWoodenStaff: Partial<IItem> = {
+export const itemWoodenStaff: IEquippableStaffBlueprint = {
   key: StaffsBlueprint.WoodenStaff,
   type: ItemType.Weapon,
   subType: ItemSubType.Staff,
   rangeType: EntityAttackType.Ranged,
+  projectileAnimationKey: AnimationEffectKeys.Blue,
+
   textureAtlas: "items",
   texturePath: "staffs/wooden-staff.png",
   name: "Training Staff",
@@ -16,7 +25,7 @@ export const itemWoodenStaff: Partial<IItem> = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 50,
-  maxRange: 7,
+  maxRange: RangeTypes.Short,
   isTwoHanded: true,
   isTraining: true,
 };

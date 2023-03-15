@@ -51,7 +51,7 @@ export class DepotNetworkDeposit {
           return;
         }
 
-        const itemContainer = await this.depositItem.deposit(character.id, data);
+        const itemContainer = await this.depositItem.deposit(character, data);
 
         this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
           itemContainer,
