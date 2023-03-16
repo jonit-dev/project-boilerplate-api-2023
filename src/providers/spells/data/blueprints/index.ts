@@ -1,10 +1,10 @@
 import { SpellsBlueprint } from "../types/SpellsBlueprintTypes";
-import { spellEagleEyes } from "./SpeelEagleEyes";
 import { spellArrowCreation } from "./SpellArrowCreation";
 import { spellBlankRuneCreation } from "./SpellBlankRuneCreation";
 import { spellBoltCreation } from "./SpellBoltCreation";
 import { spellCorruptionRuneCreation } from "./SpellCorruptionRuneCreation";
 import { spellDarkRuneCreation } from "./SpellDarkRuneCreation";
+import { spellEagleEyes } from "./SpellEagleEyes";
 import { spellEnergyBoltCreation } from "./SpellEnergyBoltCreation";
 import { spellFireBoltCreation } from "./SpellFireBoltCreation";
 import { spellFireRuneCreation } from "./SpellFireRuneCreation";

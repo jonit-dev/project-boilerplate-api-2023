@@ -1,9 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { container } from "@providers/inversify/container";
 import { MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
+import { SpellItemCreation } from "../abstractions/SpellItemCreation";
 import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
 
 export const spellBlankRuneCreation: Partial<ISpell> = {
@@ -20,12 +19,13 @@ export const spellBlankRuneCreation: Partial<ISpell> = {
   animationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {
-    const characterItemInventory = container.get(CharacterItemInventory);
-    const characterInventory = container.get(CharacterInventory);
+    const spellItemCreation = container.get(SpellItemCreation);
 
-    const added = await characterItemInventory.addItemToInventory(MagicsBlueprint.Rune, character);
-    if (added) {
-      await characterInventory.sendInventoryUpdateEvent(character);
-    }
+    return await spellItemCreation.createItem(character, {
+      itemToCreate: {
+        key: MagicsBlueprint.Rune,
+        createQty: 1,
+      },
+    });
   },
 };
