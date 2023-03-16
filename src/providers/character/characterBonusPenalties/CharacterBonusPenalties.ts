@@ -16,6 +16,7 @@ import { CharacterBasicAttributesBonusPenalties } from "./CharacterBasicAttribut
 import { CharacterClassBonusOrPenalties } from "./CharacterClassBonusOrPenalties";
 import { CharacterCombatBonusPenalties } from "./CharacterCombatBonusPenalties";
 import { CharacterCraftingBonusPenalties } from "./CharacterCraftingBonusPenalties";
+import { CharacterRaceBonusOrPenalties } from "./CharacterRaceBonusOrPenalties";
 
 @provide(CharacterBonusPenalties)
 export class CharacterBonusPenalties {
@@ -24,7 +25,8 @@ export class CharacterBonusPenalties {
     private characterCombatBonusPenalties: CharacterCombatBonusPenalties,
     private characterCraftingBonusPenalties: CharacterCraftingBonusPenalties,
     private skillFunctions: SkillFunctions,
-    private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties
+    private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties,
+    private characterRaceBonusOrPenalties: CharacterRaceBonusOrPenalties
   ) {}
 
   public async applyRaceBonusPenalties(character: ICharacter, skillType: string): Promise<void> {
@@ -54,6 +56,10 @@ export class CharacterBonusPenalties {
       character.class as CharacterClass
     );
 
+    const raceBonusOrPenaltises = this.characterRaceBonusOrPenalties.getRaceBonusOrPenaltises(
+      character.race as LifeBringerRaces | ShadowWalkerRaces
+    );
+
     switch (character.race) {
       case LifeBringerRaces.Dwarf: {
         // This is the % of each SP attribute that will be increased or decreased
@@ -61,13 +67,16 @@ export class CharacterBonusPenalties {
 
         // Update Basic Attributes
         basicAttributes = {
-          stamina: 0.1 + classBonusOrPenalties.basicAttributes.stamina,
-          strength: 0.2 + classBonusOrPenalties.basicAttributes.strength,
-          resistance: 0.2 + classBonusOrPenalties.basicAttributes.resistance,
-          dexterity: -0.1 + classBonusOrPenalties.basicAttributes.dexterity,
-          magic: -0.1 + classBonusOrPenalties.basicAttributes.magic,
-          magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
-        } as any;
+          stamina: raceBonusOrPenaltises.basicAttributes.stamina + classBonusOrPenalties.basicAttributes.stamina,
+          strength: raceBonusOrPenaltises.basicAttributes.strength + classBonusOrPenalties.basicAttributes.strength,
+          resistance:
+            raceBonusOrPenaltises.basicAttributes.resistance + classBonusOrPenalties.basicAttributes.resistance,
+          dexterity: raceBonusOrPenaltises.basicAttributes.dexterity + classBonusOrPenalties.basicAttributes.dexterity,
+          magic: raceBonusOrPenaltises.basicAttributes.magic + classBonusOrPenalties.basicAttributes.magic,
+          magicResistance:
+            raceBonusOrPenaltises.basicAttributes.magicResistance +
+            classBonusOrPenalties.basicAttributes.magicResistance,
+        };
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
@@ -79,13 +88,13 @@ export class CharacterBonusPenalties {
 
         // Update Combat Skills
         combatSkills = {
-          first: 0.1 + classBonusOrPenalties.combatSkills.first,
-          sword: 0.1 + classBonusOrPenalties.combatSkills.sword,
-          dagger: 0.1 + classBonusOrPenalties.combatSkills.dagger,
-          axe: 0.2 + classBonusOrPenalties.combatSkills.axe,
-          distance: -0.1 + classBonusOrPenalties.combatSkills.distance,
-          shielding: 0.1 + classBonusOrPenalties.combatSkills.shielding,
-          club: 0.2 + classBonusOrPenalties.combatSkills.club,
+          first: raceBonusOrPenaltises.combatSkills.first + classBonusOrPenalties.combatSkills.first,
+          sword: raceBonusOrPenaltises.combatSkills.sword + classBonusOrPenalties.combatSkills.sword,
+          dagger: raceBonusOrPenaltises.combatSkills.dagger + classBonusOrPenalties.combatSkills.dagger,
+          axe: raceBonusOrPenaltises.combatSkills.axe + classBonusOrPenalties.combatSkills.axe,
+          distance: raceBonusOrPenaltises.combatSkills.distance + classBonusOrPenalties.combatSkills.distance,
+          shielding: raceBonusOrPenaltises.combatSkills.shielding + classBonusOrPenalties.combatSkills.shielding,
+          club: raceBonusOrPenaltises.combatSkills.club + classBonusOrPenalties.combatSkills.club,
         };
 
         if (skillToUpdate in combatSkills) {
@@ -98,12 +107,14 @@ export class CharacterBonusPenalties {
 
         // Update Crafting and Gathering Skills
         craftingSkills = {
-          fishing: -0.1 + classBonusOrPenalties.craftingSkills.fishing,
-          mining: 0.2 + classBonusOrPenalties.craftingSkills.mining,
-          lumberjacking: 0.2 + classBonusOrPenalties.craftingSkills.lumberjacking,
-          cooking: 0.1 + classBonusOrPenalties.craftingSkills.cooking,
-          alchemy: 0.1 + classBonusOrPenalties.craftingSkills.alchemy,
-          blacksmithing: 0 + classBonusOrPenalties.craftingSkills.blacksmithing,
+          fishing: raceBonusOrPenaltises.craftingSkills.fishing + classBonusOrPenalties.craftingSkills.fishing,
+          mining: raceBonusOrPenaltises.craftingSkills.mining + classBonusOrPenalties.craftingSkills.mining,
+          lumberjacking:
+            raceBonusOrPenaltises.craftingSkills.lumberjacking + classBonusOrPenalties.craftingSkills.lumberjacking,
+          cooking: raceBonusOrPenaltises.craftingSkills.cooking + classBonusOrPenalties.craftingSkills.cooking,
+          alchemy: raceBonusOrPenaltises.craftingSkills.alchemy + classBonusOrPenalties.craftingSkills.alchemy,
+          blacksmithing:
+            raceBonusOrPenaltises.craftingSkills.blacksmithing + classBonusOrPenalties.craftingSkills.blacksmithing,
         };
 
         if (skillToUpdate in craftingSkills) {
@@ -119,13 +130,16 @@ export class CharacterBonusPenalties {
 
       case LifeBringerRaces.Elf: {
         basicAttributes = {
-          stamina: 0 + classBonusOrPenalties.basicAttributes.stamina,
-          strength: -0.1 + classBonusOrPenalties.basicAttributes.strength,
-          resistance: -0.1 + classBonusOrPenalties.basicAttributes.resistance,
-          dexterity: 0.1 + classBonusOrPenalties.basicAttributes.dexterity,
-          magic: 0.1 + classBonusOrPenalties.basicAttributes.magic,
-          magicResistance: 0.1 + classBonusOrPenalties.basicAttributes.magicResistance,
-        } as any;
+          stamina: raceBonusOrPenaltises.basicAttributes.stamina + classBonusOrPenalties.basicAttributes.stamina,
+          strength: raceBonusOrPenaltises.basicAttributes.strength + classBonusOrPenalties.basicAttributes.strength,
+          resistance:
+            raceBonusOrPenaltises.basicAttributes.resistance + classBonusOrPenalties.basicAttributes.resistance,
+          dexterity: raceBonusOrPenaltises.basicAttributes.dexterity + classBonusOrPenalties.basicAttributes.dexterity,
+          magic: raceBonusOrPenaltises.basicAttributes.magic + classBonusOrPenalties.basicAttributes.magic,
+          magicResistance:
+            raceBonusOrPenaltises.basicAttributes.magicResistance +
+            classBonusOrPenalties.basicAttributes.magicResistance,
+        };
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
@@ -137,13 +151,13 @@ export class CharacterBonusPenalties {
 
         // Update Combat Skills
         combatSkills = {
-          first: 0.1 + classBonusOrPenalties.combatSkills.first,
-          sword: 0.1 + classBonusOrPenalties.combatSkills.sword,
-          dagger: 0.1 + classBonusOrPenalties.combatSkills.dagger,
-          axe: -0.1 + classBonusOrPenalties.combatSkills.axe,
-          distance: 0.2 + classBonusOrPenalties.combatSkills.distance,
-          shielding: 0.1 + classBonusOrPenalties.combatSkills.shielding,
-          club: -0.1 + classBonusOrPenalties.combatSkills.club,
+          first: raceBonusOrPenaltises.combatSkills.first + classBonusOrPenalties.combatSkills.first,
+          sword: raceBonusOrPenaltises.combatSkills.sword + classBonusOrPenalties.combatSkills.sword,
+          dagger: raceBonusOrPenaltises.combatSkills.dagger + classBonusOrPenalties.combatSkills.dagger,
+          axe: raceBonusOrPenaltises.combatSkills.axe + classBonusOrPenalties.combatSkills.axe,
+          distance: raceBonusOrPenaltises.combatSkills.distance + classBonusOrPenalties.combatSkills.distance,
+          shielding: raceBonusOrPenaltises.combatSkills.shielding + classBonusOrPenalties.combatSkills.shielding,
+          club: raceBonusOrPenaltises.combatSkills.club + classBonusOrPenalties.combatSkills.club,
         };
 
         if (skillToUpdate in combatSkills) {
@@ -156,12 +170,14 @@ export class CharacterBonusPenalties {
 
         // Update Crafting Skills
         craftingSkills = {
-          fishing: 0.1 + classBonusOrPenalties.craftingSkills.fishing,
-          mining: 0.1 + classBonusOrPenalties.craftingSkills.mining,
-          lumberjacking: 0.1 + classBonusOrPenalties.craftingSkills.lumberjacking,
-          cooking: 0.1 + classBonusOrPenalties.craftingSkills.cooking,
-          alchemy: 0.1 + classBonusOrPenalties.craftingSkills.alchemy,
-          blacksmithing: 0.1 + classBonusOrPenalties.craftingSkills.blacksmithing,
+          fishing: raceBonusOrPenaltises.craftingSkills.fishing + classBonusOrPenalties.craftingSkills.fishing,
+          mining: raceBonusOrPenaltises.craftingSkills.mining + classBonusOrPenalties.craftingSkills.mining,
+          lumberjacking:
+            raceBonusOrPenaltises.craftingSkills.lumberjacking + classBonusOrPenalties.craftingSkills.lumberjacking,
+          cooking: raceBonusOrPenaltises.craftingSkills.cooking + classBonusOrPenalties.craftingSkills.cooking,
+          alchemy: raceBonusOrPenaltises.craftingSkills.alchemy + classBonusOrPenalties.craftingSkills.alchemy,
+          blacksmithing:
+            raceBonusOrPenaltises.craftingSkills.blacksmithing + classBonusOrPenalties.craftingSkills.blacksmithing,
         };
 
         if (skillToUpdate in craftingSkills) {
@@ -186,13 +202,16 @@ export class CharacterBonusPenalties {
 
       case ShadowWalkerRaces.Minotaur: {
         basicAttributes = {
-          stamina: 0 + classBonusOrPenalties.basicAttributes.stamina,
-          strength: 0.3 + classBonusOrPenalties.basicAttributes.strength,
-          resistance: 0.2 + classBonusOrPenalties.basicAttributes.resistance,
-          dexterity: -0.2 + classBonusOrPenalties.basicAttributes.dexterity,
-          magic: -0.2 + classBonusOrPenalties.basicAttributes.magic,
-          magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
-        } as any;
+          stamina: raceBonusOrPenaltises.basicAttributes.stamina + classBonusOrPenalties.basicAttributes.stamina,
+          strength: raceBonusOrPenaltises.basicAttributes.strength + classBonusOrPenalties.basicAttributes.strength,
+          resistance:
+            raceBonusOrPenaltises.basicAttributes.resistance + classBonusOrPenalties.basicAttributes.resistance,
+          dexterity: raceBonusOrPenaltises.basicAttributes.dexterity + classBonusOrPenalties.basicAttributes.dexterity,
+          magic: raceBonusOrPenaltises.basicAttributes.magic + classBonusOrPenalties.basicAttributes.magic,
+          magicResistance:
+            raceBonusOrPenaltises.basicAttributes.magicResistance +
+            classBonusOrPenalties.basicAttributes.magicResistance,
+        };
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
@@ -204,13 +223,13 @@ export class CharacterBonusPenalties {
 
         // Update Combat Skills
         combatSkills = {
-          first: 0.1 + classBonusOrPenalties.combatSkills.first,
-          sword: 0.1 + classBonusOrPenalties.combatSkills.sword,
-          dagger: 0.1 + classBonusOrPenalties.combatSkills.dagger,
-          axe: 0.3 + classBonusOrPenalties.combatSkills.axe,
-          distance: -0.3 + classBonusOrPenalties.combatSkills.distance,
-          shielding: 0.1 + classBonusOrPenalties.combatSkills.shielding,
-          club: 0.3 + classBonusOrPenalties.combatSkills.club,
+          first: raceBonusOrPenaltises.combatSkills.first + classBonusOrPenalties.combatSkills.first,
+          sword: raceBonusOrPenaltises.combatSkills.sword + classBonusOrPenalties.combatSkills.sword,
+          dagger: raceBonusOrPenaltises.combatSkills.dagger + classBonusOrPenalties.combatSkills.dagger,
+          axe: raceBonusOrPenaltises.combatSkills.axe + classBonusOrPenalties.combatSkills.axe,
+          distance: raceBonusOrPenaltises.combatSkills.distance + classBonusOrPenalties.combatSkills.distance,
+          shielding: raceBonusOrPenaltises.combatSkills.shielding + classBonusOrPenalties.combatSkills.shielding,
+          club: raceBonusOrPenaltises.combatSkills.club + classBonusOrPenalties.combatSkills.club,
         };
 
         if (skillToUpdate in combatSkills) {
@@ -223,12 +242,14 @@ export class CharacterBonusPenalties {
 
         // Update Crafting and Gathering Skills
         craftingSkills = {
-          fishing: 0.1 + classBonusOrPenalties.craftingSkills.fishing,
-          mining: 0.1 + classBonusOrPenalties.craftingSkills.mining,
-          lumberjacking: 0.1 + classBonusOrPenalties.craftingSkills.lumberjacking,
-          cooking: 0.1 + classBonusOrPenalties.craftingSkills.cooking,
-          alchemy: 0.1 + classBonusOrPenalties.craftingSkills.alchemy,
-          blacksmithing: 0.1 + classBonusOrPenalties.craftingSkills.blacksmithing,
+          fishing: raceBonusOrPenaltises.craftingSkills.fishing + classBonusOrPenalties.craftingSkills.fishing,
+          mining: raceBonusOrPenaltises.craftingSkills.mining + classBonusOrPenalties.craftingSkills.mining,
+          lumberjacking:
+            raceBonusOrPenaltises.craftingSkills.lumberjacking + classBonusOrPenalties.craftingSkills.lumberjacking,
+          cooking: raceBonusOrPenaltises.craftingSkills.cooking + classBonusOrPenalties.craftingSkills.cooking,
+          alchemy: raceBonusOrPenaltises.craftingSkills.alchemy + classBonusOrPenalties.craftingSkills.alchemy,
+          blacksmithing:
+            raceBonusOrPenaltises.craftingSkills.blacksmithing + classBonusOrPenalties.craftingSkills.blacksmithing,
         };
 
         if (skillToUpdate in craftingSkills) {
@@ -243,13 +264,16 @@ export class CharacterBonusPenalties {
 
       case ShadowWalkerRaces.Orc: {
         basicAttributes = {
-          stamina: 0 + classBonusOrPenalties.basicAttributes.stamina,
-          strength: 0.2 + classBonusOrPenalties.basicAttributes.strength,
-          resistance: 0.1 + classBonusOrPenalties.basicAttributes.resistance,
-          dexterity: -0.1 + classBonusOrPenalties.basicAttributes.dexterity,
-          magic: -0.2 + classBonusOrPenalties.basicAttributes.magic,
-          magicResistance: 0.2 + classBonusOrPenalties.basicAttributes.magicResistance,
-        } as any;
+          stamina: raceBonusOrPenaltises.basicAttributes.stamina + classBonusOrPenalties.basicAttributes.stamina,
+          strength: raceBonusOrPenaltises.basicAttributes.strength + classBonusOrPenalties.basicAttributes.strength,
+          resistance:
+            raceBonusOrPenaltises.basicAttributes.resistance + classBonusOrPenalties.basicAttributes.resistance,
+          dexterity: raceBonusOrPenaltises.basicAttributes.dexterity + classBonusOrPenalties.basicAttributes.dexterity,
+          magic: raceBonusOrPenaltises.basicAttributes.magic + classBonusOrPenalties.basicAttributes.magic,
+          magicResistance:
+            raceBonusOrPenaltises.basicAttributes.magicResistance +
+            classBonusOrPenalties.basicAttributes.magicResistance,
+        };
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
@@ -261,13 +285,13 @@ export class CharacterBonusPenalties {
 
         // Update Combat Skills
         combatSkills = {
-          first: 0.1 + classBonusOrPenalties.combatSkills.first,
-          sword: 0.1 + classBonusOrPenalties.combatSkills.sword,
-          dagger: 0.1 + classBonusOrPenalties.combatSkills.dagger,
-          axe: 0.2 + classBonusOrPenalties.combatSkills.axe,
-          distance: -0.2 + classBonusOrPenalties.combatSkills.distance,
-          shielding: 0.1 + classBonusOrPenalties.combatSkills.shielding,
-          club: 0.2 + classBonusOrPenalties.combatSkills.club,
+          first: raceBonusOrPenaltises.combatSkills.first + classBonusOrPenalties.combatSkills.first,
+          sword: raceBonusOrPenaltises.combatSkills.sword + classBonusOrPenalties.combatSkills.sword,
+          dagger: raceBonusOrPenaltises.combatSkills.dagger + classBonusOrPenalties.combatSkills.dagger,
+          axe: raceBonusOrPenaltises.combatSkills.axe + classBonusOrPenalties.combatSkills.axe,
+          distance: raceBonusOrPenaltises.combatSkills.distance + classBonusOrPenalties.combatSkills.distance,
+          shielding: raceBonusOrPenaltises.combatSkills.shielding + classBonusOrPenalties.combatSkills.shielding,
+          club: raceBonusOrPenaltises.combatSkills.club + classBonusOrPenalties.combatSkills.club,
         };
 
         if (skillToUpdate in combatSkills) {
@@ -280,12 +304,14 @@ export class CharacterBonusPenalties {
 
         // Update Crafting Skills
         craftingSkills = {
-          fishing: 0.2 + classBonusOrPenalties.craftingSkills.fishing,
-          mining: 0.1 + classBonusOrPenalties.craftingSkills.mining,
-          lumberjacking: 0.1 + classBonusOrPenalties.craftingSkills.lumberjacking,
-          cooking: -0.1 + classBonusOrPenalties.craftingSkills.cooking,
-          alchemy: -0.2 + classBonusOrPenalties.craftingSkills.alchemy,
-          blacksmithing: 0 + classBonusOrPenalties.craftingSkills.blacksmithing,
+          fishing: raceBonusOrPenaltises.craftingSkills.fishing + classBonusOrPenalties.craftingSkills.fishing,
+          mining: raceBonusOrPenaltises.craftingSkills.mining + classBonusOrPenalties.craftingSkills.mining,
+          lumberjacking:
+            raceBonusOrPenaltises.craftingSkills.lumberjacking + classBonusOrPenalties.craftingSkills.lumberjacking,
+          cooking: raceBonusOrPenaltises.craftingSkills.cooking + classBonusOrPenalties.craftingSkills.cooking,
+          alchemy: raceBonusOrPenaltises.craftingSkills.alchemy + classBonusOrPenalties.craftingSkills.alchemy,
+          blacksmithing:
+            raceBonusOrPenaltises.craftingSkills.blacksmithing + classBonusOrPenalties.craftingSkills.blacksmithing,
         };
 
         if (skillToUpdate in craftingSkills) {
