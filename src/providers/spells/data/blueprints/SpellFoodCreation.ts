@@ -22,7 +22,7 @@ export const spellFoodCreation: Partial<ISpell> = {
   usableEffect: async (character: ICharacter) => {
     const spellItemCreation = container.get(SpellItemCreation);
 
-    await spellItemCreation.createItem(character, {
+    return await spellItemCreation.createItem(character, {
       itemToCreate: {
         key: getFoodItemKey(),
       },

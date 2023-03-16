@@ -1,4 +1,4 @@
-import { CharacterClass } from "@rpg-engine/shared";
+import { CharacterClass, LifeBringerRaces, ShadowWalkerRaces } from "@rpg-engine/shared";
 
 export const EXP_RATIO = 1.5;
 
@@ -220,6 +220,121 @@ export const CLASS_BONUS_OR_PENALTIES = [
       cooking: 0.1,
       alchemy: 0,
       blacksmithing: 0.2,
+    },
+  },
+];
+
+export const RACE_BONUS_OR_PENALTIES = [
+  {
+    race: ShadowWalkerRaces.Minotaur,
+    basicAttributes: {
+      stamina: 0,
+      magic: -0.2,
+      magicResistance: 0.2,
+      strength: 0.3,
+      resistance: 0.2,
+      dexterity: -0.2,
+    },
+    combatSkills: {
+      first: 0.1,
+      club: 0.3,
+      sword: 0.1,
+      axe: 0.3,
+      distance: -0.3,
+      shielding: 0.1,
+      dagger: 0.1,
+    },
+    craftingSkills: {
+      fishing: 0.1,
+      mining: 0.1,
+      lumberjacking: 0.1,
+      cooking: 0.1,
+      alchemy: 0.1,
+      blacksmithing: 0.1,
+    },
+  },
+  {
+    race: ShadowWalkerRaces.Orc,
+    basicAttributes: {
+      stamina: 0,
+      magic: -0.2,
+      magicResistance: 0.2,
+      strength: 0.2,
+      resistance: 0.1,
+      dexterity: -0.1,
+    },
+    combatSkills: {
+      first: 0.1,
+      club: 0.2,
+      sword: 0.1,
+      axe: 0.2,
+      distance: -0.2,
+      shielding: 0.1,
+      dagger: 10,
+    },
+    craftingSkills: {
+      fishing: 0.2,
+      mining: 0.1,
+      lumberjacking: 0.1,
+      cooking: -0.1,
+      alchemy: -0.2,
+      blacksmithing: 0,
+    },
+  },
+  {
+    race: LifeBringerRaces.Dwarf,
+    basicAttributes: {
+      stamina: 0.1,
+      magic: -0.1,
+      magicResistance: 0.2,
+      strength: 0.2,
+      resistance: 0.2,
+      dexterity: -0.1,
+    },
+    combatSkills: {
+      first: 0.1,
+      club: 0.2,
+      sword: 0.1,
+      axe: 0.2,
+      distance: -0.1,
+      shielding: 0.1,
+      dagger: 0.1,
+    },
+    craftingSkills: {
+      fishing: -0.1,
+      mining: 0.2,
+      lumberjacking: 0.2,
+      cooking: 0.1,
+      alchemy: 0.1,
+      blacksmithing: 0,
+    },
+  },
+  {
+    race: LifeBringerRaces.Elf,
+    basicAttributes: {
+      stamina: 0,
+      magic: 0.1,
+      magicResistance: 0.1,
+      strength: -0.1,
+      resistance: -0.1,
+      dexterity: 0.1,
+    },
+    combatSkills: {
+      first: 0.1,
+      club: 0.2,
+      sword: 0.1,
+      axe: -0.1,
+      distance: 0.2,
+      shielding: 0.1,
+      dagger: 0.1,
+    },
+    craftingSkills: {
+      fishing: 0.1,
+      mining: 0.1,
+      lumberjacking: 0.1,
+      cooking: 0.1,
+      alchemy: 0.1,
+      blacksmithing: 0.1,
     },
   },
 ];

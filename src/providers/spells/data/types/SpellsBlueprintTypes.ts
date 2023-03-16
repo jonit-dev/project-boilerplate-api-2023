@@ -2,11 +2,11 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import {
   BasicAttribute,
+  CharacterClass,
   CharacterEntities,
   CombatSkill,
   CraftingSkill,
   SpellCastingType,
-  CharacterClass,
 } from "@rpg-engine/shared";
 
 export enum SpellsBlueprint {
@@ -44,5 +44,5 @@ export interface ISpell {
   requiredItem?: MagicsBlueprint;
   characterClass?: CharacterClass[];
   attribute?: BasicAttribute | CombatSkill | CraftingSkill | CharacterEntities;
-  usableEffect: (character: ICharacter) => void;
+  usableEffect: (character: ICharacter) => Promise<boolean> | Promise<void> | void | boolean;
 }

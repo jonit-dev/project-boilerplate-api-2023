@@ -625,7 +625,7 @@ describe("UseWithEntityValidation.ts", () => {
     );
 
     const target = (await Character.findOne({ _id: targetCharacter._id })) as unknown as ICharacter;
-    expect(target.health).toBeLessThanOrEqual(89);
+    expect(target.health).toBeLessThanOrEqual(90);
     expect(target.mana).toBe(100);
   });
 

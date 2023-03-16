@@ -24,7 +24,7 @@ export const spellDarkRuneCreation: Partial<ISpell> = {
   usableEffect: async (character: ICharacter) => {
     const spellRuneCreation = container.get(SpellItemCreation);
 
-    await spellRuneCreation.createItem(character, {
+    return await spellRuneCreation.createItem(character, {
       itemToCreate: {
         key: MagicsBlueprint.DarkRune,
       },

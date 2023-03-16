@@ -1,7 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { BattleEventType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 interface ISpellItemCreationOptions {
@@ -22,7 +24,8 @@ export class SpellItemCreation {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterItemInventory: CharacterItemInventory,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private animationEffect: AnimationEffect
   ) {}
 
   public async createItem(character: ICharacter, options: ISpellItemCreationOptions): Promise<boolean> {
@@ -46,6 +49,12 @@ export class SpellItemCreation {
     const added = await this.characterItemInventory.addItemToInventory(itemToCreate.key, character, {
       stackQty: itemToCreate.createQty || 1,
     });
+
+    if (!added) {
+      await this.animationEffect.sendAnimationEventToCharacter(character, BattleEventType.Miss);
+
+      return false;
+    }
 
     if (added) {
       await this.characterInventory.sendInventoryUpdateEvent(character);

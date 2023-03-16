@@ -1,6 +1,5 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
@@ -34,7 +33,7 @@ export class NPCDeath {
     private itemRarity: ItemRarity
   ) {}
 
-  public async handleNPCDeath(npc: INPC, character: ICharacter | null): Promise<void> {
+  public async handleNPCDeath(npc: INPC): Promise<void> {
     try {
       await this.notifyCharactersOfNPCDeath(npc);
       const npcBody = await this.generateNPCBody(npc);
@@ -123,86 +122,35 @@ export class NPCDeath {
   }
 
   private async addLootToNPCBody(npcBody: IItem, loots: INPCLoot[]): Promise<void> {
-    // get item container associated with npcBody
-    const itemContainer = await ItemContainer.findById(npcBody.itemContainer);
-    if (!itemContainer) {
-      throw new Error(`Error fetching itemContainer for Item with key ${npcBody.key}`);
-    }
+    const itemContainer = await this.fetchItemContainer(npcBody);
 
-    let freeSlotAvailable = true;
     for (const loot of loots) {
-      if (!freeSlotAvailable) {
-        break;
-      }
-
       const rand = Math.round(random(0, 100));
-      const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
-
-      let lootChance = loot.chance;
-
-      if (loot.itemBlueprintKey === OthersBlueprint.GoldCoin) {
-        lootChance = loot.chance;
-      } else if (blueprintData?.type === ItemType.CraftingResource) {
-        lootChance = loot.chance * LOOT_CRAFTING_MATERIAL_DROP_CHANCE; // crafting materials not impacted by NPC_LOOT_CHANCE_MULTIPLIER
-      } else if (blueprintData?.type === ItemSubType.Food) {
-        lootChance = loot.chance * LOOT_FOOD_DROP_CHANCE;
-      } else {
-        lootChance = loot.chance * NPC_LOOT_CHANCE_MULTIPLIER;
-      }
+      const lootChance = this.calculateLootChance(loot);
 
       if (rand <= lootChance) {
-        let lootQuantity = 1;
-        // can specify a loot quantity range, e.g. 5-10 coins.
-        // So need to add that quantity to the body container
-        if (loot.quantityRange && loot.quantityRange.length === 2) {
-          lootQuantity = Math.round(random(loot.quantityRange[0], loot.quantityRange[1]));
-        }
+        const lootQuantity = this.getLootQuantity(loot);
+        const isStackable = this.isLootItemStackable(loot);
 
-        let lootItem = new Item({ ...blueprintData });
-        // stackable items - only add 1 item and set stack qty = lootQty
-        if (lootItem.maxStackSize > 1) {
-          if (lootQuantity > lootItem.maxStackSize) {
-            throw new Error(
-              `Loot quantity of ${lootQuantity} is higher than max stack size for item ${lootItem.key}, which is ${lootItem.maxStackSize}`
-            );
-          }
+        let freeSlotAvailable = true;
+        let remainingLootQuantity = lootQuantity;
 
-          lootItem.stackQty = lootQuantity;
-          await lootItem.save();
+        while (remainingLootQuantity > 0 && freeSlotAvailable) {
+          const lootItem = await this.createLootItem(loot);
           const freeSlotId = itemContainer.firstAvailableSlotId;
           freeSlotAvailable = freeSlotId !== null;
 
-          if (!freeSlotAvailable) {
-            break;
-          }
-          itemContainer.slots[freeSlotId!] = lootItem;
-        } else {
-          while (lootQuantity > 0) {
-            if (lootItem.attack || lootItem.defense) {
-              const rarityAttributes = this.itemRarity.setItemRarityOnLootDrop(lootItem);
-              lootItem = new Item({
-                ...blueprintData,
-                attack: rarityAttributes.attack,
-                defense: rarityAttributes.defense,
-                rarity: rarityAttributes.rarity,
-              });
-              await lootItem.save();
+          if (freeSlotAvailable) {
+            if (isStackable) {
+              lootItem.stackQty = remainingLootQuantity;
+              remainingLootQuantity = 0;
             } else {
-              lootItem = new Item({
-                ...blueprintData,
-              });
-              await lootItem.save();
-            }
-
-            const freeSlotId = itemContainer.firstAvailableSlotId;
-            freeSlotAvailable = freeSlotId !== null;
-
-            if (!freeSlotAvailable) {
-              break;
+              remainingLootQuantity--;
             }
 
             itemContainer.slots[freeSlotId!] = lootItem;
-            lootQuantity--;
+
+            await lootItem.save();
           }
         }
       }
@@ -210,5 +158,56 @@ export class NPCDeath {
 
     itemContainer.markModified("slots");
     await itemContainer.save();
+  }
+
+  private async fetchItemContainer(npcBody: IItem): Promise<IItemContainer> {
+    const itemContainer = await ItemContainer.findById(npcBody.itemContainer);
+    if (!itemContainer) {
+      throw new Error(`Error fetching itemContainer for Item with key ${npcBody.key}`);
+    }
+    return itemContainer;
+  }
+
+  private calculateLootChance(loot: INPCLoot): number {
+    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+    const lootMultipliers = {
+      [OthersBlueprint.GoldCoin]: 1,
+      [ItemType.CraftingResource]: LOOT_CRAFTING_MATERIAL_DROP_CHANCE,
+      [ItemSubType.Food]: LOOT_FOOD_DROP_CHANCE,
+    };
+    const lootMultiplier = lootMultipliers[blueprintData?.type] || NPC_LOOT_CHANCE_MULTIPLIER;
+
+    return loot.chance * lootMultiplier;
+  }
+
+  private getLootQuantity(loot: INPCLoot): number {
+    if (loot.quantityRange && loot.quantityRange.length === 2) {
+      return Math.round(random(loot.quantityRange[0], loot.quantityRange[1]));
+    }
+    return 1;
+  }
+
+  private isLootItemStackable(loot: INPCLoot): boolean {
+    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+    const lootItem = new Item({ ...blueprintData });
+
+    return lootItem.maxStackSize > 1;
+  }
+
+  private async createLootItem(loot: INPCLoot): Promise<IItem> {
+    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+    let lootItem = new Item({ ...blueprintData });
+
+    if (lootItem.attack || lootItem.defense) {
+      const rarityAttributes = this.itemRarity.setItemRarityOnLootDrop(lootItem);
+      lootItem = new Item({
+        ...blueprintData,
+        attack: rarityAttributes.attack,
+        defense: rarityAttributes.defense,
+        rarity: rarityAttributes.rarity,
+      });
+    }
+
+    return await lootItem.save();
   }
 }

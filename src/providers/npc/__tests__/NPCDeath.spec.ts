@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { CraftingResourcesBlueprint, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { FromGridX, FromGridY } from "@rpg-engine/shared";
+import { itemsBlueprintIndex } from "@providers/item/data";
+import {
+  CraftingResourcesBlueprint,
+  OthersBlueprint,
+  SwordsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
+import { FromGridX, FromGridY, IItem } from "@rpg-engine/shared";
 import { NPCDeath } from "../NPCDeath";
 
 describe("NPCDeath.ts", () => {
@@ -23,6 +28,7 @@ describe("NPCDeath.ts", () => {
 
     testNPC.x = FromGridX(0);
     testNPC.y = FromGridY(0);
+    testNPC.loots = [];
     await testNPC.save();
 
     testCharacter.x = FromGridX(1);
@@ -36,7 +42,7 @@ describe("NPCDeath.ts", () => {
     // @ts-ignore
     const spySocketMessaging = jest.spyOn(npcDeath.socketMessaging, "sendEventToUser");
 
-    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+    await npcDeath.handleNPCDeath(testNPC);
 
     expect(spyOnNearbyCharacters).toHaveBeenCalledWith(testNPC.x, testNPC.y, testNPC.scene);
 
@@ -50,8 +56,6 @@ describe("NPCDeath.ts", () => {
   it("on NPC death, make sure loot stackable items are added to NPC body", async () => {
     // @ts-ignore
     jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
-    // remove NPC loots
-    testNPC.loots = undefined;
 
     testNPC.loots = [
       {
@@ -62,7 +66,7 @@ describe("NPCDeath.ts", () => {
       },
     ];
 
-    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+    await npcDeath.handleNPCDeath(testNPC);
 
     const npcBody = await Item.findOne({
       name: `${testNPC.name}'s body`,
@@ -89,8 +93,6 @@ describe("NPCDeath.ts", () => {
     // @ts-ignore
     jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
 
-    testNPC.loots = undefined;
-
     // Add some items to the NPC's loot
     // @ts-ignore
     testNPC.loots = [
@@ -100,7 +102,7 @@ describe("NPCDeath.ts", () => {
       { itemBlueprintKey: CraftingResourcesBlueprint.GoldenIngot, chance: 100, quantityRange: [1, 2] },
     ];
 
-    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+    await npcDeath.handleNPCDeath(testNPC);
 
     const npcBody = await Item.findOne({
       name: `${testNPC.name}'s body`,
@@ -126,7 +128,7 @@ describe("NPCDeath.ts", () => {
     // @ts-ignore
     jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
 
-    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+    await npcDeath.handleNPCDeath(testNPC);
 
     const npcBody = await Item.findOne({
       owner: testCharacter._id,
@@ -152,10 +154,12 @@ describe("NPCDeath.ts", () => {
       { itemBlueprintKey: OthersBlueprint.GoldCoin, chance: 100, quantityRange: [4, 4] },
     ];
 
+    await testNPC.save();
+
     // @ts-ignore
     const SpyOnGetGoldLoot = jest.spyOn(npcDeath, "getGoldLoot");
 
-    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+    await npcDeath.handleNPCDeath(testNPC);
 
     // Find the NPC's body
     const npcBody = await Item.findOne({
@@ -178,7 +182,7 @@ describe("NPCDeath.ts", () => {
     // @ts-ignore
     const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
 
-    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+    await npcDeath.handleNPCDeath(testNPC);
 
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
@@ -198,16 +202,21 @@ describe("NPCDeath.ts", () => {
     expect(bodyItemContainer!.slots).toBeDefined();
   });
 
-  it("on NPC death no loot is added to NPC body | NPC without loots", async () => {
+  it("on NPC death no loot is added to NPC body if NPC has no loot", async () => {
     // @ts-ignore
     jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
     // @ts-ignore
     const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
 
-    // remove NPC loots
-    testNPC.loots = undefined;
+    // @ts-ignore
+    jest.spyOn(npcDeath, "getGoldLoot").mockReturnValueOnce([]);
 
-    await npcDeath.handleNPCDeath(testNPC, testCharacter);
+    // remove NPC loots
+    testNPC.loots = [];
+
+    await testNPC.save();
+
+    await npcDeath.handleNPCDeath(testNPC);
 
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
@@ -228,13 +237,108 @@ describe("NPCDeath.ts", () => {
     expect(bodyItemContainer!.slots[Number(0)]).toBeNull();
   });
 
-  afterAll(() => {
-    jest.clearAllMocks();
-    jest.resetAllMocks();
+  it("should not add loot to NPC body if loot chance is not met", async () => {
+    // @ts-ignore
+    jest.spyOn(npcDeath, "getGoldLoot").mockReturnValueOnce([]);
+    // @ts-ignore
+    jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
+
+    testNPC.loots = [
+      // @ts-ignore
+      { itemBlueprintKey: CraftingResourcesBlueprint.Diamond, chance: 0, quantityRange: [1, 1] },
+    ];
+
+    await npcDeath.handleNPCDeath(testNPC);
+
+    const npcBody = await Item.findOne({
+      name: `${testNPC.name}'s body`,
+      x: testNPC.x,
+      y: testNPC.y,
+      scene: testNPC.scene,
+    });
+
+    expect(npcBody).not.toBeNull();
+    expect(npcBody!.itemContainer).toBeDefined();
+
+    const bodyItemContainer = await ItemContainer.findById(npcBody!.itemContainer);
+
+    expect(bodyItemContainer).not.toBeNull();
+    expect(bodyItemContainer!.slots).toBeDefined();
+    expect(bodyItemContainer!.slots[0]).toBeNull();
   });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    jest.resetAllMocks();
+  it("should stop adding loot to NPC body when all slots are full", async () => {
+    // @ts-ignore
+    jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
+
+    testNPC.loots = [
+      // @ts-ignore
+      { itemBlueprintKey: CraftingResourcesBlueprint.Diamond, chance: 100, quantityRange: [1, 1] },
+      // @ts-ignore
+      { itemBlueprintKey: CraftingResourcesBlueprint.GoldenIngot, chance: 100, quantityRange: [1, 1] },
+      // @ts-ignore
+      { itemBlueprintKey: CraftingResourcesBlueprint.SilverIngot, chance: 100, quantityRange: [1, 1] },
+    ];
+
+    // npc body automatically creates the itemContainer
+
+    const blueprintData = itemsBlueprintIndex["npc-body"];
+    const npcBody = new Item({
+      ...blueprintData, // base body props
+      key: `${testNPC.key}-body`,
+      bodyFromId: testNPC.id,
+      texturePath: `${testNPC.textureKey}/death/0.png`,
+      textureKey: testNPC.textureKey,
+      name: `${testNPC.name}'s body`,
+      description: `You see ${testNPC.name}'s body.`,
+      scene: testNPC.scene,
+      x: testNPC.x,
+      y: testNPC.y,
+    });
+
+    npcBody.generateContainerSlots = 2;
+
+    await npcBody.save();
+
+    const npcBodyContainer = await ItemContainer.findById(npcBody.itemContainer);
+
+    if (!npcBodyContainer) {
+      throw new Error("NPC body container not found");
+    }
+
+    // @ts-ignore
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+
+    // @ts-ignore
+    await npcDeath.addLootToNPCBody(npcBody, testNPC.loots);
+
+    expect(spyAddLootInNPCBody).toHaveBeenCalled();
+
+    const bodyItemContainer = await ItemContainer.findById(npcBody.itemContainer);
+
+    expect(bodyItemContainer).not.toBeNull();
+    expect(bodyItemContainer!.slots).toBeDefined();
+    expect(bodyItemContainer!.slots[0]).toBeDefined();
+    expect(bodyItemContainer!.slots[1]).toBeDefined();
+    expect(bodyItemContainer!.slots[2]).toBeUndefined();
+  });
+
+  it("should call setItemRarityOnLootDrop if the loot item has attack and defense", async () => {
+    // @ts-ignore
+    jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
+
+    testNPC.loots = [
+      // @ts-ignore
+      { itemBlueprintKey: SwordsBlueprint.Sword, chance: 100, quantityRange: [1, 1] },
+    ];
+
+    await testNPC.save();
+
+    // @ts-ignore
+    const spyOnSetItemRarityOnLootDrop = jest.spyOn(npcDeath.itemRarity, "setItemRarityOnLootDrop");
+
+    await npcDeath.handleNPCDeath(testNPC);
+
+    expect(spyOnSetItemRarityOnLootDrop).toHaveBeenCalled();
   });
 });

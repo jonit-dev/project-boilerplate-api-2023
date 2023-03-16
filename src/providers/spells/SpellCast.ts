@@ -4,6 +4,7 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
@@ -11,10 +12,8 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { BasicAttribute, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { spellsBlueprints } from "./data/blueprints/index";
-import { CharacterEntitiesBuff } from "@providers/character/CharacterBuffer/CharacterEntitiesBuff";
 import { SpellValidation } from "./SpellValidation";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { spellsBlueprints } from "./data/blueprints/index";
 
 @provide(SpellCast)
 export class SpellCast {
@@ -26,7 +25,6 @@ export class SpellCast {
     private skillIncrease: SkillIncrease,
     private characterBonusPenalties: CharacterBonusPenalties,
     private itemUsableEffect: ItemUsableEffect,
-    private characterEntitiesBuff: CharacterEntitiesBuff,
     private spellValidation: SpellValidation,
     private inMemoryHashTable: InMemoryHashTable
   ) {}
@@ -57,7 +55,12 @@ export class SpellCast {
       }
     }
 
-    await spell.usableEffect(character);
+    const hasCastSucceeded = await spell.usableEffect(character);
+
+    // if it fails, it will return explicitly false above. We prevent moving forward, so mana is not spent unnecessarily
+    if (hasCastSucceeded === false) {
+      return false;
+    }
 
     this.itemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
     await character.save();

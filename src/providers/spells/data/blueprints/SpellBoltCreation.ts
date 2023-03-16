@@ -34,7 +34,7 @@ export const spellBoltCreation: Partial<ISpell> = {
 
     const spellItemCreation = container.get(SpellItemCreation);
 
-    await spellItemCreation.createItem(character, {
+    return await spellItemCreation.createItem(character, {
       itemToCreate: {
         key: RangedWeaponsBlueprint.Bolt,
         createQty: itemsToCreate,

@@ -52,13 +52,11 @@ export class ItemPickupValidator {
       return false;
     }
 
-    if (!item.isItemContainer) {
-      const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(itemPickupData.toContainerId, item);
+    const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(itemPickupData.toContainerId, item);
 
-      if (!hasAvailableSlot) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your container is full.");
-        return false;
-      }
+    if (!hasAvailableSlot) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your container is full.");
+      return false;
     }
 
     const isItemOnMap =

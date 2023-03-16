@@ -273,7 +273,7 @@ export class BattleAttackTarget {
           }
           if (target.type === "NPC") {
             await this.battleEffects.generateBloodOnGround(target);
-            await this.npcDeath.handleNPCDeath(target as INPC, attacker as ICharacter);
+            await this.npcDeath.handleNPCDeath(target as INPC);
             await this.skillIncrease.releaseXP(target as INPC);
 
             if (attacker instanceof Character) {
