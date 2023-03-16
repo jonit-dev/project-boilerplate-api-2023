@@ -154,7 +154,7 @@ export class EntityEffectCycle {
       await characterDeath.handleCharacterDeath(null, target as ICharacter);
     } else {
       const npcDeath = container.get(NPCDeath);
-      await npcDeath.handleNPCDeath(target as INPC, null);
+      await npcDeath.handleNPCDeath(target as INPC);
     }
   }
 }
