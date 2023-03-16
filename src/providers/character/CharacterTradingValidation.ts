@@ -1,15 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ITradeRequestItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
-import { CharacterValidation } from "./CharacterValidation";
-import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 import { CharacterInventory } from "./CharacterInventory";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { CharacterValidation } from "./CharacterValidation";
+import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 
 @provide(CharacterTradingValidation)
 export class CharacterTradingValidation {
@@ -145,7 +145,7 @@ export class CharacterTradingValidation {
     }
 
     //  Is the character near the seller NPC?
-    const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, npc.x, npc.y, 2);
+    const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, npc.x, npc.y, 5);
 
     if (!isUnderRange) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "You are too far away from the trader.");
