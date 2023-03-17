@@ -32,6 +32,11 @@ jest.mock("@providers/constants/LootConstants", () => ({
   NPC_LOOT_CHANCE_MULTIPLIER: 1,
 }));
 
+jest.mock("@providers/constants/NPCConstants", () => ({
+  ...jest.requireActual("@providers/constants/NPCConstants"),
+  NPC_TRADER_INTERACTION_DISTANCE: 2,
+}));
+
 jest.mock("mongoose-update-if-current", () => ({
   updateIfCurrentPlugin: jest.fn(), // mock the plugin because otherwise it will break many tests
 }));

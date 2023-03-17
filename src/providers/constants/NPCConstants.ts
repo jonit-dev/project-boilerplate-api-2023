@@ -10,3 +10,7 @@ export const NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE = 30; // remember that in 
 // PZ
 
 export const NPC_CAN_ATTACK_IN_NON_PVP_ZONE = true;
+
+// Trader
+
+export const NPC_TRADER_INTERACTION_DISTANCE = 5;
