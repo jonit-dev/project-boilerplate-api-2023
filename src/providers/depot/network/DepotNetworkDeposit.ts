@@ -55,7 +55,7 @@ export class DepotNetworkDeposit {
 
         this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
           itemContainer,
-          type: ItemContainerType.MapContainer,
+          type: ItemContainerType.Depot,
         });
       } catch (error) {
         console.error(error);
