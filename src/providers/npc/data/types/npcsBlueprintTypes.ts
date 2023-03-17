@@ -130,4 +130,7 @@ export enum HostileNPCsBlueprint {
   OrcArcher = "orc-archer",
   DarkKnight = "dark-knight",
   Litch = "litch",
+  MinotaursArcher = "minotaurs-archer",
+  MinotaursMage = "minotaurs-mage",
+  MinotaursBerserker = "minotaurs-berserker",
 }
