@@ -63,30 +63,39 @@ export class BattleAttackTarget {
 
     const attackerType = attacker.attackType || (await this.characterWeapon.getAttackType(attacker as ICharacter));
 
+    const performRangedAttack = async (
+      attacker: ICharacter | INPC,
+      target: ICharacter | INPC,
+      rangedAttackParams: any,
+      magicAttack = false
+    ): Promise<boolean> => {
+      await this.hitTarget(attacker, target, magicAttack);
+      await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+      if (attacker.type === "Character" && rangedAttackParams.itemSubType === ItemSubType.Ranged) {
+        await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
+      }
+      return true;
+    };
+
     switch (attackerType) {
       case EntityAttackType.Melee: {
         const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1.5);
 
         if (isUnderMeleeRange) {
           await this.hitTarget(attacker, target);
-
           return true;
         }
-
         break;
       }
 
-      case EntityAttackType.Ranged:
+      case EntityAttackType.Ranged: {
         const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
 
         if (rangedAttackParams) {
           if (attacker.type === "Character") {
             const character = attacker as ICharacter;
-            let magicAttack = false;
             if (rangedAttackParams.itemSubType === ItemSubType.Magic) {
-              await this.hitTarget(attacker, target, magicAttack);
-              await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
-              return true;
+              return performRangedAttack(attacker, target, rangedAttackParams);
             } else if (rangedAttackParams.itemSubType === ItemSubType.Staff) {
               const attack = await this.validateMagicAttack(character._id, {
                 targetId: target.id,
@@ -94,33 +103,19 @@ export class BattleAttackTarget {
               });
 
               if (attack) {
-                magicAttack = true;
-                await this.hitTarget(attacker, target, magicAttack);
-                await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+                return performRangedAttack(attacker, target, rangedAttackParams, true);
               }
-
               return attack;
             } else if (rangedAttackParams.itemSubType === ItemSubType.Ranged) {
-              await this.hitTarget(attacker, target, magicAttack);
-              await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
-              await this.battleRangedAttack.consumeAmmo(rangedAttackParams, character);
-
-              return true;
+              return performRangedAttack(attacker, target, rangedAttackParams);
             }
           } else {
-            attacker as INPC;
-            await this.hitTarget(attacker, target);
-            await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
-
-            return true;
+            return performRangedAttack(attacker, target, rangedAttackParams);
           }
         }
         break;
-      /* 
-      NPCs can have a hybrid attack type
-      if closer enough, would be melee attack
-      otherwise would be ranged attack 
-      */
+      }
+
       case EntityAttackType.MeleeRanged: {
         if (attacker.type === "Character") {
           throw new Error(`Character cannot have MeleeRanged hybrid attack type. Character id ${attacker.id}`);
@@ -130,16 +125,12 @@ export class BattleAttackTarget {
 
         if (isUnderMeleeRange) {
           await this.hitTarget(attacker, target);
-
           return true;
         } else {
           const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
 
           if (rangedAttackParams) {
-            await this.hitTarget(attacker, target);
-            await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
-
-            return true;
+            return performRangedAttack(attacker, target, rangedAttackParams);
           }
         }
         break;
