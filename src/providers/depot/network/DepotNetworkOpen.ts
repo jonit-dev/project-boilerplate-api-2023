@@ -61,7 +61,7 @@ export class DepotNetworkOpen {
             ItemSocketEvents.ContainerRead,
             {
               itemContainer,
-              type: ItemContainerType.MapContainer,
+              type: ItemContainerType.Depot,
             }
           );
         } catch (error) {
