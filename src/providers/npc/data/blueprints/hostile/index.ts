@@ -32,6 +32,9 @@ import { npcIceTroll } from "./NPCIceTroll";
 import { npcKobold } from "./NPCKobold";
 import { npcLitch } from "./NPCLitch";
 import { npcMinotaur } from "./NPCMinotaur";
+import { npcMinotaurArcher } from "./NPCMinotaursArcher";
+import { npcMinotaurBerserker } from "./NPCMinotaursBerserker";
+import { npcMinotaurMage } from "./NPCMinotaursMage";
 import { npcMudGolem } from "./NPCMudGolem";
 import { npcOrc } from "./NPCOrc";
 import { npcOrcArcher } from "./NPCOrcArcher";
@@ -59,9 +62,6 @@ import { npcTrollWarrior } from "./NPCTrollWarrior";
 import { npcWildTroll } from "./NPCWildTroll";
 import { npcWinterWolf } from "./NPCWinterWolf";
 import { npcWolf } from "./NPCWolf";
-import { npcMinotaurArcher } from "./NPCMinotaursArcher";
-import { npcMinotaurBerserker } from "./NPCMinotaursBerserker";
-import { npcMinotaurMage } from "./NPCMinotaursMage";
 import { npcWraith } from "./NPCWraith";
 import { npcYeti } from "./bosses/NPCYeti";
 
@@ -128,7 +128,7 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.IceThing]: npcIceThing,
   [HostileNPCsBlueprint.DarkKnight]: npcDarkKnight,
   [HostileNPCsBlueprint.Litch]: npcLitch,
-  [HostileNPCsBlueprint.MinotaursArcher]: npcMinotaurArcher,
-  [HostileNPCsBlueprint.MinotaursMage]: npcMinotaurMage,
-  [HostileNPCsBlueprint.MinotaursBerserker]: npcMinotaurBerserker,
+  [HostileNPCsBlueprint.MinotaurArcher]: npcMinotaurArcher,
+  [HostileNPCsBlueprint.MinotaurMage]: npcMinotaurMage,
+  [HostileNPCsBlueprint.MinotaurBerserker]: npcMinotaurBerserker,
 };

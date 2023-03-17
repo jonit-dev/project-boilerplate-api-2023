@@ -5,6 +5,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
+import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -44,7 +45,8 @@ export class CharacterDeath {
     private characterWeight: CharacterWeight,
     private skillDecrease: SkillDecrease,
     private characterDeathCalculator: CharacterDeathCalculator,
-    private characterItemContainer: CharacterItemContainer
+    private characterItemContainer: CharacterItemContainer,
+    private entityEffectUse: EntityEffectUse
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
@@ -93,6 +95,8 @@ export class CharacterDeath {
         });
       }, 2000);
     }
+
+    await this.entityEffectUse.clearAllEntityEffects(character);
 
     await this.respawnCharacter(character);
     await this.characterWeight.updateCharacterWeight(character);

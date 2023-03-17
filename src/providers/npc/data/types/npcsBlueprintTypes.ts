@@ -68,6 +68,9 @@ export enum HostileNPCsBlueprint {
   Bat = "bat",
   Ghost = "ghost",
   Minotaur = "minotaur",
+  MinotaurArcher = "minotaur-archer",
+  MinotaurMage = "minotaur-mage",
+  MinotaurBerserker = "minotaur-berserker",
   Goblin = "goblin",
   Orc = "orc",
   OrcWarrior = "orc-warrior",
@@ -130,7 +133,4 @@ export enum HostileNPCsBlueprint {
   OrcArcher = "orc-archer",
   DarkKnight = "dark-knight",
   Litch = "litch",
-  MinotaursArcher = "minotaurs-archer",
-  MinotaursMage = "minotaurs-mage",
-  MinotaursBerserker = "minotaurs-berserker",
 }

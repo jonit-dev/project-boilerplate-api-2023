@@ -20,11 +20,11 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 export const npcMinotaurMage = {
   ...generateMoveTowardsMovement(),
   name: "Minotaur Mage",
-  key: HostileNPCsBlueprint.MinotaursMage,
-  textureKey: HostileNPCsBlueprint.MinotaursMage,
+  key: HostileNPCsBlueprint.MinotaurMage,
+  textureKey: HostileNPCsBlueprint.MinotaurMage,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.MeleeRanged,
-  ammoKey: AnimationEffectKeys.Corruption,
+  ammoKey: AnimationEffectKeys.FireBall,
   maxRangeAttack: RangeTypes.High,
   speed: MovementSpeed.Standard,
   canSwitchToLowHealthTarget: true,
@@ -113,5 +113,5 @@ export const npcMinotaurMage = {
       quantityRange: [5, 8],
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
+  entityEffects: [EntityEffectBlueprint.Burning],
 } as Partial<INPC>;

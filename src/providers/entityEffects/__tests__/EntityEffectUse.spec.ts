@@ -1,7 +1,8 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { EntityAttackType } from "@rpg-engine/shared";
+import _ from "lodash";
 import { EntityEffectCycle } from "../EntityEffectCycle";
 import { EntityEffectUse } from "../EntityEffectUse";
 import { entityEffectsBlueprintsIndex } from "../data";
@@ -17,6 +18,7 @@ describe("EntityEffectUse.ts", () => {
   let testAttacker: INPC;
   let testTarget: ICharacter;
   let poisonEntityEffect: IEntityEffect;
+  let entityEffectSpy;
 
   beforeAll(() => {
     entityEffectUse = container.get<EntityEffectUse>(EntityEffectUse);
@@ -29,7 +31,11 @@ describe("EntityEffectUse.ts", () => {
     testAttacker.entityEffects = [poisonEntityEffect.key];
 
     testTarget = await unitTestHelper.createMockCharacter(null, {});
+
+    // @ts-ignore
+    entityEffectSpy = jest.spyOn(entityEffectUse, "startEntityEffectCycle");
   });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -38,30 +44,31 @@ describe("EntityEffectUse.ts", () => {
     expect(testAttacker.entityEffects).toBeDefined();
   });
 
-  // it("should not call EntityEffectCycle if there are no EntityEffect", async () => {
-  //   testAttacker.entityEffects = [];
+  it("should not call EntityEffectCycle if there are no EntityEffect", async () => {
+    testAttacker.entityEffects = [];
+    await testAttacker.save();
+    await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
+    expect(EntityEffectCycle).not.toHaveBeenCalled();
+  });
 
-  //   await testAttacker.save();
+  it("should call EntityEffectCycle if there are EntityEffect and probability is maximum", async () => {
+    poisonEntityEffect.probability = 100;
 
-  //   await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
+    const randomMock = jest.spyOn(_, "random");
+    // make it always return 0
+    randomMock.mockReturnValue(0);
 
-  //   expect(EntityEffectCycle).not.toHaveBeenCalled();
-  // });
+    await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
 
-  // it("should call EntityEffectCycle if there are EntityEffect and probability is maximum", async () => {
-  //   poisonEntityEffect.probability = 100;
-
-  //   await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
-
-  //   expect(EntityEffectCycle).toHaveBeenCalled();
-  // });
+    expect(entityEffectSpy).toHaveBeenCalledTimes(1);
+  });
 
   it("should not call EntityEffectCycle if there are EntityEffect and probability is minimum", async () => {
     poisonEntityEffect.probability = 0;
 
     await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
 
-    expect(EntityEffectCycle).not.toHaveBeenCalled();
+    expect(entityEffectSpy).not.toHaveBeenCalled();
   });
 
   it("should not call EntityEffectCycle if character already has an effect applied", async () => {
@@ -70,13 +77,25 @@ describe("EntityEffectUse.ts", () => {
 
     await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
 
-    expect(EntityEffectCycle).not.toHaveBeenCalled();
+    expect(entityEffectSpy).not.toHaveBeenCalled();
   });
 
   it("should not call EntityEffectCycle if the target is not a character or NPC", async () => {
     const invalidTarget = {};
     await entityEffectUse.applyEntityEffects(invalidTarget as any, testAttacker);
-    expect(EntityEffectCycle).not.toHaveBeenCalled();
+    expect(entityEffectSpy).not.toHaveBeenCalled();
+  });
+
+  it("should clear all entity effects when clearAllEntityEffects is called", async () => {
+    testTarget.appliedEntityEffects = [poisonEntityEffect.key];
+    await testTarget.save();
+
+    await entityEffectUse.clearAllEntityEffects(testTarget);
+
+    // Refresh testTarget from the database
+    const refreshedTestTarget = await Character.findById(testTarget._id);
+
+    expect(refreshedTestTarget?.appliedEntityEffects).toHaveLength(0);
   });
 
   describe("Attack types", () => {
@@ -90,7 +109,7 @@ describe("EntityEffectUse.ts", () => {
 
       await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
 
-      expect(EntityEffectCycle).not.toHaveBeenCalled();
+      expect(entityEffectSpy).not.toHaveBeenCalled();
     });
     it("should not call applyEntityEffects when attacker attack type is Ranged and entity effects attack type Melee", async () => {
       testAttacker.entityEffects = [EntityEffectBlueprint.Poison];
@@ -99,25 +118,25 @@ describe("EntityEffectUse.ts", () => {
 
       await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
 
-      expect(EntityEffectCycle).not.toHaveBeenCalled();
+      expect(entityEffectSpy).not.toHaveBeenCalled();
     });
-    // it("should call applyEntityEffects and attacker attack type melee and entity effects attack type Melee", async () => {
-    //   testAttacker.entityEffects = [EntityEffectBlueprint.Poison];
-    //   testAttacker.attackType = EntityAttackType.Melee;
-    //   await testAttacker.save();
+    it("should call applyEntityEffects when attacker attack type is Melee and entity effects attack type Melee", async () => {
+      testAttacker.entityEffects = [EntityEffectBlueprint.Poison];
+      testAttacker.attackType = EntityAttackType.Melee;
+      await testAttacker.save();
 
-    //   await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
+      await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
 
-    //   expect(EntityEffectCycle).toHaveBeenCalled();
-    // });
-    // it("should call applyEntityEffects when battle event is a hit and attacker attack type MeleeRanged and entity effects attack type Melee", async () => {
-    //   testAttacker.entityEffects = [EntityEffectBlueprint.Poison];
-    //   testAttacker.attackType = EntityAttackType.MeleeRanged;
-    //   await testAttacker.save();
+      expect(entityEffectSpy).toHaveBeenCalled();
+    });
+    it("should call applyEntityEffects when attacker attack type is MeleeRanged and entity effects attack type Melee", async () => {
+      testAttacker.entityEffects = [EntityEffectBlueprint.Poison];
+      testAttacker.attackType = EntityAttackType.MeleeRanged;
+      await testAttacker.save();
 
-    //   await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
+      await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
 
-    //   expect(EntityEffectCycle).toHaveBeenCalled();
-    // });
+      expect(entityEffectSpy).toHaveBeenCalled();
+    });
   });
 });

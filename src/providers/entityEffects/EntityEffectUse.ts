@@ -4,7 +4,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { UISocketEvents } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
-import random from "lodash/random";
+import _ from "lodash";
 import { EntityEffectCycle } from "./EntityEffectCycle";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 import { entityEffectsBlueprintsIndex } from "./data/index";
@@ -56,6 +56,18 @@ export class EntityEffectUse {
     }
   }
 
+  public async clearAllEntityEffects(target: ICharacter | INPC): Promise<void> {
+    switch (target.type) {
+      case EntityType.Character:
+        await Character.updateOne({ _id: target._id }, { $unset: { appliedEntityEffects: 1 } });
+
+        break;
+      case EntityType.NPC:
+        await NPC.updateOne({ _id: target._id }, { $unset: { appliedEntityEffects: 1 } });
+        break;
+    }
+  }
+
   private getApplicableEntityEffects(npc: INPC): IEntityEffect[] {
     const npcEffects = npc.entityEffects ?? [];
     const applicableEffects: IEntityEffect[] = [];
@@ -76,11 +88,11 @@ export class EntityEffectUse {
     target: ICharacter | INPC,
     attacker: INPC
   ): Promise<void> {
-    const n = random(1, 100);
-    if (n > entityEffect.probability) {
+    const n = _.random(0, 100);
+
+    if (entityEffect.probability <= n) {
       return;
     }
-
     let appliedEffects = target.appliedEntityEffects ?? [];
     const applied = appliedEffects.find((effect) => effect.key === entityEffect.key);
 
@@ -97,6 +109,10 @@ export class EntityEffectUse {
     target.appliedEntityEffects = appliedEffects;
     await target.save();
 
+    this.startEntityEffectCycle(entityEffect, target, attacker);
+  }
+
+  private startEntityEffectCycle(entityEffect: IEntityEffect, target: ICharacter | INPC, attacker: INPC): void {
     new EntityEffectCycle(entityEffect, target._id, target.type, attacker._id);
   }
 }

@@ -19,8 +19,8 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 export const npcMinotaurArcher = {
   ...generateMoveTowardsMovement(),
   name: "Minotaur Archer",
-  key: HostileNPCsBlueprint.MinotaursArcher,
-  textureKey: HostileNPCsBlueprint.MinotaursArcher,
+  key: HostileNPCsBlueprint.MinotaurArcher,
+  textureKey: HostileNPCsBlueprint.MinotaurArcher,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Ranged,
   ammoKey: RangedWeaponsBlueprint.FireBolt,

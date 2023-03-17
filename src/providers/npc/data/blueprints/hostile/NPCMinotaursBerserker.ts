@@ -22,8 +22,8 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 export const npcMinotaurBerserker = {
   ...generateMoveTowardsMovement(),
   name: "Minotaur Berserker",
-  key: HostileNPCsBlueprint.MinotaursBerserker,
-  textureKey: HostileNPCsBlueprint.MinotaursBerserker,
+  key: HostileNPCsBlueprint.MinotaurBerserker,
+  textureKey: HostileNPCsBlueprint.MinotaurBerserker,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
