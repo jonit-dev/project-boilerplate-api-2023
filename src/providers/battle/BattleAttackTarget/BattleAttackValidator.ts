@@ -11,19 +11,11 @@ import { BattleAttackRanged, IRangedAttackParams } from "./BattleAttackRanged";
 export class BattleAttackValidator {
   constructor(private battleRangedAttack: BattleAttackRanged, private movementHelper: MovementHelper) {}
 
-  /**
-   * Validates the ranged attack based on ranged attack max range, ammo available
-   * (in case of a character) and if solids are in the attack trajectory
-   * @param attacker data
-   * @param target data
-   * @returns ranged attack parameters if is a valid attack or undefined is invalid
-   */
   public async validateAttack(
     attacker: ICharacter | INPC,
     target: ICharacter | INPC
   ): Promise<IRangedAttackParams | undefined> {
     let rangedAttackParams: Partial<IRangedAttackParams> | undefined;
-    let equipment: IEquipment;
 
     if (attacker.type === "NPC") {
       const npc = attacker as INPC;
@@ -33,44 +25,17 @@ export class BattleAttackValidator {
       rangedAttackParams = { maxRange: npc.maxRangeAttack };
     } else {
       const character = attacker as ICharacter;
-      // Get equipment to validate if character has ranged attack ammo (bow -> arrow or spear)
-      equipment = (await Equipment.findById(character.equipment).populate("inventory").exec()) as IEquipment;
-
-      if (!equipment) {
-        throw new Error(`equipment not found for character ${character.id}`);
-      }
-
-      rangedAttackParams = await this.battleRangedAttack.getAmmoForRangedAttack(character, equipment);
-
-      if (!rangedAttackParams) {
-        const magicAttack = false;
-        this.battleRangedAttack.sendNoAmmoEvent(
-          character,
-          { targetId: target.id, targetType: target.type as EntityType },
-          magicAttack
-        );
-        return;
-      }
+      rangedAttackParams = await this.getCharacterRangedAttackParams(character, target);
+      if (!rangedAttackParams) return;
     }
 
-    // check if distance between attacker and target is
-    // within the ranged weapon max range
-    const isUnderDistanceRange = this.movementHelper.isUnderRange(
-      attacker.x,
-      attacker.y,
-      target.x,
-      target.y,
-      rangedAttackParams.maxRange!
-    );
-
-    if (!isUnderDistanceRange) {
+    if (!this.isAttackInRange(attacker, target, rangedAttackParams.maxRange!)) {
       if (attacker.type === "Character") {
         this.sendNotInRangeEvent(attacker as ICharacter, target);
       }
       return;
     }
 
-    // check if there's a solid in ranged attack trajectory
     const solidInTrajectory = await this.battleRangedAttack.isSolidInRangedTrajectory(attacker, target);
     if (solidInTrajectory) {
       if (attacker.type === "Character") {
@@ -80,6 +45,35 @@ export class BattleAttackValidator {
     }
 
     return rangedAttackParams as IRangedAttackParams;
+  }
+
+  private async getCharacterRangedAttackParams(
+    character: ICharacter,
+    target: ICharacter | INPC
+  ): Promise<Partial<IRangedAttackParams> | undefined> {
+    const equipment = (await Equipment.findById(character.equipment).populate("inventory").exec()) as IEquipment;
+
+    if (!equipment) {
+      throw new Error(`equipment not found for character ${character.id}`);
+    }
+
+    const rangedAttackParams = await this.battleRangedAttack.getAmmoForRangedAttack(character, equipment);
+
+    if (!rangedAttackParams) {
+      const magicAttack = false;
+      this.battleRangedAttack.sendNoAmmoEvent(
+        character,
+        { targetId: target.id, targetType: target.type as EntityType },
+        magicAttack
+      );
+      return;
+    }
+
+    return rangedAttackParams;
+  }
+
+  private isAttackInRange(attacker: ICharacter | INPC, target: ICharacter | INPC, maxRange: number): boolean {
+    return this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, maxRange);
   }
 
   public async validateMagicAttack(

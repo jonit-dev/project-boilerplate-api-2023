@@ -31,7 +31,7 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
     testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
   });
 
-  test("handleDeathAfterHit should handle character death when target is a character and not alive", async () => {
+  it("handleDeathAfterHit should handle character death when target is a character and not alive", async () => {
     testCharacter.health = 0;
     await testCharacter.save();
 
@@ -40,7 +40,7 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
     expect(handleCharacterDeathSpy).toHaveBeenCalled();
   });
 
-  test("handleDeathAfterHit should handle NPC death when target is an NPC and not alive", async () => {
+  it("handleDeathAfterHit should handle NPC death when target is an NPC and not alive", async () => {
     testNPC.health = 0;
     await testNPC.save();
 
@@ -49,7 +49,7 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
     expect(handleNPCDeathSpy).toHaveBeenCalled();
   });
 
-  test("handleDeathAfterHit should apply entity effects if attacker is an NPC and target is not alive", async () => {
+  it("handleDeathAfterHit should apply entity effects if attacker is an NPC and target is not alive", async () => {
     testCharacter.health = 0;
     // @ts-ignore
     testNPC.entityEffects = [{ id: 1, duration: 10 }];
@@ -60,7 +60,7 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
     expect(applyEntityEffectsIfApplicableSpy).toHaveBeenCalled();
   });
 
-  test("handleDeathAfterHit should not call any death handlers or apply entity effects if target is alive", async () => {
+  it("handleDeathAfterHit should not call any death handlers or apply entity effects if target is alive", async () => {
     testCharacter.health = 1;
     await testCharacter.save();
 
@@ -71,7 +71,7 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
     expect(applyEntityEffectsIfApplicableSpy).not.toHaveBeenCalled();
   });
 
-  test("upon death, if attacker is NPC it should clearTarget", async () => {
+  it("upon death, if attacker is NPC it should clearTarget", async () => {
     testCharacter.health = 0;
     await testCharacter.save();
 
@@ -83,7 +83,7 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
     expect(clearTargetSpy).toHaveBeenCalledWith(testNPC);
   });
 
-  test("on NPC death, release XP and update quests if attacker is a character", async () => {
+  it("on NPC death, release XP and update quests if attacker is a character", async () => {
     testNPC.health = 0;
     await testNPC.save();
 
