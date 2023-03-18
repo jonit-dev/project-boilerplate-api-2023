@@ -1,17 +1,12 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
-import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { NPCDeath } from "@providers/npc/NPCDeath";
 import { NPCWarn } from "@providers/npc/NPCWarn";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
-import { QuestSystem } from "@providers/quest/QuestSystem";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -21,19 +16,18 @@ import {
   GRID_WIDTH,
   IBattleCancelTargeting,
   IBattleEventFromServer,
-  ItemSlotType,
   ItemSubType,
-  QuestType,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { Types } from "mongoose";
 import { BattleEffects } from "../BattleEffects";
 import { BattleEvent } from "../BattleEvent";
-import { BattleRangedAttack, IRangedAttackParams } from "../BattleRangedAttack";
 import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
+import { BattleAttackRanged } from "./BattleAttackRanged";
+import { BattleAttackTargetDeath } from "./BattleAttackTargetDeath";
+import { BattleAttackValidator } from "./BattleAttackValidator";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -45,15 +39,14 @@ export class BattleAttackTarget {
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private npcTarget: NPCTarget,
     private battleEffects: BattleEffects,
-    private characterDeath: CharacterDeath,
-    private npcDeath: NPCDeath,
+    private characterDeath: CharacterDeath, //! dont remove this
     private skillIncrease: SkillIncrease,
-    private battleRangedAttack: BattleRangedAttack,
-    private questSystem: QuestSystem,
-    private entityEffectUse: EntityEffectUse,
+    private battleRangedAttack: BattleAttackRanged,
     private npcWarn: NPCWarn,
     private characterMovementWarn: CharacterMovementWarn,
-    private characterWeapon: CharacterWeapon
+    private characterWeapon: CharacterWeapon,
+    private battleAttackValidator: BattleAttackValidator,
+    private battleAttackTargetDeath: BattleAttackTargetDeath
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -63,64 +56,59 @@ export class BattleAttackTarget {
 
     const attackerType = attacker.attackType || (await this.characterWeapon.getAttackType(attacker as ICharacter));
 
+    const performRangedAttack = async (
+      attacker: ICharacter | INPC,
+      target: ICharacter | INPC,
+      rangedAttackParams: any,
+      magicAttack = false
+    ): Promise<boolean> => {
+      await this.hitTarget(attacker, target, magicAttack);
+      await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+      if (attacker.type === "Character" && rangedAttackParams.itemSubType === ItemSubType.Ranged) {
+        await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
+      }
+      return true;
+    };
+
     switch (attackerType) {
       case EntityAttackType.Melee: {
         const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1.5);
 
         if (isUnderMeleeRange) {
           await this.hitTarget(attacker, target);
-
           return true;
         }
-
         break;
       }
 
-      case EntityAttackType.Ranged:
-        const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
+      case EntityAttackType.Ranged: {
+        const rangedAttackParams = await this.battleAttackValidator.validateAttack(attacker, target);
 
         if (rangedAttackParams) {
           if (attacker.type === "Character") {
             const character = attacker as ICharacter;
-            let magicAttack = false;
             if (rangedAttackParams.itemSubType === ItemSubType.Magic) {
-              await this.hitTarget(attacker, target, magicAttack);
-              await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
-              return true;
+              return performRangedAttack(attacker, target, rangedAttackParams);
             } else if (rangedAttackParams.itemSubType === ItemSubType.Staff) {
-              const attack = await this.validateMagicAttack(character._id, {
+              const attack = await this.battleAttackValidator.validateMagicAttack(character._id, {
                 targetId: target.id,
                 targetType: target.type as EntityType,
               });
 
               if (attack) {
-                magicAttack = true;
-                await this.hitTarget(attacker, target, magicAttack);
-                await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+                return performRangedAttack(attacker, target, rangedAttackParams, true);
               }
-
               return attack;
             } else if (rangedAttackParams.itemSubType === ItemSubType.Ranged) {
-              await this.hitTarget(attacker, target, magicAttack);
-              await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
-              await this.battleRangedAttack.consumeAmmo(rangedAttackParams, character);
-
-              return true;
+              return performRangedAttack(attacker, target, rangedAttackParams);
             }
           } else {
-            attacker as INPC;
-            await this.hitTarget(attacker, target);
-            await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
-
-            return true;
+            return performRangedAttack(attacker, target, rangedAttackParams);
           }
         }
         break;
-      /* 
-      NPCs can have a hybrid attack type
-      if closer enough, would be melee attack
-      otherwise would be ranged attack 
-      */
+      }
+
       case EntityAttackType.MeleeRanged: {
         if (attacker.type === "Character") {
           throw new Error(`Character cannot have MeleeRanged hybrid attack type. Character id ${attacker.id}`);
@@ -130,16 +118,12 @@ export class BattleAttackTarget {
 
         if (isUnderMeleeRange) {
           await this.hitTarget(attacker, target);
-
           return true;
         } else {
-          const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
+          const rangedAttackParams = await this.battleAttackValidator.validateAttack(attacker, target);
 
           if (rangedAttackParams) {
-            await this.hitTarget(attacker, target);
-            await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
-
-            return true;
+            return performRangedAttack(attacker, target, rangedAttackParams);
           }
         }
         break;
@@ -254,45 +238,7 @@ export class BattleAttackTarget {
         If so, send death event to client and characters around.
         */
 
-        if (!target.isAlive) {
-          if (target.type === "Character") {
-            // freeze target variable, so it does not receive any modifications
-            const targetCharacter = Object.freeze(target as ICharacter);
-
-            await this.battleEffects.generateBloodOnGround(targetCharacter);
-
-            await this.characterDeath.handleCharacterDeath(attacker, targetCharacter as ICharacter);
-
-            // Attacker could be a Character (PVP battle)
-            if (attacker.type === "NPC") {
-              await this.npcTarget.clearTarget(attacker as INPC);
-              await this.npcTarget.tryToSetTarget(attacker as INPC);
-            } else {
-              await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
-            }
-          }
-          if (target.type === "NPC") {
-            await this.battleEffects.generateBloodOnGround(target);
-            await this.npcDeath.handleNPCDeath(target as INPC);
-            await this.skillIncrease.releaseXP(target as INPC);
-
-            if (attacker instanceof Character) {
-              // update kill quests status (if any)
-              await this.questSystem.updateQuests(QuestType.Kill, attacker as ICharacter, (target as INPC).key);
-
-              // clear attacker target
-              await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
-            }
-          }
-        } else if (attacker.type === EntityType.NPC) {
-          const npc = attacker as INPC;
-
-          const hasEntityEffects = npc?.entityEffects?.length! > 0;
-
-          if (hasEntityEffects) {
-            await this.entityEffectUse.applyEntityEffects(target, attacker as INPC);
-          }
-        }
+        await this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
       }
     }
 
@@ -311,6 +257,12 @@ export class BattleAttackTarget {
 
     // finally, send battleHitPayload to characters around
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
+
+    await this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
+  }
+
+  private async sendBattleEvent(character: ICharacter, battleEventPayload: IBattleEventFromServer): Promise<void> {
+    // finally, send battleHitPayload to characters around
 
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
@@ -346,81 +298,6 @@ export class BattleAttackTarget {
         }
 
         break;
-    }
-  }
-
-  private async validateMagicAttack(
-    characterId: Types.ObjectId,
-    target: { targetId: string; targetType: EntityType }
-  ): Promise<boolean> {
-    const character = (await Character.findById(characterId)
-      .populate({
-        path: "skills",
-        model: "Skill",
-      })
-      .lean()
-      .populate({
-        path: "equipment",
-        model: "Equipment",
-
-        populate: {
-          path: "rightHand leftHand",
-          model: "Item",
-        },
-      })
-      .lean()) as ICharacter;
-
-    if (!character) {
-      throw new Error(`Character not found for id ${characterId}`);
-    }
-
-    const equipment = character.equipment as IEquipment;
-    const equipmentId = equipment._id;
-
-    if (!equipment) {
-      throw new Error(`Equipment not found for id ${equipmentId}`);
-    }
-
-    const rightItemStaff = (await Item.findById(equipment?.rightHand).lean()) as IItem;
-    const leftItemStaff = (await Item.findById(equipment?.leftHand).lean()) as IItem;
-
-    const rightAttackParams: IRangedAttackParams = {
-      location: ItemSlotType.RightHand,
-      id: rightItemStaff?._id,
-      key: rightItemStaff?.key,
-      maxRange: rightItemStaff?.maxRange as number,
-      itemSubType: rightItemStaff?.subType as ItemSubType,
-    };
-
-    const leftAttackParams: IRangedAttackParams = {
-      location: ItemSlotType.LeftHand,
-      id: leftItemStaff?._id,
-      key: leftItemStaff?.key,
-      maxRange: leftItemStaff?.maxRange as number,
-      itemSubType: leftItemStaff?.subType as ItemSubType,
-    };
-
-    let manaConsumed = false;
-
-    if (rightAttackParams?.itemSubType === ItemSubType.Staff && leftAttackParams?.itemSubType === ItemSubType.Staff) {
-      manaConsumed = await this.battleRangedAttack.consumeMana(rightAttackParams, character._id, target);
-      manaConsumed ? await this.battleRangedAttack.consumeMana(leftAttackParams, character._id, target) : manaConsumed;
-
-      return manaConsumed;
-    } else if (
-      rightAttackParams?.itemSubType === ItemSubType.Staff &&
-      leftAttackParams?.itemSubType !== ItemSubType.Staff
-    ) {
-      manaConsumed = await this.battleRangedAttack.consumeMana(rightAttackParams, character._id, target);
-      return manaConsumed;
-    } else if (
-      leftAttackParams?.itemSubType === ItemSubType.Staff &&
-      rightAttackParams?.itemSubType !== ItemSubType.Staff
-    ) {
-      manaConsumed = await this.battleRangedAttack.consumeMana(leftAttackParams, character._id, target);
-      return manaConsumed;
-    } else {
-      return manaConsumed;
     }
   }
 }

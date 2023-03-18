@@ -13,12 +13,14 @@ import {
 import { FromGridX, FromGridY, ItemSlotType } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { Types } from "mongoose";
-import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
-import { BattleRangedAttack } from "../BattleRangedAttack";
+import { BattleAttackRanged } from "../BattleAttackRanged";
+import { BattleAttackTarget } from "../BattleAttackTarget";
+import { BattleAttackValidator } from "../BattleAttackValidator";
 
 describe("BattleRangedAttack.spec.ts", () => {
-  let battleRangedAttack: BattleRangedAttack;
+  let battleRangedAttack: BattleAttackRanged;
   let battleAttackTarget: BattleAttackTarget;
+  let battleAttackValidator: BattleAttackValidator;
   let testNPC: INPC;
   let testCharacter: ICharacter;
   let characterEquipment: IEquipment;
@@ -28,8 +30,9 @@ describe("BattleRangedAttack.spec.ts", () => {
   beforeAll(async () => {
     await unitTestHelper.initializeMapLoader();
 
-    battleRangedAttack = container.get<BattleRangedAttack>(BattleRangedAttack);
+    battleRangedAttack = container.get<BattleAttackRanged>(BattleAttackRanged);
     battleAttackTarget = container.get<BattleAttackTarget>(BattleAttackTarget);
+    battleAttackValidator = container.get<BattleAttackValidator>(BattleAttackValidator);
     hitTarget = jest.spyOn(battleAttackTarget, "hitTarget" as any);
   });
 
@@ -309,7 +312,7 @@ describe("BattleRangedAttack.spec.ts", () => {
     it("special ammo dependant on mana availability", async () => {
       testCharacter.mana = Math.floor(itemFireStaff.attack! / 6) - 1;
       // @ts-ignore
-      const validadeMagicAttack = await battleAttackTarget.validateMagicAttack(testCharacter._id, {
+      const validadeMagicAttack = await battleAttackValidator.validateMagicAttack(testCharacter._id, {
         targetId: testNPC._id,
         targetType: testNPC.type as EntityType,
       });
