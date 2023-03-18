@@ -79,8 +79,8 @@ describe("battleAttackValidator.spec.ts", () => {
 
   it("should return undefined when character has no ranged attack or ammo", async () => {
     const target = await unitTestHelper.createMockCharacter();
-
     // Set up the testCharacter without ranged attack or ammo
+    // ...
 
     const result = await battleAttackValidator.validateAttack(testCharacter, target);
 
