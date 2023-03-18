@@ -113,8 +113,12 @@ describe("battleAttackValidator.spec.ts", () => {
     // @ts-ignore
     jest.spyOn(battleAttackValidator.battleRangedAttack, "isSolidInRangedTrajectory").mockImplementation(() => true);
 
-    await battleAttackValidator.validateAttack(testCharacter, target);
+    const result = await battleAttackValidator.validateAttack(testCharacter, target);
 
     expect(sendSolidTrajectoryEvent).toHaveBeenCalled();
+
+    expect(sendSolidTrajectoryEvent).toHaveBeenCalledWith(testCharacter, target);
+
+    expect(result).toBeUndefined();
   });
 });
