@@ -1,15 +1,12 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
-import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { NPCDeath } from "@providers/npc/NPCDeath";
 import { NPCWarn } from "@providers/npc/NPCWarn";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
-import { QuestSystem } from "@providers/quest/QuestSystem";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -20,7 +17,6 @@ import {
   IBattleCancelTargeting,
   IBattleEventFromServer,
   ItemSubType,
-  QuestType,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -30,6 +26,7 @@ import { BattleEffects } from "../BattleEffects";
 import { BattleEvent } from "../BattleEvent";
 import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
 import { BattleAttackRanged } from "./BattleAttackRanged";
+import { BattleAttackTargetDeath } from "./BattleAttackTargetDeath";
 import { BattleAttackValidator } from "./BattleAttackValidator";
 
 @provide(BattleAttackTarget)
@@ -42,16 +39,14 @@ export class BattleAttackTarget {
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private npcTarget: NPCTarget,
     private battleEffects: BattleEffects,
-    private characterDeath: CharacterDeath,
-    private npcDeath: NPCDeath,
+    private characterDeath: CharacterDeath, //! dont remove this
     private skillIncrease: SkillIncrease,
     private battleRangedAttack: BattleAttackRanged,
-    private questSystem: QuestSystem,
-    private entityEffectUse: EntityEffectUse,
     private npcWarn: NPCWarn,
     private characterMovementWarn: CharacterMovementWarn,
     private characterWeapon: CharacterWeapon,
-    private battleAttackValidator: BattleAttackValidator
+    private battleAttackValidator: BattleAttackValidator,
+    private battleAttackTargetDeath: BattleAttackTargetDeath
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -243,45 +238,7 @@ export class BattleAttackTarget {
         If so, send death event to client and characters around.
         */
 
-        if (!target.isAlive) {
-          if (target.type === "Character") {
-            // freeze target variable, so it does not receive any modifications
-            const targetCharacter = Object.freeze(target as ICharacter);
-
-            await this.battleEffects.generateBloodOnGround(targetCharacter);
-
-            await this.characterDeath.handleCharacterDeath(attacker, targetCharacter as ICharacter);
-
-            // Attacker could be a Character (PVP battle)
-            if (attacker.type === "NPC") {
-              await this.npcTarget.clearTarget(attacker as INPC);
-              await this.npcTarget.tryToSetTarget(attacker as INPC);
-            } else {
-              await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
-            }
-          }
-          if (target.type === "NPC") {
-            await this.battleEffects.generateBloodOnGround(target);
-            await this.npcDeath.handleNPCDeath(target as INPC);
-            await this.skillIncrease.releaseXP(target as INPC);
-
-            if (attacker instanceof Character) {
-              // update kill quests status (if any)
-              await this.questSystem.updateQuests(QuestType.Kill, attacker as ICharacter, (target as INPC).key);
-
-              // clear attacker target
-              await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
-            }
-          }
-        } else if (attacker.type === EntityType.NPC) {
-          const npc = attacker as INPC;
-
-          const hasEntityEffects = npc?.entityEffects?.length! > 0;
-
-          if (hasEntityEffects) {
-            await this.entityEffectUse.applyEntityEffects(target, attacker as INPC);
-          }
-        }
+        await this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
       }
     }
 

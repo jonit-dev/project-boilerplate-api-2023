@@ -5,6 +5,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { BasicAttribute, BattleEventType, CharacterClass, FromGridX, FromGridY } from "@rpg-engine/shared";
 import { BattleAttackTarget } from "../BattleAttackTarget";
+import { BattleAttackTargetDeath } from "../BattleAttackTargetDeath";
 
 jest.mock("../../../entityEffects/EntityEffectCycle.ts", () => ({
   EntityEffectCycle: jest.fn(),
@@ -12,12 +13,14 @@ jest.mock("../../../entityEffects/EntityEffectCycle.ts", () => ({
 
 describe("BattleAttackTarget.spec.ts", () => {
   let battleAttackTarget: BattleAttackTarget;
+  let battleAttackTargetDeath: BattleAttackTargetDeath;
 
   let testNPC: INPC;
   let testCharacter: ICharacter;
 
   beforeAll(() => {
     battleAttackTarget = container.get<BattleAttackTarget>(BattleAttackTarget);
+    battleAttackTargetDeath = container.get<BattleAttackTargetDeath>(BattleAttackTargetDeath);
   });
 
   beforeEach(async () => {
@@ -106,7 +109,7 @@ describe("BattleAttackTarget.spec.ts", () => {
     jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 200);
 
     // @ts-ignore
-    const charDeath = jest.spyOn(battleAttackTarget.characterDeath, "handleCharacterDeath");
+    const charDeath = jest.spyOn(battleAttackTarget.battleAttackTargetDeath, "handleDeathAfterHit");
 
     testCharacter.health = 1;
     (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
