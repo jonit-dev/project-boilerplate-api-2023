@@ -4,9 +4,9 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { BasicAttribute, BattleEventType, CharacterClass, FromGridX, FromGridY } from "@rpg-engine/shared";
-import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
+import { BattleAttackTarget } from "../BattleAttackTarget";
 
-jest.mock("../../entityEffects/EntityEffectCycle.ts", () => ({
+jest.mock("../../../entityEffects/EntityEffectCycle.ts", () => ({
   EntityEffectCycle: jest.fn(),
 }));
 

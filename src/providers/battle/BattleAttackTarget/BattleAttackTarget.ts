@@ -1,6 +1,4 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
@@ -21,7 +19,6 @@ import {
   GRID_WIDTH,
   IBattleCancelTargeting,
   IBattleEventFromServer,
-  ItemSlotType,
   ItemSubType,
   QuestType,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
@@ -29,11 +26,11 @@ import {
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { Types } from "mongoose";
 import { BattleEffects } from "../BattleEffects";
 import { BattleEvent } from "../BattleEvent";
-import { BattleRangedAttack, IRangedAttackParams } from "../BattleRangedAttack";
 import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
+import { BattleAttackRanged } from "./BattleAttackRanged";
+import { BattleAttackValidator } from "./BattleAttackValidator";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -48,12 +45,13 @@ export class BattleAttackTarget {
     private characterDeath: CharacterDeath,
     private npcDeath: NPCDeath,
     private skillIncrease: SkillIncrease,
-    private battleRangedAttack: BattleRangedAttack,
+    private battleRangedAttack: BattleAttackRanged,
     private questSystem: QuestSystem,
     private entityEffectUse: EntityEffectUse,
     private npcWarn: NPCWarn,
     private characterMovementWarn: CharacterMovementWarn,
-    private characterWeapon: CharacterWeapon
+    private characterWeapon: CharacterWeapon,
+    private battleAttackValidator: BattleAttackValidator
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -89,7 +87,7 @@ export class BattleAttackTarget {
       }
 
       case EntityAttackType.Ranged: {
-        const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
+        const rangedAttackParams = await this.battleAttackValidator.validateAttack(attacker, target);
 
         if (rangedAttackParams) {
           if (attacker.type === "Character") {
@@ -97,7 +95,7 @@ export class BattleAttackTarget {
             if (rangedAttackParams.itemSubType === ItemSubType.Magic) {
               return performRangedAttack(attacker, target, rangedAttackParams);
             } else if (rangedAttackParams.itemSubType === ItemSubType.Staff) {
-              const attack = await this.validateMagicAttack(character._id, {
+              const attack = await this.battleAttackValidator.validateMagicAttack(character._id, {
                 targetId: target.id,
                 targetType: target.type as EntityType,
               });
@@ -127,7 +125,7 @@ export class BattleAttackTarget {
           await this.hitTarget(attacker, target);
           return true;
         } else {
-          const rangedAttackParams = await this.battleRangedAttack.validateAttack(attacker, target);
+          const rangedAttackParams = await this.battleAttackValidator.validateAttack(attacker, target);
 
           if (rangedAttackParams) {
             return performRangedAttack(attacker, target, rangedAttackParams);
@@ -337,81 +335,6 @@ export class BattleAttackTarget {
         }
 
         break;
-    }
-  }
-
-  private async validateMagicAttack(
-    characterId: Types.ObjectId,
-    target: { targetId: string; targetType: EntityType }
-  ): Promise<boolean> {
-    const character = (await Character.findById(characterId)
-      .populate({
-        path: "skills",
-        model: "Skill",
-      })
-      .lean()
-      .populate({
-        path: "equipment",
-        model: "Equipment",
-
-        populate: {
-          path: "rightHand leftHand",
-          model: "Item",
-        },
-      })
-      .lean()) as ICharacter;
-
-    if (!character) {
-      throw new Error(`Character not found for id ${characterId}`);
-    }
-
-    const equipment = character.equipment as IEquipment;
-    const equipmentId = equipment._id;
-
-    if (!equipment) {
-      throw new Error(`Equipment not found for id ${equipmentId}`);
-    }
-
-    const rightItemStaff = (await Item.findById(equipment?.rightHand).lean()) as IItem;
-    const leftItemStaff = (await Item.findById(equipment?.leftHand).lean()) as IItem;
-
-    const rightAttackParams: IRangedAttackParams = {
-      location: ItemSlotType.RightHand,
-      id: rightItemStaff?._id,
-      key: rightItemStaff?.key,
-      maxRange: rightItemStaff?.maxRange as number,
-      itemSubType: rightItemStaff?.subType as ItemSubType,
-    };
-
-    const leftAttackParams: IRangedAttackParams = {
-      location: ItemSlotType.LeftHand,
-      id: leftItemStaff?._id,
-      key: leftItemStaff?.key,
-      maxRange: leftItemStaff?.maxRange as number,
-      itemSubType: leftItemStaff?.subType as ItemSubType,
-    };
-
-    let manaConsumed = false;
-
-    if (rightAttackParams?.itemSubType === ItemSubType.Staff && leftAttackParams?.itemSubType === ItemSubType.Staff) {
-      manaConsumed = await this.battleRangedAttack.consumeMana(rightAttackParams, character._id, target);
-      manaConsumed ? await this.battleRangedAttack.consumeMana(leftAttackParams, character._id, target) : manaConsumed;
-
-      return manaConsumed;
-    } else if (
-      rightAttackParams?.itemSubType === ItemSubType.Staff &&
-      leftAttackParams?.itemSubType !== ItemSubType.Staff
-    ) {
-      manaConsumed = await this.battleRangedAttack.consumeMana(rightAttackParams, character._id, target);
-      return manaConsumed;
-    } else if (
-      leftAttackParams?.itemSubType === ItemSubType.Staff &&
-      rightAttackParams?.itemSubType !== ItemSubType.Staff
-    ) {
-      manaConsumed = await this.battleRangedAttack.consumeMana(leftAttackParams, character._id, target);
-      return manaConsumed;
-    } else {
-      return manaConsumed;
     }
   }
 }

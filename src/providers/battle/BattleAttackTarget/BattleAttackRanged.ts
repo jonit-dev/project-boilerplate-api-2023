@@ -1,5 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
@@ -43,8 +43,8 @@ export interface IRangedAttackParams {
 
 const rangedWeaponsWithoutAmmo: string[] = [RangedWeaponsBlueprint.Shuriken];
 
-@provide(BattleRangedAttack)
-export class BattleRangedAttack {
+@provide(BattleAttackRanged)
+export class BattleAttackRanged {
   constructor(
     private socketMessaging: SocketMessaging,
     private equipmentEquip: EquipmentEquip,
@@ -56,74 +56,7 @@ export class BattleRangedAttack {
     private characterItemEquipment: CharacterItemEquipment
   ) {}
 
-  /**
-   * Validates the ranged attack based on ranged attack max range, ammo available
-   * (in case of a character) and if solids are in the attack trajectory
-   * @param attacker data
-   * @param target data
-   * @returns ranged attack parameters if is a valid attack or undefined is invalid
-   */
-  public async validateAttack(
-    attacker: ICharacter | INPC,
-    target: ICharacter | INPC
-  ): Promise<IRangedAttackParams | undefined> {
-    let rangedAttackParams: Partial<IRangedAttackParams> | undefined;
-    let equipment: IEquipment;
-
-    if (attacker.type === "NPC") {
-      const npc = attacker as INPC;
-      if (!npc.maxRangeAttack) {
-        throw new Error("NPC attempted ranged attack without specifying maxRangeAttack field");
-      }
-      rangedAttackParams = { maxRange: npc.maxRangeAttack };
-    } else {
-      const character = attacker as ICharacter;
-      // Get equipment to validate if character has ranged attack ammo (bow -> arrow or spear)
-      equipment = (await Equipment.findById(character.equipment).populate("inventory").exec()) as IEquipment;
-
-      if (!equipment) {
-        throw new Error(`equipment not found for character ${character.id}`);
-      }
-
-      rangedAttackParams = await this.getAmmoForRangedAttack(character, equipment);
-
-      if (!rangedAttackParams) {
-        const magicAttack = false;
-        this.sendNoAmmoEvent(character, { targetId: target.id, targetType: target.type as EntityType }, magicAttack);
-        return;
-      }
-    }
-
-    // check if distance between attacker and target is
-    // within the ranged weapon max range
-    const isUnderDistanceRange = this.movementHelper.isUnderRange(
-      attacker.x,
-      attacker.y,
-      target.x,
-      target.y,
-      rangedAttackParams.maxRange!
-    );
-
-    if (!isUnderDistanceRange) {
-      if (attacker.type === "Character") {
-        this.sendNotInRangeEvent(attacker as ICharacter, target);
-      }
-      return;
-    }
-
-    // check if there's a solid in ranged attack trajectory
-    const solidInTrajectory = await this.solidInTrajectory(attacker, target);
-    if (solidInTrajectory) {
-      if (attacker.type === "Character") {
-        this.sendSolidInTrajectoryEvent(attacker as ICharacter, target);
-      }
-      return;
-    }
-
-    return rangedAttackParams as IRangedAttackParams;
-  }
-
-  private sendNoAmmoEvent(
+  public sendNoAmmoEvent(
     character: ICharacter,
     target: { targetId: string; targetType: EntityType },
     magicAttack?: boolean
@@ -148,30 +81,6 @@ export class BattleRangedAttack {
         reason: `Oops! Not enough ${ammoType} for your ${attackType} attack!`,
       }
     );
-  }
-
-  private sendNotInRangeEvent(character: ICharacter, target: ICharacter | INPC): void {
-    // this.socketMessaging.sendEventToUser<IBattleRangedAttackFailed>(
-    //   character.channelId!,
-    //   BattleSocketEvents.RangedAttackFailure,
-    //   {
-    //     targetId: target.id,
-    //     type: target.type as EntityType,
-    //     reason: "Ranged attack failed because target distance exceeds weapon max range",
-    //   }
-    // );
-  }
-
-  private sendSolidInTrajectoryEvent(character: ICharacter, target: ICharacter | INPC): void {
-    // this.socketMessaging.sendEventToUser<IBattleRangedAttackFailed>(
-    //   character.channelId!,
-    //   BattleSocketEvents.RangedAttackFailure,
-    //   {
-    //     targetId: target.id,
-    //     type: target.type as EntityType,
-    //     reason: "Ranged attack failed because there's a solid in ranged attack trajectory",
-    //   }
-    // );
   }
 
   public async sendRangedAttackEvent(
@@ -202,7 +111,7 @@ export class BattleRangedAttack {
     }
   }
 
-  private async getAmmoForRangedAttack(
+  public async getAmmoForRangedAttack(
     character: ICharacter,
     equipment: IEquipment
   ): Promise<IRangedAttackParams | undefined> {
@@ -386,7 +295,7 @@ export class BattleRangedAttack {
     return { haveMana: false, newMana: 0 };
   }
 
-  private async solidInTrajectory(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
+  public async isSolidInRangedTrajectory(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
     const origin = { x: ToGridX(attacker.x), y: ToGridY(attacker.y) };
     const destination = { x: ToGridX(target.x), y: ToGridY(target.y) };
 
