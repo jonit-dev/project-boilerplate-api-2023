@@ -18,8 +18,6 @@ describe("battleAttackValidator.spec.ts", () => {
   });
 
   const setupRangedCharacter = async (): Promise<void> => {
-    // setup character ranged
-
     const bow = await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow);
     const arrows = await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, {
       stackQty: 100,
@@ -81,8 +79,8 @@ describe("battleAttackValidator.spec.ts", () => {
 
   it("should return undefined when character has no ranged attack or ammo", async () => {
     const target = await unitTestHelper.createMockCharacter();
+
     // Set up the testCharacter without ranged attack or ammo
-    // ...
 
     const result = await battleAttackValidator.validateAttack(testCharacter, target);
 
