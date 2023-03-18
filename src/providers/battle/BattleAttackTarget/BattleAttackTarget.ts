@@ -301,6 +301,12 @@ export class BattleAttackTarget {
     // finally, send battleHitPayload to characters around
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
 
+    await this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
+  }
+
+  private async sendBattleEvent(character: ICharacter, battleEventPayload: IBattleEventFromServer): Promise<void> {
+    // finally, send battleHitPayload to characters around
+
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
