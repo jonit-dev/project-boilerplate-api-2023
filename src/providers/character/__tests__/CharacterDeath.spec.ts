@@ -86,6 +86,15 @@ describe("CharacterDeath.ts", () => {
 
     expect(spySocketMessaging).toHaveBeenCalled();
   });
+  it("should clear all entity effects on character's death", async () => {
+    // @ts-ignore
+    const clearEffectsSpy = jest.spyOn(characterDeath.entityEffectUse, "clearAllEntityEffects");
+
+    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+    expect(clearEffectsSpy).toHaveBeenCalled();
+    expect(clearEffectsSpy).toHaveBeenCalledWith(testCharacter);
+  });
 });
 
 describe("CharacterDeath.ts | Character with items", () => {

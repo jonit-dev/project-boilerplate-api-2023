@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NPC_TRADER_INTERACTION_DISTANCE } from "@providers/constants/NPCConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -145,7 +146,14 @@ export class CharacterTradingValidation {
     }
 
     //  Is the character near the seller NPC?
-    const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, npc.x, npc.y, 5);
+    // eslint-disable-next-line no-undef
+    const isUnderRange = this.movementHelper.isUnderRange(
+      character.x,
+      character.y,
+      npc.x,
+      npc.y,
+      NPC_TRADER_INTERACTION_DISTANCE
+    );
 
     if (!isUnderRange) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "You are too far away from the trader.");

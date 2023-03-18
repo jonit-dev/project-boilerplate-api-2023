@@ -2,14 +2,12 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
-  ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
-  LegsBlueprint,
   PotionsBlueprint,
   SpearsBlueprint,
   SwordsBlueprint,
@@ -21,36 +19,57 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcMinotaur = {
+export const npcMinotaurBerserker = {
   ...generateMoveTowardsMovement(),
-  name: "Minotaur",
-  key: HostileNPCsBlueprint.Minotaur,
-  textureKey: HostileNPCsBlueprint.Minotaur,
+  name: "Minotaur Berserker",
+  key: HostileNPCsBlueprint.MinotaurBerserker,
+  textureKey: HostileNPCsBlueprint.MinotaurBerserker,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
-  speed: MovementSpeed.Standard,
+  speed: MovementSpeed.Fast,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 200,
-  healthRandomizerDice: Dice.D4,
-  skillRandomizerDice: Dice.D4,
+  baseHealth: 400,
+  healthRandomizerDice: Dice.D20,
+  skillRandomizerDice: Dice.D8,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 25,
+    level: 45,
     strength: {
-      level: 20,
+      level: 40,
     },
     dexterity: {
-      level: 14,
+      level: 24,
     },
     resistance: {
-      level: 28,
+      level: 38,
     },
   },
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
-      chance: 10,
+      itemBlueprintKey: BootsBlueprint.RoyalBoots,
+      chance: 3,
+    },
+    {
+      itemBlueprintKey: FoodsBlueprint.Fish,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
+      chance: 30,
+    },
+
+    {
+      itemBlueprintKey: GlovesBlueprint.PlateGloves,
+      chance: 85,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.Trident,
+      chance: 4,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.KnightsSword,
+      chance: 5,
     },
     {
       itemBlueprintKey: HammersBlueprint.WarHammer,
@@ -61,61 +80,12 @@ export const npcMinotaur = {
       chance: 10,
     },
     {
-      itemBlueprintKey: SwordsBlueprint.Katana,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: BootsBlueprint.CopperBoots,
-      chance: 20,
-    },
-    {
-      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
-      chance: 5,
-    },
-    {
-      itemBlueprintKey: GlovesBlueprint.PlateGloves,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: FoodsBlueprint.Fish,
-      chance: 30,
-    },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
-    {
-      itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
+      itemBlueprintKey: SwordsBlueprint.BasiliskSword,
       chance: 10,
     },
     {
-      itemBlueprintKey: HelmetsBlueprint.BerserkersHelmet,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: LegsBlueprint.StuddedLegs,
-      chance: 20,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
-      chance: 1,
-    },
-    {
-      itemBlueprintKey: SpearsBlueprint.Trident,
-      chance: 1,
-    },
-    {
-      itemBlueprintKey: SwordsBlueprint.KnightsSword,
+      itemBlueprintKey: SwordsBlueprint.CopperBroadsword,
       chance: 10,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.IronNail,
-      chance: 10,
-      quantityRange: [1, 5],
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Jade,
