@@ -1,6 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { EntityType, IItem, ItemSlotType, ItemSubType } from "@rpg-engine/shared";
@@ -92,11 +91,9 @@ export class BattleAttackValidator {
         path: "skills",
         model: "Skill",
       })
-      .lean()
       .populate({
         path: "equipment",
         model: "Equipment",
-
         populate: {
           path: "rightHand leftHand",
           model: "Item",
@@ -109,53 +106,42 @@ export class BattleAttackValidator {
     }
 
     const equipment = character.equipment as IEquipment;
-    const equipmentId = equipment._id;
-
     if (!equipment) {
-      throw new Error(`Equipment not found for id ${equipmentId}`);
+      throw new Error(`Equipment not found for character ${characterId}`);
     }
 
-    const rightItemStaff = (await Item.findById(equipment?.rightHand).lean()) as IItem;
-    const leftItemStaff = (await Item.findById(equipment?.leftHand).lean()) as IItem;
+    const rightItemStaff = equipment.rightHand as IItem;
+    const leftItemStaff = equipment.leftHand as IItem;
 
-    const rightAttackParams: IRangedAttackParams = {
-      location: ItemSlotType.RightHand,
-      id: rightItemStaff?._id,
-      key: rightItemStaff?.key,
-      maxRange: rightItemStaff?.maxRange as number,
-      itemSubType: rightItemStaff?.subType as ItemSubType,
-    };
+    const attackParams: IRangedAttackParams[] = [];
 
-    const leftAttackParams: IRangedAttackParams = {
-      location: ItemSlotType.LeftHand,
-      id: leftItemStaff?._id,
-      key: leftItemStaff?.key,
-      maxRange: leftItemStaff?.maxRange as number,
-      itemSubType: leftItemStaff?.subType as ItemSubType,
-    };
+    if (rightItemStaff?.subType === ItemSubType.Staff) {
+      attackParams.push({
+        location: ItemSlotType.RightHand,
+        id: rightItemStaff._id,
+        key: rightItemStaff.key,
+        maxRange: rightItemStaff.maxRange as number,
+        itemSubType: rightItemStaff.subType as ItemSubType,
+      });
+    }
+
+    if (leftItemStaff?.subType === ItemSubType.Staff) {
+      attackParams.push({
+        location: ItemSlotType.LeftHand,
+        id: leftItemStaff._id,
+        key: leftItemStaff.key,
+        maxRange: leftItemStaff.maxRange as number,
+        itemSubType: leftItemStaff.subType as ItemSubType,
+      });
+    }
 
     let manaConsumed = false;
-
-    if (rightAttackParams?.itemSubType === ItemSubType.Staff && leftAttackParams?.itemSubType === ItemSubType.Staff) {
-      manaConsumed = await this.battleRangedAttack.consumeMana(rightAttackParams, character._id, target);
-      manaConsumed ? await this.battleRangedAttack.consumeMana(leftAttackParams, character._id, target) : manaConsumed;
-
-      return manaConsumed;
-    } else if (
-      rightAttackParams?.itemSubType === ItemSubType.Staff &&
-      leftAttackParams?.itemSubType !== ItemSubType.Staff
-    ) {
-      manaConsumed = await this.battleRangedAttack.consumeMana(rightAttackParams, character._id, target);
-      return manaConsumed;
-    } else if (
-      leftAttackParams?.itemSubType === ItemSubType.Staff &&
-      rightAttackParams?.itemSubType !== ItemSubType.Staff
-    ) {
-      manaConsumed = await this.battleRangedAttack.consumeMana(leftAttackParams, character._id, target);
-      return manaConsumed;
-    } else {
-      return manaConsumed;
+    for (const attackParam of attackParams) {
+      manaConsumed = await this.battleRangedAttack.consumeMana(attackParam, character._id, target);
+      if (manaConsumed) break;
     }
+
+    return manaConsumed;
   }
 
   private sendNotInRangeEvent(character: ICharacter, target: ICharacter | INPC): void {
