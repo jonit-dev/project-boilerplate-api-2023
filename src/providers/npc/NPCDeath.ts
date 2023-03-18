@@ -74,6 +74,7 @@ export class NPCDeath {
     npc.health = 0;
     npc.nextSpawnTime = dayjs(new Date()).add(npc.spawnIntervalMin, "minutes").toDate();
     npc.currentMovementType = npc.originalMovementType;
+    npc.appliedEntityEffects = undefined;
     await npc.save();
   }
 

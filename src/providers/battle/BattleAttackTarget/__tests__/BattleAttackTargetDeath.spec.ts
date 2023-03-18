@@ -9,8 +9,6 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
 
   let handleCharacterDeathSpy: jest.SpyInstance;
   let handleNPCDeathSpy: jest.SpyInstance;
-  let applyEntityEffectsIfApplicableSpy: jest.SpyInstance;
-
   let testCharacter: ICharacter;
   let testNPC: INPC;
 
@@ -24,8 +22,6 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
     handleCharacterDeathSpy = jest.spyOn(battleAttackTargetDeath, "handleCharacterDeath");
     // @ts-ignore
     handleNPCDeathSpy = jest.spyOn(battleAttackTargetDeath, "handleNPCDeath");
-    // @ts-ignore
-    applyEntityEffectsIfApplicableSpy = jest.spyOn(battleAttackTargetDeath, "applyEntityEffectsIfApplicable");
 
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
     testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
@@ -49,17 +45,6 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
     expect(handleNPCDeathSpy).toHaveBeenCalled();
   });
 
-  it("handleDeathAfterHit should apply entity effects if attacker is an NPC and target is not alive", async () => {
-    testCharacter.health = 0;
-    // @ts-ignore
-    testNPC.entityEffects = [{ id: 1, duration: 10 }];
-    await testCharacter.save();
-
-    await battleAttackTargetDeath.handleDeathAfterHit(testNPC, testCharacter);
-
-    expect(applyEntityEffectsIfApplicableSpy).toHaveBeenCalled();
-  });
-
   it("handleDeathAfterHit should not call any death handlers or apply entity effects if target is alive", async () => {
     testCharacter.health = 1;
     await testCharacter.save();
@@ -68,7 +53,6 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
 
     expect(handleCharacterDeathSpy).not.toHaveBeenCalled();
     expect(handleNPCDeathSpy).not.toHaveBeenCalled();
-    expect(applyEntityEffectsIfApplicableSpy).not.toHaveBeenCalled();
   });
 
   it("upon death, if attacker is NPC it should clearTarget", async () => {

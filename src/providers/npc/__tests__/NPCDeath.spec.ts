@@ -2,7 +2,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { entityEffectsBlueprintsIndex } from "@providers/entityEffects/data";
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data";
 import {
@@ -340,5 +342,31 @@ describe("NPCDeath.ts", () => {
     await npcDeath.handleNPCDeath(testNPC);
 
     expect(spyOnSetItemRarityOnLootDrop).toHaveBeenCalled();
+  });
+
+  it("should update NPC data after death", async () => {
+    // @ts-ignore
+    const updateNPCSpy = jest.spyOn(npcDeath, "updateNPCAfterDeath");
+
+    const poisonEntityEffect = entityEffectsBlueprintsIndex[EntityEffectBlueprint.Poison];
+
+    testNPC.appliedEntityEffects = [poisonEntityEffect];
+
+    await testNPC.save();
+
+    await npcDeath.handleNPCDeath(testNPC);
+
+    // @ts-ignore
+    expect(updateNPCSpy).toHaveBeenCalledWith(testNPC);
+
+    const updatedNPC = await NPC.findById(testNPC.id);
+
+    if (!updatedNPC) throw new Error("NPC not found");
+
+    expect(updatedNPC).not.toBeNull();
+    expect(updatedNPC.health).toBe(0);
+    expect(updatedNPC.nextSpawnTime).toBeDefined();
+    expect(updatedNPC.currentMovementType).toBe(updatedNPC!.originalMovementType);
+    expect(updatedNPC.appliedEntityEffects?.length).toBe(0);
   });
 });

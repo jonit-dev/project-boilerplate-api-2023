@@ -1,12 +1,11 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
-import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { QuestSystem } from "@providers/quest/QuestSystem";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
-import { EntityType, QuestType } from "@rpg-engine/shared";
+import { QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleEffects } from "../BattleEffects";
 import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
@@ -20,8 +19,7 @@ export class BattleAttackTargetDeath {
     private npcDeath: NPCDeath,
     private skillIncrease: SkillIncrease,
     private questSystem: QuestSystem,
-    private battleNetworkStopTargeting: BattleNetworkStopTargeting,
-    private entityEffectUse: EntityEffectUse
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting
   ) {}
 
   public async handleDeathAfterHit(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
@@ -32,10 +30,6 @@ export class BattleAttackTargetDeath {
         await this.handleCharacterDeath(attacker, target as ICharacter);
       } else if (target.type === "NPC") {
         await this.handleNPCDeath(attacker, target as INPC);
-      }
-
-      if (attacker.type === EntityType.NPC) {
-        await this.applyEntityEffectsIfApplicable(attacker as INPC, target);
       }
     }
   }
@@ -58,14 +52,6 @@ export class BattleAttackTargetDeath {
     if (attacker instanceof Character) {
       await this.questSystem.updateQuests(QuestType.Kill, attacker as ICharacter, targetNPC.key);
       await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
-    }
-  }
-
-  private async applyEntityEffectsIfApplicable(npc: INPC, target: ICharacter | INPC): Promise<void> {
-    const hasEntityEffects = npc?.entityEffects?.length! > 0;
-
-    if (hasEntityEffects) {
-      await this.entityEffectUse.applyEntityEffects(target, npc);
     }
   }
 }
