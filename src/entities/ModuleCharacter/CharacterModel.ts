@@ -143,10 +143,6 @@ const characterSchema = createLeanSchema(
       default: CharacterClass.None,
       enum: TypeHelper.enumToStringArray(CharacterClass),
     }),
-    totalWeightCapacity: Type.number({
-      required: true,
-      default: 100,
-    }),
     isOnline: Type.boolean({
       default: false,
       required: true,
