@@ -12,7 +12,6 @@ export const characterMock: Partial<ICharacter> = {
   faction: CharacterFactions.LifeBringer,
   race: LifeBringerRaces.Human,
   textureKey: "kid-1",
-  totalWeightCapacity: 100,
   isOnline: true,
   scene: "example",
   initialScene: "example",
