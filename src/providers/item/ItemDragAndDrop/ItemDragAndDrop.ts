@@ -1,19 +1,13 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem as IModelItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  IEquipmentAndInventoryUpdatePayload,
-  IItem,
-  IItemContainer,
-  IItemMove,
-  ItemSocketEvents,
-} from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItem, IItemMove, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { itemsBlueprintIndex } from "./data/index";
+import { itemsBlueprintIndex } from "../data/index";
 
 @provide(ItemDragAndDrop)
 export class ItemDragAndDrop {
@@ -70,7 +64,7 @@ export class ItemDragAndDrop {
           )) as unknown as IItemContainer;
 
           const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-            inventory: inventoryContainer,
+            inventory: inventoryContainer as any,
             openEquipmentSetOnUpdate: false,
             openInventoryOnUpdate: false,
           };
@@ -126,30 +120,73 @@ export class ItemDragAndDrop {
       await moveItem();
     } else if (quantity && from.item.stackQty) {
       if (to.item && to.item.stackQty) {
-        const toStackQty = to.item.stackQty;
-
-        const futureQuantity = Math.min(toStackQty + quantity, to.item.maxStackSize);
-        await this.characterItemSlots.updateItemOnSlot(to.slotIndex, targetContainer, {
-          stackQty: futureQuantity,
-        } as IItem);
-
-        if (from.item.stackQty - (futureQuantity - toStackQty) <= 0) {
-          await this.characterItemSlots.deleteItemOnSlot(targetContainer, from.item._id);
-          await Item.findByIdAndDelete(from.item._id);
-        } else {
-          await this.characterItemSlots.updateItemOnSlot(from.slotIndex, targetContainer, {
-            stackQty: from.item.stackQty - (futureQuantity - toStackQty),
-          } as IItem);
-        }
+        await this.handleStackableItemMove(targetContainer, from, to, quantity);
       } else if (quantity >= from.item.stackQty) {
         await moveItem();
       } else {
-        await this.characterItemSlots.updateItemOnSlot(from.slotIndex, targetContainer, {
-          stackQty: from.item.stackQty - quantity,
-        } as IItem);
+        await this.updateStackQty(targetContainer, from.slotIndex, from.item.stackQty - quantity);
       }
     }
 
+    const hasAddedNewItem = await this.createAndAddNewItem(from, to, character, targetContainer, totalMove, quantity);
+
+    if (!hasAddedNewItem) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private async handleStackableItemMove(
+    targetContainer: IItemContainer,
+    from: {
+      item: IItem;
+      slotIndex: number;
+    },
+    to: {
+      item: IItem | null;
+      slotIndex: number;
+    },
+    quantity: number
+  ): Promise<void> {
+    const toStackQty = to.item?.stackQty;
+    const futureQuantity = Math.min(toStackQty! + quantity, to.item?.maxStackSize!);
+
+    await this.updateStackQty(targetContainer, to.slotIndex, futureQuantity);
+
+    const remainingQty = from.item.stackQty! - (futureQuantity - toStackQty!);
+    if (remainingQty <= 0) {
+      await this.deleteItemFromSlot(targetContainer, from.item._id);
+    } else {
+      await this.updateStackQty(targetContainer, from.slotIndex, remainingQty);
+    }
+  }
+
+  private async updateStackQty(targetContainer: IItemContainer, slotIndex: number, newStackQty: number): Promise<void> {
+    await this.characterItemSlots.updateItemOnSlot(slotIndex, targetContainer, {
+      stackQty: newStackQty,
+    } as IItem);
+  }
+
+  private async deleteItemFromSlot(targetContainer: IItemContainer, itemId: string): Promise<void> {
+    await this.characterItemSlots.deleteItemOnSlot(targetContainer, itemId);
+    await Item.findByIdAndDelete(itemId);
+  }
+
+  private async createAndAddNewItem(
+    from: {
+      item: IItem;
+      slotIndex: number;
+    },
+    to: {
+      item: IItem | null;
+      slotIndex: number;
+    },
+    character: ICharacter,
+    targetContainer: IItemContainer,
+    totalMove: boolean,
+    quantity?: number
+  ): Promise<boolean> {
     if (!to.item && !totalMove) {
       const blueprint = itemsBlueprintIndex[from.item.key];
       if (!blueprint) {
@@ -167,7 +204,7 @@ export class ItemDragAndDrop {
 
       await item.save();
 
-      await this.characterItemSlots.addItemOnSlot(targetContainer, item, to.slotIndex);
+      return await this.characterItemSlots.addItemOnSlot(targetContainer, item, to.slotIndex);
     }
 
     return true;
@@ -176,6 +213,41 @@ export class ItemDragAndDrop {
   private async isItemMoveValid(itemMove: IItemMove, character: ICharacter): Promise<Boolean> {
     const itemFrom = await Item.findById(itemMove.from.item._id);
     const itemTo = await Item.findById(itemMove.to.item?._id);
+
+    if (!itemFrom) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item to be moved wasn't found.");
+      return false;
+    }
+
+    // should return false if the quantity to be moved is more than the available quantity
+
+    if (itemMove.quantity && itemFrom.stackQty && itemMove.quantity > itemFrom.stackQty) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you can't move more than the available quantity."
+      );
+      return false;
+    }
+
+    // should return false if the source and target slots are the same
+    if (itemMove.from.slotIndex === itemMove?.to?.slotIndex) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can't move an item to the same slot.");
+      return false;
+    }
+
+    // check if itemTo is a container. if so, check if there's enough space before proceeding
+
+    if (itemTo?.isItemContainer) {
+      const hasAvailableSlots = await this.characterItemSlots.hasAvailableSlot(
+        itemTo.itemContainer as string,
+        itemFrom
+      );
+
+      if (!hasAvailableSlots) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, there's no space in this container.");
+        return false;
+      }
+    }
 
     // TODO: Add other sources to move from or to in future
     const isInventory = itemMove.from.source === "Inventory" && itemMove.to.source === "Inventory";
@@ -214,8 +286,8 @@ export class ItemDragAndDrop {
     }
 
     if (
-      itemMove.from.containerId.toString() !== inventoryContainer?.id.toString() ||
-      itemMove.to.containerId.toString() !== inventoryContainer?.id.toString()
+      itemMove.from.containerId.toString() !== inventoryContainer?._id.toString() ||
+      itemMove.to.containerId.toString() !== inventoryContainer?._id.toString()
     ) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,

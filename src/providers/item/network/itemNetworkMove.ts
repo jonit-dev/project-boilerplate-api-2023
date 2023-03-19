@@ -2,7 +2,7 @@ import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IItemMove, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ItemDragAndDrop } from "../ItemDragAndDrop";
+import { ItemDragAndDrop } from "../ItemDragAndDrop/ItemDragAndDrop";
 
 @provide(ItemNetworkMove)
 export class ItemNetworkMove {
