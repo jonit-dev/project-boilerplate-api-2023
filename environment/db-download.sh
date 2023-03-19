@@ -1,8 +1,14 @@
 #!/bin/bash
 
-tput setaf 3;  echo "⚙️ Downloading database file. Please wait..."; tput sgr0
-tput setaf 2;
+# define variables for VPS and backup file locations
+VPS_HOST="europe-ssh.definya.com"
+VPS_USER="jonit"
+BACKUP_PATH="/home/jonit/rpg-engine/rpg-api/environment/backups/db-dump.zip"
+LOCAL_DOWNLOAD_DIR="./environment/backups"
+LOCAL_DOWNLOAD_PATH="$LOCAL_DOWNLOAD_DIR/db-dump.zip"
 
-[ ! -d "environment/backups" ] && mkdir environment/backups
+# create the local backups directory if it doesn't already exist
+mkdir -p "$LOCAL_DOWNLOAD_DIR"
 
-wget -O environment/backups/db-dump.zip "https://www.dropbox.com/s/zqbbevdhwi7gbbe/db-dump.zip?dl=1"
+# download the backup file using scp
+scp "$VPS_USER@$VPS_HOST:$BACKUP_PATH" "$LOCAL_DOWNLOAD_PATH"
