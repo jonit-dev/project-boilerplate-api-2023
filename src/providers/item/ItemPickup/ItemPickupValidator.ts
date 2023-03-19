@@ -6,11 +6,13 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
+import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { MapHelper } from "@providers/map/MapHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItemPickup } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { isEmpty } from "lodash";
 
 @provide(ItemPickupValidator)
 export class ItemPickupValidator {
@@ -22,13 +24,21 @@ export class ItemPickupValidator {
     private movementHelper: MovementHelper,
     private characterItems: CharacterItems,
     private characterValidation: CharacterValidation,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private equipmentEquip: EquipmentEquip
   ) {}
 
   public async isItemPickupValid(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | IItem> {
     const item = (await Item.findById(itemPickupData.itemId)) as unknown as IItem;
 
     const inventory = await this.characterInventory.getInventory(character);
+
+    // if no inventory, but item trying to be picked up is an inventory item, then equip it
+
+    if (!inventory && item.isItemContainer && isEmpty(itemPickupData.toContainerId)) {
+      await this.equipmentEquip.equipInventory(character, item._id);
+      return false;
+    }
 
     if (!item) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the item to be picked up was not found.");

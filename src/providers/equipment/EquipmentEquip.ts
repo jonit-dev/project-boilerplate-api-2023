@@ -1,17 +1,18 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { ItemView } from "@providers/item/ItemView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, ItemSlotType, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentSlots } from "./EquipmentSlots";
 import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 export type SourceEquipContainerType = "inventory" | "container";
 
@@ -25,8 +26,59 @@ export class EquipmentEquip {
     private equipmentTwoHanded: EquipmentTwoHanded,
     private itemOwnership: ItemOwnership,
     private characterInventory: CharacterInventory,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private itemView: ItemView
   ) {}
+
+  public async equipInventory(character: ICharacter, itemId: string): Promise<boolean> {
+    const item = await Item.findById(itemId);
+    let inventory = await this.characterInventory.getInventory(character);
+
+    if (!item) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item not found.");
+      return false;
+    }
+    item.isBeingEquipped = true;
+    await item.save();
+
+    const isItemInventory = item.isItemContainer;
+
+    // if its not an item container, or the use already has an inventory, this method shouldnt have been called.
+    if (!isItemInventory || inventory) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can't equip this as an inventory.");
+      return false;
+    }
+
+    const equipment = await Equipment.findById(character.equipment);
+
+    if (!equipment) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
+      return false;
+    }
+
+    equipment.inventory = item._id;
+    await equipment.save();
+
+    inventory = await this.characterInventory.getInventory(character);
+
+    if (!inventory) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory not found.");
+      return false;
+    }
+
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+
+    if (!inventoryContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory container not found.");
+      return false;
+    }
+
+    await this.itemView.removeItemFromMap(item);
+
+    await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
+
+    return true;
+  }
 
   public async equip(character: ICharacter, itemId: string, fromItemContainerId: string): Promise<boolean> {
     const item = await Item.findById(itemId);
@@ -64,7 +116,6 @@ export class EquipmentEquip {
     }
 
     item.isBeingEquipped = true;
-    await item.save();
 
     const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
 
@@ -81,32 +132,10 @@ export class EquipmentEquip {
       return false;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
-    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-      equipment: equipmentSlots,
-      inventory: inventoryContainer,
-    };
+    await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
 
-    this.updateItemInventoryCharacter(payloadUpdate, character);
+    await item.save();
 
-    // if no owner, add item ownership
-    if (!item.owner) {
-      await this.itemOwnership.addItemOwnership(item, character);
-    }
-
-    await Item.updateOne({ _id: item._id }, { isEquipped: true });
-
-    // make sure it does not save coordinates here
-    if (item.x || item.y || item.scene) {
-      await Item.updateOne({ _id: item._id }, { $unset: { x: "", y: "", scene: "" } });
-    }
-
-    // set isBeingEquipped to false (lock mechanism)
-    await Item.updateOne({ _id: item._id }, { $set: { isBeingEquipped: false } });
-
-    // When Equip remove data from redis
-    await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
-    await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
     return true;
   }
 
@@ -129,6 +158,40 @@ export class EquipmentEquip {
     }
 
     return allowedItemTypes;
+  }
+
+  private async finalizeEquipItem(
+    inventoryContainer: IItemContainer,
+    equipment: IEquipment,
+    item: IItem,
+    character: ICharacter
+  ): Promise<void> {
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      equipment: equipmentSlots,
+      inventory: inventoryContainer as any,
+    };
+
+    this.updateItemInventoryCharacter(payloadUpdate, character);
+
+    // if no owner, add item ownership
+    if (!item.owner) {
+      await this.itemOwnership.addItemOwnership(item, character);
+    }
+
+    await Item.updateOne({ _id: item._id }, { isEquipped: true });
+
+    // make sure it does not save coordinates here
+    if (item.x || item.y || item.scene) {
+      await Item.updateOne({ _id: item._id }, { $unset: { x: "", y: "", scene: "" } });
+    }
+
+    // set isBeingEquipped to false (lock mechanism)
+    await Item.updateOne({ _id: item._id }, { $set: { isBeingEquipped: false } });
+
+    // When Equip remove data from redis
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
   }
 
   private async checkContainerType(itemContainer: IItemContainer): Promise<SourceEquipContainerType> {
