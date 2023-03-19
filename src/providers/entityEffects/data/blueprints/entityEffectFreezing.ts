@@ -17,7 +17,7 @@ export const entityEffectFreezing: IEntityEffect = {
   probability: 25,
   targetAnimationKey: AnimationEffectKeys.Freeze,
   type: EntityAttackType.Melee,
-  effect: (target: ICharacter | INPC, attacker: INPC) => {
+  effect: (target: ICharacter | INPC, attacker: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const attackerSkills = attacker.skills as unknown as ISkill;

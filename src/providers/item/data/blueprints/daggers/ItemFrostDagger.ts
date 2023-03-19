@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { IEquippableWeaponBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { DaggersBlueprint } from "../../types/itemsBlueprintTypes";
@@ -17,4 +18,6 @@ export const itemFrostDagger: IEquippableWeaponBlueprint = {
   weight: 1,
   rangeType: EntityAttackType.Melee,
   basePrice: 45,
+  entityEffects: [EntityEffectBlueprint.Freezing],
+  entityEffectChance: 80,
 };

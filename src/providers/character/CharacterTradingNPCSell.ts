@@ -226,9 +226,9 @@ export class CharacterTradingNPCSell {
       if (!sellPrice) continue;
 
       responseItems.push({
-        ...item as unknown as Shared.IItem,
+        ...(item as unknown as Shared.IItem),
         price: this.characterTradingBalance.getItemSellPrice(item.key),
-        stackQty: itemsQty.get(itemKey)
+        stackQty: itemsQty.get(itemKey),
       });
     }
     return responseItems;

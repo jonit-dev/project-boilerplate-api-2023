@@ -17,7 +17,7 @@ export const entityEffectPoison: IEntityEffect = {
   probability: 20, // 20% chance of triggering it for the NPC that attacks a target
   targetAnimationKey: AnimationEffectKeys.HitPoison,
   type: EntityAttackType.Melee,
-  effect: (target: ICharacter | INPC, attacker: INPC) => {
+  effect: (target: ICharacter | INPC, attacker: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const attackerSkills = attacker.skills as unknown as ISkill;

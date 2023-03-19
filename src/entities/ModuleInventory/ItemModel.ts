@@ -1,8 +1,8 @@
 import { CharacterView } from "@providers/character/CharacterView";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { container } from "@providers/inversify/container";
-import { ItemView } from "@providers/item/ItemView";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ItemView } from "@providers/item/ItemView";
 import { MapHelper } from "@providers/map/MapHelper";
 import { ItemRarities, ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -10,6 +10,7 @@ import { UpdateQuery } from "mongoose";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { ItemContainer } from "./ItemContainerModel";
 
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 const itemSchema = createLeanSchema(
@@ -99,6 +100,14 @@ const itemSchema = createLeanSchema(
     droppedBy: Type.objectId({
       ref: "Character",
     }),
+
+    entityEffects: Type.array().of(
+      Type.string({
+        typeof: EntityEffectBlueprint,
+      })
+    ),
+
+    entityEffectChance: Type.number({ default: 0 }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 ).plugin(updateIfCurrentPlugin);

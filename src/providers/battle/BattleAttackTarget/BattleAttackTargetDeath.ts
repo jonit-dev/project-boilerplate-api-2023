@@ -1,8 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
-import { NPCDeath } from "@providers/npc/NPCDeath";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
+import { NPCDeath } from "@providers/npc/NPCDeath";
 import { QuestSystem } from "@providers/quest/QuestSystem";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { QuestType } from "@rpg-engine/shared";

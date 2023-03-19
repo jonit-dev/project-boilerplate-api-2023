@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { EntityAttackType, IEquippableWeaponBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { SwordsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -16,4 +17,6 @@ export const itemIceShardLongsword: IEquippableWeaponBlueprint = {
   defense: 10,
   rangeType: EntityAttackType.Melee,
   basePrice: 80,
+  entityEffects: [EntityEffectBlueprint.Freezing],
+  entityEffectChance: 90,
 };

@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { IEquippableWeaponBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { SwordsBlueprint } from "../../types/itemsBlueprintTypes";
@@ -17,4 +18,6 @@ export const itemIceSword: IEquippableWeaponBlueprint = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
   basePrice: 53,
+  entityEffects: [EntityEffectBlueprint.Freezing],
+  entityEffectChance: 70,
 };

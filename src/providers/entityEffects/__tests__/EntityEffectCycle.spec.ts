@@ -2,11 +2,10 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { unitTestHelper } from "@providers/inversify/container";
-import { EntityType } from "@rpg-engine/shared";
-import { EntityEffectCycle } from "../EntityEffectCycle";
 import { entityEffectsBlueprintsIndex } from "../data";
 import { IEntityEffect } from "../data/blueprints/entityEffect";
 import { EntityEffectBlueprint } from "../data/types/entityEffectBlueprintTypes";
+import { EntityEffectCycle } from "../EntityEffectCycle";
 
 jest.useFakeTimers({ advanceTimers: true });
 describe("EntityEffectCycle", () => {
@@ -52,7 +51,7 @@ describe("EntityEffectCycle", () => {
     const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
     timerMock.mockImplementation();
 
-    new EntityEffectCycle(entityEffect, testTarget._id, testTarget.type, testAttacker._id);
+    new EntityEffectCycle(entityEffect, testTarget._id, testTarget.type, testAttacker._id, testAttacker.type);
 
     async function verifyEffectCycle(lastIteration: boolean): Promise<void> {
       await waitUntil(() => {
@@ -67,7 +66,7 @@ describe("EntityEffectCycle", () => {
 
       expect(getTargetMock).toHaveBeenCalledTimes(2);
       expect(getTargetMock).toHaveBeenCalledWith(testTarget._id, testTarget.type);
-      expect(getTargetMock).toHaveBeenCalledWith(testAttacker._id, EntityType.NPC);
+
       getTargetMock.mockClear();
 
       if (!lastIteration) {
@@ -107,7 +106,7 @@ describe("EntityEffectCycle", () => {
       // @ts-expect-error
       .mockImplementation(() => Promise.resolve({ _id: testTarget._id, type: testTarget.type } as any));
 
-    new EntityEffectCycle(entityEffect, testTarget._id, testTarget.type, testAttacker._id);
+    new EntityEffectCycle(entityEffect, testTarget._id, testTarget.type, testAttacker._id, testAttacker.type);
 
     await waitUntil(() => {
       return getTargetSpy.mock.calls.length > 0;

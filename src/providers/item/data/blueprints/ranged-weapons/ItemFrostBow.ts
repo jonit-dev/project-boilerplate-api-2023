@@ -1,7 +1,8 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { IEquippableRangedWeaponTwoHandedBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { RangeTypes } from "../../types/RangedWeaponTypes";
 import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
+import { RangeTypes } from "../../types/RangedWeaponTypes";
 
 export const itemFrostBow: IEquippableRangedWeaponTwoHandedBlueprint = {
   key: RangedWeaponsBlueprint.FrostBow,
@@ -20,4 +21,6 @@ export const itemFrostBow: IEquippableRangedWeaponTwoHandedBlueprint = {
   requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow],
   isTwoHanded: true,
   basePrice: 87,
+  entityEffects: [EntityEffectBlueprint.Freezing],
+  entityEffectChance: 90,
 };

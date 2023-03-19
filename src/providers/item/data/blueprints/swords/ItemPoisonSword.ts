@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { EntityAttackType, IEquippableWeaponBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { SwordsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -15,4 +16,6 @@ export const itemPoisonSword: IEquippableWeaponBlueprint = {
   defense: 7,
   rangeType: EntityAttackType.Melee,
   basePrice: 75,
+  entityEffects: [EntityEffectBlueprint.Poison],
+  entityEffectChance: 80,
 };

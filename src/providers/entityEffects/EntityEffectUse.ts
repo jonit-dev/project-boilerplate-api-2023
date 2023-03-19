@@ -1,25 +1,25 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { UISocketEvents } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { EntityEffectCycle } from "./EntityEffectCycle";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 import { entityEffectsBlueprintsIndex } from "./data/index";
 import { EntityEffectBlueprint } from "./data/types/entityEffectBlueprintTypes";
+import { EntityEffectCycle } from "./EntityEffectCycle";
 
 @provide(EntityEffectUse)
 export class EntityEffectUse {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging, private characterWeapon: CharacterWeapon) {}
 
-  public async applyEntityEffects(target: ICharacter | INPC, attacker: INPC): Promise<void> {
-    const entityEffects = this.getApplicableEntityEffects(attacker);
+  public async applyEntityEffects(target: ICharacter | INPC, attacker: ICharacter | INPC): Promise<void> {
+    const entityEffects = await this.getApplicableEntityEffects(attacker);
     if (entityEffects.length < 1) {
       return;
     }
-
     for (const entityEffect of entityEffects) {
       await this.applyEntityEffect(entityEffect, target, attacker);
     }
@@ -68,17 +68,29 @@ export class EntityEffectUse {
     }
   }
 
-  private getApplicableEntityEffects(npc: INPC): IEntityEffect[] {
-    const npcEffects = npc.entityEffects ?? [];
+  private async getApplicableEntityEffects(attacker: ICharacter | INPC): Promise<IEntityEffect[]> {
     const applicableEffects: IEntityEffect[] = [];
+    if (attacker.type === EntityType.NPC) {
+      const npc = attacker as INPC;
+      const npcEffects = npc.entityEffects ?? [];
 
-    npcEffects.forEach((effect) => {
-      const entityEffect: IEntityEffect = entityEffectsBlueprintsIndex[effect];
+      npcEffects.forEach((effect) => {
+        const entityEffect: IEntityEffect = entityEffectsBlueprintsIndex[effect];
 
-      if (npc.attackType === EntityAttackType.MeleeRanged || npc.attackType === entityEffect.type) {
-        applicableEffects.push(entityEffect);
+        if (npc.attackType === EntityAttackType.MeleeRanged || npc.attackType === entityEffect.type) {
+          applicableEffects.push(entityEffect);
+        }
+      });
+    } else {
+      const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
+      const weaponEffect = weapon?.item.entityEffects;
+      if (weaponEffect) {
+        weaponEffect.forEach((effect) => {
+          const entityEffect: IEntityEffect = entityEffectsBlueprintsIndex[effect];
+          applicableEffects.push(entityEffect);
+        });
       }
-    });
+    }
 
     return applicableEffects;
   }
@@ -86,7 +98,7 @@ export class EntityEffectUse {
   private async applyEntityEffect(
     entityEffect: IEntityEffect,
     target: ICharacter | INPC,
-    attacker: INPC
+    attacker: ICharacter | INPC
   ): Promise<void> {
     const n = _.random(0, 100);
 
@@ -112,7 +124,11 @@ export class EntityEffectUse {
     this.startEntityEffectCycle(entityEffect, target, attacker);
   }
 
-  private startEntityEffectCycle(entityEffect: IEntityEffect, target: ICharacter | INPC, attacker: INPC): void {
-    new EntityEffectCycle(entityEffect, target._id, target.type, attacker._id);
+  private startEntityEffectCycle(
+    entityEffect: IEntityEffect,
+    target: ICharacter | INPC,
+    attacker: ICharacter | INPC
+  ): void {
+    new EntityEffectCycle(entityEffect, target._id, target.type, attacker._id, attacker.type);
   }
 }

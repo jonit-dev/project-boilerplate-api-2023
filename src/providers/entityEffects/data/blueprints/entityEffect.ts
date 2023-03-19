@@ -7,7 +7,7 @@ export interface IEntityEffect {
   totalDurationMs?: number;
   intervalMs: number;
   value?: number;
-  effect: (target: ICharacter | INPC, attacker: INPC) => number | Promise<number>;
+  effect: (target: ICharacter | INPC, attacker: ICharacter | INPC) => number | Promise<number>;
   probability: number;
   targetAnimationKey: string;
   type: EntityAttackType.Melee | EntityAttackType.Ranged;

@@ -1,12 +1,13 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
+import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
-import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
+import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { NPCWarn } from "@providers/npc/NPCWarn";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
+import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -46,7 +47,8 @@ export class BattleAttackTarget {
     private characterMovementWarn: CharacterMovementWarn,
     private characterWeapon: CharacterWeapon,
     private battleAttackValidator: BattleAttackValidator,
-    private battleAttackTargetDeath: BattleAttackTargetDeath
+    private battleAttackTargetDeath: BattleAttackTargetDeath,
+    private entityEffectUse: EntityEffectUse
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -233,6 +235,15 @@ export class BattleAttackTarget {
           await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, attr);
         }
 
+        // apply Entity Effects
+        if (target.isAlive) {
+          if (attacker.type === EntityType.Character) {
+            await this.applyEntityEffectsCharacter(attacker as ICharacter, target);
+          } else if (attacker.type === EntityType.NPC) {
+            await this.applyEntityEffectsIfApplicable(attacker as INPC, target);
+          }
+        }
+
         /*
         Check if character is dead after damage calculation. 
         If so, send death event to client and characters around.
@@ -278,6 +289,27 @@ export class BattleAttackTarget {
 
     if (character.channelId) {
       this.socketMessaging.sendEventToUser(character.channelId, BattleSocketEvents.BattleEvent, battleEventPayload);
+    }
+  }
+
+  private async applyEntityEffectsIfApplicable(npc: INPC, target: ICharacter | INPC): Promise<void> {
+    const hasEntityEffects = npc?.entityEffects?.length! > 0;
+
+    if (hasEntityEffects) {
+      await this.entityEffectUse.applyEntityEffects(target, npc);
+    }
+  }
+
+  private async applyEntityEffectsCharacter(character: ICharacter, target: ICharacter | INPC): Promise<void> {
+    const weapon = await this.characterWeapon.getWeapon(character);
+    const hasEntityEffect = weapon?.item?.entityEffects?.length! > 0;
+    const entityEffectChance = weapon?.item?.entityEffectChance;
+    if (hasEntityEffect && entityEffectChance) {
+      const n = _.random(0, 100);
+      if (entityEffectChance <= n) {
+        return;
+      }
+      await this.entityEffectUse.applyEntityEffects(target, character);
     }
   }
 

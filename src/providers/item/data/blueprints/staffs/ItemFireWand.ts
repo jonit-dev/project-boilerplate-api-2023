@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   AnimationEffectKeys,
   EntityAttackType,
@@ -27,4 +28,6 @@ export const itemFireWand: IEquippableStaffBlueprint = {
   maxRange: RangeTypes.Medium,
   basePrice: 60,
   isTwoHanded: true,
+  entityEffects: [EntityEffectBlueprint.Burning],
+  entityEffectChance: 80,
 };

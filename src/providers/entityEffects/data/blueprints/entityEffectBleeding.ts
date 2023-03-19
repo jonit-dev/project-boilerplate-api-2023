@@ -16,7 +16,7 @@ export const entityEffectBleeding: IEntityEffect = {
   probability: 25,
   targetAnimationKey: "wounded",
   type: EntityAttackType.Melee,
-  effect: (target: ICharacter | INPC, attacker: INPC) => {
+  effect: (target: ICharacter | INPC, attacker: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const attackerSkills = attacker.skills as unknown as ISkill;

@@ -12,8 +12,14 @@ import { IEntityEffect } from "./data/blueprints/entityEffect";
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export class EntityEffectCycle {
-  constructor(entityEffect: IEntityEffect, targetId: string, targetType: string, attackerNpcId: string) {
-    this.execute(entityEffect, entityEffect.totalDurationMs ?? -1, targetId, targetType, attackerNpcId);
+  constructor(
+    entityEffect: IEntityEffect,
+    targetId: string,
+    targetType: string,
+    attackerId: string,
+    attackerType: string
+  ) {
+    this.execute(entityEffect, entityEffect.totalDurationMs ?? -1, targetId, targetType, attackerId, attackerType);
   }
 
   private async execute(
@@ -21,7 +27,8 @@ export class EntityEffectCycle {
     remainingDurationMs: number,
     targetId: string,
     targetType: string,
-    attackerNpcId: string
+    attackerId: string,
+    attackerType: string
   ): Promise<void> {
     const target = await this.getTarget(targetId, targetType);
 
@@ -35,9 +42,8 @@ export class EntityEffectCycle {
       return;
     }
 
-    const attacker = await this.getTarget(attackerNpcId, EntityType.NPC);
-
-    const damage = await entityEffect.effect(target, attacker as INPC);
+    const attacker = await this.getTarget(attackerId, attackerType, true);
+    const damage = await entityEffect.effect(target, attacker as ICharacter | INPC);
 
     const runAgain = remainingDurationMs === -1 || remainingDurationMs >= entityEffect.intervalMs;
     if (!runAgain) {
@@ -57,16 +63,20 @@ export class EntityEffectCycle {
 
     const timer = container.get(TimerWrapper);
     timer.setTimeout(() => {
-      this.execute(entityEffect, remainingDurationMs, targetId, targetType, attackerNpcId);
+      this.execute(entityEffect, remainingDurationMs, targetId, targetType, attackerId, attackerType);
     }, entityEffect.intervalMs);
   }
 
-  private async getTarget(targetId: string, targetType: string): Promise<ICharacter | INPC | null> {
+  private async getTarget(targetId: string, targetType: string, attacker?: boolean): Promise<ICharacter | INPC | null> {
     let target: ICharacter | INPC | null = null;
     if (targetType === EntityType.NPC) {
       target = (await NPC.findOne({ _id: targetId }).populate("skills")) as unknown as INPC;
     } else if (targetType === EntityType.Character) {
-      target = (await Character.findOne({ _id: targetId })) as ICharacter;
+      if (attacker) {
+        target = (await Character.findOne({ _id: targetId }).populate("skills")) as unknown as ICharacter;
+      } else {
+        target = (await Character.findOne({ _id: targetId })) as ICharacter;
+      }
     }
 
     return target;

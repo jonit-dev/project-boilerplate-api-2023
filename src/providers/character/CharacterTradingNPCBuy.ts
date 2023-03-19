@@ -50,7 +50,7 @@ export class CharacterTradingNPCBuy {
       const price = this.characterTradingBalance.getItemBuyPrice(key);
 
       if (price) {
-        traderItems.push({...item, price});
+        traderItems.push({ ...item, price });
       }
     });
 
