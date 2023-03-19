@@ -11,6 +11,9 @@ import { itemSpear } from "./ItemSpear";
 import { itemStoneSpear } from "./ItemStoneSpear";
 import { itemTrident } from "./ItemTrident";
 import { itemWhiteDragonSpear } from "./ItemWhiteDragonSpear";
+import { itemCopperDoubleVoulge } from "./ItemCopperDoubleVoulge";
+import { itemRustedDoubleVoulge } from "./ItemRustedDoubleVoulge";
+import { itemPoseidonTrident } from "./ItemPoseidonTrident";
 
 export const spearsBlueprintsIndex = {
   [SpearsBlueprint.RoyalSpear]: itemRoyalSpear,
@@ -25,4 +28,7 @@ export const spearsBlueprintsIndex = {
   [SpearsBlueprint.EarthbinderSpear]: itemEarthbinderSpear,
   [SpearsBlueprint.MushroomSpear]: itemMushroomSpear,
   [SpearsBlueprint.WhiteDragonSpear]: itemWhiteDragonSpear,
+  [SpearsBlueprint.CopperDoubleVoulge]: itemCopperDoubleVoulge,
+  [SpearsBlueprint.RustedDoubleVoulge]: itemRustedDoubleVoulge,
+  [SpearsBlueprint.PoseidonTrident]: itemPoseidonTrident,
 };

@@ -1,7 +1,9 @@
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemAirWand } from "./ItemAirWand";
 import { itemAppendicesStaff } from "./ItemAppendicesStaff";
+import { itemAquaStaff } from "./ItemAquaStaff";
 import { itemCorruptionStaff } from "./ItemCorruptionStaff";
+import { itemEmberward } from "./ItemEmberward";
 import { itemEnchantedStaff } from "./ItemEnchantedStaff";
 import { itemFireStaff } from "./ItemFireStaff";
 import { itemFireWand } from "./ItemFireWand";
@@ -10,7 +12,10 @@ import { itemPoisonStaff } from "./ItemPoisonStaff";
 import { itemPoisonWand } from "./ItemPoisonWand";
 import { itemRoyalStaff } from "./ItemRoyalStaff";
 import { itemRubyStaff } from "./ItemRubyStaff";
+import { itemSangriaStaff } from "./ItemSangriaStaff";
+import { itemSkyBlueStaff } from "./ItemSkyBlueStaff";
 import { itemSoulStaff } from "./ItemSoulStaff";
+import { itemTartarusStaff } from "./ItemTartarusStaff";
 import { itemWand } from "./ItemWand";
 import { itemWoodenStaff } from "./ItemWoodenStaff";
 
@@ -29,4 +34,9 @@ export const staffsBlueprintIndex = {
   [StaffsBlueprint.SoulStaff]: itemSoulStaff,
   [StaffsBlueprint.Wand]: itemWand,
   [StaffsBlueprint.WoodenStaff]: itemWoodenStaff,
+  [StaffsBlueprint.SangriaStaff]: itemSangriaStaff,
+  [StaffsBlueprint.TartarusStaff]: itemTartarusStaff,
+  [StaffsBlueprint.AquaStaff]: itemAquaStaff,
+  [StaffsBlueprint.SkyBlueStaff]: itemSkyBlueStaff,
+  [StaffsBlueprint.Emberward]: itemEmberward,
 };

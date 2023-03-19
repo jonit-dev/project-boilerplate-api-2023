@@ -32,6 +32,7 @@ export enum SwordsBlueprint {
   IronwoodTanto = "ironwood-tanto",
   FalconsSword = "falcons-sword",
   GlacialSword = "glacial-sword",
+  AzureMachete = "azure-machete",
 }
 
 export enum HelmetsBlueprint {
@@ -93,6 +94,20 @@ export enum DaggersBlueprint {
   SaiDagger = "sai-dagger",
   Kunai = "kunai",
   WoodenDagger = "wooden-dagger",
+  NinjaKunai = "ninja-kunai",
+  CopperJitte = "copper-jitte",
+  RustedDagger = "rusted-dagger",
+  IronDagger = "iron-dagger",
+  SapphireDagger = "sapphire-dagger",
+  SapphireJitte = "sapphire-jitte",
+  RustedJitte = "rusted-jitte",
+  IronJitte = "iron-jitte",
+  VerdantDagger = "verdant-dagger",
+  VerdantJitte = "verdant-jitte",
+  AzureDagger = "azure-dagger",
+  DamascusJitte = "damascus-jitte",
+  PhoenixDagger = "phoenix-dagger",
+  PhoenixJitte = "phoenix-jitte",
 }
 
 export enum ArmorsBlueprint {
@@ -274,6 +289,9 @@ export enum SpearsBlueprint {
   EarthbinderSpear = "earthbinder-spear",
   MushroomSpear = "mushroom-spear",
   WhiteDragonSpear = "white-dragon-spear",
+  CopperDoubleVoulge = "copper-double-voulge",
+  RustedDoubleVoulge = "rusted-double-voulge",
+  PoseidonTrident = "poseidon-trident",
 }
 
 export enum PotionsBlueprint {
@@ -391,6 +409,11 @@ export enum StaffsBlueprint {
   SoulStaff = "soul-staff",
   Wand = "wand",
   WoodenStaff = "wooden-staff",
+  SangriaStaff = "sangria-staff",
+  TartarusStaff = "tartarus-staff",
+  AquaStaff = "aqua-staff",
+  SkyBlueStaff = "sky-blue-staff",
+  Emberward = "emberward",
 }
 
 export enum ShieldsBlueprint {

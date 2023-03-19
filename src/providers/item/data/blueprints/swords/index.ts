@@ -1,4 +1,5 @@
 import { SwordsBlueprint } from "../../types/itemsBlueprintTypes";
+import { itemAzureMachete } from "./ItemAzureMachete";
 import { itemBasiliskSword } from "./ItemBasiliskSword";
 import { itemBroadSword } from "./ItemBroadSword";
 import { itemCopperBroadsword } from "./ItemCopperBroadsword";
@@ -68,4 +69,5 @@ export const swordsBlueprintIndex = {
   [SwordsBlueprint.IronwoodTanto]: itemIronwoodTanto,
   [SwordsBlueprint.FalconsSword]: itemFalconsSword,
   [SwordsBlueprint.GlacialSword]: itemGlacialSword,
+  [SwordsBlueprint.AzureMachete]: itemAzureMachete,
 };
