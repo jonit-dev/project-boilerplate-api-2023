@@ -3,6 +3,7 @@ import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { BattleAttackRanged } from "@providers/battle/BattleAttackTarget/BattleAttackRanged";
 import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 import { OnTargetHit } from "@providers/battle/OnTargetHit";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
@@ -49,7 +50,8 @@ export class UseWithEntity {
     private skillIncrease: SkillIncrease,
     private characterBonusPenalties: CharacterBonusPenalties,
     private onTargetHit: OnTargetHit,
-    private battleCharacterAttackValidation: BattleCharacterAttackValidation
+    private battleCharacterAttackValidation: BattleCharacterAttackValidation,
+    private battleRangedAttack: BattleAttackRanged
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -150,6 +152,12 @@ export class UseWithEntity {
         caster,
         `Sorry, '${blueprint.name}' can not only be used at magic level '${blueprint.minMagicLevelRequired}' or greater.`
       );
+      return false;
+    }
+
+    // check there're no solids between caster and target trajectory
+    const solidInTrajectory = await this.battleRangedAttack.isSolidInRangedTrajectory(caster, target);
+    if (solidInTrajectory) {
       return false;
     }
 

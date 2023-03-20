@@ -295,7 +295,13 @@ export class BattleAttackRanged {
     return { haveMana: false, newMana: 0 };
   }
 
-  public async isSolidInRangedTrajectory(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
+  public async isSolidInRangedTrajectory(
+    attacker: ICharacter | INPC,
+    target: ICharacter | INPC | IItem
+  ): Promise<boolean> {
+    if (typeof target.x === "undefined" || typeof target.y === "undefined") {
+      return false;
+    }
     const origin = { x: ToGridX(attacker.x), y: ToGridY(attacker.y) };
     const destination = { x: ToGridX(target.x), y: ToGridY(target.y) };
 
