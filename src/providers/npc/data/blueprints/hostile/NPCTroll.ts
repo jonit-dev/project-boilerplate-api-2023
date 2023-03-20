@@ -17,6 +17,7 @@ import {
   MacesBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  SpearsBlueprint,
   StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
@@ -55,6 +56,10 @@ export const npcTroll = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.BlueSapphire,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.RustedDoubleVoulge,
+      chance: 5,
     },
     {
       itemBlueprintKey: GlovesBlueprint.LeatherGloves,

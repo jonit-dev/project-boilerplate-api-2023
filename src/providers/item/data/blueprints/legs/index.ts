@@ -1,12 +1,12 @@
 import { LegsBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemBloodfireLegs } from "./ItemBloodfireLegs";
-import { itemBronzeLegs } from "./ItemBronzeLegs";
-import { itemFalconsLegs } from "./ItemFalconsLegs";
-import { itemGlacialLegs } from "./ItemGlacialLegs";
-import { itemGoldenLegs } from "./ItemGoldenLegs";
-import { itemLeatherLegs } from "./ItemLeatherLegs";
-import { itemMithrilLegs } from "./ItemMithrilLegs";
-import { itemStuddedLegs } from "./ItemStuddedLegs";
+import { itemLeatherLegs } from "./tier0/ItemLeatherLegs";
+import { itemStuddedLegs } from "./tier1/ItemStuddedLegs";
+import { itemBronzeLegs } from "./tier2/ItemBronzeLegs";
+import { itemFalconsLegs } from "./tier3/ItemFalconsLegs";
+import { itemGlacialLegs } from "./tier3/ItemGlacialLegs";
+import { itemBloodfireLegs } from "./tier4/ItemBloodfireLegs";
+import { itemGoldenLegs } from "./tier4/ItemGoldenLegs";
+import { itemMithrilLegs } from "./tier4/ItemMithrilLegs";
 
 export const legsBlueprintIndex = {
   [LegsBlueprint.LeatherLegs]: itemLeatherLegs,

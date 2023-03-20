@@ -89,6 +89,14 @@ export const npcLitch: Partial<INPC> = {
       chance: 30,
     },
     {
+      itemBlueprintKey: DaggersBlueprint.SapphireDagger,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.SapphireJitte,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: StaffsBlueprint.CorruptionStaff,
       chance: 30,
     },

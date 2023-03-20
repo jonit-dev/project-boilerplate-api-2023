@@ -92,7 +92,7 @@ describe("EquipmentModel.ts", () => {
 
     const statsCalculator = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "attack");
 
-    expect(statsCalculator).toBe(17);
+    expect(statsCalculator).toBe(16);
   });
 
   it("Properly calculates attack [ Staff/Arrow ]", async () => {
@@ -115,7 +115,7 @@ describe("EquipmentModel.ts", () => {
 
     const statsCalculator = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "attack");
 
-    expect(statsCalculator).toBe(15);
+    expect(statsCalculator).toBe(24);
   });
 
   it("Properly calculates defense ", async () => {

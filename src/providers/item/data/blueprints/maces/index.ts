@@ -1,12 +1,12 @@
 import { MacesBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemBloodstainedCenser } from "./ItemBloodstainedCenser";
-import { itemClub } from "./ItemClub";
-import { itemMace } from "./ItemMace";
-import { itemRusticFlail } from "./ItemRusticFlail";
-import { itemSilverBulbMace } from "./ItemSilverBulbMace";
-import { itemSpikedClub } from "./ItemSpikedClub";
-import { itemSpikedMace } from "./ItemSpikedMace";
-import { itemWoodenMace } from "./ItemWoodenMace";
+import { itemClub } from "./tier0/ItemClub";
+import { itemWoodenMace } from "./tier0/ItemWoodenMace";
+import { itemMace } from "./tier1/ItemMace";
+import { itemSpikedClub } from "./tier1/ItemSpikedClub";
+import { itemSpikedMace } from "./tier2/ItemSpikedMace";
+import { itemRusticFlail } from "./tier3/ItemRusticFlail";
+import { itemSilverBulbMace } from "./tier3/ItemSilverBulbMace";
+import { itemBloodstainedCenser } from "./tier4/ItemBloodstainedCenser";
 
 export const macesBlueprintIndex = {
   [MacesBlueprint.Club]: itemClub,

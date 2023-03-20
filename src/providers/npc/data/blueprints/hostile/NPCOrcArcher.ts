@@ -5,6 +5,7 @@ import {
   ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
+  DaggersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
   RangedWeaponsBlueprint,
@@ -61,6 +62,10 @@ export const npcOrcArcher: Partial<INPC> = {
     },
     {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.NinjaKunai,
       chance: 15,
     },
 

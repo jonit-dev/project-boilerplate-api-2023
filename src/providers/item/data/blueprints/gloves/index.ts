@@ -1,8 +1,8 @@
 import { GlovesBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemChainGloves } from "./ItemChainGloves";
-import { itemLeatherGloves } from "./ItemLeatherGloves";
-import { itemPlateGloves } from "./ItemPlateGloves";
-import { itemStuddedGloves } from "./ItemStuddedGloves";
+import { itemLeatherGloves } from "./tier0/ItemLeatherGloves";
+import { itemStuddedGloves } from "./tier1/ItemStuddedGloves";
+import { itemChainGloves } from "./tier2/ItemChainGloves";
+import { itemPlateGloves } from "./tier3/ItemPlateGloves";
 
 export const glovesBlueprintIndex = {
   [GlovesBlueprint.LeatherGloves]: itemLeatherGloves,

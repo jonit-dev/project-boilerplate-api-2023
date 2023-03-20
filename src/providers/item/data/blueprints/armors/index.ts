@@ -1,26 +1,27 @@
 import { ArmorsBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemBloodfireArmor } from "./ItemBloodfireArmor";
-import { itemBlueCape } from "./ItemBlueCape";
-import { itemBrassArmor } from "./ItemBrassArmor";
-import { itemBronzeArmor } from "./ItemBronzeArmor";
-import { itemCoat } from "./ItemCoat";
-import { itemCrownArmor } from "./ItemCrownArmor";
-import { itemFalconsArmor } from "./ItemFalconsArmor";
-import { itemFarmersJacket } from "./ItemFarmersJacket";
-import { itemGlacialArmor } from "./ItemGlacialArmor";
-import { itemGoldenArmor } from "./ItemGoldenArmor";
-import { itemIronArmor } from "./ItemIronArmor";
-import { itemIroncladArmor } from "./ItemIroncladArmor";
-import { itemJacket } from "./ItemJacket";
-import { itemJadeEmperorsArmor } from "./ItemJadeEmperorsArmor";
-import { itemKnightArmor } from "./ItemKnightArmor";
-import { itemLeatherJacket } from "./ItemLeatherJacket";
-import { itemMithrilArmor } from "./ItemMithrilArmor";
-import { itemMysticCape } from "./ItemMysticCape";
-import { itemPlateArmor } from "./ItemPlateArmor";
-import { itemSorcerersCape } from "./ItemSorcerersCape";
-import { itemSpellcastersCape } from "./ItemSpellcastersCape";
-import { itemStuddedArmor } from "./ItemStuddedArmor";
+
+import { itemCoat } from "./tier0/ItemCoat";
+import { itemFarmersJacket } from "./tier0/ItemFarmersJacket";
+import { itemJacket } from "./tier0/ItemJacket";
+import { itemLeatherJacket } from "./tier0/ItemLeatherJacket";
+import { itemBlueCape } from "./tier1/ItemBlueCape";
+import { itemIronArmor } from "./tier1/ItemIronArmor";
+import { itemStuddedArmor } from "./tier1/ItemStuddedArmor";
+import { itemBrassArmor } from "./tier2/ItemBrassArmor";
+import { itemBronzeArmor } from "./tier2/ItemBronzeArmor";
+import { itemIroncladArmor } from "./tier2/ItemIroncladArmor";
+import { itemMysticCape } from "./tier2/ItemMysticCape";
+import { itemGlacialArmor } from "./tier3/ItemGlacialArmor";
+import { itemJadeEmperorsArmor } from "./tier3/ItemJadeEmperorsArmor";
+import { itemKnightArmor } from "./tier3/ItemKnightArmor";
+import { itemSorcerersCape } from "./tier3/ItemSorcerersCape";
+import { itemCrownArmor } from "./tier4/ItemCrownArmor";
+import { itemFalconsArmor } from "./tier4/ItemFalconsArmor";
+import { itemPlateArmor } from "./tier4/ItemPlateArmor";
+import { itemSpellcastersCape } from "./tier4/ItemSpellcastersCape";
+import { itemBloodfireArmor } from "./tier5/ItemBloodfireArmor";
+import { itemGoldenArmor } from "./tier5/ItemGoldenArmor";
+import { itemMithrilArmor } from "./tier5/ItemMithrilArmor";
 
 export const armorsBlueprintIndex = {
   [ArmorsBlueprint.BronzeArmor]: itemBronzeArmor,

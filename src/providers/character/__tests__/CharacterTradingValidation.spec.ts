@@ -4,9 +4,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { itemBroadSword } from "@providers/item/data/blueprints/swords/ItemBroadSword";
-import { itemIceSword } from "@providers/item/data/blueprints/swords/ItemIceSword";
-import { itemKatana } from "@providers/item/data/blueprints/swords/ItemKatana";
+
 import { PotionsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { GRID_HEIGHT, GRID_WIDTH, ITradeRequestItem } from "@rpg-engine/shared";
@@ -14,6 +12,9 @@ import { CharacterTradingValidation } from "../CharacterTradingValidation";
 import { CharacterValidation } from "../CharacterValidation";
 
 import { itemGroundBlood } from "@providers/item/data/blueprints/effects/ItemGroundBlood";
+import { itemBroadSword } from "@providers/item/data/blueprints/swords/tier1/ItemBroadSword";
+import { itemKatana } from "@providers/item/data/blueprints/swords/tier1/ItemKatana";
+import { itemIceSword } from "@providers/item/data/blueprints/swords/tier2/ItemIceSword";
 
 describe("CharacterTradingValidation.ts", () => {
   let testCharacter: ICharacter;

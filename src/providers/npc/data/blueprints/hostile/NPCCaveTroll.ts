@@ -35,7 +35,7 @@ export const npcCaveTroll = {
   skillRandomizerDice: Dice.D20,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 60,
+    level: 70,
     strength: {
       level: 45,
     },
@@ -43,7 +43,7 @@ export const npcCaveTroll = {
       level: 40,
     },
     resistance: {
-      level: 50,
+      level: 60,
     },
   },
   fleeOnLowHealth: true,
@@ -60,6 +60,11 @@ export const npcCaveTroll = {
       itemBlueprintKey: ShieldsBlueprint.KiteShield,
       chance: 5,
     },
+    {
+      itemBlueprintKey: SpearsBlueprint.CopperDoubleVoulge,
+      chance: 5,
+    },
+
     {
       itemBlueprintKey: SpearsBlueprint.BohemianEarspoon,
       chance: 20,

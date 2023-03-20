@@ -10,7 +10,6 @@ import {
   HelmetsBlueprint,
   LegsBlueprint,
   PotionsBlueprint,
-  SpearsBlueprint,
   StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -65,10 +64,6 @@ export const npcAssaultSpider: Partial<INPC> = {
       chance: 15,
     },
 
-    {
-      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
-      chance: 2.5,
-    },
     {
       itemBlueprintKey: AccessoriesBlueprint.CorruptionNecklace,
       chance: 10,

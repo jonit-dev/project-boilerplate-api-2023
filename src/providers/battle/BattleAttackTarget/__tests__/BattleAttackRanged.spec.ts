@@ -3,7 +3,8 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { itemFireStaff } from "@providers/item/data/blueprints/staffs/ItemFireStaff";
+
+import { itemFireStaff } from "@providers/item/data/blueprints/staffs/item3/ItemFireStaff";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
   RangedWeaponsBlueprint,
@@ -344,7 +345,7 @@ describe("BattleRangedAttack.spec.ts", () => {
       expect(characterEquipment.accessory).toBeDefined();
 
       const updatedCharacter = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
-      expect(updatedCharacter.mana).toBe(97);
+      expect(updatedCharacter.mana).toBe(96);
     });
   });
 });

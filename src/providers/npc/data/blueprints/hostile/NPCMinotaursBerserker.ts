@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   BootsBlueprint,
   CraftingResourcesBlueprint,
+  DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
@@ -55,8 +56,20 @@ export const npcMinotaurBerserker = {
       chance: 30,
     },
     {
+      itemBlueprintKey: SwordsBlueprint.PoisonSword,
+      chance: 20,
+    },
+    {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.CopperJitte,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.DamascusJitte,
+      chance: 10,
     },
 
     {

@@ -7,6 +7,7 @@ import {
   AxesBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
+  DaggersBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
@@ -65,6 +66,10 @@ export const npcOrcBerserker = {
     {
       itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.AzureDagger,
+      chance: 20,
     },
     {
       itemBlueprintKey: HammersBlueprint.WarHammer,

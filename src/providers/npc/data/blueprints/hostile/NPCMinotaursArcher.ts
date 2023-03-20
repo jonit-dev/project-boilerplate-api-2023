@@ -5,6 +5,7 @@ import {
   ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
+  DaggersBlueprint,
   FoodsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
@@ -48,6 +49,10 @@ export const npcMinotaurArcher = {
     {
       itemBlueprintKey: BootsBlueprint.RoyalBoots,
       chance: 3,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.IronJitte,
+      chance: 10,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Fish,

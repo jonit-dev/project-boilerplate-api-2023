@@ -22,6 +22,7 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
@@ -55,6 +56,10 @@ export const npcForestTroll = {
     {
       itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.PoseidonTrident,
+      chance: 5,
     },
     {
       itemBlueprintKey: LegsBlueprint.BronzeLegs,

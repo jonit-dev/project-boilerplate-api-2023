@@ -1,19 +1,19 @@
 import { SpearsBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemBlueAuroraSpear } from "./ItemBlueAuroraSpear";
-import { itemBohemianEarspoon } from "./ItemBohemianEarspoon";
-import { itemCorseque } from "./ItemCorseque";
-import { itemEarthbinderSpear } from "./ItemEarthbinderSpear";
-import { itemGuanDao } from "./ItemGuanDao";
-import { itemjavelin } from "./ItemJavelin";
-import { itemMushroomSpear } from "./ItemMushroomSpear";
-import { itemRoyalSpear } from "./ItemRoyalSpear";
-import { itemSpear } from "./ItemSpear";
-import { itemStoneSpear } from "./ItemStoneSpear";
-import { itemTrident } from "./ItemTrident";
-import { itemWhiteDragonSpear } from "./ItemWhiteDragonSpear";
-import { itemCopperDoubleVoulge } from "./ItemCopperDoubleVoulge";
-import { itemRustedDoubleVoulge } from "./ItemRustedDoubleVoulge";
-import { itemPoseidonTrident } from "./ItemPoseidonTrident";
+import { itemSpear } from "./tier0/ItemSpear";
+import { itemStoneSpear } from "./tier0/ItemStoneSpear";
+import { itemjavelin } from "./tier1/ItemJavelin";
+import { itemBohemianEarspoon } from "./tier2/ItemBohemianEarspoon";
+import { itemCopperDoubleVoulge } from "./tier2/ItemCopperDoubleVoulge";
+import { itemCorseque } from "./tier2/ItemCorseque";
+import { itemTrident } from "./tier2/ItemTrident";
+import { itemBlueAuroraSpear } from "./tier3/ItemBlueAuroraSpear";
+import { itemGuanDao } from "./tier3/ItemGuanDao";
+import { itemMushroomSpear } from "./tier3/ItemMushroomSpear";
+import { itemEarthbinderSpear } from "./tier4/ItemEarthbinderSpear";
+import { itemPoseidonTrident } from "./tier4/ItemPoseidonTrident";
+import { itemRoyalSpear } from "./tier5/ItemRoyalSpear";
+import { itemRustedDoubleVoulge } from "./tier5/ItemRustedDoubleVoulge";
+import { itemWhiteDragonSpear } from "./tier5/ItemWhiteDragonSpear";
 
 export const spearsBlueprintsIndex = {
   [SpearsBlueprint.RoyalSpear]: itemRoyalSpear,

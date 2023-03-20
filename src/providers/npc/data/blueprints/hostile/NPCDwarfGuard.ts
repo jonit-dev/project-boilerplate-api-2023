@@ -10,6 +10,7 @@ import {
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
+  SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -60,6 +61,10 @@ export const npcDwarfGuard = {
 
     {
       itemBlueprintKey: BootsBlueprint.StuddedBoots,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.AzureMachete,
       chance: 15,
     },
     {

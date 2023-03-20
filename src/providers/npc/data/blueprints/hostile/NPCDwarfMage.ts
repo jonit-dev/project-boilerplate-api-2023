@@ -109,7 +109,7 @@ export const npcDwarfMage: Partial<INPC> = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.EldensSword,
-      chance: 10,
+      chance: 2,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Wheat,

@@ -3,12 +3,14 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   CraftingResourcesBlueprint,
+  DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   StaffsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 
@@ -78,7 +80,19 @@ export const npcMinotaurMage = {
       chance: 25,
     },
     {
+      itemBlueprintKey: SwordsBlueprint.GoldenSword,
+      chance: 4,
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.PhoenixDagger,
+      chance: 20,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.PhoenixJitte,
       chance: 20,
     },
     {

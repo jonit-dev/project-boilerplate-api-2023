@@ -1,27 +1,28 @@
 import { AccessoriesBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemAmazonsNecklace } from "./ItemAmazonsNecklace";
-import { itemAmuletOfDeath } from "./ItemAmuletOfDeath";
-import { itemAmuletOfLuck } from "./ItemAmuletOfLuck";
-import { itemBandana } from "./ItemBandana";
-import { itemCorruptionNecklace } from "./ItemCorruptionNecklace";
-import { itemDeathNecklace } from "./ItemDeathNecklace";
-import { itemElvenRing } from "./ItemElvenRing";
-import { itemFalconsRing } from "./ItemFalconsRing";
-import { itemGlacialRing } from "./ItemGlacialRing";
-import { itemGoldenRing } from "./ItemGoldenRing";
-import { itemHasteRing } from "./ItemHasteRing";
-import { itemIronRing } from "./ItemIronRing";
-import { itemJadeRing } from "./ItemJadeRing";
-import { itemOrcRing } from "./ItemOrcRing";
-import { itemPendantOfLife } from "./ItemPendantOfLife";
-import { itemRoyalBracelet } from "./ItemRoyalBracelet";
-import { itemRubyRing } from "./ItemRubyRing";
-import { itemSapphireNecklace } from "./ItemSapphireNecklace";
-import { itemSapphireRing } from "./ItemSapphireRing";
+
 import { itemSilverKey } from "./itemSilverKey";
-import { itemSoldiersRing } from "./ItemSoldiersRing";
-import { itemStarNecklace } from "./ItemStarNecklace";
-import { itemWolfToothChain } from "./ItemWolfToothChain";
+import { itemAmazonsNecklace } from "./tier0/ItemAmazonsNecklace";
+import { itemAmuletOfDeath } from "./tier0/ItemAmuletOfDeath";
+import { itemAmuletOfLuck } from "./tier0/ItemAmuletOfLuck";
+import { itemBandana } from "./tier0/ItemBandana";
+import { itemCorruptionNecklace } from "./tier0/ItemCorruptionNecklace";
+import { itemDeathNecklace } from "./tier0/ItemDeathNecklace";
+import { itemElvenRing } from "./tier0/ItemElvenRing";
+import { itemPendantOfLife } from "./tier0/ItemPendantOfLife";
+import { itemRoyalBracelet } from "./tier0/ItemRoyalBracelet";
+import { itemSapphireNecklace } from "./tier0/ItemSapphireNecklace";
+import { itemStarNecklace } from "./tier0/ItemStarNecklace";
+import { itemWolfToothChain } from "./tier0/ItemWolfToothChain";
+import { itemFalconsRing } from "./tier1/ItemFalconsRing";
+import { itemGlacialRing } from "./tier1/ItemGlacialRing";
+import { itemHasteRing } from "./tier1/ItemHasteRing";
+import { itemIronRing } from "./tier1/ItemIronRing";
+import { itemOrcRing } from "./tier1/ItemOrcRing";
+import { itemSoldiersRing } from "./tier1/ItemSoldiersRing";
+import { itemGoldenRing } from "./tier2/ItemGoldenRing";
+import { itemJadeRing } from "./tier2/ItemJadeRing";
+import { itemRubyRing } from "./tier2/ItemRubyRing";
+import { itemSapphireRing } from "./tier2/ItemSapphireRing";
 
 export const accessoriesBlueprintIndex = {
   [AccessoriesBlueprint.SilverKey]: itemSilverKey,

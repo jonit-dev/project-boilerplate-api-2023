@@ -7,7 +7,6 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
-  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -58,10 +57,7 @@ export const npcFrostSalamander: Partial<INPC> = {
       itemBlueprintKey: SwordsBlueprint.DoubleEdgedSword,
       chance: 1,
     },
-    {
-      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
-      chance: 5,
-    },
+
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Bolt,
       chance: 20,

@@ -11,6 +11,7 @@ import {
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
+  StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateMoveTowardsMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
@@ -68,6 +69,10 @@ export const npcGorgok = {
     {
       itemBlueprintKey: SwordsBlueprint.PoisonSword,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.SangriaStaff,
+      chance: 5,
     },
     {
       itemBlueprintKey: ArmorsBlueprint.GoldenArmor,

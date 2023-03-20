@@ -3,12 +3,12 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   CraftingResourcesBlueprint,
+  DaggersBlueprint,
   GlovesBlueprint,
   LegsBlueprint,
   MacesBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
-  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -70,6 +70,14 @@ export const npcGhoul = {
       chance: 10,
     },
     {
+      itemBlueprintKey: DaggersBlueprint.RustedDagger,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.RustedJitte,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,
       chance: 5,
     },
@@ -78,10 +86,7 @@ export const npcGhoul = {
       itemBlueprintKey: GlovesBlueprint.StuddedGloves,
       chance: 20,
     },
-    {
-      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
-      chance: 2.5,
-    },
+
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Arrow,
       chance: 10,

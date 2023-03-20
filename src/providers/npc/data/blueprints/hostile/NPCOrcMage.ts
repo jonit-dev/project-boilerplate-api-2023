@@ -74,6 +74,14 @@ export const npcOrcMage = {
       chance: 15,
     },
     {
+      itemBlueprintKey: StaffsBlueprint.AquaStaff,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.Emberward,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: ArmorsBlueprint.StuddedArmor,
       chance: 15,
     },

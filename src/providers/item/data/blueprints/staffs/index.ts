@@ -1,23 +1,23 @@
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemAirWand } from "./ItemAirWand";
-import { itemAppendicesStaff } from "./ItemAppendicesStaff";
-import { itemAquaStaff } from "./ItemAquaStaff";
-import { itemCorruptionStaff } from "./ItemCorruptionStaff";
-import { itemEmberward } from "./ItemEmberward";
-import { itemEnchantedStaff } from "./ItemEnchantedStaff";
-import { itemFireStaff } from "./ItemFireStaff";
-import { itemFireWand } from "./ItemFireWand";
-import { itemMoonsStaff } from "./ItemMoonsStaff";
-import { itemPoisonStaff } from "./ItemPoisonStaff";
-import { itemPoisonWand } from "./ItemPoisonWand";
-import { itemRoyalStaff } from "./ItemRoyalStaff";
-import { itemRubyStaff } from "./ItemRubyStaff";
-import { itemSangriaStaff } from "./ItemSangriaStaff";
-import { itemSkyBlueStaff } from "./ItemSkyBlueStaff";
-import { itemSoulStaff } from "./ItemSoulStaff";
-import { itemTartarusStaff } from "./ItemTartarusStaff";
-import { itemWand } from "./ItemWand";
-import { itemWoodenStaff } from "./ItemWoodenStaff";
+import { itemAirWand } from "./item0/ItemAirWand";
+import { itemWand } from "./item0/ItemWand";
+import { itemWoodenStaff } from "./item0/ItemWoodenStaff";
+import { itemAppendicesStaff } from "./item1/ItemAppendicesStaff";
+import { itemFireWand } from "./item1/ItemFireWand";
+import { itemPoisonWand } from "./item1/ItemPoisonWand";
+import { itemAquaStaff } from "./item2/ItemAquaStaff";
+import { itemCorruptionStaff } from "./item2/ItemCorruptionStaff";
+import { itemSoulStaff } from "./item2/ItemSoulStaff";
+import { itemEmberward } from "./item3/ItemEmberward";
+import { itemFireStaff } from "./item3/ItemFireStaff";
+import { itemPoisonStaff } from "./item3/ItemPoisonStaff";
+import { itemEnchantedStaff } from "./item4/ItemEnchantedStaff";
+import { itemMoonsStaff } from "./item4/ItemMoonsStaff";
+import { itemRubyStaff } from "./item4/ItemRubyStaff";
+import { itemSkyBlueStaff } from "./item4/ItemSkyBlueStaff";
+import { itemRoyalStaff } from "./item5/ItemRoyalStaff";
+import { itemSangriaStaff } from "./item5/ItemSangriaStaff";
+import { itemTartarusStaff } from "./item5/ItemTartarusStaff";
 
 export const staffsBlueprintIndex = {
   [StaffsBlueprint.AppendicesStaff]: itemAppendicesStaff,

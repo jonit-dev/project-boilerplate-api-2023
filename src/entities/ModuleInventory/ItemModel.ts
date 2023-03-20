@@ -1,8 +1,8 @@
 import { CharacterView } from "@providers/character/CharacterView";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { container } from "@providers/inversify/container";
-import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemView } from "@providers/item/ItemView";
+import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MapHelper } from "@providers/map/MapHelper";
 import { ItemRarities, ItemSlotType, ItemSubType, ItemType, MapLayers, TypeHelper } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -108,6 +108,8 @@ const itemSchema = createLeanSchema(
     ),
 
     entityEffectChance: Type.number({ default: 0 }),
+
+    tier: Type.number({ default: 1 }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 ).plugin(updateIfCurrentPlugin);

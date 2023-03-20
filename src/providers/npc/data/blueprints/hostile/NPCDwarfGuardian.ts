@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
   ContainersBlueprint,
+  DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
@@ -12,7 +13,6 @@ import {
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
-  StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -93,12 +93,12 @@ export const npcDwarfGuardian: Partial<INPC> = {
       chance: 10,
     },
     {
-      itemBlueprintKey: StaffsBlueprint.RoyalStaff,
-      chance: 10,
-    },
-    {
       itemBlueprintKey: SwordsBlueprint.EnchantedSword,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.VerdantDagger,
+      chance: 10,
     },
   ],
 };

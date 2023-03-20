@@ -2,7 +2,6 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
-  AccessoriesBlueprint,
   ArmorsBlueprint,
   AxesBlueprint,
   BootsBlueprint,
@@ -119,10 +118,6 @@ export const npcGoblin = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Rope,
       chance: 30,
-    },
-    {
-      itemBlueprintKey: AccessoriesBlueprint.GoldenRing,
-      chance: 5,
     },
 
     {

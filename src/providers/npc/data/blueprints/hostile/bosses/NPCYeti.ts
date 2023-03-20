@@ -40,7 +40,7 @@ export const npcYeti: Partial<INPC> = {
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 50,
+    level: 100,
     strength: {
       level: 50,
     },
@@ -48,7 +48,7 @@ export const npcYeti: Partial<INPC> = {
       level: 40,
     },
     resistance: {
-      level: 80,
+      level: 90,
     },
     magicResistance: {
       level: 80,
@@ -60,10 +60,7 @@ export const npcYeti: Partial<INPC> = {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,
     },
-    {
-      itemBlueprintKey: SwordsBlueprint.GoldenSword,
-      chance: 4,
-    },
+
     {
       itemBlueprintKey: ShieldsBlueprint.TowerShield,
       chance: 5,
@@ -71,6 +68,14 @@ export const npcYeti: Partial<INPC> = {
     {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.SkyBlueStaff,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.TartarusStaff,
+      chance: 5,
     },
 
     {

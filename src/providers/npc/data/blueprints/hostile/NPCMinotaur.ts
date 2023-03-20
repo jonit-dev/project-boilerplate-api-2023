@@ -5,6 +5,7 @@ import {
   ArmorsBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
+  DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HammersBlueprint,
@@ -56,6 +57,11 @@ export const npcMinotaur = {
       itemBlueprintKey: HammersBlueprint.WarHammer,
       chance: 10,
     },
+    {
+      itemBlueprintKey: DaggersBlueprint.IronDagger,
+      chance: 10,
+    },
+
     {
       itemBlueprintKey: HelmetsBlueprint.InfantryHelmet,
       chance: 10,
