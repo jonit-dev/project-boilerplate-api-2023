@@ -74,7 +74,6 @@ export const npcMinotaurArcher = {
     {
       itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
       chance: 20,
-      quantityRange: [1, 5],
     },
 
     {
