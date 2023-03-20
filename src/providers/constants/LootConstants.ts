@@ -11,7 +11,7 @@ export const LOOT_GOLD_LEVEL_WEIGHT = 1.5;
 
 // Crafting Materials
 
-export const LOOT_CRAFTING_MATERIAL_DROP_CHANCE = 1.5; // chance that a mob drops crafting materials.
+export const LOOT_CRAFTING_MATERIAL_DROP_CHANCE = 1; // chance that a mob drops crafting materials.
 
 // Food
 

@@ -14,7 +14,7 @@ export const itemDagger: IEquippableMeleeTier0WeaponBlueprint = {
   description:
     "You see a dagger. It's a fighting knife with a very sharp point and usually two sharp edges, typically designed or capable of being used as a thrusting or stabbing weapon.",
   attack: 8,
-  defense: 4,
+  defense: 8,
   tier: 0,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

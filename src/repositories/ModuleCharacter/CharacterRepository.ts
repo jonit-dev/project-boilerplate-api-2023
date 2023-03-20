@@ -136,7 +136,7 @@ export class CharacterRepository extends CRUD {
     await this.characterItemInventory.addItemToInventory(ToolsBlueprint.CarpentersAxe, character);
     await this.characterItemInventory.addItemToInventory(ToolsBlueprint.Pickaxe, character);
     await this.characterItemInventory.addItemToInventory(FoodsBlueprint.Apple, character, {
-      stackQty: 5,
+      stackQty: 20,
     });
   }
 }

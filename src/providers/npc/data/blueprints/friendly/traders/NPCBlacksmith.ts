@@ -4,7 +4,6 @@ import {
   AxesBlueprint,
   DaggersBlueprint,
   MacesBlueprint,
-  ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateRandomMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
@@ -21,7 +20,9 @@ export const npcBlacksmith = {
     {
       key: SwordsBlueprint.ShortSword,
     },
-
+    {
+      key: DaggersBlueprint.IronDagger,
+    },
     {
       key: ArmorsBlueprint.StuddedArmor,
     },
@@ -30,21 +31,6 @@ export const npcBlacksmith = {
     },
     {
       key: AxesBlueprint.Axe,
-    },
-    {
-      key: AxesBlueprint.WoodenAxe,
-    },
-    {
-      key: DaggersBlueprint.WoodenDagger,
-    },
-    {
-      key: MacesBlueprint.WoodenMace,
-    },
-    {
-      key: ShieldsBlueprint.WoodenShield,
-    },
-    {
-      key: SwordsBlueprint.WoodenSword,
     },
   ],
 } as Partial<INPC>;
