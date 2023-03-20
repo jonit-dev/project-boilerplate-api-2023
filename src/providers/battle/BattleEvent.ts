@@ -1,9 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
-import { BattleEventType, EntityAttackType } from "@rpg-engine/shared";
+import { BattleEventType, EntityAttackType, SKILLS_MAP } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 
@@ -56,13 +57,15 @@ export class BattleEvent {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
 
+    const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
+
     const totalPotentialAttackerDamage = await this.calculateTotalPotentialDamage(
       attackerSkills,
       defenderSkills,
-      isMagicAttack
+      isMagicAttack,
+      weapon?.item
     );
 
-    const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
     let damage =
       weapon?.item && weapon?.item.isTraining
         ? Math.round(_.random(0, 1))
@@ -122,7 +125,8 @@ export class BattleEvent {
   private async calculateTotalPotentialDamage(
     attackerSkills: ISkill,
     defenderSkills: ISkill,
-    isMagicAttack: boolean
+    isMagicAttack: boolean,
+    weapon: IItem | undefined
   ): Promise<number> {
     let attackerTotalAttack, defenderTotalDefense;
 
@@ -132,6 +136,7 @@ export class BattleEvent {
     } else {
       attackerTotalAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
       defenderTotalDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
+      attackerTotalAttack += this.calculateExtraDamageBasedOnSkills(weapon, attackerSkills);
     }
 
     return _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));
@@ -180,5 +185,14 @@ export class BattleEvent {
       return realDamage;
     }
     return realDamage > 0 ? realDamage : damage;
+  }
+
+  private calculateExtraDamageBasedOnSkills(weapon: IItem | undefined, characterSkills: ISkill): number {
+    const weaponSubType = weapon ? weapon.subType || "None" : "None";
+    const skillName = SKILLS_MAP.get(weaponSubType);
+    if (!skillName) {
+      return 0;
+    }
+    return Math.floor(characterSkills[skillName].level / 2);
   }
 }

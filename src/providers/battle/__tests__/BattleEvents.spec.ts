@@ -200,6 +200,44 @@ describe("BattleEvents.spec.ts", () => {
     });
   });
 
+  describe("Potential damage calculation", () => {
+    it("should properly calculate potential damage", async () => {
+      await testNPC.populate("skills").execPopulate();
+      await testCharacter.populate("skills").execPopulate();
+
+      // @ts-ignore
+      const potentialDamage = await battleEvents.calculateTotalPotentialDamage(
+        testCharacter.skills as ISkill,
+        testNPC.skills as ISkill,
+        false,
+        undefined
+      );
+
+      expect(potentialDamage).toBe(0);
+    });
+
+    it("should properly calculate potential damage - influenced by skill level", async () => {
+      const skillLvl = 100;
+      const characterSkills = await Skill.findById(testCharacter.skills);
+      expect(characterSkills).toBeDefined();
+      characterSkills!.first.level = skillLvl;
+      await characterSkills!.save();
+
+      await testNPC.populate("skills").execPopulate();
+      await testCharacter.populate("skills").execPopulate();
+
+      // @ts-ignore
+      const potentialDamage = await battleEvents.calculateTotalPotentialDamage(
+        testCharacter.skills as ISkill,
+        testNPC.skills as ISkill,
+        false,
+        undefined
+      );
+
+      expect(potentialDamage).toBe(skillLvl / 2);
+    });
+  });
+
   describe("Damage reduction", () => {
     let spyCalculateShieldingDefense: jest.SpyInstance;
     let spyCalculateRegularDefense: jest.SpyInstance;
