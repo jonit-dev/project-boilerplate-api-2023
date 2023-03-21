@@ -9,6 +9,7 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import {
+  BASIC_INCREASE_HEALTH_MANA,
   SP_CRAFTING_INCREASE_RATIO,
   SP_INCREASE_RATIO,
   SP_MAGIC_INCREASE_TIMES_MANA,
@@ -18,9 +19,12 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import {
   AnimationEffectKeys,
+  CharacterClass,
   CharacterSocketEvents,
   ICharacterAttributeChanged,
   IUIShowMessage,
+  LifeBringerRaces,
+  ShadowWalkerRaces,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
@@ -41,6 +45,8 @@ import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
+import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
+import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -55,7 +61,9 @@ export class SkillIncrease {
     private buffSkillFunctions: BuffSkillFunctions,
     private skillGainValidation: SkillGainValidation,
     private characterWeapon: CharacterWeapon,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties,
+    private characterRaceBonusOrPenalties: CharacterRaceBonusOrPenalties
   ) {}
 
   /**
@@ -308,8 +316,7 @@ export class SkillIncrease {
       await this.skillFunctions.updateSkills(skills, character);
 
       if (levelUp) {
-        const { maxHealth, maxMana } = this.increaseMaxManaMaxHealth(character.maxMana, character.maxHealth);
-        await this.updateEntitiesAttributes(character._id, { maxHealth, maxMana });
+        await this.increaseMaxManaMaxHealth(character._id);
 
         await this.sendExpLevelUpEvents(
           { level: skills.level, previousLevel, exp: record!.xp! + record!.xp! * buff },
@@ -482,17 +489,39 @@ export class SkillIncrease {
     return increaseRate;
   }
 
-  private increaseMaxManaMaxHealth(
-    currentMaxMana: number,
-    currentMaxHealth: number
-  ): { maxMana: number; maxHealth: number } {
-    const maxValue = Math.max(currentMaxMana, currentMaxHealth);
-    const increaseRate = this.calculateIncreaseRate(maxValue);
+  public async increaseMaxManaMaxHealth(characterId: Types.ObjectId): Promise<void> {
+    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
-    const maxMana = Math.ceil(currentMaxMana * increaseRate);
-    const maxHealth = Math.ceil(currentMaxHealth * increaseRate);
+    const classBonusOrPenalties = this.characterClassBonusOrPenalties.getClassBonusOrPenalties(
+      character.class as CharacterClass
+    );
 
-    return { maxMana, maxHealth };
+    const raceBonusOrPenaltises = this.characterRaceBonusOrPenalties.getRaceBonusOrPenaltises(
+      character.race as LifeBringerRaces | ShadowWalkerRaces
+    );
+
+    const level = skills.level;
+    const baseValue = 100;
+
+    const totalStrength =
+      Math.round(
+        (classBonusOrPenalties.basicAttributes.strength + raceBonusOrPenaltises.basicAttributes.strength) * 100
+      ) / 100;
+    const increaseRateStrength = 1 + BASIC_INCREASE_HEALTH_MANA * (1 + totalStrength);
+    const maxHealth = Math.round(baseValue * Math.pow(increaseRateStrength, level - 1));
+
+    const totalMagic =
+      Math.round((classBonusOrPenalties.basicAttributes.magic + raceBonusOrPenaltises.basicAttributes.magic) * 100) /
+      100;
+    const increaseRateMagic = 1 + BASIC_INCREASE_HEALTH_MANA * (1 + totalMagic);
+    const maxMana = Math.round(baseValue * Math.pow(increaseRateMagic, level - 1));
+
+    const result = await this.updateEntitiesAttributes(character._id, { maxHealth, maxMana });
+
+    if (!result) {
+      throw new Error(`Failed to increase max health and mana. Character ${character._id} not found.`);
+    }
   }
 
   private async updateEntitiesAttributes(
@@ -501,11 +530,11 @@ export class SkillIncrease {
   ): Promise<boolean> {
     const { maxHealth, maxMana } = Object.freeze(updateAttributes);
 
-    const character = await Character.findOneAndUpdate(
+    const character = (await Character.findOneAndUpdate(
       { _id: characterId },
-      { $set: { maxHealth, maxMana } },
+      { maxHealth, maxMana },
       { new: true }
-    ).lean();
+    ).lean()) as ICharacter;
 
     if (!character) {
       return false;
@@ -519,6 +548,10 @@ export class SkillIncrease {
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
 
-    return true;
+    if (character.maxHealth === maxHealth && character.maxMana === maxMana) {
+      return true;
+    }
+
+    return false;
   }
 }
