@@ -3,6 +3,7 @@ import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { User } from "@entities/ModuleSystem/UserModel";
+import { CHARACTER_MAX_BASE_SPEED } from "@providers/constants/CharacterConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
@@ -244,16 +245,24 @@ characterSchema.virtual("movementIntervalMs").get(function (this: ICharacter) {
 characterSchema.virtual("speed").get(function (this: ICharacter) {
   const ratio = this.weight / this.maxWeight;
 
+  const maxCapSpeed = (baseSpeed: number): number => {
+    if (baseSpeed <= CHARACTER_MAX_BASE_SPEED) {
+      return baseSpeed;
+    } else {
+      return CHARACTER_MAX_BASE_SPEED;
+    }
+  };
+
   if (ratio <= 1) {
-    return this.baseSpeed;
+    return maxCapSpeed(this.baseSpeed);
   }
 
   if (ratio > 1 && ratio <= 2) {
-    return this.baseSpeed * 0.8;
+    return maxCapSpeed(this.baseSpeed * 0.8);
   }
 
   if (ratio > 2 && ratio <= 6) {
-    return this.baseSpeed * 0.6;
+    return maxCapSpeed(this.baseSpeed * 0.6);
   }
 
   if (ratio > 6) {
