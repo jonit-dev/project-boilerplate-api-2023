@@ -1,1 +1,0 @@
-export const CHARACTER_MAX_BASE_SPEED = 2.5;
