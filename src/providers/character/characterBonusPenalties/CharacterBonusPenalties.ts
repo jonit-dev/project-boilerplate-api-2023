@@ -191,12 +191,126 @@ export class CharacterBonusPenalties {
       }
 
       case LifeBringerRaces.Human: {
-        // Do Nothing
+        basicAttributes = {
+          stamina: raceBonusOrPenaltises.basicAttributes.stamina + classBonusOrPenalties.basicAttributes.stamina,
+          strength: raceBonusOrPenaltises.basicAttributes.strength + classBonusOrPenalties.basicAttributes.strength,
+          resistance:
+            raceBonusOrPenaltises.basicAttributes.resistance + classBonusOrPenalties.basicAttributes.resistance,
+          dexterity: raceBonusOrPenaltises.basicAttributes.dexterity + classBonusOrPenalties.basicAttributes.dexterity,
+          magic: raceBonusOrPenaltises.basicAttributes.magic + classBonusOrPenalties.basicAttributes.magic,
+          magicResistance:
+            raceBonusOrPenaltises.basicAttributes.magicResistance +
+            classBonusOrPenalties.basicAttributes.magicResistance,
+        };
+
+        if (skillToUpdate in basicAttributes) {
+          skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+            skills,
+            skillToUpdate,
+            basicAttributes
+          );
+        }
+
+        // Update Combat Skills
+        combatSkills = {
+          first: raceBonusOrPenaltises.combatSkills.first + classBonusOrPenalties.combatSkills.first,
+          sword: raceBonusOrPenaltises.combatSkills.sword + classBonusOrPenalties.combatSkills.sword,
+          dagger: raceBonusOrPenaltises.combatSkills.dagger + classBonusOrPenalties.combatSkills.dagger,
+          axe: raceBonusOrPenaltises.combatSkills.axe + classBonusOrPenalties.combatSkills.axe,
+          distance: raceBonusOrPenaltises.combatSkills.distance + classBonusOrPenalties.combatSkills.distance,
+          shielding: raceBonusOrPenaltises.combatSkills.shielding + classBonusOrPenalties.combatSkills.shielding,
+          club: raceBonusOrPenaltises.combatSkills.club + classBonusOrPenalties.combatSkills.club,
+        };
+
+        if (skillToUpdate in combatSkills) {
+          skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            skills,
+            skillToUpdate,
+            combatSkills
+          );
+        }
+
+        // Update Crafting Skills
+        craftingSkills = {
+          fishing: raceBonusOrPenaltises.craftingSkills.fishing + classBonusOrPenalties.craftingSkills.fishing,
+          mining: raceBonusOrPenaltises.craftingSkills.mining + classBonusOrPenalties.craftingSkills.mining,
+          lumberjacking:
+            raceBonusOrPenaltises.craftingSkills.lumberjacking + classBonusOrPenalties.craftingSkills.lumberjacking,
+          cooking: raceBonusOrPenaltises.craftingSkills.cooking + classBonusOrPenalties.craftingSkills.cooking,
+          alchemy: raceBonusOrPenaltises.craftingSkills.alchemy + classBonusOrPenalties.craftingSkills.alchemy,
+          blacksmithing:
+            raceBonusOrPenaltises.craftingSkills.blacksmithing + classBonusOrPenalties.craftingSkills.blacksmithing,
+        };
+
+        if (skillToUpdate in craftingSkills) {
+          skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            skills,
+            skillToUpdate,
+            craftingSkills
+          );
+        }
         break;
       }
 
       case ShadowWalkerRaces.Human: {
-        // Do Nothing
+        basicAttributes = {
+          stamina: raceBonusOrPenaltises.basicAttributes.stamina + classBonusOrPenalties.basicAttributes.stamina,
+          strength: raceBonusOrPenaltises.basicAttributes.strength + classBonusOrPenalties.basicAttributes.strength,
+          resistance:
+            raceBonusOrPenaltises.basicAttributes.resistance + classBonusOrPenalties.basicAttributes.resistance,
+          dexterity: raceBonusOrPenaltises.basicAttributes.dexterity + classBonusOrPenalties.basicAttributes.dexterity,
+          magic: raceBonusOrPenaltises.basicAttributes.magic + classBonusOrPenalties.basicAttributes.magic,
+          magicResistance:
+            raceBonusOrPenaltises.basicAttributes.magicResistance +
+            classBonusOrPenalties.basicAttributes.magicResistance,
+        };
+
+        if (skillToUpdate in basicAttributes) {
+          skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+            skills,
+            skillToUpdate,
+            basicAttributes
+          );
+        }
+
+        // Update Combat Skills
+        combatSkills = {
+          first: raceBonusOrPenaltises.combatSkills.first + classBonusOrPenalties.combatSkills.first,
+          sword: raceBonusOrPenaltises.combatSkills.sword + classBonusOrPenalties.combatSkills.sword,
+          dagger: raceBonusOrPenaltises.combatSkills.dagger + classBonusOrPenalties.combatSkills.dagger,
+          axe: raceBonusOrPenaltises.combatSkills.axe + classBonusOrPenalties.combatSkills.axe,
+          distance: raceBonusOrPenaltises.combatSkills.distance + classBonusOrPenalties.combatSkills.distance,
+          shielding: raceBonusOrPenaltises.combatSkills.shielding + classBonusOrPenalties.combatSkills.shielding,
+          club: raceBonusOrPenaltises.combatSkills.club + classBonusOrPenalties.combatSkills.club,
+        };
+
+        if (skillToUpdate in combatSkills) {
+          skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            skills,
+            skillToUpdate,
+            combatSkills
+          );
+        }
+
+        // Update Crafting Skills
+        craftingSkills = {
+          fishing: raceBonusOrPenaltises.craftingSkills.fishing + classBonusOrPenalties.craftingSkills.fishing,
+          mining: raceBonusOrPenaltises.craftingSkills.mining + classBonusOrPenalties.craftingSkills.mining,
+          lumberjacking:
+            raceBonusOrPenaltises.craftingSkills.lumberjacking + classBonusOrPenalties.craftingSkills.lumberjacking,
+          cooking: raceBonusOrPenaltises.craftingSkills.cooking + classBonusOrPenalties.craftingSkills.cooking,
+          alchemy: raceBonusOrPenaltises.craftingSkills.alchemy + classBonusOrPenalties.craftingSkills.alchemy,
+          blacksmithing:
+            raceBonusOrPenaltises.craftingSkills.blacksmithing + classBonusOrPenalties.craftingSkills.blacksmithing,
+        };
+
+        if (skillToUpdate in craftingSkills) {
+          skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            skills,
+            skillToUpdate,
+            craftingSkills
+          );
+        }
         break;
       }
 
