@@ -1,5 +1,4 @@
 import {
-  BASIC_INCREASE_HEALTH_MANA,
   CLASS_BONUS_OR_PENALTIES,
   RACE_BONUS_OR_PENALTIES,
 } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
@@ -20,7 +19,6 @@ jest.mock("@providers/constants/SkillConstants", () => ({
   EXP_RATIO: 1,
   CLASS_BONUS_OR_PENALTIES,
   RACE_BONUS_OR_PENALTIES,
-  BASIC_INCREASE_HEALTH_MANA,
 }));
 
 jest.mock("@providers/constants/LootConstants", () => ({

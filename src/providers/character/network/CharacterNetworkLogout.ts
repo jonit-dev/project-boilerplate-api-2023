@@ -1,7 +1,7 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { BattleCycle } from "@providers/battle/BattleCycle";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
-import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -21,8 +21,7 @@ export class CharacterNetworkLogout {
     private characterView: CharacterView,
     private inMemoryHashTable: InMemoryHashTable,
     private buffSkillFunctions: BuffSkillFunctions,
-    private spellLearn: SpellLearn,
-    private skillIncrease: SkillIncrease
+    private spellLearn: SpellLearn
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -42,6 +41,8 @@ export class CharacterNetworkLogout {
 
         console.log(`🚪: Character id ${data.id} has disconnected`);
 
+        await Character.updateOne({ _id: data.id }, { isOnline: false, baseSpeed: MovementSpeed.Standard });
+
         await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());
@@ -51,9 +52,6 @@ export class CharacterNetworkLogout {
         if (spellLeveling) {
           console.log(`- Spells have been updated in Character: ${character._id}`);
         }
-
-        await this.skillIncrease.increaseMaxManaMaxHealth(character._id);
-
         const battleCycle = BattleCycle.battleCycles.get(data.id);
 
         if (battleCycle) {

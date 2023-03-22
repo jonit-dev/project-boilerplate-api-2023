@@ -1,4 +1,4 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
@@ -204,8 +204,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
     expect(testNPC.xpToRelease?.length).toBe(0);
     expect(updatedSkills.first.level).toBe(initialLevel);
-    expect(updatedSkills.first.skillPoints).toBe(SP_INCREASE_RATIO + 0.2);
-    expect(updatedSkills.first.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO - 0.2);
+    expect(updatedSkills.first.skillPoints).toBe(SP_INCREASE_RATIO);
+    expect(updatedSkills.first.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO);
     expect(updatedSkills.level).toBe(initialLevel);
     expect(updatedSkills.experience).toBe(initialSkills.experience);
     expect(updatedSkills.xpToNextLevel).toBe(xpToLvl2);
@@ -226,13 +226,13 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
     // 'first' skill should increase
     expect(updatedSkills.first.level).toBe(initialLevel);
-    expect(updatedSkills.first.skillPoints).toBe(SP_INCREASE_RATIO + 0.2);
-    expect(updatedSkills.first.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO - 0.2);
+    expect(updatedSkills.first.skillPoints).toBe(SP_INCREASE_RATIO);
+    expect(updatedSkills.first.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO);
 
     // strength should increase too
     expect(updatedSkills.strength.level).toBe(initialLevel);
-    expect(updatedSkills.strength.skillPoints).toBe(SP_INCREASE_RATIO + 0.16);
-    expect(updatedSkills.strength.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO - 0.16);
+    expect(updatedSkills.strength.skillPoints).toBe(SP_INCREASE_RATIO);
+    expect(updatedSkills.strength.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO);
 
     // Without releasing the XP, experience values should be same as initial values
     // and NPC's xpToRelease array should have a length == 1
@@ -244,21 +244,17 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
   it("should increase character's 'first' skill level and skill points. Should increase experience and level up to level 5", async () => {
     const spToAdd = spToLvl2 * 5 + 5;
-    const teste = (await Character.findByIdAndUpdate(
-      { _id: testCharacter._id },
-      { class: CharacterClass.Druid },
-      { new: true }
-    )) as ICharacter;
+
     for (let i = 0; i < spToAdd; i++) {
-      await skillIncrease.increaseSkillsOnBattle(teste, testNPC, 2);
+      await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 2);
     }
     await skillIncrease.releaseXP(testNPC);
 
-    const updatedSkills = (await Skill.findById(teste.skills).lean()) as ISkill;
+    const updatedSkills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
     expect(updatedSkills.first.level).toBe(initialLevel + 1);
-    expect(updatedSkills.first.skillPoints).toBe(spToAdd * SP_INCREASE_RATIO + 35);
-    expect(updatedSkills.first.skillPointsToNextLevel).toBe(spToLvl2 - 5.75);
+    expect(updatedSkills.first.skillPoints).toBe(spToAdd * SP_INCREASE_RATIO);
+    expect(updatedSkills.first.skillPointsToNextLevel).toBe(spToLvl3 - 5 * SP_INCREASE_RATIO);
 
     expect(updatedSkills.level).toBe(initialLevel + 3);
     expect(updatedSkills.experience).toBe(spToAdd * 2);
@@ -272,7 +268,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     // faking timers is creating issue with mongo calls
     await wait(5.2);
     expect(spellLearnMock).toHaveBeenCalledTimes(1);
-    expect(spellLearnMock).toHaveBeenCalledWith(teste._id, true);
+    expect(spellLearnMock).toHaveBeenCalledWith(testCharacter._id, true);
 
     // Check that other skills remained unchanged
     expect(updatedSkills.axe.level).toBe(initialSkills.axe.level);
@@ -299,8 +295,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
     // magic skill should increase
     expect(updatedSkills.magic.level).toBe(initialLevel);
-    expect(updatedSkills.magic.skillPoints).toBe(SP_INCREASE_RATIO + 0.52);
-    expect(updatedSkills.magic.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO - 0.52);
+    expect(updatedSkills.magic.skillPoints).toBe(SP_INCREASE_RATIO);
+    expect(updatedSkills.magic.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO);
 
     // strength should not increase
     expect(updatedSkills.strength.level).toBe(initialLevel);
@@ -315,8 +311,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
     // 'resistance' skill should increase
     expect(updatedSkills.resistance.level).toBe(initialLevel);
-    expect(updatedSkills.resistance.skillPoints).toBe(SP_INCREASE_RATIO + 0.16);
-    expect(updatedSkills.resistance.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO - 0.16);
+    expect(updatedSkills.resistance.skillPoints).toBe(SP_INCREASE_RATIO);
+    expect(updatedSkills.resistance.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO);
   });
 
   it("should increase character's magic SP as per mana cost", async () => {
@@ -328,8 +324,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(updatedSkills.magic.level).toBe(initialLevel);
 
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (spellSelfHealing.manaCost ?? 0);
-    expect(updatedSkills.magic.skillPoints).toBe(skillPoints + 0.52);
-    expect(updatedSkills.magic.skillPointsToNextLevel).toBe(spToLvl2 - (skillPoints + 0.52));
+    expect(updatedSkills.magic.skillPoints).toBe(skillPoints);
+    expect(updatedSkills.magic.skillPointsToNextLevel).toBe(spToLvl2 - skillPoints);
   });
 
   it("should increase character's magic resistance SP as per rune power", async () => {
@@ -344,8 +340,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     itemDarkRune.power = 20;
 
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
-    expect(Math.round(updatedSkills?.magicResistance.skillPoints * 10) / 10).toBeCloseTo(8.7);
-    expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBeCloseTo(spToLvl2 - 8.72);
+    expect(updatedSkills?.magicResistance.skillPoints).toBeCloseTo(skillPoints);
+    expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBeCloseTo(spToLvl2 - skillPoints);
   });
 });
 

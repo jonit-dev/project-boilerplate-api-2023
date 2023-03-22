@@ -912,7 +912,7 @@ describe("UseWithEntityValidation.ts", () => {
 
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
     const updatedSkillsTarget: ISkill = (await Skill.findById(targetCharacter.skills)) as unknown as ISkill;
-    expect(updatedSkillsTarget?.magicResistance.skillPoints).toBeCloseTo(skillPoints + 0.64, 2);
+    expect(updatedSkillsTarget?.magicResistance.skillPoints).toBeCloseTo(skillPoints, 1);
 
     expect(sendEventToUserMock).toHaveBeenCalled();
 
@@ -923,7 +923,7 @@ describe("UseWithEntityValidation.ts", () => {
       }
     });
 
-    expect(skillsCalls.length).toBe(3);
+    expect(skillsCalls.length).toBe(1);
     expect(skillsCalls[0][2]?.skill?.magicResistance?.skillPoints).toBeCloseTo(skillPoints, 1);
   });
 
