@@ -1,5 +1,6 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { BattleCycle } from "@providers/battle/BattleCycle";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -41,6 +42,8 @@ export class CharacterNetworkLogout {
         }
 
         console.log(`🚪: Character id ${data.id} has disconnected`);
+
+        await Character.updateOne({ _id: data.id }, { isOnline: false, baseSpeed: MovementSpeed.Standard });
 
         await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
 
