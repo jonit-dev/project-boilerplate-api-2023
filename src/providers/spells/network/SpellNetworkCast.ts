@@ -14,7 +14,7 @@ export class SpellNetworkCast {
       channel,
       SpellSocketEvents.CastSpell,
       async (data: ISpellCast, character: ICharacter) => {
-        await this.spellCast.castSpell(data.magicWords, character);
+        await this.spellCast.castSpell(data, character);
       }
     );
   }

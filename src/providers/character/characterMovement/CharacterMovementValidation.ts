@@ -1,11 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUIShowMessage, MapLayers, ToGridX, ToGridY, UISocketEvents } from "@rpg-engine/shared";
+import { IUIShowMessage, MapLayers, ToGridX, ToGridY, UISocketEvents, EntityType } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBan } from "../CharacterBan";
 import { CharacterValidation } from "../CharacterValidation";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(CharacterMovementValidation)
 export class CharacterMovementValidation {
@@ -13,7 +14,8 @@ export class CharacterMovementValidation {
     private characterValidation: CharacterValidation,
     private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
-    private characterBan: CharacterBan
+    private characterBan: CharacterBan,
+    private specialEffect: SpecialEffect
   ) {}
 
   public async isValid(character: ICharacter, newX: number, newY: number, isMoving: boolean): Promise<boolean> {
@@ -24,6 +26,14 @@ export class CharacterMovementValidation {
     const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
 
     if (!hasBasicValidation) {
+      return false;
+    }
+
+    if (await this.specialEffect.isStun(character._id, character.type as EntityType)) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: "Sorry, you can't move because you're stunned",
+        type: "error",
+      });
       return false;
     }
 

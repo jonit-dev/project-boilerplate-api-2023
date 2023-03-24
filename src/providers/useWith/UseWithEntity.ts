@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { BattleAttackRanged } from "@providers/battle/BattleAttackTarget/BattleAttackRanged";
 import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
@@ -32,6 +32,7 @@ import {
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { IMagicItemUseWithEntity } from "./useWithTypes";
+import { EntityUtil } from "@providers/entityEffects/EntityUtil";
 
 const StaticEntity = "Item"; // <--- should be added to the EntityType enum from @rpg-engine/shared
 
@@ -67,7 +68,7 @@ export class UseWithEntity {
   }
 
   public async execute(payload: IUseWithEntity, character: ICharacter): Promise<void> {
-    const target = payload.entityId ? await this.getEntity(payload.entityId, payload.entityType) : null;
+    const target = payload.entityId ? await EntityUtil.getEntity(payload.entityId, payload.entityType) : null;
     const item = payload.itemId ? ((await Item.findById(payload.itemId)) as unknown as IItem) : null;
 
     const isValid = await this.validateRequest(character, target, item, payload.entityType);
@@ -254,21 +255,5 @@ export class UseWithEntity {
       item.projectileAnimationKey,
       item.animationKey
     );
-  }
-
-  private async getEntity(entityId: string, entityType: EntityType): Promise<ICharacter | INPC | IItem | null> {
-    switch (entityType) {
-      case EntityType.Character:
-        return (await Character.findById(entityId)) as unknown as ICharacter;
-
-      case EntityType.NPC:
-        return (await NPC.findById(entityId)) as unknown as INPC;
-
-      case StaticEntity as EntityType:
-        return (await Item.findById(entityId)) as unknown as IItem;
-
-      default:
-        return null;
-    }
   }
 }

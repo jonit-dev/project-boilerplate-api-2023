@@ -1,5 +1,5 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY, EntityType } from "@rpg-engine/shared";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
@@ -16,6 +16,7 @@ import { NPCMovementMoveAway } from "./movement/NPCMovementMoveAway";
 import { NPCMovementMoveTowards } from "./movement/NPCMovementMoveTowards";
 import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCMovementStopped } from "./movement/NPCMovementStopped";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(NPCManager)
 export class NPCManager {
@@ -29,7 +30,8 @@ export class NPCManager {
     private npcView: NPCView,
     private npcLoader: NPCLoader,
     private npcFreezer: NPCFreezer,
-    private pm2Helper: PM2Helper
+    private pm2Helper: PM2Helper,
+    private specialEffect: SpecialEffect
   ) {}
 
   public listenForBehaviorTrigger(): void {
@@ -85,6 +87,10 @@ export class NPCManager {
 
             if (!npc.isBehaviorEnabled) {
               await this.npcFreezer.freezeNPC(npc);
+              return;
+            }
+
+            if (await this.specialEffect.isStun(npc._id, npc.type as EntityType)) {
               return;
             }
 
