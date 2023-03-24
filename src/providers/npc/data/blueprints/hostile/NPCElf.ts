@@ -9,7 +9,6 @@ import {
   LegsBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
-  StaffsBlueprint,
   SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -87,10 +86,7 @@ export const npcElf: Partial<INPC> = {
       chance: 20,
       quantityRange: [3, 10],
     },
-    {
-      itemBlueprintKey: StaffsBlueprint.EnchantedStaff,
-      chance: 20,
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.ElvenWood,
       chance: 20,

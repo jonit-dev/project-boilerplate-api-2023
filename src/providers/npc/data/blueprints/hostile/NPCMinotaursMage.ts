@@ -53,11 +53,15 @@ export const npcMinotaurMage = {
   loots: [
     {
       itemBlueprintKey: StaffsBlueprint.MoonsStaff,
-      chance: 2,
+      chance: 5,
     },
     {
       itemBlueprintKey: StaffsBlueprint.RoyalStaff,
       chance: 7,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.TartarusStaff,
+      chance: 1,
     },
     {
       itemBlueprintKey: GlovesBlueprint.PlateGloves,
@@ -70,6 +74,14 @@ export const npcMinotaurMage = {
     {
       itemBlueprintKey: PotionsBlueprint.ManaPotion,
       chance: 60,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.EnchantedStaff,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.SoulStaff,
+      chance: 5,
     },
     {
       itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,

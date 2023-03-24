@@ -76,7 +76,7 @@ export const npcOrcArcher: Partial<INPC> = {
     },
     {
       itemBlueprintKey: StaffsBlueprint.EnchantedStaff,
-      chance: 20,
+      chance: 5,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.ElvenWood,

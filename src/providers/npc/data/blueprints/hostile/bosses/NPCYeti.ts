@@ -75,7 +75,7 @@ export const npcYeti: Partial<INPC> = {
     },
     {
       itemBlueprintKey: StaffsBlueprint.TartarusStaff,
-      chance: 5,
+      chance: 1,
     },
 
     {
