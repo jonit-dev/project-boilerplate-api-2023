@@ -22,8 +22,6 @@ export class EquipmentRead {
 
     const equipment = await this.equipmentSlots.getEquipmentSlots(equipmentSet._id);
 
-    console.log(equipment);
-
     this.socketMessaging.sendEventToUser<IEquipmentRead>(character.channelId!, EquipmentSocketEvents.ContainerRead, {
       equipment,
     });
