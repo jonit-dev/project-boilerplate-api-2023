@@ -17,7 +17,7 @@ import { spellPoisonRuneCreation } from "./SpellPoisonRuneCreation";
 import { spellSelfHaste } from "./SpellSelfHaste";
 import { spellSelfHealing } from "./SpellSelfHealing";
 import { spellThunderRuneCreation } from "./SpellThunderRuneCreation";
-import { spellWarriorStunTarget } from "./SpellWarriorStunTarget";
+import { spellStunTarget } from "./warrior/SpellStunTarget";
 
 export const spellsBlueprints = {
   [SpellsBlueprint.SelfHealingSpell]: spellSelfHealing,
@@ -38,5 +38,5 @@ export const spellsBlueprints = {
   [SpellsBlueprint.SpellPhysicalShield]: spellPhysicalShield,
   [SpellsBlueprint.SpellEagleEyes]: spellEagleEyes,
   [SpellsBlueprint.ThunderRuneCreationSpell]: spellThunderRuneCreation,
-  [SpellsBlueprint.WarriorStunTarget]: spellWarriorStunTarget,
+  [SpellsBlueprint.WarriorStunTarget]: spellStunTarget,
 };
