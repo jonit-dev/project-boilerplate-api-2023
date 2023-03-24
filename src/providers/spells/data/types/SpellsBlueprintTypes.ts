@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import {
   BasicAttribute,
@@ -28,6 +29,7 @@ export enum SpellsBlueprint {
   SpellPhysicalShield = "spell-physical-shield",
   SpellEagleEyes = "spell-eagle-eyes",
   ThunderRuneCreationSpell = "thunder-rune-creation-spell",
+  WarriorStunTarget = "warrior-stun-target",
 }
 
 export interface ISpell {
@@ -44,5 +46,9 @@ export interface ISpell {
   requiredItem?: MagicsBlueprint;
   characterClass?: CharacterClass[];
   attribute?: BasicAttribute | CombatSkill | CraftingSkill | CharacterEntities;
-  usableEffect: (character: ICharacter) => Promise<boolean> | Promise<void> | void | boolean;
+  maxDistanceGrid?: number;
+  usableEffect: (
+    character: ICharacter,
+    target?: ICharacter | INPC
+  ) => Promise<boolean> | Promise<void> | void | boolean;
 }

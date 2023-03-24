@@ -11,6 +11,7 @@ import {
   CharacterSocketEvents,
   SkillSocketEvents,
   UISocketEvents,
+  SpellSocketEvents,
 } from "@rpg-engine/shared";
 import { spellArrowCreation } from "../data/blueprints/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/SpellBlankRuneCreation";
@@ -81,7 +82,7 @@ describe("SpellCast.ts", () => {
   });
 
   it("should fail with spell not found", async () => {
-    expect(await spellCast.castSpell("talas faenya ", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell({ magicWords: "talas faenya " }, testCharacter)).toBeFalsy();
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -93,14 +94,14 @@ describe("SpellCast.ts", () => {
   // to edit the spell
   it("should cast spell with case case insensitive spell", async () => {
     // talas faenya as TalAs faenya
-    expect(await spellCast.castSpell("TalAs faenya", testCharacter)).toBeTruthy();
+    expect(await spellCast.castSpell({ magicWords: "TalAs faenya" }, testCharacter)).toBeTruthy();
   });
 
   it("should call character validation", async () => {
     const characterValidationMock = jest.spyOn(CharacterValidation.prototype, "hasBasicValidation");
     characterValidationMock.mockReturnValue(false);
 
-    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell({ magicWords: "talas faenya" }, testCharacter)).toBeFalsy();
     expect(characterValidationMock).toHaveBeenLastCalledWith(testCharacter);
 
     characterValidationMock.mockRestore();
@@ -110,7 +111,7 @@ describe("SpellCast.ts", () => {
     const runTest = async (): Promise<void> => {
       sendEventToUser.mockReset();
 
-      expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
+      expect(await spellCast.castSpell({ magicWords: "talas faenya" }, testCharacter)).toBeFalsy();
 
       expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -134,7 +135,7 @@ describe("SpellCast.ts", () => {
     testCharacter.mana = (spellSelfHealing.manaCost ?? 1) - 1;
     await Skill.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
 
-    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell({ magicWords: "talas faenya" }, testCharacter)).toBeFalsy();
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -148,7 +149,7 @@ describe("SpellCast.ts", () => {
     characterSkills.level = (spellSelfHealing.minLevelRequired ?? 2) - 1;
     await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
-    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell({ magicWords: "talas faenya" }, testCharacter)).toBeFalsy();
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -162,7 +163,7 @@ describe("SpellCast.ts", () => {
     characterSkills.magic.level = (spellSelfHealing.minMagicLevelRequired ?? 2) - 1;
     await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
-    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell({ magicWords: "talas faenya" }, testCharacter)).toBeFalsy();
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -176,7 +177,7 @@ describe("SpellCast.ts", () => {
     const newHealth = testCharacter.health + spellSelfHealing.manaCost!;
     const newMana = testCharacter.mana - spellSelfHealing.manaCost!;
 
-    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeTruthy();
+    expect(await spellCast.castSpell({ magicWords: "talas faenya" }, testCharacter)).toBeTruthy();
 
     const character = (await Character.findById(testCharacter.id).lean({
       virtuals: true,
@@ -226,7 +227,7 @@ describe("SpellCast.ts", () => {
     characterSkills.magic.level = spellGreaterHealing.minMagicLevelRequired;
     await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
-    expect(await spellCast.castSpell("greater faenya", testCharacter)).toBeTruthy();
+    expect(await spellCast.castSpell({ magicWords: "greater faenya" }, testCharacter)).toBeTruthy();
 
     const character = (await Character.findById(testCharacter.id).lean({
       virtuals: true,
@@ -263,7 +264,7 @@ describe("SpellCast.ts", () => {
     const increaseSPMock = jest.spyOn(SkillIncrease.prototype, "increaseMagicSP");
     increaseSPMock.mockImplementation();
 
-    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeTruthy();
+    expect(await spellCast.castSpell({ magicWords: "talas faenya" }, testCharacter)).toBeTruthy();
 
     expect(increaseSPMock).toHaveBeenCalledTimes(1);
     expect(increaseSPMock).toHaveBeenLastCalledWith(testCharacter, spellSelfHealing.manaCost!);
@@ -272,7 +273,7 @@ describe("SpellCast.ts", () => {
   });
 
   it("should increase skill and send skill update event", async () => {
-    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeTruthy();
+    expect(await spellCast.castSpell({ magicWords: "talas faenya" }, testCharacter)).toBeTruthy();
 
     const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
@@ -296,7 +297,7 @@ describe("SpellCast.ts", () => {
     testCharacter.skills = undefined;
     await Character.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
 
-    expect(await spellCast.castSpell("talas faenya", testCharacter)).toBeFalsy();
+    expect(await spellCast.castSpell({ magicWords: "talas faenya" }, testCharacter)).toBeFalsy();
 
     expect(sendEventToUser).toBeCalledTimes(1);
 
@@ -304,6 +305,15 @@ describe("SpellCast.ts", () => {
       message: "Sorry, you can not cast this spell without any skills.",
       type: "error",
     });
+  });
+
+  it("should send identify target for ranged spells", async () => {
+    const spell = { magicWords: "talas tamb-eth" };
+    expect(await spellCast.castSpell(spell, testCharacter)).toBeFalsy();
+
+    expect(sendEventToUser).toBeCalledTimes(1);
+
+    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, SpellSocketEvents.IdentifyTarget, spell);
   });
 
   it("should add spells to learned spells (level 2 character)", async () => {
@@ -417,7 +427,7 @@ describe("SpellCast.ts", () => {
   //   });
 
   //   it("should cast food creation spell successfully", async () => {
-  //     expect(await spellCast.castSpell("iquar klatha", testCharacter)).toBeTruthy();
+  //     expect(await spellCast.castSpell({magicWords: "iquar klatha"}, testCharacter)).toBeTruthy();
 
   //     const inventory = await testCharacter.inventory;
   //     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
@@ -437,7 +447,7 @@ describe("SpellCast.ts", () => {
   //   });
 
   //   it("should cast arrow creation spell successfully", async () => {
-  //     expect(await spellCast.castSpell("iquar elandi", testCharacter)).toBeTruthy();
+  //     expect(await spellCast.castSpell({magicWords: "iquar elandi"}, testCharacter)).toBeTruthy();
 
   //     const inventory = await testCharacter.inventory;
   //     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
@@ -457,7 +467,7 @@ describe("SpellCast.ts", () => {
   //   });
 
   //   it("should cast bolt creation spell successfully", async () => {
-  //     expect(await spellCast.castSpell("iquar lyn", testCharacter)).toBeTruthy();
+  //     expect(await spellCast.castSpell({magicWords: "iquar lyn"}, testCharacter)).toBeTruthy();
 
   //     const inventory = await testCharacter.inventory;
   //     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
@@ -477,7 +487,7 @@ describe("SpellCast.ts", () => {
   //   });
 
   //   it("should cast rune creation spell successfully", async () => {
-  //     expect(await spellCast.castSpell("iquar ansr ki", testCharacter)).toBeTruthy();
+  //     expect(await spellCast.castSpell({magicWords: "iquar ansr ki"}, testCharacter)).toBeTruthy();
 
   //     const inventory = await testCharacter.inventory;
   //     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
@@ -515,7 +525,7 @@ describe("SpellCast.ts", () => {
   //     characterSkills.magic.level = spellSelfHaste.minMagicLevelRequired;
   //     await Skill.findByIdAndUpdate(characterSkills._id, { ...characterSkills });
 
-  //     const castResult = await spellCast.castSpell("talas hiz", testCharacter);
+  //     const castResult = await spellCast.castSpell({magicWords: "talas hiz"}, testCharacter);
 
   //     expect(castResult).toBeTruthy();
 

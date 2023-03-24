@@ -45,7 +45,7 @@ export class ChatNetworkGlobalMessaging {
           if (this.spellCast.isSpellCasting(data.message)) {
             const spellCharacter = (await Character.findById(character._id)) as ICharacter;
 
-            await this.spellCast.castSpell(data.message, spellCharacter);
+            await this.spellCast.castSpell({ magicWords: data.message }, spellCharacter);
           }
 
           const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);

@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
@@ -10,9 +11,20 @@ import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/It
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { BasicAttribute, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import {
+  BasicAttribute,
+  CharacterSocketEvents,
+  SpellCastingType,
+  ICharacterAttributeChanged,
+  ISpellCast,
+  SpellSocketEvents,
+  NPCAlignment,
+  EntityType,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SpellValidation } from "./SpellValidation";
+import { EntityUtil } from "@providers/entityEffects/EntityUtil";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { spellsBlueprints } from "./data/blueprints/index";
 
 @provide(SpellCast)
@@ -26,19 +38,25 @@ export class SpellCast {
     private characterBonusPenalties: CharacterBonusPenalties,
     private itemUsableEffect: ItemUsableEffect,
     private spellValidation: SpellValidation,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private movementHelper: MovementHelper
   ) {}
 
   public isSpellCasting(msg: string): boolean {
     return !!this.getSpell(msg);
   }
 
-  public async castSpell(magicWords: string, character: ICharacter): Promise<boolean> {
+  public async castSpell(data: ISpellCast, character: ICharacter): Promise<boolean> {
     if (!this.characterValidation.hasBasicValidation(character)) {
       return false;
     }
 
-    const spell = this.getSpell(magicWords);
+    const spell = this.getSpell(data.magicWords);
+    if (spell?.castingType === SpellCastingType.RangedCasting && (!data.targetType || !data.targetId)) {
+      this.sendIdentifyTargetEvent(character, data);
+      return false;
+    }
+
     if (!(await this.isSpellCastingValid(spell, character))) {
       return false;
     }
@@ -55,7 +73,15 @@ export class SpellCast {
       }
     }
 
-    const hasCastSucceeded = await spell.usableEffect(character);
+    let target;
+    if (spell.castingType === SpellCastingType.RangedCasting) {
+      target = await EntityUtil.getEntity(data.targetId!, data.targetType!);
+      if (!this.isRangedCastingValid(character, target, spell)) {
+        return false;
+      }
+    }
+
+    const hasCastSucceeded = await spell.usableEffect(character, target);
 
     // if it fails, it will return explicitly false above. We prevent moving forward, so mana is not spent unnecessarily
     if (hasCastSucceeded === false) {
@@ -65,11 +91,42 @@ export class SpellCast {
     this.itemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
     await character.save();
 
-    await this.sendPostSpellCastEvents(character, spell);
+    await this.sendPostSpellCastEvents(character, spell, target);
 
     await this.skillIncrease.increaseMagicSP(character, spell.manaCost);
+    if (target?.type === EntityType.Character) {
+      await this.skillIncrease.increaseMagicResistanceSP(target, spell.manaCost);
+    }
 
     await this.characterBonusPenalties.applyRaceBonusPenalties(character, BasicAttribute.Magic);
+
+    return true;
+  }
+
+  private isRangedCastingValid(caster: ICharacter, target: ICharacter | INPC, spell: ISpell): boolean {
+    if (!target) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        caster,
+        "Sorry, you need to select a valid target to cast this spell."
+      );
+      return false;
+    }
+
+    if (target.type === EntityType.NPC && (target as INPC).alignment === NPCAlignment.Friendly) {
+      return false;
+    }
+
+    const isUnderRange = this.movementHelper.isUnderRange(
+      caster.x,
+      caster.y,
+      target.x!,
+      target.y!,
+      spell.maxDistanceGrid || 1
+    );
+    if (!isUnderRange) {
+      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is out of reach.");
+      return false;
+    }
 
     return true;
   }
@@ -157,7 +214,11 @@ export class SpellCast {
     return null;
   }
 
-  private async sendPostSpellCastEvents(character: ICharacter, spell: ISpell): Promise<void> {
+  private async sendPostSpellCastEvents(
+    character: ICharacter,
+    spell: ISpell,
+    target?: ICharacter | INPC
+  ): Promise<void> {
     const updatedCharacter = (await Character.findById(character._id).lean()) as ICharacter;
 
     const payload: ICharacterAttributeChanged = {
@@ -174,6 +235,20 @@ export class SpellCast {
       payload
     );
 
-    await this.animationEffect.sendAnimationEventToCharacter(updatedCharacter, spell.animationKey);
+    if (target) {
+      await this.animationEffect.sendProjectileAnimationEventToCharacter(
+        updatedCharacter,
+        updatedCharacter._id,
+        target._id,
+        spell.projectileAnimationKey,
+        spell.animationKey
+      );
+    } else {
+      await this.animationEffect.sendAnimationEventToCharacter(updatedCharacter, spell.animationKey);
+    }
+  }
+
+  private sendIdentifyTargetEvent(character: ICharacter, data: ISpellCast): void {
+    this.socketMessaging.sendEventToUser(character.channelId!, SpellSocketEvents.IdentifyTarget, data);
   }
 }
