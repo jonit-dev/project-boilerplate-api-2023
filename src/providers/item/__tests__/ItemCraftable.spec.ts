@@ -11,6 +11,7 @@ import { recipeBolt } from "@providers/useWith/recipes/ranged-weapons/recipeBolt
 import {
   AnimationSocketEvents,
   CharacterSocketEvents,
+  ICraftItemPayload,
   ItemRarities,
   ItemSocketEvents,
   ItemSubType,
@@ -91,7 +92,8 @@ describe("ItemCraftable.ts", () => {
       return Promise.resolve(true);
     });
 
-    await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
+    const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
+    await craftableItem.craftItem(itemToCraft, testCharacter);
 
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
@@ -113,7 +115,8 @@ describe("ItemCraftable.ts", () => {
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.SteelIngot, { stackQty: 1 }),
     ]);
 
-    await craftableItem.craftItem(recipeBolt.outputKey!, testCharacter);
+    const itemToCraft: ICraftItemPayload = { itemKey: recipeBolt.outputKey! };
+    await craftableItem.craftItem(itemToCraft, testCharacter);
 
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
@@ -141,7 +144,8 @@ describe("ItemCraftable.ts", () => {
 
     await Skill.findByIdAndUpdate(testCharacter.skills, { blacksmithing: { level: 1000 } });
 
-    await craftableItem.craftItem(recipeSpikedClub.outputKey!, testCharacter);
+    const itemToCraft: ICraftItemPayload = { itemKey: recipeSpikedClub.outputKey! };
+    await craftableItem.craftItem(itemToCraft, testCharacter);
 
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
@@ -163,8 +167,9 @@ describe("ItemCraftable.ts", () => {
     });
 
     const originalWeight = testCharacter.weight;
+    const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
 
-    await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
+    await craftableItem.craftItem(itemToCraft, testCharacter);
 
     const character = await Character.findById(testCharacter._id);
     expect(character!.weight).not.toBe(originalWeight);
@@ -176,7 +181,8 @@ describe("ItemCraftable.ts", () => {
       return Promise.resolve(true);
     });
 
-    await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
+    const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
+    await craftableItem.craftItem(itemToCraft, testCharacter);
 
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
@@ -205,7 +211,9 @@ describe("ItemCraftable.ts", () => {
     const characterValidationMock = jest.spyOn(CharacterValidation.prototype, "hasBasicValidation");
     characterValidationMock.mockReturnValue(false);
 
-    await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
+    const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
+
+    await craftableItem.craftItem(itemToCraft, testCharacter);
     expect(performCraftingMock).not.toBeCalled();
 
     expect(characterValidationMock).toHaveBeenLastCalledWith(testCharacter);
@@ -214,7 +222,7 @@ describe("ItemCraftable.ts", () => {
     characterValidationMock.mockReset();
     characterValidationMock.mockReturnValue(true);
 
-    await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
+    await craftableItem.craftItem(itemToCraft, testCharacter);
     expect(performCraftingMock).toBeCalled();
   });
 
@@ -222,7 +230,9 @@ describe("ItemCraftable.ts", () => {
     const performCraftingMock = jest.spyOn(ItemCraftable.prototype as any, "performCrafting");
     performCraftingMock.mockImplementation();
 
-    await craftableItem.craftItem("invalid-blueprint-key", testCharacter);
+    const itemToCraft: ICraftItemPayload = { itemKey: "invalid-blueprint-key" };
+
+    await craftableItem.craftItem(itemToCraft, testCharacter);
     expect(performCraftingMock).not.toBeCalled();
 
     expect(sendEventToUser).toHaveBeenCalledTimes(1);
@@ -236,7 +246,9 @@ describe("ItemCraftable.ts", () => {
     const performCraftingMock = jest.spyOn(ItemCraftable.prototype as any, "performCrafting");
     performCraftingMock.mockImplementation();
 
-    await craftableItem.craftItem(CraftingResourcesBlueprint.Wheat, testCharacter);
+    const itemToCraft: ICraftItemPayload = { itemKey: CraftingResourcesBlueprint.Wheat };
+
+    await craftableItem.craftItem(itemToCraft, testCharacter);
     expect(performCraftingMock).not.toBeCalled();
 
     expect(sendEventToUser).toHaveBeenCalledTimes(1);
@@ -251,7 +263,9 @@ describe("ItemCraftable.ts", () => {
     performCraftingMock.mockImplementation();
 
     const performTest = async (): Promise<void> => {
-      await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
+      const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
+      await craftableItem.craftItem(itemToCraft, testCharacter);
+
       expect(performCraftingMock).not.toBeCalled();
 
       expect(sendEventToUser).toHaveBeenCalledTimes(1);
@@ -277,7 +291,8 @@ describe("ItemCraftable.ts", () => {
       return Promise.resolve(false);
     });
 
-    await craftableItem.craftItem(itemManaPotion.key!, testCharacter);
+    const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
+    await craftableItem.craftItem(itemToCraft, testCharacter);
 
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 

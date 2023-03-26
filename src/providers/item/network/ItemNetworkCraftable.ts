@@ -23,7 +23,7 @@ export class ItemNetworkCraftable {
   public onCraftItem(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, ItemSocketEvents.CraftItem, async (data: ICraftItemPayload, character) => {
       if (data) {
-        await this.itemCraftable.craftItem(data.itemKey, character);
+        await this.itemCraftable.craftItem(data, character);
       }
     });
   }

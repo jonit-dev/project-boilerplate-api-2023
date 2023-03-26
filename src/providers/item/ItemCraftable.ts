@@ -18,6 +18,7 @@ import Shared, {
   IUIShowMessage,
   ItemSocketEvents,
   UISocketEvents,
+  ICraftItemPayload,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
@@ -44,13 +45,13 @@ export class ItemCraftable {
     this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, recipes);
   }
 
-  public async craftItem(itemKey: string, character: ICharacter): Promise<void> {
+  public async craftItem(itemToCraft: ICraftItemPayload, character: ICharacter): Promise<void> {
     if (!this.characterValidation.hasBasicValidation(character)) {
       return;
     }
 
-    const blueprint = itemsBlueprintIndex[itemKey];
-    const recipe = this.getAllRecipes()[itemKey];
+    const blueprint = itemsBlueprintIndex[itemToCraft.itemKey];
+    const recipe = this.getAllRecipes()[itemToCraft.itemKey];
 
     if (!blueprint || !recipe) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item can not be crafted.");
@@ -66,7 +67,7 @@ export class ItemCraftable {
       return;
     }
 
-    await this.performCrafting(recipe, character);
+    await this.performCrafting(recipe, character, itemToCraft.itemSubType);
   }
 
   /**
@@ -83,7 +84,11 @@ export class ItemCraftable {
     return (await this.getCraftingSkillsAverage(character)) > baseChance ? this.isCraftSuccessful : baseChance;
   }
 
-  private async performCrafting(recipe: IUseWithCraftingRecipe, character: ICharacter): Promise<void> {
+  private async performCrafting(
+    recipe: IUseWithCraftingRecipe,
+    character: ICharacter,
+    itemSubType?: string
+  ): Promise<void> {
     let proceed = true;
 
     for (const item of recipe.requiredItems) {
@@ -118,9 +123,9 @@ export class ItemCraftable {
 
       await this.animationEffect.sendAnimationEventToCharacter(character, "miss");
     }
-    await this.characterWeight.updateCharacterWeight(character);
 
-    await this.sendRefreshItemsEvent(character);
+    await this.characterWeight.updateCharacterWeight(character);
+    await this.sendRefreshItemsEvent(character, itemSubType);
   }
 
   private async createItems(recipe: IUseWithCraftingRecipe, character: ICharacter): Promise<void> {
@@ -228,7 +233,7 @@ export class ItemCraftable {
     return map;
   }
 
-  private async sendRefreshItemsEvent(character: ICharacter): Promise<void> {
+  private async sendRefreshItemsEvent(character: ICharacter, itemSubType?: string): Promise<void> {
     const inventoryContainer = await this.characterItemContainer.getItemContainer(character);
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
@@ -242,6 +247,10 @@ export class ItemCraftable {
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       payloadUpdate
     );
+
+    if (itemSubType) {
+      await this.loadCraftableItems(itemSubType, character);
+    }
   }
 
   private async isCraftSuccessful(character: ICharacter): Promise<boolean> {
