@@ -2,9 +2,11 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { rollDice } from "@providers/constants/DiceConstants";
 import {
+  NPC_BASE_HEALTH_MULTIPLIER,
   NPC_SKILL_DEXTERITY_MULTIPLIER,
   NPC_SKILL_LEVEL_MULTIPLIER,
   NPC_SKILL_STRENGTH_MULTIPLIER,
+  NPC_SPEED_MULTIPLIER,
 } from "@providers/constants/NPCConstants";
 import { GridManager } from "@providers/map/GridManager";
 import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
@@ -26,18 +28,20 @@ export class NPCSeeder {
 
       await this.setInitialNPCPositionAsSolid(NPCData);
 
+      const multipliedNPCData = this.getNPCDataWithMultipliers(NPCData);
+
       if (!npcFound) {
-        await this.createNewNPCWithSkills(NPCData);
+        await this.createNewNPCWithSkills(multipliedNPCData);
       } else {
         // if npc already exists, restart initial position
 
         // console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
 
-        await this.resetNPC(npcFound, NPCData);
+        await this.resetNPC(npcFound, multipliedNPCData);
 
-        await this.updateNPCSkills(NPCData, npcFound);
+        await this.updateNPCSkills(multipliedNPCData, npcFound);
 
-        const updateData = _.omit(NPCData, ["skills"]);
+        const updateData = _.omit(multipliedNPCData, ["skills"]);
 
         await NPC.updateOne(
           { key: key },
@@ -142,6 +146,17 @@ export class NPCSeeder {
 
       console.error(error);
     }
+  }
+
+  private getNPCDataWithMultipliers(NPCData: INPCSeedData): INPCSeedData {
+    const multipliedData = { ...NPCData };
+
+    if (multipliedData.speed)
+      multipliedData.speed = Math.round(multipliedData.speed * NPC_SPEED_MULTIPLIER * 100) / 100;
+    if (multipliedData.baseHealth)
+      multipliedData.baseHealth = Math.round(multipliedData.baseHealth * NPC_BASE_HEALTH_MULTIPLIER);
+
+    return multipliedData;
   }
 
   private setNPCRandomSkillLevel(NPCData: INPCSeedData): Object {
