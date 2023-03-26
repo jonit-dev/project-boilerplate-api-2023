@@ -1,4 +1,5 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { FriendlyNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { CharacterGender } from "@rpg-engine/shared";
 import { generateRandomMovement } from "../../abstractions/BaseNeutralNPC";
@@ -9,4 +10,5 @@ export const npcMother = {
   name: "Mother",
   textureKey: "woman-1",
   gender: CharacterGender.Female,
+  speed: MovementSpeed.ExtraSlow,
 } as Partial<INPC>;

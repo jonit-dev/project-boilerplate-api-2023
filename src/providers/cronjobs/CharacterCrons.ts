@@ -1,4 +1,5 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterLastAction } from "@providers/character/CharacterLastAction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
@@ -7,7 +8,7 @@ import nodeCron from "node-cron";
 
 @provide(CharacterCrons)
 export class CharacterCrons {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging, private characterLastAction: CharacterLastAction) {}
 
   public schedule(): void {
     nodeCron.schedule("* * * * *", async () => {
@@ -44,8 +45,19 @@ export class CharacterCrons {
     });
 
     for (const character of onlineCharacters) {
-      const lastActivity = dayjs(character.updatedAt);
-      const diff = dayjs().minute() - lastActivity.minute();
+      const dateString = await this.characterLastAction.getLastAction(character._id);
+
+      let date = dayjs(dateString).toDate();
+
+      if (date === undefined) {
+        date = character.updatedAt;
+      }
+
+      const lastActivity = dayjs(date);
+
+      const now = dayjs();
+
+      const diff = now.diff(lastActivity, "minute");
 
       if (diff >= 10) {
         console.log(`🚪: Character id ${character.id} has disconnected due to inactivity...`);
@@ -60,8 +72,9 @@ export class CharacterCrons {
           }
         );
 
-        character.isOnline = false;
-        await character.save();
+        (await Character.findByIdAndUpdate({ _id: character._id }, { isOnline: false })) as ICharacter;
+
+        await this.characterLastAction.clearLastAction(character._id);
       }
     }
   }

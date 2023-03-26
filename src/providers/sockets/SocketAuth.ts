@@ -1,17 +1,24 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IUser } from "@entities/ModuleSystem/UserModel";
+import { CharacterLastAction } from "@providers/character/CharacterLastAction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { appEnv } from "@providers/config/env";
+import { BYPASS_EVENTS_AS_LAST_ACTION } from "@providers/constants/EventsConstants";
 import { EXHAUSTABLE_EVENTS, USER_EXHAUST_TIMEOUT } from "@providers/constants/ServerConstants";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { CharacterSocketEvents, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import dayjs from "dayjs";
 import { SocketMessaging } from "./SocketMessaging";
 
 @provideSingleton(SocketAuth)
 export class SocketAuth {
   private isExhausted: Map<string, boolean> = new Map();
 
-  constructor(private socketMessaging: SocketMessaging, private characterValidation: CharacterValidation) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterValidation: CharacterValidation,
+    private characterLastAction: CharacterLastAction
+  ) {}
 
   // this event makes sure that the user who's triggering the request actually owns the character!
   public authCharacterOn(
@@ -55,10 +62,12 @@ export class SocketAuth {
           console.log("⬇️ (RECEIVED): ", character.name, character.channelId!, event);
         }
 
-        // console.log(`📨 Received ${event} from ${character.name}(${character._id}): ${JSON.stringify(data)}`);
-
         try {
           await callback(data, character, owner);
+
+          if (!BYPASS_EVENTS_AS_LAST_ACTION.includes(event as any)) {
+            await this.characterLastAction.setLastAction(character._id, dayjs().toISOString());
+          }
         } catch (e) {
           console.error(e);
         }

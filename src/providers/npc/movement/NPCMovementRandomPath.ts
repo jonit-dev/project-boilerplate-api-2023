@@ -2,7 +2,9 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+
+import random from "lodash/random";
+import shuffle from "lodash/shuffle";
 import { NPCDirection, NPCMovement } from "./NPCMovement";
 
 @provide(NPCMovementRandomPath)
@@ -11,6 +13,12 @@ export class NPCMovementRandomPath {
 
   public async startRandomMovement(npc: INPC): Promise<boolean | undefined> {
     try {
+      const stopChance = random(0, 100);
+
+      if (stopChance <= 80) {
+        return;
+      }
+
       let chosenMovementDirection = this.pickRandomDirectionToMove();
 
       const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(npc.x, npc.y, chosenMovementDirection);
@@ -36,6 +44,6 @@ export class NPCMovementRandomPath {
 
   private pickRandomDirectionToMove(): NPCDirection {
     const availableDirections = ["down", "up", "right", "left"] as unknown as NPCDirection;
-    return _.shuffle(availableDirections)[0] as NPCDirection;
+    return shuffle(availableDirections)[0] as NPCDirection;
   }
 }
