@@ -13,12 +13,11 @@ export const SP_INCREASE_SECONDS_COOLDOWN = 8;
 
 export const BASIC_INCREASE_HEALTH_MANA = 0.04;
 export const CUSTOM_SKILL_COOLDOWNS = {
-  shielding: 14,
   resistance: 10,
-  distance: 3,
-  magic: 5,
-  fishing: 5,
+  distance: 8,
+  magic: 7,
 
+  shielding: 10,
   first: 10,
   club: 10,
   sword: 10,

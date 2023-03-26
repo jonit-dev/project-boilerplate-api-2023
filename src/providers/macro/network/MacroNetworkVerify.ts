@@ -13,7 +13,7 @@ export class MacroNetworkVerify {
       channel,
       MacroSocketEvents.MacroSendVerification,
       async ({ code }: { code: string }, character) => {
-        this.macroCaptchaVerify.startCaptchaVerification(character, code);
+        await this.macroCaptchaVerify.startCaptchaVerification(character, code);
       }
     );
   }

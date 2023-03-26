@@ -3,7 +3,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { FromGridX, FromGridY } from "@rpg-engine/shared";
+import { FromGridX, FromGridY, ItemRarities } from "@rpg-engine/shared";
 import { CharacterItemSlots } from "../characterItems/CharacterItemSlots";
 
 describe("CharacterItemSlots.ts", () => {
@@ -37,8 +37,14 @@ describe("CharacterItemSlots.ts", () => {
 
   describe("Quantity calculation", () => {
     it("should properly calculate qty of a NON-STACKABLE item", async () => {
-      const firstItem = await unitTestHelper.createMockItem();
-      const secondItem = await unitTestHelper.createMockItem();
+      const firstItem = await unitTestHelper.createMockItem({
+        rarity: ItemRarities.Legendary,
+      });
+
+      const secondItem = await unitTestHelper.createMockItem({
+        rarity: ItemRarities.Rare,
+      });
+
       inventoryContainer.slots = {
         ...inventoryContainer.slots,
         0: firstItem.toJSON({ virtuals: true }),
@@ -46,17 +52,26 @@ describe("CharacterItemSlots.ts", () => {
       };
       await inventoryContainer.save();
 
-      const qty = await characterItemSlots.getTotalQty(inventoryContainer, firstItem.key);
+      let qty = 0;
+      if (firstItem.rarity) {
+        qty = await characterItemSlots.getTotalQty(inventoryContainer, firstItem.key, firstItem.rarity);
+        expect(qty).toBe(1);
+      }
 
-      expect(qty).toBe(2);
+      if (secondItem.rarity) {
+        qty = await characterItemSlots.getTotalQty(inventoryContainer, secondItem.key, secondItem.rarity);
+        expect(qty).toBe(1);
+      }
     });
 
     it("should properly calculate qty of a STACKABLE item", async () => {
       const firstItem = await unitTestHelper.createStackableMockItem({
         stackQty: 25,
+        rarity: ItemRarities.Legendary,
       });
       const secondItem = await unitTestHelper.createStackableMockItem({
         stackQty: 25,
+        rarity: ItemRarities.Common,
       });
       inventoryContainer.slots = {
         ...inventoryContainer.slots,
@@ -65,9 +80,18 @@ describe("CharacterItemSlots.ts", () => {
       };
       await inventoryContainer.save();
 
-      const qty = await characterItemSlots.getTotalQty(inventoryContainer, firstItem.key);
+      let qty = 0;
+      if (firstItem.rarity) {
+        qty = await characterItemSlots.getTotalQty(inventoryContainer, firstItem.key, firstItem.rarity);
 
-      expect(qty).toBe(50);
+        expect(qty).toBe(25);
+      }
+
+      if (secondItem.rarity) {
+        qty = await characterItemSlots.getTotalQty(inventoryContainer, secondItem.key, secondItem.rarity);
+
+        expect(qty).toBe(25);
+      }
     });
   });
 

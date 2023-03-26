@@ -61,13 +61,13 @@ export class CharacterItemStack {
       if (slotItem.stackQty) {
         const futureStackQty = slotItem.stackQty + itemToBeAdded.stackQty;
 
-        if (futureStackQty > itemToBeAdded.maxStackSize) {
+        if (futureStackQty > itemToBeAdded.maxStackSize && slotItem.rarity === itemToBeAdded.rarity) {
           await this.addToStackAndCreateDifference(i, targetContainer, itemToBeAdded, futureStackQty);
 
           return false; // this means a new item should be created on itemContainer, with the difference quantity!
         }
 
-        if (futureStackQty <= itemToBeAdded.maxStackSize) {
+        if (futureStackQty <= itemToBeAdded.maxStackSize && slotItem.rarity === itemToBeAdded.rarity) {
           // if updatedStackQty is less than or equal to maxStackSize, update stackQty of existing item. Do not create new one!
           await this.addToExistingStack(i, targetContainer, futureStackQty);
 

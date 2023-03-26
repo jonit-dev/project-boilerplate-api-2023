@@ -11,14 +11,13 @@ import { provide } from "inversify-binding-decorators";
 export class CharacterItemSlots {
   constructor(private socketMessaging: SocketMessaging, private itemCleanup: ItemCleanup) {}
 
-  public async getTotalQty(targetContainer: IItemContainer, itemKey: string): Promise<number> {
+  public async getTotalQty(targetContainer: IItemContainer, itemKey: string, itemRarity: string): Promise<number> {
     const allItemsSameKey = await this.getAllItemsFromKey(targetContainer, itemKey);
-
     let qty = 0;
     for (const item of allItemsSameKey) {
-      if (item.stackQty) {
+      if (item.stackQty && item.rarity === itemRarity) {
         qty += item.stackQty;
-      } else {
+      } else if (item.rarity === itemRarity) {
         qty += 1;
       }
     }

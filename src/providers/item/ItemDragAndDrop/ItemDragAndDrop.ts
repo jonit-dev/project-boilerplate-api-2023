@@ -98,6 +98,11 @@ export class ItemDragAndDrop {
   ): Promise<boolean> {
     const targetContainer = await ItemContainer.findById(containerId);
 
+    if (from.item?.rarity !== to.item?.rarity && to.item !== null) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Unable to move items with different rarities.");
+      return false;
+    }
+
     if (!from.item) {
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
@@ -213,6 +218,11 @@ export class ItemDragAndDrop {
   private async isItemMoveValid(itemMove: IItemMove, character: ICharacter): Promise<Boolean> {
     const itemFrom = await Item.findById(itemMove.from.item._id);
     const itemTo = await Item.findById(itemMove.to.item?._id);
+
+    if (itemFrom?.rarity !== itemTo?.rarity && itemTo !== null) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Unable to move items with different rarities.");
+      return false;
+    }
 
     if (!itemFrom) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item to be moved wasn't found.");
