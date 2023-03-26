@@ -100,7 +100,9 @@ export class SkillIncrease {
       return;
     }
 
-    const increasedWeaponSP = this.increaseSP(skills, weaponSubType);
+    // stronger the opponent, higher SP per hit it gives in your combat skills
+    const bonus = await this.skillFunctions.calculateBonus(target.skills);
+    const increasedWeaponSP = this.increaseSP(skills, weaponSubType, undefined, SKILLS_MAP, bonus);
 
     let increasedStrengthSP;
     if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
@@ -386,7 +388,8 @@ export class SkillIncrease {
     skills: ISkill,
     skillKey: string,
     skillPointsCalculator?: Function,
-    skillsMap: Map<string, string> = SKILLS_MAP
+    skillsMap: Map<string, string> = SKILLS_MAP,
+    bonus?: number
   ): IIncreaseSPResult {
     let skillLevelUp = false;
     const skillToUpdate = skillsMap.get(skillKey);
@@ -396,13 +399,13 @@ export class SkillIncrease {
     }
 
     if (!skillPointsCalculator) {
-      skillPointsCalculator = (skillDetails: ISkillDetails): number => {
-        return this.calculateNewSP(skillDetails);
+      skillPointsCalculator = (skillDetails: ISkillDetails, bonus?: number): number => {
+        return this.calculateNewSP(skillDetails, bonus);
       };
     }
 
     const updatedSkillDetails = skills[skillToUpdate] as ISkillDetails;
-    updatedSkillDetails.skillPoints = skillPointsCalculator(updatedSkillDetails);
+    updatedSkillDetails.skillPoints = skillPointsCalculator(updatedSkillDetails, bonus);
     updatedSkillDetails.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(
       updatedSkillDetails.skillPoints,
       updatedSkillDetails.level + 1
@@ -429,8 +432,12 @@ export class SkillIncrease {
     };
   }
 
-  private calculateNewSP(skillDetails: ISkillDetails): number {
-    return Math.round((skillDetails.skillPoints + SP_INCREASE_RATIO) * 100) / 100;
+  private calculateNewSP(skillDetails: ISkillDetails, bonus?: number): number {
+    let spIncreaseRatio = SP_INCREASE_RATIO;
+    if (typeof bonus === "number") {
+      spIncreaseRatio += bonus;
+    }
+    return Math.round((skillDetails.skillPoints + spIncreaseRatio) * 100) / 100;
   }
 
   private calculateNewCraftSP(skillDetails: ISkillDetails): number {

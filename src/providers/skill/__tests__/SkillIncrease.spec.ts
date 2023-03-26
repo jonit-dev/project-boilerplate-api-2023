@@ -347,6 +347,52 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
     expect(Math.round(updatedSkills?.magicResistance.skillPoints * 10) / 10).toBeCloseTo(8.7);
     expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBeCloseTo(spToLvl2 - 8.72);
   });
+
+  it("target level should influence gained SP", async () => {
+    const testCases = [
+      {
+        skills: new Skill({
+          ownerType: "NPC",
+          level: 1,
+        }),
+        exp: SP_INCREASE_RATIO + 0.2,
+      },
+      {
+        skills: new Skill({
+          ownerType: "NPC",
+          level: 51,
+        }),
+        exp: SP_INCREASE_RATIO + 1.6,
+      },
+      {
+        skills: new Skill({
+          ownerType: "NPC",
+          level: 101,
+        }),
+        exp: SP_INCREASE_RATIO + 4,
+      },
+    ];
+
+    for (const tc of testCases) {
+      // update NPCs skills
+      const res = await tc.skills.save();
+      testNPC.skills = res._id;
+      await testNPC.save();
+
+      // reset character's skills on every test
+      let charSkills = new Skill({
+        ownerType: "Character",
+      });
+      charSkills = await charSkills.save();
+      await Character.findByIdAndUpdate(testCharacter._id, { skills: charSkills._id });
+
+      // increase skills
+      await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 0);
+      const updatedSkills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+
+      expect(updatedSkills.first.skillPoints).toBe(tc.exp);
+    }
+  });
 });
 
 function wait(sec): Promise<void> {

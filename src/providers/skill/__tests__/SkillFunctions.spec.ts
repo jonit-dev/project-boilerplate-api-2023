@@ -58,4 +58,35 @@ describe("Case SkillFunctions", () => {
     expect(skill[skillType].skillPointsToNextLevel).toBe(12);
     expect(skill[skillType].level).toEqual(1);
   });
+
+  it("should calculate the bonus correctly", async () => {
+    const testCases = [
+      {
+        skills: new Skill({
+          ownerType: "Character",
+          level: 1,
+        }),
+        exp: 0,
+      },
+      {
+        skills: new Skill({
+          ownerType: "Character",
+          level: 51,
+        }),
+        exp: 1,
+      },
+      {
+        skills: new Skill({
+          ownerType: "Character",
+          level: 101,
+        }),
+        exp: 2,
+      },
+    ];
+    for (const tc of testCases) {
+      const res = await tc.skills.save();
+      const bonus = await skillFunctions.calculateBonus(res._id);
+      expect(bonus).toEqual(tc.exp);
+    }
+  });
 });

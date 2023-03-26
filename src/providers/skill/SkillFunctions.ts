@@ -16,6 +16,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { Types } from "mongoose";
 import { SkillCalculator } from "./SkillCalculator";
 
 @provide(SkillFunctions)
@@ -95,5 +96,21 @@ export class SkillFunctions {
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
 
     await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.SkillLevelUp);
+  }
+
+  /**
+   * calculateBonus based on skill level
+   * @param skillLevel
+   * @returns
+   */
+  public async calculateBonus(skillsId: undefined | Types.ObjectId): Promise<number> {
+    if (!skillsId) {
+      return 0;
+    }
+    const skills = await Skill.findById(skillsId);
+    if (!skills) {
+      return 0;
+    }
+    return Number(((skills.level - 1) / 50).toFixed(2));
   }
 }
