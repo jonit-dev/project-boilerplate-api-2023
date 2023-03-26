@@ -43,4 +43,19 @@ describe("CharacterBan.ts", () => {
 
     expect(banRemovalDate.diff(today, "day")).toBe(9);
   });
+
+  it("should ban a character with next penalty", async () => {
+    testCharacter.penalty = 11;
+    await characterBan.increasePenaltyAndBan(testCharacter);
+
+    expect(testCharacter.isBanned).toBe(true);
+    expect(testCharacter.penalty).toBe(20);
+    expect(testCharacter.banRemovalDate).toBeDefined();
+
+    const today = dayjs(new Date());
+
+    const banRemovalDate = dayjs(testCharacter.banRemovalDate);
+
+    expect(banRemovalDate.diff(today, "day")).toBe(19);
+  });
 });

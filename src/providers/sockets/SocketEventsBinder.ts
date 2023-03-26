@@ -5,6 +5,7 @@ import { DepotNetwork } from "@providers/depot/network/DepotNetwork";
 import { EquipmentNetwork } from "@providers/equipment/network/EquipmentNetwork";
 import { ItemNetwork } from "@providers/item/network/ItemNetwork";
 import { ItemContainerNetwork } from "@providers/itemContainer/network/ItemContainerNetwork";
+import { MacroNetwork } from "@providers/macro/network/MacroNetwork";
 import { NPCNetwork } from "@providers/npc/network/NPCNetwork";
 import { QuestNetwork } from "@providers/quest/network/QuestNetwork";
 import { SkillNetwork } from "@providers/skill/network/SkillNetwork";
@@ -29,7 +30,8 @@ export class SocketEventsBinder {
     private questNetwork: QuestNetwork,
     private useWithNetwork: UseWithNetwork,
     private depotNetwork: DepotNetwork,
-    private spellNetwork: SpellNetwork
+    private spellNetwork: SpellNetwork,
+    private macroNetwork: MacroNetwork
   ) {}
 
   public bindEvents(channel: SocketChannel): void {
@@ -46,5 +48,6 @@ export class SocketEventsBinder {
     this.useWithNetwork.onAddEventListeners(channel);
     this.depotNetwork.onAddEventListeners(channel);
     this.spellNetwork.onAddEventListeners(channel);
+    this.macroNetwork.onAddEventListeners(channel);
   }
 }

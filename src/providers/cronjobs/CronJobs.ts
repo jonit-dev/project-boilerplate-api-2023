@@ -10,6 +10,7 @@ import { CleanupEmptyBodyCrons } from "./CleanupEmptyBodies";
 import { ControlTimeCrons } from "./ControlTimeCrons";
 import { DeleteChatCrons } from "./DeleteChatCrons";
 import { ItemDeleteCrons } from "./ItemDeleteCrons";
+import { MacroCaptchaCrons } from "./MacroCaptchaCrons";
 import { NPCCrons } from "./NPCCrons";
 
 @provide(Cronjob)
@@ -24,7 +25,8 @@ export class Cronjob {
     private deleteChatCrons: DeleteChatCrons,
     private cleanupBloodCrons: CleanupBloodCrons,
     private cleanupBodyCrons: CleanupBodyCrons,
-    private cleanupEmptyBodyCrons: CleanupEmptyBodyCrons
+    private cleanupEmptyBodyCrons: CleanupEmptyBodyCrons,
+    private macroCaptchaCrons: MacroCaptchaCrons
   ) {}
 
   public start(): void {
@@ -45,6 +47,7 @@ export class Cronjob {
         this.cleanupBloodCrons.schedule();
         this.cleanupBodyCrons.schedule();
         this.cleanupEmptyBodyCrons.schedule();
+        this.macroCaptchaCrons.schedule();
         break;
       case EnvType.Staging:
       case EnvType.Production:
@@ -59,6 +62,7 @@ export class Cronjob {
           this.cleanupBloodCrons.schedule();
           this.cleanupBodyCrons.schedule();
           this.cleanupEmptyBodyCrons.schedule();
+          this.macroCaptchaCrons.schedule();
         }
         break;
     }

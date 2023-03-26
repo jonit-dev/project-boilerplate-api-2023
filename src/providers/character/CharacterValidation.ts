@@ -8,6 +8,14 @@ export class CharacterValidation {
   constructor(private socketMessaging: SocketMessaging) {}
 
   public hasBasicValidation(character: ICharacter, msg?: Map<string, string>): boolean {
+    if (character.isBanned) {
+      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+        reason: msg?.get("banned") ?? "You cannot use this character while banned.",
+      });
+
+      return false;
+    }
+
     if (!character.isOnline) {
       this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
         reason: msg?.get("not-online") ?? "Sorry, you are not online.",
@@ -18,14 +26,6 @@ export class CharacterValidation {
     if (!character.isAlive) {
       this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
         reason: msg?.get("not-alive") ?? "Sorry, you are dead.",
-      });
-
-      return false;
-    }
-
-    if (character.isBanned) {
-      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
-        reason: msg?.get("banned") ?? "You cannot use this character while banned.",
       });
 
       return false;

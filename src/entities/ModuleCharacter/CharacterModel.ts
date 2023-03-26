@@ -187,6 +187,11 @@ const characterSchema = createLeanSchema(
     }),
     banRemovalDate: Type.date(),
     hasPermanentBan: Type.boolean(),
+    captchaVerifyCode: Type.string({
+      select: false,
+    }),
+    captchaVerifyDate: Type.date(),
+    captchaTriesLeft: Type.number(),
     lastMovement: Type.date(),
     skills: Type.objectId({
       ref: "Skill",
