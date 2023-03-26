@@ -236,12 +236,12 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
       jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
 
       // @ts-ignore
-      const increaseSkillsOnBattle = jest.spyOn(battleAttackTarget.skillIncrease, "increaseBasicAttributeSP" as any);
+      const increaseSkillsOnBattle = jest.spyOn(battleAttackTarget.skillIncrease, "increaseMagicResistanceSP" as any);
 
       // @ts-ignore
       await battleAttackTarget.hitTarget(attackerCharacter, targetCharacter);
 
-      expect(increaseSkillsOnBattle).toHaveBeenCalledWith(targetCharacter, BasicAttribute.MagicResistance);
+      expect(increaseSkillsOnBattle).toHaveBeenCalledWith(targetCharacter, 24);
     });
   });
 });

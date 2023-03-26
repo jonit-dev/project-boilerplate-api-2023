@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
@@ -227,12 +228,15 @@ export class BattleAttackTarget {
         // when target is Character, resistance SP increases
         if (target.type === "Character") {
           const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
-          const attr =
+
+          if (
             (weapon?.item && weapon?.item.subType === ItemSubType.Magic) ||
             (weapon?.item && weapon?.item.subType === ItemSubType.Staff)
-              ? BasicAttribute.MagicResistance
-              : BasicAttribute.Resistance;
-          await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, attr);
+          ) {
+            await this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, this.getPower(weapon?.item));
+          } else {
+            await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance);
+          }
         }
 
         // apply Entity Effects
@@ -332,4 +336,15 @@ export class BattleAttackTarget {
         break;
     }
   }
+
+  private getPower = (item: IItem): number => {
+    const attack = item?.attack ?? 0;
+    const basePower = 15;
+
+    if (attack < basePower) {
+      return basePower;
+    } else {
+      return attack;
+    }
+  };
 }
