@@ -14,7 +14,7 @@ export class NPCMovementRandomPath {
 
   public async startRandomMovement(npc: INPC): Promise<boolean | undefined> {
     try {
-      const stopChance = appEnv.general.IS_UNIT_TEST ? 0 : random(0, 100);
+      const stopChance = appEnv.general.IS_UNIT_TEST ? 100 : random(0, 100);
 
       //! Ideally, this would be not called here, but on the NPC Cycle level (pause the cycle every X seconds). For now, lets leave this ugly hack.
       if (stopChance <= 70) {
