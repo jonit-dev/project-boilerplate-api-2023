@@ -1,14 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
-import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
+import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { NPCWarn } from "@providers/npc/NPCWarn";
+import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -306,8 +307,25 @@ export class BattleAttackTarget {
 
   private async applyEntityEffectsCharacter(character: ICharacter, target: ICharacter | INPC): Promise<void> {
     const weapon = await this.characterWeapon.getWeapon(character);
-    const hasEntityEffect = weapon?.item?.entityEffects?.length! > 0;
-    const entityEffectChance = weapon?.item?.entityEffectChance;
+
+    if (!weapon) {
+      return;
+    }
+
+    // if we have a ranged weapon without entity effects, just use the accessory one
+    if (weapon?.item.subType === ItemSubType.Ranged && !weapon.item.entityEffects?.length!) {
+      const equipment = await Equipment.findById(character.equipment);
+      const accessory = await Item.findById(equipment?.accessory);
+      await this.applyEntity(target, character, accessory as IItem);
+    } else {
+      // otherwise, apply the weapon entity effect.
+      await this.applyEntity(target, character, weapon?.item as IItem);
+    }
+  }
+
+  private async applyEntity(target: ICharacter | INPC, character: ICharacter | INPC, item: IItem): Promise<void> {
+    const hasEntityEffect = item?.entityEffects?.length! > 0;
+    const entityEffectChance = item?.entityEffectChance;
     if (hasEntityEffect && entityEffectChance) {
       const n = _.random(0, 100);
       if (entityEffectChance <= n) {

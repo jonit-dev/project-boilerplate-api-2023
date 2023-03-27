@@ -1,4 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -84,11 +86,22 @@ export class EntityEffectUse {
     } else {
       const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
       const weaponEffect = weapon?.item.entityEffects;
-      if (weaponEffect) {
-        weaponEffect.forEach((effect) => {
+      if (weaponEffect?.length !== 0) {
+        weaponEffect?.forEach((effect) => {
           const entityEffect: IEntityEffect = entityEffectsBlueprintsIndex[effect];
           applicableEffects.push(entityEffect);
         });
+      } else {
+        const character = attacker as ICharacter;
+        const equipment = await Equipment.findById(character.equipment);
+        const accessory = await Item.findById(equipment?.accessory);
+        const accessoryEffect = accessory?.entityEffects;
+        if (accessoryEffect) {
+          accessoryEffect.forEach((effect) => {
+            const entityEffect: IEntityEffect = entityEffectsBlueprintsIndex[effect];
+            applicableEffects.push(entityEffect);
+          });
+        }
       }
     }
 

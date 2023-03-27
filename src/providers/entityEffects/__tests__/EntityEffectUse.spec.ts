@@ -1,13 +1,17 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { RangedWeaponsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { EntityAttackType } from "@rpg-engine/shared";
 import _ from "lodash";
-import { EntityEffectCycle } from "../EntityEffectCycle";
-import { EntityEffectUse } from "../EntityEffectUse";
 import { entityEffectsBlueprintsIndex } from "../data";
 import { IEntityEffect } from "../data/blueprints/entityEffect";
 import { EntityEffectBlueprint } from "../data/types/entityEffectBlueprintTypes";
+import { EntityEffectCycle } from "../EntityEffectCycle";
+import { EntityEffectUse } from "../EntityEffectUse";
 
 jest.mock("../EntityEffectCycle.ts", () => ({
   EntityEffectCycle: jest.fn(),
@@ -19,6 +23,13 @@ describe("EntityEffectUse.ts", () => {
   let testTarget: ICharacter;
   let poisonEntityEffect: IEntityEffect;
   let entityEffectSpy;
+  let testCharacter: ICharacter;
+  let poisonSwordItem: IItem;
+  let bowItem: IItem;
+  let poisonArrowItem: IItem;
+  let getWeaponSpy: jest.SpyInstance;
+  let findByIdEquipmentSpy: jest.SpyInstance;
+  let findByIdAccessorySpy: jest.SpyInstance;
 
   beforeAll(() => {
     entityEffectUse = container.get<EntityEffectUse>(EntityEffectUse);
@@ -32,12 +43,28 @@ describe("EntityEffectUse.ts", () => {
 
     testTarget = await unitTestHelper.createMockCharacter(null, {});
 
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasSkills: true,
+      hasInventory: true,
+    });
+
+    const poisonSword = itemsBlueprintIndex[SwordsBlueprint.PoisonSword];
+    poisonSwordItem = new Item({ ...poisonSword });
+
+    const bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
+    bowItem = new Item({ ...bow });
+
+    const poisonArrow = itemsBlueprintIndex[RangedWeaponsBlueprint.PoisonArrow];
+    poisonArrowItem = new Item({ ...poisonArrow });
+
     // @ts-ignore
     entityEffectSpy = jest.spyOn(entityEffectUse, "startEntityEffectCycle");
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it("creates a testAttacker with entityEffects (poison)", () => {
@@ -98,9 +125,46 @@ describe("EntityEffectUse.ts", () => {
     expect(refreshedTestTarget?.appliedEntityEffects).toHaveLength(0);
   });
 
+  it("should call applicable entity effects for a character with a weapon effect", async () => {
+    poisonEntityEffect.probability = 100;
+    // @ts-ignore
+    getWeaponSpy = jest.spyOn(entityEffectUse.characterWeapon, "getWeapon");
+    getWeaponSpy.mockResolvedValueOnce({ item: poisonSwordItem });
+
+    await entityEffectUse.applyEntityEffects(testAttacker, testCharacter);
+    expect(entityEffectSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("should not call entity effects for a character without a weapon effect", async () => {
+    poisonEntityEffect.probability = 100;
+    // @ts-ignore
+    getWeaponSpy = jest.spyOn(entityEffectUse.characterWeapon, "getWeapon");
+    getWeaponSpy.mockResolvedValueOnce({ item: bowItem });
+
+    await entityEffectUse.applyEntityEffects(testAttacker, testCharacter);
+    expect(entityEffectSpy).not.toBeCalled();
+  });
+
+  it("should call entity effects for a character with an accessory effect", async () => {
+    poisonEntityEffect.probability = 100;
+    // @ts-ignore
+    getWeaponSpy = jest.spyOn(entityEffectUse.characterWeapon, "getWeapon");
+    getWeaponSpy.mockResolvedValueOnce({ item: bowItem });
+    findByIdEquipmentSpy = jest.spyOn(Equipment, "findById");
+    findByIdAccessorySpy = jest.spyOn(Item, "findById");
+    findByIdAccessorySpy.mockResolvedValueOnce(poisonArrowItem);
+
+    await entityEffectUse.applyEntityEffects(testAttacker, testCharacter);
+    expect(entityEffectSpy).toHaveBeenCalledTimes(1);
+  });
+
   describe("Attack types", () => {
     beforeEach(() => {
       poisonEntityEffect.probability = 100;
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
     });
     it("should not call applyEntityEffects when attacker attack type Melee and no entity effects", async () => {
       testAttacker.entityEffects = [];
