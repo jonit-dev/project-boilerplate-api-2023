@@ -1,13 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentSet, ItemSlotType } from "@rpg-engine/shared";
+import { IEquipmentSet, ItemSlotType, ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { EquipmentSlots } from "./EquipmentSlots";
 
 @provide(EquipmentTwoHanded)
 export class EquipmentTwoHanded {
-  constructor(private equipmentSlots: EquipmentSlots, private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging) {}
 
   public async validateHandsItemEquip(
     equipmentSlots: IEquipmentSet,
@@ -32,8 +31,8 @@ export class EquipmentTwoHanded {
         return false;
       }
 
-      if (!itemToBeEquipped.isTwoHanded) {
-        return true; //! allow equipping 2 one-handed items
+      if (!itemToBeEquipped.isTwoHanded && itemToBeEquipped.subType !== ItemSubType.Shield) {
+        return false;
       }
     }
 
@@ -75,18 +74,17 @@ export class EquipmentTwoHanded {
     const leftHandItem = await Item.findById(equipment.leftHand);
     const rightHandItem = await Item.findById(equipment.rightHand);
 
-    if (leftHandItem?.isTwoHanded || rightHandItem?.isTwoHanded) return false;
+    if (leftHandItem?.isTwoHanded || rightHandItem?.isTwoHanded) {
+      return false;
+    }
+
+    if (leftHandItem?.subType === ItemSubType.Shield || rightHandItem?.subType === ItemSubType.Shield) {
+      return false;
+    }
 
     if (leftHandItem || rightHandItem) {
       return true;
     }
-
-    return false;
-  }
-
-  public async checkTwoHandedEquip(equipment: IEquipmentSet): Promise<boolean> {
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
-    if (!equipmentSlots.leftHand && !equipmentSlots.rightHand) return true;
 
     return false;
   }

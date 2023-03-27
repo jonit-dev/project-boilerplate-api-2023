@@ -4,7 +4,8 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { ItemSubType } from "@rpg-engine/shared";
+import { DaggersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CharacterClass, ItemSubType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EquipmentEquip } from "../EquipmentEquip";
 import { EquipmentStatsCalculator } from "../EquipmentStatsCalculator";
@@ -16,6 +17,9 @@ describe("EquipmentEquip.spec.ts", () => {
   let inventoryContainer: IItemContainer;
   let bowItem: IItem;
   let swordItem: IItem;
+  let swordItem2: IItem;
+  let daggerItem: IItem;
+  let daggerItem2: IItem;
   let shieldItem: IItem;
   let sendEventToUser;
   let equipmentStatsCalculator: EquipmentStatsCalculator;
@@ -30,6 +34,9 @@ describe("EquipmentEquip.spec.ts", () => {
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     bowItem = await unitTestHelper.createItemBow();
     swordItem = await unitTestHelper.createMockItem();
+    swordItem2 = await unitTestHelper.createMockItem();
+    daggerItem = await unitTestHelper.createMockItemFromBlueprint(DaggersBlueprint.AzureDagger);
+    daggerItem2 = await unitTestHelper.createMockItemFromBlueprint(DaggersBlueprint.AzureDagger);
     shieldItem = await unitTestHelper.createMockShield();
 
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
@@ -57,6 +64,114 @@ describe("EquipmentEquip.spec.ts", () => {
 
     const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
     expect(updatedInventory?.slots[0]).toBeNull();
+  });
+
+  it("should properly equip 2 sword Class Berserker", async () => {
+    inventoryContainer.slots[0] = swordItem;
+    inventoryContainer.slots[1] = swordItem2;
+    inventoryContainer.markModified("slots");
+    await inventoryContainer.save();
+
+    const berserker = (await Character.findByIdAndUpdate(
+      testCharacter._id,
+      {
+        class: CharacterClass.Berserker,
+      },
+      { new: true }
+    )) as ICharacter;
+
+    const equipOneHand = await equipmentEquip.equip(berserker, swordItem._id, inventoryContainer.id);
+    const equipAnotherHand = await equipmentEquip.equip(berserker, swordItem2._id, inventoryContainer.id);
+
+    expect(equipOneHand).toBeTruthy();
+    expect(equipAnotherHand).toBeTruthy();
+
+    expect(sendEventToUser).toHaveBeenCalled();
+
+    const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
+    expect(updatedInventory?.slots[0]).toBeNull();
+    expect(updatedInventory?.slots[1]).toBeNull();
+  });
+
+  it("should properly equip 2 dagger Class Rogue", async () => {
+    inventoryContainer.slots[0] = daggerItem;
+    inventoryContainer.slots[1] = daggerItem2;
+    inventoryContainer.markModified("slots");
+    await inventoryContainer.save();
+
+    const berserker = (await Character.findByIdAndUpdate(
+      testCharacter._id,
+      {
+        class: CharacterClass.Rogue,
+      },
+      { new: true }
+    )) as ICharacter;
+
+    const equipOneHand = await equipmentEquip.equip(berserker, daggerItem._id, inventoryContainer.id);
+    const equipAnotherHand = await equipmentEquip.equip(berserker, daggerItem2._id, inventoryContainer.id);
+
+    expect(equipOneHand).toBeTruthy();
+    expect(equipAnotherHand).toBeTruthy();
+
+    expect(sendEventToUser).toHaveBeenCalled();
+
+    const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
+    expect(updatedInventory?.slots[0]).toBeNull();
+    expect(updatedInventory?.slots[1]).toBeNull();
+  });
+
+  it("should fail equip 2 sword Class Warrior", async () => {
+    inventoryContainer.slots[0] = swordItem;
+    inventoryContainer.slots[1] = swordItem2;
+    inventoryContainer.markModified("slots");
+    await inventoryContainer.save();
+
+    const berserker = (await Character.findByIdAndUpdate(
+      testCharacter._id,
+      {
+        class: CharacterClass.Warrior,
+      },
+      { new: true }
+    )) as ICharacter;
+
+    const equipOneHand = await equipmentEquip.equip(berserker, swordItem._id, inventoryContainer.id);
+    const equipAnotherHand = await equipmentEquip.equip(berserker, swordItem2._id, inventoryContainer.id);
+
+    expect(equipOneHand).toBeTruthy();
+    expect(equipAnotherHand).toBeFalsy();
+
+    expect(sendEventToUser).toHaveBeenCalled();
+
+    const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
+    expect(updatedInventory?.slots[0]).toBeNull();
+    expect(updatedInventory?.slots[1]._id).toEqual(swordItem2._id);
+  });
+
+  it("should fail equip 2 sword Class Hunter", async () => {
+    inventoryContainer.slots[0] = daggerItem;
+    inventoryContainer.slots[1] = daggerItem2;
+    inventoryContainer.markModified("slots");
+    await inventoryContainer.save();
+
+    const berserker = (await Character.findByIdAndUpdate(
+      testCharacter._id,
+      {
+        class: CharacterClass.Hunter,
+      },
+      { new: true }
+    )) as ICharacter;
+
+    const equipOneHand = await equipmentEquip.equip(berserker, daggerItem._id, inventoryContainer.id);
+    const equipAnotherHand = await equipmentEquip.equip(berserker, daggerItem2._id, inventoryContainer.id);
+
+    expect(equipOneHand).toBeTruthy();
+    expect(equipAnotherHand).toBeFalsy();
+
+    expect(sendEventToUser).toHaveBeenCalled();
+
+    const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
+    expect(updatedInventory?.slots[0]).toBeNull();
+    expect(updatedInventory?.slots[1]._id).toEqual(daggerItem2._id);
   });
 
   describe("Validation", () => {

@@ -9,10 +9,18 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemView } from "@providers/item/ItemView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentAndInventoryUpdatePayload, ItemSlotType, ItemSocketEvents, ItemType } from "@rpg-engine/shared";
+import {
+  CharacterClass,
+  IEquipmentAndInventoryUpdatePayload,
+  ItemSlotType,
+  ItemSocketEvents,
+  ItemType,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { EquipmentSlots } from "./EquipmentSlots";
 import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
+import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/Berserker";
+import { RoguePassiveHabilities } from "@providers/character/characterPassiveHabilities/Rogue";
 
 export type SourceEquipContainerType = "inventory" | "container";
 
@@ -27,7 +35,9 @@ export class EquipmentEquip {
     private itemOwnership: ItemOwnership,
     private characterInventory: CharacterInventory,
     private inMemoryHashTable: InMemoryHashTable,
-    private itemView: ItemView
+    private itemView: ItemView,
+    private berserkerPassiveHabilities: BerserkerPassiveHabilities,
+    private roguePassiveHabilities: RoguePassiveHabilities
   ) {}
 
   public async equipInventory(character: ICharacter, itemId: string): Promise<boolean> {
@@ -100,6 +110,10 @@ export class EquipmentEquip {
     const isEquipValid = await this.isEquipValid(character, item, containerType);
 
     if (!isEquipValid) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Item cannot be equipped. Check requirements and try again."
+      );
       return false;
     }
 
@@ -246,6 +260,14 @@ export class EquipmentEquip {
     const validateItemsEquip = await this.equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, item, character);
 
     if (!validateItemsEquip) {
+      if (character.class === CharacterClass.Berserker) {
+        return await this.berserkerPassiveHabilities.berserkerWeaponHandler(character._id, item._id);
+      }
+
+      if (character.class === CharacterClass.Rogue) {
+        return await this.roguePassiveHabilities.rogueWeaponHandler(character._id, item._id);
+      }
+
       return false;
     }
 

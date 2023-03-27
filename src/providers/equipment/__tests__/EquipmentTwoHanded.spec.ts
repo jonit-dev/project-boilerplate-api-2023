@@ -33,7 +33,7 @@ describe("EquipmentTwoHanded.spec.ts", () => {
     await equipmentEquip.equip(testCharacter, itemToBeEquipped._id, inventoryContainer?._id);
   };
 
-  beforeAll(async () => {
+  beforeAll(() => {
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
     equipmentTwoHanded = container.get<EquipmentTwoHanded>(EquipmentTwoHanded);
   });
