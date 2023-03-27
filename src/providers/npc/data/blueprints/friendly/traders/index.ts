@@ -4,6 +4,8 @@ import { npcTrader } from "./NPCTrader";
 import { npcTraderAlchemist } from "./NPCTraderAlchemist";
 import { npcTraderArcher } from "./NPCTraderArcher";
 import { npcTraderFood } from "./NPCTraderFood";
+import { npcTraderHerbalist } from "./NPCTraderHerb";
+import { npcTraderJewelry } from "./NPCTraderJewelry";
 import { npcTraderMage } from "./NPCTraderMage";
 import { npcTraderTraining } from "./NPCTraderTraining";
 
@@ -15,4 +17,6 @@ export const tradersNPCs = {
   [FriendlyNPCsBlueprint.TraderArcher]: npcTraderArcher,
   [FriendlyNPCsBlueprint.TraderAlchemist]: npcTraderAlchemist,
   [FriendlyNPCsBlueprint.TraderTraining]: npcTraderTraining,
+  [FriendlyNPCsBlueprint.TraderHerb]: npcTraderHerbalist,
+  [FriendlyNPCsBlueprint.TraderJewelry]: npcTraderJewelry,
 };
