@@ -1,8 +1,8 @@
 import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Types } from "mongoose";
 import { IItemContainer } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { Types } from "mongoose";
 
 @provide(OpenDepot)
 export class OpenDepot {
@@ -30,7 +30,6 @@ export class OpenDepot {
       // Depot does not exist, create new one
       let newDepot = new Depot({
         owner: Types.ObjectId(characterId),
-        npc: Types.ObjectId(npcId),
       });
 
       newDepot = await newDepot.save();
