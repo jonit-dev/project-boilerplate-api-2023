@@ -19,7 +19,6 @@ export class OpenDepot {
 
     const depot = await Depot.findOne({
       owner: Types.ObjectId(characterId),
-      npc: Types.ObjectId(npcId),
     })
       .populate("itemContainer")
       .exec();
@@ -30,6 +29,7 @@ export class OpenDepot {
       // Depot does not exist, create new one
       let newDepot = new Depot({
         owner: Types.ObjectId(characterId),
+        npc: Types.ObjectId(npcId),
       });
 
       newDepot = await newDepot.save();
