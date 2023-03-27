@@ -12,7 +12,7 @@ export class MacroNetworkTrigger {
     this.socketAuth.authCharacterOn(channel, MacroSocketEvents.TriggerMacro, async (_, character) => {
       console.log("MACRO DETECTED", character._id);
 
-      this.macroCaptchaSend.sendAndStartCaptchaVerification(character);
+      // this.macroCaptchaSend.sendAndStartCaptchaVerification(character);
     });
   }
 }
