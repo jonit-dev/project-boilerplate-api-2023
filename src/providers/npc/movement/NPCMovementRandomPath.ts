@@ -3,6 +3,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
 
+import { appEnv } from "@providers/config/env";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
 import { NPCDirection, NPCMovement } from "./NPCMovement";
@@ -13,9 +14,10 @@ export class NPCMovementRandomPath {
 
   public async startRandomMovement(npc: INPC): Promise<boolean | undefined> {
     try {
-      const stopChance = random(0, 100);
+      const stopChance = appEnv.general.IS_UNIT_TEST ? 0 : random(0, 100);
 
-      if (stopChance <= 80) {
+      //! Ideally, this would be not called here, but on the NPC Cycle level (pause the cycle every X seconds). For now, lets leave this ugly hack.
+      if (stopChance <= 70) {
         return;
       }
 
