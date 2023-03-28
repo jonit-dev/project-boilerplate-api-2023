@@ -5,6 +5,7 @@ import { QuestSeeder } from "@providers/quest/QuestSeeder";
 import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCSeeder } from "../npc/NPCSeeder";
+import { RedisCleanup } from "./RedisCleanup";
 
 @provide(Seeder)
 export class Seeder {
@@ -12,7 +13,8 @@ export class Seeder {
     private npcSeeder: NPCSeeder,
     private itemSeeder: ItemSeeder,
     private questSeeder: QuestSeeder,
-    private characterTextureSeeder: CharacterTexturesSeeder
+    private characterTextureSeeder: CharacterTexturesSeeder,
+    private redisCleanup: RedisCleanup
   ) {}
 
   public async start(): Promise<void> {
@@ -22,6 +24,7 @@ export class Seeder {
       await this.itemSeeder.seed();
       await this.questSeeder.seed();
       await this.characterTextureSeeder.seed();
+      await this.redisCleanup.cleanup();
     } else {
       // in production we just need one instance
       if (process.env.NODE_APP_INSTANCE === "0") {
@@ -29,6 +32,7 @@ export class Seeder {
         await this.itemSeeder.seed();
         await this.questSeeder.seed();
         await this.characterTextureSeeder.seed();
+        await this.redisCleanup.cleanup();
       }
     }
     console.timeEnd("🌱 Seeding");

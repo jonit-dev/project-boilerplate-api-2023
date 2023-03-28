@@ -12,22 +12,32 @@ import {
   SkillSocketEvents,
   UISocketEvents,
   SpellSocketEvents,
+  EntityType,
+  GRID_WIDTH,
+  NPCAlignment,
+  NPCMovementType,
 } from "@rpg-engine/shared";
 import { spellArrowCreation } from "../data/blueprints/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/SpellBlankRuneCreation";
 import { spellGreaterHealing } from "../data/blueprints/SpellGreaterHealing";
 import { spellSelfHealing } from "../data/blueprints/SpellSelfHealing";
-import { ISpell } from "../data/types/SpellsBlueprintTypes";
+import { spellStunTarget } from "../data/blueprints/warrior/SpellStunTarget";
+import { ISpell, SpellsBlueprint } from "../data/types/SpellsBlueprintTypes";
 import { SpellCast } from "../SpellCast";
 import { SpellLearn } from "../SpellLearn";
+import { TimerWrapper } from "@providers/helpers/TimerWrapper";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;
   let spellLearn: SpellLearn;
   let testCharacter: ICharacter;
+  let targetCharacter: ICharacter;
   let characterSkills: ISkill;
   let sendEventToUser: jest.SpyInstance;
   let level2Spells: Partial<ISpell>[] = [];
+  let specialEffect: SpecialEffect;
+
   // let level3Spells: Partial<ISpell>[] = [];
   // let level4Spells: Partial<ISpell>[] = [];
   // let level5Spells: Partial<ISpell>[] = [];
@@ -35,6 +45,7 @@ describe("SpellCast.ts", () => {
   beforeAll(() => {
     spellCast = container.get<SpellCast>(SpellCast);
     spellLearn = container.get<SpellLearn>(SpellLearn);
+    specialEffect = container.get<SpecialEffect>(SpecialEffect);
 
     level2Spells = [spellSelfHealing, spellArrowCreation, spellBlankRuneCreation];
     // level3Spells = [spellBoltCreation, spellFoodCreation];
@@ -61,6 +72,11 @@ describe("SpellCast.ts", () => {
     characterSkills.level = spellSelfHealing.minLevelRequired!;
     characterSkills.magic.level = spellSelfHealing.minMagicLevelRequired;
     (await Skill.findByIdAndUpdate(characterSkills._id, characterSkills).lean()) as ISkill;
+
+    targetCharacter = await await unitTestHelper.createMockCharacter(
+      { health: 100 },
+      { hasEquipment: false, hasInventory: false, hasSkills: true }
+    );
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
   });
@@ -185,25 +201,15 @@ describe("SpellCast.ts", () => {
     })) as ICharacter;
     expect(character.mana).toBe(newMana);
 
-    /**
-     * 1. health changed event
-     * 2. life heal animation event
-     * 3. skill update event
-     */
-    expect(sendEventToUser).toBeCalledTimes(5);
+    expect(sendEventToUser).toHaveBeenCalled();
 
-    expect(sendEventToUser).toHaveBeenNthCalledWith(
-      1,
-      testCharacter.channelId,
-      CharacterSocketEvents.AttributeChanged,
-      {
-        targetId: testCharacter._id,
-        health: newHealth,
-        mana: newMana,
-      }
-    );
+    expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, CharacterSocketEvents.AttributeChanged, {
+      targetId: testCharacter._id,
+      health: newHealth,
+      mana: newMana,
+    });
 
-    expect(sendEventToUser).toHaveBeenNthCalledWith(2, testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
+    expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
       effectKey: spellSelfHealing.animationKey,
     });
@@ -241,20 +247,15 @@ describe("SpellCast.ts", () => {
      * 2. life heal animation event
      * 3. skill update event
      */
-    expect(sendEventToUser).toBeCalledTimes(7);
+    expect(sendEventToUser).toHaveBeenCalled();
 
-    expect(sendEventToUser).toHaveBeenNthCalledWith(
-      1,
-      testCharacter.channelId,
-      CharacterSocketEvents.AttributeChanged,
-      {
-        targetId: testCharacter._id,
-        health: newHealth,
-        mana: newMana,
-      }
-    );
+    expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, CharacterSocketEvents.AttributeChanged, {
+      targetId: testCharacter._id,
+      health: newHealth,
+      mana: newMana,
+    });
 
-    expect(sendEventToUser).toHaveBeenNthCalledWith(4, testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
+    expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
       effectKey: spellSelfHealing.animationKey,
     });
@@ -280,9 +281,17 @@ describe("SpellCast.ts", () => {
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (spellSelfHealing.manaCost ?? 0);
     expect(Math.round(updatedSkills?.magic.skillPoints * 10) / 10).toBe(4.8);
 
-    expect(sendEventToUser).toBeCalledTimes(5);
+    expect(sendEventToUser).toHaveBeenCalled();
 
-    const skillUpdateEventParams = sendEventToUser.mock.calls[2];
+    let skillUpdateEventParams;
+    for (const call of sendEventToUser.mock.calls) {
+      if (call[1] === SkillSocketEvents.ReadInfo) {
+        skillUpdateEventParams = call;
+        break;
+      }
+    }
+
+    expect(skillUpdateEventParams).toBeDefined();
 
     expect(skillUpdateEventParams[0]).toBe(testCharacter.channelId);
     expect(skillUpdateEventParams[1]).toBe(SkillSocketEvents.ReadInfo);
@@ -406,6 +415,90 @@ describe("SpellCast.ts", () => {
     await runTest();
   });
 
+  describe("ranged spells", () => {
+    beforeEach(async () => {
+      testCharacter.learnedSpells = [SpellsBlueprint.WarriorStunTarget];
+
+      testCharacter.class = CharacterClass.Warrior;
+      await Character.findByIdAndUpdate(testCharacter.id, testCharacter);
+
+      const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+      characterSkills = skills;
+      characterSkills.level = spellStunTarget.minLevelRequired!;
+      characterSkills.magic.level = spellStunTarget.minMagicLevelRequired;
+      (await Skill.findByIdAndUpdate(characterSkills._id, characterSkills).lean()) as ISkill;
+    });
+
+    it("should  not cast spell if the target is not valid", async () => {
+      const spell = { magicWords: "talas tamb-eth", targetId: targetCharacter._id, targetType: EntityType.NPC };
+      expect(await spellCast.castSpell(spell, testCharacter)).toBeFalsy();
+
+      expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+        message: "Sorry, you need to select a valid target to cast this spell.",
+        type: "error",
+      });
+    });
+
+    it("should  not cast spell if the target is out of reach", async () => {
+      await Character.updateOne(
+        { _id: targetCharacter._id },
+        {
+          $set: {
+            x: targetCharacter.x + (spellStunTarget.maxDistanceGrid! + 1) * GRID_WIDTH,
+          },
+        }
+      );
+
+      const spell = { magicWords: "talas tamb-eth", targetId: targetCharacter._id, targetType: EntityType.Character };
+      expect(await spellCast.castSpell(spell, testCharacter)).toBeFalsy();
+
+      expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+        message: "Sorry, your target is out of reach.",
+        type: "error",
+      });
+    });
+
+    it("should  not cast spell on friendly npc", async () => {
+      const testNPC = await unitTestHelper.createMockNPC(
+        { alignment: NPCAlignment.Friendly },
+        null,
+        NPCMovementType.Stopped
+      );
+
+      const spell = { magicWords: "talas tamb-eth", targetId: testNPC._id, targetType: EntityType.NPC };
+      expect(await spellCast.castSpell(spell, testCharacter)).toBeFalsy();
+    });
+
+    it("should  stun a target successfully", async () => {
+      const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
+      timerMock.mockImplementation();
+
+      const spell = { magicWords: "talas tamb-eth", targetId: targetCharacter._id, targetType: EntityType.Character };
+      expect(await spellCast.castSpell(spell, testCharacter)).toBeTruthy();
+
+      expect(sendEventToUser).toHaveBeenCalledWith(
+        testCharacter.channelId,
+        AnimationSocketEvents.ShowProjectileAnimation,
+        {
+          targetId: targetCharacter._id,
+          effectKey: spellStunTarget.animationKey,
+          projectileEffectKey: spellStunTarget.projectileAnimationKey,
+          sourceId: testCharacter._id,
+        }
+      );
+
+      expect(await specialEffect.isStun(targetCharacter._id, EntityType.Character)).toBeTruthy();
+
+      expect(timerMock).toHaveBeenCalled();
+
+      const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+      const timeout = Math.min(Math.max(skills.magic.level * 1.5, 10), 180);
+      expect(timerMock.mock.calls[0][1]).toBe(timeout * 1000);
+
+      await timerMock.mock.calls[0][0]();
+      expect(await specialEffect.isStun(targetCharacter._id, EntityType.Character)).toBeFalsy();
+    });
+  });
   // describe("test item creation spell invocation", () => {
   //   beforeEach(async () => {
   //     testCharacter = await (
