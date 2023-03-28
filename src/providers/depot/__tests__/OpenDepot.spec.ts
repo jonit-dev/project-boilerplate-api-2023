@@ -39,7 +39,7 @@ describe("OpenDepot.ts", () => {
 
     const newDepot = await Depot.findOne({
       owner: Types.ObjectId(testCharacter.id),
-      npc: Types.ObjectId(testNPC.id),
+      key: testNPC.key,
     })
       .populate("itemContainer")
       .exec();
@@ -55,7 +55,7 @@ describe("OpenDepot.ts", () => {
 
   it("character with depot | should return corresponding depot", async () => {
     // create depot container for character
-    const characterDepot = await unitTestHelper.createMockDepot(testNPC.id, testCharacter.id);
+    const characterDepot = await unitTestHelper.createMockDepot(testNPC, testCharacter.id);
 
     const depotContainer = await openDepot.getContainer(testCharacter.id, testNPC.id);
 
@@ -72,7 +72,7 @@ describe("OpenDepot.ts", () => {
 
     const newDepot = await Depot.findOne({
       owner: Types.ObjectId(testCharacter.id),
-      npc: Types.ObjectId(testNPC.id),
+      key: testNPC.key,
     })
       .populate("itemContainer")
       .exec();
@@ -93,7 +93,7 @@ describe("OpenDepot.ts", () => {
 
     const depotAfterDelete = await Depot.findOne({
       owner: Types.ObjectId(testCharacter.id),
-      npc: Types.ObjectId(testNPC.id),
+      key: testNPC.key,
     });
 
     expect(depotAfterDelete).toBeNull();

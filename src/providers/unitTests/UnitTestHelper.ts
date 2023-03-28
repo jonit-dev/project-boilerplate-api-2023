@@ -29,6 +29,7 @@ import { characterMock } from "@providers/unitTests/mock/characterMock";
 import { ISocketTransmissionZone, NPCMovementType, PeriodOfDay, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
+import { Types } from "mongoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
 import {
   itemMeleeRangedMock,
@@ -48,7 +49,6 @@ import {
   questRewardsMock,
 } from "./mock/questMock";
 import { userMock } from "./mock/userMock";
-import { Types } from "mongoose";
 
 export enum InteractionQuestSubtype {
   craft = "craft",
@@ -582,13 +582,9 @@ export class UnitTestHelper {
     quest.objectives!.push(testQuestObjectiveKill._id);
   }
 
-  public async createMockDepot(
-    npcId: string,
-    characterId: string,
-    extraProps?: Partial<IItemContainer>
-  ): Promise<IDepot> {
-    if (!npcId) {
-      throw new Error("need to provide npc id to create a mock depot");
+  public async createMockDepot(npc: INPC, characterId: string, extraProps?: Partial<IItemContainer>): Promise<IDepot> {
+    if (!npc) {
+      throw new Error("need to provide npc to create a mock depot");
     }
 
     if (!characterId) {
@@ -596,7 +592,7 @@ export class UnitTestHelper {
     }
     let newDepot = new Depot({
       owner: characterId,
-      npc: npcId,
+      key: npc.key,
     });
 
     newDepot = await newDepot.save();

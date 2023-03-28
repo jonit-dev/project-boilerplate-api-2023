@@ -1,8 +1,9 @@
 import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Types } from "mongoose";
+import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { IItemContainer } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { Types } from "mongoose";
 
 @provide(OpenDepot)
 export class OpenDepot {
@@ -17,12 +18,18 @@ export class OpenDepot {
   public async getContainer(characterId: string, npcId: string): Promise<IItemContainer> {
     let itemContainer: IItemContainer;
 
+    const npc = await NPC.findOne({
+      _id: Types.ObjectId(npcId),
+    }).lean();
+
+    if (!npc) {
+      throw new Error("NPC not found");
+    }
+
     const depot = await Depot.findOne({
       owner: Types.ObjectId(characterId),
-      npc: Types.ObjectId(npcId),
-    })
-      .populate("itemContainer")
-      .exec();
+      key: npc.key,
+    }).populate("itemContainer");
 
     if (depot) {
       itemContainer = depot.itemContainer as unknown as IItemContainer;
@@ -30,7 +37,7 @@ export class OpenDepot {
       // Depot does not exist, create new one
       let newDepot = new Depot({
         owner: Types.ObjectId(characterId),
-        npc: Types.ObjectId(npcId),
+        key: npc.key,
       });
 
       newDepot = await newDepot.save();

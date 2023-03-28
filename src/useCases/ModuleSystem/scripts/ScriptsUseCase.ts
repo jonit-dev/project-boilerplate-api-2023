@@ -89,4 +89,18 @@ export class ScriptsUseCase {
       }
     }
   }
+
+  public async fixAllDepotReferences(): Promise<void> {
+    await Depot.updateMany(
+      {},
+      {
+        $set: {
+          key: "banker-770",
+        },
+        $unset: {
+          npc: "",
+        },
+      }
+    );
+  }
 }

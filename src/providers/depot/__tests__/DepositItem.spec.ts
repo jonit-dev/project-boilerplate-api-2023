@@ -17,7 +17,7 @@ describe("DepositItem.ts", () => {
     item: IItem,
     characterItemSlots: CharacterItemSlots;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     depositItem = container.get<DepositItem>(DepositItem);
     characterItemSlots = container.get<CharacterItemSlots>(CharacterItemSlots);
   });
@@ -44,7 +44,7 @@ describe("DepositItem.ts", () => {
     // fetch the itemContainer from db and validate that changes persisted
     const updatedDepot = await Depot.findOne({
       owner: Types.ObjectId(testCharacter.id),
-      npc: Types.ObjectId(testNPC.id),
+      key: testNPC.key,
     })
       .populate("itemContainer")
       .exec();

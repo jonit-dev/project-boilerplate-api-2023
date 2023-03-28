@@ -22,7 +22,7 @@ describe("WithdrawItem.ts", () => {
     characterBackpack: IItem,
     characterItemSlots: CharacterItemSlots;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     withdrawItem = container.get<WithdrawItem>(WithdrawItem);
     depositItem = container.get<DepositItem>(DepositItem);
     characterItemSlots = container.get<CharacterItemSlots>(CharacterItemSlots);
@@ -59,7 +59,7 @@ describe("WithdrawItem.ts", () => {
     // fetch the itemContainer from db and validate that changes persisted
     const updatedDepot = await Depot.findOne({
       owner: Types.ObjectId(testCharacter.id),
-      npc: Types.ObjectId(testNPC.id),
+      key: testNPC.key,
     })
       .populate("itemContainer")
       .exec();
