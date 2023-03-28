@@ -15,3 +15,9 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
  
+### Scripts :: Depot
+GET {{baseUrl}}/scripts/fix-depot-reference HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+ 

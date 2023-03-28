@@ -48,4 +48,13 @@ export class ScriptsController implements interfaces.Controller {
       message: "Depot fixed",
     });
   }
+
+  @httpGet("/fix-depot-reference")
+  public async fixDepotReference(@response() res): Promise<void> {
+    await this.scriptsUserCase.fixAllDepotReferences();
+
+    return res.status(200).send({
+      message: "Depot reference fixed",
+    });
+  }
 }
