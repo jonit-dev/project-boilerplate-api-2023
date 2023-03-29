@@ -2,6 +2,7 @@ import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
+import { appEnv } from "@providers/config/env";
 import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentStatsCalculator } from "@providers/equipment/EquipmentStatsCalculator";
@@ -104,6 +105,10 @@ export class SkillStatsCalculator {
       await this.inMemoryHashTable.set(ownerSkill, "totalDefense", {
         defense: value,
       });
+    }
+
+    if (!appEnv.general.IS_UNIT_TEST) {
+      await this.inMemoryHashTable.expire(ownerSkill, 120, "NX");
     }
   }
 }
