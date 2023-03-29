@@ -4,8 +4,8 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
 import { ItemView } from "../ItemView";
 
-@provide(ItemPickupMapContainer)
-export class ItemPickupMapContainer {
+@provide(ItemPickupFromMap)
+export class ItemPickupFromMap {
   constructor(private itemView: ItemView, private socketMessaging: SocketMessaging) {}
 
   public async pickupFromMapContainer(itemToBePicked: IItem, character: ICharacter): Promise<boolean> {

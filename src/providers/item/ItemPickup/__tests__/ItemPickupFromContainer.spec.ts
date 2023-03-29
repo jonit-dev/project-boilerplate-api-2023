@@ -5,7 +5,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { IItemPickup } from "@rpg-engine/shared";
-import { ItemPickupFromContainer } from "../ItemPickup/ItemPickupFromContainer";
+import { ItemPickupFromContainer } from "../ItemPickupFromContainer";
 
 describe("ItemPickupFromContainer.ts ", () => {
   let itemPickupFromContainer: ItemPickupFromContainer;
@@ -18,7 +18,7 @@ describe("ItemPickupFromContainer.ts ", () => {
   let itemContainer;
   let characterItemSlots: CharacterItemSlots;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     itemPickupFromContainer = container.get<ItemPickupFromContainer>(ItemPickupFromContainer);
   });
   beforeEach(async () => {

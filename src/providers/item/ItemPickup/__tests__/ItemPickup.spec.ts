@@ -7,9 +7,10 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { FromGridX, FromGridY } from "@rpg-engine/shared";
-import { ItemPickup } from "../ItemPickup/ItemPickup";
-import { ContainersBlueprint } from "../data/types/itemsBlueprintTypes";
+import { FromGridX, FromGridY, IItemContainer } from "@rpg-engine/shared";
+import { ContainersBlueprint } from "../../data/types/itemsBlueprintTypes";
+import { ItemPickup } from "../ItemPickup";
+import { ItemPickupUpdater } from "../ItemPickupUpdater";
 
 describe("ItemPickup.ts", () => {
   let itemPickup: ItemPickup;
@@ -20,12 +21,14 @@ describe("ItemPickup.ts", () => {
   let characterWeight: CharacterWeight;
   let equipmentSlots: EquipmentSlots;
   let socketMessaging: SocketMessaging;
+  let itemPickupUpdater: ItemPickupUpdater;
 
   beforeAll(() => {
     itemPickup = container.get<ItemPickup>(ItemPickup);
     characterWeight = container.get<CharacterWeight>(CharacterWeight);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
     socketMessaging = container.get<SocketMessaging>(SocketMessaging);
+    itemPickupUpdater = container.get<ItemPickupUpdater>(ItemPickupUpdater);
   });
 
   beforeEach(async () => {
@@ -235,18 +238,6 @@ describe("ItemPickup.ts", () => {
     expect(await Item.findById(stackableItem3.id)).toBeFalsy();
   });
 
-  it("returns the correct list of allowed item types", () => {
-    const mockGetAllowedItemTypes = jest.fn().mockReturnValue(["Weapon", "Armor"]);
-    itemPickup.getAllowedItemTypes = mockGetAllowedItemTypes;
-
-    // Call the getAllowedItemTypes method
-    const allowedTypes = itemPickup.getAllowedItemTypes();
-
-    // Verify that the returned list of types is correct
-
-    expect(allowedTypes).toEqual(["Weapon", "Armor"]);
-  });
-
   describe("Container messaging", () => {
     let sendEventToUserSpy: jest.SpyInstance;
 
@@ -266,14 +257,13 @@ describe("ItemPickup.ts", () => {
     });
 
     it("sends container read message for inventory container", async () => {
-      const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
+      const itemContainer = (await ItemContainer.findById(inventoryItemContainerId)) as unknown as IItemContainer;
 
       if (!itemContainer) {
         throw new Error("Failed to find item container");
       }
 
-      // @ts-expect-error
-      await itemPickup.sendContainerRead(itemContainer, testCharacter);
+      await itemPickupUpdater.sendContainerRead(itemContainer, testCharacter);
 
       expect(sendEventToUserSpy).toHaveBeenCalled();
     });
@@ -282,7 +272,7 @@ describe("ItemPickup.ts", () => {
       const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
       // Call the sendContainerRead method
       // @ts-expect-error
-      await itemPickup.sendContainerRead(itemContainer, testCharacter);
+      await itemPickupUpdater.sendContainerRead(itemContainer, testCharacter);
 
       // Verify that the sendEventToUser method was called
       expect(sendEventToUserSpy).toHaveBeenCalled();
@@ -297,15 +287,15 @@ describe("ItemPickup.ts", () => {
     it("does not send message with invalid character or container", async () => {
       testCharacter.channelId = testCharacter.id;
 
-      const itemContainer = await ItemContainer.findById(inventoryItemContainerId);
+      const itemContainer = (await ItemContainer.findById(inventoryItemContainerId)) as unknown as IItemContainer;
 
       // @ts-expect-error
-      await itemPickup.sendContainerRead(itemContainer, null);
+      await itemPickupUpdater.sendContainerRead(itemContainer, null);
 
       expect(sendEventToUserSpy).not.toHaveBeenCalled();
 
       // @ts-expect-error
-      await itemPickup.sendContainerRead(null, testCharacter);
+      await itemPickupUpdater.sendContainerRead(null, testCharacter);
 
       expect(sendEventToUserSpy).not.toHaveBeenCalled();
     });

@@ -1,14 +1,19 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IItemPickup } from "@rpg-engine/shared";
+import { IItemContainer, IItemPickup } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { ItemPickupUpdater } from "./ItemPickupUpdater";
 
 @provide(ItemPickupFromContainer)
 export class ItemPickupFromContainer {
-  constructor(private socketMessaging: SocketMessaging, private characterItemSlots: CharacterItemSlots) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterItemSlots: CharacterItemSlots,
+    private itemPickupUpdater: ItemPickupUpdater
+  ) {}
 
   public async pickupFromContainer(
     itemPickupData: IItemPickup,
@@ -32,6 +37,8 @@ export class ItemPickupFromContainer {
       return false;
     }
 
+    await this.itemPickupUpdater.sendContainerRead(fromContainer, character);
+
     return true;
   }
 
@@ -40,6 +47,7 @@ export class ItemPickupFromContainer {
     fromContainer: IItemContainer,
     itemToBeRemoved: IItem
   ): Promise<boolean> {
+    // @ts-ignore
     const wasRemoved = await this.characterItemSlots.deleteItemOnSlot(fromContainer, itemToBeRemoved._id);
 
     if (!wasRemoved) {

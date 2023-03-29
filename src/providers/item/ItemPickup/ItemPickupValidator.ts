@@ -29,71 +29,123 @@ export class ItemPickupValidator {
   ) {}
 
   public async isItemPickupValid(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | IItem> {
-    const item = (await Item.findById(itemPickupData.itemId)) as unknown as IItem;
+    const item = (await Item.findById(itemPickupData.itemId)) as IItem;
+
+    if (!item) {
+      this.sendErrorMessage(character, "Sorry, the item to be picked up was not found.");
+      return false;
+    }
 
     const inventory = await this.characterInventory.getInventory(character);
 
-    // if no inventory, but item trying to be picked up is an inventory item, then equip it
-
-    if (!inventory && item.isItemContainer && isEmpty(itemPickupData.toContainerId)) {
+    if (this.shouldEquipInventoryItem(item, inventory, itemPickupData)) {
       await this.equipmentEquip.equipInventory(character, item._id);
       return false;
     }
 
-    if (!item) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the item to be picked up was not found.");
+    if (
+      this.isItemContainerIntoItself(item, itemPickupData, character) ||
+      !(await this.hasEquipmentContainer(character, item, inventory)) ||
+      !this.hasInventoryForItem(character, item, inventory) ||
+      !(await this.hasAvailableSlot(itemPickupData, item, character)) ||
+      !this.canPickupItemFromMap(character, item) ||
+      !(await this.canCarryAdditionalWeight(character, item)) ||
+      !this.canStoreItem(character, item) ||
+      !this.isInRangeForPickup(item, character, itemPickupData) ||
+      !this.canPickupNotOwnedItem(character, item) ||
+      !(await this.canPickupAlreadyOwnedItem(character, item, inventory, itemPickupData))
+    ) {
       return false;
     }
 
+    if (!this.characterValidation.hasBasicValidation(character)) {
+      return false;
+    }
+
+    return item;
+  }
+
+  private sendErrorMessage(character: ICharacter, message: string): void {
+    this.socketMessaging.sendErrorMessageToCharacter(character, message);
+  }
+
+  private shouldEquipInventoryItem(item: IItem, inventory: any, itemPickupData: IItemPickup): boolean {
+    return !inventory && item.isItemContainer && isEmpty(itemPickupData.toContainerId);
+  }
+
+  private isItemContainerIntoItself(item: IItem, itemPickupData: IItemPickup, character: ICharacter): boolean {
+    if (item.itemContainer && String(itemPickupData.toContainerId) === String(item.itemContainer)) {
+      this.sendErrorMessage(character, "Sorry, you can't pick up an item container into itself.");
+      return true;
+    }
+    return false;
+  }
+
+  private async hasEquipmentContainer(character: ICharacter, item: IItem, inventory: any): Promise<boolean> {
     const isInventoryItem = item.isItemContainer && inventory === null;
-
     if (isInventoryItem) {
-      // validate if equipment container exists
       const equipmentContainer = await Equipment.findById(character.equipment);
-
       if (!equipmentContainer) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment container not found");
+        this.sendErrorMessage(character, "Sorry, equipment container not found");
         return false;
       }
     }
+    return true;
+  }
 
+  private hasInventoryForItem(character: ICharacter, item: IItem, inventory: any): boolean {
+    const isInventoryItem = item.isItemContainer && inventory === null;
     if (!inventory && !item.isItemContainer && !isInventoryItem) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you need an inventory to pick this item.");
+      this.sendErrorMessage(character, "Sorry, you need an inventory to pick this item.");
       return false;
     }
+    return true;
+  }
 
+  private async hasAvailableSlot(itemPickupData: IItemPickup, item: IItem, character: ICharacter): Promise<boolean> {
     const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(itemPickupData.toContainerId, item);
-
     if (!hasAvailableSlot) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, your container is full.");
+      this.sendErrorMessage(character, "Sorry, your container is full.");
       return false;
     }
+    return true;
+  }
 
+  private canPickupItemFromMap(character: ICharacter, item: IItem): boolean {
     const isItemOnMap =
       this.mapHelper.isCoordinateValid(item.x) && this.mapHelper.isCoordinateValid(item.y) && item.scene;
 
-    if (isItemOnMap) {
-      if (character.scene !== item.scene) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can't pick up items from another map.");
-        return false;
-      }
+    if (isItemOnMap && character.scene !== item.scene) {
+      this.sendErrorMessage(character, "Sorry, you can't pick up items from another map.");
+      return false;
     }
 
+    return true;
+  }
+
+  private async canCarryAdditionalWeight(character: ICharacter, item: IItem): Promise<boolean> {
     const weight = await this.characterWeight.getWeight(character);
     const maxWeight = await this.characterWeight.getMaxWeight(character);
-
     const ratio = (weight + item.weight) / maxWeight;
 
     if (ratio > 4) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you are already carrying too much weight!");
+      this.sendErrorMessage(character, "Sorry, you are already carrying too much weight!");
       return false;
     }
 
+    return true;
+  }
+
+  private canStoreItem(character: ICharacter, item: IItem): boolean {
     if (!item.isStorable) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot store this item.");
+      this.sendErrorMessage(character, "Sorry, you cannot store this item.");
       return false;
     }
 
+    return true;
+  }
+
+  private isInRangeForPickup(item: IItem, character: ICharacter, itemPickupData: IItemPickup): boolean {
     if (item.x !== undefined && item.y !== undefined && item.scene !== undefined) {
       const underRange = this.movementHelper.isUnderRange(
         character.x,
@@ -103,43 +155,44 @@ export class ItemPickupValidator {
         2
       );
       if (!underRange) {
-        this.socketMessaging.sendErrorMessageToCharacter(
-          character,
-          "Sorry, you are too far away to pick up this item."
-        );
+        this.sendErrorMessage(character, "Sorry, you are too far away to pick up this item.");
         return false;
       }
     }
+    return true;
+  }
+
+  private canPickupNotOwnedItem(character: ICharacter, item: IItem): boolean {
+    const isItemOnMap =
+      this.mapHelper.isCoordinateValid(item.x) && this.mapHelper.isCoordinateValid(item.y) && item.scene;
 
     if (!isItemOnMap) {
-      // if item is not on the map
-
       if (item.owner && item.owner?.toString() !== character._id.toString()) {
-        // check if item is owned by someone else
-
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item is not yours.");
+        this.sendErrorMessage(character, "Sorry, this item is not yours.");
         return false;
       }
     }
 
-    // if item is not a container, we can proceed
+    return true;
+  }
 
+  private async canPickupAlreadyOwnedItem(
+    character: ICharacter,
+    item: IItem,
+    inventory: any,
+    itemPickupData: IItemPickup
+  ): Promise<boolean> {
+    const isInventoryItem = item.isItemContainer && inventory === null;
     const characterAlreadyHasItem = await this.characterItems.hasItem(
       item._id,
       character,
       isInventoryItem ? "equipment" : "inventory"
     );
     if (characterAlreadyHasItem && itemPickupData.toContainerId === inventory?._id.toString()) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you already have this item.");
+      this.sendErrorMessage(character, "Sorry, you already have this item.");
       return false;
     }
 
-    const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
-
-    if (!hasBasicValidation) {
-      return false;
-    }
-
-    return item;
+    return true;
   }
 }

@@ -1,40 +1,28 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
-import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  IEquipmentAndInventoryUpdatePayload,
-  IItemContainer,
-  IItemContainerRead,
-  IItemPickup,
-  ItemSocketEvents,
-  ItemType,
-} from "@rpg-engine/shared";
+import { IEquipmentAndInventoryUpdatePayload, IItemPickup } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ItemOwnership } from "../ItemOwnership";
 
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
+import { MapHelper } from "@providers/map/MapHelper";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
-import { ItemPickupMapContainer } from "./ItemPickupMapContainer";
+import { ItemPickupFromMap } from "./ItemPickupFromMap";
+import { ItemPickupUpdater } from "./ItemPickupUpdater";
 import { ItemPickupValidator } from "./ItemPickupValidator";
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(
     private socketMessaging: SocketMessaging,
-    private characterWeight: CharacterWeight,
-
     private characterItemContainer: CharacterItemContainer,
-    private equipmentSlots: EquipmentSlots,
-    private itemOwnership: ItemOwnership,
     private itemPickupFromContainer: ItemPickupFromContainer,
     private itemPickupValidator: ItemPickupValidator,
-    private itemPickupMapContainer: ItemPickupMapContainer,
-    private itemContainerHelper: ItemContainerHelper,
-    private characterInventory: CharacterInventory
+    private itemPickupMapContainer: ItemPickupFromMap,
+    private characterInventory: CharacterInventory,
+    private itemPickupUpdater: ItemPickupUpdater,
+    private mapHelper: MapHelper
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | undefined> {
@@ -46,36 +34,35 @@ export class ItemPickup {
       }
 
       // this prevents item duplication (2 chars trying to pick up the same item at the same time)
-      if (itemToBePicked.isBeingPickedUp) {
-        this.socketMessaging.sendErrorMessageToCharacter(character);
-        return false;
-      }
-      itemToBePicked.isBeingPickedUp = true;
-      await itemToBePicked.save();
+      await this.shouldPreventItemDuplication(itemToBePicked, character);
 
       const inventory = await this.characterInventory.getInventory(character);
 
       const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
-      const isPickupFromMapContainer =
-        itemToBePicked.x !== undefined && itemToBePicked.y !== undefined && itemToBePicked.scene !== undefined;
+      const isPickupFromMap =
+        this.mapHelper.isCoordinateValid(itemToBePicked.x) &&
+        this.mapHelper.isCoordinateValid(itemToBePicked.y) &&
+        itemToBePicked.scene !== undefined;
 
       itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
       await itemToBePicked.save();
 
-      if (itemPickupData.fromContainerId && !isPickupFromMapContainer) {
-        const pickupFromContainer = await this.itemPickupFromContainer.pickupFromContainer(
+      const isPickupFromContainer = itemPickupData.fromContainerId && !isPickupFromMap;
+
+      if (isPickupFromContainer) {
+        const hasPickedUpFromContainer = await this.handlePickupFromContainer(
           itemPickupData,
           itemToBePicked,
           character
         );
 
-        if (!pickupFromContainer) {
+        if (!hasPickedUpFromContainer) {
           return false;
         }
       }
 
       // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
-      if (isPickupFromMapContainer) {
+      if (isPickupFromMap) {
         const pickupFromMap = await this.itemPickupMapContainer.pickupFromMapContainer(itemToBePicked, character);
 
         if (!pickupFromMap) {
@@ -95,14 +82,14 @@ export class ItemPickup {
       }
 
       if (isInventoryItem) {
-        await this.refreshEquipmentIfInventoryItem(character);
+        await this.itemPickupUpdater.refreshEquipmentIfInventoryItem(character);
 
-        await this.finalizePickup(itemToBePicked, character);
+        await this.itemPickupUpdater.finalizePickup(itemToBePicked, character);
 
         return true;
       }
 
-      if (!itemPickupData.fromContainerId && !isInventoryItem && !isPickupFromMapContainer) {
+      if (!itemPickupData.fromContainerId && !isInventoryItem && !isPickupFromMap) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
           "Sorry, failed to remove item from container. Origin container not found."
@@ -110,38 +97,13 @@ export class ItemPickup {
         return false;
       }
 
-      const containerToUpdateId = itemPickupData.fromContainerId;
-      const updatedContainer =
-        !isPickupFromMapContainer &&
-        ((await ItemContainer.findById(containerToUpdateId).lean({
-          virtuals: true,
-          defaults: true,
-        })) as any);
+      const hasUpdatedContainers = await this.updateContainers(itemPickupData, character, isPickupFromMap);
 
-      const inventoryContainerToUpdateId = itemPickupData.toContainerId;
-      const updatedInventoryContainer = (await ItemContainer.findById(inventoryContainerToUpdateId).lean({
-        virtuals: true,
-        defaults: true,
-      })) as any;
-
-      if ((!updatedContainer && !isPickupFromMapContainer) || !updatedInventoryContainer) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, error in fetching container information.");
+      if (!hasUpdatedContainers) {
         return false;
       }
 
-      const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-        inventory: updatedInventoryContainer,
-        openInventoryOnUpdate: isPickupFromMapContainer,
-      };
-
-      this.updateInventoryCharacter(payloadUpdate, character);
-
-      if (!isPickupFromMapContainer) {
-        // RPG-1012 - reopen origin container using read to open with correct type
-        await this.sendContainerRead(updatedContainer, character);
-      }
-
-      await this.finalizePickup(itemToBePicked, character);
+      await this.itemPickupUpdater.finalizePickup(itemToBePicked, character);
 
       return true;
     } catch (error) {
@@ -149,56 +111,71 @@ export class ItemPickup {
     }
   }
 
-  private async finalizePickup(itemToBePicked: IItem, character: ICharacter): Promise<void> {
-    await this.itemOwnership.addItemOwnership(itemToBePicked, character);
+  private async shouldPreventItemDuplication(itemToBePicked: IItem, character: ICharacter): Promise<boolean> {
+    if (itemToBePicked.isBeingPickedUp) {
+      this.socketMessaging.sendErrorMessageToCharacter(character);
+      return false;
+    }
+    itemToBePicked.isBeingPickedUp = true;
+    await itemToBePicked.save();
 
-    // whenever a new item is added, we need to update the character weight
-    await this.characterWeight.updateCharacterWeight(character);
-
-    await Item.updateOne({ _id: itemToBePicked._id }, { isBeingPickedUp: false }); // unlock item
+    return true;
   }
 
-  private async refreshEquipmentIfInventoryItem(character: ICharacter): Promise<void> {
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+  private async handlePickupFromContainer(
+    itemPickupData: IItemPickup,
+    itemToBePicked: IItem,
+    character: ICharacter
+  ): Promise<boolean> {
+    const pickupFromContainer = await this.itemPickupFromContainer.pickupFromContainer(
+      itemPickupData,
+      itemToBePicked,
+      character
+    );
+
+    if (!pickupFromContainer) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private async updateContainers(
+    itemPickupData: IItemPickup,
+    character: ICharacter,
+    isPickupFromMap: boolean
+  ): Promise<boolean> {
+    const containerToUpdateId = itemPickupData.fromContainerId;
+    const updatedContainer =
+      !isPickupFromMap &&
+      ((await ItemContainer.findById(containerToUpdateId).lean({
+        virtuals: true,
+        defaults: true,
+      })) as any);
+
+    const inventoryContainerToUpdateId = itemPickupData.toContainerId;
+    const updatedInventoryContainer = (await ItemContainer.findById(inventoryContainerToUpdateId).lean({
+      virtuals: true,
+      defaults: true,
+    })) as any;
+
+    if ((!updatedContainer && !isPickupFromMap) || !updatedInventoryContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, error in fetching container information.");
+      return false;
+    }
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-      equipment: equipmentSlots,
+      inventory: updatedInventoryContainer,
+      openInventoryOnUpdate: isPickupFromMap,
     };
 
-    this.updateInventoryCharacter(payloadUpdate, character);
-  }
+    this.itemPickupUpdater.updateInventoryCharacter(payloadUpdate, character);
 
-  private updateInventoryCharacter(payloadUpdate: IEquipmentAndInventoryUpdatePayload, character: ICharacter): void {
-    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
-      character.channelId!,
-      ItemSocketEvents.EquipmentAndInventoryUpdate,
-      payloadUpdate
-    );
-  }
-
-  private async sendContainerRead(itemContainer: IItemContainer, character: ICharacter): Promise<void> {
-    if (character && itemContainer) {
-      const type = await this.itemContainerHelper.getContainerType(itemContainer);
-
-      if (!type) {
-        this.socketMessaging.sendErrorMessageToCharacter(character);
-        return;
-      }
-
-      this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
-        itemContainer,
-        type,
-      });
-    }
-  }
-
-  public getAllowedItemTypes(): ItemType[] {
-    const allowedItemTypes: ItemType[] = [];
-
-    for (const allowedItemType of Object.keys(ItemType)) {
-      allowedItemTypes.push(ItemType[allowedItemType]);
+    if (!isPickupFromMap) {
+      // RPG-1012 - reopen origin container using read to open with correct type
+      await this.itemPickupUpdater.sendContainerRead(updatedContainer, character);
     }
 
-    return allowedItemTypes;
+    return true;
   }
 }

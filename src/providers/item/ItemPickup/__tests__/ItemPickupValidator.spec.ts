@@ -3,11 +3,11 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { BodiesBlueprint, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { itemMock } from "@providers/unitTests/mock/itemMock";
 import { FromGridX, FromGridY, IItemPickup } from "@rpg-engine/shared";
 import { Types } from "mongoose";
-import { ItemPickupValidator } from "../ItemPickup/ItemPickupValidator";
-import { BodiesBlueprint, OthersBlueprint } from "../data/types/itemsBlueprintTypes";
+import { ItemPickupValidator } from "../ItemPickupValidator";
 
 describe("ItemPickupValidator.ts", () => {
   let testCharacter: ICharacter;
@@ -250,4 +250,6 @@ describe("ItemPickupValidator.ts", () => {
     expect(sendErrorMessageToCharacter).toHaveBeenCalled();
     expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "Sorry, your container is full.");
   });
+
+  it("should block an item container pickup, if character is trying to pickup to itself", async () => {});
 });
