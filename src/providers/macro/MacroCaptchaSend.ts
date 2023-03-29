@@ -38,7 +38,7 @@ export class MacroCaptchaSend {
       size: 6,
       noise: 3,
       color: true,
-      ignoreChars: "0Oo1ilI",
+      ignoreChars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0Oo1il",
     });
 
     await Character.findByIdAndUpdate(character._id, {

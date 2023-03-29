@@ -30,7 +30,8 @@ export class MacroCaptchaVerify {
       return false;
     }
 
-    if (code === fetchedCharacter?.captchaVerifyCode) await this.handleSuccessVerify(fetchedCharacter);
+    if (code.toLowerCase() === fetchedCharacter?.captchaVerifyCode.toLowerCase())
+      await this.handleSuccessVerify(fetchedCharacter);
     else if (fetchedCharacter?.captchaTriesLeft === 1) await this.handleVerifyBan(fetchedCharacter);
     else if (fetchedCharacter?.captchaTriesLeft) await this.handleDecreaseCaptchaTries(fetchedCharacter);
 
