@@ -290,6 +290,18 @@ export class CharacterItemSlots {
     targetContainer: IItemContainer,
     dropOnMapIfFull: boolean = true
   ): Promise<boolean> {
+    //! Avoid duplicate items on slots
+    // if selectedItem is not stackable, do not add it.
+    const isStackable = selectedItem.maxStackSize > 1;
+
+    if (!isStackable) {
+      const hasSameItemOnSlot = await this.findItemOnSlots(targetContainer, selectedItem._id);
+
+      if (hasSameItemOnSlot) {
+        return false;
+      }
+    }
+
     const firstAvailableSlotIndex = await this.getFirstAvailableSlotIndex(targetContainer, selectedItem);
 
     if (firstAvailableSlotIndex === null) {

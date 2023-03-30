@@ -314,4 +314,23 @@ describe("CharacterItemSlots.ts", () => {
 
     expect(result).toBeTruthy();
   });
+
+  it("should not add a duplicate non-stackable item on slots", async () => {
+    const nonStackableItem = await unitTestHelper.createMockItem({
+      maxStackSize: 1,
+    });
+
+    inventoryContainer.slots = {
+      0: nonStackableItem.toJSON({ virtuals: true }),
+    };
+    await inventoryContainer.save();
+
+    const result = await characterItemSlots.tryAddingItemOnFirstSlot(
+      testCharacter,
+      nonStackableItem,
+      inventoryContainer
+    );
+
+    expect(result).toBeFalsy();
+  });
 });

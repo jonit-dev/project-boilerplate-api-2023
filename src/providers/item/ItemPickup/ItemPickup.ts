@@ -5,7 +5,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemPickup } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MapHelper } from "@providers/map/MapHelper";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
@@ -110,9 +110,6 @@ export class ItemPickup {
       return true;
     } catch (error) {
       console.error(error);
-    } finally {
-      //! Ugly hack because itemToBePicked.unlockField is not working
-      await Item.findByIdAndUpdate(itemToBePicked._id, { $unset: { locks: 1 } });
     }
   }
 
@@ -181,7 +178,6 @@ export class ItemPickup {
     }
     itemToBePicked.isBeingPickedUp = true;
     await itemToBePicked.save();
-    await itemToBePicked.lockField("isBeingPickedUp");
 
     return false;
   }
