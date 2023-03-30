@@ -1,12 +1,13 @@
-import { IItemContainer as IItemContainerModel } from "@entities/ModuleInventory/ItemContainerModel";
-import { provide } from "inversify-binding-decorators";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { OpenDepot } from "./OpenDepot";
-import { ItemView } from "@providers/item/ItemView";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IEquipmentAndInventoryUpdatePayload, IItemContainer, IDepotDepositItem } from "@rpg-engine/shared";
+import { IItemContainer as IItemContainerModel } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { ItemView } from "@providers/item/ItemView";
+import { MapHelper } from "@providers/map/MapHelper";
+import { IDepotDepositItem, IEquipmentAndInventoryUpdatePayload, IItemContainer } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "./DepotSystem";
+import { OpenDepot } from "./OpenDepot";
 
 @provide(DepositItem)
 export class DepositItem {
@@ -14,7 +15,8 @@ export class DepositItem {
     private openDepot: OpenDepot,
     private itemView: ItemView,
     private characterWeight: CharacterWeight,
-    private depotSystem: DepotSystem
+    private depotSystem: DepotSystem,
+    private mapHelper: MapHelper
   ) {}
 
   public async deposit(character: ICharacter, data: IDepotDepositItem): Promise<IItemContainer> {
@@ -30,14 +32,15 @@ export class DepositItem {
       throw new Error(`DepotSystem > Item not found: ${itemId}`);
     }
 
-    const isDepositFromMapContainer = item.x !== undefined && item.y !== undefined && item.scene !== undefined;
+    const isItemFromMap =
+      this.mapHelper.isCoordinateValid(item.x) && this.mapHelper.isCoordinateValid(item.y) && item.scene;
 
     // support depositing items from a tiled map seed
     item.key = item.baseKey;
     await item.save();
 
     // deposit from the characters container
-    if (!!fromContainerId && !isDepositFromMapContainer) {
+    if (!!fromContainerId && !isItemFromMap) {
       const container = await this.depotSystem.removeFromContainer(fromContainerId, item);
       // whenever a new item is removed, we need to update the character weight
       await this.characterWeight.updateCharacterWeight(character);
@@ -49,7 +52,7 @@ export class DepositItem {
       this.depotSystem.updateInventoryCharacter(payloadUpdate, character);
     }
 
-    if (isDepositFromMapContainer) {
+    if (isItemFromMap) {
       await this.removeFromMapContainer(item);
     }
 
