@@ -1,6 +1,6 @@
 import { Direction } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+import _, { random } from "lodash";
 import numberString from "number-string";
 
 interface IPoint {
@@ -164,4 +164,11 @@ export class MathHelper {
   public fixPrecision(num: number): number {
     return Math.round(num * 100 + Number.EPSILON) / 100;
   }
+
+  public randomFloat(min: number, max: number, step: number = 0.01): number {
+    const range = (max - min) / step;
+    const randomNum = random(0, range);
+    return randomNum * step + min;
+  }
+ 
 }

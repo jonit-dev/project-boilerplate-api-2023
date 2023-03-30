@@ -5,7 +5,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemPickup } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MapHelper } from "@providers/map/MapHelper";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
@@ -26,20 +26,17 @@ export class ItemPickup {
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | undefined> {
+    const itemToBePicked = (await this.itemPickupValidator.isItemPickupValid(itemPickupData, character)) as IItem;
     try {
-      const itemToBePicked = (await this.itemPickupValidator.isItemPickupValid(itemPickupData, character)) as IItem;
-
       if (!itemToBePicked) {
         return false;
       }
 
-      // this prevents item duplication (2 chars trying to pick up the same item at the same time)
-      if (itemToBePicked.isBeingPickedUp) {
-        this.socketMessaging.sendErrorMessageToCharacter(character);
+      const hasRaceCondition = await this.hasRaceCondition(itemToBePicked, character);
+
+      if (hasRaceCondition) {
         return false;
       }
-      itemToBePicked.isBeingPickedUp = true;
-      await itemToBePicked.save();
 
       const inventory = await this.characterInventory.getInventory(character);
 
@@ -113,6 +110,8 @@ export class ItemPickup {
       return true;
     } catch (error) {
       console.error(error);
+    } finally {
+      await Item.findByIdAndUpdate(itemToBePicked._id, { $unset: { locks: 1 } });
     }
   }
 
@@ -171,5 +170,18 @@ export class ItemPickup {
     }
 
     return true;
+  }
+
+  private async hasRaceCondition(itemToBePicked: IItem, character: ICharacter): Promise<boolean> {
+    // this prevents item duplication (2 chars trying to pick up the same item at the same time)
+    if (itemToBePicked.isBeingPickedUp) {
+      this.socketMessaging.sendErrorMessageToCharacter(character);
+      return true;
+    }
+    itemToBePicked.isBeingPickedUp = true;
+    await itemToBePicked.save();
+    await itemToBePicked.lockField("isBeingPickedUp");
+
+    return false;
   }
 }
