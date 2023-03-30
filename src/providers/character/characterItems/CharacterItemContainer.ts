@@ -123,7 +123,8 @@ export class CharacterItemContainer {
           itemToBeAdded
         );
 
-        if (wasStacked) {
+        if (wasStacked || wasStacked === undefined) {
+          //! wasStacked can be undefined if there was an error, on this case we just return true to avoid creating a new item. (duplicate stack bug)
           return true;
         } else {
           isNewItem = true;
