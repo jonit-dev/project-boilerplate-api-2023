@@ -57,6 +57,36 @@ describe("DepositItem.ts", () => {
     expect(depotContainer._id).toEqual(container._id);
   });
 
+  it("throws error for invalid item ID", async () => {
+    const invalidItemId = Types.ObjectId();
+    await expect(
+      depositItem.deposit(testCharacter, {
+        itemId: invalidItemId as string,
+        npcId: testNPC.id,
+      })
+    ).rejects.toThrow(`DepotSystem > Item not found: ${invalidItemId}`);
+  });
+
+  it("throws error when removing item from map fails", async () => {
+    item.x = 1;
+    item.y = 0;
+    await item.save();
+
+    // Mock the failure of removing item from the map
+    // @ts-ignore
+    jest.spyOn(depositItem.itemView, "removeItemFromMap").mockImplementation(() => Promise.resolve(false));
+
+    await expect(
+      depositItem.deposit(testCharacter, {
+        itemId: item.id,
+        npcId: testNPC.id,
+      })
+    ).rejects.toThrow(`DepotSystem > Error removing item with id ${item.id} from map`);
+
+    // Restore the original implementation after the test
+    jest.restoreAllMocks();
+  });
+
   it("deposit item from container", async () => {
     // remove item's coordinates (is equipped on characters item container)
     item.x = undefined;
