@@ -34,7 +34,12 @@ export class ItemPickup {
       }
 
       // this prevents item duplication (2 chars trying to pick up the same item at the same time)
-      await this.shouldPreventItemDuplication(itemToBePicked, character);
+      if (itemToBePicked.isBeingPickedUp) {
+        this.socketMessaging.sendErrorMessageToCharacter(character);
+        return false;
+      }
+      itemToBePicked.isBeingPickedUp = true;
+      await itemToBePicked.save();
 
       const inventory = await this.characterInventory.getInventory(character);
 
@@ -109,17 +114,6 @@ export class ItemPickup {
     } catch (error) {
       console.error(error);
     }
-  }
-
-  private async shouldPreventItemDuplication(itemToBePicked: IItem, character: ICharacter): Promise<boolean> {
-    if (itemToBePicked.isBeingPickedUp) {
-      this.socketMessaging.sendErrorMessageToCharacter(character);
-      return false;
-    }
-    itemToBePicked.isBeingPickedUp = true;
-    await itemToBePicked.save();
-
-    return true;
   }
 
   private async handlePickupFromContainer(
