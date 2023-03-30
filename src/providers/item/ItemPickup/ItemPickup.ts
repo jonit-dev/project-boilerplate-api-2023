@@ -111,6 +111,7 @@ export class ItemPickup {
     } catch (error) {
       console.error(error);
     } finally {
+      //! Ugly hack because itemToBePicked.unlockField is not working
       await Item.findByIdAndUpdate(itemToBePicked._id, { $unset: { locks: 1 } });
     }
   }
