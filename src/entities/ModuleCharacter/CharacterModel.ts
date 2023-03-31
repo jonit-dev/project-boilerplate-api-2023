@@ -15,6 +15,7 @@ import {
   MapLayers,
   ShadowWalkerRaces,
   TypeHelper,
+  getSpeedMultiplierBasedOnWeightRatio,
 } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
@@ -249,21 +250,7 @@ characterSchema.virtual("movementIntervalMs").get(function (this: ICharacter) {
 characterSchema.virtual("speed").get(function (this: ICharacter) {
   const ratio = this.weight / this.maxWeight;
 
-  if (ratio <= 1) {
-    return this.baseSpeed;
-  }
-
-  if (ratio > 1 && ratio <= 2) {
-    return this.baseSpeed * 0.8;
-  }
-
-  if (ratio > 2 && ratio <= 6) {
-    return this.baseSpeed * 0.6;
-  }
-
-  if (ratio > 6) {
-    return 0;
-  }
+  return this.baseSpeed * getSpeedMultiplierBasedOnWeightRatio(ratio);
 });
 
 characterSchema.virtual("isAlive").get(function (this: ICharacter) {

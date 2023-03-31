@@ -4,7 +4,7 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, ItemType } from "@rpg-engine/shared";
+import { CharacterSocketEvents, ICharacterAttributeChanged, ItemType } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
@@ -38,10 +38,16 @@ export class CharacterWeight {
     //! Requires virtuals
     character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
 
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, {
-      speed: character.speed,
-      targetId: character._id,
-    });
+    this.socketMessaging.sendEventToUser<ICharacterAttributeChanged>(
+      character.channelId!,
+      CharacterSocketEvents.AttributeChanged,
+      {
+        speed: character.speed,
+        weight,
+        maxWeight,
+        targetId: character._id,
+      }
+    );
   }
 
   public async getMaxWeight(character: ICharacter): Promise<number> {

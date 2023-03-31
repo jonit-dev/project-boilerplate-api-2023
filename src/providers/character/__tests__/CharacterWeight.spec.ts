@@ -147,8 +147,10 @@ describe("CharacterWeight.ts", () => {
     expect(beforeAddArmor?.weight).toBe(3);
     expect(mockSendEventToUser).toBeCalledTimes(1);
     expect(mockSendEventToUser).toBeCalledWith(beforeAddArmor?.channelId, CharacterSocketEvents.AttributeChanged, {
+      maxWeight: 15,
       speed: testCharacter.speed,
       targetId: testCharacter._id,
+      weight: 3,
     });
 
     await unitTestHelper.createMockAndEquipItens(testCharacter);

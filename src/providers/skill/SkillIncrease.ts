@@ -47,6 +47,7 @@ import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -63,7 +64,8 @@ export class SkillIncrease {
     private characterWeapon: CharacterWeapon,
     private inMemoryHashTable: InMemoryHashTable,
     private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties,
-    private characterRaceBonusOrPenalties: CharacterRaceBonusOrPenalties
+    private characterRaceBonusOrPenalties: CharacterRaceBonusOrPenalties,
+    private characterWeight: CharacterWeight
   ) {}
 
   /**
@@ -120,6 +122,7 @@ export class SkillIncrease {
     // If character strength skill level increased, send level up event
     if (increasedStrengthSP && increasedStrengthSP.skillLevelUp && attacker.channelId) {
       await this.skillFunctions.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
+      await this.characterWeight.updateCharacterWeight(attacker);
     }
 
     // If character skill level increased, send level up event specifying the skill that upgraded

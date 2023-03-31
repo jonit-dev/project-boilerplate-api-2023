@@ -51,12 +51,6 @@ export class CharacterRepository extends CRUD {
       ["name"]
     );
 
-    const weight = await this.characterWeight.getWeight(createdCharacter);
-    const maxWeight = await this.characterWeight.getMaxWeight(createdCharacter);
-
-    createdCharacter.weight = weight;
-    createdCharacter.maxWeight = maxWeight;
-
     const { inventory, armor, leftHand, head, boot, neck } = await this.generateInitialItems(createdCharacter);
 
     let equipment = new Equipment();
@@ -70,8 +64,6 @@ export class CharacterRepository extends CRUD {
 
     createdCharacter.equipment = equipment._id;
 
-    await createdCharacter.save();
-
     skills.owner = createdCharacter._id;
     await skills.save();
 
@@ -79,6 +71,13 @@ export class CharacterRepository extends CRUD {
     await equipment.save();
 
     await this.generateInventoryItems(createdCharacter); // items to be added on character's bag!
+
+    const weight = await this.characterWeight.getWeight(createdCharacter);
+    const maxWeight = await this.characterWeight.getMaxWeight(createdCharacter);
+    createdCharacter.weight = weight;
+    createdCharacter.maxWeight = maxWeight;
+
+    await createdCharacter.save();
 
     await this.spellLearn.learnLatestSkillLevelSpells(createdCharacter._id, false);
 

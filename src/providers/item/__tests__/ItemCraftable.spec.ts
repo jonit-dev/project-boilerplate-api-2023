@@ -175,7 +175,7 @@ describe("ItemCraftable.ts", () => {
     expect(character!.weight).not.toBe(originalWeight);
   });
 
-  it("sould send inventory update event", async () => {
+  it("should send inventory update event", async () => {
     const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
     craftChanceMock.mockImplementation(() => {
       return Promise.resolve(true);
@@ -190,7 +190,9 @@ describe("ItemCraftable.ts", () => {
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId!, CharacterSocketEvents.AttributeChanged, {
       targetId: testCharacter._id,
+      maxWeight: 15,
       speed: MovementSpeed.Standard,
+      weight: 3.5,
     });
 
     expect(sendEventToUser).toHaveBeenCalledWith(

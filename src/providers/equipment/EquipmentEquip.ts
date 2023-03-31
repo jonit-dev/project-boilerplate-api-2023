@@ -21,6 +21,7 @@ import { EquipmentSlots } from "./EquipmentSlots";
 import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
 import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/Berserker";
 import { RoguePassiveHabilities } from "@providers/character/characterPassiveHabilities/Rogue";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 
 export type SourceEquipContainerType = "inventory" | "container";
 
@@ -37,7 +38,8 @@ export class EquipmentEquip {
     private inMemoryHashTable: InMemoryHashTable,
     private itemView: ItemView,
     private berserkerPassiveHabilities: BerserkerPassiveHabilities,
-    private roguePassiveHabilities: RoguePassiveHabilities
+    private roguePassiveHabilities: RoguePassiveHabilities,
+    private characterWeight: CharacterWeight
   ) {}
 
   public async equipInventory(character: ICharacter, itemId: string): Promise<boolean> {
@@ -206,6 +208,8 @@ export class EquipmentEquip {
     // When Equip remove data from redis
     await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
     await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
+
+    await this.characterWeight.updateCharacterWeight(character);
   }
 
   private async checkContainerType(itemContainer: IItemContainer): Promise<SourceEquipContainerType> {
