@@ -1,5 +1,5 @@
-import { CharacterLastAction } from "../CharacterLastAction";
 import { container } from "@providers/inversify/container";
+import { CharacterLastAction } from "../CharacterLastAction";
 
 describe("CharacterLastAction", () => {
   let characterLastAction: CharacterLastAction;
@@ -59,6 +59,16 @@ describe("CharacterLastAction", () => {
       await characterLastAction.clearAllLastActions();
 
       expect(await characterLastAction.getLastAction(characterId)).toBeUndefined();
+    });
+  });
+
+  describe("getActionLastExecution", () => {
+    it("should return undefined if character has no last action", async () => {
+      const characterId = "1";
+      const action = "UseWithTile";
+      const result = await characterLastAction.getActionLastExecution(characterId, action);
+
+      expect(result).toBeUndefined();
     });
   });
 });
