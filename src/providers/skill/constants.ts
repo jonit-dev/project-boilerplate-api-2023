@@ -4,6 +4,7 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   RangedWeaponsBlueprint,
+  PotionsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared/dist/types/skills.types";
 
@@ -35,4 +36,12 @@ export const CraftingSkillsMap = new Map<string, string>([
   [FoodsBlueprint.Tuna, CraftingSkill.Fishing],
   [FoodsBlueprint.BrownFish, CraftingSkill.Fishing],
   [FoodsBlueprint.Bread, CraftingSkill.Cooking],
+  [PotionsBlueprint.GreaterLifePotion, CraftingSkill.Alchemy],
+  [PotionsBlueprint.GreaterManaPotion, CraftingSkill.Alchemy],
+  [PotionsBlueprint.LifePotion, CraftingSkill.Alchemy],
+  [PotionsBlueprint.LightAntidote, CraftingSkill.Alchemy],
+  [PotionsBlueprint.LightEndurancePotion, CraftingSkill.Alchemy],
+  [PotionsBlueprint.LightLifePotion, CraftingSkill.Alchemy],
+  [PotionsBlueprint.LightManaPotion, CraftingSkill.Alchemy],
+  [PotionsBlueprint.ManaPotion, CraftingSkill.Alchemy],
 ]);

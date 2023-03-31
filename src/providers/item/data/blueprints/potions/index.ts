@@ -13,7 +13,6 @@ export const potionsBlueprintsIndex = {
   [PotionsBlueprint.LifePotion]: itemLifePotion,
   [PotionsBlueprint.LightLifePotion]: itemLightLifePotion,
   [PotionsBlueprint.LightManaPotion]: itemLightManaPotion,
-  [PotionsBlueprint.GreaterLifePotion]: itemGreaterLifePotion,
   [PotionsBlueprint.LightEndurancePotion]: itemLightEndurancePotion,
   [PotionsBlueprint.ManaPotion]: itemManaPotion,
   [PotionsBlueprint.LightAntidote]: itemLightAntidote,
