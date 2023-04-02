@@ -12,7 +12,6 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   AnimationDirection,
-  CharacterClass,
   CharacterSocketEvents,
   EnvType,
   GRID_WIDTH,
@@ -29,9 +28,9 @@ import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
-import { WarriorPassiveHabilities } from "../characterPassiveHabilities/Warrior";
-import { SorcererPassiveHabilities } from "../characterPassiveHabilities/Sorcerer";
 import { DruidPassiveHabilities } from "../characterPassiveHabilities/Druid";
+import { SorcererPassiveHabilities } from "../characterPassiveHabilities/Sorcerer";
+import { WarriorPassiveHabilities } from "../characterPassiveHabilities/Warrior";
 
 @provide(CharacterNetworkUpdate)
 export class CharacterNetworkUpdate {
@@ -62,13 +61,14 @@ export class CharacterNetworkUpdate {
           // sometimes the character is just changing facing direction and not moving.. That's why we need this.
           const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
 
-          if (character.class === CharacterClass.Warrior) {
-            await this.warriorPassiveHabilities.warriorAutoRegenHealthHandler(character._id, character.class);
-          } else if (character.class === CharacterClass.Sorcerer) {
-            await this.sorcererPassiveHabilities.sorcererAutoRegenManaHandler(character._id, character.class);
-          } else if (character.class === CharacterClass.Druid) {
-            await this.druidPassiveHabilities.druidAutoRegenManaHandler(character._id, character.class);
-          }
+          //! TODO @luiz - commented out because its causing a desync bug
+          // if (character.class === CharacterClass.Warrior) {
+          //   await this.warriorPassiveHabilities.warriorAutoRegenHealthHandler(character._id, character.class);
+          // } else if (character.class === CharacterClass.Sorcerer) {
+          //   await this.sorcererPassiveHabilities.sorcererAutoRegenManaHandler(character._id, character.class);
+          // } else if (character.class === CharacterClass.Druid) {
+          //   await this.druidPassiveHabilities.druidAutoRegenManaHandler(character._id, character.class);
+          // }
 
           // send message back to the user telling that the requested position update is not valid!
 
