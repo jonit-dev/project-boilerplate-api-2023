@@ -8,17 +8,17 @@ import round from "lodash/round";
 import { SpellItemCreation } from "../../abstractions/SpellItemCreation";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
-export const spellBoltCreation: Partial<ISpell> = {
-  key: SpellsBlueprint.BoltCreationSpell,
+export const spellFireBoltCreation: Partial<ISpell> = {
+  key: SpellsBlueprint.FireBoltCreationSpell,
 
-  name: "Bolt Creation Spell",
-  description: "A spell that creates bolt in your inventory.",
+  name: "Fire Bolt Creation Spell",
+  description: "A spell that creates fire bolts in your inventory.",
 
   castingType: SpellCastingType.SelfCasting,
-  magicWords: "iquar lyn",
-  manaCost: 15,
-  minLevelRequired: 8,
-  minMagicLevelRequired: 5,
+  magicWords: "naur iquar lyn",
+  manaCost: 25,
+  minLevelRequired: 15,
+  minMagicLevelRequired: 7,
   animationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Hunter],
 
@@ -37,7 +37,7 @@ export const spellBoltCreation: Partial<ISpell> = {
 
     return await spellItemCreation.createItem(character, {
       itemToCreate: {
-        key: RangedWeaponsBlueprint.Bolt,
+        key: RangedWeaponsBlueprint.FireBolt,
         createQty: itemsToCreate,
       },
     });

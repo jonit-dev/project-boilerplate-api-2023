@@ -5,14 +5,14 @@ import { AnimationEffectKeys, CharacterClass, SpellCastingType } from "@rpg-engi
 import { SpellItemCreation } from "../../abstractions/SpellItemCreation";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
-export const spellEnergyBoltCreation: Partial<ISpell> = {
-  key: SpellsBlueprint.EnergyBoltCreationSpell,
+export const spellFireBoltRuneCreation: Partial<ISpell> = {
+  key: SpellsBlueprint.FireBoltRuneCreationSpell,
 
-  name: "Energy Bolt Creation Spell",
-  description: "A spell that creates an energy bolt in your inventory.",
+  name: "Fire Bolt Creation Spell",
+  description: "A spell that creates a fire bolt in your inventory.",
 
   castingType: SpellCastingType.SelfCasting,
-  magicWords: "iquar kiran oorja",
+  magicWords: "iquar kiran agni",
   manaCost: 40,
   minLevelRequired: 4,
   minMagicLevelRequired: 3,
@@ -24,11 +24,11 @@ export const spellEnergyBoltCreation: Partial<ISpell> = {
 
     return await spellRuneCreation.createItem(character, {
       itemToCreate: {
-        key: MagicsBlueprint.EnergyBoltRune,
+        key: MagicsBlueprint.FireBoltRune,
       },
       itemToConsume: {
         key: MagicsBlueprint.Rune,
-        onErrorMessage: "You do not have any blank rune to create a Energy Bolt Rune.",
+        onErrorMessage: "You do not have any blank rune to create a Fire Bolt Rune.",
       },
     });
   },

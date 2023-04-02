@@ -14,7 +14,7 @@ export const itemFireBolt: IEquippableRangedAmmoBlueprint = {
   attack: 18,
   weight: 0.012,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 110,
+  maxStackSize: 100,
   basePrice: 15,
   canSell: false,
   entityEffects: [EntityEffectBlueprint.Burning],
