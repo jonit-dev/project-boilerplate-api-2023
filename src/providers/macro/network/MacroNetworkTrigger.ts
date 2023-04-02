@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { MacroSocketEvents } from "@rpg-engine/shared";
@@ -12,7 +13,7 @@ export class MacroNetworkTrigger {
     this.socketAuth.authCharacterOn(channel, MacroSocketEvents.TriggerMacro, async (_, character) => {
       console.log("MACRO DETECTED", character._id);
 
-      this.macroCaptchaSend.sendAndStartCaptchaVerification(character);
+      // await this.macroCaptchaSend.sendAndStartCaptchaVerification(character);
     });
   }
 }
