@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
@@ -9,7 +10,9 @@ import {
   StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
+import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { BattleEventType, CharacterClass, FromGridX, FromGridY } from "@rpg-engine/shared";
+import { Types } from "mongoose";
 import { BattleAttackTarget } from "../BattleAttackTarget";
 import { BattleAttackTargetDeath } from "../BattleAttackTargetDeath";
 
@@ -393,6 +396,81 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
       await battleAttackTarget.hitTarget(attackerCharacter, targetCharacter);
 
       expect(increaseSkillsOnBattle).toHaveBeenCalledWith(targetCharacter, 24);
+    });
+  });
+
+  describe("Berserker BloodThirst", () => {
+    let testCharacter: ICharacter;
+    let inMemoryHashTable: InMemoryHashTable;
+
+    beforeEach(async () => {
+      inMemoryHashTable = container.get<InMemoryHashTable>(InMemoryHashTable);
+
+      testCharacter = await unitTestHelper.createMockCharacter(null, {
+        hasSkills: true,
+      });
+    });
+
+    afterEach(() => {
+      jest.resetAllMocks();
+      jest.restoreAllMocks();
+    });
+
+    it("should heal a berserker character when applyBerserkerBloodthirst is called", async () => {
+      testCharacter.health = 90;
+      testCharacter.class = CharacterClass.Berserker;
+      (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
+
+      // @ts-ignore
+      await battleAttackTarget.applyBerserkerBloodthirst(testCharacter._id, 50);
+      const updatedCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
+
+      expect(updatedCharacter.health).toBe(95);
+    });
+
+    it("should return true when getBerserkerBloodthirstSpell is called with an existing spell", async () => {
+      const characterId = Types.ObjectId();
+      const namespace = `${NamespaceRedisControl.CharacterSpell}:${characterId}`;
+      const key = SpellsBlueprint.BerserkerBloodthirst;
+      await inMemoryHashTable.set(namespace, key, true);
+
+      // @ts-ignore
+      const spellActivated = await battleAttackTarget.getBerserkerBloodthirstSpell(characterId);
+      expect(spellActivated).toBe(true);
+    });
+
+    it("should not heal a character if it is not a berserker when applyBerserkerBloodthirst is called", async () => {
+      const initialHealth = testCharacter.health;
+      testCharacter.class = CharacterClass.Druid;
+      (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
+
+      // @ts-ignore
+      await battleAttackTarget.applyBerserkerBloodthirst(testCharacter._id, 50);
+      const updatedCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
+      expect(updatedCharacter.health).toEqual(initialHealth);
+    });
+
+    it("should full health a character if the healing would surpass the maximum health", async () => {
+      testCharacter.maxHealth = 100;
+      testCharacter.health = 90;
+      testCharacter.class = CharacterClass.Berserker;
+      (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
+
+      // @ts-ignore
+      await battleAttackTarget.applyBerserkerBloodthirst(testCharacter._id, 10000);
+      const updatedCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
+
+      expect(updatedCharacter.health).toEqual(testCharacter.maxHealth);
+    });
+
+    it("should not handle a berserker attack if the character is not a berserker", async () => {
+      const initialHealth = testCharacter.health;
+      (await Character.findByIdAndUpdate(testCharacter._id, { class: CharacterClass.Sorcerer }).lean()) as ICharacter;
+
+      // @ts-ignore
+      await battleAttackTarget.handleBerserkerAttack(testCharacter._id, 50);
+      const updatedCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
+      expect(updatedCharacter.health).toEqual(initialHealth);
     });
   });
 });

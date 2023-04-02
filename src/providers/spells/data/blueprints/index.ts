@@ -1,23 +1,25 @@
 import { SpellsBlueprint } from "../types/SpellsBlueprintTypes";
+
+import { spellArrowCreation } from "./all/SpellArrowCreation";
+import { spellBlankRuneCreation } from "./all/SpellBlankRuneCreation";
+import { spellFireRuneCreation } from "./all/SpellFireRuneCreation";
+import { spellFoodCreation } from "./all/SpellFoodCreation";
+import { spellGreaterHealing } from "./all/SpellGreaterHealing";
+import { spellPoisonRuneCreation } from "./all/SpellPoisonRuneCreation";
+import { spellSelfHaste } from "./all/SpellSelfHaste";
+import { spellSelfHealing } from "./all/SpellSelfHealing";
+import { spellBloodthirst } from "./berserker/SpellBloodthirst";
+import { spellEnergyBoltCreation } from "./druid-sorcerer/SpellEnergyBoltCreation";
+import { spellFireBoltCreation } from "./druid-sorcerer/SpellFireBoltCreation";
+import { spellMagicShield } from "./druid-sorcerer/SpellMagicShield";
+import { spellThunderRuneCreation } from "./druid-sorcerer/SpellThunderRuneCreation";
+import { spellHealRuneCreation } from "./druid/SpellHealRuneCreation";
+import { spellBoltCreation } from "./hunter/SpellBoltCreation";
+import { spellEagleEyes } from "./hunter/SpellEagleEyes";
 import { spellExecution } from "./rogue/SpellExecution";
-import { spellArrowCreation } from "./SpellArrowCreation";
-import { spellBlankRuneCreation } from "./SpellBlankRuneCreation";
-import { spellBoltCreation } from "./SpellBoltCreation";
-import { spellCorruptionRuneCreation } from "./SpellCorruptionRuneCreation";
-import { spellDarkRuneCreation } from "./SpellDarkRuneCreation";
-import { spellEagleEyes } from "./SpellEagleEyes";
-import { spellEnergyBoltCreation } from "./SpellEnergyBoltCreation";
-import { spellFireBoltCreation } from "./SpellFireBoltCreation";
-import { spellFireRuneCreation } from "./SpellFireRuneCreation";
-import { spellFoodCreation } from "./SpellFoodCreation";
-import { spellGreaterHealing } from "./SpellGreaterHealing";
-import { spellHealRuneCreation } from "./SpellHealRuneCreation";
-import { spellMagicShield } from "./SpellMagicShield";
-import { spellPhysicalShield } from "./SpellPhysicalShield";
-import { spellPoisonRuneCreation } from "./SpellPoisonRuneCreation";
-import { spellSelfHaste } from "./SpellSelfHaste";
-import { spellSelfHealing } from "./SpellSelfHealing";
-import { spellThunderRuneCreation } from "./SpellThunderRuneCreation";
+import { spellCorruptionRuneCreation } from "./sorcerer/SpellCorruptionRuneCreation";
+import { spellDarkRuneCreation } from "./sorcerer/SpellDarkRuneCreation";
+import { spellPhysicalShield } from "./warrior/SpellPhysicalShield";
 import { spellStunTarget } from "./warrior/SpellStunTarget";
 
 export const spellsBlueprints = {
@@ -40,5 +42,6 @@ export const spellsBlueprints = {
   [SpellsBlueprint.SpellEagleEyes]: spellEagleEyes,
   [SpellsBlueprint.ThunderRuneCreationSpell]: spellThunderRuneCreation,
   [SpellsBlueprint.WarriorStunTarget]: spellStunTarget,
+  [SpellsBlueprint.BerserkerBloodthirst]: spellBloodthirst,
   [SpellsBlueprint.RogueExecution]: spellExecution,
 };

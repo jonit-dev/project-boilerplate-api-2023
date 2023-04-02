@@ -2,8 +2,8 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, CombatSkill, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
+import { AnimationEffectKeys, CharacterClass, CombatSkill, SpellCastingType } from "@rpg-engine/shared";
+import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellEagleEyes: Partial<ISpell> = {
   key: SpellsBlueprint.SpellEagleEyes,
@@ -16,6 +16,7 @@ export const spellEagleEyes: Partial<ISpell> = {
   minMagicLevelRequired: 8,
   animationKey: AnimationEffectKeys.ManaHeal,
   attribute: CombatSkill.Distance,
+  characterClass: [CharacterClass.Hunter],
 
   usableEffect: async (character: ICharacter) => {
     const characterSkillBuff = container.get(CharacterSkillBuff);

@@ -6,25 +6,25 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { EntityUtil } from "@providers/entityEffects/EntityUtil";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   BasicAttribute,
   CharacterSocketEvents,
-  SpellCastingType,
+  EntityType,
   ICharacterAttributeChanged,
   ISpellCast,
-  SpellSocketEvents,
   NPCAlignment,
-  EntityType,
+  SpellCastingType,
+  SpellSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SpellValidation } from "./SpellValidation";
-import { EntityUtil } from "@providers/entityEffects/EntityUtil";
-import { MovementHelper } from "@providers/movement/MovementHelper";
 import { spellsBlueprints } from "./data/blueprints/index";
 
 @provide(SpellCast)

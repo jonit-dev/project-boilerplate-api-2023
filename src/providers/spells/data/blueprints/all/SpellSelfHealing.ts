@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
+import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellSelfHealing: Partial<ISpell> = {
   key: SpellsBlueprint.SelfHealingSpell,

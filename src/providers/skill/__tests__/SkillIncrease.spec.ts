@@ -7,7 +7,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
 import { StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SpellLearn } from "@providers/spells/SpellLearn";
-import { spellSelfHealing } from "@providers/spells/data/blueprints/SpellSelfHealing";
+import { spellSelfHealing } from "@providers/spells/data/blueprints/all/SpellSelfHealing";
 import {
   BasicAttribute,
   CharacterClass,
