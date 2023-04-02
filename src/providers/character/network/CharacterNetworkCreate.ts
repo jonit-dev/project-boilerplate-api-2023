@@ -24,6 +24,7 @@ import {
   WeatherSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
 @provide(CharacterNetworkCreate)
@@ -38,7 +39,8 @@ export class CharacterNetworkCreate {
     private gridManager: GridManager,
     private npcWarn: NPCWarn,
     private pm2Helper: PM2Helper,
-    private characterView: CharacterView
+    private characterView: CharacterView,
+    private characterMonitor: CharacterMonitor
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -130,6 +132,11 @@ export class CharacterNetworkCreate {
         await this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
 
         await this.warnAboutWeatherStatus(character.channelId!);
+
+        //! TODO: Luiz - trigger monitoring here
+        // this.characterMonitor.watch(character, (character: ICharacter) => {
+        //   console.log("Character monitoring triggered for character", character._id);
+        // });
       },
       false
     );

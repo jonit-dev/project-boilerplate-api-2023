@@ -6,6 +6,7 @@ import { appEnv } from "@providers/config/env";
 import {
   characterConnection,
   characterFoodConsumption,
+  characterMonitor,
   cronJobs,
   db,
   heapMonitor,
@@ -69,6 +70,10 @@ app.listen(port, async () => {
 
   await characterConnection.resetCharacterAttributes();
 
+  await characterFoodConsumption.clearAllFoodConsumption();
+
+  characterMonitor.monitor();
+
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({
       dsn: appEnv.general.SENTRY_DNS_URL,
@@ -89,6 +94,4 @@ app.listen(port, async () => {
       heapMonitor.monitor();
     }
   }
-
-  await characterFoodConsumption.clearAllFoodConsumption();
 });

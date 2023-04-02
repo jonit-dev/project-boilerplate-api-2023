@@ -15,9 +15,10 @@ import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { BuffSkillFunctions } from "../CharacterBuffer/BuffSkillFunctions";
 import { CharacterInventory } from "../CharacterInventory";
+import { CharacterMonitor } from "../CharacterMonitor";
+import { CharacterView } from "../CharacterView";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 import { CharacterItems } from "../characterItems/CharacterItems";
-import { CharacterView } from "../CharacterView";
 
 @provide(CharacterNetworkLogout)
 export class CharacterNetworkLogout {
@@ -33,7 +34,8 @@ export class CharacterNetworkLogout {
     private equipmentSlots: EquipmentSlots,
     private characterInventory: CharacterInventory,
     private characterItemContainer: CharacterItemContainer,
-    private characterItems: CharacterItems
+    private characterItems: CharacterItems,
+    private characterMonitor: CharacterMonitor
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -41,6 +43,8 @@ export class CharacterNetworkLogout {
       channel,
       CharacterSocketEvents.CharacterLogout,
       async (data: ICharacterLogout, character: ICharacter) => {
+        this.characterMonitor.unwatch(character);
+
         const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
         for (const character of nearbyCharacters) {
