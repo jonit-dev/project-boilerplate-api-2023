@@ -1,17 +1,21 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterBan } from "@providers/character/CharacterBan";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
+import { MacroCaptchaSend } from "@providers/macro/MacroCaptchaSend";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 import nodeCron from "node-cron";
 
 @provide(MacroCaptchaCrons)
 export class MacroCaptchaCrons {
-  constructor(private characterBan: CharacterBan, private socketMessaging: SocketMessaging) {}
+  constructor(private characterBan: CharacterBan, private macroCaptchaSend: MacroCaptchaSend) {}
 
   public schedule(): void {
     nodeCron.schedule("*/2 * * * *", async () => {
       await this.banMacroCharacters();
+    });
+
+    nodeCron.schedule("*/10 * * * *", async () => {
+      await this.sendMacroCaptchaToActiveCharacters();
     });
   }
 
@@ -31,6 +35,7 @@ export class MacroCaptchaCrons {
         captchaVerifyDate: {
           $lt: now,
         },
+        isOnline: true,
       },
       {
         captchaVerifyCode: undefined,
@@ -38,13 +43,57 @@ export class MacroCaptchaCrons {
         captchaTriesLeft: undefined,
       }
     ).lean();
+    await Character.updateMany(
+      {
+        captchaVerifyDate: {
+          $lt: now,
+        },
+        isOnline: false,
+      },
+      {
+        captchaVerifyDate: undefined,
+        captchaTriesLeft: undefined,
+      }
+    ).lean();
 
     await Promise.all(
       charactersWithCaptchaNotVerified.map(async (character) => {
-        await this.characterBan.increasePenaltyAndBan(character, false);
-        this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
-          reason: "Your character is now banned.",
-        });
+        if (character.isOnline) await this.characterBan.increasePenaltyAndBan(character);
+      })
+    );
+  }
+
+  private async sendMacroCaptchaToActiveCharacters(): Promise<void> {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - 1);
+
+    const charactersWithCaptchaNotVerified = await Character.find({
+      captchaVerifyCode: undefined,
+      updatedAt: {
+        $gt: now,
+      },
+      $or: [
+        {
+          captchaNoVerifyUntil: undefined,
+        },
+        {
+          captchaNoVerifyUntil: {
+            $lt: now,
+          },
+        },
+      ],
+      isOnline: true,
+    });
+
+    console.log("SENDING ANTI-MACRO CAPTCHA TO", charactersWithCaptchaNotVerified.length, "CHARACTERS");
+
+    await Promise.all(
+      charactersWithCaptchaNotVerified.map(async (character) => {
+        const n = _.random(0, 100);
+
+        if (n <= 5) {
+          await this.macroCaptchaSend.sendAndStartCaptchaVerification(character);
+        }
       })
     );
   }

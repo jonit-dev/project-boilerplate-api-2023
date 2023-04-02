@@ -60,10 +60,14 @@ export class MacroCaptchaVerify {
   }
 
   private async removeCaptchaFromCharacter(character: ICharacter) {
+    const captchaNoVerifyUntil = new Date();
+    captchaNoVerifyUntil.setHours(captchaNoVerifyUntil.getHours() + 1);
+
     await Character.findByIdAndUpdate(character._id, {
       captchaTriesLeft: undefined,
       captchaVerifyCode: undefined,
       captchaVerifyDate: undefined,
+      captchaNoVerifyUntil,
     });
   }
 }

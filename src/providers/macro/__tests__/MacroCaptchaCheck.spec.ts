@@ -30,6 +30,7 @@ describe("MacroCaptchaCheck.ts", () => {
   it("should generate and send captcha to character with ongoing verification", async () => {
     testCharacter.captchaVerifyCode = "abcdef";
     testCharacter.captchaTriesLeft = 5;
+    testCharacter.captchaVerifyDate = new Date();
     await testCharacter.save();
 
     const isCaptchaDetected = await macroCaptchaCheck.checkIfCharacterHasCaptchaVerification(testCharacter);

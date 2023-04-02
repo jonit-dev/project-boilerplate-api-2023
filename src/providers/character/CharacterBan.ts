@@ -29,7 +29,7 @@ export class CharacterBan {
     }
   }
 
-  public async increasePenaltyAndBan(character: ICharacter, shouldSendEvent: boolean = true): Promise<void> {
+  public async increasePenaltyAndBan(character: ICharacter): Promise<void> {
     character.penalty = Math.floor(character.penalty / 10) * 10 + 10;
 
     if (character.penalty % 10 === 0) {
@@ -38,10 +38,9 @@ export class CharacterBan {
       character.banRemovalDate = dayjs(new Date()).add(character.penalty, "day").toDate();
       await character.save();
 
-      if (shouldSendEvent)
-        this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
-          reason: "Your character is now banned.",
-        });
+      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+        reason: "Your character is now banned.",
+      });
 
       if (character.penalty > 30) {
         character.hasPermanentBan = true;

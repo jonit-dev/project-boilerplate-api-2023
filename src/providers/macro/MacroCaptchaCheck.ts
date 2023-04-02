@@ -4,10 +4,15 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { MacroSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import svgCaptcha from "svg-captcha";
+import { MacroCaptchaSend } from "./MacroCaptchaSend";
 
 @provide(MacroCaptchaCheck)
 export class MacroCaptchaCheck {
-  constructor(private socketMessaging: SocketMessaging, private characterValidation: CharacterValidation) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterValidation: CharacterValidation,
+    private macroCaptchaSend: MacroCaptchaSend
+  ) {}
 
   public async checkIfCharacterHasCaptchaVerification(character: ICharacter) {
     if (!this.characterValidation.hasBasicValidation(character)) {
@@ -20,8 +25,15 @@ export class MacroCaptchaCheck {
   private async checkAndSendUserCaptcha(character: ICharacter) {
     const fetchedCharacter = await Character.findById(character._id).select("+captchaVerifyCode").lean();
 
-    if (fetchedCharacter?.captchaVerifyCode && fetchedCharacter?.captchaTriesLeft) {
+    if (
+      fetchedCharacter?.captchaVerifyCode &&
+      fetchedCharacter?.captchaTriesLeft &&
+      fetchedCharacter.captchaVerifyDate
+    ) {
       this.sendCaptchaFromText(character, fetchedCharacter.captchaVerifyCode, fetchedCharacter.captchaTriesLeft);
+      return true;
+    } else if (fetchedCharacter?.captchaVerifyCode) {
+      this.macroCaptchaSend.generateAndSendCaptcha(character);
       return true;
     }
 
@@ -39,6 +51,7 @@ export class MacroCaptchaCheck {
     this.socketMessaging.sendEventToUser(character.channelId!, MacroSocketEvents.OpenMacroModal, {
       svgData: captcha,
       triesLeft,
+      resolveUntil: character.captchaVerifyDate,
     });
   }
 }

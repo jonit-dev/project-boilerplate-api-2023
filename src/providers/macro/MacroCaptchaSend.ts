@@ -33,7 +33,7 @@ export class MacroCaptchaSend {
     return false;
   }
 
-  private async generateAndSendCaptcha(character: ICharacter) {
+  public async generateAndSendCaptcha(character: ICharacter) {
     const captcha = svgCaptcha.create({
       size: 6,
       noise: 3,
@@ -41,16 +41,18 @@ export class MacroCaptchaSend {
       ignoreChars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0Oo1il",
     });
 
+    const resolveUntil = new Date(Date.now() + 15 * 60 * 1000);
+
     await Character.findByIdAndUpdate(character._id, {
       captchaVerifyCode: captcha.text,
-      captchaVerifyDate: new Date(Date.now() + 5 * 60 * 1000),
+      captchaVerifyDate: resolveUntil,
       captchaTriesLeft: 5,
     }).lean();
 
-    // TODO: Add type
     this.socketMessaging.sendEventToUser(character.channelId!, MacroSocketEvents.OpenMacroModal, {
       svgData: captcha.data,
       triesLeft: 5,
+      resolveUntil,
     });
 
     return true;

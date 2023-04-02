@@ -193,6 +193,7 @@ const characterSchema = createLeanSchema(
     }),
     captchaVerifyDate: Type.date(),
     captchaTriesLeft: Type.number(),
+    captchaNoVerifyUntil: Type.date(),
     lastMovement: Type.date(),
     skills: Type.objectId({
       ref: "Skill",
