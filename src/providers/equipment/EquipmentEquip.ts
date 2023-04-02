@@ -22,6 +22,7 @@ import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
 import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/Berserker";
 import { RoguePassiveHabilities } from "@providers/character/characterPassiveHabilities/Rogue";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { ItemPickupUpdater } from "@providers/item/ItemPickup/ItemPickupUpdater";
 
 export type SourceEquipContainerType = "inventory" | "container";
 
@@ -39,7 +40,8 @@ export class EquipmentEquip {
     private itemView: ItemView,
     private berserkerPassiveHabilities: BerserkerPassiveHabilities,
     private roguePassiveHabilities: RoguePassiveHabilities,
-    private characterWeight: CharacterWeight
+    private characterWeight: CharacterWeight,
+    private itemPickupUpdater: ItemPickupUpdater
   ) {}
 
   public async equipInventory(character: ICharacter, itemId: string): Promise<boolean> {
@@ -149,6 +151,10 @@ export class EquipmentEquip {
     }
 
     await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
+
+    // refresh itemContainer from which the item was equipped
+    const updatedContainer = (await ItemContainer.findById(fromItemContainerId)) as any;
+    await this.itemPickupUpdater.sendContainerRead(updatedContainer, character);
 
     await item.save();
 

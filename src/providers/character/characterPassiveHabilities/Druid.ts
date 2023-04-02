@@ -3,8 +3,9 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 
 @provide(DruidPassiveHabilities)
 export class DruidPassiveHabilities {
@@ -15,8 +16,8 @@ export class DruidPassiveHabilities {
       return;
     }
 
-    const namespace = `character-buff:${characterId.toString()}`;
-    const key = "auto-mana-regen";
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${characterId.toString()}`;
+    const key = SpellsBlueprint.ManaRegenSpell;
 
     const regenManaIntervalId = await this.inMemoryHashTable.get(namespace, key);
 

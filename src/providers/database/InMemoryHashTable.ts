@@ -1,5 +1,13 @@
+import { appEnv } from "@providers/config/env";
 import { provide } from "inversify-binding-decorators";
 import { RedisManager } from "./RedisManager";
+
+export enum NamespaceRedisControl {
+  CharacterSpell = "character-spell",
+  CharacterLastAction = "character-last-action",
+  CharacterViewType = "character-view",
+  CharacterFoodConsumption = "character-food-consumption",
+}
 
 @provide(InMemoryHashTable)
 export class InMemoryHashTable {
@@ -10,7 +18,9 @@ export class InMemoryHashTable {
   }
 
   public async expire(key: string, seconds: number, mode: "NX" | "XX" | "GT" | "LT"): Promise<void> {
-    await this.redisManager.client.expire(key?.toString(), seconds, mode);
+    if (!appEnv.general.IS_UNIT_TEST) {
+      await this.redisManager.client.expire(key?.toString(), seconds, mode);
+    }
   }
 
   public async getAll<T>(namespace: string): Promise<Record<string, T> | undefined> {

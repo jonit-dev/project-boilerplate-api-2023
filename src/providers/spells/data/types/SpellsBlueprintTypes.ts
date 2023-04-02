@@ -30,6 +30,10 @@ export enum SpellsBlueprint {
   SpellEagleEyes = "spell-eagle-eyes",
   ThunderRuneCreationSpell = "thunder-rune-creation-spell",
   WarriorStunTarget = "warrior-stun-target",
+  RogueExecution = "rogue-execution",
+  ManaRegenSpell = "auto-mana-regen",
+  HealthRegenSell = "auto-health-regen",
+  SorcererManaShield = "sorcerer-mana-shield",
 }
 
 export interface ISpell {

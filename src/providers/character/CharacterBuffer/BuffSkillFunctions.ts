@@ -1,8 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { SkillCalculator } from "@providers/skill/SkillCalculator";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   BasicAttribute,
   CharacterClass,
@@ -79,7 +80,7 @@ export class BuffSkillFunctions {
 
     const skill = skills[skillType] as ISkillDetails;
 
-    const namespace = `character-skill-buff:${skills._id}`;
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${skills.owner}`;
     const key = skillType;
     const value = skill;
 
@@ -119,7 +120,7 @@ export class BuffSkillFunctions {
       return false;
     }
 
-    const namespace = `character-skill-buff:${character.skills}`;
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
     const key = skillType;
     const value = buffedLvl;
 
@@ -306,19 +307,7 @@ export class BuffSkillFunctions {
       throw new Error("Character not found");
     }
 
-    const namespaceCharacter = `character-buff:${character._id.toString()}`;
-
-    if (character.class === CharacterClass.Druid || character.class === CharacterClass.Sorcerer) {
-      const manaKey = "auto-mana-regen";
-      await this.inMemoryHashTable.delete(namespaceCharacter, manaKey);
-    }
-
-    if (character.class === CharacterClass.Warrior) {
-      const healthKey = "auto-health-regen";
-      await this.inMemoryHashTable.delete(namespaceCharacter, healthKey);
-    }
-
-    const namespaceSkill = `character-skill-buff:${character.skills}`;
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
 
     const skills = (await Skill.findById(character.skills)) as ISkill;
     const appliedBuffsEffects = character.appliedBuffsEffects;
@@ -341,11 +330,34 @@ export class BuffSkillFunctions {
         }
 
         const key = totalValues[i].key;
-        await this.inMemoryHashTable.delete(namespaceSkill, key);
+        await this.inMemoryHashTable.delete(namespace, key);
       }
     }
 
     await Character.updateOne({ _id: character._id }, { $set: { appliedBuffsEffects: [] } });
+  }
+
+  public async removeAllSpellDataOnRedis(character: ICharacter): Promise<void> {
+    if (!character) {
+      throw new Error("Character not found");
+    }
+
+    const classKeys = {
+      [CharacterClass.None]: [],
+      [CharacterClass.Rogue]: [],
+      [CharacterClass.Hunter]: [],
+      [CharacterClass.Berserker]: [],
+      [CharacterClass.Warrior]: [SpellsBlueprint.HealthRegenSell],
+      [CharacterClass.Druid]: [SpellsBlueprint.ManaRegenSpell],
+      [CharacterClass.Sorcerer]: [SpellsBlueprint.ManaRegenSpell],
+    };
+
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
+    const keysToDelete = classKeys[character.class];
+
+    for (const key of keysToDelete) {
+      await this.inMemoryHashTable.delete(namespace, key);
+    }
   }
 
   /**
