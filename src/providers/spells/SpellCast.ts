@@ -5,7 +5,7 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
@@ -61,14 +61,18 @@ export class SpellCast {
       return false;
     }
 
-    const namespace = `character-skill-buff:${character.skills}`;
-    const key = spell.attribute;
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
+    let key = spell.attribute;
+    key || (key = spell.key);
 
     if (key) {
       const buffActivated = await this.inMemoryHashTable.get(namespace, key);
 
       if (buffActivated) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, ${spell.name} is already activated.`);
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          `Sorry, ${spell.name} is already activated or in cooldown.`
+        );
         return false;
       }
     }
@@ -236,6 +240,7 @@ export class SpellCast {
     );
 
     if (target) {
+      console.log("projectils", spell.projectileAnimationKey, "animation", spell.animationKey);
       await this.animationEffect.sendProjectileAnimationEventToCharacter(
         updatedCharacter,
         updatedCharacter._id,

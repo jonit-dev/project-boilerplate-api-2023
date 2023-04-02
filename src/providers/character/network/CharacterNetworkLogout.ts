@@ -58,6 +58,7 @@ export class CharacterNetworkLogout {
         await Character.updateOne({ _id: data.id }, { isOnline: false, baseSpeed: MovementSpeed.Standard });
 
         await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
+        await this.buffSkillFunctions.removeAllSpellDataOnRedis(character);
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());
 

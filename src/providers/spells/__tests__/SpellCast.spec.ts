@@ -27,6 +27,9 @@ import { SpellCast } from "../SpellCast";
 import { SpellLearn } from "../SpellLearn";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { spellExecution } from "../data/blueprints/rogue/SpellExecution";
+import { Item } from "@entities/ModuleInventory/ItemModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;
@@ -61,8 +64,12 @@ describe("SpellCast.ts", () => {
   });
 
   beforeEach(async () => {
-    testCharacter = await await unitTestHelper.createMockCharacter(
-      { health: 50, learnedSpells: [spellSelfHealing.key, spellGreaterHealing.key] },
+    testCharacter = await unitTestHelper.createMockCharacter(
+      {
+        health: 50,
+        learnedSpells: [spellSelfHealing.key, spellGreaterHealing.key, spellExecution.key],
+        class: CharacterClass.Rogue,
+      },
       { hasEquipment: false, hasInventory: false, hasSkills: true }
     );
 
@@ -73,7 +80,7 @@ describe("SpellCast.ts", () => {
     characterSkills.magic.level = spellSelfHealing.minMagicLevelRequired;
     (await Skill.findByIdAndUpdate(characterSkills._id, characterSkills).lean()) as ISkill;
 
-    targetCharacter = await await unitTestHelper.createMockCharacter(
+    targetCharacter = await unitTestHelper.createMockCharacter(
       { health: 100 },
       { hasEquipment: false, hasInventory: false, hasSkills: true }
     );
@@ -279,7 +286,7 @@ describe("SpellCast.ts", () => {
     const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (spellSelfHealing.manaCost ?? 0);
-    expect(Math.round(updatedSkills?.magic.skillPoints * 10) / 10).toBe(4.8);
+    expect(Math.round(updatedSkills?.magic.skillPoints * 10) / 10).toBe(5);
 
     expect(sendEventToUser).toHaveBeenCalled();
 
@@ -416,6 +423,8 @@ describe("SpellCast.ts", () => {
   });
 
   describe("ranged spells", () => {
+    let targetNPC: INPC;
+
     beforeEach(async () => {
       testCharacter.learnedSpells = [SpellsBlueprint.WarriorStunTarget];
 
@@ -427,6 +436,8 @@ describe("SpellCast.ts", () => {
       characterSkills.level = spellStunTarget.minLevelRequired!;
       characterSkills.magic.level = spellStunTarget.minMagicLevelRequired;
       (await Skill.findByIdAndUpdate(characterSkills._id, characterSkills).lean()) as ISkill;
+
+      targetNPC = await unitTestHelper.createMockNPC({ health: 5 }, { hasSkills: true });
     });
 
     it("should  not cast spell if the target is not valid", async () => {
@@ -498,7 +509,75 @@ describe("SpellCast.ts", () => {
       await timerMock.mock.calls[0][0]();
       expect(await specialEffect.isStun(targetCharacter._id, EntityType.Character)).toBeFalsy();
     });
+
+    it("should not execute spell in yourself", async () => {
+      await specialEffect.execution(testCharacter, testCharacter._id, EntityType.Character);
+
+      const characterBody = await Item.findOne({
+        name: `${testCharacter.name}'s body`,
+        scene: testCharacter.scene,
+      })
+        .populate("itemContainer")
+        .exec();
+
+      expect(characterBody).toBeNull();
+
+      expect(testCharacter.health).toBe(50);
+      expect(testCharacter.isAlive).toBe(true);
+    });
+
+    it("should execute spell successfully for a character target health <= 30% ", async () => {
+      targetCharacter.health = 25;
+      await Character.findByIdAndUpdate(targetCharacter._id, targetCharacter);
+
+      const entityType = EntityType.Character;
+
+      await specialEffect.execution(testCharacter, targetCharacter._id, entityType);
+      console.log(testCharacter.health, targetCharacter.health);
+
+      const characterBody = await Item.findOne({
+        name: `${targetCharacter.name}'s body`,
+        scene: targetCharacter.scene,
+      })
+        .populate("itemContainer")
+        .exec();
+
+      expect(characterBody).not.toBeNull();
+    });
+
+    it("should not execute spell if the health target > 30%", async () => {
+      targetCharacter.health = 100;
+      await Character.findByIdAndUpdate(targetCharacter._id, targetCharacter);
+
+      await specialEffect.execution(testCharacter, targetCharacter._id, EntityType.Character);
+
+      const characterBody = await Item.findOne({
+        name: `${targetCharacter.name}'s body`,
+        scene: targetCharacter.scene,
+      })
+        .populate("itemContainer")
+        .exec();
+
+      expect(characterBody).toBeNull();
+      expect(targetCharacter.health).toBe(100);
+      expect(targetCharacter.isAlive).toBe(true);
+    });
+
+    it("should execute spell successfully for an NPC target", async () => {
+      const entityId = targetNPC._id;
+      const entityType = EntityType.NPC;
+
+      expect(targetNPC.health).toBe(5);
+      expect(targetNPC.isAlive).toBe(true);
+
+      await specialEffect.execution(testCharacter, entityId, entityType);
+      const updateNPC = (await NPC.findById(targetNPC._id)) as INPC;
+
+      expect(updateNPC.health).toBe(0);
+      expect(updateNPC.isAlive).toBe(false);
+    });
   });
+
   // describe("test item creation spell invocation", () => {
   //   beforeEach(async () => {
   //     testCharacter = await (

@@ -1,8 +1,15 @@
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
 import { EntityType } from "@rpg-engine/shared";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NPCDeath } from "@providers/npc/NPCDeath";
+import { CharacterDeath } from "@providers/character/CharacterDeath";
+import { Types } from "mongoose";
+import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { EXECUTION_SPELL_COOLDOWN } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
 
 enum SpecialEffectNamespace {
   Stun = "character-special-effect-stun",
@@ -13,8 +20,58 @@ export class SpecialEffect {
   constructor(
     private inMemoryHashTable: InMemoryHashTable,
     private socketMessaging: SocketMessaging,
-    private timer: TimerWrapper
+    private timer: TimerWrapper,
+    private nPCDeath: NPCDeath,
+    private characterDeath: CharacterDeath
   ) {}
+
+  async execution(attacker: ICharacter, entityId: Types.ObjectId, entityType: EntityType): Promise<void> {
+    try {
+      if (!attacker || !entityId || !entityType) {
+        throw new Error("Invalid parameters");
+      }
+
+      if (attacker._id.toString() === entityId.toString()) {
+        return;
+      }
+
+      if (entityType !== EntityType.Character && entityType !== EntityType.NPC) {
+        throw new Error("Invalid entityType provided");
+      }
+
+      const target = await (entityType === EntityType.Character
+        ? Character.findById(entityId)
+        : NPC.findById(entityId));
+
+      if (!target) {
+        throw new Error(`No ${entityType} found with ${entityId}`);
+      }
+
+      const namespace = `${NamespaceRedisControl.CharacterSpell}:${attacker._id}`;
+      const key = SpellsBlueprint.RogueExecution;
+      const isActionExecuted = await this.inMemoryHashTable.get(namespace, key);
+
+      if (isActionExecuted) {
+        return;
+      }
+
+      const healthPercent = Math.floor((100 * target.health) / target.maxHealth);
+      const isCharacterTarget = target instanceof Character;
+
+      if (healthPercent <= 30) {
+        if (isCharacterTarget) {
+          await this.characterDeath.handleCharacterDeath(attacker, target as ICharacter);
+        } else {
+          await this.nPCDeath.handleNPCDeath(target as INPC);
+        }
+
+        await this.inMemoryHashTable.set(namespace, key, true);
+        await this.inMemoryHashTable.expire(namespace, EXECUTION_SPELL_COOLDOWN, "NX");
+      }
+    } catch (error) {
+      throw new Error(`Error executing attack: ${error.message}`);
+    }
+  }
 
   async stun(entityId: string, entityType: EntityType, intervalSec: number): Promise<boolean> {
     if (entityType === EntityType.Item) {

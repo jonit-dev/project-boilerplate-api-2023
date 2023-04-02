@@ -1,4 +1,5 @@
 import { SpellsBlueprint } from "../types/SpellsBlueprintTypes";
+import { spellExecution } from "./rogue/SpellExecution";
 import { spellArrowCreation } from "./SpellArrowCreation";
 import { spellBlankRuneCreation } from "./SpellBlankRuneCreation";
 import { spellBoltCreation } from "./SpellBoltCreation";
@@ -39,4 +40,5 @@ export const spellsBlueprints = {
   [SpellsBlueprint.SpellEagleEyes]: spellEagleEyes,
   [SpellsBlueprint.ThunderRuneCreationSpell]: spellThunderRuneCreation,
   [SpellsBlueprint.WarriorStunTarget]: spellStunTarget,
+  [SpellsBlueprint.RogueExecution]: spellExecution,
 };
