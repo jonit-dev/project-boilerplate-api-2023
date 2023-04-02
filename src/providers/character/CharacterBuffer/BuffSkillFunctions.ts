@@ -311,6 +311,7 @@ export class BuffSkillFunctions {
 
     const skills = (await Skill.findById(character.skills)) as ISkill;
     const appliedBuffsEffects = character.appliedBuffsEffects;
+
     if (appliedBuffsEffects) {
       const isAdding = false;
       const totalValues = this.sumBuffEffects(appliedBuffsEffects);
@@ -346,7 +347,7 @@ export class BuffSkillFunctions {
       [CharacterClass.None]: [],
       [CharacterClass.Rogue]: [],
       [CharacterClass.Hunter]: [],
-      [CharacterClass.Berserker]: [],
+      [CharacterClass.Berserker]: [SpellsBlueprint.BerserkerBloodthirst],
       [CharacterClass.Warrior]: [SpellsBlueprint.HealthRegenSell],
       [CharacterClass.Druid]: [SpellsBlueprint.ManaRegenSpell],
       [CharacterClass.Sorcerer]: [SpellsBlueprint.ManaRegenSpell],

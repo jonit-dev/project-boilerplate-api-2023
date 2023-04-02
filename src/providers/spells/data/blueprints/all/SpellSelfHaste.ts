@@ -3,7 +3,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { container } from "@providers/inversify/container";
 import { AnimationEffectKeys, CharacterEntities, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
+import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellSelfHaste: Partial<ISpell> = {
   key: SpellsBlueprint.SelfHasteSpell,

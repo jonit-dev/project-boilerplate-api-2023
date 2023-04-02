@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
@@ -16,9 +16,12 @@ import {
   BasicAttribute,
   BattleEventType,
   BattleSocketEvents,
+  CharacterClass,
+  CharacterSocketEvents,
   GRID_WIDTH,
   IBattleCancelTargeting,
   IBattleEventFromServer,
+  ICharacterAttributeChanged,
   ItemSubType,
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
@@ -31,6 +34,9 @@ import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetti
 import { BattleAttackRanged } from "./BattleAttackRanged";
 import { BattleAttackTargetDeath } from "./BattleAttackTargetDeath";
 import { BattleAttackValidator } from "./BattleAttackValidator";
+import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { Types } from "mongoose";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -50,7 +56,8 @@ export class BattleAttackTarget {
     private characterWeapon: CharacterWeapon,
     private battleAttackValidator: BattleAttackValidator,
     private battleAttackTargetDeath: BattleAttackTargetDeath,
-    private entityEffectUse: EntityEffectUse
+    private entityEffectUse: EntityEffectUse,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -203,6 +210,8 @@ export class BattleAttackTarget {
           const character = attacker as ICharacter;
           await this.skillIncrease.increaseSkillsOnBattle(character, target, damage);
         }
+
+        await this.handleBerserkerAttack(attacker._id, damage);
 
         // Update target health
         const newTargetHealth = target.health - damage;
@@ -365,4 +374,64 @@ export class BattleAttackTarget {
       return attack;
     }
   };
+
+  private sendEventAttributeChange(character: ICharacter): void {
+    const payload: ICharacterAttributeChanged = {
+      targetId: character._id,
+      health: character.health,
+    };
+
+    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+  }
+
+  private async applyBerserkerBloodthirst(characterId: Types.ObjectId, damage: number): Promise<void> {
+    try {
+      const berserkerMultiplier = 0.1;
+      const character = (await Character.findById(characterId).lean()) as ICharacter;
+
+      if (!character || character.class !== CharacterClass.Berserker) {
+        return;
+      }
+
+      const healing = Math.min(Math.round(damage * berserkerMultiplier) + character.health, character.maxHealth);
+
+      const updatedCharacter = (await Character.findByIdAndUpdate(
+        character._id,
+        { health: healing },
+        { new: true }
+      ).lean()) as ICharacter;
+
+      this.sendEventAttributeChange(updatedCharacter);
+    } catch (error) {
+      console.error(`Failed to apply berserker bloodthirst: ${error} - ${characterId}`);
+    }
+  }
+
+  private async getBerserkerBloodthirstSpell(characterId: Types.ObjectId): Promise<boolean> {
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${characterId.toString()}`;
+    const key = SpellsBlueprint.BerserkerBloodthirst;
+    const spell = await this.inMemoryHashTable.get(namespace, key);
+
+    return !!spell;
+  }
+
+  private async handleBerserkerAttack(characterId: Types.ObjectId, damage: number): Promise<void> {
+    try {
+      const character = (await Character.findById(characterId).lean()) as ICharacter;
+
+      if (!character) {
+        return;
+      }
+
+      const spellActivated = await this.getBerserkerBloodthirstSpell(character._id);
+
+      if (!spellActivated) {
+        return;
+      }
+
+      await this.applyBerserkerBloodthirst(character._id, damage);
+    } catch (error) {
+      console.error(`Failed to handle berserker attack: ${error}`);
+    }
+  }
 }

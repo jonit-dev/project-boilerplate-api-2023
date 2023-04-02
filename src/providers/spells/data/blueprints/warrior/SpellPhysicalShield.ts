@@ -2,8 +2,8 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, BasicAttribute, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
+import { AnimationEffectKeys, BasicAttribute, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
+import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellPhysicalShield: Partial<ISpell> = {
   key: SpellsBlueprint.SpellPhysicalShield,
@@ -16,6 +16,7 @@ export const spellPhysicalShield: Partial<ISpell> = {
   minMagicLevelRequired: 7,
   animationKey: AnimationEffectKeys.PhysicalShield,
   attribute: BasicAttribute.Resistance,
+  characterClass: [CharacterClass.Warrior],
 
   usableEffect: async (character: ICharacter) => {
     const characterSkillBuff = container.get(CharacterSkillBuff);

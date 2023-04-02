@@ -30,6 +30,7 @@ export enum SpellsBlueprint {
   SpellEagleEyes = "spell-eagle-eyes",
   ThunderRuneCreationSpell = "thunder-rune-creation-spell",
   WarriorStunTarget = "warrior-stun-target",
+  BerserkerBloodthirst = "berserker-bloodthirst",
   RogueExecution = "rogue-execution",
   ManaRegenSpell = "auto-mana-regen",
   HealthRegenSell = "auto-health-regen",

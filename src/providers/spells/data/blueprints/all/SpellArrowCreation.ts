@@ -5,8 +5,8 @@ import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprin
 import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
 import random from "lodash/random";
 import round from "lodash/round";
-import { SpellItemCreation } from "../abstractions/SpellItemCreation";
-import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
+import { SpellItemCreation } from "../../abstractions/SpellItemCreation";
+import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellArrowCreation: Partial<ISpell> = {
   key: SpellsBlueprint.ArrowCreationSpell,

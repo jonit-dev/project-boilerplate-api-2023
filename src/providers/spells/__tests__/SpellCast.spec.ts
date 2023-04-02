@@ -1,7 +1,11 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { Item } from "@entities/ModuleInventory/ItemModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -9,27 +13,24 @@ import {
   AnimationSocketEvents,
   CharacterClass,
   CharacterSocketEvents,
-  SkillSocketEvents,
-  UISocketEvents,
-  SpellSocketEvents,
   EntityType,
   GRID_WIDTH,
   NPCAlignment,
   NPCMovementType,
+  SkillSocketEvents,
+  SpellSocketEvents,
+  UISocketEvents,
 } from "@rpg-engine/shared";
-import { spellArrowCreation } from "../data/blueprints/SpellArrowCreation";
-import { spellBlankRuneCreation } from "../data/blueprints/SpellBlankRuneCreation";
-import { spellGreaterHealing } from "../data/blueprints/SpellGreaterHealing";
-import { spellSelfHealing } from "../data/blueprints/SpellSelfHealing";
-import { spellStunTarget } from "../data/blueprints/warrior/SpellStunTarget";
-import { ISpell, SpellsBlueprint } from "../data/types/SpellsBlueprintTypes";
 import { SpellCast } from "../SpellCast";
 import { SpellLearn } from "../SpellLearn";
-import { TimerWrapper } from "@providers/helpers/TimerWrapper";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+
+import { spellArrowCreation } from "../data/blueprints/all/SpellArrowCreation";
+import { spellBlankRuneCreation } from "../data/blueprints/all/SpellBlankRuneCreation";
+import { spellGreaterHealing } from "../data/blueprints/all/SpellGreaterHealing";
+import { spellSelfHealing } from "../data/blueprints/all/SpellSelfHealing";
 import { spellExecution } from "../data/blueprints/rogue/SpellExecution";
-import { Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { spellStunTarget } from "../data/blueprints/warrior/SpellStunTarget";
+import { ISpell, SpellsBlueprint } from "../data/types/SpellsBlueprintTypes";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;

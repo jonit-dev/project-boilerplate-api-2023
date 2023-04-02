@@ -2,11 +2,11 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { container } from "@providers/inversify/container";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { AnimationEffectKeys, SpellCastingType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
 import random from "lodash/random";
 import round from "lodash/round";
-import { SpellItemCreation } from "../abstractions/SpellItemCreation";
-import { ISpell, SpellsBlueprint } from "../types/SpellsBlueprintTypes";
+import { SpellItemCreation } from "../../abstractions/SpellItemCreation";
+import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellBoltCreation: Partial<ISpell> = {
   key: SpellsBlueprint.BoltCreationSpell,
@@ -20,6 +20,7 @@ export const spellBoltCreation: Partial<ISpell> = {
   minLevelRequired: 3,
   minMagicLevelRequired: 3,
   animationKey: AnimationEffectKeys.LevelUp,
+  characterClass: [CharacterClass.Hunter],
 
   usableEffect: async (character: ICharacter) => {
     const characterWithSkills = await character.populate("skills").execPopulate();
