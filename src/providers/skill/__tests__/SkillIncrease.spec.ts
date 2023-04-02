@@ -18,6 +18,7 @@ import {
 import { Error } from "mongoose";
 import { SkillFunctions } from "../SkillFunctions";
 import { SkillIncrease } from "../SkillIncrease";
+import { CraftingSkillsMap } from "../constants";
 
 type TestCase = {
   item: string;
@@ -123,7 +124,7 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
   }
 });
 
-describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle test cases", () => {
+describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & increaseCraftingSkills test cases", () => {
   let skillIncrease: SkillIncrease,
     testCharacter: ICharacter,
     testNPC: INPC,
@@ -392,6 +393,17 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP & increaseSkillsOnBattle t
 
       expect(updatedSkills.first.skillPoints).toBe(tc.exp);
     }
+  });
+
+  CraftingSkillsMap.forEach((skill, itemKey) => {
+    it(`item ${itemKey} should increase character's ${skill} skill`, async () => {
+      await skillIncrease.increaseCraftingSP(testCharacter, itemKey);
+
+      const updatedSkills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+
+      expect(updatedSkills[skill].level).toBe(initialLevel);
+      expect(updatedSkills[skill].skillPoints).toBeGreaterThan(initialSkills[skill].skillPoints);
+    });
   });
 });
 
