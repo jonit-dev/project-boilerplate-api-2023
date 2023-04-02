@@ -55,7 +55,7 @@ export class ScriptsUseCase {
       const characterSpells = character.learnedSpells;
 
       const removeWrongName = _.filter(characterSpells, (item) => {
-        return item !== "energy-bolt-creation-spell";
+        return item !== "fire-bolt-creation-spell";
       });
 
       if (_.isEqual(removeWrongName, characterSpells)) {

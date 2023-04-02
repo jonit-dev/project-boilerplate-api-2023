@@ -4,7 +4,7 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 ### Scripts :: Fix eagles eye
-GET {{baseUrl}}/scripts/fix-eagles-eye HTTP/1.1
+GET {{baseUrl}}/scripts/spell-fix HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
