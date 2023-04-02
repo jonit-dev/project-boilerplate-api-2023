@@ -48,14 +48,14 @@ export class ScriptsUseCase {
     }
   }
 
-  public async eaglesEyeFix(): Promise<void> {
+  public async spellNameFix(): Promise<void> {
     const characters = await Character.find({});
 
     for (const character of characters) {
       const characterSpells = character.learnedSpells;
 
       const removeWrongName = _.filter(characterSpells, (item) => {
-        return item !== "speel-eagle-eyes";
+        return item !== "energy-bolt-creation-spell";
       });
 
       if (_.isEqual(removeWrongName, characterSpells)) {
