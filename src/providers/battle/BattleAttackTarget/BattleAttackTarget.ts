@@ -208,7 +208,8 @@ export class BattleAttackTarget {
         }
 
         if (attacker.class === CharacterClass.Berserker) {
-          await this.berserkerBloodthirst.handleBerserkerAttack(attacker._id, damage);
+          const character = attacker as ICharacter;
+          await this.berserkerBloodthirst.handleBerserkerAttack(character, damage);
         }
 
         // Update target health

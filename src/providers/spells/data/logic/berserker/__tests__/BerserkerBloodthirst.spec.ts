@@ -33,7 +33,7 @@ describe("Berserker BloodThirst", () => {
     (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).populate("skills")) as ICharacter;
 
     // @ts-ignore
-    await berserkerBloodthirst.applyBerserkerBloodthirst(testCharacter._id, 50);
+    await berserkerBloodthirst.applyBerserkerBloodthirst(testCharacter, 50);
     const updatedCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
 
     expect(updatedCharacter.health).toBe(95);
@@ -68,7 +68,7 @@ describe("Berserker BloodThirst", () => {
     (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
 
     // @ts-ignore
-    await berserkerBloodthirst.applyBerserkerBloodthirst(testCharacter._id, 10000);
+    await berserkerBloodthirst.applyBerserkerBloodthirst(testCharacter, 10000);
     const updatedCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
 
     expect(updatedCharacter.health).toEqual(testCharacter.maxHealth);
