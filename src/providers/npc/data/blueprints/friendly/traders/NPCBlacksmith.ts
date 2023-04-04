@@ -1,5 +1,6 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import {
+  AccessoriesBlueprint,
   ArmorsBlueprint,
   AxesBlueprint,
   DaggersBlueprint,
@@ -31,6 +32,9 @@ export const npcBlacksmith = {
     },
     {
       key: AxesBlueprint.Axe,
+    },
+    {
+      key: AccessoriesBlueprint.AmuletOfDeath,
     },
   ],
 } as Partial<INPC>;

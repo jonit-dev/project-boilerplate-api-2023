@@ -5,6 +5,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { AccessoriesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import _ from "lodash";
@@ -260,5 +261,54 @@ describe("CharacterDeath.ts | Character with items", () => {
     const attackTypeAfterEquip = await characterWeapon.getAttackType(characterAttackTypeAfterEquip);
 
     expect(attackTypeAfterEquip).toEqual(EntityAttackType.Melee);
+  });
+
+  describe("Amulet of Death", () => {
+    let dropCharacterItemsOnBodySpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+
+      // @ts-ignore
+      dropCharacterItemsOnBodySpy = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
+    });
+
+    const equipAmuletOfDeath = async (): Promise<void> => {
+      const amuletOfDeath = await unitTestHelper.createMockItemFromBlueprint(AccessoriesBlueprint.AmuletOfDeath);
+
+      const equipment = await Equipment.findById(testCharacter.equipment);
+
+      if (!equipment) throw new Error("Equipment not found");
+
+      equipment.neck = amuletOfDeath._id;
+
+      await equipment.save();
+    };
+
+    it("If the character has an amulet of death, it should not drop any items", async () => {
+      await equipAmuletOfDeath();
+
+      await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+      expect(dropCharacterItemsOnBodySpy).not.toHaveBeenCalled();
+    });
+
+    it("If the character has NO amulet of death, it should drop items", async () => {
+      await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+      expect(dropCharacterItemsOnBodySpy).toHaveBeenCalled();
+    });
+
+    it("Should remove the amulet of death, if we die with it", async () => {
+      await equipAmuletOfDeath();
+
+      await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+      const equipment = await Equipment.findById(testCharacter.equipment);
+
+      if (!equipment) throw new Error("Equipment not found");
+
+      expect(equipment.neck).toBeUndefined();
+    });
   });
 });

@@ -241,6 +241,51 @@ export class EquipmentSlots {
     } as IEquipmentSet;
   }
 
+  public async hasItemByKeyOnSlot(
+    character: ICharacter,
+    key: string,
+    slot: EquipmentSlotTypes
+  ): Promise<IItem | undefined> {
+    const equipment = await Equipment.findById(character.equipment).lean().populate(this.slots.join(" ")).exec();
+
+    if (!equipment) {
+      return undefined;
+    }
+
+    const item = equipment[slot] as unknown as IItem;
+
+    if (!item) {
+      return undefined;
+    }
+
+    if (item.key === key) {
+      return item;
+    }
+  }
+
+  public async removeItemFromSlot(
+    character: ICharacter,
+    key: string,
+    slot: EquipmentSlotTypes
+  ): Promise<void | undefined> {
+    const equipment = await Equipment.findById(character.equipment).populate(this.slots.join(" ")).exec();
+
+    if (!equipment) {
+      return undefined;
+    }
+
+    const item = equipment[slot] as unknown as IItem;
+
+    if (!item) {
+      return undefined;
+    }
+
+    if (item.key === key) {
+      equipment[slot] = undefined;
+      await equipment.save();
+    }
+  }
+
   private getSlotType(itemSlotTypes: string[], slotType: string, subType: string): string {
     if (!itemSlotTypes.includes(slotType)) {
       return subType;

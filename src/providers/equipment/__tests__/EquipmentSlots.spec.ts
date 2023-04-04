@@ -15,6 +15,7 @@ describe("EquipmentSlots.ts", () => {
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
 
+  // eslint-disable-next-line require-await
   beforeAll(async () => {
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
@@ -157,6 +158,43 @@ describe("EquipmentSlots.ts", () => {
     expect(result).toBeTruthy();
 
     expect(result.inventory).toBeDefined();
+  });
+
+  describe("hasItemByKeyOnSlot", () => {
+    it("should return the item if it on slot", async () => {
+      const item = await unitTestHelper.createMockItem({ key: "test-item" });
+
+      equipment.ring = item._id;
+      await equipment.save();
+
+      const result = await equipmentSlots.hasItemByKeyOnSlot(testCharacter, "test-item", "ring");
+
+      expect(result?._id).toEqual(item._id);
+    });
+
+    it("should return undefined if item is not on slot", async () => {
+      const item = await unitTestHelper.createMockItem({ key: "head-test-item " });
+
+      equipment.head = item._id;
+      await equipment.save();
+
+      const result = await equipmentSlots.hasItemByKeyOnSlot(testCharacter, "test-item", "head");
+
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe("removeItemFromSlot", () => {
+    it("should return undefined after remove item", async () => {
+      const item = await unitTestHelper.createMockItem({ key: "test-item" });
+
+      equipment.ring = item._id;
+      await equipment.save();
+
+      const result = await equipmentSlots.removeItemFromSlot(testCharacter, "test-item", "ring");
+
+      expect(result).toBeUndefined();
+    });
   });
 
   describe("Validations", () => {

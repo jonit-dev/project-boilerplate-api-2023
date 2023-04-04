@@ -6,9 +6,14 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
+import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  AccessoriesBlueprint,
+  BodiesBlueprint,
+  ContainersBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -46,7 +51,8 @@ export class CharacterDeath {
     private skillDecrease: SkillDecrease,
     private characterDeathCalculator: CharacterDeathCalculator,
     private characterItemContainer: CharacterItemContainer,
-    private entityEffectUse: EntityEffectUse
+    private entityEffectUse: EntityEffectUse,
+    private equipmentSlots: EquipmentSlots
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
@@ -79,21 +85,38 @@ export class CharacterDeath {
       characterDeathData
     );
 
+    const amuletOfDeath = await this.equipmentSlots.hasItemByKeyOnSlot(
+      character,
+      AccessoriesBlueprint.AmuletOfDeath,
+      "neck"
+    );
+
     // generate character's body
     const characterBody = await this.generateCharacterBody(character);
 
-    // drop equipped items and backpack items
-    await this.dropCharacterItemsOnBody(character, characterBody, character.equipment);
+    if (!amuletOfDeath) {
+      // drop equipped items and backpack items
+      await this.dropCharacterItemsOnBody(character, characterBody, character.equipment);
 
-    const deathPenalty = await this.skillDecrease.deathPenalty(character);
-    if (deathPenalty) {
-      // Set timeout to not overwrite the msg "You are Died"
+      const deathPenalty = await this.skillDecrease.deathPenalty(character);
+      if (deathPenalty) {
+        // Set timeout to not overwrite the msg "You are Died"
+        setTimeout(() => {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "You lost some XP and skill points.",
+            type: "info",
+          });
+        }, 2000);
+      }
+    } else {
       setTimeout(() => {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "You lost some XP and skill points.",
+          message: "Your Amulet of Death protected your XP and skill points.",
           type: "info",
         });
       }, 2000);
+
+      await this.equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
     }
 
     await this.entityEffectUse.clearAllEntityEffects(character);
