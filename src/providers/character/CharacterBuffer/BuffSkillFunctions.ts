@@ -346,11 +346,15 @@ export class BuffSkillFunctions {
     const classKeys = {
       [CharacterClass.None]: [],
       [CharacterClass.Rogue]: [],
-      [CharacterClass.Hunter]: [],
+      [CharacterClass.Hunter]: [SpellsBlueprint.SpellEagleEyes],
       [CharacterClass.Berserker]: [SpellsBlueprint.BerserkerBloodthirst],
-      [CharacterClass.Warrior]: [SpellsBlueprint.HealthRegenSell],
-      [CharacterClass.Druid]: [SpellsBlueprint.ManaRegenSpell],
-      [CharacterClass.Sorcerer]: [SpellsBlueprint.ManaRegenSpell],
+      [CharacterClass.Warrior]: [SpellsBlueprint.HealthRegenSell, SpellsBlueprint.SpellPhysicalShield],
+      [CharacterClass.Druid]: [SpellsBlueprint.ManaRegenSpell, SpellsBlueprint.SpellMagicShield],
+      [CharacterClass.Sorcerer]: [
+        SpellsBlueprint.ManaRegenSpell,
+        SpellsBlueprint.SpellMagicShield,
+        SpellsBlueprint.SorcererManaShield,
+      ],
     };
 
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;

@@ -4,17 +4,17 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { CharacterClass } from "@rpg-engine/shared";
 import { Types } from "mongoose";
-import { BerserkerBloodthirst } from "../BerserkerBloodthirst";
+import { BerserkerSpells } from "../BerserkerSpells";
 
-describe("Berserker BloodThirst", () => {
+describe("Berserker Spells", () => {
   let testCharacter: ICharacter;
   let inMemoryHashTable: InMemoryHashTable;
-  let berserkerBloodthirst: BerserkerBloodthirst;
+  let berserkerspells: BerserkerSpells;
 
   beforeEach(async () => {
     inMemoryHashTable = container.get<InMemoryHashTable>(InMemoryHashTable);
 
-    berserkerBloodthirst = container.get<BerserkerBloodthirst>(BerserkerBloodthirst);
+    berserkerspells = container.get<BerserkerSpells>(BerserkerSpells);
 
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasSkills: true,
@@ -30,11 +30,11 @@ describe("Berserker BloodThirst", () => {
   it("should heal a berserker character when applyBerserkerBloodthirst is called", async () => {
     testCharacter.health = 90;
     testCharacter.class = CharacterClass.Berserker;
-    (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).populate("skills")) as ICharacter;
+    (await Character.findByIdAndUpdate(testCharacter._id, testCharacter)) as ICharacter;
 
     // @ts-ignore
-    await berserkerBloodthirst.applyBerserkerBloodthirst(testCharacter, 50);
-    const updatedCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
+    await berserkerspells.applyBerserkerBloodthirst(testCharacter, 50);
+    const updatedCharacter = (await Character.findById(testCharacter._id).lean().select("health")) as ICharacter;
 
     expect(updatedCharacter.health).toBe(95);
   });
@@ -46,7 +46,7 @@ describe("Berserker BloodThirst", () => {
     await inMemoryHashTable.set(namespace, key, true);
 
     // @ts-ignore
-    const spellActivated = await berserkerBloodthirst.getBerserkerBloodthirstSpell(characterId);
+    const spellActivated = await berserkerspells.getBerserkerBloodthirstSpell(characterId);
     expect(spellActivated).toBe(true);
   });
 
@@ -56,8 +56,8 @@ describe("Berserker BloodThirst", () => {
     (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
 
     // @ts-ignore
-    await berserkerBloodthirst.applyBerserkerBloodthirst(testCharacter._id, 50);
-    const updatedCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
+    await berserkerspells.applyBerserkerBloodthirst(testCharacter._id, 50);
+    const updatedCharacter = (await Character.findById(testCharacter._id).lean().select("health")) as ICharacter;
     expect(updatedCharacter.health).toEqual(initialHealth);
   });
 
@@ -68,8 +68,8 @@ describe("Berserker BloodThirst", () => {
     (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
 
     // @ts-ignore
-    await berserkerBloodthirst.applyBerserkerBloodthirst(testCharacter, 10000);
-    const updatedCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
+    await berserkerspells.applyBerserkerBloodthirst(testCharacter, 10000);
+    const updatedCharacter = (await Character.findById(testCharacter._id).lean().select("health")) as ICharacter;
 
     expect(updatedCharacter.health).toEqual(testCharacter.maxHealth);
   });
@@ -79,8 +79,8 @@ describe("Berserker BloodThirst", () => {
     (await Character.findByIdAndUpdate(testCharacter._id, { class: CharacterClass.Sorcerer }).lean()) as ICharacter;
 
     // @ts-ignore
-    await berserkerBloodthirst.handleBerserkerAttack(testCharacter._id, 50);
-    const updatedCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
+    await berserkerspells.handleBerserkerAttack(testCharacter._id, 50);
+    const updatedCharacter = (await Character.findById(testCharacter._id).lean().select("health")) as ICharacter;
     expect(updatedCharacter.health).toEqual(initialHealth);
   });
 });

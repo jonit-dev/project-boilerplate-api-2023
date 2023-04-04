@@ -12,7 +12,6 @@ import { NPCWarn } from "@providers/npc/NPCWarn";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BerserkerBloodthirst } from "@providers/spells/data/logic/berserker/BerserkerBloodthirst";
 import {
   BasicAttribute,
   BattleEventType,
@@ -33,6 +32,8 @@ import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetti
 import { BattleAttackRanged } from "./BattleAttackRanged";
 import { BattleAttackTargetDeath } from "./BattleAttackTargetDeath";
 import { BattleAttackValidator } from "./BattleAttackValidator";
+import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
+import { SorcererSpells } from "@providers/spells/data/logic/berserker/SorcererSpells";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -53,7 +54,8 @@ export class BattleAttackTarget {
     private battleAttackValidator: BattleAttackValidator,
     private battleAttackTargetDeath: BattleAttackTargetDeath,
     private entityEffectUse: EntityEffectUse,
-    private berserkerBloodthirst: BerserkerBloodthirst
+    private berserkerSpells: BerserkerSpells,
+    private sorcererSpells: SorcererSpells
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -209,18 +211,32 @@ export class BattleAttackTarget {
 
         if (attacker.class === CharacterClass.Berserker) {
           const character = attacker as ICharacter;
-          await this.berserkerBloodthirst.handleBerserkerAttack(character, damage);
+
+          const isActive = await this.berserkerSpells.getBerserkerBloodthirstSpell(character);
+          if (isActive) {
+            await this.berserkerSpells.handleBerserkerAttack(character, damage);
+          }
         }
 
-        // Update target health
-        const newTargetHealth = target.health - damage;
+        let sorcererManaShield: boolean = false;
+        if (target.class === CharacterClass.Sorcerer) {
+          const character = target as ICharacter;
 
-        if (newTargetHealth <= 0) {
-          target.health = 0;
-        } else {
-          target.health -= damage;
+          const isActive = await this.sorcererSpells.getSorcererManaShieldSpell(character);
+          if (isActive) {
+            sorcererManaShield = await this.sorcererSpells.handleSorcererManaShield(character, damage);
+          }
         }
-        await target.save();
+
+        if (!sorcererManaShield) {
+          const newTargetHealth = target.health - damage;
+          if (newTargetHealth <= 0) {
+            target.health = 0;
+          } else {
+            target.health -= damage;
+          }
+          await target.save();
+        }
 
         const n = _.random(0, 100);
 

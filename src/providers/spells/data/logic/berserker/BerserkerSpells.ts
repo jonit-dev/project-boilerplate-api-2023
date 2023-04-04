@@ -6,19 +6,13 @@ import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
-@provide(BerserkerBloodthirst)
-export class BerserkerBloodthirst {
+@provide(BerserkerSpells)
+export class BerserkerSpells {
   constructor(private inMemoryHashTable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
 
   public async handleBerserkerAttack(character: ICharacter, damage: number): Promise<void> {
     try {
       if (!character || character.class !== CharacterClass.Berserker || character.health === character.maxHealth) {
-        return;
-      }
-
-      const spellActivated = await this.getBerserkerBloodthirstSpell(character);
-
-      if (!spellActivated) {
         return;
       }
 
@@ -28,7 +22,7 @@ export class BerserkerBloodthirst {
     }
   }
 
-  private async getBerserkerBloodthirstSpell(character: ICharacter): Promise<boolean> {
+  public async getBerserkerBloodthirstSpell(character: ICharacter): Promise<boolean> {
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id.toString()}`;
     const key = SpellsBlueprint.BerserkerBloodthirst;
     const spell = await this.inMemoryHashTable.get(namespace, key);
@@ -54,7 +48,7 @@ export class BerserkerBloodthirst {
   }
 
   private async sendEventAttributeChange(characterId: Types.ObjectId): Promise<void> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const character = (await Character.findById(characterId).lean().select("health")) as ICharacter;
     const payload: ICharacterAttributeChanged = {
       targetId: character._id,
       health: character.health,
