@@ -1,8 +1,12 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY, EntityType } from "@rpg-engine/shared";
+import { EntityType, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { PartiallyCachedModel } from "@providers/cache/PartiallyCachedModel";
 import { NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { PM2Helper } from "@providers/server/PM2Helper";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
@@ -16,7 +20,6 @@ import { NPCMovementMoveAway } from "./movement/NPCMovementMoveAway";
 import { NPCMovementMoveTowards } from "./movement/NPCMovementMoveTowards";
 import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCMovementStopped } from "./movement/NPCMovementStopped";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(NPCManager)
 export class NPCManager {
@@ -31,7 +34,9 @@ export class NPCManager {
     private npcLoader: NPCLoader,
     private npcFreezer: NPCFreezer,
     private pm2Helper: PM2Helper,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private inMemoryHashTable: InMemoryHashTable,
+    private partiallyCachedModel: PartiallyCachedModel
   ) {}
 
   public listenForBehaviorTrigger(): void {
@@ -73,6 +78,16 @@ export class NPCManager {
   public async startBehaviorLoop(initialNPC: INPC): Promise<void> {
     let npc = initialNPC;
 
+    if (npc) {
+      await this.inMemoryHashTable.set("npc", npc._id, npc);
+    }
+
+    const npcSkills = await Skill.findById(npc.skills).lean({ virtuals: true, defaults: true });
+
+    if (npcSkills) {
+      await this.inMemoryHashTable.set("npc-skills", npc._id, npcSkills);
+    }
+
     if (!npc.isBehaviorEnabled) {
       new NPCCycle(
         npc.id,
@@ -81,9 +96,13 @@ export class NPCManager {
             this.npcFreezer.tryToFreezeNPC(npc);
 
             //! Requires virtual
-            npc =
-              (await NPC.findById(initialNPC._id).populate("skills").lean({ virtuals: true, defaults: true })) ||
-              initialNPC;
+            npc = await this.partiallyCachedModel.get<INPC>(
+              "npc",
+              NPC,
+              npc._id,
+              "name x y key health maxHealth mana maxMana alignment direction scene pathOrientation speed isBehaviorEnabled targetType targetCharacter currentMovementType",
+              "skills"
+            );
 
             if (!npc.isBehaviorEnabled) {
               await this.npcFreezer.freezeNPC(npc);
@@ -100,7 +119,7 @@ export class NPCManager {
             console.log(err);
           }
         },
-        (1600 + random(0, 200)) / npc.speed
+        (1600 + random(0, 200)) / (npc.speed * 1.6)
       );
     }
     await this.setNPCBehavior(npc, true);

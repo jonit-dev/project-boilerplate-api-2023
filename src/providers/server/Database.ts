@@ -1,6 +1,7 @@
 import { provide } from "inversify-binding-decorators";
 import mongoose from "mongoose";
 
+import { DB_POOL_SIZE } from "@providers/constants/DatabaseConstants";
 import { appEnv } from "../../providers/config/env";
 @provide(Database)
 export class Database {
@@ -14,7 +15,7 @@ export class Database {
             useCreateIndex: true,
             useUnifiedTopology: true,
             dbName: process.env.MONGO_INITDB_DATABASE,
-            poolSize: 10,
+            poolSize: DB_POOL_SIZE,
           },
           (err) => {
             if (err) {

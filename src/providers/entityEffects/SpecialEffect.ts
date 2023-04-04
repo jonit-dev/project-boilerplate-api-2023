@@ -1,15 +1,14 @@
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { provide } from "inversify-binding-decorators";
-import { EntityType } from "@rpg-engine/shared";
-import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { NPCDeath } from "@providers/npc/NPCDeath";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
-import { Types } from "mongoose";
-import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { EXECUTION_SPELL_COOLDOWN } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
+import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { TimerWrapper } from "@providers/helpers/TimerWrapper";
+import { NPCDeath } from "@providers/npc/NPCDeath";
+import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { EntityType } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
+import { Types } from "mongoose";
 
 enum SpecialEffectNamespace {
   Stun = "character-special-effect-stun",
@@ -19,9 +18,8 @@ enum SpecialEffectNamespace {
 export class SpecialEffect {
   constructor(
     private inMemoryHashTable: InMemoryHashTable,
-    private socketMessaging: SocketMessaging,
     private timer: TimerWrapper,
-    private nPCDeath: NPCDeath,
+    private npcDeath: NPCDeath,
     private characterDeath: CharacterDeath
   ) {}
 
@@ -62,7 +60,7 @@ export class SpecialEffect {
         if (isCharacterTarget) {
           await this.characterDeath.handleCharacterDeath(attacker, target as ICharacter);
         } else {
-          await this.nPCDeath.handleNPCDeath(target as INPC);
+          await this.npcDeath.handleNPCDeath(target as INPC);
         }
 
         await this.inMemoryHashTable.set(namespace, key, true);

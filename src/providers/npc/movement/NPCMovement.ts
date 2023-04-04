@@ -72,9 +72,10 @@ export class NPCMovement {
         return;
       }
 
-      await this.gridManager.setWalkable(map, ToGridX(oldX), ToGridY(oldY), true);
-
-      await this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false);
+      await Promise.all([
+        this.gridManager.setWalkable(map, ToGridX(oldX), ToGridY(oldY), true),
+        this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false),
+      ]);
 
       // warn nearby characters that the NPC moved;
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
