@@ -128,7 +128,7 @@ export class NPCMovement {
     endGridY: number
   ): Promise<IShortestPathPositionResult | undefined> {
     try {
-      const npcPath = this.gridManager.findShortestPath(npc.scene, startGridX, startGridY, endGridX, endGridY);
+      const npcPath = await this.gridManager.findShortestPath(npc.scene, startGridX, startGridY, endGridX, endGridY);
 
       if (!npcPath || npcPath.length <= 1) {
         await this.npcFreezer.freezeNPC(npc, true);

@@ -4,6 +4,7 @@ import PF from "pathfinding";
 import { MapHelper } from "./MapHelper";
 import { MapSolids } from "./MapSolids";
 import { MapTiles } from "./MapTiles";
+import { PathfindingCaching } from "./PathfindingCaching";
 
 interface IGridCourse {
   start: {
@@ -30,7 +31,12 @@ export class GridManager {
 
   private gridDimensions: Map<string, IGridBounds> = new Map();
 
-  constructor(private mapTiles: MapTiles, private mapSolids: MapSolids, private mapHelper: MapHelper) {}
+  constructor(
+    private mapTiles: MapTiles,
+    private mapSolids: MapSolids,
+    private mapHelper: MapHelper,
+    private pathfindingCaching: PathfindingCaching
+  ) {}
 
   public getGrid(map: string): number[][] {
     return this.grids.get(map)!;
@@ -148,15 +154,30 @@ export class GridManager {
     };
   }
 
-  public findShortestPath(
+  public async findShortestPath(
     map: string,
     startGridX: number,
     startGridY: number,
     endGridX: number,
     endGridY: number
-  ): number[][] | undefined {
+  ): Promise<number[][] | undefined> {
     if (!this.mapHelper.areAllCoordinatesValid([startGridX, startGridY], [endGridX, endGridY])) {
       return;
+    }
+
+    const cachedShortestPath = await this.pathfindingCaching.get(map, {
+      start: {
+        x: startGridX,
+        y: startGridY,
+      },
+      end: {
+        x: endGridX,
+        y: endGridY,
+      },
+    });
+
+    if (cachedShortestPath?.length! > 0) {
+      return cachedShortestPath as number[][];
     }
 
     return this.findShortestPathBetweenPoints(map, {
@@ -171,7 +192,11 @@ export class GridManager {
     });
   }
 
-  private findShortestPathBetweenPoints(map: string, gridCourse: IGridCourse, retries?: number): number[][] {
+  private async findShortestPathBetweenPoints(
+    map: string,
+    gridCourse: IGridCourse,
+    retries?: number
+  ): Promise<number[][]> {
     if (!retries) {
       retries = 0;
     }
@@ -195,6 +220,22 @@ export class GridManager {
       gridCourse.offset = Math.pow(10, retries + 1);
       return this.findShortestPathBetweenPoints(map, gridCourse, ++retries);
     }
+
+    // cache results
+    await this.pathfindingCaching.set(
+      map,
+      {
+        start: {
+          x: gridCourse.start.x,
+          y: gridCourse.start.y,
+        },
+        end: {
+          x: gridCourse.end.x,
+          y: gridCourse.end.y,
+        },
+      },
+      [pathWithoutOffset[0]]
+    );
 
     return pathWithoutOffset;
   }
