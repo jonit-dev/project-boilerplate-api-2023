@@ -36,6 +36,7 @@ export enum SpellsBlueprint {
   ManaRegenSpell = "auto-mana-regen",
   HealthRegenSell = "auto-health-regen",
   SorcererManaShield = "sorcerer-mana-shield",
+  BerserkerExecutioin = "berserker-execution",
 }
 
 export interface ISpell {

@@ -5,19 +5,19 @@ import { container } from "@providers/inversify/container";
 import { AnimationEffectKeys, CharacterClass, EntityType, RangeTypes, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
-export const rogueSpellExecution: Partial<ISpell> = {
-  key: SpellsBlueprint.RogueExecution,
-  name: "Suplicium",
-  description: "The Execution spell is designed for Rogues to instantly eliminate opponents",
+export const berserkerSpellExecution: Partial<ISpell> = {
+  key: SpellsBlueprint.BerserkerExecutioin,
+  name: "Insania",
+  description: "The Execution spell is designed for Berserkers to instantly eliminate opponents",
   castingType: SpellCastingType.RangedCasting,
-  magicWords: "supplicium furtim",
-  manaCost: 100,
-  minLevelRequired: 12,
+  magicWords: "insania supplicium",
+  manaCost: 150,
+  minLevelRequired: 20,
   minMagicLevelRequired: 8,
   animationKey: AnimationEffectKeys.HitCorruption,
   projectileAnimationKey: AnimationEffectKeys.HitCorruption,
-  maxDistanceGrid: RangeTypes.Short,
-  characterClass: [CharacterClass.Rogue],
+  maxDistanceGrid: RangeTypes.UltraShort,
+  characterClass: [CharacterClass.Berserker],
 
   usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
     const effect = container.get(SpecialEffect);

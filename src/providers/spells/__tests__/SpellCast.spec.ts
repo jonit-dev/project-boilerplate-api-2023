@@ -28,9 +28,9 @@ import { spellArrowCreation } from "../data/blueprints/all/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/all/SpellBlankRuneCreation";
 import { spellGreaterHealing } from "../data/blueprints/all/SpellGreaterHealing";
 import { spellSelfHealing } from "../data/blueprints/all/SpellSelfHealing";
-import { spellExecution } from "../data/blueprints/rogue/SpellExecution";
 import { spellStunTarget } from "../data/blueprints/warrior/SpellStunTarget";
 import { ISpell, SpellsBlueprint } from "../data/types/SpellsBlueprintTypes";
+import { rogueSpellExecution } from "../data/blueprints/rogue/SpellExecution";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;
@@ -68,7 +68,7 @@ describe("SpellCast.ts", () => {
     testCharacter = await unitTestHelper.createMockCharacter(
       {
         health: 50,
-        learnedSpells: [spellSelfHealing.key, spellGreaterHealing.key, spellExecution.key],
+        learnedSpells: [spellSelfHealing.key, spellGreaterHealing.key, rogueSpellExecution.key],
         class: CharacterClass.Rogue,
       },
       { hasEquipment: false, hasInventory: false, hasSkills: true }
@@ -534,7 +534,6 @@ describe("SpellCast.ts", () => {
       const entityType = EntityType.Character;
 
       await specialEffect.execution(testCharacter, targetCharacter._id, entityType);
-      console.log(testCharacter.health, targetCharacter.health);
 
       const characterBody = await Item.findOne({
         name: `${targetCharacter.name}'s body`,
@@ -572,10 +571,18 @@ describe("SpellCast.ts", () => {
       expect(targetNPC.isAlive).toBe(true);
 
       await specialEffect.execution(testCharacter, entityId, entityType);
-      const updateNPC = (await NPC.findById(targetNPC._id)) as INPC;
+      const updateNPC = (await NPC.findById(targetNPC._id).lean()) as INPC;
+
+      const characterBody = await Item.findOne({
+        name: `${targetNPC.name}'s body`,
+        scene: targetNPC.scene,
+      })
+        .populate("itemContainer")
+        .exec();
+
+      expect(characterBody).not.toBeNull();
 
       expect(updateNPC.health).toBe(0);
-      expect(updateNPC.isAlive).toBe(false);
     });
   });
 

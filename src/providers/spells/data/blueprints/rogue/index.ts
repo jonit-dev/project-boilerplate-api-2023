@@ -1,6 +1,6 @@
 import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
-import { spellExecution } from "./SpellExecution";
+import { rogueSpellExecution } from "./SpellExecution";
 
 export const rogueSpellsIndex = {
-  [SpellsBlueprint.RogueExecution]: spellExecution,
+  [SpellsBlueprint.RogueExecution]: rogueSpellExecution,
 };

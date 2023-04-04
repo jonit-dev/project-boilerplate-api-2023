@@ -6,7 +6,7 @@ import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/In
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { EntityType } from "@rpg-engine/shared";
+import { CharacterClass, EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 
@@ -37,20 +37,23 @@ export class SpecialEffect {
         throw new Error("Invalid entityType provided");
       }
 
-      const target = await (entityType === EntityType.Character
-        ? Character.findById(entityId)
-        : NPC.findById(entityId));
+      const namespace = `${NamespaceRedisControl.CharacterSpell}:${attacker._id}`;
+      let key: SpellsBlueprint = SpellsBlueprint.RogueExecution;
 
-      if (!target) {
-        throw new Error(`No ${entityType} found with ${entityId}`);
+      if (attacker.class === CharacterClass.Berserker) {
+        key = SpellsBlueprint.BerserkerExecutioin;
       }
 
-      const namespace = `${NamespaceRedisControl.CharacterSpell}:${attacker._id}`;
-      const key = SpellsBlueprint.RogueExecution;
       const isActionExecuted = await this.inMemoryHashTable.get(namespace, key);
 
       if (isActionExecuted) {
         return;
+      }
+
+      const target =
+        entityType === EntityType.Character ? await Character.findById(entityId) : await NPC.findById(entityId);
+      if (!target) {
+        throw new Error(`No ${entityType} found with ${entityId}`);
       }
 
       const healthPercent = Math.floor((100 * target.health) / target.maxHealth);
@@ -62,10 +65,10 @@ export class SpecialEffect {
         } else {
           await this.npcDeath.handleNPCDeath(target as INPC);
         }
-
-        await this.inMemoryHashTable.set(namespace, key, true);
-        await this.inMemoryHashTable.expire(namespace, EXECUTION_SPELL_COOLDOWN, "NX");
       }
+
+      await this.inMemoryHashTable.set(namespace, key, true);
+      await this.inMemoryHashTable.expire(namespace, EXECUTION_SPELL_COOLDOWN, "NX");
     } catch (error) {
       throw new Error(`Error executing attack: ${error.message}`);
     }
