@@ -1,5 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemView } from "@providers/item/ItemView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -12,15 +11,16 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
+import { ItemView } from "@providers/item/ItemView";
 
 @provide(CharacterMovementWarn)
 export class CharacterMovementWarn {
   constructor(
     private npcWarn: NPCWarn,
     private characterView: CharacterView,
-    private itemView: ItemView,
     private socketMessaging: SocketMessaging,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private itemView: ItemView
   ) {}
 
   public async warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): Promise<void> {
@@ -32,9 +32,9 @@ export class CharacterMovementWarn {
 
     await this.npcWarn.warnCharacterAboutNPCsInView(character);
 
-    //! Disabled because it some "players" spam items on the ground, it will cause the emissor to get stuck.
+    // ! Disabled because it some "players" spam items on the ground, it will cause the emissor to get stuck.
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.itemView.warnCharacterAboutItemsInView(character);
+    this.itemView.warnCharacterAboutItemsInView(character, { always: false });
   }
 
   public async warnAboutSingleCharacter(character: ICharacter, targetCharacter: ICharacter): Promise<void> {
