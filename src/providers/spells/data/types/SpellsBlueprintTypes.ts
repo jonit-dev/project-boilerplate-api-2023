@@ -36,6 +36,7 @@ export enum SpellsBlueprint {
   ManaRegenSpell = "auto-mana-regen",
   HealthRegenSell = "auto-health-regen",
   SorcererManaShield = "sorcerer-mana-shield",
+  SpellFortifyDefense = "spell-fortify-defense",
   BerserkerExecutioin = "berserker-execution",
 }
 
