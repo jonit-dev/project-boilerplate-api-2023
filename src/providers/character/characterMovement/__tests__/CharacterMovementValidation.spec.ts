@@ -85,7 +85,7 @@ describe("CharacterMovementValidation", () => {
       const isValid = await characterMovementValidation.isValid(character, 0, 0, true);
       expect(isValid).toBe(false);
 
-      expect(isStunMock).toHaveBeenCalledWith(character._id, character.type);
+      expect(isStunMock).toHaveBeenCalledWith(character);
 
       expect(sendEventToUser).toHaveBeenLastCalledWith(character.channelId, UISocketEvents.ShowMessage, {
         message: "Sorry, you can't move because you're stunned",

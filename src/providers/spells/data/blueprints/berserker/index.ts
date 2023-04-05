@@ -4,5 +4,5 @@ import { berserkerSpellExecution } from "./SpellExecution";
 
 export const berserkerSpellsIndex = {
   [SpellsBlueprint.BerserkerBloodthirst]: spellBloodthirst,
-  [SpellsBlueprint.BerserkerExecutioin]: berserkerSpellExecution,
+  [SpellsBlueprint.BerserkerExecution]: berserkerSpellExecution,
 };

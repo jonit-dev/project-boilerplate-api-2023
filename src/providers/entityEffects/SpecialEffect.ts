@@ -5,13 +5,15 @@ import { EXECUTION_SPELL_COOLDOWN } from "@providers/character/__tests__/mockCon
 import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { NPCDeath } from "@providers/npc/NPCDeath";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { CharacterClass, EntityType } from "@rpg-engine/shared";
+import { CharacterClass, CharacterSocketEvents, EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 
 enum SpecialEffectNamespace {
   Stun = "character-special-effect-stun",
+  Stealth = "character-special-effect-stealth",
 }
 
 @provide(SpecialEffect)
@@ -20,8 +22,43 @@ export class SpecialEffect {
     private inMemoryHashTable: InMemoryHashTable,
     private timer: TimerWrapper,
     private npcDeath: NPCDeath,
-    private characterDeath: CharacterDeath
+    private characterDeath: CharacterDeath,
+    private socketMessaging: SocketMessaging
   ) {}
+
+  async stun(target: ICharacter | INPC, intervalSec: number): Promise<boolean> {
+    return await this.applyEffect(target, intervalSec, SpecialEffectNamespace.Stun);
+  }
+
+  async isStun(target: ICharacter | INPC): Promise<boolean> {
+    return await this.isEffectApplied(target, SpecialEffectNamespace.Stun);
+  }
+
+  async turnInvisible(target: ICharacter, intervalSec: number): Promise<boolean> {
+    const applied = await this.applyEffect(target, intervalSec, SpecialEffectNamespace.Stealth);
+    if (!applied) {
+      return applied;
+    }
+
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(
+      target,
+      CharacterSocketEvents.CharacterRemoveFromView,
+      {
+        id: target.id,
+      }
+    );
+
+    return applied;
+  }
+
+  async isInvisible(target: ICharacter | INPC): Promise<boolean> {
+    return await this.isEffectApplied(target, SpecialEffectNamespace.Stealth);
+  }
+
+  async cleanup(): Promise<void> {
+    await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stun);
+    await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stealth);
+  }
 
   async execution(attacker: ICharacter, entityId: Types.ObjectId, entityType: EntityType): Promise<void> {
     try {
@@ -41,7 +78,7 @@ export class SpecialEffect {
       let key: SpellsBlueprint = SpellsBlueprint.RogueExecution;
 
       if (attacker.class === CharacterClass.Berserker) {
-        key = SpellsBlueprint.BerserkerExecutioin;
+        key = SpellsBlueprint.BerserkerExecution;
       }
 
       const isActionExecuted = await this.inMemoryHashTable.get(namespace, key);
@@ -74,33 +111,39 @@ export class SpecialEffect {
     }
   }
 
-  async stun(entityId: string, entityType: EntityType, intervalSec: number): Promise<boolean> {
+  private async applyEffect(
+    target: ICharacter | INPC,
+    intervalSec: number,
+    namespace: SpecialEffectNamespace
+  ): Promise<boolean> {
+    const entityType = target.type as EntityType;
     if (entityType === EntityType.Item) {
       return false;
     }
 
-    await this.inMemoryHashTable.set(SpecialEffectNamespace.Stun, this.getEntityKey(entityId, entityType), true);
+    const isApplied = await this.isEffectApplied(target, namespace);
+    if (isApplied) {
+      return false;
+    }
+
+    await this.inMemoryHashTable.set(namespace, this.getEntityKey(target), true);
 
     this.timer.setTimeout(async () => {
-      await this.inMemoryHashTable.delete(SpecialEffectNamespace.Stun, this.getEntityKey(entityId, entityType));
+      await this.inMemoryHashTable.delete(namespace, this.getEntityKey(target));
     }, intervalSec * 1000);
 
     return true;
   }
 
-  async isStun(entityId: string, entityType: EntityType): Promise<boolean> {
-    const value = await this.inMemoryHashTable.get(
-      SpecialEffectNamespace.Stun,
-      this.getEntityKey(entityId, entityType)
-    );
+  private async isEffectApplied(target: ICharacter | INPC, namespace: SpecialEffectNamespace): Promise<boolean> {
+    const value = await this.inMemoryHashTable.get(namespace, this.getEntityKey(target));
     return !!value;
   }
 
-  async cleanup(): Promise<void> {
-    await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stun);
-  }
+  private getEntityKey(target: ICharacter | INPC): string {
+    const entityType = target.type as EntityType;
+    const entityId = target._id;
 
-  private getEntityKey(entityId: string, entityType: EntityType): string {
     const key = [entityType, entityId].join(":");
     return key;
   }

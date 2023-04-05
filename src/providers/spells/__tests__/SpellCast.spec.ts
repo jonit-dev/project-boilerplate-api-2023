@@ -23,7 +23,7 @@ import {
 } from "@rpg-engine/shared";
 import { SpellCast } from "../SpellCast";
 import { SpellLearn } from "../SpellLearn";
-
+import { spellStealth } from "../data/blueprints/rogue/SpellStealth";
 import { spellArrowCreation } from "../data/blueprints/all/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/all/SpellBlankRuneCreation";
 import { spellGreaterHealing } from "../data/blueprints/all/SpellGreaterHealing";
@@ -423,6 +423,26 @@ describe("SpellCast.ts", () => {
     await runTest();
   });
 
+  it("should call special effect invisible", async () => {
+    const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
+    timerMock.mockImplementation();
+
+    expect(await specialEffect.isInvisible(testCharacter)).toBeFalsy();
+
+    await spellStealth.usableEffect!(testCharacter);
+
+    expect(await specialEffect.isInvisible(testCharacter)).toBeTruthy();
+
+    expect(timerMock).toHaveBeenCalled();
+
+    const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+    const timeout = Math.min(Math.max(skills.magic.level * 1.5, 10), 180);
+    expect(timerMock.mock.calls[0][1]).toBe(timeout * 1000);
+
+    await timerMock.mock.calls[0][0]();
+    expect(await specialEffect.isInvisible(testCharacter)).toBeFalsy();
+  });
+
   describe("ranged spells", () => {
     let targetNPC: INPC;
 
@@ -499,7 +519,7 @@ describe("SpellCast.ts", () => {
         }
       );
 
-      expect(await specialEffect.isStun(targetCharacter._id, EntityType.Character)).toBeTruthy();
+      expect(await specialEffect.isStun(targetCharacter)).toBeTruthy();
 
       expect(timerMock).toHaveBeenCalled();
 
@@ -508,7 +528,7 @@ describe("SpellCast.ts", () => {
       expect(timerMock.mock.calls[0][1]).toBe(timeout * 1000);
 
       await timerMock.mock.calls[0][0]();
-      expect(await specialEffect.isStun(targetCharacter._id, EntityType.Character)).toBeFalsy();
+      expect(await specialEffect.isStun(targetCharacter)).toBeFalsy();
     });
 
     it("should not execute spell in yourself", async () => {

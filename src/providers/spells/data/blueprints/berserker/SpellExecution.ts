@@ -6,7 +6,7 @@ import { AnimationEffectKeys, CharacterClass, EntityType, RangeTypes, SpellCasti
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const berserkerSpellExecution: Partial<ISpell> = {
-  key: SpellsBlueprint.BerserkerExecutioin,
+  key: SpellsBlueprint.BerserkerExecution,
   name: "Insania",
   description: "The Execution spell is designed for Berserkers to instantly eliminate opponents",
   castingType: SpellCastingType.RangedCasting,

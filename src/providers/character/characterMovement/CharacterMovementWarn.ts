@@ -1,4 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { ItemView } from "@providers/item/ItemView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCWarn } from "@providers/npc/NPCWarn";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -11,7 +13,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
-import { ItemView } from "@providers/item/ItemView";
 
 @provide(CharacterMovementWarn)
 export class CharacterMovementWarn {
@@ -20,6 +21,7 @@ export class CharacterMovementWarn {
     private characterView: CharacterView,
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
+    private specialEffect: SpecialEffect,
     private itemView: ItemView
   ) {}
 
@@ -75,6 +77,10 @@ export class CharacterMovementWarn {
     character: ICharacter,
     clientPosUpdateData: ICharacterPositionUpdateFromClient
   ): Promise<void> {
+    if (await this.specialEffect.isInvisible(character)) {
+      return;
+    }
+
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
@@ -156,8 +162,9 @@ export class CharacterMovementWarn {
 
   private async shouldWarnCharacter(emitter: ICharacter, nearbyCharacter: ICharacter): Promise<boolean> {
     const charOnCharView = await this.characterView.getElementOnView(emitter, nearbyCharacter._id, "characters");
+    const isInvisible = await this.specialEffect.isInvisible(nearbyCharacter);
 
-    if (!charOnCharView) {
+    if (!charOnCharView && !isInvisible) {
       return true;
     }
 

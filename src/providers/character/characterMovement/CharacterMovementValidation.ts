@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUIShowMessage, MapLayers, ToGridX, ToGridY, UISocketEvents, EntityType } from "@rpg-engine/shared";
+import { IUIShowMessage, MapLayers, ToGridX, ToGridY, UISocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBan } from "../CharacterBan";
@@ -29,7 +29,7 @@ export class CharacterMovementValidation {
       return false;
     }
 
-    if (await this.specialEffect.isStun(character._id, character.type as EntityType)) {
+    if (await this.specialEffect.isStun(character)) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "Sorry, you can't move because you're stunned",
         type: "error",

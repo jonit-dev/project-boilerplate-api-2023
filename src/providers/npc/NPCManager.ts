@@ -1,5 +1,5 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { EntityType, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
@@ -109,7 +109,7 @@ export class NPCManager {
               return;
             }
 
-            if (await this.specialEffect.isStun(npc._id, npc.type as EntityType)) {
+            if (await this.specialEffect.isStun(npc)) {
               return;
             }
 
