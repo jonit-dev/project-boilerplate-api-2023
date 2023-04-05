@@ -48,6 +48,7 @@ import { CraftingSkillsMap } from "./constants";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -306,7 +307,9 @@ export class SkillIncrease {
         return this.releaseXP(target);
       }
 
-      skills.experience += record!.xp! + record!.xp! * buff;
+      const exp = (record!.xp! + record!.xp! * buff) * (target.isGiantForm ? NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER : 1);
+
+      skills.experience += exp;
       skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
 
       while (skills.xpToNextLevel <= 0) {
@@ -323,17 +326,13 @@ export class SkillIncrease {
       if (levelUp) {
         await this.increaseMaxManaMaxHealth(character._id);
 
-        await this.sendExpLevelUpEvents(
-          { level: skills.level, previousLevel, exp: record!.xp! + record!.xp! * buff },
-          character,
-          target
-        );
+        await this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp }, character, target);
         setTimeout(async () => {
           await this.spellLearn.learnLatestSkillLevelSpells(character._id, true);
         }, 5000);
       }
 
-      await this.warnCharactersAroundAboutExpGains(character, record!.xp! + record!.xp! * buff);
+      await this.warnCharactersAroundAboutExpGains(character, exp);
     }
 
     await target.save();

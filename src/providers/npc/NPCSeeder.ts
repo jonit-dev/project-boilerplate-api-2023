@@ -13,10 +13,11 @@ import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { NPCGiantForm } from "./NPCGiantForm";
 
 @provide(NPCSeeder)
 export class NPCSeeder {
-  constructor(private npcLoader: NPCLoader, private gridManager: GridManager) {}
+  constructor(private npcLoader: NPCLoader, private gridManager: GridManager, private npcGiantForm: NPCGiantForm) { }
 
   public async seed(): Promise<void> {
     const npcSeedData = this.npcLoader.loadNPCSeedData();
@@ -37,10 +38,6 @@ export class NPCSeeder {
 
         // console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
 
-        await this.resetNPC(npcFound, multipliedNPCData);
-
-        await this.updateNPCSkills(multipliedNPCData, npcFound);
-
         const updateData = _.omit(multipliedNPCData, ["skills"]);
 
         await NPC.updateOne(
@@ -55,6 +52,12 @@ export class NPCSeeder {
             upsert: true,
           }
         );
+
+        await this.resetNPC(npcFound, multipliedNPCData);
+        await this.updateNPCSkills(multipliedNPCData, npcFound);
+
+        await this.npcGiantForm.resetNPCToNormalForm(npcFound);
+        await this.npcGiantForm.randomlyTransformNPCIntoGiantForm(npcFound);
       }
     }
   }
@@ -141,6 +144,9 @@ export class NPCSeeder {
       skills.owner = newNPC._id;
 
       await skills.save();
+
+      await this.npcGiantForm.resetNPCToNormalForm(newNPC);
+      await this.npcGiantForm.randomlyTransformNPCIntoGiantForm(newNPC);
     } catch (error) {
       console.log(`❌ Failed to spawn NPC ${NPCData.key}. Is the blueprint for this NPC missing?`);
 

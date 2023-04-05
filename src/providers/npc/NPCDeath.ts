@@ -22,6 +22,7 @@ import random from "lodash/random";
 import { NPC_CYCLES } from "./NPCCycle";
 import { calculateGold } from "./NPCGold";
 import { NPCTarget } from "./movement/NPCTarget";
+import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
 
 @provide(NPCDeath)
 export class NPCDeath {
@@ -44,7 +45,7 @@ export class NPCDeath {
 
       const npcLoots = (npc.loots as unknown as INPCLoot[]) ?? [];
 
-      await this.addLootToNPCBody(npcBody, [...npcLoots, goldLoot ?? []]);
+      await this.addLootToNPCBody(npcBody, [...npcLoots, goldLoot ?? []], npc.isGiantForm);
 
       await this.itemOwnership.removeItemOwnership(npcBody.id);
       await this.clearNPCBehavior(npc);
@@ -122,12 +123,12 @@ export class NPCDeath {
     return goldLoot;
   }
 
-  private async addLootToNPCBody(npcBody: IItem, loots: INPCLoot[]): Promise<void> {
+  private async addLootToNPCBody(npcBody: IItem, loots: INPCLoot[], wasNpcInGiantForm?: boolean): Promise<void> {
     const itemContainer = await this.fetchItemContainer(npcBody);
 
     for (const loot of loots) {
       const rand = Math.round(random(0, 100));
-      const lootChance = this.calculateLootChance(loot);
+      const lootChance = this.calculateLootChance(loot, wasNpcInGiantForm ? NPC_GIANT_FORM_LOOT_MULTIPLIER : 1);
 
       if (rand <= lootChance) {
         const lootQuantity = this.getLootQuantity(loot);
@@ -169,7 +170,7 @@ export class NPCDeath {
     return itemContainer;
   }
 
-  private calculateLootChance(loot: INPCLoot): number {
+  private calculateLootChance(loot: INPCLoot, multiplier = 1): number {
     const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
     const lootMultipliers = {
       [OthersBlueprint.GoldCoin]: 1,
@@ -178,7 +179,7 @@ export class NPCDeath {
     };
     const lootMultiplier = lootMultipliers[blueprintData?.type] || NPC_LOOT_CHANCE_MULTIPLIER;
 
-    return loot.chance * lootMultiplier;
+    return loot.chance * lootMultiplier * multiplier;
   }
 
   private getLootQuantity(loot: INPCLoot): number {

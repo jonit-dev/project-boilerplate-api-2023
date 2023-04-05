@@ -3,18 +3,18 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { NPCView } from "./NPCView";
 import { NPCWarn } from "./NPCWarn";
 import { NPCTarget } from "./movement/NPCTarget";
+import { NPCGiantForm } from "./NPCGiantForm";
 
 @provide(NPCSpawn)
 export class NPCSpawn {
   constructor(
-    private npcView: NPCView,
     private characterView: CharacterView,
     private mathHelper: MathHelper,
     private npcTarget: NPCTarget,
-    private npcWarn: NPCWarn
+    private npcWarn: NPCWarn,
+    private npcGiantForm: NPCGiantForm
   ) {}
 
   public async spawn(npc: INPC): Promise<void> {
@@ -31,6 +31,9 @@ export class NPCSpawn {
     npc.x = npc.initialX;
     npc.y = npc.initialY;
     await npc.save();
+
+    await this.npcGiantForm.resetNPCToNormalForm(npc);
+    await this.npcGiantForm.randomlyTransformNPCIntoGiantForm(npc);
 
     const nearbyCharacters = await this.characterView.getCharactersAroundXYPosition(npc.x, npc.y, npc.scene);
 

@@ -88,6 +88,7 @@ export class NPCWarn {
         hasDepot: npc.hasDepot!,
         isTrader: npc.isTrader,
         traderItems: npc.traderItems,
+        isGiantForm: npc.isGiantForm,
       }
     );
   }

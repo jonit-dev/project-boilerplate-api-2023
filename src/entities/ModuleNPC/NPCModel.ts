@@ -123,7 +123,6 @@ const npcSchema = createLeanSchema(
       endGridX: Type.number(),
       endGridY: Type.number(),
     },
-
     speed: Type.number({
       default: 1.5,
       required: true,
@@ -174,6 +173,9 @@ const npcSchema = createLeanSchema(
     skillRandomizerDice: Type.number({ required: true, default: 1 }),
     skillsToBeRandomized: [Type.string({ required: false })],
     hasDepot: Type.boolean({
+      default: false,
+    }),
+    isGiantForm: Type.boolean({
       default: false,
     }),
     ...({} as {
