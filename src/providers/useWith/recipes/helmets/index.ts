@@ -10,6 +10,11 @@ import { recipeRoyalKnightHelmet } from "./recipeRoyalKnightHelmet";
 import { recipeTurban } from "./recipeTurban";
 import { recipeVikingHelmet } from "./recipeVikingHelmet";
 import { recipeWizardHat } from "./recipeWizardHat";
+import { recipeCap } from "./recipeCap";
+import { recipeFarmersHelmet } from "./recipeFarmersHelmet";
+import { recipeHuntersCap } from "./recipeHuntersCap";
+import { recipeLeatherHelmet } from "./recipeLeatherHelmet";
+import { recipeRedHoodie } from "./recipeRedHoodie";
 
 export const recipeHelmetsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [HelmetsBlueprint.BerserkersHelmet]: [recipeBerserkersHelmet],
@@ -22,4 +27,9 @@ export const recipeHelmetsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [HelmetsBlueprint.BloodfireHelmet]: [recipeBloodfireHelmet],
   [HelmetsBlueprint.GuardianHelmet]: [recipeGuardianHelmet],
   [HelmetsBlueprint.IroncladHelmet]: [recipeIroncladHelmet],
+  [HelmetsBlueprint.Cap]: [recipeCap],
+  [HelmetsBlueprint.FarmersHelmet]: [recipeFarmersHelmet],
+  [HelmetsBlueprint.HuntersCap]: [recipeHuntersCap],
+  [HelmetsBlueprint.LeatherHelmet]: [recipeLeatherHelmet],
+  [HelmetsBlueprint.RedHoodie]: [recipeRedHoodie],
 };

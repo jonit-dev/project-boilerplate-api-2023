@@ -14,6 +14,7 @@ import { recipeIceSword } from "./recipeIceSword";
 import { recipeTungstenSword } from "./recipeIceTungstenSword";
 import { recipeKatana } from "./recipeKatana";
 import { recipeMithrilSword } from "./recipeMithrilSword";
+import { recipeWoodenSword } from "./recipeWoodenSword";
 
 export const recipeSwordsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [SwordsBlueprint.ElvenSword]: [recipeElvenSword],
@@ -30,4 +31,5 @@ export const recipeSwordsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [SwordsBlueprint.IronwoodTanto]: [recipeIronwoodTanto],
   [SwordsBlueprint.IceShardLongsword]: [recipeIceShardLongsword],
   [SwordsBlueprint.TungstenSword]: [recipeTungstenSword],
+  [SwordsBlueprint.WoodenSword]: [recipeWoodenSword],
 };

@@ -10,6 +10,8 @@ import { recipeHolyShield } from "./recipeHolyShield";
 import { recipePaviseShield } from "./recipePaviseShield";
 import { recipePlateShield } from "./recipePlateShield";
 import { recipeStoneShield } from "./recipeStoneShield";
+import { recipeWoodenShield } from "./recipeWoodenShield";
+import { recipeStuddedShield } from "./recipeStuddedShield";
 
 export const recipeShieldsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [ShieldsBlueprint.FrostShield]: [recipeFrostShield],
@@ -22,4 +24,6 @@ export const recipeShieldsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [ShieldsBlueprint.StoneShield]: [recipeStoneShield],
   [ShieldsBlueprint.PaviseShield]: [recipePaviseShield],
   [ShieldsBlueprint.CrimsonAegisShield]: [recipeCrimsonAegisShield],
+  [ShieldsBlueprint.WoodenShield]: [recipeWoodenShield],
+  [ShieldsBlueprint.StuddedShield]: [recipeStuddedShield],
 };

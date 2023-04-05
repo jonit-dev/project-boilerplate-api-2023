@@ -11,6 +11,7 @@ import { recipeShadowAxe } from "./recipeShadowAxe";
 import { recipeSilverAxe } from "./recipeSilverAxe";
 import { recipeVikingBattleAxe } from "./recipeVikingBattleAxe";
 import { recipeWhiteRavenAxe } from "./recipeWhiteRavenAxe";
+import { recipeWoodenAxe } from "./recipeWoodenAxe";
 
 export const recipeAxesIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [AxesBlueprint.Axe]: [recipeAxe],
@@ -25,4 +26,5 @@ export const recipeAxesIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [AxesBlueprint.WhiteRavenAxe]: [recipeWhiteRavenAxe],
   [AxesBlueprint.GlacialAxe]: [recipeGlacialAxe],
   [AxesBlueprint.GlacialHatchet]: [recipeGlacialHatchet],
+  [AxesBlueprint.WoodenAxe]: [recipeWoodenAxe],
 };

@@ -15,6 +15,10 @@ import { recipePlateArmor } from "./recipePlateArmor";
 import { recipeSorcerersCape } from "./recipeSorcerersCape";
 import { recipeSpellcastersCape } from "./recipeSpellCastersCape";
 import { recipeStuddedArmor } from "./recipeStuddedArmor";
+import { recipeCoat } from "./recipeCoat";
+import { recipeJacket } from "./recipeJacket";
+import { recipeFarmersJacket } from "./recipeFarmersJacket";
+import { recipeLeatherJacket } from "./recipeLeatherJacket";
 
 export const recipeArmorsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [ArmorsBlueprint.StuddedArmor]: [recipeStuddedArmor],
@@ -32,4 +36,8 @@ export const recipeArmorsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [ArmorsBlueprint.MysticCape]: [recipeMysticCape],
   [ArmorsBlueprint.SorcerersCape]: [recipeSorcerersCape],
   [ArmorsBlueprint.SpellcastersCape]: [recipeSpellcastersCape],
+  [ArmorsBlueprint.Coat]: [recipeCoat],
+  [ArmorsBlueprint.Jacket]: [recipeJacket],
+  [ArmorsBlueprint.FarmersJacket]: [recipeFarmersJacket],
+  [ArmorsBlueprint.LeatherJacket]: [recipeLeatherJacket],
 };

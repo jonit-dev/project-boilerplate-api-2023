@@ -5,6 +5,7 @@ import { recipeMace } from "./recipeMace";
 import { recipeRusticFlail } from "./recipeRusticFlail";
 import { recipeSilverBulbMace } from "./recipeSilverBulbMace";
 import { recipeSpikedClub } from "./recipeSpikedClub";
+import { recipeWoodenMace } from "./recipeWoodenMace";
 
 export const recipeMacesIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [MacesBlueprint.SpikedClub]: [recipeSpikedClub],
@@ -12,4 +13,5 @@ export const recipeMacesIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [MacesBlueprint.BloodstainedCenser]: [recipeBloodstainedCenser],
   [MacesBlueprint.RusticFlail]: [recipeRusticFlail],
   [MacesBlueprint.SilverBulbMace]: [recipeSilverBulbMace],
+  [MacesBlueprint.WoodenMace]: [recipeWoodenMace],
 };
