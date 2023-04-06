@@ -162,6 +162,12 @@
     "textureDisplayName": "Dwarf Guard"
   },
   {
+    "class": "Berserker",
+    "race": "Dwarf",
+    "textureKey": "dwarf-guardian",
+    "textureDisplayName": "Dwarf Berserker"
+  },
+  {
     "class": "Hunter",
     "race": "Dwarf",
     "textureKey": "dwarf-archer",
@@ -170,14 +176,20 @@
   {
     "class": "Druid",
     "race": "Dwarf",
-    "textureKey": "dwarf-guardian",
-    "textureDisplayName": "Dwarf Guardian"
+    "textureKey": "dwarf-mage-2",
+    "textureDisplayName": "Dwarf Druid"
   },
   {
     "class": "Sorcerer",
     "race": "Dwarf",
     "textureKey": "dwarf-mage",
     "textureDisplayName": "Dwarf Mage"
+  },
+  {
+    "class": "Rogue",
+    "race": "Dwarf",
+    "textureKey": "dwarf",
+    "textureDisplayName": "Dwarf Rogue"
   },
   {
     "class": "None",
@@ -204,9 +216,63 @@
     "textureDisplayName": "Orc Mage"
   },
   {
+    "class": "Druid",
+    "race": "Orc",
+    "textureKey": "orc-mage",
+    "textureDisplayName": "Orc Druid"
+  },
+  {
+    "class": "Rogue",
+    "race": "Orc",
+    "textureKey": "orc",
+    "textureDisplayName": "Orc Rogue"
+  },
+  {
+    "class": "Hunter",
+    "race": "Orc",
+    "textureKey": "orc-archer",
+    "textureDisplayName": "Orc Archer"
+  },
+  {
     "class": "None",
     "race": "Minotaur",
     "textureKey": "minotaur",
     "textureDisplayName": "Minotaur"
+  },
+  {
+    "class": "Warrior",
+    "race": "Minotaur",
+    "textureKey": "minotaur-berserker",
+    "textureDisplayName": "Minotaur Warrior"
+  },
+  {
+    "class": "Berserker",
+    "race": "Minotaur",
+    "textureKey": "minotaur-berserker",
+    "textureDisplayName": "Minotaur Berserker"
+  },
+  {
+    "class": "Hunter",
+    "race": "Minotaur",
+    "textureKey": "minotaur-archer",
+    "textureDisplayName": "Minotaur Hunter"
+  },
+  {
+    "class": "Rogue",
+    "race": "Minotaur",
+    "textureKey": "minotaur",
+    "textureDisplayName": "Minotaur Rogue"
+  },
+  {
+    "class": "Sorcerer",
+    "race": "Minotaur",
+    "textureKey": "minotaur-mage",
+    "textureDisplayName": "Minotaur Sorcerer"
+  },
+  {
+    "class": "Druid",
+    "race": "Minotaur",
+    "textureKey": "minotaur-mage",
+    "textureDisplayName": "Minotaur Druid"
   }
 ]
