@@ -1,3 +1,5 @@
+import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { MapLayers } from "@rpg-engine/shared";
 import PF from "pathfinding";
@@ -35,7 +37,8 @@ export class GridManager {
     private mapTiles: MapTiles,
     private mapSolids: MapSolids,
     private mapHelper: MapHelper,
-    private pathfindingCaching: PathfindingCaching
+    private pathfindingCaching: PathfindingCaching,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public getGrid(map: string): number[][] {
@@ -155,6 +158,7 @@ export class GridManager {
   }
 
   public async findShortestPath(
+    npc: INPC,
     map: string,
     startGridX: number,
     startGridY: number,
@@ -176,7 +180,19 @@ export class GridManager {
       },
     });
 
-    if (cachedShortestPath?.length! > 0) {
+    const cachedNextStep = cachedShortestPath?.[0];
+
+    const hasCircularRef = await this.hasCircularReferenceOnPathfinding(
+      npc,
+      map,
+      startGridX,
+      startGridY,
+      endGridX,
+      endGridY,
+      cachedNextStep!
+    );
+
+    if (cachedShortestPath?.length! > 0 && !hasCircularRef) {
       return cachedShortestPath as number[][];
     }
 
@@ -190,6 +206,41 @@ export class GridManager {
         y: endGridY,
       },
     });
+  }
+
+  private async hasCircularReferenceOnPathfinding(
+    npc: INPC,
+    map: string,
+    startGridX: number,
+    startGridY: number,
+    endGridX: number,
+    endGridY: number,
+    cachedNextStep: number[]
+  ): Promise<boolean> {
+    const previousNPCPosition = (await this.inMemoryHashTable.get("npc-previous-position", npc._id)) as number[];
+
+    // if the next step is the same as the previous NPC position, then we can assume that the NPC is stuck and we should recalculate the path
+    const hasCircularRef =
+      cachedNextStep &&
+      previousNPCPosition &&
+      cachedNextStep[0] === previousNPCPosition[0] &&
+      cachedNextStep[1] === previousNPCPosition[1];
+    if (hasCircularRef) {
+      await this.pathfindingCaching.delete(map, {
+        start: {
+          x: startGridX,
+          y: startGridY,
+        },
+        end: {
+          x: endGridX,
+          y: endGridY,
+        },
+      });
+
+      return true;
+    }
+
+    return false;
   }
 
   private async findShortestPathBetweenPoints(
@@ -221,21 +272,25 @@ export class GridManager {
       return this.findShortestPathBetweenPoints(map, gridCourse, ++retries);
     }
 
-    // cache results
-    await this.pathfindingCaching.set(
-      map,
-      {
-        start: {
-          x: gridCourse.start.x,
-          y: gridCourse.start.y,
+    const nextStep = pathWithoutOffset[1];
+
+    if (nextStep?.length) {
+      await this.pathfindingCaching.set(
+        map,
+
+        {
+          start: {
+            x: gridCourse.start.x,
+            y: gridCourse.start.y,
+          },
+          end: {
+            x: gridCourse.end.x,
+            y: gridCourse.end.y,
+          },
         },
-        end: {
-          x: gridCourse.end.x,
-          y: gridCourse.end.y,
-        },
-      },
-      [pathWithoutOffset[0]]
-    );
+        [nextStep]
+      );
+    }
 
     return pathWithoutOffset;
   }

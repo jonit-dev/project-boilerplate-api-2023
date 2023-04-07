@@ -3,6 +3,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
 import { CharacterView } from "@providers/character/CharacterView";
 import { MapHelper } from "@providers/map/MapHelper";
+import { PathfindingCaching } from "@providers/map/PathfindingCaching";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -38,7 +39,8 @@ export class NPCMovementMoveTowards {
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
     private mapHelper: MapHelper,
-    private characterView: CharacterView
+    private characterView: CharacterView,
+    private pathfindingCaching: PathfindingCaching
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
@@ -238,17 +240,17 @@ export class NPCMovementMoveTowards {
             Character.findById(npc.targetCharacter).populate("skills"),
           ]);
 
-          const targetCharacter = result[1] as ICharacter;
           const updatedNPC = result[0] as INPC;
+
+          const targetCharacter = result[1] as ICharacter;
 
           if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
             // if reached target and alignment is enemy, lets hit it
             await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
+            await this.tryToSwitchToRandomTarget(npc);
           }
-
-          await this.tryToSwitchToRandomTarget(npc);
         },
-        1700
+        1500
       );
     }
   }
@@ -315,7 +317,7 @@ export class NPCMovementMoveTowards {
       const { newGridX, newGridY, nextMovementDirection } = shortestPath;
       const validCoordinates = this.mapHelper.areAllCoordinatesValid([newGridX, newGridY]);
       if (validCoordinates && nextMovementDirection) {
-        await this.npcMovement.moveNPC(
+        const hasMoved = await this.npcMovement.moveNPC(
           npc,
           npc.x,
           npc.y,
@@ -323,6 +325,20 @@ export class NPCMovementMoveTowards {
           FromGridY(newGridY),
           nextMovementDirection
         );
+
+        if (!hasMoved) {
+          // probably there's a solid on the way, lets clear the pathfinding caching to force a recalculation
+          await this.pathfindingCaching.delete(npc.scene, {
+            start: {
+              x: ToGridX(npc.x),
+              y: ToGridY(npc.y),
+            },
+            end: {
+              x: ToGridX(x),
+              y: ToGridY(y),
+            },
+          });
+        }
       }
     } catch (error) {
       console.error(error);

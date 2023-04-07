@@ -28,6 +28,10 @@ export class PathfindingCaching {
   public async set(map: string, gridCoordinates: IGridCoordinates, calculatedPathfinding: number[][]): Promise<void> {
     const mapVersion = this.getMapVersion(map);
 
+    if (!calculatedPathfinding) {
+      return;
+    }
+
     await this.inMemoryHashTable.set(
       "npc-pathfinding",
       `${map}|${gridCoordinates.start.x}|${gridCoordinates.start.y}|${gridCoordinates.end.x}|${gridCoordinates.end.y}`,
@@ -59,6 +63,13 @@ export class PathfindingCaching {
     if (cachedPathfinding) {
       return cachedPathfinding?.data;
     }
+  }
+
+  public async delete(map: string, gridCoordinates: IGridCoordinates): Promise<void> {
+    await this.inMemoryHashTable.delete(
+      "npc-pathfinding",
+      `${map}|${gridCoordinates.start.x}|${gridCoordinates.start.y}|${gridCoordinates.end.x}|${gridCoordinates.end.y}`
+    );
   }
 
   private getMapVersion(map: string): string {

@@ -1,13 +1,13 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { INPCPositionUpdatePayload, NPCAlignment, NPCSocketEvents, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { NPCFreezer } from "../NPCFreezer";
 import { NPCView } from "../NPCView";
 import { NPCWarn } from "../NPCWarn";
 import { NPCTarget } from "./NPCTarget";
@@ -31,7 +31,7 @@ export class NPCMovement {
     private npcTarget: NPCTarget,
     private characterView: CharacterView,
     private npcWarn: NPCWarn,
-    private npcFreezer: NPCFreezer
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -49,12 +49,15 @@ export class NPCMovement {
     newX: number,
     newY: number,
     chosenMovementDirection: NPCDirection
-  ): Promise<void> {
+  ): Promise<boolean> {
     try {
       const map = npc.scene;
 
       const newGridX = ToGridX(newX);
       const newGridY = ToGridY(newY);
+
+      // store previous npc position. We'll use this to avoid circular dependencies while using the pathfinding cache.
+      await this.inMemoryHashTable.set("npc-previous-position", npc.id, [ToGridX(oldX), ToGridY(oldY)]);
 
       // check if max range is reached
       const hasSolid = await this.movementHelper.isSolid(
@@ -69,7 +72,7 @@ export class NPCMovement {
       if (hasSolid) {
         // console.log(`${npc.key} tried to move to ${newGridX}, ${newGridY}, but it's solid`);
         await this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false);
-        return;
+        return false;
       }
 
       await Promise.all([
@@ -115,9 +118,13 @@ export class NPCMovement {
 
       // use updateOne
       await NPC.updateOne({ _id: npc._id }, { x: newX, y: newY, direction: chosenMovementDirection });
+
+      return true;
     } catch (error) {
       console.error(error);
     }
+
+    return false;
   }
 
   public async getShortestPathNextPosition(
@@ -128,17 +135,26 @@ export class NPCMovement {
     endGridY: number
   ): Promise<IShortestPathPositionResult | undefined> {
     try {
-      const npcPath = await this.gridManager.findShortestPath(npc.scene, startGridX, startGridY, endGridX, endGridY);
+      const npcPath = await this.gridManager.findShortestPath(
+        npc,
+        npc.scene,
+        startGridX,
+        startGridY,
+        endGridX,
+        endGridY
+      );
 
-      if (!npcPath || npcPath.length <= 1) {
-        await this.npcFreezer.freezeNPC(npc, true);
-
+      if (!npcPath?.length) {
         return;
         // throw new Error("Failed to calculate shortest path! No output!");
       }
 
       // get first next available position
-      const [newGridX, newGridY] = npcPath[1];
+      const [newGridX, newGridY] = npcPath[1] ?? npcPath[0]; // 0 would be the cached path. Remember that we store only the next step on the cache.
+
+      if (!newGridX || !newGridY) {
+        return;
+      }
 
       const nextMovementDirection = this.movementHelper.getGridMovementDirection(
         ToGridX(npc.x),
