@@ -14,7 +14,7 @@ export const itemRedMushroom: IConsumableItemBlueprint = {
   description: "An edible mushroom that can be eaten to restore health.",
   weight: 0.25,
   maxStackSize: 100,
-  basePrice: 5,
+  basePrice: 6,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {

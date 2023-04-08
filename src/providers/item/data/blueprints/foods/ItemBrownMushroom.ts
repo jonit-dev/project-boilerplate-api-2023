@@ -14,12 +14,12 @@ export const itemBrownMushroom: IConsumableItemBlueprint = {
   description: "An edible mushroom that can be eaten to restore health.",
   weight: 0.25,
   maxStackSize: 100,
-  basePrice: 5,
+  basePrice: 2,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 1.5);
+    itemUsableEffect.applyEatingEffect(character, 1);
   },
 };

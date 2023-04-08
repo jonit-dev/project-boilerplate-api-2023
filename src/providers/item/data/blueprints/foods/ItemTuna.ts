@@ -14,11 +14,12 @@ export const itemTuna: IConsumableItemBlueprint = {
   description: "Tuna is widely consumed by humans, and is one of the most popular seafoods in the world.",
   weight: 0.25,
   maxStackSize: 100,
-  basePrice: 2.5,
+  basePrice: 4,
+  canSell: false,
 
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 2);
+    itemUsableEffect.applyEatingEffect(character, 3);
   },
 };

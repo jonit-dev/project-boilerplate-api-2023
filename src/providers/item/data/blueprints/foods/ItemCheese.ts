@@ -15,11 +15,11 @@ export const itemCheese: IConsumableItemBlueprint = {
   description: "A cheese wheel.",
   weight: 0.3,
   maxStackSize: 100,
-  basePrice: 10,
+  basePrice: 8,
   canSell: false,
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 10);
+    itemUsableEffect.applyEatingEffect(character, 7);
   },
 };

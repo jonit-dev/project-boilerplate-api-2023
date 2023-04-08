@@ -15,12 +15,12 @@ export const itemChickensMeat: IConsumableItemBlueprint = {
   description: "Chicken meat can be cooked and eaten to restore health",
   weight: 0.5,
   maxStackSize: 100,
-  basePrice: 10,
+  basePrice: 13,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 2);
+    itemUsableEffect.applyEatingEffect(character, 13);
   },
 };

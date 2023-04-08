@@ -15,12 +15,12 @@ export const itemBlueberry: IConsumableItemBlueprint = {
     "A blueberry is a small, sweet berry that grows in clusters on bushes. Blueberries are a good source of vitamin C and fiber.",
   weight: 0.01,
   maxStackSize: 100,
-  basePrice: 5,
+  basePrice: 2,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 0.5);
+    itemUsableEffect.applyEatingEffect(character, 1);
   },
 };

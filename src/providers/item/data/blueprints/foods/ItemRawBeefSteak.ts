@@ -31,6 +31,6 @@ export const itemRawBeefSteak: IConsumableItemBlueprint = {
 
     socketMessaging.sendErrorMessageToCharacter(character, randomMessages[0]);
 
-    itemUsableEffect.applyEatingEffect(character, -2.5);
+    itemUsableEffect.applyEatingEffect(character, -2);
   },
 };

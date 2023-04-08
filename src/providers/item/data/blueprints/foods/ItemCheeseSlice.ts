@@ -15,7 +15,7 @@ export const itemCheeseSlice: IConsumableItemBlueprint = {
   description: "A thick slice of yellow cheese.",
   weight: 0.1,
   maxStackSize: 50,
-  basePrice: 10,
+  basePrice: 3,
   canSell: false,
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);

@@ -15,7 +15,7 @@ export const itemEgg: IConsumableItemBlueprint = {
   description: "A chicken egg.",
   weight: 0.05,
   maxStackSize: 100,
-  basePrice: 10,
+  basePrice: 2,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {

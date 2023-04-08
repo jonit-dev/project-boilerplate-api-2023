@@ -14,7 +14,7 @@ export const itemFish: IConsumableItemBlueprint = {
   description: "A dull fish.",
   weight: 0.2,
   maxStackSize: 100,
-  basePrice: 4,
+  basePrice: 3,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {

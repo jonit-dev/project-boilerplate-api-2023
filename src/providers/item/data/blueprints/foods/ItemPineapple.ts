@@ -14,12 +14,12 @@ export const itemPineapple: IConsumableItemBlueprint = {
   description: "A pineapple that can be found in tropical areas.",
   weight: 1,
   maxStackSize: 50,
-  basePrice: 15,
+  basePrice: 9,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 3);
+    itemUsableEffect.applyEatingEffect(character, 8);
   },
 };

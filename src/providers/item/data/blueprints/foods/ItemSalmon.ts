@@ -15,12 +15,12 @@ export const itemSalmon: IConsumableItemBlueprint = {
   description: "A fresh salmon fish.",
   weight: 0.2,
   maxStackSize: 100,
-  basePrice: 5,
+  basePrice: 7,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 5);
+    itemUsableEffect.applyEatingEffect(character, 6);
   },
 };

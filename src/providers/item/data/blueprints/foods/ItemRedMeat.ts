@@ -20,6 +20,6 @@ export const itemRedMeat: IConsumableItemBlueprint = {
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 5);
+    itemUsableEffect.applyEatingEffect(character, 10);
   },
 };

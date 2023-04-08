@@ -14,12 +14,12 @@ export const itemWatermelon: IConsumableItemBlueprint = {
   description: "A fruit that can be found in tropical areas.",
   weight: 0.5,
   maxStackSize: 100,
-  basePrice: 5,
+  basePrice: 4,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 1);
+    itemUsableEffect.applyEatingEffect(character, 3);
   },
 };

@@ -14,12 +14,12 @@ export const itemBrownFish: IConsumableItemBlueprint = {
   description: "A brown fish that can be caught in rivers and lakes.",
   weight: 1,
   maxStackSize: 100,
-  basePrice: 7,
+  basePrice: 3,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 2);
+    itemUsableEffect.applyEatingEffect(character, 3);
   },
 };

@@ -15,12 +15,12 @@ export const itemBread: IConsumableItemBlueprint = {
   description: "A loaf of bread.",
   weight: 0.1,
   maxStackSize: 50,
-  basePrice: 10,
+  basePrice: 9,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 10);
+    itemUsableEffect.applyEatingEffect(character, 8);
   },
 };

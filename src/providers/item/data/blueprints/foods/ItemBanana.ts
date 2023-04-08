@@ -15,7 +15,7 @@ export const itemBanana: IConsumableItemBlueprint = {
   description: "A ripe banana.",
   weight: 0.05,
   maxStackSize: 100,
-  basePrice: 10,
+  basePrice: 3,
   canSell: false,
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);

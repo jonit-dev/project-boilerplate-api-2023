@@ -15,7 +15,7 @@ export const itemBananaBunch: IConsumableItemBlueprint = {
   description: "A bundle of ripe bananas.",
   weight: 0.03,
   maxStackSize: 100,
-  basePrice: 10,
+  basePrice: 5,
   canSell: false,
 
   usableEffect: (character: ICharacter) => {
