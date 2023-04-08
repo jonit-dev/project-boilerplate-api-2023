@@ -26,12 +26,12 @@ export const npcSkeleton = {
   baseHealth: 58,
   healthRandomizerDice: Dice.D4,
   skills: {
-    level: 3,
+    level: 5,
     strength: {
-      level: 2,
+      level: 3,
     },
     dexterity: {
-      level: 1,
+      level: 2,
     },
     resistance: {
       level: 1,

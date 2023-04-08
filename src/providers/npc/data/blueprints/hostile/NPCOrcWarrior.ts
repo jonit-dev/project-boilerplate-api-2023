@@ -38,13 +38,13 @@ export const npcOrcWarrior = {
   skills: {
     level: 14,
     strength: {
-      level: 10,
+      level: 12,
     },
     dexterity: {
       level: 10,
     },
     resistance: {
-      level: 14,
+      level: 12,
     },
   },
   fleeOnLowHealth: true,

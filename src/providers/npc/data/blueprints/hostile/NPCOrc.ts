@@ -31,19 +31,19 @@ export const npcOrc = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
-  baseHealth: 64,
+  baseHealth: 80,
   healthRandomizerDice: Dice.D6,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 7,
+    level: 10,
     strength: {
       level: 7,
     },
     dexterity: {
-      level: 5,
+      level: 7,
     },
     resistance: {
-      level: 5,
+      level: 7,
     },
   },
   fleeOnLowHealth: true,

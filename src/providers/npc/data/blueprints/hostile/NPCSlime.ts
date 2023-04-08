@@ -29,7 +29,7 @@ export const npcSlime = {
       level: 3,
     },
     resistance: {
-      level: 5,
+      level: 4,
     },
   },
   fleeOnLowHealth: true,

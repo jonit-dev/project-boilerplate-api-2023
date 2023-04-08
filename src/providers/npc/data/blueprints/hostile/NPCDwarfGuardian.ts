@@ -28,16 +28,16 @@ export const npcDwarfGuardian: Partial<INPC> = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
-  baseHealth: 180,
+  baseHealth: 200,
   healthRandomizerDice: Dice.D12,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 25,
+    level: 26,
     strength: {
-      level: 22,
+      level: 24,
     },
     dexterity: {
-      level: 10,
+      level: 12,
     },
     resistance: {
       level: 25,

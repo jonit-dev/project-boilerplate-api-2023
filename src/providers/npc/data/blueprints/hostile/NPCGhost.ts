@@ -21,17 +21,17 @@ export const npcGhost = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
   canSwitchToRandomTarget: true,
-  baseHealth: 30,
+  baseHealth: 50,
   healthRandomizerDice: Dice.D4,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 3,
+    level: 5,
     strength: {
-      level: 3,
+      level: 4,
     },
     dexterity: {
-      level: 2,
+      level: 3,
     },
     resistance: {
       level: 5,

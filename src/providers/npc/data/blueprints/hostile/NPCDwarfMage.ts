@@ -31,21 +31,21 @@ export const npcDwarfMage: Partial<INPC> = {
   ammoKey: "fireball",
   maxRangeAttack: 10,
   speed: MovementSpeed.Slow,
-  baseHealth: 120,
+  baseHealth: 140,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 18,
+    level: 30,
     strength: {
-      level: 10,
+      level: 32,
     },
     dexterity: {
       level: 12,
     },
     resistance: {
-      level: 5,
+      level: 7,
     },
   },
   fleeOnLowHealth: true,

@@ -26,17 +26,17 @@ export const npcDwarf = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
   canSwitchToRandomTarget: true,
-  baseHealth: 76,
+  baseHealth: 120,
   skills: {
-    level: 4,
+    level: 12,
     strength: {
-      level: 3,
+      level: 8,
     },
     dexterity: {
-      level: 4,
+      level: 6,
     },
     resistance: {
-      level: 5,
+      level: 6,
     },
   },
   fleeOnLowHealth: true,

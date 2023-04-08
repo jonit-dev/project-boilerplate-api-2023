@@ -29,20 +29,20 @@ export const npcGoblin = {
   ammoKey: RangedWeaponsBlueprint.Stone,
   maxRangeAttack: 6,
   speed: MovementSpeed.Fast,
-  baseHealth: 45,
+  baseHealth: 80,
   healthRandomizerDice: Dice.D12,
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 5,
+    level: 10,
     strength: {
-      level: 5,
+      level: 10,
     },
     dexterity: {
       level: 8,
     },
     resistance: {
-      level: 3,
+      level: 5,
     },
   },
   fleeOnLowHealth: true,

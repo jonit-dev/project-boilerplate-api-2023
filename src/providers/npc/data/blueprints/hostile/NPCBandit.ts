@@ -46,7 +46,7 @@ export const npcBandit: Partial<INPC> = {
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.BroadSword,
-      chance: 5,
+      chance: 10,
     },
     {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
@@ -96,10 +96,6 @@ export const npcBandit: Partial<INPC> = {
     {
       itemBlueprintKey: AccessoriesBlueprint.Bandana,
       chance: 30,
-    },
-    {
-      itemBlueprintKey: SwordsBlueprint.DamascusSword,
-      chance: 20,
     },
   ],
 };

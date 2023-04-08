@@ -27,20 +27,20 @@ export const npcDwarfGuard = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 120,
+  baseHealth: 180,
   healthRandomizerDice: Dice.D4,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 14,
+    level: 22,
     strength: {
-      level: 10,
+      level: 14,
     },
     dexterity: {
-      level: 10,
+      level: 12,
     },
     resistance: {
-      level: 14,
+      level: 16,
     },
   },
   fleeOnLowHealth: true,

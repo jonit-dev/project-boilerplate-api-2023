@@ -25,19 +25,19 @@ export const npcDwarfArcher: Partial<INPC> = {
   ammoKey: RangedWeaponsBlueprint.Arrow,
   maxRangeAttack: 10,
   speed: MovementSpeed.Fast,
-  baseHealth: 100,
+  baseHealth: 140,
   healthRandomizerDice: Dice.D12,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 12,
+    level: 17,
     strength: {
-      level: 12,
+      level: 14,
     },
     dexterity: {
-      level: 5,
+      level: 8,
     },
     resistance: {
-      level: 7,
+      level: 10,
     },
   },
   fleeOnLowHealth: true,

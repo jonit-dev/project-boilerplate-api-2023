@@ -32,15 +32,15 @@ export const npcOrcArcher: Partial<INPC> = {
   canSwitchToRandomTarget: true,
   skillRandomizerDice: Dice.D12,
   skills: {
-    level: 15,
+    level: 14,
     strength: {
-      level: 7,
+      level: 10,
     },
     dexterity: {
       level: 7,
     },
     resistance: {
-      level: 3,
+      level: 4,
     },
     magicResistance: {
       level: 3,
