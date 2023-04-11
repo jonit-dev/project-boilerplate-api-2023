@@ -214,6 +214,7 @@ describe("SpellCast.ts", () => {
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, CharacterSocketEvents.AttributeChanged, {
       targetId: testCharacter._id,
       health: newHealth,
+      speed: testCharacter.speed,
       mana: newMana,
     });
 
@@ -260,6 +261,7 @@ describe("SpellCast.ts", () => {
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, CharacterSocketEvents.AttributeChanged, {
       targetId: testCharacter._id,
       health: newHealth,
+      speed: testCharacter.speed,
       mana: newMana,
     });
 

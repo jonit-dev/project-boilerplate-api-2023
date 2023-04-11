@@ -36,8 +36,7 @@ export class InMemoryHashTable {
   public async has(namespace: string, key: string): Promise<boolean> {
     const result = await this.redisManager.client.hExists(namespace?.toString(), key?.toString());
 
-    // @ts-ignore
-    return result === 1;
+    return Boolean(result);
   }
 
   public async hasAll(namespace: string): Promise<boolean> {

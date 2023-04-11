@@ -39,6 +39,8 @@ export enum SpellsBlueprint {
   SorcererManaShield = "sorcerer-mana-shield",
   SpellFortifyDefense = "spell-fortify-defense",
   BerserkerExecution = "berserker-execution",
+  HunterQuickFire = "hunter-quick-fire",
+  BerserkerFrenzy = "berserker-frenzy",
 }
 
 export interface ISpell {

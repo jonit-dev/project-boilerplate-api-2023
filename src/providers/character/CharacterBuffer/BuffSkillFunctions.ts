@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { SkillCalculator } from "@providers/skill/SkillCalculator";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -50,6 +51,8 @@ const characterEntities: CharacterEntities[] = [
   CharacterEntities.Speed,
   CharacterEntities.MaxMana,
   CharacterEntities.MaxHealth,
+  CharacterEntities.AttackIntervalSpeed,
+  CharacterEntities.Defense,
 ];
 
 @provide(BuffSkillFunctions)
@@ -115,85 +118,104 @@ export class BuffSkillFunctions {
     buffedLvl: number,
     isAdding: boolean
   ): Promise<boolean> {
-    const character = (await Character.findById(characterId)) as ICharacter;
-    if (buffedLvl === 0) {
-      return false;
-    }
+    try {
+      const character = (await Character.findById(characterId).lean({ virtuals: true })) as ICharacter;
 
-    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
-    const key = skillType;
-    const value = buffedLvl;
+      if (!character) {
+        console.error(`Character with id ${characterId} not found`);
+        return false;
+      }
 
-    if (isAdding && skillType) {
-      character[skillType] = character[skillType] + buffedLvl;
-      await this.inMemoryHashTable.set(namespace, key, value);
-    } else {
-      character[skillType] = Math.max(character[skillType] - buffedLvl, 1);
-      await this.inMemoryHashTable.delete(namespace, key);
-    }
+      if (buffedLvl === 0) {
+        return false;
+      }
 
-    let payload: ICharacterAttributeChanged = {
-      targetId: "",
-    };
+      const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
+      const key = skillType;
 
-    switch (skillType) {
-      case CharacterEntities.MaxHealth: {
-        if (character[skillType] < character.health) {
-          character.health = character[skillType];
-          payload = {
-            targetId: character._id,
-            maxHealth: character[skillType],
-            health: character[skillType],
-          };
+      const isAttackSpeed = skillType === CharacterEntities.AttackIntervalSpeed;
+      if (isAdding) {
+        if (isAttackSpeed) {
+          character[skillType] = Math.max(500, Math.min(character[skillType], 1700));
+          character.attackIntervalSpeed -= Math.min(Math.max(buffedLvl, 0), 1200);
         } else {
-          payload = {
-            targetId: character._id,
-            maxHealth: character[skillType],
-          };
+          character[skillType] += buffedLvl;
         }
 
-        break;
-      }
-
-      case CharacterEntities.MaxMana: {
-        if (character[skillType] < character.mana) {
-          character.mana = character[skillType];
-          payload = {
-            targetId: character._id,
-            maxMana: character[skillType],
-            mana: character[skillType],
-          };
+        await this.inMemoryHashTable.set(namespace, key, isAttackSpeed ? buffedLvl : character[skillType]);
+      } else {
+        if (isAttackSpeed) {
+          character[skillType] = Math.max(500, Math.min(character[skillType], 1700));
+          character.attackIntervalSpeed += Math.min(Math.max(buffedLvl, 0), 1200);
+        } else if (skillType === CharacterEntities.Speed) {
+          character[skillType] = MovementSpeed.Standard;
         } else {
-          payload = {
-            targetId: character._id,
-            maxMana: character[skillType],
-          };
+          character[skillType] = Math.max(character[skillType] - buffedLvl, 1);
         }
-        break;
+        await this.inMemoryHashTable.delete(namespace, key);
       }
 
-      case CharacterEntities.Speed: {
-        character.baseSpeed = character[skillType];
+      console.log(`Updated ${skillType} to ${character[skillType]} in ${character._id}`);
 
-        payload = {
-          targetId: character._id,
-          speed: character.speed,
-        };
+      const payload: ICharacterAttributeChanged = {
+        targetId: character._id,
+      };
 
-        break;
+      switch (skillType) {
+        case CharacterEntities.MaxHealth: {
+          if (character[skillType] < character.health) {
+            character.health = character[skillType];
+            payload.maxHealth = character[skillType];
+            payload.health = character[skillType];
+          } else {
+            payload.maxHealth = character[skillType];
+          }
+          break;
+        }
+
+        case CharacterEntities.MaxMana: {
+          if (character[skillType] < character.mana) {
+            character.mana = character[skillType];
+            payload.maxMana = character[skillType];
+            payload.mana = character[skillType];
+          } else {
+            payload.maxMana = character[skillType];
+          }
+          break;
+        }
+
+        case CharacterEntities.Speed: {
+          character.baseSpeed = character[skillType];
+          character.speed = character[skillType];
+          payload.speed = character.speed;
+          break;
+        }
+
+        case CharacterEntities.AttackIntervalSpeed: {
+          character.attackIntervalSpeed = character[skillType];
+          payload.attackIntervalSpeed = character.attackIntervalSpeed;
+          break;
+        }
+
+        default: {
+          break;
+        }
       }
 
-      default: {
-        break;
+      const savedCharacter = (await Character.findByIdAndUpdate({ _id: character._id }, { ...character }, { new: true })
+        .lean()
+        .select("channelId")) as ICharacter;
+
+      if (!savedCharacter) {
+        console.error(`Failed to save character with id ${character._id}`);
+        return false;
       }
-    }
 
-    const save = (await Character.findByIdAndUpdate({ _id: character._id }, { ...character })) as ICharacter;
+      this.socketMessaging.sendEventToUser(savedCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
 
-    if (save) {
-      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
       return true;
-    } else {
+    } catch (error) {
+      console.error(`Error updating buff entities character id ${characterId}: ${error}`);
       return false;
     }
   }
@@ -216,18 +238,20 @@ export class BuffSkillFunctions {
     isAdding: boolean,
     _id?: Types.ObjectId
   ): Promise<IAppliedBuffsEffect> {
-    const appliedBuffsEffect: {
+    let appliedBuffsEffect: {
       _id: Types.ObjectId;
       key: string;
       value: number;
     } = {
-      // eslint-disable-next-line no-unneeded-ternary
-      _id: _id ? _id : new Types.ObjectId(),
+      _id: _id || new Types.ObjectId(),
       key: skillType,
       value: diffLvl,
     };
-
     if (isAdding) {
+      if (skillType === CharacterEntities.AttackIntervalSpeed) {
+        const value = Math.min(Math.max(diffLvl, 0), 1200);
+        appliedBuffsEffect = { ...appliedBuffsEffect, value };
+      }
       await Character.updateOne(
         {
           _id: characterId,
@@ -346,8 +370,8 @@ export class BuffSkillFunctions {
     const classKeys = {
       [CharacterClass.None]: [],
       [CharacterClass.Rogue]: [],
-      [CharacterClass.Hunter]: [SpellsBlueprint.SpellEagleEyes],
-      [CharacterClass.Berserker]: [SpellsBlueprint.BerserkerBloodthirst],
+      [CharacterClass.Hunter]: [SpellsBlueprint.SpellEagleEyes, SpellsBlueprint.HunterQuickFire],
+      [CharacterClass.Berserker]: [SpellsBlueprint.BerserkerBloodthirst, SpellsBlueprint.BerserkerFrenzy],
       [CharacterClass.Warrior]: [SpellsBlueprint.HealthRegenSell, SpellsBlueprint.SpellPhysicalShield],
       [CharacterClass.Druid]: [SpellsBlueprint.ManaRegenSpell, SpellsBlueprint.SpellMagicShield],
       [CharacterClass.Sorcerer]: [
@@ -363,6 +387,9 @@ export class BuffSkillFunctions {
     for (const key of keysToDelete) {
       await this.inMemoryHashTable.delete(namespace, key);
     }
+
+    await this.inMemoryHashTable.delete(character._id, "totalAttack");
+    await this.inMemoryHashTable.delete(character._id, "totalDefense");
   }
 
   /**

@@ -59,7 +59,14 @@ export class CharacterNetworkLogout {
 
         await this.temporaryRemoveWeapon(data.id);
 
-        await Character.updateOne({ _id: data.id }, { isOnline: false, baseSpeed: MovementSpeed.Standard });
+        await Character.updateOne(
+          { _id: data.id },
+          {
+            isOnline: false,
+            baseSpeed: MovementSpeed.Standard,
+            attackIntervalSpeed: 1700,
+          }
+        );
 
         await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
         await this.buffSkillFunctions.removeAllSpellDataOnRedis(character);
