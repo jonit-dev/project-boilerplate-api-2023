@@ -1,13 +1,5 @@
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemRope } from "../tools/ItemRope";
-import { itemAmethystineDust } from "./ItemAmethystineDust";
-import { itemAmethystineIngot } from "./ItemAmethystineIngot";
-import { itemAmethystineOre } from "./ItemAmethystineOre";
-import { itemAmethystineShard } from "./ItemAmethystineShard";
-import { itemAquamareineDust } from "./ItemAquamareineDust";
-import { itemAquamareineIngot } from "./ItemAquamareineIngot";
-import { itemAquamareineOre } from "./ItemAquamareineOre";
-import { itemAquamareineShard } from "./ItemAquamareineShard";
 import { itemBandage } from "./ItemBandage";
 import { itemBatsWing } from "./ItemBatsWing";
 import { itemBlueFeather } from "./ItemBlueFeather";
@@ -29,45 +21,27 @@ import { itemElvenWood } from "./itemElvenWood";
 import { itemEye } from "./ItemEye";
 import { itemFeather } from "./ItemFeather";
 import { itemFoodRecipe } from "./ItemFoodRecipe";
-import { itemGoldDust } from "./ItemGoldDust";
+
 import { itemGoldenIngot } from "./ItemGoldenIngot";
 import { itemGoldenOre } from "./ItemGoldenOre";
-import { itemGoldIngot } from "./ItemGoldIngot";
-import { itemGoldOre } from "./ItemGoldOre";
-import { itemGoldShard } from "./ItemGoldShard";
+
 import { itemGreaterWoodenLog } from "./ItemGreaterWoodenLog";
 import { itemGreenIngot } from "./ItemGreenIngot";
 import { itemGreenOre } from "./ItemGreenOre";
 import { itemHerb } from "./ItemHerb";
-import { itemIcestormiteDust } from "./ItemIcestormiteDust";
-import { itemIcestormiteIngot } from "./ItemIcestormiteIngot";
-import { itemIcestormiteOre } from "./ItemIcestormiteOre";
-import { itemIcestormiteShard } from "./ItemIcestormiteShard";
+
 import { itemIronIngot } from "./ItemIronIngot";
 import { itemIronNail } from "./itemIronNail";
 import { itemIronOre } from "./ItemIronOre";
 import { itemJade } from "./itemJade";
-import { itemLeafstoneDust } from "./ItemLeafstoneDust";
-import { itemLeafstoneIngot } from "./ItemLeafstoneIngot";
-import { itemLeafstoneOre } from "./ItemLeafstoneOre";
-import { itemLeafstoneShard } from "./ItemLeafstoneShard";
+
 import { itemLeather } from "./ItemLeather";
 import { itemMagicRecipe } from "./ItemMagicRecipe";
-import { itemMoonstoneDust } from "./ItemMoonstoneDust";
-import { itemMoonstoneIngot } from "./ItemMoonstoneIngot";
-import { itemMoonstoneOre } from "./ItemMoonstoneOre";
-import { itemMoonstoneShard } from "./ItemMoonstoneShard";
-import { itemNightstoneDust } from "./ItemNightstoneDust";
-import { itemNightstoneIngot } from "./ItemNightstoneIngot";
-import { itemNightstoneOre } from "./ItemNightstoneOre";
-import { itemNightstoneShard } from "./ItemNightstoneShard";
+
 import { itemObsidiumIngot } from "./ItemObsidiumIngot";
 import { itemObsidiumOre } from "./ItemObsidiumOre";
 import { itemPhoenixFeather } from "./itemPhoenixfeather";
-import { itemPhoenixiteDust } from "./ItemPhoenixiteDust";
-import { itemPhoenixiteIngot } from "./ItemPhoenixiteIngot";
-import { itemPhoenixiteOre } from "./ItemPhoenixiteOre";
-import { itemPhoenixiteShard } from "./ItemPhoenixiteShard";
+
 import { itemPolishedStone } from "./itemPolishedStone";
 import { itemRedSapphire } from "./itemRedSapphire";
 import { itemRock } from "./itemRock";
@@ -79,10 +53,7 @@ import { itemSkull } from "./ItemSkull";
 import { itemSmallWoodenStick } from "./itemSmallWoodenStick";
 import { itemSmallWorm } from "./itemSmallWorm";
 import { itemSteelIngot } from "./itemSteelIngot";
-import { itemTopazDust } from "./ItemTopazDust";
-import { itemTopazIngot } from "./ItemTopazIngot";
-import { itemTopazOre } from "./ItemTopazOre";
-import { itemTopazShard } from "./ItemTopazShard";
+
 import { itemWaterBottle } from "./itemWaterBottle";
 import { itemWeaponRecipe } from "./ItemWeaponRecipe";
 import { itemWheat } from "./ItemWheat";
@@ -116,10 +87,8 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.ObsidiumOre]: itemObsidiumOre,
   [CraftingResourcesBlueprint.GreenOre]: itemGreenOre,
   [CraftingResourcesBlueprint.SilverOre]: itemSilverOre,
-  [CraftingResourcesBlueprint.GoldenIngot]: itemGoldenIngot,
   [CraftingResourcesBlueprint.SilverIngot]: itemSilverIngot,
   [CraftingResourcesBlueprint.CopperIngot]: itemCopperIngot,
-  [CraftingResourcesBlueprint.IronIngot]: itemIronIngot,
   [CraftingResourcesBlueprint.RedSapphire]: itemRedSapphire,
   [CraftingResourcesBlueprint.SmallWoodenStick]: itemSmallWoodenStick,
   [CraftingResourcesBlueprint.Rope]: itemRope,
@@ -146,42 +115,6 @@ export const craftingResourcesBlueprintIndex = {
   [CraftingResourcesBlueprint.GreenIngot]: itemGreenIngot,
   [CraftingResourcesBlueprint.ObsidiumIngot]: itemObsidiumIngot,
   [CraftingResourcesBlueprint.CorruptionIngot]: itemCorruptionIngot,
-  [CraftingResourcesBlueprint.PhoenixiteShard]: itemPhoenixiteShard,
-  [CraftingResourcesBlueprint.TopazShard]: itemTopazShard,
-  [CraftingResourcesBlueprint.IcestormiteShard]: itemIcestormiteShard,
-  [CraftingResourcesBlueprint.AquamareineShard]: itemAquamareineShard,
-  [CraftingResourcesBlueprint.LeafstoneShard]: itemLeafstoneShard,
-  [CraftingResourcesBlueprint.AmethystineShard]: itemAmethystineShard,
-  [CraftingResourcesBlueprint.MoonstoneShard]: itemMoonstoneShard,
-  [CraftingResourcesBlueprint.GoldShard]: itemGoldShard,
-  [CraftingResourcesBlueprint.NightstoneShard]: itemNightstoneShard,
-  [CraftingResourcesBlueprint.PhoenixiteOre]: itemPhoenixiteOre,
-  [CraftingResourcesBlueprint.TopazOre]: itemTopazOre,
-  [CraftingResourcesBlueprint.IcestormiteOre]: itemIcestormiteOre,
-  [CraftingResourcesBlueprint.AquamareineOre]: itemAquamareineOre,
-  [CraftingResourcesBlueprint.LeafstoneOre]: itemLeafstoneOre,
-  [CraftingResourcesBlueprint.AmethystineOre]: itemAmethystineOre,
-  [CraftingResourcesBlueprint.MoonstoneOre]: itemMoonstoneOre,
-  [CraftingResourcesBlueprint.GoldOre]: itemGoldOre,
-  [CraftingResourcesBlueprint.NightstoneOre]: itemNightstoneOre,
-  [CraftingResourcesBlueprint.PhoenixiteIngot]: itemPhoenixiteIngot,
-  [CraftingResourcesBlueprint.TopazIngot]: itemTopazIngot,
-  [CraftingResourcesBlueprint.IcestormiteIngot]: itemIcestormiteIngot,
-  [CraftingResourcesBlueprint.AquamareineIngot]: itemAquamareineIngot,
-  [CraftingResourcesBlueprint.LeafstoneIngot]: itemLeafstoneIngot,
-  [CraftingResourcesBlueprint.AmethystineIngot]: itemAmethystineIngot,
-  [CraftingResourcesBlueprint.MoonstoneIngot]: itemMoonstoneIngot,
-  [CraftingResourcesBlueprint.GoldIngot]: itemGoldIngot,
-  [CraftingResourcesBlueprint.NightstoneIngot]: itemNightstoneIngot,
-  [CraftingResourcesBlueprint.PhoenixiteDust]: itemPhoenixiteDust,
-  [CraftingResourcesBlueprint.TopazDust]: itemTopazDust,
-  [CraftingResourcesBlueprint.IcestormiteDust]: itemIcestormiteDust,
-  [CraftingResourcesBlueprint.AquamareineDust]: itemAquamareineDust,
-  [CraftingResourcesBlueprint.LeafstoneDust]: itemLeafstoneDust,
-  [CraftingResourcesBlueprint.AmethystineDust]: itemAmethystineDust,
-  [CraftingResourcesBlueprint.MoonstoneDust]: itemMoonstoneDust,
-  [CraftingResourcesBlueprint.GoldDust]: itemGoldDust,
-  [CraftingResourcesBlueprint.NightstoneDust]: itemNightstoneDust,
   [CraftingResourcesBlueprint.Bandage]: itemBandage,
   [CraftingResourcesBlueprint.DragonHead]: itemDragonHead,
   [CraftingResourcesBlueprint.DragonTooth]: itemDragonTooth,
