@@ -4,7 +4,7 @@ import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeRoyalBow: IUseWithCraftingRecipe = {
-  outputKey: RangedWeaponsBlueprint.Bow,
+  outputKey: RangedWeaponsBlueprint.RoyalBow,
   outputQtyRange: [1, 1],
   requiredItems: [
     {
