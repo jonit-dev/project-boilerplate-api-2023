@@ -1,6 +1,4 @@
 import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemRoyalCrossbow } from "./tier4/ItemRoyalCrossbow";
-
 import { itemArrow } from "./ammo/ItemArrow";
 import { itemBolt } from "./ammo/ItemBolt";
 import { itemCorruptionBolt } from "./ammo/ItemCorruptionBolt";
@@ -35,16 +33,19 @@ import { itemLightningCrossbow } from "./tier3/ItemLightningCrossbow";
 import { itemRedwoodLongbow } from "./tier3/ItemRedwoodLongbow";
 import { itemRuneBow } from "./tier3/ItemRuneBow";
 import { itemRuneCrossbow } from "./tier3/ItemRuneCrossbow";
-import { itemStormBow } from "./tier5/ItemStormBow";
-import { itemSunstoneBow } from "./tier5/ItemSunstoneBow";
-import { itemValkyriesBow } from "./tier5/ItemValkyriesBow";
-import { itemZephyrusBow } from "./tier5/ItemZephyrusBow";
-
 import { itemHadesBow } from "./tier4/ItemHadesBow";
 import { itemHellishBow } from "./tier4/ItemHellishBow";
 import { itemPhoenixBow } from "./tier4/ItemPhoenixBow";
 import { itemRoyalBow } from "./tier4/ItemRoyalBow";
+import { itemRoyalCrossbow } from "./tier4/ItemRoyalCrossbow";
+import { itemScythianGoldenBow } from "./tier4/ItemScythianGoldenBow";
+import { itemTurkishGoldenBow } from "./tier4/ItemTurkishGoldenBow";
 import { itemDragonBow } from "./tier5/ItemDragonBow";
+import { itemStormBow } from "./tier5/ItemStormBow";
+import { itemSunstoneBow } from "./tier5/ItemSunstoneBow";
+import { itemValkyriesBow } from "./tier5/ItemValkyriesBow";
+import { itemYggdrasilBow } from "./tier5/ItemYggdrasilBow";
+import { itemZephyrusBow } from "./tier5/ItemZephyrusBow";
 
 export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.Slingshot]: itemSlingshot,
@@ -73,6 +74,9 @@ export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.RoyalBow]: itemRoyalBow,
   [RangedWeaponsBlueprint.RoyalCrossbow]: itemRoyalCrossbow,
   [RangedWeaponsBlueprint.ShortBow]: itemShortBow,
+  [RangedWeaponsBlueprint.ScythianGoldenBow]: itemScythianGoldenBow,
+  [RangedWeaponsBlueprint.TurkishGoldenBow]: itemTurkishGoldenBow,
+  [RangedWeaponsBlueprint.YggdrasilBow]: itemYggdrasilBow,
   [RangedWeaponsBlueprint.PoisonArrow]: itemPoisonArrow,
   [RangedWeaponsBlueprint.GoldenArrow]: itemGoldenArrow,
   [RangedWeaponsBlueprint.ShockArrow]: itemShockArrow,

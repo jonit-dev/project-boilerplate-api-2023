@@ -11,6 +11,8 @@ import { itemVikingAxe } from "./tier2/ItemVikingAxe";
 import { itemDwarvenWaraxe } from "./tier3/ItemDwarvenWaraxe";
 import { itemFrostDoubleAxe } from "./tier3/ItemFrostDoubleAxe";
 import { itemGlacialHatchet } from "./tier3/ItemGlacialHatchet";
+import { itemHellishVikingAxe } from "./tier3/ItemHellishVikingAxe";
+import { itemHellishWarAxe } from "./tier3/ItemHellishWarAxe";
 import { itemNordicAxe } from "./tier3/ItemNordicAxe";
 import { itemShadowAxe } from "./tier3/ItemShadowAxe";
 import { itemVikingBattleAxe } from "./tier3/ItemVikingBattleAxe";
@@ -21,8 +23,10 @@ import { itemHalberd } from "./tier4/ItemHalberd";
 import { itemHellishAxe } from "./tier4/ItemHellishAxe";
 import { itemWhiteRavenAxe } from "./tier4/ItemWhiteRavenAxe";
 import { itemYetiHalberd } from "./tier4/ItemYetiHalberd";
+import { itemYggdrasilVikingAxe } from "./tier4/ItemYggdrasilVikingAxe";
 import { itemGoldenAxe } from "./tier5/ItemGoldenAxe";
 import { itemRoyalDoubleAxe } from "./tier5/ItemRoyalDoubleAxe";
+import { itemYggdrasilWarAxe } from "./tier5/ItemYggdrasilWarAxe";
 
 export const axesBlueprintIndex = {
   [AxesBlueprint.Axe]: itemAxe,
@@ -40,6 +44,10 @@ export const axesBlueprintIndex = {
   [AxesBlueprint.RoyalDoubleAxe]: itemRoyalDoubleAxe,
   [AxesBlueprint.VikingAxe]: itemVikingAxe,
   [AxesBlueprint.WoodenAxe]: itemWoodenAxe,
+  [AxesBlueprint.HellishVikingAxe]: itemHellishVikingAxe,
+  [AxesBlueprint.HellishWarAxe]: itemHellishWarAxe,
+  [AxesBlueprint.YggdrasilWarAxe]: itemYggdrasilWarAxe,
+  [AxesBlueprint.YggdrasilVikingAxe]: itemYggdrasilVikingAxe,
   [AxesBlueprint.NordicAxe]: itemNordicAxe,
   [AxesBlueprint.RuneAxe]: itemRuneAxe,
   [AxesBlueprint.ShadowAxe]: itemShadowAxe,

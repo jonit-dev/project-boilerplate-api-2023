@@ -1,4 +1,6 @@
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
+import { itemHellishBronzeStaff } from "./ItemHellishBronzeStaff";
+import { itemHellishStaff } from "./ItemHellishStaff";
 import { itemAirWand } from "./item0/ItemAirWand";
 import { itemWand } from "./item0/ItemWand";
 import { itemWoodenStaff } from "./item0/ItemWoodenStaff";
@@ -33,6 +35,8 @@ export const staffsBlueprintIndex = {
   [StaffsBlueprint.RubyStaff]: itemRubyStaff,
   [StaffsBlueprint.SoulStaff]: itemSoulStaff,
   [StaffsBlueprint.Wand]: itemWand,
+  [StaffsBlueprint.HellishStaff]: itemHellishStaff,
+  [StaffsBlueprint.HellishBronzeStaff]: itemHellishBronzeStaff,
   [StaffsBlueprint.WoodenStaff]: itemWoodenStaff,
   [StaffsBlueprint.SangriaStaff]: itemSangriaStaff,
   [StaffsBlueprint.TartarusStaff]: itemTartarusStaff,
