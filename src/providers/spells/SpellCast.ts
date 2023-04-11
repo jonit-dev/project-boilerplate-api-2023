@@ -66,7 +66,7 @@ export class SpellCast {
     key || (key = spell.key);
 
     if (key) {
-      const buffActivated = await this.inMemoryHashTable.get(namespace, key);
+      const buffActivated = await this.inMemoryHashTable.has(namespace, key);
 
       if (buffActivated) {
         this.socketMessaging.sendErrorMessageToCharacter(
@@ -223,7 +223,7 @@ export class SpellCast {
     spell: ISpell,
     target?: ICharacter | INPC
   ): Promise<void> {
-    const updatedCharacter = (await Character.findById(character._id).lean()) as ICharacter;
+    const updatedCharacter = (await Character.findById(character._id).lean({ virtuals: true })) as ICharacter;
 
     const payload: ICharacterAttributeChanged = {
       targetId: updatedCharacter._id,
@@ -240,7 +240,6 @@ export class SpellCast {
     );
 
     if (target) {
-      console.log("projectils", spell.projectileAnimationKey, "animation", spell.animationKey);
       await this.animationEffect.sendProjectileAnimationEventToCharacter(
         updatedCharacter,
         updatedCharacter._id,

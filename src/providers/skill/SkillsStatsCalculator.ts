@@ -3,9 +3,10 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { EquipmentStatsCalculator } from "@providers/equipment/EquipmentStatsCalculator";
 import { container } from "@providers/inversify/container";
+import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { provide } from "inversify-binding-decorators";
 
 @provide(SkillStatsCalculator)
@@ -101,11 +102,15 @@ export class SkillStatsCalculator {
         attack: value,
       });
     } else {
+      const namespace = `${NamespaceRedisControl.CharacterSpell}:${ownerSkill}`;
+      const key = SpellsBlueprint.BerserkerFrenzy;
+      const exists = await this.inMemoryHashTable.has(namespace, key);
+
       await this.inMemoryHashTable.set(ownerSkill, "totalDefense", {
-        defense: value,
+        defense: exists ? value / 2 : value,
       });
     }
 
-    await this.inMemoryHashTable.expire(ownerSkill, 120, "NX");
+    await this.inMemoryHashTable.expire(ownerSkill, 180, "NX");
   }
 }

@@ -1,6 +1,7 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { CharacterEntities } from "@rpg-engine/shared";
 import { CharacterSkillBuff } from "../CharacterSkillBuff";
 
 describe("updateBasicAttribute", () => {
@@ -9,6 +10,10 @@ describe("updateBasicAttribute", () => {
 
   beforeAll(() => {
     characterSkillBuff = container.get<CharacterSkillBuff>(CharacterSkillBuff);
+
+    jest.useFakeTimers({
+      advanceTimers: true,
+    });
   });
 
   beforeEach(async () => {
@@ -31,6 +36,28 @@ describe("updateBasicAttribute", () => {
 
       expect(skill.strength.level).toEqual(6);
       expect(result).toEqual({ _id: result._id, key: "strength", value: 5 });
+    });
+
+    it("should return the updated basic attribute buff when skillType is IntervalAttackSpeed", async () => {
+      const buff = 10;
+      const skillType = CharacterEntities.AttackIntervalSpeed;
+      await characterSkillBuff.enableTemporaryBuff(testCharacter, skillType, buff, 5);
+
+      const character = (await Character.findById(testCharacter._id)
+        .lean()
+        .select("attackIntervalSpeed")) as ICharacter;
+
+      expect(character.attackIntervalSpeed).toEqual(1530);
+    });
+
+    it("should return the updated basic attribute buff when skillType is baseSpeed", async () => {
+      const buff = 10;
+      const skillType = CharacterEntities.Speed;
+      await characterSkillBuff.enableTemporaryBuff(testCharacter, skillType, buff, 5);
+
+      const character = (await Character.findById(testCharacter._id).lean().select("baseSpeed")) as ICharacter;
+
+      expect(character.baseSpeed).toEqual(3.65);
     });
   });
 });
