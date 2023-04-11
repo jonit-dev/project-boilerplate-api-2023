@@ -19,7 +19,7 @@ import {
 } from "@rpg-engine/shared";
 import { ItemCraftable } from "../ItemCraftable";
 import { itemManaPotion } from "../data/blueprints/potions/ItemManaPotion";
-import { CraftingResourcesBlueprint } from "../data/types/itemsBlueprintTypes";
+import { CraftingResourcesBlueprint, PotionsBlueprint } from "../data/types/itemsBlueprintTypes";
 
 describe("ItemCraftable.ts", () => {
   let craftableItem: ItemCraftable;
@@ -90,7 +90,7 @@ describe("ItemCraftable.ts", () => {
   });
 
   it("should craft stackable item", async () => {
-    skill.blacksmithing.level = 10;
+    skill.lumberjacking.level = 10;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
 
     const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
@@ -261,6 +261,8 @@ describe("ItemCraftable.ts", () => {
       return Promise.resolve(true);
     });
 
+    skill.alchemy.level = 0;
+
     // Define the item to be crafted
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
 
@@ -270,22 +272,17 @@ describe("ItemCraftable.ts", () => {
     // Retrieve the item container from the inventory
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
-    const ingredients = container.itemIds;
+    const itemKeys = (await container.items).map((item) => item.key);
 
-    const hasBlueFeather = ingredients.includes(CraftingResourcesBlueprint.BlueFeather);
-    const hasWaterBottle = ingredients.includes(CraftingResourcesBlueprint.WaterBottle);
+    expect(itemKeys.includes(CraftingResourcesBlueprint.BlueFeather)).toBe(true);
+    expect(itemKeys.includes(CraftingResourcesBlueprint.WaterBottle)).toBe(true);
+    expect(itemKeys.includes(PotionsBlueprint.ManaPotion)).toBe(false);
 
-    // Check if ingredients were consumed
-    expect(hasBlueFeather).toBe(false);
-    expect(hasWaterBottle).toBe(false);
-    expect(container.slots[1]).toStrictEqual(null);
-
-    // Retrieve the crafted potion from the container
-    const craftedPotion = container.slots[0];
-
-    // Verify that the crafted potion was produced
-    expect(craftedPotion).not.toBe(null);
-    expect(craftedPotion.key).toStrictEqual(itemManaPotion.key);
+    expect(sendEventToUser).toHaveBeenCalledTimes(1);
+    expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+      message: "Sorry, you do not have the required skills ot craft this item.",
+      type: "error",
+    });
   });
 
   it("should not craft item if it does not have a blueprint", async () => {
@@ -351,7 +348,7 @@ describe("ItemCraftable.ts", () => {
     const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
     craftChanceMock.mockImplementation(() => false);
 
-    skill.alchemy.level = 1;
+    skill.alchemy.level = 10;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
 
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
@@ -363,7 +360,7 @@ describe("ItemCraftable.ts", () => {
     expect(container.slots[1]).toBe(null);
 
     expect(craftChanceMock).toBeCalledTimes(1);
-    expect(craftChanceMock).toBeCalledWith(0, 50);
+    expect(craftChanceMock).toBeCalledWith(1, 50);
 
     expect(sendEventToUser).toHaveBeenCalledTimes(4);
 

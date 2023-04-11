@@ -78,7 +78,10 @@ export class ItemCraftable {
 
     // Check if the character meets the minimum skill requirements for crafting
     if (!(await this.haveMiniSkills(character, recipe))) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you do not minimum crafting requirements.");
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you do not have the required skills ot craft this item."
+      );
       return;
     }
 

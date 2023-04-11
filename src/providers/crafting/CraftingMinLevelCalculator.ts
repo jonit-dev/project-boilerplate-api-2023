@@ -1,3 +1,4 @@
+import { CRAFTING_MIN_LEVEL_RATIO } from "@providers/constants/CraftingConstants";
 import { itemsBlueprintIndex } from "@providers/item/data";
 
 export function calculateMinimumLevel(ingredients: [string, number][]): number {
@@ -14,5 +15,5 @@ export function calculateMinimumLevel(ingredients: [string, number][]): number {
   const minimumLevel = (totalIngredientValue * craftingConst) / 100;
 
   // Return the smallest integer greater than or equal to the minimumLevel
-  return Math.ceil(minimumLevel);
+  return Math.ceil(minimumLevel) * CRAFTING_MIN_LEVEL_RATIO;
 }

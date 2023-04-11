@@ -34,6 +34,10 @@ jest.mock("@providers/constants/LootConstants", () => ({
   NPC_LOOT_CHANCE_MULTIPLIER: 1,
 }));
 
+jest.mock("@providers/constants/CraftingConstants", () => ({
+  CRAFTING_MIN_LEVEL_RATIO: 1,
+}));
+
 jest.mock("@providers/constants/NPCConstants", () => ({
   ...jest.requireActual("@providers/constants/NPCConstants"),
   NPC_TRADER_INTERACTION_DISTANCE: 2,
