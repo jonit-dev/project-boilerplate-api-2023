@@ -25,7 +25,7 @@ export const recipeShadowAxe: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.CorruptionIngot, 10],
       [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
