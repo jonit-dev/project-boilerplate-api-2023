@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, HelmetsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeBerserkersHelmet: IUseWithCraftingRecipe = {
   outputKey: HelmetsBlueprint.BerserkersHelmet,
@@ -13,5 +15,12 @@ export const recipeBerserkersHelmet: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.BatsWing,
       qty: 5,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.IronIngot, 10],
+      [CraftingResourcesBlueprint.BatsWing, 5],
+    ]),
   ],
 };

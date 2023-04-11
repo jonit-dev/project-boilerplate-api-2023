@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AccessoriesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeElvenRing: IUseWithCraftingRecipe = {
   outputKey: AccessoriesBlueprint.ElvenRing,
@@ -17,5 +19,13 @@ export const recipeElvenRing: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.ElvenWood,
       qty: 2,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Lumberjacking,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.Diamond, 1],
+      [CraftingResourcesBlueprint.ElvenLeaf, 3],
+      [CraftingResourcesBlueprint.ElvenWood, 2],
+    ]),
   ],
 };

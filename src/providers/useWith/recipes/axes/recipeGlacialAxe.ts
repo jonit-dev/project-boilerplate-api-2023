@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AxesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeGlacialAxe: IUseWithCraftingRecipe = {
   outputKey: AxesBlueprint.GlacialAxe,
@@ -21,5 +23,14 @@ export const recipeGlacialAxe: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
       qty: 10,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.SteelIngot, 10],
+      [CraftingResourcesBlueprint.GoldenIngot, 10],
+      [CraftingResourcesBlueprint.BlueSapphire, 10],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
+    ]),
   ],
 };

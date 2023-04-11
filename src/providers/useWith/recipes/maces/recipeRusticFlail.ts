@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeRusticFlail: IUseWithCraftingRecipe = {
@@ -17,5 +19,13 @@ export const recipeRusticFlail: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.BatsWing,
       qty: 1,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 2],
+      [CraftingResourcesBlueprint.Leather, 1],
+      [CraftingResourcesBlueprint.BatsWing, 1],
+    ]),
   ],
 };

@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AccessoriesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeCorruptionNecklace: IUseWithCraftingRecipe = {
   outputKey: AccessoriesBlueprint.CorruptionNecklace,
@@ -13,5 +15,12 @@ export const recipeCorruptionNecklace: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.Rope,
       qty: 1,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Alchemy,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.CorruptionOre, 3],
+      [CraftingResourcesBlueprint.Rope, 1],
+    ]),
   ],
 };

@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeCorruptionStaff: IUseWithCraftingRecipe = {
@@ -17,5 +19,13 @@ export const recipeCorruptionStaff: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.MagicRecipe,
       qty: 6,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Alchemy,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.Jade, 5],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 3],
+      [CraftingResourcesBlueprint.MagicRecipe, 6],
+    ]),
   ],
 };

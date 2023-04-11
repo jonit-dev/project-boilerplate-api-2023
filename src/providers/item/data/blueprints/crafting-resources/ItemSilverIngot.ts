@@ -13,4 +13,5 @@ export const itemSilverIngot: ICraftableItemBlueprint = {
   weight: 1,
   maxStackSize: 100,
   canSell: false,
+  basePrice: 20,
 };

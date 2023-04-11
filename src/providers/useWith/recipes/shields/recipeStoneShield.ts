@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, ShieldsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeStoneShield: IUseWithCraftingRecipe = {
   outputKey: ShieldsBlueprint.HolyShield,
@@ -21,5 +23,14 @@ export const recipeStoneShield: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
       qty: 5,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.SteelIngot, 10],
+      [CraftingResourcesBlueprint.IronIngot, 10],
+      [CraftingResourcesBlueprint.PolishedStone, 10],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+    ]),
   ],
 };

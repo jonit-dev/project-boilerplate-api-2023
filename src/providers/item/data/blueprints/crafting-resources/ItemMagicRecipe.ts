@@ -11,4 +11,5 @@ export const itemMagicRecipe: ICraftableItemBlueprint = {
   description: "A magic recipe scroll used for crafting.",
   weight: 0.01,
   maxStackSize: 100,
+  basePrice: 12,
 };

@@ -1,9 +1,11 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import {
   CraftingResourcesBlueprint,
   MagicsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeHolyShield: IUseWithCraftingRecipe = {
   outputKey: ShieldsBlueprint.HolyShield,
@@ -33,5 +35,16 @@ export const recipeHolyShield: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.DragonTooth,
       qty: 2,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.GoldenIngot, 20],
+      [CraftingResourcesBlueprint.PhoenixFeather, 10],
+      [CraftingResourcesBlueprint.ColoredFeather, 10],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+      [CraftingResourcesBlueprint.MagicRecipe, 5],
+      [CraftingResourcesBlueprint.DragonTooth, 2],
+    ]),
   ],
 };

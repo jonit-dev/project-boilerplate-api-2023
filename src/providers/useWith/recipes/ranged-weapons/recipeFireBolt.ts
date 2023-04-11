@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeFireBolt: IUseWithCraftingRecipe = {
   outputKey: RangedWeaponsBlueprint.FireBolt,
@@ -17,5 +19,13 @@ export const recipeFireBolt: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.RedSapphire,
       qty: 1,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Alchemy,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.SmallWoodenStick, 1],
+      [CraftingResourcesBlueprint.SteelIngot, 1],
+      [CraftingResourcesBlueprint.RedSapphire, 1],
+    ]),
   ],
 };

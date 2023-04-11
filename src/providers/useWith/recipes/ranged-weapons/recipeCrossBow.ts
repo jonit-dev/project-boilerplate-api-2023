@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeCrossBow: IUseWithCraftingRecipe = {
   outputKey: RangedWeaponsBlueprint.Crossbow,
@@ -13,5 +15,12 @@ export const recipeCrossBow: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.SteelIngot,
       qty: 2,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Lumberjacking,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+      [CraftingResourcesBlueprint.SmallWoodenStick, 2],
+    ]),
   ],
 };

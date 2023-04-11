@@ -65,4 +65,5 @@ export interface IUseWithCraftingRecipe {
   outputKey: string;
   outputQtyRange: [number, number];
   requiredItems: IUseWithCraftingRecipeItem[];
+  minCraftingRequirements: [string, number];
 }

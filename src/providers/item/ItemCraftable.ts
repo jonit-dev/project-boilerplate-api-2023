@@ -7,10 +7,13 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { recipeBlueprintsIndex } from "@providers/useWith/recipes/index";
 import { IUseWithCraftingRecipe, IUseWithCraftingRecipeItem } from "@providers/useWith/useWithTypes";
 import Shared, {
+  CraftingSkill,
+  ICraftItemPayload,
   ICraftableItem,
   ICraftableItemIngredient,
   IEquipmentAndInventoryUpdatePayload,
@@ -18,12 +21,10 @@ import Shared, {
   IUIShowMessage,
   ItemSocketEvents,
   UISocketEvents,
-  ICraftItemPayload,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
-import { SkillIncrease } from "@providers/skill/SkillIncrease";
 
 @provide(ItemCraftable)
 export class ItemCraftable {
@@ -38,11 +39,18 @@ export class ItemCraftable {
   ) {}
 
   public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
+    // Retrieve character inventory items
     const inventoryInfo = await this.getCharacterInventoryItems(character);
-    const recipes = this.getRecipes(itemSubType).map(
-      this.getCraftableItem.bind(this, inventoryInfo)
-    ) as ICraftableItem[];
-    this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, recipes);
+
+    // Retrieve the list of recipes for the given item sub-type
+    const recipes = this.getRecipes(itemSubType);
+
+    // Process each recipe to generate craftable items
+    const craftableItemsPromises = recipes.map((recipe) => this.getCraftableItem(inventoryInfo, recipe, character));
+    const craftableItems = (await Promise.all(craftableItemsPromises)) as ICraftableItem[];
+
+    // Send the list of craftable items to the user through a socket event
+    this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, craftableItems);
   }
 
   public async craftItem(itemToCraft: ICraftItemPayload, character: ICharacter): Promise<void> {
@@ -59,11 +67,18 @@ export class ItemCraftable {
     }
 
     const inventoryInfo = await this.getCharacterInventoryItems(character);
+
     if (!this.canCraftRecipe(inventoryInfo, recipe)) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         "Sorry, you do not have required items in your inventory."
       );
+      return;
+    }
+
+    // Check if the character meets the minimum skill requirements for crafting
+    if (!(await this.haveMiniSkills(character, recipe))) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you do not minimum crafting requirements.");
       return;
     }
 
@@ -155,17 +170,29 @@ export class ItemCraftable {
     } while (qty > 0);
   }
 
-  private getCraftableItem(inventoryInfo: Map<string, number>, recipe: IUseWithCraftingRecipe): ICraftableItem {
+  private async getCraftableItem(
+    inventoryInfo: Map<string, number>,
+    recipe: IUseWithCraftingRecipe,
+    character: ICharacter
+  ): Promise<ICraftableItem> {
     const item = itemsBlueprintIndex[recipe.outputKey] as Shared.IItem;
 
     const ingredients: ICraftableItemIngredient[] = recipe.requiredItems.map(
       this.getCraftableItemIngredient.bind(this)
     );
 
+    const minCraftingRequirements = recipe.minCraftingRequirements;
+
+    const haveMiniSkills = await this.haveMiniSkills(character, recipe);
+
+    const canCraft = this.canCraftRecipe(inventoryInfo, recipe) && haveMiniSkills;
+
     return {
       ...item,
-      canCraft: this.canCraftRecipe(inventoryInfo, recipe),
+      canCraft,
       ingredients: ingredients,
+      minCraftingRequirements,
+      levelIsOk: haveMiniSkills,
     };
   }
 
@@ -174,6 +201,55 @@ export class ItemCraftable {
       const availableQty = inventoryInfo.get(ing.key) ?? 0;
       return availableQty >= ing.qty;
     });
+  }
+
+  private async haveMiniSkills(character: ICharacter, recipe: IUseWithCraftingRecipe): Promise<boolean> {
+    // Retrieve the character with populated skills from the database
+    const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
+      "skills"
+    )) as unknown as ICharacter;
+
+    // Ensure the character has skills
+    const skills = updatedCharacter.skills as unknown as ISkill;
+    if (!skills) {
+      return false;
+    }
+
+    // Retrieve the minimum crafting requirements from the recipe
+    const minCraftingRequirements = recipe.minCraftingRequirements;
+
+    // Determine the character's skill level for the required crafting skill
+    let skillLevel: number = 0;
+    switch (minCraftingRequirements[0]) {
+      case CraftingSkill.Blacksmithing:
+        skillLevel = skills.blacksmithing.level;
+        break;
+      case CraftingSkill.Lumberjacking:
+        skillLevel = skills.lumberjacking.level;
+        break;
+      case CraftingSkill.Alchemy:
+        skillLevel = skills.alchemy.level;
+        break;
+      case CraftingSkill.Mining:
+        skillLevel = skills.mining.level;
+        break;
+      case CraftingSkill.Cooking:
+        skillLevel = skills.cooking.level;
+        break;
+      case CraftingSkill.Fishing:
+        skillLevel = skills.fishing.level;
+        break;
+      default:
+        break;
+    }
+
+    // Check if the character's skill level meets the minimum crafting requirements
+    if (skillLevel < minCraftingRequirements[1]) {
+      return false;
+    }
+
+    // If all checks pass, return true
+    return true;
   }
 
   private getCraftableItemIngredient(item: IUseWithCraftingRecipeItem): ICraftableItemIngredient {
@@ -196,7 +272,9 @@ export class ItemCraftable {
         availableRecipes.push(recipes[item.key]);
       }
     }
-    return availableRecipes;
+
+    // Sorts the availableRecipes array based minCraftingRequirements level
+    return availableRecipes.sort((a, b) => a.minCraftingRequirements[1] - b.minCraftingRequirements[1]);
   }
 
   private getAllRecipes(): Object {

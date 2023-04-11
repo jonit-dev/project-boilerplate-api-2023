@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AxesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeWoodenAxe: IUseWithCraftingRecipe = {
   outputKey: AxesBlueprint.WoodenAxe,
@@ -9,5 +11,9 @@ export const recipeWoodenAxe: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.WoodenSticks,
       qty: 12,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Lumberjacking,
+    calculateMinimumLevel([[CraftingResourcesBlueprint.WoodenSticks, 12]]),
   ],
 };

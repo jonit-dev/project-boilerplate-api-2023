@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { ArmorsBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeStuddedArmor: IUseWithCraftingRecipe = {
   outputKey: ArmorsBlueprint.StuddedArmor,
@@ -13,5 +15,12 @@ export const recipeStuddedArmor: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.IronIngot,
       qty: 8,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.Leather, 8],
+      [CraftingResourcesBlueprint.IronIngot, 8],
+    ]),
   ],
 };

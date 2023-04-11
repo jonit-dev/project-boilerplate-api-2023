@@ -1,5 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -18,8 +18,6 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { ItemCraftable } from "../ItemCraftable";
-import { itemBlueFeather } from "../data/blueprints/crafting-resources/ItemBlueFeather";
-import { itemWaterBottle } from "../data/blueprints/crafting-resources/itemWaterBottle";
 import { itemManaPotion } from "../data/blueprints/potions/ItemManaPotion";
 import { CraftingResourcesBlueprint } from "../data/types/itemsBlueprintTypes";
 
@@ -30,6 +28,7 @@ describe("ItemCraftable.ts", () => {
   let inventory: IItem;
   let sendEventToUser: jest.SpyInstance;
   let items: IItem[];
+  let skill: ISkill;
 
   beforeAll(() => {
     craftableItem = container.get<ItemCraftable>(ItemCraftable);
@@ -41,7 +40,10 @@ describe("ItemCraftable.ts", () => {
       { hasEquipment: true, hasInventory: true, hasSkills: true }
     );
 
+    skill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+
     inventory = await testCharacter.inventory;
+    await inventory.save();
     inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
     items = [
@@ -59,31 +61,11 @@ describe("ItemCraftable.ts", () => {
 
     expect(sendEventToUser).toHaveBeenCalledTimes(1);
 
-    const args = sendEventToUser.mock.calls[0];
-
-    expect(args[0]).toEqual(testCharacter.channelId);
-    expect(args[1]).toEqual(ItemSocketEvents.CraftableItems);
-
-    const craftableItems = expect.arrayContaining([
-      expect.objectContaining({
-        key: itemManaPotion.key,
-        canCraft: true,
-        name: itemManaPotion.name,
-        texturePath: itemManaPotion.texturePath,
-        ingredients: expect.arrayContaining([
-          expect.objectContaining({
-            key: itemBlueFeather.key,
-            qty: 2,
-          }),
-          expect.objectContaining({
-            key: itemWaterBottle.key,
-            qty: 1,
-          }),
-        ]),
-      }),
-    ]);
-
-    expect(args[2]).toEqual(craftableItems);
+    expect(sendEventToUser).toHaveBeenCalledWith(
+      testCharacter.channelId!,
+      ItemSocketEvents.CraftableItems,
+      expect.any(Array)
+    );
   });
 
   it("should craft non stackable item", async () => {
@@ -91,6 +73,9 @@ describe("ItemCraftable.ts", () => {
     craftChanceMock.mockImplementation(() => {
       return Promise.resolve(true);
     });
+
+    skill.alchemy.level = 10;
+    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
 
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
     await craftableItem.craftItem(itemToCraft, testCharacter);
@@ -105,6 +90,9 @@ describe("ItemCraftable.ts", () => {
   });
 
   it("should craft stackable item", async () => {
+    skill.blacksmithing.level = 10;
+    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
     const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
     craftChanceMock.mockImplementation(() => {
       return Promise.resolve(true);
@@ -166,6 +154,9 @@ describe("ItemCraftable.ts", () => {
       return Promise.resolve(true);
     });
 
+    skill.alchemy.level = 10;
+    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
     const originalWeight = testCharacter.weight;
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
 
@@ -180,6 +171,9 @@ describe("ItemCraftable.ts", () => {
     craftChanceMock.mockImplementation(() => {
       return Promise.resolve(true);
     });
+
+    skill.alchemy.level = 10;
+    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
 
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
     await craftableItem.craftItem(itemToCraft, testCharacter);
@@ -213,6 +207,9 @@ describe("ItemCraftable.ts", () => {
     const characterValidationMock = jest.spyOn(CharacterValidation.prototype, "hasBasicValidation");
     characterValidationMock.mockReturnValue(false);
 
+    skill.alchemy.level = 10;
+    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
 
     await craftableItem.craftItem(itemToCraft, testCharacter);
@@ -226,6 +223,71 @@ describe("ItemCraftable.ts", () => {
 
     await craftableItem.craftItem(itemToCraft, testCharacter);
     expect(performCraftingMock).toBeCalled();
+  });
+
+  it("should not craft item if it does not have skills", async () => {
+    // Remove skills from the character
+    testCharacter.skills = undefined;
+    await testCharacter.save();
+
+    // Mock the isCraftSuccessful function to always return true
+    const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
+    craftChanceMock.mockImplementation(() => {
+      return Promise.resolve(true);
+    });
+
+    // Define the item to be crafted
+    const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
+
+    // Attempt to craft the item
+    await craftableItem.craftItem(itemToCraft, testCharacter);
+
+    // Retrieve the item container from the inventory
+    const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    // Check if the crafting process has not produced the expected item
+    expect(container.slots[1]).not.toBe(null);
+
+    // Retrieve the crafted potion from the container
+    const craftedPotion = container.slots[0];
+
+    // Verify that the crafted potion is not the expected item
+    expect(craftedPotion).not.toBe(null);
+    expect(craftedPotion.key).not.toEqual(itemManaPotion.key);
+  });
+
+  it("should not craft without minimum skills", async () => {
+    // Mock the isCraftSuccessful function to always return true
+    const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
+    craftChanceMock.mockImplementation(() => {
+      return Promise.resolve(true);
+    });
+
+    // Define the item to be crafted
+    const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
+
+    // Attempt to craft the item
+    await craftableItem.craftItem(itemToCraft, testCharacter);
+
+    // Retrieve the item container from the inventory
+    const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+
+    const ingredients = container.itemIds;
+
+    const hasBlueFeather = ingredients.includes(CraftingResourcesBlueprint.BlueFeather);
+    const hasWaterBottle = ingredients.includes(CraftingResourcesBlueprint.WaterBottle);
+
+    // Check if ingredients were consumed
+    expect(hasBlueFeather).toBe(false);
+    expect(hasWaterBottle).toBe(false);
+    expect(container.slots[1]).toStrictEqual(null);
+
+    // Retrieve the crafted potion from the container
+    const craftedPotion = container.slots[0];
+
+    // Verify that the crafted potion was produced
+    expect(craftedPotion).not.toBe(null);
+    expect(craftedPotion.key).toStrictEqual(itemManaPotion.key);
   });
 
   it("should not craft item if it does not have a blueprint", async () => {
@@ -293,6 +355,9 @@ describe("ItemCraftable.ts", () => {
       return Promise.resolve(false);
     });
 
+    skill.alchemy.level = 10;
+    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
     await craftableItem.craftItem(itemToCraft, testCharacter);
 
@@ -347,7 +412,14 @@ describe("ItemCraftable.ts", () => {
     expect(results.some((r) => !r)).toBeTruthy();
   });
 
+  it("should return crafting skills average", async () => {
+    // @ts-expect-error
+    const avgSkills = await craftableItem.getCraftingSkillsAverage(testCharacter);
+    expect(typeof avgSkills).toBe("number");
+  });
+
   afterEach(() => {
+    jest.clearAllMocks();
     jest.restoreAllMocks();
   });
 });

@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, ShieldsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeCrimsonAegisShield: IUseWithCraftingRecipe = {
   outputKey: ShieldsBlueprint.CrimsonAegisShield,
@@ -25,5 +27,15 @@ export const recipeCrimsonAegisShield: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.DragonHead,
       qty: 2,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.GoldenIngot, 50],
+      [CraftingResourcesBlueprint.PhoenixFeather, 20],
+      [CraftingResourcesBlueprint.ColoredFeather, 10],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+      [CraftingResourcesBlueprint.DragonHead, 2],
+    ]),
   ],
 };

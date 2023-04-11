@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, LegsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeFalconLegs: IUseWithCraftingRecipe = {
@@ -21,5 +23,14 @@ export const recipeFalconLegs: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.PhoenixFeather,
       qty: 10,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.ObsidiumIngot, 5],
+      [CraftingResourcesBlueprint.SteelIngot, 5],
+      [CraftingResourcesBlueprint.BlueLeather, 10],
+      [CraftingResourcesBlueprint.PhoenixFeather, 10],
+    ]),
   ],
 };

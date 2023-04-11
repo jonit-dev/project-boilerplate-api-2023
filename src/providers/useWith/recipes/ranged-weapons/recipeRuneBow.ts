@@ -1,9 +1,11 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import {
   CraftingResourcesBlueprint,
   MagicsBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeRuneBow: IUseWithCraftingRecipe = {
   outputKey: RangedWeaponsBlueprint.RuneBow,
@@ -21,5 +23,13 @@ export const recipeRuneBow: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
       qty: 5,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Lumberjacking,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.Rope, 5],
+      [CraftingResourcesBlueprint.MagicRecipe, 5],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+    ]),
   ],
 };

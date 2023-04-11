@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeBolt: IUseWithCraftingRecipe = {
   outputKey: RangedWeaponsBlueprint.Bolt,
@@ -13,5 +15,12 @@ export const recipeBolt: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.SteelIngot,
       qty: 1,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.SmallWoodenStick, 1],
+      [CraftingResourcesBlueprint.SteelIngot, 1],
+    ]),
   ],
 };

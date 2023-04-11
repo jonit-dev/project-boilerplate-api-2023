@@ -12,4 +12,5 @@ export const itemSilverOre: ICraftableItemBlueprint = {
   weight: 1.6,
   maxStackSize: 100,
   canSell: false,
+  basePrice: 35,
 };

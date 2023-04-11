@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, HelmetsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeTurban: IUseWithCraftingRecipe = {
@@ -13,5 +15,12 @@ export const recipeTurban: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.Leather,
       qty: 4,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.Silk, 20],
+      [CraftingResourcesBlueprint.Leather, 4],
+    ]),
   ],
 };

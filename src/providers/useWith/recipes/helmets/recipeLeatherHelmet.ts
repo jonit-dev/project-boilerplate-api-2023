@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, HelmetsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeLeatherHelmet: IUseWithCraftingRecipe = {
@@ -10,4 +12,5 @@ export const recipeLeatherHelmet: IUseWithCraftingRecipe = {
       qty: 12,
     },
   ],
+  minCraftingRequirements: [CraftingSkill.Alchemy, calculateMinimumLevel([[CraftingResourcesBlueprint.Leather, 12]])],
 };

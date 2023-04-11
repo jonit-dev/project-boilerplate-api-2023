@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeBlueAuroraSpear: IUseWithCraftingRecipe = {
@@ -17,5 +19,13 @@ export const recipeBlueAuroraSpear: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
       qty: 3,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.SteelIngot, 2],
+      [CraftingResourcesBlueprint.BlueSapphire, 5],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 3],
+    ]),
   ],
 };

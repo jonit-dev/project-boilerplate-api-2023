@@ -10,4 +10,5 @@ export const itemWeaponRecipe: ICraftableItemBlueprint = {
   name: "Weapon Recipe",
   description: "A weapon recipe scroll used for crafting.",
   weight: 0.6,
+  basePrice: 4,
 };

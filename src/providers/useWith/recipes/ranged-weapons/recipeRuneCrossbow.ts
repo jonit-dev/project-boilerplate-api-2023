@@ -1,9 +1,11 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import {
   CraftingResourcesBlueprint,
   MagicsBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeCrossBow: IUseWithCraftingRecipe = {
   outputKey: RangedWeaponsBlueprint.RuneCrossbow,
@@ -25,5 +27,14 @@ export const recipeCrossBow: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.SteelIngot,
       qty: 5,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Alchemy,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.Rope, 5],
+      [CraftingResourcesBlueprint.MagicRecipe, 5],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+      [CraftingResourcesBlueprint.SteelIngot, 5],
+    ]),
   ],
 };

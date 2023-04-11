@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AccessoriesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeDeathNecklace: IUseWithCraftingRecipe = {
   outputKey: AccessoriesBlueprint.DeathNecklace,
@@ -21,5 +23,14 @@ export const recipeDeathNecklace: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.Bone,
       qty: 1,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Alchemy,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.CorruptionOre, 3],
+      [CraftingResourcesBlueprint.Rope, 1],
+      [CraftingResourcesBlueprint.WolfTooth, 1],
+      [CraftingResourcesBlueprint.Bone, 1],
+    ]),
   ],
 };

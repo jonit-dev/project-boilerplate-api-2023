@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeSilverBulbMace: IUseWithCraftingRecipe = {
@@ -17,5 +19,13 @@ export const recipeSilverBulbMace: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
       qty: 2,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.SilverIngot, 2],
+      [CraftingResourcesBlueprint.Diamond, 1],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 2],
+    ]),
   ],
 };

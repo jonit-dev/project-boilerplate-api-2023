@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeSangriaStaff: IUseWithCraftingRecipe = {
@@ -21,5 +23,14 @@ export const recipeSangriaStaff: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
       qty: 10,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Lumberjacking,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.RedSapphire, 10],
+      [CraftingResourcesBlueprint.PhoenixFeather, 10],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 10],
+    ]),
   ],
 };

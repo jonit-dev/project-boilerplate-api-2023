@@ -1,9 +1,11 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import {
   CraftingResourcesBlueprint,
   MagicsBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeHadesBow: IUseWithCraftingRecipe = {
   outputKey: RangedWeaponsBlueprint.HadesBow,
@@ -25,5 +27,14 @@ export const recipeHadesBow: IUseWithCraftingRecipe = {
       key: MagicsBlueprint.DarkRune,
       qty: 5,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Alchemy,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.Rope, 2],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+      [CraftingResourcesBlueprint.CorruptionIngot, 5],
+      [CraftingResourcesBlueprint.MagicRecipe, 5],
+    ]),
   ],
 };

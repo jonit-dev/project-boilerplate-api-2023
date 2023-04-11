@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeSpikedClub: IUseWithCraftingRecipe = {
@@ -17,5 +19,13 @@ export const recipeSpikedClub: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.Skull,
       qty: 1,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.IronNail, 20],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 4],
+      [CraftingResourcesBlueprint.Skull, 1],
+    ]),
   ],
 };

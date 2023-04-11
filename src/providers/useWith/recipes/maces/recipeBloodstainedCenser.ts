@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeBloodstainedCenser: IUseWithCraftingRecipe = {
@@ -25,5 +27,15 @@ export const recipeBloodstainedCenser: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.DragonHead,
       qty: 3,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.GoldenIngot, 10],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 10],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 1],
+      [CraftingResourcesBlueprint.Bone, 5],
+      [CraftingResourcesBlueprint.DragonHead, 3],
+    ]),
   ],
 };

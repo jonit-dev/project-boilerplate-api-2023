@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, HelmetsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeBloodfireHelmet: IUseWithCraftingRecipe = {
   outputKey: HelmetsBlueprint.BloodfireHelmet,
@@ -21,5 +23,14 @@ export const recipeBloodfireHelmet: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.RedSapphire,
       qty: 5,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.ObsidiumIngot, 7],
+      [CraftingResourcesBlueprint.SteelIngot, 10],
+      [CraftingResourcesBlueprint.GoldenIngot, 10],
+      [CraftingResourcesBlueprint.RedSapphire, 5],
+    ]),
   ],
 };

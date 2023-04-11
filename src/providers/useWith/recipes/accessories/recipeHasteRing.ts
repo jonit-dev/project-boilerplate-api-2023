@@ -1,5 +1,7 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AccessoriesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeHasteRing: IUseWithCraftingRecipe = {
   outputKey: AccessoriesBlueprint.HasteRing,
@@ -17,5 +19,13 @@ export const recipeHasteRing: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.MagicRecipe,
       qty: 2,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Alchemy,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.BlueSapphire, 3],
+      [CraftingResourcesBlueprint.PhoenixFeather, 1],
+      [CraftingResourcesBlueprint.MagicRecipe, 2],
+    ]),
   ],
 };

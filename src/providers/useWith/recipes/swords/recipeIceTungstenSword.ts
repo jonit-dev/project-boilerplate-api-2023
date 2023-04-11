@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeTungstenSword: IUseWithCraftingRecipe = {
@@ -25,5 +27,15 @@ export const recipeTungstenSword: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.DragonHead,
       qty: 1,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.ObsidiumIngot, 3],
+      [CraftingResourcesBlueprint.GreenIngot, 3],
+      [CraftingResourcesBlueprint.WoodenSticks, 4],
+      [CraftingResourcesBlueprint.PhoenixFeather, 4],
+      [CraftingResourcesBlueprint.DragonHead, 1],
+    ]),
   ],
 };

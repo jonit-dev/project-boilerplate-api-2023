@@ -1,4 +1,6 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { ArmorsBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeSpellcastersCape: IUseWithCraftingRecipe = {
@@ -25,5 +27,15 @@ export const recipeSpellcastersCape: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.PhoenixFeather,
       qty: 20,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.CorruptionIngot, 10],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 10],
+      [CraftingResourcesBlueprint.BlueSilk, 10],
+      [CraftingResourcesBlueprint.BlueSapphire, 10],
+      [CraftingResourcesBlueprint.PhoenixFeather, 20],
+    ]),
   ],
 };

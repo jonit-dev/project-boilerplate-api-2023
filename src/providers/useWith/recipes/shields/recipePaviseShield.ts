@@ -1,9 +1,11 @@
+import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import {
   CraftingResourcesBlueprint,
   MagicsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipePaviseShield: IUseWithCraftingRecipe = {
   outputKey: ShieldsBlueprint.PaviseShield,
@@ -25,5 +27,14 @@ export const recipePaviseShield: IUseWithCraftingRecipe = {
       key: MagicsBlueprint.HealRune,
       qty: 5,
     },
+  ],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([
+      [CraftingResourcesBlueprint.GoldenIngot, 20],
+      [CraftingResourcesBlueprint.ColoredFeather, 10],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+      [CraftingResourcesBlueprint.MagicRecipe, 5],
+    ]),
   ],
 };
