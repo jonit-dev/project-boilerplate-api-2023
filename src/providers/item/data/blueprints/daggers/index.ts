@@ -1,4 +1,5 @@
 import { DaggersBlueprint } from "../../types/itemsBlueprintTypes";
+import { itemRomanDagger } from "./ItemRomanDagger";
 import { itemDagger } from "./tier0/ItemDagger";
 import { itemWoodenDagger } from "./tier0/ItemWoodenDagger";
 import { itemCopperJitte } from "./tier1/ItemCopperJitte";
@@ -31,6 +32,7 @@ export const daggersBlueprintIndex = {
   [DaggersBlueprint.Kunai]: itemKunai,
   [DaggersBlueprint.SaiDagger]: itemSaiDagger,
   [DaggersBlueprint.WoodenDagger]: itemWoodenDagger,
+  [DaggersBlueprint.RomanDagger]: itemRomanDagger,
   [DaggersBlueprint.NinjaKunai]: itemNinjaKunai,
   [DaggersBlueprint.CopperJitte]: itemCopperJitte,
   [DaggersBlueprint.RustedDagger]: itemRustedDagger,

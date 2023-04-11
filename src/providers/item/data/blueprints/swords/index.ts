@@ -1,4 +1,10 @@
 import { SwordsBlueprint } from "../../types/itemsBlueprintTypes";
+import { itemJianSword } from "./ItemJianSword";
+import { itemRoyalSword } from "./ItemRoyalSword";
+import { itemTemplarSword } from "./ItemTemplarSword";
+import { itemYggdrasilGladius } from "./ItemYggdrasilGladius";
+import { itemYggdrasilJianSword } from "./ItemYggdrasilJianSword";
+import { itemYggdrasilTemplarSword } from "./ItemYggdrasilTemplarSword";
 import { itemSword } from "./tier0/ItemSword";
 import { itemWoodenSword } from "./tier0/ItemWoodenSword";
 import { itemBroadSword } from "./tier1/ItemBroadSword";
@@ -59,6 +65,12 @@ export const swordsBlueprintIndex = {
   [SwordsBlueprint.Saber]: itemSaber,
   [SwordsBlueprint.Sword]: itemSword,
   [SwordsBlueprint.WoodenSword]: itemWoodenSword,
+  [SwordsBlueprint.YggdrasilJianSword]: itemYggdrasilJianSword,
+  [SwordsBlueprint.YggdrasilTemplarSword]: itemYggdrasilTemplarSword,
+  [SwordsBlueprint.YggdrasilGladius]: itemYggdrasilGladius,
+  [SwordsBlueprint.JianSword]: itemJianSword,
+  [SwordsBlueprint.RoyalSword]: itemRoyalSword,
+  [SwordsBlueprint.TemplarSword]: itemTemplarSword,
   [SwordsBlueprint.PoisonSword]: itemPoisonSword,
   [SwordsBlueprint.ShadowSword]: itemShadowSword,
   [SwordsBlueprint.CopperBroadsword]: itemCopperBroadsword,
