@@ -150,6 +150,12 @@
     "textureDisplayName": "Elf White Hair 1"
   },
   {
+    "class": "Hunter",
+    "race": "Elf",
+    "textureKey": "elf-archer",
+    "textureDisplayName": "Elf Archer"
+  },
+  {
     "class": "None",
     "race": "Dwarf",
     "textureKey": "dwarf",
