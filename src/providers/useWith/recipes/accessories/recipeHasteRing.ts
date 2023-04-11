@@ -21,7 +21,7 @@ export const recipeHasteRing: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.BlueSapphire, 3],
       [CraftingResourcesBlueprint.PhoenixFeather, 1],

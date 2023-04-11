@@ -25,7 +25,7 @@ export const recipeVikingHelmet: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.IronIngot, 3],
       [CraftingResourcesBlueprint.WolfTooth, 2],

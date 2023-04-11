@@ -29,7 +29,7 @@ export const recipeHadesBow: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Rope, 2],
       [CraftingResourcesBlueprint.GreaterWoodenLog, 5],

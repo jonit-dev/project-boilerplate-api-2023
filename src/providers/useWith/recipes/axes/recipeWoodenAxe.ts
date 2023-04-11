@@ -13,7 +13,7 @@ export const recipeWoodenAxe: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
+    CraftingSkill.Blacksmithing,
     calculateMinimumLevel([[CraftingResourcesBlueprint.WoodenSticks, 12]]),
   ],
 };

@@ -21,7 +21,7 @@ export const recipePoisonArrow: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Feather, 1],
       [CraftingResourcesBlueprint.SmallWoodenStick, 1],

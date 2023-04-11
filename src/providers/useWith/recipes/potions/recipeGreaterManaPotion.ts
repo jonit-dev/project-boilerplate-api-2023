@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, PotionsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -16,11 +15,5 @@ export const recipeGreaterManaPotion: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Alchemy,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.BlueFeather, 3],
-      [CraftingResourcesBlueprint.WaterBottle, 2],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 10],
 };

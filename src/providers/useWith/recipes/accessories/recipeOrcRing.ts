@@ -17,7 +17,7 @@ export const recipeOrcRing: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Mining,
+    CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.IronIngot, 2],
       [CraftingResourcesBlueprint.Jade, 1],

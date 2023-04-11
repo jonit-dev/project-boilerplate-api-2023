@@ -17,7 +17,7 @@ export const recipeBandana: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Leather, 5],
       [CraftingResourcesBlueprint.SewingThread, 15],

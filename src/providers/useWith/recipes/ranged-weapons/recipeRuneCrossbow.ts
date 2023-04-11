@@ -29,7 +29,7 @@ export const recipeCrossBow: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Rope, 5],
       [CraftingResourcesBlueprint.MagicRecipe, 5],

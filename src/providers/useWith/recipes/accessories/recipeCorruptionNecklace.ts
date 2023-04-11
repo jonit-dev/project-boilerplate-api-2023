@@ -17,7 +17,7 @@ export const recipeCorruptionNecklace: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.CorruptionOre, 3],
       [CraftingResourcesBlueprint.Rope, 1],

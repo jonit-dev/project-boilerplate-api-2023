@@ -25,7 +25,7 @@ export const recipeStormBow: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Rope, 3],
       [CraftingResourcesBlueprint.GreaterWoodenLog, 5],

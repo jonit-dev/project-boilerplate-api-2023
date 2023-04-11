@@ -21,7 +21,7 @@ export const recipeGoldenArrow: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
+    CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Feather, 1],
       [CraftingResourcesBlueprint.SmallWoodenStick, 1],

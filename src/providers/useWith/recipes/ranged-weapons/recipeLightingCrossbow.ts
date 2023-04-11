@@ -25,7 +25,7 @@ export const recipeLightingCrossbow: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
       [CraftingResourcesBlueprint.BlueSapphire, 10],

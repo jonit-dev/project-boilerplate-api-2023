@@ -21,7 +21,7 @@ export const recipeElvenRing: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
+    CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Diamond, 1],
       [CraftingResourcesBlueprint.ElvenLeaf, 3],

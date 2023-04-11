@@ -12,5 +12,5 @@ export const recipeCap: IUseWithCraftingRecipe = {
       qty: 5,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Alchemy, calculateMinimumLevel([[CraftingResourcesBlueprint.Silk, 5]])],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, calculateMinimumLevel([[CraftingResourcesBlueprint.Silk, 5]])],
 };

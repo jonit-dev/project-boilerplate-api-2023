@@ -17,7 +17,7 @@ export const recipeBolt: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
+    CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.SmallWoodenStick, 1],
       [CraftingResourcesBlueprint.SteelIngot, 1],

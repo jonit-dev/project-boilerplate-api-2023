@@ -25,7 +25,7 @@ export const recipeDeathNecklace: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.CorruptionOre, 3],
       [CraftingResourcesBlueprint.Rope, 1],

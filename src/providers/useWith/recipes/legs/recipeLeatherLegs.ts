@@ -12,5 +12,8 @@ export const recipeLeatherLegs: IUseWithCraftingRecipe = {
       qty: 15,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Alchemy, calculateMinimumLevel([[CraftingResourcesBlueprint.Leather, 15]])],
+  minCraftingRequirements: [
+    CraftingSkill.Blacksmithing,
+    calculateMinimumLevel([[CraftingResourcesBlueprint.Leather, 15]]),
+  ],
 };
