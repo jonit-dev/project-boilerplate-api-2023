@@ -128,7 +128,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.GreenOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 3),
+              chance: await itemCraftable.getCraftChance(character, 4),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -141,7 +141,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.ObsidiumOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 1.5),
+              chance: await itemCraftable.getCraftChance(character, 3),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -154,7 +154,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.CorruptionOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 1),
+              chance: await itemCraftable.getCraftChance(character, 2),
             },
           ] as IUseWithItemToTileReward[],
         };

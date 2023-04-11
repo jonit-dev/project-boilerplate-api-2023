@@ -18,7 +18,7 @@ import { IUseWithTargetTile } from "../useWithTypes";
 export interface IUseWithItemToTileReward {
   key: string;
   qty: number[] | number;
-  chance: number | ((character: ICharacter) => Promise<boolean>); // can use a function to calculate the change, e.g.: isCraftSuccessful() from ItemCraftable.ts
+  chance: number | (() => Promise<boolean>); // can use a function to calculate the change, e.g.: isCraftSuccessful() from ItemCraftable.ts
 }
 
 export interface IUseWithItemToTileOptions {
@@ -167,11 +167,13 @@ export class UseWithItemToTile {
   }
 
   private async addRewardToInventory(character: ICharacter, rewards: IUseWithItemToTileReward[]): Promise<boolean> {
+    let atLeastOneRewardAdded = false;
+
     for (const reward of rewards) {
       let addReward = false;
 
       if (typeof reward.chance === "function") {
-        addReward = await reward.chance(character);
+        addReward = await reward.chance();
       } else {
         const n = random(0, 100);
         addReward = n < reward.chance;
@@ -190,11 +192,15 @@ export class UseWithItemToTile {
         const inventoryContainerId = inventory?.itemContainer as unknown as string;
 
         // add it to the character's inventory
-        return await this.characterItemContainer.addItemToContainer(item, character, inventoryContainerId);
+        atLeastOneRewardAdded = await this.characterItemContainer.addItemToContainer(
+          item,
+          character,
+          inventoryContainerId
+        );
       }
     }
 
-    return false;
+    return atLeastOneRewardAdded;
   }
 
   private async refreshInventory(character: ICharacter): Promise<void> {

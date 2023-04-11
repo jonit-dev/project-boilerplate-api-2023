@@ -92,11 +92,9 @@ export class ItemCraftable {
    * @param baseChance chance to use in case characters avg crafting skills < baseChance
    * @returns
    */
-  public async getCraftChance(
-    character: ICharacter,
-    baseChance: number
-  ): Promise<number | ((character: ICharacter) => Promise<boolean>)> {
-    return (await this.getCraftingSkillsAverage(character)) > baseChance ? this.isCraftSuccessful : baseChance;
+  public async getCraftChance(character: ICharacter, baseChance: number): Promise<() => Promise<boolean>> {
+    const skillsAverage = await this.getCraftingSkillsAverage(character);
+    return this.isCraftSuccessful.bind(null, skillsAverage - 1, baseChance);
   }
 
   private async performCrafting(
@@ -115,7 +113,8 @@ export class ItemCraftable {
     }
 
     if (proceed) {
-      proceed = await this.isCraftSuccessful(character);
+      const skillsAverage = await this.getCraftingSkillsAverage(character);
+      proceed = this.isCraftSuccessful(skillsAverage - 1, 50);
     }
 
     if (proceed) {
@@ -331,19 +330,11 @@ export class ItemCraftable {
     }
   }
 
-  private async isCraftSuccessful(character: ICharacter): Promise<boolean> {
-    const maxChance = 1000;
-
-    const dice = random(1, maxChance);
-
-    const level = await this.getCraftingSkillsAverage(character);
-    const probabilityLevel = 20;
-    const curveSteepness = 0.02;
-
-    const probability = 1 - 1 / (1 + Math.pow(Math.E, curveSteepness * (level - probabilityLevel)));
-    const chance = probability * maxChance;
-
-    return dice <= chance;
+  private isCraftSuccessful(skillsAverage: number, baseChance: number): boolean {
+    const bonusScale = 1 + (baseChance - 1) / 20; // scale bonus based on base chance
+    const successChance = baseChance + Math.sqrt(skillsAverage * bonusScale) * 3;
+    const roll = random(0, 100);
+    return roll <= successChance;
   }
 
   private async getCraftingSkillsAverage(character: ICharacter): Promise<number> {

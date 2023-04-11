@@ -157,5 +157,13 @@ export const npcOrcWarrior = {
       itemBlueprintKey: CraftingResourcesBlueprint.Rope,
       chance: 20,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.CopperOre,
+      chance: 7,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.IronOre,
+      chance: 7,
+    },
   ],
 } as Partial<INPC>;

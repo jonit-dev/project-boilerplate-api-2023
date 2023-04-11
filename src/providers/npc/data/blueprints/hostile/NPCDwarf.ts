@@ -94,7 +94,15 @@ export const npcDwarf = {
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
-      chance: 20,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SilverOre,
+      chance: 7,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
+      chance: 5,
     },
   ],
 } as Partial<INPC>;

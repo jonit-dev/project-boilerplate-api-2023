@@ -168,9 +168,7 @@ describe("ItemCraftable.ts", () => {
 
   it("should send inventory update event", async () => {
     const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
-    craftChanceMock.mockImplementation(() => {
-      return Promise.resolve(true);
-    });
+    craftChanceMock.mockImplementation(() => true);
 
     skill.alchemy.level = 10;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
@@ -351,11 +349,9 @@ describe("ItemCraftable.ts", () => {
 
   it("should not craft valid item due to crafting failure", async () => {
     const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
-    craftChanceMock.mockImplementation(() => {
-      return Promise.resolve(false);
-    });
+    craftChanceMock.mockImplementation(() => false);
 
-    skill.alchemy.level = 10;
+    skill.alchemy.level = 1;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
 
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
@@ -367,11 +363,7 @@ describe("ItemCraftable.ts", () => {
     expect(container.slots[1]).toBe(null);
 
     expect(craftChanceMock).toBeCalledTimes(1);
-    expect(craftChanceMock).toBeCalledWith(
-      expect.objectContaining({
-        _id: testCharacter._id,
-      })
-    );
+    expect(craftChanceMock).toBeCalledWith(0, 50);
 
     expect(sendEventToUser).toHaveBeenCalledTimes(4);
 
@@ -394,7 +386,7 @@ describe("ItemCraftable.ts", () => {
   it("should produce both craft success and failure", async () => {
     const skills = await Skill.findOne({ _id: testCharacter.skills });
     if (skills) {
-      const level = 30;
+      const level = 10;
       skills.mining.level = level;
       skills.lumberjacking.level = level - 2;
       skills.cooking.level = level + 4;
@@ -402,9 +394,11 @@ describe("ItemCraftable.ts", () => {
       await skills.save();
     }
 
+    const skillsAverage = await (ItemCraftable.prototype as any).getCraftingSkillsAverage(testCharacter);
+
     const results: boolean[] = [];
-    for (let i = 0; i < 10; i++) {
-      const result: boolean = await (ItemCraftable.prototype as any).isCraftSuccessful(testCharacter);
+    for (let i = 0; i < 100; i++) {
+      const result: boolean = (ItemCraftable.prototype as any).isCraftSuccessful(skillsAverage, 50);
       results.push(result);
     }
 

@@ -45,8 +45,8 @@ export const itemHammer: IToolItemBlueprint = {
         [
           {
             key: CraftingResourcesBlueprint.IronIngot,
-            qty: [2, 5],
-            chance: await itemCraftable.getCraftChance(character, 60),
+            qty: [2, 4],
+            chance: await itemCraftable.getCraftChance(character, 65),
           },
         ],
       ],
@@ -55,18 +55,8 @@ export const itemHammer: IToolItemBlueprint = {
         [
           {
             key: CraftingResourcesBlueprint.CopperIngot,
-            qty: [2, 5],
-            chance: await itemCraftable.getCraftChance(character, 70),
-          },
-        ],
-      ],
-      [
-        CraftingResourcesBlueprint.GoldenOre,
-        [
-          {
-            key: CraftingResourcesBlueprint.GoldenIngot,
-            qty: [2, 5],
-            chance: await itemCraftable.getCraftChance(character, 40),
+            qty: [2, 4],
+            chance: await itemCraftable.getCraftChance(character, 60),
           },
         ],
       ],
@@ -75,7 +65,17 @@ export const itemHammer: IToolItemBlueprint = {
         [
           {
             key: CraftingResourcesBlueprint.SilverIngot,
-            qty: [2, 5],
+            qty: [2, 4],
+            chance: await itemCraftable.getCraftChance(character, 55),
+          },
+        ],
+      ],
+      [
+        CraftingResourcesBlueprint.GoldenOre,
+        [
+          {
+            key: CraftingResourcesBlueprint.GoldenIngot,
+            qty: [2, 4],
             chance: await itemCraftable.getCraftChance(character, 50),
           },
         ],
@@ -85,18 +85,8 @@ export const itemHammer: IToolItemBlueprint = {
         [
           {
             key: CraftingResourcesBlueprint.GreenIngot,
-            qty: [2, 5],
-            chance: await itemCraftable.getCraftChance(character, 30),
-          },
-        ],
-      ],
-      [
-        CraftingResourcesBlueprint.CorruptionOre,
-        [
-          {
-            key: CraftingResourcesBlueprint.CorruptionIngot,
-            qty: [2, 5],
-            chance: await itemCraftable.getCraftChance(character, 30),
+            qty: [2, 4],
+            chance: await itemCraftable.getCraftChance(character, 45),
           },
         ],
       ],
@@ -105,8 +95,18 @@ export const itemHammer: IToolItemBlueprint = {
         [
           {
             key: CraftingResourcesBlueprint.ObsidiumIngot,
-            qty: [2, 5],
-            chance: await itemCraftable.getCraftChance(character, 30),
+            qty: [2, 4],
+            chance: await itemCraftable.getCraftChance(character, 45),
+          },
+        ],
+      ],
+      [
+        CraftingResourcesBlueprint.CorruptionOre,
+        [
+          {
+            key: CraftingResourcesBlueprint.CorruptionIngot,
+            qty: [2, 4],
+            chance: await itemCraftable.getCraftChance(character, 45),
           },
         ],
       ],
@@ -123,7 +123,7 @@ export const itemHammer: IToolItemBlueprint = {
           CraftingResourcesBlueprint.CorruptionOre,
           CraftingResourcesBlueprint.ObsidiumOre,
         ],
-        decrementQty: 10,
+        decrementQty: 5,
         errorMessage: "Sorry, you need some more ore to forge an ingot.",
       },
       targetTileAnimationEffectKey: "block",

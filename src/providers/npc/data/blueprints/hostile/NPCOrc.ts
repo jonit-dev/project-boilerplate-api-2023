@@ -50,13 +50,13 @@ export const npcOrc = {
   loots: [
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Wheat,
-      quantityRange: [5, 7],
+      quantityRange: [3, 5],
       chance: 25,
     },
 
     {
       itemBlueprintKey: CraftingResourcesBlueprint.WaterBottle,
-      quantityRange: [1, 2],
+      quantityRange: [2, 4],
       chance: 25,
     },
     {
@@ -141,6 +141,14 @@ export const npcOrc = {
     {
       itemBlueprintKey: BootsBlueprint.FarmersBoot,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.CopperOre,
+      chance: 7,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.IronOre,
+      chance: 7,
     },
   ],
 } as Partial<INPC>;
