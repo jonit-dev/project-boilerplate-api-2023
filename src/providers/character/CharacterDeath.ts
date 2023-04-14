@@ -56,15 +56,11 @@ export class CharacterDeath {
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
-    // lock character positioning fields, so it does not change while we are handling death (causes teleport bug)
-    await character.lockField("x");
-    await character.lockField("y");
-    await character.lockField("scene");
-
     if (character.health > 0) {
       // if by any reason the char is not dead, make sure it is.
+      await Character.updateOne({ _id: character._id }, { $set: { health: 0 } });
       character.health = 0;
-      await character.save();
+      character.isAlive = false;
     }
 
     if (killer) {
@@ -123,10 +119,6 @@ export class CharacterDeath {
 
     await this.respawnCharacter(character);
     await this.characterWeight.updateCharacterWeight(character);
-
-    await character.unlockField("x");
-    await character.unlockField("y");
-    await character.unlockField("scene");
   }
 
   public async generateCharacterBody(character: ICharacter): Promise<IItem | any> {

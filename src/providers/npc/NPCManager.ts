@@ -1,8 +1,9 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { ISkill, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { CacheModel } from "@providers/cache/CacheModel";
 import { PartiallyCachedModel } from "@providers/cache/PartiallyCachedModel";
 import { NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
@@ -36,7 +37,8 @@ export class NPCManager {
     private pm2Helper: PM2Helper,
     private specialEffect: SpecialEffect,
     private inMemoryHashTable: InMemoryHashTable,
-    private partiallyCachedModel: PartiallyCachedModel
+    private partiallyCachedModel: PartiallyCachedModel,
+    private cacheModel: CacheModel
   ) {}
 
   public listenForBehaviorTrigger(): void {
@@ -82,27 +84,23 @@ export class NPCManager {
       await this.inMemoryHashTable.set("npc", npc._id, npc);
     }
 
-    const npcSkills = await Skill.findById(npc.skills).lean({ virtuals: true, defaults: true });
-
-    if (npcSkills) {
-      await this.inMemoryHashTable.set("npc-skills", npc._id, npcSkills);
-    }
-
     if (!npc.isBehaviorEnabled) {
+      const npcSkills = await this.cacheModel.getOrQuery<ISkill>(Skill, "npc-skills", npc.skills as string);
+
       new NPCCycle(
         npc.id,
         async () => {
           try {
             this.npcFreezer.tryToFreezeNPC(npc);
 
-            //! Requires virtual
             npc = await this.partiallyCachedModel.get<INPC>(
               "npc",
               NPC,
               npc._id,
-              "name x y key health maxHealth mana maxMana alignment direction scene pathOrientation speed isBehaviorEnabled targetType targetCharacter currentMovementType",
-              "skills"
+              "name x y key health maxHealth mana maxMana alignment direction scene pathOrientation speed isBehaviorEnabled targetType targetCharacter currentMovementType"
             );
+
+            npc.skills = npcSkills;
 
             if (!npc.isBehaviorEnabled) {
               await this.npcFreezer.freezeNPC(npc);

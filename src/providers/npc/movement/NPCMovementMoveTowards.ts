@@ -1,6 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
+import { CacheModel } from "@providers/cache/CacheModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { MapHelper } from "@providers/map/MapHelper";
 import { PathfindingCaching } from "@providers/map/PathfindingCaching";
@@ -10,6 +12,7 @@ import {
   EntityAttackType,
   FromGridX,
   FromGridY,
+  ISkill,
   NPCAlignment,
   NPCMovementType,
   NPCPathOrientation,
@@ -40,7 +43,8 @@ export class NPCMovementMoveTowards {
     private npcView: NPCView,
     private mapHelper: MapHelper,
     private characterView: CharacterView,
-    private pathfindingCaching: PathfindingCaching
+    private pathfindingCaching: PathfindingCaching,
+    private cacheModel: CacheModel
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
@@ -232,15 +236,19 @@ export class NPCMovementMoveTowards {
     }
 
     if (!hasBattleCycle) {
+      const npcSkills = await this.cacheModel.getOrQuery<ISkill>(Skill, "npc-skills", npc.skills as string);
+
       new NPCBattleCycle(
         npc.id,
         async () => {
           const result = await Promise.all([
-            NPC.findById(npc.id).populate("skills"),
-            Character.findById(npc.targetCharacter).populate("skills"),
+            NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
+            Character.findById(npc.targetCharacter).populate("skills").lean({ virtuals: true, defaults: true }),
           ]);
 
           const updatedNPC = result[0] as INPC;
+
+          updatedNPC.skills = npcSkills;
 
           const targetCharacter = result[1] as ICharacter;
 

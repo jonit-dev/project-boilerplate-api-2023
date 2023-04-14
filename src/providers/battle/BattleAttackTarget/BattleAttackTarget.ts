@@ -1,7 +1,7 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
@@ -12,6 +12,8 @@ import { NPCWarn } from "@providers/npc/NPCWarn";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
+import { SorcererSpells } from "@providers/spells/data/logic/berserker/SorcererSpells";
 import {
   BasicAttribute,
   BattleEventType,
@@ -32,8 +34,6 @@ import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetti
 import { BattleAttackRanged } from "./BattleAttackRanged";
 import { BattleAttackTargetDeath } from "./BattleAttackTargetDeath";
 import { BattleAttackValidator } from "./BattleAttackValidator";
-import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
-import { SorcererSpells } from "@providers/spells/data/logic/berserker/SorcererSpells";
 
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
@@ -230,12 +230,20 @@ export class BattleAttackTarget {
 
         if (!sorcererManaShield) {
           const newTargetHealth = target.health - damage;
+
           if (newTargetHealth <= 0) {
             target.health = 0;
+            target.isAlive = false;
           } else {
             target.health -= damage;
           }
-          await target.save();
+
+          if (target.type === "Character") {
+            await Character.updateOne({ _id: target.id }, { health: target.health });
+          }
+          if (target.type === "NPC") {
+            await NPC.updateOne({ _id: target.id }, { health: target.health });
+          }
         }
 
         const n = _.random(0, 100);
