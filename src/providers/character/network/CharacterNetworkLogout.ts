@@ -2,7 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { BattleCycle } from "@providers/battle/BattleCycle";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -19,6 +19,7 @@ import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 import { CharacterItems } from "../characterItems/CharacterItems";
+import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 
 @provide(CharacterNetworkLogout)
 export class CharacterNetworkLogout {
@@ -59,12 +60,21 @@ export class CharacterNetworkLogout {
 
         await this.temporaryRemoveWeapon(data.id);
 
+        const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
+        const key: SpellsBlueprint = SpellsBlueprint.DruidShapeshift;
+
+        const hasShapeShift = await this.inMemoryHashTable.has(namespace, key);
+        let textureKey: any;
+        if (hasShapeShift) {
+          textureKey = await this.inMemoryHashTable.get(namespace, key);
+        }
         await Character.updateOne(
           { _id: data.id },
           {
             isOnline: false,
             baseSpeed: MovementSpeed.Standard,
             attackIntervalSpeed: 1700,
+            textureKey: textureKey || character.textureKey,
           }
         );
 

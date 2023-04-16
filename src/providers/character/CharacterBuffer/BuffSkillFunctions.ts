@@ -372,8 +372,16 @@ export class BuffSkillFunctions {
       [CharacterClass.Rogue]: [],
       [CharacterClass.Hunter]: [SpellsBlueprint.SpellEagleEyes, SpellsBlueprint.HunterQuickFire],
       [CharacterClass.Berserker]: [SpellsBlueprint.BerserkerBloodthirst, SpellsBlueprint.BerserkerFrenzy],
-      [CharacterClass.Warrior]: [SpellsBlueprint.HealthRegenSell, SpellsBlueprint.SpellPhysicalShield],
-      [CharacterClass.Druid]: [SpellsBlueprint.ManaRegenSpell, SpellsBlueprint.SpellMagicShield],
+      [CharacterClass.Warrior]: [
+        SpellsBlueprint.HealthRegenSell,
+        SpellsBlueprint.SpellPhysicalShield,
+        SpellsBlueprint.DruidShapeshift,
+      ],
+      [CharacterClass.Druid]: [
+        SpellsBlueprint.ManaRegenSpell,
+        SpellsBlueprint.SpellMagicShield,
+        SpellsBlueprint.DruidShapeshift,
+      ],
       [CharacterClass.Sorcerer]: [
         SpellsBlueprint.ManaRegenSpell,
         SpellsBlueprint.SpellMagicShield,

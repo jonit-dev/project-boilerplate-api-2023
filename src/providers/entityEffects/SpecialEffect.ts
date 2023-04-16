@@ -7,7 +7,7 @@ import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { CharacterClass, CharacterSocketEvents, EntityType } from "@rpg-engine/shared";
+import { CharacterClass, CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 
@@ -58,6 +58,55 @@ export class SpecialEffect {
   async cleanup(): Promise<void> {
     await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stun);
     await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stealth);
+  }
+
+  async shapeShift(character: ICharacter, textureKey: string, internvalInSecs: number): Promise<void> {
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
+    const key: SpellsBlueprint = SpellsBlueprint.DruidShapeshift;
+
+    const normalTextureKey = character.textureKey;
+    await this.inMemoryHashTable.set(namespace, key, normalTextureKey);
+
+    const updatedCharacter = (await Character.findByIdAndUpdate(
+      character._id,
+      {
+        textureKey,
+      },
+      {
+        new: true,
+      }
+    ).select("_id textureKey channelId")) as ICharacter;
+
+    const payload: ICharacterAttributeChanged = {
+      targetId: updatedCharacter._id,
+      textureKey: updatedCharacter.textureKey,
+    };
+
+    this.socketMessaging.sendEventToUser(updatedCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+
+    setTimeout(async () => {
+      const normalTextureKey = await this.inMemoryHashTable.get(namespace, key);
+
+      if (normalTextureKey) {
+        const character = (await Character.findByIdAndUpdate(
+          updatedCharacter._id,
+          {
+            textureKey: normalTextureKey.toString(),
+          },
+          {
+            new: true,
+          }
+        ).select("_id textureKey channelId")) as ICharacter;
+
+        const payload: ICharacterAttributeChanged = {
+          targetId: character._id,
+          textureKey: character.textureKey,
+        };
+
+        await this.inMemoryHashTable.delete(namespace, key);
+        this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+      }
+    }, internvalInSecs * 1000);
   }
 
   async execution(attacker: ICharacter, entityId: Types.ObjectId, entityType: EntityType): Promise<void> {
