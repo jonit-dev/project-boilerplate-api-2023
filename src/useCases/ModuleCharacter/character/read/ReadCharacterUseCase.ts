@@ -2,9 +2,15 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { provide } from "inversify-binding-decorators";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+
 @provide(ReadCharacterUseCase)
 export class ReadCharacterUseCase {
-  constructor(private characterRepository: CharacterRepository, private characterInventory: CharacterInventory) {}
+  constructor(
+    private characterRepository: CharacterRepository,
+    private characterInventory: CharacterInventory,
+    private specialEffect: SpecialEffect
+  ) {}
 
   public async read(id: string): Promise<ICharacter> {
     const character = await this.characterRepository.readOne(
@@ -18,6 +24,8 @@ export class ReadCharacterUseCase {
     // convert character to object to we can pass the inventory to it (otherwise it will output a {})
     //! TODO: Temporary ugly hack until we figure out a better way to do this
     const charObject = character.toObject();
+
+    charObject.alpha = await this.specialEffect.getOpacity(character);
 
     const inventory = await this.characterInventory.getInventory(character);
     // @ts-ignore

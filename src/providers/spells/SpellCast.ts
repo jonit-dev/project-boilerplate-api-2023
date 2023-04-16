@@ -26,6 +26,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { SpellValidation } from "./SpellValidation";
 import { spellsBlueprints } from "./data/blueprints/index";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(SpellCast)
 export class SpellCast {
@@ -39,7 +40,8 @@ export class SpellCast {
     private itemUsableEffect: ItemUsableEffect,
     private spellValidation: SpellValidation,
     private inMemoryHashTable: InMemoryHashTable,
-    private movementHelper: MovementHelper
+    private movementHelper: MovementHelper,
+    private specialEffect: SpecialEffect
   ) {}
 
   public isSpellCasting(msg: string): boolean {
@@ -80,7 +82,7 @@ export class SpellCast {
     let target;
     if (spell.castingType === SpellCastingType.RangedCasting) {
       target = await EntityUtil.getEntity(data.targetId!, data.targetType!);
-      if (!this.isRangedCastingValid(character, target, spell)) {
+      if (!(await this.isRangedCastingValid(character, target, spell))) {
         return false;
       }
     }
@@ -107,7 +109,7 @@ export class SpellCast {
     return true;
   }
 
-  private isRangedCastingValid(caster: ICharacter, target: ICharacter | INPC, spell: ISpell): boolean {
+  private async isRangedCastingValid(caster: ICharacter, target: ICharacter | INPC, spell: ISpell): Promise<boolean> {
     if (!target) {
       this.socketMessaging.sendErrorMessageToCharacter(
         caster,
@@ -117,6 +119,11 @@ export class SpellCast {
     }
 
     if (target.type === EntityType.NPC && (target as INPC).alignment === NPCAlignment.Friendly) {
+      return false;
+    }
+
+    if (await this.specialEffect.isInvisible(target)) {
+      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is invisible.");
       return false;
     }
 

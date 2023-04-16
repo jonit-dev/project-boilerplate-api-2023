@@ -1,9 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, CharacterClass, EntityType, RangeTypes, SpellCastingType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, CharacterClass, RangeTypes, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
 
 export const berserkerSpellExecution: Partial<ISpell> = {
   key: SpellsBlueprint.BerserkerExecution,
@@ -20,8 +20,6 @@ export const berserkerSpellExecution: Partial<ISpell> = {
   characterClass: [CharacterClass.Berserker],
 
   usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
-    const effect = container.get(SpecialEffect);
-
-    await effect.execution(character, target._id, target.type as EntityType);
+    await container.get(BerserkerSpells).handleBerserkerExecution(character, target);
   },
 };

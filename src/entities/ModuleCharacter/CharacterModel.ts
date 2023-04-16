@@ -186,6 +186,7 @@ const characterSchema = createLeanSchema(
       default: 0,
       required: true,
     }),
+    alpha: Type.number(),
     banRemovalDate: Type.date(),
     hasPermanentBan: Type.boolean(),
     captchaVerifyCode: Type.string({

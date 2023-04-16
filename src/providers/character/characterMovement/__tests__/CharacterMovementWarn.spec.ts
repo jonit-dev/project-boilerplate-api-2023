@@ -1,20 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container } from "@providers/inversify/container";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { CharacterMovementWarn } from "../CharacterMovementWarn";
 import { CharacterView } from "@providers/character/CharacterView";
 
 describe("CharacterMovementWarn", () => {
   let characterMovementWarn: CharacterMovementWarn;
   let getCharactersInViewMock: jest.SpyInstance;
-  let isInvisibleMock: jest.SpyInstance;
-
-  const mockIsInvisible = (value: boolean): void => {
-    isInvisibleMock && isInvisibleMock.mockRestore();
-    isInvisibleMock = jest
-      .spyOn(SpecialEffect.prototype, "isInvisible")
-      .mockImplementation(jest.fn().mockReturnValue(value));
-  };
 
   const mockGetCharactersInViewMock = (value: ICharacter[]): void => {
     getCharactersInViewMock && getCharactersInViewMock.mockRestore();
@@ -24,12 +15,10 @@ describe("CharacterMovementWarn", () => {
   };
 
   beforeEach(() => {
-    mockIsInvisible(true);
     mockGetCharactersInViewMock([]);
   });
 
   afterEach(() => {
-    isInvisibleMock.mockRestore();
     getCharactersInViewMock.mockRestore();
   });
 
@@ -37,9 +26,7 @@ describe("CharacterMovementWarn", () => {
     characterMovementWarn = container.get(CharacterMovementWarn);
   });
 
-  it("it warns characters around about position update if character is visible", async () => {
-    mockIsInvisible(false);
-
+  it("it warns characters around about position update", async () => {
     const character = {
       type: "Fake",
       _id: "fake-id",
@@ -49,20 +36,6 @@ describe("CharacterMovementWarn", () => {
     await (characterMovementWarn as any).warnCharactersAroundAboutEmitterPositionUpdate(character, {});
 
     expect(getCharactersInViewMock).toHaveBeenCalledWith(character);
-
-    expect(isInvisibleMock).toHaveBeenCalledWith(character);
-  });
-
-  it("it does not warn characters around about position update if character is not visible", async () => {
-    const character = {
-      type: "Fake",
-      _id: "fake-id",
-      channelId: "fake-channel-id",
-    } as ICharacter;
-
-    await (characterMovementWarn as any).warnCharactersAroundAboutEmitterPositionUpdate(character, {});
-
-    expect(getCharactersInViewMock).not.toHaveBeenCalled();
   });
 
   describe("warn emitter about characters around", () => {
@@ -97,9 +70,7 @@ describe("CharacterMovementWarn", () => {
       addToViewMock.mockRestore();
     });
 
-    it("it warns emitter about character around if character is visible", async () => {
-      mockIsInvisible(false);
-
+    it("it warns emitter about character around", async () => {
       await (characterMovementWarn as any).warnEmitterAboutCharactersAround(testCharacter as unknown as ICharacter);
 
       expect(addToViewMock).toHaveBeenCalledWith(
@@ -115,14 +86,6 @@ describe("CharacterMovementWarn", () => {
       );
 
       expect(elementOnViewMock).toHaveBeenCalledWith(testCharacter, character._id, "characters");
-    });
-
-    it("it does not warn emitter about character around if character is not visible", async () => {
-      mockIsInvisible(true);
-
-      await (characterMovementWarn as any).warnEmitterAboutCharactersAround(testCharacter as unknown as ICharacter);
-
-      expect(addToViewMock).not.toHaveBeenCalled();
     });
   });
 });

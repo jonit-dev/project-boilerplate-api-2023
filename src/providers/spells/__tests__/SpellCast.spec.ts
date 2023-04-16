@@ -31,6 +31,7 @@ import { spellSelfHealing } from "../data/blueprints/all/SpellSelfHealing";
 import { spellStunTarget } from "../data/blueprints/warrior/SpellStunTarget";
 import { ISpell, SpellsBlueprint } from "../data/types/SpellsBlueprintTypes";
 import { rogueSpellExecution } from "../data/blueprints/rogue/SpellExecution";
+import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;
@@ -41,6 +42,7 @@ describe("SpellCast.ts", () => {
   let sendEventToUser: jest.SpyInstance;
   let level2Spells: Partial<ISpell>[] = [];
   let specialEffect: SpecialEffect;
+  let berserkerSpells: BerserkerSpells;
 
   // let level3Spells: Partial<ISpell>[] = [];
   // let level4Spells: Partial<ISpell>[] = [];
@@ -50,6 +52,7 @@ describe("SpellCast.ts", () => {
     spellCast = container.get<SpellCast>(SpellCast);
     spellLearn = container.get<SpellLearn>(SpellLearn);
     specialEffect = container.get<SpecialEffect>(SpecialEffect);
+    berserkerSpells = container.get(BerserkerSpells);
 
     level2Spells = [spellSelfHealing, spellArrowCreation, spellBlankRuneCreation];
     // level3Spells = [spellBoltCreation, spellFoodCreation];
@@ -534,7 +537,10 @@ describe("SpellCast.ts", () => {
     });
 
     it("should not execute spell in yourself", async () => {
-      await specialEffect.execution(testCharacter, testCharacter._id, EntityType.Character);
+      const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
+      timerMock.mockImplementation();
+
+      await berserkerSpells.handleBerserkerExecution(testCharacter, testCharacter);
 
       const characterBody = await Item.findOne({
         name: `${testCharacter.name}'s body`,
@@ -550,12 +556,13 @@ describe("SpellCast.ts", () => {
     });
 
     it("should execute spell successfully for a character target health <= 30% ", async () => {
+      const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
+      timerMock.mockImplementation();
+
       targetCharacter.health = 25;
       await Character.findByIdAndUpdate(targetCharacter._id, targetCharacter);
 
-      const entityType = EntityType.Character;
-
-      await specialEffect.execution(testCharacter, targetCharacter._id, entityType);
+      await berserkerSpells.handleBerserkerExecution(testCharacter, targetCharacter);
 
       const characterBody = await Item.findOne({
         name: `${targetCharacter.name}'s body`,
@@ -568,10 +575,13 @@ describe("SpellCast.ts", () => {
     });
 
     it("should not execute spell if the health target > 30%", async () => {
+      const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
+      timerMock.mockImplementation();
+
       targetCharacter.health = 100;
       await Character.findByIdAndUpdate(targetCharacter._id, targetCharacter);
 
-      await specialEffect.execution(testCharacter, targetCharacter._id, EntityType.Character);
+      await berserkerSpells.handleBerserkerExecution(testCharacter, targetCharacter);
 
       const characterBody = await Item.findOne({
         name: `${targetCharacter.name}'s body`,
@@ -586,13 +596,14 @@ describe("SpellCast.ts", () => {
     });
 
     it("should execute spell successfully for an NPC target", async () => {
-      const entityId = targetNPC._id;
-      const entityType = EntityType.NPC;
+      const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
+      timerMock.mockImplementation();
 
       expect(targetNPC.health).toBe(5);
       expect(targetNPC.isAlive).toBe(true);
 
-      await specialEffect.execution(testCharacter, entityId, entityType);
+      await berserkerSpells.handleBerserkerExecution(testCharacter, targetNPC);
+
       const updateNPC = (await NPC.findById(targetNPC._id).lean()) as INPC;
 
       const characterBody = await Item.findOne({

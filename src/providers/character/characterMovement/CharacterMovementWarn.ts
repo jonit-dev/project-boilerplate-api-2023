@@ -1,5 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { ItemView } from "@providers/item/ItemView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCWarn } from "@providers/npc/NPCWarn";
@@ -13,6 +12,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(CharacterMovementWarn)
 export class CharacterMovementWarn {
@@ -21,8 +21,8 @@ export class CharacterMovementWarn {
     private characterView: CharacterView,
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
-    private specialEffect: SpecialEffect,
-    private itemView: ItemView
+    private itemView: ItemView,
+    private specialEffect: SpecialEffect
   ) {}
 
   public async warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): Promise<void> {
@@ -70,6 +70,7 @@ export class CharacterMovementWarn {
       mana: targetCharacter.mana,
       maxMana: targetCharacter.maxMana,
       textureKey: targetCharacter.textureKey,
+      alpha: await this.specialEffect.getOpacity(targetCharacter),
     });
   }
 
@@ -77,14 +78,10 @@ export class CharacterMovementWarn {
     character: ICharacter,
     clientPosUpdateData: ICharacterPositionUpdateFromClient
   ): Promise<void> {
-    if (await this.specialEffect.isInvisible(character)) {
-      return;
-    }
-
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
-      const dataFromServer = this.generateDataPayloadFromServer(clientPosUpdateData, character);
+      const dataFromServer = await this.generateDataPayloadFromServer(clientPosUpdateData, character);
 
       await this.characterView.addToCharacterView(
         nearbyCharacter,
@@ -146,6 +143,7 @@ export class CharacterMovementWarn {
         mana: nearbyCharacter.mana,
         maxMana: nearbyCharacter.maxMana,
         textureKey: nearbyCharacter.textureKey,
+        alpha: await this.specialEffect.getOpacity(nearbyCharacter),
       });
     }
 
@@ -162,19 +160,18 @@ export class CharacterMovementWarn {
 
   private async shouldWarnCharacter(emitter: ICharacter, nearbyCharacter: ICharacter): Promise<boolean> {
     const charOnCharView = await this.characterView.getElementOnView(emitter, nearbyCharacter._id, "characters");
-    const isInvisible = await this.specialEffect.isInvisible(nearbyCharacter);
 
-    if (!charOnCharView && !isInvisible) {
+    if (!charOnCharView) {
       return true;
     }
 
     return false;
   }
 
-  private generateDataPayloadFromServer(
+  private async generateDataPayloadFromServer(
     dataFromClient: ICharacterPositionUpdateFromClient,
     character: ICharacter
-  ): ICharacterPositionUpdateFromServer {
+  ): Promise<ICharacterPositionUpdateFromServer> {
     const isMoving = this.movementHelper.isMoving(character.x, character.y, dataFromClient.newX, dataFromClient.newY);
 
     return {
@@ -194,6 +191,7 @@ export class CharacterMovementWarn {
       mana: character.mana,
       maxMana: character.maxMana,
       textureKey: character.textureKey,
+      alpha: await this.specialEffect.getOpacity(character),
     };
   }
 }

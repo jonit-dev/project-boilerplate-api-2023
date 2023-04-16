@@ -9,10 +9,16 @@ import { NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 import { NPC_CYCLES } from "../NPCCycle";
 import { NPCView } from "../NPCView";
 import { NPCDirection } from "./NPCMovement";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(NPCTarget)
 export class NPCTarget {
-  constructor(private npcView: NPCView, private movementHelper: MovementHelper, private mapNonPVPZone: MapNonPVPZone) {}
+  constructor(
+    private npcView: NPCView,
+    private movementHelper: MovementHelper,
+    private mapNonPVPZone: MapNonPVPZone,
+    private specialEffect: SpecialEffect
+  ) {}
 
   public async clearTarget(npc: INPC): Promise<void> {
     await NPC.updateOne(
@@ -72,6 +78,10 @@ export class NPCTarget {
     const minDistanceCharacter = await this.npcView.getNearestCharacter(npc);
 
     if (!minDistanceCharacter) {
+      return;
+    }
+
+    if (await this.specialEffect.isInvisible(minDistanceCharacter)) {
       return;
     }
 
@@ -144,7 +154,7 @@ export class NPCTarget {
       rangeThresholdDefinition
     );
 
-    // if target is out of range or not online, lets remove it
+    // if target is out of range or not online or invisible, lets remove it
     if ((targetCharacter && !isCharacterUnderRange) || !targetCharacter.isOnline) {
       // remove npc.targetCharacter
       await this.clearTarget(npc);

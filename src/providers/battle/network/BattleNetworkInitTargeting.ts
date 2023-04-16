@@ -17,6 +17,7 @@ import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { BattleCharacterAttack } from "../BattleCharacterAttack/BattleCharacterAttack";
 import { BattleNetworkStopTargeting } from "./BattleNetworkStopTargetting";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 interface ITargetValidation {
   isValid: boolean;
@@ -31,7 +32,8 @@ export class BattleNetworkInitTargeting {
     private movementHelper: MovementHelper,
     private battleCharacterManager: BattleCharacterAttack,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
-    private mapNonPVPZone: MapNonPVPZone
+    private mapNonPVPZone: MapNonPVPZone,
+    private specialEffect: SpecialEffect
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
@@ -67,7 +69,7 @@ export class BattleNetworkInitTargeting {
             throw new Error(`Failed to set target on NPC ${data.targetId}`);
           }
 
-          const isValidTarget = this.isValidTarget(target, character);
+          const isValidTarget = await this.isValidTarget(target, character);
 
           if (!isValidTarget.isValid) {
             console.log(
@@ -116,7 +118,7 @@ export class BattleNetworkInitTargeting {
     await this.battleCharacterManager.onHandleCharacterBattleLoop(character, target);
   }
 
-  private isValidTarget(target: INPC | ICharacter | null, character: ICharacter): ITargetValidation {
+  private async isValidTarget(target: INPC | ICharacter | null, character: ICharacter): Promise<ITargetValidation> {
     // check if target is within character range.
     if (target?.id === character.id) {
       return {
@@ -188,6 +190,13 @@ export class BattleNetworkInitTargeting {
           reason: "Sorry, you cannot attack a friendly NPC.",
         };
       }
+    }
+
+    if (target && (await this.specialEffect.isInvisible(target))) {
+      return {
+        isValid: false,
+        reason: "Sorry, your target is invisible.",
+      };
     }
 
     return {

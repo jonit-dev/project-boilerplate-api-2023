@@ -26,6 +26,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(CharacterNetworkCreate)
 export class CharacterNetworkCreate {
@@ -40,7 +41,8 @@ export class CharacterNetworkCreate {
     private npcWarn: NPCWarn,
     private pm2Helper: PM2Helper,
     private characterView: CharacterView,
-    private characterMonitor: CharacterMonitor
+    private characterMonitor: CharacterMonitor,
+    private specialEffect: SpecialEffect
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -110,6 +112,7 @@ export class CharacterNetworkCreate {
           mana: character.mana,
           maxMana: character.maxMana,
           textureKey: character.textureKey,
+          alpha: await this.specialEffect.getOpacity(character),
         };
 
         switch (appEnv.general.ENV) {
@@ -174,6 +177,7 @@ export class CharacterNetworkCreate {
           mana: nearbyCharacter.mana,
           maxMana: nearbyCharacter.maxMana,
           textureKey: nearbyCharacter.textureKey,
+          alpha: await this.specialEffect.getOpacity(nearbyCharacter),
         };
 
         // tell the emitter about these other characters too

@@ -19,6 +19,7 @@ import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 import { CharacterItems } from "../characterItems/CharacterItems";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 
 @provide(CharacterNetworkLogout)
@@ -36,7 +37,8 @@ export class CharacterNetworkLogout {
     private characterInventory: CharacterInventory,
     private characterItemContainer: CharacterItemContainer,
     private characterItems: CharacterItems,
-    private characterMonitor: CharacterMonitor
+    private characterMonitor: CharacterMonitor,
+    private specialEffect: SpecialEffect
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -80,6 +82,7 @@ export class CharacterNetworkLogout {
 
         await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
         await this.buffSkillFunctions.removeAllSpellDataOnRedis(character);
+        await this.specialEffect.clearEffects(character);
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());
 

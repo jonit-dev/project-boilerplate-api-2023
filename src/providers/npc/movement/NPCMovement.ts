@@ -11,6 +11,7 @@ import { provide } from "inversify-binding-decorators";
 import { NPCView } from "../NPCView";
 import { NPCWarn } from "../NPCWarn";
 import { NPCTarget } from "./NPCTarget";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 export type NPCDirection = "up" | "down" | "left" | "right";
 
@@ -31,6 +32,7 @@ export class NPCMovement {
     private npcTarget: NPCTarget,
     private characterView: CharacterView,
     private npcWarn: NPCWarn,
+    private specialEffect: SpecialEffect,
     private inMemoryHashTable: InMemoryHashTable
   ) {}
 
@@ -84,6 +86,8 @@ export class NPCMovement {
       const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
       for (const character of nearbyCharacters) {
+        let clearTarget = false;
+
         if (!NPC_CAN_ATTACK_IN_NON_PVP_ZONE) {
           const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
 
@@ -93,8 +97,16 @@ export class NPCMovement {
           */
 
           if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
-            await this.npcTarget.clearTarget(npc);
+            clearTarget = true;
           }
+        }
+
+        if (!clearTarget) {
+          clearTarget = await this.specialEffect.isInvisible(character);
+        }
+
+        if (clearTarget) {
+          await this.npcTarget.clearTarget(npc);
         }
 
         const isOnCharView = this.characterView.isOnCharacterView(character, npc._id, "npcs");

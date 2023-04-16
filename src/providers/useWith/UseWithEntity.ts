@@ -33,6 +33,7 @@ import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { IMagicItemUseWithEntity } from "./useWithTypes";
 import { EntityUtil } from "@providers/entityEffects/EntityUtil";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 const StaticEntity = "Item"; // <--- should be added to the EntityType enum from @rpg-engine/shared
 
@@ -52,7 +53,8 @@ export class UseWithEntity {
     private characterBonusPenalties: CharacterBonusPenalties,
     private onTargetHit: OnTargetHit,
     private battleCharacterAttackValidation: BattleCharacterAttackValidation,
-    private battleRangedAttack: BattleAttackRanged
+    private battleRangedAttack: BattleAttackRanged,
+    private specialEffect: SpecialEffect
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -105,10 +107,19 @@ export class UseWithEntity {
       return false;
     }
 
+    if (targetType !== EntityType.Item) {
+      const isInvisible = await this.specialEffect.isInvisible(target as unknown as ICharacter | INPC);
+      if (isInvisible) {
+        this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is invisible.");
+        return false;
+      }
+    }
+
     if ("isAlive" in target && !target.isAlive && targetType !== (StaticEntity as EntityType)) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is dead.");
       return false;
     }
+
     if (target.type === EntityType.Character) {
       const customMsg = new Map([
         ["not-online", "Sorry, your target is offline."],

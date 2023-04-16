@@ -26,6 +26,7 @@ import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 export interface ICharacterHealth {
   id: string;
@@ -43,6 +44,7 @@ export class NPCMovementMoveTowards {
     private npcView: NPCView,
     private mapHelper: MapHelper,
     private characterView: CharacterView,
+    private specialEffect: SpecialEffect,
     private pathfindingCaching: PathfindingCaching,
     private cacheModel: CacheModel
   ) {}
@@ -252,7 +254,14 @@ export class NPCMovementMoveTowards {
 
           const targetCharacter = result[1] as ICharacter;
 
-          if (updatedNPC?.alignment === NPCAlignment.Hostile && targetCharacter?.isAlive && updatedNPC.isAlive) {
+          const isInvisible = await this.specialEffect.isInvisible(targetCharacter);
+
+          if (
+            updatedNPC?.alignment === NPCAlignment.Hostile &&
+            targetCharacter?.isAlive &&
+            updatedNPC.isAlive &&
+            !isInvisible
+          ) {
             // if reached target and alignment is enemy, lets hit it
             await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
             await this.tryToSwitchToRandomTarget(npc);
@@ -268,7 +277,7 @@ export class NPCMovementMoveTowards {
       // Odds have failed, we will not change target
       if (!this.checkOdds()) return false;
 
-      const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+      const nearbyCharacters = await this.getVisibleCharactersInView(npc);
       // Only one character around this NPC, cannot change target
       if (nearbyCharacters.length <= 1) return false;
       let alreadySetted = false;
@@ -360,5 +369,16 @@ export class NPCMovementMoveTowards {
     if (random < 0.1) return true;
 
     return false;
+  }
+
+  private async getVisibleCharactersInView(npc: INPC): Promise<ICharacter[]> {
+    const chars = await this.npcView.getCharactersInView(npc);
+    const visible: ICharacter[] = [];
+    for (const c of chars) {
+      if (!(await this.specialEffect.isInvisible(c))) {
+        visible.push(c);
+      }
+    }
+    return visible;
   }
 }

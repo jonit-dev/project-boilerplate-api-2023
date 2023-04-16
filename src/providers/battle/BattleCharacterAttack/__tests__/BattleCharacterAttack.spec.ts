@@ -5,6 +5,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { EntityAttackType } from "@rpg-engine/shared";
 import { BattleCharacterAttack } from "../BattleCharacterAttack";
 import { BattleCharacterAttackValidation } from "../BattleCharacterAttackValidation";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 describe("BattleCharacterAttack.spec.ts", () => {
   let battleCharacterAttack: BattleCharacterAttack;
@@ -26,6 +27,10 @@ describe("BattleCharacterAttack.spec.ts", () => {
     testCharacter = await unitTestHelper.createMockCharacter();
     testCharacter.health = 100;
     (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
   });
 
   it("should avoid attacking dead targets", async () => {
@@ -64,12 +69,18 @@ describe("BattleCharacterAttack.spec.ts", () => {
   });
 
   it("returns true if the attacker and target are alive, different, and in a PVP zone", async () => {
-    testCharacter.isAlive = true;
-    testNPC.isAlive = true;
-
     const result = await battleCharacterAttackValidation.canAttack(testCharacter, testNPC);
 
     expect(result).toBe(true);
+  });
+
+  it("returns false if target is invisible", async () => {
+    const isInvisible = jest.spyOn(SpecialEffect.prototype, "isInvisible");
+    isInvisible.mockImplementation(() => Promise.resolve(true));
+
+    const result = await battleCharacterAttackValidation.canAttack(testCharacter, testNPC);
+
+    expect(result).toBe(false);
   });
 
   it("returns true if the attacker's level is too low to attack the target", async () => {

@@ -1,14 +1,25 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import { CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged, EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { NPCDeath } from "@providers/npc/NPCDeath";
+import { CharacterDeath } from "@providers/character/CharacterDeath";
+import { EXECUTION_SPELL_COOLDOWN } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 
 @provide(BerserkerSpells)
 export class BerserkerSpells {
-  constructor(private inMemoryHashTable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
+  constructor(
+    private inMemoryHashTable: InMemoryHashTable,
+    private socketMessaging: SocketMessaging,
+    private specialEffect: SpecialEffect,
+    private npcDeath: NPCDeath,
+    private characterDeath: CharacterDeath
+  ) {}
 
   public async handleBerserkerAttack(character: ICharacter, damage: number): Promise<void> {
     try {
@@ -28,6 +39,44 @@ export class BerserkerSpells {
     const spell = await this.inMemoryHashTable.get(namespace, key);
 
     return !!spell;
+  }
+
+  public async handleBerserkerExecution(character: ICharacter, target: ICharacter | INPC): Promise<void> {
+    const attacker = character;
+    const entityId = target._id;
+    const entityType = target.type as EntityType;
+
+    try {
+      if (!attacker || !entityId || !entityType) {
+        throw new Error("Invalid parameters");
+      }
+
+      if (attacker._id.toString() === entityId.toString()) {
+        return;
+      }
+
+      if (entityType !== EntityType.Character && entityType !== EntityType.NPC) {
+        throw new Error("Invalid entityType provided");
+      }
+
+      if (await this.specialEffect.isExecutionOn(attacker)) {
+        return;
+      }
+
+      const healthPercent = Math.floor((100 * target.health) / target.maxHealth);
+
+      if (healthPercent <= 30) {
+        if (target.type === EntityType.Character) {
+          await this.characterDeath.handleCharacterDeath(attacker, target as ICharacter);
+        } else {
+          await this.npcDeath.handleNPCDeath(target as INPC);
+        }
+      }
+
+      await this.specialEffect.turnOnExecution(attacker, EXECUTION_SPELL_COOLDOWN);
+    } catch (error) {
+      throw new Error(`Error executing attack: ${error.message}`);
+    }
   }
 
   private async applyBerserkerBloodthirst(character: ICharacter, damage: number): Promise<void> {

@@ -6,10 +6,15 @@ import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { EntityType, ISkill } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleTargeting } from "../BattleTargeting";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(BattleCharacterAttackValidation)
 export class BattleCharacterAttackValidation {
-  constructor(private mapNonPVPZone: MapNonPVPZone, private battleTargeting: BattleTargeting) {}
+  constructor(
+    private mapNonPVPZone: MapNonPVPZone,
+    private battleTargeting: BattleTargeting,
+    private specialEffect: SpecialEffect
+  ) {}
 
   public async canAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
     if (!target.isAlive) {
@@ -21,6 +26,10 @@ export class BattleCharacterAttackValidation {
     }
 
     if (target.id === attacker.id) {
+      return false;
+    }
+
+    if (await this.specialEffect.isInvisible(target)) {
       return false;
     }
 

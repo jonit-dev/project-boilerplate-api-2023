@@ -1,19 +1,16 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { CharacterDeath } from "@providers/character/CharacterDeath";
-import { EXECUTION_SPELL_COOLDOWN } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
+import { ICharacter, Character } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
-import { TimerWrapper } from "@providers/helpers/TimerWrapper";
-import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { CharacterClass, CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { Types } from "mongoose";
+import { TimerWrapper } from "@providers/helpers/TimerWrapper";
+import { CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";
 
 enum SpecialEffectNamespace {
   Stun = "character-special-effect-stun",
   Stealth = "character-special-effect-stealth",
+  Execution = "character-special-effect-execution",
 }
 
 @provide(SpecialEffect)
@@ -21,8 +18,6 @@ export class SpecialEffect {
   constructor(
     private inMemoryHashTable: InMemoryHashTable,
     private timer: TimerWrapper,
-    private npcDeath: NPCDeath,
-    private characterDeath: CharacterDeath,
     private socketMessaging: SocketMessaging
   ) {}
 
@@ -35,18 +30,15 @@ export class SpecialEffect {
   }
 
   async turnInvisible(target: ICharacter, intervalSec: number): Promise<boolean> {
-    const applied = await this.applyEffect(target, intervalSec, SpecialEffectNamespace.Stealth);
+    const applied = await this.applyEffect(target, intervalSec, SpecialEffectNamespace.Stealth, async () => {
+      await this.sendOpacityChange(target);
+    });
+
     if (!applied) {
       return applied;
     }
 
-    await this.socketMessaging.sendEventToCharactersAroundCharacter(
-      target,
-      CharacterSocketEvents.CharacterRemoveFromView,
-      {
-        id: target.id,
-      }
-    );
+    await this.sendOpacityChange(target);
 
     return applied;
   }
@@ -58,6 +50,21 @@ export class SpecialEffect {
   async cleanup(): Promise<void> {
     await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stun);
     await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stealth);
+  }
+
+  async turnOnExecution(target: ICharacter | INPC, intervalSec: number): Promise<boolean> {
+    return await this.applyEffect(target, intervalSec, SpecialEffectNamespace.Execution);
+  }
+
+  async isExecutionOn(target: ICharacter | INPC): Promise<boolean> {
+    return await this.isEffectApplied(target, SpecialEffectNamespace.Execution);
+  }
+
+  async getOpacity(target: ICharacter | INPC): Promise<number> {
+    if (await this.isInvisible(target)) {
+      return 0.3;
+    }
+    return 1;
   }
 
   async shapeShift(character: ICharacter, textureKey: string, internvalInSecs: number): Promise<void> {
@@ -109,61 +116,19 @@ export class SpecialEffect {
     }, internvalInSecs * 1000);
   }
 
-  async execution(attacker: ICharacter, entityId: Types.ObjectId, entityType: EntityType): Promise<void> {
-    try {
-      if (!attacker || !entityId || !entityType) {
-        throw new Error("Invalid parameters");
-      }
-
-      if (attacker._id.toString() === entityId.toString()) {
-        return;
-      }
-
-      if (entityType !== EntityType.Character && entityType !== EntityType.NPC) {
-        throw new Error("Invalid entityType provided");
-      }
-
-      const namespace = `${NamespaceRedisControl.CharacterSpell}:${attacker._id}`;
-      let key: SpellsBlueprint = SpellsBlueprint.RogueExecution;
-
-      if (attacker.class === CharacterClass.Berserker) {
-        key = SpellsBlueprint.BerserkerExecution;
-      }
-
-      const isActionExecuted = await this.inMemoryHashTable.get(namespace, key);
-
-      if (isActionExecuted) {
-        return;
-      }
-
-      const target =
-        entityType === EntityType.Character ? await Character.findById(entityId) : await NPC.findById(entityId);
-      if (!target) {
-        throw new Error(`No ${entityType} found with ${entityId}`);
-      }
-
-      const healthPercent = Math.floor((100 * target.health) / target.maxHealth);
-      const isCharacterTarget = target instanceof Character;
-
-      if (healthPercent <= 30) {
-        if (isCharacterTarget) {
-          await this.characterDeath.handleCharacterDeath(attacker, target as ICharacter);
-        } else {
-          await this.npcDeath.handleNPCDeath(target as INPC);
-        }
-      }
-
-      await this.inMemoryHashTable.set(namespace, key, true);
-      await this.inMemoryHashTable.expire(namespace, EXECUTION_SPELL_COOLDOWN, "NX");
-    } catch (error) {
-      throw new Error(`Error executing attack: ${error.message}`);
+  async clearEffects(target: ICharacter | INPC): Promise<void> {
+    if (!target) {
+      return;
     }
+
+    await this.inMemoryHashTable.delete(SpecialEffectNamespace.Stealth, this.getEntityKey(target));
   }
 
   private async applyEffect(
     target: ICharacter | INPC,
     intervalSec: number,
-    namespace: SpecialEffectNamespace
+    namespace: SpecialEffectNamespace,
+    onEffectEnd?: Function
   ): Promise<boolean> {
     const entityType = target.type as EntityType;
     if (entityType === EntityType.Item) {
@@ -179,6 +144,7 @@ export class SpecialEffect {
 
     this.timer.setTimeout(async () => {
       await this.inMemoryHashTable.delete(namespace, this.getEntityKey(target));
+      onEffectEnd && onEffectEnd();
     }, intervalSec * 1000);
 
     return true;
@@ -195,5 +161,25 @@ export class SpecialEffect {
 
     const key = [entityType, entityId].join(":");
     return key;
+  }
+
+  private async sendOpacityChange(target: ICharacter): Promise<void> {
+    const opacity = await this.getOpacity(target);
+    const payload = {
+      alpha: opacity,
+      targetId: target._id,
+    };
+
+    this.socketMessaging.sendEventToUser<ICharacterAttributeChanged>(
+      target.channelId!,
+      CharacterSocketEvents.AttributeChanged,
+      payload
+    );
+
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(
+      target,
+      CharacterSocketEvents.AttributeChanged,
+      payload
+    );
   }
 }
