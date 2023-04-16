@@ -48,4 +48,8 @@ export const CraftingSkillsMap = new Map<string, string>([
   [PotionsBlueprint.LightLifePotion, CraftingSkill.Alchemy],
   [PotionsBlueprint.LightManaPotion, CraftingSkill.Alchemy],
   [PotionsBlueprint.ManaPotion, CraftingSkill.Alchemy],
+  [FoodsBlueprint.Bread, CraftingSkill.Cooking],
+  [FoodsBlueprint.Cookie, CraftingSkill.Cooking],
+  [FoodsBlueprint.Cheese, CraftingSkill.Cooking],
+  [FoodsBlueprint.CheeseSlice, CraftingSkill.Cooking],
 ]);

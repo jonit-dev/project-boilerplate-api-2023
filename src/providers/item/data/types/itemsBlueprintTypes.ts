@@ -219,6 +219,7 @@ export enum FoodsBlueprint {
   RedMushroom = "red-mushroom",
   IceMushroom = "ice-mushroom",
   RottenMeat = "rotten-meat",
+  Milk = "milk",
 }
 export enum CraftingResourcesBlueprint {
   Rope = "rope",

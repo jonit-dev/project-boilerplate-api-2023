@@ -150,5 +150,9 @@ export const npcOrc = {
       itemBlueprintKey: CraftingResourcesBlueprint.IronOre,
       chance: 7,
     },
+    {
+      itemBlueprintKey: FoodsBlueprint.Milk,
+      chance: 10,
+    },
   ],
 } as Partial<INPC>;

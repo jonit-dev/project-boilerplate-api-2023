@@ -3,16 +3,20 @@ import { CraftingResourcesBlueprint, FoodsBlueprint } from "@providers/item/data
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
-export const recipeBread: IUseWithCraftingRecipe = {
-  outputKey: FoodsBlueprint.Bread,
-  outputQtyRange: [1, 1],
+export const recipeCookie: IUseWithCraftingRecipe = {
+  outputKey: FoodsBlueprint.Cookie,
+  outputQtyRange: [1, 5],
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Wheat,
       qty: 1,
     },
     {
-      key: CraftingResourcesBlueprint.WaterBottle,
+      key: FoodsBlueprint.Egg,
+      qty: 1,
+    },
+    {
+      key: FoodsBlueprint.Milk,
       qty: 1,
     },
   ],
@@ -20,7 +24,8 @@ export const recipeBread: IUseWithCraftingRecipe = {
     CraftingSkill.Cooking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Wheat, 1],
-      [CraftingResourcesBlueprint.WaterBottle, 1],
+      [FoodsBlueprint.Egg, 1],
+      [FoodsBlueprint.Milk, 1],
     ]),
   ],
 };
