@@ -43,11 +43,19 @@ export class ItemCraftable {
     const inventoryInfo = await this.getCharacterInventoryItems(character);
 
     // Retrieve the list of recipes for the given item sub-type
-    const recipes = this.getRecipes(itemSubType);
+    const recipes =
+      itemSubType === "Suggested"
+        ? await this.getRecipesWithAnyIngredientInInventory(character)
+        : this.getRecipes(itemSubType);
 
     // Process each recipe to generate craftable items
     const craftableItemsPromises = recipes.map((recipe) => this.getCraftableItem(inventoryInfo, recipe, character));
-    const craftableItems = (await Promise.all(craftableItemsPromises)) as ICraftableItem[];
+    const craftableItems = ((await Promise.all(craftableItemsPromises)) as ICraftableItem[]).sort((a, b) => {
+      // this what is craftable should be first
+      if (a.canCraft && !b.canCraft) return -1;
+      if (!a.canCraft && b.canCraft) return 1;
+      return 0;
+    });
 
     // Send the list of craftable items to the user through a socket event
     this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, craftableItems);
@@ -268,6 +276,7 @@ export class ItemCraftable {
   private getRecipes(subType: string): IUseWithCraftingRecipe[] {
     const availableRecipes: IUseWithCraftingRecipe[] = [];
     const recipes = this.getAllRecipes();
+
     for (const itemKey in itemsBlueprintIndex) {
       const item = itemsBlueprintIndex[itemKey];
       if (item.subType === subType && recipes[item.key]) {
@@ -277,6 +286,39 @@ export class ItemCraftable {
 
     // Sorts the availableRecipes array based minCraftingRequirements level
     return availableRecipes.sort((a, b) => a.minCraftingRequirements[1] - b.minCraftingRequirements[1]);
+  }
+
+  private async getRecipesWithAnyIngredientInInventory(character: ICharacter): Promise<IUseWithCraftingRecipe[]> {
+    const inventoryInfo = await this.getCharacterInventoryItems(character);
+
+    const availableRecipes: IUseWithCraftingRecipe[] = [];
+    const recipes = this.getAllRecipes();
+    for (const itemKey in itemsBlueprintIndex) {
+      const item = itemsBlueprintIndex[itemKey];
+      if (recipes[item.key]) {
+        const recipe = recipes[item.key];
+        if (recipe.requiredItems.some((ing) => inventoryInfo.get(ing.key) ?? 0 >= ing.qty)) {
+          availableRecipes.push(recipe);
+        }
+      }
+    }
+
+    return availableRecipes.sort((a, b) => {
+      // sort by qty of ingredients in inventory first
+      const aQty = a.requiredItems.reduce((acc, ing) => acc + (inventoryInfo.get(ing.key) ?? 0), 0);
+      const bQty = b.requiredItems.reduce((acc, ing) => acc + (inventoryInfo.get(ing.key) ?? 0), 0);
+
+      if (aQty > bQty) {
+        return -1;
+      }
+
+      if (aQty < bQty) {
+        return 1;
+      }
+
+      // sort by minCraftingRequirements level second
+      return a.minCraftingRequirements[1] - b.minCraftingRequirements[1];
+    });
   }
 
   private getAllRecipes(): Object {
