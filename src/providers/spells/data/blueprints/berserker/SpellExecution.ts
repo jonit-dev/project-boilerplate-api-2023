@@ -7,8 +7,8 @@ import { BerserkerSpells } from "@providers/spells/data/logic/berserker/Berserke
 
 export const berserkerSpellExecution: Partial<ISpell> = {
   key: SpellsBlueprint.BerserkerExecution,
-  name: "Insania",
-  description: "The Execution spell is designed for Berserkers to instantly eliminate opponents",
+  name: "Insania Supplicium",
+  description: "The Execution spell is designed to instantly eliminate opponents if target's health is <= 30%",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "insania supplicium",
   manaCost: 150,

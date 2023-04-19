@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { appEnv } from "@providers/config/env";
+import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -10,9 +11,11 @@ import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   AnimationDirection,
   AvailableWeather,
+  CharacterClass,
   CharacterSocketEvents,
   EnvType,
   ICharacterCreateFromClient,
@@ -25,6 +28,9 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
+import { DruidPassiveHabilities } from "../characterPassiveHabilities/Druid";
+import { SorcererPassiveHabilities } from "../characterPassiveHabilities/Sorcerer";
+import { WarriorPassiveHabilities } from "../characterPassiveHabilities/Warrior";
 import { CharacterView } from "../CharacterView";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
@@ -42,7 +48,11 @@ export class CharacterNetworkCreate {
     private pm2Helper: PM2Helper,
     private characterView: CharacterView,
     private characterMonitor: CharacterMonitor,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private warriorPassiveHabilities: WarriorPassiveHabilities,
+    private sorcererPassiveHabilities: SorcererPassiveHabilities,
+    private druidPassiveHabilities: DruidPassiveHabilities,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -136,10 +146,9 @@ export class CharacterNetworkCreate {
 
         await this.warnAboutWeatherStatus(character.channelId!);
 
-        //! TODO: Luiz - trigger monitoring here
-        // this.characterMonitor.watch(character, (character: ICharacter) => {
-        //   console.log("Character monitoring triggered for character", character._id);
-        // });
+        this.characterMonitor.watch(character, async (character: ICharacter) => {
+          await this.handleCharacterRegen(character);
+        });
       },
       false
     );
@@ -206,6 +215,52 @@ export class CharacterNetworkCreate {
         WeatherSocketEvents.TimeWeatherControl,
         dataOfWeather
       );
+    }
+  }
+
+  private async handleCharacterRegen(character: ICharacter): Promise<void> {
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
+    const healthKey = SpellsBlueprint.HealthRegenSell;
+    const manaKey = SpellsBlueprint.ManaRegenSpell;
+
+    const healthCondition = character.health < character.maxHealth;
+    const manaCondition = character.mana < character.maxMana;
+
+    try {
+      switch (character.class) {
+        case CharacterClass.Warrior:
+          if (healthCondition) {
+            const isActive = await this.inMemoryHashTable.has(namespace, healthKey);
+            isActive
+              ? this.characterMonitor.unwatch(character)
+              : await this.warriorPassiveHabilities.warriorAutoRegenHealthHandler(character);
+          }
+          break;
+
+        case CharacterClass.Sorcerer:
+          if (manaCondition) {
+            const isActive = await this.inMemoryHashTable.has(namespace, manaKey);
+            isActive
+              ? this.characterMonitor.unwatch(character)
+              : await this.sorcererPassiveHabilities.sorcererAutoRegenManaHandler(character);
+          }
+          break;
+
+        case CharacterClass.Druid:
+          if (manaCondition) {
+            const isActive = await this.inMemoryHashTable.has(namespace, manaKey);
+            isActive
+              ? this.characterMonitor.unwatch(character)
+              : await this.druidPassiveHabilities.druidAutoRegenManaHandler(character);
+          }
+          break;
+
+        default:
+          this.characterMonitor.unwatch(character);
+          break;
+      }
+    } catch (error) {
+      console.error(`Error regenerating character ${character._id}: ${error}`);
     }
   }
 }

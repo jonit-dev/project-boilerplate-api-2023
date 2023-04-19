@@ -7,8 +7,8 @@ import { BerserkerSpells } from "@providers/spells/data/logic/berserker/Berserke
 
 export const rogueSpellExecution: Partial<ISpell> = {
   key: SpellsBlueprint.RogueExecution,
-  name: "Suplicium",
-  description: "The Execution spell is designed for Rogues to instantly eliminate opponents",
+  name: "Suplicium Furtim",
+  description: "The Execution spell is designed to instantly eliminate opponents if target's health is <= 30%",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "supplicium furtim",
   manaCost: 100,

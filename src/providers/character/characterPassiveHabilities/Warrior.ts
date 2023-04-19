@@ -5,46 +5,63 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { Types } from "mongoose";
+import { CharacterMonitor } from "../CharacterMonitor";
 
 @provide(WarriorPassiveHabilities)
 export class WarriorPassiveHabilities {
-  constructor(private socketMessaging: SocketMessaging, private inMemoryHashTable: InMemoryHashTable) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private inMemoryHashTable: InMemoryHashTable,
+    private characterMonitor: CharacterMonitor
+  ) {}
 
-  public async warriorAutoRegenHealthHandler(
-    characterId: Types.ObjectId,
-    characterClass: CharacterClass
-  ): Promise<void> {
-    if (characterClass !== CharacterClass.Warrior) {
+  public async warriorAutoRegenHealthHandler(character: ICharacter): Promise<void> {
+    const { _id, skills, health, maxHealth } = character;
+
+    if (character.class !== CharacterClass.Warrior) {
+      this.characterMonitor.unwatch(character);
       return;
     }
 
-    const namespace = `${NamespaceRedisControl.CharacterSpell}:${characterId.toString()}`;
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${_id.toString()}`;
     const key = SpellsBlueprint.HealthRegenSell;
 
-    const regenHealthIntervalId = await this.inMemoryHashTable.get(namespace, key);
-    if (!regenHealthIntervalId) {
-      const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const regenHealthIsActive = await this.inMemoryHashTable.has(namespace, key);
+    if (regenHealthIsActive) {
+      return;
+    }
 
-      if (character.health === character.maxHealth) {
-        return;
-      }
+    try {
+      const { strength } = (await Skill.findById(skills).lean().select("strength")) as ISkill;
+      const strengthLvl = strength.level;
+      const interval = Math.min(Math.max(20000 - strengthLvl * 500, 1000), 20000);
+      const healthRegenAmount = Math.max(Math.floor(strengthLvl / 3), 4);
 
-      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
-      const strengthSkill = skills.strength.level;
+      if (health < maxHealth) {
+        const intervalId = setInterval(async () => {
+          try {
+            const refreshCharacter = (await Character.findById(_id)
+              .lean()
+              .select("_id health maxHealth")) as ICharacter;
 
-      let interval = 20000 - strengthSkill * 500;
-      interval = Math.min(Math.max(interval, 1000), 20000);
-      const qtyHealthRegen = Math.max(Math.floor(strengthSkill / 3), 4);
+            if (refreshCharacter.health === refreshCharacter.maxHealth) {
+              clearInterval(intervalId);
+              await this.inMemoryHashTable.delete(namespace, key);
+              this.characterMonitor.unwatch(character);
+              return;
+            }
 
-      const intervalId = setInterval(async () => {
-        try {
-          if (character.health < character.maxHealth) {
-            character.health = Math.min(character.health + qtyHealthRegen, character.maxHealth);
-
-            const updatedCharacter = (await Character.findByIdAndUpdate(characterId, character, {
-              new: true,
-            }).lean()) as ICharacter;
+            const updatedCharacter = (await Character.findByIdAndUpdate(
+              _id,
+              {
+                health: Math.min(refreshCharacter.health + healthRegenAmount, refreshCharacter.maxHealth),
+              },
+              {
+                new: true,
+              }
+            )
+              .lean()
+              .select("_id health channelId")) as ICharacter;
 
             const payload: ICharacterAttributeChanged = {
               targetId: updatedCharacter._id,
@@ -56,19 +73,25 @@ export class WarriorPassiveHabilities {
               CharacterSocketEvents.AttributeChanged,
               payload
             );
-          } else {
+
+            if (updatedCharacter.health === updatedCharacter.maxHealth) {
+              clearInterval(intervalId);
+              this.characterMonitor.unwatch(character);
+              await this.inMemoryHashTable.delete(namespace, key);
+              return;
+            }
+          } catch (err) {
+            console.error("Error during health regeneration interval:", err);
             clearInterval(intervalId);
-            await this.inMemoryHashTable.delete(namespace, key);
+            this.characterMonitor.unwatch(character);
           }
-        } catch (err) {
-          console.error(err);
-        }
-      }, interval);
+        }, interval);
 
-      await this.inMemoryHashTable.set(namespace, key, `interval: ${interval} qtyHealthRegen: ${qtyHealthRegen}`);
-
-      const expireTimeout = Math.floor(((character.maxHealth - character.health) / qtyHealthRegen) * (interval / 1000));
-      await this.inMemoryHashTable.expire(namespace, expireTimeout, "NX");
+        await this.inMemoryHashTable.set(namespace, key, `interval: ${interval} qtyHealthRegen: ${healthRegenAmount}`);
+        await this.inMemoryHashTable.expire(namespace, 120, "NX");
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 }
