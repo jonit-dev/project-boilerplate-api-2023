@@ -5,14 +5,14 @@ import { container } from "@providers/inversify/container";
 import { AnimationEffectKeys, BasicAttribute, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
-export const spellMagicShield: Partial<ISpell> = {
-  key: SpellsBlueprint.SpellMagicShield,
-  name: "Self Magic Shield",
-  description: "A Self Magic Shield.",
+export const spellDivineProtection: Partial<ISpell> = {
+  key: SpellsBlueprint.SpellDivineProtection,
+  name: "Divine Protection",
+  description: "A Shield boosts magic resistance by 30%, duration varies with magic level.",
   castingType: SpellCastingType.SelfCasting,
-  magicWords: "talas kalkan",
-  manaCost: 60,
-  minLevelRequired: 8,
+  magicWords: "divinum praesidium",
+  manaCost: 40,
+  minLevelRequired: 5,
   minMagicLevelRequired: 8,
   animationKey: AnimationEffectKeys.MagicShield,
   attribute: BasicAttribute.MagicResistance,
@@ -21,7 +21,7 @@ export const spellMagicShield: Partial<ISpell> = {
   usableEffect: async (character: ICharacter) => {
     const characterSkillBuff = container.get(CharacterSkillBuff);
     const skills = (await Skill.findById(character.skills).lean()) as ISkill;
-    const timeout = Math.min(Math.max(skills.magic.level * 5, 10), 180);
+    const timeout = Math.min(Math.max(skills.magic.level * 5, 30), 180);
 
     await characterSkillBuff.enableTemporaryBuff(character, BasicAttribute.MagicResistance, 30, timeout);
   },

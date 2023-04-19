@@ -379,12 +379,12 @@ export class BuffSkillFunctions {
       ],
       [CharacterClass.Druid]: [
         SpellsBlueprint.ManaRegenSpell,
-        SpellsBlueprint.SpellMagicShield,
+        SpellsBlueprint.SpellDivineProtection,
         SpellsBlueprint.DruidShapeshift,
       ],
       [CharacterClass.Sorcerer]: [
         SpellsBlueprint.ManaRegenSpell,
-        SpellsBlueprint.SpellMagicShield,
+        SpellsBlueprint.SpellDivineProtection,
         SpellsBlueprint.SorcererManaShield,
       ],
     };
