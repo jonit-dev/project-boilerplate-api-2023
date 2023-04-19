@@ -160,7 +160,7 @@ describe("CharacterDeath.ts | Character with items", () => {
     jest.clearAllMocks();
   });
 
-  it("should drop character's backpack items  as a container on its dead body", async () => {
+  it("should drop character's backpack items as a container on its dead body", async () => {
     // @ts-ignore
     const spyDropCharacterItemsOnBody = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
 
@@ -192,6 +192,9 @@ describe("CharacterDeath.ts | Character with items", () => {
 
     // backpack ownership should be null after death
     expect(bodyItemContainer.slots[0].owner).toBeUndefined();
+
+    const updatedBody = await Item.findById(characterBody!._id);
+    expect(updatedBody?.isDeadBodyLootable).toBe(true);
   });
 
   it("should drop equipment item on character's dead body", async () => {
@@ -227,6 +230,9 @@ describe("CharacterDeath.ts | Character with items", () => {
     expect(bodyItemContainer!.slots[0]).not.toBeNull();
     expect(bodyItemContainer!.slots[1]).not.toBeNull();
     expect(bodyItemContainer!.slots[2]).not.toBeNull();
+
+    const updatedBody = await Item.findById(characterBody._id);
+    expect(updatedBody?.isDeadBodyLootable).toBe(true);
   });
 
   it("should update the attack type after dead and drop Bow, Ranged to Melee", async () => {

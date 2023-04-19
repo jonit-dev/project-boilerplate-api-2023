@@ -8,6 +8,7 @@ export const itemNPCBody: Partial<IItem> = {
   textureAtlas: "entities",
   weight: 100,
   isStorable: false,
+  isDeadBodyLootable: false,
   isItemContainer: true, // this will automatically create a container once an this is spawned
   decayTime: dayjs(new Date()).add(1, "hour").toDate(),
 };

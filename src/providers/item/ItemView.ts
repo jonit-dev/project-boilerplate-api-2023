@@ -100,7 +100,7 @@ export class ItemView {
         // if we already have a representation there, just skip!
         if (
           itemOnCharView &&
-          this.objectHelper.doesObjectAttrMatches(itemOnCharView, item, ["id", "x", "y", "scene"])
+          this.objectHelper.doesObjectAttrMatches(itemOnCharView, item, ["id", "x", "y", "scene", "isDeadBodyLootable"])
         ) {
           continue;
         }
@@ -121,6 +121,7 @@ export class ItemView {
         y: item.y,
         layer: item.layer,
         stackQty: item.stackQty || 0,
+        isDeadBodyLootable: item.isDeadBodyLootable,
       });
 
       await this.characterView.addToCharacterView(

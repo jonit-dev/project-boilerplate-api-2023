@@ -369,4 +369,88 @@ describe("NPCDeath.ts", () => {
     expect(updatedNPC.currentMovementType).toBe(updatedNPC!.originalMovementType);
     expect(updatedNPC.appliedEntityEffects?.length).toBe(0);
   });
+
+  it("should add isDeadBodyLootable flag to NPC body on loot drop", async () => {
+    // @ts-ignore
+    jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
+
+    testNPC.loots = [
+      // @ts-ignore
+      { itemBlueprintKey: CraftingResourcesBlueprint.Diamond, chance: 100, quantityRange: [1, 1] },
+    ];
+
+    // npc body automatically creates the itemContainer
+
+    const blueprintData = itemsBlueprintIndex["npc-body"];
+    const npcBody = new Item({
+      ...blueprintData, // base body props
+      key: `${testNPC.key}-body`,
+      bodyFromId: testNPC.id,
+      texturePath: `${testNPC.textureKey}/death/0.png`,
+      textureKey: testNPC.textureKey,
+      name: `${testNPC.name}'s body`,
+      description: `You see ${testNPC.name}'s body.`,
+      scene: testNPC.scene,
+      x: testNPC.x,
+      y: testNPC.y,
+    });
+
+    npcBody.generateContainerSlots = 2;
+
+    await npcBody.save();
+
+    // @ts-ignore
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+
+    // @ts-ignore
+    await npcDeath.addLootToNPCBody(npcBody, testNPC.loots);
+
+    expect(spyAddLootInNPCBody).toHaveBeenCalled();
+
+    const npcBodyUpdated = await Item.findById(npcBody.id);
+
+    expect(npcBodyUpdated?.isDeadBodyLootable).toBe(true);
+  });
+
+  it("should not add isDeadBodyLootable flag to NPC body if no loot is dropped", async () => {
+    // @ts-ignore
+    jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
+
+    testNPC.loots = [
+      // @ts-ignore
+      { itemBlueprintKey: CraftingResourcesBlueprint.Diamond, chance: 0, quantityRange: [1, 1] },
+    ];
+
+    // npc body automatically creates the itemContainer
+
+    const blueprintData = itemsBlueprintIndex["npc-body"];
+    const npcBody = new Item({
+      ...blueprintData, // base body props
+      key: `${testNPC.key}-body`,
+      bodyFromId: testNPC.id,
+      texturePath: `${testNPC.textureKey}/death/0.png`,
+      textureKey: testNPC.textureKey,
+      name: `${testNPC.name}'s body`,
+      description: `You see ${testNPC.name}'s body.`,
+      scene: testNPC.scene,
+      x: testNPC.x,
+      y: testNPC.y,
+    });
+
+    npcBody.generateContainerSlots = 2;
+
+    await npcBody.save();
+
+    // @ts-ignore
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+
+    // @ts-ignore
+    await npcDeath.addLootToNPCBody(npcBody, testNPC.loots);
+
+    expect(spyAddLootInNPCBody).toHaveBeenCalled();
+
+    const npcBodyUpdated = await Item.findById(npcBody.id);
+
+    expect(npcBodyUpdated?.isDeadBodyLootable).toBe(false);
+  });
 });

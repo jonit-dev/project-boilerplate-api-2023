@@ -125,6 +125,7 @@ export class NPCDeath {
 
   private async addLootToNPCBody(npcBody: IItem, loots: INPCLoot[], wasNpcInGiantForm?: boolean): Promise<void> {
     const itemContainer = await this.fetchItemContainer(npcBody);
+    let isDeadBodyLootable = false;
 
     for (const loot of loots) {
       const rand = Math.round(random(0, 100));
@@ -153,6 +154,11 @@ export class NPCDeath {
             itemContainer.slots[freeSlotId!] = lootItem;
 
             await lootItem.save();
+
+            if (!isDeadBodyLootable) {
+              await npcBody.updateOne({ isDeadBodyLootable: true });
+              isDeadBodyLootable = true;
+            }
           }
         }
       }

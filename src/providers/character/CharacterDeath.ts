@@ -121,7 +121,7 @@ export class CharacterDeath {
     await this.characterWeight.updateCharacterWeight(character);
   }
 
-  public async generateCharacterBody(character: ICharacter): Promise<IItem | any> {
+  public async generateCharacterBody(character: ICharacter): Promise<IItem> {
     const blueprintData = itemsBlueprintIndex[BodiesBlueprint.CharacterBody];
 
     const charBody = new Item({
@@ -199,6 +199,7 @@ export class CharacterDeath {
 
   private async dropInventory(character: ICharacter, bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
     const n = _.random(0, 100);
+    let isDeadBodyLootable = false;
 
     const skills = (await Skill.findById(character.skills)) as ISkill;
 
@@ -211,6 +212,11 @@ export class CharacterDeath {
 
       // now that the slot is clear, lets drop the item on the body
       await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id);
+
+      if (!isDeadBodyLootable) {
+        isDeadBodyLootable = true;
+        await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
+      }
 
       setTimeout(() => {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -228,6 +234,8 @@ export class CharacterDeath {
     bodyContainer: IItemContainer,
     equipment: IEquipment
   ): Promise<void> {
+    let isDeadBodyLootable = false;
+
     for (const slot of DROPPABLE_EQUIPMENT) {
       const itemId = equipment[slot];
 
@@ -252,6 +260,11 @@ export class CharacterDeath {
 
         // now that the slot is clear, lets drop the item on the body
         await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id);
+
+        if (!isDeadBodyLootable) {
+          isDeadBodyLootable = true;
+          await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
+        }
       }
     }
   }

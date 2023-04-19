@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItemContainer, IItemPickup } from "@rpg-engine/shared";
@@ -56,6 +56,24 @@ export class ItemPickupFromContainer {
         "Sorry, failed to remove the item from the origin container."
       );
       return false;
+    }
+
+    await this.checkIfBodyIsEmptyAndRemoveLootableFlag(fromContainer);
+
+    return true;
+  }
+
+  private async checkIfBodyIsEmptyAndRemoveLootableFlag(fromContainer: IItemContainer): Promise<boolean> {
+    let isContainerEmpty = true;
+    for (const slot of Object.keys(fromContainer.slots)) {
+      if (fromContainer.slots[slot]) {
+        isContainerEmpty = false;
+        break;
+      }
+    }
+
+    if (isContainerEmpty) {
+      await Item.updateOne({ _id: fromContainer.parentItem }, { isDeadBodyLootable: false });
     }
 
     return true;

@@ -97,6 +97,8 @@ const itemSchema = createLeanSchema(
 
     isTraining: Type.boolean({ required: true, default: false }), // For training items which gives a max damage of 1
 
+    isDeadBodyLootable: Type.boolean({ required: false }),
+
     droppedBy: Type.objectId({
       ref: "Character",
     }),
@@ -164,8 +166,11 @@ const warnAboutItemChanges = async (item: IItem, warnType: "changes" | "removal"
 };
 
 itemSchema.post("updateOne", async function (this: UpdateQuery<IItem>) {
-  const updatedItem = { ...this, ...this._update.$set };
-  await warnAboutItemChanges(updatedItem, "changes");
+  const { _id } = this._conditions;
+  if (!_id) return;
+
+  const updatedItem = (await Item.findById(_id)) as IItem | undefined;
+  if (updatedItem) await warnAboutItemChanges(updatedItem, "changes");
 });
 
 itemSchema.post("save", async function (this: IItem) {
