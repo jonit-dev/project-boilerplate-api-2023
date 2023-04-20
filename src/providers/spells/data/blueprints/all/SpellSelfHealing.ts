@@ -15,6 +15,7 @@ export const spellSelfHealing: Partial<ISpell> = {
   manaCost: 10,
   minLevelRequired: 2,
   minMagicLevelRequired: 1,
+  cooldown: 5,
   animationKey: AnimationEffectKeys.LifeHeal,
 
   usableEffect: (character: ICharacter) => {

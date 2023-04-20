@@ -2,7 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { appEnv } from "@providers/config/env";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -11,7 +11,7 @@ import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   AnimationDirection,
   AvailableWeather,

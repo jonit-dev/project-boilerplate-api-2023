@@ -14,6 +14,7 @@ export const spellFortifyDefense: Partial<ISpell> = {
   manaCost: 50,
   minLevelRequired: 6,
   minMagicLevelRequired: 5,
+  cooldown: 20,
   animationKey: AnimationEffectKeys.PhysicalShield,
   attribute: CombatSkill.Shielding,
   characterClass: [CharacterClass.Warrior],
@@ -21,7 +22,7 @@ export const spellFortifyDefense: Partial<ISpell> = {
   usableEffect: async (character: ICharacter) => {
     const characterSkillBuff = container.get(CharacterSkillBuff);
     const skills = (await Skill.findById(character.skills).lean()) as ISkill;
-    const timeout = Math.min(Math.max(skills.magic.level * 5, 10), 180);
+    const timeout = Math.min(Math.max(skills.magic.level * 5, 20), 180);
 
     await characterSkillBuff.enableTemporaryBuff(character, CombatSkill.Shielding, 30, timeout);
   },

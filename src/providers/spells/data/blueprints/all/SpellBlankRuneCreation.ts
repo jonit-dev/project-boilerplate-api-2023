@@ -16,6 +16,7 @@ export const spellBlankRuneCreation: Partial<ISpell> = {
   manaCost: 15,
   minLevelRequired: 2,
   minMagicLevelRequired: 3,
+  cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {

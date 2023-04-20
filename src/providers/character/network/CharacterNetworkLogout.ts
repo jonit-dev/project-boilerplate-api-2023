@@ -2,7 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { BattleCycle } from "@providers/battle/BattleCycle";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -20,7 +20,8 @@ import { CharacterView } from "../CharacterView";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 import { CharacterItems } from "../characterItems/CharacterItems";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
-import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import SpellCooldown from "@providers/spells/SpellCooldown";
 
 @provide(CharacterNetworkLogout)
 export class CharacterNetworkLogout {
@@ -38,7 +39,8 @@ export class CharacterNetworkLogout {
     private characterItemContainer: CharacterItemContainer,
     private characterItems: CharacterItems,
     private characterMonitor: CharacterMonitor,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private spellCooldown: SpellCooldown
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -83,6 +85,7 @@ export class CharacterNetworkLogout {
         await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
         await this.buffSkillFunctions.removeAllSpellDataOnRedis(character);
         await this.specialEffect.clearEffects(character);
+        await this.spellCooldown.clearCooldowns(character._id);
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());
 

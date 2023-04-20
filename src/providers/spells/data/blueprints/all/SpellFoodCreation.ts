@@ -17,6 +17,7 @@ export const spellFoodCreation: Partial<ISpell> = {
   manaCost: 14,
   minLevelRequired: 3,
   minMagicLevelRequired: 3,
+  cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {

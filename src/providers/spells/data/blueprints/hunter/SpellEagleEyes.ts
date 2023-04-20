@@ -14,6 +14,7 @@ export const spellEagleEyes: Partial<ISpell> = {
   manaCost: 60,
   minLevelRequired: 8,
   minMagicLevelRequired: 8,
+  cooldown: 10,
   animationKey: AnimationEffectKeys.ManaHeal,
   attribute: CombatSkill.Distance,
   characterClass: [CharacterClass.Hunter],

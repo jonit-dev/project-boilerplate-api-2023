@@ -55,6 +55,7 @@ export interface ISpell {
   projectileAnimationKey: string;
   minLevelRequired: number;
   minMagicLevelRequired: number;
+  cooldown: number;
   requiredItem?: MagicsBlueprint;
   characterClass?: CharacterClass[];
   attribute?: BasicAttribute | CombatSkill | CraftingSkill | CharacterEntities;
@@ -63,4 +64,12 @@ export interface ISpell {
     character: ICharacter,
     target?: ICharacter | INPC
   ) => Promise<boolean> | Promise<void> | void | boolean;
+}
+
+export enum NamespaceRedisControl {
+  CharacterSpell = "character-spell",
+  CharacterLastAction = "character-last-action",
+  CharacterViewType = "character-view",
+  CharacterFoodConsumption = "character-food-consumption",
+  CharacterSpellCoolDown = "character-spell-cooldown",
 }

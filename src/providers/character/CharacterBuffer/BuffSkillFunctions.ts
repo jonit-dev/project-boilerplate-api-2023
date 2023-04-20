@@ -1,10 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SkillCalculator } from "@providers/skill/SkillCalculator";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   BasicAttribute,
   CharacterClass,

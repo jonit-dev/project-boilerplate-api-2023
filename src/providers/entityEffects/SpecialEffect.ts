@@ -1,8 +1,8 @@
 import { ICharacter, Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { provide } from "inversify-binding-decorators";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";
@@ -50,14 +50,6 @@ export class SpecialEffect {
   async cleanup(): Promise<void> {
     await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stun);
     await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stealth);
-  }
-
-  async turnOnExecution(target: ICharacter | INPC, intervalSec: number): Promise<boolean> {
-    return await this.applyEffect(target, intervalSec, SpecialEffectNamespace.Execution);
-  }
-
-  async isExecutionOn(target: ICharacter | INPC): Promise<boolean> {
-    return await this.isEffectApplied(target, SpecialEffectNamespace.Execution);
   }
 
   async getOpacity(target: ICharacter | INPC): Promise<number> {

@@ -2,8 +2,6 @@ import { CharacterClass, LifeBringerRaces, ShadowWalkerRaces } from "@rpg-engine
 
 export const BASIC_INCREASE_HEALTH_MANA = 0.04;
 
-export const EXECUTION_SPELL_COOLDOWN = 150;
-
 export const CLASS_BONUS_OR_PENALTIES = [
   {
     class: CharacterClass.None,

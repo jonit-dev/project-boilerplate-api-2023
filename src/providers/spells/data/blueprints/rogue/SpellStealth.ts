@@ -14,6 +14,7 @@ export const spellStealth: Partial<ISpell> = {
   manaCost: 40,
   minLevelRequired: 4,
   minMagicLevelRequired: 3,
+  cooldown: 10,
   animationKey: AnimationEffectKeys.ManaHeal,
   characterClass: [CharacterClass.Rogue],
 

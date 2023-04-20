@@ -1,17 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container } from "@providers/inversify/container";
-import {
-  AnimationEffectKeys,
-  BasicAttribute,
-  CharacterClass,
-  CharacterEntities,
-  CombatSkill,
-  SpellCastingType,
-} from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { AnimationEffectKeys, CharacterClass, CharacterEntities, SpellCastingType } from "@rpg-engine/shared";
+import { ISpell, NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellFrenzy: Partial<ISpell> = {
   key: SpellsBlueprint.BerserkerFrenzy,
@@ -22,6 +15,7 @@ export const spellFrenzy: Partial<ISpell> = {
   manaCost: 120,
   minLevelRequired: 15,
   minMagicLevelRequired: 10,
+  cooldown: 60,
   animationKey: AnimationEffectKeys.QuickFire,
   characterClass: [CharacterClass.Berserker],
 

@@ -16,6 +16,7 @@ export const spellThunderRuneCreation: Partial<ISpell> = {
   manaCost: 40,
   minLevelRequired: 6,
   minMagicLevelRequired: 4,
+  cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
 
   characterClass: [CharacterClass.Druid, CharacterClass.Sorcerer],

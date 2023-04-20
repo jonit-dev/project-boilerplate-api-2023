@@ -19,6 +19,7 @@ export const spellArrowCreation: Partial<ISpell> = {
   manaCost: 10,
   minLevelRequired: 2,
   minMagicLevelRequired: 3,
+  cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {

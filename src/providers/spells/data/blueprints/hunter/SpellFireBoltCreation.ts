@@ -19,6 +19,7 @@ export const spellFireBoltCreation: Partial<ISpell> = {
   manaCost: 25,
   minLevelRequired: 15,
   minMagicLevelRequired: 7,
+  cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Hunter],
 

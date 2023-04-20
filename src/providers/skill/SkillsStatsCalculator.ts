@@ -3,10 +3,10 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentStatsCalculator } from "@providers/equipment/EquipmentStatsCalculator";
 import { container } from "@providers/inversify/container";
-import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { provide } from "inversify-binding-decorators";
 
 @provide(SkillStatsCalculator)

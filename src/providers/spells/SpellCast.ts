@@ -5,14 +5,14 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EntityUtil } from "@providers/entityEffects/EntityUtil";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ISpell } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { ISpell, NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   BasicAttribute,
   CharacterSocketEvents,
@@ -27,6 +27,7 @@ import { provide } from "inversify-binding-decorators";
 import { SpellValidation } from "./SpellValidation";
 import { spellsBlueprints } from "./data/blueprints/index";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import SpellCoolDown from "./SpellCooldown";
 
 @provide(SpellCast)
 export class SpellCast {
@@ -41,7 +42,8 @@ export class SpellCast {
     private spellValidation: SpellValidation,
     private inMemoryHashTable: InMemoryHashTable,
     private movementHelper: MovementHelper,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private spellCoolDown: SpellCoolDown
   ) {}
 
   public isSpellCasting(msg: string): boolean {
@@ -63,6 +65,12 @@ export class SpellCast {
       return false;
     }
 
+    const hasSpellCooldown = await this.spellCoolDown.haveSpellCooldown(character._id, spell.magicWords);
+
+    if (!hasSpellCooldown) {
+      await this.spellCoolDown.setSpellCooldown(character._id, spell.magicWords, spell.cooldown);
+    }
+
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
     let key = spell.attribute;
     key || (key = spell.key);
@@ -71,10 +79,7 @@ export class SpellCast {
       const buffActivated = await this.inMemoryHashTable.has(namespace, key);
 
       if (buffActivated) {
-        this.socketMessaging.sendErrorMessageToCharacter(
-          character,
-          `Sorry, ${spell.name} is already activated or in cooldown.`
-        );
+        this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, ${spell.name} is already activated.`);
         return false;
       }
     }
@@ -150,6 +155,17 @@ export class SpellCast {
 
     if (!character.learnedSpells || character.learnedSpells.indexOf(spell.key) < 0) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you have not learned this spell.");
+      return false;
+    }
+
+    const hasSpellCooldown = await this.spellCoolDown.haveSpellCooldown(character._id, spell.magicWords);
+    if (hasSpellCooldown) {
+      const timeLeft = await this.spellCoolDown.getTimeLeft(character._id, spell.magicWords);
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        `Sorry, this spell is in cooldown. ${timeLeft} secs left`
+      );
+
       return false;
     }
 

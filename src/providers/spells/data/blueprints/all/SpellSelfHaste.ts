@@ -14,6 +14,7 @@ export const spellSelfHaste: Partial<ISpell> = {
   manaCost: 40,
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
+  cooldown: 35,
   animationKey: AnimationEffectKeys.HasteSpell,
   attribute: CharacterEntities.Speed,
 

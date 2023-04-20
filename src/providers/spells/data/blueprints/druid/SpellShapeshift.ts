@@ -15,6 +15,7 @@ export const spellShapeshift: Partial<ISpell> = {
   manaCost: 150,
   minLevelRequired: 10,
   minMagicLevelRequired: 10,
+  cooldown: 15,
   animationKey: AnimationEffectKeys.ManaHeal,
   characterClass: [CharacterClass.Druid],
 

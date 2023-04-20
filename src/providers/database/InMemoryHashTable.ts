@@ -2,13 +2,6 @@ import { appEnv } from "@providers/config/env";
 import { provide } from "inversify-binding-decorators";
 import { RedisManager } from "./RedisManager";
 
-export enum NamespaceRedisControl {
-  CharacterSpell = "character-spell",
-  CharacterLastAction = "character-last-action",
-  CharacterViewType = "character-view",
-  CharacterFoodConsumption = "character-food-consumption",
-}
-
 @provide(InMemoryHashTable)
 export class InMemoryHashTable {
   constructor(private redisManager: RedisManager) {}
@@ -21,6 +14,16 @@ export class InMemoryHashTable {
     if (!appEnv.general.IS_UNIT_TEST) {
       await this.redisManager.client.expire(key?.toString(), seconds, mode);
     }
+  }
+
+  public async getExpire(namespace: string): Promise<number> {
+    if (!namespace) {
+      throw new Error("Namespace is undefined or null.");
+    }
+
+    const timeLeft = await this.redisManager.client.pTTL(namespace.toString());
+
+    return timeLeft;
   }
 
   public async getAll<T>(namespace: string): Promise<Record<string, T> | undefined> {

@@ -1,9 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container } from "@providers/inversify/container";
 import { AnimationEffectKeys, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { ISpell, NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellBloodthirst: Partial<ISpell> = {
   key: SpellsBlueprint.BerserkerBloodthirst,
@@ -14,6 +14,7 @@ export const spellBloodthirst: Partial<ISpell> = {
   manaCost: 100,
   minLevelRequired: 10,
   minMagicLevelRequired: 5,
+  cooldown: 60,
   animationKey: AnimationEffectKeys.Holy,
   characterClass: [CharacterClass.Berserker],
 

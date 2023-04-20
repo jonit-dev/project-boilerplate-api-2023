@@ -1,10 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
-import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 @provide(SorcererSpells)
 export class SorcererSpells {

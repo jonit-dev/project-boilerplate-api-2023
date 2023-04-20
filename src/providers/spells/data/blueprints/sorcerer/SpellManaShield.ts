@@ -1,9 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container } from "@providers/inversify/container";
 import { AnimationEffectKeys, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { ISpell, NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellManaShield: Partial<ISpell> = {
   key: SpellsBlueprint.SorcererManaShield,
@@ -14,6 +14,7 @@ export const spellManaShield: Partial<ISpell> = {
   manaCost: 50,
   minLevelRequired: 5,
   minMagicLevelRequired: 10,
+  cooldown: 40,
   animationKey: AnimationEffectKeys.MagicShield,
   projectileAnimationKey: AnimationEffectKeys.Energy,
   characterClass: [CharacterClass.Sorcerer],
@@ -23,7 +24,7 @@ export const spellManaShield: Partial<ISpell> = {
 
     const skills = (await Skill.findById(character.skills).select("magic.level").lean()) as ISkill;
 
-    const timeout = Math.min(Math.max(skills.magic.level * 2, 20), 180);
+    const timeout = Math.min(Math.max(skills.magic.level * 2, 40), 180);
 
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
     const key = SpellsBlueprint.SorcererManaShield;

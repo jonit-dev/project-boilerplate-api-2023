@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { CharacterClass } from "@rpg-engine/shared";
 import { Types } from "mongoose";
 import { BerserkerSpells } from "../BerserkerSpells";

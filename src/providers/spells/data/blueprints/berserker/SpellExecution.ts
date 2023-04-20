@@ -14,6 +14,7 @@ export const berserkerSpellExecution: Partial<ISpell> = {
   manaCost: 150,
   minLevelRequired: 20,
   minMagicLevelRequired: 8,
+  cooldown: 150,
   animationKey: AnimationEffectKeys.HitCorruption,
   projectileAnimationKey: AnimationEffectKeys.HitCorruption,
   maxDistanceGrid: RangeTypes.UltraShort,

@@ -14,6 +14,7 @@ export const spellDivineProtection: Partial<ISpell> = {
   manaCost: 40,
   minLevelRequired: 5,
   minMagicLevelRequired: 8,
+  cooldown: 30,
   animationKey: AnimationEffectKeys.MagicShield,
   attribute: BasicAttribute.MagicResistance,
   characterClass: [CharacterClass.Druid, CharacterClass.Sorcerer],

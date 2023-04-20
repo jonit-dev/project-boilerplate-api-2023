@@ -14,6 +14,7 @@ export const spellQuickFire: Partial<ISpell> = {
   manaCost: 150,
   minLevelRequired: 15,
   minMagicLevelRequired: 10,
+  cooldown: 20,
   animationKey: AnimationEffectKeys.BlueWings,
   characterClass: [CharacterClass.Hunter],
   attribute: CharacterEntities.AttackIntervalSpeed,

@@ -1,14 +1,13 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { InMemoryHashTable, NamespaceRedisControl } from "@providers/database/InMemoryHashTable";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged, EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
-import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
-import { EXECUTION_SPELL_COOLDOWN } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 
 @provide(BerserkerSpells)
@@ -59,10 +58,6 @@ export class BerserkerSpells {
         throw new Error("Invalid entityType provided");
       }
 
-      if (await this.specialEffect.isExecutionOn(attacker)) {
-        return;
-      }
-
       const healthPercent = Math.floor((100 * target.health) / target.maxHealth);
 
       if (healthPercent <= 30) {
@@ -72,8 +67,6 @@ export class BerserkerSpells {
           await this.npcDeath.handleNPCDeath(target as INPC);
         }
       }
-
-      await this.specialEffect.turnOnExecution(attacker, EXECUTION_SPELL_COOLDOWN);
     } catch (error) {
       throw new Error(`Error executing attack: ${error.message}`);
     }
