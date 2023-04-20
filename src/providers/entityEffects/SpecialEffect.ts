@@ -59,55 +59,6 @@ export class SpecialEffect {
     return 1;
   }
 
-  async shapeShift(character: ICharacter, textureKey: string, internvalInSecs: number): Promise<void> {
-    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
-    const key: SpellsBlueprint = SpellsBlueprint.DruidShapeshift;
-
-    const normalTextureKey = character.textureKey;
-    await this.inMemoryHashTable.set(namespace, key, normalTextureKey);
-
-    const updatedCharacter = (await Character.findByIdAndUpdate(
-      character._id,
-      {
-        textureKey,
-      },
-      {
-        new: true,
-      }
-    ).select("_id textureKey channelId")) as ICharacter;
-
-    const payload: ICharacterAttributeChanged = {
-      targetId: updatedCharacter._id,
-      textureKey: updatedCharacter.textureKey,
-    };
-
-    this.socketMessaging.sendEventToUser(updatedCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
-
-    setTimeout(async () => {
-      const normalTextureKey = await this.inMemoryHashTable.get(namespace, key);
-
-      if (normalTextureKey) {
-        const character = (await Character.findByIdAndUpdate(
-          updatedCharacter._id,
-          {
-            textureKey: normalTextureKey.toString(),
-          },
-          {
-            new: true,
-          }
-        ).select("_id textureKey channelId")) as ICharacter;
-
-        const payload: ICharacterAttributeChanged = {
-          targetId: character._id,
-          textureKey: character.textureKey,
-        };
-
-        await this.inMemoryHashTable.delete(namespace, key);
-        this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
-      }
-    }, internvalInSecs * 1000);
-  }
-
   async clearEffects(target: ICharacter | INPC): Promise<void> {
     if (!target) {
       return;
