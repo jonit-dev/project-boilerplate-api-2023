@@ -30,10 +30,10 @@ export class CharacterTradingBalance {
   public calculateItemsTotalPrice(
     tradingEntityItems: Partial<IItem>[],
     items: ITradeRequestItem[],
-    priceMultiplier: number = TRADER_SELL_PRICE_MULTIPLIER
+    priceMultiplier: number
   ): number {
     return items.reduce((total, item) => {
-      const tradingEntityHasItem = tradingEntityItems.some((traderItem) => traderItem.key === item.key);
+      const tradingEntityHasItem = tradingEntityItems.some((tradingItem) => tradingItem.key === item.key);
 
       if (!tradingEntityHasItem) {
         // if the trading entity (NPC or Marketplace) doesnt have an item,
@@ -41,7 +41,7 @@ export class CharacterTradingBalance {
         return total;
       }
 
-      return total + this.getItemBuyPrice(item.key, priceMultiplier) * item.qty!;
+      return total + this.getItemPrice(item.key, priceMultiplier) * item.qty!;
     }, 0);
   }
 

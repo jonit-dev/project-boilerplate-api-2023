@@ -26,7 +26,8 @@ describe("CharacterTradingNPCSell.ts", () => {
 
   let characterTradingNPCSell: CharacterTradingNPCSell;
   let sendErrorMessageToCharacter: jest.SpyInstance;
-  let sendEventToUser: jest.SpyInstance;
+  let sendEventToUserOnSellItem: jest.SpyInstance;
+  let sendEventToUserOnInitSell: jest.SpyInstance;
   let validationMock: jest.SpyInstance;
 
   beforeAll(() => {
@@ -70,9 +71,16 @@ describe("CharacterTradingNPCSell.ts", () => {
     sendErrorMessageToCharacter = jest.spyOn(SocketMessaging.prototype, "sendErrorMessageToCharacter");
     sendErrorMessageToCharacter.mockImplementation();
 
-    sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
+    sendEventToUserOnSellItem = jest.spyOn(
+      // @ts-ignore
+      characterTradingNPCSell.characterTradingSell.socketMessaging,
+      "sendEventToUser"
+    );
 
-    validationMock = jest.spyOn(CharacterTradingValidation.prototype, "validateSellTransaction");
+    // @ts-ignore
+    sendEventToUserOnInitSell = jest.spyOn(characterTradingNPCSell.socketMessaging, "sendEventToUser");
+
+    validationMock = jest.spyOn(CharacterTradingValidation.prototype, "validateSellTransactionForNPC");
     validationMock.mockImplementation();
     validationMock.mockReturnValue(Promise.resolve(true));
 
@@ -106,9 +114,9 @@ describe("CharacterTradingNPCSell.ts", () => {
     expect(updatedContainer.slots[2].stackQty).toBe(40);
 
     expect(sendErrorMessageToCharacter).not.toBeCalled();
-    expect(sendEventToUser).toBeCalledTimes(2);
+    expect(sendEventToUserOnSellItem).toBeCalled();
 
-    expect(sendEventToUser).toHaveBeenCalledWith(
+    expect(sendEventToUserOnSellItem).toHaveBeenCalledWith(
       testCharacter.channelId!,
       ItemSocketEvents.EquipmentAndInventoryUpdate,
       {
@@ -145,7 +153,7 @@ describe("CharacterTradingNPCSell.ts", () => {
     expect(updatedContainer.slots[2].stackQty).toBe(50);
 
     expect(sendErrorMessageToCharacter).not.toBeCalled();
-    expect(sendEventToUser).not.toBeCalled();
+    expect(sendEventToUserOnSellItem).not.toBeCalled();
 
     expect(validationMock).toBeCalled();
     expect(validationMock).toBeCalledWith(testCharacter, testNPCTrader, sellItems);
@@ -246,7 +254,7 @@ describe("CharacterTradingNPCSell.ts", () => {
     expect(updatedContainer.slots[4]).toBeUndefined();
 
     expect(sendErrorMessageToCharacter).not.toBeCalled();
-    expect(sendEventToUser).not.toBeCalled();
+    expect(sendEventToUserOnSellItem).not.toBeCalled();
   });
 
   it("should do no further processing if no items were sold", async () => {
@@ -272,7 +280,7 @@ describe("CharacterTradingNPCSell.ts", () => {
     expect(updatedContainer.slots[4]).toBeUndefined();
 
     expect(sendErrorMessageToCharacter).not.toBeCalled();
-    expect(sendEventToUser).not.toBeCalled();
+    expect(sendEventToUserOnSellItem).not.toBeCalled();
   });
 
   it("should create two gold items if more gold earned than max stack size", async () => {
@@ -341,28 +349,32 @@ describe("CharacterTradingNPCSell.ts", () => {
   it("should return items to be sold", async () => {
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
-    expect(sendEventToUser).toBeCalled();
+    expect(sendEventToUserOnInitSell).toBeCalled();
 
     const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
     const arrow = itemsBlueprintIndex[RangedWeaponsBlueprint.Arrow];
 
-    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterTradeSocketEvents.TradeInit, {
-      npcId: testNPCTrader._id,
-      type: "sell",
-      characterItems: [
-        {
-          ...slingShot,
-          price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
-          stackQty: 2,
-        },
-        {
-          ...arrow,
-          price: arrow.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
-          stackQty: 100,
-        },
-      ],
-      characterAvailableGold: 0,
-    });
+    expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
+      testCharacter.channelId,
+      CharacterTradeSocketEvents.TradeInit,
+      {
+        npcId: testNPCTrader._id,
+        type: "sell",
+        characterItems: [
+          {
+            ...slingShot,
+            price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
+            stackQty: 2,
+          },
+          {
+            ...arrow,
+            price: arrow.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
+            stackQty: 100,
+          },
+        ],
+        characterAvailableGold: 0,
+      }
+    );
   });
 
   it("should stop npc movement and set character as target", async () => {
@@ -379,7 +391,7 @@ describe("CharacterTradingNPCSell.ts", () => {
   it("should not invoke trade if npc does not exist", async () => {
     await characterTradingNPCSell.initializeSell(testCharacter._id, testCharacter);
 
-    expect(sendEventToUser).not.toBeCalled();
+    expect(sendEventToUserOnInitSell).not.toBeCalled();
 
     expect(sendErrorMessageToCharacter).toBeCalled();
     expect(sendErrorMessageToCharacter).toHaveBeenLastCalledWith(
@@ -394,7 +406,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
-    expect(sendEventToUser).not.toBeCalled();
+    expect(sendEventToUserOnInitSell).not.toBeCalled();
 
     expect(sendErrorMessageToCharacter).toBeCalled();
     expect(sendErrorMessageToCharacter).toHaveBeenLastCalledWith(
@@ -413,14 +425,18 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
-    expect(sendEventToUser).toBeCalled();
+    expect(sendEventToUserOnInitSell).toBeCalled();
 
-    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterTradeSocketEvents.TradeInit, {
-      npcId: testNPCTrader._id,
-      type: "sell",
-      characterItems: [],
-      characterAvailableGold: 145,
-    });
+    expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
+      testCharacter.channelId,
+      CharacterTradeSocketEvents.TradeInit,
+      {
+        npcId: testNPCTrader._id,
+        type: "sell",
+        characterItems: [],
+        characterAvailableGold: 145,
+      }
+    );
   });
 
   it("should not invoke trade if inventory does not exist", async () => {
@@ -432,7 +448,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
-    expect(sendEventToUser).not.toBeCalled();
+    expect(sendEventToUserOnInitSell).not.toBeCalled();
 
     expect(sendErrorMessageToCharacter).toBeCalled();
     expect(sendErrorMessageToCharacter).toHaveBeenLastCalledWith(
@@ -450,7 +466,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
-    expect(sendEventToUser).not.toBeCalled();
+    expect(sendEventToUserOnInitSell).not.toBeCalled();
 
     expect(sendErrorMessageToCharacter).toBeCalled();
     expect(sendErrorMessageToCharacter).toHaveBeenLastCalledWith(
@@ -464,15 +480,19 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
-    expect(sendEventToUser).toBeCalled();
+    expect(sendEventToUserOnInitSell).toBeCalled();
     expect(sendErrorMessageToCharacter).not.toBeCalled();
 
-    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterTradeSocketEvents.TradeInit, {
-      npcId: testNPCTrader._id,
-      type: "sell",
-      characterItems: [],
-      characterAvailableGold: 0,
-    });
+    expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
+      testCharacter.channelId,
+      CharacterTradeSocketEvents.TradeInit,
+      {
+        npcId: testNPCTrader._id,
+        type: "sell",
+        characterItems: [],
+        characterAvailableGold: 0,
+      }
+    );
   });
 
   it("should not return an item if it does not have a blueprint", async () => {
@@ -487,22 +507,26 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
-    expect(sendEventToUser).toBeCalled();
+    expect(sendEventToUserOnInitSell).toBeCalled();
     expect(sendErrorMessageToCharacter).not.toBeCalled();
 
     const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
-    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterTradeSocketEvents.TradeInit, {
-      npcId: testNPCTrader._id,
-      type: "sell",
-      characterItems: [
-        {
-          ...slingShot,
-          price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
-          stackQty: 1,
-        },
-      ],
-      characterAvailableGold: 0,
-    });
+    expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
+      testCharacter.channelId,
+      CharacterTradeSocketEvents.TradeInit,
+      {
+        npcId: testNPCTrader._id,
+        type: "sell",
+        characterItems: [
+          {
+            ...slingShot,
+            price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
+            stackQty: 1,
+          },
+        ],
+        characterAvailableGold: 0,
+      }
+    );
   });
 
   it("should not return an item if it does not have a sell price", async () => {
@@ -515,21 +539,25 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);
 
-    expect(sendEventToUser).toBeCalled();
+    expect(sendEventToUserOnInitSell).toBeCalled();
     expect(sendErrorMessageToCharacter).not.toBeCalled();
 
     const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
-    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterTradeSocketEvents.TradeInit, {
-      npcId: testNPCTrader._id,
-      type: "sell",
-      characterItems: [
-        {
-          ...slingShot,
-          price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
-          stackQty: 1,
-        },
-      ],
-      characterAvailableGold: 10,
-    });
+    expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
+      testCharacter.channelId,
+      CharacterTradeSocketEvents.TradeInit,
+      {
+        npcId: testNPCTrader._id,
+        type: "sell",
+        characterItems: [
+          {
+            ...slingShot,
+            price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
+            stackQty: 1,
+          },
+        ],
+        characterAvailableGold: 10,
+      }
+    );
   });
 });
