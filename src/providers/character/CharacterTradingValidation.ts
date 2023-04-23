@@ -11,6 +11,8 @@ import { CharacterInventory } from "./CharacterInventory";
 import { CharacterValidation } from "./CharacterValidation";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
+import { IMarketplace, Marketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 
 @provide(CharacterTradingValidation)
 export class CharacterTradingValidation {
@@ -47,50 +49,48 @@ export class CharacterTradingValidation {
     return npc;
   }
 
-  public validateTransaction(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): boolean {
-    const hasBasicValidation = this.hasBasicValidation(character, npc, items);
-    if (!hasBasicValidation) {
-      return false;
+  public async validateAndReturnMarketplace(
+    marketplaceId: string,
+    character: ICharacter
+  ): Promise<IMarketplace | undefined> {
+    const mp = await Marketplace.findOne({
+      _id: marketplaceId,
+    });
+
+    if (!mp || !mp.open) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, the NPC you're trying to trade with is not available."
+      );
+      return;
     }
 
-    if (!npc.traderItems?.length) {
+    return mp;
+  }
+
+  public validateTransaction(
+    character: ICharacter,
+    tradingEntityItems: Partial<IItem>[],
+    items: ITradeRequestItem[]
+  ): boolean {
+    if (!tradingEntityItems.length) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this NPC has no items for sale.");
       return false;
     }
-
     // validate if all item blueprints are valid
-
-    for (const item of items) {
-      const traderItem = npc.traderItems?.find((traderItem) => traderItem.key === item.key);
-
-      if (!traderItem) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this NPC is not selling this item.");
-        return false;
-      }
-
-      const basePrice = itemsBlueprintIndex[item.key]?.basePrice ?? 0;
-      // check if the item has price <= 0
-      if (basePrice <= 0 || item.qty <= 0) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, invalid parameters for ${item.key}.`);
-        return false;
-      }
-
-      // make sure NPC has item to be sold
-      if (!npc.traderItems.length) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this NPC has no items for sale.");
-        return false;
-      }
-    }
-
-    return true;
+    return this.itemInTradingEntityItems(character, items, tradingEntityItems);
   }
 
-  public async validateSellTransaction(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<boolean> {
+  public validateTransactionWithNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): boolean {
     const hasBasicValidation = this.hasBasicValidation(character, npc, items);
     if (!hasBasicValidation) {
       return false;
     }
+    // validate if all item blueprints are valid
+    return this.validateTransaction(character, npc.traderItems as unknown as Partial<IItem>[], items);
+  }
 
+  public async validateSellTransaction(character: ICharacter, items: ITradeRequestItem[]): Promise<boolean> {
     const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
@@ -119,6 +119,19 @@ export class CharacterTradingValidation {
     }
 
     return true;
+  }
+
+  public async validateSellTransactionForNPC(
+    character: ICharacter,
+    npc: INPC,
+    items: ITradeRequestItem[]
+  ): Promise<boolean> {
+    const hasBasicValidation = this.hasBasicValidation(character, npc, items);
+    if (!hasBasicValidation) {
+      return false;
+    }
+
+    return await this.validateSellTransaction(character, items);
   }
 
   private hasBasicValidation(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): boolean {
@@ -160,6 +173,35 @@ export class CharacterTradingValidation {
       return false;
     }
 
+    return true;
+  }
+
+  private itemInTradingEntityItems(
+    character: ICharacter,
+    items: ITradeRequestItem[],
+    tradingEntityItems: Partial<IItem>[]
+  ): boolean {
+    for (const item of items) {
+      const traderItem = tradingEntityItems.find((traderItem) => traderItem.key === item.key);
+
+      if (!traderItem) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this NPC is not selling this item.");
+        return false;
+      }
+
+      const basePrice = itemsBlueprintIndex[item.key]?.basePrice ?? 0;
+      // check if the item has price <= 0
+      if (basePrice <= 0 || item.qty <= 0) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, invalid parameters for ${item.key}.`);
+        return false;
+      }
+
+      // make sure NPC has item to be sold
+      if (!tradingEntityItems.length) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this NPC has no items for sale.");
+        return false;
+      }
+    }
     return true;
   }
 }
