@@ -30,7 +30,7 @@ export class CharacterTradingBalance {
   public calculateItemsTotalPrice(
     tradingEntityItems: Partial<IItem>[],
     items: ITradeRequestItem[],
-    priceMultiplier: number
+    priceMultiplier: number = TRADER_SELL_PRICE_MULTIPLIER
   ): number {
     return items.reduce((total, item) => {
       const tradingEntityHasItem = tradingEntityItems.some((traderItem) => traderItem.key === item.key);
