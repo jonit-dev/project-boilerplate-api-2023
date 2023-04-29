@@ -96,11 +96,6 @@ export class CharacterNetworkUpdate {
 
             await this.handleNonPVPZone(character, newX, newY);
 
-            // try to avoid the teleport bug, by locking the fields before the map transition
-            await character.lockField("x");
-            await character.lockField("y");
-            await character.lockField("scene");
-
             // leave it for last!
             await this.handleMapTransition(character, newX, newY);
 
@@ -220,10 +215,6 @@ export class CharacterNetworkUpdate {
    Check if we are transitioning to the same map, 
    if so we should only teleport the character
    */
-
-      await character.unlockField("x");
-      await character.unlockField("y");
-      await character.unlockField("scene");
 
       if (destination.map === frozenCharacter.scene) {
         await this.mapTransition.sameMapTeleport(frozenCharacter, destination);

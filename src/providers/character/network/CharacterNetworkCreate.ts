@@ -3,6 +3,7 @@ import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel"
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { ItemView } from "@providers/item/ItemView";
 import { GridManager } from "@providers/map/GridManager";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -28,11 +29,10 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
+import { CharacterView } from "../CharacterView";
 import { DruidPassiveHabilities } from "../characterPassiveHabilities/Druid";
 import { SorcererPassiveHabilities } from "../characterPassiveHabilities/Sorcerer";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/Warrior";
-import { CharacterView } from "../CharacterView";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(CharacterNetworkCreate)
 export class CharacterNetworkCreate {
