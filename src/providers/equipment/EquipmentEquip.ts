@@ -4,9 +4,13 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/Berserker";
+import { RoguePassiveHabilities } from "@providers/character/characterPassiveHabilities/Rogue";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { ItemPickupUpdater } from "@providers/item/ItemPickup/ItemPickupUpdater";
 import { ItemView } from "@providers/item/ItemView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -19,10 +23,6 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { EquipmentSlots } from "./EquipmentSlots";
 import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
-import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/Berserker";
-import { RoguePassiveHabilities } from "@providers/character/characterPassiveHabilities/Rogue";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { ItemPickupUpdater } from "@providers/item/ItemPickup/ItemPickupUpdater";
 
 export type SourceEquipContainerType = "inventory" | "container";
 
@@ -114,10 +114,7 @@ export class EquipmentEquip {
     const isEquipValid = await this.isEquipValid(character, item, containerType);
 
     if (!isEquipValid) {
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        "Item cannot be equipped. Check requirements and try again."
-      );
+      this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
     }
 
