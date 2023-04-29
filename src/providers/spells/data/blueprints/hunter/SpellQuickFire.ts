@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, CharacterClass, CharacterEntities, SpellCastingType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, CharacterAttributes, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellQuickFire: Partial<ISpell> = {
@@ -17,14 +17,14 @@ export const spellQuickFire: Partial<ISpell> = {
   cooldown: 20,
   animationKey: AnimationEffectKeys.BlueWings,
   characterClass: [CharacterClass.Hunter],
-  attribute: CharacterEntities.AttackIntervalSpeed,
+  attribute: CharacterAttributes.AttackIntervalSpeed,
 
   usableEffect: async (character: ICharacter) => {
     const characterSkillBuff = container.get(CharacterSkillBuff);
     const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
     const timeout = Math.min(Math.max(skills.dexterity.level * 8, 20), 120);
-    const skillType = CharacterEntities.AttackIntervalSpeed;
+    const skillType = CharacterAttributes.AttackIntervalSpeed;
 
     await characterSkillBuff.enableTemporaryBuff(character, skillType, 90, timeout);
   },

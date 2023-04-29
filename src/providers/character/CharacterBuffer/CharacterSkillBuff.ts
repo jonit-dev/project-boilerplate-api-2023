@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import {
   BasicAttribute,
-  CharacterEntities,
+  CharacterAttributes,
   CombatSkill,
   CraftingSkill,
   IAppliedBuffsEffect,
@@ -10,17 +10,17 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { BuffSkillFunctions } from "./BuffSkillFunctions";
+import { CharacterAttributesBuff } from "./CharacterAttributesBuff";
 import { CharacterBasicAttributesBuff } from "./CharacterBasicAttributesBuff";
 import { CharacterCombatSkillBuff } from "./CharacterCombatSkillBuff";
 import { CharacterCraftingSkillBuff } from "./CharacterCraftingSkillBuff";
-import { CharacterEntitiesBuff } from "./CharacterEntitiesBuff";
 
 @provide(CharacterSkillBuff)
 export class CharacterSkillBuff {
   constructor(
     private characterBasicAttributesBuff: CharacterBasicAttributesBuff,
     private characterCombatSkillBuff: CharacterCombatSkillBuff,
-    private characterEntitiesBuff: CharacterEntitiesBuff,
+    private characterAttributesBuff: CharacterAttributesBuff,
     private characterCraftingSkillBuff: CharacterCraftingSkillBuff,
     private buffSkillFunctions: BuffSkillFunctions
   ) {}
@@ -246,9 +246,9 @@ export class CharacterSkillBuff {
       }
 
       case SkillType.Character: {
-        const buffSkill = await this.characterEntitiesBuff.updateCharacterEntities(
+        const buffSkill = await this.characterAttributesBuff.updateCharacterAttributes(
           character._id,
-          skillType as CharacterEntities,
+          skillType as CharacterAttributes,
           buff
         );
 
@@ -261,9 +261,9 @@ export class CharacterSkillBuff {
               buffSkill._id
             );
             if (appliedBuffsEffect) {
-              await this.characterEntitiesBuff.updateCharacterEntities(
+              await this.characterAttributesBuff.updateCharacterAttributes(
                 refreshCharacter._id,
-                skillType as CharacterEntities,
+                skillType as CharacterAttributes,
                 buff * -1,
                 buffSkill._id
               );

@@ -3,8 +3,8 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import {
   BasicAttribute,
+  CharacterAttributes,
   CharacterClass,
-  CharacterEntities,
   CombatSkill,
   CraftingSkill,
   SpellCastingType,
@@ -58,7 +58,7 @@ export interface ISpell {
   cooldown: number;
   requiredItem?: MagicsBlueprint;
   characterClass?: CharacterClass[];
-  attribute?: BasicAttribute | CombatSkill | CraftingSkill | CharacterEntities;
+  attribute?: BasicAttribute | CombatSkill | CraftingSkill | CharacterAttributes;
   maxDistanceGrid?: number;
   usableEffect: (
     character: ICharacter,

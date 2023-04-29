@@ -7,8 +7,8 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   BasicAttribute,
+  CharacterAttributes,
   CharacterClass,
-  CharacterEntities,
   CharacterSocketEvents,
   CombatSkill,
   CraftingSkill,
@@ -47,12 +47,12 @@ const craftingSkill: CraftingSkill[] = [
   CraftingSkill.Lumberjacking,
 ];
 
-const characterEntities: CharacterEntities[] = [
-  CharacterEntities.Speed,
-  CharacterEntities.MaxMana,
-  CharacterEntities.MaxHealth,
-  CharacterEntities.AttackIntervalSpeed,
-  CharacterEntities.Defense,
+const characterAttributes: CharacterAttributes[] = [
+  CharacterAttributes.Speed,
+  CharacterAttributes.MaxMana,
+  CharacterAttributes.MaxHealth,
+  CharacterAttributes.AttackIntervalSpeed,
+  CharacterAttributes.Defense,
 ];
 
 @provide(BuffSkillFunctions)
@@ -133,7 +133,7 @@ export class BuffSkillFunctions {
       const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
       const key = skillType;
 
-      const isAttackSpeed = skillType === CharacterEntities.AttackIntervalSpeed;
+      const isAttackSpeed = skillType === CharacterAttributes.AttackIntervalSpeed;
       if (isAdding) {
         if (isAttackSpeed) {
           character[skillType] = Math.max(500, Math.min(character[skillType], 1700));
@@ -147,7 +147,7 @@ export class BuffSkillFunctions {
         if (isAttackSpeed) {
           character[skillType] = Math.max(500, Math.min(character[skillType], 1700));
           character.attackIntervalSpeed += Math.min(Math.max(buffedLvl, 0), 1200);
-        } else if (skillType === CharacterEntities.Speed) {
+        } else if (skillType === CharacterAttributes.Speed) {
           character[skillType] = MovementSpeed.Standard;
         } else {
           character[skillType] = Math.max(character[skillType] - buffedLvl, 1);
@@ -162,7 +162,7 @@ export class BuffSkillFunctions {
       };
 
       switch (skillType) {
-        case CharacterEntities.MaxHealth: {
+        case CharacterAttributes.MaxHealth: {
           if (character[skillType] < character.health) {
             character.health = character[skillType];
             payload.maxHealth = character[skillType];
@@ -173,7 +173,7 @@ export class BuffSkillFunctions {
           break;
         }
 
-        case CharacterEntities.MaxMana: {
+        case CharacterAttributes.MaxMana: {
           if (character[skillType] < character.mana) {
             character.mana = character[skillType];
             payload.maxMana = character[skillType];
@@ -184,14 +184,14 @@ export class BuffSkillFunctions {
           break;
         }
 
-        case CharacterEntities.Speed: {
+        case CharacterAttributes.Speed: {
           character.baseSpeed = character[skillType];
           character.speed = character[skillType];
           payload.speed = character.speed;
           break;
         }
 
-        case CharacterEntities.AttackIntervalSpeed: {
+        case CharacterAttributes.AttackIntervalSpeed: {
           character.attackIntervalSpeed = character[skillType];
           payload.attackIntervalSpeed = character.attackIntervalSpeed;
           break;
@@ -248,7 +248,7 @@ export class BuffSkillFunctions {
       value: diffLvl,
     };
     if (isAdding) {
-      if (skillType === CharacterEntities.AttackIntervalSpeed) {
+      if (skillType === CharacterAttributes.AttackIntervalSpeed) {
         const value = Math.min(Math.max(diffLvl, 0), 1200);
         appliedBuffsEffect = { ...appliedBuffsEffect, value };
       }
@@ -342,10 +342,10 @@ export class BuffSkillFunctions {
 
       for (let i = 0; i < totalValues.length; i++) {
         if (
-          characterEntities.includes(totalValues[i].key as CharacterEntities) ||
-          characterEntities.indexOf(totalValues[i].key as CharacterEntities) !== -1
+          characterAttributes.includes(totalValues[i].key as CharacterAttributes) ||
+          characterAttributes.indexOf(totalValues[i].key as CharacterAttributes) !== -1
         ) {
-          if (totalValues[i].key !== CharacterEntities.Speed) {
+          if (totalValues[i].key !== CharacterAttributes.Speed) {
             await this.updateBuffEntities(character._id, totalValues[i].key, totalValues[i].value, isAdding);
           }
         } else {
@@ -423,8 +423,8 @@ export class BuffSkillFunctions {
     }
 
     if (
-      characterEntities.includes(skillType as CharacterEntities) ||
-      characterEntities.indexOf(skillType as CharacterEntities) !== -1
+      characterAttributes.includes(skillType as CharacterAttributes) ||
+      characterAttributes.indexOf(skillType as CharacterAttributes) !== -1
     ) {
       return (skillTypeDefinition = SkillType.Character);
     }

@@ -3,7 +3,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, CharacterClass, CharacterEntities, SpellCastingType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, CharacterAttributes, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellFrenzy: Partial<ISpell> = {
@@ -26,7 +26,7 @@ export const spellFrenzy: Partial<ISpell> = {
     const skills = (await Skill.findById(character.skills).lean().select("strength")) as ISkill;
 
     const timeout = Math.min(Math.max(skills.strength.level * 8, 20), 120);
-    const skillType = CharacterEntities.AttackIntervalSpeed;
+    const skillType = CharacterAttributes.AttackIntervalSpeed;
 
     await characterSkillBuff.enableTemporaryBuff(character, skillType, 10, timeout);
 

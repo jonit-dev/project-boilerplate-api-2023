@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { CharacterEntities } from "@rpg-engine/shared";
+import { CharacterAttributes } from "@rpg-engine/shared";
 import { CharacterSkillBuff } from "../CharacterSkillBuff";
 
 describe("updateBasicAttribute", () => {
@@ -40,7 +40,7 @@ describe("updateBasicAttribute", () => {
 
     it("should return the updated basic attribute buff when skillType is IntervalAttackSpeed", async () => {
       const buff = 10;
-      const skillType = CharacterEntities.AttackIntervalSpeed;
+      const skillType = CharacterAttributes.AttackIntervalSpeed;
       await characterSkillBuff.enableTemporaryBuff(testCharacter, skillType, buff, 5);
 
       const character = (await Character.findById(testCharacter._id)
@@ -52,7 +52,7 @@ describe("updateBasicAttribute", () => {
 
     it("should return the updated basic attribute buff when skillType is baseSpeed", async () => {
       const buff = 10;
-      const skillType = CharacterEntities.Speed;
+      const skillType = CharacterAttributes.Speed;
       await characterSkillBuff.enableTemporaryBuff(testCharacter, skillType, buff, 5);
 
       const character = (await Character.findById(testCharacter._id).lean().select("baseSpeed")) as ICharacter;

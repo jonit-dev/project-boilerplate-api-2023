@@ -1,18 +1,18 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterEntities, IAppliedBuffsEffect } from "@rpg-engine/shared";
+import { CharacterAttributes, IAppliedBuffsEffect } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { BuffSkillFunctions } from "./BuffSkillFunctions";
 
-@provide(CharacterEntitiesBuff)
-export class CharacterEntitiesBuff {
+@provide(CharacterAttributesBuff)
+export class CharacterAttributesBuff {
   constructor(private buffSkillFunctions: BuffSkillFunctions, private socketMessaging: SocketMessaging) {}
 
-  public async updateCharacterEntities(
+  public async updateCharacterAttributes(
     characterId: Types.ObjectId,
-    characterEntities: CharacterEntities,
+    characterAttributes: CharacterAttributes,
     buff: number,
     buffId?: Types.ObjectId
   ): Promise<IAppliedBuffsEffect> {
@@ -23,7 +23,13 @@ export class CharacterEntitiesBuff {
       value: 0,
     };
     try {
-      appliedBuffsEffect = await this.characterEntitiesHandler(characterId, characterEntities, isAdding, buff, buffId);
+      appliedBuffsEffect = await this.characterAttributesHandler(
+        characterId,
+        characterAttributes,
+        isAdding,
+        buff,
+        buffId
+      );
 
       return appliedBuffsEffect;
     } catch (error) {
@@ -32,9 +38,9 @@ export class CharacterEntitiesBuff {
     }
   }
 
-  private async characterEntitiesHandler(
+  private async characterAttributesHandler(
     characterId: Types.ObjectId,
-    characterEntities: CharacterEntities,
+    characterAttributes: CharacterAttributes,
     isAdding: boolean,
     buff: number,
     buffId?: Types.ObjectId
@@ -49,14 +55,14 @@ export class CharacterEntitiesBuff {
       const character = (await Character.findById(characterId).lean()) as ICharacter;
 
       let diffLvl = 0;
-      const skillLvl = character[characterEntities];
+      const skillLvl = character[characterAttributes];
 
       if (isAdding) {
-        if (characterEntities === CharacterEntities.AttackIntervalSpeed) {
+        if (characterAttributes === CharacterAttributes.AttackIntervalSpeed) {
           diffLvl =
             character.attackIntervalSpeed -
             Math.min(Math.max(character.attackIntervalSpeed * (1 - buff / 100), 500), 1700);
-        } else if (characterEntities === CharacterEntities.Speed) {
+        } else if (characterAttributes === CharacterAttributes.Speed) {
           diffLvl = MovementSpeed.ExtraFast - MovementSpeed.Slow;
         } else {
           diffLvl = this.buffSkillFunctions.calculateIncreaseLvl(skillLvl, buff);
@@ -67,7 +73,7 @@ export class CharacterEntitiesBuff {
 
       const updateSuccess = await this.buffSkillFunctions.updateBuffEntities(
         character._id,
-        characterEntities,
+        characterAttributes,
         diffLvl,
         isAdding
       );
@@ -75,7 +81,7 @@ export class CharacterEntitiesBuff {
       if (updateSuccess) {
         appliedBuffsEffect = await this.buffSkillFunctions.updateBuffEffectOnCharacter(
           characterId,
-          characterEntities,
+          characterAttributes,
           diffLvl,
           isAdding,
           buffId
@@ -98,7 +104,7 @@ export class CharacterEntitiesBuff {
     let hasteSpeed = 0;
 
     if (appliedBuffEffect) {
-      hasteSpeed = this.buffSkillFunctions.getTotalValueByKey(appliedBuffEffect, CharacterEntities.Speed);
+      hasteSpeed = this.buffSkillFunctions.getTotalValueByKey(appliedBuffEffect, CharacterAttributes.Speed);
     }
     if (hasteSpeed !== 0) {
       return true;
