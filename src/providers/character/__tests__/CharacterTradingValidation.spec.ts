@@ -122,7 +122,11 @@ describe("CharacterTradingValidation.ts", () => {
   });
 
   it("should thrown an error if trader is not a trader NPC", () => {
-    const isValid = characterTradingValidation.validateTransaction(testCharacter, nonTraderNPC, transactionItems);
+    const isValid = characterTradingValidation.validateTransactionWithNPC(
+      testCharacter,
+      nonTraderNPC,
+      transactionItems
+    );
 
     expect(isValid).toBe(false);
 
@@ -133,7 +137,11 @@ describe("CharacterTradingValidation.ts", () => {
     testNPCTrader.traderItems = [];
     await testNPCTrader.save();
 
-    const isValid = characterTradingValidation.validateTransaction(testCharacter, testNPCTrader, transactionItems);
+    const isValid = characterTradingValidation.validateTransactionWithNPC(
+      testCharacter,
+      testNPCTrader,
+      transactionItems
+    );
 
     expect(isValid).toBe(false);
 
@@ -145,7 +153,11 @@ describe("CharacterTradingValidation.ts", () => {
     testNPCTrader.y = GRID_HEIGHT * 10;
     await testNPCTrader.save();
 
-    const isValid = characterTradingValidation.validateTransaction(testCharacter, testNPCTrader, transactionItems);
+    const isValid = characterTradingValidation.validateTransactionWithNPC(
+      testCharacter,
+      testNPCTrader,
+      transactionItems
+    );
 
     expect(isValid).toBe(false);
 
@@ -160,7 +172,11 @@ describe("CharacterTradingValidation.ts", () => {
       },
     ];
 
-    const isValid = characterTradingValidation.validateTransaction(testCharacter, testNPCTrader, transactionItems);
+    const isValid = characterTradingValidation.validateTransactionWithNPC(
+      testCharacter,
+      testNPCTrader,
+      transactionItems
+    );
 
     expect(isValid).toBe(false);
 
@@ -178,7 +194,11 @@ describe("CharacterTradingValidation.ts", () => {
       },
     ];
 
-    const isValid = characterTradingValidation.validateTransaction(testCharacter, testNPCTrader, transactionItems);
+    const isValid = characterTradingValidation.validateTransactionWithNPC(
+      testCharacter,
+      testNPCTrader,
+      transactionItems
+    );
 
     expect(isValid).toBe(false);
 
@@ -190,7 +210,7 @@ describe("CharacterTradingValidation.ts", () => {
 
   describe("validate sell request", () => {
     it("should pass validation", async () => {
-      const result = await characterTradingValidation.validateSellTransaction(
+      const result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -202,7 +222,7 @@ describe("CharacterTradingValidation.ts", () => {
       const characterValidationMock = jest.spyOn(CharacterValidation.prototype, "hasBasicValidation");
       characterValidationMock.mockReturnValue(false);
 
-      let result = await characterTradingValidation.validateSellTransaction(
+      let result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -214,7 +234,7 @@ describe("CharacterTradingValidation.ts", () => {
       characterValidationMock.mockReset();
       characterValidationMock.mockReturnValue(true);
 
-      result = await characterTradingValidation.validateSellTransaction(
+      result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -225,7 +245,7 @@ describe("CharacterTradingValidation.ts", () => {
     });
 
     it("should fail if npc is not a trader", async () => {
-      const result = await characterTradingValidation.validateSellTransaction(
+      const result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         nonTraderNPC,
         transactionSellItems
@@ -244,7 +264,11 @@ describe("CharacterTradingValidation.ts", () => {
         },
       ];
 
-      let result = await characterTradingValidation.validateSellTransaction(testCharacter, testNPCTrader, sellItems);
+      let result = await characterTradingValidation.validateSellTransactionForNPC(
+        testCharacter,
+        testNPCTrader,
+        sellItems
+      );
       expect(result).toBe(false);
 
       expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
@@ -256,7 +280,7 @@ describe("CharacterTradingValidation.ts", () => {
       sendErrorMessageToCharacter.mockReset();
       sellItems = transactionSellItems.concat(sellItems);
 
-      result = await characterTradingValidation.validateSellTransaction(testCharacter, testNPCTrader, sellItems);
+      result = await characterTradingValidation.validateSellTransactionForNPC(testCharacter, testNPCTrader, sellItems);
       expect(result).toBe(false);
 
       expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
@@ -277,7 +301,7 @@ describe("CharacterTradingValidation.ts", () => {
       testNPCTrader.y = 46;
       await testNPCTrader.save();
 
-      let result = await characterTradingValidation.validateSellTransaction(
+      let result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -296,7 +320,7 @@ describe("CharacterTradingValidation.ts", () => {
       isUnderRangeMock.mockReset();
       isUnderRangeMock.mockReturnValue(true);
 
-      result = await characterTradingValidation.validateSellTransaction(
+      result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -311,7 +335,7 @@ describe("CharacterTradingValidation.ts", () => {
         await equipment.save();
       }
 
-      const result = await characterTradingValidation.validateSellTransaction(
+      const result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -332,7 +356,7 @@ describe("CharacterTradingValidation.ts", () => {
         await inventory.save();
       }
 
-      const result = await characterTradingValidation.validateSellTransaction(
+      const result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -351,7 +375,7 @@ describe("CharacterTradingValidation.ts", () => {
         qty: 1,
       });
 
-      const result = await characterTradingValidation.validateSellTransaction(
+      const result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -370,7 +394,7 @@ describe("CharacterTradingValidation.ts", () => {
         qty: 1,
       });
 
-      const result = await characterTradingValidation.validateSellTransaction(
+      const result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -395,7 +419,7 @@ describe("CharacterTradingValidation.ts", () => {
         },
       ];
 
-      let result = await characterTradingValidation.validateSellTransaction(
+      let result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -419,7 +443,7 @@ describe("CharacterTradingValidation.ts", () => {
         },
       ];
 
-      result = await characterTradingValidation.validateSellTransaction(
+      result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems
@@ -443,7 +467,7 @@ describe("CharacterTradingValidation.ts", () => {
         },
       ];
 
-      result = await characterTradingValidation.validateSellTransaction(
+      result = await characterTradingValidation.validateSellTransactionForNPC(
         testCharacter,
         testNPCTrader,
         transactionSellItems

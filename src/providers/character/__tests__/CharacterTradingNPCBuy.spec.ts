@@ -19,7 +19,8 @@ describe("CharacterTradingValidation.ts", () => {
 
   let characterTradingNPCBuy: CharacterTradingNPCBuy;
   let sendErrorMessageToCharacter: jest.SpyInstance;
-  let sendEventToUser: jest.SpyInstance;
+  let sendEventToUserOnBuyItem: jest.SpyInstance;
+  let sendEventToUserOnInitBuy: jest.SpyInstance;
   let transactionItems: ITradeRequestItem[];
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
@@ -61,11 +62,20 @@ describe("CharacterTradingValidation.ts", () => {
       ],
     });
 
-    // @ts-ignore
-    sendErrorMessageToCharacter = jest.spyOn(characterTradingNPCBuy.socketMessaging, "sendErrorMessageToCharacter");
+    sendErrorMessageToCharacter = jest.spyOn(
+      // @ts-ignore
+      characterTradingNPCBuy.characterTradingBuy.socketMessaging,
+      "sendErrorMessageToCharacter"
+    );
+
+    sendEventToUserOnBuyItem = jest.spyOn(
+      // @ts-ignore
+      characterTradingNPCBuy.characterTradingBuy.socketMessaging,
+      "sendEventToUser"
+    );
 
     // @ts-ignore
-    sendEventToUser = jest.spyOn(characterTradingNPCBuy.socketMessaging, "sendEventToUser");
+    sendEventToUserOnInitBuy = jest.spyOn(characterTradingNPCBuy.socketMessaging, "sendEventToUser");
 
     inventory = await testCharacter.inventory;
     inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
@@ -101,7 +111,7 @@ describe("CharacterTradingValidation.ts", () => {
       expect(updatedInventoryContainer.slots[0].stackQty).toBe(77.5); // gold left
       expect(updatedInventoryContainer.slots[1].key).toBe(PotionsBlueprint.LightEndurancePotion); // potion bought
 
-      expect(sendEventToUser).toHaveBeenCalledWith(
+      expect(sendEventToUserOnBuyItem).toHaveBeenCalledWith(
         testCharacter.channelId!,
         ItemSocketEvents.EquipmentAndInventoryUpdate,
         {
@@ -134,7 +144,7 @@ describe("CharacterTradingValidation.ts", () => {
       expect(updatedInventoryContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Arrow); // potion bought
       expect(updatedInventoryContainer.slots[1].stackQty).toBe(25);
 
-      expect(sendEventToUser).toHaveBeenCalledWith(
+      expect(sendEventToUserOnBuyItem).toHaveBeenCalledWith(
         testCharacter.channelId!,
         ItemSocketEvents.EquipmentAndInventoryUpdate,
         {
@@ -177,7 +187,7 @@ describe("CharacterTradingValidation.ts", () => {
         type: "buy",
       };
 
-      expect(sendEventToUser).toHaveBeenCalledWith(
+      expect(sendEventToUserOnInitBuy).toHaveBeenCalledWith(
         testCharacter.channelId!,
         CharacterTradeSocketEvents.TradeInit,
         payload

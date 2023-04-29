@@ -5,6 +5,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { OthersBlueprint, PotionsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CharacterTradingBalance } from "../CharacterTradingBalance";
+import { TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 
 describe("CharacterTradingBalance.ts", () => {
   let testCharacter: ICharacter;
@@ -67,7 +68,11 @@ describe("CharacterTradingBalance.ts", () => {
       },
     ];
 
-    const totalPrice = await characterTradingBalance.calculateItemsTotalPrice(testNPC, transactionItems);
+    const totalPrice = characterTradingBalance.calculateItemsTotalPrice(
+      testNPC.traderItems as any,
+      transactionItems,
+      TRADER_BUY_PRICE_MULTIPLIER
+    );
 
     expect(totalPrice).toBe(22.5);
   });

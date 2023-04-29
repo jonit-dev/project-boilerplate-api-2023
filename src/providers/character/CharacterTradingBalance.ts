@@ -1,5 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { TRADER_BUY_PRICE_MULTIPLIER, TRADER_SELL_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -9,6 +8,7 @@ import { ITradeRequestItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 
 @provide(CharacterTradingBalance)
 export class CharacterTradingBalance {
@@ -27,25 +27,30 @@ export class CharacterTradingBalance {
     return totalGold || 0;
   }
 
-  public calculateItemsTotalPrice(npc: INPC, items: ITradeRequestItem[]): number {
+  public calculateItemsTotalPrice(
+    tradingEntityItems: Partial<IItem>[],
+    items: ITradeRequestItem[],
+    priceMultiplier: number
+  ): number {
     return items.reduce((total, item) => {
-      const npcHasItem = npc?.traderItems?.some((traderItem) => traderItem.key === item.key);
+      const tradingEntityHasItem = tradingEntityItems.some((tradingItem) => tradingItem.key === item.key);
 
-      if (!npcHasItem) {
-        // if NPC doesnt have an item, do not take it into account into the total cost (because we won't sell it, anyway)
+      if (!tradingEntityHasItem) {
+        // if the trading entity (NPC or Marketplace) doesnt have an item,
+        // do not take it into account into the total cost (because we won't sell it, anyway)
         return total;
       }
 
-      return total + this.getItemBuyPrice(item.key) * item.qty!;
+      return total + this.getItemPrice(item.key, priceMultiplier) * item.qty!;
     }, 0);
   }
 
-  public getItemSellPrice(key: string): number {
-    return this.getItemPrice(key, TRADER_SELL_PRICE_MULTIPLIER);
+  public getItemSellPrice(key: string, priceMultiplier: number = TRADER_SELL_PRICE_MULTIPLIER): number {
+    return this.getItemPrice(key, priceMultiplier);
   }
 
-  public getItemBuyPrice(key: string): number {
-    return this.getItemPrice(key, TRADER_BUY_PRICE_MULTIPLIER);
+  public getItemBuyPrice(key: string, priceMultiplier: number = TRADER_BUY_PRICE_MULTIPLIER): number {
+    return this.getItemPrice(key, priceMultiplier);
   }
 
   private getItemPrice(key: string, multiplier: number): number {
