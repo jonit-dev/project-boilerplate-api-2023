@@ -5,7 +5,6 @@ import { CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged, Enti
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
@@ -15,7 +14,6 @@ export class BerserkerSpells {
   constructor(
     private inMemoryHashTable: InMemoryHashTable,
     private socketMessaging: SocketMessaging,
-    private specialEffect: SpecialEffect,
     private npcDeath: NPCDeath,
     private characterDeath: CharacterDeath
   ) {}
@@ -90,12 +88,18 @@ export class BerserkerSpells {
   }
 
   private async sendEventAttributeChange(characterId: Types.ObjectId): Promise<void> {
-    const character = (await Character.findById(characterId).lean().select("health")) as ICharacter;
+    const character = (await Character.findById(characterId).lean()) as ICharacter;
     const payload: ICharacterAttributeChanged = {
       targetId: character._id,
       health: character.health,
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(
+      character,
+      CharacterSocketEvents.AttributeChanged,
+      payload
+    );
   }
 }
