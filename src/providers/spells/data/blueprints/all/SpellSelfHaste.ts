@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
+import { CharacterBuff } from "@providers/character/characterBuff/CharacterBuff";
 import { container } from "@providers/inversify/container";
 import { AnimationEffectKeys, CharacterAttributes, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
@@ -19,12 +19,17 @@ export const spellSelfHaste: Partial<ISpell> = {
   attribute: CharacterAttributes.Speed,
 
   usableEffect: async (character: ICharacter) => {
-    const characterSkillBuff = container.get(CharacterSkillBuff);
+    const characterBuff = container.get(CharacterBuff);
     const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
     const timeout = Math.min(Math.max(skills.magic.level * 8, 0), 120);
-    const skillType = CharacterAttributes.Speed;
 
-    await characterSkillBuff.enableTemporaryBuff(character, skillType, 30, timeout);
+    await characterBuff.enableTemporaryBuff(character, {
+      type: "characterAttribute",
+      trait: CharacterAttributes.Speed,
+      buffPercentage: 20,
+      durationSeconds: timeout,
+      durationType: "temporary",
+    });
   },
 };

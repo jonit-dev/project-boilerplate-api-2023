@@ -3,25 +3,25 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { BattleCycle } from "@providers/battle/BattleCycle";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import SpellCooldown from "@providers/spells/SpellCooldown";
 import { SpellLearn } from "@providers/spells/SpellLearn";
+import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { CharacterClass, CharacterSocketEvents, ICharacterLogout, ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
-import { BuffSkillFunctions } from "../CharacterBuffer/BuffSkillFunctions";
 import { CharacterInventory } from "../CharacterInventory";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
+import { CharacterBuff } from "../characterBuff/CharacterBuff";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 import { CharacterItems } from "../characterItems/CharacterItems";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
-import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import SpellCooldown from "@providers/spells/SpellCooldown";
 
 @provide(CharacterNetworkLogout)
 export class CharacterNetworkLogout {
@@ -31,7 +31,6 @@ export class CharacterNetworkLogout {
     private socketConnection: SocketConnection,
     private characterView: CharacterView,
     private inMemoryHashTable: InMemoryHashTable,
-    private buffSkillFunctions: BuffSkillFunctions,
     private spellLearn: SpellLearn,
     private skillIncrease: SkillIncrease,
     private equipmentSlots: EquipmentSlots,
@@ -40,7 +39,8 @@ export class CharacterNetworkLogout {
     private characterItems: CharacterItems,
     private characterMonitor: CharacterMonitor,
     private specialEffect: SpecialEffect,
-    private spellCooldown: SpellCooldown
+    private spellCooldown: SpellCooldown,
+    private characterBuff: CharacterBuff
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -82,8 +82,8 @@ export class CharacterNetworkLogout {
           }
         );
 
-        await this.buffSkillFunctions.removeAllBuffEffectOnCharacter(character);
-        await this.buffSkillFunctions.removeAllSpellDataOnRedis(character);
+        await this.characterBuff.disableAllBuffs(character);
+
         await this.specialEffect.clearEffects(character);
         await this.spellCooldown.clearCooldowns(character._id);
 

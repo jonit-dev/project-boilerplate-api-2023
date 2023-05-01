@@ -10,7 +10,12 @@ import { CharacterItemInventory } from "@providers/character/characterItems/Char
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  IEquipmentAndInventoryUpdatePayload,
+  IItemContainer,
+  ItemSocketEvents,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { isArray } from "lodash";
 import random from "lodash/random";
@@ -106,7 +111,10 @@ export class UseWithItemToEntity {
       }
 
       if (errorAnimationEffectKey) {
-        await this.animationEffect.sendAnimationEventToCharacter(character, errorAnimationEffectKey);
+        await this.animationEffect.sendAnimationEventToCharacter(
+          character,
+          errorAnimationEffectKey as AnimationEffectKeys
+        );
       }
       return;
     }
@@ -114,7 +122,10 @@ export class UseWithItemToEntity {
     await this.characterWeight.updateCharacterWeight(character);
 
     if (successAnimationEffectKey) {
-      await this.animationEffect.sendAnimationEventToCharacter(character, successAnimationEffectKey);
+      await this.animationEffect.sendAnimationEventToCharacter(
+        character,
+        successAnimationEffectKey as AnimationEffectKeys
+      );
     }
 
     // update crafting skills if corresponds

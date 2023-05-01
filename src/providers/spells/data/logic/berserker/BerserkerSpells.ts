@@ -1,13 +1,21 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged, EntityType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  CharacterClass,
+  CharacterSocketEvents,
+  EntityType,
+  ICharacterAttributeChanged,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
-import { NPCDeath } from "@providers/npc/NPCDeath";
-import { CharacterDeath } from "@providers/character/CharacterDeath";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
 
 @provide(BerserkerSpells)
 export class BerserkerSpells {
@@ -15,7 +23,8 @@ export class BerserkerSpells {
     private inMemoryHashTable: InMemoryHashTable,
     private socketMessaging: SocketMessaging,
     private npcDeath: NPCDeath,
-    private characterDeath: CharacterDeath
+    private characterDeath: CharacterDeath,
+    private animationEffect: AnimationEffect
   ) {}
 
   public async handleBerserkerAttack(character: ICharacter, damage: number): Promise<void> {
@@ -74,12 +83,18 @@ export class BerserkerSpells {
     try {
       const berserkerMultiplier = 0.1;
 
-      const healing = Math.min(
-        Math.max(1, Math.round(damage * berserkerMultiplier)) + character.health,
-        character.maxHealth
-      );
+      const skills = await Skill.findById(character.skills).lean();
 
-      (await Character.findByIdAndUpdate(character._id, { health: healing }).lean()) as ICharacter;
+      const magicLevel = skills?.magic.level;
+      const characterLevel = skills?.level;
+      const strengthLevel = skills?.strength.level;
+
+      const healingFactor = (magicLevel + characterLevel + strengthLevel) / 4;
+      const calculatedHealing = Math.round(damage * berserkerMultiplier * healingFactor);
+
+      const cappedHealing = Math.min(character.health + calculatedHealing, character.maxHealth);
+
+      await Character.findByIdAndUpdate(character._id, { health: cappedHealing }).lean();
 
       await this.sendEventAttributeChange(character._id);
     } catch (error) {
@@ -101,5 +116,7 @@ export class BerserkerSpells {
       CharacterSocketEvents.AttributeChanged,
       payload
     );
+
+    await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.Lifedrain);
   }
 }

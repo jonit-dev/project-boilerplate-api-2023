@@ -1,7 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { AnimationSocketEvents, IAnimationEffect, IProjectileAnimationEffect } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  AnimationSocketEvents,
+  IAnimationEffect,
+  IProjectileAnimationEffect,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(AnimationEffect)
@@ -10,7 +15,7 @@ export class AnimationEffect {
 
   public async sendAnimationEventToCharacter(
     character: ICharacter,
-    effectKey: string,
+    effectKey: AnimationEffectKeys,
     targetId?: string
   ): Promise<void> {
     const payload: IAnimationEffect = {

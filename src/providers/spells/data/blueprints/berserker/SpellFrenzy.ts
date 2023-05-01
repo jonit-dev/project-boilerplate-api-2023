@@ -1,10 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { CharacterBuff } from "@providers/character/characterBuff/CharacterBuff";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, CharacterAttributes, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import {
+  AnimationEffectKeys,
+  BasicAttribute,
+  CharacterAttributes,
+  CharacterClass,
+  SpellCastingType,
+} from "@rpg-engine/shared";
+import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellFrenzy: Partial<ISpell> = {
   key: SpellsBlueprint.BerserkerFrenzy,
@@ -20,26 +25,42 @@ export const spellFrenzy: Partial<ISpell> = {
   characterClass: [CharacterClass.Berserker],
 
   usableEffect: async (character: ICharacter) => {
-    const characterSkillBuff = container.get(CharacterSkillBuff);
-    const inMemoryHashTable = container.get(InMemoryHashTable);
+    const characterBuff = container.get(CharacterBuff);
 
-    const skills = (await Skill.findById(character.skills).lean().select("strength")) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean().select("strength dexterity")) as ISkill;
 
-    const timeout = Math.min(Math.max(skills.strength.level * 8, 20), 120);
-    const skillType = CharacterAttributes.AttackIntervalSpeed;
+    const characterStrength = skills?.strength.level;
+    const characterDexterity = skills?.dexterity.level;
 
-    await characterSkillBuff.enableTemporaryBuff(character, skillType, 10, timeout);
+    const timeoutWeightedAverage = characterStrength * 0.6 + characterDexterity * 0.4;
+    const timeout = Math.min(Math.max(timeoutWeightedAverage * 2, 20), 120);
 
-    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
-    const key = SpellsBlueprint.BerserkerFrenzy;
+    await characterBuff.enableTemporaryBuff(character, {
+      type: "characterAttribute",
+      trait: CharacterAttributes.AttackIntervalSpeed,
+      buffPercentage: -30, // reduce attack interval speed by 30%
+      durationSeconds: timeout,
+      durationType: "temporary",
+      options: {
+        messages: {
+          activation:
+            "Berserker's Frenzy has been activated! Your attack speed has been increased (but your resistance was reduced)!",
+          deactivation: "Berserker's Frenzy has been deactivated!",
+        },
+      },
+    });
 
-    await inMemoryHashTable.set(namespace, key, true);
-    await inMemoryHashTable.expire(namespace, timeout, "NX");
-
-    await inMemoryHashTable.delete(character._id, "totalDefense");
-
-    setTimeout(async () => {
-      await inMemoryHashTable.delete(character._id, "totalDefense");
-    }, timeout * 1000);
+    await characterBuff.enableTemporaryBuff(character, {
+      type: "skill",
+      trait: BasicAttribute.Resistance,
+      buffPercentage: -50, // reduce resistance by 50%
+      durationSeconds: timeout,
+      durationType: "temporary",
+      options: {
+        messages: {
+          skipMessages: true,
+        },
+      },
+    });
   },
 };

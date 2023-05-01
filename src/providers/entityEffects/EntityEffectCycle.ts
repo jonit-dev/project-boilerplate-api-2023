@@ -6,7 +6,7 @@ import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { container } from "@providers/inversify/container";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import { AnimationEffectKeys, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { EffectsSocketEvents, EntityType, IEntityEffectEvent } from "@rpg-engine/shared/dist/types/entity.types";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 
@@ -105,7 +105,7 @@ export class EntityEffectCycle {
     const animationEffect = container.get(AnimationEffect);
 
     if (target.type === EntityType.Character) {
-      animationEffect.sendAnimationEventToCharacter(target as ICharacter, effectKey);
+      animationEffect.sendAnimationEventToCharacter(target as ICharacter, effectKey as AnimationEffectKeys);
     } else {
       animationEffect.sendAnimationEventToNPC(target as INPC, effectKey);
     }

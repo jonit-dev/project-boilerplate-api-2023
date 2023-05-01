@@ -7,6 +7,7 @@ import { CharacterBonusPenalties } from "@providers/character/characterBonusPena
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EntityUtil } from "@providers/entityEffects/EntityUtil";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -14,6 +15,7 @@ import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ISpell, NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
+  AnimationEffectKeys,
   BasicAttribute,
   CharacterSocketEvents,
   EntityType,
@@ -24,10 +26,9 @@ import {
   SpellSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import SpellCoolDown from "./SpellCooldown";
 import { SpellValidation } from "./SpellValidation";
 import { spellsBlueprints } from "./data/blueprints/index";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
-import SpellCoolDown from "./SpellCooldown";
 
 @provide(SpellCast)
 export class SpellCast {
@@ -271,7 +272,10 @@ export class SpellCast {
         spell.animationKey
       );
     } else {
-      await this.animationEffect.sendAnimationEventToCharacter(updatedCharacter, spell.animationKey);
+      await this.animationEffect.sendAnimationEventToCharacter(
+        updatedCharacter,
+        spell.animationKey as AnimationEffectKeys
+      );
     }
   }
 

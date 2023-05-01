@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
+import { CharacterBuff } from "@providers/character/characterBuff/CharacterBuff";
 import { container } from "@providers/inversify/container";
 import { AnimationEffectKeys, CharacterClass, CombatSkill, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
@@ -20,10 +20,16 @@ export const spellFortifyDefense: Partial<ISpell> = {
   characterClass: [CharacterClass.Warrior],
 
   usableEffect: async (character: ICharacter) => {
-    const characterSkillBuff = container.get(CharacterSkillBuff);
+    const characterBuff = container.get(CharacterBuff);
     const skills = (await Skill.findById(character.skills).lean()) as ISkill;
     const timeout = Math.min(Math.max(skills.magic.level * 5, 20), 180);
 
-    await characterSkillBuff.enableTemporaryBuff(character, CombatSkill.Shielding, 30, timeout);
+    await characterBuff.enableTemporaryBuff(character, {
+      type: "skill",
+      trait: CombatSkill.Shielding,
+      buffPercentage: 30,
+      durationSeconds: timeout,
+      durationType: "temporary",
+    });
   },
 };

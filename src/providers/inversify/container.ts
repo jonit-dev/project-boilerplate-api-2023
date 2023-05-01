@@ -1,4 +1,3 @@
-import { CharacterSkillBuff } from "@providers/character/CharacterBuffer/CharacterSkillBuff";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { CharacterMonitor } from "@providers/character/CharacterMonitor";
@@ -56,8 +55,6 @@ export const characterConnection = container.get<CharacterConnection>(CharacterC
 export const redisManager = container.get<RedisManager>(RedisManager);
 
 export const npcFreezer = container.get<NPCFreezer>(NPCFreezer);
-
-export const characterSkillBuff = container.get<CharacterSkillBuff>(CharacterSkillBuff);
 
 export const inMemoryRepository = container.get<InMemoryRepository>(InMemoryRepository);
 

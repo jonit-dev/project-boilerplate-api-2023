@@ -4,10 +4,13 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { BuffSkillFunctions } from "@providers/character/CharacterBuffer/BuffSkillFunctions";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
+import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
+import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
+import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 import {
   BASIC_INCREASE_HEALTH_MANA,
   SP_CRAFTING_INCREASE_RATIO,
@@ -45,10 +48,6 @@ import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
-import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
-import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -60,7 +59,6 @@ export class SkillIncrease {
     private spellLearn: SpellLearn,
     private characterBonusPenalties: CharacterBonusPenalties,
     private skillFunctions: SkillFunctions,
-    private buffSkillFunctions: BuffSkillFunctions,
     private skillGainValidation: SkillGainValidation,
     private characterWeapon: CharacterWeapon,
     private inMemoryHashTable: InMemoryHashTable,
@@ -292,22 +290,13 @@ export class SkillIncrease {
       // Get character skills
       const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
-      const appliedBuffEffect = character.appliedBuffsEffects;
-
-      const experience = "experience";
-      let buff = 0;
-      appliedBuffEffect
-        ? (buff = this.buffSkillFunctions.getTotalValueByKey(appliedBuffEffect, experience) / 100)
-        : (buff = 0);
-      buff < 0 ? (buff = 0) : buff;
-
       if (!skills) {
         // if attacker skills does not exist anymore
         // call again the function without this record
         return this.releaseXP(target);
       }
 
-      const exp = (record!.xp! + record!.xp! * buff) * (target.isGiantForm ? NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER : 1);
+      const exp = record!.xp! * (target.isGiantForm ? NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER : 1);
 
       skills.experience += exp;
       skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);

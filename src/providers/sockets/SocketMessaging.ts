@@ -23,6 +23,13 @@ export class SocketMessaging {
     });
   }
 
+  public sendMessageToCharacter(character: ICharacter, message: string): void {
+    this.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+      message: message,
+      type: "info",
+    });
+  }
+
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
     this.socketAdapter.emitToUser(userChannel, eventName, data || {});
   }

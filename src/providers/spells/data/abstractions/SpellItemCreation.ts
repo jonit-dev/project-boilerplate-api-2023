@@ -3,7 +3,7 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BattleEventType } from "@rpg-engine/shared";
+import { AnimationEffectKeys } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 interface ISpellItemCreationOptions {
@@ -51,7 +51,7 @@ export class SpellItemCreation {
     });
 
     if (!added) {
-      await this.animationEffect.sendAnimationEventToCharacter(character, BattleEventType.Miss);
+      await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.Miss);
 
       return false;
     }

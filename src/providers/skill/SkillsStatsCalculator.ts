@@ -6,7 +6,6 @@ import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentStatsCalculator } from "@providers/equipment/EquipmentStatsCalculator";
 import { container } from "@providers/inversify/container";
-import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { provide } from "inversify-binding-decorators";
 
 @provide(SkillStatsCalculator)
@@ -102,12 +101,8 @@ export class SkillStatsCalculator {
         attack: value,
       });
     } else {
-      const namespace = `${NamespaceRedisControl.CharacterSpell}:${ownerSkill}`;
-      const key = SpellsBlueprint.BerserkerFrenzy;
-      const exists = await this.inMemoryHashTable.has(namespace, key);
-
       await this.inMemoryHashTable.set(ownerSkill, "totalDefense", {
-        defense: exists ? value / 2 : value,
+        defense: value,
       });
     }
 

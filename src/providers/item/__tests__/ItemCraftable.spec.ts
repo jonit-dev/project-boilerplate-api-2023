@@ -9,6 +9,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { recipeSpikedClub } from "@providers/useWith/recipes/maces/recipeSpikedClub";
 import { recipeBolt } from "@providers/useWith/recipes/ranged-weapons/recipeBolt";
 import {
+  AnimationEffectKeys,
   AnimationSocketEvents,
   CharacterSocketEvents,
   ICraftItemPayload,
@@ -366,7 +367,7 @@ describe("ItemCraftable.ts", () => {
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
-      effectKey: "miss",
+      effectKey: AnimationEffectKeys.Miss,
     });
 
     expect(sendEventToUser).toHaveBeenCalledWith(

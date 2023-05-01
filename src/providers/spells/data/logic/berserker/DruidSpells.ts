@@ -5,8 +5,8 @@ import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/s
 import { provide } from "inversify-binding-decorators";
 import { NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
-@provide(RogueSpells)
-export class RogueSpells {
+@provide(DruidSpells)
+export class DruidSpells {
   constructor(private inMemoryHashTable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
 
   public async handleShapeShift(character: ICharacter, textureKey: string, intervalInSecs: number): Promise<void> {

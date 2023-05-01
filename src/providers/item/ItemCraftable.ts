@@ -12,6 +12,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { recipeBlueprintsIndex } from "@providers/useWith/recipes/index";
 import { IUseWithCraftingRecipe, IUseWithCraftingRecipeItem } from "@providers/useWith/useWithTypes";
 import Shared, {
+  AnimationEffectKeys,
   CraftingSkill,
   ICraftItemPayload,
   ICraftableItem,
@@ -146,7 +147,7 @@ export class ItemCraftable {
 
       this.socketMessaging.sendErrorMessageToCharacter(character, failureMessages[0]);
 
-      await this.animationEffect.sendAnimationEventToCharacter(character, "miss");
+      await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.Miss);
     }
 
     await this.characterWeight.updateCharacterWeight(character);
@@ -297,7 +298,7 @@ export class ItemCraftable {
       const item = itemsBlueprintIndex[itemKey];
       if (recipes[item.key]) {
         const recipe = recipes[item.key];
-        if (recipe.requiredItems.some((ing) => inventoryInfo.get(ing.key) ?? 0 >= ing.qty)) {
+        if (recipe.requiredItems.some((ing) => inventoryInfo.get(ing.key) ?? ing.qty <= 0)) {
           availableRecipes.push(recipe);
         }
       }
