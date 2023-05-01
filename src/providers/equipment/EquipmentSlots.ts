@@ -3,6 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { CharacterItemBuff } from "@providers/character/characterBuff/CharacterItemBuff";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -27,7 +28,8 @@ export class EquipmentSlots {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterItemContainer: CharacterItemContainer,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private characterItemBuff: CharacterItemBuff
   ) {}
 
   private slots: EquipmentSlotTypes[] = [
@@ -258,32 +260,36 @@ export class EquipmentSlots {
       return undefined;
     }
 
-    if (item.key === key) {
+    if (isSameKey(item.key, key)) {
       return item;
     }
   }
 
-  public async removeItemFromSlot(
-    character: ICharacter,
-    key: string,
-    slot: EquipmentSlotTypes
-  ): Promise<void | undefined> {
+  public async removeItemFromSlot(character: ICharacter, key: string, slot: EquipmentSlotTypes): Promise<boolean> {
     const equipment = await Equipment.findById(character.equipment).populate(this.slots.join(" ")).exec();
 
     if (!equipment) {
-      return undefined;
+      return false;
     }
 
     const item = equipment[slot] as unknown as IItem;
 
     if (!item) {
-      return undefined;
+      return false;
     }
 
-    if (item.key === key) {
+    if (isSameKey(item.key, key)) {
       equipment[slot] = undefined;
       await equipment.save();
+
+      await this.characterItemBuff.disableItemBuff(character, item._id);
+
+      await Item.updateOne({ _id: item._id }, { $set: { isBeingEquipped: false } });
+
+      return true;
     }
+
+    return false;
   }
 
   private getSlotType(itemSlotTypes: string[], slotType: string, subType: string): string {

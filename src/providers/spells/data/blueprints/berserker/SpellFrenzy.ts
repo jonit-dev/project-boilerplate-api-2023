@@ -58,7 +58,7 @@ export const spellFrenzy: Partial<ISpell> = {
       durationType: "temporary",
       options: {
         messages: {
-          skipMessages: true,
+          skipAllMessages: true,
         },
       },
     });

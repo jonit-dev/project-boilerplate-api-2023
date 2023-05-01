@@ -6,7 +6,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
-import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import { EquipmentSlotTypes, EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
@@ -26,7 +26,6 @@ import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterWeight } from "./CharacterWeight";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
-import { CharacterItemEquipment } from "./characterItems/CharacterItemEquipment";
 
 export const DROPPABLE_EQUIPMENT = [
   "head",
@@ -53,8 +52,7 @@ export class CharacterDeath {
     private characterDeathCalculator: CharacterDeathCalculator,
     private characterItemContainer: CharacterItemContainer,
     private entityEffectUse: EntityEffectUse,
-    private equipmentSlots: EquipmentSlots,
-    private characterItemEquipment: CharacterItemEquipment
+    private equipmentSlots: EquipmentSlots
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
@@ -252,10 +250,14 @@ export class CharacterDeath {
       const n = _.random(0, 100);
 
       if (n <= DROP_EQUIPMENT_CHANCE) {
-        const removeEquipmentFromSlot = await this.characterItemEquipment.deleteItemFromEquipment(item._id, character);
+        const removeEquipmentFromSlot = await this.equipmentSlots.removeItemFromSlot(
+          character,
+          item.key,
+          slot as EquipmentSlotTypes
+        );
 
         if (!removeEquipmentFromSlot) {
-          throw new Error(`Error removing item from equipment slot ${slot}`);
+          return;
         }
 
         item = await this.clearItem(item);
