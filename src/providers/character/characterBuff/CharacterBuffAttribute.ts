@@ -1,9 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { TextFormatter } from "@providers/text/TextFormatter";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
+import { CharacterSocketEvents, ICharacterBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ICharacterBuff } from "./CharacterBuff";
+
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
 @provide(CharacterBuffAttribute)

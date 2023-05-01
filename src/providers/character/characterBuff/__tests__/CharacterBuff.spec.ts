@@ -1,7 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { BasicAttribute, CharacterAttributes } from "@rpg-engine/shared";
-import { CharacterBuff, ICharacterPermanentBuff, ICharacterTemporaryBuff } from "../CharacterBuff";
+import {
+  BasicAttribute,
+  CharacterAttributes,
+  ICharacterPermanentBuff,
+  ICharacterTemporaryBuff,
+} from "@rpg-engine/shared";
+import { CharacterBuff } from "../CharacterBuff";
 
 describe("CharacterBuff", () => {
   let characterBuff: CharacterBuff;

@@ -1,39 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { CharacterTrait } from "@rpg-engine/shared";
+import { BuffType, ICharacterPermanentBuff, ICharacterTemporaryBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBuffAttribute } from "./CharacterBuffAttribute";
 import { CharacterBuffSkill } from "./CharacterBuffSkill";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
-
-//! Export to shared later
-
-export type BuffDurationType = "temporary" | "permanent";
-
-export type BuffType = "skill" | "characterAttribute";
-export interface ICharacterBuff {
-  _id?: string; // it will receive an id when assigned on CharacterBuffTracker
-  type: BuffType;
-  trait: CharacterTrait; // A trait is a generic character characteristic, like a CombatSkill, CraftingSkill, BasicAttribute, Attribute, etc.
-  buffPercentage: number;
-  prevTraitValue?: number;
-  durationType: BuffDurationType;
-  options?: {
-    messages?: {
-      skipMessages?: boolean;
-      activation?: string;
-      deactivation?: string;
-    };
-  };
-}
-
-export interface ICharacterPermanentBuff extends ICharacterBuff {
-  durationType: "permanent";
-}
-
-export interface ICharacterTemporaryBuff extends ICharacterBuff {
-  durationType: "temporary";
-  durationSeconds: number;
-}
 
 @provide(CharacterBuff)
 export class CharacterBuff {

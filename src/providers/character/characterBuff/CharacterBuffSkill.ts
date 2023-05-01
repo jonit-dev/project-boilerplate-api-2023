@@ -3,9 +3,9 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { TextFormatter } from "@providers/text/TextFormatter";
-import { SkillSocketEvents } from "@rpg-engine/shared";
+import { ICharacterBuff, SkillSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ICharacterBuff } from "./CharacterBuff";
+
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
 interface ISkillDetail {

@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { ICharacterBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { v4 as uuidv4 } from "uuid";
-import { ICharacterBuff } from "./CharacterBuff";
 
 interface ICharacterBuffDeleteOptions {
   deleteTemporaryOnly?: boolean;
