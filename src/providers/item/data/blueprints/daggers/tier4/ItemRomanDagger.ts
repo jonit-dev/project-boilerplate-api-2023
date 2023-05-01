@@ -1,8 +1,8 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { DaggersBlueprint } from "../../types/itemsBlueprintTypes";
+import { IEquippableMeleeTier4WeaponBlueprint } from "../../../types/TierBlueprintTypes";
+import { DaggersBlueprint } from "../../../types/itemsBlueprintTypes";
 
-export const itemRomanDagger: Partial<IItem> = {
+export const itemRomanDagger: IEquippableMeleeTier4WeaponBlueprint = {
   key: DaggersBlueprint.RomanDagger,
   type: ItemType.Weapon,
   subType: ItemSubType.Dagger,
@@ -12,7 +12,8 @@ export const itemRomanDagger: Partial<IItem> = {
   description: "The Roman Dagger is a lightweight weapon that emphasizes speed and agility.",
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  attack: 60,
-  defense: 20,
+  attack: 35,
+  defense: 33,
+  tier: 4,
   rangeType: EntityAttackType.Melee,
 };

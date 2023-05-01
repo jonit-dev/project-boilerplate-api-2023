@@ -1,5 +1,4 @@
 import { DaggersBlueprint } from "../../types/itemsBlueprintTypes";
-import { itemRomanDagger } from "./ItemRomanDagger";
 import { itemDagger } from "./tier0/ItemDagger";
 import { itemWoodenDagger } from "./tier0/ItemWoodenDagger";
 import { itemCopperJitte } from "./tier1/ItemCopperJitte";
@@ -19,6 +18,7 @@ import { itemAzureDagger } from "./tier4/ItemAzureDagger";
 import { itemHellishDagger } from "./tier4/ItemHellishDagger";
 import { itemPhoenixDagger } from "./tier4/ItemPhoenixDagger";
 import { itemPhoenixJitte } from "./tier4/ItemPhoenixJitte";
+import { itemRomanDagger } from "./tier4/ItemRomanDagger";
 import { itemVerdantDagger } from "./tier4/ItemVerdantDagger";
 import { itemVerdantJitte } from "./tier4/ItemVerdantJitte";
 import { itemGoldenDagger } from "./tier5/ItemGoldenDagger";

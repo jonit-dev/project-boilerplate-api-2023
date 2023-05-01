@@ -115,6 +115,10 @@ export const npcOrcBerserker = {
       itemBlueprintKey: CraftingResourcesBlueprint.IronOre,
       chance: 7,
     },
+    {
+      itemBlueprintKey: DaggersBlueprint.RomanDagger,
+      chance: 7,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;
