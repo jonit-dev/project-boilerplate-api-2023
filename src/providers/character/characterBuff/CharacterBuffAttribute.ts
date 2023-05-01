@@ -62,7 +62,7 @@ export class CharacterBuffAttribute {
 
     await this.characterBuffTracker.deleteBuff(character, buff._id!);
 
-    if (!buff.options?.messages?.skipMessages) {
+    if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.skipDeactivationMessage) {
       this.socketMessaging.sendMessageToCharacter(
         character,
         buff.options?.messages?.deactivation ||
@@ -70,16 +70,23 @@ export class CharacterBuffAttribute {
       );
     }
 
+    // inform and send update to client
+    this.sendUpdateToClient(character, buff, prevTraitValue);
+
     return true;
   }
 
   private sendUpdateToClient(character: ICharacter, buff: ICharacterBuff, updatedTraitValue: number): void {
+    const clientTraitNames = {
+      baseSpeed: "speed",
+    };
+
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, {
       targetId: character._id,
-      [buff.trait]: updatedTraitValue,
+      [clientTraitNames[buff.trait]]: updatedTraitValue,
     });
 
-    if (!buff.options?.messages?.skipMessages) {
+    if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.skipActivationMessage) {
       this.socketMessaging.sendMessageToCharacter(
         character,
         buff.options?.messages?.activation ||

@@ -26,6 +26,7 @@ import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterWeight } from "./CharacterWeight";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
+import { CharacterItemEquipment } from "./characterItems/CharacterItemEquipment";
 
 export const DROPPABLE_EQUIPMENT = [
   "head",
@@ -52,7 +53,8 @@ export class CharacterDeath {
     private characterDeathCalculator: CharacterDeathCalculator,
     private characterItemContainer: CharacterItemContainer,
     private entityEffectUse: EntityEffectUse,
-    private equipmentSlots: EquipmentSlots
+    private equipmentSlots: EquipmentSlots,
+    private characterItemEquipment: CharacterItemEquipment
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
@@ -250,7 +252,7 @@ export class CharacterDeath {
       const n = _.random(0, 100);
 
       if (n <= DROP_EQUIPMENT_CHANCE) {
-        const removeEquipmentFromSlot = await this.removeItemFromEquipmentSlot(equipment, slot);
+        const removeEquipmentFromSlot = await this.characterItemEquipment.deleteItemFromEquipment(item._id, character);
 
         if (!removeEquipmentFromSlot) {
           throw new Error(`Error removing item from equipment slot ${slot}`);
@@ -266,23 +268,6 @@ export class CharacterDeath {
           await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
         }
       }
-    }
-  }
-
-  private async removeItemFromEquipmentSlot(equipment: IEquipment, slot: string): Promise<boolean> {
-    try {
-      await Equipment.updateOne(
-        { _id: equipment._id },
-        {
-          $unset: {
-            [slot]: 1,
-          },
-        }
-      );
-      return true;
-    } catch (error) {
-      console.error(error);
-      return false;
     }
   }
 
