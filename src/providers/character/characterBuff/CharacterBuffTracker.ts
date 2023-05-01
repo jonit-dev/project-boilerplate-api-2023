@@ -70,7 +70,6 @@ export class CharacterBuffTracker {
 
     const buff = currentBuffs.find((buff) => String(buff?.itemKey) === String(itemKey));
 
-    console.log(buff);
     return buff;
   }
 
