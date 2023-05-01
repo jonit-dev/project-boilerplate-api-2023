@@ -6,7 +6,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
-import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import { EquipmentSlotTypes, EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
@@ -250,10 +250,14 @@ export class CharacterDeath {
       const n = _.random(0, 100);
 
       if (n <= DROP_EQUIPMENT_CHANCE) {
-        const removeEquipmentFromSlot = await this.removeItemFromEquipmentSlot(equipment, slot);
+        const removeEquipmentFromSlot = await this.equipmentSlots.removeItemFromSlot(
+          character,
+          item.key,
+          slot as EquipmentSlotTypes
+        );
 
         if (!removeEquipmentFromSlot) {
-          throw new Error(`Error removing item from equipment slot ${slot}`);
+          return;
         }
 
         item = await this.clearItem(item);
@@ -266,23 +270,6 @@ export class CharacterDeath {
           await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
         }
       }
-    }
-  }
-
-  private async removeItemFromEquipmentSlot(equipment: IEquipment, slot: string): Promise<boolean> {
-    try {
-      await Equipment.updateOne(
-        { _id: equipment._id },
-        {
-          $unset: {
-            [slot]: 1,
-          },
-        }
-      );
-      return true;
-    } catch (error) {
-      console.error(error);
-      return false;
     }
   }
 

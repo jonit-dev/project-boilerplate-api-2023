@@ -96,11 +96,11 @@ export class CharacterBuffSkill {
 
     await this.characterBuffTracker.deleteBuff(character, buff._id!);
 
-    if (!buff.options?.messages?.skipMessages) {
+    if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.activation) {
       this.socketMessaging.sendMessageToCharacter(
         character,
         buff.options?.messages?.activation ||
-          `Your skill ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} has been debuffed by ${
+          `Your skill ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} has been buffed by ${
             buff.buffPercentage
           }%!`
       );
@@ -120,7 +120,7 @@ export class CharacterBuffSkill {
       skill,
     });
 
-    if (!buff.options?.messages?.skipMessages) {
+    if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.deactivation) {
       this.socketMessaging.sendMessageToCharacter(
         character,
         buff.options?.messages?.deactivation ||

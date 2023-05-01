@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
-import { ICharacterBuff } from "@rpg-engine/shared";
+import { ICharacterBuff, ICharacterItemBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { v4 as uuidv4 } from "uuid";
 
@@ -51,6 +51,27 @@ export class CharacterBuffTracker {
     }
 
     return currentBuffs.find((buff) => buff._id === buffId);
+  }
+
+  public async getBuffByItemId(character: ICharacter, itemId: string): Promise<ICharacterItemBuff | undefined> {
+    const currentBuffs = (await this.getAllCharacterBuffs(character)) as ICharacterItemBuff[];
+
+    const buff = currentBuffs.find((buff) => String(buff?.itemId) === String(itemId));
+
+    return buff;
+  }
+
+  public async getBuffByItemKey(character: ICharacter, itemKey: string): Promise<ICharacterItemBuff | undefined> {
+    const currentBuffs = (await this.inMemoryHashTable.get("character-buffs", character._id)) as ICharacterItemBuff[];
+
+    if (!currentBuffs) {
+      return undefined;
+    }
+
+    const buff = currentBuffs.find((buff) => String(buff?.itemKey) === String(itemKey));
+
+    console.log(buff);
+    return buff;
   }
 
   public async deleteBuff(character: ICharacter, buffId: string): Promise<boolean> {

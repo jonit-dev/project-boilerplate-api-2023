@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  AccessoriesBlueprint,
   ArmorsBlueprint,
   BootsBlueprint,
   ContainersBlueprint,
@@ -73,6 +74,10 @@ export const npcLitch: Partial<INPC> = {
     },
     {
       itemBlueprintKey: DaggersBlueprint.HellishDagger,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.HasteRing,
       chance: 5,
     },
     {

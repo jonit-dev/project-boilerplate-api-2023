@@ -5,6 +5,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterItemBuff } from "@providers/character/characterBuff/CharacterItemBuff";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/Berserker";
 import { RoguePassiveHabilities } from "@providers/character/characterPassiveHabilities/Rogue";
@@ -41,7 +42,8 @@ export class EquipmentEquip {
     private berserkerPassiveHabilities: BerserkerPassiveHabilities,
     private roguePassiveHabilities: RoguePassiveHabilities,
     private characterWeight: CharacterWeight,
-    private itemPickupUpdater: ItemPickupUpdater
+    private itemPickupUpdater: ItemPickupUpdater,
+    private characterItemBuff: CharacterItemBuff
   ) {}
 
   public async equipInventory(character: ICharacter, itemId: string): Promise<boolean> {
@@ -213,6 +215,8 @@ export class EquipmentEquip {
     await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
 
     await this.characterWeight.updateCharacterWeight(character);
+
+    await this.characterItemBuff.enableItemBuff(character, item);
   }
 
   private async checkContainerType(itemContainer: IItemContainer): Promise<SourceEquipContainerType> {

@@ -185,7 +185,7 @@ describe("EquipmentSlots.ts", () => {
   });
 
   describe("removeItemFromSlot", () => {
-    it("should return undefined after remove item", async () => {
+    it("should return true after remove item", async () => {
       const item = await unitTestHelper.createMockItem({ key: "test-item" });
 
       equipment.ring = item._id;
@@ -193,7 +193,7 @@ describe("EquipmentSlots.ts", () => {
 
       const result = await equipmentSlots.removeItemFromSlot(testCharacter, "test-item", "ring");
 
-      expect(result).toBeUndefined();
+      expect(result).toBeTruthy();
     });
   });
 

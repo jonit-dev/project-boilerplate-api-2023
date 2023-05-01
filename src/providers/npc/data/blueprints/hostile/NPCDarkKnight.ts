@@ -114,6 +114,10 @@ export const npcDarkKnight: Partial<INPC> = {
       chance: 5,
     },
     {
+      itemBlueprintKey: AccessoriesBlueprint.HasteRing,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: HelmetsBlueprint.RoyalKnightHelmet,
       chance: 5,
     },

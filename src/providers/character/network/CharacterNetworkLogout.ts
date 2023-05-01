@@ -1,7 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { BattleCycle } from "@providers/battle/BattleCycle";
-import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
@@ -76,8 +75,6 @@ export class CharacterNetworkLogout {
           { _id: data.id },
           {
             isOnline: false,
-            baseSpeed: MovementSpeed.Standard,
-            attackIntervalSpeed: 1700,
             textureKey: textureKey || character.textureKey,
           }
         );

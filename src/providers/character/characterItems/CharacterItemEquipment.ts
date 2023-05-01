@@ -7,13 +7,15 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
 import { MathHelper } from "@providers/math/MathHelper";
 import { provide } from "inversify-binding-decorators";
+import { CharacterItemBuff } from "../characterBuff/CharacterItemBuff";
 
 @provide(CharacterItemEquipment)
 export class CharacterItemEquipment {
   constructor(
     private equipmentSlots: EquipmentSlots,
     private socketMessaging: SocketMessaging,
-    private mathHelper: MathHelper
+    private mathHelper: MathHelper,
+    private characterItemBuff: CharacterItemBuff
   ) {}
 
   public async deleteItemFromEquipment(itemId: string, character: ICharacter): Promise<boolean> {
@@ -33,6 +35,10 @@ export class CharacterItemEquipment {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Your equipment was not found.");
       return false;
     }
+
+    await this.characterItemBuff.disableItemBuff(character, itemId);
+
+    await Item.updateOne({ _id: itemId }, { $set: { isBeingEquipped: false } });
 
     return await this.removeItemFromEquipmentSet(item, character);
   }
