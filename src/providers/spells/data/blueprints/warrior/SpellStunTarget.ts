@@ -14,7 +14,7 @@ export const spellStunTarget: Partial<ISpell> = {
   magicWords: "talas tamb-eth",
   manaCost: 60,
   minLevelRequired: 4,
-  minMagicLevelRequired: 3,
+  minMagicLevelRequired: 8,
   cooldown: 10,
   animationKey: AnimationEffectKeys.Rooted,
   projectileAnimationKey: AnimationEffectKeys.Energy,

@@ -19,7 +19,7 @@ export const spellFrenzy: Partial<ISpell> = {
   magicWords: "kartal insanus",
   manaCost: 120,
   minLevelRequired: 15,
-  minMagicLevelRequired: 10,
+  minMagicLevelRequired: 12,
   cooldown: 60,
   animationKey: AnimationEffectKeys.QuickFire,
   characterClass: [CharacterClass.Berserker],

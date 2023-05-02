@@ -15,7 +15,7 @@ export const spellThunderRuneCreation: Partial<ISpell> = {
   magicWords: "iquar ansr runu",
   manaCost: 40,
   minLevelRequired: 6,
-  minMagicLevelRequired: 4,
+  minMagicLevelRequired: 8,
   cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
 

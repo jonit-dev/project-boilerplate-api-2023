@@ -13,7 +13,7 @@ export const spellDivineProtection: Partial<ISpell> = {
   magicWords: "divinum praesidium",
   manaCost: 40,
   minLevelRequired: 5,
-  minMagicLevelRequired: 8,
+  minMagicLevelRequired: 5,
   cooldown: 30,
   animationKey: AnimationEffectKeys.MagicShield,
   attribute: BasicAttribute.MagicResistance,

@@ -13,7 +13,7 @@ export const spellEagleEyes: Partial<ISpell> = {
   magicWords: "kartal leri",
   manaCost: 60,
   minLevelRequired: 8,
-  minMagicLevelRequired: 8,
+  minMagicLevelRequired: 7,
   cooldown: 10,
   animationKey: AnimationEffectKeys.ManaHeal,
   attribute: CombatSkill.Distance,

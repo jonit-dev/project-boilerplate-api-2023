@@ -18,7 +18,7 @@ export const spellArrowCreation: Partial<ISpell> = {
   magicWords: "iquar elandi",
   manaCost: 10,
   minLevelRequired: 2,
-  minMagicLevelRequired: 3,
+  minMagicLevelRequired: 2,
   cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
 

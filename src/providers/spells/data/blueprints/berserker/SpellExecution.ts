@@ -13,7 +13,7 @@ export const berserkerSpellExecution: Partial<ISpell> = {
   magicWords: "insania supplicium",
   manaCost: 150,
   minLevelRequired: 20,
-  minMagicLevelRequired: 8,
+  minMagicLevelRequired: 16,
   cooldown: 150,
   animationKey: AnimationEffectKeys.HitCorruption,
   projectileAnimationKey: AnimationEffectKeys.HitCorruption,

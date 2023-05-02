@@ -14,7 +14,7 @@ export const spellGreaterHealing: Partial<ISpell> = {
   magicWords: "greater faenya",
   manaCost: 30,
   minLevelRequired: 4,
-  minMagicLevelRequired: 1,
+  minMagicLevelRequired: 4,
   cooldown: 15,
   animationKey: AnimationEffectKeys.LifeHeal,
 

@@ -15,7 +15,7 @@ export const spellPoisonRuneCreation: Partial<ISpell> = {
   magicWords: "iquar ansr athil",
   manaCost: 40,
   minLevelRequired: 5,
-  minMagicLevelRequired: 3,
+  minMagicLevelRequired: 4,
   cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
 

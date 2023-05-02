@@ -13,7 +13,7 @@ export const spellQuickFire: Partial<ISpell> = {
   magicWords: "ieiunium iecit",
   manaCost: 150,
   minLevelRequired: 15,
-  minMagicLevelRequired: 10,
+  minMagicLevelRequired: 18,
   cooldown: 20,
   animationKey: AnimationEffectKeys.BlueWings,
   characterClass: [CharacterClass.Hunter],

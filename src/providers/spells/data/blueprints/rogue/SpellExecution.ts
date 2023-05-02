@@ -13,7 +13,7 @@ export const rogueSpellExecution: Partial<ISpell> = {
   magicWords: "supplicium furtim",
   manaCost: 100,
   minLevelRequired: 12,
-  minMagicLevelRequired: 8,
+  minMagicLevelRequired: 11,
   cooldown: 150,
   animationKey: AnimationEffectKeys.HitCorruption,
   projectileAnimationKey: AnimationEffectKeys.HitCorruption,

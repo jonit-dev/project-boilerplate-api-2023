@@ -13,7 +13,7 @@ export const spellManaShield: Partial<ISpell> = {
   magicWords: "mana scutum",
   manaCost: 50,
   minLevelRequired: 5,
-  minMagicLevelRequired: 10,
+  minMagicLevelRequired: 7,
   cooldown: 40,
   animationKey: AnimationEffectKeys.MagicShield,
   projectileAnimationKey: AnimationEffectKeys.Energy,

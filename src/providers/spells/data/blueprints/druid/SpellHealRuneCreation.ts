@@ -15,7 +15,7 @@ export const spellHealRuneCreation: Partial<ISpell> = {
   magicWords: "iquar ansr faenya",
   manaCost: 40,
   minLevelRequired: 4,
-  minMagicLevelRequired: 3,
+  minMagicLevelRequired: 6,
   cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Druid],

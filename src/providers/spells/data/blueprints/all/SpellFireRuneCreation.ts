@@ -15,7 +15,7 @@ export const spellFireRuneCreation: Partial<ISpell> = {
   magicWords: "iquar ansr maskan",
   manaCost: 40,
   minLevelRequired: 4,
-  minMagicLevelRequired: 3,
+  minMagicLevelRequired: 6,
   cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
 

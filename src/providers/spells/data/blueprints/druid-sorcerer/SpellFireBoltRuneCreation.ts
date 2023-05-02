@@ -15,7 +15,7 @@ export const spellFireBoltRuneCreation: Partial<ISpell> = {
   magicWords: "iquar kiran agni",
   manaCost: 40,
   minLevelRequired: 4,
-  minMagicLevelRequired: 3,
+  minMagicLevelRequired: 6,
   cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Druid, CharacterClass.Sorcerer],

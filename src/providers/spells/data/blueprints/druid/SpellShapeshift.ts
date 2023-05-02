@@ -14,7 +14,7 @@ export const spellShapeshift: Partial<ISpell> = {
   magicWords: "talas qabi",
   manaCost: 150,
   minLevelRequired: 10,
-  minMagicLevelRequired: 10,
+  minMagicLevelRequired: 15,
   cooldown: 15,
   animationKey: AnimationEffectKeys.ManaHeal,
   characterClass: [CharacterClass.Druid],

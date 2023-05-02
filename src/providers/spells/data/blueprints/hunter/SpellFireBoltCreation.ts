@@ -18,7 +18,7 @@ export const spellFireBoltCreation: Partial<ISpell> = {
   magicWords: "naur iquar lyn",
   manaCost: 25,
   minLevelRequired: 15,
-  minMagicLevelRequired: 7,
+  minMagicLevelRequired: 5,
   cooldown: 5,
   animationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Hunter],

@@ -13,7 +13,7 @@ export const spellBloodthirst: Partial<ISpell> = {
   magicWords: "sanguis sitis",
   manaCost: 70,
   minLevelRequired: 10,
-  minMagicLevelRequired: 5,
+  minMagicLevelRequired: 8,
   cooldown: 60,
   animationKey: AnimationEffectKeys.Holy,
   characterClass: [CharacterClass.Berserker],
