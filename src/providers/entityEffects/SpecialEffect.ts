@@ -1,8 +1,7 @@
-import { ICharacter, Character } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { provide } from "inversify-binding-decorators";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";

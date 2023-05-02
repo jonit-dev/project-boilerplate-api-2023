@@ -536,6 +536,18 @@ describe("SpellCast.ts", () => {
       expect(await specialEffect.isStun(targetCharacter)).toBeFalsy();
     });
 
+    it("should not be able stun itself", async () => {
+      const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
+      timerMock.mockImplementation();
+
+      const spell = { magicWords: "talas tamb-eth", targetId: testCharacter._id, targetType: EntityType.Character };
+      expect(await spellCast.castSpell(spell, testCharacter)).toBeFalsy();
+
+      expect(await specialEffect.isStun(targetCharacter)).toBeFalsy();
+
+      expect(timerMock).not.toHaveBeenCalled();
+    });
+
     it("should not execute spell in yourself", async () => {
       const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
       timerMock.mockImplementation();
