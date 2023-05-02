@@ -6,7 +6,7 @@ const marketplaceSchema = createLeanSchema(
     name: Type.string({
       required: true,
     }),
-    open: Type.boolean(),
+    open: Type.boolean({ default: true }),
     items: Type.array().of({
       key: Type.string({ required: true }),
       type: Type.string({ required: true }),

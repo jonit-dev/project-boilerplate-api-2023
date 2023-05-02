@@ -49,6 +49,7 @@ import {
   questRewardsMock,
 } from "./mock/questMock";
 import { userMock } from "./mock/userMock";
+import { IMarketplace, Marketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 
 export enum InteractionQuestSubtype {
   craft = "craft",
@@ -688,5 +689,13 @@ export class UnitTestHelper {
     await this.addItemsToContainer(parentContainer, 1, [bag], [availableSlot]);
 
     return bagCont!;
+  }
+
+  public async createMockMarketplace(items?: Partial<IItem>[]): Promise<IMarketplace> {
+    const mp = new Marketplace({
+      name: "TestMarketplace",
+      items,
+    });
+    return (await mp.save()) as IMarketplace;
   }
 }

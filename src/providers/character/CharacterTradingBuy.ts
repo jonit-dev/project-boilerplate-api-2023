@@ -175,13 +175,13 @@ export class CharacterTradingBuy {
     character: ICharacter,
     tradingEntity: INPC | IMarketplace,
     itemsToPurchase: ITradeRequestItem[],
-    tradingEntityType: "NPC" | "Marketplace"
+    tradingEntityType: TradingEntity
   ): Promise<boolean> {
     let isBaseTransactionValid = false;
     let priceModifier: number;
     let tradingItems: Partial<IItem>[] = [];
 
-    if (tradingEntityType === "NPC") {
+    if (tradingEntityType === TradingEntity.NPC) {
       priceModifier = TRADER_BUY_PRICE_MULTIPLIER;
       const entity = tradingEntity as INPC;
       isBaseTransactionValid = this.characterTradingValidation.validateTransactionWithNPC(
@@ -197,7 +197,8 @@ export class CharacterTradingBuy {
       isBaseTransactionValid = this.characterTradingValidation.validateTransaction(
         character,
         entity.items as unknown as Partial<IItem>[],
-        itemsToPurchase
+        itemsToPurchase,
+        tradingEntityType
       );
       tradingItems = entity.items as unknown as Partial<IItem>[];
     }

@@ -77,7 +77,7 @@ export class CharacterNetworkTrading {
   public onCharacterMarketplaceTrade(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      CharacterTradeSocketEvents.TradeWithMarketplace,
+      CharacterTradeSocketEvents.MarketplaceTradeInit,
       async (data: ICharacterMarketplaceTradeInit, character: ICharacter) => {
         const { marketplaceId, type } = data;
 

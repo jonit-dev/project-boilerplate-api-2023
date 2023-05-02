@@ -5,7 +5,7 @@ import { NPC_TRADER_INTERACTION_DISTANCE } from "@providers/constants/NPCConstan
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ITradeRequestItem } from "@rpg-engine/shared";
+import { ITradeRequestItem, TradingEntity } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterInventory } from "./CharacterInventory";
 import { CharacterValidation } from "./CharacterValidation";
@@ -60,7 +60,7 @@ export class CharacterTradingValidation {
     if (!mp || !mp.open) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
-        "Sorry, the NPC you're trying to trade with is not available."
+        "Sorry, the Marketplace you're trying to trade with is not available."
       );
       return;
     }
@@ -71,10 +71,11 @@ export class CharacterTradingValidation {
   public validateTransaction(
     character: ICharacter,
     tradingEntityItems: Partial<IItem>[],
-    items: ITradeRequestItem[]
+    items: ITradeRequestItem[],
+    entityType: TradingEntity
   ): boolean {
     if (!tradingEntityItems.length) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this NPC has no items for sale.");
+      this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, this ${entityType} has no items for sale.`);
       return false;
     }
     // validate if all item blueprints are valid
@@ -87,7 +88,12 @@ export class CharacterTradingValidation {
       return false;
     }
     // validate if all item blueprints are valid
-    return this.validateTransaction(character, npc.traderItems as unknown as Partial<IItem>[], items);
+    return this.validateTransaction(
+      character,
+      npc.traderItems as unknown as Partial<IItem>[],
+      items,
+      TradingEntity.NPC
+    );
   }
 
   public async validateSellTransaction(character: ICharacter, items: ITradeRequestItem[]): Promise<boolean> {
