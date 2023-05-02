@@ -32,7 +32,7 @@ describe("QuestSystem.ts", () => {
   const npcKey = FriendlyNPCsBlueprint.Alice;
   const objectivesCount = 2;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     questSystem = container.get<QuestSystem>(QuestSystem);
     characterItems = container.get<CharacterItems>(CharacterItems);
     releaseRewards = jest.spyOn(questSystem, "releaseRewards" as any);
