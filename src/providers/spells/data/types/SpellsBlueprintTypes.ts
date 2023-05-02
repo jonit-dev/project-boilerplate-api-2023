@@ -42,6 +42,7 @@ export enum SpellsBlueprint {
   HunterQuickFire = "hunter-quick-fire",
   BerserkerFrenzy = "berserker-frenzy",
   DruidShapeshift = "druid-shapeshift",
+  BerserkerRage = "berserker-rage",
 }
 
 export interface ISpell {
