@@ -6,16 +6,19 @@ import {
   ICharacterPermanentBuff,
   ICharacterTemporaryBuff,
 } from "@rpg-engine/shared";
-import { CharacterBuff } from "../CharacterBuff";
+import { CharacterBuffActivator } from "../CharacterBuffActivator";
+import { CharacterBuffTracker } from "../CharacterBuffTracker";
 
-describe("CharacterBuff", () => {
-  let characterBuff: CharacterBuff;
+describe("CharacterBuffActivator", () => {
+  let characterBuffActivator: CharacterBuffActivator;
   let testCharacter: ICharacter;
   let characterBuffCharacterAttributeSpy: jest.SpyInstance;
   let characterBuffSkillSpy: jest.SpyInstance;
+  let characterBuffTracker: CharacterBuffTracker;
 
   beforeAll(() => {
-    characterBuff = container.get(CharacterBuff);
+    characterBuffActivator = container.get(CharacterBuffActivator);
+    characterBuffTracker = container.get(CharacterBuffTracker);
 
     jest.useFakeTimers({
       advanceTimers: true,
@@ -26,10 +29,13 @@ describe("CharacterBuff", () => {
     testCharacter = await unitTestHelper.createMockCharacter(null, {
       hasSkills: true,
     });
+    characterBuffCharacterAttributeSpy = jest.spyOn(
+      // @ts-ignore
+      characterBuffActivator.characterBuffCharacterAttribute,
+      "enableBuff"
+    );
     // @ts-ignore
-    characterBuffCharacterAttributeSpy = jest.spyOn(characterBuff.characterBuffCharacterAttribute, "enableBuff");
-    // @ts-ignore
-    characterBuffSkillSpy = jest.spyOn(characterBuff.characterBuffSkill, "enableBuff");
+    characterBuffSkillSpy = jest.spyOn(characterBuffActivator.characterBuffSkill, "enableBuff");
   });
 
   afterEach(() => {
@@ -47,7 +53,7 @@ describe("CharacterBuff", () => {
       durationType: "temporary",
     } as ICharacterTemporaryBuff;
 
-    const buffId = await characterBuff.enableTemporaryBuff(testCharacter, buff);
+    const buffId = await characterBuffActivator.enableTemporaryBuff(testCharacter, buff);
 
     // Add assertions to check if the buff has been applied correctly
 
@@ -66,7 +72,7 @@ describe("CharacterBuff", () => {
       durationType: "temporary",
     } as ICharacterTemporaryBuff;
 
-    const buffId = await characterBuff.enableTemporaryBuff(testCharacter, buff);
+    const buffId = await characterBuffActivator.enableTemporaryBuff(testCharacter, buff);
 
     expect(buffId).toBeDefined();
     expect(characterBuffSkillSpy).toHaveBeenCalledTimes(1);
@@ -81,12 +87,16 @@ describe("CharacterBuff", () => {
       durationType: "permanent",
     } as ICharacterPermanentBuff;
 
-    const buffId = await characterBuff.enablePermanentBuff(testCharacter, buff);
+    const enabledBuff = await characterBuffActivator.enablePermanentBuff(testCharacter, buff);
 
     expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledTimes(1);
     expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledWith(testCharacter, buff);
 
-    const disableResult = await characterBuff.disableBuff(testCharacter, buffId, buff.type);
+    if (!enabledBuff) {
+      throw new Error("Buff ID is undefined");
+    }
+
+    const disableResult = await characterBuffActivator.disableBuff(testCharacter, enabledBuff._id!, buff.type);
 
     expect(disableResult).toBeTruthy();
   });
@@ -99,9 +109,13 @@ describe("CharacterBuff", () => {
       durationType: "permanent",
     } as ICharacterPermanentBuff;
 
-    const buffId = await characterBuff.enablePermanentBuff(testCharacter, buff);
+    const enabledBuff = await characterBuffActivator.enablePermanentBuff(testCharacter, buff);
 
-    const disableResult = await characterBuff.disableBuff(testCharacter, buffId, buff.type);
+    if (!enabledBuff) {
+      throw new Error("Buff ID is undefined");
+    }
+
+    const disableResult = await characterBuffActivator.disableBuff(testCharacter, enabledBuff._id!, buff.type);
 
     expect(disableResult).toBeTruthy();
   });
@@ -115,7 +129,11 @@ describe("CharacterBuff", () => {
       durationType: "temporary",
     } as ICharacterTemporaryBuff;
 
-    const buffId = await characterBuff.enableTemporaryBuff(testCharacter, buff);
+    const enabledBuff = await characterBuffActivator.enableTemporaryBuff(testCharacter, buff);
+
+    if (!enabledBuff) {
+      throw new Error("Buff ID is undefined");
+    }
 
     // Add assertions to check if the buff has been applied correctly
 
@@ -126,8 +144,12 @@ describe("CharacterBuff", () => {
 
     // Add assertions to check if the buff has been removed correctly
 
-    const disableResult = await characterBuff.disableBuff(testCharacter, buffId, buff.type);
+    const disableResult = await characterBuffActivator.disableBuff(testCharacter, enabledBuff._id!, buff.type);
 
     expect(disableResult).toBeTruthy();
+
+    const buffExists = await characterBuffTracker.getBuff(testCharacter, enabledBuff._id!);
+
+    expect(buffExists).toBeFalsy();
   });
 });

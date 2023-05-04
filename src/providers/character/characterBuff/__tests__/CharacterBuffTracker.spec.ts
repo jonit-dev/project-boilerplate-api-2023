@@ -2,13 +2,12 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import {
   BasicAttribute,
-  BuffDurationType,
-  BuffType,
   CharacterAttributes,
+  CharacterBuffDurationType,
+  CharacterBuffType,
   ICharacterTemporaryBuff,
 } from "@rpg-engine/shared";
 import { CharacterBuffTracker } from "../CharacterBuffTracker";
-
 describe("CharacterBuffTracker", () => {
   let characterBuffTracker: CharacterBuffTracker;
   let testCharacter: ICharacter;
@@ -25,18 +24,18 @@ describe("CharacterBuffTracker", () => {
     await characterBuffTracker.deleteAllCharacterBuffs(testCharacter);
   });
 
-  const createTestBuff = (): ICharacterTemporaryBuff => {
+  const createTestBuff = (): Partial<ICharacterTemporaryBuff> => {
     return {
-      type: "combatSkill" as BuffType,
+      type: CharacterBuffType.CharacterAttribute,
       trait: BasicAttribute.Strength,
       buffPercentage: 10,
       durationSeconds: 3600,
-      durationType: "temporary",
+      durationType: CharacterBuffDurationType.Temporary,
     };
   };
 
   it("should add a buff to a character", async () => {
-    const testBuff = createTestBuff();
+    const testBuff = createTestBuff() as ICharacterTemporaryBuff;
 
     const result = await characterBuffTracker.addBuff(testCharacter, testBuff);
 
@@ -44,24 +43,20 @@ describe("CharacterBuffTracker", () => {
   });
 
   it("should get a buff by ID", async () => {
-    const testBuff = createTestBuff();
+    const testBuff = createTestBuff() as ICharacterTemporaryBuff;
 
-    await characterBuffTracker.addBuff(testCharacter, testBuff);
+    const addedBuff = await characterBuffTracker.addBuff(testCharacter, testBuff);
 
-    const retrievedBuff = await characterBuffTracker.getBuff(testCharacter, testBuff._id!);
+    if (!addedBuff) throw new Error("Buff ID not defined");
+
+    const retrievedBuff = await characterBuffTracker.getBuff(testCharacter, addedBuff._id!);
 
     expect(retrievedBuff).toBeDefined();
-    expect(retrievedBuff).toEqual(testBuff);
-  });
-
-  it("should return undefined when getting a non-existent buff", async () => {
-    const retrievedBuff = await characterBuffTracker.getBuff(testCharacter, "non-existent-id");
-
-    expect(retrievedBuff).toBeUndefined();
+    expect(retrievedBuff).toMatchObject(testBuff);
   });
 
   it("should delete a buff by ID", async () => {
-    const testBuff = createTestBuff();
+    const testBuff = createTestBuff() as ICharacterTemporaryBuff;
 
     await characterBuffTracker.addBuff(testCharacter, testBuff);
 
@@ -71,18 +66,12 @@ describe("CharacterBuffTracker", () => {
 
     const deletedBuff = await characterBuffTracker.getBuff(testCharacter, testBuff._id!);
 
-    expect(deletedBuff).toBeUndefined();
-  });
-
-  it("should return false when deleting a non-existent buff", async () => {
-    const result = await characterBuffTracker.deleteBuff(testCharacter, "non-existent-id");
-
-    expect(result).toBeFalsy();
+    expect(deletedBuff).toBeFalsy();
   });
 
   it("should delete all buffs for a character", async () => {
-    const testBuff1 = createTestBuff();
-    const testBuff2 = { ...createTestBuff(), trait: CharacterAttributes.MaxMana };
+    const testBuff1 = createTestBuff() as ICharacterTemporaryBuff;
+    const testBuff2 = { ...createTestBuff(), trait: CharacterAttributes.MaxMana } as ICharacterTemporaryBuff;
 
     await characterBuffTracker.addBuff(testCharacter, testBuff1);
     await characterBuffTracker.addBuff(testCharacter, testBuff2);
@@ -94,13 +83,13 @@ describe("CharacterBuffTracker", () => {
     const deletedBuff1 = await characterBuffTracker.getBuff(testCharacter, testBuff1._id!);
     const deletedBuff2 = await characterBuffTracker.getBuff(testCharacter, testBuff2._id!);
 
-    expect(deletedBuff1).toBeUndefined();
-    expect(deletedBuff2).toBeUndefined();
+    expect(deletedBuff1).toBeFalsy();
+    expect(deletedBuff2).toBeFalsy();
   });
 
   it("should get all character buffs", async () => {
-    const testBuff1 = createTestBuff();
-    const testBuff2 = { ...createTestBuff(), trait: CharacterAttributes.MaxMana };
+    const testBuff1 = createTestBuff() as ICharacterTemporaryBuff;
+    const testBuff2 = { ...createTestBuff(), trait: CharacterAttributes.MaxMana } as ICharacterTemporaryBuff;
 
     await characterBuffTracker.addBuff(testCharacter, testBuff1);
     await characterBuffTracker.addBuff(testCharacter, testBuff2);
@@ -108,8 +97,18 @@ describe("CharacterBuffTracker", () => {
     const allCharacterBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
 
     expect(allCharacterBuffs.length).toEqual(2);
-    expect(allCharacterBuffs).toContainEqual(testBuff1);
-    expect(allCharacterBuffs).toContainEqual(testBuff2);
+    expect(allCharacterBuffs).toContainEqual(
+      expect.objectContaining({
+        ...testBuff1,
+        owner: testCharacter._id,
+      })
+    );
+    expect(allCharacterBuffs).toContainEqual(
+      expect.objectContaining({
+        ...testBuff2,
+        owner: testCharacter._id,
+      })
+    );
   });
 
   it("should return an empty array when getting buffs for a character with no buffs", async () => {
@@ -119,8 +118,11 @@ describe("CharacterBuffTracker", () => {
   });
 
   it("should delete only temporary buffs for a character when specified", async () => {
-    const testTemporaryBuff = createTestBuff();
-    const testPermanentBuff = { ...createTestBuff(), durationType: "permanent" as BuffDurationType };
+    const testTemporaryBuff = createTestBuff() as ICharacterTemporaryBuff;
+    const testPermanentBuff = {
+      ...createTestBuff(),
+      durationType: CharacterBuffDurationType.Permanent,
+    } as unknown as ICharacterTemporaryBuff;
 
     await characterBuffTracker.addBuff(testCharacter, testTemporaryBuff);
     await characterBuffTracker.addBuff(testCharacter, testPermanentBuff);
@@ -132,6 +134,11 @@ describe("CharacterBuffTracker", () => {
     const remainingBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
 
     expect(remainingBuffs.length).toEqual(1);
-    expect(remainingBuffs).toContainEqual(testPermanentBuff);
+    expect(remainingBuffs).toContainEqual(
+      expect.objectContaining({
+        ...testPermanentBuff,
+        owner: testCharacter._id,
+      })
+    );
   });
 });

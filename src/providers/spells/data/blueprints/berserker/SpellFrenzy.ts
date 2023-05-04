@@ -1,11 +1,13 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { CharacterBuff } from "@providers/character/characterBuff/CharacterBuff";
+import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { container } from "@providers/inversify/container";
 import {
   AnimationEffectKeys,
   BasicAttribute,
   CharacterAttributes,
+  CharacterBuffDurationType,
+  CharacterBuffType,
   CharacterClass,
   SpellCastingType,
 } from "@rpg-engine/shared";
@@ -25,7 +27,7 @@ export const spellFrenzy: Partial<ISpell> = {
   characterClass: [CharacterClass.Berserker],
 
   usableEffect: async (character: ICharacter) => {
-    const characterBuff = container.get(CharacterBuff);
+    const characterBuffActivator = container.get(CharacterBuffActivator);
 
     const skills = (await Skill.findById(character.skills).lean().select("strength dexterity")) as ISkill;
 
@@ -35,12 +37,12 @@ export const spellFrenzy: Partial<ISpell> = {
     const timeoutWeightedAverage = characterStrength * 0.6 + characterDexterity * 0.4;
     const timeout = Math.min(Math.max(timeoutWeightedAverage * 2, 20), 120);
 
-    await characterBuff.enableTemporaryBuff(character, {
-      type: "characterAttribute",
+    await characterBuffActivator.enableTemporaryBuff(character, {
+      type: CharacterBuffType.CharacterAttribute,
       trait: CharacterAttributes.AttackIntervalSpeed,
       buffPercentage: -30, // reduce attack interval speed by 30%
       durationSeconds: timeout,
-      durationType: "temporary",
+      durationType: CharacterBuffDurationType.Temporary,
       options: {
         messages: {
           activation:
@@ -50,12 +52,12 @@ export const spellFrenzy: Partial<ISpell> = {
       },
     });
 
-    await characterBuff.enableTemporaryBuff(character, {
-      type: "skill",
+    await characterBuffActivator.enableTemporaryBuff(character, {
+      type: CharacterBuffType.Skill,
       trait: BasicAttribute.Resistance,
       buffPercentage: -50, // reduce resistance by 50%
       durationSeconds: timeout,
-      durationType: "temporary",
+      durationType: CharacterBuffDurationType.Temporary,
       options: {
         messages: {
           skipAllMessages: true,

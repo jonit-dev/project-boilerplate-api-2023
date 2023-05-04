@@ -6,6 +6,12 @@ import { provide } from "inversify-binding-decorators";
 
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
+export interface IBuffValueCalculations {
+  baseTraitValue: number;
+  buffAbsoluteChange: number;
+  updatedTraitValue: number;
+}
+
 @provide(CharacterBuffAttribute)
 export class CharacterBuffAttribute {
   constructor(
@@ -14,32 +20,32 @@ export class CharacterBuffAttribute {
     private textFormatter: TextFormatter
   ) {}
 
-  public async enableBuff(character: ICharacter, buff: ICharacterBuff): Promise<string> {
-    // change character model attribute, based on specific trait
+  public async enableBuff(character: ICharacter, buff: ICharacterBuff): Promise<ICharacterBuff> {
+    const { buffAbsoluteChange, updatedTraitValue } = await this.performBuffValueCalculations(character, buff);
 
-    const prevTraitValue = character[buff.trait] as number;
-
-    const updatedTraitValue = prevTraitValue + prevTraitValue * (buff.buffPercentage / 100);
-
-    // save model
-
-    await Character.updateOne({ _id: character._id }, { [buff.trait]: updatedTraitValue });
+    // Save the absolute change in the buff object
+    buff.absoluteChange = Number(buffAbsoluteChange.toFixed(2));
 
     // then register the buff on redis (so we can rollback when needed)
 
-    const buffId = await this.characterBuffTracker.addBuff(character, {
-      ...buff,
-      prevTraitValue,
-    });
+    const addedBuff = await this.characterBuffTracker.addBuff(character, buff);
 
-    if (!buffId) {
+    if (!addedBuff) {
       throw new Error("Could not add buff to character");
     }
 
-    // inform and send update to client
-    await this.sendUpdateToClient(character, buff, updatedTraitValue);
+    // finally, update on the model
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        [buff.trait]: updatedTraitValue,
+      }
+    );
 
-    return buffId;
+    // inform and send update to client
+    this.sendUpdateToClient(character, buff, updatedTraitValue);
+
+    return addedBuff;
   }
 
   public async disableBuff(character: ICharacter, buffId: string): Promise<boolean> {
@@ -50,17 +56,26 @@ export class CharacterBuffAttribute {
       return false;
     }
 
-    const prevTraitValue = buff.prevTraitValue as number;
+    const currentBuffValue = character[buff.trait];
 
-    character[buff.trait] = prevTraitValue;
+    const debuffValue = buff.absoluteChange!;
 
-    // save model
-
-    await Character.updateOne({ _id: character._id }, { [buff.trait]: prevTraitValue });
+    const updatedTraitValue = Number((currentBuffValue - debuffValue).toFixed(2));
 
     // then delete the buff from redis
 
-    await this.characterBuffTracker.deleteBuff(character, buff._id!);
+    const hasDeletedBuff = await this.characterBuffTracker.deleteBuff(character, buff._id!);
+
+    if (!hasDeletedBuff) {
+      throw new Error("Could not delete buff from character");
+    }
+
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        [buff.trait]: updatedTraitValue,
+      }
+    );
 
     if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.skipDeactivationMessage) {
       this.socketMessaging.sendMessageToCharacter(
@@ -71,9 +86,37 @@ export class CharacterBuffAttribute {
     }
 
     // inform and send update to client
-    this.sendUpdateToClient(character, buff, prevTraitValue);
+    this.sendUpdateToClient(character, buff, updatedTraitValue);
 
     return true;
+  }
+
+  private async performBuffValueCalculations(
+    character: ICharacter,
+    buff: ICharacterBuff
+  ): Promise<IBuffValueCalculations> {
+    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(character, buff.trait);
+
+    const updatedCharacter = (await Character.findById(character._id).lean()) as ICharacter;
+
+    if (!updatedCharacter) {
+      throw new Error("Character not found");
+    }
+
+    const baseTraitValue = Number((updatedCharacter[buff.trait] - totalTraitSummedBuffs).toFixed(2));
+
+    // Calculate the new buffed value by applying the percentage buff on the BASE VALUE (additive buff!)
+    const updatedTraitValue =
+      Number((baseTraitValue * (1 + buff.buffPercentage / 100)).toFixed(2)) + totalTraitSummedBuffs;
+
+    // Calculate the absolute change of the new buff
+    const buffAbsoluteChange = Number((updatedTraitValue - baseTraitValue).toFixed(2)) - totalTraitSummedBuffs;
+
+    return {
+      baseTraitValue,
+      buffAbsoluteChange,
+      updatedTraitValue,
+    };
   }
 
   private sendUpdateToClient(character: ICharacter, buff: ICharacterBuff, updatedTraitValue: number): void {

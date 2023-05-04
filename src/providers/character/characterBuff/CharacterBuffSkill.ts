@@ -6,6 +6,7 @@ import { TextFormatter } from "@providers/text/TextFormatter";
 import { ICharacterBuff, SkillSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
+import { IBuffValueCalculations } from "./CharacterBuffAttribute";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
 interface ISkillDetail {
@@ -24,17 +25,15 @@ export class CharacterBuffSkill {
     private textFormatter: TextFormatter
   ) {}
 
-  public async enableBuff(character: ICharacter, buff: ICharacterBuff): Promise<string> {
+  public async enableBuff(character: ICharacter, buff: ICharacterBuff): Promise<ICharacterBuff> {
     const skill = await Skill.findById(character.skills);
 
     if (!skill) {
       throw new Error("Skill not found");
     }
+    const skilDetails = skill[buff.trait] as ISkillDetail;
 
-    const prevSkill = skill[buff.trait] as ISkillDetail;
-    const prevSkillLevel = prevSkill.level;
-
-    const updatedSkillLevel = Math.round(prevSkillLevel + prevSkillLevel * (buff.buffPercentage / 100));
+    const { buffAbsoluteChange, updatedTraitValue } = await this.performBuffValueCalculations(character, buff);
 
     // save model
 
@@ -42,25 +41,25 @@ export class CharacterBuffSkill {
       { _id: skill._id },
       {
         [buff.trait]: {
-          ...prevSkill,
-          level: updatedSkillLevel,
+          ...skilDetails,
+          level: updatedTraitValue.toFixed(2),
         },
       }
     );
 
     // then register the buff on redis (so we can rollback when needed)
 
-    buff.prevTraitValue = prevSkillLevel;
+    buff.absoluteChange = buffAbsoluteChange;
 
-    const buffId = await this.characterBuffTracker.addBuff(character, buff);
+    const addedBuff = (await this.characterBuffTracker.addBuff(character, buff)) as ICharacterBuff;
 
-    if (!buffId) {
+    if (!addedBuff) {
       throw new Error("Could not add buff to character");
     }
 
     await this.sendUpdateToClient(character, buff);
 
-    return buffId;
+    return addedBuff;
   }
 
   public async disableBuff(character: ICharacter, buffId: string): Promise<boolean> {
@@ -79,7 +78,19 @@ export class CharacterBuffSkill {
 
     const skillDetails = skills[buff.trait] as ISkillDetail;
 
-    const prevTraitValue = buff.prevTraitValue as number;
+    const currentBuffValue = skillDetails.level;
+
+    const debuffValue = buff.absoluteChange!;
+
+    const updatedTraitValue = Number((currentBuffValue - debuffValue).toFixed(2));
+
+    // then delete the buff from redis
+
+    const hasDeletedBuff = await this.characterBuffTracker.deleteBuff(character, buff._id!);
+
+    if (!hasDeletedBuff) {
+      throw new Error("Could not delete buff from character");
+    }
 
     // save previous skill level on model
     await Skill.updateOne(
@@ -87,14 +98,10 @@ export class CharacterBuffSkill {
       {
         [buff.trait]: {
           ...skillDetails,
-          level: prevTraitValue,
+          level: updatedTraitValue,
         },
       }
     );
-
-    // then delete the buff from redis
-
-    await this.characterBuffTracker.deleteBuff(character, buff._id!);
 
     if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.activation) {
       this.socketMessaging.sendMessageToCharacter(
@@ -106,7 +113,41 @@ export class CharacterBuffSkill {
       );
     }
 
+    await this.sendUpdateToClient(character, buff);
+
     return true;
+  }
+
+  private async performBuffValueCalculations(
+    character: ICharacter,
+    buff: ICharacterBuff
+  ): Promise<IBuffValueCalculations> {
+    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(character, buff.trait);
+
+    const updatedSkills = (await Skill.findOne({
+      owner: character._id,
+    }).lean()) as ICharacter;
+
+    if (!updatedSkills) {
+      throw new Error("Character not found");
+    }
+
+    const skillDetails = updatedSkills[buff.trait] as ISkillDetail;
+
+    const baseTraitValue = Number((skillDetails.level - totalTraitSummedBuffs).toFixed(2));
+
+    // Calculate the new buffed value by applying the percentage buff on the BASE VALUE (additive buff!)
+    const updatedTraitValue =
+      Number((baseTraitValue * (1 + buff.buffPercentage / 100)).toFixed(2)) + totalTraitSummedBuffs;
+
+    // Calculate the absolute change of the new buff
+    const buffAbsoluteChange = Number((updatedTraitValue - baseTraitValue).toFixed(2)) - totalTraitSummedBuffs;
+
+    return {
+      baseTraitValue,
+      buffAbsoluteChange,
+      updatedTraitValue,
+    };
   }
 
   private async sendUpdateToClient(character: ICharacter, buff: ICharacterBuff): Promise<void> {

@@ -1,8 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { CharacterBuff } from "@providers/character/characterBuff/CharacterBuff";
+import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, CharacterAttributes, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  CharacterAttributes,
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  CharacterClass,
+  SpellCastingType,
+} from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellQuickFire: Partial<ISpell> = {
@@ -20,17 +27,17 @@ export const spellQuickFire: Partial<ISpell> = {
   attribute: CharacterAttributes.AttackIntervalSpeed,
 
   usableEffect: async (character: ICharacter) => {
-    const characterBuff = container.get(CharacterBuff);
+    const characterBuffActivator = container.get(CharacterBuffActivator);
     const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
     const timeout = Math.min(Math.max(skills.dexterity.level * 8, 20), 120);
 
-    await characterBuff.enableTemporaryBuff(character, {
-      type: "characterAttribute",
+    await characterBuffActivator.enableTemporaryBuff(character, {
+      type: CharacterBuffType.CharacterAttribute,
       trait: CharacterAttributes.AttackIntervalSpeed,
       buffPercentage: 35,
       durationSeconds: timeout,
-      durationType: "temporary",
+      durationType: CharacterBuffDurationType.Temporary,
     });
   },
 };

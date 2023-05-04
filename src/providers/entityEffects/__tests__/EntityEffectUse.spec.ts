@@ -168,15 +168,15 @@ describe("EntityEffectUse.ts", () => {
     });
 
     //! Flaky test
-    // it("should not call applyEntityEffects when attacker attack type Melee and no entity effects", async () => {
-    //   testAttacker.entityEffects = [];
-    //   testAttacker.attackType = EntityAttackType.Melee;
-    //   await testAttacker.save();
+    it("should not call applyEntityEffects when attacker attack type Melee and no entity effects", async () => {
+      testAttacker.entityEffects = [];
+      testAttacker.attackType = EntityAttackType.Melee;
+      await testAttacker.save();
 
-    //   await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
+      await entityEffectUse.applyEntityEffects(testTarget, testAttacker);
 
-    //   expect(entityEffectSpy).not.toHaveBeenCalled();
-    // });
+      expect(entityEffectSpy).not.toHaveBeenCalled();
+    });
     it("should not call applyEntityEffects when attacker attack type is Ranged and entity effects attack type Melee", async () => {
       testAttacker.entityEffects = [EntityEffectBlueprint.Poison];
       testAttacker.attackType = EntityAttackType.Ranged;

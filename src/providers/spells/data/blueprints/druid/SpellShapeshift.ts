@@ -1,8 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { CharacterBuff } from "@providers/character/characterBuff/CharacterBuff";
+import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, BasicAttribute, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  BasicAttribute,
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  CharacterClass,
+  SpellCastingType,
+} from "@rpg-engine/shared";
 import { DruidSpells } from "../../logic/berserker/DruidSpells";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
@@ -21,7 +28,7 @@ export const spellShapeshift: Partial<ISpell> = {
 
   usableEffect: async (character: ICharacter) => {
     const druidSpells = container.get(DruidSpells);
-    const characterBuff = container.get(CharacterBuff);
+    const characterBuffActivator = container.get(CharacterBuffActivator);
 
     const skills = (await Skill.findById(character.skills).lean().select("magic strength resistance")) as ISkill;
 
@@ -31,20 +38,20 @@ export const spellShapeshift: Partial<ISpell> = {
 
     await druidSpells.handleShapeShift(character, "brown-bear", timeoutInSecs);
 
-    await characterBuff.enableTemporaryBuff(character, {
-      type: "skill",
+    await characterBuffActivator.enableTemporaryBuff(character, {
+      type: CharacterBuffType.Skill,
       trait: BasicAttribute.Strength,
       buffPercentage: strengthPercent,
       durationSeconds: timeoutInSecs,
-      durationType: "temporary",
+      durationType: CharacterBuffDurationType.Temporary,
     });
 
-    await characterBuff.enableTemporaryBuff(character, {
-      type: "skill",
+    await characterBuffActivator.enableTemporaryBuff(character, {
+      type: CharacterBuffType.Skill,
       trait: BasicAttribute.Resistance,
       buffPercentage: resistancePercent,
       durationSeconds: timeoutInSecs,
-      durationType: "temporary",
+      durationType: CharacterBuffDurationType.Temporary,
     });
   },
 };

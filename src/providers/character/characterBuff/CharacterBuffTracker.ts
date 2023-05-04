@@ -1,56 +1,44 @@
+import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
-import { ICharacterBuff, ICharacterItemBuff } from "@rpg-engine/shared";
+import { CharacterBuffDurationType, CharacterTrait, ICharacterBuff, ICharacterItemBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { v4 as uuidv4 } from "uuid";
-
 interface ICharacterBuffDeleteOptions {
   deleteTemporaryOnly?: boolean;
 }
 
 @provide(CharacterBuffTracker)
 export class CharacterBuffTracker {
-  constructor(private inMemoryHashTable: InMemoryHashTable) {}
-
-  public async addBuff(character: ICharacter, buff: ICharacterBuff): Promise<string | undefined> {
-    const newBuffId = uuidv4();
-
-    buff._id = newBuffId;
-
+  public async addBuff(character: ICharacter, buff: ICharacterBuff): Promise<ICharacterBuff | undefined> {
     try {
-      const currentBuffs = (await this.inMemoryHashTable.get("character-buffs", character._id)) as ICharacterBuff[];
+      const newCharacterBuff = new CharacterBuff({
+        owner: character._id,
+        ...buff,
+      });
 
-      if (!currentBuffs) {
-        await this.inMemoryHashTable.set("character-buffs", character._id, [buff]);
-        return buff._id;
-      }
+      await newCharacterBuff.save();
 
-      await this.inMemoryHashTable.set("character-buffs", character._id, [...currentBuffs, buff]);
-
-      return buff._id;
+      return newCharacterBuff as ICharacterBuff;
     } catch (error) {
       console.error(error);
     }
   }
 
   public async getAllCharacterBuffs(character: ICharacter): Promise<ICharacterBuff[]> {
-    const currentBuffs = (await this.inMemoryHashTable.get("character-buffs", character._id)) as ICharacterBuff[];
+    const allCharacterBuffs = (await CharacterBuff.find({ owner: character._id }).lean()) as ICharacterBuff[];
 
-    if (!currentBuffs) {
-      return [];
-    }
-
-    return currentBuffs;
+    return allCharacterBuffs;
   }
 
-  public async getBuff(character: ICharacter, buffId: string): Promise<ICharacterBuff | undefined> {
-    const currentBuffs = (await this.inMemoryHashTable.get("character-buffs", character._id)) as ICharacterBuff[];
+  public async getAllBuffAbsoluteChanges(character: ICharacter, trait: CharacterTrait): Promise<number> {
+    const characterBuffs = await this.getAllCharacterBuffs(character);
 
-    if (!currentBuffs) {
-      return undefined;
+    const buffs = characterBuffs.filter((buff) => buff.trait === trait);
+
+    if (!buffs) {
+      return 0;
     }
 
-    return currentBuffs.find((buff) => buff._id === buffId);
+    return buffs.reduce((acc, buff) => acc + buff.absoluteChange!, 0);
   }
 
   public async getBuffByItemId(character: ICharacter, itemId: string): Promise<ICharacterItemBuff | undefined> {
@@ -62,28 +50,20 @@ export class CharacterBuffTracker {
   }
 
   public async getBuffByItemKey(character: ICharacter, itemKey: string): Promise<ICharacterItemBuff | undefined> {
-    const currentBuffs = (await this.inMemoryHashTable.get("character-buffs", character._id)) as ICharacterItemBuff[];
+    const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey }).lean()) as ICharacterItemBuff;
 
-    if (!currentBuffs) {
-      return undefined;
-    }
+    return buff;
+  }
 
-    const buff = currentBuffs.find((buff) => String(buff?.itemKey) === String(itemKey));
+  public async getBuff(character: ICharacter, buffId: string): Promise<ICharacterBuff | undefined> {
+    const buff = (await CharacterBuff.findOne({ _id: buffId, owner: character._id }).lean()) as ICharacterBuff;
 
     return buff;
   }
 
   public async deleteBuff(character: ICharacter, buffId: string): Promise<boolean> {
     try {
-      const currentBuffs = (await this.inMemoryHashTable.get("character-buffs", character._id)) as ICharacterBuff[];
-
-      if (!currentBuffs) {
-        return false;
-      }
-
-      const updatedBuffs = currentBuffs.filter((buff) => buff._id !== buffId);
-
-      await this.inMemoryHashTable.set("character-buffs", character._id, updatedBuffs);
+      await CharacterBuff.deleteOne({ _id: buffId, owner: character._id });
 
       return true;
     } catch (error) {
@@ -96,16 +76,13 @@ export class CharacterBuffTracker {
   public async deleteAllCharacterBuffs(character: ICharacter, options?: ICharacterBuffDeleteOptions): Promise<boolean> {
     try {
       if (options?.deleteTemporaryOnly) {
-        const characterBuffs = await this.getAllCharacterBuffs(character);
-
-        const updatedBuffs = characterBuffs.filter((buff) => buff.durationType !== "temporary");
-
-        await this.inMemoryHashTable.set("character-buffs", character._id, updatedBuffs);
+        await CharacterBuff.deleteMany({
+          owner: character._id,
+          durationType: CharacterBuffDurationType.Temporary,
+        });
 
         return true;
       }
-
-      await this.inMemoryHashTable.delete("character-buffs", character._id);
 
       return true;
     } catch (error) {

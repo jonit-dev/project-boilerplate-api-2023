@@ -18,7 +18,7 @@ import { Types } from "mongoose";
 import { CharacterInventory } from "../CharacterInventory";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
-import { CharacterBuff } from "../characterBuff/CharacterBuff";
+import { CharacterBuffActivator } from "../characterBuff/CharacterBuffActivator";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 import { CharacterItems } from "../characterItems/CharacterItems";
 
@@ -39,7 +39,7 @@ export class CharacterNetworkLogout {
     private characterMonitor: CharacterMonitor,
     private specialEffect: SpecialEffect,
     private spellCooldown: SpellCooldown,
-    private characterBuff: CharacterBuff
+    private characterBuff: CharacterBuffActivator
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {

@@ -3,12 +3,12 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data";
 import { ICharacterItemBuff, IEquippableItemBlueprint } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterBuff } from "./CharacterBuff";
+import { CharacterBuffActivator } from "./CharacterBuffActivator";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
 @provide(CharacterItemBuff)
 export class CharacterItemBuff {
-  constructor(private characterBuff: CharacterBuff, private characterBuffTracker: CharacterBuffTracker) {}
+  constructor(private characterBuff: CharacterBuffActivator, private characterBuffTracker: CharacterBuffTracker) {}
 
   public async enableItemBuff(character: ICharacter, item: IItem): Promise<void> {
     const itemBlueprint = itemsBlueprintIndex[item.key] as IEquippableItemBlueprint;
