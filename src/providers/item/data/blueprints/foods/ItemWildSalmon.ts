@@ -22,4 +22,5 @@ export const itemWildSalmon: IConsumableItemBlueprint = {
 
     itemUsableEffect.applyEatingEffect(character, 5);
   },
+  usableEffectDescription: "Restores 5 HP and Mana 5 times",
 };

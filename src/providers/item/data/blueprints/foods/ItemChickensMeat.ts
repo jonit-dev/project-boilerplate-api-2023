@@ -23,4 +23,5 @@ export const itemChickensMeat: IConsumableItemBlueprint = {
 
     itemUsableEffect.applyEatingEffect(character, 13);
   },
+  usableEffectDescription: "Restores 13 HP and Mana 5 times",
 };

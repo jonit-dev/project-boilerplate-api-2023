@@ -25,4 +25,5 @@ export const itemLightManaPotion: IConsumableItemBlueprint = {
 
     itemUsableEffect.apply(character, EffectableAttribute.Mana, characterManaPercentage);
   },
+  usableEffectDescription: "Restores 5% of Mana",
 };

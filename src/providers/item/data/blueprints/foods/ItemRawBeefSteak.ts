@@ -33,4 +33,5 @@ export const itemRawBeefSteak: IConsumableItemBlueprint = {
 
     itemUsableEffect.applyEatingEffect(character, -2);
   },
+  usableEffectDescription: "Poisons 2 HP and Mana 5 times",
 };

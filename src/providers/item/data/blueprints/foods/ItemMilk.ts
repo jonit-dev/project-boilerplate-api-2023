@@ -23,4 +23,5 @@ export const itemMilk: IConsumableItemBlueprint = {
 
     itemUsableEffect.applyEatingEffect(character, 14);
   },
+  usableEffectDescription: "Restores 14 HP and Mana 5 times",
 };

@@ -69,4 +69,5 @@ export const itemCarpentersAxe: IToolItemBlueprint = {
       skillIncrease
     );
   },
+  usableEffectDescription: "Use it on a tree to cut it",
 };

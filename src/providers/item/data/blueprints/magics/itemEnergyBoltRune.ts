@@ -42,4 +42,5 @@ export const itemEnergyBoltRune: IRuneItemBlueprint = {
 
     return points;
   },
+  usableEffectDescription: "Deals energy damage to the target",
 };

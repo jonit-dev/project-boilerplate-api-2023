@@ -22,4 +22,5 @@ export const itemLightAntidote: IConsumableItemBlueprint = {
     // cure poison effect
     await entityEffectUse.clearEntityEffect(EntityEffectBlueprint.Poison, character);
   },
+  usableEffectDescription: "Cures poison effect",
 };

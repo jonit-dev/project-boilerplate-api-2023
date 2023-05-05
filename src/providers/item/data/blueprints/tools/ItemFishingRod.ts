@@ -89,4 +89,5 @@ export const itemFishingRod: IToolItemBlueprint = {
       skillIncrease
     );
   },
+  usableEffectDescription: "Use it on a fishing spot with a worm to catch a fish",
 };

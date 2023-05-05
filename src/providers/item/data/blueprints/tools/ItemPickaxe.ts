@@ -163,4 +163,5 @@ export const itemPickaxe: IToolItemBlueprint = {
 
     await useWithItemToTile.execute(character, useWithItemToTileOptions, skillIncrease);
   },
+  usableEffectDescription: "Use it on ores to mine them",
 };

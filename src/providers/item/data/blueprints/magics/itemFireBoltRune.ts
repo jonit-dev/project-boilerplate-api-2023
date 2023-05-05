@@ -36,4 +36,5 @@ export const itemFireBoltRune: IRuneItemBlueprint = {
 
     return points;
   },
+  usableEffectDescription: "Deals fire damage to the target",
 };

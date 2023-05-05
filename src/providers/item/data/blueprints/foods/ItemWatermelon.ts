@@ -22,4 +22,5 @@ export const itemWatermelon: IConsumableItemBlueprint = {
 
     itemUsableEffect.applyEatingEffect(character, 3);
   },
+  usableEffectDescription: "Restores 3 HP and Mana 5 times",
 };

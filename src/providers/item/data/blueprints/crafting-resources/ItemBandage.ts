@@ -26,4 +26,5 @@ export const itemBandage: ICraftableItemBlueprint = {
     // cure bleeding effect
     await entityEffectUse.clearEntityEffect(EntityEffectBlueprint.Bleeding, character);
   },
+  usableEffectDescription: "Stops bleeding and restores 3 HP",
 };

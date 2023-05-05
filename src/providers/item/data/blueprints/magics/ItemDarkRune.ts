@@ -42,4 +42,5 @@ export const itemDarkRune: IRuneItemBlueprint = {
 
     return points;
   },
+  usableEffectDescription: "Deals dark damage to the target",
 };

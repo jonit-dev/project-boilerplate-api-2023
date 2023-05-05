@@ -23,4 +23,5 @@ export const itemBread: IConsumableItemBlueprint = {
 
     itemUsableEffect.applyEatingEffect(character, 8);
   },
+  usableEffectDescription: "Restores 8 HP and Mana 5 times",
 };

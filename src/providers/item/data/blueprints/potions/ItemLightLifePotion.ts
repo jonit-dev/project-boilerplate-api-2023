@@ -25,4 +25,5 @@ export const itemLightLifePotion: IConsumableItemBlueprint = {
 
     itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
   },
+  usableEffectDescription: "Restores 5% of HP",
 };

@@ -36,4 +36,5 @@ export const itemHasteRing: IEquippableAccessoryTier1Blueprint = {
       },
     },
   },
+  equippedBuffDescription: "Increases speed by 20%",
 };

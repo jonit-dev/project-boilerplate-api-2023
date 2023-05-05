@@ -43,4 +43,5 @@ export const itemPoisonRune: IRuneItemBlueprint = {
 
     return points;
   },
+  usableEffectDescription: "Deals poison damage to the target",
 };

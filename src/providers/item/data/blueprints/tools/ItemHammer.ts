@@ -140,4 +140,5 @@ export const itemHammer: IToolItemBlueprint = {
 
     await useWithItemToTile.execute(character, options, skillIncrease);
   },
+  usableEffectDescription: "Use it on an anvil with ore to forge an ingot",
 };

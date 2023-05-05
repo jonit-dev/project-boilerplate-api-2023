@@ -42,4 +42,5 @@ export const itemHealRune: IRuneItemBlueprint = {
 
     itemUsableEffect.apply(target, EffectableAttribute.Health, points);
   },
+  usableEffectDescription: "Heals HP of target",
 };

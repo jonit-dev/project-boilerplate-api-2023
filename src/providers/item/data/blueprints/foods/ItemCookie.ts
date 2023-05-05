@@ -23,4 +23,5 @@ export const itemCookie: IConsumableItemBlueprint = {
 
     itemUsableEffect.applyEatingEffect(character, 1);
   },
+  usableEffectDescription: "Restores 1 HP and Mana 5 times",
 };

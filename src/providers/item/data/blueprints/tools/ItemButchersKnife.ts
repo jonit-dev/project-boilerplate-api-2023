@@ -144,4 +144,5 @@ export const itemButchersKnife: IToolItemBlueprint = {
     targetItem.hasButchered = true;
     await targetItem.save();
   },
+  usableEffectDescription: "Use it to butcher a dead body",
 };

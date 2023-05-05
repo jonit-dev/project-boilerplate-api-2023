@@ -22,4 +22,5 @@ export const itemCheese: IConsumableItemBlueprint = {
 
     itemUsableEffect.applyEatingEffect(character, 7);
   },
+  usableEffectDescription: "Restores 7 HP and Mana 5 times",
 };

@@ -99,6 +99,10 @@ const itemSchema = createLeanSchema(
 
     isDeadBodyLootable: Type.boolean({ required: false }),
 
+    usableEffectDescription: Type.string({ required: false }),
+
+    equippedBuffDescription: Type.string({ required: false }),
+
     droppedBy: Type.objectId({
       ref: "Character",
     }),

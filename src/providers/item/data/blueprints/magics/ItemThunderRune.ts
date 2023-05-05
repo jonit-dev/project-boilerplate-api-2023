@@ -43,4 +43,5 @@ export const itemThunderRune: IRuneItemBlueprint = {
 
     return points;
   },
+  usableEffectDescription: "Deals thunder damage to the target",
 };

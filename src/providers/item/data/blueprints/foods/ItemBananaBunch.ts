@@ -23,4 +23,5 @@ export const itemBananaBunch: IConsumableItemBlueprint = {
 
     itemUsableEffect.applyEatingEffect(character, 4);
   },
+  usableEffectDescription: "Restores 4 HP and Mana 5 times",
 };

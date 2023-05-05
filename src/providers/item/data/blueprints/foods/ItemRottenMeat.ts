@@ -33,4 +33,5 @@ export const itemRottenMeat: IConsumableItemBlueprint = {
 
     itemUsableEffect.applyEatingEffect(character, -3);
   },
+  usableEffectDescription: "Poisons 3 HP and Mana 5 times",
 };

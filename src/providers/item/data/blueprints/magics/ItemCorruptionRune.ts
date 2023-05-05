@@ -41,4 +41,5 @@ export const itemCorruptionRune: IRuneItemBlueprint = {
 
     return points;
   },
+  usableEffectDescription: "Deals corruption damage to the target",
 };
