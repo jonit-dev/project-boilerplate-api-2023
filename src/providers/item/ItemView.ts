@@ -131,6 +131,7 @@ export class ItemView {
           x: item.x,
           y: item.y,
           scene: item.scene,
+          isDeadBodyLootable: item.isDeadBodyLootable,
         },
         "items"
       );
