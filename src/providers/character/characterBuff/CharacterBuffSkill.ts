@@ -1,9 +1,9 @@
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { TextFormatter } from "@providers/text/TextFormatter";
-import { ICharacterBuff, SkillSocketEvents } from "@rpg-engine/shared";
+import { CharacterTrait, ICharacterBuff, SkillSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 import { IBuffValueCalculations } from "./CharacterBuffAttribute";
@@ -116,6 +116,21 @@ export class CharacterBuffSkill {
     await this.sendUpdateToClient(character, buff);
 
     return true;
+  }
+
+  public async getSkillLevelWithoutBuffs(character: ICharacter, skills: ISkill, skillName: string): Promise<number> {
+    if (skills.ownerType !== "Character") {
+      return skills[skillName].level;
+    }
+
+    const skillDetails = skills[skillName] as ISkillDetail;
+
+    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
+      character,
+      skillName as CharacterTrait
+    );
+
+    return skillDetails.level - totalTraitSummedBuffs;
   }
 
   private async performBuffValueCalculations(

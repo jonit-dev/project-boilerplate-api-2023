@@ -80,6 +80,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+            character,
             skills,
             skillToUpdate,
             basicAttributes
@@ -99,6 +100,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in combatSkills) {
           skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            character,
             skills,
             skillToUpdate,
             combatSkills
@@ -119,6 +121,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in craftingSkills) {
           skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            character,
             skills,
             skillToUpdate,
             craftingSkills
@@ -143,6 +146,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+            character,
             skills,
             skillToUpdate,
             basicAttributes
@@ -162,6 +166,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in combatSkills) {
           skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            character,
             skills,
             skillToUpdate,
             combatSkills
@@ -182,6 +187,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in craftingSkills) {
           skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            character,
             skills,
             skillToUpdate,
             craftingSkills
@@ -205,6 +211,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+            character,
             skills,
             skillToUpdate,
             basicAttributes
@@ -224,6 +231,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in combatSkills) {
           skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            character,
             skills,
             skillToUpdate,
             combatSkills
@@ -244,6 +252,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in craftingSkills) {
           skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            character,
             skills,
             skillToUpdate,
             craftingSkills
@@ -267,6 +276,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+            character,
             skills,
             skillToUpdate,
             basicAttributes
@@ -286,6 +296,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in combatSkills) {
           skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            character,
             skills,
             skillToUpdate,
             combatSkills
@@ -306,6 +317,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in craftingSkills) {
           skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            character,
             skills,
             skillToUpdate,
             craftingSkills
@@ -329,6 +341,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+            character,
             skills,
             skillToUpdate,
             basicAttributes
@@ -348,6 +361,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in combatSkills) {
           skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            character,
             skills,
             skillToUpdate,
             combatSkills
@@ -368,6 +382,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in craftingSkills) {
           skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            character,
             skills,
             skillToUpdate,
             craftingSkills
@@ -391,6 +406,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in basicAttributes) {
           skillSpData = await this.characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+            character,
             skills,
             skillToUpdate,
             basicAttributes
@@ -410,6 +426,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in combatSkills) {
           skillSpData = await this.characterCombatBonusPenalties.updateCombatSkills(
+            character,
             skills,
             skillToUpdate,
             combatSkills
@@ -430,6 +447,7 @@ export class CharacterBonusPenalties {
 
         if (skillToUpdate in craftingSkills) {
           skillSpData = await this.characterCraftingBonusPenalties.updateCraftingSkills(
+            character,
             skills,
             skillToUpdate,
             craftingSkills

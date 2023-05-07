@@ -9,107 +9,130 @@ export class CharacterBasicAttributesBonusPenalties {
   constructor(private skillFunctions: SkillFunctions) {}
 
   public async updateBasicAttributesSkills(
+    character: ICharacter,
     skills: ISkill,
-    skillType: string,
+    skillName: string,
     bonusOrPenalties: IBasicAttributesBonusAndPenalties
   ): Promise<IIncreaseSPResult> {
     let skillLevelUp: boolean = false;
     let skillSpData: IIncreaseSPResult = {
       skillLevelUp: false,
-      skillLevelBefore: skills[skillType].level,
+      skillLevelBefore: skills[skillName].level,
       skillLevelAfter: 0,
       skillName: "",
       skillPoints: 0,
     };
 
-    switch (skillType) {
+    switch (skillName) {
       case "strength": {
-        skillLevelUp = this.skillFunctions.updateSkillByType(
+        skillLevelUp = await this.skillFunctions.updateSkillByType(
+          character,
           skills,
-          skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.strength, skills[skillType].level)
+          skillName,
+          await this.skillFunctions.calculateBonusOrPenaltiesSP(
+            character,
+            bonusOrPenalties.strength,
+            skills[skillName].level,
+            skillName
+          )
         );
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[skillType].level,
-          skillName: skillType,
-          skillPoints: skills[skillType].skillPoints,
+          skillLevelAfter: skills[skillName].level,
+          skillName: skillName,
+          skillPoints: skills[skillName].skillPoints,
         };
 
         break;
       }
 
       case "resistance": {
-        skillLevelUp = this.skillFunctions.updateSkillByType(
+        skillLevelUp = await this.skillFunctions.updateSkillByType(
+          character,
           skills,
-          skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.resistance, skills[skillType].level)
+          skillName,
+          await this.skillFunctions.calculateBonusOrPenaltiesSP(
+            character,
+            bonusOrPenalties.resistance,
+            skills[skillName].level,
+            skillName
+          )
         );
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[skillType].level,
-          skillName: skillType,
-          skillPoints: skills[skillType].skillPoints,
+          skillLevelAfter: skills[skillName].level,
+          skillName: skillName,
+          skillPoints: skills[skillName].skillPoints,
         };
 
         break;
       }
 
       case "dexterity": {
-        skillLevelUp = this.skillFunctions.updateSkillByType(
+        skillLevelUp = await this.skillFunctions.updateSkillByType(
+          character,
           skills,
-          skillType,
-          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.dexterity, skills[skillType].level)
+          skillName,
+          await this.skillFunctions.calculateBonusOrPenaltiesSP(
+            character,
+            bonusOrPenalties.dexterity,
+            skills[skillName].level,
+            skillName
+          )
         );
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[skillType].level,
-          skillName: skillType,
-          skillPoints: skills[skillType].skillPoints,
+          skillLevelAfter: skills[skillName].level,
+          skillName: skillName,
+          skillPoints: skills[skillName].skillPoints,
         };
 
         break;
       }
 
       case "magic": {
-        const bonusOrPenaltiesMagic = this.skillFunctions.calculateBonusOrPenaltiesMagicSP(
+        const bonusOrPenaltiesMagic = await this.skillFunctions.calculateBonusOrPenaltiesMagicSP(
+          character,
           bonusOrPenalties.magic,
-          skills.magic.level
+          skills.magic.level,
+          skillName
         );
 
-        skillLevelUp = this.skillFunctions.updateSkillByType(skills, skillType, bonusOrPenaltiesMagic);
+        skillLevelUp = await this.skillFunctions.updateSkillByType(character, skills, skillName, bonusOrPenaltiesMagic);
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[skillType].level,
-          skillName: skillType,
-          skillPoints: skills[skillType].skillPoints,
+          skillLevelAfter: skills[skillName].level,
+          skillName: skillName,
+          skillPoints: skills[skillName].skillPoints,
         };
 
         break;
       }
 
       case "magicResistance": {
-        const bonusOrPenaltiesMagic = this.skillFunctions.calculateBonusOrPenaltiesMagicSP(
+        const bonusOrPenaltiesMagic = await this.skillFunctions.calculateBonusOrPenaltiesMagicSP(
+          character,
           bonusOrPenalties.magicResistance,
-          skills.magicResistance.level
+          skills.magicResistance.level,
+          skillName
         );
 
-        skillLevelUp = this.skillFunctions.updateSkillByType(skills, skillType, bonusOrPenaltiesMagic);
+        skillLevelUp = await this.skillFunctions.updateSkillByType(character, skills, skillName, bonusOrPenaltiesMagic);
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
           skillLevelBefore: skillSpData.skillLevelBefore,
-          skillLevelAfter: skills[skillType].level,
-          skillName: skillType,
-          skillPoints: skills[skillType].skillPoints,
+          skillLevelAfter: skills[skillName].level,
+          skillName: skillName,
+          skillPoints: skills[skillName].skillPoints,
         };
 
         break;
@@ -119,9 +142,9 @@ export class CharacterBasicAttributesBonusPenalties {
         break;
     }
 
-    const character = (await Character.findById(skills.owner)) as ICharacter;
+    const char = (await Character.findById(skills.owner)) as ICharacter;
 
-    await this.skillFunctions.updateSkills(skills, character);
+    await this.skillFunctions.updateSkills(skills, char);
 
     return skillSpData;
   }

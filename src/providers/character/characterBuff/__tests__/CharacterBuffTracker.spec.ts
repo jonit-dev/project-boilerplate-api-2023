@@ -5,6 +5,7 @@ import {
   CharacterAttributes,
   CharacterBuffDurationType,
   CharacterBuffType,
+  ICharacterItemBuff,
   ICharacterTemporaryBuff,
 } from "@rpg-engine/shared";
 import { CharacterBuffTracker } from "../CharacterBuffTracker";
@@ -140,5 +141,105 @@ describe("CharacterBuffTracker", () => {
         owner: testCharacter._id,
       })
     );
+  });
+
+  it("should delete all character buffs when deleteTemporaryOnly is false or not provided", async () => {
+    const testTemporaryBuff = createTestBuff() as ICharacterTemporaryBuff;
+    const testPermanentBuff = {
+      ...createTestBuff(),
+      durationType: CharacterBuffDurationType.Permanent,
+    } as unknown as ICharacterTemporaryBuff;
+
+    await characterBuffTracker.addBuff(testCharacter, testTemporaryBuff);
+    await characterBuffTracker.addBuff(testCharacter, testPermanentBuff);
+
+    const result = await characterBuffTracker.deleteAllCharacterBuffs(testCharacter, { deleteTemporaryOnly: false });
+
+    expect(result).toBeTruthy();
+
+    const remainingBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
+
+    expect(remainingBuffs.length).toEqual(0);
+  });
+
+  it("should delete all character buffs when deleteTemporaryOnly option is not provided", async () => {
+    const testTemporaryBuff = createTestBuff() as ICharacterTemporaryBuff;
+    const testPermanentBuff = {
+      ...createTestBuff(),
+      durationType: CharacterBuffDurationType.Permanent,
+    } as unknown as ICharacterTemporaryBuff;
+
+    await characterBuffTracker.addBuff(testCharacter, testTemporaryBuff);
+    await characterBuffTracker.addBuff(testCharacter, testPermanentBuff);
+
+    const result = await characterBuffTracker.deleteAllCharacterBuffs(testCharacter);
+
+    expect(result).toBeTruthy();
+
+    const remainingBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
+
+    expect(remainingBuffs.length).toEqual(0);
+  });
+
+  it("should get all buff absolute changes for a specific trait", async () => {
+    const testBuff1 = {
+      ...createTestBuff(),
+      absoluteChange: 5,
+    } as ICharacterTemporaryBuff;
+    const testBuff2 = {
+      ...createTestBuff(),
+      trait: BasicAttribute.Dexterity,
+      absoluteChange: 10,
+    } as ICharacterTemporaryBuff;
+
+    await characterBuffTracker.addBuff(testCharacter, testBuff1);
+    await characterBuffTracker.addBuff(testCharacter, testBuff2);
+
+    const totalAbsoluteChange = await characterBuffTracker.getAllBuffAbsoluteChanges(
+      testCharacter,
+      BasicAttribute.Strength
+    );
+
+    expect(totalAbsoluteChange).toEqual(5);
+  });
+
+  it("should get buff by item ID", async () => {
+    const testBuff = {
+      ...createTestBuff(),
+      itemId: "test-item-id",
+    } as unknown as ICharacterItemBuff;
+
+    await characterBuffTracker.addBuff(testCharacter, testBuff);
+
+    const retrievedBuff = await characterBuffTracker.getBuffByItemId(testCharacter, "test-item-id");
+
+    expect(retrievedBuff).toBeDefined();
+    expect(retrievedBuff).toMatchObject(testBuff);
+  });
+
+  it("should return undefined if buff with item ID is not found", async () => {
+    const retrievedBuff = await characterBuffTracker.getBuffByItemId(testCharacter, "nonexistent-item-id");
+
+    expect(retrievedBuff).toBeUndefined();
+  });
+
+  it("should get buff by item key", async () => {
+    const testBuff = {
+      ...createTestBuff(),
+      itemKey: "test-item-key",
+    } as unknown as ICharacterItemBuff;
+
+    await characterBuffTracker.addBuff(testCharacter, testBuff);
+
+    const retrievedBuff = await characterBuffTracker.getBuffByItemKey(testCharacter, "test-item-key");
+
+    expect(retrievedBuff).toBeDefined();
+    expect(retrievedBuff).toMatchObject(testBuff);
+  });
+
+  it("should return falsy if buff with item key is not found", async () => {
+    const retrievedBuff = await characterBuffTracker.getBuffByItemKey(testCharacter, "nonexistent-item-key");
+
+    expect(retrievedBuff).toBeFalsy();
   });
 });

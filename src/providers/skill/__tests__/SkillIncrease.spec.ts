@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
@@ -10,7 +11,10 @@ import { SpellLearn } from "@providers/spells/SpellLearn";
 import { spellSelfHealing } from "@providers/spells/data/blueprints/all/SpellSelfHealing";
 import {
   BasicAttribute,
+  CharacterBuffDurationType,
+  CharacterBuffType,
   CharacterClass,
+  CombatSkill,
   ItemSubType,
   calculateSPToNextLevel,
   calculateXPToNextLevel,
@@ -73,6 +77,7 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
   let skills: ISkill;
   let initialLevel: number;
   let spToLvl2: number;
+  let testCharacter: ICharacter;
 
   beforeAll(() => {
     skillIncrease = container.get<SkillIncrease>(SkillIncrease);
@@ -83,32 +88,39 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
     expect(spToLvl2).toBeGreaterThan(0);
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    testCharacter = await unitTestHelper.createMockCharacter({ hasSkills: true });
+
     skills = new Skill({
       ownerType: "Character",
     }) as ISkill;
+
+    testCharacter.skills = skills._id;
+    await testCharacter.save();
+
+    skills.owner = testCharacter._id;
+    await skills.save();
   });
 
-  it("should throw error when passing not a weapon item", () => {
+  it("should throw error when passing not a weapon item", async () => {
     try {
       // @ts-ignore
-      skillIncrease.increaseSP(skills, ItemSubType.Potion);
+      await skillIncrease.increaseSP(testCharacter, skills, ItemSubType.Potion);
       throw new Error("this should have failed");
     } catch (error: any | Error) {
       expect(error.message).toBe(`skill not found for item subtype ${ItemSubType.Potion}`);
     }
   });
 
-  for (const test of simpleTestCases) {
-    it(`should increase '${test.skill}' skill points | Item: ${test.item}`, () => {
+  function performSkillIncreaseTest(test: TestCase, initialLevel: number, spToLvl2: number) {
+    return async (): Promise<void> => {
       expect(skills[test.skill].level).toBe(initialLevel);
       expect(skills[test.skill].skillPoints).toBe(0);
 
-      // @ts-ignore
       let increasedSkills;
       for (let i = 0; i < spToLvl2 * 5; i++) {
         // @ts-ignore
-        increasedSkills = skillIncrease.increaseSP(skills, test.item);
+        increasedSkills = await skillIncrease.increaseSP(skills, test.item);
       }
 
       expect(increasedSkills.skillLevelUp).toBe(true);
@@ -120,8 +132,54 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
       expect(skills[test.skill].skillPoints).toBe(spToLvl2);
 
       expect(skills[test.skill].skillPointsToNextLevel).toBe(calculateSPToNextLevel(spToLvl2, initialLevel + 2));
+    };
+  }
+
+  for (const test of simpleTestCases) {
+    it(`should increase '${test.skill}' skill points | Item: ${test.item}`, () => {
+      performSkillIncreaseTest(test, initialLevel, spToLvl2);
     });
   }
+});
+
+describe("SkillIncrease x Buffs edge case", () => {
+  let skillIncrease: SkillIncrease;
+  let characterBuffActivator: CharacterBuffActivator;
+  let testCharacter: ICharacter;
+
+  beforeAll(() => {
+    skillIncrease = container.get(SkillIncrease);
+    characterBuffActivator = container.get(CharacterBuffActivator);
+  });
+
+  beforeEach(async () => {
+    testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
+  });
+
+  it("skill increase should not be affected by buffs", async () => {
+    await characterBuffActivator.enablePermanentBuff(testCharacter, {
+      type: CharacterBuffType.Skill,
+      trait: CombatSkill.Sword,
+      buffPercentage: 20,
+      durationType: CharacterBuffDurationType.Permanent,
+    });
+
+    let skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+
+    // @ts-ignore
+    const increasedSkills = await skillIncrease.increaseSP(testCharacter, skills, ItemSubType.Sword);
+
+    expect(increasedSkills.skillLevelUp).toBe(false);
+    expect(increasedSkills.skillName).toBe("sword");
+    expect(increasedSkills.skillLevelBefore).toBe(0);
+    expect(increasedSkills.skillLevelAfter).toBe(1);
+
+    skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+
+    expect(skills.sword.skillPoints).toBe(0);
+
+    expect(skills.sword.skillPointsToNextLevel).toBe(calculateSPToNextLevel(0, 2));
+  });
 });
 
 describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & increaseCraftingSkills test cases", () => {
@@ -137,13 +195,14 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
     sendExpLevelUpEvents: any,
     spellLearnMock: jest.SpyInstance;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     skillIncrease = container.get<SkillIncrease>(SkillIncrease);
 
     initialSkills = new Skill({
       ownerType: "Character",
     }) as ISkill;
     initialLevel = initialSkills.first.level;
+    await initialSkills.save();
 
     spToLvl2 = calculateSPToNextLevel(initialSkills.first.skillPoints, initialLevel + 1);
     spToLvl3 = calculateSPToNextLevel(spToLvl2, initialLevel + 2);

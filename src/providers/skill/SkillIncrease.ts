@@ -10,6 +10,7 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
+import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 import {
   BASIC_INCREASE_HEALTH_MANA,
@@ -64,7 +65,8 @@ export class SkillIncrease {
     private inMemoryHashTable: InMemoryHashTable,
     private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties,
     private characterRaceBonusOrPenalties: CharacterRaceBonusOrPenalties,
-    private characterWeight: CharacterWeight
+    private characterWeight: CharacterWeight,
+    private characterBuffSkill: CharacterBuffSkill
   ) {}
 
   /**
@@ -103,11 +105,11 @@ export class SkillIncrease {
 
     // stronger the opponent, higher SP per hit it gives in your combat skills
     const bonus = await this.skillFunctions.calculateBonus(target.skills);
-    const increasedWeaponSP = this.increaseSP(skills, weaponSubType, undefined, SKILLS_MAP, bonus);
+    const increasedWeaponSP = await this.increaseSP(attacker, skills, weaponSubType, undefined, SKILLS_MAP, bonus);
 
     let increasedStrengthSP;
     if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
-      increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
+      increasedStrengthSP = await this.increaseSP(attacker, skills, BasicAttribute.Strength);
     }
 
     await this.skillFunctions.updateSkills(skills, attacker);
@@ -166,10 +168,10 @@ export class SkillIncrease {
 
     let result = {} as IIncreaseSPResult;
     if (rightHandItem?.subType === ItemSubType.Shield) {
-      result = this.increaseSP(skills, rightHandItem.subType);
+      result = await this.increaseSP(character, skills, rightHandItem.subType);
     } else {
       if (leftHandItem?.subType === ItemSubType.Shield) {
-        result = this.increaseSP(skills, leftHandItem.subType);
+        result = await this.increaseSP(character, skills, leftHandItem.subType);
       }
     }
 
@@ -217,7 +219,7 @@ export class SkillIncrease {
       return;
     }
 
-    const result = this.increaseSP(skills, attribute, skillPointsCalculator);
+    const result = await this.increaseSP(character, skills, attribute, skillPointsCalculator);
     await this.skillFunctions.updateSkills(skills, character);
 
     if (result.skillLevelUp && character.channelId) {
@@ -255,7 +257,13 @@ export class SkillIncrease {
       return this.calculateNewCraftSP(skillDetails);
     };
 
-    const result = this.increaseSP(skills, craftedItemKey, craftSkillPointsCalculator, CraftingSkillsMap);
+    const result = await this.increaseSP(
+      character,
+      skills,
+      craftedItemKey,
+      craftSkillPointsCalculator,
+      CraftingSkillsMap
+    );
     await this.skillFunctions.updateSkills(skills, character);
 
     await this.characterBonusPenalties.applyRaceBonusPenalties(character, skillToUpdate);
@@ -375,13 +383,14 @@ export class SkillIncrease {
     });
   }
 
-  private increaseSP(
+  private async increaseSP(
+    character: ICharacter,
     skills: ISkill,
     skillKey: string,
     skillPointsCalculator?: Function,
     skillsMap: Map<string, string> = SKILLS_MAP,
     bonus?: number
-  ): IIncreaseSPResult {
+  ): Promise<IIncreaseSPResult> {
     let skillLevelUp = false;
     const skillToUpdate = skillsMap.get(skillKey);
 
@@ -396,6 +405,13 @@ export class SkillIncrease {
     }
 
     const updatedSkillDetails = skills[skillToUpdate] as ISkillDetails;
+
+    updatedSkillDetails.level = await this.characterBuffSkill.getSkillLevelWithoutBuffs(
+      character,
+      skills,
+      skillToUpdate
+    );
+
     updatedSkillDetails.skillPoints = skillPointsCalculator(updatedSkillDetails, bonus);
     updatedSkillDetails.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(
       updatedSkillDetails.skillPoints,

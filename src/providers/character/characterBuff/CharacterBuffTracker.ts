@@ -80,8 +80,8 @@ export class CharacterBuffTracker {
           owner: character._id,
           durationType: CharacterBuffDurationType.Temporary,
         });
-
-        return true;
+      } else {
+        await CharacterBuff.deleteMany({ owner: character._id });
       }
 
       return true;

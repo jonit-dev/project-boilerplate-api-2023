@@ -34,6 +34,7 @@ describe("Case CharacterBasicAttributesBonusPenalties", () => {
     } as any;
 
     await characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+      testCharacter,
       skills,
       BasicAttribute.Strength,
       basicAttributes
@@ -46,6 +47,7 @@ describe("Case CharacterBasicAttributesBonusPenalties", () => {
     expect(skills.magic.skillPoints).toEqual(10);
 
     await characterBasicAttributesBonusPenalties.updateBasicAttributesSkills(
+      testCharacter,
       skills,
       BasicAttribute.Magic,
       basicAttributes

@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { CharacterClass, CombatSkill, ItemSubType, ShadowWalkerRaces } from "@rpg-engine/shared";
+import { CharacterClass, CombatSkill, ShadowWalkerRaces } from "@rpg-engine/shared";
 import { CharacterCombatBonusPenalties } from "../characterBonusPenalties/CharacterCombatBonusPenalties";
 
 describe("Case CharacterCombatBonusPenalties", () => {
@@ -38,14 +38,14 @@ describe("Case CharacterCombatBonusPenalties", () => {
       club: 0.2,
     };
 
-    await characterCombatBonusPenalties.updateCombatSkills(skills, CombatSkill.Dagger, combatSkills);
+    await characterCombatBonusPenalties.updateCombatSkills(testCharacter, skills, CombatSkill.Dagger, combatSkills);
 
     expect(skills.dagger.skillPoints).toEqual(expect.closeTo(0.22, 2));
 
     // First Call
-    await characterCombatBonusPenalties.updateCombatSkills(skills, CombatSkill.Sword, combatSkills);
+    await characterCombatBonusPenalties.updateCombatSkills(testCharacter, skills, CombatSkill.Sword, combatSkills);
     // Second Call
-    await characterCombatBonusPenalties.updateCombatSkills(skills, CombatSkill.Sword, combatSkills);
+    await characterCombatBonusPenalties.updateCombatSkills(testCharacter, skills, CombatSkill.Sword, combatSkills);
 
     expect(skills.sword.skillPoints).toEqual(expect.closeTo(0.44, 2));
   });
