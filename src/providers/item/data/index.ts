@@ -1,4 +1,6 @@
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { IBlueprint } from "@providers/types/temp/BlueprintTypes";
+import { minItemLevelSkillRequirementsMiddleware } from "../ItemMinLevelCalculator";
 import { accessoriesBlueprintIndex } from "./blueprints/accessories/index";
 import { armorsBlueprintIndex } from "./blueprints/armors/index";
 import { axesBlueprintIndex } from "./blueprints/axes/index";
@@ -52,5 +54,11 @@ const itemsBlueprintIndex: IBlueprint = {
   ...toolsBlueprintIndex,
   ...hammersBlueprintIndex,
 };
+
+// auto calculate minRequirements on items tier 3 and above
+
+for (let data of Object.values(itemsBlueprintIndex)) {
+  data = minItemLevelSkillRequirementsMiddleware(data as IItem);
+}
 
 export { itemsBlueprintIndex };

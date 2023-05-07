@@ -1,11 +1,13 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { itemsBlueprintIndex } from "@providers/item/data";
 import { DaggersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { CharacterClass, ItemSubType } from "@rpg-engine/shared";
+import { CharacterClass, CombatSkill, ISkill, ItemSubType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EquipmentEquip } from "../EquipmentEquip";
 import { EquipmentStatsCalculator } from "../EquipmentStatsCalculator";
@@ -24,6 +26,7 @@ describe("EquipmentEquip.spec.ts", () => {
   let sendEventToUser;
   let equipmentStatsCalculator: EquipmentStatsCalculator;
   let characterWeapon: CharacterWeapon;
+  let sendErrorMessageToCharacter;
 
   beforeAll(() => {
     equipmentStatsCalculator = container.get<EquipmentStatsCalculator>(EquipmentStatsCalculator);
@@ -31,7 +34,12 @@ describe("EquipmentEquip.spec.ts", () => {
   });
 
   beforeEach(async () => {
-    testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasEquipment: true,
+      hasInventory: true,
+      hasSkills: true,
+    });
+    // create Mock item will require level 1 and dagger skill level 1
     bowItem = await unitTestHelper.createItemBow();
     swordItem = await unitTestHelper.createMockItem();
     swordItem2 = await unitTestHelper.createMockItem();
@@ -46,9 +54,13 @@ describe("EquipmentEquip.spec.ts", () => {
 
     // @ts-ignore
     sendEventToUser = jest.spyOn(equipmentEquip.socketMessaging, "sendEventToUser");
+
+    // @ts-ignore
+    sendErrorMessageToCharacter = jest.spyOn(equipmentEquip.socketMessaging, "sendErrorMessageToCharacter");
   });
 
-  it("should properly equip an item", async () => {
+  it("should properly equip an item with minimum skill requirements", async () => {
+    // create Mock item will require level 1 and dagger skill level 1
     inventoryContainer.slots[0] = swordItem;
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
@@ -107,6 +119,12 @@ describe("EquipmentEquip.spec.ts", () => {
       { new: true }
     )) as ICharacter;
 
+    // add dagger skills to character
+    const skill = (await Skill.findById(berserker.skills).lean()) as ISkill;
+    skill.level = 10;
+    skill.dagger.level = 10;
+    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
     const equipOneHand = await equipmentEquip.equip(berserker, daggerItem._id, inventoryContainer.id);
     const equipAnotherHand = await equipmentEquip.equip(berserker, daggerItem2._id, inventoryContainer.id);
 
@@ -147,7 +165,7 @@ describe("EquipmentEquip.spec.ts", () => {
     expect(updatedInventory?.slots[1]._id).toEqual(swordItem2._id);
   });
 
-  it("should fail equip 2 sword Class Hunter", async () => {
+  it("should fail equip 2 dagger Class Hunter", async () => {
     inventoryContainer.slots[0] = daggerItem;
     inventoryContainer.slots[1] = daggerItem2;
     inventoryContainer.markModified("slots");
@@ -161,6 +179,12 @@ describe("EquipmentEquip.spec.ts", () => {
       { new: true }
     )) as ICharacter;
 
+    // add dagger skills to character
+    const skill = (await Skill.findById(berserker.skills).lean()) as ISkill;
+    skill.level = 10;
+    skill.dagger.level = 10;
+    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
     const equipOneHand = await equipmentEquip.equip(berserker, daggerItem._id, inventoryContainer.id);
     const equipAnotherHand = await equipmentEquip.equip(berserker, daggerItem2._id, inventoryContainer.id);
 
@@ -172,6 +196,94 @@ describe("EquipmentEquip.spec.ts", () => {
     const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
     expect(updatedInventory?.slots[0]).toBeNull();
     expect(updatedInventory?.slots[1]._id).toEqual(daggerItem2._id);
+  });
+
+  describe("Min level and skill requirements", () => {
+    let minRequiredLevelSkillDagger: IItem; // a dagger with minimum level and skill requirements
+
+    beforeEach(async () => {
+      const minReqLevelDaggerBlueprint = itemsBlueprintIndex[DaggersBlueprint.AzureDagger];
+
+      minReqLevelDaggerBlueprint.minRequirements = {
+        level: 5,
+        skill: {
+          name: CombatSkill.Dagger,
+          level: 7,
+        },
+      };
+
+      minRequiredLevelSkillDagger = await unitTestHelper.createMockItemFromBlueprint(DaggersBlueprint.AzureDagger, {
+        ...minReqLevelDaggerBlueprint,
+      });
+    });
+
+    it("should not equip an item without minimum level and without minimum skill level", async () => {
+      // this dagger should require a minimum level of 5 and a minimum skill level of 7
+
+      inventoryContainer.slots[0] = minRequiredLevelSkillDagger;
+      inventoryContainer.markModified("slots");
+      await inventoryContainer.save();
+
+      const equip = await equipmentEquip.equip(testCharacter, minRequiredLevelSkillDagger._id, inventoryContainer.id);
+
+      expect(equip).toBeFalsy();
+
+      // make sure error message send to the character
+      expect(sendErrorMessageToCharacter).toHaveBeenCalled();
+
+      // make sure item was not delete on the inventory
+      const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
+      expect(updatedInventory?.slots[0]).not.toBeNull();
+    });
+
+    it("should not equip an item without minimum level but with minimum skill level", async () => {
+      // this dagger should require a minimum level of 5 and a minimum skill level of 7
+      inventoryContainer.slots[0] = minRequiredLevelSkillDagger;
+      inventoryContainer.markModified("slots");
+      await inventoryContainer.save();
+
+      // add dagger skills to character, level is 1 and skill level is 10
+      const skill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+      skill.level = 1;
+      skill.dagger.level = 10;
+      (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
+      const equip = await equipmentEquip.equip(testCharacter, minRequiredLevelSkillDagger._id, inventoryContainer.id);
+
+      expect(equip).toBeFalsy();
+
+      // make sure error message send to the character
+      expect(sendErrorMessageToCharacter).toHaveBeenCalled();
+
+      // make sure item was not delete on the inventory
+      const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
+      expect(updatedInventory?.slots[0]).not.toBeNull();
+    });
+
+    it("should not equip an item with minimum level but without minimum skill level", async () => {
+      // this dagger should require a minimum level of 5 and a minimum skill level of 7
+      inventoryContainer.slots[0] = minRequiredLevelSkillDagger;
+      inventoryContainer.markModified("slots");
+      await inventoryContainer.save();
+
+      // add dagger skills to character, level is 10 and skill level is 1
+      const skill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+      skill.level = 10;
+      skill.dagger.level = 1;
+
+      (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
+      const equip = await equipmentEquip.equip(testCharacter, minRequiredLevelSkillDagger._id, inventoryContainer.id);
+
+      expect(equip).toBeFalsy();
+
+      // make sure error message send to the character
+      expect(sendErrorMessageToCharacter).toHaveBeenCalled();
+
+      // make sure item was not delete on the inventory
+      const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
+      expect(updatedInventory?.slots[0]).not.toBeNull();
+    });
   });
 
   describe("Validation", () => {

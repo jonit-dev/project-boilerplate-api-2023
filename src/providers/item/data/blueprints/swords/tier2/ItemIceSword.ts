@@ -1,8 +1,8 @@
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { SwordsBlueprint } from "../../../types/itemsBlueprintTypes";
 import { IEquippableMeleeTier2WeaponBlueprint } from "../../../types/TierBlueprintTypes";
+import { SwordsBlueprint } from "../../../types/itemsBlueprintTypes";
 
 export const itemIceSword: IEquippableMeleeTier2WeaponBlueprint = {
   key: SwordsBlueprint.IceSword,

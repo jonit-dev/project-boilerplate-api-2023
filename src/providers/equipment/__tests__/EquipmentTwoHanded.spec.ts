@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { ItemSlotType } from "@rpg-engine/shared";
@@ -14,24 +14,6 @@ describe("EquipmentTwoHanded.spec.ts", () => {
   let itemTwoHanded: IItem;
   let testCharacter: ICharacter;
   let equipmentTwoHanded: EquipmentTwoHanded;
-
-  const tryToEquipItemWithAnotherAlreadyEquipped = async (
-    inventoryContainer: IItemContainer,
-    slot: "leftHand" | "rightHand",
-    equipment: IEquipment,
-    alreadyEquippedItem: IItem,
-    itemToBeEquipped: IItem
-  ): Promise<void> => {
-    // @ts-ignore
-    equipment[slot] = alreadyEquippedItem._id;
-    await equipment.save();
-
-    inventoryContainer.slots[0] = itemToBeEquipped;
-    inventoryContainer.markModified("slots");
-    await inventoryContainer.save();
-
-    await equipmentEquip.equip(testCharacter, itemToBeEquipped._id, inventoryContainer?._id);
-  };
 
   beforeAll(() => {
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);

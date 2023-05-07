@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
@@ -13,10 +14,13 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemPickupUpdater } from "@providers/item/ItemPickup/ItemPickupUpdater";
 import { ItemView } from "@providers/item/ItemView";
+import { itemsBlueprintIndex } from "@providers/item/data";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   CharacterClass,
+  IBaseItemBlueprint,
   IEquipmentAndInventoryUpdatePayload,
+  ISkill,
   ItemSlotType,
   ItemSocketEvents,
   ItemType,
@@ -111,6 +115,27 @@ export class EquipmentEquip {
       return false;
     }
 
+    // Check if the character meets the minimum requirements to use the item
+
+    const itemBlueprint = itemsBlueprintIndex[item.key] as IBaseItemBlueprint;
+
+    if (itemBlueprint?.minRequirements) {
+      const meetsMinRequirements = await this.checkMinimumRequirements(character, itemBlueprint);
+
+      if (!meetsMinRequirements) {
+        // Destructure properties from item.minRequirements for readability
+        const { level, skill } = itemBlueprint.minRequirements!;
+
+        // Prepare an error message to inform the character about the unmet requirements
+        const message = `Sorry, you don't have the minimum requirements to equip this item: level ${level}, ${skill.name} level ${skill.level}`;
+
+        // Send the error message to the character
+        this.socketMessaging.sendErrorMessageToCharacter(character, message);
+
+        return false;
+      }
+    }
+
     const containerType = await this.checkContainerType(itemContainer);
 
     const isEquipValid = await this.isEquipValid(character, item, containerType);
@@ -149,13 +174,13 @@ export class EquipmentEquip {
       return false;
     }
 
-    await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
+    await item.save();
 
     // refresh itemContainer from which the item was equipped
     const updatedContainer = (await ItemContainer.findById(fromItemContainerId)) as any;
     await this.itemPickupUpdater.sendContainerRead(updatedContainer, character);
 
-    await item.save();
+    await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
 
     return true;
   }
@@ -282,6 +307,27 @@ export class EquipmentEquip {
       return false;
     }
 
+    return true;
+  }
+
+  private async checkMinimumRequirements(character: ICharacter, itemBlueprint: IBaseItemBlueprint): Promise<boolean> {
+    // Fetch the character's skill from the database
+    const skill = (await Skill.findById(character.skills).lean()) as ISkill;
+
+    const minRequirements = itemBlueprint?.minRequirements;
+
+    if (!minRequirements) return true;
+
+    // Check if the character's skill level is less than the required level
+    if (skill.level < minRequirements.level) return false;
+
+    // Fetch the specific skill level from the character's skills
+    const skillsLevel: number = skill[minRequirements.skill.name]?.level ?? 0;
+
+    // Check if the character's specific skill level is less than the required level
+    if (skillsLevel < minRequirements.skill.level) return false;
+
+    // Return true if the character meets all the minimum requirements
     return true;
   }
 }
