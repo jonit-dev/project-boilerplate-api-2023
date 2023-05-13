@@ -45,6 +45,7 @@ export enum SpellsBlueprint {
   DruidShapeshift = "druid-shapeshift",
   BerserkerRage = "berserker-rage",
   Focus = "focus",
+  PowerStrike = "power-strike",
 }
 
 export interface ISpell {

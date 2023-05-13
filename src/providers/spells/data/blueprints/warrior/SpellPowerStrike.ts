@@ -7,24 +7,23 @@ import {
   CharacterBuffDurationType,
   CharacterBuffType,
   CharacterClass,
-  CombatSkill,
   SpellCastingType,
 } from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
-export const spellFortifyDefense: Partial<ISpell> = {
-  key: SpellsBlueprint.SpellFortifyDefense,
-  name: "Self Fortify Defense",
-  description: "Temporarily increases the warrior's shielding skill.",
+export const spellPowerStrike: Partial<ISpell> = {
+  key: SpellsBlueprint.PowerStrike,
+  name: "Power Strike",
+  description: "Temporarily increases the warrior's strength.",
   castingType: SpellCastingType.SelfCasting,
-  magicWords: "thura korima",
-  manaCost: 50,
-  minLevelRequired: 6,
+  magicWords: "gûl-eglir",
+  manaCost: 60,
+  minLevelRequired: 4,
   minMagicLevelRequired: 5,
-  cooldown: 40,
-  animationKey: AnimationEffectKeys.PhysicalShield,
-  attribute: CombatSkill.Shielding,
+  cooldown: 60,
+  animationKey: AnimationEffectKeys.BlueWings,
+  attribute: BasicAttribute.Strength,
   characterClass: [CharacterClass.Warrior],
 
   usableEffect: async (character: ICharacter) => {
@@ -34,7 +33,7 @@ export const spellFortifyDefense: Partial<ISpell> = {
 
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 20,
-      max: 180,
+      max: 120,
     });
 
     const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
@@ -44,7 +43,7 @@ export const spellFortifyDefense: Partial<ISpell> = {
 
     await characterBuffActivator.enableTemporaryBuff(character, {
       type: CharacterBuffType.Skill,
-      trait: CombatSkill.Shielding,
+      trait: BasicAttribute.Strength,
       buffPercentage,
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
