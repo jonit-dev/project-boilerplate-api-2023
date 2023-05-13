@@ -79,10 +79,7 @@ export class CharacterNetworkLogout {
           }
         );
 
-        await this.characterBuff.disableAllBuffs(character);
-
         await this.specialEffect.clearEffects(character);
-        await this.spellCooldown.clearCooldowns(character._id);
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());
 

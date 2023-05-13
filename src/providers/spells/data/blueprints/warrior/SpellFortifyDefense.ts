@@ -22,7 +22,7 @@ export const spellFortifyDefense: Partial<ISpell> = {
   manaCost: 50,
   minLevelRequired: 6,
   minMagicLevelRequired: 5,
-  cooldown: 20,
+  cooldown: 40,
   animationKey: AnimationEffectKeys.PhysicalShield,
   attribute: CombatSkill.Shielding,
   characterClass: [CharacterClass.Warrior],

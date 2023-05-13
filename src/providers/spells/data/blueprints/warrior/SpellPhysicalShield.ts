@@ -21,7 +21,7 @@ export const spellPhysicalShield: Partial<ISpell> = {
   manaCost: 60,
   minLevelRequired: 7,
   minMagicLevelRequired: 7,
-  cooldown: 20,
+  cooldown: 40,
   animationKey: AnimationEffectKeys.PhysicalShield,
   attribute: BasicAttribute.Resistance,
   characterClass: [CharacterClass.Warrior],

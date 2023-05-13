@@ -15,7 +15,7 @@ export const spellStunTarget: Partial<ISpell> = {
   manaCost: 60,
   minLevelRequired: 4,
   minMagicLevelRequired: 8,
-  cooldown: 60,
+  cooldown: 40,
   animationKey: AnimationEffectKeys.Rooted,
   projectileAnimationKey: AnimationEffectKeys.Energy,
   maxDistanceGrid: RangeTypes.Medium,

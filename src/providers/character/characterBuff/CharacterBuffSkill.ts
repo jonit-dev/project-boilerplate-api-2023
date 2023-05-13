@@ -196,7 +196,7 @@ export class CharacterBuffSkill {
         this.socketMessaging.sendMessageToCharacter(
           character,
           buff.options?.messages?.deactivation ||
-            `Your skill ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} has been buffed by ${
+            `Your skill ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} has been debuffed by -${
               buff.buffPercentage
             }%!`
         );
