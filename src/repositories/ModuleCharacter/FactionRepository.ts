@@ -1,20 +1,21 @@
-import { CharacterTexture, ICharacterTexture } from "@entities/ModuleCharacter/CharacterTextureModel";
-import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
-import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
+import characterTextures from "@providers/characterTextures/data/charactertextures.json";
+import { ICharacterTexture } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(FactionRepository)
-export class FactionRepository extends CRUD {
-  constructor(private analyticsHelper: AnalyticsHelper) {
-    super(analyticsHelper);
+export class FactionRepository {
+  constructor() {}
+
+  public readSprites(characterClass: string, race: string): ICharacterTexture[] {
+    return characterTextures.filter(
+      (texture: ICharacterTexture) => texture.race === race && texture.class === characterClass
+    );
   }
 
-  public async readSprites(clas: string, race: string): Promise<ICharacterTexture[]> {
-    return await this.readAll(CharacterTexture, { class: clas, race: race }, false, null, true);
-  }
-
-  public async exists(race: string, textureKey: string): Promise<boolean> {
-    const textures = await this.readAll(CharacterTexture, { race: race, textureKey: textureKey }, false, null, true);
-    return textures.length > 0;
+  public exists(race: string, textureKey: string): boolean {
+    const textures = characterTextures.find(
+      (texture: ICharacterTexture) => texture.race === race && texture.textureKey === textureKey
+    );
+    return !!textures;
   }
 }

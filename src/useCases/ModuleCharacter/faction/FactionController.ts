@@ -1,14 +1,16 @@
-import { ICharacterTexture } from "@entities/ModuleCharacter/CharacterTextureModel";
 import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
+import { CharacterClass, ICharacterTexture } from "@rpg-engine/shared";
 import { controller, httpGet, interfaces, queryParam } from "inversify-express-utils";
-import { ReadFactionRacesUseCase } from "./read/ReadFactionRacesUseCase";
-import { ReadSpriteUseCase } from "./read/ReadSpriteUseCase";
 import { ReadCharacterClass } from "./read/ReadCharacterClass";
-import { CharacterClass } from "@rpg-engine/shared";
+import { ReadFactionRacesUseCase } from "./read/ReadFactionRacesUseCase";
+import { ReadFactionSpriteUseCase } from "./read/ReadFactionSpriteUseCase";
 
 @controller("/factions", AuthMiddleware)
 export class FactionController implements interfaces.Controller {
-  constructor(private readFactionRacesUseCase: ReadFactionRacesUseCase, private readSpriteUseCase: ReadSpriteUseCase) {}
+  constructor(
+    private readFactionRacesUseCase: ReadFactionRacesUseCase,
+    private readSpriteUseCase: ReadFactionSpriteUseCase
+  ) {}
 
   @httpGet("/classes")
   private getFactionClasses(): string[] {
@@ -21,13 +23,13 @@ export class FactionController implements interfaces.Controller {
   }
 
   @httpGet("/sprites")
-  private async getSprites(
-    @queryParam("class") clas: string,
+  private getSprites(
+    @queryParam("class") characterClass: string,
     @queryParam("race") race: string
-  ): Promise<ICharacterTexture[]> {
-    let results = await this.readSpriteUseCase.readAll(clas || CharacterClass.None, race);
+  ): ICharacterTexture[] {
+    let results = this.readSpriteUseCase.readAll(characterClass || CharacterClass.None, race);
     if (results.length < 1) {
-      results = await this.readSpriteUseCase.readAll(CharacterClass.None, race);
+      results = this.readSpriteUseCase.readAll(CharacterClass.None, race);
     }
     return results;
   }

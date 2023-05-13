@@ -1,4 +1,3 @@
-import { CharacterTexturesSeeder } from "@providers/characterTextures/CharacterTexturesSeeder";
 import { appEnv } from "@providers/config/env";
 import { ItemSeeder } from "@providers/item/ItemSeeder";
 import { QuestSeeder } from "@providers/quest/QuestSeeder";
@@ -13,7 +12,6 @@ export class Seeder {
     private npcSeeder: NPCSeeder,
     private itemSeeder: ItemSeeder,
     private questSeeder: QuestSeeder,
-    private characterTextureSeeder: CharacterTexturesSeeder,
     private redisCleanup: RedisCleanup
   ) {}
 
@@ -23,7 +21,6 @@ export class Seeder {
       await this.npcSeeder.seed();
       await this.itemSeeder.seed();
       await this.questSeeder.seed();
-      await this.characterTextureSeeder.seed();
       await this.redisCleanup.cleanup();
     } else {
       // in production we just need one instance
@@ -31,7 +28,6 @@ export class Seeder {
         await this.npcSeeder.seed();
         await this.itemSeeder.seed();
         await this.questSeeder.seed();
-        await this.characterTextureSeeder.seed();
         await this.redisCleanup.cleanup();
       }
     }
