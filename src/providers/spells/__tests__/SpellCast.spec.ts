@@ -9,6 +9,7 @@ import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
 import {
   AnimationSocketEvents,
   CharacterClass,
@@ -23,15 +24,14 @@ import {
 } from "@rpg-engine/shared";
 import { SpellCast } from "../SpellCast";
 import { SpellLearn } from "../SpellLearn";
-import { spellStealth } from "../data/blueprints/rogue/SpellStealth";
 import { spellArrowCreation } from "../data/blueprints/all/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/all/SpellBlankRuneCreation";
 import { spellGreaterHealing } from "../data/blueprints/all/SpellGreaterHealing";
 import { spellSelfHealing } from "../data/blueprints/all/SpellSelfHealing";
+import { rogueSpellExecution } from "../data/blueprints/rogue/SpellExecution";
+import { spellStealth } from "../data/blueprints/rogue/SpellStealth";
 import { spellStunTarget } from "../data/blueprints/warrior/SpellStunTarget";
 import { ISpell, SpellsBlueprint } from "../data/types/SpellsBlueprintTypes";
-import { rogueSpellExecution } from "../data/blueprints/rogue/SpellExecution";
-import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;
@@ -442,7 +442,7 @@ describe("SpellCast.ts", () => {
 
     const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
     const timeout = Math.min(Math.max(skills.magic.level * 1.5, 10), 180);
-    expect(timerMock.mock.calls[0][1]).toBe(timeout * 1000);
+    expect(timerMock.mock.calls[0][1]).toBe(timeout * 1500);
 
     await timerMock.mock.calls[0][0]();
     expect(await specialEffect.isInvisible(testCharacter)).toBeFalsy();

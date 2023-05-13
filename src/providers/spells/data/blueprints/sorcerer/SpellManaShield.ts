@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, BasicAttribute, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
+import { SpellCalculator } from "../../abstractions/SpellCalculator";
 import { ISpell, NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellManaShield: Partial<ISpell> = {
@@ -22,9 +22,12 @@ export const spellManaShield: Partial<ISpell> = {
   usableEffect: async (character: ICharacter) => {
     const inMemoryHashTable = container.get(InMemoryHashTable);
 
-    const skills = (await Skill.findById(character.skills).select("magic.level").lean()) as ISkill;
+    const spellCalculator = container.get(SpellCalculator);
 
-    const timeout = Math.min(Math.max(skills.magic.level * 2, 40), 180);
+    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 40,
+      max: 180,
+    });
 
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
     const key = SpellsBlueprint.SorcererManaShield;

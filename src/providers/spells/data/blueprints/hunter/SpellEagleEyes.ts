@@ -1,15 +1,16 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { container } from "@providers/inversify/container";
 import {
   AnimationEffectKeys,
+  BasicAttribute,
   CharacterBuffDurationType,
   CharacterBuffType,
   CharacterClass,
   CombatSkill,
   SpellCastingType,
 } from "@rpg-engine/shared";
+import { SpellCalculator } from "../../abstractions/SpellCalculator";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellEagleEyes: Partial<ISpell> = {
@@ -28,14 +29,22 @@ export const spellEagleEyes: Partial<ISpell> = {
 
   usableEffect: async (character: ICharacter) => {
     const characterBuffActivator = container.get(CharacterBuffActivator);
+    const spellCalculator = container.get(SpellCalculator);
 
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
-    const timeout = Math.min(Math.max(skills.distance.level * 5, 10), 180);
+    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 20,
+      max: 180,
+    });
+
+    const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 10,
+      max: 30,
+    });
 
     await characterBuffActivator.enableTemporaryBuff(character, {
       type: CharacterBuffType.Skill,
       trait: CombatSkill.Distance,
-      buffPercentage: 20,
+      buffPercentage,
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
     });

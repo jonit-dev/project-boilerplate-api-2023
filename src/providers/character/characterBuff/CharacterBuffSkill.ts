@@ -57,7 +57,7 @@ export class CharacterBuffSkill {
       throw new Error("Could not add buff to character");
     }
 
-    await this.sendUpdateToClient(character, buff);
+    await this.sendUpdateToClient(character, buff, "activation");
 
     return addedBuff;
   }
@@ -103,17 +103,7 @@ export class CharacterBuffSkill {
       }
     );
 
-    if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.activation) {
-      this.socketMessaging.sendMessageToCharacter(
-        character,
-        buff.options?.messages?.activation ||
-          `Your skill ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} has been buffed by ${
-            buff.buffPercentage
-          }%!`
-      );
-    }
-
-    await this.sendUpdateToClient(character, buff);
+    await this.sendUpdateToClient(character, buff, "deactivation");
 
     return true;
   }
@@ -165,7 +155,11 @@ export class CharacterBuffSkill {
     };
   }
 
-  private async sendUpdateToClient(character: ICharacter, buff: ICharacterBuff): Promise<void> {
+  private async sendUpdateToClient(
+    character: ICharacter,
+    buff: ICharacterBuff,
+    type: "activation" | "deactivation"
+  ): Promise<void> {
     const skill = await Skill.findById(character.skills);
 
     if (!skill) {
@@ -176,14 +170,37 @@ export class CharacterBuffSkill {
       skill,
     });
 
-    if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.deactivation) {
-      this.socketMessaging.sendMessageToCharacter(
-        character,
-        buff.options?.messages?.deactivation ||
-          `Your skill ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} has been buffed by ${
-            buff.buffPercentage
-          }%!`
-      );
+    this.sendCharacterActivationDeactivationMessage(character, buff, type);
+  }
+
+  private sendCharacterActivationDeactivationMessage(
+    character: ICharacter,
+    buff: ICharacterBuff,
+    type: "activation" | "deactivation"
+  ): void {
+    if (buff.options?.messages?.skipAllMessages === true) {
+      return;
+    }
+
+    switch (type) {
+      case "activation":
+        this.socketMessaging.sendMessageToCharacter(
+          character,
+          buff.options?.messages?.activation ||
+            `Your skill ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} has been buffed by ${
+              buff.buffPercentage
+            }%!`
+        );
+        break;
+      case "deactivation":
+        this.socketMessaging.sendMessageToCharacter(
+          character,
+          buff.options?.messages?.deactivation ||
+            `Your skill ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} has been buffed by ${
+              buff.buffPercentage
+            }%!`
+        );
+        break;
     }
   }
 }

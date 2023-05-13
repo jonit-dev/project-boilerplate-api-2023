@@ -4,6 +4,7 @@ import "express-async-errors";
 
 import { appEnv } from "@providers/config/env";
 import {
+  characterBuffActivator,
   characterConnection,
   characterFoodConsumption,
   characterMonitor,
@@ -73,6 +74,8 @@ app.listen(port, async () => {
   await characterFoodConsumption.clearAllFoodConsumption();
 
   characterMonitor.monitor();
+
+  await characterBuffActivator.disableAllTemporaryBuffsAllCharacters();
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({

@@ -1,9 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, CharacterClass, RangeTypes, SpellCastingType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, BasicAttribute, CharacterClass, RangeTypes, SpellCastingType } from "@rpg-engine/shared";
+import { SpellCalculator } from "../../abstractions/SpellCalculator";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellStunTarget: Partial<ISpell> = {
@@ -15,7 +15,7 @@ export const spellStunTarget: Partial<ISpell> = {
   manaCost: 60,
   minLevelRequired: 4,
   minMagicLevelRequired: 8,
-  cooldown: 10,
+  cooldown: 60,
   animationKey: AnimationEffectKeys.Rooted,
   projectileAnimationKey: AnimationEffectKeys.Energy,
   maxDistanceGrid: RangeTypes.Medium,
@@ -26,9 +26,14 @@ export const spellStunTarget: Partial<ISpell> = {
       return false;
     }
 
+    const spellCalculator = container.get(SpellCalculator);
+
     const effect = container.get(SpecialEffect);
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
-    const timeout = Math.min(Math.max(skills.magic.level * 1.5, 10), 180);
+
+    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 10,
+      max: 40,
+    });
 
     await effect.stun(target, timeout);
 

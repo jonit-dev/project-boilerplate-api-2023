@@ -1,4 +1,5 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import {
   CharacterBuffDurationType,
   CharacterBuffType,
@@ -61,6 +62,20 @@ export class CharacterBuffActivator {
       if (buff.durationType === durationType) {
         await this.disableBuff(character, buff._id!, buff.type);
       }
+    }
+  }
+
+  public async disableAllTemporaryBuffsAllCharacters(): Promise<void> {
+    const temporaryBuffs = await CharacterBuff.find({ durationType: CharacterBuffDurationType.Temporary }).lean();
+
+    for (const buff of temporaryBuffs) {
+      const character = (await Character.findById(buff.owner).lean()) as ICharacter;
+
+      if (!character) {
+        continue;
+      }
+
+      await this.disableBuff(character, buff._id!, buff.type as CharacterBuffType);
     }
   }
 

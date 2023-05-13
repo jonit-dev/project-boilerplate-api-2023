@@ -1,6 +1,7 @@
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { CharacterMonitor } from "@providers/character/CharacterMonitor";
+import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { InMemoryRepository } from "@providers/database/InMemoryRepository";
 import { RedisManager } from "@providers/database/RedisManager";
@@ -12,7 +13,7 @@ import { HeapMonitor } from "@providers/server/HeapMonitor";
 import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
-import { SpellItemQuantityCalculator } from "@providers/spells/data/abstractions/SpellItemQuantityCalculator";
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
 import { Container } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
@@ -69,6 +70,8 @@ export const characterFoodConsumption = container.get<CharacterFoodConsumption>(
 
 export const characterMonitor = container.get<CharacterMonitor>(CharacterMonitor);
 
-export const spellItemQuantityCalculator = container.get<SpellItemQuantityCalculator>(SpellItemQuantityCalculator);
+export const spellCalculator = container.get<SpellCalculator>(SpellCalculator);
+
+export const characterBuffActivator = container.get<CharacterBuffActivator>(CharacterBuffActivator);
 
 export { container };
