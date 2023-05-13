@@ -11,5 +11,6 @@ export const itemSteelIngot: ICraftableItemBlueprint = {
   description: "An useful and common Steel Ingot for crafting.",
   weight: 1,
   maxStackSize: 10,
-  basePrice: 0.5,
+  basePrice: 50,
+  canSell: false,
 };

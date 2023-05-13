@@ -11,5 +11,5 @@ export const itemPolishedStone: ICraftableItemBlueprint = {
   description: "A crafting material made of stone polished to sharpen it.",
   weight: 0.1,
   maxStackSize: 100,
-  basePrice: 3,
+  basePrice: 8,
 };

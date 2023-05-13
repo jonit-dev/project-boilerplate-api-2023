@@ -11,5 +11,5 @@ export const itemHerb: ICraftableItemBlueprint = {
   description: "A crafting resource used for making healing potions and antidotes.",
   weight: 0.01,
   maxStackSize: 100,
-  basePrice: 5,
+  basePrice: 8,
 };

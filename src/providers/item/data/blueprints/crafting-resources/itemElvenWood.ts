@@ -11,6 +11,6 @@ export const itemElvenWood: ICraftableItemBlueprint = {
   description: "A piece of wood from the Elven Tree.",
   weight: 0.05,
   maxStackSize: 100,
-  basePrice: 5,
+  basePrice: 15,
   canSell: false,
 };

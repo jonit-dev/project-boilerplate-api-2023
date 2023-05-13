@@ -11,5 +11,5 @@ export const itemBlueLeather: ICraftableItemBlueprint = {
   description: "A craft material used for special armors.",
   weight: 0.01,
   maxStackSize: 100,
-  basePrice: 1.5,
+  basePrice: 12,
 };

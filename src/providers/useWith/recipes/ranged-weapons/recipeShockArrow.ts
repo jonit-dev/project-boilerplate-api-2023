@@ -29,7 +29,7 @@ export const recipeShockArrow: IUseWithCraftingRecipe = {
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Feather, 2],
       [CraftingResourcesBlueprint.SmallWoodenStick, 2],
-      [CraftingResourcesBlueprint.MagicRecipe, 2],
+      [MagicsBlueprint.EnergyBoltRune, 2],
     ]),
   ],
 };

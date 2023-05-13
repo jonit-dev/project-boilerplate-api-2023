@@ -12,6 +12,7 @@ import { HeapMonitor } from "@providers/server/HeapMonitor";
 import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
+import { SpellItemQuantityCalculator } from "@providers/spells/data/abstractions/SpellItemQuantityCalculator";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
 import { Container } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
@@ -67,5 +68,7 @@ export const pm2Helper = container.get<PM2Helper>(PM2Helper);
 export const characterFoodConsumption = container.get<CharacterFoodConsumption>(CharacterFoodConsumption);
 
 export const characterMonitor = container.get<CharacterMonitor>(CharacterMonitor);
+
+export const spellItemQuantityCalculator = container.get<SpellItemQuantityCalculator>(SpellItemQuantityCalculator);
 
 export { container };

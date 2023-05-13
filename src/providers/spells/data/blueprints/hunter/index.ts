@@ -2,6 +2,7 @@ import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 import { spellBoltCreation } from "./SpellBoltCreation";
 import { spellEagleEyes } from "./SpellEagleEyes";
 import { spellFireBoltCreation } from "./SpellFireBoltCreation";
+import { spellPoisonArrowCreation } from "./SpellPoisonArrowCreation";
 import { spellQuickFire } from "./SpellQuickFire";
 
 export const hunterSpellsIndex = {
@@ -9,4 +10,5 @@ export const hunterSpellsIndex = {
   [SpellsBlueprint.FireBoltCreationSpell]: spellFireBoltCreation,
   [SpellsBlueprint.SpellEagleEyes]: spellEagleEyes,
   [SpellsBlueprint.HunterQuickFire]: spellQuickFire,
+  [SpellsBlueprint.PoisonArrowCreationSpell]: spellPoisonArrowCreation,
 };

@@ -11,6 +11,6 @@ export const itemCopperOre: ICraftableItemBlueprint = {
   description: "Copper ore that can be smelted into ingots.",
   weight: 1.4,
   maxStackSize: 100,
-  basePrice: 10,
+  basePrice: 15,
   canSell: false,
 };

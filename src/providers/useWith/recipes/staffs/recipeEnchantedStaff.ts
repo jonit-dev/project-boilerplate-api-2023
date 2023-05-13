@@ -21,7 +21,7 @@ export const recipeEnchantedStaff: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
+    CraftingSkill.Alchemy,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.BlueFeather, 4],
       [CraftingResourcesBlueprint.ObsidiumIngot, 3],

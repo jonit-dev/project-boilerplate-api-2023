@@ -11,5 +11,5 @@ export const itemColoredFeather: ICraftableItemBlueprint = {
   description: "A crafting resource used for making arrows and magic items",
   weight: 0.01,
   maxStackSize: 100,
-  basePrice: 3,
+  basePrice: 30,
 };

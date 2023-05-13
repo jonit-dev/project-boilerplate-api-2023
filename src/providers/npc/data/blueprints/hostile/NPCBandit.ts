@@ -49,6 +49,10 @@ export const npcBandit: Partial<INPC> = {
       chance: 10,
     },
     {
+      itemBlueprintKey: FoodsBlueprint.Milk,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: MacesBlueprint.SpikedClub,
       chance: 20,
     },

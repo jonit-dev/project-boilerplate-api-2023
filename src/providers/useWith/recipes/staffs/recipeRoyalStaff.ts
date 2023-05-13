@@ -29,7 +29,7 @@ export const recipeRoyalStaff: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
+    CraftingSkill.Alchemy,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.RedSapphire, 10],
       [CraftingResourcesBlueprint.PhoenixFeather, 10],

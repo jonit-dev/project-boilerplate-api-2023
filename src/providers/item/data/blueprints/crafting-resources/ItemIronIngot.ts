@@ -12,6 +12,6 @@ export const itemIronIngot: ICraftableItemBlueprint = {
     "An iron ingot. You can use this material with a hammer to craft weapons, but you need to be close to an anvil.",
   weight: 1,
   maxStackSize: 100,
-  basePrice: 10,
+  basePrice: 12,
   canSell: false,
 };

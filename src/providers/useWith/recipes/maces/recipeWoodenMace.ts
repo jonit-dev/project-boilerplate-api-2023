@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -12,8 +11,5 @@ export const recipeWoodenMace: IUseWithCraftingRecipe = {
       qty: 20,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([[CraftingResourcesBlueprint.WoodenSticks, 20]]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 2],
 };

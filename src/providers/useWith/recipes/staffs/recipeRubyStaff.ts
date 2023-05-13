@@ -21,7 +21,7 @@ export const recipeRubyStaff: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
+    CraftingSkill.Alchemy,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.RedSapphire, 10],
       [CraftingResourcesBlueprint.GreaterWoodenLog, 3],

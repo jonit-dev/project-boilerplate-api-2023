@@ -11,5 +11,5 @@ export const itemSmallWorm: ICraftableItemBlueprint = {
   description: "A small worm used for fishing.",
   weight: 0.01,
   maxStackSize: 100,
-  basePrice: 0.2,
+  basePrice: 0.5,
 };

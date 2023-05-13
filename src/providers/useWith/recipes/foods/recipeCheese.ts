@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { FoodsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -12,5 +11,5 @@ export const recipeCheese: IUseWithCraftingRecipe = {
       qty: 0.25,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Cooking, calculateMinimumLevel([[FoodsBlueprint.Milk, 0.25]])],
+  minCraftingRequirements: [CraftingSkill.Cooking, 1],
 };

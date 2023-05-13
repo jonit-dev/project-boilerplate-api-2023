@@ -12,5 +12,5 @@ export const itemIronNail: ICraftableItemBlueprint = {
   weight: 0.01,
   maxStackSize: 100,
 
-  basePrice: 2,
+  basePrice: 5,
 };

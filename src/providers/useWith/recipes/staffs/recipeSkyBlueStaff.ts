@@ -25,7 +25,7 @@ export const recipeBlueSkyStaff: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
+    CraftingSkill.Alchemy,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.BlueSapphire, 10],
       [CraftingResourcesBlueprint.BlueFeather, 10],

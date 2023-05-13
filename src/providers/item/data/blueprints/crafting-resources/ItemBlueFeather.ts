@@ -11,5 +11,5 @@ export const itemBlueFeather: ICraftableItemBlueprint = {
   description: "A craft material used to make arrows.",
   weight: 0.01,
   maxStackSize: 100,
-  basePrice: 0.5,
+  basePrice: 10,
 };

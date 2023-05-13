@@ -97,6 +97,10 @@ export const npcOrcWarrior = {
       chance: 5,
     },
     {
+      itemBlueprintKey: FoodsBlueprint.Milk,
+      chance: 20,
+    },
+    {
       itemBlueprintKey: FoodsBlueprint.RottenMeat,
       chance: 40,
       quantityRange: [5, 10],

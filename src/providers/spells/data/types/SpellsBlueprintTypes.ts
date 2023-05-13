@@ -25,6 +25,7 @@ export enum SpellsBlueprint {
   EnergyBoltRuneCreationSpell = "energy-bolt-rune-creation-spell",
   FireBoltRuneCreationSpell = "fire-bolt-rune-creation-spell",
   FireBoltCreationSpell = "fire-bolt-creation-spell",
+  PoisonArrowCreationSpell = "poison-arrow-creation-spell",
   CorruptionRuneCreationSpell = "corruption-rune-creation-spell",
   SpellDivineProtection = "spell-divine-protection",
   SpellPhysicalShield = "spell-physical-shield",

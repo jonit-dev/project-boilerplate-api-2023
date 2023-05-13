@@ -11,5 +11,5 @@ export const itemSilk: ICraftableItemBlueprint = {
   description: "A crafting resource used for making clothes and other items",
   weight: 0.05,
   maxStackSize: 100,
-  basePrice: 0.5,
+  basePrice: 5,
 };

@@ -11,5 +11,5 @@ export const itemWolfTooth: ICraftableItemBlueprint = {
   description: "A crafting material used as a magic reagent.",
   weight: 0.01,
   maxStackSize: 100,
-  basePrice: 0.5,
+  basePrice: 4,
 };

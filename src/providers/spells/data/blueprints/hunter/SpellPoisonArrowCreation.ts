@@ -6,34 +6,33 @@ import { SpellItemCreation } from "../../abstractions/SpellItemCreation";
 import { SpellItemQuantityCalculator } from "../../abstractions/SpellItemQuantityCalculator";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
-export const spellFireBoltCreation: Partial<ISpell> = {
-  key: SpellsBlueprint.FireBoltCreationSpell,
-
-  name: "Fire Bolt Creation Spell",
-  description: "A spell that creates fire bolts in your inventory.",
+export const spellPoisonArrowCreation: Partial<ISpell> = {
+  key: SpellsBlueprint.PoisonArrowCreationSpell,
+  name: "Poison Arrow Creation Spell",
+  description: "A spell that creates poison arrows in your inventory.",
 
   castingType: SpellCastingType.SelfCasting,
-  magicWords: "naur iquar lyn",
+  magicWords: "thalion pilya",
   manaCost: 25,
-  minLevelRequired: 15,
-  minMagicLevelRequired: 5,
-  cooldown: 5,
+  minLevelRequired: 12,
+  minMagicLevelRequired: 4,
+  cooldown: 10,
   animationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Hunter],
 
   usableEffect: async (character: ICharacter) => {
+    const spellItemCreation = container.get(SpellItemCreation);
+
     const spellItemQuantityCalculator = container.get(SpellItemQuantityCalculator);
     const createQty = await spellItemQuantityCalculator.getQuantityBasedOnSkillLevel(character, "magic", {
       max: 100,
       min: 1,
-      difficulty: 5,
+      difficulty: 4,
     });
-
-    const spellItemCreation = container.get(SpellItemCreation);
 
     return await spellItemCreation.createItem(character, {
       itemToCreate: {
-        key: RangedWeaponsBlueprint.FireBolt,
+        key: RangedWeaponsBlueprint.PoisonArrow,
         createQty,
       },
     });
