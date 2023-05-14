@@ -47,6 +47,7 @@ export enum SpellsBlueprint {
   Focus = "focus",
   PowerStrike = "power-strike",
   CurseOfWeakness = "curse-of-weakness",
+  EntanglingRoots = "entangling-roots",
 }
 
 export interface ISpell {
