@@ -168,6 +168,18 @@
     "textureDisplayName": "Elf Hunter 2"
   },
   {
+    "class": "Sorcerer",
+    "race": "Elf",
+    "textureKey": "elf-mage",
+    "textureDisplayName": "Elf Mage"
+  },
+  {
+    "class": "Druid",
+    "race": "Elf",
+    "textureKey": "elf-mage",
+    "textureDisplayName": "Elf Mage"
+  },
+  {
     "class": "None",
     "race": "Dwarf",
     "textureKey": "dwarf",
