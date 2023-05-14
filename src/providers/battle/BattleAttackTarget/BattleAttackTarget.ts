@@ -222,7 +222,7 @@ export class BattleAttackTarget {
         }
 
         let sorcererManaShield: boolean = false;
-        if (target.class === CharacterClass.Sorcerer) {
+        if (target.class === CharacterClass.Sorcerer || target.class === CharacterClass.Druid) {
           const character = target as ICharacter;
 
           const isActive = await this.manaShield.getManaShieldSpell(character);

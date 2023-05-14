@@ -21,7 +21,7 @@ export class MagePassiveHabilities {
   public async autoRegenManaHandler(character: ICharacter): Promise<void> {
     const { _id, skills, mana, maxMana } = character;
 
-    if (character.class !== CharacterClass.Sorcerer) {
+    if (character.class !== CharacterClass.Sorcerer && character.class !== CharacterClass.Druid) {
       this.characterMonitor.unwatch(character);
       return;
     }

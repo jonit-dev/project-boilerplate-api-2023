@@ -237,16 +237,8 @@ export class CharacterNetworkCreate {
           }
           break;
 
-        case CharacterClass.Sorcerer:
-          if (manaCondition) {
-            const isActive = await this.inMemoryHashTable.has(namespace, manaKey);
-            isActive
-              ? this.characterMonitor.unwatch(character)
-              : await this.magePassiveHabilities.autoRegenManaHandler(character);
-          }
-          break;
-
         case CharacterClass.Druid:
+        case CharacterClass.Sorcerer:
           if (manaCondition) {
             const isActive = await this.inMemoryHashTable.has(namespace, manaKey);
             isActive
