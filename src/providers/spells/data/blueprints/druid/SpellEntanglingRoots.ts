@@ -6,21 +6,21 @@ import { AnimationEffectKeys, BasicAttribute, CharacterClass, RangeTypes, SpellC
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
-export const spellStunTarget: Partial<ISpell> = {
-  key: SpellsBlueprint.WarriorStunTarget,
-  name: "Stun",
-  description: "A spell designed for a warrior to stun a target in battle.",
+export const spellEntanglingRoots: Partial<ISpell> = {
+  key: SpellsBlueprint.EntanglingRoots,
+  name: "Entangling Roots",
+  description: "Stun your enemy by manipulating the primal forces of nature",
   castingType: SpellCastingType.RangedCasting,
-  magicWords: "talas tamb-eth",
-  manaCost: 100,
+  magicWords: "raithin-nodrim",
+  manaCost: 80,
   minLevelRequired: 4,
   minMagicLevelRequired: 8,
-  cooldown: 120,
+  cooldown: 60,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Rooted,
   projectileAnimationKey: AnimationEffectKeys.Energy,
-  maxDistanceGrid: RangeTypes.Medium,
-  characterClass: [CharacterClass.Warrior],
+  maxDistanceGrid: RangeTypes.High,
+  characterClass: [CharacterClass.Druid],
 
   usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
     if (character._id.toString() === target._id.toString()) {
@@ -32,8 +32,8 @@ export const spellStunTarget: Partial<ISpell> = {
     const effect = container.get(SpecialEffect);
 
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 5,
-      max: 10,
+      min: 10,
+      max: 30,
     });
 
     await effect.stun(target, timeout);
