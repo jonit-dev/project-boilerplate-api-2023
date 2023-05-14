@@ -10,7 +10,7 @@ import {
   CharacterClass,
   SpellCastingType,
 } from "@rpg-engine/shared";
-import { DruidSpells } from "../../logic/berserker/DruidSpells";
+import { ShapeShift } from "../../logic/mage/druid/ShapeShift";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellShapeshift: Partial<ISpell> = {
@@ -27,7 +27,7 @@ export const spellShapeshift: Partial<ISpell> = {
   characterClass: [CharacterClass.Druid],
 
   usableEffect: async (character: ICharacter) => {
-    const druidSpells = container.get(DruidSpells);
+    const shapeShift = container.get(ShapeShift);
     const characterBuffActivator = container.get(CharacterBuffActivator);
 
     const skills = (await Skill.findById(character.skills).lean().select("magic strength resistance")) as ISkill;
@@ -36,7 +36,7 @@ export const spellShapeshift: Partial<ISpell> = {
     const strengthPercent = Math.min(Math.max(skills.strength.level * 0.5, 5), 30);
     const resistancePercent = Math.min(Math.max(skills.resistance.level * 0.5, 5), 30);
 
-    await druidSpells.handleShapeShift(character, "brown-bear", timeoutInSecs);
+    await shapeShift.handleShapeShift(character, "brown-bear", timeoutInSecs);
 
     await characterBuffActivator.enableTemporaryBuff(character, {
       type: CharacterBuffType.Skill,

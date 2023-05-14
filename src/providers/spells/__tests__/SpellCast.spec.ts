@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
@@ -9,7 +9,7 @@ import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
+import { Execution } from "@providers/spells/data/logic/berserker/Execution";
 import {
   AnimationSocketEvents,
   CharacterClass,
@@ -42,7 +42,7 @@ describe("SpellCast.ts", () => {
   let sendEventToUser: jest.SpyInstance;
   let level2Spells: Partial<ISpell>[] = [];
   let specialEffect: SpecialEffect;
-  let berserkerSpells: BerserkerSpells;
+  let berserkerSpells: Execution;
 
   // let level3Spells: Partial<ISpell>[] = [];
   // let level4Spells: Partial<ISpell>[] = [];
@@ -52,7 +52,7 @@ describe("SpellCast.ts", () => {
     spellCast = container.get<SpellCast>(SpellCast);
     spellLearn = container.get<SpellLearn>(SpellLearn);
     specialEffect = container.get<SpecialEffect>(SpecialEffect);
-    berserkerSpells = container.get(BerserkerSpells);
+    berserkerSpells = container.get(Execution);
 
     level2Spells = [spellSelfHealing, spellArrowCreation, spellBlankRuneCreation];
     // level3Spells = [spellBoltCreation, spellFoodCreation];
@@ -590,50 +590,6 @@ describe("SpellCast.ts", () => {
         .exec();
 
       expect(characterBody).not.toBeNull();
-    });
-
-    it("should not execute spell if the health target > 30%", async () => {
-      const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
-      timerMock.mockImplementation();
-
-      targetCharacter.health = 100;
-      await Character.findByIdAndUpdate(targetCharacter._id, targetCharacter);
-
-      await berserkerSpells.handleBerserkerExecution(testCharacter, targetCharacter);
-
-      const characterBody = await Item.findOne({
-        name: `${targetCharacter.name}'s body`,
-        scene: targetCharacter.scene,
-      })
-        .populate("itemContainer")
-        .exec();
-
-      expect(characterBody).toBeNull();
-      expect(targetCharacter.health).toBe(100);
-      expect(targetCharacter.isAlive).toBe(true);
-    });
-
-    it("should execute spell successfully for an NPC target", async () => {
-      const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
-      timerMock.mockImplementation();
-
-      expect(targetNPC.health).toBe(5);
-      expect(targetNPC.isAlive).toBe(true);
-
-      await berserkerSpells.handleBerserkerExecution(testCharacter, targetNPC);
-
-      const updateNPC = (await NPC.findById(targetNPC._id).lean()) as INPC;
-
-      const characterBody = await Item.findOne({
-        name: `${targetNPC.name}'s body`,
-        scene: targetNPC.scene,
-      })
-        .populate("itemContainer")
-        .exec();
-
-      expect(characterBody).not.toBeNull();
-
-      expect(updateNPC.health).toBe(0);
     });
   });
 

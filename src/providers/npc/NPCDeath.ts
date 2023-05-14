@@ -1,7 +1,7 @@
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import {
   LOOT_CRAFTING_MATERIAL_DROP_CHANCE,
@@ -10,6 +10,7 @@ import {
   NPC_LOOT_CHANCE_MULTIPLIER,
 } from "@providers/constants/LootConstants";
 
+import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemRarity } from "@providers/item/ItemRarity";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -22,7 +23,6 @@ import random from "lodash/random";
 import { NPC_CYCLES } from "./NPCCycle";
 import { calculateGold } from "./NPCGold";
 import { NPCTarget } from "./movement/NPCTarget";
-import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
 
 @provide(NPCDeath)
 export class NPCDeath {
@@ -36,6 +36,13 @@ export class NPCDeath {
 
   public async handleNPCDeath(npc: INPC): Promise<void> {
     try {
+      if (npc.health > 0) {
+        // if by any reason the char is not dead, make sure it is.
+        await NPC.updateOne({ _id: npc._id }, { $set: { health: 0 } });
+        npc.health = 0;
+        npc.isAlive = false;
+      }
+
       await this.notifyCharactersOfNPCDeath(npc);
       const npcBody = await this.generateNPCBody(npc);
 

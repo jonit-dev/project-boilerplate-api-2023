@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container } from "@providers/inversify/container";
-import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
+import { Execution } from "@providers/spells/data/logic/berserker/Execution";
 import { AnimationEffectKeys, CharacterClass, RangeTypes, SpellCastingType } from "@rpg-engine/shared";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
@@ -21,6 +21,6 @@ export const rogueSpellExecution: Partial<ISpell> = {
   characterClass: [CharacterClass.Rogue],
 
   usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
-    await container.get(BerserkerSpells).handleBerserkerExecution(character, target);
+    await container.get(Execution).handleBerserkerExecution(character, target);
   },
 };

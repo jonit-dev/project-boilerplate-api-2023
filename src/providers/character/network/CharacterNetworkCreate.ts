@@ -30,9 +30,9 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
-import { DruidPassiveHabilities } from "../characterPassiveHabilities/Druid";
-import { SorcererPassiveHabilities } from "../characterPassiveHabilities/Sorcerer";
-import { WarriorPassiveHabilities } from "../characterPassiveHabilities/Warrior";
+
+import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
+import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
 
 @provide(CharacterNetworkCreate)
 export class CharacterNetworkCreate {
@@ -50,8 +50,8 @@ export class CharacterNetworkCreate {
     private characterMonitor: CharacterMonitor,
     private specialEffect: SpecialEffect,
     private warriorPassiveHabilities: WarriorPassiveHabilities,
-    private sorcererPassiveHabilities: SorcererPassiveHabilities,
-    private druidPassiveHabilities: DruidPassiveHabilities,
+    private magePassiveHabilities: MagePassiveHabilities,
+
     private inMemoryHashTable: InMemoryHashTable
   ) {}
 
@@ -242,7 +242,7 @@ export class CharacterNetworkCreate {
             const isActive = await this.inMemoryHashTable.has(namespace, manaKey);
             isActive
               ? this.characterMonitor.unwatch(character)
-              : await this.sorcererPassiveHabilities.sorcererAutoRegenManaHandler(character);
+              : await this.magePassiveHabilities.autoRegenManaHandler(character);
           }
           break;
 
@@ -251,7 +251,7 @@ export class CharacterNetworkCreate {
             const isActive = await this.inMemoryHashTable.has(namespace, manaKey);
             isActive
               ? this.characterMonitor.unwatch(character)
-              : await this.druidPassiveHabilities.druidAutoRegenManaHandler(character);
+              : await this.magePassiveHabilities.autoRegenManaHandler(character);
           }
           break;
 

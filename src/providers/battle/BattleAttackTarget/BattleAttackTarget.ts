@@ -12,9 +12,10 @@ import { NPCWarn } from "@providers/npc/NPCWarn";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
+import { Execution } from "@providers/spells/data/logic/berserker/Execution";
 
-import { ManaShield } from "@providers/spells/data/logic/Mage/ManaShield";
+import { Bloodthirst } from "@providers/spells/data/logic/berserker/Bloodthirst";
+import { ManaShield } from "@providers/spells/data/logic/mage/ManaShield";
 import {
   BasicAttribute,
   BattleEventType,
@@ -55,8 +56,9 @@ export class BattleAttackTarget {
     private battleAttackValidator: BattleAttackValidator,
     private battleAttackTargetDeath: BattleAttackTargetDeath,
     private entityEffectUse: EntityEffectUse,
-    private berserkerSpells: BerserkerSpells,
-    private manaShield: ManaShield
+    private berserkerSpells: Execution,
+    private manaShield: ManaShield,
+    private bloodthirst: Bloodthirst
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -213,9 +215,9 @@ export class BattleAttackTarget {
         if (attacker.class === CharacterClass.Berserker) {
           const character = attacker as ICharacter;
 
-          const isActive = await this.berserkerSpells.getBerserkerBloodthirstSpell(character);
+          const isActive = await this.bloodthirst.getBerserkerBloodthirstSpell(character);
           if (isActive) {
-            await this.berserkerSpells.handleBerserkerAttack(character, damage);
+            await this.bloodthirst.handleBerserkerAttack(character, damage);
           }
         }
 
