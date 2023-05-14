@@ -2,8 +2,9 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import { BasicAttribute, CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 
@@ -12,7 +13,8 @@ export class SorcererPassiveHabilities {
   constructor(
     private socketMessaging: SocketMessaging,
     private inMemoryHashTable: InMemoryHashTable,
-    private characterMonitor: CharacterMonitor
+    private characterMonitor: CharacterMonitor,
+    private spellCalculator: SpellCalculator
   ) {}
 
   public async sorcererAutoRegenManaHandler(character: ICharacter): Promise<void> {
@@ -34,7 +36,13 @@ export class SorcererPassiveHabilities {
     try {
       const { magic } = (await Skill.findById(skills).lean().select("magic")) as ISkill;
       const magicLvl = magic.level;
-      const interval = Math.min(Math.max(20000 - magicLvl * 500, 1000), 20000);
+      const interval =
+        (await this.spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+          max: 30,
+          min: 5,
+          skillAssociation: "reverse",
+        })) * 1000;
+
       const manaRegenAmount = Math.max(Math.floor(magicLvl / 3), 4);
 
       if (mana < maxMana) {

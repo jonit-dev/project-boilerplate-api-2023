@@ -14,7 +14,7 @@ import { SpellCalculator } from "../../abstractions/SpellCalculator";
 import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellFortifyDefense: Partial<ISpell> = {
-  key: SpellsBlueprint.SpellFortifyDefense,
+  key: SpellsBlueprint.FortifyDefense,
   name: "Self Fortify Defense",
   description: "Temporarily increases the warrior's shielding skill.",
   castingType: SpellCastingType.SelfCasting,
@@ -23,7 +23,7 @@ export const spellFortifyDefense: Partial<ISpell> = {
   minLevelRequired: 6,
   minMagicLevelRequired: 5,
   cooldown: 40,
-  animationKey: AnimationEffectKeys.PhysicalShield,
+  castingAnimationKey: AnimationEffectKeys.PhysicalShield,
   attribute: CombatSkill.Shielding,
   characterClass: [CharacterClass.Warrior],
 

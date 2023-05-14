@@ -13,7 +13,8 @@ import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BerserkerSpells } from "@providers/spells/data/logic/berserker/BerserkerSpells";
-import { SorcererSpells } from "@providers/spells/data/logic/berserker/SorcererSpells";
+
+import { ManaShield } from "@providers/spells/data/logic/Mage/ManaShield";
 import {
   BasicAttribute,
   BattleEventType,
@@ -55,7 +56,7 @@ export class BattleAttackTarget {
     private battleAttackTargetDeath: BattleAttackTargetDeath,
     private entityEffectUse: EntityEffectUse,
     private berserkerSpells: BerserkerSpells,
-    private sorcererSpells: SorcererSpells
+    private manaShield: ManaShield
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
@@ -222,9 +223,9 @@ export class BattleAttackTarget {
         if (target.class === CharacterClass.Sorcerer) {
           const character = target as ICharacter;
 
-          const isActive = await this.sorcererSpells.getSorcererManaShieldSpell(character);
+          const isActive = await this.manaShield.getManaShieldSpell(character);
           if (isActive) {
-            sorcererManaShield = await this.sorcererSpells.handleSorcererManaShield(character, damage);
+            sorcererManaShield = await this.manaShield.handleManaShield(character, damage);
           }
         }
 

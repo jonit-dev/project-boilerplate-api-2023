@@ -18,7 +18,7 @@ export const spellArrowCreation: Partial<ISpell> = {
   minLevelRequired: 2,
   minMagicLevelRequired: 2,
   cooldown: 5,
-  animationKey: AnimationEffectKeys.LevelUp,
+  castingAnimationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {
     const spellCalculator = container.get(SpellCalculator);

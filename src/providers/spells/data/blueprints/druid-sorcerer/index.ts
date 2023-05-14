@@ -2,6 +2,7 @@ import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 import { spellDivineProtection } from "./SpellDivineProtection";
 import { spellEnergyBoltRuneCreation } from "./SpellEnergyBoltRuneCreation";
 import { spellFireBoltRuneCreation } from "./SpellFireBoltRuneCreation";
+import { spellManaShield } from "./SpellManaShield";
 import { spellThunderRuneCreation } from "./SpellThunderRuneCreation";
 
 export const druidSorcererSpellsIndex = {
@@ -9,4 +10,5 @@ export const druidSorcererSpellsIndex = {
   [SpellsBlueprint.FireBoltRuneCreationSpell]: spellFireBoltRuneCreation,
   [SpellsBlueprint.SpellDivineProtection]: spellDivineProtection,
   [SpellsBlueprint.ThunderRuneCreationSpell]: spellThunderRuneCreation,
+  [SpellsBlueprint.ManaShield]: spellManaShield,
 };

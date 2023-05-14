@@ -22,7 +22,7 @@ export const spellFocus: Partial<ISpell> = {
   minLevelRequired: 3,
   minMagicLevelRequired: 3,
   cooldown: 30,
-  animationKey: AnimationEffectKeys.Holy,
+  castingAnimationKey: AnimationEffectKeys.Holy,
   attribute: BasicAttribute.Dexterity,
   characterClass: [CharacterClass.Rogue, CharacterClass.Hunter],
 

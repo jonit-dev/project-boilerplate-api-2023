@@ -22,7 +22,7 @@ export const spellDivineProtection: Partial<ISpell> = {
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
   cooldown: 30,
-  animationKey: AnimationEffectKeys.MagicShield,
+  castingAnimationKey: AnimationEffectKeys.MagicShield,
   attribute: BasicAttribute.MagicResistance,
   characterClass: [CharacterClass.Druid, CharacterClass.Sorcerer],
 

@@ -25,7 +25,8 @@ export class SocketAuth {
     channel,
     event: string,
     callback: (data, character: ICharacter, owner: IUser) => Promise<any>,
-    runBasicCharacterValidation: boolean = true
+    runBasicCharacterValidation: boolean = true,
+    isLeanQuery = true
   ): void {
     channel.on(event, async (data: any) => {
       let owner, character;
@@ -34,10 +35,15 @@ export class SocketAuth {
         // check if authenticated user actually owns the character (we'll fetch it from the payload id);
         owner = channel?.userData || (channel?.handshake?.query?.userData as IUser);
 
-        character = await Character.findOne({
-          _id: data.socketCharId,
-          owner: owner.id,
-        }).lean({ virtuals: true, defaults: true });
+        character = isLeanQuery
+          ? await Character.findOne({
+              _id: data.socketCharId,
+              owner: owner.id,
+            }).lean({ virtuals: true, defaults: true })
+          : await Character.findOne({
+              _id: data.socketCharId,
+              owner: owner.id,
+            });
 
         if (!character) {
           this.socketMessaging.sendEventToUser(channel.id!, CharacterSocketEvents.CharacterForceDisconnect, {

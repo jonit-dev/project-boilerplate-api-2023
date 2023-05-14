@@ -23,7 +23,7 @@ export const spellRage: Partial<ISpell> = {
   minLevelRequired: 12,
   minMagicLevelRequired: 10,
   cooldown: 60,
-  animationKey: AnimationEffectKeys.Burn,
+  castingAnimationKey: AnimationEffectKeys.Burn,
   characterClass: [CharacterClass.Berserker],
 
   usableEffect: async (character: ICharacter) => {

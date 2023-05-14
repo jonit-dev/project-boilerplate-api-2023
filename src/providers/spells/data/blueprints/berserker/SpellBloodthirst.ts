@@ -15,7 +15,7 @@ export const spellBloodthirst: Partial<ISpell> = {
   minLevelRequired: 10,
   minMagicLevelRequired: 8,
   cooldown: 60,
-  animationKey: AnimationEffectKeys.Holy,
+  castingAnimationKey: AnimationEffectKeys.Holy,
   characterClass: [CharacterClass.Berserker],
 
   usableEffect: async (character: ICharacter) => {

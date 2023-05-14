@@ -23,7 +23,7 @@ export const spellQuickFire: Partial<ISpell> = {
   minLevelRequired: 15,
   minMagicLevelRequired: 18,
   cooldown: 20,
-  animationKey: AnimationEffectKeys.BlueWings,
+  castingAnimationKey: AnimationEffectKeys.BlueWings,
   characterClass: [CharacterClass.Hunter],
   attribute: CharacterAttributes.AttackIntervalSpeed,
 

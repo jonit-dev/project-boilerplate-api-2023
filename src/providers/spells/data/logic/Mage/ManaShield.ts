@@ -6,32 +6,32 @@ import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
-@provide(SorcererSpells)
-export class SorcererSpells {
+@provide(ManaShield)
+export class ManaShield {
   constructor(private inMemoryHashTable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
 
-  public async handleSorcererManaShield(character: ICharacter, damage: number): Promise<boolean> {
+  public async handleManaShield(character: ICharacter, damage: number): Promise<boolean> {
     try {
       if (!character || character.mana === character.maxMana) {
         return false;
       }
 
-      return await this.applySorcererManaShield(character, damage);
+      return await this.applyManaShield(character, damage);
     } catch (error) {
       console.error(`Failed to handle sorcerer mana shieldk: ${error}`);
       return false;
     }
   }
 
-  public async getSorcererManaShieldSpell(character: ICharacter): Promise<boolean> {
+  public async getManaShieldSpell(character: ICharacter): Promise<boolean> {
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
-    const key = SpellsBlueprint.SorcererManaShield;
+    const key = SpellsBlueprint.ManaShield;
     const spell = await this.inMemoryHashTable.get(namespace, key);
 
     return !!spell;
   }
 
-  private async applySorcererManaShield(character: ICharacter, damage: number): Promise<boolean> {
+  private async applyManaShield(character: ICharacter, damage: number): Promise<boolean> {
     try {
       if (typeof damage !== "number" || isNaN(damage)) {
         throw new Error(`Invalid damage value: ${damage}`);
@@ -46,7 +46,7 @@ export class SorcererSpells {
 
       if (newMana <= 0) {
         const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
-        const key = SpellsBlueprint.SorcererManaShield;
+        const key = SpellsBlueprint.ManaShield;
         await this.inMemoryHashTable.delete(namespace, key);
       }
 

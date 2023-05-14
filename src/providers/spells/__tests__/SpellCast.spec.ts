@@ -223,7 +223,7 @@ describe("SpellCast.ts", () => {
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
-      effectKey: spellSelfHealing.animationKey,
+      effectKey: spellSelfHealing.castingAnimationKey,
     });
   });
 
@@ -270,7 +270,7 @@ describe("SpellCast.ts", () => {
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
-      effectKey: spellSelfHealing.animationKey,
+      effectKey: spellSelfHealing.castingAnimationKey,
     });
   });
 
@@ -330,10 +330,17 @@ describe("SpellCast.ts", () => {
   });
 
   it("should send identify target for ranged spells", async () => {
+    testCharacter.learnedSpells = [SpellsBlueprint.WarriorStunTarget];
+    testCharacter.class = CharacterClass.Warrior;
+    await testCharacter.save();
+
+    const skills = (await Skill.findById(testCharacter.skills)) as ISkill;
+    skills.level = 99;
+    skills.magic.level = 99;
+    await skills?.save();
+
     const spell = { magicWords: "talas tamb-eth" };
     expect(await spellCast.castSpell(spell, testCharacter)).toBeFalsy();
-
-    expect(sendEventToUser).toBeCalledTimes(1);
 
     expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, SpellSocketEvents.IdentifyTarget, spell);
   });
@@ -518,7 +525,6 @@ describe("SpellCast.ts", () => {
         AnimationSocketEvents.ShowProjectileAnimation,
         {
           targetId: targetCharacter._id,
-          effectKey: spellStunTarget.animationKey,
           projectileEffectKey: spellStunTarget.projectileAnimationKey,
           sourceId: testCharacter._id,
         }

@@ -18,7 +18,7 @@ export const spellFireBoltCreation: Partial<ISpell> = {
   minLevelRequired: 15,
   minMagicLevelRequired: 5,
   cooldown: 5,
-  animationKey: AnimationEffectKeys.LevelUp,
+  castingAnimationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Hunter],
 
   usableEffect: async (character: ICharacter) => {

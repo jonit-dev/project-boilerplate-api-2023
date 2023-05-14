@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { SpellSocketEvents, ISpellCast } from "@rpg-engine/shared";
+import { ISpellCast, SpellSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SpellCast } from "../SpellCast";
 
@@ -15,7 +15,9 @@ export class SpellNetworkCast {
       SpellSocketEvents.CastSpell,
       async (data: ISpellCast, character: ICharacter) => {
         await this.spellCast.castSpell(data, character);
-      }
+      },
+      true,
+      false
     );
   }
 }

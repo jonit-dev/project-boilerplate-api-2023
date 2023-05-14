@@ -16,7 +16,7 @@ export const spellCorruptionRuneCreation: Partial<ISpell> = {
   minLevelRequired: 8,
   minMagicLevelRequired: 6,
   cooldown: 5,
-  animationKey: AnimationEffectKeys.HitCorruption,
+  castingAnimationKey: AnimationEffectKeys.HitCorruption,
   projectileAnimationKey: AnimationEffectKeys.Dark,
   characterClass: [CharacterClass.Sorcerer],
 

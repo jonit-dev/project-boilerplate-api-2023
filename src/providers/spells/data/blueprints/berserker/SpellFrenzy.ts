@@ -23,7 +23,7 @@ export const spellFrenzy: Partial<ISpell> = {
   minLevelRequired: 15,
   minMagicLevelRequired: 12,
   cooldown: 60,
-  animationKey: AnimationEffectKeys.QuickFire,
+  castingAnimationKey: AnimationEffectKeys.QuickFire,
   characterClass: [CharacterClass.Berserker],
 
   usableEffect: async (character: ICharacter) => {

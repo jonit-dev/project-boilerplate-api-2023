@@ -18,7 +18,7 @@ export const spellFoodCreation: Partial<ISpell> = {
   minLevelRequired: 3,
   minMagicLevelRequired: 3,
   cooldown: 5,
-  animationKey: AnimationEffectKeys.LevelUp,
+  castingAnimationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {
     const spellItemCreation = container.get(SpellItemCreation);

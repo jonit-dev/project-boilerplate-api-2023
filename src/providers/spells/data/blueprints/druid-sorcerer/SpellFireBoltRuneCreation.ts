@@ -17,7 +17,7 @@ export const spellFireBoltRuneCreation: Partial<ISpell> = {
   minLevelRequired: 4,
   minMagicLevelRequired: 6,
   cooldown: 5,
-  animationKey: AnimationEffectKeys.LevelUp,
+  castingAnimationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Druid, CharacterClass.Sorcerer],
 
   usableEffect: async (character: ICharacter) => {

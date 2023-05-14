@@ -22,7 +22,7 @@ export const spellSelfHaste: Partial<ISpell> = {
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
   cooldown: 35,
-  animationKey: AnimationEffectKeys.HasteSpell,
+  castingAnimationKey: AnimationEffectKeys.HasteSpell,
   attribute: CharacterAttributes.Speed,
 
   usableEffect: async (character: ICharacter) => {

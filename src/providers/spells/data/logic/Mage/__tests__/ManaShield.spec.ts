@@ -3,15 +3,15 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { CharacterClass } from "@rpg-engine/shared";
-import { SorcererSpells } from "../SorcererSpells";
+import { ManaShield } from "../ManaShield";
 
-describe("SorcererSpells.spec.ts | Sorcerer Mana Shield", () => {
+describe("Mana Shield", () => {
   let testCharacter: ICharacter;
   let inMemoryHashTable: InMemoryHashTable;
-  let sorcererSpell: SorcererSpells;
+  let manaShield: ManaShield;
 
   beforeAll(() => {
-    sorcererSpell = container.get<SorcererSpells>(SorcererSpells);
+    manaShield = container.get<ManaShield>(ManaShield);
     inMemoryHashTable = container.get<InMemoryHashTable>(InMemoryHashTable);
   });
 
@@ -35,17 +35,17 @@ describe("SorcererSpells.spec.ts | Sorcerer Mana Shield", () => {
 
   it("should return true when the spell exists", async () => {
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${testCharacter._id}`;
-    const key = SpellsBlueprint.SorcererManaShield;
+    const key = SpellsBlueprint.ManaShield;
     await inMemoryHashTable.set(namespace, key, true);
 
     // @ts-ignore
-    const spellActivated = await sorcererSpell.getSorcererManaShieldSpell(testCharacter);
+    const spellActivated = await manaShield.getManaShieldSpell(testCharacter);
     expect(spellActivated).toBe(true);
   });
 
   it("should return false when the spell does not exist", async () => {
     // @ts-ignore
-    const spellActivated = await sorcererSpell.getSorcererManaShieldSpell(testCharacter);
+    const spellActivated = await manaShield.getManaShieldSpell(testCharacter);
     expect(spellActivated).toBe(false);
   });
 
@@ -53,7 +53,7 @@ describe("SorcererSpells.spec.ts | Sorcerer Mana Shield", () => {
     const damage = 10;
 
     // @ts-ignore
-    const shieldApplied = await sorcererSpell.applySorcererManaShield(testCharacter, damage);
+    const shieldApplied = await manaShield.applyManaShield(testCharacter, damage);
     const updatedCharacter = (await Character.findById(testCharacter._id).lean().select("mana")) as ICharacter;
 
     expect(shieldApplied).toBe(true);
@@ -64,14 +64,14 @@ describe("SorcererSpells.spec.ts | Sorcerer Mana Shield", () => {
     const damage = 150;
 
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${testCharacter._id}`;
-    const key = SpellsBlueprint.SorcererManaShield;
+    const key = SpellsBlueprint.ManaShield;
     await inMemoryHashTable.set(namespace, key, true);
 
     // @ts-ignore
-    const shieldApplied = await sorcererSpell.applySorcererManaShield(testCharacter, damage);
+    const shieldApplied = await manaShield.applyManaShield(testCharacter, damage);
     const updatedCharacter = (await Character.findById(testCharacter._id).lean().select("mana health")) as ICharacter;
 
-    const spellActivated = await sorcererSpell.getSorcererManaShieldSpell(testCharacter);
+    const spellActivated = await manaShield.getManaShieldSpell(testCharacter);
 
     expect(spellActivated).toBe(false);
     expect(shieldApplied).toBe(true);
@@ -83,7 +83,7 @@ describe("SorcererSpells.spec.ts | Sorcerer Mana Shield", () => {
     const damage = 10;
 
     // @ts-ignore
-    const shieldApplied = await sorcererSpell.handleSorcererManaShield(testCharacter._id, damage);
+    const shieldApplied = await manaShield.handleManaShield(testCharacter._id, damage);
     expect(shieldApplied).toBe(false);
   });
 });

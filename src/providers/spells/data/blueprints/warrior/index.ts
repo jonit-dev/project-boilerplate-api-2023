@@ -7,6 +7,6 @@ import { spellStunTarget } from "./SpellStunTarget";
 export const warriorSpellsIndex = {
   [SpellsBlueprint.SpellPhysicalShield]: spellPhysicalShield,
   [SpellsBlueprint.WarriorStunTarget]: spellStunTarget,
-  [SpellsBlueprint.SpellFortifyDefense]: spellFortifyDefense,
+  [SpellsBlueprint.FortifyDefense]: spellFortifyDefense,
   [SpellsBlueprint.PowerStrike]: spellPowerStrike,
 };

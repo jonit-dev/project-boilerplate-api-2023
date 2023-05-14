@@ -23,7 +23,7 @@ export const spellShapeshift: Partial<ISpell> = {
   minLevelRequired: 10,
   minMagicLevelRequired: 15,
   cooldown: 15,
-  animationKey: AnimationEffectKeys.ManaHeal,
+  castingAnimationKey: AnimationEffectKeys.ManaHeal,
   characterClass: [CharacterClass.Druid],
 
   usableEffect: async (character: ICharacter) => {

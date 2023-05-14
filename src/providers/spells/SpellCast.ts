@@ -57,13 +57,19 @@ export class SpellCast {
     }
 
     const spell = this.getSpell(data.magicWords);
-    if (spell?.castingType === SpellCastingType.RangedCasting && (!data.targetType || !data.targetId)) {
+
+    if (!(await this.isSpellCastingValid(spell, character))) {
+      return false;
+    }
+
+    if (spell.castingType === SpellCastingType.RangedCasting && (!data.targetType || !data.targetId)) {
+      await this.sendPreSpellCastEvents(spell, character);
       this.sendIdentifyTargetEvent(character, data);
       return false;
     }
 
-    if (!(await this.isSpellCastingValid(spell, character))) {
-      return false;
+    if (spell.castingType === SpellCastingType.SelfCasting) {
+      await this.sendPreSpellCastEvents(spell, character);
     }
 
     const hasSpellCooldown = await this.spellCoolDown.haveSpellCooldown(character._id, spell.magicWords);
@@ -170,9 +176,8 @@ export class SpellCast {
       return false;
     }
 
-    const cannotCastMsg = "Sorry, you can not cast this spell.";
     if (!this.spellValidation.isAvailableForCharacterClass(spell, character)) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, cannotCastMsg);
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this spell is not available to your class.");
       return false;
     }
 
@@ -184,7 +189,10 @@ export class SpellCast {
     if (spell.requiredItem) {
       const required = itemsBlueprintIndex[spell.requiredItem];
       if (!required) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, cannotCastMsg);
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          `Sorry, the item required to cast this spell is not available: ${spell.requiredItem}`
+        );
 
         console.log(`❌ SpellCast: Missing item blueprint for key ${spell.requiredItem}`);
         return false;
@@ -242,6 +250,15 @@ export class SpellCast {
     return null;
   }
 
+  private async sendPreSpellCastEvents(spell: ISpell, character: ICharacter): Promise<void> {
+    if (spell.castingAnimationKey) {
+      await this.animationEffect.sendAnimationEventToCharacter(
+        character,
+        spell.castingAnimationKey as AnimationEffectKeys
+      );
+    }
+  }
+
   private async sendPostSpellCastEvents(
     character: ICharacter,
     spell: ISpell,
@@ -264,18 +281,21 @@ export class SpellCast {
     );
 
     if (target) {
-      await this.animationEffect.sendProjectileAnimationEventToCharacter(
-        updatedCharacter,
-        updatedCharacter._id,
-        target._id,
-        spell.projectileAnimationKey,
-        spell.animationKey
-      );
-    } else {
-      await this.animationEffect.sendAnimationEventToCharacter(
-        updatedCharacter,
-        spell.animationKey as AnimationEffectKeys
-      );
+      if (spell.projectileAnimationKey) {
+        await this.animationEffect.sendProjectileAnimationEventToCharacter(
+          updatedCharacter,
+          updatedCharacter._id,
+          target._id,
+          spell.projectileAnimationKey
+        );
+      }
+
+      if (spell.targetHitAnimationKey) {
+        await this.animationEffect.sendAnimationEventToCharacter(
+          target as ICharacter,
+          spell.targetHitAnimationKey as AnimationEffectKeys
+        );
+      }
     }
   }
 

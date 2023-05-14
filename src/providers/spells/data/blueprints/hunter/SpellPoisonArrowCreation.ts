@@ -17,7 +17,7 @@ export const spellPoisonArrowCreation: Partial<ISpell> = {
   minLevelRequired: 12,
   minMagicLevelRequired: 4,
   cooldown: 10,
-  animationKey: AnimationEffectKeys.LevelUp,
+  castingAnimationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Hunter],
 
   usableEffect: async (character: ICharacter) => {

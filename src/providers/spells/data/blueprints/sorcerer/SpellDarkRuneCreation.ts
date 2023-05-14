@@ -17,7 +17,7 @@ export const spellDarkRuneCreation: Partial<ISpell> = {
   minLevelRequired: 4,
   minMagicLevelRequired: 3,
   cooldown: 5,
-  animationKey: AnimationEffectKeys.HitDark,
+  castingAnimationKey: AnimationEffectKeys.HitDark,
   projectileAnimationKey: AnimationEffectKeys.Dark,
   characterClass: [CharacterClass.Sorcerer],
 

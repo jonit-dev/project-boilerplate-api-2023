@@ -22,7 +22,7 @@ export const spellPowerStrike: Partial<ISpell> = {
   minLevelRequired: 4,
   minMagicLevelRequired: 5,
   cooldown: 60,
-  animationKey: AnimationEffectKeys.BlueWings,
+  castingAnimationKey: AnimationEffectKeys.BlueWings,
   attribute: BasicAttribute.Strength,
   characterClass: [CharacterClass.Warrior],
 

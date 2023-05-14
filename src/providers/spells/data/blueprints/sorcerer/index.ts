@@ -1,10 +1,10 @@
 import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 import { spellCorruptionRuneCreation } from "./SpellCorruptionRuneCreation";
+import { spellCurseOfWeakness } from "./SpellCurseOfWeakness";
 import { spellDarkRuneCreation } from "./SpellDarkRuneCreation";
-import { spellManaShield } from "./SpellManaShield";
 
 export const sorcererSpellsIndex = {
   [SpellsBlueprint.CorruptionRuneCreationSpell]: spellCorruptionRuneCreation,
   [SpellsBlueprint.DarkRuneCreationSpell]: spellDarkRuneCreation,
-  [SpellsBlueprint.SorcererManaShield]: spellManaShield,
+  [SpellsBlueprint.CurseOfWeakness]: spellCurseOfWeakness,
 };

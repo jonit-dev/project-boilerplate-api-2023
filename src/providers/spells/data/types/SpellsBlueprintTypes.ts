@@ -37,8 +37,8 @@ export enum SpellsBlueprint {
   RogueExecution = "rogue-execution",
   ManaRegenSpell = "auto-mana-regen",
   HealthRegenSell = "auto-health-regen",
-  SorcererManaShield = "sorcerer-mana-shield",
-  SpellFortifyDefense = "spell-fortify-defense",
+  ManaShield = "mana-shield",
+  FortifyDefense = "fortify-defense",
   BerserkerExecution = "berserker-execution",
   HunterQuickFire = "hunter-quick-fire",
   BerserkerFrenzy = "berserker-frenzy",
@@ -46,6 +46,7 @@ export enum SpellsBlueprint {
   BerserkerRage = "berserker-rage",
   Focus = "focus",
   PowerStrike = "power-strike",
+  CurseOfWeakness = "curse-of-weakness",
 }
 
 export interface ISpell {
@@ -55,7 +56,8 @@ export interface ISpell {
   castingType: SpellCastingType;
   magicWords: string;
   manaCost: number;
-  animationKey: string;
+  castingAnimationKey: string;
+  targetHitAnimationKey: string;
   projectileAnimationKey: string;
   minLevelRequired: number;
   minMagicLevelRequired: number;

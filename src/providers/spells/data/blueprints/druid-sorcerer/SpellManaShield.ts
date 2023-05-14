@@ -6,7 +6,7 @@ import { SpellCalculator } from "../../abstractions/SpellCalculator";
 import { ISpell, NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellManaShield: Partial<ISpell> = {
-  key: SpellsBlueprint.SorcererManaShield,
+  key: SpellsBlueprint.ManaShield,
   name: "Mana Shield",
   description: "A spell designed for a sorcerer to takes damage but damage is reduced from mana.",
   castingType: SpellCastingType.SelfCasting,
@@ -15,9 +15,9 @@ export const spellManaShield: Partial<ISpell> = {
   minLevelRequired: 5,
   minMagicLevelRequired: 7,
   cooldown: 40,
-  animationKey: AnimationEffectKeys.MagicShield,
+  castingAnimationKey: AnimationEffectKeys.MagicShield,
   projectileAnimationKey: AnimationEffectKeys.Energy,
-  characterClass: [CharacterClass.Sorcerer],
+  characterClass: [CharacterClass.Sorcerer, CharacterClass.Druid],
 
   usableEffect: async (character: ICharacter) => {
     const inMemoryHashTable = container.get(InMemoryHashTable);
@@ -30,7 +30,7 @@ export const spellManaShield: Partial<ISpell> = {
     });
 
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
-    const key = SpellsBlueprint.SorcererManaShield;
+    const key = SpellsBlueprint.ManaShield;
 
     await inMemoryHashTable.set(namespace, key, true);
     await inMemoryHashTable.expire(namespace, timeout, "NX");

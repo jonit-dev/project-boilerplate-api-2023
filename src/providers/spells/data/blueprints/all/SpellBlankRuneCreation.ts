@@ -17,7 +17,7 @@ export const spellBlankRuneCreation: Partial<ISpell> = {
   minLevelRequired: 2,
   minMagicLevelRequired: 3,
   cooldown: 5,
-  animationKey: AnimationEffectKeys.LevelUp,
+  castingAnimationKey: AnimationEffectKeys.LevelUp,
 
   usableEffect: async (character: ICharacter) => {
     const spellItemCreation = container.get(SpellItemCreation);

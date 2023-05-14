@@ -16,7 +16,7 @@ export const spellSelfHealing: Partial<ISpell> = {
   minLevelRequired: 2,
   minMagicLevelRequired: 1,
   cooldown: 5,
-  animationKey: AnimationEffectKeys.LifeHeal,
+  castingAnimationKey: AnimationEffectKeys.LifeHeal,
 
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
