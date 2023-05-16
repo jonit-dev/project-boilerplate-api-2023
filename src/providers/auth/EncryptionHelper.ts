@@ -8,7 +8,7 @@ export class EncryptionHelper {
   public cryptr: Cryptr;
 
   constructor() {
-    this.cryptr = new Cryptr(appEnv.encryption.genericHash);
+    this.cryptr = new Cryptr(appEnv.encryption.genericHash!);
   }
 
   public encrypt(text: string): string {
