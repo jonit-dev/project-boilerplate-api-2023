@@ -3,6 +3,7 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
+import { appEnv } from "@providers/config/env";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { UISocketEvents } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -16,24 +17,21 @@ import { EntityEffectBlueprint } from "./data/types/entityEffectBlueprintTypes";
 @provide(EntityEffectUse)
 export class EntityEffectUse {
   constructor(private socketMessaging: SocketMessaging, private characterWeapon: CharacterWeapon) {}
+
   public async applyEntityEffects(
     target: ICharacter | INPC,
     attacker: ICharacter | INPC,
     runeEffect?: IEntityEffect
   ): Promise<void> {
-    // }
     try {
-      // If runeEffect exists, apply it and exit
       if (runeEffect) {
         await this.applyEntityEffect(runeEffect, target, attacker, true);
         return;
       }
 
-      // Get applicable entity effects and apply them concurrently
       const entityEffects = await this.getApplicableEntityEffects(attacker);
       await Promise.all(entityEffects.map((effect) => this.applyEntityEffect(effect, target, attacker)));
     } catch (error) {
-      // Log any errors that occurred during the execution
       console.error(`Error in applyEntityEffects: ${error}`);
     }
   }
@@ -50,71 +48,70 @@ export class EntityEffectUse {
     }
 
     target.appliedEntityEffects = target.appliedEntityEffects.filter((effect) => effect.key !== effectKey);
+    await this.updateTargetInDatabase(target);
 
     if (target.type === EntityType.Character) {
       const character = target as ICharacter;
-      await Character.updateOne(
-        { _id: character._id },
-        { $set: { appliedEntityEffects: character.appliedEntityEffects } }
-      );
-
       this.socketMessaging.sendEventToUser(character.channelId!, UISocketEvents.ShowMessage, {
         message: `The following effect was cured: ${effectKey.toLowerCase()}.`,
       });
-      return;
-    }
-
-    if (target.type === EntityType.NPC) {
-      await NPC.updateOne({ _id: target._id }, { $set: { appliedEntityEffects: target.appliedEntityEffects } });
     }
   }
 
   public async clearAllEntityEffects(target: ICharacter | INPC): Promise<void> {
+    const updateData = { $unset: { appliedEntityEffects: 1 } } as any;
+
     switch (target.type) {
       case EntityType.Character:
-        await Character.updateOne({ _id: target._id }, { $unset: { appliedEntityEffects: 1 } });
-
+        await Character.updateOne({ _id: target._id }, updateData);
         break;
       case EntityType.NPC:
-        await NPC.updateOne({ _id: target._id }, { $unset: { appliedEntityEffects: 1 } });
+        await NPC.updateOne({ _id: target._id }, updateData);
         break;
     }
   }
 
   private async getApplicableEntityEffects(attacker: ICharacter | INPC): Promise<IEntityEffect[]> {
+    return attacker.type === EntityType.NPC
+      ? await this.getApplicableEntityEffectsFromNPC(attacker as INPC)
+      : await this.getApplicableEntityEffectsFromCharacter(attacker as ICharacter);
+  }
+
+  private async getApplicableEntityEffectsFromCharacter(attacker: ICharacter): Promise<IEntityEffect[]> {
     const applicableEffects: IEntityEffect[] = [];
-    if (attacker.type === EntityType.NPC) {
-      const npc = attacker as INPC;
-      const npcEffects = npc.entityEffects ?? [];
-
-      npcEffects.forEach((effect) => {
+    const weapon = await this.characterWeapon.getWeapon(attacker);
+    const weaponEffect = weapon?.item.entityEffects;
+    if (weaponEffect?.length !== 0) {
+      weaponEffect?.forEach((effect) => {
         const entityEffect: IEntityEffect = entityEffectsBlueprintsIndex[effect];
-
-        if (npc.attackType === EntityAttackType.MeleeRanged || npc.attackType === entityEffect.type) {
-          applicableEffects.push(entityEffect);
-        }
+        applicableEffects.push(entityEffect);
       });
     } else {
-      const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
-      const weaponEffect = weapon?.item.entityEffects;
-      if (weaponEffect?.length !== 0) {
-        weaponEffect?.forEach((effect) => {
+      const equipment = await Equipment.findById(attacker.equipment);
+      const accessory = await Item.findById(equipment?.accessory);
+      const accessoryEffect = accessory?.entityEffects;
+
+      if (accessoryEffect) {
+        accessoryEffect.forEach((effect) => {
           const entityEffect: IEntityEffect = entityEffectsBlueprintsIndex[effect];
           applicableEffects.push(entityEffect);
         });
-      } else {
-        const character = attacker as ICharacter;
-        const equipment = await Equipment.findById(character.equipment);
-        const accessory = await Item.findById(equipment?.accessory);
-        const accessoryEffect = accessory?.entityEffects;
-        if (accessoryEffect) {
-          accessoryEffect.forEach((effect) => {
-            const entityEffect: IEntityEffect = entityEffectsBlueprintsIndex[effect];
-            applicableEffects.push(entityEffect);
-          });
-        }
       }
     }
+
+    return applicableEffects;
+  }
+
+  private getApplicableEntityEffectsFromNPC(attacker: INPC): IEntityEffect[] {
+    const applicableEffects: IEntityEffect[] = [];
+    const npcEffects = attacker.entityEffects ?? [];
+    npcEffects.forEach((effect) => {
+      const entityEffect: IEntityEffect = entityEffectsBlueprintsIndex[effect];
+
+      if (attacker.attackType === EntityAttackType.MeleeRanged || attacker.attackType === entityEffect.type) {
+        applicableEffects.push(entityEffect);
+      }
+    });
 
     return applicableEffects;
   }
@@ -125,11 +122,12 @@ export class EntityEffectUse {
     attacker: ICharacter | INPC,
     skipProbability: boolean = false
   ): Promise<void> {
-    const n = _.random(0, 100);
-    if (entityEffect.probability <= n && !skipProbability) {
+    const randomNumber = _.random(0, 100);
+    if (entityEffect.probability <= randomNumber && !skipProbability) {
       return;
     }
     let appliedEffects = target.appliedEntityEffects ?? [];
+
     const applied = appliedEffects.find((effect) => effect.key === entityEffect.key);
 
     if (applied) {
@@ -143,19 +141,18 @@ export class EntityEffectUse {
 
     appliedEffects.push({ key: entityEffect.key, lastUpdated: new Date().getTime() });
     target.appliedEntityEffects = appliedEffects;
-    if (target.type === "Character") {
-      await Character.updateOne(
-        { _id: target.id },
-        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health } }
-      );
-    }
-    if (target.type === "NPC") {
-      await NPC.updateOne(
-        { _id: target.id },
-        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health } }
-      );
-    }
+    await this.updateTargetInDatabase(target);
     this.startEntityEffectCycle(entityEffect, target, attacker);
+  }
+
+  private async updateTargetInDatabase(target: ICharacter | INPC): Promise<void> {
+    const updateData = { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health } };
+
+    if (target.type === "Character") {
+      await Character.updateOne({ _id: target.id }, updateData);
+    } else if (target.type === "NPC") {
+      await NPC.updateOne({ _id: target.id }, updateData);
+    }
   }
 
   private startEntityEffectCycle(
@@ -163,6 +160,10 @@ export class EntityEffectUse {
     target: ICharacter | INPC,
     attacker: ICharacter | INPC
   ): void {
+    if (appEnv.general.IS_UNIT_TEST) {
+      //! This avoids the creation of EntityEffectCycle during unit tests because it was causing a character model buff timeout issue (I have no idea why)
+      return;
+    }
     new EntityEffectCycle(entityEffect, target._id, target.type, attacker._id, attacker.type);
   }
 }

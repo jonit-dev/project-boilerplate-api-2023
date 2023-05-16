@@ -20,10 +20,10 @@ const config: Config.InitialOptions = {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
   transformIgnorePatterns: ["/node_modules/"],
-  cache: true,
   testPathIgnorePatterns: ["/node_modules/", "/__tests__/mock/"],
-  workerIdleMemoryLimit: "1700MB",
+  workerIdleMemoryLimit: "2000MB",
   logHeapUsage: true,
+  bail: true, // Stop the test run when the first test fails
 };
 
 export default config;

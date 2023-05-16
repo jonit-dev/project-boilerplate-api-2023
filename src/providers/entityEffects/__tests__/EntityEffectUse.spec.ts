@@ -52,17 +52,19 @@ describe("EntityEffectUse.ts", () => {
 
     const poisonSword = itemsBlueprintIndex[SwordsBlueprint.PoisonSword];
     poisonSwordItem = new Item({ ...poisonSword });
+    await poisonSwordItem.save();
 
     const bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
     bowItem = new Item({ ...bow });
-
+    await bowItem.save();
     const poisonArrow = itemsBlueprintIndex[RangedWeaponsBlueprint.PoisonArrow];
     poisonArrowItem = new Item({ ...poisonArrow });
+    await poisonArrowItem.save();
 
     // @ts-ignore
     entityEffectSpy = jest.spyOn(entityEffectUse, "startEntityEffectCycle");
 
-    testTargetNPC = await unitTestHelper.createMockNPC(null, {});
+    testTargetNPC = await unitTestHelper.createMockNPC(null);
   });
 
   afterEach(() => {
@@ -193,8 +195,13 @@ describe("EntityEffectUse.ts", () => {
   });
 
   describe("Attack types", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       poisonEntityEffect.probability = 100;
+
+      // clear
+      testAttacker.entityEffects = [];
+      testAttacker.attackType = EntityAttackType.Melee;
+      await testAttacker.save();
     });
     afterEach(() => {
       jest.clearAllMocks();
