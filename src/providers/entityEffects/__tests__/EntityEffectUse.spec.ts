@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { RangedWeaponsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -20,6 +20,7 @@ jest.mock("../EntityEffectCycle.ts", () => ({
 describe("EntityEffectUse.ts", () => {
   let entityEffectUse: EntityEffectUse;
   let testAttacker: INPC;
+  let testTargetNPC: INPC;
   let testTarget: ICharacter;
   let poisonEntityEffect: IEntityEffect;
   let entityEffectSpy;
@@ -60,6 +61,8 @@ describe("EntityEffectUse.ts", () => {
 
     // @ts-ignore
     entityEffectSpy = jest.spyOn(entityEffectUse, "startEntityEffectCycle");
+
+    testTargetNPC = await unitTestHelper.createMockNPC(null, {});
   });
 
   afterEach(() => {
@@ -69,6 +72,16 @@ describe("EntityEffectUse.ts", () => {
 
   it("creates a testAttacker with entityEffects (poison)", () => {
     expect(testAttacker.entityEffects).toBeDefined();
+  });
+
+  it("should call applyEntityEffect if runeEffect is provided", async () => {
+    // @ts-ignore
+    const runeEffectSpy = jest.spyOn(entityEffectUse, "applyEntityEffect");
+    // @ts-ignore
+    const startEntityEffectCycleSpy = jest.spyOn(entityEffectUse, "startEntityEffectCycle");
+    await entityEffectUse.applyEntityEffects(testTarget, testAttacker, poisonEntityEffect);
+    expect(runeEffectSpy).toHaveBeenCalledTimes(1);
+    expect(startEntityEffectCycleSpy).toHaveBeenCalled();
   });
 
   it("should not call EntityEffectCycle if there are no EntityEffect", async () => {
@@ -156,6 +169,27 @@ describe("EntityEffectUse.ts", () => {
 
     await entityEffectUse.applyEntityEffects(testAttacker, testCharacter);
     expect(entityEffectSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("should call Character.updateOne if target type is Character", async () => {
+    const characterUpdateSpy = jest.spyOn(Character, "updateOne");
+    testTarget.type = "Character";
+    await entityEffectUse.applyEntityEffects(testTarget, testAttacker, poisonEntityEffect);
+    expect(characterUpdateSpy).toHaveBeenCalledTimes(1);
+    expect(characterUpdateSpy).toHaveBeenCalledWith(
+      { _id: testTarget.id },
+      { $set: { appliedEntityEffects: testTarget.appliedEntityEffects, health: testTarget.health } }
+    );
+  });
+
+  it("should call NPC.updateOne if target type is NPC", async () => {
+    const npcUpdateSpy = jest.spyOn(NPC, "updateOne");
+    await entityEffectUse.applyEntityEffects(testTargetNPC, testAttacker, poisonEntityEffect);
+    expect(npcUpdateSpy).toHaveBeenCalledTimes(1);
+    expect(npcUpdateSpy).toHaveBeenCalledWith(
+      { _id: testTargetNPC.id },
+      { $set: { appliedEntityEffects: testTargetNPC.appliedEntityEffects, health: testTargetNPC.health } }
+    );
   });
 
   describe("Attack types", () => {

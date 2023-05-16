@@ -1,16 +1,17 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { unitTestHelper } from "@providers/inversify/container";
+import { EntityEffectCycle } from "../EntityEffectCycle";
 import { entityEffectsBlueprintsIndex } from "../data";
 import { IEntityEffect } from "../data/blueprints/entityEffect";
 import { EntityEffectBlueprint } from "../data/types/entityEffectBlueprintTypes";
-import { EntityEffectCycle } from "../EntityEffectCycle";
 
 jest.useFakeTimers({ advanceTimers: true });
 describe("EntityEffectCycle", () => {
   let testAttacker: INPC;
   let testTarget: ICharacter;
+  let testTargetNPC: INPC;
   let entityEffect: IEntityEffect;
 
   beforeEach(async () => {
@@ -23,6 +24,7 @@ describe("EntityEffectCycle", () => {
     await testAttacker.save();
 
     testTarget = await unitTestHelper.createMockCharacter(null, {});
+    testTargetNPC = await unitTestHelper.createMockNPC(null, {});
   });
 
   afterEach(() => {
@@ -118,6 +120,70 @@ describe("EntityEffectCycle", () => {
 
     // Reset the mock
     getTargetSpy.mockRestore();
+  });
+
+  it("should apply character changes when target is of type 'Character'", async () => {
+    // mock the Character.updateOne method
+    const updateOneCharacterMock = jest.spyOn(Character, "updateOne");
+    updateOneCharacterMock.mockImplementation(jest.fn());
+
+    // create an instance of the class and call the method
+    const cycle = new EntityEffectCycle(
+      entityEffect,
+      testTarget._id,
+      testTarget.type,
+      testAttacker._id,
+      testAttacker.type
+    );
+
+    // Make sure you await the method here if it's asynchronous
+    await (cycle as any).applyCharacterChanges(testTarget, entityEffect, 10);
+
+    // assert that the Character.updateOne method was called with the right arguments
+    expect(updateOneCharacterMock).toHaveBeenCalledWith(
+      { _id: testTarget.id },
+      {
+        $set: {
+          appliedEntityEffects: testTarget.appliedEntityEffects,
+          health: testTarget.health - 10,
+        },
+      }
+    );
+
+    // cleanup
+    updateOneCharacterMock.mockRestore();
+  });
+
+  it("should apply NPC changes when target is of type 'NPC'", async () => {
+    // mock the NPC.updateOne method
+    const updateOneNPCMock = jest.spyOn(NPC, "updateOne");
+    updateOneNPCMock.mockImplementation(jest.fn());
+
+    // create an instance of the class and call the method
+    const cycle = new EntityEffectCycle(
+      entityEffect,
+      testTargetNPC._id,
+      testTargetNPC.type,
+      testAttacker._id,
+      testAttacker.type
+    );
+
+    // Make sure you await the method here if it's asynchronous
+    await (cycle as any).applyCharacterChanges(testTargetNPC, entityEffect, 10);
+
+    // assert that the NPC.updateOne method was called with the right arguments
+    expect(updateOneNPCMock).toHaveBeenCalledWith(
+      { _id: testTargetNPC.id },
+      {
+        $set: {
+          appliedEntityEffects: testTargetNPC.appliedEntityEffects,
+          health: testTargetNPC.health - 10,
+        },
+      }
+    );
+
+    // cleanup
+    updateOneNPCMock.mockRestore();
   });
 });
 

@@ -8,22 +8,33 @@ import { UISocketEvents } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { EntityEffectCycle } from "./EntityEffectCycle";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 import { entityEffectsBlueprintsIndex } from "./data/index";
 import { EntityEffectBlueprint } from "./data/types/entityEffectBlueprintTypes";
-import { EntityEffectCycle } from "./EntityEffectCycle";
 
 @provide(EntityEffectUse)
 export class EntityEffectUse {
   constructor(private socketMessaging: SocketMessaging, private characterWeapon: CharacterWeapon) {}
+  public async applyEntityEffects(
+    target: ICharacter | INPC,
+    attacker: ICharacter | INPC,
+    runeEffect?: IEntityEffect
+  ): Promise<void> {
+    // }
+    try {
+      // If runeEffect exists, apply it and exit
+      if (runeEffect) {
+        await this.applyEntityEffect(runeEffect, target, attacker, true);
+        return;
+      }
 
-  public async applyEntityEffects(target: ICharacter | INPC, attacker: ICharacter | INPC): Promise<void> {
-    const entityEffects = await this.getApplicableEntityEffects(attacker);
-    if (entityEffects.length < 1) {
-      return;
-    }
-    for (const entityEffect of entityEffects) {
-      await this.applyEntityEffect(entityEffect, target, attacker);
+      // Get applicable entity effects and apply them concurrently
+      const entityEffects = await this.getApplicableEntityEffects(attacker);
+      await Promise.all(entityEffects.map((effect) => this.applyEntityEffect(effect, target, attacker)));
+    } catch (error) {
+      // Log any errors that occurred during the execution
+      console.error(`Error in applyEntityEffects: ${error}`);
     }
   }
 
@@ -111,11 +122,11 @@ export class EntityEffectUse {
   private async applyEntityEffect(
     entityEffect: IEntityEffect,
     target: ICharacter | INPC,
-    attacker: ICharacter | INPC
+    attacker: ICharacter | INPC,
+    skipProbability: boolean = false
   ): Promise<void> {
     const n = _.random(0, 100);
-
-    if (entityEffect.probability <= n) {
+    if (entityEffect.probability <= n && !skipProbability) {
       return;
     }
     let appliedEffects = target.appliedEntityEffects ?? [];
@@ -132,8 +143,18 @@ export class EntityEffectUse {
 
     appliedEffects.push({ key: entityEffect.key, lastUpdated: new Date().getTime() });
     target.appliedEntityEffects = appliedEffects;
-    await target.save();
-
+    if (target.type === "Character") {
+      await Character.updateOne(
+        { _id: target.id },
+        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health } }
+      );
+    }
+    if (target.type === "NPC") {
+      await NPC.updateOne(
+        { _id: target.id },
+        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health } }
+      );
+    }
     this.startEntityEffectCycle(entityEffect, target, attacker);
   }
 

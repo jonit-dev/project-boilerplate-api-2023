@@ -92,7 +92,18 @@ export class EntityEffectCycle {
       return false;
     }
 
-    await target.save();
+    if (target.type === "Character") {
+      await Character.updateOne(
+        { _id: target.id },
+        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health - effectDamage } }
+      );
+    }
+    if (target.type === "NPC") {
+      await NPC.updateOne(
+        { _id: target.id },
+        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health - effectDamage } }
+      );
+    }
 
     this.sendAnimationEvent(target, entityEffect.targetAnimationKey);
     this.sendAttributeChangedEvent(target);
