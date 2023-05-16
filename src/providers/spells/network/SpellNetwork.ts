@@ -4,6 +4,7 @@ import { SpellNetworkCast } from "./SpellNetworkCast";
 import { SpellNetworkReadInfo } from "./SpellNetworkReadInfo";
 import { SpellNetworkDetails } from "./SpellNetworkDetails";
 import { SpellNetworkLearned } from "./SpellNetworkLearned";
+import { SpellNetworkCooldowns } from "./SpellNetworkCooldowns";
 
 @provide(SpellNetwork)
 export class SpellNetwork {
@@ -11,7 +12,8 @@ export class SpellNetwork {
     private spellNetworkReadInfo: SpellNetworkReadInfo,
     private spellNetworkCast: SpellNetworkCast,
     private spellNetworkDetails: SpellNetworkDetails,
-    private spellNetworkLearned: SpellNetworkLearned
+    private spellNetworkLearned: SpellNetworkLearned,
+    private spellNetworkCooldowns: SpellNetworkCooldowns
   ) {}
 
   public onAddEventListeners(channel: SocketChannel): void {
@@ -19,5 +21,6 @@ export class SpellNetwork {
     this.spellNetworkCast.onSpellCast(channel);
     this.spellNetworkDetails.onGetDetails(channel);
     this.spellNetworkLearned.onGetDetails(channel);
+    this.spellNetworkCooldowns.onSpellCooldownsRead(channel);
   }
 }

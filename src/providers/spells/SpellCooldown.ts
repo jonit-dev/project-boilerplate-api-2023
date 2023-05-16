@@ -4,10 +4,11 @@ import { Types } from "mongoose";
 import { ISpell, NamespaceRedisControl } from "./data/types/SpellsBlueprintTypes";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { spellsBlueprints } from "./data/blueprints";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
 @provide(SpellCoolDown)
 export default class SpellCoolDown {
-  constructor(private inMemoryHashtable: InMemoryHashTable) {}
+  constructor(private inMemoryHashtable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
 
   public async haveSpellCooldown(characterId: Types.ObjectId, magicWords: string): Promise<boolean> {
     this.validateArguments(characterId, magicWords);
@@ -48,13 +49,39 @@ export default class SpellCoolDown {
     }
   }
 
+  public async getAllSpellCooldowns(character: ICharacter): Promise<
+    {
+      spell: string;
+      timeLeft: number;
+    }[]
+  > {
+    const namespacePrefix = `${NamespaceRedisControl.CharacterSpellCoolDown}:${character._id.toString()}`;
+    const spellsInCooldowns = await this.inMemoryHashtable.getAllKeysWithPrefix(namespacePrefix);
+
+    const promises = spellsInCooldowns.map((namespace) => {
+      const spell = this.getSpellFromNamespace(namespace);
+      return this.getTimeLeft(character._id, spell).then((timeLeft) => ({ spell, timeLeft }));
+    });
+
+    const cooldowns = await Promise.all(promises);
+
+    this.socketMessaging.sendEventToUser(character.channelId!, "SpellCooldownsRead", cooldowns); // TODO: Add this to shared
+
+    return cooldowns;
+  }
+
+  private getSpellFromNamespace(namespace: string): string {
+    const namespaceParts = namespace.split(":");
+    return namespaceParts[namespaceParts.length - 1];
+  }
+
   public async getTimeLeft(characterId: Types.ObjectId, magicWords: string): Promise<number> {
     this.validateArguments(characterId, magicWords);
 
     const namespace = this.getSpellCooldownNamespace(characterId, magicWords);
 
     const timeLeftMs = await this.inMemoryHashtable.getExpire(namespace);
-    const timeLeftSecs = timeLeftMs >= 0 ? Math.round(timeLeftMs / 1000) : -1;
+    const timeLeftSecs = timeLeftMs >= 0 ? Math.floor(timeLeftMs / 100) / 10 : -1;
 
     return timeLeftSecs;
   }

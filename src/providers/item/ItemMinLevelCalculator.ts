@@ -11,13 +11,12 @@ import {
 import { itemsBlueprintIndex } from "./data";
 
 export function getMinRequirements(blueprintKey: string, skillName: string): MinRequirements {
-  const levelMultiplier = 0.2;
-  const skillMultiplier = 0.3;
-  const attackMultiplier = 0.3;
-  const defenseMultiplier = 0.2;
-  const twoHandedMultiplier = 0.4;
-  const weightMultiplier = 0.2;
-  const entityEffectMultiplier = 0.05;
+  const levelMultiplier = 1.5;
+  const skillMultiplier = 0.7;
+  const attackMultiplier = 0.5;
+  const defenseMultiplier = 0.65;
+  const weightMultiplier = 1;
+  const entityEffectMultiplier = 0.1;
 
   const itemBlueprint = itemsBlueprintIndex[blueprintKey];
 
@@ -27,18 +26,27 @@ export function getMinRequirements(blueprintKey: string, skillName: string): Min
     );
   }
 
-  const { attack, defense, isTwoHanded, weight, entityEffectChance } = itemBlueprint as IEquippableWeaponBlueprint;
+  const { attack, defense, weight, entityEffectChance, subType } = itemBlueprint as IEquippableWeaponBlueprint;
+  let finalMultiplier = 1;
+  if (subType === ItemSubType.Axe) {
+    finalMultiplier = 0.9;
+  } else if (subType === ItemSubType.Spear) {
+    finalMultiplier = 0.6;
+  } else if (subType === ItemSubType.Dagger || subType === ItemSubType.Sword || subType === ItemSubType.Ranged) {
+    finalMultiplier = 1.2;
+  } else if (subType === ItemSubType.Shield) {
+    finalMultiplier = 0.9;
+  }
 
   const attackReq = attack ? attack * attackMultiplier : 0;
   const defenseReq = defense ? defense * defenseMultiplier : 0;
-  const isTwoHandedReq = isTwoHanded ? twoHandedMultiplier : 0;
   const weightReq = weight ? weight * weightMultiplier : 0;
   const entityEffectReq = entityEffectChance ? entityEffectChance * entityEffectMultiplier : 0;
 
-  const totalReq = attackReq + defenseReq + isTwoHandedReq + weightReq + entityEffectReq;
+  const highestReq = Math.max(attackReq, defenseReq, weightReq, entityEffectReq);
 
-  const levelReq = Math.ceil(totalReq * levelMultiplier);
-  const skillReq = Math.ceil(totalReq * skillMultiplier);
+  const levelReq = Math.ceil(highestReq * levelMultiplier * finalMultiplier);
+  const skillReq = Math.ceil(highestReq * skillMultiplier * finalMultiplier);
 
   const minRequirements: MinRequirements = {
     level: levelReq,
@@ -109,8 +117,8 @@ export const minItemLevelSkillRequirementsMiddleware = (data: IItem): IItem => {
     return item;
   }
 
-  // else, automatically add minRequirements to all items tier 3+
-  if (item.tier! >= 3) {
+  // else, automatically add minRequirements to all items tier 2+
+  if (item.tier! >= 2) {
     const minRequirements = getMinRequirements(item.key, getMinRequiredSkill(item));
 
     // @ts-ignore

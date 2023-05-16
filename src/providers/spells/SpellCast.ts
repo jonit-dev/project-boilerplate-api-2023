@@ -77,6 +77,7 @@ export class SpellCast {
     if (!hasSpellCooldown) {
       await this.spellCoolDown.setSpellCooldown(character._id, spell.magicWords, spell.cooldown);
     }
+    await this.spellCoolDown.getAllSpellCooldowns(character);
 
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
     let key = spell.attribute;
@@ -167,6 +168,7 @@ export class SpellCast {
 
     const hasSpellCooldown = await this.spellCoolDown.haveSpellCooldown(character._id, spell.magicWords);
     if (hasSpellCooldown) {
+      await this.spellCoolDown.getAllSpellCooldowns(character);
       const timeLeft = await this.spellCoolDown.getTimeLeft(character._id, spell.magicWords);
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
