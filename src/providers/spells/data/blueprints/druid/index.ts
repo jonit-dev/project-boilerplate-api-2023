@@ -1,4 +1,4 @@
-import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { SpellsBlueprint } from "@rpg-engine/shared";
 import { spellEntanglingRoots } from "./SpellEntanglingRoots";
 import { spellHealRuneCreation } from "./SpellHealRuneCreation";
 import { spellShapeshift } from "./SpellShapeshift";

@@ -1,10 +1,11 @@
-import { provide } from "inversify-binding-decorators";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
-import { Types } from "mongoose";
-import { ISpell, NamespaceRedisControl } from "./data/types/SpellsBlueprintTypes";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { spellsBlueprints } from "./data/blueprints";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { ISpell } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
+import { Types } from "mongoose";
+import { spellsBlueprints } from "./data/blueprints";
+import { NamespaceRedisControl } from "./data/types/SpellsBlueprintTypes";
 
 @provide(SpellCoolDown)
 export default class SpellCoolDown {

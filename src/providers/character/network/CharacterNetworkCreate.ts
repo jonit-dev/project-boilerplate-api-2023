@@ -12,7 +12,7 @@ import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   AnimationDirection,
   AvailableWeather,
@@ -23,6 +23,7 @@ import {
   ICharacterCreateFromServer,
   IControlTime,
   PeriodOfDay,
+  SpellsBlueprint,
   ToGridX,
   ToGridY,
   WeatherSocketEvents,

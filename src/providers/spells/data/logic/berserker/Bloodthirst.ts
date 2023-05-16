@@ -8,10 +8,11 @@ import {
   CharacterClass,
   CharacterSocketEvents,
   ICharacterAttributeChanged,
+  SpellsBlueprint,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
-import { NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { NamespaceRedisControl } from "../../types/SpellsBlueprintTypes";
 
 @provide(Bloodthirst)
 export class Bloodthirst {

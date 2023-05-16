@@ -1,7 +1,6 @@
-import { provide } from "inversify-binding-decorators";
-import { ISpell } from "./data/types/SpellsBlueprintTypes";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { CharacterClass } from "@rpg-engine/shared";
+import { CharacterClass, ISpell } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
 
 @provide(SpellValidation)
 export class SpellValidation {

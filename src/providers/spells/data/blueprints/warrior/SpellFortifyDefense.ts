@@ -8,10 +8,11 @@ import {
   CharacterBuffType,
   CharacterClass,
   CombatSkill,
+  ISpell,
   SpellCastingType,
+  SpellsBlueprint,
 } from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellFortifyDefense: Partial<ISpell> = {
   key: SpellsBlueprint.FortifyDefense,

@@ -16,10 +16,12 @@ import {
   CharacterSocketEvents,
   EntityType,
   GRID_WIDTH,
+  ISpell,
   NPCAlignment,
   NPCMovementType,
   SkillSocketEvents,
   SpellSocketEvents,
+  SpellsBlueprint,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { SpellCast } from "../SpellCast";
@@ -31,7 +33,6 @@ import { spellSelfHealing } from "../data/blueprints/all/SpellSelfHealing";
 import { rogueSpellExecution } from "../data/blueprints/rogue/SpellExecution";
 import { spellStealth } from "../data/blueprints/rogue/SpellStealth";
 import { spellStunTarget } from "../data/blueprints/warrior/SpellStunTarget";
-import { ISpell, SpellsBlueprint } from "../data/types/SpellsBlueprintTypes";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;

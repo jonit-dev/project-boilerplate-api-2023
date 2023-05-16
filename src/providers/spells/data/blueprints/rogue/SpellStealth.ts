@@ -1,9 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, BasicAttribute, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  BasicAttribute,
+  CharacterClass,
+  ISpell,
+  SpellCastingType,
+  SpellsBlueprint,
+} from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellStealth: Partial<ISpell> = {
   key: SpellsBlueprint.RogueStealth,

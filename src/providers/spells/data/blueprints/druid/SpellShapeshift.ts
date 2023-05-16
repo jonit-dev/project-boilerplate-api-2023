@@ -8,10 +8,11 @@ import {
   CharacterBuffDurationType,
   CharacterBuffType,
   CharacterClass,
+  ISpell,
   SpellCastingType,
+  SpellsBlueprint,
 } from "@rpg-engine/shared";
 import { ShapeShift } from "../../logic/mage/druid/ShapeShift";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellShapeshift: Partial<ISpell> = {
   key: SpellsBlueprint.DruidShapeshift,

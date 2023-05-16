@@ -2,8 +2,14 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container } from "@providers/inversify/container";
 import { Execution } from "@providers/spells/data/logic/berserker/Execution";
-import { AnimationEffectKeys, CharacterClass, RangeTypes, SpellCastingType } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import {
+  AnimationEffectKeys,
+  CharacterClass,
+  ISpell,
+  RangeTypes,
+  SpellCastingType,
+  SpellsBlueprint,
+} from "@rpg-engine/shared";
 
 export const rogueSpellExecution: Partial<ISpell> = {
   key: SpellsBlueprint.RogueExecution,

@@ -1,4 +1,4 @@
-import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { SpellsBlueprint } from "@rpg-engine/shared";
 import { spellCorruptionRuneCreation } from "./SpellCorruptionRuneCreation";
 import { spellCurseOfWeakness } from "./SpellCurseOfWeakness";
 import { spellDarkRuneCreation } from "./SpellDarkRuneCreation";

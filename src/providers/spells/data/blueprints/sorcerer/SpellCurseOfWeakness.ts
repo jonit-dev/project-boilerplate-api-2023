@@ -9,11 +9,12 @@ import {
   CharacterBuffDurationType,
   CharacterBuffType,
   CharacterClass,
+  ISpell,
   RangeTypes,
   SpellCastingType,
+  SpellsBlueprint,
 } from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellCurseOfWeakness: Partial<ISpell> = {
   key: SpellsBlueprint.CurseOfWeakness,

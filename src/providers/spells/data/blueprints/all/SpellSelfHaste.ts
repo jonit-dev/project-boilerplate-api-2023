@@ -7,10 +7,11 @@ import {
   CharacterAttributes,
   CharacterBuffDurationType,
   CharacterBuffType,
+  ISpell,
   SpellCastingType,
+  SpellsBlueprint,
 } from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellSelfHaste: Partial<ISpell> = {
   key: SpellsBlueprint.SelfHasteSpell,

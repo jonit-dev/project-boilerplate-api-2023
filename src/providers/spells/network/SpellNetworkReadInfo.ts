@@ -3,10 +3,9 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { ISpellRead, IUIShowMessage, SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { ISpell, ISpellRead, IUIShowMessage, SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { spellsBlueprints } from "../data/blueprints/index";
-import { ISpell } from "../data/types/SpellsBlueprintTypes";
 
 @provide(SpellNetworkReadInfo)
 export class SpellNetworkReadInfo {

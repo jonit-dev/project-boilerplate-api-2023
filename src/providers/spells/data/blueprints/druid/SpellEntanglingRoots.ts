@@ -2,9 +2,16 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, BasicAttribute, CharacterClass, RangeTypes, SpellCastingType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  BasicAttribute,
+  CharacterClass,
+  ISpell,
+  RangeTypes,
+  SpellCastingType,
+  SpellsBlueprint,
+} from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellEntanglingRoots: Partial<ISpell> = {
   key: SpellsBlueprint.EntanglingRoots,

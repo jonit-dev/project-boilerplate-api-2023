@@ -1,4 +1,4 @@
-import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { SpellsBlueprint } from "@rpg-engine/shared";
 import { rogueSpellExecution } from "./SpellExecution";
 import { spellStealth } from "./SpellStealth";
 

@@ -1,4 +1,4 @@
-import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { SpellsBlueprint } from "@rpg-engine/shared";
 import { spellFocus } from "./SpellFocus";
 
 export const rogueHunterSpellsIndex = {

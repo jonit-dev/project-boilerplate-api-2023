@@ -1,9 +1,16 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, BasicAttribute, CharacterClass, SpellCastingType } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  BasicAttribute,
+  CharacterClass,
+  ISpell,
+  SpellCastingType,
+  SpellsBlueprint,
+} from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
-import { ISpell, NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { NamespaceRedisControl } from "../../types/SpellsBlueprintTypes";
 
 export const spellManaShield: Partial<ISpell> = {
   key: SpellsBlueprint.ManaShield,

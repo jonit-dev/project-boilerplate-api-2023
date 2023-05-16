@@ -1,9 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUIShowMessage, SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { ISpell, IUIShowMessage, SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { spellsBlueprints } from "../blueprints";
-import { ISpell } from "../types/SpellsBlueprintTypes";
 
 @provide(SpellLearnedSpells)
 export class SpellLearnedSpells {

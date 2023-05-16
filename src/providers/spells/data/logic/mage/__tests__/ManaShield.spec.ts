@@ -1,8 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { CharacterClass } from "@rpg-engine/shared";
+import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { CharacterClass, SpellsBlueprint } from "@rpg-engine/shared";
 import { ManaShield } from "../ManaShield";
 
 describe("Mana Shield", () => {

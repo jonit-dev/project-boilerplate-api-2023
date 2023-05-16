@@ -1,4 +1,4 @@
-import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { SpellsBlueprint } from "@rpg-engine/shared";
 import { spellBloodthirst } from "./SpellBloodthirst";
 import { berserkerSpellExecution } from "./SpellExecution";
 import { spellFrenzy } from "./SpellFrenzy";

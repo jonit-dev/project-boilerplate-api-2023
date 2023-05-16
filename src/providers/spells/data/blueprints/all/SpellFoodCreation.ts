@@ -2,9 +2,8 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { AnimationEffectKeys, ItemSubType, SpellCastingType } from "@rpg-engine/shared";
+import { AnimationEffectKeys, ISpell, ItemSubType, SpellCastingType, SpellsBlueprint } from "@rpg-engine/shared";
 import { SpellItemCreation } from "../../abstractions/SpellItemCreation";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellFoodCreation: Partial<ISpell> = {
   key: SpellsBlueprint.FoodCreationSpell,

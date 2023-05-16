@@ -1,13 +1,12 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ISkill } from "@rpg-engine/shared";
+import { ISkill, ISpell } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
-import { spellsBlueprints } from "./data/blueprints/index";
-import { ISpell } from "./data/types/SpellsBlueprintTypes";
 import { SpellValidation } from "./SpellValidation";
+import { spellsBlueprints } from "./data/blueprints/index";
 
 @provide(SpellLearn)
 export class SpellLearn {

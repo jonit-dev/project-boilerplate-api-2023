@@ -11,8 +11,14 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import SpellCooldown from "@providers/spells/SpellCooldown";
 import { SpellLearn } from "@providers/spells/SpellLearn";
-import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { CharacterClass, CharacterSocketEvents, ICharacterLogout, ItemSubType } from "@rpg-engine/shared";
+import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import {
+  CharacterClass,
+  CharacterSocketEvents,
+  ICharacterLogout,
+  ItemSubType,
+  SpellsBlueprint,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { CharacterInventory } from "../CharacterInventory";

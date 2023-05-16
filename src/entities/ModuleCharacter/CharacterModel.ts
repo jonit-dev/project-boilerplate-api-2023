@@ -5,7 +5,6 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { User } from "@entities/ModuleSystem/UserModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   CharacterClass,
   CharacterFactions,
@@ -14,6 +13,7 @@ import {
   LifeBringerRaces,
   MapLayers,
   ShadowWalkerRaces,
+  SpellsBlueprint,
   TypeHelper,
   getSpeedMultiplierBasedOnWeightRatio,
 } from "@rpg-engine/shared";
@@ -109,9 +109,7 @@ const characterSchema = createLeanSchema(
     }),
     race: Type.string({
       required: true,
-      enum: Array.from(
-        new Set(TypeHelper.enumToStringArray(LifeBringerRaces).concat(TypeHelper.enumToStringArray(ShadowWalkerRaces)))
-      ),
+      enum: [...TypeHelper.enumToStringArray(LifeBringerRaces), ...TypeHelper.enumToStringArray(ShadowWalkerRaces)],
       default: LifeBringerRaces.Human,
     }),
     textureKey: Type.string({
@@ -265,46 +263,25 @@ characterSchema.virtual("type").get(function (this: ICharacter) {
 
 characterSchema.post("remove", async function (this: ICharacter) {
   try {
-    const skill = await Skill.findOne({ _id: this.skills });
-    if (skill) {
-      await skill.remove();
-    }
-
-    const depot = await Depot.findOne({ owner: this._id });
-    if (depot) {
-      await depot.remove();
-    }
-
-    const equipment = await Equipment.findOne({ owner: this._id });
-    if (equipment) {
-      await equipment.remove();
-    }
-
-    const inventory = await ItemContainer.findOne({ owner: this._id });
-    if (inventory) {
-      await inventory.remove();
-    }
-
-    const items = await Item.find({ owner: this._id });
-    if (items) {
-      for (const item of items) {
-        await item.remove();
-      }
-    }
-
-    const user = await User.findOne({ characters: this._id });
-    if (user) {
-      await User.updateOne({
-        $pull: {
-          characters: this._id,
-        },
-      });
-    }
+    await Promise.all([
+      Skill.deleteOne({ _id: this.skills }),
+      Depot.deleteOne({ owner: this._id }),
+      Equipment.deleteOne({ owner: this._id }),
+      ItemContainer.deleteOne({ owner: this._id }),
+      Item.deleteMany({ owner: this._id }),
+      User.updateOne(
+        { characters: this._id },
+        {
+          $pull: {
+            characters: this._id,
+          },
+        }
+      ),
+    ]);
   } catch (error) {
     console.log(error);
   }
 });
-
 export type ICharacter = ExtractDoc<typeof characterSchema>;
 
 export const Character = typedModel("Character", characterSchema);

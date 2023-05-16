@@ -1,4 +1,4 @@
-import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { SpellsBlueprint } from "@rpg-engine/shared";
 import { spellBoltCreation } from "./SpellBoltCreation";
 import { spellEagleEyes } from "./SpellEagleEyes";
 import { spellFireBoltCreation } from "./SpellFireBoltCreation";

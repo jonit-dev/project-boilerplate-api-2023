@@ -1,9 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { CharacterSocketEvents, ICharacterAttributeChanged, SpellsBlueprint } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { NamespaceRedisControl, SpellsBlueprint } from "../../../types/SpellsBlueprintTypes";
 
 @provide(ShapeShift)
 export class ShapeShift {

@@ -13,13 +13,14 @@ import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/It
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ISpell, NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   AnimationEffectKeys,
   BasicAttribute,
   CharacterSocketEvents,
   EntityType,
   ICharacterAttributeChanged,
+  ISpell,
   ISpellCast,
   NPCAlignment,
   SpellCastingType,

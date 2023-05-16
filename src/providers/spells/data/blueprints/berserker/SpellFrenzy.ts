@@ -9,9 +9,10 @@ import {
   CharacterBuffDurationType,
   CharacterBuffType,
   CharacterClass,
+  ISpell,
   SpellCastingType,
+  SpellsBlueprint,
 } from "@rpg-engine/shared";
-import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellFrenzy: Partial<ISpell> = {
   key: SpellsBlueprint.BerserkerFrenzy,

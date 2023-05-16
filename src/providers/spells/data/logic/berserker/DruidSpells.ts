@@ -1,9 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import { CharacterSocketEvents, ICharacterAttributeChanged, SpellsBlueprint } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { NamespaceRedisControl, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { NamespaceRedisControl } from "../../types/SpellsBlueprintTypes";
 
 @provide(DruidSpells)
 export class DruidSpells {

@@ -3,8 +3,14 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
-import { NamespaceRedisControl, SpellsBlueprint } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { BasicAttribute, CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import {
+  BasicAttribute,
+  CharacterClass,
+  CharacterSocketEvents,
+  ICharacterAttributeChanged,
+  SpellsBlueprint,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 

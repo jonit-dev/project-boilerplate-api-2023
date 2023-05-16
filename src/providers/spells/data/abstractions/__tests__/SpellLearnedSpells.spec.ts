@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
-import { SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
+import { SpellSocketEvents, SpellsBlueprint, UISocketEvents } from "@rpg-engine/shared";
+
 import { SpellLearnedSpells } from "../SpellLearnedSpells";
 
 describe("SpellLearnedSpells", () => {

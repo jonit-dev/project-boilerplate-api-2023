@@ -1,11 +1,10 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IUIShowMessage, SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
-import { ISpell } from "../data/types/SpellsBlueprintTypes";
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { spellsBlueprints } from "../data/blueprints/index";
+import { ISpell, IUIShowMessage, SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { spellsBlueprints } from "../data/blueprints/index";
 
 @provide(SpellNetworkDetails)
 export class SpellNetworkDetails {
