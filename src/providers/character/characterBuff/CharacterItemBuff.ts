@@ -11,27 +11,25 @@ export class CharacterItemBuff {
   constructor(private characterBuff: CharacterBuffActivator, private characterBuffTracker: CharacterBuffTracker) {}
 
   public async enableItemBuff(character: ICharacter, item: IItem): Promise<void> {
-    const itemBlueprint = itemsBlueprintIndex[item.key] as IEquippableItemBlueprint;
+    const itemBlueprint = itemsBlueprintIndex[item.baseKey] as IEquippableItemBlueprint;
 
     if (!itemBlueprint?.equippedBuff) {
       return;
     }
 
-    // return if there's an ongoing buff to the same item
+    const equippedBuffs = Array.isArray(itemBlueprint.equippedBuff)
+      ? itemBlueprint.equippedBuff
+      : [itemBlueprint.equippedBuff];
 
-    const hasOngoingBuff = await this.characterBuffTracker.getBuffByItemKey(character, item.key);
+    for (const buff of equippedBuffs) {
+      const buffData = {
+        ...buff,
+        itemId: item._id,
+        itemKey: item.baseKey,
+      } as ICharacterItemBuff;
 
-    if (hasOngoingBuff) {
-      return;
+      await this.characterBuff.enablePermanentBuff(character, buffData);
     }
-
-    const buff = {
-      ...itemBlueprint.equippedBuff,
-      itemId: item._id,
-      itemKey: item.key,
-    } as ICharacterItemBuff;
-
-    await this.characterBuff.enablePermanentBuff(character, buff);
   }
 
   public async disableItemBuff(character: ICharacter, itemId: string): Promise<void> {
