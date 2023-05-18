@@ -4,9 +4,10 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
-import { BattleEventType, EntityAttackType, SKILLS_MAP } from "@rpg-engine/shared";
+import { BattleEventType, EntityAttackType, SKILLS_MAP, CharacterClass, EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { PVP_ROGUE_ATTACK_DAMAGE_INCREASE_MULTIPLIER } from "@providers/constants/PVPConstants";
 
 type BattleParticipant = ICharacter | INPC;
 
@@ -59,12 +60,19 @@ export class BattleEvent {
 
     const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
 
-    const totalPotentialAttackerDamage = await this.calculateTotalPotentialDamage(
+    let totalPotentialAttackerDamage = await this.calculateTotalPotentialDamage(
       attackerSkills,
       defenderSkills,
       isMagicAttack,
       weapon?.item
     );
+
+    if (attacker.type === EntityType.Character && target.type === EntityType.Character) {
+      totalPotentialAttackerDamage += await this.calculateExtraDamageBasedOnClass(
+        attacker.class as CharacterClass,
+        totalPotentialAttackerDamage
+      );
+    }
 
     let damage =
       weapon?.item && weapon?.item.isTraining
@@ -194,5 +202,12 @@ export class BattleEvent {
       return 0;
     }
     return Math.floor(characterSkills[skillName].level / 2);
+  }
+
+  private calculateExtraDamageBasedOnClass(clas: CharacterClass, calculatedDamage: number): number {
+    if (clas === CharacterClass.Rogue) {
+      return Math.floor(calculatedDamage * PVP_ROGUE_ATTACK_DAMAGE_INCREASE_MULTIPLIER);
+    }
+    return 0;
   }
 }

@@ -4,7 +4,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { BattleEventType } from "@rpg-engine/shared";
+import { BattleEventType, CharacterClass, EntityType } from "@rpg-engine/shared";
 import _ from "lodash";
 import { BattleEvent } from "../BattleEvent";
 
@@ -331,6 +331,61 @@ describe("BattleEvents.spec.ts", () => {
       const defenderSkills = defender.skills as ISkill;
 
       expect(spyCalculateRegularDefense).toHaveBeenCalledWith(defenderSkills.level, defenderSkills.resistance.level);
+    });
+  });
+
+  describe("pvp rogue attack damage increase", () => {
+    let attacker: ICharacter;
+    let defender: ICharacter;
+
+    beforeEach(() => {
+      // @ts-ignore
+      jest.spyOn(battleEvents.characterWeapon, "getWeapon" as any).mockImplementation(() => {
+        return null;
+      });
+
+      // @ts-ignore
+      jest.spyOn(battleEvents, "calculateTotalPotentialDamage").mockImplementation(() => 100);
+
+      jest
+        // @ts-ignore
+        .spyOn(battleEvents, "implementDamageReduction")
+        // @ts-ignore
+        .mockImplementation((defenderSkills, target, damage, isMagicAttack) => damage);
+
+      // @ts-ignore
+      jest.spyOn(_, "random").mockImplementation((a, b) => b);
+
+      attacker = {
+        class: CharacterClass.Rogue,
+        type: EntityType.Character,
+      } as unknown as ICharacter;
+
+      defender = {
+        type: EntityType.Character,
+        health: 200,
+      } as unknown as ICharacter;
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it("attack damage should be increased", async () => {
+      const damage = await battleEvents.calculateHitDamage(attacker, defender, false);
+      expect(damage).toBe(110);
+    });
+
+    it("attack damage should not be increased if attacker is not rouge", async () => {
+      attacker.class = CharacterClass.Berserker;
+      const damage = await battleEvents.calculateHitDamage(attacker, defender, false);
+      expect(damage).toBe(100);
+    });
+
+    it("attack damage should not be increased if battle is not pvp", async () => {
+      defender.type = EntityType.NPC;
+      const damage = await battleEvents.calculateHitDamage(attacker, defender, false);
+      expect(damage).toBe(100);
     });
   });
 });
