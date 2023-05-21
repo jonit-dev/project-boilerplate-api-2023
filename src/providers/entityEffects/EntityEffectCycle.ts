@@ -6,8 +6,14 @@ import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { container } from "@providers/inversify/container";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { AnimationEffectKeys, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
-import { EffectsSocketEvents, EntityType, IEntityEffectEvent } from "@rpg-engine/shared/dist/types/entity.types";
+import {
+  AnimationEffectKeys,
+  CharacterSocketEvents,
+  EffectsSocketEvents,
+  EntityType,
+  ICharacterAttributeChanged,
+  IEntityEffectEvent,
+} from "@rpg-engine/shared";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 
 /* eslint-disable @typescript-eslint/no-floating-promises */

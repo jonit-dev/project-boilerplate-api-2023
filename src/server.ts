@@ -18,6 +18,7 @@ import {
   seeds,
   server,
   socketAdapter,
+  spellSilencer,
 } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
@@ -76,6 +77,8 @@ app.listen(port, async () => {
   characterMonitor.monitor();
 
   await characterBuffActivator.disableAllTemporaryBuffsAllCharacters();
+
+  await spellSilencer.removeAllSilence();
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({

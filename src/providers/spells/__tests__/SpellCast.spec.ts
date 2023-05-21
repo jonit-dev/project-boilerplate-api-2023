@@ -33,6 +33,7 @@ import { spellSelfHealing } from "../data/blueprints/all/SpellSelfHealing";
 import { rogueSpellExecution } from "../data/blueprints/rogue/SpellExecution";
 import { spellStealth } from "../data/blueprints/rogue/SpellStealth";
 import { spellStunTarget } from "../data/blueprints/warrior/SpellStunTarget";
+import SpellSilence from "../data/logic/mage/druid/SpellSilence";
 
 describe("SpellCast.ts", () => {
   let spellCast: SpellCast;
@@ -157,6 +158,22 @@ describe("SpellCast.ts", () => {
     await Character.findByIdAndUpdate(testCharacter._id, { ...testCharacter });
 
     await runTest();
+  });
+
+  it("should fail with character under silence effect", async () => {
+    const spellSilencerMock = jest.spyOn(SpellSilence.prototype, "isSilent");
+    spellSilencerMock.mockReturnValue(Promise.resolve(true));
+
+    expect(await spellCast.castSpell({ magicWords: "talas faenya" }, testCharacter)).toBeFalsy();
+
+    expect(sendEventToUser).toBeCalledTimes(1);
+
+    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+      message: "Sorry, you are silent. You cannot cast any spell.",
+      type: "error",
+    });
+
+    spellSilencerMock.mockRestore();
   });
 
   it("should fail with not enough mana", async () => {

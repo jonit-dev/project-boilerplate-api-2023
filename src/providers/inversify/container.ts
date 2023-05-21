@@ -14,6 +14,7 @@ import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
+import SpellSilence from "@providers/spells/data/logic/mage/druid/SpellSilence";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
 import { Container } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
@@ -73,5 +74,7 @@ export const characterMonitor = container.get<CharacterMonitor>(CharacterMonitor
 export const spellCalculator = container.get<SpellCalculator>(SpellCalculator);
 
 export const characterBuffActivator = container.get<CharacterBuffActivator>(CharacterBuffActivator);
+
+export const spellSilencer = container.get<SpellSilence>(SpellSilence);
 
 export { container };

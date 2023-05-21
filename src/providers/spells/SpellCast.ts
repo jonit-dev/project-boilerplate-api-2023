@@ -30,6 +30,7 @@ import { provide } from "inversify-binding-decorators";
 import SpellCoolDown from "./SpellCooldown";
 import { SpellValidation } from "./SpellValidation";
 import { spellsBlueprints } from "./data/blueprints/index";
+import SpellSilence from "./data/logic/mage/druid/SpellSilence";
 
 @provide(SpellCast)
 export class SpellCast {
@@ -45,7 +46,8 @@ export class SpellCast {
     private inMemoryHashTable: InMemoryHashTable,
     private movementHelper: MovementHelper,
     private specialEffect: SpecialEffect,
-    private spellCoolDown: SpellCoolDown
+    private spellCoolDown: SpellCoolDown,
+    private spellSilencer: SpellSilence
   ) {}
 
   public isSpellCasting(msg: string): boolean {
@@ -164,6 +166,11 @@ export class SpellCast {
 
     if (!character.learnedSpells || character.learnedSpells.indexOf(spell.key) < 0) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you have not learned this spell.");
+      return false;
+    }
+
+    if (await this.spellSilencer.isSilent(character)) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you are silent. You cannot cast any spell.");
       return false;
     }
 
