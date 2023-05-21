@@ -11,6 +11,7 @@ import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { HeapMonitor } from "@providers/server/HeapMonitor";
 import { PM2Helper } from "@providers/server/PM2Helper";
+import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
@@ -76,5 +77,7 @@ export const spellCalculator = container.get<SpellCalculator>(SpellCalculator);
 export const characterBuffActivator = container.get<CharacterBuffActivator>(CharacterBuffActivator);
 
 export const spellSilencer = container.get<SpellSilence>(SpellSilence);
+
+export const skillIncrease = container.get<SkillIncrease>(SkillIncrease);
 
 export { container };

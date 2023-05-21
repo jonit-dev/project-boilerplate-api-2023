@@ -3,7 +3,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
-import { container } from "@providers/inversify/container";
+import { container, skillIncrease } from "@providers/inversify/container";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { AnimationEffectKeys, CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";
@@ -31,7 +31,14 @@ export class EntityEffectCycle {
   ): Promise<void> {
     const target = await this.getTarget(targetId, targetType);
 
+    // Check if the target doesn't exist or if it's not alive
     if (!target || !target.isAlive) {
+      // If the target exists (even though it's not alive)
+      if (target) {
+        await skillIncrease.releaseXP(target as INPC);
+        await this.handleDeath(target);
+      }
+      // Exit the function if the target doesn't exist or is not alive
       return;
     }
 
@@ -43,6 +50,10 @@ export class EntityEffectCycle {
 
     const attacker = await this.getTarget(attackerId, attackerType, true);
     const damage = await entityEffect.effect(target, attacker as ICharacter | INPC);
+
+    if (target.type === EntityType.NPC && attacker) {
+      await skillIncrease.recordXPinBattle(attacker as ICharacter, target, damage);
+    }
 
     const runAgain = remainingDurationMs === -1 || remainingDurationMs >= entityEffect.intervalMs;
     if (!runAgain) {

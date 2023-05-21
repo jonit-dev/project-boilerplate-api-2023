@@ -108,6 +108,13 @@ describe("EntityEffectCycle", () => {
       // @ts-expect-error
       .mockImplementation(() => Promise.resolve({ _id: testTarget._id, type: testTarget.type } as any));
 
+    const mockCharacterDeath = jest.fn().mockImplementation();
+
+    const handleDeathMock = jest.spyOn(EntityEffectCycle.prototype as any, "handleDeath");
+    handleDeathMock.mockImplementation(() => {
+      return Promise.resolve(mockCharacterDeath());
+    });
+
     new EntityEffectCycle(entityEffect, testTarget._id, testTarget.type, testAttacker._id, testAttacker.type);
 
     await waitUntil(() => {
@@ -184,6 +191,38 @@ describe("EntityEffectCycle", () => {
 
     // cleanup
     updateOneNPCMock.mockRestore();
+  });
+
+  it("handles the death of a character correctly", async () => {
+    const mockCharacterDeath = jest.fn().mockImplementation();
+    const mockTarget = {
+      isAlive: false,
+    };
+
+    const getTargetMock = jest.spyOn(EntityEffectCycle.prototype as any, "getTarget");
+    getTargetMock.mockImplementation(() => {
+      return Promise.resolve(mockTarget);
+    });
+
+    const handleDeathMock = jest.spyOn(EntityEffectCycle.prototype as any, "handleDeath");
+    handleDeathMock.mockImplementation(() => {
+      return Promise.resolve(mockCharacterDeath());
+    });
+
+    new EntityEffectCycle(entityEffect, testTarget._id, testTarget.type, testAttacker._id, testAttacker.type);
+
+    await waitUntil(() => {
+      return handleDeathMock.mock.calls.length > 0;
+    }, 100);
+
+    expect(getTargetMock).toHaveBeenCalledTimes(1);
+    expect(getTargetMock).toHaveBeenCalledWith(testTarget._id, testTarget.type);
+
+    expect(handleDeathMock).toHaveBeenCalledTimes(1);
+    expect(handleDeathMock).toHaveBeenCalledWith(mockTarget);
+
+    getTargetMock.mockClear();
+    handleDeathMock.mockClear();
   });
 });
 

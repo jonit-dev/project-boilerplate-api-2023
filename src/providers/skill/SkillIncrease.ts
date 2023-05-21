@@ -2,7 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
@@ -39,7 +39,6 @@ import {
   IIncreaseSPResult,
   IIncreaseXPResult,
   ISkillDetails,
-  ISkillEventFromServer,
   SKILLS_MAP,
   SkillEventType,
   SkillSocketEvents,
@@ -336,7 +335,7 @@ export class SkillIncrease {
       await this.warnCharactersAroundAboutExpGains(character, exp);
     }
 
-    await target.save();
+    await NPC.updateOne({ _id: target._id }, { xpToRelease: target.xpToRelease });
   }
 
   private formatLevel(level: number): string {
@@ -493,7 +492,10 @@ export class SkillIncrease {
         target.xpToRelease = [{ charId: attacker.id, xp: target.xpPerDamage * damage }];
       }
 
-      await target.save();
+      // await target.save();
+
+      // use updateOne to save
+      await NPC.updateOne({ _id: target.id }, { xpToRelease: target.xpToRelease });
     }
   }
 
