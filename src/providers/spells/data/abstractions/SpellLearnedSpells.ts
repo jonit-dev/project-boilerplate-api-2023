@@ -9,7 +9,7 @@ import { spellsBlueprints } from "../blueprints";
 export class SpellLearnedSpells {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  public async sendCharacterLearnedSpellsInfoEvent(character: ICharacter): Promise<ISpell[] | undefined> {
+  public async sendCharacterLearnedSpellsInfoEvent(character: ICharacter): Promise<void> {
     const { learnedSpells } = character;
     const learnedSpellsArr: ISpell[] = [];
 
