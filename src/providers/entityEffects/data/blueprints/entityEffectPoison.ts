@@ -21,7 +21,7 @@ export const entityEffectPoison: IEntityEffect = {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const attackerSkills = attacker.skills as unknown as ISkill;
-    const attackerLevel = attackerSkills?.level ?? 1;
+    const attackerLevel = attackerSkills?.magic.level ?? 1;
 
     const maxDamage = Math.ceil(attackerLevel * ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER);
     const effectDamage = _.random(1, maxDamage);

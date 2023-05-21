@@ -26,5 +26,8 @@ export const npcTraderAlchemist = {
     {
       key: PotionsBlueprint.AcidFlask,
     },
+    {
+      key: PotionsBlueprint.BlazingFirebomb,
+    },
   ],
 } as Partial<INPC>;

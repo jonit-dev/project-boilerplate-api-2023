@@ -1,11 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-
-import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
-import { entityEffectPoison } from "@providers/entityEffects/data/blueprints/entityEffectPoison";
-import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
+
+import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
+import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
+import { container } from "@providers/inversify/container";
 import {
   AnimationEffectKeys,
   IRuneItemBlueprint,
@@ -16,39 +16,38 @@ import {
 } from "@rpg-engine/shared";
 import { MagicsBlueprint, PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
-export const itemVenomousVial: IRuneItemBlueprint = {
-  key: PotionsBlueprint.VenomousVial,
+export const itemBlazingFirebomb: IRuneItemBlueprint = {
+  key: PotionsBlueprint.BlazingFirebomb,
   type: ItemType.Tool,
   subType: ItemSubType.Potion,
   textureAtlas: "items",
-  texturePath: "potions/venomous-vial.png",
-  name: "Venomous Vial",
-  description: "An explosive vial releasing a noxious cloud that poisons enemies and weakens their vitality.",
+  texturePath: "potions/blazing-firebomb.png",
+  name: "Blazing Firebomb",
+  description: "A volatile concoction that erupts in a blazing inferno, engulfing enemies in searing flames.",
   weight: 0.01,
   maxStackSize: 100,
-  basePrice: 45,
 
   canUseOnNonPVPZone: false,
   hasUseWith: true,
   useWithMaxDistanceGrid: RangeTypes.Medium,
-  power: RunePower.Medium,
+  power: RunePower.High,
   canSell: false,
-
-  minMagicLevelRequired: 4,
-  animationKey: AnimationEffectKeys.HitPoison,
-  projectileAnimationKey: AnimationEffectKeys.Green,
+  basePrice: 30,
+  minMagicLevelRequired: 7,
+  animationKey: AnimationEffectKeys.HitFire,
+  projectileAnimationKey: AnimationEffectKeys.FireBall,
 
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    const points = await calculateItemUseEffectPoints(MagicsBlueprint.PoisonRune, caster);
+    const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireRune, caster);
 
     itemUsableEffect.apply(target, EffectableAttribute.Health, -1.5 * points);
 
     const entityEffectUse = container.get(EntityEffectUse);
-    await entityEffectUse.applyEntityEffects(target, caster, entityEffectPoison);
+    await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);
 
     return points;
   },
-  usableEffectDescription: "Deals poison damage to the target",
+  usableEffectDescription: "Deals fire damage to the target",
 };

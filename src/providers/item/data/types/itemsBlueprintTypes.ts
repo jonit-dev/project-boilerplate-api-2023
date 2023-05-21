@@ -318,6 +318,8 @@ export enum PotionsBlueprint {
   LifePotion = "life-potion",
   ManaPotion = "mana-potion",
   LightAntidote = "light-antidote",
+  BlazingFirebomb = "blazing-firebomb",
+  FieryConcussion = "fiery-concussion",
   AcidFlask = "acid-flask",
   CorrosiveElixir = "corrosive-elixir",
   VenomousVial = "venomous-vial",
