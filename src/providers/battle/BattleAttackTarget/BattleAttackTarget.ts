@@ -204,7 +204,9 @@ export class BattleAttackTarget {
     };
 
     if (battleEvent === BattleEventType.Hit) {
-      const damage = await this.battleEvent.calculateHitDamage(attacker, target, magicAttack);
+      const baseDamage = await this.battleEvent.calculateHitDamage(attacker, target, magicAttack);
+      const damage = await this.battleEvent.getCriticalHitDamageIfSuceed(baseDamage);
+
       if (damage > 0) {
         // Increase attacker SP for weapon used and XP (if is character)
         if (attacker.type === "Character") {
@@ -259,6 +261,7 @@ export class BattleAttackTarget {
           ...battleEventPayload,
           totalDamage: damage,
           postDamageTargetHP: target.health,
+          isCriticalHit: damage > baseDamage,
         };
 
         // when target is Character, resistance SP increases
@@ -283,13 +286,6 @@ export class BattleAttackTarget {
             await this.applyEntityEffectsIfApplicable(attacker as INPC, target);
           }
         }
-
-        /*
-        Check if character is dead after damage calculation. 
-        If so, send death event to client and characters around.
-        */
-
-        await this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
       }
     }
 
@@ -310,6 +306,12 @@ export class BattleAttackTarget {
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
 
     await this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
+
+    /*
+    Check if character is dead. 
+    If so, send death event to client and characters around.
+    */
+    await this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
   }
 
   private async sendBattleEvent(character: ICharacter, battleEventPayload: IBattleEventFromServer): Promise<void> {

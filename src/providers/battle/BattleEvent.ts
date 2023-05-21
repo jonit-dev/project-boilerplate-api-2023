@@ -8,6 +8,10 @@ import { BattleEventType, EntityAttackType, SKILLS_MAP, CharacterClass, EntityTy
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { PVP_ROGUE_ATTACK_DAMAGE_INCREASE_MULTIPLIER } from "@providers/constants/PVPConstants";
+import {
+  BATTLE_CRITICAL_HIT_CHANCE,
+  BATTLE_CRITICAL_HIT_DAMAGE_MULTIPLIER,
+} from "@providers/constants/BattleConstants";
 
 type BattleParticipant = ICharacter | INPC;
 
@@ -83,6 +87,14 @@ export class BattleEvent {
 
     // damage cannot be higher than target's remaining health
     return damage > target.health ? target.health : damage;
+  }
+
+  public async getCriticalHitDamageIfSuceed(damage: number): Promise<number> {
+    const hasCriticalHitSucceeded = _.random(0, 100) <= BATTLE_CRITICAL_HIT_CHANCE;
+
+    if (hasCriticalHitSucceeded) return damage * BATTLE_CRITICAL_HIT_DAMAGE_MULTIPLIER;
+
+    return damage;
   }
 
   private async implementDamageReduction(

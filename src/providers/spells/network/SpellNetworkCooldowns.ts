@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { ISpellCast } from "@rpg-engine/shared";
+import { SpellSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import SpellCoolDown from "../SpellCooldown";
 
@@ -12,7 +12,7 @@ export class SpellNetworkCooldowns {
   public onSpellCooldownsRead(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      "SpellCooldownsRead", // TODO: Add this to shared
+      SpellSocketEvents.SpellCooldownsRead,
       async (_data, character: ICharacter) => {
         await this.spellCooldown.getAllSpellCooldowns(character);
       },

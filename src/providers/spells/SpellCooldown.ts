@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ISpell } from "@rpg-engine/shared";
+import { ISpell, SpellSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { spellsBlueprints } from "./data/blueprints";
@@ -66,7 +66,7 @@ export default class SpellCoolDown {
 
     const cooldowns = await Promise.all(promises);
 
-    this.socketMessaging.sendEventToUser(character.channelId!, "SpellCooldownsRead", cooldowns); // TODO: Add this to shared
+    this.socketMessaging.sendEventToUser(character.channelId!, SpellSocketEvents.SpellCooldownsRead, cooldowns);
 
     return cooldowns;
   }

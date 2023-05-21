@@ -4,8 +4,7 @@ import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { QuestSystem } from "@providers/quest/QuestSystem";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { EffectsSocketEvents, EntityType, IEntityEffectEvent, QuestType } from "@rpg-engine/shared";
+import { EntityType, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { BattleEffects } from "./BattleEffects";
@@ -13,7 +12,6 @@ import { BattleEffects } from "./BattleEffects";
 @provide(OnTargetHit)
 export class OnTargetHit {
   constructor(
-    private socketMessaging: SocketMessaging,
     private characterDeath: CharacterDeath,
     private npcDeath: NPCDeath,
     private skillIncrease: SkillIncrease,
@@ -23,7 +21,6 @@ export class OnTargetHit {
 
   async execute(target: ICharacter | INPC, attacker: ICharacter | INPC, damage: number): Promise<void> {
     if (damage) {
-      await this.sendDamageEvent(target, damage);
       await this.generateBloodOnGround(target);
       await this.handleSkillIncrease(attacker as ICharacter, target, damage);
     }
@@ -31,31 +28,6 @@ export class OnTargetHit {
     if (!target.isAlive) {
       await this.handleDeath(target, attacker);
       await this.updateQuests(target, attacker);
-    }
-  }
-
-  private async sendDamageEvent(target: ICharacter | INPC, damage: number): Promise<void> {
-    const payload: IEntityEffectEvent = {
-      targetId: target._id,
-      targetType: target.type as EntityType,
-      value: damage,
-    };
-
-    if (target.type === EntityType.Character) {
-      const character = target as ICharacter;
-
-      this.socketMessaging.sendEventToUser(character.channelId!, EffectsSocketEvents.EntityEffect, payload);
-      await this.socketMessaging.sendEventToCharactersAroundCharacter(
-        character,
-        EffectsSocketEvents.EntityEffect,
-        payload
-      );
-    } else {
-      await this.socketMessaging.sendEventToCharactersAroundNPC(
-        target as INPC,
-        EffectsSocketEvents.EntityEffect,
-        payload
-      );
     }
   }
 

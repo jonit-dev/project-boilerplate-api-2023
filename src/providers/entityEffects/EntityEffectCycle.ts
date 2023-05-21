@@ -6,14 +6,7 @@ import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { container } from "@providers/inversify/container";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  AnimationEffectKeys,
-  CharacterSocketEvents,
-  EffectsSocketEvents,
-  EntityType,
-  ICharacterAttributeChanged,
-  IEntityEffectEvent,
-} from "@rpg-engine/shared";
+import { AnimationEffectKeys, CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
@@ -113,7 +106,6 @@ export class EntityEffectCycle {
 
     this.sendAnimationEvent(target, entityEffect.targetAnimationKey);
     this.sendAttributeChangedEvent(target);
-    this.sendEffectsEvent(target, effectDamage);
 
     return true;
   }
@@ -153,25 +145,6 @@ export class EntityEffectCycle {
         CharacterSocketEvents.AttributeChanged,
         payload
       );
-    }
-  }
-
-  private async sendEffectsEvent(target: ICharacter | INPC, damage: number): Promise<void> {
-    const socketMessaging = container.get(SocketMessaging);
-
-    const payload: IEntityEffectEvent = {
-      targetId: target._id,
-      targetType: target.type as EntityType,
-      value: damage,
-    };
-
-    if (target.type === EntityType.Character) {
-      const character = target as ICharacter;
-
-      socketMessaging.sendEventToUser(character.channelId!, EffectsSocketEvents.EntityEffect, payload);
-      await socketMessaging.sendEventToCharactersAroundCharacter(character, EffectsSocketEvents.EntityEffect, payload);
-    } else {
-      await socketMessaging.sendEventToCharactersAroundNPC(target as INPC, EffectsSocketEvents.EntityEffect, payload);
     }
   }
 

@@ -1,0 +1,2 @@
+export const BATTLE_CRITICAL_HIT_CHANCE = 2; // %
+export const BATTLE_CRITICAL_HIT_DAMAGE_MULTIPLIER = 1.8;

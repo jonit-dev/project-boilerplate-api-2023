@@ -25,7 +25,9 @@ import {
   AnimationEffectKeys,
   CharacterClass,
   CharacterSocketEvents,
+  DisplayTextSocketEvents,
   ICharacterAttributeChanged,
+  IDisplayTextEvent,
   IUIShowMessage,
   LifeBringerRaces,
   ShadowWalkerRaces,
@@ -359,23 +361,28 @@ export class SkillIncrease {
   }
 
   private async warnCharactersAroundAboutExpGains(character: ICharacter, exp: number): Promise<void> {
-    const levelUpEventPayload: Partial<ISkillEventFromServer> = {
-      characterId: character.id,
-      exp,
+    const levelUpEventPayload: IDisplayTextEvent = {
+      targetId: character.id,
+      value: exp,
+      prefix: "+",
     };
 
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
     for (const nearbyCharacter of nearbyCharacters) {
-      this.socketMessaging.sendEventToUser(
+      this.socketMessaging.sendEventToUser<IDisplayTextEvent>(
         nearbyCharacter.channelId!,
-        SkillSocketEvents.ExperienceGain,
+        DisplayTextSocketEvents.DisplayText,
         levelUpEventPayload
       );
     }
 
     // warn character about his experience gain
-    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ExperienceGain, levelUpEventPayload);
+    this.socketMessaging.sendEventToUser<IDisplayTextEvent>(
+      character.channelId!,
+      DisplayTextSocketEvents.DisplayText,
+      levelUpEventPayload
+    );
 
     // refresh skills (lv, xp, xpToNextLevel)
     const skill = await Skill.findById(character.skills).lean();
