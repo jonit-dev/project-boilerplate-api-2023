@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ISpell, IUIShowMessage, SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -8,7 +9,7 @@ import { spellsBlueprints } from "../blueprints";
 export class SpellLearnedSpells {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  public sendCharacterLearnedSpellsInfoEvent(character: ICharacter): ISpell[] | undefined {
+  public async sendCharacterLearnedSpellsInfoEvent(character: ICharacter): Promise<ISpell[] | undefined> {
     const { learnedSpells } = character;
     const learnedSpellsArr: ISpell[] = [];
 
@@ -25,11 +26,16 @@ export class SpellLearnedSpells {
     }
 
     if (learnedSpellsArr.length > 0) {
-      this.socketMessaging.sendEventToUser<ISpell[]>(
-        character.channelId!,
-        SpellSocketEvents.LearnedSpells,
-        learnedSpellsArr
-      );
+      const skills = await Skill.findById(character.skills);
+
+      if (!skills) {
+        throw new Error("Failed to find character skills");
+      }
+
+      this.socketMessaging.sendEventToUser(character.channelId!, SpellSocketEvents.LearnedSpells, {
+        learnedSpells: learnedSpellsArr,
+        magicLevel: skills.magic.level,
+      });
 
       return;
     }

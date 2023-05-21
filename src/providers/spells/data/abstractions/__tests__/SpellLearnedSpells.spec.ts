@@ -14,7 +14,7 @@ describe("SpellLearnedSpells", () => {
   });
 
   beforeEach(async () => {
-    testCharacter = await unitTestHelper.createMockCharacter();
+    testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
     testCharacter.learnedSpells = [SpellsBlueprint.SelfHealingSpell, SpellsBlueprint.ArrowCreationSpell];
     await testCharacter.save();
 
@@ -26,27 +26,26 @@ describe("SpellLearnedSpells", () => {
     jest.clearAllMocks();
   });
 
-  it("returns character learnedSpells info", () => {
-    learnedSpells.sendCharacterLearnedSpellsInfoEvent(testCharacter);
+  it("returns character learnedSpells info", async () => {
+    await learnedSpells.sendCharacterLearnedSpellsInfoEvent(testCharacter);
 
     expect(sendEventToUser).toBeCalledTimes(1);
-    expect(sendEventToUser).toBeCalledWith(
-      testCharacter.channelId!,
-      SpellSocketEvents.LearnedSpells,
-      expect.arrayContaining([
+    expect(sendEventToUser).toBeCalledWith(testCharacter.channelId!, SpellSocketEvents.LearnedSpells, {
+      learnedSpells: expect.arrayContaining([
         expect.objectContaining({
           key: SpellsBlueprint.SelfHealingSpell,
         }),
         expect.objectContaining({
           key: SpellsBlueprint.ArrowCreationSpell,
         }),
-      ])
-    );
+      ]),
+      magicLevel: expect.any(Number),
+    });
   });
 
-  it("handles empty learnedSpells array", () => {
+  it("handles empty learnedSpells array", async () => {
     testCharacter.learnedSpells = [];
-    learnedSpells.sendCharacterLearnedSpellsInfoEvent(testCharacter);
+    await learnedSpells.sendCharacterLearnedSpellsInfoEvent(testCharacter);
 
     expect(sendEventToUser).toBeCalledTimes(1);
     expect(sendEventToUser).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
@@ -55,9 +54,9 @@ describe("SpellLearnedSpells", () => {
     });
   });
 
-  it("handles undefined learnedSpells", () => {
+  it("handles undefined learnedSpells", async () => {
     testCharacter.learnedSpells = undefined;
-    learnedSpells.sendCharacterLearnedSpellsInfoEvent(testCharacter);
+    await learnedSpells.sendCharacterLearnedSpellsInfoEvent(testCharacter);
 
     expect(sendEventToUser).toBeCalledTimes(1);
     expect(sendEventToUser).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {
@@ -66,9 +65,9 @@ describe("SpellLearnedSpells", () => {
     });
   });
 
-  it("handles non-existing spells in learnedSpells", () => {
+  it("handles non-existing spells in learnedSpells", async () => {
     testCharacter.learnedSpells = ["nonExistingSpell"];
-    learnedSpells.sendCharacterLearnedSpellsInfoEvent(testCharacter);
+    await learnedSpells.sendCharacterLearnedSpellsInfoEvent(testCharacter);
 
     expect(sendEventToUser).toBeCalledTimes(1);
     expect(sendEventToUser).toBeCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {

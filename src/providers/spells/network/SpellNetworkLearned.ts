@@ -14,8 +14,8 @@ export class SpellNetworkLearned {
       channel,
       SpellSocketEvents.LearnedSpells,
       // @ts-ignore
-      (_data, character: ICharacter) => {
-        this.spellsLearnedSpells.sendCharacterLearnedSpellsInfoEvent(character);
+      async (_data, character: ICharacter) => {
+        await this.spellsLearnedSpells.sendCharacterLearnedSpellsInfoEvent(character);
       }
     );
   }
