@@ -46,6 +46,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
 import { SkillCalculator } from "./SkillCalculator";
+import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
@@ -66,7 +67,8 @@ export class SkillIncrease {
     private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties,
     private characterRaceBonusOrPenalties: CharacterRaceBonusOrPenalties,
     private characterWeight: CharacterWeight,
-    private characterBuffSkill: CharacterBuffSkill
+    private characterBuffSkill: CharacterBuffSkill,
+    private skillMapper: SkillCraftingMapper
   ) {}
 
   /**
@@ -236,10 +238,10 @@ export class SkillIncrease {
   }
 
   public async increaseCraftingSP(character: ICharacter, craftedItemKey: string): Promise<void> {
-    const skillToUpdate = CraftingSkillsMap.get(craftedItemKey);
-    // if no crafting skill to update, return without error
+    const skillToUpdate = this.skillMapper.getCraftingSkillToUpdate(craftedItemKey);
+
     if (!skillToUpdate) {
-      return;
+      throw new Error(`skill not found for item ${craftedItemKey}`);
     }
 
     const skills = (await Skill.findById(character.skills)) as ISkill;
@@ -392,7 +394,7 @@ export class SkillIncrease {
     bonus?: number
   ): Promise<IIncreaseSPResult> {
     let skillLevelUp = false;
-    const skillToUpdate = skillsMap.get(skillKey);
+    const skillToUpdate = skillsMap.get(skillKey) ?? this.skillMapper.getCraftingSkillToUpdate(skillKey);
 
     if (!skillToUpdate) {
       throw new Error(`skill not found for item subtype ${skillKey}`);

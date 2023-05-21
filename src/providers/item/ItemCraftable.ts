@@ -138,6 +138,8 @@ export class ItemCraftable {
         message: "You successfully crafted the item!",
         type: "info",
       });
+
+      await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.SkillLevelUp);
     } else {
       const failureMessages = shuffle([
         "Sorry, you failed to craft the item.",

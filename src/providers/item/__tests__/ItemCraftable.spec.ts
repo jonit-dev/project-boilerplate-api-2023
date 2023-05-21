@@ -179,7 +179,7 @@ describe("ItemCraftable.ts", () => {
 
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
-    expect(sendEventToUser).toHaveBeenCalledTimes(5);
+    expect(sendEventToUser).toHaveBeenCalledTimes(6);
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId!, CharacterSocketEvents.AttributeChanged, {
       targetId: testCharacter._id,

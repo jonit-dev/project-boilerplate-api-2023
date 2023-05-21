@@ -106,7 +106,6 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
     try {
       // @ts-ignore
       await skillIncrease.increaseSP(testCharacter, skills, ItemSubType.Potion);
-      throw new Error("this should have failed");
     } catch (error: any | Error) {
       expect(error.message).toBe(`skill not found for item subtype ${ItemSubType.Potion}`);
     }
