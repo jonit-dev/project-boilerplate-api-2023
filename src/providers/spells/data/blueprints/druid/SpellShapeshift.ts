@@ -1,5 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { CharacterTextureChange } from "@providers/character/CharacterTextureChange";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { container } from "@providers/inversify/container";
 import {
@@ -8,11 +8,10 @@ import {
   CharacterBuffDurationType,
   CharacterBuffType,
   CharacterClass,
-  ISpell,
   SpellCastingType,
-  SpellsBlueprint,
 } from "@rpg-engine/shared";
-import { ShapeShift } from "../../logic/mage/druid/ShapeShift";
+import { SpellCalculator } from "../../abstractions/SpellCalculator";
+import { ISpell, SpellsBlueprint } from "../../types/SpellsBlueprintTypes";
 
 export const spellShapeshift: Partial<ISpell> = {
   key: SpellsBlueprint.DruidShapeshift,
@@ -21,38 +20,50 @@ export const spellShapeshift: Partial<ISpell> = {
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas qabi",
   manaCost: 150,
-  minLevelRequired: 10,
-  minMagicLevelRequired: 15,
+  minLevelRequired: 8,
+  minMagicLevelRequired: 5,
   cooldown: 15,
   castingAnimationKey: AnimationEffectKeys.ManaHeal,
   characterClass: [CharacterClass.Druid],
 
   usableEffect: async (character: ICharacter) => {
-    const shapeShift = container.get(ShapeShift);
     const characterBuffActivator = container.get(CharacterBuffActivator);
+    const characterTextureChange = container.get(CharacterTextureChange);
+    const spellCalculator = container.get(SpellCalculator);
 
-    const skills = (await Skill.findById(character.skills).lean().select("magic strength resistance")) as ISkill;
+    const timeoutInSecs = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 15,
+      max: 60,
+    });
 
-    const timeoutInSecs = Math.min(Math.max(skills.magic.level * 1.5, 15), 180);
-    const strengthPercent = Math.min(Math.max(skills.strength.level * 0.5, 5), 30);
-    const resistancePercent = Math.min(Math.max(skills.resistance.level * 0.5, 5), 30);
-
-    await shapeShift.handleShapeShift(character, "brown-bear", timeoutInSecs);
+    const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 10,
+      max: 20,
+    });
 
     await characterBuffActivator.enableTemporaryBuff(character, {
       type: CharacterBuffType.Skill,
       trait: BasicAttribute.Strength,
-      buffPercentage: strengthPercent,
+      buffPercentage: buffPercentage,
       durationSeconds: timeoutInSecs,
       durationType: CharacterBuffDurationType.Temporary,
+      options: {
+        messages: {
+          activation:
+            "You feel stronger as a bear. Your strength and resistance are increased by " + buffPercentage + "%.",
+          deactivation: "You feel weaker again.",
+        },
+      },
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {
       type: CharacterBuffType.Skill,
       trait: BasicAttribute.Resistance,
-      buffPercentage: resistancePercent,
+      buffPercentage: buffPercentage,
       durationSeconds: timeoutInSecs,
       durationType: CharacterBuffDurationType.Temporary,
     });
+
+    await characterTextureChange.changeTexture(character, "brown-bear", timeoutInSecs, "shapeshift");
   },
 };
