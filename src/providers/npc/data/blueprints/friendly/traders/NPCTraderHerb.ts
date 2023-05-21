@@ -23,8 +23,5 @@ export const npcTraderHerbalist = {
     {
       key: CraftingResourcesBlueprint.Worm,
     },
-    {
-      key: CraftingResourcesBlueprint.WaterBottle,
-    },
   ],
 } as Partial<INPC>;

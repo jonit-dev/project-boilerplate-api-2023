@@ -339,13 +339,19 @@ export class SkillIncrease {
     await target.save();
   }
 
+  private formatLevel(level: number): string {
+    return Number.isInteger(level) ? level.toString() : level.toFixed(2);
+  }
+
   private async sendExpLevelUpEvents(
     expData: IIncreaseXPResult,
     character: ICharacter,
     target: INPC | ICharacter
   ): Promise<void> {
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You advanced from level ${expData.level - 1} to level ${expData.level}.`,
+      message: `You advanced from level ${this.formatLevel(expData.level - 1)} to level ${this.formatLevel(
+        expData.level
+      )}.`,
       type: "info",
     });
 
