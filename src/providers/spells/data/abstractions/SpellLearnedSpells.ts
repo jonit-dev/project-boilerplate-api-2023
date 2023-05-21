@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ISpell, IUIShowMessage, SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { ILearnedSpellsRead, ISpell, IUIShowMessage, SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { spellsBlueprints } from "../blueprints";
 
@@ -32,7 +32,7 @@ export class SpellLearnedSpells {
         throw new Error("Failed to find character skills");
       }
 
-      this.socketMessaging.sendEventToUser(character.channelId!, SpellSocketEvents.LearnedSpells, {
+      this.socketMessaging.sendEventToUser<ILearnedSpellsRead>(character.channelId!, SpellSocketEvents.LearnedSpells, {
         learnedSpells: learnedSpellsArr,
         magicLevel: skills.magic.level,
       });
