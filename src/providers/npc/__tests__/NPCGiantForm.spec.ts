@@ -1,8 +1,8 @@
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { NPCGiantForm } from "../NPCGiantForm";
 import { NPCAlignment } from "@rpg-engine/shared";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { NPCGiantForm } from "../NPCGiantForm";
 
 describe("NPCGiantForm", () => {
   let npc: INPC;
@@ -132,25 +132,25 @@ describe("NPCGiantForm", () => {
     expect(NPC.updateOne).toHaveBeenCalledWith(
       { _id: npc._id },
       {
-        maxHealth: 130,
-        health: 130,
-        mana: 130,
-        maxMana: 130,
+        maxHealth: 175,
+        health: 175,
+        mana: 175,
+        maxMana: 175,
       }
     );
 
     expect(Skill.updateOne).toHaveBeenCalledWith(
       { _id: npc.skills },
       {
-        level: 13,
+        level: 18,
         strength: {
-          level: 13,
+          level: 18,
         },
         dexterity: {
-          level: 13,
+          level: 18,
         },
         resistance: {
-          level: 13,
+          level: 18,
         },
       }
     );

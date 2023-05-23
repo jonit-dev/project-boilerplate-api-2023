@@ -22,7 +22,7 @@ export const spellSelfHaste: Partial<ISpell> = {
   manaCost: 40,
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
-  cooldown: 35,
+  cooldown: 60,
   castingAnimationKey: AnimationEffectKeys.HasteSpell,
   attribute: CharacterAttributes.Speed,
 
@@ -33,7 +33,7 @@ export const spellSelfHaste: Partial<ISpell> = {
 
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 30,
-      max: 120,
+      max: 60,
     });
 
     const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
