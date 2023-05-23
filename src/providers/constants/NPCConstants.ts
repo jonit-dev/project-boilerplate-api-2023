@@ -9,10 +9,10 @@ export const NPC_SKILL_RESISTANCE_MULTIPLIER = 1.25;
 export const NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE = 30; // remember that in pm2 (prod) this is multiplied by the number of instances (CPUs)
 
 // PZ
-export const NPC_CAN_ATTACK_IN_NON_PVP_ZONE = true;
+export const NPC_CAN_ATTACK_IN_NON_PVP_ZONE = false;
 
 // Trader
-export const NPC_TRADER_INTERACTION_DISTANCE = 5;
+export const NPC_TRADER_INTERACTION_DISTANCE = 10;
 
 // Giant form
 export const NPC_GIANT_FORM_SPAWN_PERCENTAGE_CHANCE = 8;

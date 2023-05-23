@@ -13,8 +13,8 @@ export const spellPoisonRuneCreation: Partial<ISpell> = {
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar ansr athil",
   manaCost: 40,
-  minLevelRequired: 5,
-  minMagicLevelRequired: 4,
+  minLevelRequired: 3,
+  minMagicLevelRequired: 3,
   cooldown: 5,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
 

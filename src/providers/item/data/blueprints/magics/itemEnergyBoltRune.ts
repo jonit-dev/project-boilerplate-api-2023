@@ -29,7 +29,7 @@ export const itemEnergyBoltRune: IRuneItemBlueprint = {
 
   useWithMaxDistanceGrid: RangeTypes.Medium,
   power: RunePower.Medium,
-  minMagicLevelRequired: 5,
+  minMagicLevelRequired: 3,
   canSell: false,
   animationKey: AnimationEffectKeys.Hit,
   projectileAnimationKey: AnimationEffectKeys.Energy,

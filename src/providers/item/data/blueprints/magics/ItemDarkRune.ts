@@ -30,7 +30,7 @@ export const itemDarkRune: IRuneItemBlueprint = {
   useWithMaxDistanceGrid: RangeTypes.High,
   power: RunePower.High,
   canSell: false,
-  minMagicLevelRequired: 10,
+  minMagicLevelRequired: 8,
   animationKey: AnimationEffectKeys.HitDark,
   projectileAnimationKey: AnimationEffectKeys.Dark,
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
