@@ -9,6 +9,16 @@ import {
 import { CharacterBuffAttribute } from "../CharacterBuffAttribute";
 import { CharacterBuffTracker } from "../CharacterBuffTracker";
 
+const createTestBuff = (character: ICharacter): Partial<ICharacterTemporaryBuff> => {
+  return {
+    type: CharacterBuffType.CharacterAttribute,
+    trait: CharacterAttributes.Speed,
+    buffPercentage: 10,
+    durationSeconds: 3600,
+    durationType: CharacterBuffDurationType.Temporary,
+  };
+};
+
 describe("CharacterBuffAttribute", () => {
   let characterBuffAttribute: CharacterBuffAttribute;
 
@@ -23,16 +33,6 @@ describe("CharacterBuffAttribute", () => {
   beforeEach(async () => {
     testCharacter = await unitTestHelper.createMockCharacter();
   });
-
-  const createTestBuff = (character: ICharacter): Partial<ICharacterTemporaryBuff> => {
-    return {
-      type: CharacterBuffType.CharacterAttribute,
-      trait: CharacterAttributes.Speed,
-      buffPercentage: 10,
-      durationSeconds: 3600,
-      durationType: CharacterBuffDurationType.Temporary,
-    };
-  };
 
   it("should enable a buff and update character attribute", async () => {
     const testBuff = createTestBuff(testCharacter) as ICharacterTemporaryBuff;

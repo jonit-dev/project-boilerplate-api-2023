@@ -49,6 +49,14 @@ export class CharacterBuffAttribute {
   }
 
   public async disableBuff(character: ICharacter, buffId: string): Promise<boolean> {
+    const updatedCharacter = await Character.findById(character._id).lean();
+
+    if (!updatedCharacter) {
+      throw new Error("Character not found");
+    }
+
+    character = updatedCharacter as ICharacter;
+
     // rollback model changes
     const buff = await this.characterBuffTracker.getBuff(character, buffId);
 
