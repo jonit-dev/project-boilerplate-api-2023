@@ -27,7 +27,7 @@ export const generateMoveTowardsMovement = (): any => {
     originalMovementType: NPCMovementType.MoveTowards,
     currentMovementType: NPCMovementType.MoveTowards,
     maxRangeInGridCells: 10,
-    maxAntiLuringRangeInGridCells: 200,
+    maxAntiLuringRangeInGridCells: 100,
     pathOrientation: NPCPathOrientation.Forward, // must be forward!
   };
 };
