@@ -1,9 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
 import { CacheModel } from "@providers/cache/CacheModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { MapHelper } from "@providers/map/MapHelper";
 import { PathfindingCaching } from "@providers/map/PathfindingCaching";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -12,7 +13,6 @@ import {
   EntityAttackType,
   FromGridX,
   FromGridY,
-  ISkill,
   NPCAlignment,
   NPCMovementType,
   NPCPathOrientation,
@@ -26,7 +26,6 @@ import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 export interface ICharacterHealth {
   id: string;
@@ -238,7 +237,7 @@ export class NPCMovementMoveTowards {
     }
 
     if (!hasBattleCycle) {
-      const npcSkills = await this.cacheModel.getOrQuery<ISkill>(Skill, "npc-skills", npc.skills as string);
+      const npcSkills = (await Skill.findById(npc.skills).lean({ virtuals: true, defaults: true })) as ISkill;
 
       new NPCBattleCycle(
         npc.id,
