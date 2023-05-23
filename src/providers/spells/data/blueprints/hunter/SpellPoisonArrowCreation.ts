@@ -20,7 +20,7 @@ export const spellPoisonArrowCreation: Partial<ISpell> = {
   castingType: SpellCastingType.SelfCasting,
   magicWords: "thalion pilya",
   manaCost: 25,
-  minLevelRequired: 12,
+  minLevelRequired: 6,
   minMagicLevelRequired: 4,
   cooldown: 10,
   castingAnimationKey: AnimationEffectKeys.LevelUp,

@@ -21,7 +21,7 @@ export const spellBoltCreation: Partial<ISpell> = {
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar lyn",
   manaCost: 15,
-  minLevelRequired: 8,
+  minLevelRequired: 7,
   minMagicLevelRequired: 3,
   cooldown: 5,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
