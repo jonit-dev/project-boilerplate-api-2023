@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
@@ -21,7 +22,8 @@ export class MagePassiveHabilities {
     private socketMessaging: SocketMessaging,
     private inMemoryHashTable: InMemoryHashTable,
     private characterMonitor: CharacterMonitor,
-    private spellCalculator: SpellCalculator
+    private spellCalculator: SpellCalculator,
+    private traitGetter: TraitGetter
   ) {}
 
   public async autoRegenManaHandler(character: ICharacter): Promise<void> {
@@ -41,8 +43,9 @@ export class MagePassiveHabilities {
     }
 
     try {
-      const { magic } = (await Skill.findById(skills).lean().select("magic")) as ISkill;
-      const magicLvl = magic.level;
+      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+
+      const magicLvl = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Magic);
       const interval =
         (await this.spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
           max: 30,

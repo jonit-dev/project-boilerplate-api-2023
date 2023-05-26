@@ -157,11 +157,13 @@ export class NPCSeeder {
   private getNPCDataWithMultipliers(NPCData: INPCSeedData): INPCSeedData {
     const multipliedData = { ...NPCData };
 
-    if (multipliedData.speed)
+    if (multipliedData.speed) {
       multipliedData.speed = Math.round(multipliedData.speed * NPC_SPEED_MULTIPLIER * 100) / 100;
-    if (multipliedData.baseHealth)
-      multipliedData.baseHealth = Math.round(multipliedData.baseHealth * NPC_BASE_HEALTH_MULTIPLIER);
+    }
 
+    if (multipliedData.baseHealth) {
+      multipliedData.baseHealth = Math.round(multipliedData.baseHealth * NPC_BASE_HEALTH_MULTIPLIER);
+    }
     return multipliedData;
   }
 

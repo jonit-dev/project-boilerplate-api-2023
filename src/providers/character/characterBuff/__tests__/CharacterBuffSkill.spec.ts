@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { TraitGetter } from "@providers/skill/TraitGetter";
 import {
   CharacterBuffDurationType,
   CharacterBuffType,
@@ -13,9 +14,11 @@ import { CharacterBuffSkill } from "../CharacterBuffSkill";
 describe("CharacterBuffSkill", () => {
   let characterBuffSkill: CharacterBuffSkill;
   let testCharacter: ICharacter;
+  let traitGetter: TraitGetter;
 
   beforeAll(() => {
     characterBuffSkill = container.get<CharacterBuffSkill>(CharacterBuffSkill);
+    traitGetter = container.get<TraitGetter>(TraitGetter);
   });
 
   beforeEach(async () => {
@@ -77,15 +80,16 @@ describe("CharacterBuffSkill", () => {
     it("properly adds a buff to a skill", async () => {
       await createNewBuff();
 
-      const skills = await Skill.findById(testCharacter.skills);
+      const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
-      expect(skills?.distance.level).toBe(1.1);
+      let distanceLevel = await traitGetter.getSkillLevelWithBuffs(skills, CombatSkill.Distance);
+
+      expect(distanceLevel).toBe(1.1);
 
       await createNewBuff();
+      distanceLevel = await traitGetter.getSkillLevelWithBuffs(skills, CombatSkill.Distance);
 
-      const skills2 = await Skill.findById(testCharacter.skills);
-
-      expect(skills2?.distance.level).toBe(1.2);
+      expect(distanceLevel).toBe(distanceLevel);
     });
 
     it("removes a buff stack from a skill", async () => {
@@ -96,7 +100,7 @@ describe("CharacterBuffSkill", () => {
 
       await characterBuffSkill.disableBuff(testCharacter, b2);
 
-      const skills = await Skill.findById(testCharacter.skills);
+      const skills = await Skill.findByIdWithBuffs(testCharacter.skills);
 
       expect(skills?.distance.level).toBe(1);
     });

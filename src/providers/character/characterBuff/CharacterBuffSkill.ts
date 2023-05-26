@@ -1,9 +1,9 @@
-import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { TextFormatter } from "@providers/text/TextFormatter";
-import { CharacterTrait, ICharacterBuff, SkillSocketEvents } from "@rpg-engine/shared";
+import { ICharacterBuff, SkillSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 import { IBuffValueCalculations } from "./CharacterBuffAttribute";
@@ -31,21 +31,10 @@ export class CharacterBuffSkill {
     if (!skill) {
       throw new Error("Skill not found");
     }
-    const skilDetails = skill[buff.trait] as ISkillDetail;
 
-    const { buffAbsoluteChange, updatedTraitValue } = await this.performBuffValueCalculations(character, buff);
+    const { buffAbsoluteChange } = await this.performBuffValueCalculations(character, buff);
 
     // save model
-
-    await Skill.updateOne(
-      { _id: skill._id },
-      {
-        [buff.trait]: {
-          ...skilDetails,
-          level: updatedTraitValue.toFixed(2),
-        },
-      }
-    );
 
     // then register the buff on redis (so we can rollback when needed)
 
@@ -76,14 +65,6 @@ export class CharacterBuffSkill {
       return false;
     }
 
-    const skillDetails = skills[buff.trait] as ISkillDetail;
-
-    const currentBuffValue = skillDetails.level;
-
-    const debuffValue = buff.absoluteChange!;
-
-    const updatedTraitValue = Number((currentBuffValue - debuffValue).toFixed(2));
-
     // then delete the buff from redis
 
     const hasDeletedBuff = await this.characterBuffTracker.deleteBuff(character, buff._id!);
@@ -92,35 +73,9 @@ export class CharacterBuffSkill {
       throw new Error("Could not delete buff from character");
     }
 
-    // save previous skill level on model
-    await Skill.updateOne(
-      { _id: skills._id },
-      {
-        [buff.trait]: {
-          ...skillDetails,
-          level: updatedTraitValue,
-        },
-      }
-    );
-
     await this.sendUpdateToClient(character, buff, "deactivation");
 
     return true;
-  }
-
-  public async getSkillLevelWithoutBuffs(character: ICharacter, skills: ISkill, skillName: string): Promise<number> {
-    if (skills.ownerType !== "Character") {
-      return skills[skillName].level;
-    }
-
-    const skillDetails = skills[skillName] as ISkillDetail;
-
-    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-      character,
-      skillName as CharacterTrait
-    );
-
-    return skillDetails.level - totalTraitSummedBuffs;
   }
 
   private async performBuffValueCalculations(
@@ -139,7 +94,7 @@ export class CharacterBuffSkill {
 
     const skillDetails = updatedSkills[buff.trait] as ISkillDetail;
 
-    const baseTraitValue = Number((skillDetails.level - totalTraitSummedBuffs).toFixed(2));
+    const baseTraitValue = Number(skillDetails.level.toFixed(2));
 
     // Calculate the new buffed value by applying the percentage buff on the BASE VALUE (additive buff!)
     const updatedTraitValue =
@@ -160,7 +115,7 @@ export class CharacterBuffSkill {
     buff: ICharacterBuff,
     type: "activation" | "deactivation"
   ): Promise<void> {
-    const skill = await Skill.findById(character.skills);
+    const skill = await Skill.findByIdWithBuffs(character.skills);
 
     if (!skill) {
       throw new Error("Skill not found");

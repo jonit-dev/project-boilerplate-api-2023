@@ -1,11 +1,12 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, ICharacterAttributeChanged, ItemType } from "@rpg-engine/shared";
+import { BasicAttribute, CharacterSocketEvents, ICharacterAttributeChanged, ItemType } from "@rpg-engine/shared";
 
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { TraitGetter } from "@providers/skill/TraitGetter";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { CharacterInventory } from "./CharacterInventory";
@@ -16,7 +17,8 @@ export class CharacterWeight {
   constructor(
     private characterInventory: CharacterInventory,
     private socketMessaging: SocketMessaging,
-    private characterItemInventory: CharacterItemInventory
+    private characterItemInventory: CharacterItemInventory,
+    private traitGetter: TraitGetter
   ) {}
 
   public async updateCharacterWeight(character: ICharacter): Promise<void> {
@@ -51,9 +53,11 @@ export class CharacterWeight {
   }
 
   public async getMaxWeight(character: ICharacter): Promise<number> {
-    const skill = await Skill.findById(character.skills).lean();
-    if (skill) {
-      return skill.strength.level * 15;
+    const skills = await Skill.findById(character.skills).lean();
+    if (skills) {
+      const strengthLvl = await this.traitGetter.getSkillLevelWithBuffs(skills as ISkill, BasicAttribute.Strength);
+
+      return strengthLvl * 15;
     } else {
       return 15;
     }

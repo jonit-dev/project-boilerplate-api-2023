@@ -25,16 +25,10 @@ export class CharacterBasicAttributesBonusPenalties {
 
     switch (skillName) {
       case "strength": {
-        skillLevelUp = await this.skillFunctions.updateSkillByType(
-          character,
+        skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillName,
-          await this.skillFunctions.calculateBonusOrPenaltiesSP(
-            character,
-            bonusOrPenalties.strength,
-            skills[skillName].level,
-            skillName
-          )
+          await this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.strength, skills[skillName].level)
         );
 
         skillSpData = {
@@ -49,16 +43,10 @@ export class CharacterBasicAttributesBonusPenalties {
       }
 
       case "resistance": {
-        skillLevelUp = await this.skillFunctions.updateSkillByType(
-          character,
+        skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillName,
-          await this.skillFunctions.calculateBonusOrPenaltiesSP(
-            character,
-            bonusOrPenalties.resistance,
-            skills[skillName].level,
-            skillName
-          )
+          await this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.resistance, skills[skillName].level)
         );
 
         skillSpData = {
@@ -73,16 +61,10 @@ export class CharacterBasicAttributesBonusPenalties {
       }
 
       case "dexterity": {
-        skillLevelUp = await this.skillFunctions.updateSkillByType(
-          character,
+        skillLevelUp = this.skillFunctions.updateSkillByType(
           skills,
           skillName,
-          await this.skillFunctions.calculateBonusOrPenaltiesSP(
-            character,
-            bonusOrPenalties.dexterity,
-            skills[skillName].level,
-            skillName
-          )
+          await this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.dexterity, skills[skillName].level)
         );
 
         skillSpData = {
@@ -97,14 +79,12 @@ export class CharacterBasicAttributesBonusPenalties {
       }
 
       case "magic": {
-        const bonusOrPenaltiesMagic = await this.skillFunctions.calculateBonusOrPenaltiesMagicSP(
-          character,
+        const bonusOrPenaltiesMagic = this.skillFunctions.calculateBonusOrPenaltiesMagicSP(
           bonusOrPenalties.magic,
-          skills.magic.level,
-          skillName
+          skills.magic.level
         );
 
-        skillLevelUp = await this.skillFunctions.updateSkillByType(character, skills, skillName, bonusOrPenaltiesMagic);
+        skillLevelUp = this.skillFunctions.updateSkillByType(skills, skillName, bonusOrPenaltiesMagic);
 
         skillSpData = {
           skillLevelUp: skillLevelUp,
@@ -118,14 +98,12 @@ export class CharacterBasicAttributesBonusPenalties {
       }
 
       case "magicResistance": {
-        const bonusOrPenaltiesMagic = await this.skillFunctions.calculateBonusOrPenaltiesMagicSP(
-          character,
+        const bonusOrPenaltiesMagic = this.skillFunctions.calculateBonusOrPenaltiesMagicSP(
           bonusOrPenalties.magicResistance,
-          skills.magicResistance.level,
-          skillName
+          skills.magicResistance.level
         );
 
-        skillLevelUp = await this.skillFunctions.updateSkillByType(character, skills, skillName, bonusOrPenaltiesMagic);
+        skillLevelUp = this.skillFunctions.updateSkillByType(skills, skillName, bonusOrPenaltiesMagic);
 
         skillSpData = {
           skillLevelUp: skillLevelUp,

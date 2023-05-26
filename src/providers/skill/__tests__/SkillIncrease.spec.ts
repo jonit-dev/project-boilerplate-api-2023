@@ -102,24 +102,24 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
     await skills.save();
   });
 
-  it("should throw error when passing not a weapon item", async () => {
+  it("should throw error when passing not a weapon item", () => {
     try {
       // @ts-ignore
-      await skillIncrease.increaseSP(testCharacter, skills, ItemSubType.Potion);
+      skillIncrease.increaseSP(skills, ItemSubType.Potion);
     } catch (error: any | Error) {
       expect(error.message).toBe(`skill not found for item subtype ${ItemSubType.Potion}`);
     }
   });
 
   function performSkillIncreaseTest(test: TestCase, initialLevel: number, spToLvl2: number) {
-    return async (): Promise<void> => {
+    return (): void => {
       expect(skills[test.skill].level).toBe(initialLevel);
       expect(skills[test.skill].skillPoints).toBe(0);
 
       let increasedSkills;
       for (let i = 0; i < spToLvl2 * 5; i++) {
         // @ts-ignore
-        increasedSkills = await skillIncrease.increaseSP(skills, test.item);
+        increasedSkills = skillIncrease.increaseSP(skills, test.item);
       }
 
       expect(increasedSkills.skillLevelUp).toBe(true);
@@ -166,7 +166,7 @@ describe("SkillIncrease x Buffs edge case", () => {
     let skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
     // @ts-ignore
-    const increasedSkills = await skillIncrease.increaseSP(testCharacter, skills, ItemSubType.Sword);
+    const increasedSkills = skillIncrease.increaseSP(skills, ItemSubType.Sword);
 
     expect(increasedSkills.skillLevelUp).toBe(false);
     expect(increasedSkills.skillName).toBe("sword");
@@ -402,7 +402,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
     // @ts-ignore
     itemDarkRune.power = 20;
 
-    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
+    // const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
     expect(Math.round(updatedSkills?.magicResistance.skillPoints * 10) / 10).toBeCloseTo(8.7);
     expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBeCloseTo(spToLvl2 - 8.72);
   });

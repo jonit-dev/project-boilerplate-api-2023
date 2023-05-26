@@ -27,15 +27,9 @@ export class CharacterCraftingBonusPenalties {
     switch (skillName) {
       case "fishing": {
         skillLevelUp = await this.skillFunctions.updateSkillByType(
-          character,
           skills,
           skillName,
-          await this.skillFunctions.calculateBonusOrPenaltiesSP(
-            character,
-            bonusOrPenalties.fishing,
-            skills[skillName].level,
-            skillName
-          )
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.fishing, skills[skillName].level)
         );
 
         skillSpData = {
@@ -51,15 +45,9 @@ export class CharacterCraftingBonusPenalties {
 
       case "mining": {
         skillLevelUp = await this.skillFunctions.updateSkillByType(
-          character,
           skills,
           skillName,
-          await this.skillFunctions.calculateBonusOrPenaltiesSP(
-            character,
-            bonusOrPenalties.mining,
-            skills[skillName].level,
-            skillName
-          )
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.mining, skills[skillName].level)
         );
 
         skillSpData = {
@@ -75,15 +63,9 @@ export class CharacterCraftingBonusPenalties {
 
       case "lumberjacking": {
         skillLevelUp = await this.skillFunctions.updateSkillByType(
-          character,
           skills,
           skillName,
-          await this.skillFunctions.calculateBonusOrPenaltiesSP(
-            character,
-            bonusOrPenalties.lumberjacking,
-            skills[skillName].level,
-            skillName
-          )
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.lumberjacking, skills[skillName].level)
         );
 
         skillSpData = {
@@ -99,15 +81,9 @@ export class CharacterCraftingBonusPenalties {
 
       case "cooking": {
         skillLevelUp = await this.skillFunctions.updateSkillByType(
-          character,
           skills,
           skillName,
-          await this.skillFunctions.calculateBonusOrPenaltiesSP(
-            character,
-            bonusOrPenalties.cooking,
-            skills[skillName].level,
-            skillName
-          )
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.cooking, skills[skillName].level)
         );
 
         skillSpData = {
@@ -123,15 +99,9 @@ export class CharacterCraftingBonusPenalties {
 
       case "alchemy": {
         skillLevelUp = await this.skillFunctions.updateSkillByType(
-          character,
           skills,
           skillName,
-          await this.skillFunctions.calculateBonusOrPenaltiesSP(
-            character,
-            bonusOrPenalties.alchemy,
-            skills[skillName].level,
-            skillName
-          )
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.alchemy, skills[skillName].level)
         );
 
         skillSpData = {
@@ -147,15 +117,9 @@ export class CharacterCraftingBonusPenalties {
 
       case "blacksmithing": {
         skillLevelUp = await this.skillFunctions.updateSkillByType(
-          character,
           skills,
           skillName,
-          await this.skillFunctions.calculateBonusOrPenaltiesSP(
-            character,
-            bonusOrPenalties.blacksmithing,
-            skills[skillName].level,
-            skillName
-          )
+          this.skillFunctions.calculateBonusOrPenaltiesSP(bonusOrPenalties.blacksmithing, skills[skillName].level)
         );
 
         skillSpData = {

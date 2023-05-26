@@ -2,11 +2,11 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { PVP_MIN_REQUIRED_LV } from "@providers/constants/PVPConstants";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { EntityType, ISkill } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleTargeting } from "../BattleTargeting";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(BattleCharacterAttackValidation)
 export class BattleCharacterAttackValidation {

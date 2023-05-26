@@ -1,10 +1,12 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   AnimationEffectKeys,
+  BasicAttribute,
   CharacterClass,
   CharacterSocketEvents,
   ICharacterAttributeChanged,
@@ -19,7 +21,8 @@ export class Bloodthirst {
   constructor(
     private socketMessaging: SocketMessaging,
     private inMemoryHashTable: InMemoryHashTable,
-    private animationEffect: AnimationEffect
+    private animationEffect: AnimationEffect,
+    private traitGetter: TraitGetter
   ) {}
 
   public async handleBerserkerAttack(character: ICharacter, damage: number): Promise<void> {
@@ -46,11 +49,11 @@ export class Bloodthirst {
     try {
       const berserkerMultiplier = 0.1;
 
-      const skills = await Skill.findById(character.skills).lean();
+      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
-      const magicLevel = skills?.magic.level;
+      const magicLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Magic);
       const characterLevel = skills?.level;
-      const strengthLevel = skills?.strength.level;
+      const strengthLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Strength);
 
       const healingFactor = (magicLevel + characterLevel + strengthLevel) / 4;
       const calculatedHealing = Math.round(damage * berserkerMultiplier * healingFactor);

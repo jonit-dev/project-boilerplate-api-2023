@@ -4,7 +4,8 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER } from "@providers/constants/EntityEffectsConstants";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { AnimationEffectKeys } from "@rpg-engine/shared";
+import { TraitGetter } from "@providers/skill/TraitGetter";
+import { AnimationEffectKeys, BasicAttribute } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import _ from "lodash";
 import { EntityEffectBlueprint } from "../types/entityEffectBlueprintTypes";
@@ -17,11 +18,13 @@ export const entityEffectPoison: IEntityEffect = {
   probability: 20, // 20% chance of triggering it for the NPC that attacks a target
   targetAnimationKey: AnimationEffectKeys.HitPoison,
   type: EntityAttackType.Melee,
-  effect: (target: ICharacter | INPC, attacker: ICharacter | INPC) => {
+  effect: async (target: ICharacter | INPC, attacker: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
+    const traitGetter = container.get(TraitGetter);
     const attackerSkills = attacker.skills as unknown as ISkill;
-    const attackerLevel = attackerSkills?.magic.level ?? 1;
+    const attackerMagicLevel = await traitGetter.getSkillLevelWithBuffs(attackerSkills, BasicAttribute.Magic);
+    const attackerLevel = attackerMagicLevel ?? 1;
 
     const maxDamage = Math.ceil(attackerLevel * ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER);
     const effectDamage = _.random(1, maxDamage);

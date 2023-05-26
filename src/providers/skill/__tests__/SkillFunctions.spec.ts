@@ -33,18 +33,8 @@ describe("SkillFunctions", () => {
       },
     });
 
-    const resultBonus = await skillFunctions.calculateBonusOrPenaltiesSP(
-      testCharacter,
-      numberBonus,
-      fishingSkill,
-      "fishing"
-    );
-    const resultPenalties = await skillFunctions.calculateBonusOrPenaltiesSP(
-      testCharacter,
-      numberPenalties,
-      fishingSkill,
-      "fishing"
-    );
+    const resultBonus = skillFunctions.calculateBonusOrPenaltiesSP(numberBonus, fishingSkill);
+    const resultPenalties = skillFunctions.calculateBonusOrPenaltiesSP(numberPenalties, fishingSkill);
 
     expect(resultBonus).toEqual(0.44);
     expect(resultPenalties).toEqual(0.36);
@@ -62,18 +52,8 @@ describe("SkillFunctions", () => {
       },
     });
 
-    const resultBonus = await skillFunctions.calculateBonusOrPenaltiesMagicSP(
-      testCharacter,
-      numberBonus,
-      magicLevel,
-      "magic"
-    );
-    const resultPenalties = await skillFunctions.calculateBonusOrPenaltiesMagicSP(
-      testCharacter,
-      numberPenalties,
-      magicLevel,
-      "magic"
-    );
+    const resultBonus = skillFunctions.calculateBonusOrPenaltiesMagicSP(numberBonus, magicLevel);
+    const resultPenalties = skillFunctions.calculateBonusOrPenaltiesMagicSP(numberPenalties, magicLevel);
 
     expect(resultBonus).toEqual(0.88);
     expect(resultPenalties).toEqual(0.72);
@@ -84,7 +64,7 @@ describe("SkillFunctions", () => {
     const skillType = "strength";
     const bonusOrPenalties = 10;
 
-    const skillLevelUp = await skillFunctions.updateSkillByType(testCharacter, skill, skillType, bonusOrPenalties);
+    const skillLevelUp = skillFunctions.updateSkillByType(skill, skillType, bonusOrPenalties);
 
     expect(skillLevelUp).toEqual(false);
     expect(skill[skillType].skillPoints).toEqual(bonusOrPenalties);
@@ -158,18 +138,8 @@ describe("SkillFunctions", () => {
 
       const fishingSkill = skills.fishing.level;
 
-      const resultBonus = await skillFunctions.calculateBonusOrPenaltiesSP(
-        testCharacter,
-        numberBonus,
-        fishingSkill,
-        "fishing"
-      );
-      const resultPenalties = await skillFunctions.calculateBonusOrPenaltiesSP(
-        testCharacter,
-        numberPenalties,
-        fishingSkill,
-        "fishing"
-      );
+      const resultBonus = skillFunctions.calculateBonusOrPenaltiesSP(numberBonus, fishingSkill);
+      const resultPenalties = skillFunctions.calculateBonusOrPenaltiesSP(numberPenalties, fishingSkill);
 
       expect(resultBonus).toEqual(0.44);
       expect(resultPenalties).toEqual(0.36);
@@ -194,17 +164,10 @@ describe("SkillFunctions", () => {
 
       const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
-      const resultBonus = await skillFunctions.calculateBonusOrPenaltiesMagicSP(
-        testCharacter,
-        numberBonus,
-        skills.magic.level,
-        "magic"
-      );
+      const resultBonus = await skillFunctions.calculateBonusOrPenaltiesMagicSP(numberBonus, skills.magic.level);
       const resultPenalties = await skillFunctions.calculateBonusOrPenaltiesMagicSP(
-        testCharacter,
         numberPenalties,
-        skills.magic.level,
-        "magic"
+        skills.magic.level
       );
 
       expect(resultBonus).toEqual(0.88);

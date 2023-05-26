@@ -1,5 +1,7 @@
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TraitGetter } from "@providers/skill/TraitGetter";
+import { CraftingSkill } from "@rpg-engine/shared";
 import { ItemRarities } from "@rpg-engine/shared/dist/types/item.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -7,6 +9,8 @@ import { Types } from "mongoose";
 
 @provide(ItemRarity)
 export class ItemRarity {
+  constructor(private traitGetter: TraitGetter) {}
+
   private readonly buffItemRarities = {
     [ItemRarities.Common]: 0,
     [ItemRarities.Uncommon]: 0.1,
@@ -46,7 +50,12 @@ export class ItemRarity {
       return { attack: 0, defense: 0, rarity: ItemRarities.Common };
     }
 
-    const proficiency = skills.blacksmithing.level / 10;
+    const blacksmithingLevel = await this.traitGetter.getSkillLevelWithBuffs(
+      skills as ISkill,
+      CraftingSkill.Blacksmithing
+    );
+
+    const proficiency = blacksmithingLevel / 10;
 
     let rarity = this.randomizeRarity(true, proficiency);
     if (!item.rarity) {

@@ -34,14 +34,6 @@ export class CharacterBuffAttribute {
       throw new Error("Could not add buff to character");
     }
 
-    // finally, update on the model
-    await Character.updateOne(
-      { _id: character._id },
-      {
-        [buff.trait]: updatedTraitValue,
-      }
-    );
-
     // inform and send update to client
     this.sendUpdateToClient(character, buff, updatedTraitValue);
 
@@ -78,13 +70,6 @@ export class CharacterBuffAttribute {
       throw new Error("Could not delete buff from character");
     }
 
-    await Character.updateOne(
-      { _id: character._id },
-      {
-        [buff.trait]: updatedTraitValue,
-      }
-    );
-
     if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.skipDeactivationMessage) {
       this.socketMessaging.sendMessageToCharacter(
         character,
@@ -111,7 +96,7 @@ export class CharacterBuffAttribute {
       throw new Error("Character not found");
     }
 
-    const baseTraitValue = Number((updatedCharacter[buff.trait] - totalTraitSummedBuffs).toFixed(2));
+    const baseTraitValue = Number(updatedCharacter[buff.trait].toFixed(2));
 
     // Calculate the new buffed value by applying the percentage buff on the BASE VALUE (additive buff!)
     const updatedTraitValue =

@@ -205,7 +205,7 @@ export class BattleAttackTarget {
 
     if (battleEvent === BattleEventType.Hit) {
       const baseDamage = await this.battleEvent.calculateHitDamage(attacker, target, magicAttack);
-      const damage = await this.battleEvent.getCriticalHitDamageIfSuceed(baseDamage);
+      const damage = await this.battleEvent.getCriticalHitDamageIfSucceed(baseDamage);
 
       if (damage > 0) {
         // Increase attacker SP for weapon used and XP (if is character)

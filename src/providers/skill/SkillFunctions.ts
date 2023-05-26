@@ -5,6 +5,7 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NumberFormatter } from "@providers/text/NumberFormatter";
 import {
   AnimationEffectKeys,
   IIncreaseSPResult,
@@ -26,23 +27,17 @@ export class SkillFunctions {
     private skillCalculator: SkillCalculator,
     private animationEffect: AnimationEffect,
     private socketMessaging: SocketMessaging,
-    private characterBuffSkill: CharacterBuffSkill
+    private characterBuffSkill: CharacterBuffSkill,
+    private numberFormatter: NumberFormatter
   ) {}
 
-  public async updateSkillByType(
-    character: ICharacter,
-    skills: ISkill,
-    skillName: string,
-    bonusOrPenalties: number
-  ): Promise<boolean> {
+  public updateSkillByType(skills: ISkill, skillName: string, bonusOrPenalties: number): boolean {
     let skillLevelUp = false;
 
     const skill = skills[skillName] as ISkillDetails;
 
     if (bonusOrPenalties > 0 && skill.skillPoints >= 0) skill.skillPoints += bonusOrPenalties;
     if (bonusOrPenalties < 0 && skill.skillPoints > 0) skill.skillPoints -= bonusOrPenalties * -1;
-
-    skill.level = await this.characterBuffSkill.getSkillLevelWithoutBuffs(character, skills, skillName);
 
     skill.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(skill.skillPoints, skill.level + 1);
 
@@ -55,29 +50,11 @@ export class SkillFunctions {
     return skillLevelUp;
   }
 
-  public async calculateBonusOrPenaltiesSP(
-    character: ICharacter,
-    bonusOrPenalties: number,
-    skillLevel: number,
-    skillName: string
-  ): Promise<number> {
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
-
-    skillLevel = await this.characterBuffSkill.getSkillLevelWithoutBuffs(character, skills, skillName);
-
+  public calculateBonusOrPenaltiesSP(bonusOrPenalties: number, skillLevel: number): number {
     return Number((skillLevel * (1 + Number(bonusOrPenalties.toFixed(2))) * SP_INCREASE_RATIO).toFixed(2));
   }
 
-  public async calculateBonusOrPenaltiesMagicSP(
-    character: ICharacter,
-    magicBonusOrPenalties: number,
-    skillLevel: number,
-    skillName: string
-  ): Promise<number> {
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
-
-    skillLevel = await this.characterBuffSkill.getSkillLevelWithoutBuffs(character, skills, skillName);
-
+  public calculateBonusOrPenaltiesMagicSP(magicBonusOrPenalties: number, skillLevel: number): number {
     return Number(
       (skillLevel * (1 + Number(magicBonusOrPenalties.toFixed(2))) * SP_MAGIC_INCREASE_TIMES_MANA).toFixed(2)
     );
@@ -86,8 +63,10 @@ export class SkillFunctions {
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
     await Skill.findByIdAndUpdate(skills._id, { ...skills });
 
+    const buffedSkills = await Skill.findByIdWithBuffs(skills._id);
+
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: skills,
+      skill: buffedSkills,
     });
   }
 
@@ -114,9 +93,11 @@ export class SkillFunctions {
     };
 
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You ${behavior} from level ${skillData.skillLevelBefore} to ${
-        skillData.skillLevelAfter
-      } in ${_.startCase(_.toLower(skillData.skillName))} fighting.`,
+      message: `You ${behavior} from level ${this.numberFormatter.formatNumber(
+        skillData.skillLevelBefore
+      )} to ${this.numberFormatter.formatNumber(skillData.skillLevelAfter)} in ${_.startCase(
+        _.toLower(skillData.skillName)
+      )} fighting.`,
       type: "info",
     });
 

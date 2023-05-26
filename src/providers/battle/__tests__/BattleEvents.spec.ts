@@ -90,22 +90,6 @@ describe("BattleEvents.spec.ts", () => {
     expect(hit).toBe(10);
   });
 
-  // it("should give a max damage of 1 for a training item", async () => {
-  //   await testNPC.populate("skills").execPopulate();
-  //   await testCharacter.populate("skills").execPopulate();
-
-  //   jest.spyOn(_, "random").mockRestore();
-  //   // @ts-ignore
-  //   const spy = jest.spyOn(battleEvents.characterWeapon, "getWeapon" as any).mockImplementation(() => {
-  //     return { isTraining: true };
-  //   });
-
-  //   const hit = await battleEvents.calculateHitDamage(testCharacter, testNPC);
-
-  //   expect(hit).toBeLessThanOrEqual(1);
-  //   spy.mockReset();
-  // });
-
   it("should properly calculate a hit damage with damage reduction", async () => {
     await testNPC.populate("skills").execPopulate();
     await testCharacter.populate("skills").execPopulate();
@@ -244,8 +228,9 @@ describe("BattleEvents.spec.ts", () => {
     let spyDamageReduction: jest.SpyInstance;
     let attacker: INPC;
     let defender: ICharacter;
+    let defenderSkills: ISkill;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       // @ts-ignore
       jest.spyOn(battleEvents, "calculateTotalPotentialDamage").mockImplementation(() => 100);
 
@@ -258,23 +243,19 @@ describe("BattleEvents.spec.ts", () => {
       // @ts-ignore
       spyDamageReduction = jest.spyOn(battleEvents, "calculateDamageReduction");
 
-      attacker = {} as INPC;
+      attacker = await unitTestHelper.createMockNPC();
 
-      defender = {
-        _id: testCharacter._id,
-        type: "Character",
-        skills: {
-          shielding: {
-            level: 10,
-          },
-          resistance: {
-            level: 10,
-          },
-          magicResistance: {
-            level: 10,
-          },
-        },
-      } as unknown as ICharacter;
+      defender = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
+
+      defenderSkills = (await Skill.findById(defender.skills)) as ISkill;
+
+      defenderSkills.shielding.level = 10;
+      defenderSkills.resistance.level = 10;
+      defenderSkills.magicResistance.level = 10;
+
+      await defenderSkills.save();
+
+      await defender.populate("skills").execPopulate();
     });
 
     afterEach(() => {
@@ -290,8 +271,6 @@ describe("BattleEvents.spec.ts", () => {
       expect(spyDamageReduction).toHaveBeenCalled();
       expect(spyCalculateShieldingDefense).toHaveBeenCalled();
       // expect(spyCalculateRegularDefense).not.toHaveBeenCalled();
-
-      const defenderSkills = defender.skills as ISkill;
 
       expect(spyCalculateShieldingDefense).toHaveBeenCalledWith(
         defenderSkills.level,
@@ -309,8 +288,6 @@ describe("BattleEvents.spec.ts", () => {
       expect(spyDamageReduction).toHaveBeenCalled();
       expect(spyCalculateShieldingDefense).not.toHaveBeenCalled();
       expect(spyCalculateRegularDefense).toHaveBeenCalled();
-
-      const defenderSkills = defender.skills as ISkill;
 
       expect(spyCalculateRegularDefense).toHaveBeenCalledWith(
         defenderSkills.level,

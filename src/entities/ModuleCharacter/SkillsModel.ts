@@ -1,7 +1,11 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
+import { container } from "@providers/inversify/container";
 import { calculateExperience } from "@providers/npc/NPCExperience";
+import { SkillsAvailable } from "@providers/skill/SkillTypes";
+import { TraitGetter } from "@providers/skill/TraitGetter";
 import {
+  CharacterBuffType,
   NPCAlignment,
   SkillType,
   TypeHelper,
@@ -9,6 +13,7 @@ import {
   calculateXPToNextLevel,
 } from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { CharacterBuff } from "./CharacterBuffModel";
 
 const skillDetails = (type: SkillType): Record<string, any> => {
   return {
@@ -95,6 +100,30 @@ export const skillsSchema = createLeanSchema(
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
+
+//! This is not very performant, so prefer using await traitGetter.getSkillLevelWithBuffs(skill, skillName) instead
+skillsSchema.statics.findByIdWithBuffs = async function (id: string, ...args: any[]): Promise<ISkill> {
+  const traitGetter = container.get(TraitGetter);
+
+  const skill = await this.findById(id, ...args);
+
+  if (skill.ownerType === "Character") {
+    const buffedSkills = await CharacterBuff.find({
+      owner: skill.owner,
+      type: CharacterBuffType.Skill,
+    })
+      .select("trait")
+      .lean();
+
+    const buffedSkillsList = buffedSkills.map((buff) => buff.trait);
+
+    for (const skillName of buffedSkillsList) {
+      skill[skillName].level = await traitGetter.getSkillLevelWithBuffs(skill, skillName as SkillsAvailable);
+    }
+  }
+
+  return skill;
+};
 
 skillsSchema.post("save", async function (this: ISkill) {
   const npc = (await NPC.findById(this.owner)) as INPC;

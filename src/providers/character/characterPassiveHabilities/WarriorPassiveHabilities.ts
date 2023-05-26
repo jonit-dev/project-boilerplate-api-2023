@@ -1,9 +1,16 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged, SpellsBlueprint } from "@rpg-engine/shared";
+import {
+  BasicAttribute,
+  CharacterClass,
+  CharacterSocketEvents,
+  ICharacterAttributeChanged,
+  SpellsBlueprint,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 
@@ -12,7 +19,8 @@ export class WarriorPassiveHabilities {
   constructor(
     private socketMessaging: SocketMessaging,
     private inMemoryHashTable: InMemoryHashTable,
-    private characterMonitor: CharacterMonitor
+    private characterMonitor: CharacterMonitor,
+    private traitGetter: TraitGetter
   ) {}
 
   public async warriorAutoRegenHealthHandler(character: ICharacter): Promise<void> {
@@ -32,8 +40,8 @@ export class WarriorPassiveHabilities {
     }
 
     try {
-      const { strength } = (await Skill.findById(skills).lean().select("strength")) as ISkill;
-      const strengthLvl = strength.level;
+      const charSkills = await Skill.findById(skills).lean();
+      const strengthLvl = await this.traitGetter.getSkillLevelWithBuffs(charSkills as ISkill, BasicAttribute.Strength);
       const interval = Math.min(Math.max(20000 - strengthLvl * 500, 1000), 20000);
       const healthRegenAmount = Math.max(Math.floor(strengthLvl / 3), 4);
 

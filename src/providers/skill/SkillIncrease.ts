@@ -10,7 +10,6 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
-import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 import {
   BASIC_INCREASE_HEALTH_MANA,
@@ -21,6 +20,7 @@ import {
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellLearn } from "@providers/spells/SpellLearn";
+import { NumberFormatter } from "@providers/text/NumberFormatter";
 import {
   AnimationEffectKeys,
   CharacterClass,
@@ -68,8 +68,8 @@ export class SkillIncrease {
     private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties,
     private characterRaceBonusOrPenalties: CharacterRaceBonusOrPenalties,
     private characterWeight: CharacterWeight,
-    private characterBuffSkill: CharacterBuffSkill,
-    private skillMapper: SkillCraftingMapper
+    private skillMapper: SkillCraftingMapper,
+    private numberFormatter: NumberFormatter
   ) {}
 
   /**
@@ -108,11 +108,11 @@ export class SkillIncrease {
 
     // stronger the opponent, higher SP per hit it gives in your combat skills
     const bonus = await this.skillFunctions.calculateBonus(target.skills);
-    const increasedWeaponSP = await this.increaseSP(attacker, skills, weaponSubType, undefined, SKILLS_MAP, bonus);
+    const increasedWeaponSP = this.increaseSP(skills, weaponSubType, undefined, SKILLS_MAP, bonus);
 
     let increasedStrengthSP;
     if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
-      increasedStrengthSP = await this.increaseSP(attacker, skills, BasicAttribute.Strength);
+      increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
     }
 
     await this.skillFunctions.updateSkills(skills, attacker);
@@ -171,10 +171,10 @@ export class SkillIncrease {
 
     let result = {} as IIncreaseSPResult;
     if (rightHandItem?.subType === ItemSubType.Shield) {
-      result = await this.increaseSP(character, skills, rightHandItem.subType);
+      result = this.increaseSP(skills, rightHandItem.subType);
     } else {
       if (leftHandItem?.subType === ItemSubType.Shield) {
-        result = await this.increaseSP(character, skills, leftHandItem.subType);
+        result = this.increaseSP(skills, leftHandItem.subType);
       }
     }
 
@@ -222,7 +222,7 @@ export class SkillIncrease {
       return;
     }
 
-    const result = await this.increaseSP(character, skills, attribute, skillPointsCalculator);
+    const result = this.increaseSP(skills, attribute, skillPointsCalculator);
     await this.skillFunctions.updateSkills(skills, character);
 
     if (result.skillLevelUp && character.channelId) {
@@ -260,13 +260,7 @@ export class SkillIncrease {
       return this.calculateNewCraftSP(skillDetails);
     };
 
-    const result = await this.increaseSP(
-      character,
-      skills,
-      craftedItemKey,
-      craftSkillPointsCalculator,
-      CraftingSkillsMap
-    );
+    const result = this.increaseSP(skills, craftedItemKey, craftSkillPointsCalculator, CraftingSkillsMap);
     await this.skillFunctions.updateSkills(skills, character);
 
     await this.characterBonusPenalties.applyRaceBonusPenalties(character, skillToUpdate);
@@ -348,9 +342,9 @@ export class SkillIncrease {
     target: INPC | ICharacter
   ): Promise<void> {
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-      message: `You advanced from level ${this.formatLevel(expData.level - 1)} to level ${this.formatLevel(
-        expData.level
-      )}.`,
+      message: `You advanced from level ${this.numberFormatter.formatNumber(
+        expData.level - 1
+      )} to level ${this.numberFormatter.formatNumber(expData.level)}.`,
       type: "info",
     });
 
@@ -390,21 +384,20 @@ export class SkillIncrease {
     );
 
     // refresh skills (lv, xp, xpToNextLevel)
-    const skill = await Skill.findById(character.skills).lean();
+    const skill = await Skill.findByIdWithBuffs(character.skills);
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill,
     });
   }
 
-  private async increaseSP(
-    character: ICharacter,
+  private increaseSP(
     skills: ISkill,
     skillKey: string,
     skillPointsCalculator?: Function,
     skillsMap: Map<string, string> = SKILLS_MAP,
     bonus?: number
-  ): Promise<IIncreaseSPResult> {
+  ): IIncreaseSPResult {
     let skillLevelUp = false;
     const skillToUpdate = skillsMap.get(skillKey) ?? this.skillMapper.getCraftingSkillToUpdate(skillKey);
 
@@ -420,12 +413,6 @@ export class SkillIncrease {
 
     const updatedSkillDetails = skills[skillToUpdate] as ISkillDetails;
 
-    updatedSkillDetails.level = await this.characterBuffSkill.getSkillLevelWithoutBuffs(
-      character,
-      skills,
-      skillToUpdate
-    );
-
     updatedSkillDetails.skillPoints = skillPointsCalculator(updatedSkillDetails, bonus);
     updatedSkillDetails.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(
       updatedSkillDetails.skillPoints,
@@ -434,6 +421,7 @@ export class SkillIncrease {
 
     if (updatedSkillDetails.skillPointsToNextLevel <= 0) {
       skillLevelUp = true;
+
       updatedSkillDetails.level++;
       updatedSkillDetails.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(
         updatedSkillDetails.skillPoints,
@@ -445,11 +433,11 @@ export class SkillIncrease {
 
     return {
       skillName: skillToUpdate,
-      skillLevelBefore: updatedSkillDetails.level - 1,
-      skillLevelAfter: updatedSkillDetails.level,
+      skillLevelBefore: this.numberFormatter.formatNumber(updatedSkillDetails.level - 1),
+      skillLevelAfter: this.numberFormatter.formatNumber(updatedSkillDetails.level),
       skillLevelUp,
-      skillPoints: updatedSkillDetails.skillPoints,
-      skillPointsToNextLevel: updatedSkillDetails.skillPointsToNextLevel,
+      skillPoints: Math.round(updatedSkillDetails.skillPoints),
+      skillPointsToNextLevel: Math.round(updatedSkillDetails.skillPointsToNextLevel),
     };
   }
 

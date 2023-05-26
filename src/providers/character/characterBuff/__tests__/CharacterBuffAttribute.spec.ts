@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { TraitGetter } from "@providers/skill/TraitGetter";
 import {
   CharacterAttributes,
   CharacterBuffDurationType,
@@ -24,32 +25,27 @@ describe("CharacterBuffAttribute", () => {
 
   let characterBuffTracker: CharacterBuffTracker;
   let testCharacter: ICharacter;
+  let traitGetter: TraitGetter;
 
   beforeAll(() => {
     characterBuffAttribute = container.get(CharacterBuffAttribute);
     characterBuffTracker = container.get(CharacterBuffTracker);
+
+    traitGetter = container.get(TraitGetter);
   });
 
   beforeEach(async () => {
     testCharacter = await unitTestHelper.createMockCharacter();
   });
 
-  it("should enable a buff and update character attribute", async () => {
+  it("should enable a buff on speed", async () => {
     const testBuff = createTestBuff(testCharacter) as ICharacterTemporaryBuff;
 
     await characterBuffAttribute.enableBuff(testCharacter, testBuff);
 
-    const updatedCharacter = await Character.findById(testCharacter._id!);
-
-    const buffedSpeed = updatedCharacter?.baseSpeed;
+    const buffedSpeed = await traitGetter.getCharacterAttributeWithBuffs(testCharacter, CharacterAttributes.Speed);
 
     expect(buffedSpeed).toBe(2.64);
-
-    if (!updatedCharacter) throw new Error("Character not found");
-
-    const updatedTraitValue = updatedCharacter[testBuff.trait];
-
-    expect(updatedTraitValue).toBe(testCharacter[testBuff.trait] * (1 + testBuff.buffPercentage / 100));
   });
 
   it("should disable a buff and rollback character attribute to the previous value", async () => {
@@ -57,17 +53,17 @@ describe("CharacterBuffAttribute", () => {
 
     const enabledBuff = await characterBuffAttribute.enableBuff(testCharacter, testBuff);
 
-    testCharacter = (await Character.findById(testCharacter._id!)) as ICharacter;
+    const buffedSpeed = await traitGetter.getCharacterAttributeWithBuffs(testCharacter, CharacterAttributes.Speed);
 
-    expect(testCharacter.baseSpeed).toBe(2.64); // first 10% buff
+    expect(buffedSpeed).toBe(2.64); // first 10% buff
 
     const hasDisabledBuff = await characterBuffAttribute.disableBuff(testCharacter, enabledBuff._id!);
 
     expect(hasDisabledBuff).toBeTruthy();
 
-    testCharacter = (await Character.findById(testCharacter._id!)) as ICharacter;
+    const speed = await traitGetter.getCharacterAttributeWithBuffs(testCharacter, CharacterAttributes.Speed);
 
-    expect(testCharacter.baseSpeed).toBe(2.4); // original value
+    expect(speed).toBe(2.4); // original value
   });
 
   it("should handle multiple buffs and debuff them gradually", async () => {
@@ -81,30 +77,28 @@ describe("CharacterBuffAttribute", () => {
     const allBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
     const buffQty = allBuffs.length;
 
-    let updatedCharacter = (await Character.findById(testCharacter._id!).lean()) as ICharacter;
+    const updatedCharacter = (await Character.findById(testCharacter._id!).lean()) as ICharacter;
 
     expect(buffQty).toBe(2);
 
-    expect(updatedCharacter?.baseSpeed).toBe(2.88); // 2.4 + 20% = 2.88
+    let speed = await traitGetter.getCharacterAttributeWithBuffs(testCharacter, CharacterAttributes.Speed);
+
+    expect(speed).toBe(2.88); // 2.4 + 20% = 2.88
 
     // now lets disable the first buff
 
     await characterBuffAttribute.disableBuff(updatedCharacter, enabledBuff1._id!);
 
-    updatedCharacter = (await Character.findById(testCharacter._id!).lean()) as ICharacter;
+    speed = await traitGetter.getCharacterAttributeWithBuffs(testCharacter, CharacterAttributes.Speed);
 
-    const buffedSpeed = updatedCharacter?.baseSpeed;
-
-    expect(buffedSpeed).toBe(2.64); // 2.88 - 0.24 = 2.64
+    expect(speed).toBe(2.64); // 2.88 - 0.24 = 2.64
 
     // finally, disable the last buff
 
     await characterBuffAttribute.disableBuff(updatedCharacter, enabledBuff2._id!);
 
-    updatedCharacter = (await Character.findById(testCharacter._id!).lean()) as ICharacter;
+    speed = await traitGetter.getCharacterAttributeWithBuffs(testCharacter, CharacterAttributes.Speed);
 
-    const finalSpeed = updatedCharacter?.baseSpeed;
-
-    expect(finalSpeed).toBe(2.4); // 2.64 - 0.24 = 2.4
+    expect(speed).toBe(2.4); // 2.64 - 0.24 = 2.4
   });
 });

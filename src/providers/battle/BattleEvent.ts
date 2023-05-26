@@ -3,21 +3,34 @@ import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
-import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
-import { BattleEventType, EntityAttackType, SKILLS_MAP, CharacterClass, EntityType } from "@rpg-engine/shared";
-import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
-import { PVP_ROGUE_ATTACK_DAMAGE_INCREASE_MULTIPLIER } from "@providers/constants/PVPConstants";
 import {
   BATTLE_CRITICAL_HIT_CHANCE,
   BATTLE_CRITICAL_HIT_DAMAGE_MULTIPLIER,
 } from "@providers/constants/BattleConstants";
+import { PVP_ROGUE_ATTACK_DAMAGE_INCREASE_MULTIPLIER } from "@providers/constants/PVPConstants";
+import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
+import { TraitGetter } from "@providers/skill/TraitGetter";
+import {
+  BasicAttribute,
+  BattleEventType,
+  CharacterClass,
+  CombatSkill,
+  EntityAttackType,
+  EntityType,
+  SKILLS_MAP,
+} from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 
 type BattleParticipant = ICharacter | INPC;
 
 @provide(BattleEvent)
 export class BattleEvent {
-  constructor(private skillStatsCalculator: SkillStatsCalculator, private characterWeapon: CharacterWeapon) {}
+  constructor(
+    private skillStatsCalculator: SkillStatsCalculator,
+    private characterWeapon: CharacterWeapon,
+    private traitGetter: TraitGetter
+  ) {}
 
   public async calculateEvent(attacker: BattleParticipant, target: BattleParticipant): Promise<BattleEventType> {
     const attackerSkills = attacker.skills as unknown as ISkill;
@@ -26,8 +39,17 @@ export class BattleEvent {
     const defenderDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
     const attackerAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
 
-    const defenderModifiers = defenderDefense + defenderSkills.dexterity.level;
-    const attackerModifiers = attackerAttack + attackerSkills.dexterity.level;
+    const attackerDexterityLevel = await this.traitGetter.getSkillLevelWithBuffs(
+      attackerSkills,
+      BasicAttribute.Dexterity
+    );
+    const defenderDexterityLevel = await this.traitGetter.getSkillLevelWithBuffs(
+      defenderSkills,
+      BasicAttribute.Dexterity
+    );
+
+    const defenderModifiers = defenderDefense + defenderDexterityLevel;
+    const attackerModifiers = attackerAttack + attackerDexterityLevel;
 
     const hasHitSucceeded = await this.hasBattleEventSucceeded(
       attacker as ICharacter,
@@ -89,7 +111,7 @@ export class BattleEvent {
     return damage > target.health ? target.health : damage;
   }
 
-  public async getCriticalHitDamageIfSuceed(damage: number): Promise<number> {
+  public getCriticalHitDamageIfSucceed(damage: number): number {
     const hasCriticalHitSucceeded = _.random(0, 100) <= BATTLE_CRITICAL_HIT_CHANCE;
 
     if (hasCriticalHitSucceeded) return damage * BATTLE_CRITICAL_HIT_DAMAGE_MULTIPLIER;
@@ -108,15 +130,28 @@ export class BattleEvent {
 
       const hasShield = await this.characterWeapon.hasShield(character);
 
+      const defenderShieldingLevel = await this.traitGetter.getSkillLevelWithBuffs(
+        defenderSkills,
+        CombatSkill.Shielding
+      );
+      const defenderResistanceLevel = await this.traitGetter.getSkillLevelWithBuffs(
+        defenderSkills,
+        BasicAttribute.Resistance
+      );
+      const defenderMagicResistanceLevel = await this.traitGetter.getSkillLevelWithBuffs(
+        defenderSkills,
+        BasicAttribute.MagicResistance
+      );
+
       // we only take into account the shielding skill if the defender has a shield equipped.
       if (hasShield) {
-        if (defenderSkills.shielding.level > 1) {
+        if (defenderShieldingLevel > 1) {
           damage = this.calculateDamageReduction(
             damage,
             this.calculateCharacterShieldingDefense(
               defenderSkills.level,
-              defenderSkills.resistance.level,
-              defenderSkills.shielding.level
+              defenderResistanceLevel,
+              defenderShieldingLevel
             )
           );
         }
@@ -126,7 +161,7 @@ export class BattleEvent {
       if (!hasShield && !isMagicAttack) {
         damage = this.calculateDamageReduction(
           damage,
-          this.calculateCharacterRegularDefense(defenderSkills.level, defenderSkills.resistance.level)
+          this.calculateCharacterRegularDefense(defenderSkills.level, defenderResistanceLevel)
         );
       }
 
@@ -134,7 +169,7 @@ export class BattleEvent {
       if (isMagicAttack) {
         damage = this.calculateDamageReduction(
           damage,
-          this.calculateCharacterRegularDefense(defenderSkills.level, defenderSkills.magicResistance.level)
+          this.calculateCharacterRegularDefense(defenderSkills.level, defenderMagicResistanceLevel)
         );
       }
     }
