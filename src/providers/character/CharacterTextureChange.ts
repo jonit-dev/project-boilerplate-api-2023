@@ -23,6 +23,7 @@ export class CharacterTextureChange {
     const namespace = spell || "spell";
     const key: string = character._id.toString();
     const normalTextureKey = character.textureKey;
+    const spellType = "SpellType";
 
     try {
       const updatedCharacter = await this.updateCharacterTexture(character._id, textureKey);
@@ -34,7 +35,24 @@ export class CharacterTextureChange {
         `You've morphed into a ${textureKey} for ${intervalInSecs} seconds!`
       );
 
-      await this.inMemoryHashTable.set(namespace, key, normalTextureKey);
+      let hasSpell: boolean = false;
+      const spellTypeStored = await this.inMemoryHashTable.getAll("SpellType");
+
+      if (spellTypeStored) {
+        for (const spellKey of Object.keys(spellTypeStored)) {
+          const spell = await this.inMemoryHashTable.has(spellKey, key);
+          if (spell) {
+            hasSpell = true;
+            break; // break the loop if a spell is found
+          }
+        }
+      }
+
+      if (!hasSpell) {
+        await this.inMemoryHashTable.set(namespace, key, normalTextureKey);
+        // add all spell types.if it's already exists it will overwrite.
+        await this.inMemoryHashTable.set(spellType, namespace, true);
+      }
 
       setTimeout(async () => {
         const normalTextureKeyStored: unknown = await this.inMemoryHashTable.get(namespace, key);
@@ -57,5 +75,29 @@ export class CharacterTextureChange {
       targetId: character._id,
       textureKey: character.textureKey,
     };
+  }
+
+  public async removeAllTextureChange(): Promise<void> {
+    try {
+      const spellTypeStored = await this.inMemoryHashTable.getAll("SpellType");
+      await this.inMemoryHashTable.deleteAll("SpellType");
+
+      if (!spellTypeStored) return;
+
+      // Iterate over properties in spellTypeStored
+      for (const key of Object.keys(spellTypeStored)) {
+        const spellData = await this.inMemoryHashTable.getAll(key);
+        await this.inMemoryHashTable.deleteAll(key);
+
+        if (!spellData) continue;
+
+        // Iterating over spell data and updating character textures
+        for (const spellKey of Object.keys(spellData)) {
+          await this.updateCharacterTexture(spellKey, spellData[spellKey] as string);
+        }
+      }
+    } catch (error) {
+      console.error("An error occurred while removing all texture change:", error);
+    }
   }
 }

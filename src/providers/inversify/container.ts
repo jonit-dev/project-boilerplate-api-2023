@@ -1,6 +1,7 @@
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { CharacterMonitor } from "@providers/character/CharacterMonitor";
+import { CharacterTextureChange } from "@providers/character/CharacterTextureChange";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { InMemoryRepository } from "@providers/database/InMemoryRepository";
@@ -78,6 +79,7 @@ export const characterBuffActivator = container.get<CharacterBuffActivator>(Char
 
 export const spellSilencer = container.get<SpellSilence>(SpellSilence);
 
+export const characterTextureChange = container.get<CharacterTextureChange>(CharacterTextureChange);
 export const skillIncrease = container.get<SkillIncrease>(SkillIncrease);
 
 export { container };

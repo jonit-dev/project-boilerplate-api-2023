@@ -8,6 +8,7 @@ import {
   characterConnection,
   characterFoodConsumption,
   characterMonitor,
+  characterTextureChange,
   cronJobs,
   db,
   heapMonitor,
@@ -79,6 +80,8 @@ app.listen(port, async () => {
   await characterBuffActivator.disableAllTemporaryBuffsAllCharacters();
 
   await spellSilencer.removeAllSilence();
+
+  await characterTextureChange.removeAllTextureChange();
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({
