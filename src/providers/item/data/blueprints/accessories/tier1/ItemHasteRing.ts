@@ -24,6 +24,7 @@ export const itemHasteRing: IEquippableAccessoryTier1Blueprint = {
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Ring],
   basePrice: 4500,
+  canSell: false,
   equippedBuff: {
     type: CharacterBuffType.CharacterAttribute,
     trait: CharacterAttributes.Speed,
