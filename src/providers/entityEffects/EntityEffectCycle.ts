@@ -31,14 +31,7 @@ export class EntityEffectCycle {
   ): Promise<void> {
     const target = await this.getTarget(targetId, targetType);
 
-    // Check if the target doesn't exist or if it's not alive
-    if (!target || !target.isAlive) {
-      // If the target exists (even though it's not alive)
-      if (target) {
-        await skillIncrease.releaseXP(target as INPC);
-        await this.handleDeath(target);
-      }
-      // Exit the function if the target doesn't exist or is not alive
+    if (!target) {
       return;
     }
 
@@ -64,6 +57,11 @@ export class EntityEffectCycle {
     }
 
     const isAlive = await this.applyCharacterChanges(target, entityEffect, damage);
+
+    if (!isAlive) {
+      await this.handleDeath(target);
+      await skillIncrease.releaseXP(target as INPC);
+    }
 
     if (!runAgain || !isAlive) {
       return;
@@ -105,13 +103,13 @@ export class EntityEffectCycle {
     if (target.type === "Character") {
       await Character.updateOne(
         { _id: target.id },
-        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health - effectDamage } }
+        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health } }
       );
     }
     if (target.type === "NPC") {
       await NPC.updateOne(
         { _id: target.id },
-        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health - effectDamage } }
+        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health } }
       );
     }
 

@@ -1,16 +1,18 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { BattleAttackRanged } from "@providers/battle/BattleAttackTarget/BattleAttackRanged";
 import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 import { OnTargetHit } from "@providers/battle/OnTargetHit";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { EntityUtil } from "@providers/entityEffects/EntityUtil";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -24,16 +26,14 @@ import {
   ICharacterAttributeChanged,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
-  ItemSocketEvents,
   IUseWithEntity,
+  ItemSocketEvents,
   NPCAlignment,
   UseWithSocketEvents,
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { IMagicItemUseWithEntity } from "./useWithTypes";
-import { EntityUtil } from "@providers/entityEffects/EntityUtil";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 const StaticEntity = "Item"; // <--- should be added to the EntityType enum from @rpg-engine/shared
 
@@ -238,20 +238,43 @@ export class UseWithEntity {
   }
 
   private async sendTargetUpdateEvents(character: ICharacter, target: ICharacter | INPC): Promise<void> {
-    const payload: ICharacterAttributeChanged = {
-      targetId: target._id,
-      health: target.health,
-      mana: target.mana,
-      speed: target.speed,
-    };
+    try {
+      const classMapping = {
+        NPC: NPC,
+        Character: Character,
+      };
 
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+      let nTarget = target;
 
-    await this.socketMessaging.sendEventToCharactersAroundCharacter(
-      character,
-      CharacterSocketEvents.AttributeChanged,
-      payload
-    );
+      if (target.type in classMapping) {
+        const Model = classMapping[target.type];
+        const newTarget = await Model.findById(target.id);
+        if (newTarget) {
+          nTarget = newTarget;
+        }
+      }
+
+      const { health, mana, speed } = nTarget;
+
+      const payload: ICharacterAttributeChanged = {
+        targetId: target._id,
+        health,
+        mana,
+        speed,
+      };
+
+      await Promise.all([
+        this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload),
+        this.socketMessaging.sendEventToCharactersAroundCharacter(
+          character,
+          CharacterSocketEvents.AttributeChanged,
+          payload
+        ),
+      ]);
+    } catch (error) {
+      console.error("Failed to send target update events: ", error);
+      throw error;
+    }
   }
 
   private async sendAnimationEvents(

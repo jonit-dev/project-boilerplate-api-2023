@@ -180,7 +180,7 @@ describe("EntityEffectUse.ts", () => {
     expect(characterUpdateSpy).toHaveBeenCalledTimes(1);
     expect(characterUpdateSpy).toHaveBeenCalledWith(
       { _id: testTarget.id },
-      { $set: { appliedEntityEffects: testTarget.appliedEntityEffects, health: testTarget.health } }
+      { $set: { appliedEntityEffects: testTarget.appliedEntityEffects } }
     );
   });
 
@@ -190,7 +190,7 @@ describe("EntityEffectUse.ts", () => {
     expect(npcUpdateSpy).toHaveBeenCalledTimes(1);
     expect(npcUpdateSpy).toHaveBeenCalledWith(
       { _id: testTargetNPC.id },
-      { $set: { appliedEntityEffects: testTargetNPC.appliedEntityEffects, health: testTargetNPC.health } }
+      { $set: { appliedEntityEffects: testTargetNPC.appliedEntityEffects } }
     );
   });
 

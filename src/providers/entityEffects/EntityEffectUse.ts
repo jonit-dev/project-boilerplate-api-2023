@@ -146,7 +146,7 @@ export class EntityEffectUse {
   }
 
   private async updateTargetInDatabase(target: ICharacter | INPC): Promise<void> {
-    const updateData = { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health } };
+    const updateData = { $set: { appliedEntityEffects: target.appliedEntityEffects } };
 
     if (target.type === "Character") {
       await Character.updateOne({ _id: target.id }, updateData);

@@ -152,7 +152,7 @@ describe("EntityEffectCycle", () => {
       {
         $set: {
           appliedEntityEffects: testTarget.appliedEntityEffects,
-          health: testTarget.health - 10,
+          health: testTarget.health,
         },
       }
     );
@@ -184,7 +184,7 @@ describe("EntityEffectCycle", () => {
       {
         $set: {
           appliedEntityEffects: testTargetNPC.appliedEntityEffects,
-          health: testTargetNPC.health - 10,
+          health: testTargetNPC.health,
         },
       }
     );
@@ -197,6 +197,8 @@ describe("EntityEffectCycle", () => {
     const mockCharacterDeath = jest.fn().mockImplementation();
     const mockTarget = {
       isAlive: false,
+      appliedEntityEffects: [{ key: entityEffect.key }],
+      markModified: jest.fn(),
     };
 
     const getTargetMock = jest.spyOn(EntityEffectCycle.prototype as any, "getTarget");
@@ -209,20 +211,47 @@ describe("EntityEffectCycle", () => {
       return Promise.resolve(mockCharacterDeath());
     });
 
-    new EntityEffectCycle(entityEffect, testTarget._id, testTarget.type, testAttacker._id, testAttacker.type);
+    const applyChangesMock = jest.spyOn(EntityEffectCycle.prototype as any, "applyCharacterChanges");
+    applyChangesMock.mockImplementation(() => {
+      return Promise.resolve(false);
+    });
+
+    const entityEffectCycle = new EntityEffectCycle(
+      entityEffect,
+      testTarget._id,
+      testTarget.type,
+      testAttacker._id,
+      testAttacker.type
+    );
+
+    // @ts-expect-error
+    await entityEffectCycle.execute(
+      entityEffect,
+      100,
+      testTarget._id,
+      testTarget.type,
+      testAttacker._id,
+      testAttacker.type
+    );
 
     await waitUntil(() => {
       return handleDeathMock.mock.calls.length > 0;
     }, 100);
 
-    expect(getTargetMock).toHaveBeenCalledTimes(1);
+    expect(getTargetMock).toHaveBeenCalledTimes(4);
     expect(getTargetMock).toHaveBeenCalledWith(testTarget._id, testTarget.type);
 
-    expect(handleDeathMock).toHaveBeenCalledTimes(1);
+    expect(applyChangesMock).toHaveBeenCalledTimes(2);
+    expect(applyChangesMock).toHaveBeenCalledWith(mockTarget, expect.anything(), expect.anything());
+
+    expect(mockTarget.markModified).toHaveBeenCalledWith("appliedEntityEffects");
+
+    expect(handleDeathMock).toHaveBeenCalledTimes(2);
     expect(handleDeathMock).toHaveBeenCalledWith(mockTarget);
 
     getTargetMock.mockClear();
     handleDeathMock.mockClear();
+    applyChangesMock.mockClear();
   });
 });
 
