@@ -164,6 +164,7 @@ export class NPCSeeder {
     if (multipliedData.baseHealth) {
       multipliedData.baseHealth = Math.round(multipliedData.baseHealth * NPC_BASE_HEALTH_MULTIPLIER);
     }
+
     return multipliedData;
   }
 

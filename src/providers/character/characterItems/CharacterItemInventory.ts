@@ -445,4 +445,97 @@ export class CharacterItemInventory {
     }
     return result;
   }
+
+  public async decrementItemFromContainer(
+    itemId: string,
+    character: ICharacter,
+    decrementQty: number,
+    inventoryId: string
+  ): Promise<boolean> {
+    const itemContainer = (await ItemContainer.findById(inventoryId)) as IItemContainer;
+
+    if (!itemContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
+      return false;
+    }
+
+    const item = (await Item.findById(itemId).lean()) as IItem;
+    if (!item) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Item not found.");
+      return false;
+    }
+
+    const slotIndex = this.checkItemInContainer(itemId, itemContainer);
+    if (!slotIndex) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Item not found on character's inventory.");
+      return false;
+    }
+
+    const decreasedItem = this.decrementQtyInContainer(item, slotIndex - 1, itemContainer, character, decrementQty);
+
+    return decreasedItem;
+  }
+
+  private async decrementQtyInContainer(
+    slotItem: IItem,
+    slotIndex: number,
+    inventoryItemContainer: IItemContainer,
+    character: ICharacter,
+    decrementQty: number
+  ): Promise<boolean> {
+    let result = false;
+    try {
+      if (slotItem.maxStackSize > 1) {
+        let remaining = 0;
+
+        if (decrementQty <= slotItem.stackQty!) {
+          remaining = this.mathHelper.fixPrecision(slotItem.stackQty! - decrementQty);
+        }
+
+        if (remaining > 0) {
+          await this.characterItemSlots.updateItemOnSlot(slotIndex, inventoryItemContainer, {
+            stackQty: remaining,
+          });
+          result = true;
+        } else {
+          result = await this.deleteItemInContainer(slotItem._id, character, inventoryItemContainer);
+          await Item.deleteOne({ _id: slotItem._id });
+        }
+      } else {
+        result = await this.deleteItemInContainer(slotItem._id, character, inventoryItemContainer);
+        await Item.deleteOne({ _id: slotItem._id });
+      }
+
+      return result;
+    } catch (error) {
+      console.error(error);
+
+      return false;
+    }
+  }
+
+  public async deleteItemInContainer(
+    itemId: string,
+    character: ICharacter,
+    inventoryItemContainer: IItemContainer
+  ): Promise<boolean> {
+    const doesCharacterHaveItemInInventory = this.checkItemInContainer(itemId, inventoryItemContainer);
+
+    if (!doesCharacterHaveItemInInventory) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Oops! The character does not have the item to be deleted on the inventory."
+      );
+      return false;
+    }
+
+    const item = (await Item.findById(itemId).lean()) as IItem;
+
+    if (!item) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The item to be deleted was not found.");
+      return false;
+    }
+
+    return await this.removeItemFromContainer(item._id, inventoryItemContainer);
+  }
 }
