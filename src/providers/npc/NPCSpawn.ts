@@ -24,8 +24,6 @@ export class NPCSpawn {
       return;
     }
 
-    await npc.unlockField("health");
-
     await this.npcTarget.clearTarget(npc);
 
     await NPC.updateOne(

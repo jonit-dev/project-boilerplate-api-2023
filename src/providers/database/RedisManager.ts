@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { appEnv } from "@providers/config/env";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { RedisClientType } from "@redis/client";
@@ -15,15 +16,16 @@ export class RedisManager {
   public async connect(): Promise<void> {
     const redisConnectionUrl = `redis://${appEnv.database.REDIS_CONTAINER}:${appEnv.database.REDIS_PORT}`;
 
-    await applySpeedGooseCacheLayer(mongoose, {
-      redisUri: redisConnectionUrl,
-    });
-
     this.client = createClient({
       url: redisConnectionUrl,
     });
     try {
       await this.client.connect();
+
+      // @ts-ignore
+      void applySpeedGooseCacheLayer(mongoose, {
+        redisUri: redisConnectionUrl,
+      });
 
       if (!appEnv.general.IS_UNIT_TEST) {
         console.log("✅ Redis Client Connected");

@@ -41,14 +41,12 @@ export class NPCDeath {
       // first thing, lets freeze the NPC so it clears all the interval and it stops moving.
       await this.npcFreezer.freezeNPC(npc);
 
-      if (npc.health > 0) {
+      if (npc.health !== 0) {
         // if by any reason the char is not dead, make sure it is.
         await NPC.updateOne({ _id: npc._id }, { $set: { health: 0 } });
         npc.health = 0;
         npc.isAlive = false;
         await npc.save();
-
-        await npc.lockField("health");
       }
 
       await this.notifyCharactersOfNPCDeath(npc);
