@@ -1,5 +1,6 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { CharacterBuffDurationType, CharacterBuffType, TypeHelper } from "@rpg-engine/shared";
+import { SpeedGooseCacheAutoCleaner } from "speedgoose";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 const characterBuffModel = createLeanSchema({
@@ -30,6 +31,8 @@ const characterBuffModel = createLeanSchema({
   itemId: Type.string(),
   itemKey: Type.string(),
 });
+
+characterBuffModel.plugin(SpeedGooseCacheAutoCleaner);
 
 export type ICharacterBuff = ExtractDoc<typeof characterBuffModel>;
 

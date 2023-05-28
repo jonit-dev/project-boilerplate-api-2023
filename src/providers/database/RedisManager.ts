@@ -3,6 +3,9 @@ import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { RedisClientType } from "@redis/client";
 import { createClient } from "redis";
 
+import mongoose from "mongoose";
+import { applySpeedGooseCacheLayer } from "speedgoose";
+
 @provideSingleton(RedisManager)
 export class RedisManager {
   public client: RedisClientType;
@@ -11,6 +14,10 @@ export class RedisManager {
 
   public async connect(): Promise<void> {
     const redisConnectionUrl = `redis://${appEnv.database.REDIS_CONTAINER}:${appEnv.database.REDIS_PORT}`;
+
+    await applySpeedGooseCacheLayer(mongoose, {
+      redisUri: redisConnectionUrl,
+    });
 
     this.client = createClient({
       url: redisConnectionUrl,

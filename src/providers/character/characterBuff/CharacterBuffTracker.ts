@@ -2,6 +2,7 @@ import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterBuffDurationType, CharacterTrait, ICharacterBuff, ICharacterItemBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { clearCacheForKey } from "speedgoose";
 interface ICharacterBuffDeleteOptions {
   deleteTemporaryOnly?: boolean;
 }
@@ -17,6 +18,12 @@ export class CharacterBuffTracker {
 
       await newCharacterBuff.save();
 
+      await clearCacheForKey(`characterBuffs_${character._id}`);
+
+      if (newCharacterBuff.itemKey) {
+        await clearCacheForKey(`characterBuff_${character._id}_${newCharacterBuff.itemKey}`);
+      }
+
       return newCharacterBuff as ICharacterBuff;
     } catch (error) {
       console.error(error);
@@ -24,7 +31,11 @@ export class CharacterBuffTracker {
   }
 
   public async getAllCharacterBuffs(character: ICharacter): Promise<ICharacterBuff[]> {
-    const allCharacterBuffs = (await CharacterBuff.find({ owner: character._id }).lean()) as ICharacterBuff[];
+    const allCharacterBuffs = (await CharacterBuff.find({ owner: character._id })
+      .lean()
+      .cacheQuery({
+        cacheKey: `characterBuffs_${character._id}`,
+      })) as ICharacterBuff[];
 
     return allCharacterBuffs;
   }
@@ -50,13 +61,21 @@ export class CharacterBuffTracker {
   }
 
   public async getBuffByItemKey(character: ICharacter, itemKey: string): Promise<ICharacterItemBuff | undefined> {
-    const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey }).lean()) as ICharacterItemBuff;
+    const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey })
+      .lean()
+      .cacheQuery({
+        cacheKey: `characterBuff_${character._id}_${itemKey}`,
+      })) as ICharacterItemBuff;
 
     return buff;
   }
 
   public async getBuff(character: ICharacter, buffId: string): Promise<ICharacterBuff | undefined> {
-    const buff = (await CharacterBuff.findOne({ _id: buffId, owner: character._id }).lean()) as ICharacterBuff;
+    const buff = (await CharacterBuff.findOne({ _id: buffId, owner: character._id })
+      .lean()
+      .cacheQuery({
+        cacheKey: `characterBuff_${character._id}_${buffId}`,
+      })) as ICharacterBuff;
 
     return buff;
   }

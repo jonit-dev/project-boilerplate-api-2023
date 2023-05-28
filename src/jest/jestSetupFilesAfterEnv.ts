@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import {
   BASIC_INCREASE_HEALTH_MANA,
   CLASS_BONUS_OR_PENALTIES,
@@ -11,6 +12,18 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 
 let mongoServer: MongoMemoryServer;
+
+jest.mock("speedgoose", () => ({
+  clearCacheForKey: jest.fn(() => Promise.resolve()),
+  applySpeedGooseCacheLayer: jest.fn(),
+  SpeedGooseCacheAutoCleaner: jest.fn(),
+}));
+
+// @ts-ignore
+mongoose.Query.prototype.cacheQuery = function () {
+  // This is a no-op function
+  return this;
+};
 
 // mock skill constants to always the same, to avoid having to adjust all tests whenever we change them
 jest.mock("@providers/constants/SkillConstants", () => ({

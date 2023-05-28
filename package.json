@@ -65,6 +65,7 @@
     "number-string": "^1.1.5",
     "pathfinding": "^0.4.18",
     "socket.io": "^4.4.1",
+    "speedgoose": "^1.2.23",
     "svg-captcha": "^1.4.0"
   },
   "devDependencies": {
