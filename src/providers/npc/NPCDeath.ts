@@ -46,6 +46,9 @@ export class NPCDeath {
         await NPC.updateOne({ _id: npc._id }, { $set: { health: 0 } });
         npc.health = 0;
         npc.isAlive = false;
+        await npc.save();
+
+        await npc.lockField("health");
       }
 
       await this.notifyCharactersOfNPCDeath(npc);
