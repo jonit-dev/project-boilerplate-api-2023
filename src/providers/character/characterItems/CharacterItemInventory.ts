@@ -13,6 +13,7 @@ import { Types } from "mongoose";
 import { CharacterInventory } from "../CharacterInventory";
 import { CharacterItemContainer } from "./CharacterItemContainer";
 import { CharacterItemSlots } from "./CharacterItemSlots";
+import { ItemType } from "@rpg-engine/shared";
 
 interface IDecrementItemByKeyResult {
   success: boolean;
@@ -31,22 +32,32 @@ export class CharacterItemInventory {
   ) {}
 
   public async getAllItemsFromInventoryNested(character: ICharacter): Promise<IItem[]> {
-    // loop through every slot that this character has (item containers), and get all items from each slot
-    // this method is more reliable, because it get all slots including NESTED SLOTS (nested bags, for example)
+    const inventory = await this.characterInventory.getInventory(character);
+    const container = await ItemContainer.findById(inventory?.itemContainer);
+    if (!container) {
+      return [];
+    }
+
+    return await this.getAllItemsFromContainer(container);
+  }
+
+  private async getAllItemsFromContainer(container: IItemContainer): Promise<IItem[]> {
+    const slots = container.slots as unknown as IItem[];
 
     const items: IItem[] = [];
+    for (const [, slot] of Object.entries(slots)) {
+      if (slot) {
+        const item = await Item.findById(slot._id);
+        if (item) {
+          // @ts-ignore
+          items.push(item);
 
-    const itemContainers = await ItemContainer.find({ owner: character._id });
-
-    for (const itemContainer of itemContainers) {
-      const slots = itemContainer.slots as unknown as IItem[];
-
-      for (const [, slot] of Object.entries(slots)) {
-        if (slot) {
-          const item = await Item.findById(slot._id);
-          if (item) {
-            // @ts-ignore
-            items.push(item);
+          if (item.type === ItemType.Container) {
+            const nestedContainer = await ItemContainer.findById(item?.itemContainer);
+            if (nestedContainer) {
+              const nestedItems = await this.getAllItemsFromContainer(nestedContainer);
+              items.push(...nestedItems);
+            }
           }
         }
       }

@@ -1,8 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { OthersBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { Types } from "mongoose";
 import { CharacterTradingBalance } from "../CharacterTradingBalance";
 import { CharacterItemInventory } from "../characterItems/CharacterItemInventory";
 
@@ -456,5 +458,44 @@ describe("CharacterItemInventory.ts", () => {
 
     const item2 = await Item.findOne({ _id: goldCoins2._id });
     expect(item2).toBeNull();
+  });
+
+  describe("Edge case - Depot x Inventory", () => {
+    beforeEach(async () => {
+      // create user depot
+
+      let newDepot = new Depot({
+        owner: Types.ObjectId(testCharacter._id),
+        key: "banker",
+      });
+
+      newDepot = await newDepot.save();
+      let depotItemContainer = new ItemContainer({
+        parentItem: newDepot._id,
+        name: "Depot",
+        slotQty: 40,
+      });
+      depotItemContainer = await depotItemContainer.save();
+
+      const shortSword = await unitTestHelper.createMockItem();
+
+      depotItemContainer.slots[0] = shortSword.toJSON({ virtuals: true }); // if we dont do this, isStackable will be undefined, because its a virtual field!
+      depotItemContainer.markModified("slots");
+      await depotItemContainer.save();
+    });
+
+    it("should avoid taking into account character's depot item on item calculation", async () => {
+      const goldCoins = await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, {
+        stackQty: 25,
+      });
+
+      inventoryContainer.slots[0] = goldCoins.toJSON({ virtuals: true }); // if we dont do this, isStackable will be undefined, because its a virtual field!
+      inventoryContainer.markModified("slots");
+      await inventoryContainer.save();
+
+      const items = await characterItemInventory.getAllItemsFromInventoryNested(testCharacter);
+
+      expect(items.length).toBe(1);
+    });
   });
 });
