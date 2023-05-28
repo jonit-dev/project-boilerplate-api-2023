@@ -1,4 +1,4 @@
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
@@ -21,6 +21,7 @@ import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import { NPC_CYCLES } from "./NPCCycle";
+import { NPCFreezer } from "./NPCFreezer";
 import { calculateGold } from "./NPCGold";
 import { NPCTarget } from "./movement/NPCTarget";
 
@@ -31,11 +32,15 @@ export class NPCDeath {
     private characterView: CharacterView,
     private npcTarget: NPCTarget,
     private itemOwnership: ItemOwnership,
-    private itemRarity: ItemRarity
+    private itemRarity: ItemRarity,
+    private npcFreezer: NPCFreezer
   ) {}
 
   public async handleNPCDeath(npc: INPC): Promise<void> {
     try {
+      // first thing, lets freeze the NPC so it clears all the interval and it stops moving.
+      await this.npcFreezer.freezeNPC(npc);
+
       if (npc.health > 0) {
         // if by any reason the char is not dead, make sure it is.
         await NPC.updateOne({ _id: npc._id }, { $set: { health: 0 } });
@@ -79,10 +84,21 @@ export class NPCDeath {
   }
 
   private async updateNPCAfterDeath(npc: INPC): Promise<void> {
+    const skills = await Skill.findById(npc.skills).lean();
+
+    if (!skills) {
+      throw new Error(`Skills not found for NPC ${npc.id}`);
+    }
+
+    const strengthLevel = skills.strength.level;
+
     npc.health = 0;
-    npc.nextSpawnTime = dayjs(new Date()).add(npc.spawnIntervalMin, "minutes").toDate();
+    npc.nextSpawnTime = dayjs(new Date())
+      .add(Math.max(1, Math.round(strengthLevel / 4)), "minutes")
+      .toDate();
     npc.currentMovementType = npc.originalMovementType;
     npc.appliedEntityEffects = undefined;
+    npc.isBehaviorEnabled = false;
     await npc.save();
   }
 

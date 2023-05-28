@@ -1,4 +1,4 @@
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { MathHelper } from "@providers/math/MathHelper";
@@ -50,6 +50,8 @@ describe("NPCSpawn", () => {
 
     await npcSpawn.spawn(npc);
 
+    npc = await NPC.findById(npc._id).lean();
+
     expect(npc.health).toEqual(20);
     expect(npc.mana).toEqual(10);
   });
@@ -58,6 +60,9 @@ describe("NPCSpawn", () => {
     // @ts-ignore
     jest.spyOn(npcSpawn, "canSpawn").mockImplementation(() => true);
     await npcSpawn.spawn(npc);
+
+    npc = await NPC.findById(npc._id).lean();
+
     expect(npc.health).toEqual(npc.maxHealth);
     expect(npc.mana).toEqual(npc.maxMana);
     expect(npc.appliedEntityEffects).toHaveLength(0);
@@ -101,5 +106,21 @@ describe("NPCSpawn", () => {
     // @ts-ignore
     const result = await npcSpawn.canSpawn(npc);
     expect(result).toBe(false);
+  });
+
+  it("should transform the NPC into giant form", async () => {
+    const transformMock = jest.fn().mockResolvedValue(null);
+    // @ts-ignore
+    npcSpawn.npcGiantForm.randomlyTransformNPCIntoGiantForm = transformMock;
+    await npcSpawn.spawn(npc);
+    expect(transformMock).toHaveBeenCalledWith(npc);
+  });
+
+  it("should reset the NPC's form", async () => {
+    const resetMock = jest.fn().mockResolvedValue(null);
+    // @ts-ignore
+    npcSpawn.npcGiantForm.resetNPCToNormalForm = resetMock;
+    await npcSpawn.spawn(npc);
+    expect(resetMock).toHaveBeenCalledWith(npc);
   });
 });

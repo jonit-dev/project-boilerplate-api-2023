@@ -131,10 +131,7 @@ const npcSchema = createLeanSchema(
     skills: Type.objectId({
       ref: "Skill",
     }),
-    spawnIntervalMin: Type.number({
-      required: true,
-      default: 1,
-    }),
+
     nextSpawnTime: Type.date(),
     fleeOnLowHealth: Type.boolean({
       default: false,

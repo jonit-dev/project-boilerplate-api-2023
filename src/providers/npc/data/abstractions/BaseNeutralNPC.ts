@@ -7,7 +7,7 @@ const generateBaseNPCProperties = (): Partial<INPC> => {
     direction: "down" as AnimationDirection,
     class: CharacterClass.None,
     layer: MapLayers.Character,
-    spawnIntervalMin: 1,
+
     speed: _.random(1, 2),
   };
 };

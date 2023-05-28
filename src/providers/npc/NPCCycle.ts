@@ -12,8 +12,16 @@ export class NPCCycle {
 
   constructor(id: string, fn: Function, intervalSpeed: number) {
     this.id = id;
-    this.interval = setInterval(() => {
+    this.interval = setInterval(async () => {
       fn();
+
+      // check if NPC has behavior enabled or is dead, if so, clear the cycle
+      // This is important because if by any change NPC_CYCLES is doubled in pm2 instances, we want to make sure all cycles are cleared out!
+      const shouldClearNPCCycle = await this.shouldNPCBeCleared();
+
+      if (shouldClearNPCCycle) {
+        await this.clear();
+      }
     }, intervalSpeed);
 
     this.clearIfAlreadyExists();
@@ -33,6 +41,16 @@ export class NPCCycle {
 
     await Character.updateOne({ _id: this.id }, { $unset: { target: 1 } });
     await NPC.updateOne({ _id: this.id }, { $set: { isBehaviorEnabled: false } });
+  }
+
+  private async shouldNPCBeCleared(): Promise<boolean> {
+    const npc = await NPC.findById(this.id).lean();
+
+    if (!npc) return true;
+
+    if (!npc.isBehaviorEnabled || npc.health <= 0) return true;
+
+    return false;
   }
 
   private clearIfAlreadyExists(): void {

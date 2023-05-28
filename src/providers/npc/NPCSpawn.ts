@@ -1,11 +1,11 @@
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { NPCGiantForm } from "./NPCGiantForm";
 import { NPCWarn } from "./NPCWarn";
 import { NPCTarget } from "./movement/NPCTarget";
-import { NPCGiantForm } from "./NPCGiantForm";
 
 @provide(NPCSpawn)
 export class NPCSpawn {
@@ -24,13 +24,21 @@ export class NPCSpawn {
       return;
     }
 
-    npc.health = npc.maxHealth;
-    npc.mana = npc.maxMana;
-    npc.appliedEntityEffects = [];
     await this.npcTarget.clearTarget(npc);
-    npc.x = npc.initialX;
-    npc.y = npc.initialY;
-    await npc.save();
+
+    await NPC.updateOne(
+      { _id: npc._id },
+      {
+        $set: {
+          health: npc.maxHealth,
+          mana: npc.maxMana,
+          appliedEntityEffects: [],
+          x: npc.initialX,
+          y: npc.initialY,
+          nextSpawnTime: undefined,
+        },
+      }
+    );
 
     await this.npcGiantForm.resetNPCToNormalForm(npc);
     await this.npcGiantForm.randomlyTransformNPCIntoGiantForm(npc);
