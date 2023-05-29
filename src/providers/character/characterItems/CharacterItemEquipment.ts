@@ -135,13 +135,13 @@ export class CharacterItemEquipment {
       } else {
         result = await this.deleteItemFromEquipment(item._id, character);
         // we also need to delete item from items table
-        await Item.deleteOne({ _id: item._id });
+        await Item.deleteOne({ _id: item._id }, { skipEquipmentCheck: true });
       }
     } else {
       // if its not stackable, just remove it
       result = await this.deleteItemFromEquipment(item._id, character);
       // we also need to delete item from items table
-      await Item.deleteOne({ _id: item._id });
+      await Item.deleteOne({ _id: item._id }, { skipEquipmentCheck: true });
     }
 
     if (!result) {

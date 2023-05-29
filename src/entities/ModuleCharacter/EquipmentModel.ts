@@ -40,9 +40,45 @@ export const equipmentSchema = createLeanSchema(
     inventory: Type.objectId({
       ref: "Item",
     }),
+    ...({} as {
+      equippedItemIds: string;
+      isEquipped(itemId: string): boolean;
+    }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
 );
+
+equipmentSchema.virtual("equippedItemIds").get(function (this: IEquipment) {
+  return [
+    this.head,
+    this.neck,
+    this.leftHand,
+    this.rightHand,
+    this.ring,
+    this.legs,
+    this.boot,
+    this.accessory,
+    this.armor,
+    this.inventory,
+  ].filter((id) => id !== null);
+});
+
+equipmentSchema.method("isEquipped", function (this: IEquipment, itemId: string) {
+  const equippedItems = [
+    this.head,
+    this.neck,
+    this.leftHand,
+    this.rightHand,
+    this.ring,
+    this.legs,
+    this.boot,
+    this.accessory,
+    this.armor,
+    this.inventory,
+  ].map((id) => id?.toString());
+
+  return equippedItems.includes(itemId.toString());
+});
 
 export type IEquipment = ExtractDoc<typeof equipmentSchema>;
 

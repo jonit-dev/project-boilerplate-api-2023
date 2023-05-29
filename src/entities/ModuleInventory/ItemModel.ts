@@ -10,6 +10,8 @@ import { UpdateQuery } from "mongoose";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import { ItemContainer } from "./ItemContainerModel";
 
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
@@ -224,6 +226,64 @@ itemSchema.post("remove", async function (this: IItem) {
   if (this.isItemContainer) {
     await ItemContainer.deleteOne({ parentItem: this._id });
   }
+});
+
+itemSchema.pre("remove", async function (next) {
+  const item = this as IItem;
+
+  if (!item.owner) {
+    next();
+    return;
+  }
+
+  const character = (await Character.findById(item.owner).lean()) as ICharacter;
+
+  if (!character.equipment) {
+    return;
+  }
+
+  const equipment = await Equipment.findById(character.equipment);
+
+  const isEquipped = await equipment?.isEquipped(item._id);
+
+  if (isEquipped) {
+    next(new Error("Cannot delete item because it is equipped"));
+  } else {
+    next();
+  }
+});
+
+itemSchema.pre("deleteOne", { document: false, query: true }, async function (next) {
+  // The `this` here is a Query
+  // @ts-ignore
+  const skipEquipmentCheck: boolean = this.getOptions().skipEquipmentCheck;
+
+  if (!skipEquipmentCheck) {
+    // @ts-ignore
+    const item = await this.model.findOne(this.getQuery());
+
+    if (!item.owner) {
+      next();
+      return;
+    }
+
+    const character = (await Character.findById(item.owner).lean()) as ICharacter;
+
+    if (!character.equipment) {
+      return;
+    }
+
+    const equipment = await Equipment.findById(character.equipment);
+
+    const isEquipped = equipment?.isEquipped(item._id);
+
+    if (isEquipped) {
+      next(new Error("Cannot delete item because it is equipped"));
+      return;
+    }
+  }
+
+  next();
 });
 
 export type IItem = ExtractDoc<typeof itemSchema>;
