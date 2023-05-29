@@ -76,14 +76,19 @@ export class ItemRarity {
 
     const rarity = _.random(variable, 100, true);
 
+    const commonRarityLimit = Math.max(90 - (proficiency ?? 0), 0);
+    const uncommonRarityLimit = Math.max(98 - (proficiency ?? 0), 0);
+    const rareRarityLimit = Math.max(99 - (proficiency ?? 0) * 0.1, 0);
+    const epicRarityLimit = Math.max(99.75 - (proficiency ?? 0) * 0.05, 0);
+
     switch (true) {
-      case rarity <= 90:
+      case rarity <= commonRarityLimit:
         return ItemRarities.Common;
-      case rarity <= 98:
+      case rarity <= uncommonRarityLimit:
         return ItemRarities.Uncommon;
-      case rarity <= 99:
+      case rarity <= rareRarityLimit:
         return ItemRarities.Rare;
-      case rarity <= 99.75:
+      case rarity <= epicRarityLimit:
         return ItemRarities.Epic;
       case rarity <= 100:
         return ItemRarities.Legendary;
