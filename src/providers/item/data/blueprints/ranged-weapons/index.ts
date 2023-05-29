@@ -2,8 +2,11 @@ import { RangedWeaponsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemArrow } from "./ammo/ItemArrow";
 import { itemBolt } from "./ammo/ItemBolt";
 import { itemCorruptionBolt } from "./ammo/ItemCorruptionBolt";
+import { itemCrimsonArrow } from "./ammo/ItemCrimsonArrow";
 import { itemElvenBolt } from "./ammo/ItemElvenBolt";
+import { itemEmeraldArrow } from "./ammo/ItemEmeraldArrow";
 import { itemFireBolt } from "./ammo/ItemFireBolt";
+import { itemFrostArrow } from "./ammo/ItemFrostArrow";
 import { itemGoldenArrow } from "./ammo/ItemGoldenArrow";
 import { itemIronArrow } from "./ammo/ItemIronArrow";
 import { itemPoisonArrow } from "./ammo/ItemPoisonArrow";
@@ -58,7 +61,10 @@ export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.OrcishBow]: itemOrcishBow,
   [RangedWeaponsBlueprint.FrostBow]: itemFrostBow,
   [RangedWeaponsBlueprint.FrostCrossbow]: itemFrostCrossbow,
+  [RangedWeaponsBlueprint.EmeraldArrow]: itemEmeraldArrow,
+  [RangedWeaponsBlueprint.FrostArrow]: itemFrostArrow,
   [RangedWeaponsBlueprint.IronArrow]: itemIronArrow,
+  [RangedWeaponsBlueprint.CrimsonArrow]: itemCrimsonArrow,
   [RangedWeaponsBlueprint.AsterionsBow]: itemAsterionsBow,
   [RangedWeaponsBlueprint.CompoundBow]: itemCompoundBow,
   [RangedWeaponsBlueprint.CorruptionBolt]: itemCorruptionBolt,

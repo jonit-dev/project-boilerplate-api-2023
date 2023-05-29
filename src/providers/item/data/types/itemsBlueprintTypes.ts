@@ -374,6 +374,9 @@ export enum RangedWeaponsBlueprint {
   RedwoodLongbow = "redwood-longbow",
   ElmReflexBow = "elm-reflex-bow",
   EbonyLongbow = "ebony-longbow",
+  FrostArrow = "frost-arrow",
+  CrimsonArrow = "crimson-arrow",
+  EmeraldArrow = "emerald-arrow",
 }
 
 export enum GlovesBlueprint {
