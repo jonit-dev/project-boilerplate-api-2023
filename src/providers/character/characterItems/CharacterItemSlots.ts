@@ -135,7 +135,7 @@ export class CharacterItemSlots {
 
   public async findItemOnSlots(targetContainer: IItemContainer, itemId: string): Promise<IItem | undefined> {
     try {
-      const container = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
+      const container = (await ItemContainer.findById(targetContainer._id)) as unknown as IItemContainer;
 
       if (!container) {
         throw new Error("Container not found");

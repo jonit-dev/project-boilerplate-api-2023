@@ -4,6 +4,7 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Depot, IDepot } from "@entities/ModuleDepot/DepotModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IMarketplace, Marketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { IQuest, Quest } from "@entities/ModuleQuest/QuestModel";
 import { QuestObjectiveInteraction, QuestObjectiveKill } from "@entities/ModuleQuest/QuestObjectiveModel";
@@ -49,7 +50,6 @@ import {
   questRewardsMock,
 } from "./mock/questMock";
 import { userMock } from "./mock/userMock";
-import { IMarketplace, Marketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 
 export enum InteractionQuestSubtype {
   craft = "craft",
@@ -604,16 +604,8 @@ export class UnitTestHelper {
     });
     depotItemContainer = await depotItemContainer.save();
 
-    await Depot.updateOne(
-      {
-        _id: newDepot._id,
-      },
-      {
-        $set: {
-          itemContainer: depotItemContainer._id,
-        },
-      }
-    );
+    newDepot.itemContainer = depotItemContainer._id;
+    newDepot = await newDepot.save();
 
     return newDepot;
   }

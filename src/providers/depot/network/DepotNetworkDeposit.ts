@@ -6,10 +6,10 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   DepotSocketEvents,
+  IDepotDepositItem,
   IItemContainerRead,
   ItemContainerType,
   ItemSocketEvents,
-  IDepotDepositItem,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { DepositItem } from "../DepositItem";
@@ -52,6 +52,10 @@ export class DepotNetworkDeposit {
         }
 
         const itemContainer = await this.depositItem.deposit(character, data);
+
+        if (!itemContainer) {
+          return;
+        }
 
         this.socketMessaging.sendEventToUser<IItemContainerRead>(character.channelId!, ItemSocketEvents.ContainerRead, {
           itemContainer,

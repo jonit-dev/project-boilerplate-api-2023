@@ -1,12 +1,14 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { Depot } from "@entities/ModuleDepot/DepotModel";
+import { Depot, IDepot } from "@entities/ModuleDepot/DepotModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemMock } from "@providers/unitTests/mock/itemMock";
+import { UISocketEvents } from "@rpg-engine/shared";
 import { Types } from "mongoose";
 import { DepositItem } from "../DepositItem";
 
@@ -50,11 +52,11 @@ describe("DepositItem.ts", () => {
       .exec();
 
     expect(updatedDepot).toBeDefined();
-    expect(depotContainer.parentItem).toEqual(updatedDepot!._id);
+    expect(depotContainer?.parentItem).toEqual(updatedDepot!._id);
 
     const container = updatedDepot!.itemContainer as unknown as IItemContainer;
     assertDepotContainer(container);
-    expect(depotContainer._id).toEqual(container._id);
+    expect(depotContainer?._id).toEqual(container._id);
   });
 
   it("throws error for invalid item ID", async () => {
@@ -114,6 +116,77 @@ describe("DepositItem.ts", () => {
 
     const foundItem = await characterItemSlots.findItemOnSlots(characterItemContainer as IItemContainer, item.id!);
     expect(foundItem).toBeUndefined();
+  });
+
+  describe("Edge cases", () => {
+    let testCharacter: ICharacter;
+    let testDepot: IDepot;
+    let testDepotContainer: IItemContainer;
+    let testNPC: INPC;
+    let inventory: IItem;
+    let inventoryContainer: IItemContainer;
+    let characterInventory: CharacterInventory;
+    let characterItemSlots: CharacterItemSlots;
+
+    let sendEventToUserSpy: jest.SpyInstance;
+    beforeAll(() => {
+      characterItemSlots = container.get<CharacterItemSlots>(CharacterItemSlots);
+      characterInventory = container.get<CharacterInventory>(CharacterInventory);
+    });
+
+    beforeEach(async () => {
+      testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
+      testNPC = await unitTestHelper.createMockNPC();
+
+      testDepot = await unitTestHelper.createMockDepot(testNPC, testCharacter._id);
+
+      if (!testDepot || !testDepot.itemContainer) {
+        throw new Error("testDepot or testDepot.itemContainer is undefined");
+      }
+
+      testDepotContainer = (await ItemContainer.findById(testDepot.itemContainer)) as IItemContainer;
+
+      inventory = (await characterInventory.getInventory(testCharacter)) as IItem;
+      inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as IItemContainer;
+
+      // @ts-ignore
+      sendEventToUserSpy = jest.spyOn(depositItem.socketMessaging, "sendEventToUser");
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it("fails if trying to deposit an item in a full deposit, and does not remove the item from the character's inventory", async () => {
+      testDepotContainer.slots = Array(40).fill(itemMock);
+      await testDepotContainer.save();
+
+      // add item to inventory
+      inventoryContainer.slots[0] = item;
+      await inventoryContainer.save();
+
+      const result = await depositItem.deposit(testCharacter, {
+        itemId: item._id,
+        npcId: testNPC._id,
+        fromContainerId: inventoryContainer._id,
+      });
+      // Try to deposit item
+      expect(result).toBeUndefined();
+
+      expect(sendEventToUserSpy).toHaveBeenCalledWith(
+        testCharacter.channelId!,
+        UISocketEvents.ShowMessage,
+        expect.objectContaining({
+          message: expect.stringContaining("Sorry, your depot is full."),
+        })
+      );
+
+      // Check that item still exists in character's inventory
+
+      inventoryContainer = (await ItemContainer.findById(inventory.itemContainer).lean()) as IItemContainer;
+
+      expect(inventoryContainer.slots[0]).toBeDefined();
+    });
   });
 });
 

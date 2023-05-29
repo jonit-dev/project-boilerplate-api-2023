@@ -6,10 +6,10 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   DepotSocketEvents,
+  IDepotContainerWithdraw,
   IItemContainerRead,
   ItemContainerType,
   ItemSocketEvents,
-  IDepotContainerWithdraw,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "../DepotSystem";
@@ -55,6 +55,10 @@ export class DepotNetworkWithdraw {
           }
 
           const itemContainer = await this.withdrawItem.withdraw(character, data);
+
+          if (!itemContainer) {
+            return;
+          }
 
           this.socketMessaging.sendEventToUser<IItemContainerRead>(
             character.channelId!,

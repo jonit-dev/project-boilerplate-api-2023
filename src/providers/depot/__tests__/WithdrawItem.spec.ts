@@ -7,7 +7,8 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemMock } from "@providers/unitTests/mock/itemMock";
-import { IItemContainer } from "@rpg-engine/shared";
+
+import { IItemContainer, UISocketEvents } from "@rpg-engine/shared";
 import { Types } from "mongoose";
 import { DepositItem } from "../DepositItem";
 import { WithdrawItem } from "../WithdrawItem";
@@ -34,7 +35,10 @@ describe("WithdrawItem.ts", () => {
     item = await unitTestHelper.createMockItem();
 
     // Deposit item into character's container
-    depotContainer = await depositItem.deposit(testCharacter, { itemId: item.id, npcId: testNPC.id });
+    depotContainer = (await depositItem.deposit(testCharacter, {
+      itemId: item.id,
+      npcId: testNPC.id,
+    })) as IItemContainer;
 
     const characterEquipment = (await Equipment.findById(testCharacter.equipment)
       .populate("inventory")
@@ -48,11 +52,11 @@ describe("WithdrawItem.ts", () => {
     let foundItem = await characterItemSlots.findItemOnSlots(characterItemContainer as IItemContainerModel, item.id!);
     expect(foundItem).toBeUndefined();
 
-    depotContainer = await withdrawItem.withdraw(testCharacter, {
+    depotContainer = (await withdrawItem.withdraw(testCharacter, {
       itemId: item.id,
       npcId: testNPC.id,
       toContainerId: characterItemContainer!.id,
-    });
+    })) as IItemContainer;
 
     assertDepotContainer(depotContainer);
 
@@ -76,6 +80,46 @@ describe("WithdrawItem.ts", () => {
     expect(foundItem).toBeDefined();
     expect(foundItem?._id.toString()).toEqual(item.id);
     expect(foundItem?.type).toEqual(itemMock.type);
+  });
+
+  describe("Edge cases", () => {
+    let sendEventToUserSpy: jest.SpyInstance;
+
+    beforeAll(() => {
+      // @ts-ignore
+      sendEventToUserSpy = jest.spyOn(withdrawItem.socketMessaging, "sendEventToUser");
+    });
+
+    it("should not withdraw from deposit if destination container if full", async () => {
+      const characterInventoryContainer = await ItemContainer.findById(characterBackpack.itemContainer);
+
+      if (!characterInventoryContainer) {
+        throw new Error(
+          "WithdrawItem.spec.ts > should not withdraw from deposit if destination container if full > characterInventoryContainer not found"
+        );
+      }
+
+      characterInventoryContainer.slots = Array(40).fill(itemMock);
+      await characterInventoryContainer.save();
+
+      expect(characterInventoryContainer.slotQty).toEqual(40);
+
+      const result = await withdrawItem.withdraw(testCharacter, {
+        itemId: item.id,
+        npcId: testNPC.id,
+        toContainerId: characterInventoryContainer.id,
+      });
+
+      expect(result).toBeUndefined();
+
+      expect(sendEventToUserSpy).toHaveBeenCalledWith(
+        testCharacter.channelId!,
+        UISocketEvents.ShowMessage,
+        expect.objectContaining({
+          message: expect.stringContaining("Sorry, destination container is full."),
+        })
+      );
+    });
   });
 });
 

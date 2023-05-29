@@ -1,9 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemContainer, IItemContainer as IItemContainerModel } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItemContainer as IItemContainerModel, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { ItemDrop } from "@providers/item/ItemDrop";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { IItemContainer, IDepotContainerWithdraw, IEquipmentAndInventoryUpdatePayload } from "@rpg-engine/shared";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { IDepotContainerWithdraw, IEquipmentAndInventoryUpdatePayload, IItemContainer } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "./DepotSystem";
 import { OpenDepot } from "./OpenDepot";
@@ -14,10 +17,13 @@ export class WithdrawItem {
     private openDepot: OpenDepot,
     private depotSystem: DepotSystem,
     private movementHelper: MovementHelper,
-    private itemDrop: ItemDrop
+    private itemDrop: ItemDrop,
+    private characterItemSlots: CharacterItemSlots,
+    private socketMessaging: SocketMessaging,
+    private characterInventory: CharacterInventory
   ) {}
 
-  public async withdraw(character: ICharacter, data: IDepotContainerWithdraw): Promise<IItemContainer> {
+  public async withdraw(character: ICharacter, data: IDepotContainerWithdraw): Promise<IItemContainer | undefined> {
     const { npcId, itemId, toContainerId } = data;
     let itemContainer = await this.openDepot.getContainer(character.id, npcId);
     if (!itemContainer) {
@@ -28,6 +34,12 @@ export class WithdrawItem {
     const item = await Item.findById(itemId);
     if (!item) {
       throw new Error(`DepotSystem > Item not found: ${itemId}`);
+    }
+
+    const isWithdrawValid = await this.isWithdrawValid(character, data);
+
+    if (!isWithdrawValid) {
+      return;
     }
 
     // check if item is on depot container
@@ -63,5 +75,30 @@ export class WithdrawItem {
     this.depotSystem.updateInventoryCharacter(payloadUpdate, character);
 
     return itemContainer;
+  }
+
+  private async isWithdrawValid(character: ICharacter, data: IDepotContainerWithdraw): Promise<boolean> {
+    const { itemId, toContainerId } = data;
+
+    const destinationContainer = await ItemContainer.findById(toContainerId);
+
+    if (!destinationContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Destination container not found");
+      return false;
+    }
+
+    const itemToBeAdded = (await Item.findById(itemId).lean()) as IItem;
+
+    const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(
+      destinationContainer._id as string,
+      itemToBeAdded
+    );
+
+    if (!hasAvailableSlot) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, destination container is full.");
+      return false;
+    }
+
+    return true;
   }
 }
