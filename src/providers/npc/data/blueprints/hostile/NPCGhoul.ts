@@ -105,10 +105,7 @@ export const npcGhoul = {
       itemBlueprintKey: SwordsBlueprint.Sword,
       chance: 15,
     },
-    {
-      itemBlueprintKey: RangedWeaponsBlueprint.HellishBow,
-      chance: 2,
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Eye,
       chance: 15,

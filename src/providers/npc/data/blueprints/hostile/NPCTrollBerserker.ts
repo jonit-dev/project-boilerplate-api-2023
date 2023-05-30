@@ -9,7 +9,6 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
-  ArmorsBlueprint,
   AxesBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
@@ -56,10 +55,7 @@ export const npcTrollBerserker = {
       itemBlueprintKey: GlovesBlueprint.PlateGloves,
       chance: 30,
     },
-    {
-      itemBlueprintKey: ArmorsBlueprint.MithrilArmor,
-      chance: 5,
-    },
+
     {
       itemBlueprintKey: ShieldsBlueprint.PaviseShield,
       chance: 5,
@@ -68,10 +64,7 @@ export const npcTrollBerserker = {
       itemBlueprintKey: ShieldsBlueprint.TowerShield,
       chance: 5,
     },
-    {
-      itemBlueprintKey: LegsBlueprint.MithrilLegs,
-      chance: 5,
-    },
+
     {
       itemBlueprintKey: LegsBlueprint.BronzeLegs,
       chance: 10,

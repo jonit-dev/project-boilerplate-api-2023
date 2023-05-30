@@ -28,7 +28,7 @@ export const npcFrostSalamander: Partial<INPC> = {
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 5,
+    level: 15,
     strength: {
       level: 7,
     },

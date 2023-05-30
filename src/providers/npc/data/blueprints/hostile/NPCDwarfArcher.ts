@@ -7,7 +7,6 @@ import {
   BootsBlueprint,
   CraftingResourcesBlueprint,
   RangedWeaponsBlueprint,
-  SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -76,10 +75,6 @@ export const npcDwarfArcher: Partial<INPC> = {
     {
       itemBlueprintKey: AccessoriesBlueprint.SapphireRing,
       chance: 1,
-    },
-    {
-      itemBlueprintKey: SwordsBlueprint.MithrilSword,
-      chance: 5,
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,

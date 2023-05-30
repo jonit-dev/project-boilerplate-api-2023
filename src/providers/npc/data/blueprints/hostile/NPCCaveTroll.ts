@@ -13,7 +13,6 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
-  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -60,15 +59,7 @@ export const npcCaveTroll = {
       itemBlueprintKey: ShieldsBlueprint.KiteShield,
       chance: 5,
     },
-    {
-      itemBlueprintKey: SpearsBlueprint.CopperDoubleVoulge,
-      chance: 5,
-    },
 
-    {
-      itemBlueprintKey: SpearsBlueprint.BohemianEarspoon,
-      chance: 20,
-    },
     {
       itemBlueprintKey: SwordsBlueprint.LongSword,
       chance: 15,

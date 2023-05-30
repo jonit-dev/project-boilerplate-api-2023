@@ -14,6 +14,7 @@ import {
   OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -161,6 +162,15 @@ export const npcDarkKnight: Partial<INPC> = {
     {
       itemBlueprintKey: SwordsBlueprint.FalconsSword,
       chance: 5,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.CopperDoubleVoulge,
+      chance: 2,
+    },
+
+    {
+      itemBlueprintKey: SpearsBlueprint.BohemianEarspoon,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],

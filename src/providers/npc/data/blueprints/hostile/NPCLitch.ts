@@ -139,6 +139,10 @@ export const npcLitch: Partial<INPC> = {
       itemBlueprintKey: ArmorsBlueprint.MithrilArmor,
       chance: 5,
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.HellishBow,
+      chance: 2,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],
 };

@@ -9,6 +9,7 @@ import {
   PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  SpearsBlueprint,
   StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -137,6 +138,10 @@ export const npcMinotaurMage = {
       itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
       chance: 30,
       quantityRange: [5, 8],
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.PoseidonTrident,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],

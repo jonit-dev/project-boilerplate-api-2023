@@ -37,7 +37,7 @@ export const npcDwarfMage: Partial<INPC> = {
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 30,
+    level: 45,
     strength: {
       level: 32,
     },

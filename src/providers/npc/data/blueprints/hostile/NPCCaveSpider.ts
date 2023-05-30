@@ -30,7 +30,7 @@ export const npcCaveSpider: Partial<INPC> = {
   baseHealth: 80,
   healthRandomizerDice: Dice.D6,
   skills: {
-    level: 12,
+    level: 20,
     strength: {
       level: 9,
     },
