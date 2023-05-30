@@ -143,6 +143,8 @@ export class CharacterNetworkCreate {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.itemView.warnCharacterAboutItemsInView(character, { always: true }); // dont await this because if there's a ton of garbage in the server, the character will be stuck waiting for this to finish
 
+        await this.sendCreatedMessageToCharacterCreator(data.channelId, dataFromServer);
+
         await this.sendCreationMessageToCharacters(data.channelId, dataFromServer, character);
 
         await this.warnAboutWeatherStatus(character.channelId!);
@@ -152,6 +154,17 @@ export class CharacterNetworkCreate {
         });
       },
       false
+    );
+  }
+
+  private async sendCreatedMessageToCharacterCreator(
+    channelId: string,
+    dataFromServer: ICharacterCreateFromServer
+  ): Promise<void> {
+    this.socketMessaging.sendEventToUser<ICharacterCreateFromServer>(
+      channelId,
+      CharacterSocketEvents.CharacterCreate,
+      dataFromServer
     );
   }
 
