@@ -1,7 +1,7 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { Item } from "@entities/ModuleInventory/ItemModel";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
-import { CharacterClass, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { CharacterClass, ICharacter, IItem, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 
@@ -9,7 +9,7 @@ import { Types } from "mongoose";
 export class BerserkerPassiveHabilities {
   constructor(private equipmentSlots: EquipmentSlots) {}
 
-  public async berserkerWeaponHandler(characterId: Types.ObjectId, itemId: Types.ObjectId): Promise<boolean> {
+  public async canBerserkerEquipItem(characterId: Types.ObjectId, itemId: Types.ObjectId): Promise<boolean> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
 
     if (character.class !== CharacterClass.Berserker) {
@@ -31,14 +31,16 @@ export class BerserkerPassiveHabilities {
     }
 
     if (
-      (leftHandItem?.subType === ItemSubType.Sword &&
-        itemToBeEquipped.subType === ItemSubType.Sword &&
-        !rightHandItem) ||
-      (rightHandItem?.subType === ItemSubType.Sword && itemToBeEquipped.subType === ItemSubType.Sword && !leftHandItem)
+      (this.isOneHandedWeapon(leftHandItem) && this.isOneHandedWeapon(itemToBeEquipped) && !rightHandItem) ||
+      (this.isOneHandedWeapon(rightHandItem) && this.isOneHandedWeapon(itemToBeEquipped) && !leftHandItem)
     ) {
       return true;
     } else {
       return false;
     }
+  }
+
+  private isOneHandedWeapon(item: IItem): boolean {
+    return (item?.subType === ItemSubType.Sword || item?.subType === ItemSubType.Axe) && !item.isTwoHanded;
   }
 }

@@ -115,27 +115,6 @@ export class EquipmentEquip {
       return false;
     }
 
-    // Check if the character meets the minimum requirements to use the item
-
-    const itemBlueprint = itemsBlueprintIndex[item.key] as IBaseItemBlueprint;
-
-    if (itemBlueprint?.minRequirements) {
-      const meetsMinRequirements = await this.checkMinimumRequirements(character, itemBlueprint);
-
-      if (!meetsMinRequirements) {
-        // Destructure properties from item.minRequirements for readability
-        const { level, skill } = itemBlueprint.minRequirements!;
-
-        // Prepare an error message to inform the character about the unmet requirements
-        const message = `Sorry, you don't have the minimum requirements to equip this item: level ${level}, ${skill.name} level ${skill.level}`;
-
-        // Send the error message to the character
-        this.socketMessaging.sendErrorMessageToCharacter(character, message);
-
-        return false;
-      }
-    }
-
     const containerType = await this.checkContainerType(itemContainer);
 
     const isEquipValid = await this.isEquipValid(character, item, containerType);
@@ -273,6 +252,27 @@ export class EquipmentEquip {
       return false;
     }
 
+    // Check if the character meets the minimum requirements to use the item
+
+    const itemBlueprint = itemsBlueprintIndex[item.key] as IBaseItemBlueprint;
+
+    if (itemBlueprint?.minRequirements) {
+      const meetsMinRequirements = await this.checkMinimumRequirements(character, itemBlueprint);
+
+      if (!meetsMinRequirements) {
+        // Destructure properties from item.minRequirements for readability
+        const { level, skill } = itemBlueprint.minRequirements!;
+
+        // Prepare an error message to inform the character about the unmet requirements
+        const message = `Sorry, you don't have the minimum requirements to equip this item: level ${level}, ${skill.name} level ${skill.level}`;
+
+        // Send the error message to the character
+        this.socketMessaging.sendErrorMessageToCharacter(character, message);
+
+        return false;
+      }
+    }
+
     if (containerType === "inventory") {
       // if item is coming from a character's inventory, check if the character owns the item
 
@@ -297,7 +297,7 @@ export class EquipmentEquip {
 
     if (!validateItemsEquip) {
       if (character.class === CharacterClass.Berserker) {
-        return await this.berserkerPassiveHabilities.berserkerWeaponHandler(character._id, item._id);
+        return await this.berserkerPassiveHabilities.canBerserkerEquipItem(character._id, item._id);
       }
 
       if (character.class === CharacterClass.Rogue) {

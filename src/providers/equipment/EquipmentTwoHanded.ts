@@ -29,9 +29,18 @@ export class EquipmentTwoHanded {
         );
 
         return false;
-      }
+      } else {
+        const hasShield = await this.hasShieldEquipped(equipmentSlots);
 
-      if (!itemToBeEquipped.isTwoHanded && itemToBeEquipped.subType !== ItemSubType.Shield) {
+        if (hasShield) {
+          return true;
+        }
+
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, your class can't equip 2 one-handed item of this type."
+        );
+
         return false;
       }
     }
@@ -78,11 +87,18 @@ export class EquipmentTwoHanded {
       return false;
     }
 
-    if (leftHandItem?.subType === ItemSubType.Shield || rightHandItem?.subType === ItemSubType.Shield) {
-      return false;
+    if (leftHandItem || rightHandItem) {
+      return true;
     }
 
-    if (leftHandItem || rightHandItem) {
+    return false;
+  }
+
+  public async hasShieldEquipped(equipment: IEquipmentSet): Promise<boolean> {
+    const leftHandItem = await Item.findById(equipment.leftHand);
+    const rightHandItem = await Item.findById(equipment.rightHand);
+
+    if (leftHandItem?.subType === ItemSubType.Shield || rightHandItem?.subType === ItemSubType.Shield) {
       return true;
     }
 

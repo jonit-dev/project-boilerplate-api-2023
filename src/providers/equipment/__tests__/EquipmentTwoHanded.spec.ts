@@ -3,6 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { RangedWeaponsBlueprint, ShieldsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemSlotType } from "@rpg-engine/shared";
 import { EquipmentEquip } from "../EquipmentEquip";
 import { EquipmentTwoHanded } from "../EquipmentTwoHanded";
@@ -67,6 +68,20 @@ describe("EquipmentTwoHanded.spec.ts", () => {
       } as ICharacter;
     });
 
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("should properly detect if a one-handed item is already equipped", async () => {
+      const shieldMock = await unitTestHelper.createMockItemFromBlueprint(ShieldsBlueprint.PlateShield);
+
+      equipmentSlots.leftHand = shieldMock._id;
+
+      const result = await equipmentTwoHanded.hasOneHandedItemEquippedOnArms(equipmentSlots);
+
+      expect(result).toBe(true);
+    });
+
     it("should return true if the item is not equippable on hands", async () => {
       itemToBeEquipped.allowedEquipSlotType = [ItemSlotType.Head];
       const result = await equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, itemToBeEquipped, character);
@@ -116,6 +131,18 @@ describe("EquipmentTwoHanded.spec.ts", () => {
       equipmentTwoHanded.hasOneHandedItemEquippedOnArms = equipmentTwoHandedMock.hasOneHandedItemEquippedOnArms;
 
       const result = await equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, itemToBeEquipped, character);
+      expect(result).toBe(false);
+    });
+
+    it("should not allow equipping a 2-handed item if a one-handed is already in place", async () => {
+      const shieldMock = await unitTestHelper.createMockItemFromBlueprint(ShieldsBlueprint.PlateShield);
+
+      const bowMock = await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow);
+
+      equipmentSlots.leftHand = shieldMock._id;
+
+      const result = await equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, bowMock, character);
+
       expect(result).toBe(false);
     });
   });

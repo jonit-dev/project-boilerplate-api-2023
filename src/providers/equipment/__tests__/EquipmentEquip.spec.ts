@@ -383,10 +383,10 @@ describe("EquipmentEquip.spec.ts", () => {
       expect(attackTypeBeforeEquip).toEqual(EntityAttackType.Melee);
 
       const equipShield = await equipmentEquip.equip(testCharacter, shieldItem._id, inventoryContainer.id);
-      const equipSword = await equipmentEquip.equip(testCharacter, swordItem._id, inventoryContainer.id);
-
-      expect(equipSword).toBeTruthy();
       expect(equipShield).toBeTruthy();
+
+      const equipSword = await equipmentEquip.equip(testCharacter, swordItem._id, inventoryContainer.id);
+      expect(equipSword).toBeTruthy();
 
       const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
 
@@ -466,6 +466,32 @@ describe("EquipmentEquip.spec.ts", () => {
       expect(swordItem.x).toBeUndefined();
       expect(swordItem.y).toBeUndefined();
       expect(swordItem.scene).toBeUndefined();
+    });
+
+    describe("Classes", () => {
+      it("A berserker should be allowed to equip 2 one handed swords", async () => {
+        testCharacter.class = CharacterClass.Berserker;
+        await testCharacter.save();
+
+        inventoryContainer.slots[1] = swordItem;
+        inventoryContainer.slots[0] = swordItem;
+        inventoryContainer.markModified("slots");
+        await inventoryContainer.save();
+
+        const characterAttackTypeBeforeEquip = await Character.findById({ _id: testCharacter._id });
+
+        if (!characterAttackTypeBeforeEquip) throw new Error("Character not found");
+
+        const attackTypeBeforeEquip = await characterWeapon.getAttackType(characterAttackTypeBeforeEquip);
+
+        expect(attackTypeBeforeEquip).toEqual(EntityAttackType.Melee);
+
+        const equipSword1 = await equipmentEquip.equip(testCharacter, swordItem._id, inventoryContainer.id);
+        expect(equipSword1).toBeTruthy();
+
+        const equipSword2 = await equipmentEquip.equip(testCharacter, swordItem._id, inventoryContainer.id);
+        expect(equipSword2).toBeTruthy();
+      });
     });
   });
 });
