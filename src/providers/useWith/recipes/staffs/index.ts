@@ -9,6 +9,8 @@ import { recipeSangriaStaff } from "./recipeSangriaStaff";
 import { recipeBlueSkyStaff } from "./recipeSkyBlueStaff";
 import { recipeTartarusStaff } from "./recipeTartarusStaff";
 import { recipeWoodenStaff } from "./recipeWoodenStaff";
+import { recipeFireWand } from "./recipeFireWand";
+import { recipePoisonWand } from "./recipePoisonWand";
 
 export const recipeStaffsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [StaffsBlueprint.FireStaff]: [recipeFireStaff],
@@ -20,4 +22,6 @@ export const recipeStaffsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [StaffsBlueprint.SangriaStaff]: [recipeSangriaStaff],
   [StaffsBlueprint.TartarusStaff]: [recipeTartarusStaff],
   [StaffsBlueprint.WoodenStaff]: [recipeWoodenStaff],
+  [StaffsBlueprint.FireWand]: [recipeFireWand],
+  [StaffsBlueprint.PoisonWand]: [recipePoisonWand],
 };

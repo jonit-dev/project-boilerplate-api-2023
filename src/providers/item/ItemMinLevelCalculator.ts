@@ -12,7 +12,7 @@ import { itemsBlueprintIndex } from "./data";
 
 export function getMinRequirements(blueprintKey: string, skillName: string): MinRequirements {
   const levelMultiplier = 1.5;
-  const skillMultiplier = 0.7;
+  const skillMultiplier = 0.45;
   const attackMultiplier = 0.5;
   const defenseMultiplier = 0.65;
   const weightMultiplier = 1;
@@ -34,8 +34,17 @@ export function getMinRequirements(blueprintKey: string, skillName: string): Min
     finalMultiplier = 0.6;
   } else if (subType === ItemSubType.Dagger || subType === ItemSubType.Sword || subType === ItemSubType.Ranged) {
     finalMultiplier = 1.2;
+  } else if (subType === ItemSubType.Mace) {
+    finalMultiplier = 1.4;
   } else if (subType === ItemSubType.Shield) {
     finalMultiplier = 0.9;
+  } else if (
+    subType === ItemSubType.Helmet ||
+    subType === ItemSubType.Boot ||
+    subType === ItemSubType.Glove ||
+    subType === ItemSubType.Legs
+  ) {
+    finalMultiplier = 1.4;
   }
 
   const attackReq = attack ? attack * attackMultiplier : 0;
