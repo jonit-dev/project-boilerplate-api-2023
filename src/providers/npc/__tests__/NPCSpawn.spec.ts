@@ -3,6 +3,7 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
+import dayjs from "dayjs";
 import { NPCSpawn } from "../NPCSpawn";
 import { NPCView } from "../NPCView";
 
@@ -122,5 +123,24 @@ describe("NPCSpawn", () => {
     npcSpawn.npcGiantForm.resetNPCToNormalForm = resetMock;
     await npcSpawn.spawn(npc);
     expect(resetMock).toHaveBeenCalledWith(npc);
+  });
+
+  describe("calculateSpawnTime", () => {
+    it("should correctly calculate spawn time based on the strength level", () => {
+      // testing lower boundary
+      let spawnTime = npcSpawn.calculateSpawnTime(1);
+      let expectedTime = dayjs().add(1, "minutes").toDate();
+      expect(spawnTime.getMinutes()).toEqual(expectedTime.getMinutes());
+
+      // testing middle value
+      spawnTime = npcSpawn.calculateSpawnTime(72); // strengthLevel of 72 should result in spawnTime of 12 minutes
+      expectedTime = dayjs().add(12, "minutes").toDate();
+      expect(spawnTime.getMinutes()).toEqual(expectedTime.getMinutes());
+
+      // testing upper boundary
+      spawnTime = npcSpawn.calculateSpawnTime(200); // should be capped at 20 minutes
+      expectedTime = dayjs().add(20, "minutes").toDate();
+      expect(spawnTime.getMinutes()).toEqual(expectedTime.getMinutes());
+    });
   });
 });

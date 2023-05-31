@@ -2,6 +2,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
+import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import { NPCGiantForm } from "./NPCGiantForm";
 import { NPCWarn } from "./NPCWarn";
@@ -16,6 +17,14 @@ export class NPCSpawn {
     private npcWarn: NPCWarn,
     private npcGiantForm: NPCGiantForm
   ) {}
+
+  public calculateSpawnTime(strengthLevel: number): Date {
+    let spawnTime = Math.round(strengthLevel / 6);
+    spawnTime = Math.max(1, spawnTime); // ensure it's at least 1
+    spawnTime = Math.min(20, spawnTime); // ensure it's at most 20
+
+    return dayjs(new Date()).add(spawnTime, "minutes").toDate();
+  }
 
   public async spawn(npc: INPC): Promise<void> {
     const canSpawn = await this.canSpawn(npc);

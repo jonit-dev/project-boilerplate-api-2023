@@ -17,12 +17,12 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemSubType, ItemType } from "@rpg-engine/shared";
-import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import { NPC_CYCLES } from "./NPCCycle";
 import { NPCFreezer } from "./NPCFreezer";
 import { calculateGold } from "./NPCGold";
+import { NPCSpawn } from "./NPCSpawn";
 import { NPCTarget } from "./movement/NPCTarget";
 
 @provide(NPCDeath)
@@ -33,7 +33,8 @@ export class NPCDeath {
     private npcTarget: NPCTarget,
     private itemOwnership: ItemOwnership,
     private itemRarity: ItemRarity,
-    private npcFreezer: NPCFreezer
+    private npcFreezer: NPCFreezer,
+    private npcSpawn: NPCSpawn
   ) {}
 
   public async handleNPCDeath(npc: INPC): Promise<void> {
@@ -94,9 +95,8 @@ export class NPCDeath {
     const strengthLevel = skills.strength.level;
 
     npc.health = 0;
-    npc.nextSpawnTime = dayjs(new Date())
-      .add(Math.max(1, Math.round(strengthLevel / 4)), "minutes")
-      .toDate();
+
+    npc.nextSpawnTime = this.npcSpawn.calculateSpawnTime(strengthLevel);
     npc.currentMovementType = npc.originalMovementType;
     npc.appliedEntityEffects = undefined;
     npc.isBehaviorEnabled = false;
