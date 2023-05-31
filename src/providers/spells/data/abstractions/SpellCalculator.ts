@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { LinearInterpolation } from "@providers/math/LinearInterpolation";
 import { CharacterTrait, ISkill } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { random, round } from "lodash";
@@ -10,7 +11,7 @@ interface IOptions {
   difficulty?: 2 | 3 | 4 | 5 | 6;
 }
 
-interface IRequiredOptions {
+export interface IRequiredOptions {
   max: number;
   min: number;
   skillAssociation?: "default" | "reverse"; // reverse = higher skill, lower the value. default = higher skill, higher the value
@@ -18,6 +19,8 @@ interface IRequiredOptions {
 
 @provide(SpellCalculator)
 export class SpellCalculator {
+  constructor(private linearInterpolation: LinearInterpolation) {}
+
   public async getQuantityBasedOnSkillLevel(
     character: ICharacter,
     skillName: CharacterTrait,
@@ -43,9 +46,10 @@ export class SpellCalculator {
     skillName: CharacterTrait,
     options: IRequiredOptions
   ): Promise<number> {
-    return await this.calculateLinearInterpolation(
-      character,
-      skillName,
+    const value = await this.getSkillLevel(character, skillName);
+
+    return this.linearInterpolation.calculateLinearInterpolation(
+      value,
       options.min,
       options.max,
       options.skillAssociation
@@ -57,37 +61,17 @@ export class SpellCalculator {
     skillName: CharacterTrait,
     options: IRequiredOptions
   ): Promise<number> {
-    return await this.calculateLinearInterpolation(
-      character,
-      skillName,
+    const value = await this.getSkillLevel(character, skillName);
+
+    return this.linearInterpolation.calculateLinearInterpolation(
+      value,
       options.min,
       options.max,
       options.skillAssociation
     );
   }
 
-  private async calculateLinearInterpolation(
-    character: ICharacter,
-    skillName: CharacterTrait,
-    min: number,
-    max: number,
-    skillAssociation: "default" | "reverse" = "default"
-  ): Promise<number> {
-    const skillLevel = await this.getSkillLevel(character, skillName);
-
-    let value;
-    if (skillAssociation === "default") {
-      // Linear interpolation formula for default skill association (higher skill, higher the value)
-      value = min + ((max - min) * (skillLevel - 1)) / 99;
-    } else {
-      // Linear interpolation formula for reverse skill association (higher skill, lower the value)
-      value = max - ((max - min) * (skillLevel - 1)) / 99;
-    }
-
-    return round(value);
-  }
-
-  private async getSkillLevel(character: ICharacter, skillName: string): Promise<number> {
+  public async getSkillLevel(character: ICharacter, skillName: string): Promise<number> {
     const skills = (await Skill.findOne({ _id: character.skills }).lean()) as unknown as ISkill;
     const skillLevel = skills[skillName].level as number;
 

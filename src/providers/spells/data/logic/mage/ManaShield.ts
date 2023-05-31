@@ -1,9 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents, ICharacterAttributeChanged, SpellsBlueprint } from "@rpg-engine/shared";
+import { SpellsBlueprint } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { Types } from "mongoose";
 import { NamespaceRedisControl } from "../../types/SpellsBlueprintTypes";
 
 @provide(ManaShield)
@@ -55,24 +54,12 @@ export class ManaShield {
         health: newMana < 0 ? Math.max(newHealth, 0) : character.health,
       }).lean()) as ICharacter;
 
-      await this.sendEventAttributeChange(character._id);
+      await this.socketMessaging.sendEventAttributeChange(character._id);
 
       return true;
     } catch (error) {
       console.error(`Failed to apply sorcerer mana shield: ${error} - ${character._id}`);
       return false;
     }
-  }
-
-  private async sendEventAttributeChange(characterId: Types.ObjectId): Promise<void> {
-    const character = (await Character.findById(characterId).select("_id health mana").lean()) as ICharacter;
-
-    const payload: ICharacterAttributeChanged = {
-      targetId: character._id,
-      health: character.health,
-      mana: character.mana,
-    };
-
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
   }
 }

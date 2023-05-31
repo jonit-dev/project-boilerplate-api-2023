@@ -1,19 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import {
-  AnimationEffectKeys,
-  BasicAttribute,
-  CharacterClass,
-  CharacterSocketEvents,
-  ICharacterAttributeChanged,
-  SpellsBlueprint,
-} from "@rpg-engine/shared";
+import { BasicAttribute, CharacterClass, SpellsBlueprint } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { Types } from "mongoose";
 import { NamespaceRedisControl } from "../../types/SpellsBlueprintTypes";
 
 @provide(Bloodthirst)
@@ -21,7 +12,6 @@ export class Bloodthirst {
   constructor(
     private socketMessaging: SocketMessaging,
     private inMemoryHashTable: InMemoryHashTable,
-    private animationEffect: AnimationEffect,
     private traitGetter: TraitGetter
   ) {}
 
@@ -62,27 +52,9 @@ export class Bloodthirst {
 
       await Character.findByIdAndUpdate(character._id, { health: cappedHealing }).lean();
 
-      await this.sendEventAttributeChange(character._id);
+      await this.socketMessaging.sendEventAttributeChange(character._id);
     } catch (error) {
       console.error(`Failed to apply berserker bloodthirst: ${error} - ${character._id}`);
     }
-  }
-
-  private async sendEventAttributeChange(characterId: Types.ObjectId): Promise<void> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
-    const payload: ICharacterAttributeChanged = {
-      targetId: character._id,
-      health: character.health,
-    };
-
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
-
-    await this.socketMessaging.sendEventToCharactersAroundCharacter(
-      character,
-      CharacterSocketEvents.AttributeChanged,
-      payload
-    );
-
-    await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.Lifedrain);
   }
 }

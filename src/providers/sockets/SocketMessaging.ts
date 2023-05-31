@@ -1,12 +1,20 @@
 // @ts-ignore
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { appEnv } from "@providers/config/env";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
-import { EnvType, IUIShowMessage, UIMessageType, UISocketEvents } from "@rpg-engine/shared";
+import {
+  CharacterSocketEvents,
+  EnvType,
+  ICharacterAttributeChanged,
+  IUIShowMessage,
+  UIMessageType,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { Types } from "mongoose";
 
 @provide(SocketMessaging)
 export class SocketMessaging {
@@ -60,5 +68,27 @@ export class SocketMessaging {
         this.sendEventToUser<T>(character.channelId!, eventName, data || ({} as T));
       }
     }
+  }
+
+  public async sendEventAttributeChange(characterId: Types.ObjectId): Promise<void> {
+    const character = (await Character.findById(characterId).lean()) as ICharacter;
+
+    const payload: ICharacterAttributeChanged = {
+      targetId: character._id,
+      health: character.health,
+      maxHealth: character.maxHealth,
+      mana: character.mana,
+      maxMana: character.maxMana,
+      speed: character.speed,
+      weight: character.weight,
+      maxWeight: character.maxWeight,
+      alpha: character.alpha,
+      attackIntervalSpeed: character.attackIntervalSpeed,
+      textureKey: character.textureKey,
+    };
+
+    this.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+
+    await this.sendEventToCharactersAroundCharacter(character, CharacterSocketEvents.AttributeChanged, payload);
   }
 }
