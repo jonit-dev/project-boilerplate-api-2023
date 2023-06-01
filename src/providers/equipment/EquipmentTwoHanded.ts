@@ -36,6 +36,11 @@ export class EquipmentTwoHanded {
           return true;
         }
 
+        // if item to be equipped is a shield, just allow it
+        if (itemToBeEquipped.subType === ItemSubType.Shield) {
+          return true;
+        }
+
         this.socketMessaging.sendErrorMessageToCharacter(
           character,
           "Sorry, your class can't equip 2 one-handed item of this type."
@@ -60,7 +65,10 @@ export class EquipmentTwoHanded {
       }
 
       if (!itemToBeEquipped.isTwoHanded) {
-        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you already have an item equipped.");
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, not possible. Please unequip your two-handed item first."
+        );
 
         return false;
       }
