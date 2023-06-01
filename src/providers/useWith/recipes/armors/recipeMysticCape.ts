@@ -21,7 +21,7 @@ export const recipeMysticCape: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
+    CraftingSkill.Alchemy,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Eye, 10],
       [CraftingResourcesBlueprint.BlueSilk, 10],

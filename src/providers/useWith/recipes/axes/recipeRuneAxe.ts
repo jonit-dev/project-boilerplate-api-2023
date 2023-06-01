@@ -25,7 +25,7 @@ export const recipeRuneAxe: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Alchemy,
+    CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.SteelIngot, 5],
       [CraftingResourcesBlueprint.GreaterWoodenLog, 10],

@@ -25,7 +25,7 @@ export const recipeSorcerersCape: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
+    CraftingSkill.Alchemy,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.CorruptionIngot, 10],
       [CraftingResourcesBlueprint.BlueSilk, 10],

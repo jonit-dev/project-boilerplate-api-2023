@@ -29,7 +29,7 @@ export const recipeSpellcastersCape: IUseWithCraftingRecipe = {
     },
   ],
   minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
+    CraftingSkill.Alchemy,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.CorruptionIngot, 10],
       [CraftingResourcesBlueprint.ObsidiumIngot, 10],

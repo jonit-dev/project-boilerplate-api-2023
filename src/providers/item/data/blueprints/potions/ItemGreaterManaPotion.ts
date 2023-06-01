@@ -12,7 +12,7 @@ export const itemGreaterManaPotion: IConsumableItemBlueprint = {
   textureAtlas: "items",
   texturePath: "potions/greater-mana-potion.png",
 
-  name: "Mana Potion",
+  name: "Greater Mana Potion",
   description: "A greater flask containing blue liquid of a mana potion.",
   weight: 0.5,
   basePrice: 40,

@@ -12,6 +12,7 @@ import { recipeLightLifePotion } from "./recipeLightLifePotion";
 import { recipeLightManaPotion } from "./recipeLightManaPotion";
 import { recipeManaPotion } from "./recipeManaPotion";
 import { recipeVenomousVial } from "./recipeVenomousVial";
+import { recipeLifePotion } from "./recipeLifePotion";
 
 export const recipePotionsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [PotionsBlueprint.LightManaPotion]: [recipeLightManaPotion],
@@ -26,4 +27,5 @@ export const recipePotionsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [PotionsBlueprint.AcidFlask]: [recipeAcidFlask],
   [PotionsBlueprint.CorrosiveElixir]: [recipeCorrosiveElixir],
   [PotionsBlueprint.VenomousVial]: [recipeVenomousVial],
+  [PotionsBlueprint.LifePotion]: [recipeLifePotion],
 };

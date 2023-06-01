@@ -11,7 +11,10 @@ export function calculateMinimumLevel(ingredients: [string, number][]): number {
   });
 
   // Compute the minimum level using the total value of ingredients and the craftingConst
-  const minimumLevel = (totalIngredientValue * CRAFTING_MIN_LEVEL_RATIO) / 100;
+  const minimumLevelLinear = (totalIngredientValue * CRAFTING_MIN_LEVEL_RATIO) / 100;
+  const minimumLevelLogarithmic = Math.log(totalIngredientValue + 1) * CRAFTING_MIN_LEVEL_RATIO;
+
+  const minimumLevel = Math.min(minimumLevelLinear, minimumLevelLogarithmic);
 
   // Return the smallest integer greater than or equal to the minimumLevel
   return Math.ceil(minimumLevel);
