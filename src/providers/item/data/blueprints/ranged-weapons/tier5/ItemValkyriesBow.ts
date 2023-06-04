@@ -1,8 +1,8 @@
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
+import { IEquippableRangedTier5WeaponBlueprint } from "@providers/item/data/types/TierBlueprintTypes";
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { RangeTypes } from "../../../types/RangedWeaponTypes";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
-import { IEquippableRangedTier5WeaponBlueprint } from "@providers/item/data/types/TierBlueprintTypes";
 
 export const itemValkyriesBow: IEquippableRangedTier5WeaponBlueprint = {
   key: RangedWeaponsBlueprint.ValkyriesBow,
@@ -23,6 +23,8 @@ export const itemValkyriesBow: IEquippableRangedTier5WeaponBlueprint = {
     RangedWeaponsBlueprint.PoisonArrow,
     RangedWeaponsBlueprint.ShockArrow,
     RangedWeaponsBlueprint.GoldenArrow,
+    RangedWeaponsBlueprint.EmeraldArrow,
+    RangedWeaponsBlueprint.CrimsonArrow,
   ],
   tier: 5,
   isTwoHanded: true,

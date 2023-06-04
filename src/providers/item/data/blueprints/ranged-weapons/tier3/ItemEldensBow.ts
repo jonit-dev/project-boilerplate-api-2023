@@ -23,6 +23,7 @@ export const itemEldensBow: IEquippableRangedTier3WeaponBlueprint = {
     RangedWeaponsBlueprint.Arrow,
     RangedWeaponsBlueprint.IronArrow,
     RangedWeaponsBlueprint.PoisonArrow,
+    RangedWeaponsBlueprint.FrostArrow,
   ],
   isTwoHanded: true,
   basePrice: 65,

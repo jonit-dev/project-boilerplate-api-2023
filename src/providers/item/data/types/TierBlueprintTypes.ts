@@ -172,9 +172,16 @@ type Tier0AmmoKeys =
 type Tier1AmmoKeys =
   | [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow]
   | [RangedWeaponsBlueprint.Bolt, RangedWeaponsBlueprint.ElvenBolt];
-type Tier2AmmoKeys = Tier1AmmoKeys;
+type Tier2AmmoKeys =
+  | Tier1AmmoKeys
+  | [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow, RangedWeaponsBlueprint.FrostArrow];
 type Tier3AmmoKeys =
-  | [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow, RangedWeaponsBlueprint.PoisonArrow]
+  | [
+      RangedWeaponsBlueprint.Arrow,
+      RangedWeaponsBlueprint.IronArrow,
+      RangedWeaponsBlueprint.PoisonArrow,
+      RangedWeaponsBlueprint.FrostArrow
+    ]
   | [RangedWeaponsBlueprint.Bolt, RangedWeaponsBlueprint.ElvenBolt, RangedWeaponsBlueprint.FireBolt];
 type Tier4AmmoKeys =
   | [
@@ -196,7 +203,9 @@ type Tier5AmmoKeys =
       RangedWeaponsBlueprint.IronArrow,
       RangedWeaponsBlueprint.PoisonArrow,
       RangedWeaponsBlueprint.ShockArrow,
-      RangedWeaponsBlueprint.GoldenArrow
+      RangedWeaponsBlueprint.GoldenArrow,
+      RangedWeaponsBlueprint.EmeraldArrow,
+      RangedWeaponsBlueprint.CrimsonArrow
     ]
   | [
       RangedWeaponsBlueprint.Bolt,

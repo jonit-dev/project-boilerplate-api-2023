@@ -21,6 +21,7 @@ export const itemRedwoodLongbow: IEquippableRangedTier3WeaponBlueprint = {
     RangedWeaponsBlueprint.Arrow,
     RangedWeaponsBlueprint.IronArrow,
     RangedWeaponsBlueprint.PoisonArrow,
+    RangedWeaponsBlueprint.FrostArrow,
   ],
   isTwoHanded: true,
   basePrice: 75,

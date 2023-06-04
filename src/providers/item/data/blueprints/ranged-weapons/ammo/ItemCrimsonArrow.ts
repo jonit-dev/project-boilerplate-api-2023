@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { IEquippableRangedAmmoBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -9,9 +10,11 @@ export const itemCrimsonArrow: IEquippableRangedAmmoBlueprint = {
   texturePath: "ranged-weapons/crimson-arrow.png",
   name: "Crimson Arrow",
   description: "A specialized arrow with a crimson hue.",
-  attack: 30,
+  attack: 24,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 50,
+  maxStackSize: 100,
   basePrice: 12,
+  entityEffects: [EntityEffectBlueprint.Burning],
+  entityEffectChance: 80,
 };
