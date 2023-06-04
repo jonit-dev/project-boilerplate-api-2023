@@ -23,7 +23,7 @@ export const itemEnchantedStaff: IEquippableTwoHandedStaffTier4WeaponBlueprint =
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 30,
-  defense: 30,
+  defense: 7,
   tier: 4,
   maxRange: RangeTypes.High,
   basePrice: 80,

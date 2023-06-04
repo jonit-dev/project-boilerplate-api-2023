@@ -23,7 +23,7 @@ export const itemMoonsStaff: IEquippableTwoHandedStaffTier4WeaponBlueprint = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 34,
-  defense: 32,
+  defense: 8,
   tier: 4,
   basePrice: 80,
   maxRange: RangeTypes.Medium,

@@ -1,5 +1,4 @@
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
-import { RangeTypes } from "../../../types/RangedWeaponTypes";
+import { EntityAttackType, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
 import { IEquippableRangedTier5WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -16,7 +15,7 @@ export const itemDragonBow: IEquippableRangedTier5WeaponBlueprint = {
   tier: 5,
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  maxRange: RangeTypes.High,
+  maxRange: RangeTypes.Medium,
   requiredAmmoKeys: [
     RangedWeaponsBlueprint.Arrow,
     RangedWeaponsBlueprint.IronArrow,

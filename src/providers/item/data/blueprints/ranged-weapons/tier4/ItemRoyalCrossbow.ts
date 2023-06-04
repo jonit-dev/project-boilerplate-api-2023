@@ -1,4 +1,4 @@
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { IEquippableRangedTier4WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
@@ -17,7 +17,7 @@ export const itemRoyalCrossbow: IEquippableRangedTier4WeaponBlueprint = {
   attack: 33,
   tier: 4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  maxRange: 9,
+  maxRange: RangeTypes.High,
   requiredAmmoKeys: [
     RangedWeaponsBlueprint.Bolt,
     RangedWeaponsBlueprint.ElvenBolt,

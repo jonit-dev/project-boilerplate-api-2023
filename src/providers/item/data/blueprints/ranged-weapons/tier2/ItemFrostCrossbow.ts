@@ -1,8 +1,8 @@
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
-import { RangeTypes } from "../../../types/RangedWeaponTypes";
+
 import { IEquippableRangedTier2WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 
 export const itemFrostCrossbow: IEquippableRangedTier2WeaponBlueprint = {

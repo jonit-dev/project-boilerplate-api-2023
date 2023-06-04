@@ -23,7 +23,7 @@ export const itemHasteRing: IEquippableAccessoryTier1Blueprint = {
   tier: 1,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Ring],
-  basePrice: 4500,
+  basePrice: 300,
   canSell: false,
   equippedBuff: {
     type: CharacterBuffType.CharacterAttribute,

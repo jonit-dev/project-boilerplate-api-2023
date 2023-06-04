@@ -25,7 +25,7 @@ export const itemSangriaStaff: IEquippableTwoHandedStaffTier5WeaponBlueprint = {
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 38,
-  defense: 37,
+  defense: 10,
   tier: 5,
   maxRange: RangeTypes.Medium,
   basePrice: 93,

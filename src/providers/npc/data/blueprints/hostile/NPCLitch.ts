@@ -78,7 +78,7 @@ export const npcLitch: Partial<INPC> = {
     },
     {
       itemBlueprintKey: AccessoriesBlueprint.HasteRing,
-      chance: 5,
+      chance: 1,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.RuneCrossbow,
@@ -111,7 +111,7 @@ export const npcLitch: Partial<INPC> = {
     },
     {
       itemBlueprintKey: ContainersBlueprint.Backpack,
-      chance: 50,
+      chance: 10,
     },
 
     {

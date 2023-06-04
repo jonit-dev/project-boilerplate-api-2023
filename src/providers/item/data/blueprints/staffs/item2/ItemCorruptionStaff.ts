@@ -20,7 +20,7 @@ export const itemCorruptionStaff: IEquippableTwoHandedStaffTier2WeaponBlueprint 
   name: "Corruption Staff",
   description: "A twisted, corrupted staff imbued with dark energy, capable of sapping the life force of its victims.",
   attack: 20,
-  defense: 18,
+  defense: 4,
   tier: 2,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

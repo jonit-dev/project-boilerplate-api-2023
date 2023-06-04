@@ -3,12 +3,9 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
-  ArmorsBlueprint,
-  BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
-  LegsBlueprint,
   OthersBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -73,19 +70,6 @@ export const npcDragonKnight: Partial<INPC> = {
       itemBlueprintKey: OthersBlueprint.GoldCoin,
       chance: 50,
       quantityRange: [25, 75],
-    },
-    {
-      itemBlueprintKey: ArmorsBlueprint.GoldenArmor,
-      chance: 2,
-    },
-
-    {
-      itemBlueprintKey: LegsBlueprint.GoldenLegs,
-      chance: 10,
-    },
-    {
-      itemBlueprintKey: BootsBlueprint.GoldenBoots,
-      chance: 10,
     },
     {
       itemBlueprintKey: HelmetsBlueprint.RoyalHelmet,

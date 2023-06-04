@@ -24,7 +24,7 @@ export const itemPoisonStaff: IEquippableTwoHandedStaffTier3WeaponBlueprint = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 24,
-  defense: 25,
+  defense: 6,
   tier: 3,
   basePrice: 85,
   maxRange: RangeTypes.Medium,

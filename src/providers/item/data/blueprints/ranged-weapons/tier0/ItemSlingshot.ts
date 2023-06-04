@@ -1,6 +1,5 @@
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { RangeTypes } from "../../../types/RangedWeaponTypes";
 import { IEquippableRangedTier0WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
 

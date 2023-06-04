@@ -80,7 +80,7 @@ export const npcWraith: Partial<INPC> = {
 
     {
       itemBlueprintKey: ContainersBlueprint.Backpack,
-      chance: 50,
+      chance: 10,
     },
 
     {
