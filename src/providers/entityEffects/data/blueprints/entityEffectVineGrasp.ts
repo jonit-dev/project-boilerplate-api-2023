@@ -10,7 +10,7 @@ import { IEntityEffect } from "./entityEffect";
 
 export const entityEffectVineGrasp: IEntityEffect = {
   key: EntityEffectBlueprint.VineGrasp,
-  totalDurationMs: 40000,
+  totalDurationMs: 8000,
   intervalMs: 2000,
   probability: 25,
   targetAnimationKey: AnimationEffectKeys.Rooted,

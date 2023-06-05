@@ -13,6 +13,7 @@ import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { clearCacheForKey } from "speedgoose";
 import { NPCGiantForm } from "./NPCGiantForm";
 
 @provide(NPCSeeder)
@@ -39,6 +40,8 @@ export class NPCSeeder {
         // console.log(`🧍 Updating NPC ${NPCData.key} database data...`);
 
         const updateData = _.omit(multipliedNPCData, ["skills"]);
+
+        await clearCacheForKey(`${npcFound.id}-skills`);
 
         await NPC.updateOne(
           { key: key },

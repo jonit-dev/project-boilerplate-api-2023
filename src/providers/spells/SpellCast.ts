@@ -75,13 +75,6 @@ export class SpellCast {
       await this.sendPreSpellCastEvents(spell, character);
     }
 
-    const hasSpellCooldown = await this.spellCoolDown.haveSpellCooldown(character._id, spell.magicWords);
-
-    if (!hasSpellCooldown) {
-      await this.spellCoolDown.setSpellCooldown(character._id, spell.magicWords, spell.cooldown);
-    }
-    await this.spellCoolDown.getAllSpellCooldowns(character);
-
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
     let key = spell.attribute;
     // @ts-ignore
@@ -103,6 +96,13 @@ export class SpellCast {
         return false;
       }
     }
+
+    const hasSpellCooldown = await this.spellCoolDown.haveSpellCooldown(character._id, spell.magicWords);
+
+    if (!hasSpellCooldown) {
+      await this.spellCoolDown.setSpellCooldown(character._id, spell.magicWords, spell.cooldown);
+    }
+    await this.spellCoolDown.getAllSpellCooldowns(character);
 
     const hasCastSucceeded = await spell.usableEffect(character, target);
 

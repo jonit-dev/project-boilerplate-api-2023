@@ -237,7 +237,12 @@ export class NPCMovementMoveTowards {
     }
 
     if (!hasBattleCycle) {
-      const npcSkills = (await Skill.findById(npc.skills).lean({ virtuals: true, defaults: true })) as ISkill;
+      const npcSkills = (await Skill.findById(npc.skills)
+        .lean({ virtuals: true, defaults: true })
+        .cacheQuery({
+          cacheKey: `${npc.id}-skills`,
+          ttl: 60 * 60 * 24 * 7,
+        })) as ISkill;
 
       new NPCBattleCycle(
         npc.id,

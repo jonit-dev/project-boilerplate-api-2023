@@ -50,13 +50,9 @@ export class HitTarget {
     magicAttack?: boolean,
     bonusDamage?: number
   ): Promise<void> {
-    if (!attacker.populated("skills")) {
-      attacker.skills = (await Skill.findById(attacker.skills)) as ISkill;
-    }
+    attacker.skills = (await Skill.findById(attacker.skills)) as ISkill;
 
-    if (!target.populated("skills")) {
-      target.skills = (await Skill.findById(target.skills)) as ISkill;
-    }
+    target.skills = (await Skill.findById(target.skills)) as ISkill;
 
     // if target is dead, do nothing.
     if (!target.isAlive) {

@@ -8,6 +8,7 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
+import { clearCacheForKey } from "speedgoose";
 
 interface INPCNormalFormStats {
   npc: {
@@ -48,6 +49,8 @@ export class NPCGiantForm {
     npc: INPC,
     percent = NPC_GIANT_FORM_SPAWN_PERCENTAGE_CHANCE
   ): Promise<void> {
+    await clearCacheForKey(`${npc.id}-skills`);
+
     if (npc.isGiantForm || npc.alignment !== NPCAlignment.Hostile) return;
 
     const n = _.random(0, 100);

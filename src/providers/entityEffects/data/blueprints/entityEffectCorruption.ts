@@ -10,7 +10,7 @@ import { IEntityEffect } from "./entityEffect";
 
 export const entityEffectCorruption: IEntityEffect = {
   key: EntityEffectBlueprint.Corruption,
-  totalDurationMs: 40000,
+  totalDurationMs: 8000,
   intervalMs: 2000,
   probability: 25,
   targetAnimationKey: AnimationEffectKeys.Corruption,
