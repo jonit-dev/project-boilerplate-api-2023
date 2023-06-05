@@ -9,8 +9,8 @@ import {
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
+  MagicPower,
   RangeTypes,
-  RunePower,
 } from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -28,7 +28,7 @@ export const itemEnergyBoltRune: IRuneItemBlueprint = {
   canUseOnNonPVPZone: false,
 
   useWithMaxDistanceGrid: RangeTypes.Medium,
-  power: RunePower.Medium,
+  power: MagicPower.Medium,
   minMagicLevelRequired: 3,
   canSell: false,
   animationKey: AnimationEffectKeys.Hit,

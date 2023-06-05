@@ -11,8 +11,8 @@ import {
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
+  MagicPower,
   RangeTypes,
-  RunePower,
 } from "@rpg-engine/shared";
 import { MagicsBlueprint, PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -31,7 +31,7 @@ export const itemVenomousVial: IRuneItemBlueprint = {
   canUseOnNonPVPZone: false,
   hasUseWith: true,
   useWithMaxDistanceGrid: RangeTypes.Medium,
-  power: RunePower.Medium,
+  power: MagicPower.Medium,
   canSell: false,
 
   minMagicLevelRequired: 4,

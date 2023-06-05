@@ -7,8 +7,8 @@ import { SpellItemCreation } from "../../abstractions/SpellItemCreation";
 export const spellFireBoltRuneCreation: Partial<ISpell> = {
   key: SpellsBlueprint.FireBoltRuneCreationSpell,
 
-  name: "Fire Bolt Creation Spell",
-  description: "A spell that creates a fire bolt in your inventory.",
+  name: "Fire Bolt Rune Creation Spell",
+  description: "A spell that creates a fire bolt rune in your inventory.",
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar kiran agni",

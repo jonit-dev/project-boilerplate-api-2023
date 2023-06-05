@@ -11,8 +11,8 @@ import {
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
+  MagicPower,
   RangeTypes,
-  RunePower,
 } from "@rpg-engine/shared";
 import { MagicsBlueprint, PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -30,7 +30,7 @@ export const itemBlazingFirebomb: IRuneItemBlueprint = {
   canUseOnNonPVPZone: false,
   hasUseWith: true,
   useWithMaxDistanceGrid: RangeTypes.Medium,
-  power: RunePower.High,
+  power: MagicPower.High,
   canSell: false,
   basePrice: 30,
   minMagicLevelRequired: 7,

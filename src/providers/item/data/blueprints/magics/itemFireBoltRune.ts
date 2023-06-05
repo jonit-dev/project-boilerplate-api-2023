@@ -6,8 +6,15 @@ import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHel
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
 import { container } from "@providers/inversify/container";
-import { AnimationEffectKeys, IRuneItemBlueprint, ItemSubType, ItemType, RunePower } from "@rpg-engine/shared";
-import { RangeTypes } from "../../types/RangedWeaponTypes";
+import {
+  AnimationEffectKeys,
+  IRuneItemBlueprint,
+  ItemSubType,
+  ItemType,
+  MagicPower,
+  RangeTypes,
+} from "@rpg-engine/shared";
+
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemFireBoltRune: IRuneItemBlueprint = {
@@ -24,7 +31,7 @@ export const itemFireBoltRune: IRuneItemBlueprint = {
 
   canUseOnNonPVPZone: false,
   useWithMaxDistanceGrid: RangeTypes.Medium,
-  power: RunePower.Medium,
+  power: MagicPower.Medium,
   minMagicLevelRequired: 5,
   canSell: false,
   animationKey: AnimationEffectKeys.Hit,

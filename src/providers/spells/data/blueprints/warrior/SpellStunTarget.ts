@@ -30,10 +30,6 @@ export const spellStunTarget: Partial<ISpell> = {
   characterClass: [CharacterClass.Warrior],
 
   usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
-    if (character._id.toString() === target._id.toString()) {
-      return false;
-    }
-
     const spellCalculator = container.get(SpellCalculator);
 
     const effect = container.get(SpecialEffect);

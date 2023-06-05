@@ -11,8 +11,8 @@ import {
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
+  MagicPower,
   RangeTypes,
-  RunePower,
 } from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -30,7 +30,7 @@ export const itemPoisonRune: IRuneItemBlueprint = {
   canUseOnNonPVPZone: false,
   hasUseWith: true,
   useWithMaxDistanceGrid: RangeTypes.Medium,
-  power: RunePower.Low,
+  power: MagicPower.Low,
   canSell: false,
   minMagicLevelRequired: 2,
   animationKey: AnimationEffectKeys.HitPoison,

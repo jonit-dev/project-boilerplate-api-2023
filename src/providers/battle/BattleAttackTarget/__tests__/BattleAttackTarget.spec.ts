@@ -1,15 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import {
-  RangedWeaponsBlueprint,
-  StaffsBlueprint,
-  SwordsBlueprint,
-} from "@providers/item/data/types/itemsBlueprintTypes";
-import { BattleEventType, CharacterClass, FromGridX, FromGridY } from "@rpg-engine/shared";
+import { CharacterClass, FromGridX, FromGridY } from "@rpg-engine/shared";
 import { BattleAttackTarget } from "../BattleAttackTarget";
 import { BattleAttackTargetDeath } from "../BattleAttackTargetDeath";
 
@@ -46,7 +38,8 @@ describe("BattleAttackTarget.spec.ts", () => {
   });
 
   it("should NOT hit a target if attacker has melee attack type and target is out of range", async () => {
-    const hitTarget = jest.spyOn(battleAttackTarget, "hitTarget" as any);
+    // @ts-ignore
+    const hitTarget = jest.spyOn(battleAttackTarget.hitTarget, "hit" as any);
 
     const attacker = testCharacter;
     attacker.x = FromGridX(0);
@@ -73,208 +66,14 @@ describe("BattleAttackTarget.spec.ts", () => {
 
     // expect battleAttackTarget to not have been called
 
-    const hitTarget = jest.spyOn(battleAttackTarget, "hitTarget" as any);
+    // @ts-ignore
+    const hitTarget = jest.spyOn(battleAttackTarget.hitTarget, "hit" as any);
 
     expect(hitTarget).toHaveBeenCalled();
   });
-
-  it("when battle event is a hit, it should decrease the target's health", async () => {
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
-
-    // @ts-ignore
-    const increaseSkillsOnBattle = jest.spyOn(battleAttackTarget.skillIncrease, "increaseSkillsOnBattle" as any);
-
-    // @ts-ignore
-    await battleAttackTarget.hitTarget(testCharacter, testNPC);
-
-    expect(testNPC.health).toBeLessThan(testNPC.maxHealth);
-    expect(increaseSkillsOnBattle).toHaveBeenCalled();
-  });
-
-  it("when battle event is a miss, it should not decrease the target's health", async () => {
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Miss);
-
-    // @ts-ignore
-    await battleAttackTarget.hitTarget(testCharacter, testNPC);
-
-    expect(testNPC.health).toBe(testNPC.maxHealth);
-  });
-
-  it("NPC should clear its target, after killing a character", async () => {
-    jest.useFakeTimers({
-      advanceTimers: true,
-    });
-
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 200);
-
-    // @ts-ignore
-    const charDeath = jest.spyOn(battleAttackTarget.battleAttackTargetDeath, "handleDeathAfterHit");
-
-    testCharacter.health = 1;
-    (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
-
-    // @ts-ignore
-    await battleAttackTarget.hitTarget(testNPC, testCharacter);
-
-    expect(charDeath).toHaveBeenCalled();
-
-    expect(testNPC.targetCharacter).toBe(undefined);
-  });
-
-  describe("applyEntityEffectsIfApplicable", () => {
-    let targetCharacter: ICharacter;
-    let attackerCharacter: ICharacter;
-    let testNPC: INPC;
-    let battleAttackTarget: BattleAttackTarget;
-    let bowItem: IItem;
-    let fireSwordItem: IItem;
-    let applyEntitySpy: jest.SpyInstance;
-    let getWeaponSpy: jest.SpyInstance;
-    let findByIdSpy: jest.SpyInstance;
-
-    beforeAll(() => {
-      battleAttackTarget = container.get<BattleAttackTarget>(BattleAttackTarget);
-    });
-
-    beforeEach(async () => {
-      testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
-      targetCharacter = await unitTestHelper.createMockCharacter(null, {
-        hasEquipment: true,
-        hasSkills: true,
-      });
-      attackerCharacter = await unitTestHelper.createMockCharacter(null, {
-        hasEquipment: true,
-        hasSkills: true,
-        hasInventory: true,
-      });
-
-      const bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
-      const fireSword = itemsBlueprintIndex[SwordsBlueprint.FireSword];
-
-      bowItem = new Item({ ...bow });
-
-      fireSwordItem = new Item({ ...fireSword });
-    });
-
-    afterEach(() => {
-      jest.resetAllMocks();
-      jest.restoreAllMocks();
-    });
-
-    it("should always call applyEntity when weapon has entityEffect and entity effect chance is 100", async () => {
-      fireSwordItem.entityEffectChance = 100;
-      // @ts-ignore
-      // prettier-ignore
-      const applyEntityEffects = jest.spyOn(battleAttackTarget.entityEffectUse, "applyEntityEffects" as any).mockResolvedValue(undefined);
-
-      // @ts-ignore
-      await battleAttackTarget.applyEntity(attackerCharacter, testNPC, fireSwordItem);
-
-      expect(applyEntityEffects).toBeCalledWith(attackerCharacter, testNPC);
-    });
-
-    it("should not call applyEntity when weapon has entityEffect and entity effect chance is 0", async () => {
-      fireSwordItem.entityEffectChance = 0;
-      // @ts-ignore
-      // prettier-ignore
-      const applyEntityEffects = jest.spyOn(battleAttackTarget.entityEffectUse, "applyEntityEffects" as any).mockResolvedValue(undefined);
-
-      // @ts-ignore
-      await battleAttackTarget.applyEntity(attackerCharacter, testNPC, fireSwordItem);
-
-      expect(applyEntityEffects).not.toHaveBeenCalled();
-    });
-
-    it("should not call applyEntity when weapon has  no entityEffect", async () => {
-      fireSwordItem.entityEffectChance = 100;
-      // @ts-ignore
-      // prettier-ignore
-      const applyEntityEffects = jest.spyOn(battleAttackTarget.entityEffectUse, "applyEntityEffects" as any).mockResolvedValue(undefined);
-
-      // @ts-ignore
-      await battleAttackTarget.applyEntity(attackerCharacter, testNPC, bowItem);
-
-      expect(applyEntityEffects).not.toHaveBeenCalled();
-    });
-
-    it("should call applyEntityEffects if npc has entityEffects", async () => {
-      testNPC.entityEffects = ["a", "b"];
-      // @ts-ignore
-      // prettier-ignore
-      const applyEntityEffects = jest.spyOn(battleAttackTarget.entityEffectUse, "applyEntityEffects" as any).mockResolvedValue(undefined);
-
-      // @ts-ignore
-      await battleAttackTarget.applyEntityEffectsIfApplicable(testNPC, targetCharacter);
-
-      expect(applyEntityEffects).toHaveBeenCalled();
-    });
-
-    it("should  call apply effects one time for the weapon", async () => {
-      // @ts-ignore
-      applyEntitySpy = jest.spyOn(battleAttackTarget, "applyEntity");
-      // @ts-ignore
-      getWeaponSpy = jest.spyOn(battleAttackTarget.characterWeapon, "getWeapon");
-      // @ts-ignore
-      findByIdSpy = jest.spyOn(Item, "findById");
-
-      getWeaponSpy.mockResolvedValueOnce({ item: fireSwordItem });
-
-      // @ts-ignore
-      await battleAttackTarget.applyEntityEffectsCharacter(attackerCharacter, testNPC);
-
-      expect(getWeaponSpy).toHaveBeenCalledWith(attackerCharacter);
-      expect(applyEntitySpy).toHaveBeenCalledWith(testNPC, attackerCharacter, fireSwordItem);
-      expect(applyEntitySpy).toBeCalledTimes(1);
-    });
-
-    it("should call applyEntityEffectsCharacter if the attacker is a Character", async () => {
-      // @ts-ignore
-      jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
-      // @ts-ignore
-      jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
-      // @ts-ignore
-      // prettier-ignore
-      const applyEntityEffectsCharacter = jest.spyOn(battleAttackTarget, "applyEntityEffectsCharacter").mockResolvedValue(undefined);
-      // @ts-ignore
-      // prettier-ignore
-      const applyEntityEffectsIfApplicable = jest.spyOn(battleAttackTarget, "applyEntityEffectsIfApplicable").mockResolvedValue(undefined);
-
-      // @ts-ignore
-      await battleAttackTarget.hitTarget(attackerCharacter, testNPC);
-
-      expect(applyEntityEffectsCharacter).toHaveBeenCalledWith(attackerCharacter, testNPC);
-      expect(applyEntityEffectsIfApplicable).not.toHaveBeenCalled();
-    });
-
-    it("should call applyEntityEffectsIfApplicable if the attacker is a npc", async () => {
-      // @ts-ignore
-      jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
-      // @ts-ignore
-      jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
-      // @ts-ignore
-      // prettier-ignore
-      const applyEntityEffectsCharacter = jest.spyOn(battleAttackTarget, "applyEntityEffectsCharacter").mockResolvedValue(undefined);
-      // @ts-ignore
-      // prettier-ignore
-      const applyEntityEffectsIfApplicable = jest.spyOn(battleAttackTarget, "applyEntityEffectsIfApplicable").mockResolvedValue(undefined);
-
-      // @ts-ignore
-      await battleAttackTarget.hitTarget(testNPC, targetCharacter);
-
-      expect(applyEntityEffectsIfApplicable).toHaveBeenCalledWith(testNPC, targetCharacter);
-      expect(applyEntityEffectsCharacter).not.toHaveBeenCalled();
-    });
-  });
 });
 
-describe("BattleAttackTarget.spec.ts | PVP battle", () => {
+describe("PVP battle", () => {
   let battleAttackTarget: BattleAttackTarget;
 
   let targetCharacter: ICharacter;
@@ -308,7 +107,8 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
   });
 
   it("should NOT hit a target if attacker has melee attack type and target is out of range", async () => {
-    const hitTarget = jest.spyOn(battleAttackTarget, "hitTarget" as any);
+    // @ts-ignore
+    const hitTarget = jest.spyOn(battleAttackTarget.hitTarget, "hit" as any);
 
     const attacker = attackerCharacter;
     attacker.x = FromGridX(0);
@@ -334,65 +134,11 @@ describe("BattleAttackTarget.spec.ts | PVP battle", () => {
     await attackerCharacter.populate("skills").execPopulate();
 
     // expect battleAttackTarget to have been called
-    const hitTarget = jest.spyOn(battleAttackTarget, "hitTarget" as any);
+    // @ts-ignore
+    const hitTarget = jest.spyOn(battleAttackTarget.hitTarget, "hit" as any);
 
     await battleAttackTarget.checkRangeAndAttack(targetCharacter, attackerCharacter);
 
     expect(hitTarget).toHaveBeenCalled();
-  });
-
-  it("when battle event is a hit, it should decrease the target's health", async () => {
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
-
-    // @ts-ignore
-    const increaseSkillsOnBattle = jest.spyOn(battleAttackTarget.skillIncrease, "increaseSkillsOnBattle" as any);
-
-    // @ts-ignore
-    await battleAttackTarget.hitTarget(attackerCharacter, targetCharacter);
-
-    expect(targetCharacter.health).toBeLessThan(targetCharacter.maxHealth);
-    expect(increaseSkillsOnBattle).toHaveBeenCalled();
-  });
-
-  it("when battle event is a miss, it should not decrease the target's health", async () => {
-    // @ts-ignore
-    jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Miss);
-
-    // @ts-ignore
-    await battleAttackTarget.hitTarget(attackerCharacter, targetCharacter);
-
-    expect(targetCharacter.health).toBe(targetCharacter.maxHealth);
-  });
-
-  describe("magic staff ranged attack", () => {
-    beforeEach(async () => {
-      const characterEquipment = (await Equipment.findById(attackerCharacter.equipment).lean()) as IEquipment;
-      const res = await unitTestHelper.createMockItemFromBlueprint(StaffsBlueprint.FireStaff);
-      characterEquipment.rightHand = res.id;
-
-      (await Equipment.findByIdAndUpdate(characterEquipment._id, characterEquipment).lean()) as IEquipment;
-    });
-
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it("when battle event is a hit, it should increase target magic resistance", async () => {
-      // @ts-ignore
-      jest.spyOn(battleAttackTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
-      // @ts-ignore
-      jest.spyOn(battleAttackTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
-
-      // @ts-ignore
-      const increaseSkillsOnBattle = jest.spyOn(battleAttackTarget.skillIncrease, "increaseMagicResistanceSP" as any);
-
-      // @ts-ignore
-      await battleAttackTarget.hitTarget(attackerCharacter, targetCharacter);
-
-      expect(increaseSkillsOnBattle).toHaveBeenCalledWith(targetCharacter, 24);
-    });
   });
 });

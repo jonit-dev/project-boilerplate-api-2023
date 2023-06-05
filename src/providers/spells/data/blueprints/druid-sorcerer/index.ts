@@ -1,10 +1,12 @@
 import { SpellsBlueprint } from "@rpg-engine/shared";
-import { spellDivineProtection } from "./SpellDivineProtection";
+import { spellDivineProtection } from "../druid/SpellDivineProtection";
+import { spellFrostBolt } from "../sorcerer/SpellFrostBolt";
 import { spellEnergyBoltRuneCreation } from "./SpellEnergyBoltRuneCreation";
+import { spellFireBolt } from "./SpellFireBolt";
 import { spellFireBoltRuneCreation } from "./SpellFireBoltRuneCreation";
+import { spellManaDrain } from "./SpellManaDrain";
 import { spellManaShield } from "./SpellManaShield";
 import { spellThunderRuneCreation } from "./SpellThunderRuneCreation";
-import { spellManaDrain } from "./SpellManaDrain";
 
 export const druidSorcererSpellsIndex = {
   [SpellsBlueprint.EnergyBoltRuneCreationSpell]: spellEnergyBoltRuneCreation,
@@ -13,4 +15,6 @@ export const druidSorcererSpellsIndex = {
   [SpellsBlueprint.ThunderRuneCreationSpell]: spellThunderRuneCreation,
   [SpellsBlueprint.ManaShield]: spellManaShield,
   [SpellsBlueprint.ManaDrain]: spellManaDrain,
+  [SpellsBlueprint.FireBolt]: spellFireBolt,
+  [SpellsBlueprint.FrostBolt]: spellFrostBolt,
 };

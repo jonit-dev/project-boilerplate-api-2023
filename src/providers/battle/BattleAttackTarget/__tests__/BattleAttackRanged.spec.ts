@@ -34,7 +34,8 @@ describe("BattleRangedAttack.spec.ts", () => {
     battleRangedAttack = container.get<BattleAttackRanged>(BattleAttackRanged);
     battleAttackTarget = container.get<BattleAttackTarget>(BattleAttackTarget);
     battleAttackValidator = container.get<BattleAttackValidator>(BattleAttackValidator);
-    hitTarget = jest.spyOn(battleAttackTarget, "hitTarget" as any);
+    // @ts-ignore
+    hitTarget = jest.spyOn(battleAttackTarget.hitTarget, "hit" as any);
   });
 
   beforeEach(async () => {

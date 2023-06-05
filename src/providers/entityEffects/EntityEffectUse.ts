@@ -21,11 +21,11 @@ export class EntityEffectUse {
   public async applyEntityEffects(
     target: ICharacter | INPC,
     attacker: ICharacter | INPC,
-    runeEffect?: IEntityEffect
+    entityEffect?: IEntityEffect
   ): Promise<void> {
     try {
-      if (runeEffect) {
-        await this.applyEntityEffect(runeEffect, target, attacker, true);
+      if (entityEffect) {
+        await this.applyEntityEffect(entityEffect, target, attacker, true);
         return;
       }
 

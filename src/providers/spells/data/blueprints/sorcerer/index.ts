@@ -1,4 +1,5 @@
 import { SpellsBlueprint } from "@rpg-engine/shared";
+import { spellCorruptionBolt } from "./SpellCorruptionBolt";
 import { spellCorruptionRuneCreation } from "./SpellCorruptionRuneCreation";
 import { spellCurseOfWeakness } from "./SpellCurseOfWeakness";
 import { spellDarkRuneCreation } from "./SpellDarkRuneCreation";
@@ -9,4 +10,5 @@ export const sorcererSpellsIndex = {
   [SpellsBlueprint.DarkRuneCreationSpell]: spellDarkRuneCreation,
   [SpellsBlueprint.CurseOfWeakness]: spellCurseOfWeakness,
   [SpellsBlueprint.SpellPolymorph]: spellPolymorph,
+  [SpellsBlueprint.CorruptionBolt]: spellCorruptionBolt,
 };

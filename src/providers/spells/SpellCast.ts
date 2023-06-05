@@ -59,7 +59,7 @@ export class SpellCast {
       return false;
     }
 
-    const spell = this.getSpell(data.magicWords);
+    const spell = this.getSpell(data.magicWords) as ISpell;
 
     if (!(await this.isSpellCastingValid(spell, character))) {
       return false;
@@ -84,6 +84,7 @@ export class SpellCast {
 
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
     let key = spell.attribute;
+    // @ts-ignore
     key || (key = spell.key);
 
     if (key) {
@@ -132,6 +133,12 @@ export class SpellCast {
         "Sorry, you need to select a valid target to cast this spell."
       );
       return false;
+    }
+
+    if (!spell.canSelfTarget) {
+      if (caster._id.toString() === target._id?.toString()) {
+        return false;
+      }
     }
 
     if (target.type === EntityType.NPC && (target as INPC).alignment === NPCAlignment.Friendly) {

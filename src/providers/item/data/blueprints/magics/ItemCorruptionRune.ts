@@ -8,8 +8,8 @@ import {
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
+  MagicPower,
   RangeTypes,
-  RunePower,
 } from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -27,7 +27,7 @@ export const itemCorruptionRune: IRuneItemBlueprint = {
   hasUseWith: true,
   canUseOnNonPVPZone: false,
   useWithMaxDistanceGrid: RangeTypes.High,
-  power: RunePower.UltraHigh,
+  power: MagicPower.UltraHigh,
   canSell: false,
   minMagicLevelRequired: 10,
   animationKey: AnimationEffectKeys.HitCorruption,

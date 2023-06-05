@@ -33,11 +33,6 @@ export const spellSilence: Partial<ISpell> = {
     const silence = container.get(SpellSilence);
     const spellCalculator = container.get(SpellCalculator);
 
-    // avoid self target
-    if (character._id.toString() === target._id.toString()) {
-      return false;
-    }
-
     const timeoutInSecs = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 15,
       max: 40,

@@ -2,7 +2,6 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import { RangeTypes } from "@providers/item/data/types/RangedWeaponTypes";
 import {
   AxesBlueprint,
   CraftingResourcesBlueprint,
@@ -13,7 +12,7 @@ import {
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { AnimationEffectKeys, NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
+import { AnimationEffectKeys, NPCAlignment, NPCSubtype, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 

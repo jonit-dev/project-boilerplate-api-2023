@@ -3,4 +3,6 @@ export enum EntityEffectBlueprint {
   Bleeding = "bleeding",
   Freezing = "freezing",
   Burning = "burning",
+  Corruption = "corruption",
+  VineGrasp = "vine-grasp",
 }

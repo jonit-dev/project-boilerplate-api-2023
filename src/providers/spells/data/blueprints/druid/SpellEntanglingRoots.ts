@@ -30,10 +30,6 @@ export const spellEntanglingRoots: Partial<ISpell> = {
   characterClass: [CharacterClass.Druid],
 
   usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
-    if (character._id.toString() === target._id.toString()) {
-      return false;
-    }
-
     const spellCalculator = container.get(SpellCalculator);
 
     const effect = container.get(SpecialEffect);

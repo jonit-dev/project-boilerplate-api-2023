@@ -37,11 +37,6 @@ export const spellCurseOfWeakness: Partial<ISpell> = {
     const spellCalculator = container.get(SpellCalculator);
     const characterBuffActivator = container.get(CharacterBuffActivator);
 
-    // avoid self target
-    if (character._id.toString() === target._id.toString()) {
-      return false;
-    }
-
     if (target.type === "NPC") {
       socketMessaging.sendErrorMessageToCharacter(character, "You can't cast this spell on a NPC.");
       return false;

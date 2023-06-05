@@ -9,8 +9,8 @@ import {
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
+  MagicPower,
   RangeTypes,
-  RunePower,
 } from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -29,7 +29,7 @@ export const itemHealRune: IRuneItemBlueprint = {
   hasUseWith: true,
   canUseOnNonPVPZone: true,
   useWithMaxDistanceGrid: RangeTypes.Short,
-  power: RunePower.Low,
+  power: MagicPower.Low,
   minMagicLevelRequired: 8,
   canSell: false,
   animationKey: AnimationEffectKeys.HitHeal,

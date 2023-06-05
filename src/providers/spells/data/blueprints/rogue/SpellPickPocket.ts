@@ -28,10 +28,6 @@ export const spellPickPocket: Partial<ISpell> = {
   characterClass: [CharacterClass.Rogue],
 
   usableEffect: async (character: ICharacter, target: ICharacter) => {
-    if (character._id.toString() === target._id.toString()) {
-      return false;
-    }
-
     const pickPocket = container.get(PickPocket);
     const socketMessaging = container.get(SocketMessaging);
 
