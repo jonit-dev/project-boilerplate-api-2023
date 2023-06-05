@@ -30,15 +30,15 @@ export const npcElderGolem: Partial<INPC> = {
   skillsToBeRandomized: ["level", "strength", "dexterity"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 18,
+    level: 35,
     strength: {
-      level: 15,
+      level: 25,
     },
     dexterity: {
-      level: 3,
+      level: 10,
     },
     resistance: {
-      level: 15,
+      level: 25,
     },
   },
   loots: [

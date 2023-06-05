@@ -29,22 +29,24 @@ export class CharacterBuffActivator {
 
   public async enablePermanentBuff(
     character: ICharacter,
-    buff: ICharacterPermanentBuff
+    buff: ICharacterPermanentBuff,
+    noMessage?: boolean
   ): Promise<ICharacterBuff | undefined> {
-    return await this.enableBuff(character, buff);
+    return await this.enableBuff(character, buff, noMessage);
   }
 
   public async disableBuff(
     character: ICharacter,
     buffId: string,
-    type: CharacterBuffType
+    type: CharacterBuffType,
+    noMessage?: boolean
   ): Promise<boolean | undefined> {
     switch (type) {
       case CharacterBuffType.CharacterAttribute:
-        return await this.characterBuffCharacterAttribute.disableBuff(character, buffId);
+        return await this.characterBuffCharacterAttribute.disableBuff(character, buffId, noMessage);
 
       case CharacterBuffType.Skill:
-        return await this.characterBuffSkill.disableBuff(character, buffId);
+        return await this.characterBuffSkill.disableBuff(character, buffId, noMessage);
     }
   }
 
@@ -81,11 +83,12 @@ export class CharacterBuffActivator {
 
   private async enableBuff(
     character: ICharacter,
-    buff: ICharacterPermanentBuff | ICharacterTemporaryBuff
+    buff: ICharacterPermanentBuff | ICharacterTemporaryBuff,
+    noMessage?: boolean
   ): Promise<ICharacterBuff | undefined> {
     switch (buff.type) {
       case "characterAttribute":
-        const newCharBuff = await this.characterBuffCharacterAttribute.enableBuff(character, buff);
+        const newCharBuff = await this.characterBuffCharacterAttribute.enableBuff(character, buff, noMessage);
 
         if (!newCharBuff) {
           throw new Error(`Failed to enable buff with details ${JSON.stringify(buff)}`);
@@ -100,7 +103,7 @@ export class CharacterBuffActivator {
         return newCharBuff;
 
       case "skill":
-        const newSkillBuff = await this.characterBuffSkill.enableBuff(character, buff);
+        const newSkillBuff = await this.characterBuffSkill.enableBuff(character, buff, noMessage);
 
         if (!newSkillBuff) {
           throw new Error(`Failed to enable buff with details ${JSON.stringify(buff)}`);

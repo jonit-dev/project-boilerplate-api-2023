@@ -1,5 +1,13 @@
 import { IEquippableAccessoryTier1Blueprint } from "@providers/item/data/types/TierBlueprintTypes";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  BasicAttribute,
+  CharacterAttributes,
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+} from "@rpg-engine/shared";
 import { AccessoriesBlueprint } from "../../../types/itemsBlueprintTypes";
 
 export const itemFalconsRing: IEquippableAccessoryTier1Blueprint = {
@@ -16,4 +24,31 @@ export const itemFalconsRing: IEquippableAccessoryTier1Blueprint = {
   defense: 6,
   tier: 1,
   allowedEquipSlotType: [ItemSlotType.Ring],
+  equippedBuff: [
+    {
+      type: CharacterBuffType.Skill,
+      trait: BasicAttribute.Resistance,
+      buffPercentage: 7,
+      durationType: CharacterBuffDurationType.Permanent,
+      options: {
+        messages: {
+          activation: "You feel the power of resistance flowing through your body. (+7% resistance)",
+          deactivation: "You feel the power of resistance leaving your body. (-7% resistance)",
+        },
+      },
+    },
+    {
+      type: CharacterBuffType.CharacterAttribute,
+      trait: CharacterAttributes.MaxHealth,
+      buffPercentage: 5,
+      durationType: CharacterBuffDurationType.Permanent,
+      options: {
+        messages: {
+          activation: "You feel the power of max health flowing through your body. (+5% MaxHealth)",
+          deactivation: "You feel the power of max health leaving your body. (-5% MaxHealth)",
+        },
+      },
+    },
+  ],
+  equippedBuffDescription: "Increases resistance by 7% and  max health by 5% respectively",
 };

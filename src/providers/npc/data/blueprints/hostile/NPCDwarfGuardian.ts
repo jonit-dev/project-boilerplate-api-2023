@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
   ContainersBlueprint,
+  CraftingResourcesBlueprint,
   DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
@@ -32,15 +33,15 @@ export const npcDwarfGuardian: Partial<INPC> = {
   healthRandomizerDice: Dice.D12,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 26,
+    level: 35,
     strength: {
-      level: 24,
+      level: 30,
     },
     dexterity: {
-      level: 12,
+      level: 15,
     },
     resistance: {
-      level: 25,
+      level: 30,
     },
   },
   fleeOnLowHealth: true,
@@ -99,6 +100,18 @@ export const npcDwarfGuardian: Partial<INPC> = {
     {
       itemBlueprintKey: DaggersBlueprint.VerdantDagger,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SilverOre,
+      chance: 7,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
+      chance: 5,
     },
   ],
 };

@@ -21,6 +21,8 @@ export const itemYggdrasilBow: IEquippableRangedTier5WeaponBlueprint = {
     RangedWeaponsBlueprint.PoisonArrow,
     RangedWeaponsBlueprint.ShockArrow,
     RangedWeaponsBlueprint.GoldenArrow,
+    RangedWeaponsBlueprint.EmeraldArrow,
+    RangedWeaponsBlueprint.CrimsonArrow,
   ],
   isTwoHanded: true,
   rangeType: EntityAttackType.Ranged,

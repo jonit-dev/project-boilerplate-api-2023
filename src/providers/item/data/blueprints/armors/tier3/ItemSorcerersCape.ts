@@ -1,4 +1,11 @@
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  CharacterAttributes,
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+} from "@rpg-engine/shared";
 import { IEquippableArmorTier3Blueprint } from "../../../types/TierBlueprintTypes";
 import { ArmorsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -15,4 +22,17 @@ export const itemSorcerersCape: IEquippableArmorTier3Blueprint = {
   defense: 25,
   tier: 3,
   allowedEquipSlotType: [ItemSlotType.Torso],
+  equippedBuff: {
+    type: CharacterBuffType.CharacterAttribute,
+    trait: CharacterAttributes.MaxMana,
+    buffPercentage: 5,
+    durationType: CharacterBuffDurationType.Permanent,
+    options: {
+      messages: {
+        activation: "You feel the power of max mana flowing through your body. (+5% MaxMana)",
+        deactivation: "You feel the power of max mana leaving your body. (-5% MaxMana)",
+      },
+    },
+  },
+  equippedBuffDescription: "Increases max mana by 5%",
 };

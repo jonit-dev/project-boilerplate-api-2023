@@ -27,10 +27,10 @@ export const recipeRoyalKnightHelmet: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 3],
-      [CraftingResourcesBlueprint.Leather, 2],
-      [CraftingResourcesBlueprint.SilverIngot, 2],
-      [CraftingResourcesBlueprint.BlueFeather, 1],
+      [CraftingResourcesBlueprint.GoldenIngot, 10],
+      [CraftingResourcesBlueprint.Leather, 10],
+      [CraftingResourcesBlueprint.SilverIngot, 10],
+      [CraftingResourcesBlueprint.BlueFeather, 10],
     ]),
   ],
 };

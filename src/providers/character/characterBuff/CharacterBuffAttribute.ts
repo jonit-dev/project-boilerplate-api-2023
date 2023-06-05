@@ -20,7 +20,7 @@ export class CharacterBuffAttribute {
     private textFormatter: TextFormatter
   ) {}
 
-  public async enableBuff(character: ICharacter, buff: ICharacterBuff): Promise<ICharacterBuff> {
+  public async enableBuff(character: ICharacter, buff: ICharacterBuff, noMessage?: boolean): Promise<ICharacterBuff> {
     const { buffAbsoluteChange, updatedTraitValue } = await this.performBuffValueCalculations(character, buff);
 
     // Save the absolute change in the buff object
@@ -30,6 +30,8 @@ export class CharacterBuffAttribute {
 
     const addedBuff = await this.characterBuffTracker.addBuff(character, buff);
 
+    const updatedTraitValueFixed = Number(updatedTraitValue.toFixed(2));
+
     if (!addedBuff) {
       throw new Error("Could not add buff to character");
     }
@@ -38,17 +40,17 @@ export class CharacterBuffAttribute {
     await Character.updateOne(
       { _id: character._id },
       {
-        [buff.trait]: updatedTraitValue,
+        [buff.trait]: updatedTraitValueFixed,
       }
     );
 
     // inform and send update to client
-    this.sendUpdateToClient(character, buff, updatedTraitValue);
+    this.sendUpdateToClient(character, buff, updatedTraitValueFixed, noMessage);
 
     return addedBuff;
   }
 
-  public async disableBuff(character: ICharacter, buffId: string): Promise<boolean> {
+  public async disableBuff(character: ICharacter, buffId: string, noMessage?: boolean): Promise<boolean> {
     const updatedCharacter = await Character.findById(character._id).lean();
 
     if (!updatedCharacter) {
@@ -85,18 +87,50 @@ export class CharacterBuffAttribute {
       }
     );
 
-    if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.skipDeactivationMessage) {
-      this.socketMessaging.sendMessageToCharacter(
-        character,
-        buff.options?.messages?.deactivation ||
-          `Your ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} buff has been removed!`
-      );
+    try {
+      const newCharacter = await Character.findById(character._id).lean();
+
+      // Use destructuring to reduce the repetitive newCharacter
+      const { health, maxHealth, mana, maxMana } = newCharacter || {};
+
+      // Guard clause to avoid nested if statements and extra conditions
+      if (health && maxHealth && health > maxHealth) {
+        await this.updateCharacterAndSendEvent(character, "health", maxHealth);
+      }
+
+      if (mana && maxMana && mana > maxMana) {
+        await this.updateCharacterAndSendEvent(character, "mana", maxMana);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (!noMessage) {
+      if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.skipDeactivationMessage) {
+        this.socketMessaging.sendMessageToCharacter(
+          character,
+          buff.options?.messages?.deactivation ||
+            `Your ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} buff has been removed!`
+        );
+      }
     }
 
     // inform and send update to client
-    this.sendUpdateToClient(character, buff, updatedTraitValue);
+    this.sendUpdateToClient(character, buff, updatedTraitValue, noMessage);
 
     return true;
+  }
+
+  private async updateCharacterAndSendEvent(
+    character: ICharacter,
+    attribute: "health" | "mana",
+    newValue: number
+  ): Promise<void> {
+    await Character.updateOne({ _id: character._id }, { [attribute]: newValue });
+    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, {
+      targetId: character._id,
+      [attribute]: newValue,
+    });
   }
 
   private async performBuffValueCalculations(
@@ -127,9 +161,16 @@ export class CharacterBuffAttribute {
     };
   }
 
-  private sendUpdateToClient(character: ICharacter, buff: ICharacterBuff, updatedTraitValue: number): void {
+  private sendUpdateToClient(
+    character: ICharacter,
+    buff: ICharacterBuff,
+    updatedTraitValue: number,
+    noMessage?: boolean
+  ): void {
     const clientTraitNames = {
       baseSpeed: "speed",
+      maxHealth: "maxHealth",
+      maxMana: "maxMana",
     };
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, {
@@ -137,14 +178,16 @@ export class CharacterBuffAttribute {
       [clientTraitNames[buff.trait]]: updatedTraitValue,
     });
 
-    if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.skipActivationMessage) {
-      this.socketMessaging.sendMessageToCharacter(
-        character,
-        buff.options?.messages?.activation ||
-          `Your ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} has been buffed by ${
-            buff.buffPercentage
-          }%!`
-      );
+    if (!noMessage) {
+      if (!buff.options?.messages?.skipAllMessages && !buff.options?.messages?.skipActivationMessage) {
+        this.socketMessaging.sendMessageToCharacter(
+          character,
+          buff.options?.messages?.activation ||
+            `Your ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} has been buffed by ${
+              buff.buffPercentage
+            }%!`
+        );
+      }
     }
   }
 }

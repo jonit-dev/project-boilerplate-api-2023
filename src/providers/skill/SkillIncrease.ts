@@ -10,6 +10,7 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
+import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
 import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 import {
   BASIC_INCREASE_HEALTH_MANA,
@@ -36,6 +37,7 @@ import {
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import {
   BasicAttribute,
+  CharacterAttributes,
   IIncreaseSPResult,
   IIncreaseXPResult,
   ISkillDetails,
@@ -69,7 +71,8 @@ export class SkillIncrease {
     private characterRaceBonusOrPenalties: CharacterRaceBonusOrPenalties,
     private characterWeight: CharacterWeight,
     private skillMapper: SkillCraftingMapper,
-    private numberFormatter: NumberFormatter
+    private numberFormatter: NumberFormatter,
+    private characterBuffTracker: CharacterBuffTracker
   ) {}
 
   /**
@@ -536,7 +539,7 @@ export class SkillIncrease {
     const increaseRateMagic = 1 + BASIC_INCREASE_HEALTH_MANA * (1 + totalMagic);
     const maxMana = Math.round(baseValue * Math.pow(increaseRateMagic, level - 1));
 
-    const result = await this.updateEntitiesAttributes(character._id, { maxHealth, maxMana });
+    const result = await this.updateEntitiesAttributes(character, { maxHealth, maxMana });
 
     if (!result) {
       throw new Error(`Failed to increase max health and mana. Character ${character._id} not found.`);
@@ -544,30 +547,42 @@ export class SkillIncrease {
   }
 
   private async updateEntitiesAttributes(
-    characterId: Types.ObjectId,
+    character: ICharacter,
     updateAttributes: { maxHealth: number; maxMana: number }
   ): Promise<boolean> {
     const { maxHealth, maxMana } = Object.freeze(updateAttributes);
 
-    const character = (await Character.findOneAndUpdate(
-      { _id: characterId },
-      { maxHealth, maxMana },
+    const allBuffsOnMaxHealth = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
+      character,
+      CharacterAttributes.MaxHealth
+    );
+    const allBuffsOnMaxMana = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
+      character,
+      CharacterAttributes.MaxMana
+    );
+
+    const updatedCharacter = (await Character.findOneAndUpdate(
+      { _id: character._id },
+      { maxHealth: maxHealth + allBuffsOnMaxHealth, maxMana: maxMana + allBuffsOnMaxMana },
       { new: true }
     ).lean()) as ICharacter;
 
-    if (!character) {
+    if (!updatedCharacter) {
       return false;
     }
 
     const payload: ICharacterAttributeChanged = {
-      targetId: character._id,
-      maxHealth,
-      maxMana,
+      targetId: updatedCharacter._id,
+      maxHealth: maxHealth + allBuffsOnMaxHealth,
+      maxMana: maxMana + allBuffsOnMaxMana,
     };
 
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+    this.socketMessaging.sendEventToUser(updatedCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
 
-    if (character.maxHealth === maxHealth && character.maxMana === maxMana) {
+    if (
+      updatedCharacter.maxHealth === maxHealth + allBuffsOnMaxHealth &&
+      updatedCharacter.maxMana === maxMana + allBuffsOnMaxMana
+    ) {
       return true;
     }
 

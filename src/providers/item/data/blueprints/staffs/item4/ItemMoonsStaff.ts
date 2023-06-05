@@ -1,5 +1,9 @@
 import {
   AnimationEffectKeys,
+  BasicAttribute,
+  CharacterAttributes,
+  CharacterBuffDurationType,
+  CharacterBuffType,
   EntityAttackType,
   ItemSlotType,
   ItemSubType,
@@ -23,9 +27,36 @@ export const itemMoonsStaff: IEquippableTwoHandedStaffTier4WeaponBlueprint = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 34,
-  defense: 32,
+  defense: 8,
   tier: 4,
   basePrice: 80,
   maxRange: RangeTypes.Medium,
   isTwoHanded: true,
+  equippedBuff: [
+    {
+      type: CharacterBuffType.CharacterAttribute,
+      trait: CharacterAttributes.MaxMana,
+      buffPercentage: 10,
+      durationType: CharacterBuffDurationType.Permanent,
+      options: {
+        messages: {
+          activation: "You feel the power of max mana flowing through your body. (+10% MaxMana)",
+          deactivation: "You feel the power of max mana leaving your body. (-10% MaxMana)",
+        },
+      },
+    },
+    {
+      type: CharacterBuffType.Skill,
+      trait: BasicAttribute.Magic,
+      buffPercentage: 10,
+      durationType: CharacterBuffDurationType.Permanent,
+      options: {
+        messages: {
+          activation: "You feel the power of magic flowing through your body. (+10% magic)",
+          deactivation: "You feel the power of magic health leaving your body. (-10% magic)",
+        },
+      },
+    },
+  ],
+  equippedBuffDescription: "Increases max mana by 10% and magic by 10% respectively",
 };

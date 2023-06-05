@@ -25,7 +25,7 @@ export const npcScorpion: Partial<INPC> = {
   healthRandomizerDice: Dice.D6,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 3,
+    level: 5,
     strength: {
       level: 3,
     },

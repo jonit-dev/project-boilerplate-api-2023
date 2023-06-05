@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { IEquippableRangedAmmoBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -12,6 +13,8 @@ export const itemEmeraldArrow: IEquippableRangedAmmoBlueprint = {
   attack: 23,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 50,
+  maxStackSize: 100,
   basePrice: 8,
+  entityEffects: [EntityEffectBlueprint.Burning],
+  entityEffectChance: 80,
 };
