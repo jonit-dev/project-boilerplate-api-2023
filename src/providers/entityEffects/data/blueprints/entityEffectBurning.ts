@@ -1,13 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER } from "@providers/constants/EntityEffectsConstants";
+import { CalculateEffectDamage } from "@providers/entityEffects/CalculateEffectDamage";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { TraitGetter } from "@providers/skill/TraitGetter";
-import { AnimationEffectKeys, BasicAttribute } from "@rpg-engine/shared";
+import { AnimationEffectKeys } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import _ from "lodash";
 import { EntityEffectBlueprint } from "../types/entityEffectBlueprintTypes";
 import { IEntityEffect } from "./entityEffect";
 
@@ -21,13 +18,8 @@ export const entityEffectBurning: IEntityEffect = {
   effect: async (target: ICharacter | INPC, attacker: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    const traitGetter = container.get(TraitGetter);
-    const attackerSkills = attacker.skills as unknown as ISkill;
-    const attackerMagicLevel = await traitGetter.getSkillLevelWithBuffs(attackerSkills, BasicAttribute.Magic);
-    const attackerLevel = attackerMagicLevel ?? 1;
-
-    const maxDamage = Math.ceil(attackerLevel * ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER);
-    const effectDamage = _.random(1, maxDamage);
+    const calculateEffectDamage = container.get(CalculateEffectDamage);
+    const effectDamage = await calculateEffectDamage.calculateEffectDamage(attacker, target);
 
     itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
 
