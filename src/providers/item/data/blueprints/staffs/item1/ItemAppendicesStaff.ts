@@ -21,7 +21,7 @@ export const itemAppendicesStaff: IEquippableTwoHandedStaffTier1WeaponBlueprint 
   description:
     "A basic wooden staff used by novice mages learning the fundamentals of magic. It is a simple yet reliable tool for channeling magical energy.",
   attack: 10,
-  defense: 4,
+  defense: 12,
   tier: 1,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

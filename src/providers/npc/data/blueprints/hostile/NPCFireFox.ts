@@ -29,15 +29,15 @@ export const npcFireFox: Partial<INPC> = {
   healthRandomizerDice: Dice.D6,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 30,
+    level: 17,
     strength: {
-      level: 25,
+      level: 20,
     },
     dexterity: {
       level: 25,
     },
     resistance: {
-      level: 20,
+      level: 15,
     },
   },
   fleeOnLowHealth: true,

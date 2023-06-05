@@ -1,4 +1,3 @@
-import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { IEquippableRangedAmmoBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -10,11 +9,9 @@ export const itemFrostArrow: IEquippableRangedAmmoBlueprint = {
   texturePath: "ranged-weapons/frost-arrow.png",
   name: "Frost Arrow",
   description: "An arrow infused with icy energy, chilling enemies on impact.",
-  attack: 19,
+  attack: 25,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 100,
+  maxStackSize: 50,
   basePrice: 10,
-  entityEffects: [EntityEffectBlueprint.Freezing],
-  entityEffectChance: 80,
 };

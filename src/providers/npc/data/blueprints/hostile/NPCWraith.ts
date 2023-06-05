@@ -26,7 +26,7 @@ export const npcWraith: Partial<INPC> = {
   textureKey: HostileNPCsBlueprint.Wraith,
   alignment: NPCAlignment.Hostile,
   speed: MovementSpeed.Fast,
-  baseHealth: 650,
+  baseHealth: 500,
   attackType: EntityAttackType.Melee,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
@@ -80,7 +80,7 @@ export const npcWraith: Partial<INPC> = {
 
     {
       itemBlueprintKey: ContainersBlueprint.Backpack,
-      chance: 10,
+      chance: 50,
     },
 
     {

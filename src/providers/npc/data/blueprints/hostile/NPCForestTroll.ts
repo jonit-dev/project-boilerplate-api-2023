@@ -10,6 +10,7 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   BootsBlueprint,
+  ContainersBlueprint,
   CraftingResourcesBlueprint,
   DaggersBlueprint,
   FoodsBlueprint,
@@ -84,7 +85,10 @@ export const npcForestTroll = {
       itemBlueprintKey: FoodsBlueprint.WildSalmon,
       chance: 30,
     },
-
+    {
+      itemBlueprintKey: ContainersBlueprint.Backpack,
+      chance: 10,
+    },
     {
       itemBlueprintKey: BootsBlueprint.PlateBoots,
       chance: 15,

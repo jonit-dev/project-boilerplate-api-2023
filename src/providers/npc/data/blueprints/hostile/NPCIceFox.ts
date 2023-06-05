@@ -52,11 +52,6 @@ export const npcIceFox: Partial<INPC> = {
       chance: 20,
     },
     {
-      itemBlueprintKey: RangedWeaponsBlueprint.FrostArrow,
-      chance: 20,
-      quantityRange: [10, 20],
-    },
-    {
       itemBlueprintKey: RangedWeaponsBlueprint.FrostCrossbow,
       chance: 5,
     },
@@ -76,6 +71,10 @@ export const npcIceFox: Partial<INPC> = {
     {
       itemBlueprintKey: GlovesBlueprint.ChainGloves,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.GoldenDagger,
+      chance: 3,
     },
     {
       itemBlueprintKey: DaggersBlueprint.FrostDagger,

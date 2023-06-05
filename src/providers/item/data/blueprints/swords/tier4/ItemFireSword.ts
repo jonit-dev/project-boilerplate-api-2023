@@ -1,15 +1,8 @@
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import {
-  BasicAttribute,
-  CharacterBuffDurationType,
-  CharacterBuffType,
-  ItemSlotType,
-  ItemSubType,
-  ItemType,
-} from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
-import { IEquippableMeleeTier4WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { SwordsBlueprint } from "../../../types/itemsBlueprintTypes";
+import { IEquippableMeleeTier4WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 
 export const itemFireSword: IEquippableMeleeTier4WeaponBlueprint = {
   key: SwordsBlueprint.FireSword,
@@ -29,17 +22,4 @@ export const itemFireSword: IEquippableMeleeTier4WeaponBlueprint = {
   basePrice: 74,
   entityEffects: [EntityEffectBlueprint.Burning],
   entityEffectChance: 70,
-  equippedBuff: {
-    type: CharacterBuffType.Skill,
-    trait: BasicAttribute.Strength,
-    buffPercentage: 10,
-    durationType: CharacterBuffDurationType.Permanent,
-    options: {
-      messages: {
-        activation: "You feel the power of strength flowing through your body. (+10% strength)",
-        deactivation: "You feel the power of strength leaving your body. (-10% strength)",
-      },
-    },
-  },
-  equippedBuffDescription: "Increases strength by 10%",
 };

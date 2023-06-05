@@ -62,12 +62,7 @@ export const npcGiantSpider: Partial<INPC> = {
 
     {
       itemBlueprintKey: ContainersBlueprint.Backpack,
-      chance: 25,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GreenOre,
-      chance: 10,
-      quantityRange: [1, 5],
+      chance: 50,
     },
 
     {

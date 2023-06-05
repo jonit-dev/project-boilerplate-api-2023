@@ -8,7 +8,6 @@ import {
   FoodsBlueprint,
   LegsBlueprint,
   RangedWeaponsBlueprint,
-  ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -31,7 +30,7 @@ export const npcKobold: Partial<INPC> = {
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 45,
+    level: 35,
     strength: {
       level: 40,
     },
@@ -81,15 +80,6 @@ export const npcKobold: Partial<INPC> = {
     {
       itemBlueprintKey: SwordsBlueprint.CorruptionSword,
       chance: 2,
-    },
-    {
-      itemBlueprintKey: BootsBlueprint.CopperBoots,
-      chance: 20,
-    },
-
-    {
-      itemBlueprintKey: ShieldsBlueprint.TowerShield,
-      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Burning],

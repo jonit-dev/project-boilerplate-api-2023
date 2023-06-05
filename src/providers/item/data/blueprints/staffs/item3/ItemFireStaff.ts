@@ -22,7 +22,7 @@ export const itemFireStaff: IEquippableTwoHandedStaffTier3WeaponBlueprint = {
   description:
     "A staff imbued with the power of flames, adorned with a glowing fire ember gem at its peak. It is capable of unleashing fiery attacks and generating intense heat.",
   attack: 24,
-  defense: 6,
+  defense: 26,
   tier: 3,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],

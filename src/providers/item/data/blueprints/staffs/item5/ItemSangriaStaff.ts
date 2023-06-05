@@ -1,9 +1,5 @@
 import {
   AnimationEffectKeys,
-  BasicAttribute,
-  CharacterAttributes,
-  CharacterBuffDurationType,
-  CharacterBuffType,
   EntityAttackType,
   ItemSlotType,
   ItemSubType,
@@ -29,63 +25,11 @@ export const itemSangriaStaff: IEquippableTwoHandedStaffTier5WeaponBlueprint = {
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 38,
-  defense: 10,
+  defense: 37,
   tier: 5,
   maxRange: RangeTypes.Medium,
   basePrice: 93,
   isTwoHanded: true,
   entityEffects: [EntityEffectBlueprint.Bleeding],
   entityEffectChance: 80,
-  equippedBuff: [
-    {
-      type: CharacterBuffType.CharacterAttribute,
-      trait: CharacterAttributes.MaxHealth,
-      buffPercentage: 10,
-      durationType: CharacterBuffDurationType.Permanent,
-      options: {
-        messages: {
-          activation: "You feel the power of max health flowing through your body. (+10% MaxHealth)",
-          deactivation: "You feel the power of max health leaving your body. (-10% MaxHealth)",
-        },
-      },
-    },
-    {
-      type: CharacterBuffType.CharacterAttribute,
-      trait: CharacterAttributes.MaxMana,
-      buffPercentage: 10,
-      durationType: CharacterBuffDurationType.Permanent,
-      options: {
-        messages: {
-          activation: "You feel the power of max mana flowing through your body. (+10% MaxMana)",
-          deactivation: "You feel the power of max mana leaving your body. (-10% MaxMana)",
-        },
-      },
-    },
-    {
-      type: CharacterBuffType.Skill,
-      trait: BasicAttribute.Magic,
-      buffPercentage: 10,
-      durationType: CharacterBuffDurationType.Permanent,
-      options: {
-        messages: {
-          activation: "You feel the power of magic flowing through your body. (+10% magic)",
-          deactivation: "You feel the power of magic leaving your body. (-10% magic)",
-        },
-      },
-    },
-    {
-      type: CharacterBuffType.Skill,
-      trait: BasicAttribute.MagicResistance,
-      buffPercentage: 10,
-      durationType: CharacterBuffDurationType.Permanent,
-      options: {
-        messages: {
-          activation: "You feel the power of magic resistance flowing through your body. (+10% MagicResistance)",
-          deactivation: "You feel the power of magic resistance leaving your body. (-10% MagicResistance)",
-        },
-      },
-    },
-  ],
-  equippedBuffDescription:
-    "Increases max health by 10%, max mana by 10%, magic by 10% and magic resistance by 10% respectively",
 };

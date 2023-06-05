@@ -22,8 +22,6 @@ export const itemValkyriesBow: IEquippableRangedTier5WeaponBlueprint = {
     RangedWeaponsBlueprint.PoisonArrow,
     RangedWeaponsBlueprint.ShockArrow,
     RangedWeaponsBlueprint.GoldenArrow,
-    RangedWeaponsBlueprint.EmeraldArrow,
-    RangedWeaponsBlueprint.CrimsonArrow,
   ],
   tier: 5,
   isTwoHanded: true,

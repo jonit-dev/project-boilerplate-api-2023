@@ -25,7 +25,7 @@ export class CharacterBuffSkill {
     private textFormatter: TextFormatter
   ) {}
 
-  public async enableBuff(character: ICharacter, buff: ICharacterBuff, noMessage?: boolean): Promise<ICharacterBuff> {
+  public async enableBuff(character: ICharacter, buff: ICharacterBuff): Promise<ICharacterBuff> {
     const skill = await Skill.findById(character.skills);
 
     if (!skill) {
@@ -46,12 +46,12 @@ export class CharacterBuffSkill {
       throw new Error("Could not add buff to character");
     }
 
-    await this.sendUpdateToClient(character, buff, "activation", noMessage);
+    await this.sendUpdateToClient(character, buff, "activation");
 
     return addedBuff;
   }
 
-  public async disableBuff(character: ICharacter, buffId: string, noMessage?: boolean): Promise<boolean> {
+  public async disableBuff(character: ICharacter, buffId: string): Promise<boolean> {
     const skills = await Skill.findById(character.skills);
 
     if (!skills) {
@@ -73,7 +73,7 @@ export class CharacterBuffSkill {
       throw new Error("Could not delete buff from character");
     }
 
-    await this.sendUpdateToClient(character, buff, "deactivation", noMessage);
+    await this.sendUpdateToClient(character, buff, "deactivation");
 
     return true;
   }
@@ -113,8 +113,7 @@ export class CharacterBuffSkill {
   private async sendUpdateToClient(
     character: ICharacter,
     buff: ICharacterBuff,
-    type: "activation" | "deactivation",
-    noMessage?: boolean
+    type: "activation" | "deactivation"
   ): Promise<void> {
     const skill = await Skill.findByIdWithBuffs(character.skills);
 
@@ -126,9 +125,7 @@ export class CharacterBuffSkill {
       skill,
     });
 
-    if (!noMessage) {
-      this.sendCharacterActivationDeactivationMessage(character, buff, type);
-    }
+    this.sendCharacterActivationDeactivationMessage(character, buff, type);
   }
 
   private sendCharacterActivationDeactivationMessage(

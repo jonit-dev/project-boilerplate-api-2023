@@ -1,11 +1,4 @@
-import {
-  CharacterAttributes,
-  CharacterBuffDurationType,
-  CharacterBuffType,
-  ItemSlotType,
-  ItemSubType,
-  ItemType,
-} from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { IEquippableLightArmorTier3Blueprint } from "../../../types/TierBlueprintTypes";
 import { BootsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -22,17 +15,4 @@ export const itemRoyalBoots: IEquippableLightArmorTier3Blueprint = {
   weight: 0.5,
   allowedEquipSlotType: [ItemSlotType.Feet],
   basePrice: 73,
-  equippedBuff: {
-    type: CharacterBuffType.CharacterAttribute,
-    trait: CharacterAttributes.Speed,
-    buffPercentage: 5,
-    durationType: CharacterBuffDurationType.Permanent,
-    options: {
-      messages: {
-        activation: "You feel the power of speed and quickness flowing through your body. (+5 speed)",
-        deactivation: "You feel the power of speed and quickness leaving your body. (-5% speed)",
-      },
-    },
-  },
-  equippedBuffDescription: "Increases speed by 5%",
 };

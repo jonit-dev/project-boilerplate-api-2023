@@ -60,7 +60,7 @@ describe("CharacterBuffActivator", () => {
     expect(buffId).toBeDefined();
 
     expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledTimes(1);
-    expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledWith(testCharacter, buff, undefined);
+    expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledWith(testCharacter, buff);
   });
 
   it("should enable a skill buff", async () => {
@@ -76,7 +76,7 @@ describe("CharacterBuffActivator", () => {
 
     expect(buffId).toBeDefined();
     expect(characterBuffSkillSpy).toHaveBeenCalledTimes(1);
-    expect(characterBuffSkillSpy).toHaveBeenCalledWith(testCharacter, buff, undefined);
+    expect(characterBuffSkillSpy).toHaveBeenCalledWith(testCharacter, buff);
   });
 
   it("should disable a character attribute buff", async () => {
@@ -90,7 +90,7 @@ describe("CharacterBuffActivator", () => {
     const enabledBuff = await characterBuffActivator.enablePermanentBuff(testCharacter, buff);
 
     expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledTimes(1);
-    expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledWith(testCharacter, buff, undefined);
+    expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledWith(testCharacter, buff);
 
     if (!enabledBuff) {
       throw new Error("Buff ID is undefined");
@@ -138,7 +138,7 @@ describe("CharacterBuffActivator", () => {
     // Add assertions to check if the buff has been applied correctly
 
     expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledTimes(1);
-    expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledWith(testCharacter, buff, undefined);
+    expect(characterBuffCharacterAttributeSpy).toHaveBeenCalledWith(testCharacter, buff);
 
     jest.advanceTimersByTime(buff.durationSeconds * 1000);
 

@@ -24,7 +24,7 @@ export const itemFireWand: IEquippableTwoHandedStaffTier1WeaponBlueprint = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 12,
-  defense: 4,
+  defense: 11,
   tier: 1,
   maxRange: RangeTypes.Medium,
   basePrice: 60,

@@ -23,7 +23,7 @@ export const itemSoulStaff: IEquippableTwoHandedStaffTier2WeaponBlueprint = {
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 16,
-  defense: 4,
+  defense: 16,
   tier: 2,
   maxRange: RangeTypes.Medium,
   basePrice: 55,

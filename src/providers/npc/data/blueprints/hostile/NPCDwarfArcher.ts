@@ -28,7 +28,7 @@ export const npcDwarfArcher: Partial<INPC> = {
   healthRandomizerDice: Dice.D12,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 20,
+    level: 17,
     strength: {
       level: 14,
     },
@@ -93,6 +93,10 @@ export const npcDwarfArcher: Partial<INPC> = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.SilverOre,
       chance: 7,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
+      chance: 5,
     },
   ],
 };

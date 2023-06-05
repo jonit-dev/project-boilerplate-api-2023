@@ -24,7 +24,7 @@ export const itemSkyBlueStaff: IEquippableTwoHandedStaffTier4WeaponBlueprint = {
   weight: 1.2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 30,
-  defense: 7,
+  defense: 33,
   tier: 4,
   maxRange: RangeTypes.Medium,
   basePrice: 85,

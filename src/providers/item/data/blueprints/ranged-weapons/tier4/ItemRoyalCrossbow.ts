@@ -1,13 +1,4 @@
-import {
-  CharacterAttributes,
-  CharacterBuffDurationType,
-  CharacterBuffType,
-  CombatSkill,
-  ItemSlotType,
-  ItemSubType,
-  ItemType,
-  RangeTypes,
-} from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { IEquippableRangedTier4WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
@@ -26,7 +17,7 @@ export const itemRoyalCrossbow: IEquippableRangedTier4WeaponBlueprint = {
   attack: 33,
   tier: 4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  maxRange: RangeTypes.High,
+  maxRange: 9,
   requiredAmmoKeys: [
     RangedWeaponsBlueprint.Bolt,
     RangedWeaponsBlueprint.ElvenBolt,
@@ -35,31 +26,4 @@ export const itemRoyalCrossbow: IEquippableRangedTier4WeaponBlueprint = {
   ],
   isTwoHanded: true,
   basePrice: 95,
-  equippedBuff: [
-    {
-      type: CharacterBuffType.Skill,
-      trait: CombatSkill.Distance,
-      buffPercentage: 10,
-      durationType: CharacterBuffDurationType.Permanent,
-      options: {
-        messages: {
-          activation: "You feel the power of distance flowing through your body. (+10% distance)",
-          deactivation: "You feel the power of distance leaving your body. (-10% distance)",
-        },
-      },
-    },
-    {
-      type: CharacterBuffType.CharacterAttribute,
-      trait: CharacterAttributes.Speed,
-      buffPercentage: 3,
-      durationType: CharacterBuffDurationType.Permanent,
-      options: {
-        messages: {
-          activation: "You feel the power of speed flowing through your body. (+3% speed)",
-          deactivation: "You feel the power of speed leaving your body. (-3% speed)",
-        },
-      },
-    },
-  ],
-  equippedBuffDescription: "Increases distance by 10% and speed by 3% respectively",
 };

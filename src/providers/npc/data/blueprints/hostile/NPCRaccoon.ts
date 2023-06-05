@@ -25,7 +25,7 @@ export const npcRaccoon: Partial<INPC> = {
   healthRandomizerDice: Dice.D6,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 3,
+    level: 1,
     strength: {
       level: 3,
     },

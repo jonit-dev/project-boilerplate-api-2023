@@ -25,7 +25,7 @@ export const itemAquaStaff: IEquippableTwoHandedStaffTier2WeaponBlueprint = {
   weight: 1.3,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 18,
-  defense: 4,
+  defense: 16,
   tier: 2,
   basePrice: 85,
   isTwoHanded: true,

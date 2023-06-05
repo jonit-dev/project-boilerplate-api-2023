@@ -1,11 +1,4 @@
-import {
-  BasicAttribute,
-  CharacterBuffDurationType,
-  CharacterBuffType,
-  ItemSlotType,
-  ItemSubType,
-  ItemType,
-} from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { IEquippableAccessoryTier1Blueprint } from "../../../types/TierBlueprintTypes";
 import { AccessoriesBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -24,17 +17,4 @@ export const itemIronRing: IEquippableAccessoryTier1Blueprint = {
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Ring],
   basePrice: 30,
-  equippedBuff: {
-    type: CharacterBuffType.Skill,
-    trait: BasicAttribute.Resistance,
-    buffPercentage: 2,
-    durationType: CharacterBuffDurationType.Permanent,
-    options: {
-      messages: {
-        activation: "You feel the power of resistance flowing through your body. (+2% resistance)",
-        deactivation: "You feel the power of resistance leaving your body. (-2% resistance)",
-      },
-    },
-  },
-  equippedBuffDescription: "Increases resistance by 2%",
 };

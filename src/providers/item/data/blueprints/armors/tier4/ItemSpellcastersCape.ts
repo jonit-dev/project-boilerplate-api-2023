@@ -1,12 +1,4 @@
-import {
-  BasicAttribute,
-  CharacterAttributes,
-  CharacterBuffDurationType,
-  CharacterBuffType,
-  ItemSlotType,
-  ItemSubType,
-  ItemType,
-} from "@rpg-engine/shared";
+import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { IEquippableArmorTier4Blueprint } from "../../../types/TierBlueprintTypes";
 import { ArmorsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -23,31 +15,4 @@ export const itemSpellcastersCape: IEquippableArmorTier4Blueprint = {
   defense: 30,
   tier: 4,
   allowedEquipSlotType: [ItemSlotType.Torso],
-  equippedBuff: [
-    {
-      type: CharacterBuffType.Skill,
-      trait: BasicAttribute.Resistance,
-      buffPercentage: 5,
-      durationType: CharacterBuffDurationType.Permanent,
-      options: {
-        messages: {
-          activation: "You feel the power of resistance flowing through your body. (+5% resistance)",
-          deactivation: "You feel the power of resistance leaving your body. (-5% resistance)",
-        },
-      },
-    },
-    {
-      type: CharacterBuffType.CharacterAttribute,
-      trait: CharacterAttributes.MaxMana,
-      buffPercentage: 10,
-      durationType: CharacterBuffDurationType.Permanent,
-      options: {
-        messages: {
-          activation: "You feel the power of max mana flowing through your body. (+10% MaxMana)",
-          deactivation: "You feel the power of max mana leaving your body. (-10% MaxMana)",
-        },
-      },
-    },
-  ],
-  equippedBuffDescription: "Increases resistance by 5% and max mana by 10% respectively",
 };

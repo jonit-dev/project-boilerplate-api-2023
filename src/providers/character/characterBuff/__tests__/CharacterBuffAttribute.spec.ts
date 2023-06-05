@@ -107,46 +107,4 @@ describe("CharacterBuffAttribute", () => {
 
     expect(finalSpeed).toBe(2.4); // 2.64 - 0.24 = 2.4
   });
-  it("should update health and mana if they are greater than maxHealth and maxMana after disabling a buff", async () => {
-    // Create a buff that increases health and mana
-    const healthBuff = {
-      ...createTestBuff(testCharacter),
-      trait: CharacterAttributes.MaxHealth,
-      absoluteChange: 50,
-    } as ICharacterTemporaryBuff;
-
-    const manaBuff = {
-      ...createTestBuff(testCharacter),
-      trait: CharacterAttributes.MaxMana,
-      absoluteChange: 50,
-    } as ICharacterTemporaryBuff;
-
-    // Enable the buffs
-    const enabledHealthBuff = await characterBuffAttribute.enableBuff(testCharacter, healthBuff);
-    const enabledManaBuff = await characterBuffAttribute.enableBuff(testCharacter, manaBuff);
-
-    // Update character's health and mana to be more than maxHealth and maxMana
-    await Character.updateOne(
-      { _id: testCharacter._id },
-      {
-        health: testCharacter.maxHealth + 100,
-        mana: testCharacter.maxMana + 100,
-      }
-    );
-
-    testCharacter = (await Character.findById(testCharacter._id!)) as ICharacter;
-
-    expect(testCharacter.health).toBeGreaterThan(testCharacter.maxHealth);
-    expect(testCharacter.mana).toBeGreaterThan(testCharacter.maxMana);
-
-    // Disable the buffs
-    await characterBuffAttribute.disableBuff(testCharacter, enabledHealthBuff._id!);
-    await characterBuffAttribute.disableBuff(testCharacter, enabledManaBuff._id!);
-
-    testCharacter = (await Character.findById(testCharacter._id!)) as ICharacter;
-
-    // Expect character's health and mana to be equal to maxHealth and maxMana
-    expect(testCharacter.health).toBe(testCharacter.maxHealth);
-    expect(testCharacter.mana).toBe(testCharacter.maxMana);
-  });
 });

@@ -20,7 +20,6 @@ export const itemElmReflexBow: IEquippableRangedTier3WeaponBlueprint = {
     RangedWeaponsBlueprint.Arrow,
     RangedWeaponsBlueprint.IronArrow,
     RangedWeaponsBlueprint.PoisonArrow,
-    RangedWeaponsBlueprint.FrostArrow,
   ],
   isTwoHanded: true,
   basePrice: 70,

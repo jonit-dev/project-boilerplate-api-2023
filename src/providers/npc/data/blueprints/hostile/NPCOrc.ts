@@ -35,9 +35,9 @@ export const npcOrc = {
   healthRandomizerDice: Dice.D6,
   canSwitchToRandomTarget: true,
   skills: {
-    level: 12,
+    level: 10,
     strength: {
-      level: 11,
+      level: 7,
     },
     dexterity: {
       level: 7,

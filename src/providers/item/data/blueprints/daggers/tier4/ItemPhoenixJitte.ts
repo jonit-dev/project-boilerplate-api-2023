@@ -1,13 +1,4 @@
-import {
-  BasicAttribute,
-  CharacterBuffDurationType,
-  CharacterBuffType,
-  CombatSkill,
-  EntityAttackType,
-  ItemSlotType,
-  ItemSubType,
-  ItemType,
-} from "@rpg-engine/shared";
+import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { IEquippableMeleeTier4WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { DaggersBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -27,31 +18,4 @@ export const itemPhoenixJitte: IEquippableMeleeTier4WeaponBlueprint = {
   tier: 4,
   rangeType: EntityAttackType.Melee,
   basePrice: 67,
-  equippedBuff: [
-    {
-      type: CharacterBuffType.Skill,
-      trait: BasicAttribute.Dexterity,
-      buffPercentage: 10,
-      durationType: CharacterBuffDurationType.Permanent,
-      options: {
-        messages: {
-          activation: "You feel the power of dexterity flowing through your body. (+10% dexterity)",
-          deactivation: "You feel the power of dexterity leaving your body. (-10% dexterity)",
-        },
-      },
-    },
-    {
-      type: CharacterBuffType.Skill,
-      trait: CombatSkill.Dagger,
-      buffPercentage: 5,
-      durationType: CharacterBuffDurationType.Permanent,
-      options: {
-        messages: {
-          activation: "You feel the power of dagger flowing through your body. (+5% dagger)",
-          deactivation: "You feel the power of dagger leaving your body. (-5% dagger)",
-        },
-      },
-    },
-  ],
-  equippedBuffDescription: "Increases dexterity by 10% and dagger by 5% respectively",
 };

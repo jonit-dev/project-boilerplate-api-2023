@@ -3,6 +3,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
   BootsBlueprint,
+  CraftingResourcesBlueprint,
   GlovesBlueprint,
   MacesBlueprint,
   OthersBlueprint,
@@ -85,6 +86,18 @@ export const npcDwarf = {
 
     {
       itemBlueprintKey: SwordsBlueprint.Sword,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SilverOre,
+      chance: 7,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
       chance: 5,
     },
   ],

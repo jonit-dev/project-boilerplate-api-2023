@@ -16,7 +16,7 @@ import {
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateMoveTowardsMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment, RangeTypes } from "@rpg-engine/shared";
+import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
 export const npcGorgok = {
@@ -27,14 +27,14 @@ export const npcGorgok = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.MeleeRanged,
   ammoKey: RangedWeaponsBlueprint.IronArrow,
-  maxRangeAttack: RangeTypes.High,
+  maxRangeAttack: 10,
   speed: MovementSpeed.Fast,
   baseHealth: 1500,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 150,
+    level: 80,
     strength: {
       level: 45,
     },

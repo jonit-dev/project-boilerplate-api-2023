@@ -9,9 +9,9 @@ export const itemGoldenArrow: IEquippableRangedAmmoBlueprint = {
   texturePath: "ranged-weapons/golden-arrow.png",
   name: "Golden Arrow",
   description: "An arrow made of pure gold that deals extra damage to enemies weak to gold.",
-  attack: 28,
+  attack: 20,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 100,
+  maxStackSize: 50,
   basePrice: 3,
 };
