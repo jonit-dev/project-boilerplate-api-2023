@@ -260,7 +260,7 @@ export class SpellCast {
   private getSpell(magicWords: string): any {
     for (const key in spellsBlueprints) {
       const spell = spellsBlueprints[key];
-      if (spell.magicWords.toLocaleLowerCase() === magicWords.toLocaleLowerCase()) {
+      if (spell.magicWords === magicWords.toLocaleLowerCase()) {
         return spell;
       }
     }

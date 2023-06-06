@@ -23,8 +23,6 @@ export default class SpellCoolDown {
   }
 
   public async setSpellCooldown(characterId: Types.ObjectId, magicWords: string, cooldown: number): Promise<boolean> {
-    magicWords = magicWords.toLowerCase();
-
     this.validateArguments(characterId, magicWords, cooldown);
 
     const key = this.getNamespaceKey(magicWords);
