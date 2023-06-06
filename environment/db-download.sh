@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # define variables for VPS and backup file locations
-VPS_HOST="europe-ssh.definya.com"
+VPS_HOST="na-ssh.definya.com"
 VPS_USER="jonit"
-BACKUP_PATH="/home/jonit/rpg-engine/rpg-api/environment/backups/db-dump.zip"
+BACKUP_PATH="/home/jonit/definya/api/environment/backups/db-dump.zip"
 LOCAL_DOWNLOAD_DIR="./environment/backups"
 LOCAL_DOWNLOAD_PATH="$LOCAL_DOWNLOAD_DIR/db-dump.zip"
 
