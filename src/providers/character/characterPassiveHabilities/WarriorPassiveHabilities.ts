@@ -24,6 +24,10 @@ export class WarriorPassiveHabilities {
   ) {}
 
   public async warriorAutoRegenHealthHandler(character: ICharacter): Promise<void> {
+    if (!character) {
+      return;
+    }
+
     const { _id, skills, health, maxHealth } = character;
 
     if (character.class !== CharacterClass.Warrior) {

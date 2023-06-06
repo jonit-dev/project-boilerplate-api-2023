@@ -49,6 +49,12 @@ export class CharacterMonitor {
 
         if (callback) {
           const character = (await Character.findOne({ _id: characterId }).lean()) as ICharacter;
+
+          if (!character) {
+            this.charactersCallbacks.delete(characterId);
+            continue;
+          }
+
           callback(character);
         }
       }

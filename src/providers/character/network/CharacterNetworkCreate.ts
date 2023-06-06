@@ -157,10 +157,7 @@ export class CharacterNetworkCreate {
     );
   }
 
-  private async sendCreatedMessageToCharacterCreator(
-    channelId: string,
-    dataFromServer: ICharacterCreateFromServer
-  ): Promise<void> {
+  private sendCreatedMessageToCharacterCreator(channelId: string, dataFromServer: ICharacterCreateFromServer): void {
     this.socketMessaging.sendEventToUser<ICharacterCreateFromServer>(
       channelId,
       CharacterSocketEvents.CharacterCreate,
@@ -233,6 +230,10 @@ export class CharacterNetworkCreate {
   }
 
   private async handleCharacterRegen(character: ICharacter): Promise<void> {
+    if (!character) {
+      return;
+    }
+
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
     const healthKey = SpellsBlueprint.HealthRegenSell;
     const manaKey = SpellsBlueprint.ManaRegenSpell;
