@@ -1,5 +1,13 @@
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  BasicAttribute,
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  CombatSkill,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+} from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { IEquippableMeleeTier4WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { DaggersBlueprint } from "../../../types/itemsBlueprintTypes";
@@ -22,4 +30,43 @@ export const itemHellishDagger: IEquippableMeleeTier4WeaponBlueprint = {
   basePrice: 57,
   entityEffects: [EntityEffectBlueprint.Burning],
   entityEffectChance: 80,
+  equippedBuff: [
+    {
+      type: CharacterBuffType.Skill,
+      trait: BasicAttribute.Resistance,
+      buffPercentage: 5,
+      durationType: CharacterBuffDurationType.Permanent,
+      options: {
+        messages: {
+          activation: "You feel the power of resistance flowing through your body. (+5% resistance)",
+          deactivation: "You feel the power of resistance leaving your body. (-5% resistance)",
+        },
+      },
+    },
+    {
+      type: CharacterBuffType.Skill,
+      trait: CombatSkill.Dagger,
+      buffPercentage: 5,
+      durationType: CharacterBuffDurationType.Permanent,
+      options: {
+        messages: {
+          activation: "You feel the power of dagger flowing through your body. (+5% dagger)",
+          deactivation: "You feel the power of dagger leaving your body. (-5% dagger)",
+        },
+      },
+    },
+    {
+      type: CharacterBuffType.Skill,
+      trait: BasicAttribute.Dexterity,
+      buffPercentage: 5,
+      durationType: CharacterBuffDurationType.Permanent,
+      options: {
+        messages: {
+          activation: "You feel the power of dexterity flowing through your body. (+5% dexterity)",
+          deactivation: "You feel the power of dexterity leaving your body. (-5% dexterity)",
+        },
+      },
+    },
+  ],
+  equippedBuffDescription: "Increases resistance by 5%, dagger by 5% and dexterity by 5% respectively",
 };

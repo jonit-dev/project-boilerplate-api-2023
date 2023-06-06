@@ -214,13 +214,38 @@ describe("CharacterBuffTracker", () => {
     const retrievedBuff = await characterBuffTracker.getBuffByItemId(testCharacter, "test-item-id");
 
     expect(retrievedBuff).toBeDefined();
-    expect(retrievedBuff).toMatchObject(testBuff);
+    expect(retrievedBuff).toMatchObject([testBuff]);
   });
 
-  it("should return undefined if buff with item ID is not found", async () => {
+  it("should get multiple buffs by item ID", async () => {
+    // Create test buffs
+    const testBuff1 = {
+      ...createTestBuff(),
+      itemId: "test-item-id",
+    } as unknown as ICharacterItemBuff;
+
+    const testBuff2 = {
+      ...createTestBuff(),
+      itemId: "test-item-id",
+    } as unknown as ICharacterItemBuff;
+
+    // Add test buffs to character
+    await characterBuffTracker.addBuff(testCharacter, testBuff1);
+    await characterBuffTracker.addBuff(testCharacter, testBuff2);
+
+    // Get buffs by item ID
+    const retrievedBuffs = await characterBuffTracker.getBuffByItemId(testCharacter, "test-item-id");
+
+    // Assertions
+    expect(retrievedBuffs).toBeDefined();
+    expect(retrievedBuffs.length).toBe(2);
+    expect(retrievedBuffs).toMatchObject([testBuff1, testBuff2]);
+  });
+
+  it("should return empty array if buff with item ID is not found", async () => {
     const retrievedBuff = await characterBuffTracker.getBuffByItemId(testCharacter, "nonexistent-item-id");
 
-    expect(retrievedBuff).toBeUndefined();
+    expect(retrievedBuff).toEqual([]);
   });
 
   it("should get buff by item key", async () => {

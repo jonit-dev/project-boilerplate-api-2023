@@ -26,7 +26,7 @@ export const itemEmberward: IEquippableTwoHandedStaffTier3WeaponBlueprint = {
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 25,
-  defense: 23,
+  defense: 6,
   tier: 3,
   basePrice: 86,
   isTwoHanded: true,

@@ -1,5 +1,13 @@
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import { ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
+import {
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  CombatSkill,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+} from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { IEquippableRangedTier4WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
@@ -29,4 +37,17 @@ export const itemHellishBow: IEquippableRangedTier4WeaponBlueprint = {
   basePrice: 70,
   entityEffects: [EntityEffectBlueprint.Burning],
   entityEffectChance: 90,
+  equippedBuff: {
+    type: CharacterBuffType.Skill,
+    trait: CombatSkill.Distance,
+    buffPercentage: 7,
+    durationType: CharacterBuffDurationType.Permanent,
+    options: {
+      messages: {
+        activation: "You feel the power of distance flowing through your body. (+7% distance)",
+        deactivation: "You feel the power of distance leaving your body. (-7% distance)",
+      },
+    },
+  },
+  equippedBuffDescription: "Increases distance by 7%",
 };

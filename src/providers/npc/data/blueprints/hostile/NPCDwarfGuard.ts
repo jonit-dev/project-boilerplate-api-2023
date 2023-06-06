@@ -49,7 +49,6 @@ export const npcDwarfGuard = {
       itemBlueprintKey: BootsBlueprint.Boots,
       chance: 30,
     },
-
     {
       itemBlueprintKey: ToolsBlueprint.FishingRod,
       chance: 20,
@@ -88,11 +87,6 @@ export const npcDwarfGuard = {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
       chance: 1,
     },
-
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.ObsidiumOre,
-      chance: 5,
-    },
     {
       itemBlueprintKey: SpearsBlueprint.Javelin,
       chance: 5,
@@ -100,18 +94,6 @@ export const npcDwarfGuard = {
     {
       itemBlueprintKey: ShieldsBlueprint.DwarvenShield,
       chance: 20,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
-      chance: 5,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.SilverOre,
-      chance: 7,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
-      chance: 5,
     },
   ],
 } as Partial<INPC>;

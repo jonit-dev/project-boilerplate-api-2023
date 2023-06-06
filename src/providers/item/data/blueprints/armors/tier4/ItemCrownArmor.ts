@@ -1,4 +1,11 @@
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  BasicAttribute,
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+} from "@rpg-engine/shared";
 import { IEquippableArmorTier4Blueprint } from "../../../types/TierBlueprintTypes";
 import { ArmorsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -16,4 +23,17 @@ export const itemCrownArmor: IEquippableArmorTier4Blueprint = {
   weight: 3,
   allowedEquipSlotType: [ItemSlotType.Torso],
   basePrice: 200,
+  equippedBuff: {
+    type: CharacterBuffType.Skill,
+    trait: BasicAttribute.Resistance,
+    buffPercentage: 5,
+    durationType: CharacterBuffDurationType.Permanent,
+    options: {
+      messages: {
+        activation: "You feel the power of resistance flowing through your body. (+5% resistance)",
+        deactivation: "You feel the power of resistance leaving your body. (-5% resistance)",
+      },
+    },
+  },
+  equippedBuffDescription: "Increases resistance by 5%",
 };

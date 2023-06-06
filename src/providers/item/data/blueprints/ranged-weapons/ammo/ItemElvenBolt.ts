@@ -13,7 +13,7 @@ export const itemElvenBolt: IEquippableRangedAmmoBlueprint = {
   attack: 16,
   weight: 0.03,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 105,
+  maxStackSize: 100,
   basePrice: 7,
   canSell: false,
 };

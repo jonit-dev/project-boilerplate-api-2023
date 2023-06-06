@@ -1,5 +1,4 @@
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
-
 import { IEquippableRangedTier5WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { RangedWeaponsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -23,6 +22,8 @@ export const itemZephyrusBow: IEquippableRangedTier5WeaponBlueprint = {
     RangedWeaponsBlueprint.PoisonArrow,
     RangedWeaponsBlueprint.ShockArrow,
     RangedWeaponsBlueprint.GoldenArrow,
+    RangedWeaponsBlueprint.EmeraldArrow,
+    RangedWeaponsBlueprint.CrimsonArrow,
   ],
   isTwoHanded: true,
   basePrice: 120,

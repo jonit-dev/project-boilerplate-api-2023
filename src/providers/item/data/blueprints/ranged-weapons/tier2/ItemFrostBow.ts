@@ -18,7 +18,7 @@ export const itemFrostBow: IEquippableRangedTier2WeaponBlueprint = {
   tier: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   maxRange: RangeTypes.Medium,
-  requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow],
+  requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow, RangedWeaponsBlueprint.FrostArrow],
   isTwoHanded: true,
   basePrice: 87,
   entityEffects: [EntityEffectBlueprint.Freezing],

@@ -34,12 +34,12 @@ export const npcIceTroll: Partial<INPC> = {
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToRandomTarget: true,
   skills: {
-    level: 25,
+    level: 40,
     strength: {
-      level: 24,
+      level: 30,
     },
     dexterity: {
-      level: 13,
+      level: 15,
     },
     resistance: {
       level: 30,

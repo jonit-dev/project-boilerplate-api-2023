@@ -8,7 +8,9 @@ import {
   LegsBlueprint,
   PotionsBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
   SpearsBlueprint,
+  StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateMoveTowardsMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -76,6 +78,27 @@ export const npcAsterion = {
     {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,
       chance: 60,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.CopperBoots,
+      chance: 20,
+    },
+
+    {
+      itemBlueprintKey: ShieldsBlueprint.TowerShield,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.RoyalSpear,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.SkyBlueStaff,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.TartarusStaff,
+      chance: 1,
     },
   ],
 } as Partial<INPC>;

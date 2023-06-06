@@ -1,19 +1,24 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { itemsBlueprintIndex } from "@providers/item/data";
-import { ICharacterItemBuff, IEquippableItemBlueprint } from "@rpg-engine/shared";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { ICharacterItemBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBuffActivator } from "./CharacterBuffActivator";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
 @provide(CharacterItemBuff)
 export class CharacterItemBuff {
-  constructor(private characterBuff: CharacterBuffActivator, private characterBuffTracker: CharacterBuffTracker) {}
+  constructor(
+    private characterBuff: CharacterBuffActivator,
+    private characterBuffTracker: CharacterBuffTracker,
+    private socketMessaging: SocketMessaging
+  ) {}
 
   public async enableItemBuff(character: ICharacter, item: IItem): Promise<void> {
-    const itemBlueprint = itemsBlueprintIndex[item.baseKey] as IEquippableItemBlueprint;
+    const itemBlueprint = itemsBlueprintIndex[item.baseKey];
 
-    if (!itemBlueprint?.equippedBuff) {
+    if (!itemBlueprint || !itemBlueprint.equippedBuff) {
       return;
     }
 
@@ -21,24 +26,48 @@ export class CharacterItemBuff {
       ? itemBlueprint.equippedBuff
       : [itemBlueprint.equippedBuff];
 
-    for (const buff of equippedBuffs) {
-      const buffData = {
-        ...buff,
-        itemId: item._id,
-        itemKey: item.baseKey,
-      } as ICharacterItemBuff;
+    try {
+      const messages: string[] = await Promise.all(
+        equippedBuffs.map(async (buff) => {
+          const buffData: ICharacterItemBuff = {
+            ...buff,
+            itemId: item._id,
+            itemKey: item.baseKey,
+          };
 
-      await this.characterBuff.enablePermanentBuff(character, buffData);
+          await this.characterBuff.enablePermanentBuff(character, buffData, true);
+          return buffData.options?.messages?.activation || "";
+        })
+      );
+
+      this.socketMessaging.sendMessageToCharacter(character, messages.join(" "));
+    } catch (error) {
+      console.error(`An error occurred while enabling the buff: ${error}`);
     }
   }
 
   public async disableItemBuff(character: ICharacter, itemId: string): Promise<void> {
-    const itemBuff = await this.characterBuffTracker.getBuffByItemId(character, itemId);
+    try {
+      const itemBuffs = await this.characterBuffTracker.getBuffByItemId(character, itemId);
 
-    if (!itemBuff) {
-      return;
+      if (itemBuffs.length === 0) {
+        return;
+      }
+
+      const messages: string[] = await Promise.all(
+        itemBuffs.map(async (buff) => {
+          if (!buff._id) {
+            throw new Error(`Buff id is null or undefined for item id: ${itemId}`);
+          }
+
+          await this.characterBuff.disableBuff(character, buff._id, buff.type, true);
+          return buff.options?.messages?.deactivation || "";
+        })
+      );
+
+      this.socketMessaging.sendMessageToCharacter(character, messages.join(" "));
+    } catch (err) {
+      console.error(err);
     }
-
-    await this.characterBuff.disableBuff(character, itemBuff._id!, itemBuff.type);
   }
 }

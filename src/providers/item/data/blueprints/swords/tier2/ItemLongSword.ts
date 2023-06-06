@@ -1,4 +1,12 @@
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  CombatSkill,
+  EntityAttackType,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+} from "@rpg-engine/shared";
 import { IEquippableMeleeTier2WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { SwordsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -17,4 +25,17 @@ export const itemLongSword: IEquippableMeleeTier2WeaponBlueprint = {
   tier: 2,
   rangeType: EntityAttackType.Melee,
   basePrice: 78,
+  equippedBuff: {
+    type: CharacterBuffType.Skill,
+    trait: CombatSkill.Sword,
+    buffPercentage: 5,
+    durationType: CharacterBuffDurationType.Permanent,
+    options: {
+      messages: {
+        activation: "You feel the power of sword flowing through your body. (+5% sword)",
+        deactivation: "You feel the power of sword leaving your body. (-5% sword)",
+      },
+    },
+  },
+  equippedBuffDescription: "Increases sword by 5%",
 };

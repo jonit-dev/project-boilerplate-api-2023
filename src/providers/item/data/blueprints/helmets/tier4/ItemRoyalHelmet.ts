@@ -1,4 +1,11 @@
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  BasicAttribute,
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+} from "@rpg-engine/shared";
 import { IEquippableLightArmorTier4Blueprint } from "../../../types/TierBlueprintTypes";
 import { HelmetsBlueprint } from "../../../types/itemsBlueprintTypes";
 
@@ -15,4 +22,17 @@ export const itemRoyalHelmet: IEquippableLightArmorTier4Blueprint = {
   weight: 1.7,
   allowedEquipSlotType: [ItemSlotType.Head],
   basePrice: 77,
+  equippedBuff: {
+    type: CharacterBuffType.Skill,
+    trait: BasicAttribute.Strength,
+    buffPercentage: 10,
+    durationType: CharacterBuffDurationType.Permanent,
+    options: {
+      messages: {
+        activation: "You feel the power of strength flowing through your body. (+10% strength)",
+        deactivation: "You feel the power of strength leaving your body. (-10% strength)",
+      },
+    },
+  },
+  equippedBuffDescription: "Increases strength by 10%",
 };

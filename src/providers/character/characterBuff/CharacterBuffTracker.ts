@@ -52,12 +52,12 @@ export class CharacterBuffTracker {
     return buffs.reduce((acc, buff) => acc + buff.absoluteChange!, 0);
   }
 
-  public async getBuffByItemId(character: ICharacter, itemId: string): Promise<ICharacterItemBuff | undefined> {
+  public async getBuffByItemId(character: ICharacter, itemId: string): Promise<ICharacterItemBuff[]> {
     const currentBuffs = (await this.getAllCharacterBuffs(character)) as ICharacterItemBuff[];
 
-    const buff = currentBuffs.find((buff) => String(buff?.itemId) === String(itemId));
+    const buffs = currentBuffs.filter((buff) => String(buff?.itemId) === String(itemId));
 
-    return buff;
+    return buffs;
   }
 
   public async getBuffByItemKey(character: ICharacter, itemKey: string): Promise<ICharacterItemBuff | undefined> {
