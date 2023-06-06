@@ -13,7 +13,7 @@ import {
 
 export const berserkerSpellExecution: Partial<ISpell> = {
   key: SpellsBlueprint.BerserkerExecution,
-  name: "Insania Supplicium",
+  name: "Execution",
   description: "The Execution spell is designed to instantly eliminate opponents if target's health is <= 30%",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "insania supplicium",
