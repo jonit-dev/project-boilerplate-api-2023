@@ -29,7 +29,7 @@ export const itemHealRune: IRuneItemBlueprint = {
   hasUseWith: true,
   canUseOnNonPVPZone: true,
   useWithMaxDistanceGrid: RangeTypes.Short,
-  power: MagicPower.Low,
+  power: MagicPower.High,
   minMagicLevelRequired: 8,
   canSell: false,
   animationKey: AnimationEffectKeys.HitHeal,
