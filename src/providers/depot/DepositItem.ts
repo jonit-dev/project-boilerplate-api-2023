@@ -79,7 +79,7 @@ export class DepositItem {
   private async isDepositValid(character: ICharacter, data: IDepotDepositItem, npc: INPC): Promise<boolean> {
     // check if there're slots available on the depot
 
-    const depot = await Depot.findOne({ key: npc.key }).lean();
+    const depot = await Depot.findOne({ owner: character._id }).lean();
 
     if (!depot) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this depot is not available.");
