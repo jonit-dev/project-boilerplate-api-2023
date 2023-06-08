@@ -3,6 +3,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import {
+  BasicAttribute,
   CharacterBuffDurationType,
   CharacterBuffType,
   CombatSkill,
@@ -10,15 +11,18 @@ import {
   ICharacterTemporaryBuff,
 } from "@rpg-engine/shared";
 import { CharacterBuffSkill } from "../CharacterBuffSkill";
+import { CharacterBuffTracker } from "../CharacterBuffTracker";
 
 describe("CharacterBuffSkill", () => {
   let characterBuffSkill: CharacterBuffSkill;
+  let characterBuffTracker: CharacterBuffTracker;
   let testCharacter: ICharacter;
   let traitGetter: TraitGetter;
 
   beforeAll(() => {
     characterBuffSkill = container.get<CharacterBuffSkill>(CharacterBuffSkill);
     traitGetter = container.get<TraitGetter>(TraitGetter);
+    characterBuffTracker = container.get<CharacterBuffTracker>(CharacterBuffTracker);
   });
 
   beforeEach(async () => {
@@ -60,7 +64,7 @@ describe("CharacterBuffSkill", () => {
   });
 
   describe("Calculations", () => {
-    const createNewBuff = async (): Promise<string> => {
+    const createDistanceBuff = async (): Promise<string> => {
       const buff: Partial<ICharacterPermanentBuff> = {
         type: CharacterBuffType.Skill,
         trait: CombatSkill.Distance,
@@ -77,8 +81,27 @@ describe("CharacterBuffSkill", () => {
 
       return enabledBuff._id!;
     };
+
+    const createStrengthBuff = async (): Promise<string> => {
+      const buff: Partial<ICharacterPermanentBuff> = {
+        type: CharacterBuffType.Skill,
+        trait: BasicAttribute.Strength,
+        buffPercentage: 15,
+        durationType: CharacterBuffDurationType.Permanent,
+      };
+
+      const enabledBuff = await characterBuffSkill.enableBuff(
+        testCharacter,
+        buff as unknown as ICharacterTemporaryBuff
+      );
+
+      expect(enabledBuff).toBeDefined();
+
+      return enabledBuff._id!;
+    };
+
     it("properly adds a buff to a skill", async () => {
-      await createNewBuff();
+      await createDistanceBuff();
 
       const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
@@ -86,15 +109,15 @@ describe("CharacterBuffSkill", () => {
 
       expect(distanceLevel).toBe(1.1);
 
-      await createNewBuff();
+      await createDistanceBuff();
       distanceLevel = await traitGetter.getSkillLevelWithBuffs(skills, CombatSkill.Distance);
 
       expect(distanceLevel).toBe(distanceLevel);
     });
 
     it("removes a buff stack from a skill", async () => {
-      const b1 = await createNewBuff();
-      const b2 = await createNewBuff();
+      const b1 = await createDistanceBuff();
+      const b2 = await createDistanceBuff();
 
       await characterBuffSkill.disableBuff(testCharacter, b1);
 
@@ -103,6 +126,33 @@ describe("CharacterBuffSkill", () => {
       const skills = await Skill.findByIdWithBuffs(testCharacter.skills);
 
       expect(skills?.distance.level).toBe(1);
+    });
+
+    it("should correctly calculate all active buffs", async () => {
+      await createDistanceBuff();
+      await createStrengthBuff();
+
+      const buffs = await characterBuffSkill.calculateAllActiveBuffs(testCharacter);
+      expect(buffs![0].trait).toEqual(CombatSkill.Distance);
+      expect(buffs![0].buffPercentage).toEqual(10);
+      expect(buffs![1].trait).toEqual(BasicAttribute.Strength);
+      expect(buffs![1].buffPercentage).toEqual(15);
+    });
+
+    it("should correctly calculate multiple buffs of the same trait", async () => {
+      await createDistanceBuff();
+      await createDistanceBuff();
+
+      const buffs = await characterBuffSkill.calculateAllActiveBuffs(testCharacter);
+      const distanceBuff = buffs!.find((buff) => buff.trait === CombatSkill.Distance);
+
+      expect(distanceBuff).toBeDefined();
+      expect(distanceBuff!.buffPercentage).toEqual(20);
+    });
+
+    it("should throw an error if no character is provided", async () => {
+      // @ts-ignore
+      await expect(characterBuffSkill.calculateAllActiveBuffs(undefined)).rejects.toThrow("Character not found");
     });
   });
 });

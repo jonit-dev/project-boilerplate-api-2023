@@ -7,9 +7,7 @@ import {
   CraftingResourcesBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  OthersBlueprint,
   ShieldsBlueprint,
-  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateMoveTowardsMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";

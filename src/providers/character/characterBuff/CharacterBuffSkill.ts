@@ -3,19 +3,11 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { TextFormatter } from "@providers/text/TextFormatter";
-import { ICharacterBuff, SkillSocketEvents } from "@rpg-engine/shared";
+import { ICharacterBuff, ISkillDetails, SkillSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 import { IBuffValueCalculations } from "./CharacterBuffAttribute";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
-
-interface ISkillDetail {
-  type: string;
-  level: number;
-  skillPoints: number;
-  skillPointsToNextLevel: number;
-  lastSkillGain: Date;
-}
 
 @provide(CharacterBuffSkill)
 export class CharacterBuffSkill {
@@ -92,7 +84,7 @@ export class CharacterBuffSkill {
       throw new Error("Character not found");
     }
 
-    const skillDetails = updatedSkills[buff.trait] as ISkillDetail;
+    const skillDetails = updatedSkills[buff.trait] as ISkillDetails;
 
     const baseTraitValue = Number(skillDetails.level.toFixed(2));
 
@@ -122,13 +114,50 @@ export class CharacterBuffSkill {
       throw new Error("Skill not found");
     }
 
+    const buffs = await this.calculateAllActiveBuffs(character);
+    console.log("aqui2", buffs);
+
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill,
+      buffs,
     });
 
     if (!noMessage) {
       this.sendCharacterActivationDeactivationMessage(character, buff, type);
     }
+
+    this.sendCharacterActivationDeactivationMessage(character, buff, type);
+  }
+
+  public async calculateAllActiveBuffs(character: ICharacter): Promise<ICharacterBuff[] | undefined> {
+    if (!character) {
+      throw new Error("Character not found");
+    }
+
+    const characterBuffs = await this.characterBuffTracker.getAllCharacterBuffs(character);
+    if (!characterBuffs) {
+      return;
+    }
+
+    const buffSet = characterBuffs.reduce((set: Set<ICharacterBuff>, buff) => {
+      if (!buff) return set;
+
+      const { trait, buffPercentage = 0, absoluteChange = 0 } = buff;
+
+      const existingBuff = Array.from(set).find((b) => b.trait === trait);
+      if (existingBuff) {
+        existingBuff.buffPercentage += buffPercentage;
+        existingBuff.absoluteChange! += absoluteChange;
+      } else {
+        const { _id, options, ...cleanBuff } = buff;
+
+        set.add(cleanBuff);
+      }
+
+      return set;
+    }, new Set<ICharacterBuff>());
+
+    return Array.from(buffSet);
   }
 
   private sendCharacterActivationDeactivationMessage(

@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -8,7 +9,11 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(SkillNetworkReadInfo)
 export class SkillNetworkReadInfo {
-  constructor(private socketAuth: SocketAuth, private socketMessaging: SocketMessaging) {}
+  constructor(
+    private socketAuth: SocketAuth,
+    private socketMessaging: SocketMessaging,
+    private characterBuffSkill: CharacterBuffSkill
+  ) {}
 
   public onGetInfo(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, SkillSocketEvents.ReadInfo, async (data, character: ICharacter) => {
@@ -22,8 +27,11 @@ export class SkillNetworkReadInfo {
         return false;
       }
 
+      const buffs = await this.characterBuffSkill.calculateAllActiveBuffs(character);
+
       this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
         skill,
+        buffs,
       });
     });
   }

@@ -10,7 +10,6 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
-import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
 import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 import {
   BASIC_INCREASE_HEALTH_MANA,
@@ -53,6 +52,8 @@ import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
+import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
+import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -72,7 +73,8 @@ export class SkillIncrease {
     private characterWeight: CharacterWeight,
     private skillMapper: SkillCraftingMapper,
     private numberFormatter: NumberFormatter,
-    private characterBuffTracker: CharacterBuffTracker
+    private characterBuffTracker: CharacterBuffTracker,
+    private characterBuffSkill: CharacterBuffSkill
   ) {}
 
   /**
@@ -335,10 +337,6 @@ export class SkillIncrease {
     await NPC.updateOne({ _id: target._id }, { xpToRelease: target.xpToRelease });
   }
 
-  private formatLevel(level: number): string {
-    return Number.isInteger(level) ? level.toString() : level.toFixed(2);
-  }
-
   private async sendExpLevelUpEvents(
     expData: IIncreaseXPResult,
     character: ICharacter,
@@ -388,9 +386,11 @@ export class SkillIncrease {
 
     // refresh skills (lv, xp, xpToNextLevel)
     const skill = await Skill.findByIdWithBuffs(character.skills);
+    const buffs = await this.characterBuffSkill.calculateAllActiveBuffs(character);
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill,
+      buffs,
     });
   }
 
@@ -495,20 +495,6 @@ export class SkillIncrease {
       const manaSp = Math.round((power ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
       return this.calculateNewSP(skillDetails) + manaSp;
     }).bind(this, spellPower);
-  }
-
-  private calculateIncreaseRate(maxValue: number): number {
-    let increaseRate = 1.05;
-
-    if (maxValue >= 900) {
-      increaseRate = 1.01;
-    } else if (maxValue >= 700) {
-      increaseRate = 1.02;
-    } else if (maxValue >= 500) {
-      increaseRate = 1.03;
-    }
-
-    return increaseRate;
   }
 
   public async increaseMaxManaMaxHealth(characterId: Types.ObjectId): Promise<void> {

@@ -64,9 +64,11 @@ export class SkillFunctions {
     await Skill.findByIdAndUpdate(skills._id, { ...skills });
 
     const buffedSkills = await Skill.findByIdWithBuffs(skills._id);
+    const buffs = await this.characterBuffSkill.calculateAllActiveBuffs(character);
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill: buffedSkills,
+      buffs,
     });
   }
 

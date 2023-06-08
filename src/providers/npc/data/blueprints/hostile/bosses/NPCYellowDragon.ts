@@ -3,12 +3,10 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   ArmorsBlueprint,
-  AxesBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  OthersBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";

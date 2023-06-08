@@ -9,7 +9,6 @@ import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import SpellCooldown from "@providers/spells/SpellCooldown";
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
@@ -24,7 +23,6 @@ import { Types } from "mongoose";
 import { CharacterInventory } from "../CharacterInventory";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
-import { CharacterBuffActivator } from "../characterBuff/CharacterBuffActivator";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 import { CharacterItems } from "../characterItems/CharacterItems";
 
@@ -43,9 +41,7 @@ export class CharacterNetworkLogout {
     private characterItemContainer: CharacterItemContainer,
     private characterItems: CharacterItems,
     private characterMonitor: CharacterMonitor,
-    private specialEffect: SpecialEffect,
-    private spellCooldown: SpellCooldown,
-    private characterBuff: CharacterBuffActivator
+    private specialEffect: SpecialEffect
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
