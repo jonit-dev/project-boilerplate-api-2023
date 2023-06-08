@@ -115,7 +115,6 @@ export class CharacterBuffSkill {
     }
 
     const buffs = await this.calculateAllActiveBuffs(character);
-    console.log("aqui2", buffs);
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
       skill,
