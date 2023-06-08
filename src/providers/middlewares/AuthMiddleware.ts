@@ -4,7 +4,7 @@ import { User } from "../../entities/ModuleSystem/UserModel";
 import { appEnv } from "../config/env";
 import { UnauthorizedError } from "../errors/UnauthorizedError";
 import { TS } from "../translation/TranslationHelper";
-import { IAuthenticatedRequest } from "../types/ExpressTypes";
+import { IAuthenticatedRequest } from "../types/ServerTypes";
 
 export const AuthMiddleware = (req: IAuthenticatedRequest, res, next): void => {
   let authHeader = req.headers.authorization;

@@ -22,6 +22,9 @@ import { NPCMovementMoveTowards } from "./movement/NPCMovementMoveTowards";
 import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCMovementStopped } from "./movement/NPCMovementStopped";
 
+import { NewRelic } from "@providers/analytics/NewRelic";
+import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+
 @provide(NPCManager)
 export class NPCManager {
   constructor(
@@ -38,7 +41,8 @@ export class NPCManager {
     private specialEffect: SpecialEffect,
     private inMemoryHashTable: InMemoryHashTable,
     private partiallyCachedModel: PartiallyCachedModel,
-    private cacheModel: CacheModel
+    private cacheModel: CacheModel,
+    private newRelic: NewRelic
   ) {}
 
   public listenForBehaviorTrigger(): void {
@@ -66,6 +70,8 @@ export class NPCManager {
     for (const npc of nearbyNPCs) {
       const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
 
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, "NPCs/Active", totalActiveNPCs);
+
       if (totalActiveNPCs <= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
         // watch out for max NPCs active limit so we don't fry our CPU
 
@@ -89,29 +95,35 @@ export class NPCManager {
 
       new NPCCycle(
         npc.id,
-        async () => {
+        () => {
           try {
-            this.npcFreezer.tryToFreezeNPC(npc);
+            this.newRelic.trackTransaction(
+              NewRelicTransactionCategory.Operation,
+              `NPCCycle/${npc.currentMovementType}`,
+              async () => {
+                this.npcFreezer.tryToFreezeNPC(npc);
 
-            npc = await this.partiallyCachedModel.get<INPC>(
-              "npc",
-              NPC,
-              npc._id,
-              "name x y key health maxHealth mana maxMana alignment direction scene pathOrientation speed isBehaviorEnabled targetType targetCharacter currentMovementType"
+                npc = await this.partiallyCachedModel.get<INPC>(
+                  "npc",
+                  NPC,
+                  npc._id,
+                  "name x y key health maxHealth mana maxMana alignment direction scene pathOrientation speed isBehaviorEnabled targetType targetCharacter currentMovementType"
+                );
+
+                npc.skills = npcSkills;
+
+                if (!npc.isBehaviorEnabled) {
+                  await this.npcFreezer.freezeNPC(npc);
+                  return;
+                }
+
+                if (await this.specialEffect.isStun(npc)) {
+                  return;
+                }
+
+                await this.startCoreNPCBehavior(npc);
+              }
             );
-
-            npc.skills = npcSkills;
-
-            if (!npc.isBehaviorEnabled) {
-              await this.npcFreezer.freezeNPC(npc);
-              return;
-            }
-
-            if (await this.specialEffect.isStun(npc)) {
-              return;
-            }
-
-            await this.startCoreNPCBehavior(npc);
           } catch (err) {
             console.log(`Error in ${npc.key}`);
             console.log(err);

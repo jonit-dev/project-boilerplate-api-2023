@@ -1,21 +1,35 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterBan } from "@providers/character/CharacterBan";
 import { MacroCaptchaSend } from "@providers/macro/MacroCaptchaSend";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import nodeCron from "node-cron";
 
 @provide(MacroCaptchaCrons)
 export class MacroCaptchaCrons {
-  constructor(private characterBan: CharacterBan, private macroCaptchaSend: MacroCaptchaSend) {}
+  constructor(
+    private characterBan: CharacterBan,
+    private macroCaptchaSend: MacroCaptchaSend,
+    private newRelic: NewRelic
+  ) {}
 
   public schedule(): void {
-    nodeCron.schedule("*/2 * * * *", async () => {
-      await this.banMacroCharacters();
+    nodeCron.schedule("*/2 * * * *", () => {
+      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "BanMacroCharacters", async () => {
+        await this.banMacroCharacters();
+      });
     });
 
-    nodeCron.schedule("*/10 * * * *", async () => {
-      await this.sendMacroCaptchaToActiveCharacters();
+    nodeCron.schedule("*/10 * * * *", () => {
+      this.newRelic.trackTransaction(
+        NewRelicTransactionCategory.CronJob,
+        "SendMacroCaptchaToActiveCharacters",
+        async () => {
+          await this.sendMacroCaptchaToActiveCharacters();
+        }
+      );
     });
   }
 

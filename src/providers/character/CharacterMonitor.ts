@@ -1,7 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { appEnv } from "@providers/config/env";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { PM2Helper } from "@providers/server/PM2Helper";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EnvType } from "@rpg-engine/shared";
 
 type CharacterMonitorCallback = (character: ICharacter) => void;
@@ -11,7 +13,7 @@ export class CharacterMonitor {
   private charactersCallbacks = new Map<string, CharacterMonitorCallback>();
   private monitorIntervalMS: number;
 
-  constructor(private pm2Helper: PM2Helper) {}
+  constructor(private pm2Helper: PM2Helper, private newRelic: NewRelic) {}
 
   public monitor(intervalMs?: number): void {
     this.monitorIntervalMS = intervalMs || 3000;
@@ -40,24 +42,26 @@ export class CharacterMonitor {
   }
 
   private execCallbacks(): void {
-    setInterval(async () => {
-      const characterIds = this.charactersCallbacks.keys();
+    setInterval(() => {
+      this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "CharacterMonitor", async () => {
+        const characterIds = this.charactersCallbacks.keys();
 
-      for (const characterId of characterIds) {
-        // execute character callback
-        const callback = this.charactersCallbacks.get(characterId);
+        for (const characterId of characterIds) {
+          // execute character callback
+          const callback = this.charactersCallbacks.get(characterId);
 
-        if (callback) {
-          const character = (await Character.findOne({ _id: characterId }).lean()) as ICharacter;
+          if (callback) {
+            const character = (await Character.findOne({ _id: characterId }).lean()) as ICharacter;
 
-          if (!character) {
-            this.charactersCallbacks.delete(characterId);
-            continue;
+            if (!character) {
+              this.charactersCallbacks.delete(characterId);
+              continue;
+            }
+
+            callback(character);
           }
-
-          callback(character);
         }
-      }
+      });
     }, this.monitorIntervalMS);
   }
 }

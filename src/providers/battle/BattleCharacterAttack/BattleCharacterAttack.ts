@@ -1,18 +1,20 @@
 /* eslint-disable no-new */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
 import { BattleCharacterAttackValidation } from "./BattleCharacterAttackValidation";
-
 @provide(BattleCharacterAttack)
 export class BattleCharacterAttack {
   constructor(
     private battleAttackTarget: BattleAttackTarget,
     private battleCharacterAttackValidation: BattleCharacterAttackValidation,
-    private socketMessaging: SocketMessaging
+    private socketMessaging: SocketMessaging,
+    private newRelic: NewRelic
   ) {}
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
@@ -25,23 +27,25 @@ export class BattleCharacterAttack {
 
     new BattleCycle(
       character.id,
-      async () => {
-        // get an updated version of the character and target.
-        const updatedCharacter = await Character.findOne({ _id: character._id }).populate("skills");
-        let updatedTarget;
+      () => {
+        this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "CharacterBattleCycle", async () => {
+          // get an updated version of the character and target.
+          const updatedCharacter = await Character.findOne({ _id: character._id }).populate("skills");
+          let updatedTarget;
 
-        if (target.type === "NPC") {
-          updatedTarget = await NPC.findOne({ _id: target._id }).populate("skills");
-        }
-        if (target.type === "Character") {
-          updatedTarget = await Character.findOne({ _id: target._id }).populate("skills");
-        }
+          if (target.type === "NPC") {
+            updatedTarget = await NPC.findOne({ _id: target._id }).populate("skills");
+          }
+          if (target.type === "Character") {
+            updatedTarget = await Character.findOne({ _id: target._id }).populate("skills");
+          }
 
-        if (!updatedCharacter || !updatedTarget) {
-          throw new Error("Failed to get updated required elements for attacking target.");
-        }
+          if (!updatedCharacter || !updatedTarget) {
+            throw new Error("Failed to get updated required elements for attacking target.");
+          }
 
-        await this.attackTarget(updatedCharacter, updatedTarget);
+          await this.attackTarget(updatedCharacter, updatedTarget);
+        });
       },
       character.attackIntervalSpeed
     );

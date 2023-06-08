@@ -20,6 +20,8 @@ services:
     environment:
       FORCE_COLOR: "true"
       CHOKIDAR_USEPOLLING: "true" # enables hot-reloading on windows host
+      NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
+      NEW_RELIC_APP_NAME: "Definya API Dev"
     links:
       - rpg-db
     depends_on:

@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IUser } from "@entities/ModuleSystem/UserModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterLastAction } from "@providers/character/CharacterLastAction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { appEnv } from "@providers/config/env";
@@ -7,6 +8,7 @@ import { BYPASS_EVENTS_AS_LAST_ACTION } from "@providers/constants/EventsConstan
 import { EXHAUSTABLE_EVENTS } from "@providers/constants/ServerConstants";
 import { ExhaustValidation } from "@providers/exhaust/ExhaustValidation";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { CharacterSocketEvents, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { SocketMessaging } from "./SocketMessaging";
@@ -17,7 +19,8 @@ export class SocketAuth {
     private socketMessaging: SocketMessaging,
     private characterValidation: CharacterValidation,
     private exhaustValidation: ExhaustValidation,
-    private characterLastAction: CharacterLastAction
+    private characterLastAction: CharacterLastAction,
+    private newRelic: NewRelic
   ) {}
 
   // this event makes sure that the user who's triggering the request actually owns the character!
@@ -79,11 +82,9 @@ export class SocketAuth {
           await this.characterLastAction.setLastAction(character._id, dayjs().toISOString());
         }
 
-        try {
+        this.newRelic.trackTransaction(NewRelicTransactionCategory.SocketEvent, event, async (): Promise<void> => {
           await callback(data, character, owner);
-        } catch (e) {
-          console.error(e);
-        }
+        });
         // console.log(`📨 Received ${event} from ${character.name}(${character._id}): ${JSON.stringify(data)}`);
       } catch (error) {
         console.error(`${character.name} => ${event}, channel ${channel} failed with error: ${error}`);

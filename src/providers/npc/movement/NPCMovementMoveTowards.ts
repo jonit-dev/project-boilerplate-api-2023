@@ -1,14 +1,15 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
-import { CacheModel } from "@providers/cache/CacheModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { MapHelper } from "@providers/map/MapHelper";
 import { PathfindingCaching } from "@providers/map/PathfindingCaching";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   EntityAttackType,
   FromGridX,
@@ -45,7 +46,7 @@ export class NPCMovementMoveTowards {
     private characterView: CharacterView,
     private specialEffect: SpecialEffect,
     private pathfindingCaching: PathfindingCaching,
-    private cacheModel: CacheModel
+    private newRelic: NewRelic
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
@@ -246,30 +247,32 @@ export class NPCMovementMoveTowards {
 
       new NPCBattleCycle(
         npc.id,
-        async () => {
-          const result = await Promise.all([
-            NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
-            Character.findById(npc.targetCharacter).populate("skills").lean({ virtuals: true, defaults: true }),
-          ]);
+        () => {
+          this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "NpcBattleCycle", async () => {
+            const result = await Promise.all([
+              NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
+              Character.findById(npc.targetCharacter).populate("skills").lean({ virtuals: true, defaults: true }),
+            ]);
 
-          const updatedNPC = result[0] as INPC;
+            const updatedNPC = result[0] as INPC;
 
-          updatedNPC.skills = npcSkills;
+            updatedNPC.skills = npcSkills;
 
-          const targetCharacter = result[1] as ICharacter;
+            const targetCharacter = result[1] as ICharacter;
 
-          const isInvisible = await this.specialEffect.isInvisible(targetCharacter);
+            const isInvisible = await this.specialEffect.isInvisible(targetCharacter);
 
-          if (
-            updatedNPC?.alignment === NPCAlignment.Hostile &&
-            targetCharacter?.isAlive &&
-            updatedNPC.isAlive &&
-            !isInvisible
-          ) {
-            // if reached target and alignment is enemy, lets hit it
-            await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
-            await this.tryToSwitchToRandomTarget(npc);
-          }
+            if (
+              updatedNPC?.alignment === NPCAlignment.Hostile &&
+              targetCharacter?.isAlive &&
+              updatedNPC.isAlive &&
+              !isInvisible
+            ) {
+              // if reached target and alignment is enemy, lets hit it
+              await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
+              await this.tryToSwitchToRandomTarget(npc);
+            }
+          });
         },
         1500
       );

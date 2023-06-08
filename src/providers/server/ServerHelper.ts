@@ -3,7 +3,7 @@ import { provide } from "inversify-binding-decorators";
 import { appEnv } from "../config/env";
 import { ConsoleHelper } from "../console/ConsoleHelper";
 import { TS } from "../translation/TranslationHelper";
-import { IServerBootstrapVars } from "../types/ExpressTypes";
+import { IServerBootstrapVars } from "../types/ServerTypes";
 
 @provide(ServerHelper)
 export class ServerHelper {

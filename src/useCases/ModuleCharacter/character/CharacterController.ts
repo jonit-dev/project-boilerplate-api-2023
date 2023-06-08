@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
 import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddleware";
-import { IAuthenticatedRequest } from "@providers/types/ExpressTypes";
+import { IAuthenticatedRequest } from "@providers/types/ServerTypes";
 import {
   controller,
   httpGet,

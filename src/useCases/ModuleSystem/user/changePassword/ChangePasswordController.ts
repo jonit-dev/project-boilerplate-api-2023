@@ -3,7 +3,7 @@ import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddl
 import { HttpStatus } from "@rpg-engine/shared";
 import { Response } from "express";
 import { controller, httpPost, interfaces, JsonContent, requestBody } from "inversify-express-utils";
-import { IAuthenticatedRequest } from "../../../../providers/types/ExpressTypes";
+import { IAuthenticatedRequest } from "../../../../providers/types/ServerTypes";
 import { AuthChangePasswordDTO } from "../AuthDTO";
 import { ChangePasswordUseCase } from "./ChangePasswordUseCase";
 

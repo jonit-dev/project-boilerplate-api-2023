@@ -2,7 +2,7 @@ import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
 import { IChatMessage } from "@rpg-engine/shared";
 import { Response } from "express";
 import { controller, httpGet, interfaces, queryParam } from "inversify-express-utils";
-import { IAuthenticatedRequest } from "../../../../providers/types/ExpressTypes";
+import { IAuthenticatedRequest } from "../../../../providers/types/ServerTypes";
 import { ReadChatLogUseCase } from "./ReadChatLogUseCase";
 
 @controller("/chat-log/zone")

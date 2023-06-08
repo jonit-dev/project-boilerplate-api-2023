@@ -6,9 +6,10 @@ import { NPC_BATTLE_CYCLES } from "./NPCBattleCycle";
 import { NPC_CYCLES } from "./NPCCycle";
 import { NPCView } from "./NPCView";
 
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { appEnv } from "@providers/config/env";
 import { NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
-import { PM2Helper } from "@providers/server/PM2Helper";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EnvType } from "@rpg-engine/shared";
 import CPUusage from "cpu-percentage";
 import round from "lodash/round";
@@ -17,7 +18,7 @@ import round from "lodash/round";
 export class NPCFreezer {
   public freezeCheckIntervals: Map<string, NodeJS.Timeout> = new Map();
 
-  constructor(private npcView: NPCView, private pm2Helper: PM2Helper) {
+  constructor(private npcView: NPCView, private newRelic: NewRelic) {
     if (appEnv.general.IS_UNIT_TEST) {
       return;
     }
@@ -36,16 +37,18 @@ export class NPCFreezer {
     // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
     const checkRange = random(2000, 4000);
 
-    const interval = setInterval(async () => {
-      const shouldFreezeNPC = await this.shouldFreezeNPC(npc);
+    const interval = setInterval(() => {
+      this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NPCFreezer", async () => {
+        const shouldFreezeNPC = await this.shouldFreezeNPC(npc);
 
-      if (!shouldFreezeNPC) {
-        return;
-      }
+        if (!shouldFreezeNPC) {
+          return;
+        }
 
-      await this.freezeNPC(npc);
+        await this.freezeNPC(npc);
 
-      clearInterval(interval);
+        clearInterval(interval);
+      });
     }, checkRange);
 
     this.freezeCheckIntervals.set(npc.id, interval);

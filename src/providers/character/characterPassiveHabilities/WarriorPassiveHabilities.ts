@@ -1,9 +1,11 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   BasicAttribute,
   CharacterClass,
@@ -20,7 +22,8 @@ export class WarriorPassiveHabilities {
     private socketMessaging: SocketMessaging,
     private inMemoryHashTable: InMemoryHashTable,
     private characterMonitor: CharacterMonitor,
-    private traitGetter: TraitGetter
+    private traitGetter: TraitGetter,
+    private newRelic: NewRelic
   ) {}
 
   public async warriorAutoRegenHealthHandler(character: ICharacter): Promise<void> {
@@ -50,53 +53,59 @@ export class WarriorPassiveHabilities {
       const healthRegenAmount = Math.max(Math.floor(strengthLvl / 3), 4);
 
       if (health < maxHealth) {
-        const intervalId = setInterval(async () => {
-          try {
-            const refreshCharacter = (await Character.findById(_id)
-              .lean()
-              .select("_id health maxHealth")) as ICharacter;
+        const intervalId = setInterval(() => {
+          this.newRelic.trackTransaction(
+            NewRelicTransactionCategory.Interval,
+            "WarriorAutoRegenHealthHandler",
+            async () => {
+              try {
+                const refreshCharacter = (await Character.findById(_id)
+                  .lean()
+                  .select("_id health maxHealth")) as ICharacter;
 
-            if (refreshCharacter.health === refreshCharacter.maxHealth) {
-              clearInterval(intervalId);
-              await this.inMemoryHashTable.delete(namespace, key);
-              this.characterMonitor.unwatch(character);
-              return;
-            }
+                if (refreshCharacter.health === refreshCharacter.maxHealth) {
+                  clearInterval(intervalId);
+                  await this.inMemoryHashTable.delete(namespace, key);
+                  this.characterMonitor.unwatch(character);
+                  return;
+                }
 
-            const updatedCharacter = (await Character.findByIdAndUpdate(
-              _id,
-              {
-                health: Math.min(refreshCharacter.health + healthRegenAmount, refreshCharacter.maxHealth),
-              },
-              {
-                new: true,
+                const updatedCharacter = (await Character.findByIdAndUpdate(
+                  _id,
+                  {
+                    health: Math.min(refreshCharacter.health + healthRegenAmount, refreshCharacter.maxHealth),
+                  },
+                  {
+                    new: true,
+                  }
+                )
+                  .lean()
+                  .select("_id health channelId")) as ICharacter;
+
+                const payload: ICharacterAttributeChanged = {
+                  targetId: updatedCharacter._id,
+                  health: updatedCharacter.health,
+                };
+
+                this.socketMessaging.sendEventToUser(
+                  updatedCharacter.channelId!,
+                  CharacterSocketEvents.AttributeChanged,
+                  payload
+                );
+
+                if (updatedCharacter.health === updatedCharacter.maxHealth) {
+                  clearInterval(intervalId);
+                  this.characterMonitor.unwatch(character);
+                  await this.inMemoryHashTable.delete(namespace, key);
+                  return;
+                }
+              } catch (err) {
+                console.error("Error during health regeneration interval:", err);
+                clearInterval(intervalId);
+                this.characterMonitor.unwatch(character);
               }
-            )
-              .lean()
-              .select("_id health channelId")) as ICharacter;
-
-            const payload: ICharacterAttributeChanged = {
-              targetId: updatedCharacter._id,
-              health: updatedCharacter.health,
-            };
-
-            this.socketMessaging.sendEventToUser(
-              updatedCharacter.channelId!,
-              CharacterSocketEvents.AttributeChanged,
-              payload
-            );
-
-            if (updatedCharacter.health === updatedCharacter.maxHealth) {
-              clearInterval(intervalId);
-              this.characterMonitor.unwatch(character);
-              await this.inMemoryHashTable.delete(namespace, key);
-              return;
             }
-          } catch (err) {
-            console.error("Error during health regeneration interval:", err);
-            clearInterval(intervalId);
-            this.characterMonitor.unwatch(character);
-          }
+          );
         }, interval);
 
         await this.inMemoryHashTable.set(namespace, key, `interval: ${interval} qtyHealthRegen: ${healthRegenAmount}`);

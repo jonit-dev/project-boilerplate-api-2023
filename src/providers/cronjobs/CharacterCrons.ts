@@ -1,23 +1,32 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterLastAction } from "@providers/character/CharacterLastAction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
-
 @provide(CharacterCrons)
 export class CharacterCrons {
-  constructor(private socketMessaging: SocketMessaging, private characterLastAction: CharacterLastAction) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterLastAction: CharacterLastAction,
+    private newRelic: NewRelic
+  ) {}
 
   public schedule(): void {
-    nodeCron.schedule("* * * * *", async () => {
-      await this.logoutInactiveCharacters();
+    nodeCron.schedule("* * * * *", () => {
+      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "LogoutInactiveCharacters", async () => {
+        await this.logoutInactiveCharacters();
+      });
     });
 
     // check banned characters every day
-    nodeCron.schedule("0 0 * * *", async () => {
-      await this.unbanCharacters();
+    nodeCron.schedule("0 0 * * *", () => {
+      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "LogoutInactiveCharacters", async () => {
+        await this.unbanCharacters();
+      });
     });
   }
 
@@ -43,6 +52,8 @@ export class CharacterCrons {
     const onlineCharacters = await Character.find({
       isOnline: true,
     });
+
+    this.newRelic.trackMetric(NewRelicMetricCategory.Count, "Characters/Online", onlineCharacters.length);
 
     for (const character of onlineCharacters) {
       const dateString = await this.characterLastAction.getLastAction(character._id);

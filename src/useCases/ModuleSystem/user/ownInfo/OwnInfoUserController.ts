@@ -3,7 +3,7 @@ import { AuthMiddleware } from "@providers/middlewares/AuthMiddleware";
 import { Response } from "express";
 import { controller, httpGet, interfaces } from "inversify-express-utils";
 
-import { IAuthenticatedRequest } from "../../../../providers/types/ExpressTypes";
+import { IAuthenticatedRequest } from "../../../../providers/types/ServerTypes";
 import { OwnInfoUserUseCase } from "./OwnInfoUserUseCase";
 
 @controller("/users")

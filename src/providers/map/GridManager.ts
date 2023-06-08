@@ -1,6 +1,8 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { MapLayers } from "@rpg-engine/shared";
 import PF from "pathfinding";
 import { MapHelper } from "./MapHelper";
@@ -38,7 +40,8 @@ export class GridManager {
     private mapSolids: MapSolids,
     private mapHelper: MapHelper,
     private pathfindingCaching: PathfindingCaching,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private newRelic: NewRelic
   ) {}
 
   public getGrid(map: string): number[][] {
@@ -196,16 +199,22 @@ export class GridManager {
       return cachedShortestPath as number[][];
     }
 
-    return this.findShortestPathBetweenPoints(map, {
-      start: {
-        x: startGridX,
-        y: startGridY,
-      },
-      end: {
-        x: endGridX,
-        y: endGridY,
-      },
+    let shortestPath;
+
+    this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "FindShortestPath/BestFirstFinder", () => {
+      shortestPath = this.findShortestPathBetweenPoints(map, {
+        start: {
+          x: startGridX,
+          y: startGridY,
+        },
+        end: {
+          x: endGridX,
+          y: endGridY,
+        },
+      });
     });
+
+    return shortestPath;
   }
 
   private async hasCircularReferenceOnPathfinding(

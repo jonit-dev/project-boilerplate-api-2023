@@ -10,10 +10,10 @@ describe("MapControlTime", () => {
   let create: jest.SpyInstance;
   let find: jest.SpyInstance;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     mapControlTime = container.get<MapControlTime>(MapControlTime);
   });
-  beforeEach(async () => {
+  beforeEach(() => {
     // @ts-expect-error
     sendEventToUser = jest.spyOn(mapControlTime.socketMessaging, "sendEventToUser");
     create = jest.spyOn(MapControlTimeModel, "create");
