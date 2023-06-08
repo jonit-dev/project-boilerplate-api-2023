@@ -9,9 +9,9 @@ export class NewRelic {
     event: string,
     callback: () => void | Promise<void> | Promise<any>
   ): void {
-    return newrelic.startBackgroundTransaction(event, category, async () => {
+    newrelic.startBackgroundTransaction(event, category, async () => {
       try {
-        return await callback();
+        await callback();
       } catch (e) {
         console.error(e);
         throw e;
