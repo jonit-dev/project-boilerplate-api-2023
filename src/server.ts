@@ -31,9 +31,7 @@ import * as Tracing from "@sentry/tracing";
 
 const port = appEnv.general.SERVER_PORT || 3002;
 
-if (!appEnv.general.IS_UNIT_TEST) {
-  require("newrelic");
-}
+require("newrelic");
 
 app.listen(port, async () => {
   server.showBootstrapMessage({
