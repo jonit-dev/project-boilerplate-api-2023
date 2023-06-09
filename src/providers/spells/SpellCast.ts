@@ -10,6 +10,7 @@ import { EntityUtil } from "@providers/entityEffects/EntityUtil";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
+import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -47,7 +48,8 @@ export class SpellCast {
     private movementHelper: MovementHelper,
     private specialEffect: SpecialEffect,
     private spellCoolDown: SpellCoolDown,
-    private spellSilencer: SpellSilence
+    private spellSilencer: SpellSilence,
+    private mapNonPVPZone: MapNonPVPZone
   ) {}
 
   public isSpellCasting(msg: string): boolean {
@@ -139,6 +141,14 @@ export class SpellCast {
       if (caster._id.toString() === target._id?.toString()) {
         return false;
       }
+    }
+
+    const isTargetAtPZ = this.mapNonPVPZone.isNonPVPZoneAtXY(target.scene, target.x, target.y);
+
+    if (isTargetAtPZ) {
+      this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is at a protected zone.");
+
+      return false;
     }
 
     if (target.type === EntityType.NPC && (target as INPC).alignment === NPCAlignment.Friendly) {
