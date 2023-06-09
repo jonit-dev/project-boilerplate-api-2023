@@ -44,7 +44,7 @@ describe("SkillsModel", () => {
     const defense = await skillStatsCalculator.getDefense(skills);
 
     expect(attack).toBe(7);
-    expect(defense).toBe(40);
+    expect(defense).toBe(42);
   });
 
   describe("findByIdWithBuffs", () => {

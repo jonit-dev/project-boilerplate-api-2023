@@ -1,6 +1,5 @@
 import { StaffsBlueprint } from "../../types/itemsBlueprintTypes";
 import { itemHellishBronzeStaff } from "./ItemHellishBronzeStaff";
-import { itemHellishStaff } from "./ItemHellishStaff";
 import { itemAirWand } from "./item0/ItemAirWand";
 import { itemWand } from "./item0/ItemWand";
 import { itemWoodenStaff } from "./item0/ItemWoodenStaff";
@@ -14,6 +13,7 @@ import { itemEmberward } from "./item3/ItemEmberward";
 import { itemFireStaff } from "./item3/ItemFireStaff";
 import { itemPoisonStaff } from "./item3/ItemPoisonStaff";
 import { itemEnchantedStaff } from "./item4/ItemEnchantedStaff";
+import { itemHellishStaff } from "./item4/ItemHellishStaff";
 import { itemMoonsStaff } from "./item4/ItemMoonsStaff";
 import { itemRubyStaff } from "./item4/ItemRubyStaff";
 import { itemSkyBlueStaff } from "./item4/ItemSkyBlueStaff";

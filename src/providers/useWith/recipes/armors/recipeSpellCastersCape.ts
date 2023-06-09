@@ -11,10 +11,7 @@ export const recipeSpellcastersCape: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.CorruptionIngot,
       qty: 10,
     },
-    {
-      key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 10,
-    },
+
     {
       key: CraftingResourcesBlueprint.BlueSilk,
       qty: 10,
@@ -32,7 +29,7 @@ export const recipeSpellcastersCape: IUseWithCraftingRecipe = {
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.CorruptionIngot, 10],
-      [CraftingResourcesBlueprint.ObsidiumIngot, 10],
+
       [CraftingResourcesBlueprint.BlueSilk, 10],
       [CraftingResourcesBlueprint.BlueSapphire, 10],
       [CraftingResourcesBlueprint.PhoenixFeather, 20],

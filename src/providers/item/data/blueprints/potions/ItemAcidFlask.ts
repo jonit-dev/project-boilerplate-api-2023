@@ -42,7 +42,7 @@ export const itemAcidFlask: IRuneItemBlueprint = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.PoisonRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -2 * points);
 
     const entityEffectUse = container.get(EntityEffectUse);
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectPoison);

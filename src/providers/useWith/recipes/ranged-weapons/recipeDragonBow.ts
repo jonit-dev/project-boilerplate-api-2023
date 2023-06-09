@@ -9,7 +9,7 @@ export const recipeDragonBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Rope,
-      qty: 2,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
@@ -17,7 +17,7 @@ export const recipeDragonBow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 5,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.DragonHead,
@@ -27,9 +27,9 @@ export const recipeDragonBow: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Rope, 2],
+      [CraftingResourcesBlueprint.Rope, 10],
       [CraftingResourcesBlueprint.PhoenixFeather, 10],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
       [CraftingResourcesBlueprint.DragonHead, 1],
     ]),
   ],

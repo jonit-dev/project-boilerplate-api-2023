@@ -138,6 +138,6 @@ describe("EquipmentModel.ts", () => {
 
     const statsCalculator = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "defense");
 
-    expect(statsCalculator).toBe(54);
+    expect(statsCalculator).toBe(56);
   });
 });

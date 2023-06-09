@@ -17,10 +17,10 @@ export const spellStealth: Partial<ISpell> = {
   description: "A spell designed to turn a rogue invisible.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas nelluon",
-  manaCost: 40,
+  manaCost: 80,
   minLevelRequired: 10,
   minMagicLevelRequired: 8,
-  cooldown: 10,
+  cooldown: 120,
   castingAnimationKey: AnimationEffectKeys.ManaHeal,
   characterClass: [CharacterClass.Rogue],
 
@@ -28,8 +28,8 @@ export const spellStealth: Partial<ISpell> = {
     const effect = container.get(SpecialEffect);
     const spellCalculator = container.get(SpellCalculator);
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 15,
-      max: 40,
+      min: 20,
+      max: 45,
     });
 
     return await effect.turnInvisible(character, timeout);

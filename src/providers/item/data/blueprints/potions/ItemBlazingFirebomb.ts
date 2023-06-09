@@ -42,7 +42,7 @@ export const itemBlazingFirebomb: IRuneItemBlueprint = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1.5 * points);
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -2.5 * points);
 
     const entityEffectUse = container.get(EntityEffectUse);
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);

@@ -8,6 +8,7 @@ import {
   ContainersBlueprint,
   GlovesBlueprint,
   LegsBlueprint,
+  MacesBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
@@ -80,6 +81,10 @@ export const npcGorgok = {
     },
     {
       itemBlueprintKey: BootsBlueprint.GoldenBoots,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: MacesBlueprint.HellishKingMace,
       chance: 10,
     },
     {

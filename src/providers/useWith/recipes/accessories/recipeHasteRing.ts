@@ -8,22 +8,22 @@ export const recipeHasteRing: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 3,
+      key: CraftingResourcesBlueprint.GreenIngot,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 1,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 2,
+      qty: 10,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.BlueSapphire, 3],
+      [CraftingResourcesBlueprint.GreenIngot, 3],
       [CraftingResourcesBlueprint.PhoenixFeather, 1],
       [CraftingResourcesBlueprint.MagicRecipe, 2],
     ]),

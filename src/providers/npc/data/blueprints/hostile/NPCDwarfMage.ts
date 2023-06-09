@@ -47,6 +47,9 @@ export const npcDwarfMage: Partial<INPC> = {
     resistance: {
       level: 7,
     },
+    magicResistance: {
+      level: 10,
+    },
   },
   fleeOnLowHealth: true,
   loots: [
@@ -63,10 +66,7 @@ export const npcDwarfMage: Partial<INPC> = {
       itemBlueprintKey: AxesBlueprint.Axe,
       chance: 30,
     },
-    {
-      itemBlueprintKey: AxesBlueprint.RoyalDoubleAxe,
-      chance: 10,
-    },
+
     {
       itemBlueprintKey: AxesBlueprint.HellishAxe,
       chance: 7,

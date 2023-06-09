@@ -13,13 +13,13 @@ export const itemSpikedMace: IEquippableMeleeTier2WeaponBlueprint = {
   name: "Spiked Mace",
   description:
     "A mace with a heavy, spiked head mounted on a long handle. It is used for crushing and bludgeoning in close combat, and is often wielded by heavily-armored warriors.",
-  attack: 17,
-  defense: 7,
+  attack: 20,
+  defense: 14,
   tier: 2,
   weight: 2.9,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  basePrice: 75,
+  basePrice: 40,
   entityEffects: [EntityEffectBlueprint.Bleeding],
   entityEffectChance: 70,
 };

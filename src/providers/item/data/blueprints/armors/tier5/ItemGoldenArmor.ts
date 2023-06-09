@@ -10,7 +10,7 @@ export const itemGoldenArmor: IEquippableArmorTier5Blueprint = {
   texturePath: "armors/golden-armor.png",
   name: "Golden Armor",
   description: "A Golden Armor is a suit of heavy-duty scale armor made out of gold.",
-  defense: 38,
+  defense: 40,
   tier: 5,
   weight: 5,
   allowedEquipSlotType: [ItemSlotType.Torso],

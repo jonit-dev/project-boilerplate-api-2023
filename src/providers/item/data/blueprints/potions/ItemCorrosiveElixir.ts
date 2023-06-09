@@ -41,7 +41,7 @@ export const itemCorrosiveElixir: IRuneItemBlueprint = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.PoisonRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -2 * points);
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -3 * points);
 
     const entityEffectUse = container.get(EntityEffectUse);
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectPoison);

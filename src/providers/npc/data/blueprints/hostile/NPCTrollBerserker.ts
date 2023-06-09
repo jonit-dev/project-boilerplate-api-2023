@@ -94,6 +94,10 @@ export const npcTrollBerserker = {
       chance: 30,
     },
     {
+      itemBlueprintKey: AxesBlueprint.RoyalDoubleAxe,
+      chance: 5,
+    },
+    {
       itemBlueprintKey: RangedWeaponsBlueprint.Bolt,
       chance: 50,
       quantityRange: [5, 10],

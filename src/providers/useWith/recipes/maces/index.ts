@@ -1,6 +1,7 @@
 import { MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { recipeBloodstainedCenser } from "./recipeBloodstainedCenser";
+import { recipeHellishMace } from "./recipeHellishMace";
 import { recipeMace } from "./recipeMace";
 import { recipeRusticFlail } from "./recipeRusticFlail";
 import { recipeSilverBulbMace } from "./recipeSilverBulbMace";
@@ -14,4 +15,5 @@ export const recipeMacesIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [MacesBlueprint.RusticFlail]: [recipeRusticFlail],
   [MacesBlueprint.SilverBulbMace]: [recipeSilverBulbMace],
   [MacesBlueprint.WoodenMace]: [recipeWoodenMace],
+  [MacesBlueprint.HellishMace]: [recipeHellishMace],
 };
