@@ -23,9 +23,11 @@ import {
   ISkill,
   ItemSlotType,
   ItemSocketEvents,
+  ItemSubType,
   ItemType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { EquipmentCharacterClass } from "./ EquipmentCharacterClass";
 import { EquipmentSlots } from "./EquipmentSlots";
 import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
 
@@ -47,7 +49,8 @@ export class EquipmentEquip {
     private roguePassiveHabilities: RoguePassiveHabilities,
     private characterWeight: CharacterWeight,
     private itemPickupUpdater: ItemPickupUpdater,
-    private characterItemBuff: CharacterItemBuff
+    private characterItemBuff: CharacterItemBuff,
+    private equipmentCharacterClass: EquipmentCharacterClass
   ) {}
 
   public async equipInventory(character: ICharacter, itemId: string): Promise<boolean> {
@@ -246,6 +249,21 @@ export class EquipmentEquip {
     item: IItem,
     containerType: SourceEquipContainerType
   ): Promise<boolean> {
+    const allowedSubTypes = [ItemSubType.Book, ItemSubType.Shield];
+
+    if (item.type === ItemType.Weapon || allowedSubTypes.includes(item.subType as ItemSubType)) {
+      const isItemAllowed = this.equipmentCharacterClass.isItemAllowed(character.class, item.subType);
+
+      if (!isItemAllowed) {
+        const errorMessage = `Sorry, you are not allowed to use ${item.subType} type items.`;
+
+        // Send the error message to the character
+        this.socketMessaging.sendErrorMessageToCharacter(character, errorMessage);
+
+        return false;
+      }
+    }
+
     const hasBasicValidation = await this.characterValidation.hasBasicValidation(character);
 
     if (!hasBasicValidation) {

@@ -18,4 +18,5 @@ export const itemSword: IEquippableMeleeTier0WeaponBlueprint = {
   tier: 0,
   rangeType: EntityAttackType.Melee,
   basePrice: 68,
+  canSell: false,
 };
