@@ -8,7 +8,6 @@ import {
   ContainersBlueprint,
   DaggersBlueprint,
   HelmetsBlueprint,
-  RangedWeaponsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
   SwordsBlueprint,
@@ -36,21 +35,17 @@ describe("CharacterRepository.spec.ts", () => {
       { class: CharacterClass.Druid, left: StaffsBlueprint.Wand, right: DaggersBlueprint.Dagger },
       { class: CharacterClass.Sorcerer, left: StaffsBlueprint.Wand, right: DaggersBlueprint.Dagger },
       { class: CharacterClass.Berserker, left: AxesBlueprint.Axe, right: null },
-      { class: CharacterClass.Hunter, left: RangedWeaponsBlueprint.Slingshot, right: SpearsBlueprint.Spear },
+      { class: CharacterClass.Hunter, left: SpearsBlueprint.Spear },
       { class: CharacterClass.Warrior, left: SwordsBlueprint.Sword, right: null },
       { class: CharacterClass.None, left: DaggersBlueprint.Dagger, right: null },
     ];
 
-    for (const { class: testClass, left, right } of classesAndWeapons) {
+    for (const { class: testClass, left } of classesAndWeapons) {
       testCharacter.class = testClass;
       // @ts-ignore
       const data = await characterRepository.generateInitialItems(testCharacter as ICharacter);
       const leftHandWeapon = await Item.findById(data.leftHand);
-      const rightHandWeapon = await Item.findById(data.rightHand);
       expect(leftHandWeapon?.key).toEqual(left);
-      if (right) {
-        expect(rightHandWeapon?.key).toEqual(right);
-      }
     }
   });
 

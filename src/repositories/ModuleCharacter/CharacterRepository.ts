@@ -17,6 +17,7 @@ import {
   DaggersBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
+  MacesBlueprint,
   RangedWeaponsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
@@ -105,12 +106,17 @@ export class CharacterRepository extends CRUD {
     return await this.update(Character, id, updateCharacter, null);
   }
 
-  private async generateInitialItem(blueprintKey: string, ownerId: string): Promise<IItem> {
+  private async generateInitialItem(
+    blueprintKey: string,
+    ownerId: string,
+    extraProps?: Partial<IItem>
+  ): Promise<IItem> {
     const blueprintData = itemsBlueprintIndex[blueprintKey];
     const item = new Item({
       ...blueprintData,
       owner: ownerId,
       isEquipped: true,
+      ...extraProps,
     });
     await item.save();
     return item;
@@ -118,16 +124,15 @@ export class CharacterRepository extends CRUD {
 
   private async generateInitialItems(character: ICharacter): Promise<Partial<IEquipment>> {
     const ownerId = character._id;
-    const defaultWeapon = DaggersBlueprint.Dagger;
 
     const weaponsMap = {
-      [CharacterClass.Rogue]: [defaultWeapon],
-      [CharacterClass.Druid]: [StaffsBlueprint.Wand, defaultWeapon],
-      [CharacterClass.Sorcerer]: [StaffsBlueprint.Wand, defaultWeapon],
+      [CharacterClass.Rogue]: [DaggersBlueprint.Dagger],
+      [CharacterClass.Druid]: [StaffsBlueprint.Wand],
+      [CharacterClass.Sorcerer]: [StaffsBlueprint.Wand],
       [CharacterClass.Berserker]: [AxesBlueprint.Axe],
-      [CharacterClass.Hunter]: [RangedWeaponsBlueprint.Slingshot, SpearsBlueprint.Spear],
+      [CharacterClass.Hunter]: [SpearsBlueprint.Spear],
       [CharacterClass.Warrior]: [SwordsBlueprint.Sword],
-      default: [defaultWeapon],
+      default: [DaggersBlueprint.Dagger],
     };
 
     const [leftHandWeapon, rightHandWeapon] = weaponsMap[character.class] || weaponsMap.default;
@@ -163,5 +168,18 @@ export class CharacterRepository extends CRUD {
     await this.characterItemInventory.addItemToInventory(FoodsBlueprint.Apple, character, {
       stackQty: 20,
     });
+
+    if (character.class === CharacterClass.Sorcerer) {
+      await this.characterItemInventory.addItemToInventory(DaggersBlueprint.Dagger, character);
+    }
+    if (character.class === CharacterClass.Druid) {
+      await this.characterItemInventory.addItemToInventory(MacesBlueprint.Mace, character);
+    }
+    if (character.class === CharacterClass.Hunter) {
+      await this.characterItemInventory.addItemToInventory(RangedWeaponsBlueprint.Slingshot, character);
+      await this.characterItemInventory.addItemToInventory(RangedWeaponsBlueprint.Stone, character, {
+        stackQty: 100,
+      });
+    }
   }
 }

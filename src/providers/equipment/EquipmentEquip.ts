@@ -255,7 +255,7 @@ export class EquipmentEquip {
       const isItemAllowed = this.equipmentCharacterClass.isItemAllowed(character.class, item.subType);
 
       if (!isItemAllowed) {
-        const errorMessage = `Sorry, you are not allowed to use ${item.subType} type items.`;
+        const errorMessage = `Sorry, your class is not allowed to use ${item.subType.toLowerCase()} type items.`;
 
         // Send the error message to the character
         this.socketMessaging.sendErrorMessageToCharacter(character, errorMessage);
