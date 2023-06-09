@@ -21,6 +21,7 @@
     "bootstrap": "git pull origin master && yarn install && yarn configure",
     "env:switch:dev": "./environment/env-switch.sh dev",
     "env:switch:prod": "./environment/env-switch.sh prod",
+    "env:switch:prod:test": "./environment/env-switch.sh prod:test",
     "configure:first-time": "./environment/first-time-setup.sh",
     "configure": "./environment/configure.sh",
     "db:export": "./environment/db-export.sh",

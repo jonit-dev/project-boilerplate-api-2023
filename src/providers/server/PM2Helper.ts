@@ -3,20 +3,26 @@ import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import os from "os";
 
+import pm2Config from "../../../pm2.json";
+
 @provide(PM2Helper)
 export class PM2Helper {
-  public getTotalCPUs(): number {
+  public getPm2TotalInstances(): number {
+    return Number(pm2Config.apps[0].instances);
+  }
+
+  public getTotalAvailableCPUs(): number {
     return os.cpus().length;
   }
 
   public pickRandomCPUInstance(): string {
-    const totalCPUs = this.getTotalCPUs();
+    const totalCPUs = this.getPm2TotalInstances();
 
     return random(0, totalCPUs - 1).toString();
   }
 
   public pickLastCPUInstance(): string {
-    const totalCPUs = this.getTotalCPUs();
+    const totalCPUs = this.getPm2TotalInstances();
 
     if (totalCPUs === 1) return "0";
 
