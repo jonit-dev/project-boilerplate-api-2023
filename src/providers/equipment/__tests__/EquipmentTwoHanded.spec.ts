@@ -39,6 +39,8 @@ describe("EquipmentTwoHanded.spec.ts", () => {
     if (container) {
       container.slots[0] = itemTwoHanded;
       container.markModified("slots");
+      // add a character class that can  equip a Staff
+      testCharacter.class = "Druid";
       await container.save();
       await equipmentEquip.equip(testCharacter, itemTwoHanded._id, container?._id);
 

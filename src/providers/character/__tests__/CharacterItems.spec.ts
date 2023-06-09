@@ -17,7 +17,7 @@ describe("CharacterItems.ts", () => {
   let equipmentEquip: EquipmentEquip;
   let characterItems: CharacterItems;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     characterItems = container.get<CharacterItems>(CharacterItems);
 
     // itemSelled = container.get<ItemPickup>(ItemPickup);
@@ -67,6 +67,8 @@ describe("CharacterItems.ts", () => {
   });
 
   it("should properly identify an item on the equipment", async () => {
+    // add a character class that can  equip a sword
+    testCharacter.class = "Berserker";
     const itemPickedUp = await pickupItem(inventoryItemContainerId);
     expect(itemPickedUp).toBeTruthy();
     // try to equip the test item
@@ -87,6 +89,8 @@ describe("CharacterItems.ts", () => {
   });
 
   it("should properly remove an item from the equipment", async () => {
+    // add a character class that can  equip a sword
+    testCharacter.class = "Berserker";
     const itemPickedUp = await pickupItem(inventoryItemContainerId);
     expect(itemPickedUp).toBeTruthy();
     // try to equip the test item

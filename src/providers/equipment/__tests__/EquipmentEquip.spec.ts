@@ -6,7 +6,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data";
-import { DaggersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { DaggersBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CharacterClass, CombatSkill, ISkill, ItemSubType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EquipmentEquip } from "../EquipmentEquip";
@@ -23,10 +23,14 @@ describe("EquipmentEquip.spec.ts", () => {
   let daggerItem: IItem;
   let daggerItem2: IItem;
   let shieldItem: IItem;
+  let spearItem: IItem;
+  let spearItem2: IItem;
+  let testItem: IItem;
   let sendEventToUser;
   let equipmentStatsCalculator: EquipmentStatsCalculator;
   let characterWeapon: CharacterWeapon;
   let sendErrorMessageToCharacter;
+  let isItemAllowed;
 
   beforeAll(() => {
     equipmentStatsCalculator = container.get<EquipmentStatsCalculator>(EquipmentStatsCalculator);
@@ -39,6 +43,8 @@ describe("EquipmentEquip.spec.ts", () => {
       hasInventory: true,
       hasSkills: true,
     });
+
+    testCharacter.class = "Berserker";
     // create Mock item will require level 1 and dagger skill level 1
     bowItem = await unitTestHelper.createItemBow();
     swordItem = await unitTestHelper.createMockItem();
@@ -46,6 +52,9 @@ describe("EquipmentEquip.spec.ts", () => {
     daggerItem = await unitTestHelper.createMockItemFromBlueprint(DaggersBlueprint.AzureDagger);
     daggerItem2 = await unitTestHelper.createMockItemFromBlueprint(DaggersBlueprint.AzureDagger);
     shieldItem = await unitTestHelper.createMockShield();
+    spearItem = await unitTestHelper.createMockItemFromBlueprint(SpearsBlueprint.Spear);
+    spearItem2 = await unitTestHelper.createMockItemFromBlueprint(SpearsBlueprint.Spear);
+    testItem = await unitTestHelper.createMockItem();
 
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
 
@@ -57,6 +66,9 @@ describe("EquipmentEquip.spec.ts", () => {
 
     // @ts-ignore
     sendErrorMessageToCharacter = jest.spyOn(equipmentEquip.socketMessaging, "sendErrorMessageToCharacter");
+
+    // @ts-ignore
+    isItemAllowed = jest.spyOn(equipmentEquip.equipmentCharacterClass, "isItemAllowed");
   });
 
   it("should properly equip an item with minimum skill requirements", async () => {
@@ -65,7 +77,16 @@ describe("EquipmentEquip.spec.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    const equip = await equipmentEquip.equip(testCharacter, swordItem._id, inventoryContainer.id);
+    // berserker can equip swords
+    const berserker = (await Character.findByIdAndUpdate(
+      testCharacter._id,
+      {
+        class: CharacterClass.Berserker,
+      },
+      { new: true }
+    )) as ICharacter;
+
+    const equip = await equipmentEquip.equip(berserker, swordItem._id, inventoryContainer.id);
 
     expect(equip).toBeTruthy();
 
@@ -111,7 +132,7 @@ describe("EquipmentEquip.spec.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    const berserker = (await Character.findByIdAndUpdate(
+    const rogue = (await Character.findByIdAndUpdate(
       testCharacter._id,
       {
         class: CharacterClass.Rogue,
@@ -120,13 +141,13 @@ describe("EquipmentEquip.spec.ts", () => {
     )) as ICharacter;
 
     // add dagger skills to character
-    const skill = (await Skill.findById(berserker.skills).lean()) as ISkill;
+    const skill = (await Skill.findById(rogue.skills).lean()) as ISkill;
     skill.level = 10;
     skill.dagger.level = 10;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
 
-    const equipOneHand = await equipmentEquip.equip(berserker, daggerItem._id, inventoryContainer.id);
-    const equipAnotherHand = await equipmentEquip.equip(berserker, daggerItem2._id, inventoryContainer.id);
+    const equipOneHand = await equipmentEquip.equip(rogue, daggerItem._id, inventoryContainer.id);
+    const equipAnotherHand = await equipmentEquip.equip(rogue, daggerItem2._id, inventoryContainer.id);
 
     expect(equipOneHand).toBeTruthy();
     expect(equipAnotherHand).toBeTruthy();
@@ -144,7 +165,7 @@ describe("EquipmentEquip.spec.ts", () => {
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    const berserker = (await Character.findByIdAndUpdate(
+    const warrior = (await Character.findByIdAndUpdate(
       testCharacter._id,
       {
         class: CharacterClass.Warrior,
@@ -152,8 +173,8 @@ describe("EquipmentEquip.spec.ts", () => {
       { new: true }
     )) as ICharacter;
 
-    const equipOneHand = await equipmentEquip.equip(berserker, swordItem._id, inventoryContainer.id);
-    const equipAnotherHand = await equipmentEquip.equip(berserker, swordItem2._id, inventoryContainer.id);
+    const equipOneHand = await equipmentEquip.equip(warrior, swordItem._id, inventoryContainer.id);
+    const equipAnotherHand = await equipmentEquip.equip(warrior, swordItem2._id, inventoryContainer.id);
 
     expect(equipOneHand).toBeTruthy();
     expect(equipAnotherHand).toBeFalsy();
@@ -165,13 +186,13 @@ describe("EquipmentEquip.spec.ts", () => {
     expect(updatedInventory?.slots[1]._id).toEqual(swordItem2._id);
   });
 
-  it("should fail equip 2 dagger Class Hunter", async () => {
-    inventoryContainer.slots[0] = daggerItem;
-    inventoryContainer.slots[1] = daggerItem2;
+  it("should fail equip 2 spear Class Hunter", async () => {
+    inventoryContainer.slots[0] = spearItem;
+    inventoryContainer.slots[1] = spearItem2;
     inventoryContainer.markModified("slots");
     await inventoryContainer.save();
 
-    const berserker = (await Character.findByIdAndUpdate(
+    const hunter = (await Character.findByIdAndUpdate(
       testCharacter._id,
       {
         class: CharacterClass.Hunter,
@@ -179,14 +200,8 @@ describe("EquipmentEquip.spec.ts", () => {
       { new: true }
     )) as ICharacter;
 
-    // add dagger skills to character
-    const skill = (await Skill.findById(berserker.skills).lean()) as ISkill;
-    skill.level = 10;
-    skill.dagger.level = 10;
-    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
-
-    const equipOneHand = await equipmentEquip.equip(berserker, daggerItem._id, inventoryContainer.id);
-    const equipAnotherHand = await equipmentEquip.equip(berserker, daggerItem2._id, inventoryContainer.id);
+    const equipOneHand = await equipmentEquip.equip(hunter, spearItem._id, inventoryContainer.id);
+    const equipAnotherHand = await equipmentEquip.equip(hunter, spearItem2._id, inventoryContainer.id);
 
     expect(equipOneHand).toBeTruthy();
     expect(equipAnotherHand).toBeFalsy();
@@ -195,7 +210,7 @@ describe("EquipmentEquip.spec.ts", () => {
 
     const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
     expect(updatedInventory?.slots[0]).toBeNull();
-    expect(updatedInventory?.slots[1]._id).toEqual(daggerItem2._id);
+    expect(updatedInventory?.slots[1]._id).toEqual(spearItem2._id);
   });
 
   describe("Min level and skill requirements", () => {
@@ -314,6 +329,13 @@ describe("EquipmentEquip.spec.ts", () => {
     });
 
     it("should successfully update the attack type, after equipping an item | Ranged", async () => {
+      const hunter = (await Character.findByIdAndUpdate(
+        testCharacter._id,
+        {
+          class: CharacterClass.Hunter,
+        },
+        { new: true }
+      )) as ICharacter;
       const characterAttackTypeBeforeEquip = await Character.findById({ _id: testCharacter._id });
 
       if (!characterAttackTypeBeforeEquip) throw new Error("Character not found");
@@ -326,7 +348,7 @@ describe("EquipmentEquip.spec.ts", () => {
       inventoryContainer.markModified("slots");
       await inventoryContainer.save();
 
-      const equip = await equipmentEquip.equip(testCharacter, bowItem._id, inventoryContainer.id);
+      const equip = await equipmentEquip.equip(hunter, bowItem._id, inventoryContainer.id);
 
       expect(equip).toBeTruthy();
 
@@ -491,6 +513,35 @@ describe("EquipmentEquip.spec.ts", () => {
 
         const equipSword2 = await equipmentEquip.equip(testCharacter, swordItem._id, inventoryContainer.id);
         expect(equipSword2).toBeTruthy();
+      });
+    });
+
+    describe("Item Allowed", () => {
+      it("should call isItemAllowed method if item type Weapon or item sub type Book or Shield ", async () => {
+        // this should call isItemAllowed
+        testItem.type = "Weapon";
+        // @ts-ignore
+        await equipmentEquip.isEquipValid(testCharacter, testItem, inventoryContainer);
+
+        // this should call isItemAllowed
+        testItem.type = "other";
+        testItem.subType = "Book";
+        // @ts-ignore
+        await equipmentEquip.isEquipValid(testCharacter, testItem, inventoryContainer);
+
+        // this should call isItemAllowed
+        testItem.type = "other";
+        testItem.subType = "Shield";
+        // @ts-ignore
+        await equipmentEquip.isEquipValid(testCharacter, testItem, inventoryContainer);
+
+        // this should not call isItemAllowed
+        testItem.type = "other";
+        testItem.subType = "other";
+        // @ts-ignore
+        await equipmentEquip.isEquipValid(testCharacter, testItem, inventoryContainer);
+
+        expect(isItemAllowed).toHaveBeenCalledTimes(3);
       });
     });
   });
