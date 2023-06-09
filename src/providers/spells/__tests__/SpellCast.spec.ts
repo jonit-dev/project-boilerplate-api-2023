@@ -467,7 +467,7 @@ describe("SpellCast.ts", () => {
 
     const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
     const timeout = Math.min(Math.max(skills.magic.level * 1.5, 10), 180);
-    expect(timerMock.mock.calls[0][1]).toBe(timeout * 1500);
+    expect(timerMock.mock.calls[0][1]).toBe(timeout * 2000);
 
     await timerMock.mock.calls[0][0]();
     expect(await specialEffect.isInvisible(testCharacter)).toBeFalsy();

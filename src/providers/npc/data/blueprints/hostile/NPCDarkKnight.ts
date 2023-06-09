@@ -131,6 +131,11 @@ export const npcDarkKnight: Partial<INPC> = {
       quantityRange: [1, 3],
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.ObsidiumOre,
+      chance: 30,
+      quantityRange: [5, 7],
+    },
+    {
       itemBlueprintKey: ArmorsBlueprint.KnightArmor,
       chance: 20,
     },

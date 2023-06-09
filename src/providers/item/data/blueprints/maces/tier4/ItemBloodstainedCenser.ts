@@ -14,7 +14,7 @@ export const itemBloodstainedCenser: IEquippableMeleeTier4WeaponBlueprint = {
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 30,
-  defense: 10,
+  defense: 20,
   tier: 4,
   rangeType: EntityAttackType.Melee,
   basePrice: 70,

@@ -13,7 +13,7 @@ export const itemSilverBulbMace: IEquippableMeleeTier3WeaponBlueprint = {
   weight: 2,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   attack: 27,
-  defense: 12,
+  defense: 18,
   tier: 3,
   rangeType: EntityAttackType.Melee,
   basePrice: 72,

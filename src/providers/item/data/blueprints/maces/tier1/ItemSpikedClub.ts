@@ -12,11 +12,11 @@ export const itemSpikedClub: IEquippableMeleeTier1WeaponBlueprint = {
 
   name: "Spiked club",
   description: "A simple wooden club with metal spikes.",
-  attack: 13,
-  defense: 6,
+  attack: 15,
+  defense: 10,
   tier: 1,
   weight: 1.5,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
-  basePrice: 65,
+  basePrice: 30,
 };

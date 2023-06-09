@@ -21,11 +21,11 @@ export const recipeRoyalStaff: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 10,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.GreenIngot,
-      qty: 10,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
@@ -34,8 +34,8 @@ export const recipeRoyalStaff: IUseWithCraftingRecipe = {
       [CraftingResourcesBlueprint.RedSapphire, 10],
       [CraftingResourcesBlueprint.PhoenixFeather, 10],
       [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
-      [CraftingResourcesBlueprint.ObsidiumIngot, 10],
-      [CraftingResourcesBlueprint.GreenIngot, 10],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 5],
+      [CraftingResourcesBlueprint.GreenIngot, 5],
     ]),
   ],
 };

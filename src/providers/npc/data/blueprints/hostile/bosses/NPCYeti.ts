@@ -91,6 +91,10 @@ export const npcYeti: Partial<INPC> = {
       chance: 30,
     },
     {
+      itemBlueprintKey: AxesBlueprint.RoyalDoubleAxe,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,
     },
