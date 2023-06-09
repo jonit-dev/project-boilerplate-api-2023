@@ -21,4 +21,5 @@ export const itemSlingshot: IEquippableRangedTier0WeaponBlueprint = {
   requiredAmmoKeys: [RangedWeaponsBlueprint.Stone],
   isTwoHanded: true,
   basePrice: 49,
+  canSell: false,
 };

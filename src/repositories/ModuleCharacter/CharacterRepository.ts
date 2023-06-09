@@ -10,16 +10,22 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
   AccessoriesBlueprint,
   ArmorsBlueprint,
+  AxesBlueprint,
   BootsBlueprint,
   ContainersBlueprint,
   CraftingResourcesBlueprint,
   DaggersBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
+  RangedWeaponsBlueprint,
+  SpearsBlueprint,
+  StaffsBlueprint,
+  SwordsBlueprint,
   ToolsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { SpellLearn } from "@providers/spells/SpellLearn";
+import { CharacterClass } from "@rpg-engine/shared";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
 import { UpdateCharacterDTO } from "@useCases/ModuleCharacter/character/update/UpdateCharacterDTO";
 import { provide } from "inversify-binding-decorators";
@@ -51,7 +57,9 @@ export class CharacterRepository extends CRUD {
       ["name"]
     );
 
-    const { inventory, armor, leftHand, head, boot, neck } = await this.generateInitialItems(createdCharacter);
+    const { inventory, armor, leftHand, head, boot, neck, rightHand } = await this.generateInitialItems(
+      createdCharacter
+    );
 
     let equipment = new Equipment();
     equipment.inventory = inventory;
@@ -60,6 +68,7 @@ export class CharacterRepository extends CRUD {
     equipment.head = head;
     equipment.boot = boot;
     equipment.neck = neck;
+    equipment.rightHand = rightHand;
     equipment = await equipment.save();
 
     createdCharacter.equipment = equipment._id;
@@ -109,21 +118,38 @@ export class CharacterRepository extends CRUD {
 
   private async generateInitialItems(character: ICharacter): Promise<Partial<IEquipment>> {
     const ownerId = character._id;
+    const defaultWeapon = DaggersBlueprint.Dagger;
 
-    const bag = await this.generateInitialItem(ContainersBlueprint.Bag, ownerId);
-    const dagger = await this.generateInitialItem(DaggersBlueprint.Dagger, ownerId);
-    const jacket = await this.generateInitialItem(ArmorsBlueprint.Jacket, ownerId);
-    const cap = await this.generateInitialItem(HelmetsBlueprint.Cap, ownerId);
-    const boot = await this.generateInitialItem(BootsBlueprint.Boots, ownerId);
-    const bandana = await this.generateInitialItem(AccessoriesBlueprint.Bandana, ownerId);
+    const weaponsMap = {
+      [CharacterClass.Rogue]: [defaultWeapon],
+      [CharacterClass.Druid]: [StaffsBlueprint.Wand, defaultWeapon],
+      [CharacterClass.Sorcerer]: [StaffsBlueprint.Wand, defaultWeapon],
+      [CharacterClass.Berserker]: [AxesBlueprint.Axe],
+      [CharacterClass.Hunter]: [RangedWeaponsBlueprint.Slingshot, SpearsBlueprint.Spear],
+      [CharacterClass.Warrior]: [SwordsBlueprint.Sword],
+      default: [defaultWeapon],
+    };
+
+    const [leftHandWeapon, rightHandWeapon] = weaponsMap[character.class] || weaponsMap.default;
+
+    const [leftHand, rightHand, bag, jacket, cap, boot, bandana] = await Promise.all([
+      this.generateInitialItem(leftHandWeapon, ownerId),
+      rightHandWeapon ? this.generateInitialItem(rightHandWeapon, ownerId) : null,
+      this.generateInitialItem(ContainersBlueprint.Bag, ownerId),
+      this.generateInitialItem(ArmorsBlueprint.Jacket, ownerId),
+      this.generateInitialItem(HelmetsBlueprint.Cap, ownerId),
+      this.generateInitialItem(BootsBlueprint.Boots, ownerId),
+      this.generateInitialItem(AccessoriesBlueprint.Bandana, ownerId),
+    ]);
 
     return {
-      inventory: bag._id,
-      leftHand: dagger._id,
-      armor: jacket._id,
-      head: cap._id,
-      boot: boot._id,
-      neck: bandana._id,
+      inventory: bag?._id,
+      leftHand: leftHand?._id,
+      armor: jacket?._id,
+      head: cap?._id,
+      boot: boot?._id,
+      neck: bandana?._id,
+      rightHand: rightHand?._id,
     };
   }
 

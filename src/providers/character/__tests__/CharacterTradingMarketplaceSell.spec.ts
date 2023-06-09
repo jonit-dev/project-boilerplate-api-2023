@@ -3,6 +3,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IMarketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 import { MARKETPLACE_SELL_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -13,10 +14,9 @@ import {
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterTradeSocketEvents, ItemSocketEvents } from "@rpg-engine/shared";
+import { CharacterTradingMarketplaceSell } from "../CharacterTradingMarketplaceSell";
 import { CharacterTradingValidation } from "../CharacterTradingValidation";
 import { CharacterItemInventory } from "../characterItems/CharacterItemInventory";
-import { CharacterTradingMarketplaceSell } from "../CharacterTradingMarketplaceSell";
-import { IMarketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 
 describe("CharacterTradingMarketplaceSell.ts", () => {
   let testCharacter: ICharacter;
@@ -36,8 +36,8 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
 
   const addItemsToInventory = async () => {
     const items = [
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
     ];
@@ -89,7 +89,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
   it("should successfully sell stackable and non stackable items", async () => {
     await characterTradingMarketplaceSell.sellItems(testCharacter, [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 1,
       },
       {
@@ -102,7 +102,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(29.5);
+    expect(updatedContainer.slots[0].stackQty).toBe(36.5);
 
     expect(updatedContainer.slots[2]).not.toBeNull();
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
@@ -127,7 +127,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
 
     const sellItems = [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 1,
       },
       {
@@ -141,7 +141,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
     const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
     expect(updatedContainer.slots[0]).not.toBeNull();
-    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Slingshot);
+    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Bow);
 
     expect(updatedContainer.slots[2]).not.toBeNull();
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
@@ -157,11 +157,11 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
   it("should merge duplicate items qty before passing to validation", async () => {
     const sellItems = [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 1,
       },
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 1,
       },
       {
@@ -179,7 +179,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
     expect(validationMock).toBeCalled();
     expect(validationMock).toBeCalledWith(testCharacter, [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 2,
       },
       {
@@ -239,8 +239,8 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
     await characterTradingMarketplaceSell.sellItems(testCharacter, sellItems);
 
     const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
-    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Slingshot);
-    expect(updatedContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Slingshot);
+    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Bow);
+    expect(updatedContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Bow);
 
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
     expect(updatedContainer.slots[2].stackQty).toBe(50);
@@ -259,14 +259,14 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
 
     await characterTradingMarketplaceSell.sellItems(testCharacter, [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 1,
       },
     ]);
 
     const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
-    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Slingshot);
-    expect(updatedContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Slingshot);
+    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Bow);
+    expect(updatedContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Bow);
 
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
     expect(updatedContainer.slots[2].stackQty).toBe(50);
@@ -281,7 +281,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
   it("should create two gold items if more gold earned than max stack size", async () => {
     const sellItems = [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 2,
       },
       {
@@ -298,7 +298,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
     // character is equipped with 100 arrows
     // can only sell up to 100 arrows
-    expect(updatedContainer.slots[0].stackQty).toBe(99);
+    expect(updatedContainer.slots[0].stackQty).toBe(113);
 
     expect(updatedContainer.slots[1]).toBeNull();
     expect(updatedContainer.slots[2]).toBeNull();
@@ -307,8 +307,8 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
 
   it("should add gold to existing stack if possible", async () => {
     const items = [
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
       await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 10 }),
@@ -318,7 +318,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
 
     const sellItems = [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 2,
       },
       {
@@ -333,7 +333,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
 
     expect(updatedContainer.slots[4]).not.toBeNull();
     expect(updatedContainer.slots[4].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[4].stackQty).toBe(109);
+    expect(updatedContainer.slots[4].stackQty).toBe(123);
 
     expect(updatedContainer.slots[0]).toBeNull();
     expect(updatedContainer.slots[1]).toBeNull();
@@ -346,7 +346,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
 
     expect(sendEventToUserOnInitSell).toBeCalled();
 
-    const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
+    const Bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
     const arrow = itemsBlueprintIndex[RangedWeaponsBlueprint.Arrow];
 
     expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
@@ -357,8 +357,8 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
         type: "sell",
         characterItems: [
           {
-            ...slingShot,
-            price: slingShot.basePrice * MARKETPLACE_SELL_PRICE_MULTIPLIER,
+            ...Bow,
+            price: Bow.basePrice * MARKETPLACE_SELL_PRICE_MULTIPLIER,
             stackQty: 2,
           },
           {
@@ -481,10 +481,10 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
 
   it("should not return an item if it does not have a blueprint", async () => {
     const items = [
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot, {
-        key: "invalid-slingshot-key",
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow, {
+        key: "invalid-Bow-key",
       }),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
     ];
 
     await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
@@ -494,7 +494,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
     expect(sendEventToUserOnInitSell).toBeCalled();
     expect(sendErrorMessageToCharacter).not.toBeCalled();
 
-    const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
+    const Bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
     expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
       testCharacter.channelId,
       CharacterTradeSocketEvents.MarketplaceTradeInit,
@@ -503,8 +503,8 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
         type: "sell",
         characterItems: [
           {
-            ...slingShot,
-            price: slingShot.basePrice * MARKETPLACE_SELL_PRICE_MULTIPLIER,
+            ...Bow,
+            price: Bow.basePrice * MARKETPLACE_SELL_PRICE_MULTIPLIER,
             stackQty: 1,
           },
         ],
@@ -516,7 +516,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
   it("should not return an item if it does not have a sell price", async () => {
     const items = [
       await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 10 }),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
     ];
 
     await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
@@ -526,7 +526,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
     expect(sendEventToUserOnInitSell).toBeCalled();
     expect(sendErrorMessageToCharacter).not.toBeCalled();
 
-    const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
+    const Bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
     expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
       testCharacter.channelId,
       CharacterTradeSocketEvents.MarketplaceTradeInit,
@@ -535,8 +535,8 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
         type: "sell",
         characterItems: [
           {
-            ...slingShot,
-            price: slingShot.basePrice * MARKETPLACE_SELL_PRICE_MULTIPLIER,
+            ...Bow,
+            price: Bow.basePrice * MARKETPLACE_SELL_PRICE_MULTIPLIER,
             stackQty: 1,
           },
         ],

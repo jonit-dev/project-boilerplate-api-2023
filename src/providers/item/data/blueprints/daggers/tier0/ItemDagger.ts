@@ -20,4 +20,5 @@ export const itemDagger: IEquippableMeleeTier0WeaponBlueprint = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
   basePrice: 0,
+  canSell: false,
 };

@@ -36,8 +36,8 @@ describe("CharacterTradingNPCSell.ts", () => {
 
   const addItemsToInventory = async () => {
     const items = [
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
     ];
@@ -94,7 +94,7 @@ describe("CharacterTradingNPCSell.ts", () => {
   it("should successfully sell stackable and non stackable items", async () => {
     await characterTradingNPCSell.sellItemsToNPC(testCharacter, testNPCTrader, [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 1,
       },
       {
@@ -107,7 +107,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[0]).not.toBeNull();
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[0].stackQty).toBe(29.5);
+    expect(updatedContainer.slots[0].stackQty).toBe(36.5);
 
     expect(updatedContainer.slots[2]).not.toBeNull();
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
@@ -132,7 +132,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     const sellItems = [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 1,
       },
       {
@@ -146,7 +146,7 @@ describe("CharacterTradingNPCSell.ts", () => {
     const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
     expect(updatedContainer.slots[0]).not.toBeNull();
-    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Slingshot);
+    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Bow);
 
     expect(updatedContainer.slots[2]).not.toBeNull();
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
@@ -162,11 +162,11 @@ describe("CharacterTradingNPCSell.ts", () => {
   it("should merge duplicate items qty before passing to validation", async () => {
     const sellItems = [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 1,
       },
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 1,
       },
       {
@@ -184,7 +184,7 @@ describe("CharacterTradingNPCSell.ts", () => {
     expect(validationMock).toBeCalled();
     expect(validationMock).toBeCalledWith(testCharacter, testNPCTrader, [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 2,
       },
       {
@@ -244,8 +244,8 @@ describe("CharacterTradingNPCSell.ts", () => {
     await characterTradingNPCSell.sellItemsToNPC(testCharacter, testNPCTrader, sellItems);
 
     const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
-    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Slingshot);
-    expect(updatedContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Slingshot);
+    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Bow);
+    expect(updatedContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Bow);
 
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
     expect(updatedContainer.slots[2].stackQty).toBe(50);
@@ -264,14 +264,14 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     await characterTradingNPCSell.sellItemsToNPC(testCharacter, testNPCTrader, [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 1,
       },
     ]);
 
     const updatedContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
-    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Slingshot);
-    expect(updatedContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Slingshot);
+    expect(updatedContainer.slots[0].key).toBe(RangedWeaponsBlueprint.Bow);
+    expect(updatedContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Bow);
 
     expect(updatedContainer.slots[2].key).toBe(RangedWeaponsBlueprint.Arrow);
     expect(updatedContainer.slots[2].stackQty).toBe(50);
@@ -286,7 +286,7 @@ describe("CharacterTradingNPCSell.ts", () => {
   it("should create two gold items if more gold earned than max stack size", async () => {
     const sellItems = [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 2,
       },
       {
@@ -303,7 +303,7 @@ describe("CharacterTradingNPCSell.ts", () => {
     expect(updatedContainer.slots[0].key).toBe(OthersBlueprint.GoldCoin);
     // character is equipped with 100 arrows
     // can only sell up to 100 arrows
-    expect(updatedContainer.slots[0].stackQty).toBe(99);
+    expect(updatedContainer.slots[0].stackQty).toBe(113);
 
     expect(updatedContainer.slots[1]).toBeNull();
     expect(updatedContainer.slots[2]).toBeNull();
@@ -312,8 +312,8 @@ describe("CharacterTradingNPCSell.ts", () => {
 
   it("should add gold to existing stack if possible", async () => {
     const items = [
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
       await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Arrow, { stackQty: 50 }),
       await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 10 }),
@@ -323,7 +323,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     const sellItems = [
       {
-        key: RangedWeaponsBlueprint.Slingshot,
+        key: RangedWeaponsBlueprint.Bow,
         qty: 2,
       },
       {
@@ -338,7 +338,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(updatedContainer.slots[4]).not.toBeNull();
     expect(updatedContainer.slots[4].key).toBe(OthersBlueprint.GoldCoin);
-    expect(updatedContainer.slots[4].stackQty).toBe(109);
+    expect(updatedContainer.slots[4].stackQty).toBe(123);
 
     expect(updatedContainer.slots[0]).toBeNull();
     expect(updatedContainer.slots[1]).toBeNull();
@@ -351,7 +351,7 @@ describe("CharacterTradingNPCSell.ts", () => {
 
     expect(sendEventToUserOnInitSell).toBeCalled();
 
-    const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
+    const Bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
     const arrow = itemsBlueprintIndex[RangedWeaponsBlueprint.Arrow];
 
     expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
@@ -362,8 +362,8 @@ describe("CharacterTradingNPCSell.ts", () => {
         type: "sell",
         characterItems: [
           {
-            ...slingShot,
-            price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
+            ...Bow,
+            price: Bow.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
             stackQty: 2,
           },
           {
@@ -497,10 +497,10 @@ describe("CharacterTradingNPCSell.ts", () => {
 
   it("should not return an item if it does not have a blueprint", async () => {
     const items = [
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot, {
-        key: "invalid-slingshot-key",
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow, {
+        key: "invalid-Bow-key",
       }),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
     ];
 
     await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
@@ -510,7 +510,7 @@ describe("CharacterTradingNPCSell.ts", () => {
     expect(sendEventToUserOnInitSell).toBeCalled();
     expect(sendErrorMessageToCharacter).not.toBeCalled();
 
-    const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
+    const Bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
     expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
       testCharacter.channelId,
       CharacterTradeSocketEvents.TradeInit,
@@ -519,8 +519,8 @@ describe("CharacterTradingNPCSell.ts", () => {
         type: "sell",
         characterItems: [
           {
-            ...slingShot,
-            price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
+            ...Bow,
+            price: Bow.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
             stackQty: 1,
           },
         ],
@@ -532,7 +532,7 @@ describe("CharacterTradingNPCSell.ts", () => {
   it("should not return an item if it does not have a sell price", async () => {
     const items = [
       await unitTestHelper.createMockItemFromBlueprint(OthersBlueprint.GoldCoin, { stackQty: 10 }),
-      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Slingshot),
+      await unitTestHelper.createMockItemFromBlueprint(RangedWeaponsBlueprint.Bow),
     ];
 
     await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
@@ -542,7 +542,7 @@ describe("CharacterTradingNPCSell.ts", () => {
     expect(sendEventToUserOnInitSell).toBeCalled();
     expect(sendErrorMessageToCharacter).not.toBeCalled();
 
-    const slingShot = itemsBlueprintIndex[RangedWeaponsBlueprint.Slingshot];
+    const Bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
     expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
       testCharacter.channelId,
       CharacterTradeSocketEvents.TradeInit,
@@ -551,8 +551,8 @@ describe("CharacterTradingNPCSell.ts", () => {
         type: "sell",
         characterItems: [
           {
-            ...slingShot,
-            price: slingShot.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
+            ...Bow,
+            price: Bow.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
             stackQty: 1,
           },
         ],

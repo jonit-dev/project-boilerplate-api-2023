@@ -18,4 +18,5 @@ export const itemAxe: IEquippableMeleeTier0WeaponBlueprint = {
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   rangeType: EntityAttackType.Melee,
   basePrice: 36,
+  canSell: false,
 };
