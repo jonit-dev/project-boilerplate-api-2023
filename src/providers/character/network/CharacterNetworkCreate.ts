@@ -32,6 +32,7 @@ import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
+import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
 
@@ -52,8 +53,8 @@ export class CharacterNetworkCreate {
     private specialEffect: SpecialEffect,
     private warriorPassiveHabilities: WarriorPassiveHabilities,
     private magePassiveHabilities: MagePassiveHabilities,
-
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private socketSessionControl: SocketSessionControl
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -90,7 +91,16 @@ export class CharacterNetworkCreate {
 
         await this.gridManager.setWalkable(map, ToGridX(character.x), ToGridY(character.y), false);
 
-        // join channel specific to the user, to we can send direct later if we want.
+        const hasSession = await this.socketSessionControl.hasSession(character);
+
+        if (hasSession) {
+          console.log("Character already has a session in place! Clearing up!");
+          await channel.leave(data.channelId);
+          await this.socketSessionControl.deleteSession(character);
+        }
+
+        await this.socketSessionControl.setSession(character);
+
         await channel.join(data.channelId);
 
         if (character.isBanned) {

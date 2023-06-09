@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterLastAction } from "@providers/character/CharacterLastAction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
@@ -12,7 +13,8 @@ export class CharacterCrons {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterLastAction: CharacterLastAction,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private socketSessionControl: SocketSessionControl
   ) {}
 
   public schedule(): void {
@@ -84,6 +86,8 @@ export class CharacterCrons {
         );
 
         (await Character.findByIdAndUpdate({ _id: character._id }, { isOnline: false })) as ICharacter;
+
+        await this.socketSessionControl.deleteSession(character);
 
         await this.characterLastAction.clearLastAction(character._id);
       }

@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import {
   BattleSocketEvents,
   FromGridX,
@@ -28,7 +29,8 @@ export class MapTransition {
     private mapObjectsLoader: MapObjectsLoader,
     private socketMessaging: SocketMessaging,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
-    private characterView: CharacterView
+    private characterView: CharacterView,
+    private socketSessionControl: SocketSessionControl
   ) {}
 
   public async changeCharacterScene(character: ICharacter, destination: TransitionDestination): Promise<void> {
@@ -44,6 +46,8 @@ export class MapTransition {
         },
       }
     );
+
+    await this.socketSessionControl.deleteSession(character);
 
     if (character.target.id && character.target.type) {
       const targetId = character.target.id as unknown as string;

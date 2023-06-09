@@ -8,6 +8,7 @@ import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
@@ -41,7 +42,8 @@ export class CharacterNetworkLogout {
     private characterItemContainer: CharacterItemContainer,
     private characterItems: CharacterItems,
     private characterMonitor: CharacterMonitor,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private socketSessionControl: SocketSessionControl
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -80,6 +82,8 @@ export class CharacterNetworkLogout {
             textureKey: textureKey || character.textureKey,
           }
         );
+
+        await this.socketSessionControl.deleteSession(character);
 
         await this.specialEffect.clearEffects(character);
 

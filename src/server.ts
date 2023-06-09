@@ -19,6 +19,7 @@ import {
   seeds,
   server,
   socketAdapter,
+  socketSessionControl,
   spellSilencer,
 } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";
@@ -73,6 +74,8 @@ app.listen(port, async () => {
   await characterConnection.resetCharacterAttributes();
 
   await characterFoodConsumption.clearAllFoodConsumption();
+
+  await socketSessionControl.clearAllSessions();
 
   characterMonitor.monitor();
 
