@@ -24,14 +24,8 @@ import { NPCMovementStopped } from "./movement/NPCMovementStopped";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 
-import { appEnv } from "@providers/config/env";
-import { Queue, Worker } from "bullmq";
-
 @provide(NPCManager)
 export class NPCManager {
-  private queue: Queue;
-  private worker: Worker;
-
   constructor(
     private npcMovement: NPCMovement,
     private npcMovementFixedPath: NPCMovementFixedPath,
@@ -47,56 +41,7 @@ export class NPCManager {
     private inMemoryHashTable: InMemoryHashTable,
 
     private newRelic: NewRelic
-  ) {
-    this.queue = new Queue("NPCStartBehaviorLoop", {
-      connection: {
-        host: appEnv.database.REDIS_CONTAINER,
-        port: Number(appEnv.database.REDIS_PORT),
-      },
-    });
-
-    this.worker = new Worker(
-      "NPCStartBehaviorLoop",
-      async (job) => {
-        let { npc, npcSkills } = job.data;
-
-        try {
-          this.npcFreezer.tryToFreezeNPC(npc);
-
-          npc = await NPC.findById(npc._id).lean({
-            virtuals: true,
-            defaults: true,
-          });
-
-          npc.skills = npcSkills;
-
-          if (!npc.isBehaviorEnabled) {
-            await this.npcFreezer.freezeNPC(npc);
-            return;
-          }
-
-          if (await this.specialEffect.isStun(npc)) {
-            return;
-          }
-
-          void this.startCoreNPCBehavior(npc);
-        } catch (error) {
-          console.error(error);
-        }
-      },
-
-      {
-        connection: {
-          host: appEnv.database.REDIS_CONTAINER,
-          port: Number(appEnv.database.REDIS_PORT),
-        },
-      }
-    );
-
-    this.worker.on("failed", (job, err) => {
-      console.log(`Job ${job?.id} failed with error ${err.message}`);
-    });
-  }
+  ) {}
 
   public listenForBehaviorTrigger(): void {
     process.on("message", async (data) => {
@@ -137,19 +82,17 @@ export class NPCManager {
   }
 
   public async startBehaviorLoop(initialNPC: INPC): Promise<void> {
-    const npc = initialNPC;
+    let npc = initialNPC;
 
     if (npc) {
       await this.inMemoryHashTable.set("npc", npc._id, npc);
     }
 
     if (!npc.isBehaviorEnabled) {
-      const npcSkills = await Skill.findOne({ owner: npc._id })
-        .lean()
-        .cacheQuery({
-          cacheKey: `${npc.id}-skills`,
-          ttl: 60 * 60 * 24 * 7,
-        });
+      const npcSkills = await Skill.find({ owner: npc._id }).cacheQuery({
+        cacheKey: `npc-${npc.id}-skills`,
+        ttl: 60 * 60 * 24 * 7,
+      });
 
       new NPCCycle(
         npc.id,
@@ -159,7 +102,25 @@ export class NPCManager {
               NewRelicTransactionCategory.Operation,
               `NPCCycle/${npc.currentMovementType}`,
               async () => {
-                await this.queue.add("NPCStartBehaviorLoop", { npc, npcSkills }, { removeOnComplete: true });
+                this.npcFreezer.tryToFreezeNPC(npc);
+
+                npc = await NPC.findById(npc._id).lean({
+                  virtuals: true,
+                  defaults: true,
+                });
+
+                npc.skills = npcSkills;
+
+                if (!npc.isBehaviorEnabled) {
+                  await this.npcFreezer.freezeNPC(npc);
+                  return;
+                }
+
+                if (await this.specialEffect.isStun(npc)) {
+                  return;
+                }
+
+                void this.startCoreNPCBehavior(npc);
               }
             );
           } catch (err) {
