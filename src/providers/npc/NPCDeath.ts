@@ -91,9 +91,14 @@ export class NPCDeath {
       throw new Error(`NPC not found with id ${npc._id}`);
     }
 
-    const npcSkills = (await Skill.findById(npc.skills).cacheQuery({
-      cacheKey: `npc-${npc._id}-skills`,
-    })) as ISkill;
+    const npcSkills = (await Skill.findById(npc.skills)
+      .lean({
+        virtuals: true,
+        defaults: true,
+      })
+      .cacheQuery({
+        cacheKey: `${npc._id}-skills`,
+      })) as ISkill;
 
     npcFound.skills = npcSkills;
 

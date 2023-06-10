@@ -144,10 +144,12 @@ export class NPCManager {
     }
 
     if (!npc.isBehaviorEnabled) {
-      const npcSkills = await Skill.find({ owner: npc._id }).cacheQuery({
-        cacheKey: `npc-${npc.id}-skills`,
-        ttl: 60 * 60 * 24 * 7,
-      });
+      const npcSkills = await Skill.findOne({ owner: npc._id })
+        .lean()
+        .cacheQuery({
+          cacheKey: `${npc.id}-skills`,
+          ttl: 60 * 60 * 24 * 7,
+        });
 
       new NPCCycle(
         npc.id,

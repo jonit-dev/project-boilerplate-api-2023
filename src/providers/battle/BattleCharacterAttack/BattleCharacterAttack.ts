@@ -2,7 +2,7 @@
 /* eslint-disable no-void */
 /* eslint-disable no-new */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { appEnv } from "@providers/config/env";
@@ -46,10 +46,15 @@ export class BattleCharacterAttack {
               throw new Error("Failed to get updated character for attacking target.");
             }
 
-            const characterSkills = await Skill.find({ owner: characterId }).cacheQuery({
-              cacheKey: `character-${characterId}-skills`,
-              ttl: 86400,
-            });
+            const characterSkills = (await Skill.findOne({ owner: characterId })
+              .lean({
+                virtuals: true,
+                defaults: true,
+              })
+              .cacheQuery({
+                cacheKey: `${characterId}-skills`,
+                ttl: 86400,
+              })) as ISkill;
 
             updatedCharacter.skills = characterSkills;
 
@@ -61,9 +66,14 @@ export class BattleCharacterAttack {
                 defaults: true,
               });
 
-              const updatedNPCSkills = await Skill.findOne({ owner: targetId }).cacheQuery({
-                cacheKey: `npc-${targetId}-skills`,
-              });
+              const updatedNPCSkills = await Skill.findOne({ owner: targetId })
+                .lean({
+                  virtuals: true,
+                  defaults: true,
+                })
+                .cacheQuery({
+                  cacheKey: `${targetId}-skills`,
+                });
 
               updatedTarget.skills = updatedNPCSkills;
             }
@@ -74,7 +84,7 @@ export class BattleCharacterAttack {
               });
 
               const updatedCharacterSkills = await Skill.findOne({ owner: targetId }).cacheQuery({
-                cacheKey: `character-${targetId}-skills`,
+                cacheKey: `${targetId}-skills`,
               });
 
               updatedTarget.skills = updatedCharacterSkills;

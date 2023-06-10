@@ -104,7 +104,7 @@ export class SkillFunctions {
       type: "info",
     });
 
-    await clearCacheForKey(`character-${character._id}-skills`);
+    await clearCacheForKey(`${character._id}-skills`);
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
 

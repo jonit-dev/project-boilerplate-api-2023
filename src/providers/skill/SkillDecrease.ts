@@ -17,7 +17,7 @@ export class SkillDecrease {
 
   public async deathPenalty(character: ICharacter): Promise<boolean> {
     try {
-      await clearCacheForKey(`character-${character._id}-skills`);
+      await clearCacheForKey(`${character._id}-skills`);
 
       const decreaseXp = await this.decreaseCharacterXp(character);
       const decreaseBasicAttributes = await this.decreaseBasicAttributeSP(character);

@@ -141,7 +141,7 @@ export class CharacterDeath {
     return charBody;
   }
 
-  private async respawnCharacter(character: ICharacter): Promise<void> {
+  public async respawnCharacter(character: ICharacter): Promise<void> {
     await Character.updateOne(
       { _id: character._id },
       {

@@ -41,7 +41,7 @@ export class NPCSeeder {
 
         const updateData = _.omit(multipliedNPCData, ["skills"]);
 
-        await clearCacheForKey(`npc-${npcFound.id}-skills`);
+        await clearCacheForKey(`${npcFound.id}-skills`);
 
         await NPC.updateOne(
           { key: key },

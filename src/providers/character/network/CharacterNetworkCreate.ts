@@ -33,6 +33,7 @@ import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
+import { CharacterDeath } from "../CharacterDeath";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
 
@@ -53,7 +54,7 @@ export class CharacterNetworkCreate {
     private specialEffect: SpecialEffect,
     private warriorPassiveHabilities: WarriorPassiveHabilities,
     private magePassiveHabilities: MagePassiveHabilities,
-
+    private characterDeath: CharacterDeath,
     private inMemoryHashTable: InMemoryHashTable
   ) {}
 
@@ -72,7 +73,7 @@ export class CharacterNetworkCreate {
           }
         );
 
-        const character = await Character.findById(connectionCharacter._id);
+        let character = (await Character.findById(connectionCharacter._id)) as ICharacter;
 
         if (!character) {
           console.log(`🚫 ${connectionCharacter.name} tried to create its instance but it was not found!`);
@@ -102,6 +103,12 @@ export class CharacterNetworkCreate {
           });
 
           return;
+        }
+
+        if (!character.isAlive) {
+          await this.characterDeath.respawnCharacter(character);
+
+          character = (await Character.findById(connectionCharacter._id)) as ICharacter;
         }
 
         /*
