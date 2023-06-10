@@ -249,8 +249,8 @@ export class NPCMovementMoveTowards {
 
       new NPCBattleCycle(
         npc.id,
-        () => {
-          this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "NpcBattleCycle", async () => {
+        async () => {
+          await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "NpcBattleCycle", async () => {
             const result = await Promise.all([
               NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
               Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true }),

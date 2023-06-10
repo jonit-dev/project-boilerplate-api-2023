@@ -1,7 +1,9 @@
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { appEnv } from "@providers/config/env";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import PF from "pathfinding";
 import { GridManager, IGridCourse } from "./GridManager";
@@ -14,7 +16,8 @@ export class Pathfinder {
     private mapHelper: MapHelper,
     private pathfindingCaching: PathfindingCaching,
     private inMemoryHashTable: InMemoryHashTable,
-    private gridManager: GridManager
+    private gridManager: GridManager,
+    private newRelic: NewRelic
   ) {}
 
   public async findShortestPath(
@@ -25,47 +28,53 @@ export class Pathfinder {
     endGridX: number,
     endGridY: number
   ): Promise<number[][] | undefined> {
-    if (!this.mapHelper.areAllCoordinatesValid([startGridX, startGridY], [endGridX, endGridY])) {
-      return;
-    }
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "Pathfinder/findShortestPath",
+      async () => {
+        if (!this.mapHelper.areAllCoordinatesValid([startGridX, startGridY], [endGridX, endGridY])) {
+          return;
+        }
 
-    const cachedShortestPath = await this.pathfindingCaching.get(map, {
-      start: {
-        x: startGridX,
-        y: startGridY,
-      },
-      end: {
-        x: endGridX,
-        y: endGridY,
-      },
-    });
+        const cachedShortestPath = await this.pathfindingCaching.get(map, {
+          start: {
+            x: startGridX,
+            y: startGridY,
+          },
+          end: {
+            x: endGridX,
+            y: endGridY,
+          },
+        });
 
-    const cachedNextStep = cachedShortestPath?.[0];
+        const cachedNextStep = cachedShortestPath?.[0];
 
-    const hasCircularRef = await this.hasCircularReferenceOnPathfinding(
-      npc,
-      map,
-      startGridX,
-      startGridY,
-      endGridX,
-      endGridY,
-      cachedNextStep!
+        const hasCircularRef = await this.hasCircularReferenceOnPathfinding(
+          npc,
+          map,
+          startGridX,
+          startGridY,
+          endGridX,
+          endGridY,
+          cachedNextStep!
+        );
+
+        if (cachedShortestPath?.length! > 0 && !hasCircularRef) {
+          return cachedShortestPath as number[][];
+        }
+
+        return this.findShortestPathBetweenPoints(map, {
+          start: {
+            x: startGridX,
+            y: startGridY,
+          },
+          end: {
+            x: endGridX,
+            y: endGridY,
+          },
+        });
+      }
     );
-
-    if (cachedShortestPath?.length! > 0 && !hasCircularRef) {
-      return cachedShortestPath as number[][];
-    }
-
-    return this.findShortestPathBetweenPoints(map, {
-      start: {
-        x: startGridX,
-        y: startGridY,
-      },
-      end: {
-        x: endGridX,
-        y: endGridY,
-      },
-    });
   }
 
   private async hasCircularReferenceOnPathfinding(

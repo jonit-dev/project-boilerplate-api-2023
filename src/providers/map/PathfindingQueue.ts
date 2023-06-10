@@ -58,6 +58,13 @@ export class PathfindingQueue {
     });
   }
 
+  public async clearAllJobs(): Promise<void> {
+    const jobs = await this.queue.getJobs(["waiting", "active", "delayed", "paused"]);
+    for (const job of jobs) {
+      await job.remove();
+    }
+  }
+
   async addPathfindingJob(
     npc: INPC,
     startGridX: number,

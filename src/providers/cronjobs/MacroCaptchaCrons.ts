@@ -16,14 +16,14 @@ export class MacroCaptchaCrons {
   ) {}
 
   public schedule(): void {
-    nodeCron.schedule("*/2 * * * *", () => {
-      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "BanMacroCharacters", async () => {
+    nodeCron.schedule("*/2 * * * *", async () => {
+      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "BanMacroCharacters", async () => {
         await this.banMacroCharacters();
       });
     });
 
-    nodeCron.schedule("*/10 * * * *", () => {
-      this.newRelic.trackTransaction(
+    nodeCron.schedule("*/10 * * * *", async () => {
+      await this.newRelic.trackTransaction(
         NewRelicTransactionCategory.CronJob,
         "SendMacroCaptchaToActiveCharacters",
         async () => {

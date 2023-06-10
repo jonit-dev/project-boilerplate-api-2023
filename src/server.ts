@@ -4,6 +4,7 @@ import "express-async-errors";
 
 import { appEnv } from "@providers/config/env";
 import {
+  battleCharacterAttackQueue,
   characterBuffActivator,
   characterConnection,
   characterFoodConsumption,
@@ -14,6 +15,7 @@ import {
   heapMonitor,
   mapLoader,
   npcManager,
+  pathfindingQueue,
   pathfindingResults,
   pm2Helper,
   redisManager,
@@ -29,6 +31,8 @@ import { app } from "@providers/server/app";
 import { EnvType } from "@rpg-engine/shared/dist";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
+
+const { Queue } = require("bullmq");
 
 const port = appEnv.general.SERVER_PORT || 3002;
 
@@ -65,6 +69,14 @@ app.listen(port, async () => {
   PushNotificationHelper.initialize();
 
   await npcManager.disableNPCBehaviors();
+
+  const clearAllQueues = async (): Promise<void> => {
+    await pathfindingQueue.clearAllJobs();
+    await battleCharacterAttackQueue.clearAllJobs();
+    console.log("🧹 BullMQ queues cleared...");
+  };
+
+  await clearAllQueues();
 
   await seeds.start();
 

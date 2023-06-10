@@ -1,3 +1,4 @@
+import { appEnv } from "@providers/config/env";
 import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import newrelic from "newrelic";
@@ -8,16 +9,23 @@ export class NewRelic {
     category: NewRelicTransactionCategory,
     event: string,
     callback: () => void | Promise<void> | Promise<any>
-  ): void {
-    newrelic.startBackgroundTransaction(event, category, async () => {
-      try {
-        await callback();
-      } catch (e) {
-        console.error(e);
-        throw e;
-      } finally {
-        newrelic.endTransaction();
+  ): Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (appEnv.general.IS_UNIT_TEST) {
+        return resolve(callback());
       }
+
+      newrelic.startBackgroundTransaction(event, category, async () => {
+        try {
+          const result = await callback();
+          resolve(result);
+        } catch (e) {
+          console.error(e);
+          reject(e);
+        } finally {
+          newrelic.endTransaction();
+        }
+      });
     });
   }
 
