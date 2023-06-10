@@ -13,3 +13,13 @@ jest.mock("newrelic", () => ({
   endTransaction: jest.fn(),
   recordMetric: jest.fn(),
 }));
+
+jest.mock("bullmq", () => ({
+  Queue: jest.fn(() => ({
+    add: jest.fn(),
+  })),
+  Worker: jest.fn(() => ({
+    on: jest.fn(),
+  })),
+  Job: jest.fn(),
+}));

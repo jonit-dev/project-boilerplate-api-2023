@@ -14,6 +14,7 @@ import {
   heapMonitor,
   mapLoader,
   npcManager,
+  pathfindingResults,
   pm2Helper,
   redisManager,
   seeds,
@@ -81,6 +82,8 @@ app.listen(port, async () => {
   await spellSilencer.removeAllSilence();
 
   await characterTextureChange.removeAllTextureChange();
+
+  await pathfindingResults.clearAllResults();
 
   if (appEnv.general.ENV === EnvType.Production) {
     Sentry.init({

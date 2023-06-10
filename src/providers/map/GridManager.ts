@@ -1,15 +1,10 @@
-import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { MapLayers } from "@rpg-engine/shared";
 import PF from "pathfinding";
-import { MapHelper } from "./MapHelper";
 import { MapSolids } from "./MapSolids";
 import { MapTiles } from "./MapTiles";
-import { PathfindingCaching } from "./PathfindingCaching";
 
-interface IGridCourse {
+export interface IGridCourse {
   start: {
     x: number;
     y: number;
@@ -21,11 +16,16 @@ interface IGridCourse {
   offset?: number;
 }
 
-interface IGridBounds {
+export interface IGridBounds {
   startX: number;
   startY: number;
   height: number;
   width: number;
+}
+interface IGridBetweenPoints {
+  grid: PF.Grid;
+  startX: number;
+  startY: number;
 }
 
 @provideSingleton(GridManager)
@@ -34,14 +34,7 @@ export class GridManager {
 
   private gridDimensions: Map<string, IGridBounds> = new Map();
 
-  constructor(
-    private mapTiles: MapTiles,
-    private mapSolids: MapSolids,
-    private mapHelper: MapHelper,
-    private pathfindingCaching: PathfindingCaching,
-    private inMemoryHashTable: InMemoryHashTable,
-    private newRelic: NewRelic
-  ) {}
+  constructor(private mapTiles: MapTiles, private mapSolids: MapSolids) {}
 
   public getGrid(map: string): number[][] {
     return this.grids.get(map)!;
@@ -159,145 +152,7 @@ export class GridManager {
     };
   }
 
-  public async findShortestPath(
-    npc: INPC,
-    map: string,
-    startGridX: number,
-    startGridY: number,
-    endGridX: number,
-    endGridY: number
-  ): Promise<number[][] | undefined> {
-    if (!this.mapHelper.areAllCoordinatesValid([startGridX, startGridY], [endGridX, endGridY])) {
-      return;
-    }
-
-    const cachedShortestPath = await this.pathfindingCaching.get(map, {
-      start: {
-        x: startGridX,
-        y: startGridY,
-      },
-      end: {
-        x: endGridX,
-        y: endGridY,
-      },
-    });
-
-    const cachedNextStep = cachedShortestPath?.[0];
-
-    const hasCircularRef = await this.hasCircularReferenceOnPathfinding(
-      npc,
-      map,
-      startGridX,
-      startGridY,
-      endGridX,
-      endGridY,
-      cachedNextStep!
-    );
-
-    if (cachedShortestPath?.length! > 0 && !hasCircularRef) {
-      return cachedShortestPath as number[][];
-    }
-
-    return this.findShortestPathBetweenPoints(map, {
-      start: {
-        x: startGridX,
-        y: startGridY,
-      },
-      end: {
-        x: endGridX,
-        y: endGridY,
-      },
-    });
-  }
-
-  private async hasCircularReferenceOnPathfinding(
-    npc: INPC,
-    map: string,
-    startGridX: number,
-    startGridY: number,
-    endGridX: number,
-    endGridY: number,
-    cachedNextStep: number[]
-  ): Promise<boolean> {
-    const previousNPCPosition = (await this.inMemoryHashTable.get("npc-previous-position", npc._id)) as number[];
-
-    // if the next step is the same as the previous NPC position, then we can assume that the NPC is stuck and we should recalculate the path
-    const hasCircularRef =
-      cachedNextStep &&
-      previousNPCPosition &&
-      cachedNextStep[0] === previousNPCPosition[0] &&
-      cachedNextStep[1] === previousNPCPosition[1];
-    if (hasCircularRef) {
-      await this.pathfindingCaching.delete(map, {
-        start: {
-          x: startGridX,
-          y: startGridY,
-        },
-        end: {
-          x: endGridX,
-          y: endGridY,
-        },
-      });
-
-      return true;
-    }
-
-    return false;
-  }
-
-  private async findShortestPathBetweenPoints(
-    map: string,
-    gridCourse: IGridCourse,
-    retries?: number
-  ): Promise<number[][]> {
-    if (!retries) {
-      retries = 0;
-    }
-
-    const data = this.generateGridBetweenPoints(map, gridCourse);
-    const grid = data.grid;
-
-    // translate co-ordinates to sub grid co-ordinates
-    const firstNode = { x: gridCourse.start.x - data.startX, y: gridCourse.start.y - data.startY };
-    const lastNode = { x: gridCourse.end.x - data.startX, y: gridCourse.end.y - data.startY };
-
-    grid.setWalkableAt(firstNode.x, firstNode.y, true);
-    grid.setWalkableAt(lastNode.x, lastNode.y, true);
-
-    const finder = new PF.BestFirstFinder(); // way more efficient than AStar in CPU usage!
-    const path = finder.findPath(firstNode.x, firstNode.y, lastNode.x, lastNode.y, grid);
-
-    const pathWithoutOffset = path.map(([x, y]) => [x + data.startX, y + data.startY]);
-
-    if (pathWithoutOffset.length < 1 && retries < 3) {
-      gridCourse.offset = Math.pow(10, retries + 1);
-      return this.findShortestPathBetweenPoints(map, gridCourse, ++retries);
-    }
-
-    const nextStep = pathWithoutOffset[1];
-
-    if (nextStep?.length) {
-      await this.pathfindingCaching.set(
-        map,
-
-        {
-          start: {
-            x: gridCourse.start.x,
-            y: gridCourse.start.y,
-          },
-          end: {
-            x: gridCourse.end.x,
-            y: gridCourse.end.y,
-          },
-        },
-        [nextStep]
-      );
-    }
-
-    return pathWithoutOffset;
-  }
-
-  private generateGridBetweenPoints(map: string, gridCourse: IGridCourse): any {
+  public generateGridBetweenPoints(map: string, gridCourse: IGridCourse): IGridBetweenPoints {
     const tree = this.getGrid(map);
     if (!tree) {
       throw new Error(`❌ Could not find grid for map: ${map}`);

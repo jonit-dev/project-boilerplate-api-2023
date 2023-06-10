@@ -1,9 +1,14 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { appEnv } from "@providers/config/env";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
+import { Pathfinder } from "@providers/map/Pathfinder";
+import { PathfindingQueue } from "@providers/map/PathfindingQueue";
+import { PathfindingResults } from "@providers/map/PathfindingResults";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { INPCPositionUpdatePayload, NPCAlignment, NPCSocketEvents, ToGridX, ToGridY } from "@rpg-engine/shared";
@@ -11,7 +16,6 @@ import { provide } from "inversify-binding-decorators";
 import { NPCView } from "../NPCView";
 import { NPCWarn } from "../NPCWarn";
 import { NPCTarget } from "./NPCTarget";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 export type NPCDirection = "up" | "down" | "left" | "right";
 
@@ -33,7 +37,10 @@ export class NPCMovement {
     private characterView: CharacterView,
     private npcWarn: NPCWarn,
     private specialEffect: SpecialEffect,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private pathfindingQueue: PathfindingQueue,
+    private pathfindingResults: PathfindingResults,
+    private pathfinder: Pathfinder
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -147,14 +154,13 @@ export class NPCMovement {
     endGridY: number
   ): Promise<IShortestPathPositionResult | undefined> {
     try {
-      const npcPath = await this.gridManager.findShortestPath(
-        npc,
-        npc.scene,
-        startGridX,
-        startGridY,
-        endGridX,
-        endGridY
-      );
+      let npcPath;
+      if (appEnv.general.IS_UNIT_TEST) {
+        npcPath = await this.pathfinder.findShortestPath(npc, npc.scene, startGridX, startGridY, endGridX, endGridY);
+      } else {
+        const job = await this.pathfindingQueue.addPathfindingJob(npc, startGridX, startGridY, endGridX, endGridY);
+        npcPath = await this.pathfinderPoller(job.id!);
+      }
 
       if (!npcPath?.length) {
         return;
@@ -189,5 +195,41 @@ export class NPCMovement {
       console.error(`❌ Error while trying to move NPC key: ${npc.key} at ${npc.x}, ${npc.y} - map ${npc.scene}`);
       console.error(error);
     }
+  }
+
+  private pathfinderPoller(jobId: string): Promise<number[][]> {
+    if (!jobId) {
+      throw new Error("Job ID is required!");
+    }
+
+    return new Promise((resolve, reject) => {
+      try {
+        let tries = 0;
+
+        const interval = setInterval(async () => {
+          const npcPath = await this.pathfindingResults.getResult(jobId);
+
+          if (npcPath) {
+            clearInterval(interval);
+
+            await this.pathfindingResults.deleteResult(jobId);
+
+            resolve(npcPath);
+          }
+
+          tries++;
+
+          if (tries > 100) {
+            clearInterval(interval);
+            await this.pathfindingResults.deleteResult(jobId);
+
+            reject(new Error("Error while trying to fetch pathfinding result for NPC. Timeout!"));
+          }
+        }, 50);
+      } catch (error) {
+        console.log(error);
+        reject(error);
+      }
+    });
   }
 }

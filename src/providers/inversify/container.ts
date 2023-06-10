@@ -7,6 +7,7 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { InMemoryRepository } from "@providers/database/InMemoryRepository";
 import { RedisManager } from "@providers/database/RedisManager";
 import { MapLoader } from "@providers/map/MapLoader";
+import { PathfindingResults } from "@providers/map/PathfindingResults";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -81,5 +82,7 @@ export const spellSilencer = container.get<SpellSilence>(SpellSilence);
 
 export const characterTextureChange = container.get<CharacterTextureChange>(CharacterTextureChange);
 export const skillIncrease = container.get<SkillIncrease>(SkillIncrease);
+
+export const pathfindingResults = container.get<PathfindingResults>(PathfindingResults);
 
 export { container };

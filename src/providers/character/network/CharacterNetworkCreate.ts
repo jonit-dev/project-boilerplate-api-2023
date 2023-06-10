@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
@@ -128,7 +129,7 @@ export class CharacterNetworkCreate {
 
         switch (appEnv.general.ENV) {
           case EnvType.Development:
-            await this.npcManager.startNearbyNPCsBehaviorLoop(character);
+            void this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
             break;
           case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
@@ -138,7 +139,7 @@ export class CharacterNetworkCreate {
             break;
         }
 
-        await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
+        void this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.itemView.warnCharacterAboutItemsInView(character, { always: true }); // dont await this because if there's a ton of garbage in the server, the character will be stuck waiting for this to finish
