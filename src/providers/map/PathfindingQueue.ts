@@ -56,10 +56,6 @@ export class PathfindingQueue {
     this.worker.on("failed", (job, err) => {
       console.log(`Job ${job?.id} failed with error ${err.message}`);
     });
-
-    this.worker.on("completed", (job) => {
-      job.remove().catch((err) => console.error(`Failed to remove job ${job.id}:`, err));
-    });
   }
 
   async addPathfindingJob(
@@ -72,6 +68,10 @@ export class PathfindingQueue {
     // avoid clogging the queue wtih too many jobs at the same time
     await this.time.waitForMilliseconds(random(50, 150));
 
-    return await this.queue.add("pathfindingJob", { npc, startGridX, startGridY, endGridX, endGridY });
+    return await this.queue.add(
+      "pathfindingJob",
+      { npc, startGridX, startGridY, endGridX, endGridY },
+      { removeOnComplete: true }
+    );
   }
 }

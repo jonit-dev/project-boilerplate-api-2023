@@ -27,7 +27,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { Queue, QueueEvents, Worker } from "bullmq";
+import { Queue, Worker } from "bullmq";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
@@ -36,7 +36,6 @@ import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWar
 export class CharacterNetworkUpdate {
   private queue: Queue;
   private worker: Worker;
-  private queueEvents: QueueEvents;
 
   constructor(
     private socketMessaging: SocketMessaging,
@@ -131,10 +130,6 @@ export class CharacterNetworkUpdate {
       }
     );
 
-    this.worker.on("completed", (job) => {
-      job.remove().catch((err) => console.error(`Failed to remove job ${job.id}:`, err));
-    });
-
     this.worker.on("failed", (job, err) => {
       console.log(`Job ${job?.id} failed with error ${err.message}`);
     });
@@ -145,10 +140,14 @@ export class CharacterNetworkUpdate {
       channel,
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
-        void this.queue.add("CharacterNetworkUpdate", {
-          data,
-          character,
-        });
+        void this.queue.add(
+          "CharacterNetworkUpdate",
+          {
+            data,
+            character,
+          },
+          { removeOnComplete: true }
+        );
       }
     );
   }

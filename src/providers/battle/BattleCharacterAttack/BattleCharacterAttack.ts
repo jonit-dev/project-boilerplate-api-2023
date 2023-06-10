@@ -8,7 +8,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { appEnv } from "@providers/config/env";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { Queue, QueueEvents, Worker } from "bullmq";
+import { Queue, Worker } from "bullmq";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
@@ -18,7 +18,6 @@ import { BattleCharacterAttackValidation } from "./BattleCharacterAttackValidati
 export class BattleCharacterAttack {
   private queue: Queue;
   private worker: Worker;
-  private queueEvents: QueueEvents;
 
   constructor(
     private battleAttackTarget: BattleAttackTarget,
@@ -37,53 +36,56 @@ export class BattleCharacterAttack {
       "BattleCharacterAttack",
       async (job) => {
         try {
-          const { characterId, targetId, targetType } = job.data;
+          this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "CharacterBattleCycle", async () => {
+            // get an updated version of the character and target.
+            const { characterId, targetId, targetType } = job.data;
 
-          const updatedCharacter = await Character.findOne({ _id: characterId });
+            const updatedCharacter = await Character.findOne({ _id: characterId });
 
-          if (!updatedCharacter) {
-            throw new Error("Failed to get updated character for attacking target.");
-          }
+            if (!updatedCharacter) {
+              throw new Error("Failed to get updated character for attacking target.");
+            }
 
-          const characterSkills = await Skill.find({ owner: characterId }).cacheQuery({
-            cacheKey: `character-${characterId}-skills`,
-            ttl: 86400,
+            const characterSkills = await Skill.find({ owner: characterId }).cacheQuery({
+              cacheKey: `character-${characterId}-skills`,
+              ttl: 86400,
+            });
+
+            updatedCharacter.skills = characterSkills;
+
+            let updatedTarget;
+
+            if (targetType === "NPC") {
+              updatedTarget = await NPC.findOne({ _id: targetId }).lean({
+                virtuals: true,
+                defaults: true,
+              });
+
+              const updatedNPCSkills = await Skill.findOne({ owner: targetId }).cacheQuery({
+                cacheKey: `npc-${targetId}-skills`,
+              });
+
+              updatedTarget.skills = updatedNPCSkills;
+            }
+            if (targetType === "Character") {
+              updatedTarget = await Character.findOne({ _id: targetId }).lean({
+                virtuals: true,
+                defaults: true,
+              });
+
+              const updatedCharacterSkills = await Skill.findOne({ owner: targetId }).cacheQuery({
+                cacheKey: `character-${targetId}-skills`,
+              });
+
+              updatedTarget.skills = updatedCharacterSkills;
+            }
+
+            if (!updatedCharacter || !updatedTarget) {
+              throw new Error("Failed to get updated required elements for attacking target.");
+            }
+
+            await this.attackTarget(updatedCharacter, updatedTarget);
           });
-
-          updatedCharacter.skills = characterSkills;
-
-          let updatedTarget;
-
-          if (targetType === "NPC") {
-            updatedTarget = await NPC.findOne({ _id: targetId }).lean({
-              virtuals: true,
-              defaults: true,
-            });
-
-            const updatedNPCSkills = await Skill.findOne({ owner: targetId }).cacheQuery({
-              cacheKey: `npc-${targetId}-skills`,
-            });
-
-            updatedTarget.skills = updatedNPCSkills;
-          }
-          if (targetType === "Character") {
-            updatedTarget = await Character.findOne({ _id: targetId }).lean({
-              virtuals: true,
-              defaults: true,
-            });
-
-            const updatedCharacterSkills = await Skill.findOne({ owner: targetId }).cacheQuery({
-              cacheKey: `character-${targetId}-skills`,
-            });
-
-            updatedTarget.skills = updatedCharacterSkills;
-          }
-
-          if (!updatedCharacter || !updatedTarget) {
-            throw new Error("Failed to get updated required elements for attacking target.");
-          }
-
-          await this.attackTarget(updatedCharacter, updatedTarget);
         } catch (error) {
           console.error(error);
         }
@@ -99,10 +101,6 @@ export class BattleCharacterAttack {
     this.worker.on("failed", (job, err) => {
       console.log(`Job ${job?.id} failed with error ${err.message}`);
     });
-
-    this.worker.on("completed", (job) => {
-      job.remove().catch((err) => console.error(`Failed to remove job ${job.id}:`, err));
-    });
   }
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
@@ -116,14 +114,15 @@ export class BattleCharacterAttack {
     new BattleCycle(
       character.id,
       async () => {
-        this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "CharacterBattleCycle", async () => {
-          // get an updated version of the character and target.
-          await this.queue.add("BattleCharacterAttack", {
+        await this.queue.add(
+          "BattleCharacterAttack",
+          {
             characterId: character.id,
             targetId: target.id,
             targetType: target.type,
-          });
-        });
+          },
+          { removeOnComplete: true }
+        );
       },
       character.attackIntervalSpeed
     );
