@@ -11,8 +11,8 @@ export class CleanupBloodCrons {
   constructor(private newRelic: NewRelic) {}
 
   public schedule(): void {
-    nodeCron.schedule("*/5 * * * *", () => {
-      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "CleanupBloodCrons", async () => {
+    nodeCron.schedule("*/5 * * * *", async () => {
+      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "CleanupBloodCrons", async () => {
         const fiveMinAgo = new Date();
         fiveMinAgo.setMinutes(fiveMinAgo.getMinutes() - 5);
 

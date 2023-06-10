@@ -11,10 +11,10 @@ export class NPCCrons {
   constructor(private npcSpawn: NPCSpawn, private newRelic: NewRelic) {}
 
   public schedule(): void {
-    nodeCron.schedule("* * * * *", () => {
+    nodeCron.schedule("* * * * *", async () => {
       // filter all dead npcs that have a nextSpawnTime > now
 
-      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "NPCSpawn", async () => {
+      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "NPCSpawn", async () => {
         const deadNPCs = (await NPC.find({
           health: 0,
           isBehaviorEnabled: false,

@@ -10,8 +10,8 @@ export class ChatLogCrons {
   constructor(private newRelic: NewRelic) {}
 
   public schedule(): void {
-    nodeCron.schedule("0 0 * * 7", () => {
-      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "DeleteOldChatLogs", async () => {
+    nodeCron.schedule("0 0 * * 7", async () => {
+      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "DeleteOldChatLogs", async () => {
         await this.deleteOldMessages();
       });
     });

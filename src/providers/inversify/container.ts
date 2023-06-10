@@ -1,3 +1,4 @@
+import { BattleCharacterAttack } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttack";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { CharacterMonitor } from "@providers/character/CharacterMonitor";
@@ -7,6 +8,7 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { InMemoryRepository } from "@providers/database/InMemoryRepository";
 import { RedisManager } from "@providers/database/RedisManager";
 import { MapLoader } from "@providers/map/MapLoader";
+import { PathfindingQueue } from "@providers/map/PathfindingQueue";
 import { PathfindingResults } from "@providers/map/PathfindingResults";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import { NPCLoader } from "@providers/npc/NPCLoader";
@@ -84,5 +86,8 @@ export const characterTextureChange = container.get<CharacterTextureChange>(Char
 export const skillIncrease = container.get<SkillIncrease>(SkillIncrease);
 
 export const pathfindingResults = container.get<PathfindingResults>(PathfindingResults);
+
+export const pathfindingQueue = container.get<PathfindingQueue>(PathfindingQueue);
+export const battleCharacterAttackQueue = container.get<BattleCharacterAttack>(BattleCharacterAttack);
 
 export { container };

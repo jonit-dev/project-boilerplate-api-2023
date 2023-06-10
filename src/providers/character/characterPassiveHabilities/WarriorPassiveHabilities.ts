@@ -53,8 +53,8 @@ export class WarriorPassiveHabilities {
       const healthRegenAmount = Math.max(Math.floor(strengthLvl / 3), 4);
 
       if (health < maxHealth) {
-        const intervalId = setInterval(() => {
-          this.newRelic.trackTransaction(
+        const intervalId = setInterval(async () => {
+          await this.newRelic.trackTransaction(
             NewRelicTransactionCategory.Interval,
             "WarriorAutoRegenHealthHandler",
             async () => {

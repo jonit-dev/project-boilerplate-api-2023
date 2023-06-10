@@ -96,9 +96,9 @@ export class NPCManager {
 
       new NPCCycle(
         npc.id,
-        () => {
+        async () => {
           try {
-            this.newRelic.trackTransaction(
+            await this.newRelic.trackTransaction(
               NewRelicTransactionCategory.Operation,
               `NPCCycle/${npc.currentMovementType}`,
               async () => {

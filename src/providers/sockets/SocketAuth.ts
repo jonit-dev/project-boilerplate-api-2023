@@ -82,9 +82,13 @@ export class SocketAuth {
           await this.characterLastAction.setLastAction(character._id, dayjs().toISOString());
         }
 
-        this.newRelic.trackTransaction(NewRelicTransactionCategory.SocketEvent, event, async (): Promise<void> => {
-          await callback(data, character, owner);
-        });
+        await this.newRelic.trackTransaction(
+          NewRelicTransactionCategory.SocketEvent,
+          event,
+          async (): Promise<void> => {
+            await callback(data, character, owner);
+          }
+        );
         // console.log(`📨 Received ${event} from ${character.name}(${character._id}): ${JSON.stringify(data)}`);
       } catch (error) {
         console.error(`${character.name} => ${event}, channel ${channel} failed with error: ${error}`);

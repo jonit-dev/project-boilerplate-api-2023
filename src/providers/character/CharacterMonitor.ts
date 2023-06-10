@@ -42,8 +42,8 @@ export class CharacterMonitor {
   }
 
   private execCallbacks(): void {
-    setInterval(() => {
-      this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "CharacterMonitor", async () => {
+    setInterval(async () => {
+      await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "CharacterMonitor", async () => {
         const characterIds = this.charactersCallbacks.keys();
 
         for (const characterId of characterIds) {

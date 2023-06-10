@@ -1,7 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { GRID_HEIGHT, GRID_WIDTH, IViewElement, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -21,7 +23,8 @@ export class CharacterView {
   constructor(
     private socketTransmissionZone: SocketTransmissionZone,
     private mathHelper: MathHelper,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private newRelic: NewRelic
   ) {}
 
   public async addToCharacterView(
@@ -218,37 +221,43 @@ export class CharacterView {
     scene: string,
     filter?: Record<string, any>
   ): Promise<T[]> {
-    const socketTransmissionZone = this.socketTransmissionZone.calculateSocketTransmissionZone(
-      x,
-      y,
-      GRID_WIDTH,
-      GRID_HEIGHT,
-      SOCKET_TRANSMISSION_ZONE_WIDTH,
-      SOCKET_TRANSMISSION_ZONE_WIDTH
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "CharacterView/getOtherElementsInView",
+      async () => {
+        const socketTransmissionZone = this.socketTransmissionZone.calculateSocketTransmissionZone(
+          x,
+          y,
+          GRID_WIDTH,
+          GRID_HEIGHT,
+          SOCKET_TRANSMISSION_ZONE_WIDTH,
+          SOCKET_TRANSMISSION_ZONE_WIDTH
+        );
+
+        // @ts-ignore
+        const otherCharactersInView = await Element.find({
+          $and: [
+            {
+              x: {
+                $gte: socketTransmissionZone.x,
+                $lte: socketTransmissionZone.width,
+              },
+            },
+            {
+              y: {
+                $gte: socketTransmissionZone.y,
+                $lte: socketTransmissionZone.height,
+              },
+            },
+            {
+              scene,
+              ...filter,
+            },
+          ],
+        }).lean({ virtuals: true, defaults: true }); //! Required until we have quadtrees
+
+        return otherCharactersInView as unknown as T[];
+      }
     );
-
-    // @ts-ignore
-    const otherCharactersInView = await Element.find({
-      $and: [
-        {
-          x: {
-            $gte: socketTransmissionZone.x,
-            $lte: socketTransmissionZone.width,
-          },
-        },
-        {
-          y: {
-            $gte: socketTransmissionZone.y,
-            $lte: socketTransmissionZone.height,
-          },
-        },
-        {
-          scene,
-          ...filter,
-        },
-      ],
-    }).lean({ virtuals: true, defaults: true }); //! Required until we have quadtrees
-
-    return otherCharactersInView as unknown as T[];
   }
 }

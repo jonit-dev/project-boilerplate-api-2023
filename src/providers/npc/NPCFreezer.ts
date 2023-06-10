@@ -37,8 +37,8 @@ export class NPCFreezer {
     // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
     const checkRange = random(2000, 4000);
 
-    const interval = setInterval(() => {
-      this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NPCFreezer", async () => {
+    const interval = setInterval(async () => {
+      await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NPCFreezer", async () => {
         const shouldFreezeNPC = await this.shouldFreezeNPC(npc);
 
         if (!shouldFreezeNPC) {

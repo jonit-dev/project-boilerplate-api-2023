@@ -6,7 +6,9 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BasicAttribute, CharacterSocketEvents, ICharacterAttributeChanged, ItemType } from "@rpg-engine/shared";
 
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { TraitGetter } from "@providers/skill/TraitGetter";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { CharacterInventory } from "./CharacterInventory";
@@ -18,36 +20,43 @@ export class CharacterWeight {
     private characterInventory: CharacterInventory,
     private socketMessaging: SocketMessaging,
     private characterItemInventory: CharacterItemInventory,
-    private traitGetter: TraitGetter
+    private traitGetter: TraitGetter,
+    private newRelic: NewRelic
   ) {}
 
   public async updateCharacterWeight(character: ICharacter): Promise<void> {
-    const weight = await this.getWeight(character);
-    const maxWeight = await this.getMaxWeight(character);
+    await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "CharacterWeight/updateCharacterWeight",
+      async () => {
+        const weight = await this.getWeight(character);
+        const maxWeight = await this.getMaxWeight(character);
 
-    await Character.updateOne(
-      {
-        _id: character._id,
-      },
-      {
-        $set: {
-          weight,
-          maxWeight,
-        },
-      }
-    );
+        await Character.updateOne(
+          {
+            _id: character._id,
+          },
+          {
+            $set: {
+              weight,
+              maxWeight,
+            },
+          }
+        );
 
-    //! Requires virtuals
-    character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
+        //! Requires virtuals
+        character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
 
-    this.socketMessaging.sendEventToUser<ICharacterAttributeChanged>(
-      character.channelId!,
-      CharacterSocketEvents.AttributeChanged,
-      {
-        speed: character.speed,
-        weight,
-        maxWeight,
-        targetId: character._id,
+        this.socketMessaging.sendEventToUser<ICharacterAttributeChanged>(
+          character.channelId!,
+          CharacterSocketEvents.AttributeChanged,
+          {
+            speed: character.speed,
+            weight,
+            maxWeight,
+            targetId: character._id,
+          }
+        );
       }
     );
   }
