@@ -82,7 +82,22 @@ export class NPCDeath {
   }
 
   private async getNPCWithSkills(npc: INPC): Promise<INPC> {
-    return await npc.populate("skills").execPopulate();
+    const npcFound = (await NPC.findById(npc._id).lean({
+      virtuals: true,
+      defaults: true,
+    })) as INPC;
+
+    if (!npcFound) {
+      throw new Error(`NPC not found with id ${npc._id}`);
+    }
+
+    const npcSkills = (await Skill.findById(npc.skills).cacheQuery({
+      cacheKey: `npc-${npc._id}-skills`,
+    })) as ISkill;
+
+    npcFound.skills = npcSkills;
+
+    return npcFound;
   }
 
   private async updateNPCAfterDeath(npc: INPC): Promise<void> {
@@ -94,13 +109,21 @@ export class NPCDeath {
 
     const strengthLevel = skills.strength.level;
 
-    npc.health = 0;
+    const nextSpawnTime = this.npcSpawn.calculateSpawnTime(strengthLevel);
+    const currentMovementType = npc.originalMovementType;
 
-    npc.nextSpawnTime = this.npcSpawn.calculateSpawnTime(strengthLevel);
-    npc.currentMovementType = npc.originalMovementType;
-    npc.appliedEntityEffects = undefined;
-    npc.isBehaviorEnabled = false;
-    await npc.save();
+    await NPC.updateOne(
+      { _id: npc.id },
+      {
+        $set: {
+          health: 0,
+          nextSpawnTime,
+          currentMovementType: currentMovementType,
+          appliedEntityEffects: undefined,
+          isBehaviorEnabled: false,
+        },
+      }
+    );
   }
 
   public async generateNPCBody(npc: INPC): Promise<IItem> {

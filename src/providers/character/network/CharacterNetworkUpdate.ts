@@ -1,3 +1,5 @@
+/* eslint-disable require-await */
+/* eslint-disable no-void */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
 import { GridManager } from "@providers/map/GridManager";
@@ -25,12 +27,17 @@ import {
 import { provide } from "inversify-binding-decorators";
 
 import { NPC } from "@entities/ModuleNPC/NPCModel";
+import { Queue, QueueEvents, Worker } from "bullmq";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
 
 @provide(CharacterNetworkUpdate)
 export class CharacterNetworkUpdate {
+  private queue: Queue;
+  private worker: Worker;
+  private queueEvents: QueueEvents;
+
   constructor(
     private socketMessaging: SocketMessaging,
     private socketAuth: SocketAuth,
@@ -44,67 +51,104 @@ export class CharacterNetworkUpdate {
     private mathHelper: MathHelper,
     private characterView: CharacterView,
     private pm2Helper: PM2Helper
-  ) {}
+  ) {
+    this.queue = new Queue("CharacterNetworkUpdate", {
+      connection: {
+        host: appEnv.database.REDIS_CONTAINER,
+        port: Number(appEnv.database.REDIS_PORT),
+      },
+    });
+
+    this.worker = new Worker(
+      "CharacterNetworkUpdate",
+      async (job) => {
+        const { data, character } = job.data;
+
+        try {
+          if (data) {
+            // sometimes the character is just changing facing direction and not moving.. That's why we need this.
+            const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
+
+            // send message back to the user telling that the requested position update is not valid!
+
+            let isPositionUpdateValid = true;
+
+            const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
+              character.x,
+              character.y,
+              data.direction
+            );
+
+            if (isMoving) {
+              isPositionUpdateValid = await this.characterMovementValidation.isValid(character, newX, newY, isMoving);
+            }
+
+            if (isPositionUpdateValid) {
+              const serverCharacterPosition = {
+                x: character.x,
+                y: character.y,
+              };
+
+              await this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
+
+              await this.characterMovementWarn.warn(character, data);
+
+              switch (appEnv.general.ENV) {
+                case EnvType.Development:
+                  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                  this.npcManager.startNearbyNPCsBehaviorLoop(character);
+
+                  break;
+                case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
+                  this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
+                    character,
+                  });
+                  break;
+              }
+
+              await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
+
+              await this.handleNonPVPZone(character, newX, newY);
+
+              // leave it for last!
+              await this.handleMapTransition(character, newX, newY);
+
+              // eslint-disable-next-line @typescript-eslint/no-floating-promises
+              this.characterView.clearAllOutOfViewElements(character);
+            }
+
+            this.sendConfirmation(character, data.direction, isPositionUpdateValid);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      {
+        connection: {
+          host: appEnv.database.REDIS_CONTAINER,
+          port: Number(appEnv.database.REDIS_PORT),
+        },
+      }
+    );
+
+    this.worker.on("completed", (job) => {
+      job.remove().catch((err) => console.error(`Failed to remove job ${job.id}:`, err));
+    });
+
+    this.worker.on("failed", (job, err) => {
+      console.log(`Job ${job?.id} failed with error ${err.message}`);
+    });
+  }
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
-        if (data) {
-          // sometimes the character is just changing facing direction and not moving.. That's why we need this.
-          const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
-
-          // send message back to the user telling that the requested position update is not valid!
-
-          let isPositionUpdateValid = true;
-
-          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
-            character.x,
-            character.y,
-            data.direction
-          );
-
-          if (isMoving) {
-            isPositionUpdateValid = await this.characterMovementValidation.isValid(character, newX, newY, isMoving);
-          }
-
-          if (isPositionUpdateValid) {
-            const serverCharacterPosition = {
-              x: character.x,
-              y: character.y,
-            };
-
-            await this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
-
-            await this.characterMovementWarn.warn(character, data);
-
-            switch (appEnv.general.ENV) {
-              case EnvType.Development:
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                this.npcManager.startNearbyNPCsBehaviorLoop(character);
-
-                break;
-              case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
-                this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
-                  character,
-                });
-                break;
-            }
-
-            await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
-
-            await this.handleNonPVPZone(character, newX, newY);
-
-            // leave it for last!
-            await this.handleMapTransition(character, newX, newY);
-
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.characterView.clearAllOutOfViewElements(character);
-          }
-
-          this.sendConfirmation(character, data.direction, isPositionUpdateValid);
-        }
+        void this.queue.add("CharacterNetworkUpdate", {
+          data,
+          character,
+        });
       }
     );
   }

@@ -3,6 +3,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterDeathCalculator } from "@providers/character/CharacterDeathCalculator";
 import { BASIC_ATTRIBUTES, COMBAT_SKILLS, ISkillDetails, SKILLS_MAP, calculateSPToNextLevel } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { clearCacheForKey } from "speedgoose";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
 
@@ -16,6 +17,8 @@ export class SkillDecrease {
 
   public async deathPenalty(character: ICharacter): Promise<boolean> {
     try {
+      await clearCacheForKey(`character-${character._id}-skills`);
+
       const decreaseXp = await this.decreaseCharacterXp(character);
       const decreaseBasicAttributes = await this.decreaseBasicAttributeSP(character);
       const decreaseCombatSkills = await this.decreaseCombatSkillsSP(character);

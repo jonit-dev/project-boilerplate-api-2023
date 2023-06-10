@@ -19,6 +19,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { SkillCalculator } from "./SkillCalculator";
 
 @provide(SkillFunctions)
@@ -102,6 +103,8 @@ export class SkillFunctions {
       )} fighting.`,
       type: "info",
     });
+
+    await clearCacheForKey(`character-${character._id}-skills`);
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
 
