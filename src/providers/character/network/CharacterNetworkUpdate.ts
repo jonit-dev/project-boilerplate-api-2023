@@ -131,6 +131,10 @@ export class CharacterNetworkUpdate {
       }
     );
 
+    this.worker.on("completed", (job) => {
+      job.remove().catch((err) => console.error(`Failed to remove job ${job.id}:`, err));
+    });
+
     this.worker.on("failed", (job, err) => {
       console.log(`Job ${job?.id} failed with error ${err.message}`);
     });

@@ -56,6 +56,10 @@ export class PathfindingQueue {
     this.worker.on("failed", (job, err) => {
       console.log(`Job ${job?.id} failed with error ${err.message}`);
     });
+
+    this.worker.on("completed", (job) => {
+      job.remove().catch((err) => console.error(`Failed to remove job ${job.id}:`, err));
+    });
   }
 
   async addPathfindingJob(

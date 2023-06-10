@@ -49,7 +49,7 @@ export class NPCGiantForm {
     npc: INPC,
     percent = NPC_GIANT_FORM_SPAWN_PERCENTAGE_CHANCE
   ): Promise<void> {
-    await clearCacheForKey(`${npc.id}-skills`);
+    await clearCacheForKey(`npc-${npc.id}-skills`);
 
     if (npc.isGiantForm || npc.alignment !== NPCAlignment.Hostile) return;
 

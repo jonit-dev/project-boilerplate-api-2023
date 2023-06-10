@@ -77,6 +77,7 @@ describe("CharacterDeath.ts", () => {
     expect(postDeathCharacter.x === postDeathCharacter.initialX).toBeTruthy();
     expect(postDeathCharacter.y === postDeathCharacter.initialY).toBeTruthy();
     expect(postDeathCharacter.scene === postDeathCharacter.initialScene).toBeTruthy();
+    expect(postDeathCharacter.appliedEntityEffects).toHaveLength(0);
   });
 
   it("should properly warn characters around, about character's death", async () => {
@@ -95,6 +96,35 @@ describe("CharacterDeath.ts", () => {
 
     expect(clearEffectsSpy).toHaveBeenCalled();
     expect(clearEffectsSpy).toHaveBeenCalledWith(testCharacter);
+  });
+
+  it("should always call the respawnCharacter method even if another promise fails", async () => {
+    // Create a spy on the respawnCharacter method
+    // @ts-ignore
+    const respawnSpy = jest.spyOn(characterDeath, "respawnCharacter");
+
+    // Temporarily replace the clearAttackerTarget method to throw an error
+    // @ts-ignore
+    const originalMethod = characterDeath.clearAttackerTarget;
+    // @ts-ignore
+    characterDeath.clearAttackerTarget = jest.fn().mockRejectedValue(new Error("Mock error"));
+
+    try {
+      await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+    } catch (error) {
+      // Ignore the error for this test, as we're only checking if respawnCharacter was called
+    }
+
+    // Assert that the respawnCharacter method was called
+    expect(respawnSpy).toBeCalledWith(testCharacter);
+
+    // Clean up the spy
+    // @ts-ignore
+    respawnSpy.mockRestore();
+
+    // Restore the original method
+    // @ts-ignore
+    characterDeath.clearAttackerTarget = originalMethod;
   });
 });
 

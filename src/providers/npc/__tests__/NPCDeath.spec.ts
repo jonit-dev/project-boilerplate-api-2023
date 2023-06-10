@@ -142,6 +142,8 @@ describe("NPCDeath.ts", () => {
 
     expect(npcBody).toBeDefined();
 
+    testNPC = (await NPC.findById(testNPC._id)) as INPC;
+
     expect(!testNPC.isAlive).toBeTruthy();
 
     expect(testNPC.nextSpawnTime).toBeDefined();
@@ -367,7 +369,7 @@ describe("NPCDeath.ts", () => {
     expect(updatedNPC.health).toBe(0);
     expect(updatedNPC.nextSpawnTime).toBeDefined();
     expect(updatedNPC.currentMovementType).toBe(updatedNPC!.originalMovementType);
-    expect(updatedNPC.appliedEntityEffects?.length).toBe(0);
+    expect(updatedNPC.appliedEntityEffects).toBeNull();
   });
 
   it("should add isDeadBodyLootable flag to NPC body on loot drop", async () => {

@@ -241,7 +241,7 @@ export class NPCMovementMoveTowards {
       const npcSkills = (await Skill.findById(npc.skills)
         .lean({ virtuals: true, defaults: true })
         .cacheQuery({
-          cacheKey: `${npc.id}-skills`,
+          cacheKey: `npc-${npc.id}-skills`,
           ttl: 60 * 60 * 24 * 7,
         })) as ISkill;
 
