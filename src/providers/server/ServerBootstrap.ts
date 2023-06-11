@@ -80,7 +80,6 @@ export class ServerBootstrap {
 
   private async clearAllQueues(): Promise<void> {
     await this.pathfindingQueue.clearAllJobs();
-    await this.battleCharacterAttackQueue.clearAllJobs();
     console.log("🧹 BullMQ queues cleared...");
   }
 }
