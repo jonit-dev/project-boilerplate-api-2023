@@ -2,7 +2,10 @@ import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { MapLayers } from "@rpg-engine/shared";
 import PF from "pathfinding";
 import { MapSolids } from "./MapSolids";
-import { MapTiles } from "./MapTiles";
+import { MapGridSolidsStorage } from "./storage/MapGridSolidsStorage";
+
+import mapVersions from "../../../public/config/map-versions.json";
+import { MapProperties } from "./MapProperties";
 
 export interface IGridCourse {
   start: {
@@ -32,9 +35,11 @@ interface IGridBetweenPoints {
 export class GridManager {
   private grids: Map<string, number[][]> = new Map();
 
-  private gridDimensions: Map<string, IGridBounds> = new Map();
-
-  constructor(private mapTiles: MapTiles, private mapSolids: MapSolids) {}
+  constructor(
+    private mapSolids: MapSolids,
+    private mapGridSolidsStorage: MapGridSolidsStorage,
+    private mapProperties: MapProperties
+  ) {}
 
   public getGrid(map: string): number[][] {
     return this.grids.get(map)!;
@@ -44,9 +49,30 @@ export class GridManager {
     return !!this.grids.get(map);
   }
 
-  public generateGridSolids(map: string): void {
-    const bounds = this.getMapDimensions(map, true);
-    const offset = this.getMapOffset(bounds.startX, bounds.startY)!;
+  public async generateGridSolids(map: string): Promise<void> {
+    const bounds = this.mapProperties.getMapDimensions(map, true);
+    const offset = this.mapProperties.getMapOffset(bounds.startX, bounds.startY)!;
+
+    const currentMapVersion = mapVersions[map];
+
+    // check if we already have the grid for this map on redis (pre-calculated), or if we should calculate it
+    const storedMapVersion = await this.mapGridSolidsStorage.getGridSolidsVersion(map);
+
+    if (storedMapVersion && storedMapVersion === currentMapVersion) {
+      const tree = await this.mapGridSolidsStorage.getGridSolids(map);
+
+      if (!tree) {
+        throw new Error("❌Could not find grid for map: " + map);
+      }
+
+      this.grids.set(map, tree);
+
+      return;
+    }
+
+    // if not, delete what we have there and regenerate
+
+    await this.mapGridSolidsStorage.deleteGridSolids(map);
 
     const tree: number[][] = []; // new Quadtree({ width: bounds.width, height: bounds.height });
 
@@ -68,6 +94,8 @@ export class GridManager {
       }
     }
 
+    await this.mapGridSolidsStorage.setGridSolids(map, tree);
+
     this.grids.set(map, tree);
   }
 
@@ -79,8 +107,8 @@ export class GridManager {
         throw new Error("❌Could not find grid for map: " + map);
       }
 
-      const bounds = this.getMapDimensions(map);
-      const offset = this.getMapOffset(bounds.startX, bounds.startY)!;
+      const bounds = this.mapProperties.getMapDimensions(map);
+      const offset = this.mapProperties.getMapOffset(bounds.startX, bounds.startY)!;
 
       return grid[gridY + offset.gridOffsetY][gridX + offset.gridOffsetX] === 0;
     } catch (error) {
@@ -97,8 +125,8 @@ export class GridManager {
         throw new Error("❌Could not find grid for map: " + map);
       }
 
-      const bounds = this.getMapDimensions(map);
-      const offset = this.getMapOffset(bounds.startX, bounds.startY)!;
+      const bounds = this.mapProperties.getMapDimensions(map);
+      const offset = this.mapProperties.getMapOffset(bounds.startX, bounds.startY)!;
 
       grid[gridY + offset.gridOffsetY][gridX + offset.gridOffsetX] = walkable ? 0 : 1;
       // also save this change to redis, so it can persist. Otherwise, we'll get a brand new grid everytime we call this.getGrid
@@ -108,58 +136,14 @@ export class GridManager {
     }
   }
 
-  private getMapDimensions(map: string, calculate?: boolean): IGridBounds {
-    let dimens = !calculate ? this.gridDimensions.get(map) : null;
-    if (dimens) {
-      return dimens;
-    }
-
-    const initialXY = this.mapTiles.getFirstXY(map);
-
-    if (!initialXY) {
-      throw new Error(`❌ Failed to get first XY for ${map}`);
-    }
-
-    const offset = this.getMapOffset(initialXY[0], initialXY[1])!;
-    const dimensions = this.mapTiles.getMapWidthHeight(map, offset.gridOffsetX, offset.gridOffsetY);
-
-    dimens = {
-      startX: initialXY[0],
-      startY: initialXY[1],
-      width: dimensions.width,
-      height: dimensions.height,
-    };
-
-    this.gridDimensions.set(map, dimens);
-
-    return dimens;
-  }
-
-  private getMapOffset(initialX: number, initialY: number): { gridOffsetX: number; gridOffsetY: number } | undefined {
-    let gridOffsetX = 0;
-    let gridOffsetY = 0;
-
-    if (initialX < 0) {
-      gridOffsetX = Math.abs(initialX);
-    }
-    if (initialY < 0) {
-      gridOffsetY = Math.abs(initialY);
-    }
-
-    return {
-      gridOffsetX,
-      gridOffsetY,
-    };
-  }
-
   public generateGridBetweenPoints(map: string, gridCourse: IGridCourse): IGridBetweenPoints {
     const tree = this.getGrid(map);
     if (!tree) {
       throw new Error(`❌ Could not find grid for map: ${map}`);
     }
 
-    const dimens = this.getMapDimensions(map);
-    const offset = this.getMapOffset(dimens.startX, dimens.startY)!;
+    const dimens = this.mapProperties.getMapDimensions(map);
+    const offset = this.mapProperties.getMapOffset(dimens.startX, dimens.startY)!;
 
     const bounds = this.getSubGridBounds(map, gridCourse);
 
@@ -192,7 +176,7 @@ export class GridManager {
     let height = Math.abs(end.y - start.y) + 1;
 
     if (gridCourse.offset && gridCourse.offset > 0) {
-      const mapDimens = this.getMapDimensions(map);
+      const mapDimens = this.mapProperties.getMapDimensions(map);
 
       const minGridX = mapDimens.startX;
       const minGridY = mapDimens.startY;

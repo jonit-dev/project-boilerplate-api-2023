@@ -4,35 +4,22 @@ import "express-async-errors";
 
 import { appEnv } from "@providers/config/env";
 import {
-  battleCharacterAttackQueue,
-  characterBuffActivator,
-  characterConnection,
-  characterFoodConsumption,
-  characterMonitor,
-  characterTextureChange,
   cronJobs,
   db,
-  heapMonitor,
   mapLoader,
-  npcManager,
-  pathfindingQueue,
-  pathfindingResults,
-  pm2Helper,
+  newRelic,
   redisManager,
-  seeds,
   server,
+  serverBootstrap,
   socketAdapter,
-  spellSilencer,
 } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";
-import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { router } from "@providers/server/Router";
 import { app } from "@providers/server/app";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EnvType } from "@rpg-engine/shared/dist";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
-
-const { Queue } = require("bullmq");
 
 const port = appEnv.general.SERVER_PORT || 3002;
 
@@ -41,80 +28,52 @@ if (!appEnv.general.IS_UNIT_TEST) {
 }
 
 app.listen(port, async () => {
-  server.showBootstrapMessage({
-    appName: appEnv.general.APP_NAME!,
-    port: appEnv.general.SERVER_PORT!,
-    timezone: appEnv.general.TIMEZONE!,
-    adminEmail: appEnv.general.ADMIN_EMAIL!,
-    language: appEnv.general.LANGUAGE!,
-    phoneLocale: appEnv.general.PHONE_LOCALE!,
-  });
-
-  await db.init();
-  await redisManager.connect();
-
-  await cronJobs.start();
-  await socketAdapter.init(appEnv.socket.type);
-
-  await mapLoader.init(); // must be the first thing loaded!
-
-  app.use(Sentry.Handlers.requestHandler());
-  app.use(Sentry.Handlers.tracingHandler());
-  app.use(router);
-
-  app.use(Sentry.Handlers.errorHandler());
-  app.use(errorHandlerMiddleware);
-
-  // Firebase-admin setup, that push notification requires.
-  PushNotificationHelper.initialize();
-
-  await npcManager.disableNPCBehaviors();
-
-  const clearAllQueues = async (): Promise<void> => {
-    await pathfindingQueue.clearAllJobs();
-    await battleCharacterAttackQueue.clearAllJobs();
-    console.log("🧹 BullMQ queues cleared...");
-  };
-
-  await clearAllQueues();
-
-  await seeds.start();
-
-  //! TODO: Load balance NPCs on PM2 instances
-  npcManager.listenForBehaviorTrigger();
-
-  await characterConnection.resetCharacterAttributes();
-
-  await characterFoodConsumption.clearAllFoodConsumption();
-
-  characterMonitor.monitor();
-
-  await characterBuffActivator.disableAllTemporaryBuffsAllCharacters();
-
-  await spellSilencer.removeAllSilence();
-
-  await characterTextureChange.removeAllTextureChange();
-
-  await pathfindingResults.clearAllResults();
-
-  if (appEnv.general.ENV === EnvType.Production) {
-    Sentry.init({
-      dsn: appEnv.general.SENTRY_DNS_URL,
-      integrations: [
-        // enable HTTP calls tracing
-        new Sentry.Integrations.Http({ tracing: true }),
-        // enable Express.js middleware tracing
-        new Tracing.Integrations.Express({ app }),
-      ],
-
-      // Set tracesSampleRate to 1.0 to capture 100%
-      // of transactions for performance monitoring.
-      // We recommend adjusting this value in production
-      tracesSampleRate: 1.0,
+  await newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "ServerBootstrap", async () => {
+    server.showBootstrapMessage({
+      appName: appEnv.general.APP_NAME!,
+      port: appEnv.general.SERVER_PORT!,
+      timezone: appEnv.general.TIMEZONE!,
+      adminEmail: appEnv.general.ADMIN_EMAIL!,
+      language: appEnv.general.LANGUAGE!,
+      phoneLocale: appEnv.general.PHONE_LOCALE!,
     });
 
-    if (process.env.pm_id === pm2Helper.pickLastCPUInstance()) {
-      heapMonitor.monitor();
+    await db.init();
+    await redisManager.connect();
+
+    cronJobs.start();
+    await socketAdapter.init(appEnv.socket.type);
+
+    await mapLoader.init(); // must be the first thing loaded!
+
+    app.use(Sentry.Handlers.requestHandler());
+    app.use(Sentry.Handlers.tracingHandler());
+    app.use(router);
+
+    app.use(Sentry.Handlers.errorHandler());
+    app.use(errorHandlerMiddleware);
+
+    //! Dev Warning: If you want to add a new operation on server bootstrap, make sure to add it to one of the methods below (check if needs to be executed in all PM2 instances or not.)
+
+    await serverBootstrap.performOneTimeOperations();
+
+    await serverBootstrap.performMultipleInstancesOperations();
+
+    if (appEnv.general.ENV === EnvType.Production) {
+      Sentry.init({
+        dsn: appEnv.general.SENTRY_DNS_URL,
+        integrations: [
+          // enable HTTP calls tracing
+          new Sentry.Integrations.Http({ tracing: true }),
+          // enable Express.js middleware tracing
+          new Tracing.Integrations.Express({ app }),
+        ],
+
+        // Set tracesSampleRate to 1.0 to capture 100%
+        // of transactions for performance monitoring.
+        // We recommend adjusting this value in production
+        tracesSampleRate: 1.0,
+      });
     }
-  }
+  });
 });

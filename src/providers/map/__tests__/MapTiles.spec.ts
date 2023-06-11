@@ -2,24 +2,28 @@
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { MapLayers } from "@rpg-engine/shared";
 import { GridManager } from "../GridManager";
+import { MapProperties } from "../MapProperties";
 import { MapTiles } from "../MapTiles";
 
 describe("MapTiles.ts", () => {
   let mapTiles: MapTiles;
   let gridManager: GridManager;
+  let mapProperties: MapProperties;
   const mapName = "unit-test-map";
 
   beforeAll(async () => {
     await unitTestHelper.initializeMapLoader();
     mapTiles = container.get<MapTiles>(MapTiles);
     gridManager = container.get<GridManager>(GridManager);
+    mapProperties = container.get<MapProperties>(MapProperties);
   });
 
   beforeEach(async () => {});
 
   const getMapOffset = (mapName) => {
     const xy = mapTiles.getFirstXY("unit-test-map-negative-coordinate")!;
-    return (gridManager as any).getMapOffset(xy[0], xy[1]);
+
+    return mapProperties.getMapOffset(xy[0], xy[1]);
   };
 
   it("should detect if all layers are empty", () => {
