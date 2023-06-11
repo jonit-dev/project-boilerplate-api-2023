@@ -15,8 +15,8 @@ describe("Pathfinder", () => {
 
     await unitTestHelper.initializeMapLoader();
 
-    gridManager.generateGridSolids("unit-test-map-negative-coordinate");
-    gridManager.generateGridSolids("example");
+    await gridManager.generateGridSolids("unit-test-map-negative-coordinate");
+    await gridManager.generateGridSolids("example");
   });
 
   beforeEach(async () => {

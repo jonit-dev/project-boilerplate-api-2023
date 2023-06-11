@@ -1,14 +1,18 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { GridManager } from "../GridManager";
+import { MapProperties } from "../MapProperties";
 import { MapTiles } from "../MapTiles";
 
 describe("GridManager", () => {
   let gridManager: GridManager;
   let mapTiles: MapTiles;
   let testNPC: INPC;
+  let mapProperties: MapProperties;
   beforeAll(async () => {
     gridManager = container.get<GridManager>(GridManager);
+    mapProperties = container.get<MapProperties>(MapProperties);
+
     mapTiles = container.get<MapTiles>(MapTiles);
 
     await unitTestHelper.initializeMapLoader();
@@ -27,7 +31,10 @@ describe("GridManager", () => {
 
   const getMapOffset = (mapName: string): { gridOffsetX: number; gridOffsetY: number } => {
     const initialXY = mapTiles.getFirstXY(mapName)!;
-    return (gridManager as any).getMapOffset(initialXY[0], initialXY[1])!;
+
+    const offset = mapProperties.getMapOffset(initialXY[0], initialXY[1]);
+
+    return offset!;
   };
 
   const checkMapSize = async (mapName: string, expectedWidth: number, expectedHeight: number): Promise<void> => {
@@ -151,7 +158,8 @@ describe("GridManager", () => {
   });
 
   it("should return correct bounds with offset for grid with x > 0", () => {
-    const mapDimensSpy = jest.spyOn(gridManager as any, "getMapDimensions");
+    // @ts-ignore
+    const mapDimensSpy = jest.spyOn(gridManager.mapProperties as any, "getMapDimensions");
     mapDimensSpy.mockImplementation();
     mapDimensSpy.mockReturnValue({
       startX: 256,
