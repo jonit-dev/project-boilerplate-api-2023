@@ -101,6 +101,13 @@ export const skillsSchema = createLeanSchema(
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
+skillsSchema.index(
+  {
+    owner: 1,
+  },
+  { background: true }
+);
+
 //! This is not very performant, so prefer using await traitGetter.getSkillLevelWithBuffs(skill, skillName) instead
 skillsSchema.statics.findByIdWithBuffs = async function (id: string, ...args: any[]): Promise<ISkill> {
   const traitGetter = container.get(TraitGetter);

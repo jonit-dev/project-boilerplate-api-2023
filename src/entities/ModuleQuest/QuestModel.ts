@@ -1,7 +1,7 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import { QuestStatus } from "@rpg-engine/shared";
-import { Types } from "mongoose";
 import _ from "lodash";
+import { Types } from "mongoose";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 import {
   IQuestObjectiveInteraction,
@@ -26,6 +26,14 @@ const questSchema = createLeanSchema(
     }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
+);
+
+questSchema.index(
+  {
+    npcId: 1,
+    key: 1,
+  },
+  { background: true }
 );
 
 questSchema.virtual("objectivesDetails").get(async function (this: IQuest) {

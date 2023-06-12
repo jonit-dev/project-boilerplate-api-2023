@@ -13,3 +13,11 @@ const depotSchema = createLeanSchema(
 export type IDepot = ExtractDoc<typeof depotSchema>;
 
 export const Depot = typedModel("Depot", depotSchema);
+
+depotSchema.index(
+  {
+    owner: 1,
+    key: 1,
+  },
+  { background: true }
+);

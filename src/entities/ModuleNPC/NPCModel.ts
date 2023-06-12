@@ -190,7 +190,7 @@ const npcSchema = createLeanSchema(
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
-npcSchema.index({ x: 1, y: 1, scene: 1 }, { background: true });
+npcSchema.index({ x: 1, y: 1, scene: 1, health: 1 }, { background: true });
 
 export type INPC = ExtractDoc<typeof npcSchema>;
 

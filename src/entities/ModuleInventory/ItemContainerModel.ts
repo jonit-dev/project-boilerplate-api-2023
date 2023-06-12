@@ -39,6 +39,14 @@ const itemContainerSchema = createSchema(
   .plugin(locks, { helpers: true, throw: true })
   .plugin(updateIfCurrentPlugin);
 
+itemContainerSchema.index(
+  {
+    owner: 1,
+    parentItem: 1,
+  },
+  { background: true }
+);
+
 itemContainerSchema.virtual("itemIds").get(function (this: IItemContainer) {
   if (!this.slots) {
     return [];

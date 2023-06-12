@@ -6,7 +6,7 @@ import { IAuthResponse, TypeHelper, UserAuthFlow, UserTypes } from "@rpg-engine/
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import uniqueValidator from "mongoose-unique-validator";
-import { createSchema, ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { ExtractDoc, Type, createSchema, typedModel } from "ts-mongoose";
 
 const mongooseHidden = require("mongoose-hidden")();
 
@@ -50,6 +50,13 @@ const userSchema = createSchema(
     pushNotificationToken: Type.string({ default: null }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
+);
+
+userSchema.index(
+  {
+    email: 1,
+  },
+  { background: true }
 );
 
 userSchema.plugin(uniqueValidator);
