@@ -129,6 +129,8 @@ const itemSchema = createLeanSchema(
   { timestamps: { createdAt: true, updatedAt: true } }
 ).plugin(updateIfCurrentPlugin);
 
+itemSchema.index({ x: 1, y: 1, scene: 1 });
+
 itemSchema.virtual("baseKey").get(function (this: IItem) {
   return this.key.replace(/-\d+$/, "");
 });
