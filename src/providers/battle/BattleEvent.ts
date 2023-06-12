@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import {
   BATTLE_CRITICAL_HIT_CHANCE,
@@ -10,6 +11,7 @@ import {
 import { PVP_ROGUE_ATTACK_DAMAGE_INCREASE_MULTIPLIER } from "@providers/constants/PVPConstants";
 import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
 import { TraitGetter } from "@providers/skill/TraitGetter";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   BasicAttribute,
   BattleEventType,
@@ -29,51 +31,58 @@ export class BattleEvent {
   constructor(
     private skillStatsCalculator: SkillStatsCalculator,
     private characterWeapon: CharacterWeapon,
-    private traitGetter: TraitGetter
+    private traitGetter: TraitGetter,
+    private newRelic: NewRelic
   ) {}
 
   public async calculateEvent(attacker: BattleParticipant, target: BattleParticipant): Promise<BattleEventType> {
-    const attackerSkills = attacker.skills as unknown as ISkill;
-    const defenderSkills = target.skills as unknown as ISkill;
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "BattleEvent.calculateEvent",
+      async () => {
+        const attackerSkills = attacker.skills as unknown as ISkill;
+        const defenderSkills = target.skills as unknown as ISkill;
 
-    const defenderDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
-    const attackerAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
+        const defenderDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
+        const attackerAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
 
-    const attackerDexterityLevel = await this.traitGetter.getSkillLevelWithBuffs(
-      attackerSkills,
-      BasicAttribute.Dexterity
+        const attackerDexterityLevel = await this.traitGetter.getSkillLevelWithBuffs(
+          attackerSkills,
+          BasicAttribute.Dexterity
+        );
+        const defenderDexterityLevel = await this.traitGetter.getSkillLevelWithBuffs(
+          defenderSkills,
+          BasicAttribute.Dexterity
+        );
+
+        const defenderModifiers = defenderDefense + defenderDexterityLevel;
+        const attackerModifiers = attackerAttack + attackerDexterityLevel;
+
+        const hasHitSucceeded = await this.hasBattleEventSucceeded(
+          attacker as ICharacter,
+          attackerModifiers,
+          defenderModifiers,
+          "attack"
+        );
+
+        if (hasHitSucceeded) {
+          return BattleEventType.Hit;
+        }
+
+        const hasBlockSucceeded = await this.hasBattleEventSucceeded(
+          target as ICharacter,
+          defenderModifiers,
+          attackerModifiers,
+          "defense"
+        );
+
+        if (hasBlockSucceeded) {
+          return BattleEventType.Block;
+        }
+
+        return BattleEventType.Miss;
+      }
     );
-    const defenderDexterityLevel = await this.traitGetter.getSkillLevelWithBuffs(
-      defenderSkills,
-      BasicAttribute.Dexterity
-    );
-
-    const defenderModifiers = defenderDefense + defenderDexterityLevel;
-    const attackerModifiers = attackerAttack + attackerDexterityLevel;
-
-    const hasHitSucceeded = await this.hasBattleEventSucceeded(
-      attacker as ICharacter,
-      attackerModifiers,
-      defenderModifiers,
-      "attack"
-    );
-
-    if (hasHitSucceeded) {
-      return BattleEventType.Hit;
-    }
-
-    const hasBlockSucceeded = await this.hasBattleEventSucceeded(
-      target as ICharacter,
-      defenderModifiers,
-      attackerModifiers,
-      "defense"
-    );
-
-    if (hasBlockSucceeded) {
-      return BattleEventType.Block;
-    }
-
-    return BattleEventType.Miss;
   }
 
   public async calculateHitDamage(
@@ -81,34 +90,40 @@ export class BattleEvent {
     target: BattleParticipant,
     isMagicAttack: boolean = false
   ): Promise<number> {
-    const attackerSkills = attacker.skills as unknown as ISkill;
-    const defenderSkills = target.skills as unknown as ISkill;
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "BattleEvent.calculateHitDamage",
+      async () => {
+        const attackerSkills = attacker.skills as unknown as ISkill;
+        const defenderSkills = target.skills as unknown as ISkill;
 
-    const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
+        const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
 
-    let totalPotentialAttackerDamage = await this.calculateTotalPotentialDamage(
-      attackerSkills,
-      defenderSkills,
-      isMagicAttack,
-      weapon?.item
+        let totalPotentialAttackerDamage = await this.calculateTotalPotentialDamage(
+          attackerSkills,
+          defenderSkills,
+          isMagicAttack,
+          weapon?.item
+        );
+
+        if (attacker.type === EntityType.Character && target.type === EntityType.Character) {
+          totalPotentialAttackerDamage += await this.calculateExtraDamageBasedOnClass(
+            attacker.class as CharacterClass,
+            totalPotentialAttackerDamage
+          );
+        }
+
+        let damage =
+          weapon?.item && weapon?.item.isTraining
+            ? Math.round(_.random(0, 1))
+            : Math.round(_.random(0, totalPotentialAttackerDamage));
+
+        damage = await this.implementDamageReduction(defenderSkills, target, damage, isMagicAttack);
+
+        // damage cannot be higher than target's remaining health
+        return damage > target.health ? target.health : damage;
+      }
     );
-
-    if (attacker.type === EntityType.Character && target.type === EntityType.Character) {
-      totalPotentialAttackerDamage += await this.calculateExtraDamageBasedOnClass(
-        attacker.class as CharacterClass,
-        totalPotentialAttackerDamage
-      );
-    }
-
-    let damage =
-      weapon?.item && weapon?.item.isTraining
-        ? Math.round(_.random(0, 1))
-        : Math.round(_.random(0, totalPotentialAttackerDamage));
-
-    damage = await this.implementDamageReduction(defenderSkills, target, damage, isMagicAttack);
-
-    // damage cannot be higher than target's remaining health
-    return damage > target.health ? target.health : damage;
   }
 
   public getCriticalHitDamageIfSucceed(damage: number): number {

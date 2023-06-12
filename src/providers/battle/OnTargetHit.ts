@@ -1,9 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { QuestSystem } from "@providers/quest/QuestSystem";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EntityType, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -16,19 +18,22 @@ export class OnTargetHit {
     private npcDeath: NPCDeath,
     private skillIncrease: SkillIncrease,
     private questSystem: QuestSystem,
-    private battleEffects: BattleEffects
+    private battleEffects: BattleEffects,
+    private newRelic: NewRelic
   ) {}
 
   async execute(target: ICharacter | INPC, attacker: ICharacter | INPC, damage: number): Promise<void> {
-    if (damage) {
-      await this.generateBloodOnGround(target);
-      await this.handleSkillIncrease(attacker as ICharacter, target, damage);
-    }
+    await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "OnTargetHit.execute", async () => {
+      if (damage) {
+        await this.generateBloodOnGround(target);
+        await this.handleSkillIncrease(attacker as ICharacter, target, damage);
+      }
 
-    if (!target.isAlive) {
-      await this.handleDeath(target, attacker);
-      await this.updateQuests(target, attacker);
-    }
+      if (!target.isAlive) {
+        await this.handleDeath(target, attacker);
+        await this.updateQuests(target, attacker);
+      }
+    });
   }
 
   private async handleDeath(target: ICharacter | INPC, attacker: ICharacter | INPC): Promise<void> {

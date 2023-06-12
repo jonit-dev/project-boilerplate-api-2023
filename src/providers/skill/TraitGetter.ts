@@ -1,8 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { CharacterAttributes, CharacterTrait } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SkillsAvailable } from "./SkillTypes";
@@ -13,37 +15,53 @@ export type Entity = ICharacter | INPC;
 
 @provide(TraitGetter)
 export class TraitGetter {
-  constructor(private characterBuffTracker: CharacterBuffTracker, private numberFormatter: NumberFormatter) {}
+  constructor(
+    private characterBuffTracker: CharacterBuffTracker,
+    private numberFormatter: NumberFormatter,
+    private newRelic: NewRelic
+  ) {}
 
   public async getSkillLevelWithBuffs(skills: ISkill, skillName: SkillsAvailable): Promise<number> {
-    let totalTraitSummedBuffs = 0;
-    if (skills.ownerType === "Character") {
-      const entity = (await Character.findById(skills.owner).lean()) as ICharacter;
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "TraitGetter.getSkillLevelWithBuffs",
+      async () => {
+        let totalTraitSummedBuffs = 0;
+        if (skills.ownerType === "Character") {
+          const entity = (await Character.findById(skills.owner).lean()) as ICharacter;
 
-      totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-        entity,
-        skillName as CharacterTrait
-      );
-    }
+          totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
+            entity,
+            skillName as CharacterTrait
+          );
+        }
 
-    const skillValue = skills[skillName].level + totalTraitSummedBuffs;
+        const skillValue = skills[skillName].level + totalTraitSummedBuffs;
 
-    return this.numberFormatter.formatNumber(skillValue);
+        return this.numberFormatter.formatNumber(skillValue);
+      }
+    );
   }
 
   public async getCharacterAttributeWithBuffs(
     character: ICharacter,
     attributeName: CharacterAttributes
   ): Promise<number> {
-    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-      character,
-      attributeName as CharacterTrait
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "TraitGetter.getCharacterAttributeWithBuffs",
+      async () => {
+        const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
+          character,
+          attributeName as CharacterTrait
+        );
+
+        const baseValue = character[attributeName];
+
+        const traitValue = Number(baseValue + totalTraitSummedBuffs);
+
+        return this.numberFormatter.formatNumber(traitValue);
+      }
     );
-
-    const baseValue = character[attributeName];
-
-    const traitValue = Number(baseValue + totalTraitSummedBuffs);
-
-    return this.numberFormatter.formatNumber(traitValue);
   }
 }

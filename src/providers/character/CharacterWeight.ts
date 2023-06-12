@@ -73,63 +73,69 @@ export class CharacterWeight {
   }
 
   public async getWeight(character: ICharacter): Promise<number> {
-    const equipment = await Equipment.findById(character.equipment).lean();
-    const inventory = await this.characterInventory.getInventory(character);
-    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "CharacterWeight/getWeight",
+      async () => {
+        const equipment = await Equipment.findById(character.equipment).lean();
+        const inventory = await this.characterInventory.getInventory(character);
+        const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
-    let totalWeight = 0;
-    if (equipment) {
-      const { head, neck, leftHand, rightHand, ring, legs, boot, accessory, armor, inventory } = equipment;
-      const slots: Types.ObjectId[] = [
-        head!,
-        neck!,
-        leftHand!,
-        rightHand!,
-        ring!,
-        legs!,
-        boot!,
-        accessory!,
-        armor!,
-        inventory!,
-      ];
-      const nestedBags = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
+        let totalWeight = 0;
+        if (equipment) {
+          const { head, neck, leftHand, rightHand, ring, legs, boot, accessory, armor, inventory } = equipment;
+          const slots: Types.ObjectId[] = [
+            head!,
+            neck!,
+            leftHand!,
+            rightHand!,
+            ring!,
+            legs!,
+            boot!,
+            accessory!,
+            armor!,
+            inventory!,
+          ];
+          const nestedBags = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
 
-      if (nestedBags.length > 0) {
-        for (const item of nestedBags) {
-          // check if nestedBag is actually on the inventory top level
+          if (nestedBags.length > 0) {
+            for (const item of nestedBags) {
+              // check if nestedBag is actually on the inventory top level
 
-          const isInInventory = await this.characterItemInventory.checkItemInInventory(item._id, character);
+              const isInInventory = await this.characterItemInventory.checkItemInInventory(item._id, character);
 
-          if (!isInInventory) continue;
+              if (!isInInventory) continue;
 
-          if (item.type === ItemType.Container) {
-            const inventoryContainer = await ItemContainer.findById(item?.itemContainer);
-            for (const bagItem of inventoryContainer!.itemIds) {
-              totalWeight += await this.getWeithFromItemContainer(bagItem);
+              if (item.type === ItemType.Container) {
+                const inventoryContainer = await ItemContainer.findById(item?.itemContainer);
+                for (const bagItem of inventoryContainer!.itemIds) {
+                  totalWeight += await this.getWeithFromItemContainer(bagItem);
+                }
+              }
+            }
+          }
+
+          for (const slot of slots) {
+            const item = await Item.findById(slot).lean();
+            if (item) {
+              if (item.stackQty && item.stackQty > 1) {
+                // -1 because the count is include the weight of the container item.
+                // 100 arrows x 0.1 = 10 weight, but the result will be 10.1 without the -1.
+                totalWeight += item.weight * (item.stackQty - 1);
+              }
+              totalWeight += item.weight;
             }
           }
         }
-      }
 
-      for (const slot of slots) {
-        const item = await Item.findById(slot).lean();
-        if (item) {
-          if (item.stackQty && item.stackQty > 1) {
-            // -1 because the count is include the weight of the container item.
-            // 100 arrows x 0.1 = 10 weight, but the result will be 10.1 without the -1.
-            totalWeight += item.weight * (item.stackQty - 1);
+        if (inventoryContainer) {
+          for (const bagItem of inventoryContainer!.itemIds) {
+            totalWeight += await this.getWeithFromItemContainer(bagItem);
           }
-          totalWeight += item.weight;
         }
+        return totalWeight;
       }
-    }
-
-    if (inventoryContainer) {
-      for (const bagItem of inventoryContainer!.itemIds) {
-        totalWeight += await this.getWeithFromItemContainer(bagItem);
-      }
-    }
-    return totalWeight;
+    );
   }
 
   public async getWeightRatio(character: ICharacter, item: IItem): Promise<number> {
