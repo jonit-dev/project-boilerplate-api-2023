@@ -2,7 +2,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TRADER_SELL_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -461,7 +461,8 @@ describe("CharacterTradingNPCSell.ts", () => {
     const inventory = await testCharacter.inventory;
     if (inventory) {
       inventory.itemContainer = undefined;
-      await inventory.save();
+
+      await Item.updateOne({ _id: inventory._id }, { itemContainer: undefined });
     }
 
     await characterTradingNPCSell.initializeSell(testNPCTrader._id, testCharacter);

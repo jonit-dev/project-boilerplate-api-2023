@@ -44,7 +44,7 @@ describe("ItemCraftable.ts", () => {
     skill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
     inventory = await testCharacter.inventory;
-    await inventory.save();
+
     inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
     items = [

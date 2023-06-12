@@ -353,7 +353,7 @@ describe("CharacterTradingValidation.ts", () => {
 
       if (inventory) {
         inventory.itemContainer = undefined;
-        await inventory.save();
+        await Item.updateOne({ _id: inventory._id }, { itemContainer: undefined });
       }
 
       const result = await characterTradingValidation.validateSellTransactionForNPC(

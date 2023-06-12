@@ -2,7 +2,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { IMarketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 import { MARKETPLACE_SELL_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -445,7 +445,7 @@ describe("CharacterTradingMarketplaceSell.ts", () => {
     const inventory = await testCharacter.inventory;
     if (inventory) {
       inventory.itemContainer = undefined;
-      await inventory.save();
+      await Item.updateOne({ _id: inventory._id }, { itemContainer: undefined });
     }
 
     await characterTradingMarketplaceSell.initializeSell(testMarketplace._id, testCharacter);
