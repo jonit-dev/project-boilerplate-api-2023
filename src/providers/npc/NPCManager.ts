@@ -1,11 +1,10 @@
+/* eslint-disable no-void */
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { ISkill, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { CacheModel } from "@providers/cache/CacheModel";
-import { PartiallyCachedModel } from "@providers/cache/PartiallyCachedModel";
-import { NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
+import { NPC_CYCLE_INTERVAL_RATIO, NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { PM2Helper } from "@providers/server/PM2Helper";
@@ -40,8 +39,7 @@ export class NPCManager {
     private pm2Helper: PM2Helper,
     private specialEffect: SpecialEffect,
     private inMemoryHashTable: InMemoryHashTable,
-    private partiallyCachedModel: PartiallyCachedModel,
-    private cacheModel: CacheModel,
+
     private newRelic: NewRelic
   ) {}
 
@@ -75,7 +73,7 @@ export class NPCManager {
       if (totalActiveNPCs <= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
         // watch out for max NPCs active limit so we don't fry our CPU
 
-        await this.startBehaviorLoop(npc);
+        void this.startBehaviorLoop(npc);
 
         // wait 200 ms
         await new Promise((resolve) => setTimeout(resolve, 25));
@@ -91,24 +89,25 @@ export class NPCManager {
     }
 
     if (!npc.isBehaviorEnabled) {
-      const npcSkills = await this.cacheModel.getOrQuery<ISkill>(Skill, "npc-skills", npc.skills as string);
+      const npcSkills = await Skill.find({ owner: npc._id }).cacheQuery({
+        cacheKey: `npc-${npc.id}-skills`,
+        ttl: 60 * 60 * 24 * 7,
+      });
 
       new NPCCycle(
         npc.id,
-        () => {
+        async () => {
           try {
-            this.newRelic.trackTransaction(
+            await this.newRelic.trackTransaction(
               NewRelicTransactionCategory.Operation,
               `NPCCycle/${npc.currentMovementType}`,
               async () => {
                 this.npcFreezer.tryToFreezeNPC(npc);
 
-                npc = await this.partiallyCachedModel.get<INPC>(
-                  "npc",
-                  NPC,
-                  npc._id,
-                  "name x y key health maxHealth mana maxMana alignment direction scene pathOrientation speed isBehaviorEnabled targetType targetCharacter currentMovementType"
-                );
+                npc = await NPC.findById(npc._id).lean({
+                  virtuals: true,
+                  defaults: true,
+                });
 
                 npc.skills = npcSkills;
 
@@ -121,7 +120,7 @@ export class NPCManager {
                   return;
                 }
 
-                await this.startCoreNPCBehavior(npc);
+                void this.startCoreNPCBehavior(npc);
               }
             );
           } catch (err) {
@@ -129,7 +128,7 @@ export class NPCManager {
             console.log(err);
           }
         },
-        (1600 + random(0, 200)) / (npc.speed * 1.6)
+        (1600 + random(0, 200)) / (npc.speed * 1.6) / NPC_CYCLE_INTERVAL_RATIO
       );
     }
     await this.setNPCBehavior(npc, true);
@@ -146,20 +145,20 @@ export class NPCManager {
   private async startCoreNPCBehavior(npc: INPC): Promise<void> {
     switch (npc.currentMovementType) {
       case NPCMovementType.MoveAway:
-        await this.npcMovementMoveAway.startMovementMoveAway(npc);
+        void this.npcMovementMoveAway.startMovementMoveAway(npc);
         break;
 
       case NPCMovementType.Stopped:
-        await this.npcMovementStopped.startMovementStopped(npc);
+        void this.npcMovementStopped.startMovementStopped(npc);
         break;
 
       case NPCMovementType.MoveTowards:
-        await this.npcMovementMoveTowards.startMoveTowardsMovement(npc);
+        void this.npcMovementMoveTowards.startMoveTowardsMovement(npc);
 
         break;
 
       case NPCMovementType.Random:
-        await this.npcMovementRandom.startRandomMovement(npc);
+        void this.npcMovementRandom.startRandomMovement(npc);
         break;
       case NPCMovementType.FixedPath:
         let endGridX = npc.fixedPath.endGridX as unknown as number;

@@ -3,7 +3,7 @@ import { provideSingleton } from "@providers/inversify/provideSingleton";
 import fs from "fs";
 import v8 from "v8";
 
-const MAX_HEAP_SIZE = 300 * 1024 * 1024;
+const MAX_HEAP_SIZE = 500 * 1024 * 1024;
 const HEAP_CHECK_INTERVAL = 1000 * 60 * 10; // 10 minutes
 const MAX_SNAPSHOTS = 2;
 

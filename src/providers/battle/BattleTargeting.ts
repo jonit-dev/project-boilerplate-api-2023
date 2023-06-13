@@ -1,5 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { BattleSocketEvents, EntityType, IBattleCancelTargeting } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleNetworkStopTargeting } from "./network/BattleNetworkStopTargetting";
@@ -8,7 +10,8 @@ import { BattleNetworkStopTargeting } from "./network/BattleNetworkStopTargettin
 export class BattleTargeting {
   constructor(
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
-    private socketMessaging: SocketMessaging
+    private socketMessaging: SocketMessaging,
+    private newRelic: NewRelic
   ) {}
 
   public async cancelTargeting(
@@ -17,23 +20,29 @@ export class BattleTargeting {
     targetId: string,
     targetType: EntityType
   ): Promise<void> {
-    // if attacker has a target, cancel it and send message.
-    if (attacker.target?.id?.toString() === targetId) {
-      await this.battleNetworkStopTargeting.stopTargeting(attacker as unknown as ICharacter);
+    await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "BattleTargeting.cancelTargeting",
+      async () => {
+        // if attacker has a target, cancel it and send message.
+        if (attacker.target?.id?.toString() === targetId) {
+          await this.battleNetworkStopTargeting.stopTargeting(attacker as unknown as ICharacter);
 
-      this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-        attacker.channelId!,
-        BattleSocketEvents.CancelTargeting,
-        {
-          targetId,
-          type: targetType,
-          reason,
+          this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+            attacker.channelId!,
+            BattleSocketEvents.CancelTargeting,
+            {
+              targetId,
+              type: targetType,
+              reason,
+            }
+          );
+        } else {
+          // otherwise, just send error message
+
+          this.socketMessaging.sendErrorMessageToCharacter(attacker, reason);
         }
-      );
-    } else {
-      // otherwise, just send error message
-
-      this.socketMessaging.sendErrorMessageToCharacter(attacker, reason);
-    }
+      }
+    );
   }
 }

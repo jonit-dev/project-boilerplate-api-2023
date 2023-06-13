@@ -243,6 +243,18 @@ const characterSchema = createLeanSchema(
   }
 );
 
+characterSchema.index(
+  {
+    x: 1,
+    y: 1,
+    scene: 1,
+    isOnline: 1,
+    isBanned: 1,
+    isBattleActive: 1,
+  },
+  { background: true }
+);
+
 characterSchema.virtual("movementIntervalMs").get(function (this: ICharacter) {
   return 1000 / this.speed / 48;
 });

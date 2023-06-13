@@ -15,6 +15,13 @@ const MapControlTimeSchema = createLeanSchema(
   { timestamps: { createdAt: true } }
 );
 
+MapControlTimeSchema.index(
+  {
+    time: 1,
+  },
+  { background: true }
+);
+
 export type IControlTime = ExtractDoc<typeof MapControlTimeSchema>;
 
 export const MapControlTimeModel = typedModel("MapControlTime", MapControlTimeSchema);

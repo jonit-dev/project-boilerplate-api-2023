@@ -238,7 +238,9 @@ export class NPCMovementMoveTowards {
     }
 
     if (!hasBattleCycle) {
-      const npcSkills = (await Skill.findById(npc.skills)
+      const npcSkills = (await Skill.findOne({
+        _id: npc.skills,
+      })
         .lean({ virtuals: true, defaults: true })
         .cacheQuery({
           cacheKey: `${npc.id}-skills`,
@@ -247,18 +249,28 @@ export class NPCMovementMoveTowards {
 
       new NPCBattleCycle(
         npc.id,
-        () => {
-          this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "NpcBattleCycle", async () => {
+        async () => {
+          await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "NpcBattleCycle", async () => {
             const result = await Promise.all([
               NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
-              Character.findById(npc.targetCharacter).populate("skills").lean({ virtuals: true, defaults: true }),
+              Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true }),
             ]);
+
+            const targetCharacter = result[1] as ICharacter;
+
+            const characterSkills = (await Skill.findOne({
+              _id: targetCharacter.skills,
+            })
+              .lean()
+              .cacheQuery({
+                cacheKey: `${targetCharacter.id}-skills`,
+              })) as ISkill;
+
+            targetCharacter.skills = characterSkills;
 
             const updatedNPC = result[0] as INPC;
 
             updatedNPC.skills = npcSkills;
-
-            const targetCharacter = result[1] as ICharacter;
 
             const isInvisible = await this.specialEffect.isInvisible(targetCharacter);
 

@@ -2,54 +2,69 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer as IItemContainerModel, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 
 @provide(CharacterInventory)
 export class CharacterInventory {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic) {}
 
   public async getInventory(character: ICharacter): Promise<IItem | null> {
-    const equipment = (await Equipment.findById(character.equipment).lean().select("inventory")) as IEquipment;
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "CharacterInventory.getInventory",
+      async () => {
+        const equipment = (await Equipment.findById(character.equipment).lean().select("inventory")) as IEquipment;
 
-    if (equipment) {
-      const inventory = (await Item.findById(equipment.inventory)) as IItem;
+        if (equipment) {
+          const inventory = await Item.findById(equipment.inventory);
 
-      if (inventory) {
-        return inventory;
+          if (inventory) {
+            return inventory;
+          }
+        }
+
+        return null; //! some areas of the codebase strictly check for null, so return it instead of undefined
       }
-    }
-
-    return null; //! some areas of the codebase strictly check for null, so return it instead of undefined
+    );
   }
 
   public async getAllItemsFromContainer(itemContainerId: Types.ObjectId): Promise<IItem[]> {
-    try {
-      const inventory = (await ItemContainer.findById(itemContainerId).lean()) as IItemContainerModel;
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "CharacterInventory.getAllItemsFromContainer",
 
-      if (!inventory) {
-        throw new Error(`Inventory not found for itemContainerId: ${itemContainerId}`);
+      async () => {
+        try {
+          const inventory = (await ItemContainer.findById(itemContainerId).lean()) as IItemContainerModel;
+
+          if (!inventory) {
+            throw new Error(`Inventory not found for itemContainerId: ${itemContainerId}`);
+          }
+
+          const slots = inventory.slots as IItem[];
+          const slotsArray = Object.values(slots);
+
+          const itemsPromises = slotsArray
+            .filter((slot) => slot !== null)
+            .map(async (slot) => {
+              return (await Item.findById(slot._id).lean()) as IItem;
+            });
+
+          const items = await Promise.all(itemsPromises);
+          return items.filter((item): item is IItem => item !== null);
+        } catch (error) {
+          console.error(error);
+          return [];
+        }
       }
-
-      const slots = inventory.slots as IItem[];
-      const slotsArray = Object.values(slots);
-
-      const itemsPromises = slotsArray
-        .filter((slot) => slot !== null)
-        .map(async (slot) => {
-          return (await Item.findById(slot._id).lean()) as IItem;
-        });
-
-      const items = await Promise.all(itemsPromises);
-      return items.filter((item): item is IItem => item !== null);
-    } catch (error) {
-      console.error(error);
-      return [];
-    }
+    );
   }
 
   /**
@@ -58,53 +73,67 @@ export class CharacterInventory {
    *
    */
   public async getAllItemsFromInventory(character: ICharacter): Promise<Record<string, IItem[]> | null> {
-    const nestedInventoryAndItems: Record<string, IItem[]> = {};
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "CharacterInventory.getAllItemsFromInventory",
+      async () => {
+        const nestedInventoryAndItems: Record<string, IItem[]> = {};
 
-    try {
-      const characterInventory = await this.getInventory(character);
+        try {
+          const characterInventory = await this.getInventory(character);
 
-      if (!characterInventory || !characterInventory.itemContainer) {
-        throw new Error("Character inventory not found");
+          if (!characterInventory || !characterInventory.itemContainer) {
+            throw new Error("Character inventory not found");
+          }
+
+          const mainInventory = await this.getAllItemsFromContainer(characterInventory.itemContainer);
+
+          if (mainInventory.length === 0) {
+            return null;
+          }
+
+          await this.getItemsRecursively(characterInventory.itemContainer, nestedInventoryAndItems);
+
+          return nestedInventoryAndItems;
+        } catch (err) {
+          console.error(err);
+
+          return null;
+        }
       }
-
-      const mainInventory = await this.getAllItemsFromContainer(characterInventory.itemContainer);
-
-      if (mainInventory.length === 0) {
-        return null;
-      }
-
-      await this.getItemsRecursively(characterInventory.itemContainer, nestedInventoryAndItems);
-
-      return nestedInventoryAndItems;
-    } catch (err) {
-      console.error(err);
-
-      return null;
-    }
+    );
   }
 
   async getItemsRecursively(
     inventoryId: Types.ObjectId,
     nestedInventoryAndItems: Record<string, IItem[]>
   ): Promise<void> {
-    const inventory = await this.getAllItemsFromContainer(inventoryId);
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "CharacterInventory.getItemsRecursively",
+      async () => {
+        const inventory = await this.getAllItemsFromContainer(inventoryId);
 
-    if (inventory.length > 0) {
-      nestedInventoryAndItems[inventoryId.toString()] = inventory;
+        if (inventory.length > 0) {
+          nestedInventoryAndItems[inventoryId.toString()] = inventory;
 
-      const hasContainer = inventory.filter((item) => item.type === "Container" && item.itemContainer !== inventoryId);
+          const hasContainer = inventory.filter(
+            (item) => item.type === "Container" && item.itemContainer !== inventoryId
+          );
 
-      if (hasContainer.length > 0) {
-        // Map and await all recursive calls
-        await Promise.all(
-          hasContainer.map((nestedBag) =>
-            nestedBag.itemContainer
-              ? this.getItemsRecursively(nestedBag.itemContainer, nestedInventoryAndItems)
-              : Promise.resolve()
-          )
-        );
+          if (hasContainer.length > 0) {
+            // Map and await all recursive calls
+            await Promise.all(
+              hasContainer.map((nestedBag) =>
+                nestedBag.itemContainer
+                  ? this.getItemsRecursively(nestedBag.itemContainer, nestedInventoryAndItems)
+                  : Promise.resolve()
+              )
+            );
+          }
+        }
       }
-    }
+    );
   }
 
   public async generateNewInventory(

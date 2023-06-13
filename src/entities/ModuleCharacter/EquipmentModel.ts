@@ -48,6 +48,15 @@ export const equipmentSchema = createLeanSchema(
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
+equipmentSchema.index(
+  {
+    owner: 1,
+    ownerRef: 1,
+    inventory: 1,
+  },
+  { background: true }
+);
+
 equipmentSchema.virtual("equippedItemIds").get(function (this: IEquipment) {
   return [
     this.head,

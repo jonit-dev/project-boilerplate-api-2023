@@ -10,5 +10,5 @@ export const itemDiamond: ICraftableItemBlueprint = {
   description: "A rare item that can be used as a jewel or as a crafting resource.",
   weight: 0.25,
   maxStackSize: 100,
-  basePrice: 50,
+  basePrice: 30,
 };

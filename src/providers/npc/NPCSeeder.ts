@@ -24,7 +24,10 @@ export class NPCSeeder {
     const npcSeedData = this.npcLoader.loadNPCSeedData();
 
     for (const [key, NPCData] of npcSeedData.entries()) {
-      const npcFound = (await NPC.findOne({ tiledId: NPCData.tiledId, scene: NPCData.scene })) as unknown as INPC;
+      const npcFound = (await NPC.findOne({ tiledId: NPCData.tiledId, scene: NPCData.scene }).lean({
+        virtuals: true,
+        defaults: true,
+      })) as unknown as INPC;
 
       NPCData.targetCharacter = undefined; // reset any targets
 
@@ -69,20 +72,22 @@ export class NPCSeeder {
     try {
       const randomMaxHealth = this.setNPCRandomHealth(NPCData);
 
+      const updateParams = {
+        mana: npc.maxMana,
+        x: npc.initialX,
+        y: npc.initialY,
+        targetCharacter: undefined,
+        currentMovementType: npc.originalMovementType,
+      } as any;
+
       if (randomMaxHealth) {
-        npc.health = randomMaxHealth;
-        npc.maxHealth = randomMaxHealth;
+        updateParams.health = randomMaxHealth;
+        updateParams.maxHealth = randomMaxHealth;
       } else {
-        npc.health = npc.maxHealth;
+        updateParams.health = npc.maxHealth;
       }
 
-      npc.mana = npc.maxMana;
-      npc.x = npc.initialX;
-      npc.y = npc.initialY;
-      npc.targetCharacter = undefined;
-      npc.currentMovementType = npc.originalMovementType;
-
-      await npc.save();
+      await NPC.updateOne({ _id: npc._id }, updateParams);
     } catch (error) {
       console.log(`❌ Failed to reset NPC ${NPCData.key}`);
       console.error(error);

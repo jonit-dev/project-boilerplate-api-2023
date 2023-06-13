@@ -51,6 +51,16 @@ jest.mock("@providers/constants/CraftingConstants", () => ({
   CRAFTING_MIN_LEVEL_RATIO: 1,
 }));
 
+jest.mock("@providers/constants/ItemConstants", () => ({
+  TRADER_SELL_PRICE_MULTIPLIER: 0.5,
+  TRADER_BUY_PRICE_MULTIPLIER: 1.5,
+  MARKETPLACE_BUY_PRICE_MULTIPLIER: 1.5,
+  MARKETPLACE_SELL_PRICE_MULTIPLIER: 0.5,
+  ITEM_USE_WITH_BASE_EFFECT: 1,
+  ITEM_USE_WITH_BASE_SCALING_FACTOR: 0.008,
+  ITEM_CLEANUP_THRESHOLD: 100,
+}));
+
 jest.mock("@providers/constants/NPCConstants", () => ({
   ...jest.requireActual("@providers/constants/NPCConstants"),
   NPC_TRADER_INTERACTION_DISTANCE: 2,

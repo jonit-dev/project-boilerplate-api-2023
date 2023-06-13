@@ -38,7 +38,7 @@ describe("CharacterBuffTracker", () => {
   it("should add a buff to a character", async () => {
     const testBuff = createTestBuff() as ICharacterTemporaryBuff;
 
-    const result = await characterBuffTracker.addBuff(testCharacter, testBuff);
+    const result = await characterBuffTracker.addBuff(testCharacter._id, testBuff);
 
     expect(result).toBeTruthy();
   });
@@ -46,11 +46,11 @@ describe("CharacterBuffTracker", () => {
   it("should get a buff by ID", async () => {
     const testBuff = createTestBuff() as ICharacterTemporaryBuff;
 
-    const addedBuff = await characterBuffTracker.addBuff(testCharacter, testBuff);
+    const addedBuff = await characterBuffTracker.addBuff(testCharacter._id, testBuff);
 
     if (!addedBuff) throw new Error("Buff ID not defined");
 
-    const retrievedBuff = await characterBuffTracker.getBuff(testCharacter, addedBuff._id!);
+    const retrievedBuff = await characterBuffTracker.getBuff(testCharacter._id, addedBuff._id!);
 
     expect(retrievedBuff).toBeDefined();
     expect(retrievedBuff).toMatchObject(testBuff);
@@ -59,13 +59,13 @@ describe("CharacterBuffTracker", () => {
   it("should delete a buff by ID", async () => {
     const testBuff = createTestBuff() as ICharacterTemporaryBuff;
 
-    await characterBuffTracker.addBuff(testCharacter, testBuff);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff);
 
     const result = await characterBuffTracker.deleteBuff(testCharacter, testBuff._id!);
 
     expect(result).toBeTruthy();
 
-    const deletedBuff = await characterBuffTracker.getBuff(testCharacter, testBuff._id!);
+    const deletedBuff = await characterBuffTracker.getBuff(testCharacter._id, testBuff._id!);
 
     expect(deletedBuff).toBeFalsy();
   });
@@ -74,15 +74,15 @@ describe("CharacterBuffTracker", () => {
     const testBuff1 = createTestBuff() as ICharacterTemporaryBuff;
     const testBuff2 = { ...createTestBuff(), trait: CharacterAttributes.MaxMana } as ICharacterTemporaryBuff;
 
-    await characterBuffTracker.addBuff(testCharacter, testBuff1);
-    await characterBuffTracker.addBuff(testCharacter, testBuff2);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff1);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff2);
 
     const result = await characterBuffTracker.deleteAllCharacterBuffs(testCharacter);
 
     expect(result).toBeTruthy();
 
-    const deletedBuff1 = await characterBuffTracker.getBuff(testCharacter, testBuff1._id!);
-    const deletedBuff2 = await characterBuffTracker.getBuff(testCharacter, testBuff2._id!);
+    const deletedBuff1 = await characterBuffTracker.getBuff(testCharacter._id, testBuff1._id!);
+    const deletedBuff2 = await characterBuffTracker.getBuff(testCharacter._id, testBuff2._id!);
 
     expect(deletedBuff1).toBeFalsy();
     expect(deletedBuff2).toBeFalsy();
@@ -92,10 +92,10 @@ describe("CharacterBuffTracker", () => {
     const testBuff1 = createTestBuff() as ICharacterTemporaryBuff;
     const testBuff2 = { ...createTestBuff(), trait: CharacterAttributes.MaxMana } as ICharacterTemporaryBuff;
 
-    await characterBuffTracker.addBuff(testCharacter, testBuff1);
-    await characterBuffTracker.addBuff(testCharacter, testBuff2);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff1);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff2);
 
-    const allCharacterBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
+    const allCharacterBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 
     expect(allCharacterBuffs.length).toEqual(2);
     expect(allCharacterBuffs).toContainEqual(
@@ -113,7 +113,7 @@ describe("CharacterBuffTracker", () => {
   });
 
   it("should return an empty array when getting buffs for a character with no buffs", async () => {
-    const allCharacterBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
+    const allCharacterBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 
     expect(allCharacterBuffs).toEqual([]);
   });
@@ -125,14 +125,14 @@ describe("CharacterBuffTracker", () => {
       durationType: CharacterBuffDurationType.Permanent,
     } as unknown as ICharacterTemporaryBuff;
 
-    await characterBuffTracker.addBuff(testCharacter, testTemporaryBuff);
-    await characterBuffTracker.addBuff(testCharacter, testPermanentBuff);
+    await characterBuffTracker.addBuff(testCharacter._id, testTemporaryBuff);
+    await characterBuffTracker.addBuff(testCharacter._id, testPermanentBuff);
 
     const result = await characterBuffTracker.deleteAllCharacterBuffs(testCharacter, { deleteTemporaryOnly: true });
 
     expect(result).toBeTruthy();
 
-    const remainingBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
+    const remainingBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 
     expect(remainingBuffs.length).toEqual(1);
     expect(remainingBuffs).toContainEqual(
@@ -150,14 +150,14 @@ describe("CharacterBuffTracker", () => {
       durationType: CharacterBuffDurationType.Permanent,
     } as unknown as ICharacterTemporaryBuff;
 
-    await characterBuffTracker.addBuff(testCharacter, testTemporaryBuff);
-    await characterBuffTracker.addBuff(testCharacter, testPermanentBuff);
+    await characterBuffTracker.addBuff(testCharacter._id, testTemporaryBuff);
+    await characterBuffTracker.addBuff(testCharacter._id, testPermanentBuff);
 
     const result = await characterBuffTracker.deleteAllCharacterBuffs(testCharacter, { deleteTemporaryOnly: false });
 
     expect(result).toBeTruthy();
 
-    const remainingBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
+    const remainingBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 
     expect(remainingBuffs.length).toEqual(0);
   });
@@ -169,14 +169,14 @@ describe("CharacterBuffTracker", () => {
       durationType: CharacterBuffDurationType.Permanent,
     } as unknown as ICharacterTemporaryBuff;
 
-    await characterBuffTracker.addBuff(testCharacter, testTemporaryBuff);
-    await characterBuffTracker.addBuff(testCharacter, testPermanentBuff);
+    await characterBuffTracker.addBuff(testCharacter._id, testTemporaryBuff);
+    await characterBuffTracker.addBuff(testCharacter._id, testPermanentBuff);
 
     const result = await characterBuffTracker.deleteAllCharacterBuffs(testCharacter);
 
     expect(result).toBeTruthy();
 
-    const remainingBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
+    const remainingBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 
     expect(remainingBuffs.length).toEqual(0);
   });
@@ -192,11 +192,11 @@ describe("CharacterBuffTracker", () => {
       absoluteChange: 10,
     } as ICharacterTemporaryBuff;
 
-    await characterBuffTracker.addBuff(testCharacter, testBuff1);
-    await characterBuffTracker.addBuff(testCharacter, testBuff2);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff1);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff2);
 
     const totalAbsoluteChange = await characterBuffTracker.getAllBuffAbsoluteChanges(
-      testCharacter,
+      testCharacter._id,
       BasicAttribute.Strength
     );
 
@@ -209,9 +209,9 @@ describe("CharacterBuffTracker", () => {
       itemId: "test-item-id",
     } as unknown as ICharacterItemBuff;
 
-    await characterBuffTracker.addBuff(testCharacter, testBuff);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff);
 
-    const retrievedBuff = await characterBuffTracker.getBuffByItemId(testCharacter, "test-item-id");
+    const retrievedBuff = await characterBuffTracker.getBuffByItemId(testCharacter._id, "test-item-id");
 
     expect(retrievedBuff).toBeDefined();
     expect(retrievedBuff).toMatchObject([testBuff]);
@@ -230,11 +230,11 @@ describe("CharacterBuffTracker", () => {
     } as unknown as ICharacterItemBuff;
 
     // Add test buffs to character
-    await characterBuffTracker.addBuff(testCharacter, testBuff1);
-    await characterBuffTracker.addBuff(testCharacter, testBuff2);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff1);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff2);
 
     // Get buffs by item ID
-    const retrievedBuffs = await characterBuffTracker.getBuffByItemId(testCharacter, "test-item-id");
+    const retrievedBuffs = await characterBuffTracker.getBuffByItemId(testCharacter.id, "test-item-id");
 
     // Assertions
     expect(retrievedBuffs).toBeDefined();
@@ -243,7 +243,7 @@ describe("CharacterBuffTracker", () => {
   });
 
   it("should return empty array if buff with item ID is not found", async () => {
-    const retrievedBuff = await characterBuffTracker.getBuffByItemId(testCharacter, "nonexistent-item-id");
+    const retrievedBuff = await characterBuffTracker.getBuffByItemId(testCharacter._id, "nonexistent-item-id");
 
     expect(retrievedBuff).toEqual([]);
   });
@@ -254,7 +254,7 @@ describe("CharacterBuffTracker", () => {
       itemKey: "test-item-key",
     } as unknown as ICharacterItemBuff;
 
-    await characterBuffTracker.addBuff(testCharacter, testBuff);
+    await characterBuffTracker.addBuff(testCharacter._id, testBuff);
 
     const retrievedBuff = await characterBuffTracker.getBuffByItemKey(testCharacter, "test-item-key");
 

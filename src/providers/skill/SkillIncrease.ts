@@ -3,6 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
@@ -10,6 +11,8 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
+import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
+import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
 import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 import {
   BASIC_INCREASE_HEALTH_MANA,
@@ -21,6 +24,7 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   AnimationEffectKeys,
   CharacterClass,
@@ -47,13 +51,12 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
-import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
-import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -74,7 +77,8 @@ export class SkillIncrease {
     private skillMapper: SkillCraftingMapper,
     private numberFormatter: NumberFormatter,
     private characterBuffTracker: CharacterBuffTracker,
-    private characterBuffSkill: CharacterBuffSkill
+    private characterBuffSkill: CharacterBuffSkill,
+    private newRelic: NewRelic
   ) {}
 
   /**
@@ -83,124 +87,135 @@ export class SkillIncrease {
    *
    */
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
-    // Get character skills and equipment to upgrade them
-    const skills = (await Skill.findById(attacker.skills).lean()) as ISkill;
-    if (!skills) {
-      throw new Error(`skills not found for character ${attacker.id}`);
-    }
+    await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "increaseSkillsOnBattle", async () => {
+      // Get character skills and equipment to upgrade them
+      const skills = (await Skill.findById(attacker.skills)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${attacker?._id}-skills`,
+        })) as unknown as ISkill;
 
-    const equipment = await Equipment.findById(attacker.equipment).lean();
-    if (!equipment) {
-      throw new Error(`equipment not found for character ${attacker.id}`);
-    }
+      if (!skills) {
+        throw new Error(`skills not found for character ${attacker.id}`);
+      }
 
-    const weapon = await this.characterWeapon.getWeapon(attacker);
+      const equipment = await Equipment.findById(attacker.equipment).lean();
+      if (!equipment) {
+        throw new Error(`equipment not found for character ${attacker.id}`);
+      }
 
-    const weaponSubType = weapon?.item ? weapon?.item.subType || "None" : "None";
-    const skillName = SKILLS_MAP.get(weaponSubType);
+      const weapon = await this.characterWeapon.getWeapon(attacker);
 
-    if (!skillName) {
-      throw new Error(`Skill not found for weapon ${weaponSubType}`);
-    }
+      const weaponSubType = weapon?.item ? weapon?.item.subType || "None" : "None";
+      const skillName = SKILLS_MAP.get(weaponSubType);
 
-    await this.recordXPinBattle(attacker, target, damage);
+      if (!skillName) {
+        throw new Error(`Skill not found for weapon ${weaponSubType}`);
+      }
 
-    const canIncreaseSP = this.skillGainValidation.canUpdateSkills(skills, skillName);
+      await this.recordXPinBattle(attacker, target, damage);
 
-    if (!canIncreaseSP) {
-      return;
-    }
+      const canIncreaseSP = this.skillGainValidation.canUpdateSkills(skills, skillName);
 
-    // stronger the opponent, higher SP per hit it gives in your combat skills
-    const bonus = await this.skillFunctions.calculateBonus(target.skills);
-    const increasedWeaponSP = this.increaseSP(skills, weaponSubType, undefined, SKILLS_MAP, bonus);
+      if (!canIncreaseSP) {
+        return;
+      }
 
-    let increasedStrengthSP;
-    if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
-      increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
-    }
+      // stronger the opponent, higher SP per hit it gives in your combat skills
+      const bonus = await this.skillFunctions.calculateBonus(target, target.skills);
+      const increasedWeaponSP = this.increaseSP(skills, weaponSubType, undefined, SKILLS_MAP, bonus);
 
-    await this.skillFunctions.updateSkills(skills, attacker);
+      let increasedStrengthSP;
+      if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
+        increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
+      }
 
-    await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weaponSubType);
+      await this.skillFunctions.updateSkills(skills, attacker);
 
-    if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
-      await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, BasicAttribute.Strength);
-    }
+      await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weaponSubType);
 
-    // If character strength skill level increased, send level up event
-    if (increasedStrengthSP && increasedStrengthSP.skillLevelUp && attacker.channelId) {
-      await this.skillFunctions.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
-      await this.characterWeight.updateCharacterWeight(attacker);
-    }
+      if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
+        await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, BasicAttribute.Strength);
+      }
 
-    // If character skill level increased, send level up event specifying the skill that upgraded
-    if (increasedWeaponSP.skillLevelUp && attacker.channelId) {
-      await this.skillFunctions.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
-    }
+      // If character strength skill level increased, send level up event
+      if (increasedStrengthSP && increasedStrengthSP.skillLevelUp && attacker.channelId) {
+        await this.skillFunctions.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
+        await this.characterWeight.updateCharacterWeight(attacker);
+      }
+
+      // If character skill level increased, send level up event specifying the skill that upgraded
+      if (increasedWeaponSP.skillLevelUp && attacker.channelId) {
+        await this.skillFunctions.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
+      }
+    });
   }
 
   public async increaseShieldingSP(character: ICharacter): Promise<void> {
-    const characterWithRelations = (await Character.findById(character.id)
-      .populate({
-        path: "skills",
-        model: "Skill",
-      })
-      .lean()
-      .populate({
-        path: "equipment",
-        model: "Equipment",
+    await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "increaseShieldingSP", async () => {
+      const characterWithRelations = (await Character.findById(character.id)
+        .populate({
+          path: "skills",
+          model: "Skill",
+        })
+        .lean()
+        .populate({
+          path: "equipment",
+          model: "Equipment",
 
-        populate: {
-          path: "rightHand leftHand",
-          model: "Item",
-        },
-      })
-      .lean()) as ICharacter;
+          populate: {
+            path: "rightHand leftHand",
+            model: "Item",
+          },
+        })
+        .lean()) as ICharacter;
 
-    if (!characterWithRelations) {
-      throw new Error(`character not found for id ${character.id}`);
-    }
-    const skills = characterWithRelations.skills as ISkill;
-
-    const canIncreaseSP = this.skillGainValidation.canUpdateSkills(skills as ISkill, "shielding");
-
-    if (!canIncreaseSP) {
-      return;
-    }
-
-    const equipment = characterWithRelations.equipment as IEquipment;
-
-    const rightHandItem = equipment?.rightHand as IItem;
-    const leftHandItem = equipment?.leftHand as IItem;
-
-    let result = {} as IIncreaseSPResult;
-    if (rightHandItem?.subType === ItemSubType.Shield) {
-      result = this.increaseSP(skills, rightHandItem.subType);
-    } else {
-      if (leftHandItem?.subType === ItemSubType.Shield) {
-        result = this.increaseSP(skills, leftHandItem.subType);
+      if (!characterWithRelations) {
+        throw new Error(`character not found for id ${character.id}`);
       }
-    }
+      const skills = characterWithRelations.skills as ISkill;
 
-    await this.skillFunctions.updateSkills(skills, character);
-    if (!_.isEmpty(result)) {
-      if (result.skillLevelUp && characterWithRelations.channelId) {
-        await this.skillFunctions.sendSkillLevelUpEvents(result, characterWithRelations);
+      const canIncreaseSP = this.skillGainValidation.canUpdateSkills(skills as ISkill, "shielding");
+
+      if (!canIncreaseSP) {
+        return;
       }
 
+      const equipment = characterWithRelations.equipment as IEquipment;
+
+      const rightHandItem = equipment?.rightHand as IItem;
+      const leftHandItem = equipment?.leftHand as IItem;
+
+      let result = {} as IIncreaseSPResult;
       if (rightHandItem?.subType === ItemSubType.Shield) {
-        await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
+        result = this.increaseSP(skills, rightHandItem.subType);
       } else {
         if (leftHandItem?.subType === ItemSubType.Shield) {
-          await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
+          result = this.increaseSP(skills, leftHandItem.subType);
         }
       }
-    }
+
+      await this.skillFunctions.updateSkills(skills, character);
+      if (!_.isEmpty(result)) {
+        if (result.skillLevelUp && characterWithRelations.channelId) {
+          await this.skillFunctions.sendSkillLevelUpEvents(result, characterWithRelations);
+        }
+
+        if (rightHandItem?.subType === ItemSubType.Shield) {
+          await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
+        } else {
+          if (leftHandItem?.subType === ItemSubType.Shield) {
+            await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
+          }
+        }
+      }
+    });
   }
 
   public async increaseMagicSP(character: ICharacter, power: number): Promise<void> {
-    await this.increaseBasicAttributeSP(character, BasicAttribute.Magic, this.getMagicSkillIncreaseCalculator(power));
+    await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "increaseMagicSP", async () => {
+      await this.increaseBasicAttributeSP(character, BasicAttribute.Magic, this.getMagicSkillIncreaseCalculator(power));
+    });
   }
 
   public async increaseMagicResistanceSP(character: ICharacter, power: number): Promise<void> {
@@ -216,7 +231,11 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
@@ -250,7 +269,9 @@ export class SkillIncrease {
       throw new Error(`skill not found for item ${craftedItemKey}`);
     }
 
-    const skills = (await Skill.findById(character.skills)) as ISkill;
+    const skills = (await Skill.findById(character.skills).cacheQuery({
+      cacheKey: `${character?._id}-skills`,
+    })) as unknown as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
@@ -291,14 +312,22 @@ export class SkillIncrease {
 
       // Get attacker character data
       const character = (await Character.findById(record!.charId)) as ICharacter;
+
       if (!character) {
         // if attacker does not exist anymore
         // call again the function without this record
         return this.releaseXP(target);
       }
 
+      await clearCacheForKey(`${character._id}-skills`);
+      await clearCacheForKey(`characterBuffs_${character._id}`);
+
       // Get character skills
-      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+      const skills = (await Skill.findById(character.skills)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${character?._id}-skills`,
+        })) as ISkill;
 
       if (!skills) {
         // if attacker skills does not exist anymore
@@ -342,9 +371,15 @@ export class SkillIncrease {
     character: ICharacter,
     target: INPC | ICharacter
   ): Promise<void> {
+    const previousLevel = expData.level - 1;
+
+    if (previousLevel === 0) {
+      return;
+    }
+
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
       message: `You advanced from level ${this.numberFormatter.formatNumber(
-        expData.level - 1
+        previousLevel
       )} to level ${this.numberFormatter.formatNumber(expData.level)}.`,
       type: "info",
     });
@@ -499,7 +534,11 @@ export class SkillIncrease {
 
   public async increaseMaxManaMaxHealth(characterId: Types.ObjectId): Promise<void> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as ISkill;
 
     const classBonusOrPenalties = this.characterClassBonusOrPenalties.getClassBonusOrPenalties(
       character.class as CharacterClass
@@ -539,11 +578,11 @@ export class SkillIncrease {
     const { maxHealth, maxMana } = Object.freeze(updateAttributes);
 
     const allBuffsOnMaxHealth = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-      character,
+      character._id,
       CharacterAttributes.MaxHealth
     );
     const allBuffsOnMaxMana = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-      character,
+      character._id,
       CharacterAttributes.MaxMana
     );
 

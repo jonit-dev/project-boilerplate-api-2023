@@ -32,6 +32,13 @@ const characterBuffModel = createLeanSchema({
   itemKey: Type.string(),
 });
 
+characterBuffModel.index(
+  {
+    owner: 1,
+  },
+  { background: true }
+);
+
 characterBuffModel.plugin(SpeedGooseCacheAutoCleaner);
 
 export type ICharacterBuff = ExtractDoc<typeof characterBuffModel>;

@@ -12,8 +12,8 @@ export class ItemDeleteCrons {
   constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic) {}
 
   public schedule(): void {
-    nodeCron.schedule("0 */4 * * *", () => {
-      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "ItemDeleteCrons", async () => {
+    nodeCron.schedule("0 */4 * * *", async () => {
+      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "ItemDeleteCrons", async () => {
         const allOnlineCharacters = await Character.find({ isOnline: true }).lean();
 
         for (const character of allOnlineCharacters) {

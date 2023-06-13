@@ -35,7 +35,6 @@ export const npcSpider = {
       level: 1,
     },
   },
-  fleeOnLowHealth: true,
   loots: [
     {
       itemBlueprintKey: GlovesBlueprint.LeatherGloves,

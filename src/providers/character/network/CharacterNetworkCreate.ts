@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
@@ -33,6 +34,10 @@ import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
+
+import { ItemCleaner } from "@providers/item/ItemCleaner";
+import { clearCacheForKey } from "speedgoose";
+import { CharacterDeath } from "../CharacterDeath";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
 
@@ -54,7 +59,9 @@ export class CharacterNetworkCreate {
     private warriorPassiveHabilities: WarriorPassiveHabilities,
     private magePassiveHabilities: MagePassiveHabilities,
     private inMemoryHashTable: InMemoryHashTable,
-    private socketSessionControl: SocketSessionControl
+    private socketSessionControl: SocketSessionControl,
+    private characterDeath: CharacterDeath,
+    private itemCleaner: ItemCleaner
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -72,7 +79,7 @@ export class CharacterNetworkCreate {
           }
         );
 
-        const character = await Character.findById(connectionCharacter._id);
+        let character = (await Character.findById(connectionCharacter._id)) as ICharacter;
 
         if (!character) {
           console.log(`🚫 ${connectionCharacter.name} tried to create its instance but it was not found!`);
@@ -83,7 +90,13 @@ export class CharacterNetworkCreate {
 
           return;
         }
+
+        await clearCacheForKey(`characterBuffs_${character._id}`);
+        await clearCacheForKey(`${character._id}-skills`);
+
         await this.characterView.clearCharacterView(character);
+
+        await this.itemCleaner.clearMissingReferences(character);
 
         await this.battleNetworkStopTargeting.stopTargeting(character);
 
@@ -113,6 +126,12 @@ export class CharacterNetworkCreate {
           return;
         }
 
+        if (!character.isAlive) {
+          await this.characterDeath.respawnCharacter(character);
+
+          character = (await Character.findById(connectionCharacter._id)) as ICharacter;
+        }
+
         /*
         Here we inject our server side character properties, 
         to make sure the client is not hacking anything
@@ -138,7 +157,7 @@ export class CharacterNetworkCreate {
 
         switch (appEnv.general.ENV) {
           case EnvType.Development:
-            await this.npcManager.startNearbyNPCsBehaviorLoop(character);
+            void this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
             break;
           case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
@@ -148,7 +167,7 @@ export class CharacterNetworkCreate {
             break;
         }
 
-        await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
+        void this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.itemView.warnCharacterAboutItemsInView(character, { always: true }); // dont await this because if there's a ton of garbage in the server, the character will be stuck waiting for this to finish

@@ -47,14 +47,18 @@ export class WarriorPassiveHabilities {
     }
 
     try {
-      const charSkills = await Skill.findById(skills).lean();
+      const charSkills = (await Skill.findById(skills)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${character?._id}-skills`,
+        })) as unknown as ISkill;
       const strengthLvl = await this.traitGetter.getSkillLevelWithBuffs(charSkills as ISkill, BasicAttribute.Strength);
       const interval = Math.min(Math.max(20000 - strengthLvl * 500, 1000), 20000);
       const healthRegenAmount = Math.max(Math.floor(strengthLvl / 3), 4);
 
       if (health < maxHealth) {
-        const intervalId = setInterval(() => {
-          this.newRelic.trackTransaction(
+        const intervalId = setInterval(async () => {
+          await this.newRelic.trackTransaction(
             NewRelicTransactionCategory.Interval,
             "WarriorAutoRegenHealthHandler",
             async () => {

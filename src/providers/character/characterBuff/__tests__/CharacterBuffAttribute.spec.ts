@@ -78,7 +78,7 @@ describe("CharacterBuffAttribute", () => {
     const enabledBuff1 = await characterBuffAttribute.enableBuff(testCharacter, testBuff1);
     const enabledBuff2 = await characterBuffAttribute.enableBuff(testCharacter, testBuff2);
 
-    const allBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
+    const allBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
     const buffQty = allBuffs.length;
 
     let updatedCharacter = (await Character.findById(testCharacter._id!).lean()) as ICharacter;

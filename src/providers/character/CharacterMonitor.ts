@@ -15,17 +15,16 @@ export class CharacterMonitor {
 
   constructor(private pm2Helper: PM2Helper, private newRelic: NewRelic) {}
 
-  public monitor(intervalMs?: number): void {
+  public async monitor(intervalMs?: number): Promise<void> {
     this.monitorIntervalMS = intervalMs || 3000;
-
     this.clear(); // clear our state in redis before beginning
 
     if (appEnv.general.ENV === EnvType.Production && process.env.pm_id === this.pm2Helper.pickLastCPUInstance()) {
       // in prod, only use one instance for this.
-      this.execCallbacks();
+      await this.execCallbacks();
     } else {
       // in dev, just monitor
-      this.execCallbacks();
+      await this.execCallbacks();
     }
   }
 
@@ -41,27 +40,32 @@ export class CharacterMonitor {
     this.charactersCallbacks.clear();
   }
 
-  private execCallbacks(): void {
-    setInterval(() => {
-      this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "CharacterMonitor", async () => {
-        const characterIds = this.charactersCallbacks.keys();
+  private async fetchAndExecuteCallback(characterId: string): Promise<void> {
+    // execute character callback
+    const callback = this.charactersCallbacks.get(characterId);
 
-        for (const characterId of characterIds) {
-          // execute character callback
-          const callback = this.charactersCallbacks.get(characterId);
+    if (callback) {
+      const character = (await Character.findOne({ _id: characterId }).lean({
+        virtuals: true,
+        defaults: true,
+      })) as ICharacter;
 
-          if (callback) {
-            const character = (await Character.findOne({ _id: characterId }).lean()) as ICharacter;
+      if (!character || !character.isAlive || character.isBanned || !character.isOnline) {
+        this.charactersCallbacks.delete(characterId);
+      } else {
+        callback(character);
+      }
+    }
+  }
 
-            if (!character) {
-              this.charactersCallbacks.delete(characterId);
-              continue;
-            }
+  private async execCallbacks(): Promise<void> {
+    const characterIds = [...this.charactersCallbacks.keys()];
+    await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "CharacterMonitor", async () => {
+      // Create an array of promises and execute them concurrently
+      await Promise.all(characterIds.map((characterId) => this.fetchAndExecuteCallback(characterId)));
+    });
 
-            callback(character);
-          }
-        }
-      });
-    }, this.monitorIntervalMS);
+    // Ensure next execution does not overlap with current one by using setTimeout instead of setInterval
+    setTimeout(() => this.execCallbacks(), this.monitorIntervalMS);
   }
 }

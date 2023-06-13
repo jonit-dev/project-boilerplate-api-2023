@@ -20,6 +20,13 @@ const marketplaceSchema = createLeanSchema(
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
+marketplaceSchema.index(
+  {
+    name: 1,
+  },
+  { background: true }
+);
+
 export type IMarketplace = ExtractDoc<typeof marketplaceSchema>;
 
 export const Marketplace = typedModel("Marketplace", marketplaceSchema);

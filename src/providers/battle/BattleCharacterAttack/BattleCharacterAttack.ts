@@ -1,5 +1,8 @@
+/* eslint-disable require-await */
+/* eslint-disable no-void */
 /* eslint-disable no-new */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -8,6 +11,7 @@ import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
 import { BattleCharacterAttackValidation } from "./BattleCharacterAttackValidation";
+
 @provide(BattleCharacterAttack)
 export class BattleCharacterAttack {
   constructor(
@@ -27,25 +31,71 @@ export class BattleCharacterAttack {
 
     new BattleCycle(
       character.id,
-      () => {
-        this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "CharacterBattleCycle", async () => {
-          // get an updated version of the character and target.
-          const updatedCharacter = await Character.findOne({ _id: character._id }).populate("skills");
-          let updatedTarget;
+      async () => {
+        await this.newRelic.trackTransaction(
+          NewRelicTransactionCategory.Operation,
+          "CharacterBattleCycle",
+          async () => {
+            const updatedCharacter = (await Character.findOne({ _id: character._id }).lean({
+              virtuals: true,
+              defaults: true,
+            })) as ICharacter;
 
-          if (target.type === "NPC") {
-            updatedTarget = await NPC.findOne({ _id: target._id }).populate("skills");
-          }
-          if (target.type === "Character") {
-            updatedTarget = await Character.findOne({ _id: target._id }).populate("skills");
-          }
+            if (!updatedCharacter) {
+              throw new Error("Failed to get updated character for attacking target.");
+            }
 
-          if (!updatedCharacter || !updatedTarget) {
-            throw new Error("Failed to get updated required elements for attacking target.");
-          }
+            const characterSkills = (await Skill.findOne({ owner: character._id })
+              .lean({
+                virtuals: true,
+                defaults: true,
+              })
+              .cacheQuery({
+                cacheKey: `${character._id}-skills`,
+                ttl: 86400,
+              })) as ISkill;
 
-          await this.attackTarget(updatedCharacter, updatedTarget);
-        });
+            updatedCharacter.skills = characterSkills;
+
+            let updatedTarget;
+
+            if (target.type === "NPC") {
+              updatedTarget = await NPC.findOne({ _id: target._id }).lean({
+                virtuals: true,
+                defaults: true,
+              });
+
+              const updatedNPCSkills = await Skill.findOne({ owner: target._id })
+                .lean({
+                  virtuals: true,
+                  defaults: true,
+                })
+                .cacheQuery({
+                  cacheKey: `${target._id}-skills`,
+                });
+
+              updatedTarget.skills = updatedNPCSkills;
+            }
+            if (target.type === "Character") {
+              updatedTarget = await Character.findOne({ _id: target._id }).lean({
+                virtuals: true,
+                defaults: true,
+              });
+
+              const updatedCharacterSkills = await Skill.findOne({ owner: target._id }).cacheQuery({
+                cacheKey: `${target._id}-skills`,
+              });
+
+              updatedTarget.skills = updatedCharacterSkills;
+            }
+
+            if (!updatedCharacter || !updatedTarget) {
+              throw new Error("Failed to get updated required elements for attacking target.");
+            }
+
+            await this.attackTarget(updatedCharacter, updatedTarget);
+          }
+        );
       },
       character.attackIntervalSpeed
     );

@@ -101,28 +101,37 @@ export const skillsSchema = createLeanSchema(
   { timestamps: { createdAt: true, updatedAt: true } }
 );
 
+skillsSchema.index(
+  {
+    owner: 1,
+    ownerType: 1,
+  },
+  { background: true }
+);
+
 //! This is not very performant, so prefer using await traitGetter.getSkillLevelWithBuffs(skill, skillName) instead
 skillsSchema.statics.findByIdWithBuffs = async function (id: string, ...args: any[]): Promise<ISkill> {
   const traitGetter = container.get(TraitGetter);
 
-  const skill = await this.findById(id, ...args);
+  const skills = await this.findById(id, ...args).lean({ virtuals: true, default: true });
 
-  if (skill.ownerType === "Character") {
+  if (skills.ownerType === "Character") {
     const buffedSkills = await CharacterBuff.find({
-      owner: skill.owner,
+      owner: skills.owner,
       type: CharacterBuffType.Skill,
-    })
-      .select("trait")
-      .lean();
+    }).lean({
+      virtuals: true,
+      default: true,
+    });
 
     const buffedSkillsList = buffedSkills.map((buff) => buff.trait);
 
     for (const skillName of buffedSkillsList) {
-      skill[skillName].level = await traitGetter.getSkillLevelWithBuffs(skill, skillName as SkillsAvailable);
+      skills[skillName].level = await traitGetter.getSkillLevelWithBuffs(skills, skillName as SkillsAvailable);
     }
   }
 
-  return skill;
+  return skills;
 };
 
 skillsSchema.post("save", async function (this: ISkill) {
@@ -133,7 +142,11 @@ skillsSchema.post("save", async function (this: ISkill) {
   }
 
   if (npc?.alignment === NPCAlignment.Hostile || npc?.alignment === NPCAlignment.Neutral) {
-    const skills = (await Skill.findById(this._id).lean({ virtuals: true, default: true })) as ISkill;
+    const skills = (await Skill.findById(this._id)
+      .lean({ virtuals: true, default: true })
+      .cacheQuery({
+        cacheKey: `${this._id}-skills`,
+      })) as ISkill;
     const experience = calculateExperience(npc.baseHealth, skills);
 
     await NPC.updateOne(
