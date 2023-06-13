@@ -119,11 +119,10 @@ skillsSchema.statics.findByIdWithBuffs = async function (id: string, ...args: an
     const buffedSkills = await CharacterBuff.find({
       owner: skills.owner,
       type: CharacterBuffType.Skill,
-    })
-      .lean()
-      .cacheQuery({
-        cacheKey: `characterBuffs_${skills.owner}`,
-      });
+    }).lean({
+      virtuals: true,
+      default: true,
+    });
 
     const buffedSkillsList = buffedSkills.map((buff) => buff.trait);
 
