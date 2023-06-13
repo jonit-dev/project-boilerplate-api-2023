@@ -8,7 +8,7 @@ import { NPCView } from "./NPCView";
 
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { appEnv } from "@providers/config/env";
-import { NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
+import { NPC_FREEZE_CHECK_INTERVAL, NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EnvType } from "@rpg-engine/shared";
 import CPUusage from "cpu-percentage";
@@ -18,36 +18,24 @@ import round from "lodash/round";
 export class NPCFreezer {
   public freezeCheckIntervals: Map<string, NodeJS.Timeout> = new Map();
 
-  constructor(private npcView: NPCView, private newRelic: NewRelic) {
-    if (appEnv.general.IS_UNIT_TEST) {
-      return;
-    }
+  constructor(private npcView: NPCView, private newRelic: NewRelic) {}
 
+  public init(): void {
     this.setCPUUsageCheckInterval();
   }
 
   public tryToFreezeNPC(npc: INPC): void {
-    if (this.freezeCheckIntervals.has(npc.id)) {
-      return; // interval is already, running, lets not create another one!
-    }
-    if (!npc.isBehaviorEnabled) {
+    if (this.freezeCheckIntervals.has(npc.id) || !npc.isBehaviorEnabled) {
       return;
     }
 
-    // every 5-10 seconds, check if theres a character nearby. If not, shut down NPCCycle.
     const checkRange = random(2000, 4000);
-
     const interval = setInterval(async () => {
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NPCFreezer", async () => {
-        const shouldFreezeNPC = await this.shouldFreezeNPC(npc);
-
-        if (!shouldFreezeNPC) {
-          return;
+        if (await this.shouldFreezeNPC(npc)) {
+          await this.freezeNPC(npc);
+          clearInterval(interval);
         }
-
-        await this.freezeNPC(npc);
-
-        clearInterval(interval);
       });
     }, checkRange);
 
@@ -61,13 +49,11 @@ export class NPCFreezer {
 
     await NPC.updateOne({ _id: npc._id }, { isBehaviorEnabled: false });
     const npcCycle = NPC_CYCLES.get(npc.id);
-
     if (npcCycle) {
       await npcCycle.clear();
     }
 
     const battleCycle = NPC_BATTLE_CYCLES.get(npc.id);
-
     if (battleCycle) {
       await battleCycle.clear();
     }
@@ -75,16 +61,14 @@ export class NPCFreezer {
     this.freezeCheckIntervals.delete(npc.id);
   }
 
-  // This works like a security measure to prevent the server from crashing due to high CPU usage if there are too many NPCs active at the same time.
   private setCPUUsageCheckInterval(): void {
     const start = CPUusage();
-    const checkInterval = 5000;
+    const checkInterval = NPC_FREEZE_CHECK_INTERVAL;
     const maxCPUUsagePerInstance = 70;
 
     setInterval(async () => {
       const end = CPUusage(start);
       const totalCPUUsage = round(end.percent);
-
       if (appEnv.general.ENV === EnvType.Development && appEnv.general.DEBUG_MODE) {
         console.log(
           `NPC_CYCLES: ${NPC_CYCLES.size} NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size} CPU_USAGE: ${totalCPUUsage}%`
@@ -92,33 +76,32 @@ export class NPCFreezer {
       }
 
       const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
+      const freezeTasks: any[] = [];
 
       if (totalActiveNPCs >= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
         const diff = totalActiveNPCs - NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE;
-
         for (let i = 0; i < diff; i++) {
-          await this.freezeRandomNPC(totalCPUUsage);
+          freezeTasks.push(this.freezeRandomNPC());
         }
-
-        return;
       }
 
       if (totalCPUUsage >= maxCPUUsagePerInstance) {
         const freezeCount = Math.ceil(totalActiveNPCs * 0.3);
         for (let i = 0; i < freezeCount; i++) {
-          await this.freezeRandomNPC(totalCPUUsage);
+          freezeTasks.push(this.freezeRandomNPC());
         }
       }
+
+      await Promise.all(freezeTasks);
     }, checkInterval);
   }
 
   private async shouldFreezeNPC(npc: INPC): Promise<boolean> {
     const nearbyCharacters = await this.npcView.getCharactersInView(npc);
-
-    return !nearbyCharacters.length;
+    return nearbyCharacters.length === 0;
   }
 
-  private async freezeRandomNPC(usage: number): Promise<void> {
+  private async freezeRandomNPC(): Promise<void> {
     const npcIds = Array.from(NPC_CYCLES.keys());
     const randomNpcId = random(0, npcIds.length - 1);
     const npcCycle = NPC_CYCLES.get(npcIds[randomNpcId]);
@@ -128,11 +111,12 @@ export class NPCFreezer {
     }
 
     const npc = await NPC.findById(npcCycle.id);
-
-    if (!npc) {
-      throw new Error(`Failed to freeze NPC! NPC ${npcCycle.id} not found`);
+    if (npc) {
+      try {
+        await this.freezeNPC(npc, true);
+      } catch (error) {
+        console.error(`Failed to freeze NPC ${npcCycle.id}: ${error.message}`);
+      }
     }
-
-    await this.freezeNPC(npc, true);
   }
 }

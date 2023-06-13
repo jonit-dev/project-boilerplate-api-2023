@@ -33,6 +33,8 @@ import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
+import { ItemCleaner } from "@providers/item/ItemCleaner";
+import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
@@ -55,7 +57,8 @@ export class CharacterNetworkCreate {
     private warriorPassiveHabilities: WarriorPassiveHabilities,
     private magePassiveHabilities: MagePassiveHabilities,
     private characterDeath: CharacterDeath,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private itemCleaner: ItemCleaner
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -84,7 +87,13 @@ export class CharacterNetworkCreate {
 
           return;
         }
+
+        await clearCacheForKey(`characterBuffs_${character._id}`);
+        await clearCacheForKey(`${character._id}-skills`);
+
         await this.characterView.clearCharacterView(character);
+
+        await this.itemCleaner.clearMissingReferences(character);
 
         await this.battleNetworkStopTargeting.stopTargeting(character);
 
