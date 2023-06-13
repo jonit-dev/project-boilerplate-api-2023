@@ -4,6 +4,7 @@ import { BattleCycle } from "@providers/battle/BattleCycle";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import { ItemCleaner } from "@providers/item/ItemCleaner";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
@@ -42,7 +43,8 @@ export class CharacterNetworkLogout {
     private characterItemContainer: CharacterItemContainer,
     private characterItems: CharacterItems,
     private characterMonitor: CharacterMonitor,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private itemCleaner: ItemCleaner
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -81,6 +83,7 @@ export class CharacterNetworkLogout {
             textureKey: textureKey || character.textureKey,
           }
         );
+        await this.itemCleaner.cleanupMissingReferences(character);
 
         await this.specialEffect.clearEffects(character);
 

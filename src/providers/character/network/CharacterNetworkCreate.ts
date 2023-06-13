@@ -33,6 +33,7 @@ import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
+import { ItemCleaner } from "@providers/item/ItemCleaner";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
@@ -56,7 +57,8 @@ export class CharacterNetworkCreate {
     private warriorPassiveHabilities: WarriorPassiveHabilities,
     private magePassiveHabilities: MagePassiveHabilities,
     private characterDeath: CharacterDeath,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private itemCleaner: ItemCleaner
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
