@@ -45,11 +45,19 @@ export class BattleCharacterAttackValidation {
           let targetSkills = target?.skills as ISkill;
 
           if (!attackerSkills?.level) {
-            attackerSkills = await Skill.findById(attacker.skills).lean();
+            attackerSkills = (await Skill.findById(attacker.skills)
+              .lean()
+              .cacheQuery({
+                cacheKey: `${attacker?._id}-skills`,
+              })) as unknown as ISkill;
           }
 
           if (!targetSkills?.level) {
-            targetSkills = await Skill.findById(target.skills).lean();
+            targetSkills = (await Skill.findById(target.skills)
+              .lean()
+              .cacheQuery({
+                cacheKey: `${target?._id}-skills`,
+              })) as unknown as ISkill;
           }
 
           const pvpLvRestrictedReason = this.isCharactersLevelRestrictedForPVP(attackerSkills, targetSkills);

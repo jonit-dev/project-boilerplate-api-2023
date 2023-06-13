@@ -1,5 +1,5 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
@@ -28,15 +28,19 @@ export class TraitGetter {
       async () => {
         let totalTraitSummedBuffs = 0;
         if (skills.ownerType === "Character") {
-          const entity = (await Character.findById(skills.owner).lean()) as ICharacter;
-
           totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-            entity,
+            skills.owner?.toString() as string,
             skillName as CharacterTrait
           );
         }
 
-        const skillValue = skills[skillName].level + totalTraitSummedBuffs;
+        const skillLevel = skills[skillName].level;
+
+        if (!skillLevel) {
+          skills = await Skill.findById(skills._id).lean();
+        }
+
+        const skillValue = skillLevel + totalTraitSummedBuffs;
 
         return this.numberFormatter.formatNumber(skillValue);
       }
@@ -52,7 +56,7 @@ export class TraitGetter {
       "TraitGetter.getCharacterAttributeWithBuffs",
       async () => {
         const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-          character,
+          character._id,
           attributeName as CharacterTrait
         );
 

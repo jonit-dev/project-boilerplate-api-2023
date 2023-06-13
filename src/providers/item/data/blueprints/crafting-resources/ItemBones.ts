@@ -11,5 +11,5 @@ export const itemBones: ICraftableItemBlueprint = {
   description: "Bones that can be used for crafting weapons or tools.",
   weight: 0.29,
   maxStackSize: 100,
-  basePrice: 8,
+  basePrice: 5,
 };

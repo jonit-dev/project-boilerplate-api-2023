@@ -1,3 +1,4 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { TraitGetter } from "@providers/skill/TraitGetter";
@@ -41,10 +42,15 @@ export class ItemRarity {
   }
 
   public async setItemRarityOnCraft(
+    character: ICharacter,
     item: IItem,
     skillId: Types.ObjectId
   ): Promise<{ attack: number; defense: number; rarity: ItemRarities }> {
-    const skills = await Skill.findById(skillId).lean();
+    const skills = (await Skill.findById(skillId)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as unknown as ISkill;
 
     if (!skills) {
       return { attack: 0, defense: 0, rarity: ItemRarities.Common };
