@@ -3,6 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
@@ -16,6 +17,7 @@ import { ItemPickupUpdater } from "@providers/item/ItemPickup/ItemPickupUpdater"
 import { ItemView } from "@providers/item/ItemView";
 import { itemsBlueprintIndex } from "@providers/item/data";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   CharacterClass,
   IBaseItemBlueprint,
@@ -51,7 +53,8 @@ export class EquipmentEquip {
     private characterWeight: CharacterWeight,
     private itemPickupUpdater: ItemPickupUpdater,
     private characterItemBuff: CharacterItemBuff,
-    private equipmentCharacterClass: EquipmentCharacterClass
+    private equipmentCharacterClass: EquipmentCharacterClass,
+    private newRelic: NewRelic
   ) {}
 
   public async equipInventory(character: ICharacter, itemId: string): Promise<boolean> {
@@ -105,70 +108,76 @@ export class EquipmentEquip {
   }
 
   public async equip(character: ICharacter, itemId: string, fromItemContainerId: string): Promise<boolean> {
-    const item = await Item.findById(itemId);
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "EquipmentEquip.equip",
+      async () => {
+        const item = await Item.findById(itemId);
 
-    if (!item) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item not found.");
-      return false;
-    }
+        if (!item) {
+          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item not found.");
+          return false;
+        }
 
-    const itemContainer = await ItemContainer.findById(fromItemContainerId);
+        const itemContainer = await ItemContainer.findById(fromItemContainerId);
 
-    if (!itemContainer) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item container not found.");
-      return false;
-    }
+        if (!itemContainer) {
+          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item container not found.");
+          return false;
+        }
 
-    const containerType = await this.checkContainerType(itemContainer);
+        const containerType = await this.checkContainerType(itemContainer);
 
-    const isEquipValid = await this.isEquipValid(character, item, containerType);
+        const isEquipValid = await this.isEquipValid(character, item, containerType);
 
-    if (!isEquipValid) {
-      this.socketMessaging.sendErrorMessageToCharacter(character);
-      return false;
-    }
+        if (!isEquipValid) {
+          this.socketMessaging.sendErrorMessageToCharacter(character);
+          return false;
+        }
 
-    const equipment = await Equipment.findById(character.equipment);
+        const equipment = await Equipment.findById(character.equipment);
 
-    if (!equipment) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
-      return false;
-    }
+        if (!equipment) {
+          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
+          return false;
+        }
 
-    if (item.isBeingEquipped) {
-      this.socketMessaging.sendErrorMessageToCharacter(character);
-      return false;
-    }
+        if (item.isBeingEquipped) {
+          this.socketMessaging.sendErrorMessageToCharacter(character);
+          return false;
+        }
 
-    item.isBeingEquipped = true;
+        item.isBeingEquipped = true;
 
-    const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
+        const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
 
-    if (!equipItem) {
-      return false;
-    }
+        if (!equipItem) {
+          return false;
+        }
 
-    const inventory = await this.characterInventory.getInventory(character);
+        const inventory = await this.characterInventory.getInventory(character);
 
-    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
+        const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
 
-    if (!inventoryContainer) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Failed to equip item.");
-      return false;
-    }
+        if (!inventoryContainer) {
+          this.socketMessaging.sendErrorMessageToCharacter(character, "Failed to equip item.");
+          return false;
+        }
 
-    await item.save();
+        await item.save();
 
-    // refresh itemContainer from which the item was equipped
-    const updatedContainer = (await ItemContainer.findById(fromItemContainerId)) as any;
-    await this.itemPickupUpdater.sendContainerRead(updatedContainer, character);
+        // refresh itemContainer from which the item was equipped
+        const updatedContainer = (await ItemContainer.findById(fromItemContainerId)) as any;
+        await this.itemPickupUpdater.sendContainerRead(updatedContainer, character);
 
-    await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
+        await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
 
-    await clearCacheForKey(`characterBuffs_${character._id}`);
-    await clearCacheForKey(`${character._id}-skills`);
+        await clearCacheForKey(`characterBuffs_${character._id}`);
+        await clearCacheForKey(`${character._id}-skills`);
 
-    return true;
+        return true;
+      }
+    );
   }
 
   public updateItemInventoryCharacter(

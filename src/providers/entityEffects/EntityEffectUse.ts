@@ -2,9 +2,11 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { appEnv } from "@providers/config/env";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { UISocketEvents } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
@@ -16,24 +18,34 @@ import { EntityEffectBlueprint } from "./data/types/entityEffectBlueprintTypes";
 
 @provide(EntityEffectUse)
 export class EntityEffectUse {
-  constructor(private socketMessaging: SocketMessaging, private characterWeapon: CharacterWeapon) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterWeapon: CharacterWeapon,
+    private newRelic: NewRelic
+  ) {}
 
   public async applyEntityEffects(
     target: ICharacter | INPC,
     attacker: ICharacter | INPC,
     entityEffect?: IEntityEffect
   ): Promise<void> {
-    try {
-      if (entityEffect) {
-        await this.applyEntityEffect(entityEffect, target, attacker, true);
-        return;
-      }
+    await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "EntityEffectUse.applyEntityEffects",
+      async () => {
+        try {
+          if (entityEffect) {
+            await this.applyEntityEffect(entityEffect, target, attacker, true);
+            return;
+          }
 
-      const entityEffects = await this.getApplicableEntityEffects(attacker);
-      await Promise.all(entityEffects.map((effect) => this.applyEntityEffect(effect, target, attacker)));
-    } catch (error) {
-      console.error(`Error in applyEntityEffects: ${error}`);
-    }
+          const entityEffects = await this.getApplicableEntityEffects(attacker);
+          await Promise.all(entityEffects.map((effect) => this.applyEntityEffect(effect, target, attacker)));
+        } catch (error) {
+          console.error(`Error in applyEntityEffects: ${error}`);
+        }
+      }
+    );
   }
 
   public async clearEntityEffect(effectKey: EntityEffectBlueprint, target: ICharacter | INPC): Promise<void> {

@@ -1,9 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
@@ -21,16 +23,23 @@ export class ItemPickupUpdater {
     private characterWeight: CharacterWeight,
     private equipmentSlots: EquipmentSlots,
     private socketMessaging: SocketMessaging,
-    private itemContainerHelper: ItemContainerHelper
+    private itemContainerHelper: ItemContainerHelper,
+    private newRelic: NewRelic
   ) {}
 
   public async finalizePickup(itemToBePicked: IItem, character: ICharacter): Promise<void> {
-    await this.itemOwnership.addItemOwnership(itemToBePicked, character);
+    await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "ItemPickupUpdater.finalizePickup",
+      async () => {
+        await this.itemOwnership.addItemOwnership(itemToBePicked, character);
 
-    // whenever a new item is added, we need to update the character weight
-    await this.characterWeight.updateCharacterWeight(character);
+        // whenever a new item is added, we need to update the character weight
+        await this.characterWeight.updateCharacterWeight(character);
 
-    await Item.updateOne({ _id: itemToBePicked._id }, { isBeingPickedUp: false }); // unlock item
+        await Item.updateOne({ _id: itemToBePicked._id }, { isBeingPickedUp: false }); // unlock item
+      }
+    );
   }
 
   public async refreshEquipmentIfInventoryItem(character: ICharacter): Promise<void> {

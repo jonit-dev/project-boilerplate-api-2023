@@ -9,10 +9,12 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
@@ -36,63 +38,73 @@ export class ItemUse {
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
     private characterInventory: CharacterInventory,
-    private characterFoodConsumption: CharacterFoodConsumption
+    private characterFoodConsumption: CharacterFoodConsumption,
+    private newRelic: NewRelic
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
-    if (!this.characterValidation.hasBasicValidation(character)) {
-      return false;
-    }
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "ItemUse.performItemUse",
+      async () => {
+        if (!this.characterValidation.hasBasicValidation(character)) {
+          return false;
+        }
 
-    const isItemInCharacterInventory = await this.itemValidation.isItemInCharacterInventory(character, itemUse.itemId);
-    if (!isItemInCharacterInventory) {
-      return false;
-    }
+        const isItemInCharacterInventory = await this.itemValidation.isItemInCharacterInventory(
+          character,
+          itemUse.itemId
+        );
+        if (!isItemInCharacterInventory) {
+          return false;
+        }
 
-    const useItem = (await Item.findById(itemUse.itemId).lean({ virtuals: true, defaults: true })) as IItem;
+        const useItem = (await Item.findById(itemUse.itemId).lean({ virtuals: true, defaults: true })) as IItem;
 
-    if (!useItem) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
-      return false;
-    }
+        if (!useItem) {
+          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
+          return false;
+        }
 
-    const bluePrintItem = itemsBlueprintIndex[useItem.key];
-    if (!bluePrintItem || !bluePrintItem.usableEffect) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
-      return false;
-    }
+        const bluePrintItem = itemsBlueprintIndex[useItem.key];
+        if (!bluePrintItem || !bluePrintItem.usableEffect) {
+          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
+          return false;
+        }
 
-    const canApplyItemUsage = await this.canApplyItemUsage(bluePrintItem, character);
+        const canApplyItemUsage = await this.canApplyItemUsage(bluePrintItem, character);
 
-    if (!canApplyItemUsage) {
-      return false;
-    }
+        if (!canApplyItemUsage) {
+          return false;
+        }
 
-    this.applyItemUsage(bluePrintItem, character.id);
+        this.applyItemUsage(bluePrintItem, character.id);
 
-    await this.characterItemInventory.decrementItemFromInventoryByKey(useItem.key, character, 1);
+        await this.characterItemInventory.decrementItemFromInventoryByKey(useItem.key, character, 1);
 
-    await this.characterWeight.updateCharacterWeight(character);
+        await this.characterWeight.updateCharacterWeight(character);
 
-    const updatedInventoryContainer = await this.getInventoryContainer(character);
+        const updatedInventoryContainer = await this.getInventoryContainer(character);
 
-    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-      inventory: {
-        _id: updatedInventoryContainer?._id,
-        parentItem: updatedInventoryContainer!.parentItem.toString(),
-        owner: updatedInventoryContainer?.owner?.toString() || character.name,
-        name: updatedInventoryContainer?.name,
-        slotQty: updatedInventoryContainer!.slotQty,
-        slots: updatedInventoryContainer?.slots,
-        allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
-        isEmpty: updatedInventoryContainer!.isEmpty,
-      },
-      openInventoryOnUpdate: false,
-    };
+        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+          inventory: {
+            _id: updatedInventoryContainer?._id,
+            parentItem: updatedInventoryContainer!.parentItem.toString(),
+            owner: updatedInventoryContainer?.owner?.toString() || character.name,
+            name: updatedInventoryContainer?.name,
+            slotQty: updatedInventoryContainer!.slotQty,
+            slots: updatedInventoryContainer?.slots,
+            allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
+            isEmpty: updatedInventoryContainer!.isEmpty,
+          },
+          openInventoryOnUpdate: false,
+        };
 
-    this.updateInventoryCharacter(payloadUpdate, character);
+        this.updateInventoryCharacter(payloadUpdate, character);
 
-    return true;
+        return true;
+      }
+    );
   }
 
   private async canApplyItemUsage(bluePrintItem: Partial<IItem>, character: ICharacter): Promise<boolean> {
