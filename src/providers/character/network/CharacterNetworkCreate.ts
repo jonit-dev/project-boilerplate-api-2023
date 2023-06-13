@@ -33,6 +33,7 @@ import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
+import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
@@ -84,6 +85,10 @@ export class CharacterNetworkCreate {
 
           return;
         }
+
+        await clearCacheForKey(`characterBuffs_${character._id}`);
+        await clearCacheForKey(`${character._id}-skills`);
+
         await this.characterView.clearCharacterView(character);
 
         await this.battleNetworkStopTargeting.stopTargeting(character);

@@ -62,6 +62,9 @@ export class SkillFunctions {
   }
 
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
+    await clearCacheForKey(`${character._id}-skills`);
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+
     await Skill.findByIdAndUpdate(skills._id, { ...skills });
 
     const buffedSkills = await Skill.findByIdWithBuffs(skills._id);
@@ -116,11 +119,11 @@ export class SkillFunctions {
    * @param skillLevel
    * @returns
    */
-  public async calculateBonus(skillsId: undefined | Types.ObjectId): Promise<number> {
+  public async calculateBonus(character: ICharacter | INPC, skillsId: undefined | Types.ObjectId): Promise<number> {
     if (!skillsId) {
       return 0;
     }
-    const skills = await Skill.findById(skillsId);
+    const skills = (await Skill.findById(skillsId).lean()) as unknown as ISkill;
     if (!skills) {
       return 0;
     }

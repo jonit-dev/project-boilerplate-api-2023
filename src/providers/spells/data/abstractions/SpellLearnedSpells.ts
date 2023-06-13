@@ -26,7 +26,9 @@ export class SpellLearnedSpells {
     }
 
     if (learnedSpellsArr.length > 0) {
-      const skills = await Skill.findById(character.skills);
+      const skills = await Skill.findById(character.skills).cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      });
 
       if (!skills) {
         throw new Error("Failed to find character skills");

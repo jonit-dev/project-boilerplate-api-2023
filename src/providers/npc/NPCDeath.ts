@@ -106,7 +106,11 @@ export class NPCDeath {
   }
 
   private async updateNPCAfterDeath(npc: INPC): Promise<void> {
-    const skills = await Skill.findById(npc.skills).lean();
+    const skills = (await Skill.findById(npc.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${npc?._id}-skills`,
+      })) as unknown as ISkill;
 
     if (!skills) {
       throw new Error(`Skills not found for NPC ${npc.id}`);

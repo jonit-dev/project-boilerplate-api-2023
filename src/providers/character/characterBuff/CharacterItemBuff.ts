@@ -48,7 +48,7 @@ export class CharacterItemBuff {
 
   public async disableItemBuff(character: ICharacter, itemId: string): Promise<void> {
     try {
-      const itemBuffs = await this.characterBuffTracker.getBuffByItemId(character, itemId);
+      const itemBuffs = await this.characterBuffTracker.getBuffByItemId(character._id, itemId);
 
       if (itemBuffs.length === 0) {
         return;

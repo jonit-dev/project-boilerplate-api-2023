@@ -216,7 +216,11 @@ export class CharacterDeath {
     const n = _.random(0, 100);
     let isDeadBodyLootable = false;
 
-    const skills = (await Skill.findById(character.skills)) as ISkill;
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character._id}-skills`,
+      })) as unknown as ISkill as ISkill;
 
     const dropInventoryChance = this.characterDeathCalculator.calculateInventoryDropChance(skills);
 

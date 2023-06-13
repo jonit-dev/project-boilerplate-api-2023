@@ -39,7 +39,11 @@ export class Bloodthirst {
     try {
       const berserkerMultiplier = 0.1;
 
-      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+      const skills = (await Skill.findById(character.skills)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${character?._id}-skills`,
+        })) as ISkill;
 
       const magicLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Magic);
       const characterLevel = skills?.level;

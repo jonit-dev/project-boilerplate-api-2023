@@ -46,7 +46,11 @@ export class MagePassiveHabilities {
     }
 
     try {
-      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+      const skills = (await Skill.findById(character.skills)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${character?._id}-skills`,
+        })) as unknown as ISkill as ISkill;
 
       const magicLvl = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Magic);
       const interval =

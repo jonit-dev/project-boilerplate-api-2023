@@ -46,7 +46,7 @@ describe("CharacterItemBuff", () => {
   it("should support multiple added buffs on an item", async () => {
     await characterItemBuff.enableItemBuff(testCharacter, testItem);
 
-    const characterBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter);
+    const characterBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 
     expect(characterBuffs).toHaveLength(2);
   });

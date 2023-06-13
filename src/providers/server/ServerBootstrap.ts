@@ -11,6 +11,7 @@ import { PushNotificationHelper } from "@providers/pushNotification/PushNotifica
 import { Seeder } from "@providers/seeds/Seeder";
 
 import { appEnv } from "@providers/config/env";
+import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import SpellSilence from "@providers/spells/data/logic/mage/druid/SpellSilence";
 import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -32,7 +33,8 @@ export class ServerBootstrap {
     private characterTextureChange: CharacterTextureChange,
     private pathfindingResults: PathfindingResults,
     private characterMonitor: CharacterMonitor,
-    private heapMonitor: HeapMonitor
+    private heapMonitor: HeapMonitor,
+    private npcFreezer: NPCFreezer
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -51,7 +53,7 @@ export class ServerBootstrap {
   public async performMultipleInstancesOperations(): Promise<void> {
     await this.clearAllQueues();
 
-    this.characterMonitor.monitor();
+    await this.characterMonitor.monitor();
 
     //! TODO: Load balance NPCs on PM2 instances
     this.npcManager.listenForBehaviorTrigger();
@@ -76,6 +78,8 @@ export class ServerBootstrap {
     this.heapMonitor.monitor();
 
     await this.seeder.start();
+
+    this.npcFreezer.init();
   }
 
   private async clearAllQueues(): Promise<void> {

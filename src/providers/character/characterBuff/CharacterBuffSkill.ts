@@ -3,7 +3,7 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { TextFormatter } from "@providers/text/TextFormatter";
-import { ICharacterBuff, ISkillDetails, SkillSocketEvents } from "@rpg-engine/shared";
+import { ICharacterBuff, ISkill, ISkillDetails, SkillSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 import { IBuffValueCalculations } from "./CharacterBuffAttribute";
@@ -18,7 +18,11 @@ export class CharacterBuffSkill {
   ) {}
 
   public async enableBuff(character: ICharacter, buff: ICharacterBuff, noMessage?: boolean): Promise<ICharacterBuff> {
-    const skill = await Skill.findById(character.skills);
+    const skill = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as unknown as ISkill;
 
     if (!skill) {
       throw new Error("Skill not found");
@@ -32,7 +36,7 @@ export class CharacterBuffSkill {
 
     buff.absoluteChange = buffAbsoluteChange;
 
-    const addedBuff = (await this.characterBuffTracker.addBuff(character, buff)) as ICharacterBuff;
+    const addedBuff = (await this.characterBuffTracker.addBuff(character._id, buff)) as ICharacterBuff;
 
     if (!addedBuff) {
       throw new Error("Could not add buff to character");
@@ -44,14 +48,18 @@ export class CharacterBuffSkill {
   }
 
   public async disableBuff(character: ICharacter, buffId: string, noMessage?: boolean): Promise<boolean> {
-    const skills = await Skill.findById(character.skills);
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as unknown as ISkill;
 
     if (!skills) {
       throw new Error("Skill not found");
     }
 
     // rollback model changes
-    const buff = await this.characterBuffTracker.getBuff(character, buffId);
+    const buff = await this.characterBuffTracker.getBuff(character._id, buffId);
 
     if (!buff) {
       return false;
@@ -74,7 +82,7 @@ export class CharacterBuffSkill {
     character: ICharacter,
     buff: ICharacterBuff
   ): Promise<IBuffValueCalculations> {
-    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(character, buff.trait);
+    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(character._id, buff.trait);
 
     const updatedSkills = (await Skill.findOne({
       owner: character._id,
@@ -133,7 +141,7 @@ export class CharacterBuffSkill {
       throw new Error("Character not found");
     }
 
-    const characterBuffs = await this.characterBuffTracker.getAllCharacterBuffs(character);
+    const characterBuffs = await this.characterBuffTracker.getAllCharacterBuffs(character._id);
     if (!characterBuffs) {
       return;
     }

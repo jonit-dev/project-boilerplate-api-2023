@@ -8,12 +8,12 @@ import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { CharacterInventory } from "../CharacterInventory";
 import { CharacterItemContainer } from "./CharacterItemContainer";
 import { CharacterItemSlots } from "./CharacterItemSlots";
-import { ItemType } from "@rpg-engine/shared";
 
 interface IDecrementItemByKeyResult {
   success: boolean;
@@ -88,6 +88,7 @@ export class CharacterItemInventory {
     });
 
     const { rarity, attack, defense } = await this.itemRarity.setItemRarityOnCraft(
+      character,
       item,
       character.skills as Types.ObjectId
     );

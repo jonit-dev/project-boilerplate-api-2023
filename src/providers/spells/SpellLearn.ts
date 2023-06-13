@@ -14,7 +14,11 @@ export class SpellLearn {
 
   public async learnLatestSkillLevelSpells(characterId: string, notifyUser: boolean): Promise<void> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as unknown as ISkill;
 
     const spells = this.getSkillLevelSpells(skills.level);
     await this.addToCharacterLearnedSpells(character._id, spells);
@@ -78,7 +82,11 @@ export class SpellLearn {
 
   public async levelingSpells(characterId: Types.ObjectId, skillId: Types.ObjectId): Promise<boolean> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
-    const skills = (await Skill.findById(skillId).lean()) as ISkill;
+    const skills = (await Skill.findById(skillId)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as unknown as ISkill;
 
     const characterSpells = character.learnedSpells;
     if (!characterSpells) {
