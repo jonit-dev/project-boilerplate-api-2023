@@ -53,7 +53,7 @@ export class ServerBootstrap {
   public async performMultipleInstancesOperations(): Promise<void> {
     await this.clearAllQueues();
 
-    this.characterMonitor.monitor();
+    await this.characterMonitor.monitor();
 
     //! TODO: Load balance NPCs on PM2 instances
     this.npcManager.listenForBehaviorTrigger();
