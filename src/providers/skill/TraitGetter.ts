@@ -26,23 +26,31 @@ export class TraitGetter {
       NewRelicTransactionCategory.Operation,
       "TraitGetter.getSkillLevelWithBuffs",
       async () => {
-        let totalTraitSummedBuffs = 0;
-        if (skills.ownerType === "Character") {
-          totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-            skills.owner?.toString() as string,
-            skillName as CharacterTrait
-          );
+        try {
+          if (!skills.owner) {
+            throw new Error("Skills owner is undefined");
+          }
+
+          let totalTraitSummedBuffs = 0;
+          if (skills.ownerType === "Character") {
+            totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
+              skills.owner?.toString()!,
+              skillName as CharacterTrait
+            );
+          }
+
+          const skillLevel = skills?.[skillName]?.level;
+
+          if (!skillLevel) {
+            skills = await Skill.findById(skills._id).lean();
+          }
+
+          const skillValue = skillLevel + totalTraitSummedBuffs;
+
+          return this.numberFormatter.formatNumber(skillValue);
+        } catch (error) {
+          console.error(error);
         }
-
-        const skillLevel = skills[skillName].level;
-
-        if (!skillLevel) {
-          skills = await Skill.findById(skills._id).lean();
-        }
-
-        const skillValue = skillLevel + totalTraitSummedBuffs;
-
-        return this.numberFormatter.formatNumber(skillValue);
       }
     );
   }
