@@ -93,6 +93,8 @@ export class CharacterNetworkCreate {
 
         await this.characterView.clearCharacterView(character);
 
+        await this.itemCleaner.clearMissingReferences(character);
+
         await this.battleNetworkStopTargeting.stopTargeting(character);
 
         const map = character.scene;
