@@ -88,6 +88,7 @@ export class CharacterNetworkLogout {
 
         const spellLeveling = await this.spellLearn.levelingSpells(character._id, character.skills!);
 
+        await clearCacheForKey(`characterBuffs_${character._id}`);
         await clearCacheForKey(`${character._id}-skills`);
 
         if (spellLeveling) {

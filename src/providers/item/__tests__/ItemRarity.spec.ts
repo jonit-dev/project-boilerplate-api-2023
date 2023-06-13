@@ -1,5 +1,6 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { container } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { ItemRarities } from "@rpg-engine/shared";
 import _ from "lodash";
@@ -12,9 +13,14 @@ describe("ItemRarity", () => {
     defense: 10,
     rarity: ItemRarities.Common,
   } as IItem;
+  let testCharacter: ICharacter;
 
   beforeAll(() => {
     itemRarity = container.get(ItemRarity);
+  });
+
+  beforeEach(async () => {
+    testCharacter = await unitTestHelper.createMockCharacter();
   });
 
   describe("setItemRarityOnLootDrop", () => {
@@ -35,12 +41,12 @@ describe("ItemRarity", () => {
     const mockSkillId = "60bd68e8e7f23824c4de76bb";
 
     it("should assign rarity to a crafted item", async () => {
-      const result = await itemRarity.setItemRarityOnCraft(mockItem, mockSkillId);
+      const result = await itemRarity.setItemRarityOnCraft(testCharacter._id, mockItem, mockSkillId);
       expect(result.rarity).toBeDefined();
     });
 
     it("should calculate attack and defense based on rarity and skill", async () => {
-      const result = await itemRarity.setItemRarityOnCraft(mockItem, mockSkillId);
+      const result = await itemRarity.setItemRarityOnCraft(testCharacter._id, mockItem, mockSkillId);
       expect(result.attack).toBeDefined();
       expect(result.defense).toBeDefined();
     });

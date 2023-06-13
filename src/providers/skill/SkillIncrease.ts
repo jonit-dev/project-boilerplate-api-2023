@@ -51,6 +51,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
@@ -88,7 +89,12 @@ export class SkillIncrease {
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "increaseSkillsOnBattle", async () => {
       // Get character skills and equipment to upgrade them
-      const skills = (await Skill.findById(attacker.skills).lean()) as ISkill;
+      const skills = (await Skill.findById(attacker.skills)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${attacker?._id}-skills`,
+        })) as unknown as ISkill;
+
       if (!skills) {
         throw new Error(`skills not found for character ${attacker.id}`);
       }
@@ -116,7 +122,7 @@ export class SkillIncrease {
       }
 
       // stronger the opponent, higher SP per hit it gives in your combat skills
-      const bonus = await this.skillFunctions.calculateBonus(target.skills);
+      const bonus = await this.skillFunctions.calculateBonus(target, target.skills);
       const increasedWeaponSP = this.increaseSP(skills, weaponSubType, undefined, SKILLS_MAP, bonus);
 
       let increasedStrengthSP;
@@ -225,7 +231,11 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
@@ -259,7 +269,9 @@ export class SkillIncrease {
       throw new Error(`skill not found for item ${craftedItemKey}`);
     }
 
-    const skills = (await Skill.findById(character.skills)) as ISkill;
+    const skills = (await Skill.findById(character.skills).cacheQuery({
+      cacheKey: `${character?._id}-skills`,
+    })) as unknown as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
@@ -300,14 +312,22 @@ export class SkillIncrease {
 
       // Get attacker character data
       const character = (await Character.findById(record!.charId)) as ICharacter;
+
       if (!character) {
         // if attacker does not exist anymore
         // call again the function without this record
         return this.releaseXP(target);
       }
 
+      await clearCacheForKey(`${character._id}-skills`);
+      await clearCacheForKey(`characterBuffs_${character._id}`);
+
       // Get character skills
-      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+      const skills = (await Skill.findById(character.skills)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${character?._id}-skills`,
+        })) as ISkill;
 
       if (!skills) {
         // if attacker skills does not exist anymore
@@ -351,9 +371,15 @@ export class SkillIncrease {
     character: ICharacter,
     target: INPC | ICharacter
   ): Promise<void> {
+    const previousLevel = expData.level - 1;
+
+    if (previousLevel === 0) {
+      return;
+    }
+
     this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
       message: `You advanced from level ${this.numberFormatter.formatNumber(
-        expData.level - 1
+        previousLevel
       )} to level ${this.numberFormatter.formatNumber(expData.level)}.`,
       type: "info",
     });
@@ -508,7 +534,11 @@ export class SkillIncrease {
 
   public async increaseMaxManaMaxHealth(characterId: Types.ObjectId): Promise<void> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as ISkill;
 
     const classBonusOrPenalties = this.characterClassBonusOrPenalties.getClassBonusOrPenalties(
       character.class as CharacterClass
@@ -548,11 +578,11 @@ export class SkillIncrease {
     const { maxHealth, maxMana } = Object.freeze(updateAttributes);
 
     const allBuffsOnMaxHealth = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-      character,
+      character._id,
       CharacterAttributes.MaxHealth
     );
     const allBuffsOnMaxMana = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-      character,
+      character._id,
       CharacterAttributes.MaxMana
     );
 

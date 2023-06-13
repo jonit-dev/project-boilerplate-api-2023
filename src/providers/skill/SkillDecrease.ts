@@ -53,7 +53,11 @@ export class SkillDecrease {
   }
 
   private async decreaseBasicAttributeSP(character: ICharacter): Promise<boolean> {
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as unknown as ISkill;
 
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
@@ -80,7 +84,11 @@ export class SkillDecrease {
   }
 
   private async decreaseCombatSkillsSP(character: ICharacter): Promise<boolean> {
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as unknown as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }

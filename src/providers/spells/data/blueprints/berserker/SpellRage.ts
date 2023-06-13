@@ -32,7 +32,11 @@ export const spellRage: Partial<ISpell> = {
     const characterBuffActivator = container.get(CharacterBuffActivator);
     const traitGetter = container.get(TraitGetter);
 
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as ISkill;
 
     const characterStrength = await traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Strength);
     const characterDexterity = await traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Dexterity);

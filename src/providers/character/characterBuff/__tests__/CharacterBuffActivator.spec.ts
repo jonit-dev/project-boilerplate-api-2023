@@ -148,7 +148,7 @@ describe("CharacterBuffActivator", () => {
 
     expect(disableResult).toBeTruthy();
 
-    const buffExists = await characterBuffTracker.getBuff(testCharacter, enabledBuff._id!);
+    const buffExists = await characterBuffTracker.getBuff(testCharacter._id, enabledBuff._id!);
 
     expect(buffExists).toBeFalsy();
   });

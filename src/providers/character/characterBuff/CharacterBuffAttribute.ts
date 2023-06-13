@@ -21,14 +21,14 @@ export class CharacterBuffAttribute {
   ) {}
 
   public async enableBuff(character: ICharacter, buff: ICharacterBuff, noMessage?: boolean): Promise<ICharacterBuff> {
-    const { buffAbsoluteChange, updatedTraitValue } = await this.performBuffValueCalculations(character, buff);
+    const { buffAbsoluteChange, updatedTraitValue } = await this.performBuffValueCalculations(character._id, buff);
 
     // Save the absolute change in the buff object
     buff.absoluteChange = Number(buffAbsoluteChange.toFixed(2));
 
     // then register the buff on redis (so we can rollback when needed)
 
-    const addedBuff = await this.characterBuffTracker.addBuff(character, buff);
+    const addedBuff = await this.characterBuffTracker.addBuff(character._id, buff);
 
     const updatedTraitValueFixed = Number(updatedTraitValue.toFixed(2));
 
@@ -60,7 +60,7 @@ export class CharacterBuffAttribute {
     character = updatedCharacter as ICharacter;
 
     // rollback model changes
-    const buff = await this.characterBuffTracker.getBuff(character, buffId);
+    const buff = await this.characterBuffTracker.getBuff(character._id, buffId);
 
     if (!buff) {
       return false;
@@ -116,7 +116,7 @@ export class CharacterBuffAttribute {
     }
 
     // inform and send update to client
-    this.sendUpdateToClient(character, buff, updatedTraitValue, noMessage);
+    this.sendUpdateToClient(character._id, buff, updatedTraitValue, noMessage);
 
     return true;
   }
@@ -134,12 +134,12 @@ export class CharacterBuffAttribute {
   }
 
   private async performBuffValueCalculations(
-    character: ICharacter,
+    characterId: string,
     buff: ICharacterBuff
   ): Promise<IBuffValueCalculations> {
-    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(character, buff.trait);
+    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(characterId, buff.trait);
 
-    const updatedCharacter = (await Character.findById(character._id).lean()) as ICharacter;
+    const updatedCharacter = (await Character.findById(characterId).lean()) as ICharacter;
 
     if (!updatedCharacter) {
       throw new Error("Character not found");

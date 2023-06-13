@@ -27,6 +27,7 @@ import {
   ItemType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { clearCacheForKey } from "speedgoose";
 import { EquipmentCharacterClass } from "./ EquipmentCharacterClass";
 import { EquipmentSlots } from "./EquipmentSlots";
 import { EquipmentTwoHanded } from "./EquipmentTwoHanded";
@@ -163,6 +164,9 @@ export class EquipmentEquip {
     await this.itemPickupUpdater.sendContainerRead(updatedContainer, character);
 
     await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
+
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
 
     return true;
   }
@@ -330,7 +334,11 @@ export class EquipmentEquip {
 
   private async checkMinimumRequirements(character: ICharacter, itemBlueprint: IBaseItemBlueprint): Promise<boolean> {
     // Fetch the character's skill from the database
-    const skill = (await Skill.findById(character.skills).lean()) as ISkill;
+    const skill = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as unknown as ISkill as ISkill;
 
     const minRequirements = itemBlueprint?.minRequirements;
 

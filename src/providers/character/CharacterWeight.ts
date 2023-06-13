@@ -62,7 +62,11 @@ export class CharacterWeight {
   }
 
   public async getMaxWeight(character: ICharacter): Promise<number> {
-    const skills = await Skill.findById(character.skills).lean();
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character?._id}-skills`,
+      })) as unknown as ISkill;
     if (skills) {
       const strengthLvl = await this.traitGetter.getSkillLevelWithBuffs(skills as ISkill, BasicAttribute.Strength);
 

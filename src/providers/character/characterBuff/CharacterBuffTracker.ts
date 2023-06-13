@@ -9,19 +9,19 @@ interface ICharacterBuffDeleteOptions {
 
 @provide(CharacterBuffTracker)
 export class CharacterBuffTracker {
-  public async addBuff(character: ICharacter, buff: ICharacterBuff): Promise<ICharacterBuff | undefined> {
+  public async addBuff(characterId: string, buff: ICharacterBuff): Promise<ICharacterBuff | undefined> {
     try {
       const newCharacterBuff = new CharacterBuff({
-        owner: character._id,
+        owner: characterId,
         ...buff,
       });
 
       await newCharacterBuff.save();
 
-      await clearCacheForKey(`characterBuffs_${character._id}`);
+      await clearCacheForKey(`characterBuffs_${characterId}`);
 
       if (newCharacterBuff.itemKey) {
-        await clearCacheForKey(`characterBuff_${character._id}_${newCharacterBuff.itemKey}`);
+        await clearCacheForKey(`characterBuff_${characterId}_${newCharacterBuff.itemKey}`);
       }
 
       return newCharacterBuff as ICharacterBuff;
@@ -30,18 +30,18 @@ export class CharacterBuffTracker {
     }
   }
 
-  public async getAllCharacterBuffs(character: ICharacter): Promise<ICharacterBuff[]> {
-    const allCharacterBuffs = (await CharacterBuff.find({ owner: character._id })
+  public async getAllCharacterBuffs(characterId: string): Promise<ICharacterBuff[]> {
+    const allCharacterBuffs = (await CharacterBuff.find({ owner: characterId })
       .lean()
       .cacheQuery({
-        cacheKey: `characterBuffs_${character._id}`,
+        cacheKey: `characterBuffs_${characterId}`,
       })) as ICharacterBuff[];
 
     return allCharacterBuffs;
   }
 
-  public async getAllBuffAbsoluteChanges(character: ICharacter, trait: CharacterTrait): Promise<number> {
-    const characterBuffs = await this.getAllCharacterBuffs(character);
+  public async getAllBuffAbsoluteChanges(characterId: string, trait: CharacterTrait): Promise<number> {
+    const characterBuffs = await this.getAllCharacterBuffs(characterId);
 
     const buffs = characterBuffs.filter((buff) => buff.trait === trait);
 
@@ -52,8 +52,8 @@ export class CharacterBuffTracker {
     return buffs.reduce((acc, buff) => acc + buff.absoluteChange!, 0);
   }
 
-  public async getBuffByItemId(character: ICharacter, itemId: string): Promise<ICharacterItemBuff[]> {
-    const currentBuffs = (await this.getAllCharacterBuffs(character)) as ICharacterItemBuff[];
+  public async getBuffByItemId(characterId: string, itemId: string): Promise<ICharacterItemBuff[]> {
+    const currentBuffs = (await this.getAllCharacterBuffs(characterId)) as ICharacterItemBuff[];
 
     const buffs = currentBuffs.filter((buff) => String(buff?.itemId) === String(itemId));
 
@@ -70,11 +70,11 @@ export class CharacterBuffTracker {
     return buff;
   }
 
-  public async getBuff(character: ICharacter, buffId: string): Promise<ICharacterBuff | undefined> {
-    const buff = (await CharacterBuff.findOne({ _id: buffId, owner: character._id })
+  public async getBuff(characterId: string, buffId: string): Promise<ICharacterBuff | undefined> {
+    const buff = (await CharacterBuff.findOne({ _id: buffId, owner: characterId })
       .lean()
       .cacheQuery({
-        cacheKey: `characterBuff_${character._id}_${buffId}`,
+        cacheKey: `characterBuff_${characterId}_${buffId}`,
       })) as ICharacterBuff;
 
     return buff;
