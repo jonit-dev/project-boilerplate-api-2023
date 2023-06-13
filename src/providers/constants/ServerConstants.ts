@@ -1,7 +1,7 @@
 import { ChatSocketEvents, ItemSocketEvents } from "@rpg-engine/shared";
 
 export const USER_CONTROL_ONLINE = {
-  MAX_NUMBER_OF_PLAYERS: 1,
+  MAX_NUMBER_OF_PLAYERS: 10,
   MAX_NUMBER_ACC_PER_USER: 20,
 };
 
