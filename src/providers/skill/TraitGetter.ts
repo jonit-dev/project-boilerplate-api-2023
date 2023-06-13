@@ -29,7 +29,7 @@ export class TraitGetter {
         let totalTraitSummedBuffs = 0;
         if (skills.ownerType === "Character") {
           totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
-            skills.owner as string,
+            skills.owner?.toString() as string,
             skillName as CharacterTrait
           );
         }
