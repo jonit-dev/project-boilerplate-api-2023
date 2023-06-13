@@ -1,5 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
@@ -34,7 +34,13 @@ export class TraitGetter {
           );
         }
 
-        const skillValue = skills[skillName].level + totalTraitSummedBuffs;
+        const skillLevel = skills[skillName].level;
+
+        if (!skillLevel) {
+          skills = await Skill.findById(skills._id).lean();
+        }
+
+        const skillValue = skillLevel + totalTraitSummedBuffs;
 
         return this.numberFormatter.formatNumber(skillValue);
       }
