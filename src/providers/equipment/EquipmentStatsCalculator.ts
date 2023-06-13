@@ -1,11 +1,21 @@
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { IItem, ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(EquipmentStatsCalculator)
 export class EquipmentStatsCalculator {
+  constructor(private newRelic: NewRelic) {}
+
   public async getTotalEquipmentStats(equipmentId: string, type: "attack" | "defense"): Promise<number> {
-    return await this.getTotalAttackOrDefense(equipmentId, type);
+    return await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "EquipmentStatsCalculator.getTotalEquipmentStats",
+      async () => {
+        return await this.getTotalAttackOrDefense(equipmentId, type);
+      }
+    );
   }
 
   private async getTotalAttackOrDefense(equipmentId: string, type: "attack" | "defense"): Promise<number> {

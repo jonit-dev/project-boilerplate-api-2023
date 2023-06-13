@@ -170,15 +170,23 @@ export class CharacterInventory {
   }
 
   public async sendInventoryUpdateEvent(character: ICharacter): Promise<void> {
-    const inventory = await this.getInventory(character);
-    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
+    await this.newRelic.trackTransaction(
+      NewRelicTransactionCategory.Operation,
+      "CharacterInventory.sendInventoryUpdateEvent",
+      async () => {
+        const inventory = await this.getInventory(character);
+        const inventoryContainer = (await ItemContainer.findById(
+          inventory?.itemContainer
+        )) as unknown as IItemContainer;
 
-    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
-      character.channelId!,
-      ItemSocketEvents.EquipmentAndInventoryUpdate,
-      {
-        inventory: inventoryContainer,
-        openInventoryOnUpdate: false,
+        this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+          character.channelId!,
+          ItemSocketEvents.EquipmentAndInventoryUpdate,
+          {
+            inventory: inventoryContainer,
+            openInventoryOnUpdate: false,
+          }
+        );
       }
     );
   }

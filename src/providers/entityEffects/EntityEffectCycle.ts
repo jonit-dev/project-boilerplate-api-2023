@@ -3,13 +3,15 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
-import { container, skillIncrease } from "@providers/inversify/container";
+import { container, newRelic, skillIncrease } from "@providers/inversify/container";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { AnimationEffectKeys, CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
+
 export class EntityEffectCycle {
   constructor(
     entityEffect: IEntityEffect,
@@ -29,50 +31,52 @@ export class EntityEffectCycle {
     attackerId: string,
     attackerType: string
   ): Promise<void> {
-    const target = await this.getTarget(targetId, targetType);
+    await newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "EntityEffectCycle.execute", async () => {
+      const target = await this.getTarget(targetId, targetType);
 
-    if (!target) {
-      return;
-    }
+      if (!target) {
+        return;
+      }
 
-    const appliedEffects = target.appliedEntityEffects ?? [];
-    const currentEffectIndex = appliedEffects.findIndex((effect) => effect.key === entityEffect.key);
-    if (currentEffectIndex < 0) {
-      return;
-    }
+      const appliedEffects = target.appliedEntityEffects ?? [];
+      const currentEffectIndex = appliedEffects.findIndex((effect) => effect.key === entityEffect.key);
+      if (currentEffectIndex < 0) {
+        return;
+      }
 
-    const attacker = await this.getTarget(attackerId, attackerType, true);
-    const damage = await entityEffect.effect(target, attacker as ICharacter | INPC);
+      const attacker = await this.getTarget(attackerId, attackerType, true);
+      const damage = await entityEffect.effect(target, attacker as ICharacter | INPC);
 
-    if (target.type === EntityType.NPC && attacker) {
-      await skillIncrease.recordXPinBattle(attacker as ICharacter, target, damage);
-    }
+      if (target.type === EntityType.NPC && attacker) {
+        await skillIncrease.recordXPinBattle(attacker as ICharacter, target, damage);
+      }
 
-    const runAgain = remainingDurationMs === -1 || remainingDurationMs >= entityEffect.intervalMs;
-    if (!runAgain) {
-      target.appliedEntityEffects = target.appliedEntityEffects!.filter((e) => e.key !== entityEffect.key);
-    } else {
-      target.appliedEntityEffects![currentEffectIndex].lastUpdated = new Date().getTime();
-      target.markModified("appliedEntityEffects");
-    }
+      const runAgain = remainingDurationMs === -1 || remainingDurationMs >= entityEffect.intervalMs;
+      if (!runAgain) {
+        target.appliedEntityEffects = target.appliedEntityEffects!.filter((e) => e.key !== entityEffect.key);
+      } else {
+        target.appliedEntityEffects![currentEffectIndex].lastUpdated = new Date().getTime();
+        target.markModified("appliedEntityEffects");
+      }
 
-    const isAlive = await this.applyCharacterChanges(target, entityEffect, damage);
+      const isAlive = await this.applyCharacterChanges(target, entityEffect, damage);
 
-    if (!isAlive) {
-      await this.handleDeath(target);
-      await skillIncrease.releaseXP(target as INPC);
-    }
+      if (!isAlive) {
+        await this.handleDeath(target);
+        await skillIncrease.releaseXP(target as INPC);
+      }
 
-    if (!runAgain || !isAlive) {
-      return;
-    }
+      if (!runAgain || !isAlive) {
+        return;
+      }
 
-    remainingDurationMs = remainingDurationMs === -1 ? -1 : remainingDurationMs - entityEffect.intervalMs;
+      remainingDurationMs = remainingDurationMs === -1 ? -1 : remainingDurationMs - entityEffect.intervalMs;
 
-    const timer = container.get(TimerWrapper);
-    timer.setTimeout(() => {
-      this.execute(entityEffect, remainingDurationMs, targetId, targetType, attackerId, attackerType);
-    }, entityEffect.intervalMs);
+      const timer = container.get(TimerWrapper);
+      timer.setTimeout(() => {
+        this.execute(entityEffect, remainingDurationMs, targetId, targetType, attackerId, attackerType);
+      }, entityEffect.intervalMs);
+    });
   }
 
   private async getTarget(targetId: string, targetType: string, attacker?: boolean): Promise<ICharacter | INPC | null> {

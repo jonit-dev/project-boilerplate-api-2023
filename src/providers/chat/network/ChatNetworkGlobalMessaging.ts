@@ -1,6 +1,7 @@
 import { profanity } from "@2toad/profanity";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -8,6 +9,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { SpellCast } from "@providers/spells/SpellCast";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   ChatMessageType,
   ChatSocketEvents,
@@ -27,7 +29,8 @@ export class ChatNetworkGlobalMessaging {
     private characterView: CharacterView,
     private socketTransmissionZone: SocketTransmissionZone,
     private spellCast: SpellCast,
-    private characterValidation: CharacterValidation
+    private characterValidation: CharacterValidation,
+    private newRelic: NewRelic
   ) {}
 
   public onGlobalMessaging(channel: SocketChannel): void {
@@ -35,52 +38,58 @@ export class ChatNetworkGlobalMessaging {
       channel,
       ChatSocketEvents.GlobalChatMessageCreate,
       async (data: IChatMessageCreatePayload, character: ICharacter) => {
-        try {
-          const canChat = this.characterValidation.hasBasicValidation(character);
+        await this.newRelic.trackTransaction(
+          NewRelicTransactionCategory.Operation,
+          "ChatNetworkGlobalMessaging.onGlobalMessaging",
+          async () => {
+            try {
+              const canChat = this.characterValidation.hasBasicValidation(character);
 
-          if (!canChat) {
-            return;
+              if (!canChat) {
+                return;
+              }
+
+              if (this.spellCast.isSpellCasting(data.message)) {
+                const spellCharacter = (await Character.findById(character._id)) as ICharacter;
+
+                await this.spellCast.castSpell({ magicWords: data.message }, spellCharacter);
+              }
+
+              const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
+
+              if (data.message.length >= 200) {
+                this.socketMessaging.sendErrorMessageToCharacter(
+                  character,
+                  "Chat message is too long, maximum is 200 characters"
+                );
+                return;
+              }
+
+              if (data.message.length > 0) {
+                // If the message contains profanity, replace it with asterisks except the first letter
+                data = this.replaceProfanity(data);
+
+                const chatLog = new ChatLog({
+                  message: data.message,
+                  emitter: character._id,
+                  type: data.type,
+                  x: character.x,
+                  y: character.y,
+                  scene: character.scene,
+                });
+
+                await chatLog.save();
+
+                const chatLogs = await this.getChatLogsInZone(character, data.limit);
+
+                this.sendMessagesToNearbyCharacters(chatLogs, nearbyCharacters);
+                this.sendMessagesToCharacter(chatLogs, character);
+              }
+            } catch (error) {
+              console.error(error);
+            }
           }
-
-          if (this.spellCast.isSpellCasting(data.message)) {
-            const spellCharacter = (await Character.findById(character._id)) as ICharacter;
-
-            await this.spellCast.castSpell({ magicWords: data.message }, spellCharacter);
-          }
-
-          const nearbyCharacters = await this.characterView.getCharactersInView(character as ICharacter);
-
-          if (data.message.length >= 200) {
-            this.socketMessaging.sendErrorMessageToCharacter(
-              character,
-              "Chat message is too long, maximum is 200 characters"
-            );
-            return;
-          }
-
-          if (data.message.length > 0) {
-            // If the message contains profanity, replace it with asterisks except the first letter
-            data = this.replaceProfanity(data);
-
-            const chatLog = new ChatLog({
-              message: data.message,
-              emitter: character._id,
-              type: data.type,
-              x: character.x,
-              y: character.y,
-              scene: character.scene,
-            });
-
-            await chatLog.save();
-
-            const chatLogs = await this.getChatLogsInZone(character, data.limit);
-
-            this.sendMessagesToNearbyCharacters(chatLogs, nearbyCharacters);
-            this.sendMessagesToCharacter(chatLogs, character);
-          }
-        } catch (error) {
-          console.error(error);
-        }
+        );
       }
     );
   }
