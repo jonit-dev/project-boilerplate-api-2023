@@ -23,10 +23,7 @@ export class CharacterInventory {
         const equipment = (await Equipment.findById(character.equipment).lean().select("inventory")) as IEquipment;
 
         if (equipment) {
-          const inventory = (await Item.findById(equipment.inventory).lean({
-            virtuals: true,
-            defaults: true,
-          })) as IItem;
+          const inventory = await Item.findById(equipment.inventory);
 
           if (inventory) {
             return inventory;
