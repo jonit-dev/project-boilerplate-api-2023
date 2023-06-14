@@ -178,8 +178,6 @@ export class CharacterBuffAttribute {
       maxMana: "maxMana",
     };
 
-    console.log("sending back to the client", updatedTraitValue);
-
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, {
       targetId: character._id,
       [clientTraitNames[buff.trait]]: updatedTraitValue,
