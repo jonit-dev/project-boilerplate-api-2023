@@ -130,6 +130,7 @@ export class NPCDeath {
           currentMovementType: currentMovementType,
           appliedEntityEffects: undefined,
           isBehaviorEnabled: false,
+          xpReleased: false,
         },
       }
     );

@@ -51,6 +51,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { v4 as uuidv4 } from "uuid";
 import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
@@ -127,6 +128,9 @@ export class SkillIncrease {
         return;
       }
 
+      await clearCacheForKey(`characterBuffs_${attacker._id}`);
+      await clearCacheForKey(`${attacker._id}-skills`);
+
       // stronger the opponent, higher SP per hit it gives in your combat skills
       const bonus = await this.skillFunctions.calculateBonus(target, target.skills);
       const increasedWeaponSP = this.increaseSP(skills, weaponSubType, undefined, SKILLS_MAP, bonus);
@@ -186,6 +190,9 @@ export class SkillIncrease {
       if (!canIncreaseSP) {
         return;
       }
+
+      await clearCacheForKey(`characterBuffs_${character._id}`);
+      await clearCacheForKey(`${character._id}-skills`);
 
       const equipment = characterWithRelations.equipment as IEquipment;
 
@@ -252,6 +259,9 @@ export class SkillIncrease {
       return;
     }
 
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
+
     const result = this.increaseSP(skills, attribute, skillPointsCalculator);
     await this.skillFunctions.updateSkills(skills, character);
 
@@ -287,6 +297,9 @@ export class SkillIncrease {
     if (!canIncreaseSP) {
       return;
     }
+
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
 
     const craftSkillPointsCalculator = (skillDetails: ISkillDetails): number => {
       return this.calculateNewCraftSP(skillDetails);
@@ -335,6 +348,9 @@ export class SkillIncrease {
         // call again the function without this record
         return this.releaseXP(target);
       }
+
+      await clearCacheForKey(`characterBuffs_${character._id}`);
+      await clearCacheForKey(`${character._id}-skills`);
 
       // Get character skills
       const skills = (await Skill.findById(character.skills)

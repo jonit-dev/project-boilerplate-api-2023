@@ -14,6 +14,7 @@ import {
 } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
+import { v4 as uuidv4 } from "uuid";
 
 const npcSchema = createLeanSchema(
   {
@@ -139,7 +140,12 @@ const npcSchema = createLeanSchema(
     }),
     experience: Type.number(),
     xpToRelease: Type.array().of({
-      xpId: Type.string({ required: true }),
+      xpId: Type.string({
+        required: true,
+        default: function () {
+          return uuidv4();
+        },
+      }),
       charId: Type.objectId({
         ref: "Character",
         required: true,

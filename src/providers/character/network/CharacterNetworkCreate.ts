@@ -36,6 +36,7 @@ import { CharacterView } from "../CharacterView";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 
 import { ItemCleaner } from "@providers/item/ItemCleaner";
+import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
@@ -89,6 +90,9 @@ export class CharacterNetworkCreate {
 
           return;
         }
+
+        await clearCacheForKey(`characterBuffs_${character._id}`);
+        await clearCacheForKey(`${character._id}-skills`);
 
         await this.characterView.clearCharacterView(character);
 

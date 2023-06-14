@@ -27,20 +27,31 @@ export class CharacterItemBuff {
       : [itemBlueprint.equippedBuff];
 
     try {
-      const messages: string[] = await Promise.all(
-        equippedBuffs.map(async (buff) => {
-          const buffData: ICharacterItemBuff = {
-            ...buff,
-            itemId: item._id,
-            itemKey: item.baseKey,
-          };
+      const messages = (
+        await Promise.all(
+          equippedBuffs.map(async (buff) => {
+            // avoid same item stacking
+            const hasSameItemBuff = await this.characterBuffTracker.getBuffByItemId(character._id, item._id);
 
-          await this.characterBuff.enablePermanentBuff(character, buffData, true);
-          return buffData.options?.messages?.activation || "";
-        })
-      );
+            if (hasSameItemBuff.length > 0) {
+              return null; // return null instead of sending a message
+            }
 
-      this.socketMessaging.sendMessageToCharacter(character, messages.join(" "));
+            const buffData: ICharacterItemBuff = {
+              ...buff,
+              itemId: item._id,
+              itemKey: item.baseKey,
+            };
+
+            await this.characterBuff.enablePermanentBuff(character, buffData, true);
+            return buffData.options?.messages?.activation || "";
+          })
+        )
+      ).filter(Boolean); // filter out null messages
+
+      if (messages.length > 0) {
+        this.socketMessaging.sendMessageToCharacter(character, messages.join(" "));
+      }
     } catch (error) {
       console.error(`An error occurred while enabling the buff: ${error}`);
     }

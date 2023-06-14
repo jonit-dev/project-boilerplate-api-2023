@@ -54,11 +54,7 @@ export class CharacterBuffTracker {
   }
 
   public async getBuffByItemKey(character: ICharacter, itemKey: string): Promise<ICharacterItemBuff | undefined> {
-    const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey })
-      .lean()
-      .cacheQuery({
-        cacheKey: `characterBuff_${character._id}_${itemKey}`,
-      })) as ICharacterItemBuff;
+    const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey }).lean()) as ICharacterItemBuff;
 
     return buff;
   }
