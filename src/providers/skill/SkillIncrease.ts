@@ -349,6 +349,9 @@ export class SkillIncrease {
         return this.releaseXP(target);
       }
 
+      await clearCacheForKey(`characterBuffs_${character._id}`);
+      await clearCacheForKey(`${character._id}-skills`);
+
       // Get character skills
       const skills = (await Skill.findById(character.skills)
         .lean()
