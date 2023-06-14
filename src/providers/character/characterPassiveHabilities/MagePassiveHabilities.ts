@@ -47,7 +47,7 @@ export class MagePassiveHabilities {
 
     try {
       const skills = (await Skill.findById(character.skills)
-        .lean()
+        .lean({ virtuals: true, defaults: true })
         .cacheQuery({
           cacheKey: `${character?._id}-skills`,
         })) as unknown as ISkill as ISkill;
