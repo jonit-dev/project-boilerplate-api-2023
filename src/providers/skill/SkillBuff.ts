@@ -35,17 +35,19 @@ export class SkillBuff {
           cacheKey: `characterBuffs_${skills.owner?.toString()}`,
         });
 
-      const buffedSkillsList = buffedSkills.map((buff) => buff.trait);
+      for (const buff of buffedSkills) {
+        if (buff.type !== CharacterBuffType.Skill) {
+          continue;
+        }
 
-      for (const skillName of buffedSkillsList) {
-        if (!skills?.[skillName]?.level) {
+        if (!skills?.[buff.trait]?.level) {
           console.log(`Skill not found for character ${character._id} trait ${skillName}`);
           await clearCacheForKey(`characterBuffs_${skills.owner?.toString()}`);
           await clearCacheForKey(`${character._id}-skills`);
           continue;
         }
 
-        skills[skillName].level = await this.traitGetter.getSkillLevelWithBuffs(skills, skillName as SkillsAvailable);
+        skills[buff.trait].level = await this.traitGetter.getSkillLevelWithBuffs(skills, skillName as SkillsAvailable);
       }
     }
 
