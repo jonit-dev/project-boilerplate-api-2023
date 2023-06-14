@@ -19,6 +19,7 @@ import {
   ItemSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { clearCacheForKey } from "speedgoose";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
 import { ItemCleanup } from "./ItemCleanup";
 import { ItemOwnership } from "./ItemOwnership";
@@ -116,6 +117,8 @@ export class ItemDrop {
           }
 
           await this.characterWeight.updateCharacterWeight(character);
+
+          await clearCacheForKey(`${character._id}-inventory`);
 
           return true;
         } catch (err) {

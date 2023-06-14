@@ -10,6 +10,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MapHelper } from "@providers/map/MapHelper";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { clearCacheForKey } from "speedgoose";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
 import { ItemPickupFromMap } from "./ItemPickupFromMap";
 import { ItemPickupUpdater } from "./ItemPickupUpdater";
@@ -113,6 +114,8 @@ export class ItemPickup {
           }
 
           await this.itemPickupUpdater.finalizePickup(itemToBePicked, character);
+
+          await clearCacheForKey(`${character._id}-inventory`);
 
           return true;
         } catch (error) {

@@ -9,6 +9,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { IEquipmentAndInventoryUpdatePayload, IItem, IItemMove, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { clearCacheForKey } from "speedgoose";
 import { itemsBlueprintIndex } from "../data/index";
 
 @provide(ItemDragAndDrop)
@@ -80,6 +81,8 @@ export class ItemDragAndDrop {
 
               break;
           }
+
+          await clearCacheForKey(`${character._id}-inventory`);
 
           return true;
         } catch (err) {

@@ -23,7 +23,15 @@ export class CharacterInventory {
         const equipment = (await Equipment.findById(character.equipment).lean().select("inventory")) as IEquipment;
 
         if (equipment) {
-          const inventory = await Item.findById(equipment.inventory);
+          const inventory = await Item.findById(equipment.inventory)
+            .lean({
+              virtuals: true,
+              getters: true,
+              defaults: true,
+            })
+            .cacheQuery({
+              cacheKey: `${character._id}-inventory`,
+            });
 
           if (inventory) {
             return inventory;

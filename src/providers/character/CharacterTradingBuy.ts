@@ -1,7 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { Item, IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IMarketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MARKETPLACE_BUY_PRICE_MULTIPLIER, TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -13,14 +15,13 @@ import {
   TradingEntity,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { clearCacheForKey } from "speedgoose";
 import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterTradingValidation } from "./CharacterTradingValidation";
 import { CharacterWeight } from "./CharacterWeight";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
-import { IMarketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
-import { MARKETPLACE_BUY_PRICE_MULTIPLIER, TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 
 @provide(CharacterTradingBuy)
 export class CharacterTradingBuy {
@@ -159,6 +160,8 @@ export class CharacterTradingBuy {
     };
 
     this.sendRefreshItemsEvent(payloadUpdate, character);
+
+    await clearCacheForKey(`${character._id}-inventory`);
 
     return true;
   }

@@ -102,6 +102,7 @@ export class EquipmentUnequip {
 
         await clearCacheForKey(`characterBuffs_${character._id}`);
         await clearCacheForKey(`${character._id}-skills`);
+        await clearCacheForKey(`${character._id}-inventory`);
 
         return true;
       }
