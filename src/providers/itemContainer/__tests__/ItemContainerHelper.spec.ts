@@ -19,7 +19,6 @@ describe("ItemContainerHelper", () => {
   beforeEach(async () => {
     testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
     inventory = await testCharacter.inventory;
-    await inventory.save();
   });
 
   describe("itemContainer type detection", () => {
