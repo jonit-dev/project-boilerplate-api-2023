@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer as IItemContainerModel, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackTransactionDecorator } from "@providers/analytics/decorator/NewRelicTransactionDecorator";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -15,12 +16,9 @@ import { Types } from "mongoose";
 export class CharacterInventory {
   constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic) {}
 
+  @TrackTransactionDecorator()
   public async getInventory(character: ICharacter): Promise<IItem | null> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "CharacterInventory.getInventory",
-      async () => {
-        const equipment = (await Equipment.findById(character.equipment)
+    const equipment = (await Equipment.findById(character.equipment)
           .lean({
             virtuals: true,
             defaults: true,
@@ -29,25 +27,23 @@ export class CharacterInventory {
             cacheKey: `${character._id}-equipment`,
           })) as IEquipment;
 
-        if (equipment) {
-          const inventory = await Item.findById(equipment.inventory)
-            .lean({
-              virtuals: true,
-              getters: true,
-              defaults: true,
-            })
-            .cacheQuery({
-              cacheKey: `${character._id}-inventory`,
-            });
+    if (equipment) {
+      const inventory = await Item.findById(equipment.inventory)
+        .lean({
+          virtuals: true,
+          getters: true,
+          defaults: true,
+        })
+        .cacheQuery({
+          cacheKey: `${character._id}-inventory`,
+        });
 
-          if (inventory) {
-            return inventory;
-          }
-        }
-
-        return null; //! some areas of the codebase strictly check for null, so return it instead of undefined
+      if (inventory) {
+        return inventory as IItem;
       }
-    );
+    }
+
+    return null; //! some areas of the codebase strictly check for null, so return it instead of undefined
   }
 
   public async getAllItemsFromContainer(itemContainerId: Types.ObjectId): Promise<IItem[]> {

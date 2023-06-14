@@ -30,6 +30,33 @@ export class NewRelic {
     });
   }
 
+  public trackPromiseTransaction(
+    category: NewRelicTransactionCategory,
+    event: string,
+    cb: Promise<(...args: unknown[]) => any>,
+    skipTracking?: boolean
+  ): Promise<any> {
+
+    
+    return new Promise((resolve, reject): void => {
+      if (appEnv.general.IS_UNIT_TEST || skipTracking) {
+        return resolve(cb);
+      }
+
+      newrelic.startBackgroundTransaction(event, category, async () => {
+        try {
+          const result = await cb;
+          resolve(result);
+        } catch (e) {
+          console.error(e);
+          reject(e);
+        } finally {
+          newrelic.endTransaction();
+        }
+      });
+    });
+  }
+
   public trackMetric(category: NewRelicMetricCategory, name: string, value: number): void {
     return newrelic.recordMetric(`${category}/${name}`, value);
   }
