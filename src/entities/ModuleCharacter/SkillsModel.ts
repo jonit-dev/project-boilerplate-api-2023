@@ -113,7 +113,7 @@ skillsSchema.index(
 skillsSchema.statics.findByIdWithBuffs = async function (id: string, ...args: any[]): Promise<ISkill> {
   const traitGetter = container.get(TraitGetter);
 
-  const skills = await this.findById(id, ...args).lean({ virtuals: true, default: true });
+  const skills = await this.findById(id, ...args).lean({ virtuals: true, defaults: true });
 
   if (skills.ownerType === "Character") {
     const buffedSkills = await CharacterBuff.find({
