@@ -191,6 +191,9 @@ export class SkillIncrease {
         return;
       }
 
+      await clearCacheForKey(`characterBuffs_${character._id}`);
+      await clearCacheForKey(`${character._id}-skills`);
+
       const equipment = characterWithRelations.equipment as IEquipment;
 
       const rightHandItem = equipment?.rightHand as IItem;
@@ -256,6 +259,9 @@ export class SkillIncrease {
       return;
     }
 
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
+
     const result = this.increaseSP(skills, attribute, skillPointsCalculator);
     await this.skillFunctions.updateSkills(skills, character);
 
@@ -291,6 +297,9 @@ export class SkillIncrease {
     if (!canIncreaseSP) {
       return;
     }
+
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
 
     const craftSkillPointsCalculator = (skillDetails: ISkillDetails): number => {
       return this.calculateNewCraftSP(skillDetails);
