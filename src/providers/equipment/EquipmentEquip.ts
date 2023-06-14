@@ -177,6 +177,7 @@ export class EquipmentEquip {
         await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
 
         await clearCacheForKey(`${character._id}-inventory`);
+        await clearCacheForKey(`${character._id}-equipment`);
 
         return true;
       }

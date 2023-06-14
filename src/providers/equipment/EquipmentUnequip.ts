@@ -101,6 +101,7 @@ export class EquipmentUnequip {
         await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
 
         await clearCacheForKey(`${character._id}-inventory`);
+        await clearCacheForKey(`${character._id}-equipment`);
 
         return true;
       }
