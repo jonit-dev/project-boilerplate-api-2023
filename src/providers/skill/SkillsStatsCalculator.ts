@@ -44,7 +44,7 @@ export class SkillStatsCalculator {
       return redisDefense.defense;
     }
 
-    const equipment = await Equipment.findOne({ owner: skills.owner }).lean({ virtuals: true, default: true });
+    const equipment = await Equipment.findOne({ owner: skills.owner }).lean({ virtuals: true, defaults: true });
     const [dataOfWeather, character] = await Promise.all([
       MapControlTimeModel.findOne().lean(),
       Character.findById(skills.owner).lean(),

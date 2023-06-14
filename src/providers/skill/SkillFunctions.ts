@@ -20,6 +20,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
 import { clearCacheForKey } from "speedgoose";
+import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
 
 @provide(SkillFunctions)
@@ -29,7 +30,8 @@ export class SkillFunctions {
     private animationEffect: AnimationEffect,
     private socketMessaging: SocketMessaging,
     private characterBuffSkill: CharacterBuffSkill,
-    private numberFormatter: NumberFormatter
+    private numberFormatter: NumberFormatter,
+    private skillBuff: SkillBuff
   ) {}
 
   public updateSkillByType(skills: ISkill, skillName: string, bonusOrPenalties: number): boolean {
@@ -67,7 +69,7 @@ export class SkillFunctions {
 
     await Skill.findByIdAndUpdate(skills._id, { ...skills });
 
-    const buffedSkills = await Skill.findByIdWithBuffs(skills._id);
+    const buffedSkills = await this.skillBuff.getSkillsWithBuff(character);
     const buffs = await this.characterBuffSkill.calculateAllActiveBuffs(character);
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {

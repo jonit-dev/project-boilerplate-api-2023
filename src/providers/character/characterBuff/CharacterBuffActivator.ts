@@ -44,6 +44,7 @@ export class CharacterBuffActivator {
   ): Promise<boolean | undefined> {
     await clearCacheForKey(`${character._id}-skills`);
     await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`characterBuff_${character._id}_${buffId}`);
 
     switch (type) {
       case CharacterBuffType.CharacterAttribute:

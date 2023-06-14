@@ -30,6 +30,7 @@ import {
   SpellSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { clearCacheForKey } from "speedgoose";
 import SpellCoolDown from "./SpellCooldown";
 import { SpellValidation } from "./SpellValidation";
 import { spellsBlueprints } from "./data/blueprints/index";
@@ -64,6 +65,9 @@ export class SpellCast {
       NewRelicTransactionCategory.Operation,
       "SpellCast.castSpell",
       async () => {
+        await clearCacheForKey(`${character._id}-skills`);
+        await clearCacheForKey(`characterBuffs_${character._id}`);
+
         if (!this.characterValidation.hasBasicValidation(character)) {
           return false;
         }

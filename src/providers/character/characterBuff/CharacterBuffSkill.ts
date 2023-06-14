@@ -6,6 +6,7 @@ import { TextFormatter } from "@providers/text/TextFormatter";
 import { ICharacterBuff, ISkill, ISkillDetails, SkillSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
+import { SkillBuff } from "@providers/skill/SkillBuff";
 import { IBuffValueCalculations } from "./CharacterBuffAttribute";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
@@ -14,7 +15,8 @@ export class CharacterBuffSkill {
   constructor(
     private characterBuffTracker: CharacterBuffTracker,
     private socketMessaging: SocketMessaging,
-    private textFormatter: TextFormatter
+    private textFormatter: TextFormatter,
+    private skillBuff: SkillBuff
   ) {}
 
   public async enableBuff(character: ICharacter, buff: ICharacterBuff, noMessage?: boolean): Promise<ICharacterBuff> {
@@ -116,7 +118,7 @@ export class CharacterBuffSkill {
     type: "activation" | "deactivation",
     noMessage?: boolean
   ): Promise<void> {
-    const skill = await Skill.findByIdWithBuffs(character.skills);
+    const skill = await this.skillBuff.getSkillsWithBuff(character);
 
     if (!skill) {
       throw new Error("Skill not found");

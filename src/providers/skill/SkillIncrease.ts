@@ -52,6 +52,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
 import { clearCacheForKey } from "speedgoose";
+import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
@@ -78,7 +79,8 @@ export class SkillIncrease {
     private numberFormatter: NumberFormatter,
     private characterBuffTracker: CharacterBuffTracker,
     private characterBuffSkill: CharacterBuffSkill,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private skillBuff: SkillBuff
   ) {}
 
   /**
@@ -419,8 +421,7 @@ export class SkillIncrease {
       levelUpEventPayload
     );
 
-    // refresh skills (lv, xp, xpToNextLevel)
-    const skill = await Skill.findByIdWithBuffs(character.skills);
+    const skill = await this.skillBuff.getSkillsWithBuff(character);
     const buffs = await this.characterBuffSkill.calculateAllActiveBuffs(character);
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {

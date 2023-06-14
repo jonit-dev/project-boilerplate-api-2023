@@ -1,11 +1,7 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { container } from "@providers/inversify/container";
 import { calculateExperience } from "@providers/npc/NPCExperience";
-import { SkillsAvailable } from "@providers/skill/SkillTypes";
-import { TraitGetter } from "@providers/skill/TraitGetter";
 import {
-  CharacterBuffType,
   NPCAlignment,
   SkillType,
   TypeHelper,
@@ -13,7 +9,6 @@ import {
   calculateXPToNextLevel,
 } from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
-import { CharacterBuff } from "./CharacterBuffModel";
 
 const skillDetails = (type: SkillType): Record<string, any> => {
   return {
@@ -109,35 +104,6 @@ skillsSchema.index(
   { background: true }
 );
 
-//! This is not very performant, so prefer using await traitGetter.getSkillLevelWithBuffs(skill, skillName) instead
-skillsSchema.statics.findByIdWithBuffs = async function (id: string, ...args: any[]): Promise<ISkill> {
-  const traitGetter = container.get(TraitGetter);
-
-  const skills = await this.findById(id, ...args).lean({ virtuals: true, defaults: true });
-
-  if (skills.ownerType === "Character") {
-    const buffedSkills = await CharacterBuff.find({
-      owner: skills.owner,
-      type: CharacterBuffType.Skill,
-    })
-      .lean({
-        virtuals: true,
-        default: true,
-      })
-      .cacheQuery({
-        cacheKey: `characterBuffs_${skills.owner.toString()}`,
-      });
-
-    const buffedSkillsList = buffedSkills.map((buff) => buff.trait);
-
-    for (const skillName of buffedSkillsList) {
-      skills[skillName].level = await traitGetter.getSkillLevelWithBuffs(skills, skillName as SkillsAvailable);
-    }
-  }
-
-  return skills;
-};
-
 skillsSchema.post("save", async function (this: ISkill) {
   const npc = (await NPC.findById(this.owner)) as INPC;
 
@@ -147,7 +113,7 @@ skillsSchema.post("save", async function (this: ISkill) {
 
   if (npc?.alignment === NPCAlignment.Hostile || npc?.alignment === NPCAlignment.Neutral) {
     const skills = (await Skill.findById(this._id)
-      .lean({ virtuals: true, default: true })
+      .lean({ virtuals: true, defaults: true })
       .cacheQuery({
         cacheKey: `${this._id}-skills`,
       })) as ISkill;

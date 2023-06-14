@@ -1,8 +1,6 @@
-import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { ArmorsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
-import { BasicAttribute, CharacterBuffDurationType, CharacterBuffType } from "@rpg-engine/shared";
 import { ICharacter } from "../CharacterModel";
 import { Equipment } from "../EquipmentModel";
 import { Skill } from "../SkillsModel";
@@ -45,31 +43,5 @@ describe("SkillsModel", () => {
 
     expect(attack).toBe(7);
     expect(defense).toBe(42);
-  });
-
-  describe("findByIdWithBuffs", () => {
-    let characterBuffActivator: CharacterBuffActivator;
-    let testCharacter: ICharacter;
-
-    beforeAll(() => {
-      characterBuffActivator = container.get(CharacterBuffActivator);
-    });
-
-    beforeEach(async () => {
-      testCharacter = (await unitTestHelper.createMockCharacter(null, { hasSkills: true })) as ICharacter;
-    });
-
-    it("should return skill with buffs", async () => {
-      await characterBuffActivator.enablePermanentBuff(testCharacter, {
-        type: CharacterBuffType.Skill,
-        trait: BasicAttribute.Magic,
-        buffPercentage: 10,
-        durationType: CharacterBuffDurationType.Permanent,
-      });
-
-      const skills = await Skill.findByIdWithBuffs(testCharacter.skills);
-
-      expect(skills.magic.level).toBe(1.1);
-    });
   });
 });

@@ -1,5 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -7,13 +6,15 @@ import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IUIShowMessage, SkillSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { clearCacheForKey } from "speedgoose";
+import { SkillBuff } from "../SkillBuff";
 
 @provide(SkillNetworkReadInfo)
 export class SkillNetworkReadInfo {
   constructor(
     private socketAuth: SocketAuth,
     private socketMessaging: SocketMessaging,
-    private characterBuffSkill: CharacterBuffSkill
+    private characterBuffSkill: CharacterBuffSkill,
+    private skillBuff: SkillBuff
   ) {}
 
   public onGetInfo(channel: SocketChannel): void {
@@ -21,7 +22,7 @@ export class SkillNetworkReadInfo {
       await clearCacheForKey(`${character._id}-skills`);
       await clearCacheForKey(`characterBuffs_${character._id}`);
 
-      const skill = await Skill.findByIdWithBuffs(character.skills);
+      const skill = await this.skillBuff.getSkillsWithBuff(character);
 
       if (!skill) {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {

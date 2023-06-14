@@ -10,5 +10,5 @@ export const itemGoldCoin: IBaseItemBlueprint = {
   name: "Gold Coin",
   description: "A pile of gold coins.",
   weight: 0.01,
-  maxStackSize: 999,
+  maxStackSize: 9999,
 };

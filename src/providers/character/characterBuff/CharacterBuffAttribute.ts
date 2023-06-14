@@ -4,6 +4,7 @@ import { TextFormatter } from "@providers/text/TextFormatter";
 import { CharacterSocketEvents, ICharacterBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
+import { clearCacheForKey } from "speedgoose";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
 export interface IBuffValueCalculations {
@@ -51,6 +52,8 @@ export class CharacterBuffAttribute {
   }
 
   public async disableBuff(character: ICharacter, buffId: string, noMessage?: boolean): Promise<boolean> {
+    await clearCacheForKey(`${character._id}-skills`);
+    await clearCacheForKey(`characterBuffs_${character._id}`);
     const updatedCharacter = await Character.findById(character._id).lean();
 
     if (!updatedCharacter) {
@@ -79,6 +82,8 @@ export class CharacterBuffAttribute {
     if (!hasDeletedBuff) {
       throw new Error("Could not delete buff from character");
     }
+
+    console.log(buff.trait, updatedTraitValue);
 
     await Character.updateOne(
       { _id: character._id },
@@ -110,13 +115,13 @@ export class CharacterBuffAttribute {
         this.socketMessaging.sendMessageToCharacter(
           character,
           buff.options?.messages?.deactivation ||
-            `Your ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} buff has been removed!`
+            `Your ${this.textFormatter.convertCamelCaseToSentence(buff.trait)} buff was removed!`
         );
       }
     }
 
     // inform and send update to client
-    this.sendUpdateToClient(character._id, buff, updatedTraitValue, noMessage);
+    this.sendUpdateToClient(character, buff, updatedTraitValue, noMessage);
 
     return true;
   }
@@ -172,6 +177,8 @@ export class CharacterBuffAttribute {
       maxHealth: "maxHealth",
       maxMana: "maxMana",
     };
+
+    console.log("sending back to the client", updatedTraitValue);
 
     this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, {
       targetId: character._id,
