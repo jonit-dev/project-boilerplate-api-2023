@@ -8,7 +8,6 @@ import {
   ICharacterTemporaryBuff,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { clearCacheForKey } from "speedgoose";
 import { CharacterBuffAttribute } from "./CharacterBuffAttribute";
 import { CharacterBuffSkill } from "./CharacterBuffSkill";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
@@ -42,10 +41,6 @@ export class CharacterBuffActivator {
     type: CharacterBuffType,
     noMessage?: boolean
   ): Promise<boolean | undefined> {
-    await clearCacheForKey(`${character._id}-skills`);
-    await clearCacheForKey(`characterBuffs_${character._id}`);
-    await clearCacheForKey(`characterBuff_${character._id}_${buffId}`);
-
     switch (type) {
       case CharacterBuffType.CharacterAttribute:
         return await this.characterBuffCharacterAttribute.disableBuff(character, buffId, noMessage);
@@ -59,9 +54,6 @@ export class CharacterBuffActivator {
     character: ICharacter,
     durationType: CharacterBuffDurationType | "all" = CharacterBuffDurationType.Temporary
   ): Promise<void> {
-    await clearCacheForKey(`${character._id}-skills`);
-    await clearCacheForKey(`characterBuffs_${character._id}`);
-
     const buffs = await this.characterBuffTracker.getAllCharacterBuffs(character._id);
 
     for (const buff of buffs) {
@@ -94,9 +86,6 @@ export class CharacterBuffActivator {
     buff: ICharacterPermanentBuff | ICharacterTemporaryBuff,
     noMessage?: boolean
   ): Promise<ICharacterBuff | undefined> {
-    await clearCacheForKey(`${character._id}-skills`);
-    await clearCacheForKey(`characterBuffs_${character._id}`);
-
     switch (buff.type) {
       case "characterAttribute":
         const newCharBuff = await this.characterBuffCharacterAttribute.enableBuff(character, buff, noMessage);

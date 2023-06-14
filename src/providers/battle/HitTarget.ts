@@ -237,7 +237,9 @@ export class HitTarget {
 
     // if we have a ranged weapon without entity effects, just use the accessory one
     if (weapon?.item.subType === ItemSubType.Ranged && !weapon.item.entityEffects?.length!) {
-      const equipment = await Equipment.findById(character.equipment);
+      const equipment = await Equipment.findById(character.equipment).cacheQuery({
+        cacheKey: `${character._id}-equipment`,
+      });
       const accessory = await Item.findById(equipment?.accessory);
       await this.applyEntity(target, character, accessory as IItem);
     } else {

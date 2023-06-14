@@ -2,7 +2,9 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EntityType, IItem, ItemSlotType, ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -14,7 +16,9 @@ export class BattleAttackValidator {
   constructor(
     private battleRangedAttack: BattleAttackRanged,
     private movementHelper: MovementHelper,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private characterInventory: CharacterInventory,
+    private socketMessaging: SocketMessaging
   ) {}
 
   public async validateAttack(
@@ -63,7 +67,18 @@ export class BattleAttackValidator {
     character: ICharacter,
     target: ICharacter | INPC
   ): Promise<Partial<IRangedAttackParams> | undefined> {
-    const equipment = (await Equipment.findById(character.equipment).populate("inventory").exec()) as IEquipment;
+    const equipment = (await Equipment.findById(character.equipment).cacheQuery({
+      cacheKey: `${character._id}-equipment`,
+    })) as IEquipment;
+
+    const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
+
+    if (!inventory) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you don't have an inventory");
+      return;
+    }
+
+    equipment.inventory = inventory;
 
     if (!equipment) {
       throw new Error(`equipment not found for character ${character.id}`);

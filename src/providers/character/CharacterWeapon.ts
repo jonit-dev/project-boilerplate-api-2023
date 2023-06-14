@@ -21,7 +21,11 @@ export class CharacterWeapon {
       NewRelicTransactionCategory.Operation,
       "CharacterWeapon.getWeapon",
       async () => {
-        const equipment = (await Equipment.findById(character.equipment).lean()) as IEquipment;
+        const equipment = (await Equipment.findById(character.equipment)
+          .lean()
+          .cacheQuery({
+            cacheKey: `${character._id}-equipment`,
+          })) as IEquipment;
 
         if (!equipment) {
           return undefined;
@@ -47,7 +51,11 @@ export class CharacterWeapon {
   }
 
   public async hasShield(character: ICharacter): Promise<boolean | undefined> {
-    const equipment = (await Equipment.findById(character.equipment).lean()) as IEquipment;
+    const equipment = (await Equipment.findById(character.equipment)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character._id}-equipment`,
+      })) as IEquipment;
 
     if (!equipment) {
       return;

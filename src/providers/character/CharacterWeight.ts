@@ -81,7 +81,11 @@ export class CharacterWeight {
       NewRelicTransactionCategory.Operation,
       "CharacterWeight/getWeight",
       async () => {
-        const equipment = await Equipment.findById(character.equipment).lean();
+        const equipment = await Equipment.findById(character.equipment)
+          .lean()
+          .cacheQuery({
+            cacheKey: `${character._id}-equipment`,
+          });
         const inventory = await this.characterInventory.getInventory(character);
         const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 

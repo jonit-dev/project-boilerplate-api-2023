@@ -20,7 +20,14 @@ export class CharacterInventory {
       NewRelicTransactionCategory.Operation,
       "CharacterInventory.getInventory",
       async () => {
-        const equipment = (await Equipment.findById(character.equipment).lean().select("inventory")) as IEquipment;
+        const equipment = (await Equipment.findById(character.equipment)
+          .lean({
+            virtuals: true,
+            defaults: true,
+          })
+          .cacheQuery({
+            cacheKey: `${character._id}-equipment`,
+          })) as IEquipment;
 
         if (equipment) {
           const inventory = await Item.findById(equipment.inventory)
@@ -154,7 +161,9 @@ export class CharacterInventory {
     if (!useExistingEquipment) {
       equipment = new Equipment();
     } else {
-      equipment = await Equipment.findById(character.equipment);
+      equipment = await Equipment.findById(character.equipment).cacheQuery({
+        cacheKey: `${character._id}-equipment`,
+      });
 
       if (!equipment) {
         throw new Error("Equipment not found");

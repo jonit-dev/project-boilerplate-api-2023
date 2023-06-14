@@ -4,7 +4,6 @@ import { TextFormatter } from "@providers/text/TextFormatter";
 import { CharacterSocketEvents, ICharacterBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import { clearCacheForKey } from "speedgoose";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
 export interface IBuffValueCalculations {
@@ -52,8 +51,6 @@ export class CharacterBuffAttribute {
   }
 
   public async disableBuff(character: ICharacter, buffId: string, noMessage?: boolean): Promise<boolean> {
-    await clearCacheForKey(`${character._id}-skills`);
-    await clearCacheForKey(`characterBuffs_${character._id}`);
     const updatedCharacter = await Character.findById(character._id).lean();
 
     if (!updatedCharacter) {

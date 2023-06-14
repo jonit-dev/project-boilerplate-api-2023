@@ -247,6 +247,7 @@ export class QuestSystem {
     const rewards = await QuestReward.find({ _id: { $in: quest.rewards } });
 
     // Get character's backpack to store there the rewards
+    // TODO: Cache this
     const equipment = await Equipment.findById(character.equipment).populate("inventory").exec();
     if (!equipment) {
       throw new Error(

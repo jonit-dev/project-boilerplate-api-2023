@@ -21,7 +21,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
-import { clearCacheForKey } from "speedgoose";
 import { CharacterInventory } from "../CharacterInventory";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
@@ -91,9 +90,6 @@ export class CharacterNetworkLogout {
         await this.inMemoryHashTable.deleteAll(data.id.toString());
 
         const spellLeveling = await this.spellLearn.levelingSpells(character._id, character.skills!);
-
-        await clearCacheForKey(`characterBuffs_${character._id}`);
-        await clearCacheForKey(`${character._id}-skills`);
 
         if (spellLeveling) {
           console.log(`- Spells have been updated in Character: ${character._id}`);

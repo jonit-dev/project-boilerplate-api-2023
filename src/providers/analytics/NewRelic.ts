@@ -8,10 +8,11 @@ export class NewRelic {
   public trackTransaction(
     category: NewRelicTransactionCategory,
     event: string,
-    callback: () => void | Promise<void> | Promise<any>
+    callback: () => void | Promise<void> | Promise<any>,
+    skipTracking?: boolean
   ): Promise<any> {
     return new Promise((resolve, reject) => {
-      if (appEnv.general.IS_UNIT_TEST) {
+      if (appEnv.general.IS_UNIT_TEST || skipTracking) {
         return resolve(callback());
       }
 

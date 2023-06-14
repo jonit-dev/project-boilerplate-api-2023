@@ -172,7 +172,9 @@ export class ItemDrop {
 
   private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
     const equipmentSetId = character.equipment;
-    const equipmentSet = await Equipment.findById(equipmentSetId);
+    const equipmentSet = await Equipment.findById(equipmentSetId).cacheQuery({
+      cacheKey: `${character._id}-equipment`,
+    });
 
     if (!equipmentSet) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment set not found.");

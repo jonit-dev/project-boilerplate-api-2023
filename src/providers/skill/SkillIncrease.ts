@@ -101,7 +101,11 @@ export class SkillIncrease {
         throw new Error(`skills not found for character ${attacker.id}`);
       }
 
-      const equipment = await Equipment.findById(attacker.equipment).lean();
+      const equipment = await Equipment.findById(attacker.equipment)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${attacker._id}-equipment`,
+        });
       if (!equipment) {
         throw new Error(`equipment not found for character ${attacker.id}`);
       }

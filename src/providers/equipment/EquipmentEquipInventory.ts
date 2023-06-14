@@ -16,7 +16,9 @@ export class EquipmentEquipInventory {
       NewRelicTransactionCategory.Operation,
       "EquipmentEquipInventory.equipInventory",
       async () => {
-        const equipment = await Equipment.findById(character.equipment);
+        const equipment = await Equipment.findById(character.equipment).cacheQuery({
+          cacheKey: `${character._id}-equipment`,
+        });
 
         if (!equipment) {
           this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");

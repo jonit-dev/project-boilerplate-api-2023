@@ -190,7 +190,17 @@ export class CharacterDeath {
       return;
     }
 
-    const equipment = await Equipment.findById(equipmentId).populate("inventory").exec();
+    const equipment = (await Equipment.findById(character.equipment).cacheQuery({
+      cacheKey: `${character._id}-equipment`,
+    })) as IEquipment;
+
+    equipment.inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
+
+    if (!equipment.inventory) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you don't have an inventory");
+      return;
+    }
+
     if (!equipment) {
       throw new Error(`No equipment found for id ${equipmentId}`);
     }

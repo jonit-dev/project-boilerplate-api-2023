@@ -1,4 +1,5 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
+import { SpeedGooseCacheAutoCleaner } from "speedgoose";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
 export const equipmentSchema = createLeanSchema(
@@ -88,6 +89,8 @@ equipmentSchema.method("isEquipped", function (this: IEquipment, itemId: string)
 
   return equippedItems.includes(itemId.toString());
 });
+
+equipmentSchema.plugin(SpeedGooseCacheAutoCleaner);
 
 export type IEquipment = ExtractDoc<typeof equipmentSchema>;
 

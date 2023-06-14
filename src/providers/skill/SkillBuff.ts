@@ -3,7 +3,6 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterBuffType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { clearCacheForKey } from "speedgoose";
 import { SkillsAvailable } from "./SkillTypes";
 import { TraitGetter } from "./TraitGetter";
 
@@ -42,8 +41,6 @@ export class SkillBuff {
 
         if (!skills?.[buff.trait]?.level) {
           console.log(`Skill not found for character ${character._id} trait ${buff.trait}`);
-          await clearCacheForKey(`characterBuffs_${skills.owner?.toString()}`);
-          await clearCacheForKey(`${character._id}-skills`);
           continue;
         }
 

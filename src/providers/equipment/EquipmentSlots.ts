@@ -239,6 +239,7 @@ export class EquipmentSlots {
       NewRelicTransactionCategory.Operation,
       "EquipmentSlots.getEquipmentSlots",
       async () => {
+        // TODO: Cache this
         const equipment = await Equipment.findById(equipmentId).lean().populate(this.slots.join(" ")).exec();
 
         const head = equipment?.head! as unknown as IItem;
@@ -279,6 +280,7 @@ export class EquipmentSlots {
       NewRelicTransactionCategory.Operation,
       "EquipmentSlots.hasItemByKeyOnSlot",
       async () => {
+        // TODO: Cache this
         const equipment = await Equipment.findById(character.equipment).lean().populate(this.slots.join(" ")).exec();
 
         if (!equipment) {
@@ -303,6 +305,7 @@ export class EquipmentSlots {
       NewRelicTransactionCategory.Operation,
       "EquipmentSlots.removeItemFromSlot",
       async () => {
+        // TODO: Cache this
         const equipment = await Equipment.findById(character.equipment).populate(this.slots.join(" ")).exec();
 
         if (!equipment) {

@@ -99,7 +99,9 @@ export class EntityEffectUse {
         applicableEffects.push(entityEffect);
       });
     } else {
-      const equipment = await Equipment.findById(attacker.equipment);
+      const equipment = await Equipment.findById(attacker.equipment).cacheQuery({
+        cacheKey: `${attacker._id}-equipment`,
+      });
       const accessory = await Item.findById(equipment?.accessory);
       const accessoryEffect = accessory?.entityEffects;
 

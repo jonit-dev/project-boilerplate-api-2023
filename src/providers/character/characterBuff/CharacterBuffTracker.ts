@@ -2,7 +2,6 @@ import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterBuffDurationType, CharacterTrait, ICharacterBuff, ICharacterItemBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { clearCacheForKey } from "speedgoose";
 interface ICharacterBuffDeleteOptions {
   deleteTemporaryOnly?: boolean;
 }
@@ -17,12 +16,6 @@ export class CharacterBuffTracker {
       });
 
       await newCharacterBuff.save();
-
-      await clearCacheForKey(`characterBuffs_${characterId}`);
-
-      if (newCharacterBuff.itemKey) {
-        await clearCacheForKey(`characterBuff_${characterId}_${newCharacterBuff.itemKey}`);
-      }
 
       return newCharacterBuff as ICharacterBuff;
     } catch (error) {

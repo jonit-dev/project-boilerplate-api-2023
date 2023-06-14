@@ -19,7 +19,6 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
-import { clearCacheForKey } from "speedgoose";
 import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
 
@@ -64,9 +63,6 @@ export class SkillFunctions {
   }
 
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
-    await clearCacheForKey(`${character._id}-skills`);
-    await clearCacheForKey(`characterBuffs_${character._id}`);
-
     await Skill.findByIdAndUpdate(skills._id, { ...skills });
 
     const buffedSkills = await this.skillBuff.getSkillsWithBuff(character);
@@ -108,8 +104,6 @@ export class SkillFunctions {
       )} fighting.`,
       type: "info",
     });
-
-    await clearCacheForKey(`${character._id}-skills`);
 
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
 

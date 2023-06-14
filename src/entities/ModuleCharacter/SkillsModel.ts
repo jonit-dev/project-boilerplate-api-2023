@@ -10,6 +10,8 @@ import {
 } from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
+import { SpeedGooseCacheAutoCleaner } from "speedgoose";
+
 const skillDetails = (type: SkillType): Record<string, any> => {
   return {
     type: Type.string({
@@ -129,6 +131,8 @@ skillsSchema.post("save", async function (this: ISkill) {
     );
   }
 });
+
+skillsSchema.plugin(SpeedGooseCacheAutoCleaner);
 
 export type ISkill = ExtractDoc<typeof skillsSchema>;
 

@@ -19,6 +19,7 @@ export class EquipmentStatsCalculator {
   }
 
   private async getTotalAttackOrDefense(equipmentId: string, type: "attack" | "defense"): Promise<number> {
+    // TODO: Cache this
     const equipment = await Equipment.findById(equipmentId)
       .populate("head neck leftHand rightHand ring legs boot accessory armor inventory")
       .lean();

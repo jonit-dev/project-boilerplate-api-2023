@@ -29,7 +29,9 @@ export class CharacterItemEquipment {
       return false;
     }
 
-    const equipment = await Equipment.findById(character.equipment);
+    const equipment = await Equipment.findById(character.equipment).cacheQuery({
+      cacheKey: `${character._id}-equipment`,
+    });
 
     if (!equipment) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Your equipment was not found.");
@@ -49,7 +51,9 @@ export class CharacterItemEquipment {
     decrementQty: number,
     equipmentSlot?: string
   ): Promise<boolean> {
-    const equipment = await Equipment.findById(character.equipment);
+    const equipment = await Equipment.findById(character.equipment).cacheQuery({
+      cacheKey: `${character._id}-equipment`,
+    });
 
     if (!equipment) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Your equipment was not found.");
@@ -152,7 +156,9 @@ export class CharacterItemEquipment {
   }
 
   public async checkItemEquipment(itemId: string, character: ICharacter): Promise<boolean> {
-    const equipment = await Equipment.findById(character.equipment);
+    const equipment = await Equipment.findById(character.equipment).cacheQuery({
+      cacheKey: `${character._id}-equipment`,
+    });
 
     if (!equipment) {
       return false;
@@ -176,7 +182,9 @@ export class CharacterItemEquipment {
    * @returns the item id if found, otherwise returns undefined
    */
   public async checkItemEquipmentByKey(itemKey: string, character: ICharacter): Promise<string | undefined> {
-    const equipment = await Equipment.findById(character.equipment);
+    const equipment = await Equipment.findById(character.equipment).cacheQuery({
+      cacheKey: `${character._id}-equipment`,
+    });
 
     if (!equipment) {
       return;
@@ -206,7 +214,9 @@ export class CharacterItemEquipment {
 
   private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
     const equipmentSetId = character.equipment;
-    const equipmentSet = await Equipment.findById(equipmentSetId);
+    const equipmentSet = await Equipment.findById(equipmentSetId).cacheQuery({
+      cacheKey: `${character._id}-equipment`,
+    });
 
     if (!equipmentSet) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Your equipment was not found.");

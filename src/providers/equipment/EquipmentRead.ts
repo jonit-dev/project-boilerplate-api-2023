@@ -20,7 +20,11 @@ export class EquipmentRead {
       NewRelicTransactionCategory.Operation,
       "EquipmentRead.onEquipmentRead",
       async () => {
-        const equipmentSet = await Equipment.findById(character.equipment).lean();
+        const equipmentSet = await Equipment.findById(character.equipment)
+          .lean()
+          .cacheQuery({
+            cacheKey: `${character._id}-equipment`,
+          });
 
         if (!equipmentSet) {
           this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {

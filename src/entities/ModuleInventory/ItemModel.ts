@@ -244,7 +244,9 @@ itemSchema.pre("remove", async function (next) {
     return;
   }
 
-  const equipment = await Equipment.findById(character.equipment);
+  const equipment = await Equipment.findById(character.equipment).cacheQuery({
+    cacheKey: `${character._id}-equipment`,
+  });
 
   const isEquipped = await equipment?.isEquipped(item._id);
 
@@ -275,7 +277,9 @@ itemSchema.pre("deleteOne", { document: false, query: true }, async function (ne
       return;
     }
 
-    const equipment = await Equipment.findById(character.equipment);
+    const equipment = await Equipment.findById(character.equipment).cacheQuery({
+      cacheKey: `${character._id}-equipment`,
+    });
 
     const isEquipped = equipment?.isEquipped(item._id);
 

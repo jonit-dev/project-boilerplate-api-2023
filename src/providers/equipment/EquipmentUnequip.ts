@@ -100,8 +100,6 @@ export class EquipmentUnequip {
         await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
         await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
 
-        await clearCacheForKey(`characterBuffs_${character._id}`);
-        await clearCacheForKey(`${character._id}-skills`);
         await clearCacheForKey(`${character._id}-inventory`);
 
         return true;

@@ -84,7 +84,9 @@ export class ItemPickupValidator {
   private async hasEquipmentContainer(character: ICharacter, item: IItem, inventory: any): Promise<boolean> {
     const isInventoryItem = item.isItemContainer && inventory === null;
     if (isInventoryItem) {
-      const equipmentContainer = await Equipment.findById(character.equipment);
+      const equipmentContainer = await Equipment.findById(character.equipment).cacheQuery({
+        cacheKey: `${character._id}-equipment`,
+      });
       if (!equipmentContainer) {
         this.sendErrorMessage(character, "Sorry, equipment container not found");
         return false;

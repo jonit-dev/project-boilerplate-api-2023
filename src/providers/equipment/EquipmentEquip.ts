@@ -76,7 +76,9 @@ export class EquipmentEquip {
       return false;
     }
 
-    const equipment = await Equipment.findById(character.equipment);
+    const equipment = await Equipment.findById(character.equipment).cacheQuery({
+      cacheKey: `${character._id}-equipment`,
+    });
 
     if (!equipment) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
@@ -135,7 +137,9 @@ export class EquipmentEquip {
           return false;
         }
 
-        const equipment = await Equipment.findById(character.equipment);
+        const equipment = await Equipment.findById(character.equipment).cacheQuery({
+          cacheKey: `${character._id}-equipment`,
+        });
 
         if (!equipment) {
           this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
@@ -172,8 +176,6 @@ export class EquipmentEquip {
 
         await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
 
-        await clearCacheForKey(`characterBuffs_${character._id}`);
-        await clearCacheForKey(`${character._id}-skills`);
         await clearCacheForKey(`${character._id}-inventory`);
 
         return true;
