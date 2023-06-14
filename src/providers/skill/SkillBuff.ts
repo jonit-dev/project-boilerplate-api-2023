@@ -41,13 +41,13 @@ export class SkillBuff {
         }
 
         if (!skills?.[buff.trait]?.level) {
-          console.log(`Skill not found for character ${character._id} trait ${skillName}`);
+          console.log(`Skill not found for character ${character._id} trait ${buff.trait}`);
           await clearCacheForKey(`characterBuffs_${skills.owner?.toString()}`);
           await clearCacheForKey(`${character._id}-skills`);
           continue;
         }
 
-        skills[buff.trait].level = await this.traitGetter.getSkillLevelWithBuffs(skills, skillName as SkillsAvailable);
+        skills[buff.trait].level = await this.traitGetter.getSkillLevelWithBuffs(skills, buff.trait as SkillsAvailable);
       }
     }
 
