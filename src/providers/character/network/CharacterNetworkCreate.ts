@@ -40,6 +40,7 @@ import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
+import { CharacterBuffValidation } from "../characterBuff/CharacterBuffValidation";
 
 @provide(CharacterNetworkCreate)
 export class CharacterNetworkCreate {
@@ -61,7 +62,8 @@ export class CharacterNetworkCreate {
     private inMemoryHashTable: InMemoryHashTable,
     private socketSessionControl: SocketSessionControl,
     private characterDeath: CharacterDeath,
-    private itemCleaner: ItemCleaner
+    private itemCleaner: ItemCleaner,
+    private characterBuffValidation: CharacterBuffValidation
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -99,6 +101,8 @@ export class CharacterNetworkCreate {
         await this.itemCleaner.clearMissingReferences(character);
 
         await this.battleNetworkStopTargeting.stopTargeting(character);
+
+        await this.characterBuffValidation.removeDuplicatedBuffsForSameItem(character);
 
         const map = character.scene;
 
