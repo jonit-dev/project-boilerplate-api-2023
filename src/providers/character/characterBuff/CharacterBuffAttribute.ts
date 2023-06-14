@@ -83,8 +83,6 @@ export class CharacterBuffAttribute {
       throw new Error("Could not delete buff from character");
     }
 
-    console.log(buff.trait, updatedTraitValue);
-
     await Character.updateOne(
       { _id: character._id },
       {
