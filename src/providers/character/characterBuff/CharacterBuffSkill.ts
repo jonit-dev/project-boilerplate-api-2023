@@ -134,8 +134,6 @@ export class CharacterBuffSkill {
     if (!noMessage) {
       this.sendCharacterActivationDeactivationMessage(character, buff, type);
     }
-
-    this.sendCharacterActivationDeactivationMessage(character, buff, type);
   }
 
   public async calculateAllActiveBuffs(character: ICharacter): Promise<ICharacterBuff[] | undefined> {

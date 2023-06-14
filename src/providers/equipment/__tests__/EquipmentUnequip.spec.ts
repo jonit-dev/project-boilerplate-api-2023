@@ -1,12 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import { ItemSocketEvents, ItemSubType, ItemType, UISocketEvents } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EquipmentSlots } from "../EquipmentSlots";
 import { EquipmentUnequip } from "../EquipmentUnequip";
@@ -99,6 +99,69 @@ describe("EquipmentUnequip.spec.ts", () => {
     const attackTypePostUnequip = await characterWeapon.getAttackType(testCharacter);
 
     expect(attackTypePostUnequip).toBe(EntityAttackType.Melee);
+  });
+  describe("Decrease attack and defense", () => {
+    const DECREASE_VALUE = 2;
+
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    async function fetchItem(itemId: any) {
+      const item = await Item.findById(itemId);
+      // Note: Ensure Item has attack and defense properties in its model
+      return item as unknown as { attack: number; defense: number; _id: string };
+    }
+
+    it("should decrease the attack and defense values if the item type is Weapon and accessory subtype is Book", async () => {
+      // Arrange
+      const weaponItem = await unitTestHelper.createMockItem({ type: ItemType.Weapon });
+      const bookAccessory = await unitTestHelper.createMockItem({ subType: ItemSubType.Book });
+
+      equipment.rightHand = weaponItem._id;
+      equipment.accessory = bookAccessory._id;
+      await equipment.save();
+
+      const originalWeaponItem = await fetchItem(weaponItem._id);
+
+      // Act
+      const unequip = await equipmentUnequip.unequip(testCharacter, inventory, weaponItem);
+
+      // Assert
+      expect(unequip).toBeTruthy();
+
+      const updatedWeaponItem = await fetchItem(weaponItem._id);
+
+      expect(updatedWeaponItem.attack).toBe(originalWeaponItem.attack - DECREASE_VALUE);
+      expect(updatedWeaponItem.defense).toBe(originalWeaponItem.defense - DECREASE_VALUE);
+    });
+
+    it("should decrease the attack and defense values if the item subtype is Book and the left and right hand items are Weapons", async () => {
+      // Arrange
+      const bookItem = await unitTestHelper.createMockItem({ subType: ItemSubType.Book });
+      const leftHandWeapon = await unitTestHelper.createMockItem({ type: ItemType.Weapon });
+      const rightHandWeapon = await unitTestHelper.createMockItem({ type: ItemType.Weapon });
+
+      equipment.leftHand = leftHandWeapon._id;
+      equipment.rightHand = rightHandWeapon._id;
+      equipment.accessory = bookItem._id;
+      await equipment.save();
+
+      const originalLeftHandWeapon = await fetchItem(leftHandWeapon._id);
+      const originalRightHandWeapon = await fetchItem(rightHandWeapon._id);
+
+      // Act
+      const unequip = await equipmentUnequip.unequip(testCharacter, inventory, bookItem);
+
+      // Assert
+      expect(unequip).toBeTruthy();
+
+      const updatedLeftHandWeapon = await fetchItem(leftHandWeapon._id);
+      const updatedRightHandWeapon = await fetchItem(rightHandWeapon._id);
+
+      expect(updatedLeftHandWeapon.attack).toBe(originalLeftHandWeapon.attack - DECREASE_VALUE);
+      expect(updatedLeftHandWeapon.defense).toBe(originalLeftHandWeapon.defense - DECREASE_VALUE);
+
+      expect(updatedRightHandWeapon.attack).toBe(originalRightHandWeapon.attack - DECREASE_VALUE);
+      expect(updatedRightHandWeapon.defense).toBe(originalRightHandWeapon.defense - DECREASE_VALUE);
+    });
   });
 
   describe("Validation cases", () => {

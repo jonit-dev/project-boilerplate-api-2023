@@ -9,7 +9,7 @@ import { CharacterItems } from "@providers/character/characterItems/CharacterIte
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { ItemSocketEvents } from "@rpg-engine/shared";
+import { ItemSocketEvents, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { clearCacheForKey } from "speedgoose";
 import { EquipmentSlots } from "./EquipmentSlots";
@@ -57,10 +57,20 @@ export class EquipmentUnequip {
           return false;
         }
 
+        const preEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+
+        const DECREASE_VALUE = 2;
+        const Accessory = await Item.findById(preEquipmentSlots.accessory);
+        if (item.type === ItemType.Weapon && Accessory?.subType === ItemSubType.Book) {
+          await Item.updateOne({ _id: item._id }, { $inc: { attack: -DECREASE_VALUE, defense: -DECREASE_VALUE } });
+        }
+
+        const newItem = (await Item.findById(item._id)) || item;
+
         //   add it to the inventory
 
         const addItemToInventory = await this.characterItemContainer.addItemToContainer(
-          item,
+          newItem,
           character,
           inventoryContainerId
         );
@@ -104,6 +114,33 @@ export class EquipmentUnequip {
         await clearCacheForKey(`${character._id}-equipment`);
         await clearCacheForKey(`characterBuffs_${character._id}`);
         await clearCacheForKey(`${character._id}-skills`);
+
+        // decrease attack and defense
+        if (item.subType === ItemSubType.Book) {
+          const leftHandItem = await Item.findById(equipmentSlots.leftHand);
+          const rightHandItem = await Item.findById(equipmentSlots.rightHand);
+          if (leftHandItem?.type === ItemType.Weapon) {
+            await Item.updateOne(
+              { _id: leftHandItem._id },
+              { $inc: { attack: -DECREASE_VALUE, defense: -DECREASE_VALUE } }
+            );
+          }
+          if (rightHandItem?.type === ItemType.Weapon) {
+            await Item.updateOne(
+              { _id: rightHandItem._id },
+              { $inc: { attack: -DECREASE_VALUE, defense: -DECREASE_VALUE } }
+            );
+          }
+        }
+
+        const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+
+        const newInventoryContainer = await ItemContainer.findById(inventoryContainerId);
+
+        this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.EquipmentAndInventoryUpdate, {
+          equipment: newEquipmentSlots,
+          inventory: newInventoryContainer,
+        });
 
         return true;
       }
