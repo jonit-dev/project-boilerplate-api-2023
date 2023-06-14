@@ -24,7 +24,7 @@ export const spellFrenzy: Partial<ISpell> = {
   manaCost: 120,
   minLevelRequired: 7,
   minMagicLevelRequired: 6,
-  cooldown: 60,
+  cooldown: 120,
   castingAnimationKey: AnimationEffectKeys.QuickFire,
   characterClass: [CharacterClass.Berserker],
 
@@ -47,7 +47,7 @@ export const spellFrenzy: Partial<ISpell> = {
     await characterBuffActivator.enableTemporaryBuff(character, {
       type: CharacterBuffType.CharacterAttribute,
       trait: CharacterAttributes.AttackIntervalSpeed,
-      buffPercentage: -30, // reduce attack interval speed by 30%
+      buffPercentage: -20, // reduce attack interval speed by 20%
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
       options: {

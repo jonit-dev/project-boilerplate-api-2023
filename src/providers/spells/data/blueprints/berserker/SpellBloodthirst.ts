@@ -18,10 +18,10 @@ export const spellBloodthirst: Partial<ISpell> = {
   description: "Bloodthirst is a spell designed for a Berserker to heal themselves.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "sanguis sitis",
-  manaCost: 70,
+  manaCost: 120,
   minLevelRequired: 4,
   minMagicLevelRequired: 3,
-  cooldown: 60,
+  cooldown: 120,
   castingAnimationKey: AnimationEffectKeys.Holy,
   characterClass: [CharacterClass.Berserker],
 
@@ -31,8 +31,8 @@ export const spellBloodthirst: Partial<ISpell> = {
     const spellCalculator = await container.get(SpellCalculator);
 
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Strength, {
-      min: 30,
-      max: 120,
+      min: 10,
+      max: 30,
     });
 
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;

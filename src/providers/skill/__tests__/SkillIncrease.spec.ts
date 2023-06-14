@@ -21,6 +21,7 @@ import {
   calculateSPToNextLevel,
   calculateXPToNextLevel,
 } from "@rpg-engine/shared";
+import { v4 as uuidv4 } from "uuid";
 import { SkillFunctions } from "../SkillFunctions";
 import { SkillIncrease } from "../SkillIncrease";
 import { CraftingSkillsMap } from "../constants";
@@ -116,7 +117,7 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
     beforeEach(async () => {
       jest.useFakeTimers({ advanceTimers: true });
       testNPC = await unitTestHelper.createMockNPC({
-        xpToRelease: [{ charId: testCharacter._id, xp: 100 }],
+        xpToRelease: [{ xpId: uuidv4(), charId: testCharacter._id, xp: 100 }],
       });
 
       increaseMaxHealthMaxManaSpy = jest.spyOn(skillIncrease, "increaseMaxManaMaxHealth");
@@ -130,12 +131,17 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
       await skills.save();
     });
 
-    afterEach(() => {
+    afterEach(async () => {
       jest.useRealTimers();
       jest.clearAllMocks();
+
+      testNPC.xpReleased = false;
+      await testNPC.save();
     });
 
     it("should properly gain maxHealth and maxMana on level up", async () => {
+      testNPC.health = 0;
+      await testNPC.save();
       await skillIncrease.releaseXP(testNPC);
 
       expect(increaseMaxHealthMaxManaSpy).toHaveBeenCalledWith(testCharacter._id);
@@ -152,6 +158,8 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
       if (!buff) {
         throw new Error("Buff not found");
       }
+      testNPC.health = 0;
+      await testNPC.save();
 
       await skillIncrease.releaseXP(testNPC);
 
@@ -312,6 +320,9 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
     testCharacter.class = CharacterClass.Druid;
 
     testNPC = await unitTestHelper.createMockNPC();
+
+    testNPC.health = 0;
+    await testNPC.save();
   });
 
   it("should not increase character's 'shielding' skill | Character without Shield", async () => {
@@ -396,6 +407,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
     for (let i = 0; i < spToAdd; i++) {
       await skillIncrease.increaseSkillsOnBattle(teste, testNPC, 2);
     }
+
     await skillIncrease.releaseXP(testNPC);
 
     const updatedSkills = (await Skill.findById(teste.skills).lean()) as ISkill;

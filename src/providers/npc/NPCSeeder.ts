@@ -78,6 +78,7 @@ export class NPCSeeder {
         y: npc.initialY,
         targetCharacter: undefined,
         currentMovementType: npc.originalMovementType,
+        xpReleased: false,
       } as any;
 
       if (randomMaxHealth) {

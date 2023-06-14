@@ -45,7 +45,7 @@ export const spellQuickFire: Partial<ISpell> = {
     await characterBuffActivator.enableTemporaryBuff(character, {
       type: CharacterBuffType.CharacterAttribute,
       trait: CharacterAttributes.AttackIntervalSpeed,
-      buffPercentage,
+      buffPercentage: -buffPercentage,
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
     });

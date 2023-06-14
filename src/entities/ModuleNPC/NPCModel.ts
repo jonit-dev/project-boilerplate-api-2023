@@ -139,11 +139,15 @@ const npcSchema = createLeanSchema(
     }),
     experience: Type.number(),
     xpToRelease: Type.array().of({
+      xpId: Type.string({ required: true }),
       charId: Type.objectId({
         ref: "Character",
         required: true,
       }),
       xp: Type.number({ required: true }),
+    }),
+    xpReleased: Type.boolean({
+      default: false,
     }),
     loots: Type.array().of({
       itemBlueprintKey: Type.string({ required: true }),

@@ -51,7 +51,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
-import { clearCacheForKey } from "speedgoose";
+import { v4 as uuidv4 } from "uuid";
 import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillCraftingMapper } from "./SkillCraftingMapper";
@@ -304,25 +304,33 @@ export class SkillIncrease {
    * characters and notifies them if leveled up
    */
   public async releaseXP(target: INPC): Promise<void> {
+    if (target.health > 0 || target.xpReleased) {
+      // if target stills alive, he cant release XP.
+      return;
+    }
+
     let levelUp = false;
     let previousLevel = 0;
     // The xp gained is released once the NPC dies.
     // Store the xp in the xpToRelease array
     // before adding the character to the array, check if the character already caused some damage
+
+    target.xpToRelease = _.uniqBy(target.xpToRelease, "xpId");
+
     while (target.xpToRelease && target.xpToRelease.length) {
       const record = target.xpToRelease.shift();
 
       // Get attacker character data
-      const character = (await Character.findById(record!.charId)) as ICharacter;
+      const character = (await Character.findById(record!.charId).lean({
+        virtuals: true,
+        defaults: true,
+      })) as ICharacter;
 
       if (!character) {
         // if attacker does not exist anymore
         // call again the function without this record
         return this.releaseXP(target);
       }
-
-      await clearCacheForKey(`${character._id}-skills`);
-      await clearCacheForKey(`characterBuffs_${character._id}`);
 
       // Get character skills
       const skills = (await Skill.findById(character.skills)
@@ -365,7 +373,7 @@ export class SkillIncrease {
       await this.warnCharactersAroundAboutExpGains(character, exp);
     }
 
-    await NPC.updateOne({ _id: target._id }, { xpToRelease: target.xpToRelease });
+    await NPC.updateOne({ _id: target._id }, { xpToRelease: target.xpToRelease, xpReleased: true });
   }
 
   private async sendExpLevelUpEvents(
@@ -513,15 +521,12 @@ export class SkillIncrease {
           }
         }
         if (!found) {
-          target.xpToRelease.push({ charId: attacker.id, xp: target.xpPerDamage * damage });
+          target.xpToRelease.push({ xpId: uuidv4(), charId: attacker.id, xp: target.xpPerDamage * damage });
         }
       } else {
-        target.xpToRelease = [{ charId: attacker.id, xp: target.xpPerDamage * damage }];
+        target.xpToRelease = [{ xpId: uuidv4(), charId: attacker.id, xp: target.xpPerDamage * damage }];
       }
 
-      // await target.save();
-
-      // use updateOne to save
       await NPC.updateOne({ _id: target.id }, { xpToRelease: target.xpToRelease });
     }
   }
