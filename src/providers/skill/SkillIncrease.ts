@@ -51,6 +51,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { v4 as uuidv4 } from "uuid";
 import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
@@ -126,6 +127,9 @@ export class SkillIncrease {
       if (!canIncreaseSP) {
         return;
       }
+
+      await clearCacheForKey(`characterBuffs_${attacker._id}`);
+      await clearCacheForKey(`${attacker._id}-skills`);
 
       // stronger the opponent, higher SP per hit it gives in your combat skills
       const bonus = await this.skillFunctions.calculateBonus(target, target.skills);
