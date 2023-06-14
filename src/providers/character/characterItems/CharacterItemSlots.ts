@@ -72,9 +72,6 @@ export class CharacterItemSlots {
       ...payload,
     };
 
-    targetContainer.markModified("slots");
-    await targetContainer.save();
-
     // remember that we also need to update the item on the database. What we have above is just a reference inside of the container (copy)
     await Item.updateOne(
       {
