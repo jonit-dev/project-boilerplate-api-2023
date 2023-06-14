@@ -29,7 +29,7 @@ export class SkillBuff {
       })
         .lean({
           virtuals: true,
-          default: true,
+          defaults: true,
         })
         .cacheQuery({
           cacheKey: `characterBuffs_${skills.owner?.toString()}`,
