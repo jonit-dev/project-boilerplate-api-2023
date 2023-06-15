@@ -1,8 +1,8 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ICharacterBuff, ICharacterItemBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBuffAttribute } from "./CharacterBuffAttribute";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 
 interface IBuff extends ICharacterBuff {
   itemKey?: string;
@@ -18,6 +18,10 @@ export class CharacterBuffValidation {
 
   public async removeDuplicatedBuffsForSameItem(character: ICharacter): Promise<void> {
     const allCharacterBuffs = (await this.characterBuffTracker.getAllCharacterBuffs(character._id)) as IBuff[];
+
+    if (!allCharacterBuffs) {
+      return;
+    }
 
     const itemBuffs = allCharacterBuffs.filter((buff) => !!buff.itemId) as ICharacterItemBuff[];
 
@@ -55,11 +59,11 @@ export class CharacterBuffValidation {
           const aAbsoluteChange = a.absoluteChange ?? 0;
           const bAbsoluteChange = b.absoluteChange ?? 0;
 
-          if (aAbsoluteChange > bAbsoluteChange) {
+          if (aAbsoluteChange < bAbsoluteChange) {
             return 1;
           }
 
-          if (aAbsoluteChange < bAbsoluteChange) {
+          if (aAbsoluteChange > bAbsoluteChange) {
             return -1;
           }
 
