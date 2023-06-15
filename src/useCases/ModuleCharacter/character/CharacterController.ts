@@ -7,6 +7,7 @@ import {
   httpGet,
   httpPatch,
   httpPost,
+  httpDelete,
   interfaces,
   request,
   requestBody,
@@ -17,13 +18,15 @@ import { CreateCharacterUseCase } from "./create/CreateCharacterUseCase";
 import { ReadCharacterUseCase } from "./read/ReadCharacterUseCase";
 import { UpdateCharacterDTO } from "./update/UpdateCharacterDTO";
 import { UpdateCharacterUseCase } from "./update/UpdateCharacterUseCase";
+import { DeleteCharacterUseCase } from "./delete/DeleteCharacterUseCase";
 
 @controller("/characters", AuthMiddleware)
 export class CharacterController implements interfaces.Controller {
   constructor(
     private createCharacterUseCase: CreateCharacterUseCase,
     private readCharacterUseCase: ReadCharacterUseCase,
-    private updateCharacterUseCase: UpdateCharacterUseCase
+    private updateCharacterUseCase: UpdateCharacterUseCase,
+    private deleteCharacterUseCase: DeleteCharacterUseCase
   ) {}
 
   @httpPost("/", DTOValidatorMiddleware(CreateCharacterDTO))
@@ -57,5 +60,14 @@ export class CharacterController implements interfaces.Controller {
     const ownerId = request.user.id;
 
     return await this.updateCharacterUseCase.updateCharacter(id, updateCharacter, ownerId);
+  }
+  @httpDelete("/:id")
+  private async deleteCharacter(
+    @requestParam("id") id: string,
+    @request() request: IAuthenticatedRequest
+  ): Promise<boolean> {
+    const ownerId = request.user.id;
+
+    return await this.deleteCharacterUseCase.delete(id, ownerId);
   }
 }
