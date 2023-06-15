@@ -414,6 +414,11 @@ export enum MagicsBlueprint {
 
 export enum BooksBlueprint {
   Book = "book",
+  MysticWardenCodex = "mystic-warden-codex",
+  EmberSageScripture = "ember-sage-scripture",
+  FrostWraithTome = "frost-wraith-tome",
+  StormbringerGrimoire = "stormbringer-grimoire",
+  ArcaneArbiterChronicles = "arcane-arbiter-chronicles",
 }
 
 export enum OthersBlueprint {

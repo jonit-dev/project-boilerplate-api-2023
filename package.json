@@ -84,6 +84,7 @@
     "@types/lodash": "^4.14.165",
     "@types/mongodb-memory-server": "^2.3.0",
     "@types/morgan": "^1.9.2",
+    "@types/newrelic": "^9.14.0",
     "@types/node": "^14.11.5",
     "@types/pathfinding": "^0.0.5",
     "@typescript-eslint/eslint-plugin": "^5.31.0",

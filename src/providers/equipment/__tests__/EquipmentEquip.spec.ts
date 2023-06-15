@@ -6,7 +6,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data";
-import { DaggersBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { BooksBlueprint, DaggersBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CharacterClass, CombatSkill, ISkill, ItemSubType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EquipmentEquip } from "../EquipmentEquip";
@@ -26,6 +26,7 @@ describe("EquipmentEquip.spec.ts", () => {
   let spearItem: IItem;
   let spearItem2: IItem;
   let testItem: IItem;
+  let bookitem: IItem;
   let sendEventToUser;
   let equipmentStatsCalculator: EquipmentStatsCalculator;
   let characterWeapon: CharacterWeapon;
@@ -55,6 +56,7 @@ describe("EquipmentEquip.spec.ts", () => {
     spearItem = await unitTestHelper.createMockItemFromBlueprint(SpearsBlueprint.Spear);
     spearItem2 = await unitTestHelper.createMockItemFromBlueprint(SpearsBlueprint.Spear);
     testItem = await unitTestHelper.createMockItem();
+    bookitem = await unitTestHelper.createMockItemFromBlueprint(BooksBlueprint.EmberSageScripture);
 
     equipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
 
@@ -211,6 +213,51 @@ describe("EquipmentEquip.spec.ts", () => {
     const updatedInventory = await ItemContainer.findById(inventory.itemContainer);
     expect(updatedInventory?.slots[0]).toBeNull();
     expect(updatedInventory?.slots[1]._id).toEqual(spearItem2._id);
+  });
+
+  describe("Weapon Attack and Defense increase", () => {
+    const INCREASE_VALUE = 2;
+
+    beforeEach(async () => {
+      inventoryContainer.slots[0] = daggerItem;
+      inventoryContainer.slots[1] = bookitem;
+      inventoryContainer.markModified("slots");
+      await inventoryContainer.save();
+
+      testCharacter = (await Character.findByIdAndUpdate(
+        testCharacter._id,
+        { class: CharacterClass.Sorcerer },
+        { new: true }
+      )) as ICharacter;
+    });
+
+    it("should increase the attack and defense values of weapon if Book is equipped", async () => {
+      const equipOneHand = await equipmentEquip.equip(testCharacter, daggerItem._id, inventoryContainer.id);
+      expect(equipOneHand).toBeTruthy();
+
+      const accessory = await equipmentEquip.equip(testCharacter, bookitem._id, inventoryContainer.id);
+      expect(accessory).toBeTruthy();
+
+      const updatedDagger = await Item.findById(daggerItem._id);
+      // @ts-ignore
+      expect(updatedDagger?.attack).toBe(daggerItem.attack + INCREASE_VALUE);
+      // @ts-ignore
+      expect(updatedDagger?.defense).toBe(daggerItem.defense + INCREASE_VALUE);
+    });
+
+    it("should increase the attack and defense values if Book is equipped already", async () => {
+      const accessory = await equipmentEquip.equip(testCharacter, bookitem._id, inventoryContainer.id);
+      expect(accessory).toBeTruthy();
+
+      const equipOneHand = await equipmentEquip.equip(testCharacter, daggerItem._id, inventoryContainer.id);
+      expect(equipOneHand).toBeTruthy();
+
+      const updatedDagger = await Item.findById(daggerItem._id);
+      // @ts-ignore
+      expect(updatedDagger?.attack).toBe(daggerItem.attack + INCREASE_VALUE);
+      // @ts-ignore
+      expect(updatedDagger?.defense).toBe(daggerItem.defense + INCREASE_VALUE);
+    });
   });
 
   describe("Min level and skill requirements", () => {
