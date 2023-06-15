@@ -7,6 +7,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterBuffValidation } from "@providers/character/characterBuff/CharacterBuffValidation";
 import { CharacterItemBuff } from "@providers/character/characterBuff/CharacterItemBuff";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/BerserkerPassiveHabilities";
@@ -54,7 +55,8 @@ export class EquipmentEquip {
     private itemPickupUpdater: ItemPickupUpdater,
     private characterItemBuff: CharacterItemBuff,
     private equipmentCharacterClass: EquipmentCharacterClass,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private characterBuffValidation: CharacterBuffValidation
   ) {}
 
   public async equipInventory(character: ICharacter, itemId: string): Promise<boolean> {
@@ -180,6 +182,8 @@ export class EquipmentEquip {
         await clearCacheForKey(`${character._id}-equipment`);
         await clearCacheForKey(`characterBuffs_${character._id}`);
         await clearCacheForKey(`${character._id}-skills`);
+
+        await this.characterBuffValidation.removeDuplicatedBuffsForSameItem(character);
 
         return true;
       }

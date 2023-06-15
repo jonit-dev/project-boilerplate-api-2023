@@ -6,10 +6,13 @@
       "merge_logs": true,
       "max_restarts": 20,
       "autorestart": true,
-      "instances": "8",
+      "instances": "5",
       "exec_mode": "cluster",
       "node_args": "-r dotenv/config -r ./register-paths.js",
-      "max_memory_restart": "8G"
+      "max_memory_restart": "8G",
+      "env_production": {
+        "NODE_ENV": "production"
+      }
     }
   ]
 }
