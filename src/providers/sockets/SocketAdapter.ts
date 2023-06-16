@@ -43,12 +43,12 @@ export class SocketAdapter implements ISocket {
     SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
   }
 
-  public emitToAllUsers<T>(eventName: string, data?: T): void {
-    if (data) {
-      data = this.dataIdToString(data);
+  public emitToAllUsers<T>(eventName: string, eventData?: T): void {
+    if (eventData) {
+      eventData = this.dataIdToString(eventData || {}) as T;
     }
 
-    SocketAdapter.socketClass?.emitToAllUsers(eventName, data);
+    SocketAdapter.socketClass?.emitToAllUsers(eventName, eventData);
   }
 
   public onConnect(): void {
