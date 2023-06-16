@@ -1,6 +1,6 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { calculateExperience } from "@providers/npc/NPCExperience";
+import { calculateExperience } from "@providers/npc/NPCExperience/NPCExperienceCalculator";
 import {
   NPCAlignment,
   SkillType,

@@ -27,6 +27,8 @@ export const berserkerSpellExecution: Partial<ISpell> = {
   characterClass: [CharacterClass.Berserker],
 
   usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
-    await container.get(Execution).handleBerserkerExecution(character, target);
+    const execution = container.get(Execution);
+
+    await execution.handleBerserkerExecution(character, target);
   },
 };

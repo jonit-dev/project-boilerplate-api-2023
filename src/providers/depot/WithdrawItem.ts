@@ -11,6 +11,7 @@ import { IDepotContainerWithdraw, IEquipmentAndInventoryUpdatePayload, IItemCont
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "./DepotSystem";
 import { OpenDepot } from "./OpenDepot";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 
 @provide(WithdrawItem)
 export class WithdrawItem {
@@ -21,7 +22,8 @@ export class WithdrawItem {
     private itemDrop: ItemDrop,
     private characterItemSlots: CharacterItemSlots,
     private socketMessaging: SocketMessaging,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private characterWeight: CharacterWeight
   ) {}
 
   public async withdraw(character: ICharacter, data: IDepotContainerWithdraw): Promise<IItemContainer | undefined> {
@@ -75,10 +77,11 @@ export class WithdrawItem {
           await this.itemDrop.dropItems([item], gridPoints, character.scene);
         }
 
+        this.characterWeight.updateCharacterWeight(character);
+
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
           inventory: toContainer as any,
         };
-
         this.depotSystem.updateInventoryCharacter(payloadUpdate, character);
 
         return itemContainer;

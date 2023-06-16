@@ -72,7 +72,7 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
     await testNPC.save();
 
     // @ts-ignore
-    const releaseXPSpy = jest.spyOn(battleAttackTargetDeath.skillIncrease, "releaseXP");
+    const releaseXPSpy = jest.spyOn(battleAttackTargetDeath.npcExperience, "releaseXP");
     // @ts-ignore
     const updateQuestsSpy = jest.spyOn(battleAttackTargetDeath.questSystem, "updateQuests");
 

@@ -1,19 +1,25 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import Shared, {
-  CharacterTradeSocketEvents,
-  ICharacterMarketplaceTradeInitBuyResponse,
-  ITradeRequestItem,
-  ITradeResponseItem,
-  TradingEntity,
+import {
+  IEquipmentAndInventoryUpdatePayload,
+  IItemContainer,
+  IMarketplaceAvailableMoneyNotification,
+  MarketplaceSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
-import { CharacterTradingValidation } from "./CharacterTradingValidation";
-import { MARKETPLACE_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
-import { IMarketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 import { CharacterTradingBuy } from "./CharacterTradingBuy";
+import { IMarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
+import { CharacterInventory } from "./CharacterInventory";
+import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
+import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
+import { CharacterWeight } from "./CharacterWeight";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { clearCacheForKey } from "speedgoose";
 
 @provide(CharacterTradingMarketplaceBuy)
 export class CharacterTradingMarketplaceBuy {
@@ -21,40 +27,113 @@ export class CharacterTradingMarketplaceBuy {
     private socketMessaging: SocketMessaging,
     private characterTradingBalance: CharacterTradingBalance,
     private characterTradingBuy: CharacterTradingBuy,
-    private characterTradingValidation: CharacterTradingValidation
+    private characterInventory: CharacterInventory,
+    private characterItemSlots: CharacterItemSlots,
+    private characterItemInventory: CharacterItemInventory,
+    private characterItemContainer: CharacterItemContainer,
+    private characterWeight: CharacterWeight
   ) {}
 
-  public async initializeBuy(marketplaceId: string, character: ICharacter): Promise<void> {
-    const mp = await this.characterTradingValidation.validateAndReturnMarketplace(marketplaceId, character);
-    if (!mp) {
-      return;
+  public async buyItem(character: ICharacter, marketplaceItem: IMarketplaceItem): Promise<boolean> {
+    const isTransactionValid = await this.validateBuyTransaction(character, marketplaceItem);
+    if (!isTransactionValid) {
+      return false;
     }
-    const marketplaceItems: ITradeResponseItem[] = [];
 
-    mp.items?.forEach(({ key }) => {
-      const item = itemsBlueprintIndex[key] as Shared.IItem;
-      const price = this.characterTradingBalance.getItemBuyPrice(key, MARKETPLACE_BUY_PRICE_MULTIPLIER);
-
-      if (price) {
-        marketplaceItems.push({ ...item, price });
-      }
-    });
-
-    const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
-
-    this.socketMessaging.sendEventToUser<ICharacterMarketplaceTradeInitBuyResponse>(
-      character.channelId!,
-      CharacterTradeSocketEvents.MarketplaceTradeInit,
-      {
-        marketplaceId: mp._id,
-        type: "buy",
-        items: marketplaceItems,
-        characterAvailableGold,
-      }
+    const decrementedGold = await this.characterItemInventory.decrementItemFromNestedInventoryByKey(
+      OthersBlueprint.GoldCoin,
+      character,
+      marketplaceItem.price
     );
+    if (!decrementedGold.success) {
+      return false;
+    }
+
+    const itemToBuy = marketplaceItem.item as unknown as IItem;
+    const inventory = await this.characterInventory.getInventory(character);
+    const inventoryContainerId = inventory?.itemContainer as unknown as string;
+
+    const wasItemAddedToContainer = await this.characterItemContainer.addItemToContainer(
+      itemToBuy,
+      character,
+      inventoryContainerId
+    );
+    if (!wasItemAddedToContainer) {
+      return false;
+    }
+
+    await this.characterWeight.updateCharacterWeight(character);
+
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
+
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      inventory: inventoryContainer,
+      openEquipmentSetOnUpdate: false,
+      openInventoryOnUpdate: true,
+    };
+
+    this.characterTradingBuy.sendRefreshItemsEvent(payloadUpdate, character);
+
+    await clearCacheForKey(`${character._id}-inventory`);
+
+    await this.addMoneyToSellerMarketplaceBalance(marketplaceItem);
+
+    await marketplaceItem.delete();
+
+    return true;
   }
 
-  public buyItems(character: ICharacter, marketplace: IMarketplace, items: ITradeRequestItem[]): Promise<boolean> {
-    return this.characterTradingBuy.buyItems(character, marketplace, items, TradingEntity.Marketplace);
+  private async addMoneyToSellerMarketplaceBalance(marketplaceItem: IMarketplaceItem): Promise<boolean> {
+    const seller = marketplaceItem.owner as unknown as string;
+
+    let marketplaceOwnerBalance = await MarketplaceMoney.findOne({ owner: seller });
+    if (!marketplaceOwnerBalance) {
+      marketplaceOwnerBalance = new MarketplaceMoney({ owner: seller, money: 0 });
+      await marketplaceOwnerBalance.save();
+    }
+
+    const updatedMoney = marketplaceOwnerBalance.money + marketplaceItem.price;
+    await marketplaceOwnerBalance.updateOne({ money: updatedMoney });
+
+    const sellerCharacter = await Character.findById(seller);
+    if (sellerCharacter?.isOnline) {
+      this.socketMessaging.sendEventToUser<IMarketplaceAvailableMoneyNotification>(
+        sellerCharacter?.channelId!,
+        MarketplaceSocketEvents.AvailableMoneyNotification,
+        {
+          moneyAvailable: updatedMoney,
+        }
+      );
+    }
+
+    return true;
+  }
+
+  private async validateBuyTransaction(character: ICharacter, marketplaceItem: IMarketplaceItem): Promise<boolean> {
+    await marketplaceItem.updateOne({ isBeingBought: true });
+
+    const inventory = await this.characterInventory.getInventory(character);
+    const inventoryContainerId = inventory?.itemContainer as unknown as string;
+    if (!inventoryContainerId) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "You don't have an inventory.");
+      return false;
+    }
+
+    const hasAvailableSlot = await this.characterItemSlots.hasAvailableSlot(
+      inventoryContainerId,
+      marketplaceItem.item as unknown as IItem
+    );
+    if (!hasAvailableSlot) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "You don't have enough space in your inventory.");
+      return false;
+    }
+
+    const characterAvailableGold = await this.characterTradingBalance.getTotalGoldInInventory(character);
+    if (characterAvailableGold < marketplaceItem.price) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "You don't have enough gold.");
+      return false;
+    }
+
+    return true;
   }
 }

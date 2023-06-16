@@ -39,7 +39,6 @@ export class NPCManager {
     private pm2Helper: PM2Helper,
     private specialEffect: SpecialEffect,
     private inMemoryHashTable: InMemoryHashTable,
-
     private newRelic: NewRelic
   ) {}
 

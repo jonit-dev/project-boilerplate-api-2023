@@ -1,11 +1,11 @@
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { container } from "@providers/inversify/container";
-import { NPCExperience } from "../NPCExperience";
+import { NPCExperienceCalculator } from "../NPCExperienceCalculator";
 
-describe("NPCExperience", () => {
-  let npcExperience: NPCExperience;
+describe("NPCExperienceCalculator", () => {
+  let npcExperience: NPCExperienceCalculator;
   beforeAll(() => {
-    npcExperience = container.get<NPCExperience>(NPCExperience);
+    npcExperience = container.get<NPCExperienceCalculator>(NPCExperienceCalculator);
   });
   beforeEach(async () => {});
   afterEach(() => {

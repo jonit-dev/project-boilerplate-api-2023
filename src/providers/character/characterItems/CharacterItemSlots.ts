@@ -185,6 +185,36 @@ export class CharacterItemSlots {
     return false;
   }
 
+  public async getAvailableQuantityOnSlotToStack(
+    targetContainerId: string,
+    itemKeyToBeAdded: string,
+    qty: number
+  ): Promise<number> {
+    const targetContainer = (await ItemContainer.findById(targetContainerId)) as unknown as IItemContainer;
+
+    for (const slotItem of Object.values(targetContainer.slots)) {
+      if (!slotItem) {
+        return qty;
+      } else if (slotItem as unknown as IItem) {
+        const slotItemKey = (slotItem as unknown as IItem).key;
+        const slotItemQty = (slotItem as unknown as IItem).stackQty;
+
+        if (slotItemKey === itemKeyToBeAdded && slotItemQty) {
+          const availableQty = (slotItem as unknown as IItem).maxStackSize - slotItemQty;
+          if (availableQty === 0) continue;
+
+          if (qty <= availableQty) {
+            return qty;
+          }
+
+          return availableQty;
+        }
+      }
+    }
+
+    return 0;
+  }
+
   public async hasAvailableSlot(targetContainerId: string, itemToBeAdded: IItem): Promise<boolean> {
     const targetContainer = (await ItemContainer.findById(targetContainerId)) as unknown as IItemContainer;
 

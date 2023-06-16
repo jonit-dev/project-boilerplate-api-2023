@@ -4,7 +4,6 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Depot, IDepot } from "@entities/ModuleDepot/DepotModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { IMarketplace, Marketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { IQuest, Quest } from "@entities/ModuleQuest/QuestModel";
 import { QuestObjectiveInteraction, QuestObjectiveKill } from "@entities/ModuleQuest/QuestObjectiveModel";
@@ -681,13 +680,5 @@ export class UnitTestHelper {
     await this.addItemsToContainer(parentContainer, 1, [bag], [availableSlot]);
 
     return bagCont!;
-  }
-
-  public async createMockMarketplace(items?: Partial<IItem>[]): Promise<IMarketplace> {
-    const mp = new Marketplace({
-      name: "TestMarketplace",
-      items,
-    });
-    return (await mp.save()) as IMarketplace;
   }
 }

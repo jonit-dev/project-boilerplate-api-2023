@@ -20,6 +20,7 @@ import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemSubType, ItemType } fro
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import { NPC_CYCLES } from "./NPCCycle";
+import { NPCExperience } from "./NPCExperience/NPCExperience";
 import { NPCFreezer } from "./NPCFreezer";
 import { calculateGold } from "./NPCGold";
 import { NPCSpawn } from "./NPCSpawn";
@@ -34,7 +35,8 @@ export class NPCDeath {
     private itemOwnership: ItemOwnership,
     private itemRarity: ItemRarity,
     private npcFreezer: NPCFreezer,
-    private npcSpawn: NPCSpawn
+    private npcSpawn: NPCSpawn,
+    private npcExperience: NPCExperience
   ) {}
 
   public async handleNPCDeath(npc: INPC): Promise<void> {
@@ -65,6 +67,8 @@ export class NPCDeath {
       await this.clearNPCBehavior(npc);
 
       await this.updateNPCAfterDeath(npc);
+
+      await this.npcExperience.releaseXP(npc as INPC);
     } catch (error) {
       console.error(error);
     }

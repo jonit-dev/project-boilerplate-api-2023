@@ -34,6 +34,7 @@ export class CharacterItemStack {
           character,
           "Sorry, there are no available slots in your container."
         );
+        return false;
       }
 
       const allItemsSameKey = await this.characterItemSlots.getAllItemsFromKey(targetContainer, itemToBeAdded.key);

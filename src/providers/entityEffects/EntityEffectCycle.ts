@@ -3,7 +3,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
-import { container, newRelic, skillIncrease } from "@providers/inversify/container";
+import { container, newRelic, npcExperience } from "@providers/inversify/container";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
@@ -48,7 +48,7 @@ export class EntityEffectCycle {
       const damage = await entityEffect.effect(target, attacker as ICharacter | INPC);
 
       if (target.type === EntityType.NPC && attacker) {
-        await skillIncrease.recordXPinBattle(attacker as ICharacter, target, damage);
+        await npcExperience.recordXPinBattle(attacker as ICharacter, target, damage);
       }
 
       const runAgain = remainingDurationMs === -1 || remainingDurationMs >= entityEffect.intervalMs;
@@ -63,7 +63,6 @@ export class EntityEffectCycle {
 
       if (!isAlive) {
         await this.handleDeath(target);
-        await skillIncrease.releaseXP(target as INPC);
       }
 
       if (!runAgain || !isAlive) {

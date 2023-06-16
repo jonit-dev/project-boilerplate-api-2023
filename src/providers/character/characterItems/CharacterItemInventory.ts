@@ -166,7 +166,7 @@ export class CharacterItemInventory {
     character: ICharacter,
     decrementQty: number
   ): Promise<IDecrementItemByKeyResult> {
-    const itemContainers = await ItemContainer.find({ owner: character._id });
+    const itemContainers = await ItemContainer.find({ owner: character._id, name: { $ne: "Depot" } });
 
     if (!itemContainers) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
@@ -280,8 +280,12 @@ export class CharacterItemInventory {
     for (let i = 0; i < container.slotQty; i++) {
       if (decrementQty <= 0) break;
 
-      const slotItem = container.slots[i] as unknown as IItem;
+      let slotItem = container.slots[i] as unknown as IItem;
       if (!slotItem) continue;
+
+      if (!slotItem.key) {
+        slotItem = (await Item.findById(slotItem as any)) as unknown as IItem;
+      }
 
       let result = true;
 

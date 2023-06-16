@@ -11,7 +11,6 @@ import { CharacterInventory } from "./CharacterInventory";
 import { CharacterValidation } from "./CharacterValidation";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
-import { IMarketplace, Marketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 
 @provide(CharacterTradingValidation)
@@ -47,25 +46,6 @@ export class CharacterTradingValidation {
     }
 
     return npc;
-  }
-
-  public async validateAndReturnMarketplace(
-    marketplaceId: string,
-    character: ICharacter
-  ): Promise<IMarketplace | undefined> {
-    const mp = await Marketplace.findOne({
-      _id: marketplaceId,
-    });
-
-    if (!mp || !mp.open) {
-      this.socketMessaging.sendErrorMessageToCharacter(
-        character,
-        "Sorry, the Marketplace you're trying to trade with is not available."
-      );
-      return;
-    }
-
-    return mp;
   }
 
   public validateTransaction(

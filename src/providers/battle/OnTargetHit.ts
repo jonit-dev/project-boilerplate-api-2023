@@ -3,8 +3,8 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { NPCDeath } from "@providers/npc/NPCDeath";
+import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { QuestSystem } from "@providers/quest/QuestSystem";
-import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EntityType, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -16,10 +16,10 @@ export class OnTargetHit {
   constructor(
     private characterDeath: CharacterDeath,
     private npcDeath: NPCDeath,
-    private skillIncrease: SkillIncrease,
     private questSystem: QuestSystem,
     private battleEffects: BattleEffects,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private npcExperience: NPCExperience
   ) {}
 
   async execute(target: ICharacter | INPC, attacker: ICharacter | INPC, damage: number): Promise<void> {
@@ -45,10 +45,10 @@ export class OnTargetHit {
   }
 
   private async handleSkillIncrease(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
-    await this.skillIncrease.recordXPinBattle(attacker, target, damage);
+    await this.npcExperience.recordXPinBattle(attacker, target, damage);
 
     if (target.type === EntityType.NPC && !target.isAlive) {
-      await this.skillIncrease.releaseXP(target as INPC);
+      await this.npcExperience.releaseXP(target as INPC);
     }
   }
 

@@ -2,8 +2,8 @@ import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { EXP_RATIO } from "@providers/constants/SkillConstants";
 import { provide } from "inversify-binding-decorators";
 
-@provide(NPCExperience)
-export class NPCExperience {
+@provide(NPCExperienceCalculator)
+export class NPCExperienceCalculator {
   public calculateExperience(baseHealth: number, skills: Partial<ISkill>): number {
     return calculateExperience(baseHealth, skills);
   }
