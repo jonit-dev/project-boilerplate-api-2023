@@ -14,6 +14,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "../DepotSystem";
 import { WithdrawItem } from "../WithdrawItem";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 
 @provide(DepotNetworkWithdraw)
 export class DepotNetworkWithdraw {

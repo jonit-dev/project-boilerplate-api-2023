@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { MARKETPLACE_SELL_PRICE_MULTIPLIER, TRADER_SELL_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
+import { TRADER_SELL_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
@@ -51,11 +51,9 @@ export class CharacterTradingSell {
 
     items = this.mergeSameItems(items);
 
-    let isValid: boolean;
+    let isValid = false;
     if (entityType === TradingEntity.NPC) {
       isValid = await this.characterTradingValidation.validateSellTransactionForNPC(character, npc!, items);
-    } else {
-      isValid = await this.characterTradingValidation.validateSellTransaction(character, items);
     }
 
     if (!isValid) {
@@ -188,7 +186,7 @@ export class CharacterTradingSell {
   ): Promise<ITradeResponseItem[] | undefined> {
     const responseItems: ITradeResponseItem[] = [];
     const uniqueItems: string[] = [];
-    let priceMultiplier: number;
+    let priceMultiplier = 1;
 
     const container = await this.characterItemContainer.getItemContainer(character);
     if (!container) {
@@ -207,8 +205,6 @@ export class CharacterTradingSell {
 
     if (tradingEntity === TradingEntity.NPC) {
       priceMultiplier = TRADER_SELL_PRICE_MULTIPLIER;
-    } else {
-      priceMultiplier = MARKETPLACE_SELL_PRICE_MULTIPLIER;
     }
 
     for (const itemKey of uniqueItems) {

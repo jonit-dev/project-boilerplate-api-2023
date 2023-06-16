@@ -1,9 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { IMarketplace } from "@entities/ModuleMarketplace/MarketplaceModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { MARKETPLACE_BUY_PRICE_MULTIPLIER, TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
+import { TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -37,7 +36,7 @@ export class CharacterTradingBuy {
 
   public async buyItems(
     character: ICharacter,
-    tradingEntity: INPC | IMarketplace,
+    tradingEntity: INPC,
     items: ITradeRequestItem[],
     tradingEntityType: TradingEntity
   ): Promise<boolean> {
@@ -56,16 +55,12 @@ export class CharacterTradingBuy {
     }
 
     let tradingEntityItems: Partial<IItem>[] = [];
-    let priceMultiplier: number;
+    let priceMultiplier = 1;
 
     if (tradingEntityType === TradingEntity.NPC) {
       priceMultiplier = TRADER_BUY_PRICE_MULTIPLIER;
       const entity = tradingEntity as INPC;
       tradingEntityItems = entity.traderItems as unknown as Partial<IItem>[];
-    } else {
-      priceMultiplier = MARKETPLACE_BUY_PRICE_MULTIPLIER;
-      const entity = tradingEntity as IMarketplace;
-      tradingEntityItems = entity.items as unknown as Partial<IItem>[];
     }
 
     for (const purchasedItem of items) {
@@ -176,12 +171,12 @@ export class CharacterTradingBuy {
 
   public async validateBuyTransaction(
     character: ICharacter,
-    tradingEntity: INPC | IMarketplace,
+    tradingEntity: INPC,
     itemsToPurchase: ITradeRequestItem[],
     tradingEntityType: TradingEntity
   ): Promise<boolean> {
     let isBaseTransactionValid = false;
-    let priceModifier: number;
+    let priceModifier = 1;
     let tradingItems: Partial<IItem>[] = [];
 
     if (tradingEntityType === TradingEntity.NPC) {
@@ -193,17 +188,6 @@ export class CharacterTradingBuy {
         itemsToPurchase
       );
       tradingItems = entity.traderItems as unknown as Partial<IItem>[];
-    } else {
-      // trading with Marketplace
-      priceModifier = MARKETPLACE_BUY_PRICE_MULTIPLIER;
-      const entity = tradingEntity as IMarketplace;
-      isBaseTransactionValid = this.characterTradingValidation.validateTransaction(
-        character,
-        entity.items as unknown as Partial<IItem>[],
-        itemsToPurchase,
-        tradingEntityType
-      );
-      tradingItems = entity.items as unknown as Partial<IItem>[];
     }
 
     if (!isBaseTransactionValid) {
