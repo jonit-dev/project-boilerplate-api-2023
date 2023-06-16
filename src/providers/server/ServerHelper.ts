@@ -1,11 +1,11 @@
+import { database, socketAdapter } from "@providers/inversify/container";
+import { CharacterSocketEvents } from "@rpg-engine/shared";
+import { Server } from "http";
 import { provide } from "inversify-binding-decorators";
 import { appEnv } from "../config/env";
 import { ConsoleHelper } from "../console/ConsoleHelper";
 import { TS } from "../translation/TranslationHelper";
 import { IServerBootstrapVars } from "../types/ServerTypes";
-import { database, socketAdapter } from "@providers/inversify/container";
-import { Server } from "http";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
 
 @provide(ServerHelper)
 export class ServerHelper {
@@ -53,17 +53,17 @@ export class ServerHelper {
     ];
 
     terminationSignals.forEach((termination) => {
-      process.on(termination.signal, async () => {
+      process.on(termination.signal, () => {
         try {
           console.info(`🛑 ${termination.signal} signal received, gracefully shutting down the server...`);
 
-          socketAdapter.emitToAllUsers(CharacterSocketEvents.CharacterForceDisconnect); //TODO: Use an event name to inform players that they are getting disconnected because the server is restarting
+          socketAdapter.emitToAllUsers(CharacterSocketEvents.CharacterForceDisconnect); // TODO: Use an event name to inform players that they are getting disconnected because the server is restarting
 
           server.close(() => {
             console.info("✅ Express server closed successfully");
 
             setTimeout(async () => {
-              //to finish all methods running in time
+              // to finish all methods running in time
               console.info("🛑 Database connection closing");
 
               await database.close();

@@ -1,12 +1,12 @@
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { MarketplaceItemAddRemove } from "../MarketplaceItemAddRemove";
-import { MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { Types } from "mongoose";
+import { MarketplaceItemAddRemove } from "../MarketplaceItemAddRemove";
 
 describe("MarketplaceItemAddRemove.ts", () => {
   let marketplaceItemAddRemove: MarketplaceItemAddRemove;
@@ -15,7 +15,7 @@ describe("MarketplaceItemAddRemove.ts", () => {
   let testItem: IItem;
   let testNPC: INPC;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     marketplaceItemAddRemove = container.get(MarketplaceItemAddRemove);
     characterInventory = container.get(CharacterInventory);
   });
