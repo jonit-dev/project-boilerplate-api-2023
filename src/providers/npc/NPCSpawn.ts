@@ -46,6 +46,8 @@ export class NPCSpawn {
           y: npc.initialY,
           nextSpawnTime: undefined,
           xpReleased: false,
+          xpReleasing: false,
+          xpToRelease: [],
         },
       }
     );
