@@ -53,10 +53,20 @@ export class NPCExperience {
   public async releaseXP(target: INPC): Promise<void> {
     await this.time.waitForMilliseconds(random(0, 200)); // add artificial delay to avoid concurrency
 
-    if (target.health > 0 || target.xpReleased) {
-      // if target stills alive, he cant release XP.
+    // refresh target in case it was updated in the meantime
+    const { xpReleased, xpReleasing } = (await NPC.findById(target._id)
+      .lean()
+      .select("xpToRelease xpReleasing health")) as INPC;
+
+    if (xpReleased || xpReleasing) {
+      // clean up xpToRelease array
+      await NPC.updateOne({ _id: target._id }, { xpToRelease: [] });
+
+      // if target is still alive, or XP is already released, or XP is currently being released, then return
       return;
     }
+
+    await NPC.updateOne({ _id: target._id }, { xpReleasing: true });
 
     let levelUp = false;
     let previousLevel = 0;
