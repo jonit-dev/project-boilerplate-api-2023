@@ -42,10 +42,10 @@ container.load(
   useCasesControllers
 );
 
-export const db = container.get<Database>(Database);
+export const database = container.get<Database>(Database);
 export const cronJobs = container.get<Cronjob>(Cronjob);
 export const seeds = container.get<Seeder>(Seeder);
-export const server = container.get<ServerHelper>(ServerHelper);
+export const serverHelper = container.get<ServerHelper>(ServerHelper);
 export const socketAdapter = container.get<SocketAdapter>(SocketAdapter);
 
 export const mapLoader = container.get<MapLoader>(MapLoader);

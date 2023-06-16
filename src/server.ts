@@ -5,11 +5,11 @@ import "express-async-errors";
 import { appEnv } from "@providers/config/env";
 import {
   cronJobs,
-  db,
+  database,
   mapLoader,
   newRelic,
   redisManager,
-  server,
+  serverHelper,
   serverBootstrap,
   socketAdapter,
 } from "@providers/inversify/container";
@@ -27,12 +27,12 @@ if (!appEnv.general.IS_UNIT_TEST) {
   require("newrelic");
 }
 
-app.listen(port, async () => {
+const server = app.listen(port, async () => {
   await newRelic.trackTransaction(
     NewRelicTransactionCategory.Operation,
     "ServerBootstrap",
     async () => {
-      server.showBootstrapMessage({
+      serverHelper.showBootstrapMessage({
         appName: appEnv.general.APP_NAME!,
         port: appEnv.general.SERVER_PORT!,
         timezone: appEnv.general.TIMEZONE!,
@@ -41,7 +41,7 @@ app.listen(port, async () => {
         phoneLocale: appEnv.general.PHONE_LOCALE!,
       });
 
-      await db.init();
+      await database.initialize();
       await redisManager.connect();
 
       cronJobs.start();
@@ -77,8 +77,12 @@ app.listen(port, async () => {
           // We recommend adjusting this value in production
           tracesSampleRate: 1.0,
         });
+
+        console.log(`✅ Application started succesfully on PMID ${process.env.pm_id}`);
       }
     },
     appEnv.general.ENV === EnvType.Development
   );
 });
+
+serverHelper.gracefullyShutdown(server);
