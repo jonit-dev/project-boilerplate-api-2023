@@ -2,7 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import { IUIShowMessage, MapLayers, ToGridX, ToGridY, UISocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBan } from "../CharacterBan";
@@ -54,18 +54,18 @@ export class CharacterMovementValidation {
       return false;
     }
 
-    // const isSolid = await this.movementHelper.isSolid(
-    //   character.scene,
-    //   ToGridX(newX),
-    //   ToGridY(newY),
-    //   MapLayers.Character
-    // );
+    const isSolid = await this.movementHelper.isSolid(
+      character.scene,
+      ToGridX(newX),
+      ToGridY(newY),
+      MapLayers.Character
+    );
 
-    // if (isSolid) {
-    //   console.log(`🚫 ${character.name} is trying to move to a solid!`);
+    if (isSolid) {
+      console.log(`🚫 ${character.name} is trying to move to a solid!`);
 
-    //   return false;
-    // }
+      return false;
+    }
 
     return true;
   }
