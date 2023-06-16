@@ -3,9 +3,9 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { NPCDeath } from "@providers/npc/NPCDeath";
+import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { QuestSystem } from "@providers/quest/QuestSystem";
-import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -19,10 +19,10 @@ export class BattleAttackTargetDeath {
     private characterDeath: CharacterDeath,
     private npcTarget: NPCTarget,
     private npcDeath: NPCDeath,
-    private skillIncrease: SkillIncrease,
     private questSystem: QuestSystem,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private npcExperience: NPCExperience
   ) {}
 
   public async handleDeathAfterHit(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
@@ -56,7 +56,7 @@ export class BattleAttackTargetDeath {
 
   private async handleNPCDeath(attacker: ICharacter | INPC, targetNPC: INPC): Promise<void> {
     await this.npcDeath.handleNPCDeath(targetNPC);
-    await this.skillIncrease.releaseXP(targetNPC);
+    await this.npcExperience.releaseXP(targetNPC);
 
     if (attacker instanceof Character) {
       await this.questSystem.updateQuests(QuestType.Kill, attacker as ICharacter, targetNPC.key);

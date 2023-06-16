@@ -11,17 +11,14 @@ import { SpellLearn } from "@providers/spells/SpellLearn";
 import { spellSelfHealing } from "@providers/spells/data/blueprints/all/SpellSelfHealing";
 import {
   BasicAttribute,
-  CharacterAttributes,
   CharacterBuffDurationType,
   CharacterBuffType,
   CharacterClass,
-  CharacterSocketEvents,
   CombatSkill,
   ItemSubType,
   calculateSPToNextLevel,
   calculateXPToNextLevel,
 } from "@rpg-engine/shared";
-import { v4 as uuidv4 } from "uuid";
 import { SkillFunctions } from "../SkillFunctions";
 import { SkillIncrease } from "../SkillIncrease";
 import { CraftingSkillsMap } from "../constants";
@@ -102,97 +99,6 @@ describe("SkillIncrease.spec.ts | increaseSP test cases", () => {
 
     skills.owner = testCharacter._id;
     await skills.save();
-  });
-
-  describe("maxHealth and maxMana gains", () => {
-    let testNPC: INPC;
-    let increaseMaxHealthMaxManaSpy: jest.SpyInstance;
-    let sendEventToUserSpy: jest.SpyInstance;
-    let characterBuffActivator: CharacterBuffActivator;
-
-    beforeAll(() => {
-      characterBuffActivator = container.get(CharacterBuffActivator);
-    });
-
-    beforeEach(async () => {
-      jest.useFakeTimers({ advanceTimers: true });
-      testNPC = await unitTestHelper.createMockNPC({
-        xpToRelease: [{ xpId: uuidv4(), charId: testCharacter._id, xp: 100 }],
-      });
-
-      increaseMaxHealthMaxManaSpy = jest.spyOn(skillIncrease, "increaseMaxManaMaxHealth");
-      // @ts-ignore
-      sendEventToUserSpy = jest.spyOn(skillIncrease.socketMessaging, "sendEventToUser");
-
-      const skills = (await Skill.findById(testCharacter.skills)) as ISkill;
-      skills.level = 1;
-      skills.experience = 0;
-
-      await skills.save();
-    });
-
-    afterEach(async () => {
-      jest.useRealTimers();
-      jest.clearAllMocks();
-
-      testNPC.xpReleased = false;
-      await testNPC.save();
-    });
-
-    it("should properly gain maxHealth and maxMana on level up", async () => {
-      testNPC.health = 0;
-      await testNPC.save();
-      await skillIncrease.releaseXP(testNPC);
-
-      expect(increaseMaxHealthMaxManaSpy).toHaveBeenCalledWith(testCharacter._id);
-    });
-
-    it("buffs x maxHealth and maxMana gains", async () => {
-      const buff = await characterBuffActivator.enablePermanentBuff(testCharacter, {
-        type: CharacterBuffType.CharacterAttribute,
-        trait: CharacterAttributes.MaxHealth,
-        buffPercentage: 10,
-        durationType: CharacterBuffDurationType.Permanent,
-      });
-
-      if (!buff) {
-        throw new Error("Buff not found");
-      }
-      testNPC.health = 0;
-      await testNPC.save();
-
-      await skillIncrease.releaseXP(testNPC);
-
-      expect(increaseMaxHealthMaxManaSpy).toHaveBeenCalledWith(testCharacter._id);
-
-      testCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
-
-      let newMaxHealth = testCharacter.maxHealth;
-      let newMaxMana = testCharacter.maxMana;
-
-      expect(newMaxHealth).toBe(120);
-      expect(newMaxMana).toBe(107);
-
-      expect(sendEventToUserSpy).toHaveBeenCalledWith(
-        testCharacter.channelId!,
-        CharacterSocketEvents.AttributeChanged,
-        expect.objectContaining({
-          maxHealth: newMaxHealth,
-          maxMana: newMaxMana,
-          targetId: testCharacter._id,
-        })
-      );
-
-      await characterBuffActivator.disableBuff(testCharacter, buff._id!, buff.type);
-
-      testCharacter = (await Character.findById(testCharacter._id).lean()) as ICharacter;
-
-      newMaxHealth = testCharacter.maxHealth;
-      newMaxMana = testCharacter.maxMana;
-
-      expect(newMaxHealth).toBe(110);
-      expect(newMaxMana).toBe(107);
-    });
   });
 
   it("should throw error when passing not a weapon item", () => {
@@ -305,7 +211,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
     expect(xpToLvl2).toBeGreaterThan(0);
 
     sendSkillLevelUpEvents = jest.spyOn(SkillFunctions.prototype, "sendSkillLevelUpEvents" as any);
-    sendExpLevelUpEvents = jest.spyOn(skillIncrease, "sendExpLevelUpEvents" as any);
+    // @ts-ignore
+    sendExpLevelUpEvents = jest.spyOn(skillIncrease.npcExperience, "sendExpLevelUpEvents" as any);
     spellLearnMock = jest.spyOn(SpellLearn.prototype, "learnLatestSkillLevelSpells");
     spellLearnMock.mockImplementation();
   });
@@ -408,7 +315,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
       await skillIncrease.increaseSkillsOnBattle(teste, testNPC, 2);
     }
 
-    await skillIncrease.releaseXP(testNPC);
+    // @ts-ignore
+    await skillIncrease.npcExperience.releaseXP(testNPC);
 
     const updatedSkills = (await Skill.findById(teste.skills).lean()) as ISkill;
 

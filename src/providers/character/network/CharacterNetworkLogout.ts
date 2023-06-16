@@ -4,7 +4,7 @@ import { BattleCycle } from "@providers/battle/BattleCycle";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
-import { SkillIncrease } from "@providers/skill/SkillIncrease";
+import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -36,14 +36,14 @@ export class CharacterNetworkLogout {
     private characterView: CharacterView,
     private inMemoryHashTable: InMemoryHashTable,
     private spellLearn: SpellLearn,
-    private skillIncrease: SkillIncrease,
     private equipmentSlots: EquipmentSlots,
     private characterInventory: CharacterInventory,
     private characterItemContainer: CharacterItemContainer,
     private characterItems: CharacterItems,
     private characterMonitor: CharacterMonitor,
     private specialEffect: SpecialEffect,
-    private socketSessionControl: SocketSessionControl
+    private socketSessionControl: SocketSessionControl,
+    private skillStatsIncrease: SkillStatsIncrease
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -95,7 +95,7 @@ export class CharacterNetworkLogout {
           console.log(`- Spells have been updated in Character: ${character._id}`);
         }
 
-        await this.skillIncrease.increaseMaxManaMaxHealth(character._id);
+        await this.skillStatsIncrease.increaseMaxManaMaxHealth(character._id);
 
         const battleCycle = BattleCycle.battleCycles.get(data.id);
 

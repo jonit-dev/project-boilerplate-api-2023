@@ -1,9 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
-import { container } from "@providers/inversify/container";
 import { NPCDeath } from "@providers/npc/NPCDeath";
-import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -17,8 +15,6 @@ export class Execution {
   ) {}
 
   public async handleBerserkerExecution(attacker: ICharacter, target: ICharacter | INPC): Promise<void> {
-    const skillIncrease = container.get<SkillIncrease>(SkillIncrease);
-
     const targetId = target._id;
     const targetType = target.type as EntityType;
 
@@ -47,7 +43,6 @@ export class Execution {
           await this.characterDeath.handleCharacterDeath(attacker, target as ICharacter);
         } else if (targetType === EntityType.NPC) {
           await this.npcDeath.handleNPCDeath(target as INPC);
-          await skillIncrease.releaseXP(target as INPC);
         }
       }
     } catch (error) {

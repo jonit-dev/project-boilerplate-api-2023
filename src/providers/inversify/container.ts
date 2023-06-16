@@ -5,6 +5,7 @@ import { CharacterBuffActivator } from "@providers/character/characterBuff/Chara
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { RedisManager } from "@providers/database/RedisManager";
 import { MapLoader } from "@providers/map/MapLoader";
+import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { PM2Helper } from "@providers/server/PM2Helper";
@@ -13,6 +14,7 @@ import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
+import { SpellLearn } from "@providers/spells/SpellLearn";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
 import { Container } from "inversify";
@@ -73,4 +75,9 @@ export const socketSessionControl = container.get<SocketSessionControl>(SocketSe
 export const serverBootstrap = container.get<ServerBootstrap>(ServerBootstrap);
 
 export const newRelic = container.get<NewRelic>(NewRelic);
+
+export const spellLearn = container.get<SpellLearn>(SpellLearn);
+
+export const npcExperience = container.get<NPCExperience>(NPCExperience);
+
 export { container };

@@ -1,11 +1,21 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CUSTOM_SKILL_COOLDOWNS, SP_INCREASE_SECONDS_COOLDOWN } from "@providers/constants/SkillConstants";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 
 @provide(SkillGainValidation)
 export class SkillGainValidation {
-  public canUpdateSkills(attackerSkills: ISkill, skillName: string): boolean {
+  constructor(private characterValidation: CharacterValidation) {}
+
+  public canUpdateSkills(character: ICharacter, attackerSkills: ISkill, skillName: string): boolean {
+    const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
+
+    if (!hasBasicValidation) {
+      return false;
+    }
+
     const skill = attackerSkills[skillName];
 
     const lastSkillGain = skill.lastSkillGain || new Date();
