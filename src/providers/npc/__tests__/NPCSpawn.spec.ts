@@ -133,13 +133,13 @@ describe("NPCSpawn", () => {
       expect(spawnTime.getMinutes()).toEqual(expectedTime.getMinutes());
 
       // testing middle value
-      spawnTime = npcSpawn.calculateSpawnTime(72); // strengthLevel of 72 should result in spawnTime of 12 minutes
-      expectedTime = dayjs().add(12, "minutes").toDate();
+      spawnTime = npcSpawn.calculateSpawnTime(30); // strengthLevel of 30 should result in spawnTime of 5 minutes
+      expectedTime = dayjs().add(5, "minutes").toDate();
       expect(spawnTime.getMinutes()).toEqual(expectedTime.getMinutes());
 
       // testing upper boundary
-      spawnTime = npcSpawn.calculateSpawnTime(200); // should be capped at 20 minutes
-      expectedTime = dayjs().add(20, "minutes").toDate();
+      spawnTime = npcSpawn.calculateSpawnTime(200); // should be capped at 10 minutes
+      expectedTime = dayjs().add(10, "minutes").toDate();
       expect(spawnTime.getMinutes()).toEqual(expectedTime.getMinutes());
     });
   });

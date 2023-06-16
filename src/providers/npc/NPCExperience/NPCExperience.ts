@@ -12,6 +12,7 @@ import { SkillFunctions } from "@providers/skill/SkillFunctions";
 import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
+import { Time } from "@providers/time/Time";
 import {
   AnimationEffectKeys,
   DisplayTextSocketEvents,
@@ -24,10 +25,11 @@ import {
 } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+
+import random from "lodash/random";
+import uniqBy from "lodash/uniqBy";
 import { clearCacheForKey } from "speedgoose";
 import { v4 as uuidv4 } from "uuid";
-
 @provide(NPCExperience)
 export class NPCExperience {
   constructor(
@@ -39,7 +41,7 @@ export class NPCExperience {
     private skillBuff: SkillBuff,
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
-
+    private time: Time,
     private skillLvUpStatsIncrease: SkillStatsIncrease
   ) {}
 
@@ -49,6 +51,8 @@ export class NPCExperience {
    * characters and notifies them if leveled up
    */
   public async releaseXP(target: INPC): Promise<void> {
+    await this.time.waitForMilliseconds(random(0, 200)); // add artificial delay to avoid concurrency
+
     if (target.health > 0 || target.xpReleased) {
       // if target stills alive, he cant release XP.
       return;
@@ -60,7 +64,7 @@ export class NPCExperience {
     // Store the xp in the xpToRelease array
     // before adding the character to the array, check if the character already caused some damage
 
-    target.xpToRelease = _.uniqBy(target.xpToRelease, "xpId");
+    target.xpToRelease = uniqBy(target.xpToRelease, "xpId");
 
     while (target.xpToRelease && target.xpToRelease.length) {
       const record = target.xpToRelease.shift();
