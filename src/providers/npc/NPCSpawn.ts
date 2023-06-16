@@ -21,7 +21,7 @@ export class NPCSpawn {
   public calculateSpawnTime(strengthLevel: number): Date {
     let spawnTime = Math.round(strengthLevel / 6);
     spawnTime = Math.max(1, spawnTime); // ensure it's at least 1
-    spawnTime = Math.min(20, spawnTime); // ensure it's at most 20
+    spawnTime = Math.min(10, spawnTime); // ensure it's at most 20
 
     return dayjs(new Date()).add(spawnTime, "minutes").toDate();
   }

@@ -42,7 +42,7 @@ export const npcStoneGolem: Partial<INPC> = {
       level: 10,
     },
     resistance: {
-      level: 150,
+      level: 100,
     },
     magicResistance: {
       level: 60,

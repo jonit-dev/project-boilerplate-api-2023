@@ -72,13 +72,10 @@ describe("BattleAttackTargetDeath.spec.ts", () => {
     await testNPC.save();
 
     // @ts-ignore
-    const releaseXPSpy = jest.spyOn(battleAttackTargetDeath.npcExperience, "releaseXP");
-    // @ts-ignore
     const updateQuestsSpy = jest.spyOn(battleAttackTargetDeath.questSystem, "updateQuests");
 
     await battleAttackTargetDeath.handleDeathAfterHit(testCharacter, testNPC);
 
-    expect(releaseXPSpy).toHaveBeenCalledWith(testNPC);
     expect(updateQuestsSpy).toHaveBeenCalledWith(QuestType.Kill, testCharacter, testNPC.key);
   });
 });

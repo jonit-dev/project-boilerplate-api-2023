@@ -56,7 +56,6 @@ export class BattleAttackTargetDeath {
 
   private async handleNPCDeath(attacker: ICharacter | INPC, targetNPC: INPC): Promise<void> {
     await this.npcDeath.handleNPCDeath(targetNPC);
-    await this.npcExperience.releaseXP(targetNPC);
 
     if (attacker instanceof Character) {
       await this.questSystem.updateQuests(QuestType.Kill, attacker as ICharacter, targetNPC.key);

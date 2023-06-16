@@ -26,7 +26,7 @@ export class OnTargetHit {
     await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "OnTargetHit.execute", async () => {
       if (damage) {
         await this.generateBloodOnGround(target);
-        await this.handleSkillIncrease(attacker as ICharacter, target, damage);
+        await this.npcExperience.recordXPinBattle(attacker as ICharacter, target, damage);
       }
 
       if (!target.isAlive) {
@@ -41,14 +41,6 @@ export class OnTargetHit {
       await this.characterDeath.handleCharacterDeath(attacker, target as ICharacter);
     } else {
       await this.npcDeath.handleNPCDeath(target as INPC);
-    }
-  }
-
-  private async handleSkillIncrease(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
-    await this.npcExperience.recordXPinBattle(attacker, target, damage);
-
-    if (target.type === EntityType.NPC && !target.isAlive) {
-      await this.npcExperience.releaseXP(target as INPC);
     }
   }
 
