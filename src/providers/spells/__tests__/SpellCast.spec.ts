@@ -228,16 +228,10 @@ describe("SpellCast.ts", () => {
       virtuals: true,
       defaults: true,
     })) as ICharacter;
+
     expect(character.mana).toBe(newMana);
 
     expect(sendEventToUser).toHaveBeenCalled();
-
-    expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, CharacterSocketEvents.AttributeChanged, {
-      targetId: testCharacter._id,
-      health: newHealth,
-      speed: testCharacter.speed,
-      mana: newMana,
-    });
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,

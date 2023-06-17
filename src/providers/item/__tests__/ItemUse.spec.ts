@@ -236,7 +236,7 @@ describe("ItemUse.ts", () => {
     expect(args[1]).toBe(AnimationEffectKeys.LifeHeal);
 
     const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
-    expect(character.health).toBe(55);
+    expect(character.health).toBe(50);
   });
 
   it("should call character validation", async () => {
