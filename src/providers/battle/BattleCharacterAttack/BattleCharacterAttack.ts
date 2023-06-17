@@ -10,6 +10,7 @@ import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
+import { BattleTargeting } from "../BattleTargeting";
 import { BattleCharacterAttackValidation } from "./BattleCharacterAttackValidation";
 
 @provide(BattleCharacterAttack)
@@ -18,7 +19,8 @@ export class BattleCharacterAttack {
     private battleAttackTarget: BattleAttackTarget,
     private battleCharacterAttackValidation: BattleCharacterAttackValidation,
     private socketMessaging: SocketMessaging,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private battleTargeting: BattleTargeting
   ) {}
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
@@ -27,6 +29,10 @@ export class BattleCharacterAttack {
     } else {
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return;
+    }
+
+    if (character.target) {
+      await this.battleTargeting.cancelTargeting(character);
     }
 
     new BattleCycle(
