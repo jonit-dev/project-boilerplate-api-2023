@@ -535,6 +535,9 @@ describe("SpellCast.ts", () => {
       const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
       timerMock.mockImplementation();
 
+      await Skill.findByIdAndUpdate(targetCharacter.skills, { level: 8 });
+      await Skill.findByIdAndUpdate(testCharacter.skills, { level: 8 });
+
       const spell = { magicWords: "talas tamb-eth", targetId: targetCharacter._id, targetType: EntityType.Character };
       expect(await spellCast.castSpell(spell, testCharacter)).toBeTruthy();
 
