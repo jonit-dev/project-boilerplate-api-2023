@@ -35,12 +35,13 @@ import { CharacterView } from "../CharacterView";
 
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 
+import { BattleTargeting } from "@providers/battle/BattleTargeting";
 import { ItemCleaner } from "@providers/item/ItemCleaner";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
+import { CharacterBuffValidation } from "../characterBuff/CharacterBuffValidation";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
-import { CharacterBuffValidation } from "../characterBuff/CharacterBuffValidation";
 
 @provide(CharacterNetworkCreate)
 export class CharacterNetworkCreate {
@@ -63,7 +64,8 @@ export class CharacterNetworkCreate {
     private socketSessionControl: SocketSessionControl,
     private characterDeath: CharacterDeath,
     private itemCleaner: ItemCleaner,
-    private characterBuffValidation: CharacterBuffValidation
+    private characterBuffValidation: CharacterBuffValidation,
+    private battleTargeting: BattleTargeting
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -101,6 +103,7 @@ export class CharacterNetworkCreate {
         await this.itemCleaner.clearMissingReferences(character);
 
         await this.battleNetworkStopTargeting.stopTargeting(character);
+        await this.battleTargeting.cancelTargeting(character);
 
         await this.characterBuffValidation.removeDuplicatedBuffsForSameItem(character);
 

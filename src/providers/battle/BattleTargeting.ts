@@ -16,14 +16,22 @@ export class BattleTargeting {
 
   public async cancelTargeting(
     attacker: ICharacter,
-    reason: string,
-    targetId: string,
-    targetType: EntityType
+    reason?: string | undefined,
+    targetId?: string,
+    targetType?: EntityType
   ): Promise<void> {
     await this.newRelic.trackTransaction(
       NewRelicTransactionCategory.Operation,
       "BattleTargeting.cancelTargeting",
       async () => {
+        if (!targetId) {
+          targetId = attacker.target?.id?.toString();
+        }
+
+        if (!targetType) {
+          targetType = attacker.target?.type as unknown as EntityType;
+        }
+
         // if attacker has a target, cancel it and send message.
         if (attacker.target?.id?.toString() === targetId) {
           await this.battleNetworkStopTargeting.stopTargeting(attacker as unknown as ICharacter);
