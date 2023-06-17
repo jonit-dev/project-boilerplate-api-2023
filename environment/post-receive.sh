@@ -35,6 +35,6 @@ docker-compose stop rpg-api
 
 # Initialize container with new code
 echo "Restarting container..."
-docker-compose restart rpg-api
+docker-compose restart
 
 echo "Deployment complete."
