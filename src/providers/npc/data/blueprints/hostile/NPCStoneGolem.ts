@@ -34,9 +34,9 @@ export const npcStoneGolem: Partial<INPC> = {
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 80,
+    level: 120,
     strength: {
-      level: 80,
+      level: 100,
     },
     dexterity: {
       level: 10,
@@ -45,7 +45,7 @@ export const npcStoneGolem: Partial<INPC> = {
       level: 100,
     },
     magicResistance: {
-      level: 60,
+      level: 80,
     },
   },
   fleeOnLowHealth: true,
