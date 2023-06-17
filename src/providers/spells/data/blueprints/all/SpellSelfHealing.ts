@@ -1,7 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { AnimationEffectKeys, ISpell, SpellCastingType, SpellsBlueprint } from "@rpg-engine/shared";
+import { AnimationEffectKeys, BasicAttribute, ISpell, SpellCastingType, SpellsBlueprint } from "@rpg-engine/shared";
+import { SpellCalculator } from "../../abstractions/SpellCalculator";
 
 export const spellSelfHealing: Partial<ISpell> = {
   key: SpellsBlueprint.SelfHealingSpell,
@@ -14,12 +15,21 @@ export const spellSelfHealing: Partial<ISpell> = {
   manaCost: 10,
   minLevelRequired: 2,
   minMagicLevelRequired: 1,
-  cooldown: 5,
+  cooldown: 7,
   castingAnimationKey: AnimationEffectKeys.LifeHeal,
 
-  usableEffect: (character: ICharacter) => {
+  usableEffect: async (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, 10);
+    const spellCalculator = container.get(SpellCalculator);
+
+    const percentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 5,
+      max: 10,
+    });
+
+    const totalAmount = (character.maxHealth * percentage) / 100;
+
+    itemUsableEffect.apply(character, EffectableAttribute.Health, totalAmount);
   },
 };
