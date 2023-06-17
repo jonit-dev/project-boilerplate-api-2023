@@ -185,19 +185,15 @@ export class UseWithEntity {
       }
     }
 
-    const blueprint = itemsBlueprintIndex[item.key];
+    const blueprint = itemsBlueprintIndex[item.key]; //TODO Must be typed
+
+    const { health: healthBeforeHit } = target as ICharacter | INPC;
 
     const damage = await blueprint.usableEffect(caster, target, item);
     await target.save();
 
     // handle static item case
-    if ("isUsable" in target) {
-      if (target.isUsable) {
-        await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, caster, 1);
-      }
-    } else {
-      await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, caster, 1);
-    }
+    await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, caster, 1);
 
     await this.characterWeight.updateCharacterWeight(caster);
 
@@ -209,6 +205,7 @@ export class UseWithEntity {
 
     if (target.type === EntityType.Character || target.type === EntityType.NPC) {
       const transformedTarget = target as ICharacter | INPC;
+      transformedTarget["healthBeforeHit"] = healthBeforeHit;
 
       await this.sendTargetUpdateEvents(caster, transformedTarget);
       await this.onTargetHit.execute(transformedTarget, caster, damage);
