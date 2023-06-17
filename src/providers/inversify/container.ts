@@ -30,6 +30,7 @@ import {
   useCasesControllers,
   userControllerContainer,
 } from "./ControllersInversify";
+import PartyManagement from "@providers/party/PartyManagement";
 
 const container = new Container();
 
@@ -79,5 +80,7 @@ export const newRelic = container.get<NewRelic>(NewRelic);
 export const spellLearn = container.get<SpellLearn>(SpellLearn);
 
 export const npcExperience = container.get<NPCExperience>(NPCExperience);
+
+export const partyManagement = container.get<PartyManagement>(PartyManagement);
 
 export { container };
