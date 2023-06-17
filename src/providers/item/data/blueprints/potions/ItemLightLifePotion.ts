@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
-import round from "lodash/round";
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
+import { CraftingSkill, IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemLightLifePotion: IConsumableItemBlueprint = {
@@ -18,12 +18,19 @@ export const itemLightLifePotion: IConsumableItemBlueprint = {
   basePrice: 10,
   maxStackSize: 100,
   canSell: false,
-  usableEffect: (character: ICharacter) => {
+  usableEffect: async (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    const characterHealthPercentage = round(character.maxHealth * 0.05); // 5% of char max health
+    const spellCalculator = container.get(SpellCalculator);
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
+    const percentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, CraftingSkill.Alchemy, {
+      min: 5,
+      max: 10,
+    });
+
+    const totalAmount = (character.maxHealth * percentage) / 100;
+
+    itemUsableEffect.apply(character, EffectableAttribute.Health, totalAmount);
   },
-  usableEffectDescription: "Restores 5% of HP",
+  usableEffectDescription: "Restores 5-10% of health, based on Alchemy skill level",
 };

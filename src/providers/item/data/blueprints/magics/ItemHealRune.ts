@@ -1,11 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
 
 import { container } from "@providers/inversify/container";
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import {
   AnimationEffectKeys,
+  BasicAttribute,
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
@@ -30,7 +31,7 @@ export const itemHealRune: IRuneItemBlueprint = {
   canUseOnNonPVPZone: true,
   useWithMaxDistanceGrid: RangeTypes.Short,
   power: MagicPower.High,
-  minMagicLevelRequired: 8,
+  minMagicLevelRequired: RangeTypes.High,
   canSell: false,
   animationKey: AnimationEffectKeys.HitHeal,
   projectileAnimationKey: AnimationEffectKeys.Heal,
@@ -38,9 +39,17 @@ export const itemHealRune: IRuneItemBlueprint = {
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    const points = await calculateItemUseEffectPoints(MagicsBlueprint.HealRune, caster);
+    const spellCalculator = container.get(SpellCalculator);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, points);
+    const percentage = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+      min: 50,
+      max: 100,
+    });
+
+    const totalAmount = (caster.maxHealth * percentage) / 100;
+
+    itemUsableEffect.apply(target, EffectableAttribute.Health, totalAmount);
   },
-  usableEffectDescription: "Heals HP of target",
+
+  usableEffectDescription: "Restores 50-100% of health, based on Magic skill level",
 };

@@ -4,8 +4,10 @@ import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/It
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
 
 import { container } from "@providers/inversify/container";
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import {
   AnimationEffectKeys,
+  BasicAttribute,
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
@@ -38,7 +40,14 @@ export const itemDarkRune: IRuneItemBlueprint = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.DarkRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+    const spellCalculator = container.get(SpellCalculator);
+
+    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+      min: 2,
+      max: 4,
+    });
+
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
 
     return points;
   },
