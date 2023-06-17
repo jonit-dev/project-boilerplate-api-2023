@@ -49,8 +49,8 @@ export class BattleCharacterAttack {
               throw new Error("Failed to get updated character for attacking target.");
             }
 
-            const hasNoTarget = !updatedCharacter.target?.id.toString();
-            const hasDifferentTarget = updatedCharacter.target?.id.toString() !== target._id.toString();
+            const hasNoTarget = !updatedCharacter.target?.id?.toString();
+            const hasDifferentTarget = updatedCharacter.target?.id?.toString() !== target._id.toString();
 
             if (hasNoTarget || hasDifferentTarget) {
               await this.battleTargeting.cancelTargeting(updatedCharacter);
