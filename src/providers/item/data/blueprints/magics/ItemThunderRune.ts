@@ -3,9 +3,14 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
 
-import { container } from "@providers/inversify/container";
+import { characterBuffActivator, container } from "@providers/inversify/container";
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import {
   AnimationEffectKeys,
+  BasicAttribute,
+  CharacterAttributes,
+  CharacterBuffDurationType,
+  CharacterBuffType,
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
@@ -37,11 +42,45 @@ export const itemThunderRune: IRuneItemBlueprint = {
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    const points = await calculateItemUseEffectPoints(MagicsBlueprint.ThunderRune, caster);
+    const points = await calculateItemUseEffectPoints(MagicsBlueprint.EnergyBoltRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+    const spellCalculator = container.get(SpellCalculator);
+
+    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+      min: 2,
+      max: 4,
+    });
+
+    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+      min: 30,
+      max: 60,
+    });
+
+    const debuffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+      min: 20,
+      max: 35,
+    });
+
+    if (target.type === "Character") {
+      await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {
+        type: CharacterBuffType.CharacterAttribute,
+        trait: CharacterAttributes.Speed,
+        buffPercentage: -debuffPercentage,
+        durationSeconds: timeout,
+        durationType: CharacterBuffDurationType.Temporary,
+        options: {
+          messages: {
+            activation: `You're electrified, and your speed is reduced! (-${debuffPercentage}%)`,
+            deactivation: "You're no longer electrified!",
+          },
+        },
+      });
+    }
+
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
 
     return points;
   },
-  usableEffectDescription: "Deals thunder damage to the target",
+  usableEffectDescription:
+    "Deals a strong energy damage on the target based on your magic level, and also reduces its speed.",
 };

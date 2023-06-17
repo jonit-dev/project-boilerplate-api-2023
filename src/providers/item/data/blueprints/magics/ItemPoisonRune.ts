@@ -5,9 +5,11 @@ import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { entityEffectPoison } from "@providers/entityEffects/data/blueprints/entityEffectPoison";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
 import {
   AnimationEffectKeys,
+  BasicAttribute,
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
@@ -41,7 +43,14 @@ export const itemPoisonRune: IRuneItemBlueprint = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.PoisonRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+    const spellCalculator = container.get(SpellCalculator);
+
+    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+      min: 1,
+      max: 3,
+    });
+
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
 
     const entityEffectUse = container.get(EntityEffectUse);
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectPoison);

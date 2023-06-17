@@ -1,7 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { AnimationEffectKeys, ISpell, SpellCastingType, SpellsBlueprint } from "@rpg-engine/shared";
+import { AnimationEffectKeys, BasicAttribute, ISpell, SpellCastingType, SpellsBlueprint } from "@rpg-engine/shared";
+import { SpellCalculator } from "../../abstractions/SpellCalculator";
 
 export const spellGreaterHealing: Partial<ISpell> = {
   key: SpellsBlueprint.GreaterHealingSpell,
@@ -17,9 +18,18 @@ export const spellGreaterHealing: Partial<ISpell> = {
   cooldown: 15,
   castingAnimationKey: AnimationEffectKeys.LifeHeal,
 
-  usableEffect: (character: ICharacter) => {
+  usableEffect: async (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, 45);
+    const spellCalculator = container.get(SpellCalculator);
+
+    const percentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 10,
+      max: 25,
+    });
+
+    const totalAmount = (character.maxHealth * percentage) / 100;
+
+    itemUsableEffect.apply(character, EffectableAttribute.Health, totalAmount);
   },
 };

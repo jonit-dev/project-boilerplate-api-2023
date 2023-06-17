@@ -8,6 +8,7 @@ import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/en
 import { container } from "@providers/inversify/container";
 import {
   AnimationEffectKeys,
+  BasicAttribute,
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
@@ -15,6 +16,7 @@ import {
   RangeTypes,
 } from "@rpg-engine/shared";
 
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemFireBoltRune: IRuneItemBlueprint = {
@@ -38,15 +40,23 @@ export const itemFireBoltRune: IRuneItemBlueprint = {
   projectileAnimationKey: AnimationEffectKeys.Red,
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
+    const entityEffectUse = container.get(EntityEffectUse);
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireBoltRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+    const spellCalculator = container.get(SpellCalculator);
 
-    const entityEffectUse = container.get(EntityEffectUse);
+    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+      min: 2,
+      max: 4,
+    });
+
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
+
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);
 
     return points;
   },
-  usableEffectDescription: "Deals fire damage to the target",
+  usableEffectDescription:
+    "Deals fire damage to the target. Damage depends on your magic level and it gives a burning effect.",
 };

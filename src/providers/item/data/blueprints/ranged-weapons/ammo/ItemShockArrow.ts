@@ -17,4 +17,5 @@ export const itemShockArrow: IEquippableRangedAmmoBlueprint = {
   basePrice: 2,
   entityEffects: [EntityEffectBlueprint.Bleeding],
   entityEffectChance: 50,
+  canSell: false,
 };

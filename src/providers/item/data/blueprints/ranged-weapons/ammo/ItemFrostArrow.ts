@@ -17,4 +17,5 @@ export const itemFrostArrow: IEquippableRangedAmmoBlueprint = {
   basePrice: 10,
   entityEffects: [EntityEffectBlueprint.Freezing],
   entityEffectChance: 80,
+  canSell: false,
 };
