@@ -93,7 +93,7 @@ export class BattleNetworkInitTargeting {
             const hasTargetId = character?.target?.id?.toString();
 
             // prevents double targeting
-            if (battleCycle && hasTargetId) {
+            if (battleCycle || hasTargetId) {
               await this.battleTargeting.cancelTargeting(character);
               await this.battleNetworkStopTargeting.stopTargeting(character);
             }
