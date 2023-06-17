@@ -15,4 +15,5 @@ export const itemWoodenArrow: IEquippableRangedAmmoBlueprint = {
   maxStackSize: 999,
   basePrice: 0.05,
   isTraining: true,
+  canSell: false,
 };

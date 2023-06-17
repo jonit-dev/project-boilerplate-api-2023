@@ -14,4 +14,5 @@ export const itemIronArrow: IEquippableRangedAmmoBlueprint = {
   allowedEquipSlotType: [ItemSlotType.Accessory],
   basePrice: 3,
   attack: 12,
+  canSell: false,
 };
