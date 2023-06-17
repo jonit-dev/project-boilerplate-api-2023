@@ -48,6 +48,7 @@ export class NPCSpawn {
           xpReleased: false,
           xpReleasing: false,
           xpToRelease: [],
+          canDie: true,
         },
       }
     );

@@ -69,7 +69,7 @@ export class NPCFreezer {
     setInterval(async () => {
       const end = CPUusage(start);
       const totalCPUUsage = round(end.percent);
-      if (appEnv.general.ENV === EnvType.Development && appEnv.general.DEBUG_MODE) {
+      if (appEnv.general.DEBUG_MODE) {
         console.log(
           `NPC_CYCLES: ${NPC_CYCLES.size} NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size} CPU_USAGE: ${totalCPUUsage}%`
         );

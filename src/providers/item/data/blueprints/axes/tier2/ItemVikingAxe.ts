@@ -9,7 +9,7 @@ export const itemVikingAxe: IEquippableTwoHandedTier2WeaponBlueprint = {
   subType: ItemSubType.Axe,
   textureAtlas: "items",
   texturePath: "axes/viking-axe.png",
-  name: "Viking aAxe",
+  name: "Viking Axe",
   description:
     "An axe with a broad, single-edged blade and a short, curved handle. It was commonly used by the Vikings in battle and is associated with Norse mythology.",
   attack: 32,

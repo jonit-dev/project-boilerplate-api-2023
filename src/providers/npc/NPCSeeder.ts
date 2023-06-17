@@ -81,6 +81,7 @@ export class NPCSeeder {
         xpReleased: false,
         xpReleasing: false,
         xpToRelease: [],
+        canDie: true,
       } as any;
 
       if (randomMaxHealth) {

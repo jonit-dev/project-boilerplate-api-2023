@@ -172,6 +172,9 @@ const npcSchema = createLeanSchema(
       default: false,
       required: true,
     }),
+    canDie: Type.boolean({
+      default: true,
+    }),
     isTrader: Type.boolean({}),
     traderItems: Type.array().of({
       key: Type.string({ required: true }),

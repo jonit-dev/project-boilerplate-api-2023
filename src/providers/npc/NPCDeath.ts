@@ -16,6 +16,7 @@ import { ItemRarity } from "@providers/item/ItemRarity";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { Time } from "@providers/time/Time";
 import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
@@ -36,18 +37,24 @@ export class NPCDeath {
     private itemRarity: ItemRarity,
     private npcFreezer: NPCFreezer,
     private npcSpawn: NPCSpawn,
-    private npcExperience: NPCExperience
+    private npcExperience: NPCExperience,
+    private time: Time
   ) {}
 
   public async handleNPCDeath(npc: INPC): Promise<void> {
-    try {
-      // first thing, lets freeze the NPC so it clears all the interval and it stops moving.
-      await this.npcFreezer.freezeNPC(npc);
+    // first thing, lets freeze the NPC so it clears all the interval and it stops moving.
+    await this.npcFreezer.freezeNPC(npc);
 
-      if (npc.xpReleased || npc.xpReleasing) {
+    await this.time.waitForMilliseconds(random(1, 100));
+
+    try {
+      if (npc.xpReleased || npc.xpReleasing || !npc.canDie) {
         // if the npc already released the xp, just return. Probably a bug?
         return;
       }
+      await NPC.findOneAndUpdate({ _id: npc._id }, { $set: { canDie: false } });
+
+      console.log("NPCDeath for npc: ", npc.key);
 
       if (npc.health !== 0) {
         // if by any reason the char is not dead, make sure it is.
@@ -115,6 +122,8 @@ export class NPCDeath {
   }
 
   private async updateNPCAfterDeath(npc: INPC): Promise<void> {
+    await this.time.waitForMilliseconds(random(1, 100));
+
     const skills = (await Skill.findById(npc.skills)
       .lean()
       .cacheQuery({
@@ -140,6 +149,7 @@ export class NPCDeath {
           appliedEntityEffects: undefined,
           isBehaviorEnabled: false,
           xpReleased: false,
+          canDie: true,
         },
       }
     );

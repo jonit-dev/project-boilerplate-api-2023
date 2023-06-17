@@ -10,7 +10,7 @@ import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { PM2Helper } from "@providers/server/PM2Helper";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
-import { NPCCycle } from "./NPCCycle";
+import { NPCCycle, NPC_CYCLES } from "./NPCCycle";
 import { NPCFreezer } from "./NPCFreezer";
 import { NPCLoader } from "./NPCLoader";
 import { NPCView } from "./NPCView";
@@ -92,6 +92,11 @@ export class NPCManager {
         cacheKey: `npc-${npc.id}-skills`,
         ttl: 60 * 60 * 24 * 7,
       });
+
+      // prevent double behavior loop
+      if (NPC_CYCLES.has(npc.id)) {
+        return;
+      }
 
       new NPCCycle(
         npc.id,
