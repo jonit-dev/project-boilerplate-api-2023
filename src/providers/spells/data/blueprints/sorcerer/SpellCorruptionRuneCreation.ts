@@ -12,7 +12,7 @@ export const spellCorruptionRuneCreation: Partial<ISpell> = {
   description: "A spell that converts a blank rune, in your inventory, into corruption rune.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar ansr umbra",
-  manaCost: 50,
+  manaCost: 180,
   minLevelRequired: 8,
   minMagicLevelRequired: 6,
   cooldown: 5,
