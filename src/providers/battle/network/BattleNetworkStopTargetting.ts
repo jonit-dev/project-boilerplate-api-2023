@@ -18,7 +18,7 @@ export class BattleNetworkStopTargeting {
   public async stopTargeting(character: ICharacter): Promise<void> {
     try {
       if (character) {
-        await Character.updateOne({ _id: character._id }, { $unset: { target: 1 } });
+        await Character.updateOne({ _id: character._id }, { $unset: { target: 1 }, $set: { isBattleActive: false } });
 
         const battleCycle = BattleCycle.battleCycles.get(character.id);
 

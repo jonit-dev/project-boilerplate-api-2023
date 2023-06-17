@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -16,8 +17,9 @@ import {
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { BattleCharacterAttack } from "../BattleCharacterAttack/BattleCharacterAttack";
+import { BattleCycle } from "../BattleCycle";
+import { BattleTargeting } from "../BattleTargeting";
 import { BattleNetworkStopTargeting } from "./BattleNetworkStopTargetting";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 interface ITargetValidation {
   isValid: boolean;
@@ -33,7 +35,8 @@ export class BattleNetworkInitTargeting {
     private battleCharacterManager: BattleCharacterAttack,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private mapNonPVPZone: MapNonPVPZone,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private battleTargeting: BattleTargeting
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
@@ -85,6 +88,16 @@ export class BattleNetworkInitTargeting {
               }
             );
           } else {
+            const battleCycle = BattleCycle.battleCycles.has(character._id);
+
+            const hasTargetId = character?.target?.id?.toString();
+
+            // prevents double targeting
+            if (battleCycle && hasTargetId) {
+              await this.battleTargeting.cancelTargeting(character);
+              await this.battleNetworkStopTargeting.stopTargeting(character);
+            }
+
             await this.characterSetTargeting(character, target, data.type);
           }
           // validate if character actually can set this target
@@ -100,8 +113,6 @@ export class BattleNetworkInitTargeting {
     target: ICharacter | INPC,
     targetType: EntityType
   ): Promise<void> {
-    await this.battleNetworkStopTargeting.stopTargeting(character);
-
     await Character.updateOne(
       { _id: character._id },
       {

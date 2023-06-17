@@ -29,7 +29,11 @@ export class BattleTargeting {
         }
 
         if (!targetType) {
-          targetType = attacker.target?.type as unknown as EntityType;
+          targetType = attacker.target?.type?.toString() as EntityType;
+        }
+
+        if (!targetId || !targetType) {
+          return;
         }
 
         // if attacker has a target, cancel it and send message.

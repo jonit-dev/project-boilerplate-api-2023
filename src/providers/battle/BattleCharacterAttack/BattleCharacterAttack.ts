@@ -11,6 +11,7 @@ import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
 import { BattleTargeting } from "../BattleTargeting";
+import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
 import { BattleCharacterAttackValidation } from "./BattleCharacterAttackValidation";
 
 @provide(BattleCharacterAttack)
@@ -20,7 +21,8 @@ export class BattleCharacterAttack {
     private battleCharacterAttackValidation: BattleCharacterAttackValidation,
     private socketMessaging: SocketMessaging,
     private newRelic: NewRelic,
-    private battleTargeting: BattleTargeting
+    private battleTargeting: BattleTargeting,
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting
   ) {}
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
@@ -29,10 +31,6 @@ export class BattleCharacterAttack {
     } else {
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return;
-    }
-
-    if (character.target) {
-      await this.battleTargeting.cancelTargeting(character);
     }
 
     new BattleCycle(
@@ -49,6 +47,15 @@ export class BattleCharacterAttack {
 
             if (!updatedCharacter) {
               throw new Error("Failed to get updated character for attacking target.");
+            }
+
+            const hasNoTarget = !updatedCharacter.target?.id.toString();
+            const hasDifferentTarget = updatedCharacter.target?.id.toString() !== target._id.toString();
+
+            if (hasNoTarget || hasDifferentTarget) {
+              await this.battleTargeting.cancelTargeting(updatedCharacter);
+              await this.battleNetworkStopTargeting.stopTargeting(updatedCharacter);
+              return;
             }
 
             const characterSkills = (await Skill.findOne({ owner: character._id })
