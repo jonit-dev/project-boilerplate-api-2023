@@ -52,12 +52,9 @@ describe("SkillStatsIncrease", () => {
       await skills.save();
     });
 
-    afterEach(async () => {
+    afterEach(() => {
       jest.useRealTimers();
       jest.clearAllMocks();
-
-      testNPC.xpReleased = false;
-      await testNPC.save();
     });
 
     it("should properly gain maxHealth and maxMana on level up", async () => {
