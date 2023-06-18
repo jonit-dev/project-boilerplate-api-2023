@@ -44,26 +44,29 @@ export class NPCSeeder {
 
         const updateData = _.omit(multipliedNPCData, ["skills"]);
 
-        await clearCacheForKey(`${npcFound.id}-skills`);
+        if (!_.isEqual(npcFound, updateData)) {
+          await clearCacheForKey(`${npcFound.id}-skills`);
 
-        await NPC.updateOne(
-          { key: key },
-          {
-            // @ts-ignore
-            $set: {
-              ...updateData,
+          await NPC.updateOne(
+            { key: key },
+            {
+              // @ts-ignore
+              $set: {
+                ...updateData,
+              },
             },
-          },
-          {
-            upsert: true,
-          }
-        );
+            {
+              upsert: true,
+            }
+          );
+        }
 
-        await this.resetNPC(npcFound, multipliedNPCData);
-        await this.updateNPCSkills(multipliedNPCData, npcFound);
-
-        await this.npcGiantForm.resetNPCToNormalForm(npcFound);
-        await this.npcGiantForm.randomlyTransformNPCIntoGiantForm(npcFound);
+        await Promise.all([
+          this.resetNPC(npcFound, multipliedNPCData),
+          this.updateNPCSkills(multipliedNPCData, npcFound),
+          this.npcGiantForm.resetNPCToNormalForm(npcFound),
+          this.npcGiantForm.randomlyTransformNPCIntoGiantForm(npcFound),
+        ]);
       }
     }
   }
@@ -152,10 +155,11 @@ export class NPCSeeder {
 
       skills.owner = newNPC._id;
 
-      await skills.save();
-
-      await this.npcGiantForm.resetNPCToNormalForm(newNPC);
-      await this.npcGiantForm.randomlyTransformNPCIntoGiantForm(newNPC);
+      await Promise.all([
+        skills.save(),
+        this.npcGiantForm.resetNPCToNormalForm(newNPC),
+        this.npcGiantForm.randomlyTransformNPCIntoGiantForm(newNPC),
+      ]);
     } catch (error) {
       console.log(`❌ Failed to spawn NPC ${NPCData.key}. Is the blueprint for this NPC missing?`);
 
