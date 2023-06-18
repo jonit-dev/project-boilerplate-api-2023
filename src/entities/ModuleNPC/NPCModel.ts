@@ -152,12 +152,7 @@ const npcSchema = createLeanSchema(
       }),
       xp: Type.number({ required: true }),
     }),
-    xpReleased: Type.boolean({
-      default: false,
-    }),
-    xpReleasing: Type.boolean({
-      default: false,
-    }),
+
     loots: Type.array().of({
       itemBlueprintKey: Type.string({ required: true }),
       chance: Type.number({ required: true, min: 0, max: 100 }),

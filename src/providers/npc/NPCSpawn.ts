@@ -47,10 +47,6 @@ export class NPCSpawn {
           x: npc.initialX,
           y: npc.initialY,
           nextSpawnTime: undefined,
-          xpReleased: false,
-          xpReleasing: false,
-          xpToRelease: [],
-          canDie: true,
         },
       }
     );

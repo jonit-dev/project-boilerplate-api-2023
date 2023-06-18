@@ -49,7 +49,7 @@ export class NPCDeath {
 
     const isLocked = await this.locker.isLocked(`npc-death-${npc._id}`);
 
-    if (npc.xpReleased || npc.xpReleasing || isLocked) {
+    if (isLocked) {
       return;
     }
 
