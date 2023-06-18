@@ -27,7 +27,7 @@ npm run db:export
 
 # Inform PM2 to initialize the graceful shutdown and run command
 echo "Shutting down instances..."
-docker exec -it rpg-api bash -c 'pm2 sendSignal SIGINT rpg-api'
+docker exec rpg-api bash -c 'pm2 sendSignal SIGINT rpg-api'
 
 # Stop the container after shutting down all instances
 echo "Stopping container..."
@@ -38,3 +38,4 @@ echo "Restarting container..."
 docker-compose restart
 
 echo "Deployment complete."
+
