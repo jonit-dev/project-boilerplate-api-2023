@@ -225,7 +225,7 @@ describe("ItemUse.ts", () => {
 
     expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, CharacterSocketEvents.AttributeChanged, {
       targetId: testCharacter._id,
-      health: 55,
+      health: 60,
       mana: testCharacter.mana,
     });
 
