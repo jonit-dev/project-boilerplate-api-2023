@@ -17,4 +17,5 @@ export const itemPoisonArrow: IEquippableRangedAmmoBlueprint = {
   basePrice: 1.5,
   entityEffects: [EntityEffectBlueprint.Poison],
   entityEffectChance: 90,
+  canSell: false,
 };

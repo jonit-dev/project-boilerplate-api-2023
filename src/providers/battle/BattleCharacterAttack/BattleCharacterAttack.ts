@@ -26,13 +26,6 @@ export class BattleCharacterAttack {
   ) {}
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
-    if (!character.isBattleActive) {
-      await Character.updateOne({ _id: character._id }, { $set: { isBattleActive: true } });
-    } else {
-      this.socketMessaging.sendErrorMessageToCharacter(character);
-      return;
-    }
-
     new BattleCycle(
       character.id,
       async () => {

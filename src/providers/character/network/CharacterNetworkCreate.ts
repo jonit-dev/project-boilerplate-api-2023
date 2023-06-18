@@ -37,6 +37,7 @@ import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 
 import { BattleTargeting } from "@providers/battle/BattleTargeting";
 import { ItemCleaner } from "@providers/item/ItemCleaner";
+import { Locker } from "@providers/locks/Locker";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
 import { CharacterBuffValidation } from "../characterBuff/CharacterBuffValidation";
@@ -65,7 +66,8 @@ export class CharacterNetworkCreate {
     private characterDeath: CharacterDeath,
     private itemCleaner: ItemCleaner,
     private characterBuffValidation: CharacterBuffValidation,
-    private battleTargeting: BattleTargeting
+    private battleTargeting: BattleTargeting,
+    private locker: Locker
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -76,7 +78,6 @@ export class CharacterNetworkCreate {
         await Character.findOneAndUpdate(
           { _id: connectionCharacter._id },
           {
-            isBattleActive: false,
             target: undefined,
             isOnline: true,
             channelId: data.channelId,
@@ -102,6 +103,8 @@ export class CharacterNetworkCreate {
 
         await this.itemCleaner.clearMissingReferences(character);
 
+        // refresh battle
+        await this.locker.unlock(`character-${character._id}-battle-targeting`);
         await this.battleNetworkStopTargeting.stopTargeting(character);
         await this.battleTargeting.cancelTargeting(character);
 

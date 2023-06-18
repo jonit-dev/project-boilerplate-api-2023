@@ -62,7 +62,7 @@ export const spellCorruptionBolt: Partial<ISpell> = {
         durationType: CharacterBuffDurationType.Temporary,
         options: {
           messages: {
-            activation: ` You feel weakened by corruption (-${debuffPercentage}% strength and resistance)`,
+            activation: `You feel weakened by corruption (-${debuffPercentage}% strength and resistance)`,
             deactivation: "You're no longer weakened by corruption.",
           },
         },

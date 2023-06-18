@@ -6,8 +6,10 @@ import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHel
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
 import { container } from "@providers/inversify/container";
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import {
   AnimationEffectKeys,
+  BasicAttribute,
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
@@ -38,13 +40,20 @@ export const itemFireRune: IRuneItemBlueprint = {
 
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
+    const entityEffectUse = container.get(EntityEffectUse);
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * points);
+    const spellCalculator = container.get(SpellCalculator);
 
-    const entityEffectUse = container.get(EntityEffectUse);
+    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+      min: 1,
+      max: 3,
+    });
+
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);
+
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
 
     return points;
   },

@@ -1,5 +1,6 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { Locker } from "@providers/locks/Locker";
 import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
 import dayjs from "dayjs";
@@ -15,7 +16,8 @@ export class NPCSpawn {
     private mathHelper: MathHelper,
     private npcTarget: NPCTarget,
     private npcWarn: NPCWarn,
-    private npcGiantForm: NPCGiantForm
+    private npcGiantForm: NPCGiantForm,
+    private locker: Locker
   ) {}
 
   public calculateSpawnTime(strengthLevel: number): Date {
@@ -51,6 +53,10 @@ export class NPCSpawn {
         },
       }
     );
+
+    await this.locker.unlock(`npc-death-${npc._id}`);
+    await this.locker.unlock(`npc-body-generation-${npc._id}`);
+    await this.locker.unlock(`npc-${npc._id}-release-xp`);
 
     await this.npcGiantForm.resetNPCToNormalForm(npc);
     await this.npcGiantForm.randomlyTransformNPCIntoGiantForm(npc);

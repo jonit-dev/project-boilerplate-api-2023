@@ -12,7 +12,7 @@ export const spellBlankRuneCreation: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar ansr ki",
-  manaCost: 15,
+  manaCost: 30,
   minLevelRequired: 2,
   minMagicLevelRequired: 3,
   cooldown: 5,

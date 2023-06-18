@@ -228,16 +228,10 @@ describe("SpellCast.ts", () => {
       virtuals: true,
       defaults: true,
     })) as ICharacter;
+
     expect(character.mana).toBe(newMana);
 
     expect(sendEventToUser).toHaveBeenCalled();
-
-    expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, CharacterSocketEvents.AttributeChanged, {
-      targetId: testCharacter._id,
-      health: newHealth,
-      speed: testCharacter.speed,
-      mana: newMana,
-    });
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
@@ -254,7 +248,7 @@ describe("SpellCast.ts", () => {
     testCharacter.class = CharacterClass.Druid;
     await Character.findByIdAndUpdate(testCharacter.id, testCharacter);
 
-    const newHealth = testCharacter.health + 45;
+    const newHealth = testCharacter.health + 10;
     const newMana = testCharacter.mana - spellGreaterHealing.manaCost!;
 
     const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;

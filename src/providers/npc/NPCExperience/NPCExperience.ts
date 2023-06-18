@@ -6,6 +6,7 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 import { spellLearn } from "@providers/inversify/container";
+import { Locker } from "@providers/locks/Locker";
 import { SkillBuff } from "@providers/skill/SkillBuff";
 import { SkillCalculator } from "@providers/skill/SkillCalculator";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
@@ -42,7 +43,8 @@ export class NPCExperience {
     private characterView: CharacterView,
     private animationEffect: AnimationEffect,
     private time: Time,
-    private skillLvUpStatsIncrease: SkillStatsIncrease
+    private skillLvUpStatsIncrease: SkillStatsIncrease,
+    private locker: Locker
   ) {}
 
   /**
@@ -53,20 +55,13 @@ export class NPCExperience {
   public async releaseXP(target: INPC): Promise<void> {
     await this.time.waitForMilliseconds(random(0, 200)); // add artificial delay to avoid concurrency
 
-    // refresh target in case it was updated in the meantime
-    const { xpReleased, xpReleasing } = (await NPC.findById(target._id)
-      .lean()
-      .select("xpToRelease xpReleasing health")) as INPC;
+    const hasXPLock = await this.locker.isLocked(`npc-${target._id}-release-xp`);
 
-    if (xpReleased || xpReleasing) {
-      // clean up xpToRelease array
-      await NPC.updateOne({ _id: target._id }, { xpToRelease: [] });
-
-      // if target is still alive, or XP is already released, or XP is currently being released, then return
+    if (hasXPLock) {
       return;
     }
 
-    await NPC.updateOne({ _id: target._id }, { xpReleasing: true });
+    await this.locker.lock(`npc-${target._id}-release-xp`);
 
     let levelUp = false;
     let previousLevel = 0;
@@ -136,7 +131,7 @@ export class NPCExperience {
       await this.warnCharactersAroundAboutExpGains(character, exp);
     }
 
-    await NPC.updateOne({ _id: target._id }, { xpToRelease: target.xpToRelease, xpReleased: true });
+    await NPC.updateOne({ _id: target._id }, { xpToRelease: target.xpToRelease });
   }
 
   /**
@@ -156,7 +151,8 @@ export class NPCExperience {
           if (target.xpToRelease[i].charId?.toString() === attacker.id) {
             found = true;
 
-            const multiplier = damage > target["healthBeforeHit"] ? target["healthBeforeHit"] : damage;
+            // @ts-ignore
+            const multiplier = damage > target.healthBeforeHit ? target.healthBeforeHit : damage;
 
             target.xpToRelease[i].xp! += target.xpPerDamage * multiplier;
             break;

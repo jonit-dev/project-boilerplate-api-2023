@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
-import round from "lodash/round";
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
+import { CraftingSkill, IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
 
 export const itemManaPotion: IConsumableItemBlueprint = {
@@ -18,12 +18,19 @@ export const itemManaPotion: IConsumableItemBlueprint = {
   basePrice: 20,
   maxStackSize: 100,
   canSell: false,
-  usableEffect: (character: ICharacter) => {
+  usableEffect: async (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    const characterManaPercentage = round(character.maxMana * 0.1); // 10% of char max mana
+    const spellCalculator = container.get(SpellCalculator);
 
-    itemUsableEffect.apply(character, EffectableAttribute.Mana, characterManaPercentage);
+    const percentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, CraftingSkill.Alchemy, {
+      min: 10,
+      max: 20,
+    });
+
+    const totalAmount = (character.maxMana * percentage) / 100;
+
+    itemUsableEffect.apply(character, EffectableAttribute.Mana, totalAmount);
   },
-  usableEffectDescription: "Restores 10% of Mana",
+  usableEffectDescription: "Restores between 10-20% of mana, depending on your Alchemy skill level.",
 };

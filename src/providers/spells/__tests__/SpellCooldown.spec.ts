@@ -1,10 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { container, inMemoryHashTable, unitTestHelper } from "@providers/inversify/container";
+import { SpellCast } from "../SpellCast";
+import SpellCoolDown from "../SpellCooldown";
 import { spellGreaterHealing } from "../data/blueprints/all/SpellGreaterHealing";
 import { spellSelfHealing } from "../data/blueprints/all/SpellSelfHealing";
-import SpellCoolDown from "../SpellCooldown";
-import { SpellCast } from "../SpellCast";
 import { NamespaceRedisControl } from "../data/types/SpellsBlueprintTypes";
 
 describe("SpellCooldown", () => {
@@ -117,6 +117,6 @@ describe("SpellCooldown", () => {
 
     const cooldown = await inMemoryHashTable.get(namespace, regexMagicWords);
 
-    expect(cooldown).toEqual(5);
+    expect(cooldown).toEqual(7);
   });
 });

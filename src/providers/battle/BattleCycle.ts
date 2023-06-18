@@ -30,6 +30,6 @@ export class BattleCycle {
     clearInterval(this.interval);
     BattleCycle.battleCycles.delete(this.id);
 
-    await Character.updateOne({ _id: this.id }, { $unset: { target: 1 }, $set: { isBattleActive: false } });
+    await Character.updateOne({ _id: this.id }, { $unset: { target: 1 } });
   }
 }

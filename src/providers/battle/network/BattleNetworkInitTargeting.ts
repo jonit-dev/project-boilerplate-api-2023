@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { Locker } from "@providers/locks/Locker";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -36,7 +37,8 @@ export class BattleNetworkInitTargeting {
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private mapNonPVPZone: MapNonPVPZone,
     private specialEffect: SpecialEffect,
-    private battleTargeting: BattleTargeting
+    private battleTargeting: BattleTargeting,
+    private locker: Locker
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
@@ -44,6 +46,21 @@ export class BattleNetworkInitTargeting {
       channel,
       BattleSocketEvents.InitTargeting,
       async (data: IBattleInitTargeting, character: ICharacter) => {
+        const hasBattleTarget = await this.locker.isLocked(`character-${character._id}-battle-targeting`);
+
+        if (hasBattleTarget) {
+          this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+            character.channelId!,
+            BattleSocketEvents.CancelTargeting,
+            {
+              targetId: data.targetId,
+              type: data.type,
+            }
+          );
+          return;
+        }
+        await this.locker.lock(`character-${character._id}-battle-targeting`);
+
         try {
           let target: INPC | ICharacter | null = null;
 
@@ -93,7 +110,7 @@ export class BattleNetworkInitTargeting {
             const hasTargetId = character?.target?.id?.toString();
 
             // prevents double targeting
-            if (battleCycle && hasTargetId) {
+            if (battleCycle || hasTargetId) {
               await this.battleTargeting.cancelTargeting(character);
               await this.battleNetworkStopTargeting.stopTargeting(character);
             }

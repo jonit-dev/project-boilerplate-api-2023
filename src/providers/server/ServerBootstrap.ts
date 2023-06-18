@@ -1,4 +1,3 @@
-import { BattleCharacterAttack } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttack";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { CharacterMonitor } from "@providers/character/CharacterMonitor";
@@ -11,6 +10,7 @@ import { PushNotificationHelper } from "@providers/pushNotification/PushNotifica
 import { Seeder } from "@providers/seeds/Seeder";
 
 import { appEnv } from "@providers/config/env";
+import { Locker } from "@providers/locks/Locker";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import SpellSilence from "@providers/spells/data/logic/mage/druid/SpellSilence";
 import { EnvType } from "@rpg-engine/shared";
@@ -27,14 +27,14 @@ export class ServerBootstrap {
     private characterConnection: CharacterConnection,
     private characterFoodConsumption: CharacterFoodConsumption,
     private pathfindingQueue: PathfindingQueue,
-    private battleCharacterAttackQueue: BattleCharacterAttack,
     private characterBuffActivator: CharacterBuffActivator,
     private spellSilence: SpellSilence,
     private characterTextureChange: CharacterTextureChange,
     private pathfindingResults: PathfindingResults,
     private characterMonitor: CharacterMonitor,
     private heapMonitor: HeapMonitor,
-    private npcFreezer: NPCFreezer
+    private npcFreezer: NPCFreezer,
+    private locker: Locker
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -80,6 +80,8 @@ export class ServerBootstrap {
     await this.seeder.start();
 
     this.npcFreezer.init();
+
+    await this.locker.clear();
   }
 
   private async clearAllQueues(): Promise<void> {

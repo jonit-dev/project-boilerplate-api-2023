@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Locker } from "@providers/locks/Locker";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { BattleSocketEvents } from "@rpg-engine/shared";
@@ -7,10 +8,11 @@ import { BattleCycle } from "../BattleCycle";
 
 @provide(BattleNetworkStopTargeting)
 export class BattleNetworkStopTargeting {
-  constructor(private socketAuth: SocketAuth) {}
+  constructor(private socketAuth: SocketAuth, private locker: Locker) {}
 
   public onBattleStopTargeting(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, BattleSocketEvents.StopTargeting, async (data, character) => {
+      await this.locker.unlock(`character-${character._id}-battle-targeting`);
       await this.stopTargeting(character);
     });
   }
@@ -18,7 +20,7 @@ export class BattleNetworkStopTargeting {
   public async stopTargeting(character: ICharacter): Promise<void> {
     try {
       if (character) {
-        await Character.updateOne({ _id: character._id }, { $unset: { target: 1 }, $set: { isBattleActive: false } });
+        await Character.updateOne({ _id: character._id }, { $unset: { target: 1 } });
 
         const battleCycle = BattleCycle.battleCycles.get(character.id);
 

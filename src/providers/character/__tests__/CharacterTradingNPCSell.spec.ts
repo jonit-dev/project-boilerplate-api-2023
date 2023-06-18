@@ -352,7 +352,6 @@ describe("CharacterTradingNPCSell.ts", () => {
     expect(sendEventToUserOnInitSell).toBeCalled();
 
     const Bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
-    const arrow = itemsBlueprintIndex[RangedWeaponsBlueprint.Arrow];
 
     expect(sendEventToUserOnInitSell).toHaveBeenLastCalledWith(
       testCharacter.channelId,
@@ -365,11 +364,6 @@ describe("CharacterTradingNPCSell.ts", () => {
             ...Bow,
             price: Bow.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
             stackQty: 2,
-          },
-          {
-            ...arrow,
-            price: arrow.basePrice * TRADER_SELL_PRICE_MULTIPLIER,
-            stackQty: 100,
           },
         ],
         characterAvailableGold: 0,

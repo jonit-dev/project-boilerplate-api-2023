@@ -272,6 +272,17 @@ export class NPCMovementMoveTowards {
 
             updatedNPC.skills = npcSkills;
 
+            const hasNoTarget = !updatedNPC.targetCharacter?.toString();
+            const hasDifferentTarget = updatedNPC.targetCharacter?.toString() !== targetCharacter?.id;
+
+            if (hasNoTarget || hasDifferentTarget) {
+              if (hasBattleCycle) {
+                await this.npcTarget.clearTarget(npc);
+              }
+
+              return;
+            }
+
             const isInvisible = await this.specialEffect.isInvisible(targetCharacter);
 
             if (

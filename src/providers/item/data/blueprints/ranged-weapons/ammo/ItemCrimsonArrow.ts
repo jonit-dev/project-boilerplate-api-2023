@@ -17,4 +17,5 @@ export const itemCrimsonArrow: IEquippableRangedAmmoBlueprint = {
   basePrice: 12,
   entityEffects: [EntityEffectBlueprint.Burning],
   entityEffectChance: 80,
+  canSell: false,
 };

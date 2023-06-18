@@ -12,7 +12,7 @@ export const spellFireRuneCreation: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar ansr maskan",
-  manaCost: 40,
+  manaCost: 60,
   minLevelRequired: 4,
   minMagicLevelRequired: 6,
   cooldown: 5,

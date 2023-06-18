@@ -215,10 +215,7 @@ const characterSchema = createLeanSchema(
         enum: TypeHelper.enumToStringArray(SpellsBlueprint),
       })
     ),
-    isBattleActive: Type.boolean({
-      default: false,
-      required: true,
-    }),
+
     appliedEntityEffects: Type.array().of(Type.mixed({})),
     appliedBuffsEffects: Type.array().of(
       Type.mixed({
@@ -250,7 +247,6 @@ characterSchema.index(
     scene: 1,
     isOnline: 1,
     isBanned: 1,
-    isBattleActive: 1,
   },
   { background: true }
 );
