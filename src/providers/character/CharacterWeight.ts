@@ -3,7 +3,13 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BasicAttribute, CharacterSocketEvents, ICharacterAttributeChanged, ItemType } from "@rpg-engine/shared";
+import {
+  BasicAttribute,
+  CharacterClass,
+  CharacterSocketEvents,
+  ICharacterAttributeChanged,
+  ItemType,
+} from "@rpg-engine/shared";
 
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
@@ -68,6 +74,12 @@ export class CharacterWeight {
         cacheKey: `${character?._id}-skills`,
       })) as unknown as ISkill;
     if (skills) {
+      if (character.class === CharacterClass.Sorcerer || character.class === CharacterClass.Druid) {
+        const magicLvl = await this.traitGetter.getSkillLevelWithBuffs(skills as ISkill, BasicAttribute.Magic);
+
+        return magicLvl * 15;
+      }
+
       const strengthLvl = await this.traitGetter.getSkillLevelWithBuffs(skills as ISkill, BasicAttribute.Strength);
 
       return strengthLvl * 15;

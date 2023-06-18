@@ -1,5 +1,5 @@
 import { database, socketAdapter } from "@providers/inversify/container";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
+import { CharacterSocketEvents, EnvType } from "@rpg-engine/shared";
 import { Server } from "http";
 import { provide } from "inversify-binding-decorators";
 import { appEnv } from "../config/env";
@@ -47,6 +47,10 @@ export class ServerHelper {
   }
 
   public gracefullyShutdown(server: Server): void {
+    if (appEnv.general.ENV !== EnvType.Production) {
+      return;
+    }
+
     const terminationSignals: { signal: NodeJS.Signals; errno: number }[] = [
       { signal: "SIGINT", errno: 1 },
       { signal: "SIGTERM", errno: 1 },

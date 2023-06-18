@@ -34,6 +34,7 @@ import SpellCoolDown from "./SpellCooldown";
 import { SpellValidation } from "./SpellValidation";
 import { spellsBlueprints } from "./data/blueprints/index";
 import SpellSilence from "./data/logic/mage/druid/SpellSilence";
+import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 
 @provide(SpellCast)
 export class SpellCast {
@@ -52,7 +53,8 @@ export class SpellCast {
     private spellCoolDown: SpellCoolDown,
     private spellSilencer: SpellSilence,
     private mapNonPVPZone: MapNonPVPZone,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private battleCharacterAttackValidation: BattleCharacterAttackValidation
   ) {}
 
   public isSpellCasting(msg: string): boolean {
@@ -178,6 +180,11 @@ export class SpellCast {
     );
     if (!isUnderRange) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, "Sorry, your target is out of reach.");
+      return false;
+    }
+
+    const canAttack = await this.battleCharacterAttackValidation.canAttack(caster, target);
+    if (!canAttack) {
       return false;
     }
 
