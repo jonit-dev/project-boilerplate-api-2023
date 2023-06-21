@@ -252,4 +252,23 @@ describe("ItemPickupValidator.ts", () => {
   });
 
   it("should block an item container pickup, if character is trying to pickup to itself", async () => {});
+
+  it("should assign toContainerId if initially empty", async () => {
+    const itemPickupData = generatePickupData({
+      toContainerId: "",
+    });
+    // @ts-ignore
+    const spyGetInventory = jest.spyOn(itemPickupValidator.characterInventory, "getInventory");
+
+    await itemPickupValidator.isItemPickupValid(itemPickupData, testCharacter);
+
+    // Check if getInventory has been called
+    expect(spyGetInventory).toHaveBeenCalledWith(testCharacter);
+
+    // Check if toContainerId has been assigned a value
+    expect(itemPickupData.toContainerId).toEqual(inventoryItemContainerId);
+
+    // After the test, remove the spy
+    spyGetInventory.mockRestore();
+  });
 });

@@ -38,6 +38,10 @@ export class ItemPickupValidator {
 
     const inventory = await this.characterInventory.getInventory(character);
 
+    if (itemPickupData.toContainerId === "") {
+      itemPickupData.toContainerId = inventory?.itemContainer as string;
+    }
+
     if (this.shouldEquipInventoryItem(item, inventory, itemPickupData)) {
       await this.equipmentEquip.equipInventory(character, item._id);
       return false;
