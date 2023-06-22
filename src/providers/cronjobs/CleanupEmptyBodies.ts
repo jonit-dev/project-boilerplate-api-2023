@@ -11,7 +11,7 @@ export class CleanupEmptyBodyCrons {
   constructor(private newRelic: NewRelic) {}
 
   public schedule(): void {
-    nodeCron.schedule("*/3 * * * *", async () => {
+    nodeCron.schedule("*/1 * * * *", async () => {
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "CleanupEmptyBodyCrons", async () => {
         const threeMinAgo = new Date();
         threeMinAgo.setMinutes(threeMinAgo.getMinutes() - 3);
