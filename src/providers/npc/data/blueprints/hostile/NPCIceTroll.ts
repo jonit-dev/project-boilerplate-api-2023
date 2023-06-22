@@ -54,11 +54,11 @@ export const npcIceTroll: Partial<INPC> = {
 
     {
       itemBlueprintKey: SwordsBlueprint.IceSword,
-      chance: 10,
+      chance: 5,
     },
     {
       itemBlueprintKey: AxesBlueprint.FrostDoubleAxe,
-      chance: 15,
+      chance: 5,
     },
     {
       itemBlueprintKey: AxesBlueprint.DwarvenWaraxe,
@@ -70,7 +70,7 @@ export const npcIceTroll: Partial<INPC> = {
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.FrostCrossbow,
-      chance: 20,
+      chance: 10,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Fish,
@@ -117,7 +117,7 @@ export const npcIceTroll: Partial<INPC> = {
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
-      chance: 20,
+      chance: 10,
       quantityRange: [1, 10],
     },
     {
