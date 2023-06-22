@@ -8,13 +8,15 @@ import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 
 import { provide } from "inversify-binding-decorators";
+import { ItemOwnership } from "./ItemOwnership";
 
 @provide(ItemCleaner)
 export class ItemCleaner {
   constructor(
     private characterInventory: CharacterInventory,
     private equipmentSlots: EquipmentSlots,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private itemOwnership: ItemOwnership
   ) {}
 
   public async clearMissingReferences(character: ICharacter): Promise<void> {
@@ -88,6 +90,10 @@ export class ItemCleaner {
           if (!item) {
             // remove slot on item container with update one
             delete slots[slotNumber];
+          }
+
+          if (!item?.owner) {
+            await this.itemOwnership.addItemOwnership(item as IItem, character);
           }
         }
 

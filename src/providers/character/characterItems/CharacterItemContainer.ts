@@ -3,6 +3,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInventory";
 import { ItemMap } from "@providers/item/ItemMap";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
 import { CharacterInventory } from "../CharacterInventory";
@@ -17,7 +18,8 @@ export class CharacterItemContainer {
     private characterItemSlots: CharacterItemSlots,
     private equipmentEquipInventory: EquipmentEquipInventory,
     private itemMap: ItemMap,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private itemOwnership: ItemOwnership
   ) {}
 
   public async removeItemFromContainer(
@@ -147,6 +149,8 @@ export class CharacterItemContainer {
       }
       await targetContainer.unlockField("slots");
 
+      await this.addItemOwnership(targetContainer._id, itemToBeAdded, character);
+
       return true;
     }
 
@@ -174,5 +178,25 @@ export class CharacterItemContainer {
     }
 
     await container.save();
+  }
+
+  private async addItemOwnership(
+    targetContainerId: string,
+    item: IItem,
+    character: ICharacter
+  ): Promise<Promise<void>> {
+    // check if target container is our inventory. If so, update item ownership
+    const inventory = await this.characterInventory.getInventory(character);
+
+    const inventoryItemContainerId = inventory?.itemContainer?.toString();
+
+    const isTargetContainerOurInventory = inventoryItemContainerId === targetContainerId.toString();
+
+    const isItemOwnedByCharacter = item.owner?.toString() === character._id.toString();
+
+    // if item is not owned, update ownership
+    if (isTargetContainerOurInventory && (!item.owner || !isItemOwnedByCharacter)) {
+      await this.itemOwnership.addItemOwnership(item, character);
+    }
   }
 }

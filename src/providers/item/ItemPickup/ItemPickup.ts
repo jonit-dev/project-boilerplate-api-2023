@@ -5,12 +5,13 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemPickup } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MapHelper } from "@providers/map/MapHelper";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { clearCacheForKey } from "speedgoose";
+import { ItemOwnership } from "../ItemOwnership";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
 import { ItemPickupFromMap } from "./ItemPickupFromMap";
 import { ItemPickupUpdater } from "./ItemPickupUpdater";
@@ -26,7 +27,8 @@ export class ItemPickup {
     private characterInventory: CharacterInventory,
     private itemPickupUpdater: ItemPickupUpdater,
     private mapHelper: MapHelper,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private itemOwnership: ItemOwnership
   ) {}
 
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | undefined> {
@@ -54,8 +56,17 @@ export class ItemPickup {
             this.mapHelper.isCoordinateValid(itemToBePicked.y) &&
             itemToBePicked.scene !== undefined;
 
-          itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
-          await itemToBePicked.save();
+          // support picking items from a tiled map seed
+          await Item.updateOne(
+            { _id: itemToBePicked._id },
+            {
+              $set: {
+                key: itemToBePicked.baseKey,
+              },
+            }
+          );
+
+          await this.itemOwnership.addItemOwnership(itemToBePicked, character);
 
           const isPickupFromContainer = itemPickupData.fromContainerId && !isPickupFromMap;
 

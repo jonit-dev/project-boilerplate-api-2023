@@ -14,12 +14,10 @@ import {
   ItemType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ItemOwnership } from "../ItemOwnership";
 
 @provide(ItemPickupUpdater)
 export class ItemPickupUpdater {
   constructor(
-    private itemOwnership: ItemOwnership,
     private characterWeight: CharacterWeight,
     private equipmentSlots: EquipmentSlots,
     private socketMessaging: SocketMessaging,
@@ -32,8 +30,6 @@ export class ItemPickupUpdater {
       NewRelicTransactionCategory.Operation,
       "ItemPickupUpdater.finalizePickup",
       async () => {
-        await this.itemOwnership.addItemOwnership(itemToBePicked, character);
-
         // whenever a new item is added, we need to update the character weight
         await this.characterWeight.updateCharacterWeight(character);
 

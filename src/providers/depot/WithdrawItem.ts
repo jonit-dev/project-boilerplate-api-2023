@@ -2,8 +2,10 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer as IItemContainerModel, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { ItemDrop } from "@providers/item/ItemDrop";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
@@ -11,7 +13,6 @@ import { IDepotContainerWithdraw, IEquipmentAndInventoryUpdatePayload, IItemCont
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "./DepotSystem";
 import { OpenDepot } from "./OpenDepot";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 
 @provide(WithdrawItem)
 export class WithdrawItem {
@@ -23,7 +24,8 @@ export class WithdrawItem {
     private characterItemSlots: CharacterItemSlots,
     private socketMessaging: SocketMessaging,
     private newRelic: NewRelic,
-    private characterWeight: CharacterWeight
+    private characterWeight: CharacterWeight,
+    private itemOwnership: ItemOwnership
   ) {}
 
   public async withdraw(character: ICharacter, data: IDepotContainerWithdraw): Promise<IItemContainer | undefined> {
@@ -77,12 +79,17 @@ export class WithdrawItem {
           await this.itemDrop.dropItems([item], gridPoints, character.scene);
         }
 
-        this.characterWeight.updateCharacterWeight(character);
+        await this.characterWeight.updateCharacterWeight(character);
 
         const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
           inventory: toContainer as any,
         };
         this.depotSystem.updateInventoryCharacter(payloadUpdate, character);
+
+        // make sure our character ownership is updated
+        if (!item.owner) {
+          await this.itemOwnership.addItemOwnership(item, character);
+        }
 
         return itemContainer;
       }

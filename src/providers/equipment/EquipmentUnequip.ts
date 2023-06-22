@@ -7,6 +7,7 @@ import { CharacterItemContainer } from "@providers/character/characterItems/Char
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { ItemSocketEvents, ItemSubType, ItemType } from "@rpg-engine/shared";
@@ -24,7 +25,8 @@ export class EquipmentUnequip {
     private characterItemSlots: CharacterItemSlots,
     private characterItemContainer: CharacterItemContainer,
     private inMemoryHashTable: InMemoryHashTable,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private itemOwnership: ItemOwnership
   ) {}
 
   public async unequip(character: ICharacter, inventory: IItem, item: IItem): Promise<boolean> {
@@ -141,6 +143,10 @@ export class EquipmentUnequip {
           equipment: newEquipmentSlots,
           inventory: newInventoryContainer,
         });
+
+        if (!item.owner) {
+          await this.itemOwnership.addItemOwnership(item, character);
+        }
 
         return true;
       }
