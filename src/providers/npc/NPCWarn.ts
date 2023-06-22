@@ -66,7 +66,7 @@ export class NPCWarn {
       "NPCWarn.warnCharacterAboutSingleNPCCreation",
       async () => {
         await this.characterView.addToCharacterView(
-          character,
+          character._id,
           {
             id: npc._id,
             x: npc.x,

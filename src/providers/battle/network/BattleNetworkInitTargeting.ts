@@ -57,6 +57,7 @@ export class BattleNetworkInitTargeting {
               type: data.type,
             }
           );
+          await this.locker.unlock(`character-${character._id}-battle-targeting`);
           return;
         }
         await this.locker.lock(`character-${character._id}-battle-targeting`);

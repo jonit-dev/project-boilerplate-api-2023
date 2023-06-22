@@ -95,7 +95,7 @@ export class ItemView {
               }
             );
 
-            await this.characterView.removeFromCharacterView(character, item.id, "items");
+            await this.characterView.removeFromCharacterView(character._id, item.id, "items");
           }
         } else {
           throw new Error("You cannot call this method without x, y and scene");
@@ -152,7 +152,7 @@ export class ItemView {
           });
 
           await this.characterView.addToCharacterView(
-            character,
+            character._id,
             {
               id: item.id,
               x: item.x,

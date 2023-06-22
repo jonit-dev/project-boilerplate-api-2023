@@ -14,7 +14,7 @@ export class ViewNetworkDestroy {
       channel,
       ViewSocketEvents.Destroy,
       async (data: IViewDestroyElementPayload, character: ICharacter) => {
-        await this.characterView.removeFromCharacterView(character, data.id, data.type);
+        await this.characterView.removeFromCharacterView(character._id, data.id, data.type);
       }
     );
   }

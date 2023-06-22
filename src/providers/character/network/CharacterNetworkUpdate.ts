@@ -100,7 +100,7 @@ export class CharacterNetworkUpdate {
             await this.handleMapTransition(character, newX, newY);
 
             // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.characterView.clearAllOutOfViewElements(character);
+            this.characterView.clearAllOutOfViewElements(character._id, character.x, character.y);
           }
 
           this.sendConfirmation(character, data.direction, isPositionUpdateValid);

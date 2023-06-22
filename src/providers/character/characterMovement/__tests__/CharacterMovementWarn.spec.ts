@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterView } from "@providers/character/CharacterView";
 import { container } from "@providers/inversify/container";
 import { CharacterMovementWarn } from "../CharacterMovementWarn";
-import { CharacterView } from "@providers/character/CharacterView";
 
 describe("CharacterMovementWarn", () => {
   let characterMovementWarn: CharacterMovementWarn;
@@ -50,7 +50,7 @@ describe("CharacterMovementWarn", () => {
     };
 
     const testCharacter = {
-      id: "fake-id-2",
+      _id: "fake-id-2",
     };
 
     let elementOnViewMock: jest.SpyInstance;
@@ -74,7 +74,7 @@ describe("CharacterMovementWarn", () => {
       await (characterMovementWarn as any).warnEmitterAboutCharactersAround(testCharacter as unknown as ICharacter);
 
       expect(addToViewMock).toHaveBeenCalledWith(
-        testCharacter,
+        testCharacter._id,
         {
           id: character.id,
           x: character.x,

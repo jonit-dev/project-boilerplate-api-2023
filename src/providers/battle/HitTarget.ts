@@ -263,14 +263,14 @@ export class HitTarget {
   private async warnCharacterIfNotInView(character: ICharacter, target: ICharacter | INPC): Promise<void> {
     switch (target.type) {
       case "NPC":
-        const isNPCInView = this.characterView.isOnCharacterView(character, target._id, "npcs");
+        const isNPCInView = this.characterView.isOnCharacterView(character._id, target._id, "npcs");
 
         if (!isNPCInView) {
           await this.npcWarn.warnCharacterAboutSingleNPCCreation(target as INPC, character);
         }
         break;
       case "Character":
-        const isCharacterOnCharView = this.characterView.isOnCharacterView(character, target._id, "characters");
+        const isCharacterOnCharView = this.characterView.isOnCharacterView(character._id, target._id, "characters");
 
         if (!isCharacterOnCharView) {
           await this.characterMovementWarn.warnAboutSingleCharacter(character, target as ICharacter);

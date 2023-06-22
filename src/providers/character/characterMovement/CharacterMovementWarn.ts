@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { ItemView } from "@providers/item/ItemView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCWarn } from "@providers/npc/NPCWarn";
@@ -12,7 +13,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(CharacterMovementWarn)
 export class CharacterMovementWarn {
@@ -41,7 +41,7 @@ export class CharacterMovementWarn {
 
   public async warnAboutSingleCharacter(character: ICharacter, targetCharacter: ICharacter): Promise<void> {
     await this.characterView.addToCharacterView(
-      character,
+      character._id,
       {
         id: targetCharacter.id,
         x: targetCharacter.x,
@@ -84,7 +84,7 @@ export class CharacterMovementWarn {
       const dataFromServer = await this.generateDataPayloadFromServer(clientPosUpdateData, character);
 
       await this.characterView.addToCharacterView(
-        nearbyCharacter,
+        nearbyCharacter._id,
         {
           id: character.id,
           x: character.x,
@@ -114,7 +114,7 @@ export class CharacterMovementWarn {
       }
 
       await this.characterView.addToCharacterView(
-        character,
+        character._id,
         {
           id: nearbyCharacter.id,
           x: nearbyCharacter.x,

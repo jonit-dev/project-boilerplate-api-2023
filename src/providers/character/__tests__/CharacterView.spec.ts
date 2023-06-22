@@ -29,7 +29,7 @@ describe("CharacterView.ts", () => {
       scene: "example",
     };
 
-    await characterView.addToCharacterView(testCharacter, viewElement, "items");
+    await characterView.addToCharacterView(testCharacter._id, viewElement, "items");
 
     const hasItems = await characterView.hasElementOnView(testCharacter, "testId", "items");
 
@@ -44,9 +44,9 @@ describe("CharacterView.ts", () => {
       scene: "example",
     };
 
-    await characterView.addToCharacterView(testCharacter, viewElement, "items");
+    await characterView.addToCharacterView(testCharacter._id, viewElement, "items");
 
-    await characterView.removeFromCharacterView(testCharacter, "testId", "items");
+    await characterView.removeFromCharacterView(testCharacter._id, "testId", "items");
 
     const hasItems = await characterView.hasElementOnView(testCharacter, "testId", "items");
 
@@ -108,8 +108,8 @@ describe("CharacterView.ts", () => {
       y: 1,
       scene: "example",
     };
-    await characterView.addToCharacterView(testCharacter, viewElement, "items");
-    const isOnView = await characterView.isOnCharacterView(testCharacter, "testId", "items");
+    await characterView.addToCharacterView(testCharacter._id, viewElement, "items");
+    const isOnView = await characterView.isOnCharacterView(testCharacter._id, "testId", "items");
     expect(isOnView).toBeTruthy();
   });
 
@@ -120,8 +120,8 @@ describe("CharacterView.ts", () => {
       y: 1,
       scene: "example",
     };
-    await characterView.addToCharacterView(testCharacter, viewElement, "items");
-    const isOnView = await characterView.isOnCharacterView(testCharacter, "testId2", "items");
+    await characterView.addToCharacterView(testCharacter._id, viewElement, "items");
+    const isOnView = await characterView.isOnCharacterView(testCharacter._id, "testId2", "items");
     expect(isOnView).toBeFalsy();
   });
 
@@ -132,7 +132,7 @@ describe("CharacterView.ts", () => {
       y: 1,
       scene: "example",
     };
-    await characterView.addToCharacterView(testCharacter, viewElement, "items");
+    await characterView.addToCharacterView(testCharacter._id, viewElement, "items");
     const hasElement = await characterView.hasElementOnView(testCharacter, viewElement.id, "items");
     expect(hasElement).toBeTruthy();
   });
@@ -144,7 +144,7 @@ describe("CharacterView.ts", () => {
       y: 1,
       scene: "example",
     };
-    await characterView.addToCharacterView(testCharacter, viewElement, "items");
+    await characterView.addToCharacterView(testCharacter._id, viewElement, "items");
     const element = await characterView.getElementOnView(testCharacter, viewElement.id, "items");
     expect(element).toBeTruthy();
     expect(element).toMatchObject(viewElement);
@@ -195,14 +195,14 @@ describe("CharacterView.ts", () => {
       scene: "example",
     };
 
-    await characterView.addToCharacterView(testCharacter, viewElement1, "items");
-    await characterView.addToCharacterView(testCharacter, viewElement2, "items");
+    await characterView.addToCharacterView(testCharacter._id, viewElement1, "items");
+    await characterView.addToCharacterView(testCharacter._id, viewElement2, "items");
 
     testCharacter.x = FromGridX(999);
     testCharacter.y = FromGridY(999);
     await testCharacter.save();
 
-    await characterView.clearOutOfViewElements(testCharacter, "items");
+    await characterView.clearOutOfViewElements(testCharacter._id, testCharacter.x, testCharacter.y, "items");
 
     const updatedTestCharacter = await Character.findById(testCharacter._id);
 
@@ -235,9 +235,9 @@ describe("CharacterView.ts", () => {
       scene: "example",
     };
 
-    await characterView.addToCharacterView(testCharacter, viewElement1, "items");
-    await characterView.addToCharacterView(testCharacter, viewElement2, "npcs");
-    await characterView.addToCharacterView(testCharacter, viewElement3, "characters");
+    await characterView.addToCharacterView(testCharacter._id, viewElement1, "items");
+    await characterView.addToCharacterView(testCharacter._id, viewElement2, "npcs");
+    await characterView.addToCharacterView(testCharacter._id, viewElement3, "characters");
 
     testCharacter.x = FromGridX(999);
     testCharacter.y = FromGridY(999);
@@ -252,7 +252,7 @@ describe("CharacterView.ts", () => {
     expect(characterViewNpcs).toMatchObject({ testId2: viewElement2 });
     expect(characterViewCharacters).toMatchObject({ testId3: viewElement3 });
 
-    await characterView.clearAllOutOfViewElements(testCharacter);
+    await characterView.clearAllOutOfViewElements(testCharacter._id, testCharacter.x, testCharacter.y);
 
     const hasItems = await characterView.hasElementOnView(testCharacter, "testId1", "items");
     const hasNpcs = await characterView.hasElementOnView(testCharacter, "testId2", "npcs");

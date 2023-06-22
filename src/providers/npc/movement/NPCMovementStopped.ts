@@ -38,7 +38,7 @@ export class NPCMovementStopped {
             // update serverside info (to avoid submitting the same package all the time!)
 
             await this.characterView.addToCharacterView(
-              nearbyCharacter,
+              nearbyCharacter._id,
               {
                 id: npc.id,
                 x: npc.x,

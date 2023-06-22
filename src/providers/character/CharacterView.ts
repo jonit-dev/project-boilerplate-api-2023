@@ -28,32 +28,32 @@ export class CharacterView {
   ) {}
 
   public async addToCharacterView(
-    character: ICharacter,
+    characterId: string,
     viewElement: IViewElement,
     type: CharacterViewType
   ): Promise<void> {
-    if (!character._id) return;
+    if (!characterId) return;
 
-    if (await this.isOnCharacterView(character, viewElement.id, type)) {
+    if (await this.isOnCharacterView(characterId, viewElement.id, type)) {
       return;
     }
 
-    await this.inMemoryHashTable.set(`character-view-${type}:${character._id}`, viewElement.id, viewElement);
+    await this.inMemoryHashTable.set(`character-view-${type}:${characterId}`, viewElement.id, viewElement);
   }
 
-  public async isOnCharacterView(character: ICharacter, elementId: string, type: CharacterViewType): Promise<boolean> {
-    return await this.inMemoryHashTable.has(`character-view-${type}:${character._id}`, elementId);
+  public async isOnCharacterView(characterId: string, elementId: string, type: CharacterViewType): Promise<boolean> {
+    return await this.inMemoryHashTable.has(`character-view-${type}:${characterId}`, elementId);
   }
 
-  public isOutOfCharacterView(character: ICharacter, x: number, y: number): boolean {
+  public isOutOfCharacterView(characterX: number, characterY: number, x: number, y: number): boolean {
     const viewWidth = SOCKET_TRANSMISSION_ZONE_WIDTH * 2;
     const viewHeight = SOCKET_TRANSMISSION_ZONE_WIDTH * 2;
 
     if (
-      x < character.x - viewWidth / 2 ||
-      x > character.x + viewWidth / 2 ||
-      y < character.y - viewHeight / 2 ||
-      y > character.y + viewHeight / 2
+      x < characterX - viewWidth / 2 ||
+      x > characterX + viewWidth / 2 ||
+      y < characterY - viewHeight / 2 ||
+      y > characterY + viewHeight / 2
     ) {
       return true;
     }
@@ -61,21 +61,26 @@ export class CharacterView {
     return false;
   }
 
-  public async clearAllOutOfViewElements(character: ICharacter): Promise<void> {
+  public async clearAllOutOfViewElements(characterId: string, characterX: number, characterY: number): Promise<void> {
     const types: CharacterViewType[] = ["npcs", "items", "characters"];
     for (const type of types) {
-      await this.clearOutOfViewElements(character, type);
+      await this.clearOutOfViewElements(characterId, characterX, characterY, type);
     }
   }
 
-  public async clearOutOfViewElements(character: ICharacter, type: CharacterViewType): Promise<void> {
-    const hasView = await this.inMemoryHashTable.hasAll(`character-view-${type}:${character._id}`);
+  public async clearOutOfViewElements(
+    characterId: string,
+    characterX: number,
+    characterY: number,
+    type: CharacterViewType
+  ): Promise<void> {
+    const hasView = await this.inMemoryHashTable.hasAll(`character-view-${type}:${characterId}`);
 
     if (!hasView) {
       return;
     }
 
-    const elementsOnView = await this.inMemoryHashTable.getAll(`character-view-${type}:${character._id}`);
+    const elementsOnView = await this.inMemoryHashTable.getAll(`character-view-${type}:${characterId}`);
 
     if (!elementsOnView) {
       return;
@@ -87,13 +92,13 @@ export class CharacterView {
     for (const elementId of elementsIds) {
       const element = elementsOnView[elementId] as unknown as IViewElement;
 
-      if (this.isOutOfCharacterView(character, element.x, element.y)) {
+      if (this.isOutOfCharacterView(characterX, characterY, element.x, element.y)) {
         elementsToRemove.push(elementId);
       }
     }
 
     for (const elementId of elementsToRemove) {
-      await this.removeFromCharacterView(character, elementId, type);
+      await this.removeFromCharacterView(characterId, elementId, type);
     }
   }
 
@@ -134,12 +139,8 @@ export class CharacterView {
     }
   }
 
-  public async removeFromCharacterView(
-    character: ICharacter,
-    elementId: string,
-    type: CharacterViewType
-  ): Promise<void> {
-    await this.inMemoryHashTable.delete(`character-view-${type}:${character._id}`, elementId);
+  public async removeFromCharacterView(characterId: string, elementId: string, type: CharacterViewType): Promise<void> {
+    await this.inMemoryHashTable.delete(`character-view-${type}:${characterId}`, elementId);
   }
 
   public async getCharactersAroundXYPosition(
