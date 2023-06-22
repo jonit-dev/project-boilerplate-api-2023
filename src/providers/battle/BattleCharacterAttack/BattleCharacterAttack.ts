@@ -5,6 +5,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
@@ -22,7 +23,8 @@ export class BattleCharacterAttack {
     private socketMessaging: SocketMessaging,
     private newRelic: NewRelic,
     private battleTargeting: BattleTargeting,
-    private battleNetworkStopTargeting: BattleNetworkStopTargeting
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting,
+    private characterValidation: CharacterValidation
   ) {}
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
@@ -45,7 +47,9 @@ export class BattleCharacterAttack {
             const hasNoTarget = !updatedCharacter.target?.id?.toString();
             const hasDifferentTarget = updatedCharacter.target?.id?.toString() !== target._id.toString();
 
-            if (hasNoTarget || hasDifferentTarget) {
+            const hasBasicValidation = this.characterValidation.hasBasicValidation(updatedCharacter);
+
+            if (hasNoTarget || hasDifferentTarget || !hasBasicValidation) {
               await this.battleTargeting.cancelTargeting(updatedCharacter);
               await this.battleNetworkStopTargeting.stopTargeting(updatedCharacter);
               return;

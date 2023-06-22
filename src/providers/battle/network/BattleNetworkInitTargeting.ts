@@ -46,22 +46,6 @@ export class BattleNetworkInitTargeting {
       channel,
       BattleSocketEvents.InitTargeting,
       async (data: IBattleInitTargeting, character: ICharacter) => {
-        const hasBattleTarget = await this.locker.isLocked(`character-${character._id}-battle-targeting`);
-
-        if (hasBattleTarget) {
-          this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-            character.channelId!,
-            BattleSocketEvents.CancelTargeting,
-            {
-              targetId: data.targetId,
-              type: data.type,
-            }
-          );
-          await this.locker.unlock(`character-${character._id}-battle-targeting`);
-          return;
-        }
-        await this.locker.lock(`character-${character._id}-battle-targeting`);
-
         try {
           let target: INPC | ICharacter | null = null;
 
@@ -115,6 +99,16 @@ export class BattleNetworkInitTargeting {
               await this.battleTargeting.cancelTargeting(character);
               await this.battleNetworkStopTargeting.stopTargeting(character);
             }
+
+            const hasBattleTarget = await this.locker.isLocked(`character-${character._id}-battle-targeting`);
+
+            if (hasBattleTarget) {
+              await this.battleTargeting.cancelTargeting(character);
+              await this.battleNetworkStopTargeting.stopTargeting(character);
+              await this.locker.unlock(`character-${character._id}-battle-targeting`);
+            }
+
+            await this.locker.lock(`character-${character._id}-battle-targeting`);
 
             await this.characterSetTargeting(character, target, data.type);
           }
