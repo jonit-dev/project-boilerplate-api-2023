@@ -74,7 +74,9 @@ describe("Party Management", () => {
   it("should create a party", async () => {
     await partyManagement.createParty(characterLeader, firstMember);
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(characterLeader)).toBeTruthy();
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(firstMember)).toBeTruthy();
   });
 
@@ -91,18 +93,22 @@ describe("Party Management", () => {
   it("should check leader in party", async () => {
     await partyManagement.createParty(characterLeader, firstMember);
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsLeader(characterLeader)).toBeTruthy();
+    // @ts-ignore
     expect(await partyManagement.checkIfIsLeader(firstMember)).toBeFalsy();
   });
 
   it("should transfer leadership without removing the old leader", async () => {
     await partyManagement.createParty(characterLeader, firstMember);
-    console.log("leader", characterLeader._id, "member", firstMember._id);
     await partyManagement.transferLeadership(characterLeader, firstMember, false);
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsLeader(characterLeader)).toBeFalsy();
+    // @ts-ignore
     expect(await partyManagement.checkIfIsLeader(firstMember)).toBeTruthy();
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(characterLeader)).toBeTruthy();
   });
 
@@ -111,20 +117,25 @@ describe("Party Management", () => {
 
     await partyManagement.transferLeadership(characterLeader, firstMember, true);
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsLeader(characterLeader)).toBeFalsy();
+    // @ts-ignore
     expect(await partyManagement.checkIfIsLeader(firstMember)).toBeTruthy();
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(characterLeader)).toBeFalsy();
+    // @ts-ignore
     expect(await partyManagement.checkIfIsLeader(characterLeader)).toBeFalsy();
   });
 
   it("should a leader be able to invite a character to the party", async () => {
     await partyManagement.createParty(characterLeader, firstMember);
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(firstMember)).toBeTruthy();
 
     await partyManagement.inviteToParty(characterLeader, secondMember);
-
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(secondMember)).toBeTruthy();
   });
 
@@ -164,6 +175,7 @@ describe("Party Management", () => {
 
     await partyManagement.leaveParty(characterLeader, firstMember);
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(firstMember)).toBeFalsy();
 
     expect(successMessageSpy).toBeCalledWith(firstMember, "You left the party");
@@ -183,7 +195,9 @@ describe("Party Management", () => {
     await partyManagement.createParty(characterLeader, firstMember);
     await partyManagement.leaveParty(characterLeader, characterLeader);
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(characterLeader)).toBeFalsy();
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(firstMember)).toBeFalsy();
   });
 
@@ -199,6 +213,7 @@ describe("Party Management", () => {
     await partyManagement.createParty(characterLeader, firstMember);
     await partyManagement.leaveParty(firstMember, firstMember);
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(firstMember)).toBeFalsy();
     expect(successMessageSpy).toBeCalledWith(firstMember, "You left the party");
   });
@@ -253,7 +268,9 @@ describe("Party Management", () => {
   it("should not delete a party if character is not the leader", async () => {
     await partyManagement.createParty(characterLeader, firstMember);
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(characterLeader)).toBeTruthy();
+    // @ts-ignore
     expect(await partyManagement.checkIfIsLeader(characterLeader)).toBeTruthy();
 
     // @ts-ignore
@@ -315,6 +332,7 @@ describe("Party Management", () => {
     await partyManagement.createParty(characterLeader, firstMember, 2);
     await partyManagement.inviteToParty(characterLeader, secondMember);
 
+    // @ts-ignore
     expect(await partyManagement.checkIfIsInParty(secondMember)).toBeFalsy();
 
     expect(errorMessageSpy).toBeCalledWith(characterLeader, "Your party is already full");

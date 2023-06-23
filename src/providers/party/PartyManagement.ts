@@ -141,7 +141,11 @@ export default class PartyManagement {
   constructor(private socketMessaging: SocketMessaging) {}
 
   // create party
-  async createParty(leader: ICharacter, target: ICharacter, maxSize?: number): Promise<void> {
+  public async createParty(
+    leader: ICharacter,
+    target: ICharacter,
+    maxSize?: number
+  ): Promise<ICharacterParty | undefined> {
     if (!leader) {
       throw new Error("Character not found");
     }
@@ -197,7 +201,7 @@ export default class PartyManagement {
   }
 
   // invte to a party
-  async inviteToParty(leader: ICharacter, target: ICharacter): Promise<void> {
+  public async inviteToParty(leader: ICharacter, target: ICharacter): Promise<void> {
     if (!leader || !target) {
       throw new Error("Leader or target not found");
     }
@@ -239,7 +243,7 @@ export default class PartyManagement {
   }
 
   // check if is already in a party
-  async checkIfIsInParty(character: ICharacter): Promise<boolean> {
+  private async checkIfIsInParty(character: ICharacter): Promise<boolean> {
     const party = (await CharacterParty.findOne({
       $or: [
         { "members._id": mongoose.Types.ObjectId(character._id) },
@@ -258,7 +262,7 @@ export default class PartyManagement {
   }
 
   // check if is leader
-  async checkIfIsLeader(character: ICharacter): Promise<boolean> {
+  private async checkIfIsLeader(character: ICharacter): Promise<boolean> {
     const party = (await CharacterParty.findOne({ "leader._id": character._id })
       .lean()
       .select("leader")) as ICharacterParty;
@@ -282,7 +286,7 @@ export default class PartyManagement {
     await CharacterParty.updateOne({ _id: party._id }, { $set: { members: members } });
   }
 
-  async leaveParty(leader: ICharacter, target: ICharacter): Promise<void> {
+  public async leaveParty(leader: ICharacter, target: ICharacter): Promise<void> {
     const isLeader = await this.checkIfIsLeader(leader);
     const isSameCharacter = leader._id.toString() === target._id.toString();
 
@@ -367,7 +371,7 @@ export default class PartyManagement {
   }
 
   // transfer party leadership
-  async transferLeadership(leader: ICharacter, target: ICharacter, removeLeader: boolean): Promise<void> {
+  public async transferLeadership(leader: ICharacter, target: ICharacter, removeLeader?: boolean): Promise<void> {
     const inSameParty = await this.checkIfSameParty(leader, target);
 
     if (!inSameParty) {
