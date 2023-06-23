@@ -91,10 +91,6 @@ export class ItemCleaner {
             // remove slot on item container with update one
             delete slots[slotNumber];
           }
-
-          if (!item?.owner) {
-            await this.itemOwnership.addItemOwnership(item as IItem, character);
-          }
         }
 
         await ItemContainer.updateOne({ _id: inventoryContainer._id }, { slots });

@@ -16,6 +16,7 @@ import {
   ViewSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { ItemCoordinates } from "./ItemCoordinates";
 
 @provide(ItemView)
 export class ItemView {
@@ -23,7 +24,8 @@ export class ItemView {
     private characterView: CharacterView,
     private socketMessaging: SocketMessaging,
     private objectHelper: DataStructureHelper,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private itemCoordinates: ItemCoordinates
   ) {}
 
   public async removeItemFromMap(item: IItem): Promise<boolean> {
@@ -39,16 +41,8 @@ export class ItemView {
           await this.warnCharactersAboutItemRemovalInView(item, item.x, item.y, item.scene);
 
           // unset x, y, and scene from item model
-          await Item.updateOne(
-            {
-              _id: item.id,
-            },
-            {
-              x: undefined,
-              y: undefined,
-              scene: undefined,
-            }
-          );
+          await this.itemCoordinates.removeItemCoordinates(item);
+
           return true;
         } catch (error) {
           console.error(error);

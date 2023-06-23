@@ -21,7 +21,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
-import { ItemCleanup } from "./ItemCleanup";
+import { ItemDropCleanup } from "./ItemDropCleanup";
 import { ItemOwnership } from "./ItemOwnership";
 
 @provide(ItemDrop)
@@ -35,7 +35,7 @@ export class ItemDrop {
     private characterWeight: CharacterWeight,
     private itemOwnership: ItemOwnership,
     private characterInventory: CharacterInventory,
-    private itemCleanup: ItemCleanup,
+    private itemCleanup: ItemDropCleanup,
     private newRelic: NewRelic
   ) {}
 

@@ -40,10 +40,9 @@ export class ItemOwnership {
         _id: item._id,
       },
       {
-        owner: undefined,
+        $unset: { owner: "" },
       }
     );
-
     if (item?.itemContainer) {
       const itemContainer = await ItemContainer.findById(item.itemContainer);
 
@@ -56,7 +55,7 @@ export class ItemOwnership {
         {
           _id: item.itemContainer,
         },
-        { owner: undefined }
+        { $unset: { owner: "" } }
       );
 
       // this removes from all nested items
