@@ -40,8 +40,6 @@ export class CharacterItemEquipment {
 
     await this.characterItemBuff.disableItemBuff(character, itemId);
 
-    await Item.updateOne({ _id: itemId }, { $set: { isBeingEquipped: false } });
-
     return await this.removeItemFromEquipmentSet(item, character);
   }
 
@@ -247,9 +245,16 @@ export class CharacterItemEquipment {
       return false;
     }
 
-    equipmentSet[targetSlot] = undefined;
-
-    await equipmentSet.save();
+    await Equipment.updateOne(
+      {
+        _id: equipmentSetId,
+      },
+      {
+        $unset: {
+          [targetSlot]: 1,
+        },
+      }
+    );
 
     return true;
   }
