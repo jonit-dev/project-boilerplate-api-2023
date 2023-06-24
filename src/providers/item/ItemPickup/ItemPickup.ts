@@ -42,12 +42,6 @@ export class ItemPickup {
             return false;
           }
 
-          const hasRaceCondition = await this.hasRaceCondition(itemToBePicked, character);
-
-          if (hasRaceCondition) {
-            return false;
-          }
-
           const inventory = await this.characterInventory.getInventory(character);
 
           const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
@@ -95,7 +89,9 @@ export class ItemPickup {
             itemToBePicked,
             character,
             itemPickupData.toContainerId,
-            isInventoryItem
+            {
+              isInventoryItem,
+            }
           );
 
           if (!addToContainer) {
@@ -191,17 +187,5 @@ export class ItemPickup {
     }
 
     return true;
-  }
-
-  private async hasRaceCondition(itemToBePicked: IItem, character: ICharacter): Promise<boolean> {
-    // this prevents item duplication (2 chars trying to pick up the same item at the same time)
-    if (itemToBePicked.isBeingPickedUp) {
-      this.socketMessaging.sendErrorMessageToCharacter(character);
-      return true;
-    }
-    itemToBePicked.isBeingPickedUp = true;
-    await itemToBePicked.save();
-
-    return false;
   }
 }

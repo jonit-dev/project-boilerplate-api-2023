@@ -47,13 +47,11 @@ export class NPCDeath {
     // first thing, lets freeze the NPC so it clears all the interval and it stops moving.
     await this.npcFreezer.freezeNPC(npc);
 
-    const isLocked = await this.locker.isLocked(`npc-death-${npc._id}`);
+    const hasLocked = await this.locker.lock(`npc-death-${npc._id}`);
 
-    if (isLocked) {
+    if (!hasLocked) {
       return;
     }
-
-    await this.locker.lock(`npc-death-${npc._id}`);
 
     await this.time.waitForMilliseconds(random(1, 100));
 
@@ -163,9 +161,9 @@ export class NPCDeath {
   }
 
   public async generateNPCBody(npc: INPC): Promise<IItem | undefined> {
-    const hasBodyGenerateLock = await this.locker.isLocked(`npc-body-generation-${npc._id}`);
+    const hasLock = await this.locker.lock(`npc-body-generation-${npc._id}`);
 
-    if (hasBodyGenerateLock) {
+    if (!hasLock) {
       return;
     }
 
@@ -182,7 +180,6 @@ export class NPCDeath {
       x: npc.x,
       y: npc.y,
     });
-    await this.locker.lock(`npc-body-generation-${npc._id}`);
 
     return await npcBody.save();
   }

@@ -100,15 +100,14 @@ export class BattleNetworkInitTargeting {
               await this.battleNetworkStopTargeting.stopTargeting(character);
             }
 
-            const hasBattleTarget = await this.locker.isLocked(`character-${character._id}-battle-targeting`);
+            const hasLocked = await this.locker.lock(`character-${character._id}-battle-targeting`);
 
-            if (hasBattleTarget) {
+            // if it fails to lock thats because the character is already targeting, so lets clear it.
+            if (!hasLocked) {
               await this.battleTargeting.cancelTargeting(character);
               await this.battleNetworkStopTargeting.stopTargeting(character);
               await this.locker.unlock(`character-${character._id}-battle-targeting`);
             }
-
-            await this.locker.lock(`character-${character._id}-battle-targeting`);
 
             await this.characterSetTargeting(character, target, data.type);
           }

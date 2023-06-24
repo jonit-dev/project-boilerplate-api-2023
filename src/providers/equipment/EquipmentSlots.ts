@@ -324,8 +324,6 @@ export class EquipmentSlots {
 
           await this.characterItemBuff.disableItemBuff(character, item._id);
 
-          await Item.updateOne({ _id: item._id }, { $set: { isBeingEquipped: false } });
-
           return true;
         }
 

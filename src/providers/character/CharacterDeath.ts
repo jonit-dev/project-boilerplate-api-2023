@@ -240,7 +240,9 @@ export class CharacterDeath {
       item = await this.clearItem(item);
 
       // now that the slot is clear, lets drop the item on the body
-      await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id);
+      await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
+        shouldAddOwnership: false,
+      });
 
       if (!isDeadBodyLootable) {
         isDeadBodyLootable = true;
@@ -292,7 +294,9 @@ export class CharacterDeath {
         item = await this.clearItem(item);
 
         // now that the slot is clear, lets drop the item on the body
-        await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id);
+        await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
+          shouldAddOwnership: false,
+        });
 
         if (!isDeadBodyLootable) {
           isDeadBodyLootable = true;

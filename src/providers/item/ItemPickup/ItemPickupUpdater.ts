@@ -1,5 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
@@ -32,8 +32,6 @@ export class ItemPickupUpdater {
       async () => {
         // whenever a new item is added, we need to update the character weight
         await this.characterWeight.updateCharacterWeight(character);
-
-        await Item.updateOne({ _id: itemToBePicked._id }, { isBeingPickedUp: false }); // unlock item
       }
     );
   }

@@ -223,7 +223,10 @@ describe("CharacterDeath.ts | Character with items", () => {
     // backpack ownership should be null after death
     expect(bodyItemContainer.slots[0].owner).toBeUndefined();
 
-    const updatedBody = await Item.findById(characterBody!._id);
+    const updatedBody = await Item.findById(characterBody!._id).lean();
+
+    expect(updatedBody?.owner).toBeUndefined();
+
     expect(updatedBody?.isDeadBodyLootable).toBe(true);
   });
 
