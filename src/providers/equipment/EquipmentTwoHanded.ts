@@ -3,7 +3,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { IEquipmentSet, ItemSlotType, ItemSubType } from "@rpg-engine/shared";
+import { CharacterClass, IEquipmentSet, ItemSlotType, ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(EquipmentTwoHanded)
@@ -44,6 +44,10 @@ export class EquipmentTwoHanded {
 
             // if item to be equipped is a shield, just allow it
             if (itemToBeEquipped.subType === ItemSubType.Shield) {
+              return true;
+            }
+
+            if (character.class === CharacterClass.Berserker) {
               return true;
             }
 
