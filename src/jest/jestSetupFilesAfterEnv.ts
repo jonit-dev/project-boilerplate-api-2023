@@ -68,6 +68,7 @@ jest.mock("@providers/constants/NPCConstants", () => ({
 
 jest.mock("@providers/constants/PVPConstants", () => ({
   PVP_MIN_REQUIRED_LV: 8,
+  PVP_ROGUE_ATTACK_DAMAGE_INCREASE_MULTIPLIER: 0.1,
 }));
 
 jest.mock("mongoose-update-if-current", () => ({
