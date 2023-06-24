@@ -1,4 +1,4 @@
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { Locker } from "@providers/locks/Locker";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IItemPickup, ItemSocketEvents } from "@rpg-engine/shared";
@@ -7,18 +7,21 @@ import { ItemPickup } from "../ItemPickup/ItemPickup";
 
 @provide(ItemNetworkPickup)
 export class ItemNetworkPickup {
-  constructor(private socketAuth: SocketAuth, private itemPickup: ItemPickup) {}
+  constructor(private socketAuth: SocketAuth, private itemPickup: ItemPickup, private locker: Locker) {}
 
   public onItemPickup(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, ItemSocketEvents.Pickup, async (data: IItemPickup, character) => {
-      if (data) {
-        const result = await this.itemPickup.performItemPickup(data, character);
+      const hasLocked = await this.locker.lock(`item-pickup-${data.itemId}`);
 
-        // if we couldnt pick this up, make sure it remains unlocked
-        if (!result) {
-          await Item.updateOne({ _id: data.itemId }, { isBeingPickedUp: false }); // unlock item
-        }
+      if (!hasLocked) {
+        return;
       }
+
+      if (data) {
+        await this.itemPickup.performItemPickup(data, character);
+      }
+
+      await this.locker.unlock(`item-pickup-${data.itemId}`);
     });
   }
 }

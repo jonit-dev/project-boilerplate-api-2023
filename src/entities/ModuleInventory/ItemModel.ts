@@ -13,7 +13,6 @@ import { ItemContainer } from "./ItemContainerModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 const itemSchema = createLeanSchema(
   {
@@ -98,8 +97,6 @@ const itemSchema = createLeanSchema(
 
     canUseOnNonPVPZone: Type.boolean({ required: true, default: false }),
 
-    isBeingPickedUp: Type.boolean({ required: true, default: false }), // lock mechanism to avoid item duplication
-
     isBeingEquipped: Type.boolean({ required: true, default: false }), // lock mechanism to avoid item equip duplication
 
     isEquipped: Type.boolean({ required: true, default: false }),
@@ -127,7 +124,7 @@ const itemSchema = createLeanSchema(
     tier: Type.number({ default: 1 }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
-).plugin(updateIfCurrentPlugin);
+);
 
 itemSchema.index({ x: 1, y: 1, scene: 1, owner: 1, ItemContainer: 1 }, { background: true });
 

@@ -10,6 +10,10 @@ export class InMemoryHashTable {
     await this.redisManager.client.hSet(namespace?.toString(), key?.toString(), JSON.stringify(value));
   }
 
+  public async setNx(namespace: string, key: string, value: any): Promise<boolean> {
+    return await this.redisManager.client.hSetNX(namespace?.toString(), key?.toString(), JSON.stringify(value));
+  }
+
   public async expire(key: string, seconds: number, mode: "NX" | "XX" | "GT" | "LT"): Promise<void> {
     if (!appEnv.general.IS_UNIT_TEST) {
       await this.redisManager.client.expire(key?.toString(), seconds, mode);

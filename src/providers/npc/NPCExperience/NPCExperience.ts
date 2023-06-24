@@ -55,13 +55,11 @@ export class NPCExperience {
   public async releaseXP(target: INPC): Promise<void> {
     await this.time.waitForMilliseconds(random(0, 200)); // add artificial delay to avoid concurrency
 
-    const hasXPLock = await this.locker.isLocked(`npc-${target._id}-release-xp`);
+    const hasLock = await this.locker.lock(`npc-${target._id}-release-xp`);
 
-    if (hasXPLock) {
+    if (!hasLock) {
       return;
     }
-
-    await this.locker.lock(`npc-${target._id}-release-xp`);
 
     let levelUp = false;
     let previousLevel = 0;
