@@ -14,6 +14,7 @@ const v4Client = {
   set: promisify(client.set).bind(client),
   del: promisify(client.del).bind(client),
   hSet: promisify(client.hset).bind(client),
+  hSetNX: promisify(client.hsetnx).bind(client),
   hGet: promisify(client.hget).bind(client),
   hDel: promisify(client.hdel).bind(client),
   hGetAll: promisify(client.hgetall).bind(client),
