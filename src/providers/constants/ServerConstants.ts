@@ -16,3 +16,12 @@ export const EXHAUSTABLE_EVENTS = [
   "UseWithItem",
   ItemSocketEvents.Use,
 ] as string[];
+
+export const LOCKABLE_EVENTS = [
+  ItemSocketEvents.Pickup,
+  ItemSocketEvents.Equip,
+  ItemSocketEvents.Unequip,
+  ItemSocketEvents.Drop,
+  ItemSocketEvents.Use,
+  ItemSocketEvents.UseWith,
+] as string[];
