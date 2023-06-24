@@ -66,6 +66,11 @@ jest.mock("@providers/constants/NPCConstants", () => ({
   NPC_TRADER_INTERACTION_DISTANCE: 2,
 }));
 
+jest.mock("@providers/constants/PVPConstants", () => ({
+  PVP_MIN_REQUIRED_LV: 8,
+  PVP_ROGUE_ATTACK_DAMAGE_INCREASE_MULTIPLIER: 0.1,
+}));
+
 jest.mock("mongoose-update-if-current", () => ({
   updateIfCurrentPlugin: jest.fn(), // mock the plugin because otherwise it will break many tests
 }));
