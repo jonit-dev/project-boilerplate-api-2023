@@ -67,8 +67,6 @@ export class EquipmentEquip {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item not found.");
       return false;
     }
-    item.isBeingEquipped = true;
-    await item.save();
 
     const isItemInventory = item.isItemContainer;
 
@@ -147,13 +145,6 @@ export class EquipmentEquip {
           this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
           return false;
         }
-
-        if (item.isBeingEquipped) {
-          this.socketMessaging.sendErrorMessageToCharacter(character);
-          return false;
-        }
-
-        item.isBeingEquipped = true;
 
         const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
 
@@ -236,9 +227,6 @@ export class EquipmentEquip {
     if (item.x || item.y || item.scene) {
       await Item.updateOne({ _id: item._id }, { $unset: { x: "", y: "", scene: "" } });
     }
-
-    // set isBeingEquipped to false (lock mechanism)
-    await Item.updateOne({ _id: item._id }, { $set: { isBeingEquipped: false } });
 
     // When Equip remove data from redis
     await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");

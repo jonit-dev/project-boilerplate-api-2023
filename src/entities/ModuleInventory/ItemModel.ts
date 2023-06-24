@@ -97,8 +97,6 @@ const itemSchema = createLeanSchema(
 
     canUseOnNonPVPZone: Type.boolean({ required: true, default: false }),
 
-    isBeingEquipped: Type.boolean({ required: true, default: false }), // lock mechanism to avoid item equip duplication
-
     isEquipped: Type.boolean({ required: true, default: false }),
 
     isTraining: Type.boolean({ required: true, default: false }), // For training items which gives a max damage of 1

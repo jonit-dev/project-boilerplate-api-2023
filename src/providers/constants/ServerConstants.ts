@@ -24,4 +24,9 @@ export const LOCKABLE_EVENTS = [
   ItemSocketEvents.Drop,
   ItemSocketEvents.Use,
   ItemSocketEvents.UseWith,
+  ItemSocketEvents.ContainerTransfer,
+  ItemSocketEvents.CraftItem,
+  ItemSocketEvents.Move,
+  "UseWithTile",
+  "UseWithItem",
 ] as string[];

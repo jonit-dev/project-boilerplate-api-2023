@@ -41,7 +41,7 @@ export class ItemDeleteCrons {
             //* And also without an owner
             owner: { $in: [null, undefined] },
 
-            //* Are not equipped
+            //* Are not equipped and not picked up
             isEquipped: { $ne: true },
 
             name: { $ne: "Depot" },

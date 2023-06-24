@@ -11,17 +11,9 @@ export class ItemNetworkPickup {
 
   public onItemPickup(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, ItemSocketEvents.Pickup, async (data: IItemPickup, character) => {
-      const hasLocked = await this.locker.lock(`item-pickup-${data.itemId}`);
-
-      if (!hasLocked) {
-        return;
-      }
-
       if (data) {
         await this.itemPickup.performItemPickup(data, character);
       }
-
-      await this.locker.unlock(`item-pickup-${data.itemId}`);
     });
   }
 }

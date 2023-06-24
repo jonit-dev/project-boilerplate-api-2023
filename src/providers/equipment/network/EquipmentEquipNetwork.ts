@@ -1,5 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { Locker } from "@providers/locks/Locker";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IEquipItemPayload, ItemSocketEvents } from "@rpg-engine/shared";
@@ -8,7 +8,7 @@ import { EquipmentEquip } from "../EquipmentEquip";
 
 @provide(EquipmentEquipNetwork)
 export class EquipmentEquipNetwork {
-  constructor(private socketAuth: SocketAuth, private equipmentEquip: EquipmentEquip) {}
+  constructor(private socketAuth: SocketAuth, private equipmentEquip: EquipmentEquip, private locker: Locker) {}
 
   public onItemEquip(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
@@ -16,11 +16,7 @@ export class EquipmentEquipNetwork {
       ItemSocketEvents.Equip,
       async (data: IEquipItemPayload, character: ICharacter) => {
         const { itemId, itemContainerId } = data;
-        const result = await this.equipmentEquip.equip(character, itemId, itemContainerId);
-
-        if (!result) {
-          await Item.updateOne({ _id: itemId }, { $set: { isBeingEquipped: false } });
-        }
+        await this.equipmentEquip.equip(character, itemId, itemContainerId);
       }
     );
   }
