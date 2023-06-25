@@ -115,16 +115,7 @@ export const npcIceTroll: Partial<INPC> = {
       chance: 20,
       quantityRange: [1, 5],
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
-      chance: 10,
-      quantityRange: [1, 10],
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
-      chance: 20,
-      quantityRange: [1, 5],
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Skull,
       chance: 15,
