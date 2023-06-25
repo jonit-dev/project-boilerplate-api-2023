@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IEquippableRangedAmmoBlueprint, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 
@@ -16,4 +17,6 @@ export const itemCorruptionBolt: IEquippableRangedAmmoBlueprint = {
   maxStackSize: 100,
   basePrice: 3,
   canSell: false,
+  entityEffects: [EntityEffectBlueprint.Corruption],
+  entityEffectChance: 70,
 };

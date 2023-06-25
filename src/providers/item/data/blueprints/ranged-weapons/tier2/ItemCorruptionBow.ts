@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { IEquippableRangedTier2WeaponBlueprint } from "../../../types/TierBlueprintTypes";
@@ -21,4 +22,6 @@ export const itemCorruptionBow: IEquippableRangedTier2WeaponBlueprint = {
   requiredAmmoKeys: [RangedWeaponsBlueprint.Arrow, RangedWeaponsBlueprint.IronArrow, RangedWeaponsBlueprint.FrostArrow],
   isTwoHanded: true,
   basePrice: 70,
+  entityEffects: [EntityEffectBlueprint.Corruption],
+  entityEffectChance: 70,
 };

@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   BasicAttribute,
   CharacterBuffDurationType,
@@ -27,6 +28,8 @@ export const itemCorruptionDagger: IEquippableMeleeTier3WeaponBlueprint = {
   tier: 3,
   rangeType: EntityAttackType.Melee,
   basePrice: 44,
+  entityEffects: [EntityEffectBlueprint.Corruption],
+  entityEffectChance: 70,
   equippedBuff: [
     {
       type: CharacterBuffType.Skill,
