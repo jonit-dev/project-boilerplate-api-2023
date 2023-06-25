@@ -174,7 +174,7 @@ export class EquipmentEquip {
         await clearCacheForKey(`characterBuffs_${character._id}`);
         await clearCacheForKey(`${character._id}-skills`);
 
-        await this.characterBuffValidation.removeDuplicatedBuffsForSameItem(character);
+        await this.characterBuffValidation.removeDuplicatedBuffs(character);
 
         return true;
       }

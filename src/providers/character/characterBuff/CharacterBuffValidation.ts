@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ICharacterBuff, ICharacterItemBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { CharacterItemEquipment } from "../characterItems/CharacterItemEquipment";
 import { CharacterBuffAttribute } from "./CharacterBuffAttribute";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
@@ -13,10 +14,11 @@ interface IBuff extends ICharacterBuff {
 export class CharacterBuffValidation {
   constructor(
     private characterBuffAttribute: CharacterBuffAttribute,
-    private characterBuffTracker: CharacterBuffTracker
+    private characterBuffTracker: CharacterBuffTracker,
+    private characterItemEquipment: CharacterItemEquipment
   ) {}
 
-  public async removeDuplicatedBuffsForSameItem(character: ICharacter): Promise<void> {
+  public async removeDuplicatedBuffs(character: ICharacter): Promise<void> {
     const allCharacterBuffs = (await this.characterBuffTracker.getAllCharacterBuffs(character._id)) as IBuff[];
 
     if (!allCharacterBuffs) {
@@ -29,6 +31,21 @@ export class CharacterBuffValidation {
 
     for (const buff of duplicatedBuffsToRemove) {
       if (buff._id) await this.characterBuffAttribute.disableBuff(character, buff._id, true);
+    }
+
+    // remove buffs from items that are not equipped
+
+    for (const buff of itemBuffs) {
+      // if its not a item buff, skip
+      if (!buff.itemKey) {
+        continue;
+      }
+
+      const isItemEquipped = await this.characterItemEquipment.checkItemEquipment(buff.itemId, character);
+
+      if (!isItemEquipped) {
+        await this.characterBuffAttribute.disableBuff(character, buff._id!, true);
+      }
     }
   }
 

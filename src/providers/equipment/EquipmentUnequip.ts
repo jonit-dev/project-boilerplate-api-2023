@@ -3,6 +3,8 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
+import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
@@ -26,7 +28,9 @@ export class EquipmentUnequip {
     private characterItemContainer: CharacterItemContainer,
     private inMemoryHashTable: InMemoryHashTable,
     private newRelic: NewRelic,
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private characterBuffTracker: CharacterBuffTracker,
+    private characterBuffActivator: CharacterBuffActivator
   ) {}
 
   public async unequip(character: ICharacter, inventory: IItem, item: IItem): Promise<boolean> {
@@ -146,6 +150,14 @@ export class EquipmentUnequip {
 
         if (!item.owner) {
           await this.itemOwnership.addItemOwnership(item, character);
+        }
+
+        // if by any reason the item still have a buff, lets make sure its wiped out
+
+        const buffs = await this.characterBuffTracker.getBuffByItemId(character._id, item._id);
+
+        for (const buff of buffs) {
+          await this.characterBuffActivator.disableBuff(character, buff._id!, buff.type, true);
         }
 
         return true;

@@ -108,7 +108,7 @@ export class CharacterNetworkCreate {
         await this.battleNetworkStopTargeting.stopTargeting(character);
         await this.battleTargeting.cancelTargeting(character);
 
-        await this.characterBuffValidation.removeDuplicatedBuffsForSameItem(character);
+        await this.characterBuffValidation.removeDuplicatedBuffs(character);
 
         const map = character.scene;
 
