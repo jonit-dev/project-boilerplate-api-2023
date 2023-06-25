@@ -5,7 +5,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemPickup } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MapHelper } from "@providers/map/MapHelper";
@@ -42,6 +42,10 @@ export class ItemPickup {
             return false;
           }
 
+          if (itemToBePicked.isBeingPickedUp) {
+            return false;
+          }
+
           const inventory = await this.characterInventory.getInventory(character);
 
           const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
@@ -51,14 +55,9 @@ export class ItemPickup {
             itemToBePicked.scene !== undefined;
 
           // support picking items from a tiled map seed
-          await Item.updateOne(
-            { _id: itemToBePicked._id },
-            {
-              $set: {
-                key: itemToBePicked.baseKey,
-              },
-            }
-          );
+          itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
+          itemToBePicked.isBeingPickedUp = true;
+          await itemToBePicked.save();
 
           await this.itemOwnership.addItemOwnership(itemToBePicked, character);
 

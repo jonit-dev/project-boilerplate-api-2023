@@ -14,6 +14,8 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+
 const itemSchema = createLeanSchema(
   {
     tiledId: Type.number(),
@@ -103,6 +105,8 @@ const itemSchema = createLeanSchema(
 
     isDeadBodyLootable: Type.boolean({ required: false }),
 
+    isBeingPickedUp: Type.boolean({ required: false }),
+
     usableEffectDescription: Type.string({ required: false }),
 
     equippedBuffDescription: Type.string({ required: false }),
@@ -122,7 +126,7 @@ const itemSchema = createLeanSchema(
     tier: Type.number({ default: 1 }),
   },
   { timestamps: { createdAt: true, updatedAt: true } }
-);
+).plugin(updateIfCurrentPlugin);
 
 itemSchema.index({ x: 1, y: 1, scene: 1, owner: 1, ItemContainer: 1 }, { background: true });
 
