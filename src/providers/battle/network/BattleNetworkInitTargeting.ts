@@ -96,28 +96,33 @@ export class BattleNetworkInitTargeting {
                 reason: isValidTarget.reason,
               }
             );
-          } else {
-            const battleCycle = BattleCycle.battleCycles.has(character._id);
-
-            const hasTargetId = character?.target?.id?.toString();
-
-            // prevents double targeting
-            if (battleCycle || hasTargetId) {
-              await this.battleTargeting.cancelTargeting(character);
-              await this.battleNetworkStopTargeting.stopTargeting(character);
-            }
-
-            await this.characterSetTargeting(character, target, data.type);
+            return;
           }
+
+          await this.preventDuplicateTarget(character);
+
+          await this.characterSetTargeting(character, target, data.type);
+
           // validate if character actually can set this target
         } catch (error) {
           console.error(error);
           await this.locker.unlock(`character-${character._id}-battle-targeting`);
-        } finally {
-          await this.locker.unlock(`character-${character._id}-battle-targeting`);
         }
       }
     );
+  }
+
+  private async preventDuplicateTarget(character: ICharacter): Promise<void> {
+    const hasBattleCycle = BattleCycle.battleCycles.has(character._id);
+
+    const hasTargetId = character?.target?.id?.toString();
+
+    // prevents double targeting
+    if (hasBattleCycle || hasTargetId) {
+      const battleCycle = BattleCycle.battleCycles.get(character._id);
+
+      await battleCycle?.clear();
+    }
   }
 
   private async characterSetTargeting(
