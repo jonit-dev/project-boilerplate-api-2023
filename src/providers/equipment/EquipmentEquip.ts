@@ -114,69 +114,73 @@ export class EquipmentEquip {
       NewRelicTransactionCategory.Operation,
       "EquipmentEquip.equip",
       async () => {
-        const item = await Item.findById(itemId);
+        try {
+          const item = await Item.findById(itemId);
 
-        if (!item) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item not found.");
+          if (!item) {
+            this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item not found.");
+            return false;
+          }
+
+          const itemContainer = await ItemContainer.findById(fromItemContainerId);
+
+          if (!itemContainer) {
+            this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item container not found.");
+            return false;
+          }
+
+          const containerType = await this.checkContainerType(itemContainer);
+
+          const isEquipValid = await this.isEquipValid(character, item, containerType);
+
+          if (!isEquipValid) {
+            this.socketMessaging.sendErrorMessageToCharacter(character);
+            return false;
+          }
+
+          //! Warning: Do not cache this query. It causes a bug where the item being equipped disappears from the inventory due to a model missing _id error.
+          const equipment = await Equipment.findById(character.equipment);
+
+          if (!equipment) {
+            this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
+            return false;
+          }
+
+          const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
+
+          if (!equipItem) {
+            return false;
+          }
+
+          const inventory = await this.characterInventory.getInventory(character);
+
+          const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
+
+          if (!inventoryContainer) {
+            this.socketMessaging.sendErrorMessageToCharacter(character, "Failed to equip item.");
+            return false;
+          }
+
+          await item.save();
+
+          // refresh itemContainer from which the item was equipped
+          const updatedContainer = (await ItemContainer.findById(fromItemContainerId)) as any;
+          await this.itemPickupUpdater.sendContainerRead(updatedContainer, character);
+
+          await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
+
+          await clearCacheForKey(`${character._id}-inventory`);
+          await clearCacheForKey(`${character._id}-equipment`);
+          await clearCacheForKey(`characterBuffs_${character._id}`);
+          await clearCacheForKey(`${character._id}-skills`);
+
+          await this.characterBuffValidation.removeDuplicatedBuffs(character);
+
+          return true;
+        } catch (error) {
+          console.error(error);
           return false;
         }
-
-        const itemContainer = await ItemContainer.findById(fromItemContainerId);
-
-        if (!itemContainer) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item container not found.");
-          return false;
-        }
-
-        const containerType = await this.checkContainerType(itemContainer);
-
-        const isEquipValid = await this.isEquipValid(character, item, containerType);
-
-        if (!isEquipValid) {
-          this.socketMessaging.sendErrorMessageToCharacter(character);
-          return false;
-        }
-
-        const equipment = await Equipment.findById(character.equipment).cacheQuery({
-          cacheKey: `${character._id}-equipment`,
-        });
-
-        if (!equipment) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
-          return false;
-        }
-
-        const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
-
-        if (!equipItem) {
-          return false;
-        }
-
-        const inventory = await this.characterInventory.getInventory(character);
-
-        const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
-
-        if (!inventoryContainer) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Failed to equip item.");
-          return false;
-        }
-
-        await item.save();
-
-        // refresh itemContainer from which the item was equipped
-        const updatedContainer = (await ItemContainer.findById(fromItemContainerId)) as any;
-        await this.itemPickupUpdater.sendContainerRead(updatedContainer, character);
-
-        await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
-
-        await clearCacheForKey(`${character._id}-inventory`);
-        await clearCacheForKey(`${character._id}-equipment`);
-        await clearCacheForKey(`characterBuffs_${character._id}`);
-        await clearCacheForKey(`${character._id}-skills`);
-
-        await this.characterBuffValidation.removeDuplicatedBuffs(character);
-
-        return true;
       }
     );
   }
