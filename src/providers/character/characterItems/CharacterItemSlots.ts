@@ -215,27 +215,27 @@ export class CharacterItemSlots {
     return 0;
   }
 
-  public async hasAvailableSlot(targetContainerId: string, itemToBeAdded: IItem): Promise<boolean> {
+  public async hasAvailableSlot(
+    targetContainerId: string,
+    itemToBeAdded: IItem,
+    checkForEmptyOnly: boolean = false
+  ): Promise<boolean> {
     const targetContainer = (await ItemContainer.findById(targetContainerId)) as unknown as IItemContainer;
 
     if (!targetContainer) {
       return false;
     }
 
-    if (!(itemToBeAdded.maxStackSize > 1)) {
-      return targetContainer.firstAvailableSlotId !== null;
-    } else {
-      // if item is stackable, check if there's an empty slot
-      const hasEmptySlot = targetContainer.firstAvailableSlotId !== null;
+    const hasEmptySlot = targetContainer.firstAvailableSlotId !== null;
 
-      if (hasEmptySlot) {
-        return true;
-      }
+    if (hasEmptySlot) {
+      return true;
+    }
 
-      // if there's no empty slot, check if there's a stackable item with the same type, and the stack is not full
+    if (!checkForEmptyOnly && itemToBeAdded.maxStackSize > 1) {
+      // if item is stackable, check if there's a stackable item with the same type, and the stack is not full
 
       // loop through all slots
-
       for (const slot of Object.values(targetContainer.slots)) {
         const slotItem = slot as unknown as IItem;
 
@@ -250,7 +250,7 @@ export class CharacterItemSlots {
       }
     }
 
-    return false;
+    return checkForEmptyOnly && Object.keys(targetContainer.slots).length < targetContainer.slotQty;
   }
 
   public async getFirstAvailableSlotIndex(

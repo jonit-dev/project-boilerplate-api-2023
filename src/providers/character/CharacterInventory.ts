@@ -19,13 +19,13 @@ export class CharacterInventory {
   @TrackTransactionDecorator()
   public async getInventory(character: ICharacter): Promise<IItem | null> {
     const equipment = (await Equipment.findById(character.equipment)
-          .lean({
-            virtuals: true,
-            defaults: true,
-          })
-          .cacheQuery({
-            cacheKey: `${character._id}-equipment`,
-          })) as IEquipment;
+      .lean({
+        virtuals: true,
+        defaults: true,
+      })
+      .cacheQuery({
+        cacheKey: `${character._id}-equipment`,
+      })) as IEquipment;
 
     if (equipment) {
       const inventory = await Item.findById(equipment.inventory)
