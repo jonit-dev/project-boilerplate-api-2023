@@ -12,7 +12,6 @@ export class BattleNetworkStopTargeting {
 
   public onBattleStopTargeting(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, BattleSocketEvents.StopTargeting, async (data, character) => {
-      await this.locker.unlock(`character-${character._id}-battle-targeting`);
       await this.stopTargeting(character);
     });
   }
@@ -27,6 +26,8 @@ export class BattleNetworkStopTargeting {
         if (battleCycle) {
           await battleCycle.clear();
         }
+
+        await this.locker.unlock(`character-${character._id}-battle-targeting`);
       }
     } catch (error) {
       console.error(error);
