@@ -32,8 +32,6 @@ export class BattleCharacterAttack {
       return;
     }
 
-    await this.execAttackLoop(character, target);
-
     new BattleCycle(
       character.id,
       async () => {
