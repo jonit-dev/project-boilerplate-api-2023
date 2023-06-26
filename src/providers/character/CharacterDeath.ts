@@ -19,7 +19,13 @@ import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { BattleSocketEvents, IBattleDeath, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
+import {
+  BattleSocketEvents,
+  CharacterBuffType,
+  IBattleDeath,
+  IUIShowMessage,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
@@ -28,6 +34,8 @@ import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterWeight } from "./CharacterWeight";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
+import { CharacterBuffActivator } from "./characterBuff/CharacterBuffActivator";
+import { CharacterBuff, ICharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 
 export const DROPPABLE_EQUIPMENT = [
   "head",
@@ -55,7 +63,8 @@ export class CharacterDeath {
     private characterItemContainer: CharacterItemContainer,
     private entityEffectUse: EntityEffectUse,
     private equipmentSlots: EquipmentSlots,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private characterBuffActivator: CharacterBuffActivator
   ) {}
 
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
@@ -289,6 +298,24 @@ export class CharacterDeath {
 
         if (!removeEquipmentFromSlot) {
           return;
+        }
+
+        const itemKey = item.key;
+        const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey })
+          .lean()
+          .select("_id type")) as ICharacterBuff;
+
+        if (buff) {
+          const disableBuff = await this.characterBuffActivator.disableBuff(
+            character,
+            buff._id,
+            buff.type as CharacterBuffType,
+            true
+          );
+
+          if (!disableBuff) {
+            throw new Error(`Error disabling buff ${buff._id}`);
+          }
         }
 
         item = await this.clearItem(item);
