@@ -1,3 +1,4 @@
+import { CharacterBuff, ICharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
@@ -33,9 +34,8 @@ import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterWeight } from "./CharacterWeight";
-import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterBuffActivator } from "./characterBuff/CharacterBuffActivator";
-import { CharacterBuff, ICharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
+import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 
 export const DROPPABLE_EQUIPMENT = [
   "head",
@@ -246,7 +246,7 @@ export class CharacterDeath {
     if (n <= dropInventoryChance) {
       let item = (await Item.findById(inventory._id)) as IItem;
 
-      item = await this.clearItem(item);
+      item = await this.clearItem(character, item);
 
       // now that the slot is clear, lets drop the item on the body
       await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
@@ -300,25 +300,7 @@ export class CharacterDeath {
           return;
         }
 
-        const itemKey = item.key;
-        const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey })
-          .lean()
-          .select("_id type")) as ICharacterBuff;
-
-        if (buff) {
-          const disableBuff = await this.characterBuffActivator.disableBuff(
-            character,
-            buff._id,
-            buff.type as CharacterBuffType,
-            true
-          );
-
-          if (!disableBuff) {
-            throw new Error(`Error disabling buff ${buff._id}`);
-          }
-        }
-
-        item = await this.clearItem(item);
+        item = await this.clearItem(character, item);
 
         // now that the slot is clear, lets drop the item on the body
         await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
@@ -333,7 +315,25 @@ export class CharacterDeath {
     }
   }
 
-  private async clearItem(item: IItem): Promise<IItem> {
+  private async clearItem(character: ICharacter, item: IItem): Promise<IItem> {
+    const itemKey = item.key;
+    const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey })
+      .lean()
+      .select("_id type")) as ICharacterBuff;
+
+    if (buff) {
+      const disableBuff = await this.characterBuffActivator.disableBuff(
+        character,
+        buff._id,
+        buff.type as CharacterBuffType,
+        true
+      );
+
+      if (!disableBuff) {
+        throw new Error(`Error disabling buff ${buff._id}`);
+      }
+    }
+
     item.x = undefined;
     item.y = undefined;
     item.owner = undefined;

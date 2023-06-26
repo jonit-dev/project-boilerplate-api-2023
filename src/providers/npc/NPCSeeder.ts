@@ -8,6 +8,7 @@ import {
   NPC_SKILL_STRENGTH_MULTIPLIER,
   NPC_SPEED_MULTIPLIER,
 } from "@providers/constants/NPCConstants";
+import { Locker } from "@providers/locks/Locker";
 import { GridManager } from "@providers/map/GridManager";
 import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
 import { ToGridX, ToGridY } from "@rpg-engine/shared";
@@ -18,7 +19,12 @@ import { NPCGiantForm } from "./NPCGiantForm";
 
 @provide(NPCSeeder)
 export class NPCSeeder {
-  constructor(private npcLoader: NPCLoader, private gridManager: GridManager, private npcGiantForm: NPCGiantForm) {}
+  constructor(
+    private npcLoader: NPCLoader,
+    private gridManager: GridManager,
+    private npcGiantForm: NPCGiantForm,
+    private locker: Locker
+  ) {}
 
   public async seed(): Promise<void> {
     const npcSeedData = this.npcLoader.loadNPCSeedData();
@@ -73,6 +79,10 @@ export class NPCSeeder {
 
   private async resetNPC(npc: INPC, NPCData: INPCSeedData): Promise<void> {
     try {
+      await this.locker.unlock(`npc-death-${npc._id}`);
+      await this.locker.unlock(`npc-body-generation-${npc._id}`);
+      await this.locker.unlock(`npc-${npc._id}-release-xp`);
+
       const randomMaxHealth = this.setNPCRandomHealth(NPCData);
 
       const updateParams = {
