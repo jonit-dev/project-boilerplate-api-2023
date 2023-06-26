@@ -12,7 +12,7 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { ItemSocketEvents, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IEquipmentSet, ItemSocketEvents, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { clearCacheForKey } from "speedgoose";
 import { EquipmentSlots } from "./EquipmentSlots";
@@ -63,45 +63,30 @@ export class EquipmentUnequip {
           return false;
         }
 
-        const preEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+        const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
-        const DECREASE_VALUE = 2;
-        const Accessory = await Item.findById(preEquipmentSlots.accessory);
+        const bookValue = 2;
+        const Accessory = await Item.findById(equipmentSlots.accessory);
         if (item.type === ItemType.Weapon && Accessory?.subType === ItemSubType.Book) {
-          await Item.updateOne({ _id: item._id }, { $inc: { attack: -DECREASE_VALUE, defense: -DECREASE_VALUE } });
+          await Item.updateOne({ _id: item._id }, { $inc: { attack: -bookValue, defense: -bookValue } });
         }
 
-        const newItem = (await Item.findById(item._id)) || item;
-
-        //   add it to the inventory
-
-        const addItemToInventory = await this.characterItemContainer.addItemToContainer(
-          newItem,
-          character,
-          inventoryContainerId
-        );
-
-        if (!addItemToInventory) {
-          return false;
-        }
+        const updatedItem = (await Item.findById(item._id)) || item;
 
         const hasItemOnEquipment = await this.characterItems.hasItem(item._id, character, "equipment");
 
-        if (hasItemOnEquipment) {
-          try {
-            await this.characterItems.deleteItemFromContainer(item._id, character, "equipment");
-          } catch (error) {
-            // if we couldn't remove the item from the equipment, we need to remove it from the inventory to avoid a duplicate item
-            await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
+        // if we don't have the item we're trying to unequip, just abort the operation
+        if (!hasItemOnEquipment) {
+          return false;
+        }
 
-            console.error(error);
-            return false;
-          }
+        const hasUnequipped = await this.performUnequipTransaction(character, updatedItem, inventoryContainerId);
+
+        if (!hasUnequipped) {
+          return false;
         }
 
         // send payload event to the client, informing about the change
-
-        const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
         const inventoryContainer = await ItemContainer.findById(inventoryContainerId);
 
@@ -112,32 +97,7 @@ export class EquipmentUnequip {
 
         await Item.updateOne({ _id: item._id }, { isEquipped: false });
 
-        // When unequip remove data from redis
-        await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
-        await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
-
-        await clearCacheForKey(`${character._id}-inventory`);
-        await clearCacheForKey(`${character._id}-equipment`);
-        await clearCacheForKey(`characterBuffs_${character._id}`);
-        await clearCacheForKey(`${character._id}-skills`);
-
-        // decrease attack and defense
-        if (item.subType === ItemSubType.Book) {
-          const leftHandItem = await Item.findById(equipmentSlots.leftHand);
-          const rightHandItem = await Item.findById(equipmentSlots.rightHand);
-          if (leftHandItem?.type === ItemType.Weapon) {
-            await Item.updateOne(
-              { _id: leftHandItem._id },
-              { $inc: { attack: -DECREASE_VALUE, defense: -DECREASE_VALUE } }
-            );
-          }
-          if (rightHandItem?.type === ItemType.Weapon) {
-            await Item.updateOne(
-              { _id: rightHandItem._id },
-              { $inc: { attack: -DECREASE_VALUE, defense: -DECREASE_VALUE } }
-            );
-          }
-        }
+        await this.handleBookEffect(item, equipmentSlots, bookValue);
 
         const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
@@ -160,9 +120,65 @@ export class EquipmentUnequip {
           await this.characterBuffActivator.disableBuff(character, buff._id!, buff.type, true);
         }
 
+        await this.clearCache(character);
+
         return true;
       }
     );
+  }
+
+  private async performUnequipTransaction(
+    character: ICharacter,
+    item: IItem,
+    inventoryContainerId: string
+  ): Promise<boolean> {
+    try {
+      //   add it to the inventory
+      const addItemToInventory = await this.characterItemContainer.addItemToContainer(
+        item,
+        character,
+        inventoryContainerId
+      );
+
+      if (!addItemToInventory) {
+        return false;
+      }
+
+      await this.characterItems.deleteItemFromContainer(item._id, character, "equipment");
+    } catch (error) {
+      // if we couldn't remove the item from the equipment, we need to remove it from the inventory to avoid a duplicate item
+      await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
+
+      console.error(error);
+      return false;
+    }
+
+    return true;
+  }
+
+  private async clearCache(character: ICharacter): Promise<void> {
+    // When unequip remove data from redis
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
+
+    await clearCacheForKey(`${character._id}-inventory`);
+    await clearCacheForKey(`${character._id}-equipment`);
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
+  }
+
+  private async handleBookEffect(item: IItem, equipmentSlots: IEquipmentSet, bookValue: number): Promise<void> {
+    // decrease attack and defense
+    if (item.subType === ItemSubType.Book) {
+      const leftHandItem = await Item.findById(equipmentSlots.leftHand);
+      const rightHandItem = await Item.findById(equipmentSlots.rightHand);
+      if (leftHandItem?.type === ItemType.Weapon) {
+        await Item.updateOne({ _id: leftHandItem._id }, { $inc: { attack: -bookValue, defense: -bookValue } });
+      }
+      if (rightHandItem?.type === ItemType.Weapon) {
+        await Item.updateOne({ _id: rightHandItem._id }, { $inc: { attack: -bookValue, defense: -bookValue } });
+      }
+    }
   }
 
   private async isUnequipValid(character: ICharacter, item: IItem, inventoryContainerId: string): Promise<boolean> {

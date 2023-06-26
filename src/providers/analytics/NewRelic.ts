@@ -36,8 +36,6 @@ export class NewRelic {
     cb: Promise<(...args: unknown[]) => any>,
     skipTracking?: boolean
   ): Promise<any> {
-
-    
     return new Promise((resolve, reject): void => {
       if (appEnv.general.IS_UNIT_TEST || skipTracking) {
         return resolve(cb);
