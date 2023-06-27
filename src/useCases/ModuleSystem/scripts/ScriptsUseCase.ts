@@ -76,15 +76,17 @@ export class ScriptsUseCase {
       const depots = await Depot.find({ owner: character._id });
 
       for (const depot of depots) {
-        const itemContainer = await ItemContainer.findById(depot.itemContainer);
+        const itemContainer = await ItemContainer.findById(depot.itemContainer).cacheQuery({
+          cacheKey: `${depot.itemContainer}-targetContainer`,
+        });
 
         if (!itemContainer) {
-          await depot.remove();
+          await Depot.deleteOne({ _id: depot._id });
         }
 
         if (!itemContainer?.slots) {
-          await depot.remove();
-          await itemContainer?.remove();
+          await Depot.deleteOne({ _id: depot._id });
+          await ItemContainer.deleteOne({ _id: itemContainer?._id });
         }
       }
     }

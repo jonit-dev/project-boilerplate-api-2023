@@ -44,7 +44,9 @@ export class ItemOwnership {
       }
     );
     if (item?.itemContainer) {
-      const itemContainer = await ItemContainer.findById(item.itemContainer);
+      const itemContainer = await ItemContainer.findById(item.itemContainer).cacheQuery({
+        cacheKey: `${item.itemContainer}-targetContainer`,
+      });
 
       if (!itemContainer) {
         throw new Error("ItemOwnership: Item container not found");
@@ -64,7 +66,9 @@ export class ItemOwnership {
   }
 
   public async addOwnershipToAllItemsInContainer(itemContainerId: string, owner: string): Promise<void> {
-    const itemContainer = await ItemContainer.findById(itemContainerId);
+    const itemContainer = await ItemContainer.findById(itemContainerId).cacheQuery({
+      cacheKey: `${itemContainerId}-targetContainer`,
+    });
 
     if (!itemContainer) {
       throw new Error("ItemOwnership: Item container not found");
@@ -91,7 +95,9 @@ export class ItemOwnership {
   }
 
   public async removeOwnershipFromAllItemsInContainer(itemContainerId: string): Promise<void> {
-    const itemContainer = await ItemContainer.findById(itemContainerId);
+    const itemContainer = await ItemContainer.findById(itemContainerId).cacheQuery({
+      cacheKey: `${itemContainerId}-targetContainer`,
+    });
 
     if (!itemContainer) {
       throw new Error("ItemOwnership: Item container not found");

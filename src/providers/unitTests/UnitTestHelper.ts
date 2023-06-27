@@ -30,6 +30,7 @@ import { ISocketTransmissionZone, NPCMovementType, PeriodOfDay, QuestType } from
 import { provide } from "inversify-binding-decorators";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { chatLogsMock } from "./mock/chatLogsMock";
 import {
   itemMeleeRangedMock,
@@ -170,6 +171,9 @@ export class UnitTestHelper {
 
     container.markModified("slots");
     await container.save();
+
+    await clearCacheForKey(`${container._id}-targetContainer`);
+    await clearCacheForKey(`${container._id}-inventoryContainer`);
 
     return container;
   }

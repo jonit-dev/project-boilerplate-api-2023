@@ -88,7 +88,9 @@ export class EquipmentUnequip {
 
         // send payload event to the client, informing about the change
 
-        const inventoryContainer = await ItemContainer.findById(inventoryContainerId);
+        const inventoryContainer = await ItemContainer.findById(inventoryContainerId).cacheQuery({
+          cacheKey: `${inventoryContainerId}-inventoryContainer`,
+        });
 
         this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.EquipmentAndInventoryUpdate, {
           equipment: equipmentSlots,
@@ -101,7 +103,9 @@ export class EquipmentUnequip {
 
         const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
-        const newInventoryContainer = await ItemContainer.findById(inventoryContainerId);
+        const newInventoryContainer = await ItemContainer.findById(inventoryContainerId).cacheQuery({
+          cacheKey: `${inventoryContainerId}-inventoryContainer`,
+        });
 
         this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.EquipmentAndInventoryUpdate, {
           equipment: newEquipmentSlots,

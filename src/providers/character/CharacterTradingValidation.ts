@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPC_TRADER_INTERACTION_DISTANCE } from "@providers/constants/NPCConstants";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
@@ -11,7 +12,6 @@ import { CharacterInventory } from "./CharacterInventory";
 import { CharacterValidation } from "./CharacterValidation";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 
 @provide(CharacterTradingValidation)
 export class CharacterTradingValidation {
@@ -78,7 +78,9 @@ export class CharacterTradingValidation {
 
   public async validateSellTransaction(character: ICharacter, items: ITradeRequestItem[]): Promise<boolean> {
     const inventory = await this.characterInventory.getInventory(character);
-    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
+    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
+      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
+    });
 
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The character does not have an inventory.");

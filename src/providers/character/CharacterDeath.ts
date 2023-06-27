@@ -215,7 +215,9 @@ export class CharacterDeath {
     }
 
     // get item container associated with characterBody
-    const bodyContainer = await ItemContainer.findById(characterBody.itemContainer);
+    const bodyContainer = (await ItemContainer.findById(characterBody.itemContainer).cacheQuery({
+      cacheKey: `${characterBody.itemContainer}-bodyContainer`,
+    })) as IItemContainer;
 
     if (!bodyContainer) {
       throw new Error(`Error fetching itemContainer for Item with key ${characterBody.key}`);

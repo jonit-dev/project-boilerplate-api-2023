@@ -157,16 +157,24 @@ export class ItemPickup {
     const containerToUpdateId = itemPickupData.fromContainerId;
     const updatedContainer =
       !isPickupFromMap &&
-      ((await ItemContainer.findById(containerToUpdateId).lean({
-        virtuals: true,
-        defaults: true,
-      })) as any);
+      ((await ItemContainer.findById(containerToUpdateId)
+        .lean({
+          virtuals: true,
+          defaults: true,
+        })
+        .cacheQuery({
+          cacheKey: `${containerToUpdateId}-targetContainer`,
+        })) as any);
 
     const inventoryContainerToUpdateId = itemPickupData.toContainerId;
-    const updatedInventoryContainer = (await ItemContainer.findById(inventoryContainerToUpdateId).lean({
-      virtuals: true,
-      defaults: true,
-    })) as any;
+    const updatedInventoryContainer = (await ItemContainer.findById(inventoryContainerToUpdateId)
+      .lean({
+        virtuals: true,
+        defaults: true,
+      })
+      .cacheQuery({
+        cacheKey: `${inventoryContainerToUpdateId}-inventoryContainer`,
+      })) as any;
 
     if ((!updatedContainer && !isPickupFromMap) || !updatedInventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, error in fetching container information.");

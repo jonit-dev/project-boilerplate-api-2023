@@ -22,7 +22,11 @@ export class ItemContainerHelper {
       "ItemContainerHelper.getContainerType",
       async () => {
         try {
-          const item = await Item.findById(itemContainer.parentItem).lean();
+          const item = await Item.findById(itemContainer.parentItem)
+            .lean()
+            .cacheQuery({
+              cacheKey: `${itemContainer.parentItem}-parentItem`,
+            });
 
           if (!item) {
             throw new Error("Failed to get item type: item not found");

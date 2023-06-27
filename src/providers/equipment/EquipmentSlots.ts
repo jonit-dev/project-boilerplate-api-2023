@@ -117,7 +117,9 @@ export class EquipmentSlots {
               // then add it to the inventory
 
               const inventory = await this.characterInventory.getInventory(character);
-              const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
+              const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
+                cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
+              });
 
               if (!inventoryContainer) {
                 throw new Error(`Item container ${inventory?._id} not found`);
