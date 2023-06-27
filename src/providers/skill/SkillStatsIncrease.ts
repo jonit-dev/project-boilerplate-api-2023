@@ -1,10 +1,11 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
 import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
 import { BASIC_INCREASE_HEALTH_MANA } from "@providers/constants/SkillConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   CharacterAttributes,
   CharacterClass,
@@ -22,11 +23,14 @@ export class SkillStatsIncrease {
     private characterClassBonusOrPenalties: CharacterClassBonusOrPenalties,
     private characterRaceBonusOrPenalties: CharacterRaceBonusOrPenalties,
     private socketMessaging: SocketMessaging,
-    private characterBuffTracker: CharacterBuffTracker
+    private characterBuffTracker: CharacterBuffTracker,
+    private characterRepository: CharacterRepository
   ) {}
 
   public async increaseMaxManaMaxHealth(characterId: Types.ObjectId): Promise<void> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const character = (await this.characterRepository.findById(characterId.toString(), {
+      leanType: "lean",
+    })) as ICharacter;
     const skills = (await Skill.findById(character.skills)
       .lean()
       .cacheQuery({
@@ -79,11 +83,10 @@ export class SkillStatsIncrease {
       CharacterAttributes.MaxMana
     );
 
-    const updatedCharacter = (await Character.findOneAndUpdate(
-      { _id: character._id },
-      { maxHealth: maxHealth + allBuffsOnMaxHealth, maxMana: maxMana + allBuffsOnMaxMana },
-      { new: true }
-    ).lean()) as ICharacter;
+    const updatedCharacter = (await this.characterRepository.findByIdAndUpdate(character._id, {
+      maxHealth: maxHealth + allBuffsOnMaxHealth,
+      maxMana: maxMana + allBuffsOnMaxMana,
+    })) as ICharacter;
 
     if (!updatedCharacter) {
       return false;

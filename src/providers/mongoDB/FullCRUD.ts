@@ -11,8 +11,8 @@ import { ConflictError } from "../errors/ConflictError";
 import { InternalServerError } from "../errors/InternalServerError";
 import { TS } from "../translation/TranslationHelper";
 
-@provide(CRUD)
-export class CRUD {
+@provide(FullCRUD)
+export class FullCRUD {
   constructor(private analytics: AnalyticsHelper) {}
 
   public async create<T extends Document>(

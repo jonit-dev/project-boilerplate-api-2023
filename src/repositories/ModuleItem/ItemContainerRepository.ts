@@ -1,11 +1,11 @@
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
-import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
+import { FullCRUD } from "@providers/mongoDB/FullCRUD";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ItemContainerRepository)
-export class ItemContainerRepository extends CRUD {
+export class ItemContainerRepository extends FullCRUD {
   constructor(private analyticsHelper: AnalyticsHelper) {
     super(analyticsHelper);
   }

@@ -1,6 +1,7 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { ISpell, SpellSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
@@ -9,7 +10,11 @@ import { NamespaceRedisControl } from "./data/types/SpellsBlueprintTypes";
 
 @provide(SpellCoolDown)
 export default class SpellCoolDown {
-  constructor(private inMemoryHashtable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
+  constructor(
+    private inMemoryHashtable: InMemoryHashTable,
+    private socketMessaging: SocketMessaging,
+    private characterRepository: CharacterRepository
+  ) {}
 
   public async haveSpellCooldown(characterId: Types.ObjectId, magicWords: string): Promise<boolean> {
     this.validateArguments(characterId, magicWords);
@@ -113,7 +118,10 @@ export default class SpellCoolDown {
   }
 
   public async clearCooldowns(characterId: Types.ObjectId): Promise<void> {
-    const character = (await Character.findById(characterId).lean().select("learnedSpells")) as ICharacter;
+    const character = (await this.characterRepository.findById(characterId.toString(), {
+      leanType: "lean",
+      select: "learnedSpells",
+    })) as ICharacter;
 
     let spells: ISpell[] = [];
     if (character.learnedSpells) {

@@ -2,14 +2,14 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { User } from "@entities/ModuleSystem/UserModel";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { TS } from "@providers/translation/TranslationHelper";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
+import { CharacterRESTRepository } from "@repositories/ModuleCharacter/CharacterRESTRepository";
 import { FactionRepository } from "@repositories/ModuleCharacter/FactionRepository";
 import { provide } from "inversify-binding-decorators";
 import { CreateCharacterDTO } from "./CreateCharacterDTO";
 
 @provide(CreateCharacterUseCase)
 export class CreateCharacterUseCase {
-  constructor(private characterRepository: CharacterRepository, private factionRepository: FactionRepository) {}
+  constructor(private characterRepository: CharacterRESTRepository, private factionRepository: FactionRepository) {}
 
   public async create(newCharacter: CreateCharacterDTO, ownerId: string): Promise<ICharacter> {
     // assign character to user

@@ -3,6 +3,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterBan } from "@providers/character/CharacterBan";
 import { MacroCaptchaSend } from "@providers/macro/MacroCaptchaSend";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import nodeCron from "node-cron";
@@ -12,7 +13,8 @@ export class MacroCaptchaCrons {
   constructor(
     private characterBan: CharacterBan,
     private macroCaptchaSend: MacroCaptchaSend,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private characterRepository: CharacterRepository
   ) {}
 
   public schedule(): void {
@@ -36,7 +38,7 @@ export class MacroCaptchaCrons {
   private async banMacroCharacters(): Promise<void> {
     const now = new Date();
 
-    const charactersWithCaptchaNotVerified = await Character.find({
+    const charactersWithCaptchaNotVerified = await this.characterRepository.find({
       captchaVerifyDate: {
         $lt: now,
       },
@@ -81,7 +83,7 @@ export class MacroCaptchaCrons {
     const now = new Date();
     now.setMinutes(now.getMinutes() - 1);
 
-    const charactersWithCaptchaNotVerified = await Character.find({
+    const charactersWithCaptchaNotVerified = await this.characterRepository.find({
       captchaVerifyCode: undefined,
       updatedAt: {
         $gt: now,
@@ -98,8 +100,6 @@ export class MacroCaptchaCrons {
       ],
       isOnline: true,
     });
-
-    console.log("SENDING ANTI-MACRO CAPTCHA TO", charactersWithCaptchaNotVerified.length, "CHARACTERS");
 
     await Promise.all(
       charactersWithCaptchaNotVerified.map(async (character) => {

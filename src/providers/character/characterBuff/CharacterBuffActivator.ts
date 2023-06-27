@@ -1,5 +1,6 @@
 import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   CharacterBuffDurationType,
   CharacterBuffType,
@@ -18,7 +19,8 @@ export class CharacterBuffActivator {
   constructor(
     private characterBuffCharacterAttribute: CharacterBuffAttribute,
     private characterBuffSkill: CharacterBuffSkill,
-    private characterBuffTracker: CharacterBuffTracker
+    private characterBuffTracker: CharacterBuffTracker,
+    private characterRepository: CharacterRepository
   ) {}
 
   public async enableTemporaryBuff(
@@ -76,7 +78,9 @@ export class CharacterBuffActivator {
     const temporaryBuffs = await CharacterBuff.find({ durationType: CharacterBuffDurationType.Temporary }).lean();
 
     for (const buff of temporaryBuffs) {
-      const character = (await Character.findById(buff.owner).lean()) as ICharacter;
+      const character = (await this.characterRepository.findById(buff.owner.toString(), {
+        leanType: "lean",
+      })) as ICharacter;
 
       if (!character) {
         continue;

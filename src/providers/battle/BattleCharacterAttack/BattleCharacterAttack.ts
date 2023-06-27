@@ -1,13 +1,13 @@
 /* eslint-disable require-await */
 /* eslint-disable no-void */
 /* eslint-disable no-new */
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
@@ -20,10 +20,11 @@ export class BattleCharacterAttack {
   constructor(
     private battleAttackTarget: BattleAttackTarget,
     private battleCharacterAttackValidation: BattleCharacterAttackValidation,
-    private socketMessaging: SocketMessaging,
+
     private newRelic: NewRelic,
     private battleTargeting: BattleTargeting,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
+    private characterRepository: CharacterRepository,
     private characterValidation: CharacterValidation
   ) {}
 
@@ -43,10 +44,7 @@ export class BattleCharacterAttack {
 
   private async execAttackLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
     await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "CharacterBattleCycle", async () => {
-      const updatedCharacter = (await Character.findOne({ _id: character._id }).lean({
-        virtuals: true,
-        defaults: true,
-      })) as ICharacter;
+      const updatedCharacter = (await this.characterRepository.findOne({ _id: character._id })) as ICharacter;
 
       if (!updatedCharacter) {
         throw new Error("Failed to get updated character for attacking target.");
@@ -92,10 +90,7 @@ export class BattleCharacterAttack {
         updatedTarget.skills = updatedNPCSkills;
       }
       if (target.type === "Character") {
-        updatedTarget = await Character.findOne({ _id: target._id }).lean({
-          virtuals: true,
-          defaults: true,
-        });
+        updatedTarget = await this.characterRepository.findOne({ _id: target._id });
 
         const updatedCharacterSkills = await Skill.findOne({ owner: target._id }).cacheQuery({
           cacheKey: `${target._id}-skills`,

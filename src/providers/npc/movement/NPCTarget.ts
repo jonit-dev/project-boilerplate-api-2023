@@ -1,15 +1,16 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 import { NPC_CYCLES } from "../NPCCycle";
 import { NPCView } from "../NPCView";
 import { NPCDirection } from "./NPCMovement";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(NPCTarget)
 export class NPCTarget {
@@ -17,7 +18,8 @@ export class NPCTarget {
     private npcView: NPCView,
     private movementHelper: MovementHelper,
     private mapNonPVPZone: MapNonPVPZone,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private characterRepository: CharacterRepository
   ) {}
 
   public async clearTarget(npc: INPC): Promise<void> {
@@ -104,7 +106,9 @@ export class NPCTarget {
       return;
     }
 
-    const character = await Character.findById(minDistanceCharacter.id).lean();
+    const character = await this.characterRepository.findById(minDistanceCharacter.id, {
+      leanType: "lean",
+    });
 
     if (!character) {
       throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
@@ -134,7 +138,9 @@ export class NPCTarget {
       throw new Error(`NPC ${npc.key} is trying to verify target, but no maxRangeInGridCells is specified!`);
     }
 
-    const targetCharacter = await Character.findById(npc.targetCharacter).lean();
+    const targetCharacter = await this.characterRepository.findById(npc.targetCharacter.toString(), {
+      leanType: "lean",
+    });
 
     if (!targetCharacter) {
       throw new Error(`Error in ${npc.key}: Failed to find targetCharacter!`);
@@ -167,7 +173,9 @@ export class NPCTarget {
         return;
       }
 
-      const char = await Character.findById(character.id).lean();
+      const char = await this.characterRepository.findById(character.id, {
+        leanType: "lean",
+      });
       if (!char) {
         throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
       }

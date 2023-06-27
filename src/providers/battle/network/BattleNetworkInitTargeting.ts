@@ -7,6 +7,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   BattleSocketEvents,
   GRID_WIDTH,
@@ -38,7 +39,8 @@ export class BattleNetworkInitTargeting {
     private mapNonPVPZone: MapNonPVPZone,
     private specialEffect: SpecialEffect,
     private battleTargeting: BattleTargeting,
-    private locker: Locker
+    private locker: Locker,
+    private characterRepository: CharacterRepository
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
@@ -63,9 +65,9 @@ export class BattleNetworkInitTargeting {
           }
 
           if (data.type === EntityType.Character) {
-            target = await Character.findOne({
+            target = (await this.characterRepository.findOne({
               _id: data.targetId,
-            });
+            })) as ICharacter;
           }
 
           if (!target) {

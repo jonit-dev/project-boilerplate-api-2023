@@ -1,10 +1,11 @@
 // @ts-ignore
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { appEnv } from "@providers/config/env";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   CharacterSocketEvents,
   EnvType,
@@ -18,7 +19,12 @@ import { Types } from "mongoose";
 
 @provide(SocketMessaging)
 export class SocketMessaging {
-  constructor(private characterView: CharacterView, private npcView: NPCView, private socketAdapter: SocketAdapter) {}
+  constructor(
+    private characterView: CharacterView,
+    private npcView: NPCView,
+    private socketAdapter: SocketAdapter,
+    private characterRepository: CharacterRepository
+  ) {}
 
   public sendErrorMessageToCharacter(character: ICharacter, message?: string, type: UIMessageType = "error"): void {
     if (appEnv.general.ENV === EnvType.Development && !appEnv.general.IS_UNIT_TEST) {
@@ -71,7 +77,9 @@ export class SocketMessaging {
   }
 
   public async sendEventAttributeChange(characterId: Types.ObjectId): Promise<void> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const character = (await this.characterRepository.findById(characterId.toString(), {
+      leanType: "lean",
+    })) as ICharacter;
 
     const payload: ICharacterAttributeChanged = {
       targetId: character._id,

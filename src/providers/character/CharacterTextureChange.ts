@@ -1,17 +1,20 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterTextureChange)
 export class CharacterTextureChange {
-  constructor(private inMemoryHashTable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
+  constructor(
+    private inMemoryHashTable: InMemoryHashTable,
+    private socketMessaging: SocketMessaging,
+    private characterRepository: CharacterRepository
+  ) {}
 
   private async updateCharacterTexture(id: string, textureKey: string): Promise<ICharacter> {
-    return await Character.findByIdAndUpdate(id, { textureKey }, { new: true })
-      .select("_id textureKey channelId")
-      .lean();
+    return await this.characterRepository.findByIdAndUpdate(id, { textureKey });
   }
 
   public async changeTexture(

@@ -6,6 +6,7 @@ import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   BasicAttribute,
   CharacterClass,
@@ -23,7 +24,8 @@ export class WarriorPassiveHabilities {
     private inMemoryHashTable: InMemoryHashTable,
     private characterMonitor: CharacterMonitor,
     private traitGetter: TraitGetter,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private characterRepository: CharacterRepository
   ) {}
 
   public async warriorAutoRegenHealthHandler(character: ICharacter): Promise<void> {
@@ -63,9 +65,10 @@ export class WarriorPassiveHabilities {
             "WarriorAutoRegenHealthHandler",
             async () => {
               try {
-                const refreshCharacter = (await Character.findById(_id)
-                  .lean()
-                  .select("_id health maxHealth")) as ICharacter;
+                const refreshCharacter = (await this.characterRepository.findById(_id, {
+                  leanType: "lean",
+                  select: "_id health maxHealth",
+                })) as ICharacter;
 
                 if (refreshCharacter.health === refreshCharacter.maxHealth) {
                   clearInterval(intervalId);
@@ -74,6 +77,7 @@ export class WarriorPassiveHabilities {
                   return;
                 }
 
+                // TODO: Refactor to use repository
                 const updatedCharacter = (await Character.findByIdAndUpdate(
                   _id,
                   {

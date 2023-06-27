@@ -1,7 +1,7 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { container } from "@providers/inversify/container";
+import { characterRepository, container } from "@providers/inversify/container";
 import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -41,7 +41,8 @@ export const itemButchersKnife: IToolItemBlueprint = {
     const socketMessaging = container.get<SocketMessaging>(SocketMessaging);
 
     const targetEntity =
-      (await NPC.findOne({ _id: targetItem.bodyFromId })) || (await Character.findOne({ _id: targetItem.bodyFromId }));
+      (await NPC.findOne({ _id: targetItem.bodyFromId })) ||
+      (await characterRepository.findOne({ _id: targetItem.bodyFromId }));
 
     if (!targetEntity) {
       socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you can't butcher this.");

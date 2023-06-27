@@ -1,12 +1,13 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { ICraftingSkillsBonusAndPenalties, IIncreaseSPResult } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterCraftingBonusPenalties)
 export class CharacterCraftingBonusPenalties {
-  constructor(private skillFunctions: SkillFunctions) {}
+  constructor(private skillFunctions: SkillFunctions, private characterRepository: CharacterRepository) {}
 
   public async updateCraftingSkills(
     character: ICharacter,
@@ -137,7 +138,13 @@ export class CharacterCraftingBonusPenalties {
         break;
     }
 
-    const char = (await Character.findById(skills.owner).lean()) as ICharacter;
+    if (!skills.owner) {
+      throw new Error("Skills owner not found");
+    }
+
+    const char = (await this.characterRepository.findById(skills.owner.toString(), {
+      leanType: "lean",
+    })) as ICharacter;
 
     await this.skillFunctions.updateSkills(skills, char);
 

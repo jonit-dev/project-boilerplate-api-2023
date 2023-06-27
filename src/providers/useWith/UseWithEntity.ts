@@ -20,6 +20,7 @@ import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   BasicAttribute,
   CharacterSocketEvents,
@@ -54,7 +55,8 @@ export class UseWithEntity {
     private onTargetHit: OnTargetHit,
     private battleCharacterAttackValidation: BattleCharacterAttackValidation,
     private battleRangedAttack: BattleAttackRanged,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private characterRepository: CharacterRepository
   ) {}
 
   public onUseWithEntity(channel: SocketChannel): void {
@@ -155,7 +157,10 @@ export class UseWithEntity {
       return false;
     }
 
-    const updatedCharacter = (await Character.findOne({ _id: caster._id }).populate("skills")) as unknown as ICharacter;
+    const updatedCharacter = (await this.characterRepository.findOne(
+      { _id: caster._id },
+      { populate: "skills" }
+    )) as unknown as ICharacter;
     const skills = updatedCharacter.skills as unknown as ISkill;
     const casterMagicLevel = skills?.magic?.level ?? 0;
 
@@ -185,7 +190,7 @@ export class UseWithEntity {
       }
     }
 
-    const blueprint = itemsBlueprintIndex[item.key]; //TODO Must be typed
+    const blueprint = itemsBlueprintIndex[item.key]; // TODO Must be typed
 
     const { health: healthBeforeHit } = target as ICharacter | INPC;
 
@@ -205,7 +210,8 @@ export class UseWithEntity {
 
     if (target.type === EntityType.Character || target.type === EntityType.NPC) {
       const transformedTarget = target as ICharacter | INPC;
-      transformedTarget["healthBeforeHit"] = healthBeforeHit;
+      // @ts-ignore
+      transformedTarget.healthBeforeHit = healthBeforeHit;
 
       await this.sendTargetUpdateEvents(caster, transformedTarget);
       await this.onTargetHit.execute(transformedTarget, caster, damage);
