@@ -1,16 +1,16 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { BadRequestError } from "@providers/errors/BadRequestError";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
+import { CharacterRESTRepository } from "@repositories/ModuleCharacter/CharacterRESTRepository";
 import { provide } from "inversify-binding-decorators";
 
 @provide(DeleteCharacterUseCase)
 export class DeleteCharacterUseCase {
-  constructor(private characterRepository: CharacterRepository) {}
+  constructor(private characterRESTRepository: CharacterRESTRepository) {}
 
   public async delete(id: string, ownerId: string): Promise<boolean> {
     let wasDeleted: boolean = false;
 
-    const characterToDelete = (await this.characterRepository.readOne(Character, {
+    const characterToDelete = (await this.characterRESTRepository.readOne(Character, {
       _id: id,
     })) as ICharacter;
 

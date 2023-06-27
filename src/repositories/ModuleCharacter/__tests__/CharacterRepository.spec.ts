@@ -1,65 +1,143 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { EntityPosition } from "@providers/entity/EntityPosition";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import {
-  AccessoriesBlueprint,
-  ArmorsBlueprint,
-  AxesBlueprint,
-  ContainersBlueprint,
-  DaggersBlueprint,
-  HelmetsBlueprint,
-  SpearsBlueprint,
-  StaffsBlueprint,
-  SwordsBlueprint,
-} from "@providers/item/data/types/itemsBlueprintTypes";
-import { CharacterClass } from "@rpg-engine/shared";
 import { CharacterRepository } from "../CharacterRepository";
 
-describe("CharacterRepository.spec.ts", () => {
-  let characterRepository: CharacterRepository;
+describe("CharacterRepository", () => {
   let testCharacter: ICharacter;
+  let characterRepository: CharacterRepository;
+  let entityPosition: EntityPosition;
+
   beforeAll(() => {
-    characterRepository = container.get<CharacterRepository>(CharacterRepository);
+    characterRepository = container.get(CharacterRepository);
+    entityPosition = container.get(EntityPosition);
   });
 
   beforeEach(async () => {
-    testCharacter = await unitTestHelper.createMockCharacter(null, {
-      hasEquipment: true,
-      hasInventory: true,
+    testCharacter = await unitTestHelper.createMockCharacter();
+  });
+
+  it("should properly find one character", async () => {
+    const foundCharacter = await characterRepository.findOne({ _id: testCharacter.id });
+    expect(foundCharacter).toBeTruthy();
+    expect(foundCharacter?.id).toBe(testCharacter.id);
+  });
+
+  it("should properly find character by id", async () => {
+    const foundCharacter = await characterRepository.findById(testCharacter.id);
+    expect(foundCharacter).toBeTruthy();
+    expect(foundCharacter?.id).toBe(testCharacter.id);
+  });
+
+  it("should properly find and update a character", async () => {
+    const updatedName = "Updated Name";
+    const updatedCharacter = await characterRepository.findByIdAndUpdate(testCharacter.id, { name: updatedName });
+    expect(updatedCharacter).toBeTruthy();
+    expect(updatedCharacter?.id).toBe(testCharacter.id);
+    expect(updatedCharacter?.name).toBe(updatedName);
+  });
+
+  it("should properly find all characters", async () => {
+    await unitTestHelper.createMockCharacter();
+
+    const foundCharacters = await characterRepository.find({});
+
+    expect(foundCharacters).toBeTruthy();
+
+    expect(foundCharacters.length).toEqual(2);
+  });
+
+  describe("Middleware functionality", () => {
+    it("should properly return a in-memory redis stored position", async () => {
+      await entityPosition.setEntityPosition(testCharacter, "characters");
+
+      await entityPosition.updateEntityPosition(testCharacter, "characters", {
+        x: 999,
+        y: 999,
+      });
+
+      const char = await characterRepository.findById(testCharacter.id, {
+        activateMiddleware: true,
+      });
+
+      expect(char).toBeTruthy();
+      expect(char?.x).toBe(999);
+      expect(char?.y).toBe(999);
+    });
+
+    it("should properly return an in-memory redis stored position for a collection of characters", async () => {
+      await entityPosition.setEntityPosition(testCharacter, "characters");
+
+      await entityPosition.updateEntityPosition(testCharacter, "characters", {
+        x: 999,
+        y: 999,
+      });
+
+      const char2 = await unitTestHelper.createMockCharacter();
+
+      await entityPosition.setEntityPosition(char2, "characters");
+
+      await entityPosition.updateEntityPosition(char2, "characters", {
+        x: 999,
+        y: 999,
+      });
+
+      const results = await characterRepository.find(
+        {},
+        {
+          activateMiddleware: true,
+        }
+      );
+
+      expect(results).toBeTruthy();
+
+      expect(results.length).toEqual(2);
+
+      expect(results[0].x).toBe(999);
+      expect(results[0].y).toBe(999);
+      expect(results[1].x).toBe(999);
+      expect(results[1].y).toBe(999);
     });
   });
 
-  it("should generate correct initial items based on character class", async () => {
-    const classesAndWeapons = [
-      { class: CharacterClass.Rogue, left: DaggersBlueprint.Dagger, right: null },
-      { class: CharacterClass.Druid, left: StaffsBlueprint.Wand, right: DaggersBlueprint.Dagger },
-      { class: CharacterClass.Sorcerer, left: StaffsBlueprint.Wand, right: DaggersBlueprint.Dagger },
-      { class: CharacterClass.Berserker, left: AxesBlueprint.Axe, right: null },
-      { class: CharacterClass.Hunter, left: SpearsBlueprint.Spear },
-      { class: CharacterClass.Warrior, left: SwordsBlueprint.Sword, right: null },
-      { class: CharacterClass.None, left: DaggersBlueprint.Dagger, right: null },
-    ];
+  describe("Select and populate", () => {
+    it("Should perform a select fields properly", async () => {
+      const result = await characterRepository.findById(testCharacter.id, {
+        leanType: "lean",
+        select: "name health maxHealth",
+      });
 
-    for (const { class: testClass, left } of classesAndWeapons) {
-      testCharacter.class = testClass;
-      // @ts-ignore
-      const data = await characterRepository.generateInitialItems(testCharacter as ICharacter);
-      const leftHandWeapon = await Item.findById(data.leftHand);
-      expect(leftHandWeapon?.key).toEqual(left);
-    }
-  });
+      expect(result).toBeTruthy();
 
-  it("should always generate bag, jacket, cap, boot, and bandana", async () => {
-    // @ts-ignore
-    const equipment = await characterRepository.generateInitialItems(testCharacter);
-    const bag = await Item.findById(equipment.inventory);
-    const jacket = await Item.findById(equipment.armor);
-    const cap = await Item.findById(equipment.head);
-    const bandana = await Item.findById(equipment.neck);
+      expect(result?.name).toBeTruthy();
 
-    expect(bag?.key).toEqual(ContainersBlueprint.Bag);
-    expect(jacket?.key).toEqual(ArmorsBlueprint.Jacket);
-    expect(cap?.key).toEqual(HelmetsBlueprint.Cap);
-    expect(bandana?.key).toEqual(AccessoriesBlueprint.Bandana);
+      expect(result?.health).toBeTruthy();
+
+      expect(result?.maxHealth).toBeTruthy();
+
+      expect(result?.x).toBeFalsy();
+    });
+
+    it("should perform a populate properly", async () => {
+      const characterWithSkills = await unitTestHelper.createMockCharacter(null, {
+        hasSkills: true,
+      });
+
+      const result = await characterRepository.findOne(
+        {
+          _id: characterWithSkills.id,
+        },
+        {
+          populate: "skills",
+        }
+      );
+
+      expect(result).toBeTruthy();
+
+      const skills = result?.skills as ISkill;
+
+      expect(skills.level).toBeTruthy();
+    });
   });
 });

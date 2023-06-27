@@ -1,16 +1,18 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { CharacterClass, ICharacter, IItem, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 
 @provide(BerserkerPassiveHabilities)
 export class BerserkerPassiveHabilities {
-  constructor(private equipmentSlots: EquipmentSlots) {}
+  constructor(private equipmentSlots: EquipmentSlots, private characterRepository: CharacterRepository) {}
 
   public async canBerserkerEquipItem(characterId: Types.ObjectId, itemId: Types.ObjectId): Promise<boolean> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const character = (await this.characterRepository.findById(characterId.toString(), {
+      leanType: "lean",
+    })) as unknown as ICharacter as ICharacter;
 
     if (character.class !== CharacterClass.Berserker) {
       return false;

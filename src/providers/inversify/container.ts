@@ -4,10 +4,12 @@ import { CharacterMonitor } from "@providers/character/CharacterMonitor";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { RedisManager } from "@providers/database/RedisManager";
+import { EntityPosition } from "@providers/entity/EntityPosition";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
+import PartyManagement from "@providers/party/PartyManagement";
 import { PM2Helper } from "@providers/server/PM2Helper";
 import { ServerBootstrap } from "@providers/server/ServerBootstrap";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
@@ -17,6 +19,8 @@ import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
+import { CharacterRESTRepository } from "@repositories/ModuleCharacter/CharacterRESTRepository";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { Container } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
 import { Cronjob } from "../cronjobs/CronJobs";
@@ -30,7 +34,6 @@ import {
   useCasesControllers,
   userControllerContainer,
 } from "./ControllersInversify";
-import PartyManagement from "@providers/party/PartyManagement";
 
 const container = new Container();
 
@@ -82,5 +85,11 @@ export const spellLearn = container.get<SpellLearn>(SpellLearn);
 export const npcExperience = container.get<NPCExperience>(NPCExperience);
 
 export const partyManagement = container.get<PartyManagement>(PartyManagement);
+
+export const entityPosition = container.get<EntityPosition>(EntityPosition);
+
+export const characterRESTRepository = container.get<CharacterRESTRepository>(CharacterRESTRepository);
+
+export const characterRepository = container.get<CharacterRepository>(CharacterRepository);
 
 export { container };

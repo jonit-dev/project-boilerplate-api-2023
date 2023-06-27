@@ -1,8 +1,9 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
@@ -17,6 +18,7 @@ import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   AnimationEffectKeys,
   BasicAttribute,
@@ -34,7 +36,6 @@ import SpellCoolDown from "./SpellCooldown";
 import { SpellValidation } from "./SpellValidation";
 import { spellsBlueprints } from "./data/blueprints/index";
 import SpellSilence from "./data/logic/mage/druid/SpellSilence";
-import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 
 @provide(SpellCast)
 export class SpellCast {
@@ -54,7 +55,8 @@ export class SpellCast {
     private spellSilencer: SpellSilence,
     private mapNonPVPZone: MapNonPVPZone,
     private newRelic: NewRelic,
-    private battleCharacterAttackValidation: BattleCharacterAttackValidation
+    private battleCharacterAttackValidation: BattleCharacterAttackValidation,
+    private characterRepository: CharacterRepository
   ) {}
 
   public isSpellCasting(msg: string): boolean {
@@ -123,6 +125,7 @@ export class SpellCast {
         }
 
         this.itemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
+        // TODO: Change to update one
         await character.save();
 
         await this.sendPostSpellCastEvents(character, spell, target);
@@ -251,8 +254,11 @@ export class SpellCast {
       }
     }
 
-    const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
-      "skills"
+    const updatedCharacter = (await this.characterRepository.findOne(
+      { _id: character._id },
+      {
+        populate: "skills",
+      }
     )) as unknown as ICharacter;
     const skills = updatedCharacter.skills as unknown as ISkill;
 
@@ -307,7 +313,7 @@ export class SpellCast {
     spell: ISpell,
     target?: ICharacter | INPC
   ): Promise<void> {
-    const updatedCharacter = (await Character.findById(character._id).lean({ virtuals: true })) as ICharacter;
+    const updatedCharacter = (await this.characterRepository.findById(character._id)) as ICharacter;
 
     const payload: ICharacterAttributeChanged = {
       targetId: updatedCharacter._id,

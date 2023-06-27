@@ -1,6 +1,7 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { ISkill, ISpell } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -10,10 +11,16 @@ import { spellsBlueprints } from "./data/blueprints/index";
 
 @provide(SpellLearn)
 export class SpellLearn {
-  constructor(private socketMessaging: SocketMessaging, private spellValidation: SpellValidation) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private spellValidation: SpellValidation,
+    private characterRepository: CharacterRepository
+  ) {}
 
   public async learnLatestSkillLevelSpells(characterId: string, notifyUser: boolean): Promise<void> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const character = (await this.characterRepository.findById(characterId, {
+      leanType: "lean",
+    })) as ICharacter;
     const skills = (await Skill.findById(character.skills)
       .lean()
       .cacheQuery({
@@ -62,7 +69,9 @@ export class SpellLearn {
   }
 
   private async addToCharacterLearnedSpells(characterId: Types.ObjectId, spells: ISpell[]): Promise<void> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const character = (await this.characterRepository.findById(characterId.toString(), {
+      leanType: "lean",
+    })) as ICharacter;
     const learned = character.learnedSpells ?? [];
     spells.forEach((spell) => {
       if (!learned.includes(spell.key) && this.spellValidation.isAvailableForCharacterClass(spell, character)) {
@@ -70,18 +79,15 @@ export class SpellLearn {
       }
     });
 
-    await Character.findByIdAndUpdate(
-      {
-        _id: character._id,
-      },
-      {
-        learnedSpells: learned,
-      }
-    );
+    await this.characterRepository.findByIdAndUpdate(character._id, {
+      learnedSpells: learned,
+    });
   }
 
   public async levelingSpells(characterId: Types.ObjectId, skillId: Types.ObjectId): Promise<boolean> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const character = (await this.characterRepository.findById(characterId.toString(), {
+      leanType: "lean",
+    })) as ICharacter;
     const skills = (await Skill.findById(skillId)
       .lean()
       .cacheQuery({
@@ -99,7 +105,7 @@ export class SpellLearn {
     const isEqual = _.isEqual(characterSpells.sort(), spellsKeys.sort());
 
     if (isEqual === false) {
-      await Character.findByIdAndUpdate({ _id: character._id }, { learnedSpells: [] });
+      await this.characterRepository.findByIdAndUpdate(character._id, { learnedSpells: [] });
 
       await this.addToCharacterLearnedSpells(character._id, spells);
 

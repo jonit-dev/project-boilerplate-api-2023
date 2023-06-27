@@ -1,19 +1,21 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
-import { provide } from "inversify-binding-decorators";
+import { EntityPositionDocMiddleware } from "@providers/entity/EntityPositionDocMiddleware";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { CharacterRESTRepository } from "@repositories/ModuleCharacter/CharacterRESTRepository";
+import { provide } from "inversify-binding-decorators";
 
 @provide(ReadCharacterUseCase)
 export class ReadCharacterUseCase {
   constructor(
-    private characterRepository: CharacterRepository,
+    private characterRESTRepository: CharacterRESTRepository,
     private characterInventory: CharacterInventory,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private entityPositionDocMiddleware: EntityPositionDocMiddleware
   ) {}
 
   public async read(id: string): Promise<ICharacter> {
-    const character = await this.characterRepository.readOne(
+    const character = await this.characterRESTRepository.readOne(
       Character,
       {
         _id: id,
@@ -23,7 +25,9 @@ export class ReadCharacterUseCase {
 
     // convert character to object to we can pass the inventory to it (otherwise it will output a {})
     //! TODO: Temporary ugly hack until we figure out a better way to do this
-    const charObject = character.toObject();
+    let charObject = character.toObject() as ICharacter;
+
+    charObject = await this.entityPositionDocMiddleware.applyCharacterMiddleware(charObject);
 
     charObject.alpha = await this.specialEffect.getOpacity(character);
 
@@ -37,7 +41,7 @@ export class ReadCharacterUseCase {
   }
 
   public async readAll(ownerId: string): Promise<ICharacter[]> {
-    const characters = await this.characterRepository.readAll(
+    const characters = await this.characterRESTRepository.readAll(
       Character,
       {
         owner: ownerId,

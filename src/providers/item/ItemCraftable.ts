@@ -15,6 +15,7 @@ import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { recipeBlueprintsIndex } from "@providers/useWith/recipes/index";
 import { IUseWithCraftingRecipe, IUseWithCraftingRecipeItem } from "@providers/useWith/useWithTypes";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import Shared, {
   AnimationEffectKeys,
   CraftingSkill,
@@ -43,6 +44,7 @@ export class ItemCraftable {
     private animationEffect: AnimationEffect,
     private skillIncrease: SkillIncrease,
     private traitGetter: TraitGetter,
+    private characterRepository: CharacterRepository,
     private characterInventory: CharacterInventory
   ) {}
 
@@ -259,9 +261,13 @@ export class ItemCraftable {
 
   private async haveMinimumSkills(character: ICharacter, recipe: IUseWithCraftingRecipe): Promise<boolean> {
     // Retrieve the character with populated skills from the database
-    const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
-      "skills"
-    )) as unknown as ICharacter;
+    const updatedCharacter = (await this.characterRepository.findOne(
+      { _id: character._id },
+      {
+        leanType: "no-lean",
+        populate: "skills",
+      }
+    )) as ICharacter;
 
     // Ensure the character has skills
     const skills = updatedCharacter.skills as unknown as ISkill;
@@ -432,6 +438,7 @@ export class ItemCraftable {
   }
 
   private async getCraftingSkillsAverage(character: ICharacter): Promise<number> {
+    // TODO: Refactor this to use characterRepository. I tried, but it causes ItemCraftable.spec.ts to fail.
     const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
       "skills"
     )) as unknown as ICharacter;

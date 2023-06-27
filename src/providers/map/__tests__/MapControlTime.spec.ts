@@ -103,7 +103,6 @@ describe("MapControlTime", () => {
 
     expect(create).toHaveBeenCalledWith({ time: "11:00", period: PeriodOfDay.Morning, weather: expect.anything() });
   });
-
   it("should send a WeatherSocketEvents.TimeWeatherControl event to all online characters with the correct IControlTime data when the controlTime method is called", async () => {
     const onlineCharacters = [{ channelId: "channel-1" }, { channelId: "channel-2" }, { channelId: "channel-3" }];
 

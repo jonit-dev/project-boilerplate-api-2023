@@ -1,5 +1,5 @@
 /* eslint-disable no-void */
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { appEnv } from "@providers/config/env";
@@ -38,6 +38,7 @@ import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { BattleTargeting } from "@providers/battle/BattleTargeting";
 import { ItemCleaner } from "@providers/item/ItemCleaner";
 import { Locker } from "@providers/locks/Locker";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
 import { CharacterBuffValidation } from "../characterBuff/CharacterBuffValidation";
@@ -67,7 +68,8 @@ export class CharacterNetworkCreate {
     private itemCleaner: ItemCleaner,
     private characterBuffValidation: CharacterBuffValidation,
     private battleTargeting: BattleTargeting,
-    private locker: Locker
+    private locker: Locker,
+    private characterRepository: CharacterRepository
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -75,16 +77,15 @@ export class CharacterNetworkCreate {
       channel,
       CharacterSocketEvents.CharacterCreate,
       async (data: ICharacterCreateFromClient, connectionCharacter: ICharacter) => {
-        await Character.findOneAndUpdate(
-          { _id: connectionCharacter._id },
-          {
-            target: undefined,
-            isOnline: true,
-            channelId: data.channelId,
-          }
-        );
+        await this.characterRepository.findByIdAndUpdate(connectionCharacter._id, {
+          target: undefined,
+          isOnline: true,
+          channelId: data.channelId,
+        });
 
-        let character = (await Character.findById(connectionCharacter._id)) as ICharacter;
+        let character = (await this.characterRepository.findById(connectionCharacter._id, {
+          leanType: "no-lean",
+        })) as ICharacter;
 
         if (!character) {
           console.log(`🚫 ${connectionCharacter.name} tried to create its instance but it was not found!`);
@@ -139,7 +140,9 @@ export class CharacterNetworkCreate {
         if (!character.isAlive) {
           await this.characterDeath.respawnCharacter(character);
 
-          character = (await Character.findById(connectionCharacter._id)) as ICharacter;
+          character = (await this.characterRepository.findById(connectionCharacter._id, {
+            leanType: "no-lean",
+          })) as ICharacter;
         }
 
         /*
@@ -177,7 +180,7 @@ export class CharacterNetworkCreate {
             break;
         }
 
-        void this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
+        await this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.itemView.warnCharacterAboutItemsInView(character, { always: true }); // dont await this because if there's a ton of garbage in the server, the character will be stuck waiting for this to finish

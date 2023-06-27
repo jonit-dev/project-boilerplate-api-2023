@@ -12,6 +12,7 @@ import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprin
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 
 import {
   AnimationEffectKeys,
@@ -53,7 +54,8 @@ export class BattleAttackRanged {
     private equipmentSlots: EquipmentSlots,
     private animationEffect: AnimationEffect,
     private characterWeapon: CharacterWeapon,
-    private characterItemEquipment: CharacterItemEquipment
+    private characterItemEquipment: CharacterItemEquipment,
+    private characterRepository: CharacterRepository
   ) {}
 
   public sendNoAmmoEvent(
@@ -241,7 +243,9 @@ export class BattleAttackRanged {
     characterId: Types.ObjectId,
     target: { targetId: string; targetType: EntityType }
   ): Promise<boolean> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const character = (await this.characterRepository.findById(characterId.toString(), {
+      leanType: "lean",
+    })) as ICharacter;
     const itemMagicRanged = (await Item.findById(attackParams.id).lean()) as IItem;
 
     if (!itemMagicRanged || !character) {

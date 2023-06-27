@@ -1,17 +1,23 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ITEM_USE_WITH_BASE_EFFECT, ITEM_USE_WITH_BASE_SCALING_FACTOR } from "@providers/constants/ItemConstants";
+import { characterRepository } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { ISkill, IUseWithItem, IUseWithTile } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 
 @provide(UseWithHelper)
 export class UseWithHelper {
-  constructor(private characterValidation: CharacterValidation, private characterItems: CharacterItems) {}
+  constructor(
+    private characterValidation: CharacterValidation,
+    private characterItems: CharacterItems,
+    private characterRepository: CharacterRepository
+  ) {}
 
   public basicValidations(character: ICharacter, data: IUseWithItem | IUseWithTile): void {
     const isValid = this.characterValidation.hasBasicValidation(character);
@@ -40,7 +46,12 @@ export class UseWithHelper {
 }
 
 export async function calculateItemUseEffectPoints(itemKey: string, caster: ICharacter): Promise<number> {
-  const updatedCharacter = (await Character.findOne({ _id: caster._id }).populate("skills")) as unknown as ICharacter;
+  const updatedCharacter = (await characterRepository.findOne(
+    { _id: caster._id },
+    {
+      populate: "skills",
+    }
+  )) as unknown as ICharacter;
   const level = (updatedCharacter.skills as unknown as ISkill)?.magic?.level ?? 0;
 
   const itemData = itemsBlueprintIndex[itemKey] as IMagicItemUseWithEntity;

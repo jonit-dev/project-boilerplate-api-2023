@@ -12,6 +12,7 @@ import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   CharacterClass,
   CharacterSocketEvents,
@@ -44,7 +45,8 @@ export class CharacterNetworkLogout {
     private characterMonitor: CharacterMonitor,
     private specialEffect: SpecialEffect,
     private socketSessionControl: SocketSessionControl,
-    private skillStatsIncrease: SkillStatsIncrease
+    private skillStatsIncrease: SkillStatsIncrease,
+    private characterRepository: CharacterRepository
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -115,7 +117,9 @@ export class CharacterNetworkLogout {
   }
 
   private async temporaryRemoveWeapon(characterId: Types.ObjectId): Promise<void> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
+    const character = (await this.characterRepository.findById(characterId.toString(), {
+      leanType: "lean",
+    })) as ICharacter;
 
     const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as string);
     const leftHandItem = (await Item.findById(equipmentSlots.leftHand).lean()) as IItem;

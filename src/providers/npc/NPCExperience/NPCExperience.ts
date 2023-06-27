@@ -1,4 +1,4 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
@@ -14,6 +14,7 @@ import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
 import { Time } from "@providers/time/Time";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   AnimationEffectKeys,
   DisplayTextSocketEvents,
@@ -44,7 +45,8 @@ export class NPCExperience {
     private animationEffect: AnimationEffect,
     private time: Time,
     private skillLvUpStatsIncrease: SkillStatsIncrease,
-    private locker: Locker
+    private locker: Locker,
+    private characterRepository: CharacterRepository
   ) {}
 
   /**
@@ -73,10 +75,7 @@ export class NPCExperience {
       const record = target.xpToRelease.shift();
 
       // Get attacker character data
-      const character = (await Character.findById(record!.charId).lean({
-        virtuals: true,
-        defaults: true,
-      })) as ICharacter;
+      const character = (await this.characterRepository.findById(record!.charId.toString())) as ICharacter;
 
       if (!character) {
         // if attacker does not exist anymore

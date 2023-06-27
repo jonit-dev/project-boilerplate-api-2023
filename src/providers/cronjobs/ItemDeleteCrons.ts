@@ -1,21 +1,31 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { MapHelper } from "@providers/map/MapHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 
 @provide(ItemDeleteCrons)
 export class ItemDeleteCrons {
-  constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic, private mapHelper: MapHelper) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private newRelic: NewRelic,
+    private characterRepository: CharacterRepository,
+    private mapHelper: MapHelper
+  ) {}
 
   public schedule(): void {
     nodeCron.schedule("0 */1 * * *", async () => {
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "ItemDeleteCrons", async () => {
-        const allOnlineCharacters = await Character.find({ isOnline: true }).lean();
+        const allOnlineCharacters = await this.characterRepository.find(
+          { isOnline: true },
+          {
+            leanType: "lean",
+          }
+        );
 
         for (const character of allOnlineCharacters) {
           this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {

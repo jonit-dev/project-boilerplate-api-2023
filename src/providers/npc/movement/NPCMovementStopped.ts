@@ -2,6 +2,7 @@ import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { NPCSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCView } from "../NPCView";
@@ -13,11 +14,13 @@ export class NPCMovementStopped {
     private npcTarget: NPCTarget,
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
-    private characterView: CharacterView
+    private characterView: CharacterView,
+    private characterRepository: CharacterRepository
   ) {}
 
   public async startMovementStopped(npc: INPC): Promise<void> {
     try {
+      // TODO: Refactor to use repository. Trying to do so caused some tests to fail. Investigate later.
       const targetCharacter = await Character.findById(npc.targetCharacter).lean();
 
       if (targetCharacter) {
