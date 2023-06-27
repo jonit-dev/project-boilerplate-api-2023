@@ -45,7 +45,7 @@ export class CharacterRepository {
       const result = await this.leanCRUD.findByIdAndUpdate<ICharacter>(
         Character,
         characterId,
-        update,
+        update as any,
         defaultLeanCRUDOptions,
         (doc: ICharacter) => this.entityPositionDocMiddleware.applyCharacterMiddleware(doc)
       );
