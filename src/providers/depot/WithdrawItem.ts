@@ -11,7 +11,6 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { IDepotContainerWithdraw, IEquipmentAndInventoryUpdatePayload, IItemContainer } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { clearCacheForKey } from "speedgoose";
 import { DepotSystem } from "./DepotSystem";
 import { OpenDepot } from "./OpenDepot";
 
@@ -62,9 +61,7 @@ export class WithdrawItem {
         )) as unknown as IItemContainer;
 
         // check if destination container exists
-        let toContainer = (await ItemContainer.findById(toContainerId).cacheQuery({
-          cacheKey: `${toContainerId}-targetContainer`,
-        })) as unknown as IItemContainerModel;
+        const toContainer = (await ItemContainer.findById(toContainerId)) as unknown as IItemContainerModel;
 
         if (!toContainer) {
           throw new Error(`DepotSystem > Destination ItemContainer not found: ${toContainerId}`);
@@ -81,12 +78,6 @@ export class WithdrawItem {
           // 2. drop items on those grid points
           await this.itemDrop.dropItems([item], gridPoints, character.scene);
         }
-
-        await clearCacheForKey(`${toContainerId}-targetContainer`);
-
-        toContainer = (await ItemContainer.findById(toContainerId).cacheQuery({
-          cacheKey: `${toContainerId}-targetContainer`,
-        })) as unknown as IItemContainerModel;
 
         await this.characterWeight.updateCharacterWeight(character);
 
@@ -108,9 +99,7 @@ export class WithdrawItem {
   private async isWithdrawValid(character: ICharacter, data: IDepotContainerWithdraw): Promise<boolean> {
     const { itemId, toContainerId } = data;
 
-    const destinationContainer = await ItemContainer.findById(toContainerId).cacheQuery({
-      cacheKey: `${toContainerId}-targetContainer`,
-    });
+    const destinationContainer = await ItemContainer.findById(toContainerId);
 
     if (!destinationContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Destination container not found");

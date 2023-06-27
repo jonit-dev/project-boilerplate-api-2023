@@ -146,9 +146,7 @@ export class CharacterTradingBuy {
     // finally, update character's weight
     await this.characterWeight.updateCharacterWeight(character);
 
-    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    })) as unknown as IItemContainer;
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: inventoryContainer,

@@ -95,9 +95,7 @@ export class EquipmentEquip {
       return false;
     }
 
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    });
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
 
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory container not found.");
@@ -124,9 +122,8 @@ export class EquipmentEquip {
             return false;
           }
 
-          const itemContainer = await ItemContainer.findById(fromItemContainerId).cacheQuery({
-            cacheKey: `${fromItemContainerId}-targetContainer`,
-          });
+          const itemContainer = await ItemContainer.findById(fromItemContainerId);
+
           if (!itemContainer) {
             this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item container not found.");
             return false;
@@ -157,9 +154,8 @@ export class EquipmentEquip {
 
           const inventory = await this.characterInventory.getInventory(character);
 
-          const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-            cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-          })) as any;
+          const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
+
           if (!inventoryContainer) {
             this.socketMessaging.sendErrorMessageToCharacter(character, "Failed to equip item.");
             return false;
@@ -271,9 +267,7 @@ export class EquipmentEquip {
       throw new Error("Item container not found");
     }
 
-    const parentItem = await Item.findById(itemContainer.parentItem).cacheQuery({
-      cacheKey: `${itemContainer.parentItem}-parentItem`,
-    });
+    const parentItem = await Item.findById(itemContainer.parentItem);
 
     if (!parentItem) {
       throw new Error("Parent item not found");

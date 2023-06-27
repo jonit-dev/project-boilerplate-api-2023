@@ -27,9 +27,9 @@ export class ItemPickupFromContainer {
       NewRelicTransactionCategory.Operation,
       "ItemPickupFromContainer.pickupFromContainer",
       async () => {
-        const fromContainer = (await ItemContainer.findById(itemPickupData.fromContainerId).cacheQuery({
-          cacheKey: `${itemPickupData.fromContainerId}-targetContainer`,
-        })) as unknown as IItemContainer;
+        const fromContainer = (await ItemContainer.findById(
+          itemPickupData.fromContainerId
+        )) as unknown as IItemContainer;
 
         if (!fromContainer) {
           this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the origin container was not found.");

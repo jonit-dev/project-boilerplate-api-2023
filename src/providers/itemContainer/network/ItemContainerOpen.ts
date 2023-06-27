@@ -65,9 +65,7 @@ export class ItemContainerOpen {
       return;
     }
 
-    const itemContainer = (await ItemContainer.findById(item.itemContainer).cacheQuery({
-      cacheKey: `${item.itemContainer}-targetContainer`,
-    })) as unknown as IItemContainer;
+    const itemContainer = (await ItemContainer.findById(item.itemContainer)) as unknown as IItemContainer;
 
     if (!itemContainer) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -112,11 +110,7 @@ export class ItemContainerOpen {
       }
     }
 
-    const parentItem = await Item.findById(itemContainer.parentItem)
-      .lean()
-      .cacheQuery({
-        cacheKey: `${itemContainer.parentItem}-parentItem`,
-      });
+    const parentItem = await Item.findById(itemContainer.parentItem).lean();
 
     if (!parentItem) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {

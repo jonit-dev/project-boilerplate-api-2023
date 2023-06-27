@@ -101,9 +101,7 @@ export class CharacterWeight {
             cacheKey: `${character._id}-equipment`,
           });
         const inventory = await this.characterInventory.getInventory(character);
-        const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-          cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-        });
+        const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
         let totalWeight = 0;
         if (equipment) {
@@ -131,9 +129,7 @@ export class CharacterWeight {
               if (!isInInventory) continue;
 
               if (item.type === ItemType.Container) {
-                const inventoryContainer = await ItemContainer.findById(item?.itemContainer).cacheQuery({
-                  cacheKey: `${item?.itemContainer}-inventoryContainer`,
-                });
+                const inventoryContainer = await ItemContainer.findById(item?.itemContainer);
                 for (const bagItem of inventoryContainer!.itemIds) {
                   totalWeight += await this.getWeithFromItemContainer(bagItem);
                 }

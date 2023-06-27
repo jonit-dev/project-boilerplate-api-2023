@@ -68,14 +68,10 @@ export class ItemCleaner {
           return;
         }
 
-        const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer)
-          .lean({
-            virtuals: true,
-            defaults: true,
-          })
-          .cacheQuery({
-            cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-          });
+        const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer).lean({
+          virtuals: true,
+          defaults: true,
+        });
 
         if (!inventoryContainer) {
           return;

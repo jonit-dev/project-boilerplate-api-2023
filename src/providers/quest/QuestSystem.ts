@@ -255,9 +255,7 @@ export class QuestSystem {
       );
     }
     const backpack = equipment.inventory as unknown as IItem;
-    const backpackContainer = await ItemContainer.findById(backpack.itemContainer).cacheQuery({
-      cacheKey: `${backpack.itemContainer}-targetContainer`,
-    });
+    const backpackContainer = await ItemContainer.findById(backpack.itemContainer);
     if (!backpackContainer) {
       throw new Error(
         `Character item container not found. Character id ${character.id}, ItemContainer id ${backpack.itemContainer}`
@@ -282,7 +280,8 @@ export class QuestSystem {
         await this.itemDrop.dropItems(overflowingRewards, gridPoints, character.scene);
       }
 
-      await ItemContainer.updateOne({ _id: backpackContainer._id }, { $set: { slots: backpackContainer.slots } });
+      backpackContainer.markModified("slots");
+      await backpackContainer.save();
 
       await this.characterWeight.updateCharacterWeight(character);
 

@@ -33,9 +33,7 @@ export class CharacterItemInventory {
 
   public async getAllItemsFromInventoryNested(character: ICharacter): Promise<IItem[]> {
     const inventory = await this.characterInventory.getInventory(character);
-    const container = await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    });
+    const container = await ItemContainer.findById(inventory?.itemContainer);
     if (!container) {
       return [];
     }
@@ -55,9 +53,7 @@ export class CharacterItemInventory {
           items.push(item);
 
           if (item.type === ItemType.Container) {
-            const nestedContainer = await ItemContainer.findById(item?.itemContainer).cacheQuery({
-              cacheKey: `${item?.itemContainer}-inventoryContainer`,
-            });
+            const nestedContainer = await ItemContainer.findById(item?.itemContainer);
             if (nestedContainer) {
               const nestedItems = await this.getAllItemsFromContainer(nestedContainer);
               items.push(...nestedItems);
@@ -112,9 +108,7 @@ export class CharacterItemInventory {
     decrementQty: number
   ): Promise<boolean> {
     const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
-    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    });
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
@@ -144,9 +138,7 @@ export class CharacterItemInventory {
   ): Promise<boolean> {
     const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
-    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    });
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");
@@ -231,9 +223,7 @@ export class CharacterItemInventory {
   public async checkItemInInventoryByKey(itemKey: string, character: ICharacter): Promise<string | undefined> {
     const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
-    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    });
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
       return;
@@ -262,9 +252,7 @@ export class CharacterItemInventory {
    */
   public async checkItemInInventory(itemId: string, character: ICharacter): Promise<number | undefined> {
     const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
-    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    });
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryItemContainer) {
       return;
@@ -327,9 +315,7 @@ export class CharacterItemInventory {
 
             // we need to fetch updated container in case some quantity remains to be substracted
             if (result && decrementQty > 0) {
-              const updatedCont = await ItemContainer.findById(container.id).cacheQuery({
-                cacheKey: `${container.id}-targetContainer`,
-              });
+              const updatedCont = await ItemContainer.findById(container.id);
               if (!updatedCont) {
                 result = false;
                 break;
@@ -369,9 +355,7 @@ export class CharacterItemInventory {
       return false;
     }
 
-    const inventoryItemContainer = await ItemContainer.findById(inventory.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    });
+    const inventoryItemContainer = await ItemContainer.findById(inventory.itemContainer);
 
     if (!inventoryItemContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The character does not have an inventory.");
@@ -484,9 +468,7 @@ export class CharacterItemInventory {
     decrementQty: number,
     inventoryId: string
   ): Promise<boolean> {
-    const itemContainer = (await ItemContainer.findById(inventoryId).cacheQuery({
-      cacheKey: `${inventoryId}-targetContainer`,
-    })) as IItemContainer;
+    const itemContainer = (await ItemContainer.findById(inventoryId)) as IItemContainer;
 
     if (!itemContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! Inventory container not found.");

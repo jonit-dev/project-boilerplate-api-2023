@@ -67,23 +67,13 @@ export class CharacterItemSlots {
   ): Promise<void> {
     const slotItem = targetContainer.slots[slotIndex];
 
-    const updatedSlot = {
+    targetContainer.slots[slotIndex] = {
       ...slotItem,
       ...payload,
     };
 
-    const pathToSlot = `slots.${slotIndex}`;
-
-    const update = {
-      $set: {
-        [pathToSlot]: updatedSlot,
-      },
-    };
-
-    const filter = { _id: targetContainer._id };
-
-    // Update the document in the database
-    await ItemContainer.updateOne(filter, update);
+    targetContainer.markModified("slots");
+    await targetContainer.save();
 
     // remember that we also need to update the item on the database. What we have above is just a reference inside of the container (copy)
     await Item.updateOne(
@@ -96,9 +86,7 @@ export class CharacterItemSlots {
 
   public async findItemSlotIndex(targetContainer: IItemContainer, itemId: string): Promise<number | undefined> {
     try {
-      const container = (await ItemContainer.findById(targetContainer.id).cacheQuery({
-        cacheKey: `${targetContainer.id}-targetContainer`,
-      })) as unknown as IItemContainer;
+      const container = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
 
       if (!container) {
         throw new Error("Container not found");
@@ -122,9 +110,7 @@ export class CharacterItemSlots {
 
   public async findItemWithSameKey(targetContainer: IItemContainer, itemKey: string): Promise<IItem | undefined> {
     try {
-      const container = (await ItemContainer.findById(targetContainer.id).cacheQuery({
-        cacheKey: `${targetContainer.id}-targetContainer`,
-      })) as unknown as IItemContainer;
+      const container = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
 
       if (!container) {
         throw new Error("Container not found");
@@ -149,9 +135,7 @@ export class CharacterItemSlots {
 
   public async findItemOnSlots(targetContainer: IItemContainer, itemId: string): Promise<IItem | undefined> {
     try {
-      const container = (await ItemContainer.findById(targetContainer._id).cacheQuery({
-        cacheKey: `${targetContainer._id}-targetContainer`,
-      })) as unknown as IItemContainer;
+      const container = (await ItemContainer.findById(targetContainer._id)) as unknown as IItemContainer;
 
       if (!container) {
         throw new Error("Container not found");
@@ -206,9 +190,7 @@ export class CharacterItemSlots {
     itemKeyToBeAdded: string,
     qty: number
   ): Promise<number> {
-    const targetContainer = (await ItemContainer.findById(targetContainerId).cacheQuery({
-      cacheKey: `${targetContainerId}-targetContainer`,
-    })) as unknown as IItemContainer;
+    const targetContainer = (await ItemContainer.findById(targetContainerId)) as unknown as IItemContainer;
 
     for (const slotItem of Object.values(targetContainer.slots)) {
       if (!slotItem) {
@@ -238,9 +220,7 @@ export class CharacterItemSlots {
     itemToBeAdded: IItem,
     checkForEmptyOnly: boolean = false
   ): Promise<boolean> {
-    const targetContainer = (await ItemContainer.findById(targetContainerId).cacheQuery({
-      cacheKey: `${targetContainerId}-targetContainer`,
-    })) as unknown as IItemContainer;
+    const targetContainer = (await ItemContainer.findById(targetContainerId)) as unknown as IItemContainer;
 
     if (!targetContainer) {
       return false;
@@ -277,9 +257,7 @@ export class CharacterItemSlots {
     targetContainer: IItemContainer,
     itemToBeAdded?: IItem
   ): Promise<number | null> {
-    const itemContainer = (await ItemContainer.findById(targetContainer.id).cacheQuery({
-      cacheKey: `${targetContainer.id}-targetContainer`,
-    })) as unknown as IItemContainer;
+    const itemContainer = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
 
     if (!itemContainer) {
       return null;
@@ -310,9 +288,7 @@ export class CharacterItemSlots {
     itemToBeAdded: IItem,
     slotIndex: number
   ): Promise<boolean> {
-    const targetContainerItem = (await ItemContainer.findById(targetContainer.id).cacheQuery({
-      cacheKey: `${targetContainer.id}-targetContainer`,
-    })) as unknown as IItemContainer;
+    const targetContainerItem = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
 
     if (!targetContainerItem) {
       return false;

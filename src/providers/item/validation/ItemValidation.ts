@@ -20,11 +20,7 @@ export class ItemValidation {
       return false;
     }
 
-    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)
-      .lean()
-      .cacheQuery({
-        cacheKey: `${inventory.itemContainer}-inventoryContainer`,
-      })) as unknown as IItemContainer;
+    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer).lean()) as IItemContainer;
 
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory container not found.");
