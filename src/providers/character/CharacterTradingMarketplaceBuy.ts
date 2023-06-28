@@ -1,11 +1,5 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { IMarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
-import { MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
@@ -13,14 +7,19 @@ import {
   MarketplaceSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { clearCacheForKey } from "speedgoose";
-import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterTradingBuy } from "./CharacterTradingBuy";
-import { CharacterWeight } from "./CharacterWeight";
-import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
-import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { IMarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
+import { CharacterInventory } from "./CharacterInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
+import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
+import { CharacterWeight } from "./CharacterWeight";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { clearCacheForKey } from "speedgoose";
 
 @provide(CharacterTradingMarketplaceBuy)
 export class CharacterTradingMarketplaceBuy {
@@ -32,8 +31,7 @@ export class CharacterTradingMarketplaceBuy {
     private characterItemSlots: CharacterItemSlots,
     private characterItemInventory: CharacterItemInventory,
     private characterItemContainer: CharacterItemContainer,
-    private characterWeight: CharacterWeight,
-    private characterRepository: CharacterRepository
+    private characterWeight: CharacterWeight
   ) {}
 
   public async buyItem(character: ICharacter, marketplaceItem: IMarketplaceItem): Promise<boolean> {
@@ -97,7 +95,7 @@ export class CharacterTradingMarketplaceBuy {
     const updatedMoney = marketplaceOwnerBalance.money + marketplaceItem.price;
     await marketplaceOwnerBalance.updateOne({ money: updatedMoney });
 
-    const sellerCharacter = await this.characterRepository.findById(seller);
+    const sellerCharacter = await Character.findById(seller);
     if (sellerCharacter?.isOnline) {
       this.socketMessaging.sendEventToUser<IMarketplaceAvailableMoneyNotification>(
         sellerCharacter?.channelId!,

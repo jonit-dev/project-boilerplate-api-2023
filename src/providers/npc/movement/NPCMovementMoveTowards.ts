@@ -10,7 +10,6 @@ import { PathfindingCaching } from "@providers/map/PathfindingCaching";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   EntityAttackType,
   FromGridX,
@@ -47,22 +46,14 @@ export class NPCMovementMoveTowards {
     private characterView: CharacterView,
     private specialEffect: SpecialEffect,
     private pathfindingCaching: PathfindingCaching,
-    private newRelic: NewRelic,
-    private characterRepository: CharacterRepository
+    private newRelic: NewRelic
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
-    if (!npc.targetCharacter) {
-      await this.npcTarget.tryToSetTarget(npc);
-      return;
-    }
-
     // first step is setting a target
     // for this, get all characters nearby and set the target to the closest one
 
-    const targetCharacter = (await this.characterRepository.findById(npc.targetCharacter!.toString(), {
-      leanType: "lean",
-    })) as ICharacter;
+    const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;
 
     if (!targetCharacter) {
       // no target character
@@ -190,13 +181,7 @@ export class NPCMovementMoveTowards {
   }
 
   private async faceTarget(npc: INPC): Promise<void> {
-    if (!npc.targetCharacter) {
-      return;
-    }
-
-    const targetCharacter = (await this.characterRepository.findById(npc.targetCharacter.toString(), {
-      leanType: "lean",
-    })) as ICharacter;
+    const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;
 
     if (targetCharacter) {
       const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
@@ -341,14 +326,7 @@ export class NPCMovementMoveTowards {
         }
 
         const minHealthCharacterInfo = _.minBy(charactersHealth, "health");
-
-        if (!minHealthCharacterInfo) {
-          return false;
-        }
-
-        const minHealthCharacter = (await this.characterRepository.findById(minHealthCharacterInfo?.id!, {
-          leanType: "lean",
-        })) as ICharacter;
+        const minHealthCharacter = (await Character.findById(minHealthCharacterInfo?.id).lean()) as ICharacter;
 
         // Only set as target if the minimum health character is with 25% of it's health
         if (minHealthCharacter.health <= minHealthCharacter.maxHealth / 4) {

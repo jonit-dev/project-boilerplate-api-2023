@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -15,7 +15,6 @@ import { CharacterFoodConsumption } from "@providers/character/CharacterFoodCons
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
@@ -40,8 +39,7 @@ export class ItemUse {
     private characterItemInventory: CharacterItemInventory,
     private characterInventory: CharacterInventory,
     private characterFoodConsumption: CharacterFoodConsumption,
-    private newRelic: NewRelic,
-    private characterRepository: CharacterRepository
+    private newRelic: NewRelic
   ) {}
 
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
@@ -123,12 +121,7 @@ export class ItemUse {
     const intervals = bluePrintItem.subType === ItemSubType.Food ? 5 : 1;
 
     new ItemUseCycle(async () => {
-      const character = await this.characterRepository.findOne(
-        { _id: characterId },
-        {
-          leanType: "no-lean",
-        }
-      );
+      const character = await Character.findOne({ _id: characterId });
 
       if (character) {
         bluePrintItem.usableEffect(character);

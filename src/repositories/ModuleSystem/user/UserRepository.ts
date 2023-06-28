@@ -1,14 +1,14 @@
 import { IUser, User } from "@entities/ModuleSystem/UserModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { NotFoundError } from "@providers/errors/NotFoundError";
-import { FullCRUD } from "@providers/mongoDB/FullCRUD";
+import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { TS } from "@providers/translation/TranslationHelper";
 import { provide } from "inversify-binding-decorators";
 
 import { IUserRepository } from "./IUserRepository";
 
 @provide(UserRepository)
-export class UserRepository extends FullCRUD implements IUserRepository {
+export class UserRepository extends CRUD implements IUserRepository {
   constructor(private analyticsHelper: AnalyticsHelper) {
     super(analyticsHelper);
   }

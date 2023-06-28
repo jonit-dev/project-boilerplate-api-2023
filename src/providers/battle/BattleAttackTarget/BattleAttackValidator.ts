@@ -6,7 +6,6 @@ import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { EntityType, IItem, ItemSlotType, ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
@@ -19,8 +18,7 @@ export class BattleAttackValidator {
     private movementHelper: MovementHelper,
     private newRelic: NewRelic,
     private characterInventory: CharacterInventory,
-    private socketMessaging: SocketMessaging,
-    private characterRepository: CharacterRepository
+    private socketMessaging: SocketMessaging
   ) {}
 
   public async validateAttack(
@@ -109,7 +107,6 @@ export class BattleAttackValidator {
     characterId: Types.ObjectId,
     target: { targetId: string; targetType: EntityType }
   ): Promise<boolean> {
-    // TODO: Refactor to use characterRepository
     const character = (await Character.findById(characterId)
       .populate({
         path: "skills",

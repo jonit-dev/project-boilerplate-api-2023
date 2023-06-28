@@ -127,7 +127,7 @@ export class SkillIncrease {
 
   public async increaseShieldingSP(character: ICharacter): Promise<void> {
     await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "increaseShieldingSP", async () => {
-      // TODO: Refactor this bizarre query. Avoid populate!
+      // TODO: Refactor this to use queries. Avoid populate!
       const characterWithRelations = (await Character.findById(character.id)
         .populate({
           path: "skills",

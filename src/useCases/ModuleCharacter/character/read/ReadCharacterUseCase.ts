@@ -1,21 +1,19 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { EntityPositionDocMiddleware } from "@providers/entity/EntityPositionDocMiddleware";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
-import { CharacterRESTRepository } from "@repositories/ModuleCharacter/CharacterRESTRepository";
+import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { provide } from "inversify-binding-decorators";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(ReadCharacterUseCase)
 export class ReadCharacterUseCase {
   constructor(
-    private characterRESTRepository: CharacterRESTRepository,
+    private characterRepository: CharacterRepository,
     private characterInventory: CharacterInventory,
-    private specialEffect: SpecialEffect,
-    private entityPositionDocMiddleware: EntityPositionDocMiddleware
+    private specialEffect: SpecialEffect
   ) {}
 
   public async read(id: string): Promise<ICharacter> {
-    const character = await this.characterRESTRepository.readOne(
+    const character = await this.characterRepository.readOne(
       Character,
       {
         _id: id,
@@ -25,9 +23,7 @@ export class ReadCharacterUseCase {
 
     // convert character to object to we can pass the inventory to it (otherwise it will output a {})
     //! TODO: Temporary ugly hack until we figure out a better way to do this
-    let charObject = character.toObject() as ICharacter;
-
-    charObject = await this.entityPositionDocMiddleware.applyCharacterMiddleware(charObject);
+    const charObject = character.toObject();
 
     charObject.alpha = await this.specialEffect.getOpacity(character);
 
@@ -41,7 +37,7 @@ export class ReadCharacterUseCase {
   }
 
   public async readAll(ownerId: string): Promise<ICharacter[]> {
-    const characters = await this.characterRESTRepository.readAll(
+    const characters = await this.characterRepository.readAll(
       Character,
       {
         owner: ownerId,

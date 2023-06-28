@@ -1,7 +1,6 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { provide } from "inversify-binding-decorators";
 import { NPC_CYCLES } from "../NPCCycle";
 import { NPCMovement } from "./NPCMovement";
@@ -9,20 +8,11 @@ import { NPCTarget } from "./NPCTarget";
 
 @provide(NPCMovementMoveAway)
 export class NPCMovementMoveAway {
-  constructor(
-    private npcMovement: NPCMovement,
-    private npcTarget: NPCTarget,
-    private movementHelper: MovementHelper,
-    private characterRepository: CharacterRepository
-  ) {}
+  constructor(private npcMovement: NPCMovement, private npcTarget: NPCTarget, private movementHelper: MovementHelper) {}
 
   public async startMovementMoveAway(npc: INPC): Promise<void> {
-    if (!npc.targetCharacter) return;
-
     try {
-      const targetCharacter = (await this.characterRepository.findById(npc.targetCharacter!.toString(), {
-        leanType: "lean",
-      })) as ICharacter;
+      const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;
 
       if (targetCharacter) {
         await this.npcTarget.tryToClearOutOfRangeTargets(npc);

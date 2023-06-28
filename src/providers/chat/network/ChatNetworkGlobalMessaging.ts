@@ -1,5 +1,5 @@
 import { profanity } from "@2toad/profanity";
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -10,7 +10,6 @@ import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { SpellCast } from "@providers/spells/SpellCast";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   ChatMessageType,
   ChatSocketEvents,
@@ -31,8 +30,7 @@ export class ChatNetworkGlobalMessaging {
     private socketTransmissionZone: SocketTransmissionZone,
     private spellCast: SpellCast,
     private characterValidation: CharacterValidation,
-    private newRelic: NewRelic,
-    private characterRepository: CharacterRepository
+    private newRelic: NewRelic
   ) {}
 
   public onGlobalMessaging(channel: SocketChannel): void {
@@ -52,9 +50,7 @@ export class ChatNetworkGlobalMessaging {
               }
 
               if (this.spellCast.isSpellCasting(data.message)) {
-                const spellCharacter = (await this.characterRepository.findById(character._id, {
-                  leanType: "no-lean",
-                })) as ICharacter;
+                const spellCharacter = (await Character.findById(character._id)) as ICharacter;
 
                 await this.spellCast.castSpell({ magicWords: data.message }, spellCharacter);
               }

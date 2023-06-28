@@ -4,7 +4,6 @@ import { TextFormatter } from "@providers/text/TextFormatter";
 import { CharacterSocketEvents, ICharacterBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
 export interface IBuffValueCalculations {
@@ -18,8 +17,7 @@ export class CharacterBuffAttribute {
   constructor(
     private characterBuffTracker: CharacterBuffTracker,
     private socketMessaging: SocketMessaging,
-    private textFormatter: TextFormatter,
-    private characterRepository: CharacterRepository
+    private textFormatter: TextFormatter
   ) {}
 
   public async enableBuff(character: ICharacter, buff: ICharacterBuff, noMessage?: boolean): Promise<ICharacterBuff> {
@@ -53,9 +51,7 @@ export class CharacterBuffAttribute {
   }
 
   public async disableBuff(character: ICharacter, buffId: string, noMessage?: boolean): Promise<boolean> {
-    const updatedCharacter = await this.characterRepository.findById(character._id, {
-      leanType: "lean",
-    });
+    const updatedCharacter = await Character.findById(character._id).lean();
 
     if (!updatedCharacter) {
       throw new Error("Character not found");
@@ -92,9 +88,7 @@ export class CharacterBuffAttribute {
     );
 
     try {
-      const newCharacter = await this.characterRepository.findById(character._id, {
-        leanType: "lean",
-      });
+      const newCharacter = await Character.findById(character._id).lean();
 
       // Use destructuring to reduce the repetitive newCharacter
       const { health, maxHealth, mana, maxMana } = newCharacter || {};
@@ -145,9 +139,7 @@ export class CharacterBuffAttribute {
   ): Promise<IBuffValueCalculations> {
     const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(characterId, buff.trait);
 
-    const updatedCharacter = (await this.characterRepository.findById(characterId, {
-      leanType: "lean",
-    })) as ICharacter;
+    const updatedCharacter = (await Character.findById(characterId).lean()) as ICharacter;
 
     if (!updatedCharacter) {
       throw new Error("Character not found");

@@ -7,7 +7,6 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import {
   BasicAttribute,
   CharacterClass,
@@ -27,8 +26,7 @@ export class MagePassiveHabilities {
     private characterMonitor: CharacterMonitor,
     private spellCalculator: SpellCalculator,
     private traitGetter: TraitGetter,
-    private newRelic: NewRelic,
-    private characterRepository: CharacterRepository
+    private newRelic: NewRelic
   ) {}
 
   public async autoRegenManaHandler(character: ICharacter): Promise<void> {
@@ -71,10 +69,9 @@ export class MagePassiveHabilities {
             "AutoRegenManaHandler",
             async () => {
               try {
-                const refreshCharacter = (await this.characterRepository.findById(_id, {
-                  leanType: "lean",
-                  select: "_id mana maxMana",
-                })) as ICharacter;
+                const refreshCharacter = (await Character.findById(_id)
+                  .lean()
+                  .select("_id mana maxMana")) as ICharacter;
 
                 if (refreshCharacter.mana === refreshCharacter.maxMana) {
                   clearInterval(intervalId);
@@ -82,7 +79,6 @@ export class MagePassiveHabilities {
                   return;
                 }
 
-                // TODO: Refactor this later
                 const updatedCharacter = (await Character.findByIdAndUpdate(
                   _id,
                   {

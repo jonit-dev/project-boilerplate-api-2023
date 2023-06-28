@@ -15,7 +15,6 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { CharacterInventory } from "./CharacterInventory";
@@ -28,8 +27,7 @@ export class CharacterWeight {
     private socketMessaging: SocketMessaging,
     private characterItemInventory: CharacterItemInventory,
     private traitGetter: TraitGetter,
-    private newRelic: NewRelic,
-    private characterRepository: CharacterRepository
+    private newRelic: NewRelic
   ) {}
 
   public async updateCharacterWeight(character: ICharacter): Promise<void> {
@@ -53,7 +51,7 @@ export class CharacterWeight {
         );
 
         //! Requires virtuals
-        character = (await this.characterRepository.findById(character._id)) || character;
+        character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
 
         this.socketMessaging.sendEventToUser<ICharacterAttributeChanged>(
           character.channelId!,

@@ -1,20 +1,12 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
-
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(SocketConnection)
 export class SocketConnection {
-  constructor(private characterRepository: CharacterRepository) {}
-
   public async getConnectedCharacters(): Promise<ICharacter[]> {
-    return await this.characterRepository.find(
-      {
-        isOnline: true,
-      },
-      {
-        leanType: "lean",
-      }
-    );
+    return await Character.find({
+      isOnline: true,
+    }).lean();
   }
 }

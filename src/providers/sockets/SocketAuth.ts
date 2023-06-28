@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IUser } from "@entities/ModuleSystem/UserModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterLastAction } from "@providers/character/CharacterLastAction";
@@ -10,7 +10,6 @@ import { ExhaustValidation } from "@providers/exhaust/ExhaustValidation";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { Locker } from "@providers/locks/Locker";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { CharacterSocketEvents, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { SocketMessaging } from "./SocketMessaging";
@@ -23,7 +22,6 @@ export class SocketAuth {
     private exhaustValidation: ExhaustValidation,
     private characterLastAction: CharacterLastAction,
     private newRelic: NewRelic,
-    private characterRepository: CharacterRepository,
     private locker: Locker
   ) {}
 
@@ -42,22 +40,15 @@ export class SocketAuth {
         // check if authenticated user actually owns the character (we'll fetch it from the payload id);
         owner = channel?.userData || (channel?.handshake?.query?.userData as IUser);
 
-        if (isLeanQuery) {
-          character = await this.characterRepository.findOne({
-            _id: data.socketCharId,
-            owner: owner.id,
-          });
-        } else {
-          character = await this.characterRepository.findOne(
-            {
+        character = isLeanQuery
+          ? await Character.findOne({
               _id: data.socketCharId,
               owner: owner.id,
-            },
-            {
-              leanType: "no-lean",
-            }
-          );
-        }
+            }).lean({ virtuals: true, defaults: true })
+          : await Character.findOne({
+              _id: data.socketCharId,
+              owner: owner.id,
+            });
 
         if (!character) {
           this.socketMessaging.sendEventToUser(channel.id!, CharacterSocketEvents.CharacterForceDisconnect, {

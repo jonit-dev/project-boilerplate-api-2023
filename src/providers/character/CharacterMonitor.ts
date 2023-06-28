@@ -1,10 +1,9 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { appEnv } from "@providers/config/env";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { PM2Helper } from "@providers/server/PM2Helper";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { EnvType } from "@rpg-engine/shared";
 
 type CharacterMonitorCallback = (character: ICharacter) => void;
@@ -14,11 +13,7 @@ export class CharacterMonitor {
   private charactersCallbacks = new Map<string, CharacterMonitorCallback>();
   private monitorIntervalMS: number;
 
-  constructor(
-    private pm2Helper: PM2Helper,
-    private newRelic: NewRelic,
-    private characterRepository: CharacterRepository
-  ) {}
+  constructor(private pm2Helper: PM2Helper, private newRelic: NewRelic) {}
 
   public async monitor(intervalMs?: number): Promise<void> {
     this.monitorIntervalMS = intervalMs || 3000;
@@ -50,7 +45,10 @@ export class CharacterMonitor {
     const callback = this.charactersCallbacks.get(characterId);
 
     if (callback) {
-      const character = await this.characterRepository.findOne({ _id: characterId });
+      const character = (await Character.findOne({ _id: characterId }).lean({
+        virtuals: true,
+        defaults: true,
+      })) as ICharacter;
 
       if (!character || !character.isAlive || character.isBanned || !character.isOnline) {
         this.charactersCallbacks.delete(characterId);

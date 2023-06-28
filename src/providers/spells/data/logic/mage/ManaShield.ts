@@ -1,18 +1,13 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { SpellsBlueprint } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NamespaceRedisControl } from "../../types/SpellsBlueprintTypes";
 
 @provide(ManaShield)
 export class ManaShield {
-  constructor(
-    private inMemoryHashTable: InMemoryHashTable,
-    private socketMessaging: SocketMessaging,
-    private characterRepository: CharacterRepository
-  ) {}
+  constructor(private inMemoryHashTable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
 
   public async handleManaShield(character: ICharacter, damage: number): Promise<boolean> {
     try {
@@ -54,10 +49,10 @@ export class ManaShield {
         await this.inMemoryHashTable.delete(namespace, key);
       }
 
-      (await this.characterRepository.findByIdAndUpdate(character._id, {
+      (await Character.findByIdAndUpdate(character._id, {
         mana: newMana > 0 ? newMana : 0,
         health: newMana < 0 ? Math.max(newHealth, 0) : character.health,
-      })) as ICharacter;
+      }).lean()) as ICharacter;
 
       await this.socketMessaging.sendEventAttributeChange(character._id);
 

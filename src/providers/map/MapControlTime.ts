@@ -20,7 +20,6 @@ export class MapControlTime {
   }
 
   public async controlTime(time: string, periodOfDay: PeriodOfDay): Promise<IControlTime> {
-    // TODO: Refactor to use repository later
     const onlineCharacters = await Character.find({ isOnline: true });
 
     const dataOfWeather: IControlTime = {

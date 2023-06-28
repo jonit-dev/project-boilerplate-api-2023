@@ -1,9 +1,8 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { BasicAttribute, CharacterClass, SpellsBlueprint } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NamespaceRedisControl } from "../../types/SpellsBlueprintTypes";
@@ -13,8 +12,7 @@ export class Bloodthirst {
   constructor(
     private socketMessaging: SocketMessaging,
     private inMemoryHashTable: InMemoryHashTable,
-    private traitGetter: TraitGetter,
-    private characterRepository: CharacterRepository
+    private traitGetter: TraitGetter
   ) {}
 
   public async handleBerserkerAttack(character: ICharacter, damage: number): Promise<void> {
@@ -56,7 +54,7 @@ export class Bloodthirst {
 
       const cappedHealing = Math.min(character.health + calculatedHealing, character.maxHealth);
 
-      await this.characterRepository.findByIdAndUpdate(character._id, { health: cappedHealing });
+      await Character.findByIdAndUpdate(character._id, { health: cappedHealing }).lean();
 
       await this.socketMessaging.sendEventAttributeChange(character._id);
     } catch (error) {

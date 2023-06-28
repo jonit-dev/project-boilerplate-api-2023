@@ -1,11 +1,9 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterLastAction } from "@providers/character/CharacterLastAction";
-import { EntityPosition } from "@providers/entity/EntityPosition";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
@@ -16,43 +14,26 @@ export class CharacterCrons {
     private socketMessaging: SocketMessaging,
     private characterLastAction: CharacterLastAction,
     private newRelic: NewRelic,
-    private socketSessionControl: SocketSessionControl,
-    private characterRepository: CharacterRepository,
-    private entityPosition: EntityPosition
+    private socketSessionControl: SocketSessionControl
   ) {}
 
   public schedule(): void {
-    nodeCron.schedule("* * * * *", async () => {
-      await this.newRelic.trackTransaction(
-        NewRelicTransactionCategory.CronJob,
-        "LogoutInactiveCharacters",
-        async () => {
-          await this.logoutInactiveCharacters();
-        }
-      );
+    nodeCron.schedule("* * * * *", () => {
+      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "LogoutInactiveCharacters", async () => {
+        await this.logoutInactiveCharacters();
+      });
     });
 
     // check banned characters every day
-    nodeCron.schedule("0 0 * * *", async () => {
-      await this.newRelic.trackTransaction(
-        NewRelicTransactionCategory.CronJob,
-        "LogoutInactiveCharacters",
-        async () => {
-          await this.unbanCharacters();
-        }
-      );
-    });
-
-    // every hour, sync all character positions
-    nodeCron.schedule("0 * * * *", async () => {
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "SyncCharacterPositions", async () => {
-        await this.entityPosition.syncAllEntityPositions();
+    nodeCron.schedule("0 0 * * *", () => {
+      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "LogoutInactiveCharacters", async () => {
+        await this.unbanCharacters();
       });
     });
   }
 
   private async unbanCharacters(): Promise<void> {
-    const bannedCharacters = await this.characterRepository.find({
+    const bannedCharacters = await Character.find({
       isBanned: true,
       hasPermanentBan: {
         $ne: true,
@@ -70,7 +51,7 @@ export class CharacterCrons {
   }
 
   private async logoutInactiveCharacters(): Promise<void> {
-    const onlineCharacters = await this.characterRepository.find({
+    const onlineCharacters = await Character.find({
       isOnline: true,
     });
 
@@ -104,7 +85,7 @@ export class CharacterCrons {
           }
         );
 
-        (await this.characterRepository.findByIdAndUpdate(character._id, { isOnline: false })) as ICharacter;
+        (await Character.findByIdAndUpdate({ _id: character._id }, { isOnline: false })) as ICharacter;
 
         await this.socketSessionControl.deleteSession(character);
 

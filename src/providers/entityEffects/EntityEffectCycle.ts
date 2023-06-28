@@ -84,7 +84,6 @@ export class EntityEffectCycle {
       target = (await NPC.findOne({ _id: targetId }).populate("skills")) as unknown as INPC;
     } else if (targetType === EntityType.Character) {
       if (attacker) {
-        // TODO: Refactor to repository
         target = (await Character.findOne({ _id: targetId }).populate("skills")) as unknown as ICharacter;
       } else {
         target = (await Character.findOne({ _id: targetId })) as ICharacter;
