@@ -146,6 +146,40 @@ export class EquipmentEquip {
             return false;
           }
 
+          const leftHandItem = await Item.findById(equipment.leftHand);
+          const rightHandItem = await Item.findById(equipment.rightHand);
+
+          if (item.type === "Weapon") {
+            if (
+              leftHandItem &&
+              rightHandItem &&
+              leftHandItem.subType !== rightHandItem.subType &&
+              leftHandItem.subType !== "Shield"
+            ) {
+              this.socketMessaging.sendErrorMessageToCharacter(
+                character,
+                "Sorry, you cannot equip one-handed items with different subtypes."
+              );
+              return false;
+            }
+
+            if (leftHandItem && leftHandItem.subType !== item.subType && leftHandItem.subType !== "Shield") {
+              this.socketMessaging.sendErrorMessageToCharacter(
+                character,
+                "Sorry, you cannot equip this item in the left hand."
+              );
+              return false;
+            }
+
+            if (rightHandItem && rightHandItem.subType !== item.subType && rightHandItem.subType !== "Shield") {
+              this.socketMessaging.sendErrorMessageToCharacter(
+                character,
+                "Sorry, you cannot equip this item in the right hand."
+              );
+              return false;
+            }
+          }
+
           const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
 
           if (!equipItem) {
