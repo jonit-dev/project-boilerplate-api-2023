@@ -1,35 +1,77 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { appEnv } from "@providers/config/env";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { Queue, Worker } from "bullmq";
+import { provide } from "inversify-binding-decorators";
 
-type SetInterval = ReturnType<typeof setInterval>;
-
+@provide(BattleCycle)
 export class BattleCycle {
-  public static battleCycles: Map<string, BattleCycle> = new Map<string, BattleCycle>(); // create a map to store character intervals.
+  private queue: Queue;
+  private worker: Worker;
 
-  public interval: SetInterval;
-  public id: string;
+  constructor(private inMemoryHashTable: InMemoryHashTable) {}
 
-  constructor(id: string, fn: Function, intervalSpeed: number) {
-    this.id = id;
+  public async init(id: string, intervalSpeed: number, fn: () => void | Promise<void>): Promise<void> {
+    const queueName = `battle-cycle-${id}`;
 
-    this.interval = setInterval(() => {
-      fn();
-    }, intervalSpeed);
+    // clear out any stop flags
+    await this.inMemoryHashTable.set("battle-cycle-stop-flags", id, false);
 
-    if (BattleCycle.battleCycles.has(this.id)) {
-      const battleCycle = BattleCycle.battleCycles.get(this.id);
-      if (battleCycle) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        battleCycle.clear();
+    this.queue = new Queue(queueName, {
+      connection: {
+        host: appEnv.database.REDIS_CONTAINER,
+        port: Number(appEnv.database.REDIS_PORT),
+      },
+    });
+
+    this.worker = new Worker(
+      queueName,
+      async (job) => {
+        try {
+          const hasStopFlag = await this.inMemoryHashTable.get("battle-cycle-stop-flags", id);
+
+          if (hasStopFlag) {
+            console.log("stop flag found, stopping...");
+
+            // clear repeatable
+            await this.queue.removeRepeatable(queueName, {
+              every: intervalSpeed,
+            });
+
+            await this.queue.close();
+            await this.worker.close();
+            return;
+          }
+
+          console.log("executing function...");
+          await fn();
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      {
+        connection: {
+          host: appEnv.database.REDIS_CONTAINER,
+          port: Number(appEnv.database.REDIS_PORT),
+        },
       }
-    } else {
-      BattleCycle.battleCycles.set(this.id, this);
-    }
+    );
+
+    this.worker.on("failed", (job, err) => {
+      console.log(`Job ${job?.id} failed with error ${err.message}`);
+    });
+
+    await this.queue.add(
+      queueName,
+      {},
+      {
+        repeat: {
+          every: intervalSpeed,
+        },
+      }
+    );
   }
 
-  public async clear(): Promise<void> {
-    clearInterval(this.interval);
-    BattleCycle.battleCycles.delete(this.id);
-
-    await Character.updateOne({ _id: this.id }, { $unset: { target: 1 } });
+  public async stop(id: string): Promise<void> {
+    await this.inMemoryHashTable.set("battle-cycle-stop-flags", id, true);
   }
 }

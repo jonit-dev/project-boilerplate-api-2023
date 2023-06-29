@@ -6,7 +6,6 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
@@ -20,11 +19,11 @@ export class BattleCharacterAttack {
   constructor(
     private battleAttackTarget: BattleAttackTarget,
     private battleCharacterAttackValidation: BattleCharacterAttackValidation,
-    private socketMessaging: SocketMessaging,
     private newRelic: NewRelic,
     private battleTargeting: BattleTargeting,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
-    private characterValidation: CharacterValidation
+    private characterValidation: CharacterValidation,
+    private battleCycle: BattleCycle
   ) {}
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
@@ -32,13 +31,9 @@ export class BattleCharacterAttack {
       return;
     }
 
-    new BattleCycle(
-      character.id,
-      async () => {
-        await this.execAttackLoop(character, target);
-      },
-      character.attackIntervalSpeed
-    );
+    await this.battleCycle.init(character._id, character.attackIntervalSpeed, async () => {
+      await this.execAttackLoop(character, target);
+    });
   }
 
   private async execAttackLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {

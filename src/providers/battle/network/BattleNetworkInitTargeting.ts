@@ -19,8 +19,6 @@ import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { BattleCharacterAttack } from "../BattleCharacterAttack/BattleCharacterAttack";
 import { BattleCycle } from "../BattleCycle";
-import { BattleTargeting } from "../BattleTargeting";
-import { BattleNetworkStopTargeting } from "./BattleNetworkStopTargetting";
 
 interface ITargetValidation {
   isValid: boolean;
@@ -34,11 +32,10 @@ export class BattleNetworkInitTargeting {
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
     private battleCharacterManager: BattleCharacterAttack,
-    private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private mapNonPVPZone: MapNonPVPZone,
     private specialEffect: SpecialEffect,
-    private battleTargeting: BattleTargeting,
-    private locker: Locker
+    private locker: Locker,
+    private battleCycle: BattleCycle
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
@@ -99,8 +96,6 @@ export class BattleNetworkInitTargeting {
             return;
           }
 
-          await this.preventDuplicateTarget(character);
-
           await this.characterSetTargeting(character, target, data.type);
 
           // validate if character actually can set this target
@@ -110,19 +105,6 @@ export class BattleNetworkInitTargeting {
         }
       }
     );
-  }
-
-  private async preventDuplicateTarget(character: ICharacter): Promise<void> {
-    const hasBattleCycle = BattleCycle.battleCycles.has(character._id);
-
-    const hasTargetId = character?.target?.id?.toString();
-
-    // prevents double targeting
-    if (hasBattleCycle || hasTargetId) {
-      const battleCycle = BattleCycle.battleCycles.get(character._id);
-
-      await battleCycle?.clear();
-    }
   }
 
   private async characterSetTargeting(

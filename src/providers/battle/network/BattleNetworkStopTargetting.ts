@@ -8,7 +8,7 @@ import { BattleCycle } from "../BattleCycle";
 
 @provide(BattleNetworkStopTargeting)
 export class BattleNetworkStopTargeting {
-  constructor(private socketAuth: SocketAuth, private locker: Locker) {}
+  constructor(private socketAuth: SocketAuth, private locker: Locker, private battleCycle: BattleCycle) {}
 
   public onBattleStopTargeting(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, BattleSocketEvents.StopTargeting, async (data, character) => {
@@ -21,11 +21,7 @@ export class BattleNetworkStopTargeting {
       if (character) {
         await Character.updateOne({ _id: character._id }, { $unset: { target: 1 } });
 
-        const battleCycle = BattleCycle.battleCycles.get(character.id);
-
-        if (battleCycle) {
-          await battleCycle.clear();
-        }
+        await this.battleCycle.stop(character._id);
 
         await this.locker.unlock(`character-${character._id}-battle-targeting`);
       }
