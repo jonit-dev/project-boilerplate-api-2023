@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { Queue, Worker } from "bullmq";
@@ -14,13 +15,30 @@ export class BattleCycle {
     const queueName = `battle-cycle-${id}`;
 
     // clear out any stop flags
-    await this.inMemoryHashTable.set("battle-cycle-stop-flags", id, false);
+    await this.inMemoryHashTable.delete("battle-cycle-stop-flags", id);
+
+    // close any previous queue or workers, if available
+    if (this.queue) {
+      await this.queue.close();
+    }
+
+    if (this.worker) {
+      await this.worker.close();
+    }
 
     this.queue = new Queue(queueName, {
       connection: {
         host: appEnv.database.REDIS_CONTAINER,
         port: Number(appEnv.database.REDIS_PORT),
       },
+    });
+
+    // before starting, lets make sure the queue is clear
+
+    // clear repeatable
+    await this.queue.removeRepeatable(queueName, {
+      every: intervalSpeed,
+      immediately: true,
     });
 
     this.worker = new Worker(
@@ -35,10 +53,9 @@ export class BattleCycle {
             // clear repeatable
             await this.queue.removeRepeatable(queueName, {
               every: intervalSpeed,
+              immediately: true,
             });
 
-            await this.queue.close();
-            await this.worker.close();
             return;
           }
 
@@ -60,6 +77,7 @@ export class BattleCycle {
       console.log(`Job ${job?.id} failed with error ${err.message}`);
     });
 
+    // initialize queue
     await this.queue.add(
       queueName,
       {},
@@ -67,6 +85,7 @@ export class BattleCycle {
         repeat: {
           every: intervalSpeed,
         },
+        attempts: 1,
       }
     );
   }

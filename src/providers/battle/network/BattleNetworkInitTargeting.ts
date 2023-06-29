@@ -18,7 +18,6 @@ import {
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
 import { BattleCharacterAttack } from "../BattleCharacterAttack/BattleCharacterAttack";
-import { BattleCycle } from "../BattleCycle";
 
 interface ITargetValidation {
   isValid: boolean;
@@ -34,8 +33,7 @@ export class BattleNetworkInitTargeting {
     private battleCharacterManager: BattleCharacterAttack,
     private mapNonPVPZone: MapNonPVPZone,
     private specialEffect: SpecialEffect,
-    private locker: Locker,
-    private battleCycle: BattleCycle
+    private locker: Locker
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
