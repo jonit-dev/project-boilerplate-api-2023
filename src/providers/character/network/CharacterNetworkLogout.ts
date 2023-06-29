@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { BattleCycle } from "@providers/battle/BattleCycle";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
@@ -99,6 +100,12 @@ export class CharacterNetworkLogout {
         }
 
         await this.skillStatsIncrease.increaseMaxManaMaxHealth(character._id);
+
+        const battleCycle = BattleCycle.battleCycles.get(data.id);
+
+        if (battleCycle) {
+          await battleCycle.clear();
+        }
 
         const connectedCharacters = await this.socketConnection.getConnectedCharacters();
 
