@@ -7,6 +7,8 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterTarget)
 export class CharacterTarget {
+  constructor(private battleCycle: BattleCycle) {}
+
   public async clearTarget(character: ICharacter): Promise<void> {
     if (!character.target) {
       return;
@@ -17,10 +19,8 @@ export class CharacterTarget {
     await Character.updateOne({ _id: character._id }, { $unset: { target: 1 } });
 
     // and on battle cycle
-    const battleCycle = BattleCycle.battleCycles.get(character.id);
-    if (battleCycle) {
-      await battleCycle.clear();
-    }
+
+    await this.battleCycle.stop(character._id);
   }
 
   public async setFocusOnCharacter(npc: INPC, character: ICharacter): Promise<void> {
