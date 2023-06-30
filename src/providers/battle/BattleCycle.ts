@@ -1,4 +1,5 @@
 /* eslint-disable no-void */
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { Queue, Worker } from "bullmq";
@@ -45,21 +46,28 @@ export class BattleCycle {
       queueName,
       async (job) => {
         try {
-          const hasStopFlag = await this.inMemoryHashTable.get("battle-cycle-stop-flags", id);
+          // check if we should stop
+          const stopFlag = await this.inMemoryHashTable.get("battle-cycle-stop-flags", id);
 
-          if (hasStopFlag) {
-            console.log("stop flag found, stopping...");
+          if (stopFlag) {
+            // check if character still have a target
+            // if so, then we should not stop the battle cycle
 
-            // clear repeatable
-            await this.queue.removeRepeatable(queueName, {
-              every: intervalSpeed,
-              immediately: true,
-            });
+            // @ts-ignore
+            const { target } = await Character.findById(id).lean().select("target");
 
-            return;
+            if (!target?._id) {
+              await this.queue.removeRepeatable(queueName, {
+                every: intervalSpeed,
+                immediately: true,
+              });
+
+              await this.queue.close();
+
+              return;
+            }
           }
 
-          console.log("executing function...");
           await fn();
         } catch (error) {
           console.error(error);
