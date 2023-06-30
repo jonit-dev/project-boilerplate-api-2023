@@ -3,7 +3,6 @@ import { CharacterFoodConsumption } from "@providers/character/CharacterFoodCons
 import { CharacterMonitor } from "@providers/character/CharacterMonitor";
 import { CharacterTextureChange } from "@providers/character/CharacterTextureChange";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
-import { PathfindingQueue } from "@providers/map/PathfindingQueue";
 import { PathfindingResults } from "@providers/map/PathfindingResults";
 import { NPCManager } from "@providers/npc/NPCManager";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
@@ -26,7 +25,6 @@ export class ServerBootstrap {
     private seeder: Seeder,
     private characterConnection: CharacterConnection,
     private characterFoodConsumption: CharacterFoodConsumption,
-    private pathfindingQueue: PathfindingQueue,
     private characterBuffActivator: CharacterBuffActivator,
     private spellSilence: SpellSilence,
     private characterTextureChange: CharacterTextureChange,
@@ -51,8 +49,6 @@ export class ServerBootstrap {
   }
 
   public async performMultipleInstancesOperations(): Promise<void> {
-    await this.clearAllQueues();
-
     await this.characterMonitor.monitor();
 
     //! TODO: Load balance NPCs on PM2 instances
@@ -82,10 +78,5 @@ export class ServerBootstrap {
     this.npcFreezer.init();
 
     await this.locker.clear();
-  }
-
-  private async clearAllQueues(): Promise<void> {
-    await this.pathfindingQueue.clearAllJobs();
-    console.log("🧹 BullMQ queues cleared...");
   }
 }
