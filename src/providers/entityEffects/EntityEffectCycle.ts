@@ -45,7 +45,8 @@ export class EntityEffectCycle {
       }
 
       const attacker = await this.getTarget(attackerId, attackerType, true);
-      const damage = await entityEffect.effect(target, attacker as ICharacter | INPC);
+      let damage = await entityEffect.effect(target, attacker as ICharacter | INPC);
+      damage = damage > target.health ? target.health : damage;
 
       if (target.type === EntityType.NPC && attacker) {
         await npcExperience.recordXPinBattle(attacker as ICharacter, target, damage);

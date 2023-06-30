@@ -32,7 +32,6 @@ export class OnTargetHit {
       if (!target.isAlive) {
         await this.handleDeath(target, attacker);
         await this.updateQuests(target, attacker);
-        return;
       }
     });
   }

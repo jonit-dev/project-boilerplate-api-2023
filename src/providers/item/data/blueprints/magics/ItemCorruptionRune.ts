@@ -38,8 +38,6 @@ export const itemCorruptionRune: IRuneItemBlueprint = {
   projectileAnimationKey: AnimationEffectKeys.Dark,
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
-    const entityEffectUse = container.get(EntityEffectUse);
-
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.CorruptionRune, caster);
 
     const spellCalculator = container.get(SpellCalculator);
@@ -49,11 +47,16 @@ export const itemCorruptionRune: IRuneItemBlueprint = {
       max: 5,
     });
 
-    await entityEffectUse.applyEntityEffects(target, caster, entityEffectCorruption);
+    let totalPoints = pointModifier * points;
+    totalPoints = totalPoints > target.health ? target.health : totalPoints;
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -totalPoints);
 
-    return points;
+    return totalPoints;
   },
   usableEffectDescription: "Deals corruption damage to the target. Damage is based on your magic level.",
+  usableEntityEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
+    const entityEffectUse = container.get(EntityEffectUse);
+    await entityEffectUse.applyEntityEffects(target, caster, entityEffectCorruption);
+  },
 };

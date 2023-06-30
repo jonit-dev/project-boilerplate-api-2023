@@ -47,9 +47,12 @@ export const itemDarkRune: IRuneItemBlueprint = {
       max: 4,
     });
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
+    let totalPoints = pointModifier * points;
+    totalPoints = totalPoints > target.health ? target.health : totalPoints;
 
-    return points;
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -totalPoints);
+    console.log("target.health", target.health);
+    return totalPoints;
   },
   usableEffectDescription: "Deals dark damage to the target",
 };

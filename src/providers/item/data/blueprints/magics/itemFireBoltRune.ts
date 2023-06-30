@@ -40,8 +40,6 @@ export const itemFireBoltRune: IRuneItemBlueprint = {
   projectileAnimationKey: AnimationEffectKeys.Red,
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
-    const entityEffectUse = container.get(EntityEffectUse);
-
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireBoltRune, caster);
 
     const spellCalculator = container.get(SpellCalculator);
@@ -51,12 +49,16 @@ export const itemFireBoltRune: IRuneItemBlueprint = {
       max: 4,
     });
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
+    let totalPoints = pointModifier * points;
+    totalPoints = totalPoints > target.health ? target.health : totalPoints;
 
-    await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);
-
-    return points;
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -totalPoints);
+    return totalPoints;
   },
   usableEffectDescription:
     "Deals fire damage to the target. Damage depends on your magic level and it gives a burning effect.",
+  usableEntityEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
+    const entityEffectUse = container.get(EntityEffectUse);
+    await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);
+  },
 };

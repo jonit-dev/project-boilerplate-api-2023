@@ -148,11 +148,7 @@ export class NPCExperience {
         for (const i in target.xpToRelease) {
           if (target.xpToRelease[i].charId?.toString() === attacker.id) {
             found = true;
-
-            // @ts-ignore
-            const multiplier = damage > target.healthBeforeHit ? target.healthBeforeHit : damage;
-
-            target.xpToRelease[i].xp! += target.xpPerDamage * multiplier;
+            target.xpToRelease[i].xp! += target.xpPerDamage * damage;
             break;
           }
         }

@@ -77,9 +77,11 @@ export const itemThunderRune: IRuneItemBlueprint = {
       });
     }
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
+    let totalPoints = pointModifier * points;
+    totalPoints = totalPoints > target.health ? target.health : totalPoints;
 
-    return points;
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -totalPoints);
+    return totalPoints;
   },
   usableEffectDescription:
     "Deals a strong energy damage on the target based on your magic level, and also reduces its speed.",

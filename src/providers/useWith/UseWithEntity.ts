@@ -97,7 +97,7 @@ export class UseWithEntity {
       return false;
     }
 
-    const blueprint = itemsBlueprintIndex[item.key];
+    const blueprint = itemsBlueprintIndex[item.baseKey];
     if (!blueprint || !(!!blueprint.power || targetType === StaticEntity) || !blueprint.usableEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, `Sorry, '${item.name}' cannot be used with target.`);
       return false;
@@ -185,9 +185,7 @@ export class UseWithEntity {
       }
     }
 
-    const blueprint = itemsBlueprintIndex[item.key]; //TODO Must be typed
-
-    const { health: healthBeforeHit } = target as ICharacter | INPC;
+    const blueprint = itemsBlueprintIndex[item.baseKey];
 
     const damage = await blueprint.usableEffect(caster, target, item);
     await target.save();
@@ -205,10 +203,12 @@ export class UseWithEntity {
 
     if (target.type === EntityType.Character || target.type === EntityType.NPC) {
       const transformedTarget = target as ICharacter | INPC;
-      transformedTarget["healthBeforeHit"] = healthBeforeHit;
 
       await this.sendTargetUpdateEvents(caster, transformedTarget);
       await this.onTargetHit.execute(transformedTarget, caster, damage);
+      if (blueprint.usableEntityEffect) {
+        await blueprint.usableEntityEffect(caster, transformedTarget);
+      }
     }
 
     if (target.type === EntityType.Character) {

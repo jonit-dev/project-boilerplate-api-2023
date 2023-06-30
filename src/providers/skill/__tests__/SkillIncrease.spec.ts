@@ -311,6 +311,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
       { class: CharacterClass.Druid },
       { new: true }
     )) as ICharacter;
+    testNPC.health = 100;
+
     for (let i = 0; i < spToAdd; i++) {
       await skillIncrease.increaseSkillsOnBattle(teste, testNPC, 2);
     }

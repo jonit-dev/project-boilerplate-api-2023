@@ -40,7 +40,6 @@ export const itemFireRune: IRuneItemBlueprint = {
 
   usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
-    const entityEffectUse = container.get(EntityEffectUse);
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireRune, caster);
 
@@ -51,11 +50,15 @@ export const itemFireRune: IRuneItemBlueprint = {
       max: 3,
     });
 
-    await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);
+    let totalPoints = pointModifier * points;
+    totalPoints = totalPoints > target.health ? target.health : totalPoints;
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
-
-    return points;
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -totalPoints);
+    return totalPoints;
   },
   usableEffectDescription: "Deals fire damage to the target",
+  usableEntityEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
+    const entityEffectUse = container.get(EntityEffectUse);
+    await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);
+  },
 };

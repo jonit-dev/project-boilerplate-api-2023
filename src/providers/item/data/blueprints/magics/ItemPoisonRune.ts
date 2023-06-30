@@ -50,12 +50,15 @@ export const itemPoisonRune: IRuneItemBlueprint = {
       max: 3,
     });
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
+    let totalPoints = pointModifier * points;
+    totalPoints = totalPoints > target.health ? target.health : totalPoints;
 
-    const entityEffectUse = container.get(EntityEffectUse);
-    await entityEffectUse.applyEntityEffects(target, caster, entityEffectPoison);
-
-    return points;
+    itemUsableEffect.apply(target, EffectableAttribute.Health, -totalPoints);
+    return totalPoints;
   },
   usableEffectDescription: "Deals poison damage to the target",
+  usableEntityEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
+    const entityEffectUse = container.get(EntityEffectUse);
+    await entityEffectUse.applyEntityEffects(target, caster, entityEffectPoison);
+  },
 };
