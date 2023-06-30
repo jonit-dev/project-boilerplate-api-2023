@@ -31,7 +31,7 @@ export class BattleCharacterAttack {
       return;
     }
 
-    await this.battleCycle.init(character._id, character.attackIntervalSpeed, async () => {
+    await this.battleCycle.init(character, target._id, character.attackIntervalSpeed, async () => {
       await this.execAttackLoop(character, target);
     });
   }

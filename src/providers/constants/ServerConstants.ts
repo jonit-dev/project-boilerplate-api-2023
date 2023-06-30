@@ -1,4 +1,4 @@
-import { ChatSocketEvents, ItemSocketEvents } from "@rpg-engine/shared";
+import { BattleSocketEvents, ChatSocketEvents, ItemSocketEvents } from "@rpg-engine/shared";
 
 export const USER_CONTROL_ONLINE = {
   MAX_NUMBER_OF_PLAYERS: 30,
@@ -29,4 +29,6 @@ export const LOCKABLE_EVENTS = [
   ItemSocketEvents.Move,
   "UseWithTile",
   "UseWithItem",
+  BattleSocketEvents.InitTargeting,
+  BattleSocketEvents.StopTargeting,
 ] as string[];

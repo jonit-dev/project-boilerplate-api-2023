@@ -1,104 +1,75 @@
-/* eslint-disable no-void */
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
-import { appEnv } from "@providers/config/env";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
-import { Queue, Worker } from "bullmq";
-import { provide } from "inversify-binding-decorators";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { provideSingleton } from "@providers/inversify/provideSingleton";
+import { Locker } from "@providers/locks/Locker";
 
-@provide(BattleCycle)
+@provideSingleton(BattleCycle)
 export class BattleCycle {
-  private queue: Queue;
-  private worker: Worker;
+  private intervals: Map<string, NodeJS.Timeout> = new Map();
 
-  constructor(private inMemoryHashTable: InMemoryHashTable) {}
+  constructor(private characterValidation: CharacterValidation, private locker: Locker) {}
 
-  public async init(id: string, intervalSpeed: number, fn: () => void | Promise<void>): Promise<void> {
-    const queueName = `battle-cycle-${id}`;
+  public async init(
+    character: ICharacter,
+    targetId: string,
+    attackIntervalSpeed: number,
+    attackFn: () => Promise<void>
+  ): Promise<void> {
+    try {
+      await this.stop(character._id.toString());
 
-    // clear out any stop flags
-    await this.inMemoryHashTable.delete("battle-cycle-stop-flags", id);
+      if (this.intervals.has(character._id.toString())) {
+        return;
+      }
 
-    // close any previous queue or workers, if available
-    if (this.queue) {
-      await this.queue.close();
-    }
+      const interval = setInterval(async () => {
+        const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
 
-    if (this.worker) {
-      await this.worker.close();
-    }
-
-    this.queue = new Queue(queueName, {
-      connection: {
-        host: appEnv.database.REDIS_CONTAINER,
-        port: Number(appEnv.database.REDIS_PORT),
-      },
-    });
-
-    // before starting, lets make sure the queue is clear
-
-    // clear repeatable
-    await this.queue.removeRepeatable(queueName, {
-      every: intervalSpeed,
-      immediately: true,
-    });
-
-    this.worker = new Worker(
-      queueName,
-      async (job) => {
-        try {
-          // check if we should stop
-          const stopFlag = await this.inMemoryHashTable.get("battle-cycle-stop-flags", id);
-
-          if (stopFlag) {
-            // check if character still have a target
-            // if so, then we should not stop the battle cycle
-
-            // @ts-ignore
-            const { target } = await Character.findById(id).lean().select("target");
-
-            if (!target?._id) {
-              await this.queue.removeRepeatable(queueName, {
-                every: intervalSpeed,
-                immediately: true,
-              });
-
-              await this.queue.close();
-
-              return;
-            }
-          }
-
-          await fn();
-        } catch (error) {
-          console.error(error);
+        if (!hasBasicValidation) {
+          clearInterval(interval);
+          return;
         }
-      },
-      {
-        connection: {
-          host: appEnv.database.REDIS_CONTAINER,
-          port: Number(appEnv.database.REDIS_PORT),
-        },
-      }
-    );
 
-    this.worker.on("failed", (job, err) => {
-      console.log(`Job ${job?.id} failed with error ${err.message}`);
-    });
+        // if original target (init) is not the same as the current target, stop the interval
 
-    // initialize queue
-    await this.queue.add(
-      queueName,
-      {},
-      {
-        repeat: {
-          every: intervalSpeed,
-        },
-        attempts: 1,
-      }
-    );
+        const currentTargetId = await this.getCurrentTargetId(character._id.toString());
+
+        if (!currentTargetId) {
+          clearInterval(interval);
+          return;
+        }
+
+        if (currentTargetId?.toString() !== targetId.toString()) {
+          clearInterval(interval);
+          return;
+        }
+
+        await attackFn();
+      }, attackIntervalSpeed);
+
+      this.intervals.set(character._id.toString(), interval);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  public async stop(id: string): Promise<void> {
-    await this.inMemoryHashTable.set("battle-cycle-stop-flags", id, true);
+  public stop(characterId: string): void {
+    const interval = this.intervals.get(characterId);
+
+    if (!interval) {
+      return;
+    }
+
+    clearInterval(interval);
+
+    this.intervals.delete(characterId);
+  }
+
+  private async getCurrentTargetId(characterId: string): Promise<string | undefined> {
+    console.time("getCurrentTargetId");
+    const { target } = (await Character.findById(characterId).select("target").lean()) as ICharacter;
+    console.timeEnd("getCurrentTargetId");
+
+    return target?.id.toString();
   }
 }
