@@ -66,9 +66,7 @@ export class BattleCycle {
   }
 
   private async getCurrentTargetId(characterId: string): Promise<string | undefined> {
-    console.time("getCurrentTargetId");
     const { target } = (await Character.findById(characterId).select("target").lean()) as ICharacter;
-    console.timeEnd("getCurrentTargetId");
 
     return target?.id.toString();
   }
