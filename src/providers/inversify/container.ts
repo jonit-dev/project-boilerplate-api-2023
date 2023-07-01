@@ -1,4 +1,5 @@
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterMonitor } from "@providers/character/CharacterMonitor";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
@@ -8,6 +9,7 @@ import { MapLoader } from "@providers/map/MapLoader";
 import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { NPCLoader } from "@providers/npc/NPCLoader";
 import { NPCManager } from "@providers/npc/NPCManager";
+import PartyManagement from "@providers/party/PartyManagement";
 import { PM2Helper } from "@providers/server/PM2Helper";
 import { ServerBootstrap } from "@providers/server/ServerBootstrap";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
@@ -30,7 +32,6 @@ import {
   useCasesControllers,
   userControllerContainer,
 } from "./ControllersInversify";
-import PartyManagement from "@providers/party/PartyManagement";
 
 const container = new Container();
 
@@ -82,5 +83,7 @@ export const spellLearn = container.get<SpellLearn>(SpellLearn);
 export const npcExperience = container.get<NPCExperience>(NPCExperience);
 
 export const partyManagement = container.get<PartyManagement>(PartyManagement);
+
+export const blueprintManager = container.get<BlueprintManager>(BlueprintManager);
 
 export { container };

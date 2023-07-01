@@ -1,11 +1,16 @@
+import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { ITiledObject } from "@rpg-engine/shared";
 import { MapHelper } from "../MapHelper";
 
 describe("MapHelper", () => {
   let mapHelper: MapHelper;
+  let blueprintManager: BlueprintManager;
 
   beforeAll(async () => {
     mapHelper = container.get<MapHelper>(MapHelper);
+
+    blueprintManager = container.get<BlueprintManager>(BlueprintManager);
 
     await unitTestHelper.initializeMapLoader();
   });
@@ -45,12 +50,19 @@ describe("MapHelper", () => {
       properties: [{ name: "key", value: "test-key" }],
     };
     const mapName = "test-map";
-    const blueprintIndex = {
-      "test-key": { foo: "bar" },
-    };
+
+    await blueprintManager.updateBlueprint("items", "test-key", {
+      foo: "bar",
+    });
+
     const additionalProperties = { baz: "qux" };
-    // @ts-ignore
-    const result = await mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, additionalProperties, "items");
+
+    const result = await mapHelper.mergeBlueprintWithTiledProps(
+      tiledData as ITiledObject,
+      mapName,
+      additionalProperties,
+      "items"
+    );
 
     expect(result.key).toEqual("test-key-1");
   });
@@ -63,12 +75,19 @@ describe("MapHelper", () => {
       properties: [{ name: "key", value: "test-key" }],
     };
     const mapName = "test-map";
-    const blueprintIndex = {
-      "test-key": { foo: "bar" },
-    };
+
     const additionalProperties = { baz: "qux" };
-    // @ts-ignore
-    const result = await mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, additionalProperties, "items");
+
+    await blueprintManager.updateBlueprint("items", "test-key", {
+      foo: "bar",
+    });
+
+    const result = await mapHelper.mergeBlueprintWithTiledProps(
+      tiledData as ITiledObject,
+      mapName,
+      additionalProperties,
+      "items"
+    );
 
     expect(result.data).toEqual({
       foo: "bar",
@@ -89,12 +108,19 @@ describe("MapHelper", () => {
       properties: [{ name: "key", value: "test-key" }],
     };
     const mapName = "test-map";
-    const blueprintIndex = {
-      "test-key": { foo: "bar" },
-    };
+
+    await blueprintManager.updateBlueprint("items", "test-key", {
+      foo: "bar",
+    });
+
     const additionalProperties = { baz: "qux" };
-    // @ts-ignore
-    const result = await mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, additionalProperties, "items");
+
+    const result = await mapHelper.mergeBlueprintWithTiledProps(
+      tiledData as ITiledObject,
+      mapName,
+      additionalProperties,
+      "items"
+    );
 
     expect(result.data).toEqual({
       foo: "bar",
@@ -115,12 +141,19 @@ describe("MapHelper", () => {
       properties: [{ name: "key", value: "test-key" }],
     };
     const mapName = "test-map";
-    const blueprintIndex = {
-      "test-key": { foo: "bar" },
-    };
+
+    await blueprintManager.updateBlueprint("items", "test-key", {
+      foo: "bar",
+    });
+
     const additionalProperties = { baz: "qux" };
-    // @ts-ignore
-    const result = await mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, additionalProperties, "items");
+
+    const result = await mapHelper.mergeBlueprintWithTiledProps(
+      tiledData as ITiledObject,
+      mapName,
+      additionalProperties,
+      "items"
+    );
 
     expect(result.data).toEqual({
       foo: "bar",
@@ -140,14 +173,15 @@ describe("MapHelper", () => {
       y: 0,
       properties: [{ name: "key", value: "test-key" }],
     };
-    const blueprintIndex = {
-      "test-key": { foo: "bar" },
-    };
+    await blueprintManager.updateBlueprint("items", "test-key", {
+      foo: "bar",
+    });
+
     const additionalProperties = { baz: "qux" };
 
-    expect(() => {
+    await expect(() =>
       // @ts-ignore
-      await mapHelper.mergeBlueprintWithTiledProps(tiledData, null, additionalProperties, "items");
-    }).toThrowError("NPCLoader: Map name is for map null");
+      mapHelper.mergeBlueprintWithTiledProps(tiledData as ITiledObject, null, additionalProperties, "items")
+    ).rejects.toThrow("NPCLoader: Map name is for map null");
   });
 });

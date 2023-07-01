@@ -38,7 +38,7 @@ export class MapHelper {
     const tiledKey = tiledProperties.key;
 
     // const blueprint = blueprintIndex[tiledKey];
-    const blueprint = await this.blueprintManager.getDataFromBlueprint<T>(blueprintNamespace, tiledKey);
+    const blueprint = await this.blueprintManager.getBlueprint<T>(blueprintNamespace, tiledKey);
     const key = `${tiledKey}-${tiledData.id}`;
 
     if (!mapName) {

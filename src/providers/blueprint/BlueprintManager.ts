@@ -1,3 +1,4 @@
+import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { npcsBlueprintIndex } from "@providers/npc/data";
 import crypto from "crypto";
@@ -18,15 +19,30 @@ export class BlueprintManager {
     await this.loadBlueprintFor("npcs", npcsBlueprintIndex);
   }
 
-  public getDataFromBlueprint<T>(namespace: BlueprintNamespaces, key: string): Promise<T> {
+  public getBlueprint<T>(namespace: BlueprintNamespaces, key: string): Promise<T> {
     return this.inMemoryHashTable.get(`blueprint-${namespace}`, key) as Promise<T>;
+  }
+
+  public async setBlueprint<T>(namespace: BlueprintNamespaces, key: string, data: T): Promise<void> {
+    await this.inMemoryHashTable.set(`blueprint-${namespace}`, key, data);
+  }
+
+  public async updateBlueprint<T>(namespace: BlueprintNamespaces, key: string, data: T): Promise<void> {
+    const blueprint = await this.getBlueprint<T>(namespace, key);
+
+    await this.setBlueprint(namespace, key, {
+      ...blueprint,
+      ...data,
+    });
   }
 
   private async loadBlueprintFor(
     namespace: BlueprintNamespaces,
     blueprintIndex: Record<string, Record<string, string>>
   ): Promise<void> {
-    console.time(`📜 Loading blueprints for ${namespace}...`);
+    if (!appEnv.general.IS_UNIT_TEST) {
+      console.time(`📜 Loading blueprints for ${namespace}...`);
+    }
     for (const [key, blueprintData] of Object.entries(blueprintIndex)) {
       try {
         const currentHash = this.createHashFromBlueprint(blueprintData as Record<string, unknown>);
@@ -50,7 +66,9 @@ export class BlueprintManager {
         console.error(error);
       }
     }
-    console.timeEnd(`📜 Loading blueprints for ${namespace}...`);
+    if (!appEnv.general.IS_UNIT_TEST) {
+      console.timeEnd(`📜 Loading blueprints for ${namespace}...`);
+    }
   }
 
   private createHashFromBlueprint(blueprint: Record<string, unknown>): string {
