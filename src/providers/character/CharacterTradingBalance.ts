@@ -5,7 +5,7 @@ import { MathHelper } from "@providers/math/MathHelper";
 import { ITradeRequestItem } from "@rpg-engine/shared";
 
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
+import { blueprintManager } from "@providers/inversify/container";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
@@ -15,8 +15,7 @@ export class CharacterTradingBalance {
   constructor(
     private characterItemSlots: CharacterItemSlots,
     private mathHelper: MathHelper,
-    private characterItemInventory: CharacterItemInventory,
-    private blueprintManager: BlueprintManager
+    private characterItemInventory: CharacterItemInventory
   ) {}
 
   public async getTotalGoldInInventory(character: ICharacter): Promise<number> {
@@ -56,8 +55,7 @@ export class CharacterTradingBalance {
   }
 
   private async getItemPrice(key: string, multiplier: number): Promise<number> {
-    const basePrice =
-      (await this.blueprintManager.getBlueprint<IItem>("items", key as AvailableBlueprints)).basePrice ?? 0;
+    const basePrice = (await blueprintManager.getBlueprint<IItem>("items", key as AvailableBlueprints)).basePrice ?? 0;
     return this.mathHelper.fixPrecision(basePrice * multiplier);
   }
 }

@@ -8,8 +8,8 @@ import { NPCManager } from "@providers/npc/NPCManager";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { Seeder } from "@providers/seeds/Seeder";
 
-import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { appEnv } from "@providers/config/env";
+import { blueprintManager } from "@providers/inversify/container";
 import { Locker } from "@providers/locks/Locker";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import SpellSilence from "@providers/spells/data/logic/mage/druid/SpellSilence";
@@ -33,8 +33,7 @@ export class ServerBootstrap {
     private characterMonitor: CharacterMonitor,
     private heapMonitor: HeapMonitor,
     private npcFreezer: NPCFreezer,
-    private locker: Locker,
-    private blueprintManager: BlueprintManager
+    private locker: Locker
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -81,6 +80,6 @@ export class ServerBootstrap {
 
     await this.locker.clear();
 
-    await this.blueprintManager.loadAllBlueprints();
+    await blueprintManager.loadAllBlueprints();
   }
 }

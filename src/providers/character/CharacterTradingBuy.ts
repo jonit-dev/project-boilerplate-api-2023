@@ -2,8 +2,8 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
+import { blueprintManager } from "@providers/inversify/container";
 import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -31,8 +31,7 @@ export class CharacterTradingBuy {
     private characterItemInventory: CharacterItemInventory,
     private characterWeight: CharacterWeight,
     private characterTradingValidation: CharacterTradingValidation,
-    private characterInventory: CharacterInventory,
-    private blueprintManager: BlueprintManager
+    private characterInventory: CharacterInventory
   ) {}
 
   public async buyItems(
@@ -100,7 +99,7 @@ export class CharacterTradingBuy {
       }
 
       // create the new item representation on the database
-      const itemBlueprint = await this.blueprintManager.getBlueprint<IItem>(
+      const itemBlueprint = await blueprintManager.getBlueprint<IItem>(
         "items",
         purchasedItem.key as AvailableBlueprints
       );
@@ -199,7 +198,7 @@ export class CharacterTradingBuy {
     }
 
     for (const item of itemsToPurchase) {
-      const itemBlueprint = await this.blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
+      const itemBlueprint = await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
 
       if (!itemBlueprint) {
         this.socketMessaging.sendErrorMessageToCharacter(

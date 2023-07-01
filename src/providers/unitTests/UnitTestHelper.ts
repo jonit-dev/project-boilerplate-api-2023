@@ -14,9 +14,13 @@ import { IUser, User } from "@entities/ModuleSystem/UserModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
-import { container, mapLoader } from "@providers/inversify/container";
+import { blueprintManager, container, mapLoader } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { BodiesBlueprint, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  AvailableBlueprints,
+  BodiesBlueprint,
+  ContainersBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import {
   fixedPathMockNPC,
@@ -196,7 +200,7 @@ export class UnitTestHelper {
   }
 
   public async createMockItemFromBlueprint(blueprintKey: string, extraProps?: Partial<IItem>): Promise<IItem> {
-    const blueprintData = itemsBlueprintIndex[blueprintKey];
+    const blueprintData = await blueprintManager.getBlueprint<IItem>("items", blueprintKey as AvailableBlueprints);
 
     const newItem = new Item({
       ...blueprintData,

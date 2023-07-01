@@ -2,8 +2,8 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { NPC_TRADER_INTERACTION_DISTANCE } from "@providers/constants/NPCConstants";
+import { blueprintManager } from "@providers/inversify/container";
 import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -22,8 +22,7 @@ export class CharacterTradingValidation {
     private movementHelper: MovementHelper,
     private characterItemSlots: CharacterItemSlots,
     private characterInventory: CharacterInventory,
-    private characterItemInventory: CharacterItemInventory,
-    private blueprintManager: BlueprintManager
+    private characterItemInventory: CharacterItemInventory
   ) {}
 
   public async validateAndReturnTraderNPC(npcId: string, character: ICharacter): Promise<INPC | undefined> {
@@ -95,7 +94,7 @@ export class CharacterTradingValidation {
     const itemsQty = this.characterItemSlots.getTotalQtyByKey(charItems);
 
     for (const item of items) {
-      const itemBlueprint = await this.blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
+      const itemBlueprint = await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
       const qty = itemsQty.get(item.key);
 
       if (!itemBlueprint.basePrice) {
@@ -139,7 +138,7 @@ export class CharacterTradingValidation {
     }
 
     for (const item of items) {
-      const itemBlueprint = await this.blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
+      const itemBlueprint = await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
 
       if (!itemBlueprint) {
         this.socketMessaging.sendErrorMessageToCharacter(
@@ -182,7 +181,7 @@ export class CharacterTradingValidation {
       }
 
       const basePrice =
-        (await this.blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints))?.basePrice ?? 0;
+        (await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints))?.basePrice ?? 0;
       // check if the item has price <= 0
       if (basePrice <= 0 || item.qty <= 0) {
         this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, invalid parameters for ${item.key}.`);

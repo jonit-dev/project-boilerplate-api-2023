@@ -1,8 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { itemsBlueprintIndex } from "@providers/item/data";
+import { blueprintManager } from "@providers/inversify/container";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ICharacterItemBuff } from "@rpg-engine/shared";
+import { ICharacterItemBuff, IEquippableItemBlueprint } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBuffActivator } from "./CharacterBuffActivator";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
@@ -16,7 +17,10 @@ export class CharacterItemBuff {
   ) {}
 
   public async enableItemBuff(character: ICharacter, item: IItem): Promise<void> {
-    const itemBlueprint = itemsBlueprintIndex[item.baseKey];
+    const itemBlueprint = await blueprintManager.getBlueprint<IEquippableItemBlueprint>(
+      "items",
+      item.baseKey as AvailableBlueprints
+    );
 
     if (!itemBlueprint || !itemBlueprint.equippedBuff) {
       return;
