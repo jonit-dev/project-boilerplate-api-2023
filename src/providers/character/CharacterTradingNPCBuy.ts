@@ -1,8 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import Shared, {
+import {
   CharacterTradeSocketEvents,
   ICharacterNPCTradeInitBuyResponse,
   ITradeRequestItem,
@@ -22,7 +23,8 @@ export class CharacterTradingNPCBuy {
     private characterTradingBalance: CharacterTradingBalance,
     private characterTradingBuy: CharacterTradingBuy,
     private characterTradingValidation: CharacterTradingValidation,
-    private characterTarget: CharacterTarget
+    private characterTarget: CharacterTarget,
+    private blueprintManager: BlueprintManager
   ) {}
 
   public async initializeBuy(npcId: string, character: ICharacter): Promise<void> {
@@ -35,7 +37,7 @@ export class CharacterTradingNPCBuy {
     const traderItems: ITradeResponseItem[] = [];
 
     npc?.traderItems?.forEach(async ({ key }) => {
-      const item = itemsBlueprintIndex[key] as Shared.IItem;
+      const item = await this.blueprintManager.getBlueprint<any>("items", key as AvailableBlueprints);
       const price = await this.characterTradingBalance.getItemBuyPrice(key);
 
       if (price) {

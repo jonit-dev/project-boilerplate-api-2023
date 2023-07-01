@@ -2,9 +2,9 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { TRADER_SELL_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import Shared, {
@@ -36,7 +36,8 @@ export class CharacterTradingSell {
     private mathHelper: MathHelper,
     private characterItemSlots: CharacterItemSlots,
     private characterTradingBalance: CharacterTradingBalance,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private blueprintManager: BlueprintManager
   ) {}
 
   public async sellItems(
@@ -117,7 +118,8 @@ export class CharacterTradingSell {
   }
 
   private async addGoldToInventory(items: ITradeRequestItem[], character: ICharacter): Promise<void> {
-    const blueprint = itemsBlueprintIndex[OthersBlueprint.GoldCoin];
+    const blueprint = await this.blueprintManager.getBlueprint<IItem>("items", OthersBlueprint.GoldCoin);
+
     const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainerId = inventory?.itemContainer as unknown as string;
 
@@ -208,7 +210,7 @@ export class CharacterTradingSell {
     }
 
     for (const itemKey of uniqueItems) {
-      const item = itemsBlueprintIndex[itemKey] as IItem;
+      const item = await this.blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
 
       if (!item || !item.basePrice || item.canSell === false) continue;
 

@@ -2,9 +2,9 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
@@ -31,7 +31,8 @@ export class CharacterTradingBuy {
     private characterItemInventory: CharacterItemInventory,
     private characterWeight: CharacterWeight,
     private characterTradingValidation: CharacterTradingValidation,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private blueprintManager: BlueprintManager
   ) {}
 
   public async buyItems(
@@ -99,7 +100,10 @@ export class CharacterTradingBuy {
       }
 
       // create the new item representation on the database
-      const itemBlueprint = itemsBlueprintIndex[purchasedItem.key] as Partial<IItem>;
+      const itemBlueprint = await this.blueprintManager.getBlueprint<IItem>(
+        "items",
+        purchasedItem.key as AvailableBlueprints
+      );
       const isStackable = itemBlueprint?.maxStackSize! > 1;
 
       let wasItemAddedToContainer;
@@ -182,7 +186,7 @@ export class CharacterTradingBuy {
     if (tradingEntityType === TradingEntity.NPC) {
       priceModifier = TRADER_BUY_PRICE_MULTIPLIER;
       const entity = tradingEntity as INPC;
-      isBaseTransactionValid = this.characterTradingValidation.validateTransactionWithNPC(
+      isBaseTransactionValid = await this.characterTradingValidation.validateTransactionWithNPC(
         character,
         entity,
         itemsToPurchase
@@ -195,7 +199,7 @@ export class CharacterTradingBuy {
     }
 
     for (const item of itemsToPurchase) {
-      const itemBlueprint = itemsBlueprintIndex[item.key] as Partial<IItem>;
+      const itemBlueprint = await this.blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
 
       if (!itemBlueprint) {
         this.socketMessaging.sendErrorMessageToCharacter(

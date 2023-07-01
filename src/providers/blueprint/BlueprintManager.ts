@@ -22,8 +22,12 @@ export class BlueprintManager {
     await this.loadBlueprintFor("items", itemsBlueprintIndex);
   }
 
-  public getBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints): Promise<T> {
-    return this.inMemoryHashTable.get(`blueprint-${namespace}`, key) as Promise<T>;
+  public async getBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints): Promise<T> {
+    const blueprint = await this.inMemoryHashTable.get(`blueprint-${namespace}`, key);
+
+    delete blueprint?.versionHash;
+
+    return blueprint as T;
   }
 
   public async setBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints, data: T): Promise<void> {
