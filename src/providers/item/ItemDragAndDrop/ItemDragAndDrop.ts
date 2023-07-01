@@ -5,12 +5,13 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { blueprintManager } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { IEquipmentAndInventoryUpdatePayload, IItem, IItemMove, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { clearCacheForKey } from "speedgoose";
-import { itemsBlueprintIndex } from "../data/index";
+import { AvailableBlueprints } from "../data/types/itemsBlueprintTypes";
 
 @provide(ItemDragAndDrop)
 export class ItemDragAndDrop {
@@ -205,7 +206,7 @@ export class ItemDragAndDrop {
     quantity?: number
   ): Promise<boolean> {
     if (!to.item && !totalMove) {
-      const blueprint = itemsBlueprintIndex[from.item.key];
+      const blueprint = await blueprintManager.getBlueprint<IItem>("items", from.item.key as AvailableBlueprints);
       if (!blueprint) {
         return false;
       }

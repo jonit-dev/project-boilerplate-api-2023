@@ -345,7 +345,7 @@ export class ItemCraftable {
     const availableRecipes: IUseWithCraftingRecipe[] = [];
     const recipes = this.getAllRecipes();
     for (const itemKey in itemsBlueprintIndex) {
-      const item = itemsBlueprintIndex[itemKey];
+      const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
       if (recipes[item.key]) {
         const recipe = recipes[item.key];
         if (recipe.requiredItems.some((ing) => inventoryInfo.get(ing.key) ?? ing.qty <= 0)) {
