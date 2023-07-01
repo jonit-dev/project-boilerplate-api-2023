@@ -30,6 +30,10 @@ export class BlueprintManager {
     return blueprint as T;
   }
 
+  public async getAllBlueprintKeys(namespace: BlueprintNamespaces): Promise<string[]> {
+    return await this.inMemoryHashTable.getAllKeys(`blueprint-${namespace}`);
+  }
+
   public async setBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints, data: T): Promise<void> {
     await this.inMemoryHashTable.set(`blueprint-${namespace}`, key, data);
   }

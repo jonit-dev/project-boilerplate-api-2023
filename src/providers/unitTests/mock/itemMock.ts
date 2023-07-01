@@ -1,4 +1,8 @@
-import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import {
+  RangedWeaponsBlueprint,
+  ShieldsBlueprint,
+  StaffsBlueprint,
+} from "@providers/item/data/types/itemsBlueprintTypes";
 import { IItem, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 
@@ -10,7 +14,7 @@ export const itemMock: Partial<IItem> = {
   maxStackSize: 1,
   isUsable: false,
   isStorable: true,
-  layer: 2.5,
+
   isItemContainer: false,
   isSolid: false,
   key: "short-sword-66",
@@ -86,14 +90,15 @@ export const itemTwoHandedMock: Partial<IItem> = {
   maxStackSize: 1,
   isUsable: false,
   isStorable: true,
-  layer: 2.5,
+
   isItemContainer: false,
   isSolid: false,
-  key: "fire-staff",
-  texturePath: "staffs/fire-staff.png",
-  textureKey: "fire-staff",
+  key: StaffsBlueprint.Wand,
+  texturePath: "staffs/wand.png",
+  textureKey: "wand",
   name: "Fire Staff",
-  description: "A staff with an fire ember gem at the top.",
+  description:
+    "A powerful magic wand crafted by the dark lord Sauron himself, imbued with malevolent energy and deadly magical power.",
   attack: 3,
   defense: 0,
   weight: 1,
@@ -113,7 +118,7 @@ export const itemMockArmor: Partial<IItem> = {
   maxStackSize: 1,
   isUsable: false,
   isStorable: true,
-  layer: 2.5,
+
   isItemContainer: false,
   isSolid: false,
   key: "golden-armor",
@@ -132,15 +137,15 @@ export const itemMockArmor: Partial<IItem> = {
 };
 
 export const itemMockShield: Partial<IItem> = {
+  key: ShieldsBlueprint.WoodenShield,
   type: ItemType.Armor,
   subType: ItemSubType.Shield,
-  key: "frost-shield",
   textureAtlas: "items",
-  texturePath: "shields/frost-shield.png",
-  name: "Frost Shield",
-  description: "A defensive tool based on a magic durable ice",
-  defense: 7,
-  weight: 3,
+  texturePath: "shields/wooden-shield.png",
+  name: "Training Shield",
+  description: "A simple round wooden shield for protection.",
+  defense: 1,
+  weight: 1.4,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
 };
 
