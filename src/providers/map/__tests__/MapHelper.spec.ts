@@ -37,7 +37,7 @@ describe("MapHelper", () => {
     expect(highestLayer).toEqual(6);
   });
 
-  it("returns the correct key in the returned object", () => {
+  it("returns the correct key in the returned object", async () => {
     const tiledData = {
       id: 1,
       x: 0,
@@ -50,12 +50,12 @@ describe("MapHelper", () => {
     };
     const additionalProperties = { baz: "qux" };
     // @ts-ignore
-    const result = mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, blueprintIndex, additionalProperties);
+    const result = await mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, additionalProperties, "items");
 
     expect(result.key).toEqual("test-key-1");
   });
 
-  it("returns the correct data in the returned object", () => {
+  it("returns the correct data in the returned object", async () => {
     const tiledData = {
       id: 1,
       x: 0,
@@ -68,7 +68,7 @@ describe("MapHelper", () => {
     };
     const additionalProperties = { baz: "qux" };
     // @ts-ignore
-    const result = mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, blueprintIndex, additionalProperties);
+    const result = await mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, additionalProperties, "items");
 
     expect(result.data).toEqual({
       foo: "bar",
@@ -81,7 +81,7 @@ describe("MapHelper", () => {
     });
   });
 
-  it("returns the correct x and y coordinates in the returned object", () => {
+  it("returns the correct x and y coordinates in the returned object", async () => {
     const tiledData = {
       id: 1,
       x: 10,
@@ -94,7 +94,7 @@ describe("MapHelper", () => {
     };
     const additionalProperties = { baz: "qux" };
     // @ts-ignore
-    const result = mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, blueprintIndex, additionalProperties);
+    const result = await mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, additionalProperties, "items");
 
     expect(result.data).toEqual({
       foo: "bar",
@@ -107,7 +107,7 @@ describe("MapHelper", () => {
     });
   });
 
-  it("returns the correct scene name in the returned object", () => {
+  it("returns the correct scene name in the returned object", async () => {
     const tiledData = {
       id: 1,
       x: 0,
@@ -120,7 +120,7 @@ describe("MapHelper", () => {
     };
     const additionalProperties = { baz: "qux" };
     // @ts-ignore
-    const result = mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, blueprintIndex, additionalProperties);
+    const result = await mapHelper.mergeBlueprintWithTiledProps(tiledData, mapName, additionalProperties, "items");
 
     expect(result.data).toEqual({
       foo: "bar",
@@ -133,7 +133,7 @@ describe("MapHelper", () => {
     });
   });
 
-  it("throws an error if the mapName argument is not provided", () => {
+  it("throws an error if the mapName argument is not provided", async () => {
     const tiledData = {
       id: 1,
       x: 0,
@@ -147,7 +147,7 @@ describe("MapHelper", () => {
 
     expect(() => {
       // @ts-ignore
-      mapHelper.mergeBlueprintWithTiledProps(tiledData, null, blueprintIndex, additionalProperties);
+      await mapHelper.mergeBlueprintWithTiledProps(tiledData, null, additionalProperties, "items");
     }).toThrowError("NPCLoader: Map name is for map null");
   });
 });

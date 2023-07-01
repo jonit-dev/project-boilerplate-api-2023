@@ -15,7 +15,7 @@ export interface IItemSeedData extends Omit<IItem, "_id"> {
 export class ItemLoader {
   constructor(private mapHelper: MapHelper, private mapObjectsLoader: MapObjectsLoader) {}
 
-  public loadItemSeedData(): Map<string, IItemSeedData> {
+  public async loadItemSeedData(): Promise<Map<string, IItemSeedData>> {
     const itemSeedData = new Map<string, IItemSeedData>();
 
     for (const [mapName, mapData] of MapLoader.maps.entries()) {
@@ -35,11 +35,11 @@ export class ItemLoader {
           throw new Error(`ItemLoader: Map name is not found for ${mapName}`);
         }
 
-        const { key, data } = this.mapHelper.mergeBlueprintWithTiledProps<IItemSeedData>(
+        const { key, data } = await this.mapHelper.mergeBlueprintWithTiledProps<IItemSeedData>(
           tiledItemData,
           mapName,
-          itemsBlueprintIndex,
-          null
+          null,
+          "items"
         );
 
         itemSeedData.set(key, data);

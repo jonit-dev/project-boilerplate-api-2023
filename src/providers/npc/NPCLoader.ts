@@ -13,7 +13,7 @@ export interface INPCSeedData extends Omit<INPC, "_id"> {
 export class NPCLoader {
   constructor(private mapHelper: MapHelper, private mapObjectsLoader: MapObjectsLoader) {}
 
-  public loadNPCSeedData(): Map<string, INPCSeedData> {
+  public async loadNPCSeedData(): Promise<Map<string, INPCSeedData>> {
     const npcSeedData = new Map<string, INPCSeedData>();
 
     for (const [mapName, mapData] of MapLoader.maps.entries()) {
@@ -47,11 +47,11 @@ export class NPCLoader {
           }
         }
 
-        const { key, data } = this.mapHelper.mergeBlueprintWithTiledProps<INPCSeedData>(
+        const { key, data } = await this.mapHelper.mergeBlueprintWithTiledProps<INPCSeedData>(
           tiledNPC,
           mapName,
-          npcsBlueprintIndex,
-          additionalProps
+          additionalProps,
+          "npcs"
         );
 
         npcSeedData.set(key, data);

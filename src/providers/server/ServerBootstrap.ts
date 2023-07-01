@@ -8,6 +8,7 @@ import { NPCManager } from "@providers/npc/NPCManager";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { Seeder } from "@providers/seeds/Seeder";
 
+import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { appEnv } from "@providers/config/env";
 import { Locker } from "@providers/locks/Locker";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
@@ -32,7 +33,8 @@ export class ServerBootstrap {
     private characterMonitor: CharacterMonitor,
     private heapMonitor: HeapMonitor,
     private npcFreezer: NPCFreezer,
-    private locker: Locker
+    private locker: Locker,
+    private blueprintManager: BlueprintManager
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -78,5 +80,7 @@ export class ServerBootstrap {
     this.npcFreezer.init();
 
     await this.locker.clear();
+
+    await this.blueprintManager.loadAllBlueprints();
   }
 }

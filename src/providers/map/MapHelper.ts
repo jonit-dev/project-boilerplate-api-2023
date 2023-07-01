@@ -1,8 +1,11 @@
+import { BlueprintManager, BlueprintNamespaces } from "@providers/blueprint/BlueprintManager";
 import { ITiledObject, MapLayers } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(MapHelper)
 export class MapHelper {
+  constructor(private blueprintManager: BlueprintManager) {}
+
   public isCoordinateValid = (value: number | undefined | null): boolean => !(!value && value !== 0);
 
   public areAllCoordinatesValid(...args: number[][]): boolean {
@@ -20,12 +23,12 @@ export class MapHelper {
     return highest;
   };
 
-  public mergeBlueprintWithTiledProps<T>(
+  public async mergeBlueprintWithTiledProps<T>(
     tiledData: ITiledObject,
     mapName: string,
-    blueprintIndex: Record<string, any>,
-    additionalProperties: Record<string, any> | null
-  ): { key: string; data: T } {
+    additionalProperties: Record<string, any> | null,
+    blueprintNamespace: BlueprintNamespaces
+  ): Promise<{ key: string; data: T }> {
     const tiledProperties: Record<string, any> = {};
 
     tiledData.properties.forEach((property) => {
@@ -34,7 +37,8 @@ export class MapHelper {
 
     const tiledKey = tiledProperties.key;
 
-    const blueprint = blueprintIndex[tiledKey];
+    // const blueprint = blueprintIndex[tiledKey];
+    const blueprint = await this.blueprintManager.getDataFromBlueprint<T>(blueprintNamespace, tiledKey);
     const key = `${tiledKey}-${tiledData.id}`;
 
     if (!mapName) {
@@ -52,6 +56,6 @@ export class MapHelper {
       scene: mapName,
     };
 
-    return { key, data };
+    return { key, data: data as T };
   }
 }
