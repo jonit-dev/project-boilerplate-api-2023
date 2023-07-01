@@ -57,6 +57,8 @@ export class ServerBootstrap {
   }
 
   private async execOneTimeOperations(): Promise<void> {
+    await blueprintManager.loadAllBlueprints();
+
     await this.npcManager.disableNPCBehaviors();
 
     await this.characterConnection.resetCharacterAttributes();
@@ -79,7 +81,5 @@ export class ServerBootstrap {
     this.npcFreezer.init();
 
     await this.locker.clear();
-
-    await blueprintManager.loadAllBlueprints();
   }
 }

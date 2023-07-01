@@ -15,7 +15,6 @@ import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { blueprintManager, container, mapLoader } from "@providers/inversify/container";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
   AvailableBlueprints,
   BodiesBlueprint,
@@ -179,7 +178,7 @@ export class UnitTestHelper {
   }
 
   public async createMockItemContainer(character: ICharacter): Promise<IItem> {
-    const blueprintData = itemsBlueprintIndex[BodiesBlueprint.CharacterBody];
+    const blueprintData = await blueprintManager.getBlueprint<IItem>("items", BodiesBlueprint.CharacterBody);
 
     const charBody = new Item({
       ...blueprintData,

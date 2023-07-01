@@ -14,7 +14,8 @@ import { IQuestReward, QuestReward } from "@entities/ModuleQuest/QuestRewardMode
 import { CharacterItems, IItemByKeyResult } from "@providers/character/characterItems/CharacterItems";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager } from "@providers/inversify/container";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemDrop } from "@providers/item/ItemDrop";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -325,7 +326,7 @@ export class QuestSystem {
     }
 
     for (const itemKey of reward.itemKeys) {
-      const blueprintData = itemsBlueprintIndex[itemKey];
+      const blueprintData = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
 
       for (let i = 0; i < reward.qty; i++) {
         let rewardItem = new Item({ ...blueprintData });
@@ -387,25 +388,5 @@ export class QuestSystem {
     /*
      * TODO: implement when spells are supported
      */
-    // if (!reward.spellKeys) {
-    //     return;
-    // }
-    // for (const spellKey of reward.spellKeys) {
-    //     let freeSlotAvailable = true;
-    //     const blueprintData = itemsBlueprintIndex[spellKey];
-    //     if (!freeSlotAvailable) {
-    //         break;
-    //     }
-    //     for (let i = 0; i < reward.qty; i++) {
-    //         const rewardSpell = new Spell({ ...blueprintData });
-    //         await rewardSpell.save();
-    //         const freeSlotId = itemContainer.firstAvailableSlotId;
-    //         freeSlotAvailable = freeSlotId !== null;
-    //         if (!freeSlotAvailable) {
-    //             break;
-    //         }
-    //         itemContainer.slots[freeSlotId!] = rewardSpell;
-    //     }
-    // }
   }
 }
