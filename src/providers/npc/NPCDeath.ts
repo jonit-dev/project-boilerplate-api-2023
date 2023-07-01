@@ -11,10 +11,10 @@ import {
 } from "@providers/constants/LootConstants";
 
 import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
+import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemRarity } from "@providers/item/ItemRarity";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { Time } from "@providers/time/Time";
@@ -167,7 +167,7 @@ export class NPCDeath {
       return;
     }
 
-    const blueprintData = itemsBlueprintIndex["npc-body"];
+    const blueprintData = await blueprintManager.getBlueprint<IItem>("items", "npc-body" as AvailableBlueprints);
     const npcBody = new Item({
       ...blueprintData, // base body props
       key: `${npc.key}-body`,
@@ -216,11 +216,11 @@ export class NPCDeath {
 
     for (const loot of loots) {
       const rand = Math.round(random(0, 100));
-      const lootChance = this.calculateLootChance(loot, wasNpcInGiantForm ? NPC_GIANT_FORM_LOOT_MULTIPLIER : 1);
+      const lootChance = await this.calculateLootChance(loot, wasNpcInGiantForm ? NPC_GIANT_FORM_LOOT_MULTIPLIER : 1);
 
       if (rand <= lootChance) {
         const lootQuantity = this.getLootQuantity(loot);
-        const isStackable = this.isLootItemStackable(loot);
+        const isStackable = await this.isLootItemStackable(loot);
 
         let freeSlotAvailable = true;
         let remainingLootQuantity = lootQuantity;
@@ -263,8 +263,11 @@ export class NPCDeath {
     return itemContainer;
   }
 
-  private calculateLootChance(loot: INPCLoot, multiplier = 1): number {
-    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+  private async calculateLootChance(loot: INPCLoot, multiplier = 1): Promise<number> {
+    const blueprintData = await blueprintManager.getBlueprint<IItem>(
+      "items",
+      loot.itemBlueprintKey as AvailableBlueprints
+    );
     const lootMultipliers = {
       [OthersBlueprint.GoldCoin]: 1,
       [ItemType.CraftingResource]: LOOT_CRAFTING_MATERIAL_DROP_CHANCE,
@@ -282,15 +285,21 @@ export class NPCDeath {
     return 1;
   }
 
-  private isLootItemStackable(loot: INPCLoot): boolean {
-    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+  private async isLootItemStackable(loot: INPCLoot): Promise<boolean> {
+    const blueprintData = await blueprintManager.getBlueprint<IItem>(
+      "items",
+      loot.itemBlueprintKey as AvailableBlueprints
+    );
     const lootItem = new Item({ ...blueprintData });
 
     return lootItem.maxStackSize > 1;
   }
 
   private async createLootItem(loot: INPCLoot): Promise<IItem> {
-    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+    const blueprintData = await blueprintManager.getBlueprint<IItem>(
+      "items",
+      loot.itemBlueprintKey as AvailableBlueprints
+    );
     let lootItem = new Item({ ...blueprintData });
 
     if (lootItem.attack || lootItem.defense) {
