@@ -1,4 +1,6 @@
+/* eslint-disable no-async-promise-executor */
 import { appEnv } from "@providers/config/env";
+import { NEW_RELIC_ALLOWED_TRANSACTIONS } from "@providers/constants/AnalyticsConstants";
 import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import newrelic from "newrelic";
@@ -11,12 +13,14 @@ export class NewRelic {
     callback: () => void | Promise<void> | Promise<any>,
     skipTracking?: boolean
   ): Promise<any> {
-    return new Promise((resolve, reject) => {
-      if (appEnv.general.IS_UNIT_TEST || skipTracking) {
+    return new Promise(async (resolve, reject) => {
+      const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.includes(event);
+
+      if (appEnv.general.IS_UNIT_TEST || skipTracking || !shouldTrackTransaction) {
         return resolve(callback());
       }
 
-      newrelic.startBackgroundTransaction(event, category, async () => {
+      await newrelic.startBackgroundTransaction(event, category, async () => {
         try {
           const result = await callback();
           resolve(result);
@@ -36,12 +40,14 @@ export class NewRelic {
     cb: Promise<(...args: unknown[]) => any>,
     skipTracking?: boolean
   ): Promise<any> {
-    return new Promise((resolve, reject): void => {
-      if (appEnv.general.IS_UNIT_TEST || skipTracking) {
+    return new Promise(async (resolve, reject): Promise<void> => {
+      const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.includes(event);
+
+      if (appEnv.general.IS_UNIT_TEST || skipTracking || !shouldTrackTransaction) {
         return resolve(cb);
       }
 
-      newrelic.startBackgroundTransaction(event, category, async () => {
+      await newrelic.startBackgroundTransaction(event, category, async () => {
         try {
           const result = await cb;
           resolve(result);
