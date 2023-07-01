@@ -18,8 +18,10 @@ export class BlueprintManager {
   constructor(private inMemoryHashTable: InMemoryHashTable) {}
 
   public async loadAllBlueprints(): Promise<void> {
-    await this.loadBlueprintFor("npcs", npcsBlueprintIndex);
-    await this.loadBlueprintFor("items", itemsBlueprintIndex);
+    await Promise.all([
+      this.loadBlueprintFor("npcs", npcsBlueprintIndex),
+      this.loadBlueprintFor("items", itemsBlueprintIndex),
+    ]);
   }
 
   public async getBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints): Promise<T> {

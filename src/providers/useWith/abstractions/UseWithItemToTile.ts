@@ -6,7 +6,8 @@ import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager } from "@providers/inversify/container";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -192,7 +193,7 @@ export class UseWithItemToTile {
       }
 
       if (addReward) {
-        const itemBlueprint = itemsBlueprintIndex[reward.key];
+        const itemBlueprint = await blueprintManager.getBlueprint<IItem>("items", reward.key as AvailableBlueprints);
 
         const item = new Item({
           ...itemBlueprint,
