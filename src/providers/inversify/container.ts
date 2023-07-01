@@ -5,6 +5,8 @@ import { CharacterMonitor } from "@providers/character/CharacterMonitor";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { RedisManager } from "@providers/database/RedisManager";
+import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
+import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { NPCLoader } from "@providers/npc/NPCLoader";
@@ -83,6 +85,10 @@ export const spellLearn = container.get<SpellLearn>(SpellLearn);
 export const npcExperience = container.get<NPCExperience>(NPCExperience);
 
 export const partyManagement = container.get<PartyManagement>(PartyManagement);
+
+export const entityEffectUse = container.get<EntityEffectUse>(EntityEffectUse);
+
+export const equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
 
 export const blueprintManager = container.get<BlueprintManager>(BlueprintManager);
 

@@ -1,10 +1,11 @@
-import { BlueprintManager, BlueprintNamespaces } from "@providers/blueprint/BlueprintManager";
+import { BlueprintNamespaces } from "@providers/blueprint/BlueprintManager";
+import { blueprintManager } from "@providers/inversify/container";
 import { ITiledObject, MapLayers } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(MapHelper)
 export class MapHelper {
-  constructor(private blueprintManager: BlueprintManager) {}
+  constructor() {}
 
   public isCoordinateValid = (value: number | undefined | null): boolean => !(!value && value !== 0);
 
@@ -38,7 +39,7 @@ export class MapHelper {
     const tiledKey = tiledProperties.key;
 
     // const blueprint = blueprintIndex[tiledKey];
-    const blueprint = await this.blueprintManager.getBlueprint<T>(blueprintNamespace, tiledKey);
+    const blueprint = await blueprintManager.getBlueprint<T>(blueprintNamespace, tiledKey);
     const key = `${tiledKey}-${tiledData.id}`;
 
     if (!mapName) {

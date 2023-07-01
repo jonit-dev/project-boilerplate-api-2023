@@ -1,5 +1,6 @@
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { itemsBlueprintIndex } from "@providers/item/data";
 import { npcsBlueprintIndex } from "@providers/npc/data";
 import crypto from "crypto";
 import { provide } from "inversify-binding-decorators";
@@ -17,6 +18,7 @@ export class BlueprintManager {
 
   public async loadAllBlueprints(): Promise<void> {
     await this.loadBlueprintFor("npcs", npcsBlueprintIndex);
+    await this.loadBlueprintFor("items", itemsBlueprintIndex);
   }
 
   public getBlueprint<T>(namespace: BlueprintNamespaces, key: string): Promise<T> {
