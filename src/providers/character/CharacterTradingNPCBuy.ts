@@ -12,8 +12,8 @@ import Shared, {
 import { provide } from "inversify-binding-decorators";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
-import { CharacterTradingValidation } from "./CharacterTradingValidation";
 import { CharacterTradingBuy } from "./CharacterTradingBuy";
+import { CharacterTradingValidation } from "./CharacterTradingValidation";
 
 @provide(CharacterTradingNPCBuy)
 export class CharacterTradingNPCBuy {
@@ -34,9 +34,9 @@ export class CharacterTradingNPCBuy {
 
     const traderItems: ITradeResponseItem[] = [];
 
-    npc?.traderItems?.forEach(({ key }) => {
+    npc?.traderItems?.forEach(async ({ key }) => {
       const item = itemsBlueprintIndex[key] as Shared.IItem;
-      const price = this.characterTradingBalance.getItemBuyPrice(key);
+      const price = await this.characterTradingBalance.getItemBuyPrice(key);
 
       if (price) {
         traderItems.push({ ...item, price });

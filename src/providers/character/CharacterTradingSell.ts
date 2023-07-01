@@ -121,7 +121,7 @@ export class CharacterTradingSell {
     const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainerId = inventory?.itemContainer as unknown as string;
 
-    let qty = this.getGoldQuantity(items);
+    let qty = await this.getGoldQuantity(items);
     let success = true;
 
     while (qty > 0) {
@@ -147,11 +147,11 @@ export class CharacterTradingSell {
     }
   }
 
-  private getGoldQuantity(items: ITradeRequestItem[]): number {
+  private async getGoldQuantity(items: ITradeRequestItem[]): Promise<number> {
     let qty = 0;
 
     for (const item of items) {
-      qty += item.qty * this.characterTradingBalance.getItemSellPrice(item.key);
+      qty += item.qty * (await this.characterTradingBalance.getItemSellPrice(item.key));
     }
 
     qty = this.mathHelper.fixPrecision(qty);
@@ -212,13 +212,13 @@ export class CharacterTradingSell {
 
       if (!item || !item.basePrice || item.canSell === false) continue;
 
-      const sellPrice = this.characterTradingBalance.getItemSellPrice(itemKey, priceMultiplier);
+      const sellPrice = await this.characterTradingBalance.getItemSellPrice(itemKey, priceMultiplier);
 
       if (!sellPrice) continue;
 
       responseItems.push({
         ...(item as unknown as Shared.IItem),
-        price: this.characterTradingBalance.getItemSellPrice(item.key, priceMultiplier),
+        price: await this.characterTradingBalance.getItemSellPrice(item.key, priceMultiplier),
         stackQty: itemsQty.get(itemKey),
       });
     }

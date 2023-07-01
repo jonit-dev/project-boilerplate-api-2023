@@ -3,12 +3,12 @@ import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { CharacterItemEquipment } from "@providers/character/characterItems/CharacterItemEquipment";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { AvailableBlueprints, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -53,7 +53,8 @@ export class BattleAttackRanged {
     private equipmentSlots: EquipmentSlots,
     private animationEffect: AnimationEffect,
     private characterWeapon: CharacterWeapon,
-    private characterItemEquipment: CharacterItemEquipment
+    private characterItemEquipment: CharacterItemEquipment,
+    private blueprintManager: BlueprintManager
   ) {}
 
   public sendNoAmmoEvent(
@@ -147,7 +148,10 @@ export class BattleAttackRanged {
     }
 
     if (weapon.item.subType === "Staff") {
-      const itemStaffOrWand = itemsBlueprintIndex[weapon.item.key];
+      const itemStaffOrWand = await this.blueprintManager.getBlueprint<any>(
+        "items",
+        weapon.item.key as AvailableBlueprints
+      );
       result = {
         location: weapon.location,
         id: weapon.item._id,

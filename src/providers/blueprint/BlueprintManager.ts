@@ -1,6 +1,7 @@
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { itemsBlueprintIndex } from "@providers/item/data";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { npcsBlueprintIndex } from "@providers/npc/data";
 import crypto from "crypto";
 import { provide } from "inversify-binding-decorators";
@@ -21,15 +22,15 @@ export class BlueprintManager {
     await this.loadBlueprintFor("items", itemsBlueprintIndex);
   }
 
-  public getBlueprint<T>(namespace: BlueprintNamespaces, key: string): Promise<T> {
+  public getBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints): Promise<T> {
     return this.inMemoryHashTable.get(`blueprint-${namespace}`, key) as Promise<T>;
   }
 
-  public async setBlueprint<T>(namespace: BlueprintNamespaces, key: string, data: T): Promise<void> {
+  public async setBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints, data: T): Promise<void> {
     await this.inMemoryHashTable.set(`blueprint-${namespace}`, key, data);
   }
 
-  public async updateBlueprint<T>(namespace: BlueprintNamespaces, key: string, data: T): Promise<void> {
+  public async updateBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints, data: T): Promise<void> {
     const blueprint = await this.getBlueprint<T>(namespace, key);
 
     await this.setBlueprint(namespace, key, {

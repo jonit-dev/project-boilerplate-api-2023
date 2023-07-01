@@ -1,5 +1,6 @@
 import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { container, unitTestHelper } from "@providers/inversify/container";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ITiledObject } from "@rpg-engine/shared";
 import { MapHelper } from "../MapHelper";
 
@@ -51,7 +52,7 @@ describe("MapHelper", () => {
     };
     const mapName = "test-map";
 
-    await blueprintManager.updateBlueprint("items", "test-key", {
+    await blueprintManager.updateBlueprint("items", "test-key" as AvailableBlueprints, {
       foo: "bar",
     });
 
@@ -78,7 +79,7 @@ describe("MapHelper", () => {
 
     const additionalProperties = { baz: "qux" };
 
-    await blueprintManager.updateBlueprint("items", "test-key", {
+    await blueprintManager.updateBlueprint("items", "test-key" as AvailableBlueprints, {
       foo: "bar",
     });
 
@@ -109,7 +110,7 @@ describe("MapHelper", () => {
     };
     const mapName = "test-map";
 
-    await blueprintManager.updateBlueprint("items", "test-key", {
+    await blueprintManager.updateBlueprint("items", "test-key" as AvailableBlueprints, {
       foo: "bar",
     });
 
@@ -142,7 +143,7 @@ describe("MapHelper", () => {
     };
     const mapName = "test-map";
 
-    await blueprintManager.updateBlueprint("items", "test-key", {
+    await blueprintManager.updateBlueprint("items", "test-key" as AvailableBlueprints, {
       foo: "bar",
     });
 
@@ -173,7 +174,7 @@ describe("MapHelper", () => {
       y: 0,
       properties: [{ name: "key", value: "test-key" }],
     };
-    await blueprintManager.updateBlueprint("items", "test-key", {
+    await blueprintManager.updateBlueprint("items", "test-key" as AvailableBlueprints, {
       foo: "bar",
     });
 

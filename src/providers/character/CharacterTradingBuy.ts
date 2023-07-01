@@ -72,7 +72,7 @@ export class CharacterTradingBuy {
         continue;
       }
 
-      const itemPrice = this.characterTradingBalance.getItemBuyPrice(purchasedItem.key, priceMultiplier);
+      const itemPrice = await this.characterTradingBalance.getItemBuyPrice(purchasedItem.key, priceMultiplier);
 
       if (!itemPrice) {
         this.socketMessaging.sendErrorMessageToCharacter(
@@ -218,7 +218,7 @@ export class CharacterTradingBuy {
 
     // Does the character has enough gold to purchase all required items?
 
-    const totalCost = this.characterTradingBalance.calculateItemsTotalPrice(
+    const totalCost = await this.characterTradingBalance.calculateItemsTotalPrice(
       tradingItems,
       itemsToPurchase,
       priceModifier

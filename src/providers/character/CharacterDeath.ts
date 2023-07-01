@@ -8,9 +8,8 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { EquipmentSlotTypes } from "@providers/equipment/EquipmentSlots";
-import { entityEffectUse, equipmentSlots } from "@providers/inversify/container";
+import { blueprintManager, entityEffectUse, equipmentSlots } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
   AccessoriesBlueprint,
   BodiesBlueprint,
@@ -144,7 +143,7 @@ export class CharacterDeath {
   }
 
   public async generateCharacterBody(character: ICharacter): Promise<IItem> {
-    const blueprintData = itemsBlueprintIndex[BodiesBlueprint.CharacterBody];
+    const blueprintData = await blueprintManager.getBlueprint<IItem>("items", BodiesBlueprint.CharacterBody);
 
     const charBody = new Item({
       ...blueprintData,
