@@ -7,6 +7,7 @@ import {
   RangeTypes,
 } from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemPoisonRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.PoisonRune,
@@ -27,4 +28,5 @@ export const itemPoisonRune: IRuneItemBlueprint = {
   minMagicLevelRequired: 2,
   animationKey: AnimationEffectKeys.HitPoison,
   projectileAnimationKey: AnimationEffectKeys.Green,
+  usableEffectKey: UsableEffectsBlueprint.PoisonRuneUsableEffect,
 };

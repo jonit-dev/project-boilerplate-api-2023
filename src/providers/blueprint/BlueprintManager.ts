@@ -34,12 +34,13 @@ export class BlueprintManager {
     if (namespace === "items") {
       // if item, lookup for usable effect and inject it on the blueprint
       let usableEffectBlueprint = usableEffectsIndex[blueprint?.usableEffectKey] as IUsableEffect | IUsableEffectRune;
+
       if (usableEffectBlueprint && blueprint) {
         blueprint.usableEffect = usableEffectBlueprint.usableEffect;
         blueprint.usableEffectDescription = usableEffectBlueprint.usableEffectDescription;
 
-        if (blueprint.usableEntityEffect) {
-          usableEffectBlueprint = usableEffectBlueprint as IUsableEffectRune;
+        usableEffectBlueprint = usableEffectBlueprint as IUsableEffectRune;
+        if (usableEffectBlueprint.usableEntityEffect) {
           blueprint.usableEntityEffect = usableEffectBlueprint.usableEntityEffect;
         }
       }
