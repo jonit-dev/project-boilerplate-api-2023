@@ -39,4 +39,15 @@ export enum UsableEffectsBlueprint {
   LightBurningVialsUsableEffect = "LightBurningVialsUsableEffect",
   ModerateBurningVialsUsableEffect = "ModerateBurningVialsUsableEffect",
   StrongBurningVialsUsableEffect = "StrongBurningVialsUsableEffect",
+
+  LightLifePotionUsableEffect = "LightLifePotionUsableEffect",
+  LifePotionUsableEffect = "LifePotionUsableEffect",
+  GreaterLifePotionUsableEffect = "GreaterLifePotionUsableEffect",
+
+  LightManaPotionUsableEffect = "LightManaPotionUsableEffect",
+  ManaPotionUsableEffect = "ManaPotionUsableEffect",
+  GreaterManaPotionUsableEffect = "GreaterManaPotionUsableEffect",
+
+  AntidotePotionUsableEffect = "AntidotePotionUsableEffect",
+  LightEndurancePotionUsableEffect = "LightEndurancePotionUsableEffect",
 }

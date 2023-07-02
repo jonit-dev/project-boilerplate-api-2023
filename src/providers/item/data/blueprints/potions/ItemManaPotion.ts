@@ -1,9 +1,6 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { container } from "@providers/inversify/container";
-import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
-import round from "lodash/round";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemManaPotion: IConsumableItemBlueprint = {
   key: PotionsBlueprint.ManaPotion,
@@ -18,12 +15,5 @@ export const itemManaPotion: IConsumableItemBlueprint = {
   basePrice: 20,
   maxStackSize: 100,
   canSell: false,
-  usableEffect: (character: ICharacter) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
-
-    const characterManaPercentage = round(character.maxMana * 0.15); // 15% of char max mana
-
-    itemUsableEffect.apply(character, EffectableAttribute.Mana, characterManaPercentage);
-  },
-  usableEffectDescription: "Restores 15% of mana",
+  usableEffectKey: UsableEffectsBlueprint.ManaPotionUsableEffect,
 };

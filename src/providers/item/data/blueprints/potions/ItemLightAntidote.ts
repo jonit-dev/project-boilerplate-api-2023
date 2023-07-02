@@ -1,9 +1,6 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
-import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import { container } from "@providers/inversify/container";
 import { IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemLightAntidote: IConsumableItemBlueprint = {
   key: PotionsBlueprint.LightAntidote,
@@ -16,11 +13,5 @@ export const itemLightAntidote: IConsumableItemBlueprint = {
   weight: 0.04,
   basePrice: 15,
   maxStackSize: 100,
-  usableEffect: async (character: ICharacter) => {
-    const entityEffectUse = container.get(EntityEffectUse);
-
-    // cure poison effect
-    await entityEffectUse.clearEntityEffect(EntityEffectBlueprint.Poison, character);
-  },
-  usableEffectDescription: "Cures poison effect",
+  usableEffectKey: UsableEffectsBlueprint.AntidotePotionUsableEffect,
 };
