@@ -1,6 +1,6 @@
 /* eslint-disable no-async-promise-executor */
 import { appEnv } from "@providers/config/env";
-import { NEW_RELIC_ALLOWED_TRANSACTIONS } from "@providers/constants/AnalyticsConstants";
+import { NEW_RELIC_SAMPLE_RATE } from "@providers/constants/AnalyticsConstants";
 import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import newrelic from "newrelic";
@@ -14,9 +14,14 @@ export class NewRelic {
     skipTracking?: boolean
   ): Promise<any> {
     return new Promise(async (resolve, reject) => {
-      const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.some((transaction) => event.includes(transaction));
+      // const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.some((transaction) => event.includes(transaction));
 
-      if (appEnv.general.IS_UNIT_TEST || skipTracking || !shouldTrackTransaction) {
+      if (appEnv.general.IS_UNIT_TEST || skipTracking) {
+        return resolve(callback());
+      }
+
+      if (Math.random() > NEW_RELIC_SAMPLE_RATE) {
+        // Sample only a % of transactions to avoid eating our our quota massively
         return resolve(callback());
       }
 
@@ -41,9 +46,13 @@ export class NewRelic {
     skipTracking?: boolean
   ): Promise<any> {
     return new Promise(async (resolve, reject): Promise<void> => {
-      const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.some((transaction) => event.includes(transaction));
+      // const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.some((transaction) => event.includes(transaction));
 
-      if (appEnv.general.IS_UNIT_TEST || skipTracking || !shouldTrackTransaction) {
+      if (appEnv.general.IS_UNIT_TEST || skipTracking) {
+        return resolve(cb);
+      }
+
+      if (Math.random() > NEW_RELIC_SAMPLE_RATE) {
         return resolve(cb);
       }
 
