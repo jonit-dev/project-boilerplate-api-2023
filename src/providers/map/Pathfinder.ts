@@ -1,10 +1,15 @@
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { appEnv } from "@providers/config/env";
+import { MathHelper } from "@providers/math/MathHelper";
+import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { GRID_WIDTH, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { minBy } from "lodash";
 import PF from "pathfinding";
 import { GridManager, IGridCourse } from "./GridManager";
 import { MapHelper } from "./MapHelper";
@@ -17,11 +22,14 @@ export class Pathfinder {
     private pathfindingCaching: PathfindingCaching,
     private inMemoryHashTable: InMemoryHashTable,
     private gridManager: GridManager,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private mathHelper: MathHelper,
+    private movementHelper: MovementHelper
   ) {}
 
   public async findShortestPath(
     npc: INPC,
+    target: ICharacter | null,
     map: string,
     startGridX: number,
     startGridY: number,
@@ -49,6 +57,8 @@ export class Pathfinder {
 
         const cachedNextStep = cachedShortestPath?.[0];
 
+        const previousNPCPosition = (await this.inMemoryHashTable.get("npc-previous-position", npc._id)) as number[];
+
         const hasCircularRef = await this.hasCircularReferenceOnPathfinding(
           npc,
           map,
@@ -56,11 +66,29 @@ export class Pathfinder {
           startGridY,
           endGridX,
           endGridY,
-          cachedNextStep!
+          cachedNextStep!,
+          previousNPCPosition
         );
 
         if (cachedShortestPath?.length! > 0 && !hasCircularRef) {
           return cachedShortestPath as number[][];
+        }
+
+        const hasForcedPathfindingCalculation = await this.inMemoryHashTable.get(
+          "npc-force-pathfinding-calculation",
+          npc._id
+        );
+
+        if (!hasForcedPathfindingCalculation && target) {
+          const isUnderRange = this.movementHelper.isUnderRange(npc.x, npc.y, target.x, target.y, 2);
+
+          if (!isUnderRange) {
+            const nearestGridToTarget = await this.getNearestGridToTarget(npc, target.x, target.y, previousNPCPosition);
+
+            if (nearestGridToTarget?.length) {
+              return nearestGridToTarget;
+            }
+          }
         }
 
         return this.findShortestPathBetweenPoints(map, {
@@ -77,6 +105,112 @@ export class Pathfinder {
     );
   }
 
+  private async getNearestGridToTarget(
+    npc: INPC,
+    targetX: number,
+    targetY: number,
+    previousNPCPosition: number[]
+  ): Promise<number[][]> {
+    const potentialPositions = [
+      {
+        direction: "top",
+        x: npc.x,
+        y: npc.y - GRID_WIDTH,
+      },
+      {
+        direction: "bottom",
+        x: npc.x,
+        y: npc.y + GRID_WIDTH,
+      },
+      {
+        direction: "left",
+        x: npc.x - GRID_WIDTH,
+        y: npc.y,
+      },
+      {
+        direction: "right",
+        x: npc.x + GRID_WIDTH,
+        y: npc.y,
+      },
+    ];
+
+    const nonSolidPositions: {
+      direction: string;
+      x: number;
+      y: number;
+    }[] = [];
+
+    for (const data of potentialPositions) {
+      const isSolid = await this.movementHelper.isSolid(
+        npc.scene,
+        ToGridX(data.x),
+        ToGridX(data.y),
+        npc.layer,
+        "CHECK_ALL_LAYERS_BELOW"
+      );
+
+      if (!isSolid) {
+        nonSolidPositions.push(data);
+      }
+    }
+
+    // Now we check for the direction of the target relative to the NPC
+    const dx = targetX - npc.x;
+    const dy = targetY - npc.y;
+
+    const targetDirection = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "bottom" : "top";
+
+    // First, we try to find a non-solid position in the direction of the target
+    const targetDirectionPosition = nonSolidPositions.find((pos) => pos.direction === targetDirection);
+
+    if (targetDirectionPosition) {
+      // if the next step is the same as the previous NPC position, then we can assume that the NPC is stuck and we should recalculate the path
+      if (
+        previousNPCPosition &&
+        previousNPCPosition[0] === ToGridX(targetDirectionPosition.x) &&
+        previousNPCPosition[1] === ToGridY(targetDirectionPosition.y)
+      ) {
+        await this.inMemoryHashTable.set("npc-force-pathfinding-calculation", npc._id, true);
+        return [];
+      }
+
+      return [[ToGridX(targetDirectionPosition.x), ToGridY(targetDirectionPosition.y)]];
+    }
+
+    // If there is no non-solid position in the direction of the target, we default to your previous approach
+    const results: {
+      distance: number;
+      direction: string;
+      x: number;
+      y: number;
+    }[] = [];
+
+    for (const data of nonSolidPositions) {
+      const distanceToPosition = this.mathHelper.getDistanceBetweenPoints(data.x, data.y, targetX, targetY);
+
+      results.push({
+        distance: distanceToPosition,
+        direction: data.direction,
+        x: data.x,
+        y: data.y,
+      });
+    }
+
+    const minDistance = minBy(results, "distance");
+
+    // if the next step is the same as the previous NPC position, then we can assume that the NPC is stuck and we should recalculate the path
+    if (
+      previousNPCPosition &&
+      ToGridX(minDistance?.x!) === previousNPCPosition[0] &&
+      ToGridY(minDistance?.y!) === previousNPCPosition[1]
+    ) {
+      await this.inMemoryHashTable.set("npc-force-pathfinding-calculation", npc._id, true);
+      return [];
+    }
+
+    return [[ToGridX(minDistance!.x), ToGridY(minDistance!.y)]];
+  }
+
   private async hasCircularReferenceOnPathfinding(
     npc: INPC,
     map: string,
@@ -84,10 +218,9 @@ export class Pathfinder {
     startGridY: number,
     endGridX: number,
     endGridY: number,
-    cachedNextStep: number[]
+    cachedNextStep: number[],
+    previousNPCPosition: number[]
   ): Promise<boolean> {
-    const previousNPCPosition = (await this.inMemoryHashTable.get("npc-previous-position", npc._id)) as number[];
-
     // if the next step is the same as the previous NPC position, then we can assume that the NPC is stuck and we should recalculate the path
     const hasCircularRef =
       cachedNextStep &&

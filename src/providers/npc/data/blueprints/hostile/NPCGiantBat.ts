@@ -6,7 +6,6 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
-  PotionsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
@@ -39,10 +38,6 @@ export const npcGiantBat: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 15,
-    },
     {
       itemBlueprintKey: HelmetsBlueprint.DeathsHelmet,
       chance: 10,

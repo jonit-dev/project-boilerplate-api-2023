@@ -12,10 +12,10 @@ export const spellThunderRuneCreation: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar ansr runu",
-  manaCost: 120,
-  minLevelRequired: 6,
-  minMagicLevelRequired: 8,
-  cooldown: 5,
+  manaCost: 180,
+  minLevelRequired: 10,
+  minMagicLevelRequired: 10,
+  cooldown: 120,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
 
   characterClass: [CharacterClass.Druid, CharacterClass.Sorcerer],

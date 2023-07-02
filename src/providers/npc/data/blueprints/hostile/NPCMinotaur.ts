@@ -11,7 +11,6 @@ import {
   HammersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  PotionsBlueprint,
   SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -86,10 +85,7 @@ export const npcMinotaur = {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
       chance: 10,

@@ -15,7 +15,7 @@ export const spellPoisonRuneCreation: Partial<ISpell> = {
   manaCost: 50,
   minLevelRequired: 3,
   minMagicLevelRequired: 3,
-  cooldown: 5,
+  cooldown: 60,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
 
   requiredItem: MagicsBlueprint.Rune,

@@ -1,3 +1,4 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { appEnv } from "@providers/config/env";
 import { Time } from "@providers/time/Time";
@@ -23,11 +24,12 @@ export class PathfindingQueue {
     this.worker = new Worker(
       "pathfinding",
       async (job) => {
-        const { npc, startGridX, startGridY, endGridX, endGridY } = job.data;
+        const { npc, target, startGridX, startGridY, endGridX, endGridY } = job.data;
 
         try {
           const path = await this.pathfinder.findShortestPath(
             npc as INPC,
+            target,
             npc.scene,
             startGridX,
             startGridY,
@@ -67,6 +69,7 @@ export class PathfindingQueue {
 
   async addPathfindingJob(
     npc: INPC,
+    target: ICharacter | null,
     startGridX: number,
     startGridY: number,
     endGridX: number,
@@ -77,7 +80,7 @@ export class PathfindingQueue {
 
     return await this.queue.add(
       "pathfindingJob",
-      { npc, startGridX, startGridY, endGridX, endGridY },
+      { npc, target, startGridX, startGridY, endGridX, endGridY },
       { removeOnComplete: true }
     );
   }

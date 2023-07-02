@@ -13,7 +13,6 @@ import {
   GlovesBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   StaffsBlueprint,
@@ -66,14 +65,7 @@ export const npcTrollWarrior = {
       itemBlueprintKey: HelmetsBlueprint.BrassHelmet,
       chance: 20,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
-    {
-      itemBlueprintKey: PotionsBlueprint.ManaPotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Bolt,
       chance: 50,

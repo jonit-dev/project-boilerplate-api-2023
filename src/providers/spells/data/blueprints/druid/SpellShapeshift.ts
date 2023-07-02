@@ -19,10 +19,10 @@ export const spellShapeshift: Partial<ISpell> = {
   description: "A spell designed to turn a druid into a Bear. Raise Attack and Resistance.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas qabi",
-  manaCost: 150,
+  manaCost: 200,
   minLevelRequired: 8,
   minMagicLevelRequired: 5,
-  cooldown: 15,
+  cooldown: 180,
   castingAnimationKey: AnimationEffectKeys.ManaHeal,
   characterClass: [CharacterClass.Druid],
 
@@ -33,12 +33,12 @@ export const spellShapeshift: Partial<ISpell> = {
 
     const timeoutInSecs = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 15,
-      max: 60,
+      max: 30,
     });
 
     const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 10,
-      max: 20,
+      min: 5,
+      max: 15,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {

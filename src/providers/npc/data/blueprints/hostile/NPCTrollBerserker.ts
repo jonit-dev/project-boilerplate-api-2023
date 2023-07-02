@@ -17,7 +17,6 @@ import {
   HelmetsBlueprint,
   LegsBlueprint,
   MagicsBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -85,14 +84,7 @@ export const npcTrollBerserker = {
       itemBlueprintKey: HammersBlueprint.WarHammer,
       chance: 5,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
-    {
-      itemBlueprintKey: PotionsBlueprint.ManaPotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: AxesBlueprint.RoyalDoubleAxe,
       chance: 5,

@@ -549,7 +549,7 @@ describe("SpellCast.ts", () => {
 
       expect(timerMock).toHaveBeenCalled();
 
-      expect(timerMock.mock.calls[0][1]).toBe(5000);
+      expect(timerMock.mock.calls[0][1]).toBe(11000);
 
       await timerMock.mock.calls[0][0]();
       expect(await specialEffect.isStun(targetCharacter)).toBeFalsy();

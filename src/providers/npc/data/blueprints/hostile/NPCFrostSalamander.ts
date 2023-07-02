@@ -4,7 +4,6 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   CraftingResourcesBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -41,14 +40,6 @@ export const npcFrostSalamander: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 20,
-    },
-    {
-      itemBlueprintKey: PotionsBlueprint.ManaPotion,
-      chance: 10,
-    },
     {
       itemBlueprintKey: SwordsBlueprint.IceSword,
       chance: 10,

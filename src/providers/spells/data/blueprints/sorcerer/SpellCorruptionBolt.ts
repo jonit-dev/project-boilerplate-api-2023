@@ -24,10 +24,10 @@ export const spellCorruptionBolt: Partial<ISpell> = {
   description: "Cast a deadly corruption bolt at your target.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "moe i morgul",
-  manaCost: 120,
-  minLevelRequired: 15,
-  minMagicLevelRequired: 15,
-  cooldown: 60,
+  manaCost: 180,
+  minLevelRequired: 20,
+  minMagicLevelRequired: 20,
+  cooldown: 80,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Corruption,
   projectileAnimationKey: AnimationEffectKeys.Dark,
@@ -44,13 +44,13 @@ export const spellCorruptionBolt: Partial<ISpell> = {
     await entityEffectUse.applyEntityEffects(target, character, entityEffectCorruption);
 
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 30,
-      max: 60,
+      min: 10,
+      max: 30,
     });
 
     const debuffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 5,
-      max: 15,
+      max: 10,
     });
 
     if (target.type === "Character") {

@@ -7,6 +7,7 @@ import {
   RangeTypes,
 } from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemEnergyBoltRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.EnergyBoltRune,
@@ -27,4 +28,6 @@ export const itemEnergyBoltRune: IRuneItemBlueprint = {
   canSell: false,
   animationKey: AnimationEffectKeys.Hit,
   projectileAnimationKey: AnimationEffectKeys.Energy,
+
+  usableEffectKey: UsableEffectsBlueprint.EnergyBoltRuneUsableEffect,
 };

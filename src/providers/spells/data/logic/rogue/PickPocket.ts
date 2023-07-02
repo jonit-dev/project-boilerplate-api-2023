@@ -6,6 +6,7 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { blueprintManager } from "@providers/inversify/container";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -76,7 +77,7 @@ export class PickPocket {
       );
 
       if (decrementFromTarget) {
-        const basicItem = await blueprintManager.getBlueprint<IItem>("items", randomItem.key);
+        const basicItem = await blueprintManager.getBlueprint<IItem>("items", randomItem.key as AvailableBlueprints);
 
         const newItem = new Item({
           ...basicItem,

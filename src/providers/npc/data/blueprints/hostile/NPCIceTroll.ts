@@ -10,7 +10,6 @@ import {
   FoodsBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -48,11 +47,6 @@ export const npcIceTroll: Partial<INPC> = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 20,
-    },
-
-    {
       itemBlueprintKey: SwordsBlueprint.IceSword,
       chance: 5,
     },
@@ -89,10 +83,7 @@ export const npcIceTroll: Partial<INPC> = {
       itemBlueprintKey: SwordsBlueprint.Saber,
       chance: 10,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 50,
-    },
+
     {
       itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
       chance: 10,

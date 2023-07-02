@@ -15,7 +15,7 @@ export const spellFireRuneCreation: Partial<ISpell> = {
   manaCost: 60,
   minLevelRequired: 4,
   minMagicLevelRequired: 6,
-  cooldown: 5,
+  cooldown: 60,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
 
   requiredItem: MagicsBlueprint.Rune,

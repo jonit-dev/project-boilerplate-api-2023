@@ -14,7 +14,7 @@ export class NewRelic {
     skipTracking?: boolean
   ): Promise<any> {
     return new Promise(async (resolve, reject) => {
-      const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.includes(event);
+      const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.some((transaction) => event.includes(transaction));
 
       if (appEnv.general.IS_UNIT_TEST || skipTracking || !shouldTrackTransaction) {
         return resolve(callback());
@@ -41,7 +41,7 @@ export class NewRelic {
     skipTracking?: boolean
   ): Promise<any> {
     return new Promise(async (resolve, reject): Promise<void> => {
-      const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.includes(event);
+      const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.some((transaction) => event.includes(transaction));
 
       if (appEnv.general.IS_UNIT_TEST || skipTracking || !shouldTrackTransaction) {
         return resolve(cb);

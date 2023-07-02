@@ -22,10 +22,10 @@ export const spellCurseOfWeakness: Partial<ISpell> = {
   description: "A sorcerer's spell designed to reduce the strength and resistance of a target.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "dhagnir-lûth",
-  manaCost: 80,
-  minLevelRequired: 5,
-  minMagicLevelRequired: 7,
-  cooldown: 60,
+  manaCost: 120,
+  minLevelRequired: 10,
+  minMagicLevelRequired: 10,
+  cooldown: 120,
   targetHitAnimationKey: AnimationEffectKeys.Corruption,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
   projectileAnimationKey: AnimationEffectKeys.Dark,
@@ -44,12 +44,12 @@ export const spellCurseOfWeakness: Partial<ISpell> = {
 
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 10,
-      max: 40,
+      max: 30,
     });
 
     const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 10,
-      max: 25,
+      max: 15,
     });
 
     await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {

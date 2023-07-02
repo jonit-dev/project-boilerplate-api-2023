@@ -39,8 +39,8 @@ export const spellFortifyDefense: Partial<ISpell> = {
     });
 
     const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 10,
-      max: 35,
+      min: 20,
+      max: 100,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {

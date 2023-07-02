@@ -10,7 +10,6 @@ import {
   GlovesBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
@@ -63,10 +62,7 @@ export const npcDwarfGuardian: Partial<INPC> = {
       itemBlueprintKey: GlovesBlueprint.ChainGloves,
       chance: 10,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: RangedWeaponsBlueprint.IronArrow,
       chance: 50,

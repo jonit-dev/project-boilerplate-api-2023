@@ -9,7 +9,6 @@ import {
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
-  PotionsBlueprint,
   SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -59,10 +58,7 @@ export const npcMinotaurBerserker = {
       itemBlueprintKey: SwordsBlueprint.PoisonSword,
       chance: 20,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: DaggersBlueprint.CopperJitte,
       chance: 10,

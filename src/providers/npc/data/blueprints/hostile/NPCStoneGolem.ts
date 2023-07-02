@@ -8,7 +8,6 @@ import {
   FoodsBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -67,10 +66,7 @@ export const npcStoneGolem: Partial<INPC> = {
       itemBlueprintKey: ArmorsBlueprint.FalconsArmor,
       chance: 1,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: BootsBlueprint.SilverBoots,
       chance: 5,
