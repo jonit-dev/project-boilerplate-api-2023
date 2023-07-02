@@ -7,10 +7,9 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
-import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
-import { EquipmentSlotTypes, EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import { EquipmentSlotTypes } from "@providers/equipment/EquipmentSlots";
+import { blueprintManager, entityEffectUse, equipmentSlots } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
   AccessoriesBlueprint,
   BodiesBlueprint,
@@ -61,8 +60,6 @@ export class CharacterDeath {
     private skillDecrease: SkillDecrease,
     private characterDeathCalculator: CharacterDeathCalculator,
     private characterItemContainer: CharacterItemContainer,
-    private entityEffectUse: EntityEffectUse,
-    private equipmentSlots: EquipmentSlots,
     private newRelic: NewRelic,
     private characterBuffActivator: CharacterBuffActivator
   ) {}
@@ -102,7 +99,7 @@ export class CharacterDeath {
             characterDeathData
           );
 
-          const amuletOfDeath = await this.equipmentSlots.hasItemByKeyOnSlot(
+          const amuletOfDeath = await equipmentSlots.hasItemByKeyOnSlot(
             character,
             AccessoriesBlueprint.AmuletOfDeath,
             "neck"
@@ -133,10 +130,10 @@ export class CharacterDeath {
               });
             }, 2000);
 
-            await this.equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
+            await equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
           }
 
-          await this.entityEffectUse.clearAllEntityEffects(character);
+          await entityEffectUse.clearAllEntityEffects(character);
           await this.characterWeight.updateCharacterWeight(character);
         } finally {
           await this.respawnCharacter(character);
@@ -146,7 +143,7 @@ export class CharacterDeath {
   }
 
   public async generateCharacterBody(character: ICharacter): Promise<IItem> {
-    const blueprintData = itemsBlueprintIndex[BodiesBlueprint.CharacterBody];
+    const blueprintData = await blueprintManager.getBlueprint<IItem>("items", BodiesBlueprint.CharacterBody);
 
     const charBody = new Item({
       ...blueprintData,
@@ -290,7 +287,7 @@ export class CharacterDeath {
       const n = _.random(0, 100);
 
       if (n <= DROP_EQUIPMENT_CHANCE) {
-        const removeEquipmentFromSlot = await this.equipmentSlots.removeItemFromSlot(
+        const removeEquipmentFromSlot = await equipmentSlots.removeItemFromSlot(
           character,
           item.key,
           slot as EquipmentSlotTypes

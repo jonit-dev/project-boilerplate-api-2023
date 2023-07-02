@@ -1,8 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPC_TRADER_INTERACTION_DISTANCE } from "@providers/constants/NPCConstants";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager } from "@providers/inversify/container";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ITradeRequestItem, TradingEntity } from "@rpg-engine/shared";
@@ -11,7 +13,6 @@ import { CharacterInventory } from "./CharacterInventory";
 import { CharacterValidation } from "./CharacterValidation";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 
 @provide(CharacterTradingValidation)
 export class CharacterTradingValidation {
@@ -48,27 +49,31 @@ export class CharacterTradingValidation {
     return npc;
   }
 
-  public validateTransaction(
+  public async validateTransaction(
     character: ICharacter,
     tradingEntityItems: Partial<IItem>[],
     items: ITradeRequestItem[],
     entityType: TradingEntity
-  ): boolean {
+  ): Promise<boolean> {
     if (!tradingEntityItems.length) {
       this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, this ${entityType} has no items for sale.`);
       return false;
     }
     // validate if all item blueprints are valid
-    return this.itemInTradingEntityItems(character, items, tradingEntityItems);
+    return await this.itemInTradingEntityItems(character, items, tradingEntityItems);
   }
 
-  public validateTransactionWithNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): boolean {
-    const hasBasicValidation = this.hasBasicValidation(character, npc, items);
+  public async validateTransactionWithNPC(
+    character: ICharacter,
+    npc: INPC,
+    items: ITradeRequestItem[]
+  ): Promise<boolean> {
+    const hasBasicValidation = await this.hasBasicValidation(character, npc, items);
     if (!hasBasicValidation) {
       return false;
     }
     // validate if all item blueprints are valid
-    return this.validateTransaction(
+    return await this.validateTransaction(
       character,
       npc.traderItems as unknown as Partial<IItem>[],
       items,
@@ -89,7 +94,7 @@ export class CharacterTradingValidation {
     const itemsQty = this.characterItemSlots.getTotalQtyByKey(charItems);
 
     for (const item of items) {
-      const itemBlueprint = itemsBlueprintIndex[item.key];
+      const itemBlueprint = await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
       const qty = itemsQty.get(item.key);
 
       if (!itemBlueprint.basePrice) {
@@ -112,7 +117,7 @@ export class CharacterTradingValidation {
     npc: INPC,
     items: ITradeRequestItem[]
   ): Promise<boolean> {
-    const hasBasicValidation = this.hasBasicValidation(character, npc, items);
+    const hasBasicValidation = await this.hasBasicValidation(character, npc, items);
     if (!hasBasicValidation) {
       return false;
     }
@@ -120,7 +125,7 @@ export class CharacterTradingValidation {
     return await this.validateSellTransaction(character, items);
   }
 
-  private hasBasicValidation(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): boolean {
+  private async hasBasicValidation(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<boolean> {
     const baseValidation = this.characterValidation.hasBasicValidation(character);
 
     if (!baseValidation) {
@@ -133,7 +138,7 @@ export class CharacterTradingValidation {
     }
 
     for (const item of items) {
-      const itemBlueprint = itemsBlueprintIndex[item.key];
+      const itemBlueprint = await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
 
       if (!itemBlueprint) {
         this.socketMessaging.sendErrorMessageToCharacter(
@@ -162,11 +167,11 @@ export class CharacterTradingValidation {
     return true;
   }
 
-  private itemInTradingEntityItems(
+  private async itemInTradingEntityItems(
     character: ICharacter,
     items: ITradeRequestItem[],
     tradingEntityItems: Partial<IItem>[]
-  ): boolean {
+  ): Promise<boolean> {
     for (const item of items) {
       const traderItem = tradingEntityItems.find((traderItem) => traderItem.key === item.key);
 
@@ -175,7 +180,8 @@ export class CharacterTradingValidation {
         return false;
       }
 
-      const basePrice = itemsBlueprintIndex[item.key]?.basePrice ?? 0;
+      const basePrice =
+        (await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints))?.basePrice ?? 0;
       // check if the item has price <= 0
       if (basePrice <= 0 || item.qty <= 0) {
         this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, invalid parameters for ${item.key}.`);

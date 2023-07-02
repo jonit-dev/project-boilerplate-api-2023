@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager } from "@providers/inversify/container";
 import { EffectsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
@@ -17,7 +17,7 @@ export class BattleEffects {
       NewRelicTransactionCategory.Operation,
       "BattleEffects.generateBloodOnGround",
       async () => {
-        const groundBloodBlueprint = itemsBlueprintIndex[EffectsBlueprint.GroundBlood];
+        const groundBloodBlueprint = await blueprintManager.getBlueprint<IItem>("items", EffectsBlueprint.GroundBlood);
 
         const newGroundBlood = new Item({
           ...groundBloodBlueprint,

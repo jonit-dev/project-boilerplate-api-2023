@@ -7,8 +7,8 @@ import { CharacterItemEquipment } from "@providers/character/characterItems/Char
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { blueprintManager } from "@providers/inversify/container";
+import { AvailableBlueprints, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -147,7 +147,7 @@ export class BattleAttackRanged {
     }
 
     if (weapon.item.subType === "Staff") {
-      const itemStaffOrWand = itemsBlueprintIndex[weapon.item.key];
+      const itemStaffOrWand = await blueprintManager.getBlueprint<any>("items", weapon.item.key as AvailableBlueprints);
       result = {
         location: weapon.location,
         id: weapon.item._id,

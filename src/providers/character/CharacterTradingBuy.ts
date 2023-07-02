@@ -3,8 +3,8 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { blueprintManager } from "@providers/inversify/container";
+import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
@@ -72,7 +72,7 @@ export class CharacterTradingBuy {
         continue;
       }
 
-      const itemPrice = this.characterTradingBalance.getItemBuyPrice(purchasedItem.key, priceMultiplier);
+      const itemPrice = await this.characterTradingBalance.getItemBuyPrice(purchasedItem.key, priceMultiplier);
 
       if (!itemPrice) {
         this.socketMessaging.sendErrorMessageToCharacter(
@@ -99,7 +99,10 @@ export class CharacterTradingBuy {
       }
 
       // create the new item representation on the database
-      const itemBlueprint = itemsBlueprintIndex[purchasedItem.key] as Partial<IItem>;
+      const itemBlueprint = await blueprintManager.getBlueprint<IItem>(
+        "items",
+        purchasedItem.key as AvailableBlueprints
+      );
       const isStackable = itemBlueprint?.maxStackSize! > 1;
 
       let wasItemAddedToContainer;
@@ -182,7 +185,7 @@ export class CharacterTradingBuy {
     if (tradingEntityType === TradingEntity.NPC) {
       priceModifier = TRADER_BUY_PRICE_MULTIPLIER;
       const entity = tradingEntity as INPC;
-      isBaseTransactionValid = this.characterTradingValidation.validateTransactionWithNPC(
+      isBaseTransactionValid = await this.characterTradingValidation.validateTransactionWithNPC(
         character,
         entity,
         itemsToPurchase
@@ -195,7 +198,7 @@ export class CharacterTradingBuy {
     }
 
     for (const item of itemsToPurchase) {
-      const itemBlueprint = itemsBlueprintIndex[item.key] as Partial<IItem>;
+      const itemBlueprint = await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
 
       if (!itemBlueprint) {
         this.socketMessaging.sendErrorMessageToCharacter(
@@ -218,7 +221,7 @@ export class CharacterTradingBuy {
 
     // Does the character has enough gold to purchase all required items?
 
-    const totalCost = this.characterTradingBalance.calculateItemsTotalPrice(
+    const totalCost = await this.characterTradingBalance.calculateItemsTotalPrice(
       tradingItems,
       itemsToPurchase,
       priceModifier

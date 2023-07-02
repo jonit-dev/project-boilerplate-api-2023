@@ -29,7 +29,7 @@ export class NPCSeeder {
   ) {}
 
   public async seed(): Promise<void> {
-    const npcSeedData = this.npcLoader.loadNPCSeedData();
+    const npcSeedData = await this.npcLoader.loadNPCSeedData();
 
     for (const [key, NPCData] of npcSeedData.entries()) {
       const npcFound = (await NPC.findOne({ tiledId: NPCData.tiledId, scene: NPCData.scene }).lean({

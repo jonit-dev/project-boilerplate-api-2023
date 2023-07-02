@@ -2,10 +2,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { OthersBlueprint, PotionsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CharacterTradingBalance } from "../CharacterTradingBalance";
-import { TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 
 describe("CharacterTradingBalance.ts", () => {
   let testCharacter: ICharacter;
@@ -68,7 +68,7 @@ describe("CharacterTradingBalance.ts", () => {
       },
     ];
 
-    const totalPrice = characterTradingBalance.calculateItemsTotalPrice(
+    const totalPrice = await characterTradingBalance.calculateItemsTotalPrice(
       testNPC.traderItems as any,
       transactionItems,
       TRADER_BUY_PRICE_MULTIPLIER

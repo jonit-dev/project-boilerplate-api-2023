@@ -1,15 +1,17 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EntityUtil } from "@providers/entityEffects/EntityUtil";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -34,7 +36,6 @@ import SpellCoolDown from "./SpellCooldown";
 import { SpellValidation } from "./SpellValidation";
 import { spellsBlueprints } from "./data/blueprints/index";
 import SpellSilence from "./data/logic/mage/druid/SpellSilence";
-import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 
 @provide(SpellCast)
 export class SpellCast {
@@ -230,7 +231,8 @@ export class SpellCast {
     }
 
     if (spell.requiredItem) {
-      const required = itemsBlueprintIndex[spell.requiredItem];
+      const required = await blueprintManager.getBlueprint<IItem>("items", spell.requiredItem);
+
       if (!required) {
         this.socketMessaging.sendErrorMessageToCharacter(
           character,

@@ -4,7 +4,7 @@ import {
   CLASS_BONUS_OR_PENALTIES,
   RACE_BONUS_OR_PENALTIES,
 } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
-import { container, redisManager } from "@providers/inversify/container";
+import { blueprintManager, container, redisManager } from "@providers/inversify/container";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
 import { NPC_CYCLES } from "@providers/npc/NPCCycle";
@@ -89,6 +89,8 @@ beforeAll(async () => {
   await mongoose.connection.db.dropDatabase();
 
   await redisManager.connect();
+
+  await blueprintManager.loadAllBlueprints();
 });
 
 afterAll(async () => {

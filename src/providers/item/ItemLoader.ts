@@ -1,10 +1,11 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { blueprintManager } from "@providers/inversify/container";
 import { MapHelper } from "@providers/map/MapHelper";
 import { MapLoader } from "@providers/map/MapLoader";
 import { MapObjectsLoader } from "@providers/map/MapObjectsLoader";
 import { ITiledObject } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { itemsBlueprintIndex } from "./data/index";
+import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
 //! Main goal of a loader is to merge Tiled data with our blueprints data.
 
@@ -15,7 +16,7 @@ export interface IItemSeedData extends Omit<IItem, "_id"> {
 export class ItemLoader {
   constructor(private mapHelper: MapHelper, private mapObjectsLoader: MapObjectsLoader) {}
 
-  public loadItemSeedData(): Map<string, IItemSeedData> {
+  public async loadItemSeedData(): Promise<Map<string, IItemSeedData>> {
     const itemSeedData = new Map<string, IItemSeedData>();
 
     for (const [mapName, mapData] of MapLoader.maps.entries()) {
@@ -28,18 +29,18 @@ export class ItemLoader {
       const itemKeys = this.getItemKeys(items);
 
       const uniqueArrayKeys = Array.from(new Set(itemKeys));
-      this.checkIfItemBlueprintsExists(uniqueArrayKeys, mapName);
+      await this.checkIfItemBlueprintsExists(uniqueArrayKeys, mapName);
 
       for (const tiledItemData of items) {
         if (!mapName) {
           throw new Error(`ItemLoader: Map name is not found for ${mapName}`);
         }
 
-        const { key, data } = this.mapHelper.mergeBlueprintWithTiledProps<IItemSeedData>(
+        const { key, data } = await this.mapHelper.mergeBlueprintWithTiledProps<IItemSeedData>(
           tiledItemData,
           mapName,
-          itemsBlueprintIndex,
-          null
+          null,
+          "items"
         );
 
         itemSeedData.set(key, data);
@@ -71,11 +72,17 @@ export class ItemLoader {
     });
   }
 
-  private checkIfItemBlueprintsExists(items: string[], mapName: string): void {
-    const missingNPCs = items.filter((npc) => !itemsBlueprintIndex[npc]);
-    if (missingNPCs.length > 0) {
+  private async checkIfItemBlueprintsExists(items: string[], mapName: string): Promise<void> {
+    const itemBlueprintsPromises = items.map(
+      async (item) => await blueprintManager.getBlueprint<IItem>("items", item as AvailableBlueprints)
+    );
+    const itemBlueprints = await Promise.all(itemBlueprintsPromises);
+
+    const missingItems = items.filter((item, index) => !itemBlueprints[index]);
+
+    if (missingItems.length > 0) {
       throw new Error(
-        `❌ ItemLoader: Missing Item blueprints for keys ${missingNPCs.join(
+        `❌ ItemLoader: Missing Item blueprints for keys ${missingItems.join(
           ", "
         )}. Please, double check the map ${mapName}`
       );

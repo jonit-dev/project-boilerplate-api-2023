@@ -11,10 +11,10 @@ import {
 } from "@providers/constants/LootConstants";
 
 import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
+import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemRarity } from "@providers/item/ItemRarity";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemSubType, ItemType } from "@rpg-engine/shared";
@@ -167,7 +167,7 @@ export class NPCDeath {
       return;
     }
 
-    const blueprintData = itemsBlueprintIndex["npc-body"];
+    const blueprintData = await blueprintManager.getBlueprint<IItem>("items", "npc-body" as AvailableBlueprints);
     const npcBody = new Item({
       ...blueprintData, // base body props
       key: `${npc.key}-body`,
@@ -261,8 +261,12 @@ export class NPCDeath {
     await Item.updateOne({ _id: npcBody._id }, npcBody);
   }
 
-  private createLootItemWithoutSaving(loot: INPCLoot): IItem {
-    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+  private async createLootItemWithoutSaving(loot: INPCLoot): Promise<IItem> {
+    const blueprintData = await blueprintManager.getBlueprint<IItem>(
+      "items",
+      loot.itemBlueprintKey as AvailableBlueprints
+    );
+
     let lootItem = new Item({ ...blueprintData });
 
     if (lootItem.attack || lootItem.defense) {
@@ -286,8 +290,11 @@ export class NPCDeath {
     return itemContainer;
   }
 
-  private calculateLootChance(loot: INPCLoot, multiplier = 1): number {
-    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+  private async calculateLootChance(loot: INPCLoot, multiplier = 1): Promise<number> {
+    const blueprintData = await blueprintManager.getBlueprint<IItem>(
+      "items",
+      loot.itemBlueprintKey as AvailableBlueprints
+    );
     const lootMultipliers = {
       [OthersBlueprint.GoldCoin]: 1,
       [ItemType.CraftingResource]: LOOT_CRAFTING_MATERIAL_DROP_CHANCE,
@@ -305,8 +312,11 @@ export class NPCDeath {
     return 1;
   }
 
-  private isLootItemStackable(loot: INPCLoot): boolean {
-    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+  private async isLootItemStackable(loot: INPCLoot): Promise<boolean> {
+    const blueprintData = await blueprintManager.getBlueprint<IItem>(
+      "items",
+      loot.itemBlueprintKey as AvailableBlueprints
+    );
     const lootItem = new Item({ ...blueprintData });
 
     return lootItem.maxStackSize > 1;

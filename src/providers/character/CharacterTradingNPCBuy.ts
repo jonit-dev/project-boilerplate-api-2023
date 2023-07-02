@@ -1,8 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager } from "@providers/inversify/container";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import Shared, {
+import {
   CharacterTradeSocketEvents,
   ICharacterNPCTradeInitBuyResponse,
   ITradeRequestItem,
@@ -12,8 +13,8 @@ import Shared, {
 import { provide } from "inversify-binding-decorators";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
-import { CharacterTradingValidation } from "./CharacterTradingValidation";
 import { CharacterTradingBuy } from "./CharacterTradingBuy";
+import { CharacterTradingValidation } from "./CharacterTradingValidation";
 
 @provide(CharacterTradingNPCBuy)
 export class CharacterTradingNPCBuy {
@@ -34,9 +35,9 @@ export class CharacterTradingNPCBuy {
 
     const traderItems: ITradeResponseItem[] = [];
 
-    npc?.traderItems?.forEach(({ key }) => {
-      const item = itemsBlueprintIndex[key] as Shared.IItem;
-      const price = this.characterTradingBalance.getItemBuyPrice(key);
+    npc?.traderItems?.forEach(async ({ key }) => {
+      const item = await blueprintManager.getBlueprint<any>("items", key as AvailableBlueprints);
+      const price = await this.characterTradingBalance.getItemBuyPrice(key);
 
       if (price) {
         traderItems.push({ ...item, price });

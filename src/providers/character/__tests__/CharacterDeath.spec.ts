@@ -4,7 +4,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { container, entityEffectUse, unitTestHelper } from "@providers/inversify/container";
 import { AccessoriesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -90,7 +90,7 @@ describe("CharacterDeath.ts", () => {
   });
   it("should clear all entity effects on character's death", async () => {
     // @ts-ignore
-    const clearEffectsSpy = jest.spyOn(characterDeath.entityEffectUse, "clearAllEntityEffects");
+    const clearEffectsSpy = jest.spyOn(entityEffectUse, "clearAllEntityEffects");
 
     await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 

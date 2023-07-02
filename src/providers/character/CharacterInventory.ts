@@ -4,7 +4,7 @@ import { IItemContainer as IItemContainerModel, ItemContainer } from "@entities/
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackTransactionDecorator } from "@providers/analytics/decorator/NewRelicTransactionDecorator";
 import { NewRelic } from "@providers/analytics/NewRelic";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager } from "@providers/inversify/container";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
@@ -168,7 +168,7 @@ export class CharacterInventory {
 
     equipment.owner = character._id;
 
-    const containerBlueprint = itemsBlueprintIndex[inventoryType];
+    const containerBlueprint = await blueprintManager.getBlueprint<IItem>("items", inventoryType);
 
     const bag = new Item({
       ...containerBlueprint,

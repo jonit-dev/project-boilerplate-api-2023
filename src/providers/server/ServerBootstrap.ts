@@ -10,6 +10,7 @@ import { PushNotificationHelper } from "@providers/pushNotification/PushNotifica
 import { Seeder } from "@providers/seeds/Seeder";
 
 import { appEnv } from "@providers/config/env";
+import { blueprintManager } from "@providers/inversify/container";
 import { Locker } from "@providers/locks/Locker";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import SpellSilence from "@providers/spells/data/logic/mage/druid/SpellSilence";
@@ -60,6 +61,8 @@ export class ServerBootstrap {
   }
 
   private async execOneTimeOperations(): Promise<void> {
+    await blueprintManager.loadAllBlueprints();
+
     await this.npcManager.disableNPCBehaviors();
 
     await this.characterConnection.resetCharacterAttributes();

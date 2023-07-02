@@ -13,10 +13,11 @@ import { CharacterItemInventory } from "@providers/character/characterItems/Char
 import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/BerserkerPassiveHabilities";
 import { RoguePassiveHabilities } from "@providers/character/characterPassiveHabilities/RoguePassiveHabilities";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemPickupUpdater } from "@providers/item/ItemPickup/ItemPickupUpdater";
 import { ItemView } from "@providers/item/ItemView";
-import { itemsBlueprintIndex } from "@providers/item/data";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
@@ -342,7 +343,10 @@ export class EquipmentEquip {
 
     // Check if the character meets the minimum requirements to use the item
 
-    const itemBlueprint = itemsBlueprintIndex[item.key] as IBaseItemBlueprint;
+    const itemBlueprint = await blueprintManager.getBlueprint<IBaseItemBlueprint>(
+      "items",
+      item.key as AvailableBlueprints
+    );
 
     if (itemBlueprint?.minRequirements) {
       const meetsMinRequirements = await this.checkMinimumRequirements(character, itemBlueprint);

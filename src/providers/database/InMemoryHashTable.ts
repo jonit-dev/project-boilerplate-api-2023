@@ -69,6 +69,12 @@ export class InMemoryHashTable {
     return keys ?? [];
   }
 
+  public async getAllKeys(namespace: string): Promise<string[]> {
+    const keys = await this.redisManager.client.hKeys(namespace?.toString());
+
+    return keys ?? [];
+  }
+
   public async delete(namespace: string, key: string): Promise<void> {
     await this.redisManager.client.hDel(namespace?.toString(), key?.toString());
   }
