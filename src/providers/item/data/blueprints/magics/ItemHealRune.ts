@@ -46,7 +46,7 @@ export const itemHealRune: IRuneItemBlueprint = {
       max: 100,
     });
 
-    const totalAmount = (caster.maxHealth * percentage) / 100;
+    const totalAmount = (target.maxHealth * percentage) / 100;
 
     itemUsableEffect.apply(target, EffectableAttribute.Health, totalAmount);
   },
