@@ -30,4 +30,13 @@ export enum UsableEffectsBlueprint {
   HealRuneUsableEffect = "HealRuneUsableEffect",
   PoisonRuneUsableEffect = "PoisonRuneUsableEffect",
   ThunderRuneUsableEffect = "ThunderRuneUsableEffect",
+
+  // Potions
+  LightPoisonVialUsableEffect = "LightPoisonVialUsableEffect",
+  ModeratePoisonVialUsableEffect = "ModeratePoisonVialUsableEffect",
+  StrongPoisonVialUsableEffect = "StrongPoisonVialUsableEffect",
+
+  LightBurningVialsUsableEffect = "LightBurningVialsUsableEffect",
+  ModerateBurningVialsUsableEffect = "ModerateBurningVialsUsableEffect",
+  StrongBurningVialsUsableEffect = "StrongBurningVialsUsableEffect",
 }

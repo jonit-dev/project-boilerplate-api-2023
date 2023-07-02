@@ -3,7 +3,7 @@ import { container } from "@providers/inversify/container";
 import { ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { shuffle } from "lodash";
-import { IUsableEffect, UsableEffectsBlueprint } from "./types";
+import { IUsableEffect, UsableEffectsBlueprint } from "../types";
 
 export const minorEatingUsableEffect: IUsableEffect = {
   key: UsableEffectsBlueprint.MinorEatingEffect,
