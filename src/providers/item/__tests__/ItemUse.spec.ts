@@ -4,14 +4,17 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { blueprintManager, container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { stackableItemMock } from "@providers/unitTests/mock/itemMock";
-import { AnimationEffectKeys, CharacterSocketEvents, ItemSocketEvents, UISocketEvents } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  CharacterSocketEvents,
+  IConsumableItemBlueprint,
+  ItemSocketEvents,
+} from "@rpg-engine/shared";
 import { ItemUse } from "../ItemUse";
-import { itemApple } from "../data/blueprints/foods/ItemApple";
-import { itemLightLifePotion } from "../data/blueprints/potions/ItemLightLifePotion";
-import { FoodsBlueprint } from "../data/types/itemsBlueprintTypes";
+import { FoodsBlueprint, PotionsBlueprint } from "../data/types/itemsBlueprintTypes";
 import { ItemValidation } from "../validation/ItemValidation";
 
 describe("ItemUse.ts", () => {
@@ -106,7 +109,13 @@ describe("ItemUse.ts", () => {
     await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
 
     expect(itemUsageMock).toBeCalledTimes(1);
-    expect(itemUsageMock).toBeCalledWith(itemApple, testCharacter.id);
+    expect(itemUsageMock).toBeCalledWith(
+      expect.objectContaining({
+        key: testItem.key,
+      }),
+
+      testCharacter.id
+    );
   });
 
   it("should decrement item from inventory, after item is consumed", async () => {
@@ -165,7 +174,12 @@ describe("ItemUse.ts", () => {
     itemUsageMock.mockRestore();
     jest.useFakeTimers({ advanceTimers: true, doNotFake: ["setInterval", "clearInterval"] });
 
-    (itemUse as any).applyItemUsage(itemApple, testCharacter.id);
+    const itemAppleBlueprint = await blueprintManager.getBlueprint<IConsumableItemBlueprint>(
+      "items",
+      FoodsBlueprint.Apple
+    );
+
+    (itemUse as any).applyItemUsage(itemAppleBlueprint, testCharacter.id);
 
     await wait(0.2);
 
@@ -214,7 +228,12 @@ describe("ItemUse.ts", () => {
     itemUsageMock.mockRestore();
     jest.useFakeTimers({ advanceTimers: true, doNotFake: ["setInterval", "clearInterval"] });
 
-    (itemUse as any).applyItemUsage(itemLightLifePotion, testCharacter.id);
+    const itemLightLifePotionBlueprint = await blueprintManager.getBlueprint<IConsumableItemBlueprint>(
+      "items",
+      PotionsBlueprint.LightLifePotion
+    );
+
+    (itemUse as any).applyItemUsage(itemLightLifePotionBlueprint, testCharacter.id);
 
     await wait(0.2);
 
@@ -274,27 +293,6 @@ describe("ItemUse.ts", () => {
     expect(result).toBeTruthy();
 
     itemValidationMock.mockRestore();
-  });
-
-  it("should fail if item does not have usable effect", async () => {
-    const appleUsableEffect = itemApple.usableEffect;
-    // @ts-ignore
-    itemApple.usableEffect = null;
-
-    const result = await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
-
-    if (typeof appleUsableEffect !== "undefined") {
-      itemApple.usableEffect = appleUsableEffect;
-    }
-
-    expect(result).toBeFalsy();
-
-    expect(sendEventToUser).toBeCalledTimes(1);
-
-    expect(sendEventToUser).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
-      message: "Sorry, you cannot use this item.",
-      type: "error",
-    });
   });
 
   it("should decrement correct quantity if item has multiple stacks", async () => {

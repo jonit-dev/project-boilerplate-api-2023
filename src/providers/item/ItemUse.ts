@@ -68,6 +68,7 @@ export class ItemUse {
         }
 
         const bluePrintItem = await blueprintManager.getBlueprint<IItem>("items", useItem.key as AvailableBlueprints);
+
         if (!bluePrintItem || !bluePrintItem.usableEffect) {
           this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
           return false;
@@ -125,7 +126,7 @@ export class ItemUse {
       const character = await Character.findOne({ _id: characterId });
 
       if (character) {
-        bluePrintItem.usableEffect(character);
+        bluePrintItem.usableEffect?.(character);
         await character.save();
         await this.sendItemConsumptionEvent(character);
       }
