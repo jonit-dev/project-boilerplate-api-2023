@@ -1,7 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { blueprintManager, container } from "@providers/inversify/container";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { AnimationEffectKeys, ISpell, ItemSubType, SpellCastingType, SpellsBlueprint } from "@rpg-engine/shared";
 import { SpellItemCreation } from "../../abstractions/SpellItemCreation";
@@ -40,7 +39,10 @@ async function getFoodItemKey(): Promise<string> {
 
 async function getFoodItems(): Promise<Partial<IItem>[]> {
   const foods: Partial<IItem>[] = [];
-  for (const itemKey in itemsBlueprintIndex) {
+
+  const itemKeys = await blueprintManager.getAllBlueprintKeys("items");
+
+  for (const itemKey in itemKeys) {
     const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
 
     if (item.subType === ItemSubType.Food) {

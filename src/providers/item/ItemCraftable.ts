@@ -10,7 +10,6 @@ import { CharacterItemContainer } from "@providers/character/characterItems/Char
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { blueprintManager } from "@providers/inversify/container";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -344,7 +343,10 @@ export class ItemCraftable {
 
     const availableRecipes: IUseWithCraftingRecipe[] = [];
     const recipes = this.getAllRecipes();
-    for (const itemKey in itemsBlueprintIndex) {
+
+    const itemKeys = await blueprintManager.getAllBlueprintKeys("items");
+
+    for (const itemKey in itemKeys) {
       const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
       if (recipes[item.key]) {
         const recipe = recipes[item.key];
