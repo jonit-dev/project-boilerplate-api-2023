@@ -22,7 +22,7 @@ export class MacroCaptchaCrons {
       });
     });
 
-    nodeCron.schedule("*/5 * * * *", async () => {
+    nodeCron.schedule("*/10 * * * *", async () => {
       await this.newRelic.trackTransaction(
         NewRelicTransactionCategory.CronJob,
         "SendMacroCaptchaToActiveCharacters",
@@ -99,7 +99,7 @@ export class MacroCaptchaCrons {
       isOnline: true,
     });
 
-    let sentTo = 0;
+    console.log("SENDING ANTI-MACRO CAPTCHA TO", charactersWithCaptchaNotVerified.length, "CHARACTERS");
 
     await Promise.all(
       charactersWithCaptchaNotVerified.map(async (character) => {
@@ -107,11 +107,8 @@ export class MacroCaptchaCrons {
 
         if (n <= 5) {
           await this.macroCaptchaSend.sendAndStartCaptchaVerification(character);
-          sentTo++;
         }
       })
     );
-
-    console.log("SENDING ANTI-MACRO CAPTCHA TO", sentTo, "CHARACTERS");
   }
 }

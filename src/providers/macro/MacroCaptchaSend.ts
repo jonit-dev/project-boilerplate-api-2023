@@ -35,23 +35,23 @@ export class MacroCaptchaSend {
 
   public async generateAndSendCaptcha(character: ICharacter) {
     const captcha = svgCaptcha.create({
-      size: 4,
-      noise: 1,
+      size: 6,
+      noise: 3,
       color: true,
-      ignoreChars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0Oo1il458",
+      ignoreChars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0Oo1il",
     });
 
-    const resolveUntil = new Date(Date.now() + 30 * 60 * 1000);
+    const resolveUntil = new Date(Date.now() + 15 * 60 * 1000);
 
     await Character.findByIdAndUpdate(character._id, {
       captchaVerifyCode: captcha.text,
       captchaVerifyDate: resolveUntil,
-      captchaTriesLeft: 10,
+      captchaTriesLeft: 5,
     }).lean();
 
     this.socketMessaging.sendEventToUser(character.channelId!, MacroSocketEvents.OpenMacroModal, {
       svgData: captcha.data,
-      triesLeft: 10,
+      triesLeft: 5,
       resolveUntil,
     });
 
