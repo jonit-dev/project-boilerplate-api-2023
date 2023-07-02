@@ -7,6 +7,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { Time } from "@providers/time/Time";
 import {
   BattleSocketEvents,
   GRID_WIDTH,
@@ -17,6 +18,7 @@ import {
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
+import { random } from "lodash";
 import { BattleCharacterAttack } from "../BattleCharacterAttack/BattleCharacterAttack";
 
 interface ITargetValidation {
@@ -33,7 +35,8 @@ export class BattleNetworkInitTargeting {
     private battleCharacterManager: BattleCharacterAttack,
     private mapNonPVPZone: MapNonPVPZone,
     private specialEffect: SpecialEffect,
-    private locker: Locker
+    private locker: Locker,
+    private time: Time
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
@@ -41,6 +44,8 @@ export class BattleNetworkInitTargeting {
       channel,
       BattleSocketEvents.InitTargeting,
       async (data: IBattleInitTargeting, character: ICharacter) => {
+        await this.time.waitForMilliseconds(random(1, 50));
+
         const hasLocked = await this.locker.lock(`character-${character._id}-battle-targeting`);
 
         // if it fails to lock thats because the character is already targeting, so lets clear it.
@@ -110,6 +115,11 @@ export class BattleNetworkInitTargeting {
     target: ICharacter | INPC,
     targetType: EntityType
   ): Promise<void> {
+    if (character.target?.id?.toString() === target?._id?.toString()) {
+      // avoid setting target again
+      return;
+    }
+
     await Character.updateOne(
       { _id: character._id },
       {
