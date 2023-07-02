@@ -4,6 +4,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
@@ -53,78 +54,78 @@ export class SkillIncrease {
    * If new skill level is reached, sends the corresponding event to the character
    *
    */
+  @TrackNewRelicTransaction()
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
-    await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "increaseSkillsOnBattle", async () => {
-      // Get character skills and equipment to upgrade them
-      const skills = (await Skill.findById(attacker.skills)
-        .lean()
-        .cacheQuery({
-          cacheKey: `${attacker?._id}-skills`,
-        })) as unknown as ISkill;
+    // Get character skills and equipment to upgrade them
+    const skills = (await Skill.findById(attacker.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${attacker?._id}-skills`,
+      })) as unknown as ISkill;
 
-      if (!skills) {
-        throw new Error(`skills not found for character ${attacker.id}`);
-      }
+    if (!skills) {
+      throw new Error(`skills not found for character ${attacker.id}`);
+    }
 
-      const equipment = await Equipment.findById(attacker.equipment)
-        .lean()
-        .cacheQuery({
-          cacheKey: `${attacker._id}-equipment`,
-        });
-      if (!equipment) {
-        throw new Error(`equipment not found for character ${attacker.id}`);
-      }
+    const equipment = await Equipment.findById(attacker.equipment)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${attacker._id}-equipment`,
+      });
+    if (!equipment) {
+      throw new Error(`equipment not found for character ${attacker.id}`);
+    }
 
-      const weapon = await this.characterWeapon.getWeapon(attacker);
+    const weapon = await this.characterWeapon.getWeapon(attacker);
 
-      const weaponSubType = weapon?.item ? weapon?.item.subType || "None" : "None";
-      const skillName = SKILLS_MAP.get(weaponSubType);
+    const weaponSubType = weapon?.item ? weapon?.item.subType || "None" : "None";
+    const skillName = SKILLS_MAP.get(weaponSubType);
 
-      if (!skillName) {
-        throw new Error(`Skill not found for weapon ${weaponSubType}`);
-      }
+    if (!skillName) {
+      throw new Error(`Skill not found for weapon ${weaponSubType}`);
+    }
 
-      await this.npcExperience.recordXPinBattle(attacker, target, damage);
+    await this.npcExperience.recordXPinBattle(attacker, target, damage);
 
-      const canIncreaseSP = this.skillGainValidation.canUpdateSkills(attacker, skills, skillName);
+    const canIncreaseSP = this.skillGainValidation.canUpdateSkills(attacker, skills, skillName);
 
-      if (!canIncreaseSP) {
-        return;
-      }
+    if (!canIncreaseSP) {
+      return;
+    }
 
-      await clearCacheForKey(`characterBuffs_${attacker._id}`);
-      await clearCacheForKey(`${attacker._id}-skills`);
+    await clearCacheForKey(`characterBuffs_${attacker._id}`);
+    await clearCacheForKey(`${attacker._id}-skills`);
 
-      // stronger the opponent, higher SP per hit it gives in your combat skills
-      const bonus = await this.skillFunctions.calculateBonus(target, target.skills);
-      const increasedWeaponSP = this.increaseSP(skills, weaponSubType, undefined, SKILLS_MAP, bonus);
+    // stronger the opponent, higher SP per hit it gives in your combat skills
+    const bonus = await this.skillFunctions.calculateBonus(target, target.skills);
+    const increasedWeaponSP = this.increaseSP(skills, weaponSubType, undefined, SKILLS_MAP, bonus);
 
-      let increasedStrengthSP;
-      if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
-        increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
-      }
+    let increasedStrengthSP;
+    if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
+      increasedStrengthSP = this.increaseSP(skills, BasicAttribute.Strength);
+    }
 
-      await this.skillFunctions.updateSkills(skills, attacker);
+    await this.skillFunctions.updateSkills(skills, attacker);
 
-      await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weaponSubType);
+    await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, weaponSubType);
 
-      if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
-        await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, BasicAttribute.Strength);
-      }
+    if (weaponSubType !== ItemSubType.Magic && weaponSubType !== ItemSubType.Staff) {
+      await this.characterBonusPenalties.applyRaceBonusPenalties(attacker, BasicAttribute.Strength);
+    }
 
-      // If character strength skill level increased, send level up event
-      if (increasedStrengthSP && increasedStrengthSP.skillLevelUp && attacker.channelId) {
-        await this.skillFunctions.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
-        await this.characterWeight.updateCharacterWeight(attacker);
-      }
+    // If character strength skill level increased, send level up event
+    if (increasedStrengthSP && increasedStrengthSP.skillLevelUp && attacker.channelId) {
+      await this.skillFunctions.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
+      await this.characterWeight.updateCharacterWeight(attacker);
+    }
 
-      // If character skill level increased, send level up event specifying the skill that upgraded
-      if (increasedWeaponSP.skillLevelUp && attacker.channelId) {
-        await this.skillFunctions.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
-      }
-    });
+    // If character skill level increased, send level up event specifying the skill that upgraded
+    if (increasedWeaponSP.skillLevelUp && attacker.channelId) {
+      await this.skillFunctions.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
+    }
   }
 
+  @TrackNewRelicTransaction()
   public async increaseShieldingSP(character: ICharacter): Promise<void> {
     await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "increaseShieldingSP", async () => {
       // TODO: Refactor this to use queries. Avoid populate!
@@ -190,6 +191,7 @@ export class SkillIncrease {
     });
   }
 
+  @TrackNewRelicTransaction()
   public async increaseMagicSP(character: ICharacter, power: number): Promise<void> {
     await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "increaseMagicSP", async () => {
       await this.increaseBasicAttributeSP(character, BasicAttribute.Magic, this.getMagicSkillIncreaseCalculator(power));
@@ -204,6 +206,7 @@ export class SkillIncrease {
     );
   }
 
+  @TrackNewRelicTransaction()
   public async increaseBasicAttributeSP(
     character: ICharacter,
     attribute: BasicAttribute,
