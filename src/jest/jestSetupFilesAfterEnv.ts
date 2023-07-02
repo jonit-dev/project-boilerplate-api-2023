@@ -19,6 +19,18 @@ jest.mock("speedgoose", () => ({
   SpeedGooseCacheAutoCleaner: jest.fn(),
 }));
 
+jest.mock("@rpg-engine/shared", () => ({
+  ...jest.requireActual("@rpg-engine/shared"),
+  MagicPower: {
+    UltraLow: 5,
+    Low: 10,
+    Medium: 15,
+    High: 20,
+    UltraHigh: 25,
+    Fatal: 30,
+  },
+}));
+
 // @ts-ignore
 mongoose.Query.prototype.cacheQuery = function () {
   // This is a no-op function
