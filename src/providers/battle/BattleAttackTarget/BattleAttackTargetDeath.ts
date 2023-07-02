@@ -1,12 +1,11 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { QuestSystem } from "@providers/quest/QuestSystem";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleEffects } from "../BattleEffects";
@@ -21,26 +20,20 @@ export class BattleAttackTargetDeath {
     private npcDeath: NPCDeath,
     private questSystem: QuestSystem,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
-    private newRelic: NewRelic,
     private npcExperience: NPCExperience
   ) {}
 
+  @TrackNewRelicTransaction()
   public async handleDeathAfterHit(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
-    await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "BattleAttackTargetDeath.handleDeathAfterHit",
-      async () => {
-        if (!target.isAlive) {
-          await this.battleEffects.generateBloodOnGround(target);
+    if (!target.isAlive) {
+      await this.battleEffects.generateBloodOnGround(target);
 
-          if (target.type === "Character") {
-            await this.handleCharacterDeath(attacker, target as ICharacter);
-          } else if (target.type === "NPC") {
-            await this.handleNPCDeath(attacker, target as INPC);
-          }
-        }
+      if (target.type === "Character") {
+        await this.handleCharacterDeath(attacker, target as ICharacter);
+      } else if (target.type === "NPC") {
+        await this.handleNPCDeath(attacker, target as INPC);
       }
-    );
+    }
   }
 
   private async handleCharacterDeath(attacker: ICharacter | INPC, targetCharacter: ICharacter): Promise<void> {

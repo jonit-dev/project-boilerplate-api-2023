@@ -49,7 +49,7 @@ describe("BattleAttackTarget.spec.ts", () => {
     const defender = testNPC;
     defender.x = FromGridX(5);
     defender.y = FromGridY(5);
-    (await Character.findByIdAndUpdate(defender._id, defender).lean()) as ICharacter;
+    (await Character.findByIdAndUpdate(defender._id, defender as any).lean()) as ICharacter;
 
     await battleAttackTarget.checkRangeAndAttack(attacker, defender);
 
