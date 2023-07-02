@@ -35,10 +35,10 @@ export class MacroCaptchaSend {
 
   public async generateAndSendCaptcha(character: ICharacter) {
     const captcha = svgCaptcha.create({
-      size: 4,
+      size: 6,
       noise: 1,
       color: true,
-      ignoreChars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0Oo1il458",
+      ignoreChars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0Oo1il458pgqs",
     });
 
     const resolveUntil = new Date(Date.now() + 30 * 60 * 1000);
