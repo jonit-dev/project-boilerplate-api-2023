@@ -36,6 +36,7 @@ describe("NPCMovement.ts", () => {
   it("should get the shortest path to a gridX and gridY position", async () => {
     const shortestPath = await npcMovement.getShortestPathNextPosition(
       testNPC,
+      null,
       ToGridX(testNPC.x),
       ToGridY(testNPC.y),
       7,

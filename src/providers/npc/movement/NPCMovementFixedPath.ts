@@ -14,6 +14,7 @@ export class NPCMovementFixedPath {
     try {
       const shortestPath = await this.NPCMovement.getShortestPathNextPosition(
         npc,
+        null,
         ToGridX(npc.x),
         ToGridY(npc.y),
         endGridX,

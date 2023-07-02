@@ -8,6 +8,7 @@ import {
   NPC_SKILL_STRENGTH_MULTIPLIER,
   NPC_SPEED_MULTIPLIER,
 } from "@providers/constants/NPCConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { Locker } from "@providers/locks/Locker";
 import { GridManager } from "@providers/map/GridManager";
 import { INPCSeedData, NPCLoader } from "@providers/npc/NPCLoader";
@@ -23,7 +24,8 @@ export class NPCSeeder {
     private npcLoader: NPCLoader,
     private gridManager: GridManager,
     private npcGiantForm: NPCGiantForm,
-    private locker: Locker
+    private locker: Locker,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public async seed(): Promise<void> {
@@ -82,6 +84,8 @@ export class NPCSeeder {
       await this.locker.unlock(`npc-death-${npc._id}`);
       await this.locker.unlock(`npc-body-generation-${npc._id}`);
       await this.locker.unlock(`npc-${npc._id}-release-xp`);
+
+      await this.inMemoryHashTable.delete("npc-force-pathfinding-calculation", npc._id);
 
       const randomMaxHealth = this.setNPCRandomHealth(NPCData);
 
