@@ -9,26 +9,28 @@ export const mixpanel = Mixpanel.init(appEnv.analytics.mixpanelToken!, {
 
 export const amplitudeClient: Amplitude.NodeClient = Amplitude.init(appEnv.analytics.amplitudeApiKey!);
 
+export const NEW_RELIC_SAMPLE_RATE = 0.05; // 5% of transactions will be sampled
+
+//! Disabled for now. Use it together with NewRelic.ts to filter events
 export const NEW_RELIC_ALLOWED_TRANSACTIONS: string[] = [
-  // TODO: New Relic disabled for now. Use it only for sampling.
-  // "getOtherELementsInView",
-  // "getSkillLevelWithBuffs",
-  // "getInventory",
+  "getOtherELementsInView",
+  "getSkillLevelWithBuffs",
+  "getInventory",
   "MoveTowards",
-  // "NpcBattleCycle",
-  // "NPCFreezer",
-  // "NPCView.getElementsInNPCView",
-  // "warnCharacterAboutItemsInView",
-  // "increaseShieldingSP",
-  // "CharacterWeapon.getWeapon",
+  "NpcBattleCycle",
+  "NPCFreezer",
+  "NPCView.getElementsInNPCView",
+  "warnCharacterAboutItemsInView",
+  "increaseShieldingSP",
+  "CharacterWeapon.getWeapon",
   "findShortestPath",
-  // "HitTarget.hit",
-  // "CharacterBattleCycle",
-  // "NPCWarn.warnCharacterAboutNPCsInView",
-  // "MovementHelper.isSolid",
-  // "Random",
-  // "EntityEffectCycle.execute",
-  // "BattleAttackTarget.checkRangeAndAttack",
-  // "MoveAway",
-  // "SocketEvent/CharacterPositionUpdate",
+  "HitTarget.hit",
+  "CharacterBattleCycle",
+  "NPCWarn.warnCharacterAboutNPCsInView",
+  "MovementHelper.isSolid",
+  "Random",
+  "EntityEffectCycle.execute",
+  "BattleAttackTarget.checkRangeAndAttack",
+  "MoveAway",
+  "SocketEvent/CharacterPositionUpdate",
 ];

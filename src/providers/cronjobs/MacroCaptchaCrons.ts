@@ -11,8 +11,8 @@ import nodeCron from "node-cron";
 export class MacroCaptchaCrons {
   constructor(
     private characterBan: CharacterBan,
-    private macroCaptchaSend: MacroCaptchaSend,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private macroCaptchaSend: MacroCaptchaSend
   ) {}
 
   public schedule(): void {

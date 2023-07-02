@@ -1,5 +1,6 @@
 import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterBuffDurationType, CharacterTrait, ICharacterBuff, ICharacterItemBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 interface ICharacterBuffDeleteOptions {
@@ -8,6 +9,7 @@ interface ICharacterBuffDeleteOptions {
 
 @provide(CharacterBuffTracker)
 export class CharacterBuffTracker {
+  @TrackNewRelicTransaction()
   public async addBuff(characterId: string, buff: ICharacterBuff): Promise<ICharacterBuff | undefined> {
     try {
       const newCharacterBuff = new CharacterBuff({
@@ -23,6 +25,7 @@ export class CharacterBuffTracker {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async getAllCharacterBuffs(characterId: string): Promise<ICharacterBuff[]> {
     const allCharacterBuffs = (await CharacterBuff.find({ owner: characterId })
       .lean()
@@ -33,6 +36,7 @@ export class CharacterBuffTracker {
     return allCharacterBuffs;
   }
 
+  @TrackNewRelicTransaction()
   public async getAllBuffAbsoluteChanges(characterId: string, trait: CharacterTrait): Promise<number> {
     const characterBuffs = await this.getAllCharacterBuffs(characterId);
 
@@ -45,6 +49,7 @@ export class CharacterBuffTracker {
     return buffs.reduce((acc, buff) => acc + buff.absoluteChange!, 0);
   }
 
+  @TrackNewRelicTransaction()
   public async getBuffByItemId(characterId: string, itemId: string): Promise<ICharacterItemBuff[]> {
     const currentBuffs = (await this.getAllCharacterBuffs(characterId)) as ICharacterItemBuff[];
 

@@ -1,11 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
@@ -21,19 +20,13 @@ export class ItemPickupUpdater {
     private characterWeight: CharacterWeight,
     private equipmentSlots: EquipmentSlots,
     private socketMessaging: SocketMessaging,
-    private itemContainerHelper: ItemContainerHelper,
-    private newRelic: NewRelic
+    private itemContainerHelper: ItemContainerHelper
   ) {}
 
+  @TrackNewRelicTransaction()
   public async finalizePickup(itemToBePicked: IItem, character: ICharacter): Promise<void> {
-    await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "ItemPickupUpdater.finalizePickup",
-      async () => {
-        // whenever a new item is added, we need to update the character weight
-        await this.characterWeight.updateCharacterWeight(character);
-      }
-    );
+    // whenever a new item is added, we need to update the character weight
+    await this.characterWeight.updateCharacterWeight(character);
   }
 
   public async refreshEquipmentIfInventoryItem(character: ICharacter): Promise<void> {

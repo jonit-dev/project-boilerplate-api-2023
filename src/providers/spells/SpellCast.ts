@@ -2,7 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -18,7 +18,6 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   AnimationEffectKeys,
   BasicAttribute,
@@ -54,7 +53,7 @@ export class SpellCast {
     private spellCoolDown: SpellCoolDown,
     private spellSilencer: SpellSilence,
     private mapNonPVPZone: MapNonPVPZone,
-    private newRelic: NewRelic,
+
     private battleCharacterAttackValidation: BattleCharacterAttackValidation
   ) {}
 
@@ -62,82 +61,77 @@ export class SpellCast {
     return !!this.getSpell(msg);
   }
 
+  @TrackNewRelicTransaction()
   public async castSpell(data: ISpellCast, character: ICharacter): Promise<boolean> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "SpellCast.castSpell",
-      async () => {
-        if (!this.characterValidation.hasBasicValidation(character)) {
-          return false;
-        }
+    if (!this.characterValidation.hasBasicValidation(character)) {
+      return false;
+    }
 
-        const spell = this.getSpell(data.magicWords) as ISpell;
+    const spell = this.getSpell(data.magicWords) as ISpell;
 
-        if (!(await this.isSpellCastingValid(spell, character))) {
-          return false;
-        }
+    if (!(await this.isSpellCastingValid(spell, character))) {
+      return false;
+    }
 
-        if (spell.castingType === SpellCastingType.RangedCasting && (!data.targetType || !data.targetId)) {
-          await this.sendPreSpellCastEvents(spell, character);
-          this.sendIdentifyTargetEvent(character, data);
-          return false;
-        }
+    if (spell.castingType === SpellCastingType.RangedCasting && (!data.targetType || !data.targetId)) {
+      await this.sendPreSpellCastEvents(spell, character);
+      this.sendIdentifyTargetEvent(character, data);
+      return false;
+    }
 
-        if (spell.castingType === SpellCastingType.SelfCasting) {
-          await this.sendPreSpellCastEvents(spell, character);
-        }
+    if (spell.castingType === SpellCastingType.SelfCasting) {
+      await this.sendPreSpellCastEvents(spell, character);
+    }
 
-        const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
-        let key = spell.attribute;
-        // @ts-ignore
-        key || (key = spell.key);
+    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
+    let key = spell.attribute;
+    // @ts-ignore
+    key || (key = spell.key);
 
-        if (key) {
-          const buffActivated = await this.inMemoryHashTable.has(namespace, key);
+    if (key) {
+      const buffActivated = await this.inMemoryHashTable.has(namespace, key);
 
-          if (buffActivated) {
-            this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, ${spell.name} is already activated.`);
-            return false;
-          }
-        }
-
-        let target;
-        if (spell.castingType === SpellCastingType.RangedCasting) {
-          target = await EntityUtil.getEntity(data.targetId!, data.targetType!);
-          if (!(await this.isRangedCastingValid(character, target, spell))) {
-            return false;
-          }
-        }
-
-        const hasSpellCooldown = await this.spellCoolDown.haveSpellCooldown(character._id, spell.magicWords);
-
-        if (!hasSpellCooldown) {
-          await this.spellCoolDown.setSpellCooldown(character._id, spell.magicWords, spell.cooldown);
-        }
-        await this.spellCoolDown.getAllSpellCooldowns(character);
-
-        const hasCastSucceeded = await spell.usableEffect(character, target);
-
-        // if it fails, it will return explicitly false above. We prevent moving forward, so mana is not spent unnecessarily
-        if (hasCastSucceeded === false) {
-          return false;
-        }
-
-        this.itemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
-        await character.save();
-
-        await this.sendPostSpellCastEvents(character, spell, target);
-
-        await this.skillIncrease.increaseMagicSP(character, spell.manaCost);
-        if (target?.type === EntityType.Character) {
-          await this.skillIncrease.increaseMagicResistanceSP(target, spell.manaCost);
-        }
-
-        await this.characterBonusPenalties.applyRaceBonusPenalties(character, BasicAttribute.Magic);
-
-        return true;
+      if (buffActivated) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, ${spell.name} is already activated.`);
+        return false;
       }
-    );
+    }
+
+    let target;
+    if (spell.castingType === SpellCastingType.RangedCasting) {
+      target = await EntityUtil.getEntity(data.targetId!, data.targetType!);
+      if (!(await this.isRangedCastingValid(character, target, spell))) {
+        return false;
+      }
+    }
+
+    const hasSpellCooldown = await this.spellCoolDown.haveSpellCooldown(character._id, spell.magicWords);
+
+    if (!hasSpellCooldown) {
+      await this.spellCoolDown.setSpellCooldown(character._id, spell.magicWords, spell.cooldown);
+    }
+    await this.spellCoolDown.getAllSpellCooldowns(character);
+
+    const hasCastSucceeded = await spell.usableEffect(character, target);
+
+    // if it fails, it will return explicitly false above. We prevent moving forward, so mana is not spent unnecessarily
+    if (hasCastSucceeded === false) {
+      return false;
+    }
+
+    this.itemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
+    await character.save();
+
+    await this.sendPostSpellCastEvents(character, spell, target);
+
+    await this.skillIncrease.increaseMagicSP(character, spell.manaCost);
+    if (target?.type === EntityType.Character) {
+      await this.skillIncrease.increaseMagicResistanceSP(target, spell.manaCost);
+    }
+
+    await this.characterBonusPenalties.applyRaceBonusPenalties(character, BasicAttribute.Magic);
+
+    return true;
   }
 
   private async isRangedCastingValid(caster: ICharacter, target: ICharacter | INPC, spell: ISpell): Promise<boolean> {

@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInventory";
 import { ItemMap } from "@providers/item/ItemMap";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
@@ -74,6 +75,7 @@ export class CharacterItemContainer {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   public async addItemToContainer(
     item: IItem,
     character: ICharacter,

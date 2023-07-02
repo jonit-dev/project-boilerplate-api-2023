@@ -2,14 +2,13 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   FromGridX,
   FromGridY,
@@ -35,100 +34,92 @@ export class ItemDrop {
     private characterWeight: CharacterWeight,
     private itemOwnership: ItemOwnership,
     private characterInventory: CharacterInventory,
-    private itemCleanup: ItemDropCleanup,
-    private newRelic: NewRelic
+    private itemCleanup: ItemDropCleanup
   ) {}
 
   //! For now, only a drop from inventory or equipment set is allowed.
+  @TrackNewRelicTransaction()
   public async performItemDrop(itemDropData: IItemDrop, character: ICharacter): Promise<boolean> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "ItemDrop.performItemDrop",
-      async () => {
-        const isDropValid = await this.isItemDropValid(itemDropData, character);
-        const source = itemDropData.source;
-        if (!isDropValid) {
-          return false;
-        }
+    const isDropValid = await this.isItemDropValid(itemDropData, character);
+    const source = itemDropData.source;
+    if (!isDropValid) {
+      return false;
+    }
 
-        const itemToBeDropped = await Item.findById(itemDropData.itemId);
+    const itemToBeDropped = await Item.findById(itemDropData.itemId);
 
-        if (!itemToBeDropped) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item to be dropped wasn't found.");
-          return false;
-        }
+    if (!itemToBeDropped) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item to be dropped wasn't found.");
+      return false;
+    }
 
-        const mapDrop = await this.tryDroppingToMap(itemDropData, itemToBeDropped as unknown as IItem, character);
+    const mapDrop = await this.tryDroppingToMap(itemDropData, itemToBeDropped as unknown as IItem, character);
 
-        if (!mapDrop) {
-          return false;
-        }
+    if (!mapDrop) {
+      return false;
+    }
 
-        let isItemRemoved = false;
+    let isItemRemoved = false;
 
-        try {
-          switch (source) {
-            case "equipment":
-              isItemRemoved = await this.removeItemFromEquipmentSet(itemToBeDropped as unknown as IItem, character);
+    try {
+      switch (source) {
+        case "equipment":
+          isItemRemoved = await this.removeItemFromEquipmentSet(itemToBeDropped as unknown as IItem, character);
 
-              if (!isItemRemoved) {
-                this.socketMessaging.sendErrorMessageToCharacter(character);
-                return false;
-              }
-
-              const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
-                character.equipment as unknown as string
-              );
-
-              this.sendRefreshItemsEvent(
-                {
-                  equipment: equipmentSlots,
-                  openEquipmentSetOnUpdate: false,
-                },
-                character
-              );
-
-              break;
-            case "inventory":
-              isItemRemoved = await this.removeItemFromInventory(
-                itemToBeDropped as unknown as IItem,
-                character,
-                itemDropData.fromContainerId
-              );
-
-              if (!isItemRemoved) {
-                this.socketMessaging.sendErrorMessageToCharacter(character);
-                return false;
-              }
-
-              const inventoryContainer = (await ItemContainer.findById(
-                itemDropData.fromContainerId
-              )) as unknown as IItemContainer;
-
-              const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-                inventory: inventoryContainer,
-                openEquipmentSetOnUpdate: false,
-                openInventoryOnUpdate: false,
-              };
-
-              this.sendRefreshItemsEvent(payloadUpdate, character);
-
-              break;
+          if (!isItemRemoved) {
+            this.socketMessaging.sendErrorMessageToCharacter(character);
+            return false;
           }
 
-          await this.characterWeight.updateCharacterWeight(character);
+          const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
-          await clearCacheForKey(`${character._id}-inventory`);
+          this.sendRefreshItemsEvent(
+            {
+              equipment: equipmentSlots,
+              openEquipmentSetOnUpdate: false,
+            },
+            character
+          );
 
-          return true;
-        } catch (err) {
-          this.socketMessaging.sendErrorMessageToCharacter(character);
+          break;
+        case "inventory":
+          isItemRemoved = await this.removeItemFromInventory(
+            itemToBeDropped as unknown as IItem,
+            character,
+            itemDropData.fromContainerId
+          );
 
-          console.log(err);
-          return false;
-        }
+          if (!isItemRemoved) {
+            this.socketMessaging.sendErrorMessageToCharacter(character);
+            return false;
+          }
+
+          const inventoryContainer = (await ItemContainer.findById(
+            itemDropData.fromContainerId
+          )) as unknown as IItemContainer;
+
+          const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+            inventory: inventoryContainer,
+            openEquipmentSetOnUpdate: false,
+            openInventoryOnUpdate: false,
+          };
+
+          this.sendRefreshItemsEvent(payloadUpdate, character);
+
+          break;
       }
-    );
+
+      await this.characterWeight.updateCharacterWeight(character);
+
+      await clearCacheForKey(`${character._id}-inventory`);
+
+      return true;
+    } catch (err) {
+      this.socketMessaging.sendErrorMessageToCharacter(character);
+
+      console.log(err);
+      return false;
+    }
   }
 
   private async tryDroppingToMap(itemDrop: IItemDrop, dropItem: IItem, character: ICharacter): Promise<boolean> {

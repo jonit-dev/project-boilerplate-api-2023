@@ -5,7 +5,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { EquipmentSlotTypes } from "@providers/equipment/EquipmentSlots";
 import { blueprintManager, entityEffectUse, equipmentSlots } from "@providers/inversify/container";
@@ -18,7 +18,6 @@ import {
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   BattleSocketEvents,
   CharacterBuffType,
@@ -60,88 +59,80 @@ export class CharacterDeath {
     private skillDecrease: SkillDecrease,
     private characterDeathCalculator: CharacterDeathCalculator,
     private characterItemContainer: CharacterItemContainer,
-    private newRelic: NewRelic,
+
     private characterBuffActivator: CharacterBuffActivator
   ) {}
 
+  @TrackNewRelicTransaction()
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
-    await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "CharacterDeath.handleCharacterDeath",
-      async () => {
-        try {
-          if (character.health > 0) {
-            // if by any reason the char is not dead, make sure it is.
-            await Character.updateOne({ _id: character._id }, { $set: { health: 0 } });
-            character.health = 0;
-            character.isAlive = false;
-          }
-
-          if (killer) {
-            await this.clearAttackerTarget(killer);
-          }
-
-          const characterDeathData: IBattleDeath = {
-            id: character.id,
-            type: "Character",
-          };
-          this.socketMessaging.sendEventToUser(
-            character.channelId!,
-            BattleSocketEvents.BattleDeath,
-            characterDeathData
-          );
-
-          // communicate all players around that character is dead
-
-          await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
-            character,
-            BattleSocketEvents.BattleDeath,
-            characterDeathData
-          );
-
-          const amuletOfDeath = await equipmentSlots.hasItemByKeyOnSlot(
-            character,
-            AccessoriesBlueprint.AmuletOfDeath,
-            "neck"
-          );
-
-          // generate character's body
-          const characterBody = await this.generateCharacterBody(character);
-
-          if (!amuletOfDeath) {
-            // drop equipped items and backpack items
-            await this.dropCharacterItemsOnBody(character, characterBody, character.equipment);
-
-            const deathPenalty = await this.skillDecrease.deathPenalty(character);
-            if (deathPenalty) {
-              // Set timeout to not overwrite the msg "You are Died"
-              setTimeout(() => {
-                this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-                  message: "You lost some XP and skill points.",
-                  type: "info",
-                });
-              }, 2000);
-            }
-          } else {
-            setTimeout(() => {
-              this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-                message: "Your Amulet of Death protected your XP and skill points.",
-                type: "info",
-              });
-            }, 2000);
-
-            await equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
-          }
-
-          await entityEffectUse.clearAllEntityEffects(character);
-          await this.characterWeight.updateCharacterWeight(character);
-        } finally {
-          await this.respawnCharacter(character);
-        }
+    try {
+      if (character.health > 0) {
+        // if by any reason the char is not dead, make sure it is.
+        await Character.updateOne({ _id: character._id }, { $set: { health: 0 } });
+        character.health = 0;
+        character.isAlive = false;
       }
-    );
+
+      if (killer) {
+        await this.clearAttackerTarget(killer);
+      }
+
+      const characterDeathData: IBattleDeath = {
+        id: character.id,
+        type: "Character",
+      };
+      this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, characterDeathData);
+
+      // communicate all players around that character is dead
+
+      await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
+        character,
+        BattleSocketEvents.BattleDeath,
+        characterDeathData
+      );
+
+      const amuletOfDeath = await equipmentSlots.hasItemByKeyOnSlot(
+        character,
+        AccessoriesBlueprint.AmuletOfDeath,
+        "neck"
+      );
+
+      // generate character's body
+      const characterBody = await this.generateCharacterBody(character);
+
+      if (!amuletOfDeath) {
+        // drop equipped items and backpack items
+        await this.dropCharacterItemsOnBody(character, characterBody, character.equipment);
+
+        const deathPenalty = await this.skillDecrease.deathPenalty(character);
+        if (deathPenalty) {
+          // Set timeout to not overwrite the msg "You are Died"
+          setTimeout(() => {
+            this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+              message: "You lost some XP and skill points.",
+              type: "info",
+            });
+          }, 2000);
+        }
+      } else {
+        setTimeout(() => {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "Your Amulet of Death protected your XP and skill points.",
+            type: "info",
+          });
+        }, 2000);
+
+        await equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
+      }
+
+      await entityEffectUse.clearAllEntityEffects(character);
+      await this.characterWeight.updateCharacterWeight(character);
+    } finally {
+      await this.respawnCharacter(character);
+    }
   }
 
+  @TrackNewRelicTransaction()
   public async generateCharacterBody(character: ICharacter): Promise<IItem> {
     const blueprintData = await blueprintManager.getBlueprint<IItem>("items", BodiesBlueprint.CharacterBody);
 
@@ -160,6 +151,7 @@ export class CharacterDeath {
     return charBody;
   }
 
+  @TrackNewRelicTransaction()
   public async respawnCharacter(character: ICharacter): Promise<void> {
     await Character.updateOne(
       { _id: character._id },

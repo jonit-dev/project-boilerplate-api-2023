@@ -7,6 +7,7 @@ import { NPC_CYCLES } from "./NPCCycle";
 import { NPCView } from "./NPCView";
 
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { NPC_FREEZE_CHECK_INTERVAL, NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
@@ -24,12 +25,13 @@ export class NPCFreezer {
     this.setCPUUsageCheckInterval();
   }
 
+  @TrackNewRelicTransaction()
   public tryToFreezeNPC(npc: INPC): void {
     if (this.freezeCheckIntervals.has(npc.id) || !npc.isBehaviorEnabled) {
       return;
     }
 
-    const checkRange = random(2000, 4000);
+    const checkRange = random(12000, 14000);
     const interval = setInterval(async () => {
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NPCFreezer", async () => {
         if (await this.shouldFreezeNPC(npc)) {
@@ -42,6 +44,7 @@ export class NPCFreezer {
     this.freezeCheckIntervals.set(npc.id, interval);
   }
 
+  @TrackNewRelicTransaction()
   public async freezeNPC(npc: INPC, isForced?: boolean): Promise<void> {
     if (appEnv.general.ENV === EnvType.Development) {
       console.log(`Freezing NPC ${npc.key} (${npc.id}) ${isForced ? "(FORCED)" : ""}`);
@@ -101,6 +104,7 @@ export class NPCFreezer {
     return nearbyCharacters.length === 0;
   }
 
+  @TrackNewRelicTransaction()
   private async freezeRandomNPC(): Promise<void> {
     const npcIds = Array.from(NPC_CYCLES.keys());
     const randomNpcId = random(0, npcIds.length - 1);
@@ -110,10 +114,10 @@ export class NPCFreezer {
       return;
     }
 
-    const npc = await NPC.findById(npcCycle.id);
+    const npc = await NPC.findById(npcCycle.id).lean().select("id _id key");
     if (npc) {
       try {
-        await this.freezeNPC(npc, true);
+        await this.freezeNPC(npc as INPC, true);
       } catch (error) {
         console.error(`Failed to freeze NPC ${npcCycle.id}: ${error.message}`);
       }

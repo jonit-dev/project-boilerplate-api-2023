@@ -2,11 +2,10 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { MathHelper } from "@providers/math/MathHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { GRID_WIDTH, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { minBy } from "lodash";
@@ -22,11 +21,12 @@ export class Pathfinder {
     private pathfindingCaching: PathfindingCaching,
     private inMemoryHashTable: InMemoryHashTable,
     private gridManager: GridManager,
-    private newRelic: NewRelic,
+
     private mathHelper: MathHelper,
     private movementHelper: MovementHelper
   ) {}
 
+  @TrackNewRelicTransaction()
   public async findShortestPath(
     npc: INPC,
     target: ICharacter | null,
@@ -36,75 +36,70 @@ export class Pathfinder {
     endGridX: number,
     endGridY: number
   ): Promise<number[][] | undefined> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "Pathfinder/findShortestPath",
-      async () => {
-        if (!this.mapHelper.areAllCoordinatesValid([startGridX, startGridY], [endGridX, endGridY])) {
-          return;
-        }
+    if (!this.mapHelper.areAllCoordinatesValid([startGridX, startGridY], [endGridX, endGridY])) {
+      return;
+    }
 
-        const cachedShortestPath = await this.pathfindingCaching.get(map, {
-          start: {
-            x: startGridX,
-            y: startGridY,
-          },
-          end: {
-            x: endGridX,
-            y: endGridY,
-          },
-        });
+    const cachedShortestPath = await this.pathfindingCaching.get(map, {
+      start: {
+        x: startGridX,
+        y: startGridY,
+      },
+      end: {
+        x: endGridX,
+        y: endGridY,
+      },
+    });
 
-        const cachedNextStep = cachedShortestPath?.[0];
+    const cachedNextStep = cachedShortestPath?.[0];
 
-        const previousNPCPosition = (await this.inMemoryHashTable.get("npc-previous-position", npc._id)) as number[];
+    const previousNPCPosition = (await this.inMemoryHashTable.get("npc-previous-position", npc._id)) as number[];
 
-        const hasCircularRef = await this.hasCircularReferenceOnPathfinding(
-          npc,
-          map,
-          startGridX,
-          startGridY,
-          endGridX,
-          endGridY,
-          cachedNextStep!,
-          previousNPCPosition
-        );
-
-        if (cachedShortestPath?.length! > 0 && !hasCircularRef) {
-          return cachedShortestPath as number[][];
-        }
-
-        const hasForcedPathfindingCalculation = await this.inMemoryHashTable.get(
-          "npc-force-pathfinding-calculation",
-          npc._id
-        );
-
-        if (!hasForcedPathfindingCalculation && target) {
-          const isUnderRange = this.movementHelper.isUnderRange(npc.x, npc.y, target.x, target.y, 2);
-
-          if (!isUnderRange) {
-            const nearestGridToTarget = await this.getNearestGridToTarget(npc, target.x, target.y, previousNPCPosition);
-
-            if (nearestGridToTarget?.length) {
-              return nearestGridToTarget;
-            }
-          }
-        }
-
-        return this.findShortestPathBetweenPoints(map, {
-          start: {
-            x: startGridX,
-            y: startGridY,
-          },
-          end: {
-            x: endGridX,
-            y: endGridY,
-          },
-        });
-      }
+    const hasCircularRef = await this.hasCircularReferenceOnPathfinding(
+      npc,
+      map,
+      startGridX,
+      startGridY,
+      endGridX,
+      endGridY,
+      cachedNextStep!,
+      previousNPCPosition
     );
+
+    if (cachedShortestPath?.length! > 0 && !hasCircularRef) {
+      return cachedShortestPath as number[][];
+    }
+
+    const hasForcedPathfindingCalculation = await this.inMemoryHashTable.get(
+      "npc-force-pathfinding-calculation",
+      npc._id
+    );
+
+    if (!hasForcedPathfindingCalculation && target) {
+      const isUnderRange = this.movementHelper.isUnderRange(npc.x, npc.y, target.x, target.y, 2);
+
+      if (!isUnderRange) {
+        const nearestGridToTarget = await this.getNearestGridToTarget(npc, target.x, target.y, previousNPCPosition);
+
+        if (nearestGridToTarget?.length) {
+          return nearestGridToTarget;
+        }
+      }
+    }
+
+    return this.findShortestPathBetweenPoints(map, {
+      start: {
+        x: startGridX,
+        y: startGridY,
+      },
+      end: {
+        x: endGridX,
+        y: endGridY,
+      },
+    });
   }
 
+  @TrackNewRelicTransaction()
   private async getNearestGridToTarget(
     npc: INPC,
     targetX: number,

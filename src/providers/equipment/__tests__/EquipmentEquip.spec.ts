@@ -145,7 +145,7 @@ describe("EquipmentEquip.spec.ts", () => {
     const skill = (await Skill.findById(rogue.skills).lean()) as ISkill;
     skill.level = 10;
     skill.dagger.level = 10;
-    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+    (await Skill.findByIdAndUpdate(skill._id, { ...skill } as any).lean()) as ISkill;
 
     const equipOneHand = await equipmentEquip.equip(rogue, daggerItem._id, inventoryContainer.id);
     const equipAnotherHand = await equipmentEquip.equip(rogue, daggerItem2._id, inventoryContainer.id);
@@ -310,7 +310,7 @@ describe("EquipmentEquip.spec.ts", () => {
       const skill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
       skill.level = 1;
       skill.dagger.level = 10;
-      (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+      (await Skill.findByIdAndUpdate(skill._id, { ...skill } as any).lean()) as ISkill;
 
       const equip = await equipmentEquip.equip(testCharacter, minRequiredLevelSkillDagger._id, inventoryContainer.id);
 
@@ -335,7 +335,7 @@ describe("EquipmentEquip.spec.ts", () => {
       skill.level = 10;
       skill.dagger.level = 1;
 
-      (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+      (await Skill.findByIdAndUpdate(skill._id, { ...skill } as any).lean()) as ISkill;
 
       const equip = await equipmentEquip.equip(testCharacter, minRequiredLevelSkillDagger._id, inventoryContainer.id);
 

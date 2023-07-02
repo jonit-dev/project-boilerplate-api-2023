@@ -1,92 +1,86 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { CharacterClass, IEquipmentSet, ItemSlotType, ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(EquipmentTwoHanded)
 export class EquipmentTwoHanded {
-  constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic) {}
+  constructor(private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async validateHandsItemEquip(
     equipmentSlots: IEquipmentSet,
     itemToBeEquipped: IItem,
     character: ICharacter
   ): Promise<boolean> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "EquipmentTwoHanded.validateHandsItemEquip",
-      async () => {
-        const isItemEquippableOnHands = this.isItemEquippableOnHands(itemToBeEquipped);
+    const isItemEquippableOnHands = this.isItemEquippableOnHands(itemToBeEquipped);
 
-        if (!isItemEquippableOnHands) {
+    if (!isItemEquippableOnHands) {
+      return true;
+    }
+
+    const hasOneHandedItemEquipped = await this.hasOneHandedItemEquippedOnArms(equipmentSlots);
+
+    if (hasOneHandedItemEquipped) {
+      if (itemToBeEquipped.isTwoHanded) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, you can't equip a two-handed item together with the equipped item."
+        );
+
+        return false;
+      } else {
+        const hasShield = await this.hasShieldEquipped(equipmentSlots);
+
+        if (hasShield) {
           return true;
         }
 
-        const hasOneHandedItemEquipped = await this.hasOneHandedItemEquippedOnArms(equipmentSlots);
-
-        if (hasOneHandedItemEquipped) {
-          if (itemToBeEquipped.isTwoHanded) {
-            this.socketMessaging.sendErrorMessageToCharacter(
-              character,
-              "Sorry, you can't equip a two-handed item together with the equipped item."
-            );
-
-            return false;
-          } else {
-            const hasShield = await this.hasShieldEquipped(equipmentSlots);
-
-            if (hasShield) {
-              return true;
-            }
-
-            // if item to be equipped is a shield, just allow it
-            if (itemToBeEquipped.subType === ItemSubType.Shield) {
-              return true;
-            }
-
-            if (character.class === CharacterClass.Berserker) {
-              return true;
-            }
-
-            this.socketMessaging.sendErrorMessageToCharacter(
-              character,
-              "Sorry, your class can't equip 2 one-handed item of this type."
-            );
-
-            return false;
-          }
+        // if item to be equipped is a shield, just allow it
+        if (itemToBeEquipped.subType === ItemSubType.Shield) {
+          return true;
         }
 
-        const hasTwoHandedItemEquipped = await this.hasTwoHandedItemEquippedOnArms(
-          equipmentSlots as unknown as IEquipmentSet
+        if (character.class === CharacterClass.Berserker) {
+          return true;
+        }
+
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, your class can't equip 2 one-handed item of this type."
         );
 
-        if (hasTwoHandedItemEquipped) {
-          if (itemToBeEquipped.isTwoHanded) {
-            this.socketMessaging.sendErrorMessageToCharacter(
-              character,
-              "Sorry, you already have a two-handed item equipped."
-            );
-
-            return false;
-          }
-
-          if (!itemToBeEquipped.isTwoHanded) {
-            this.socketMessaging.sendErrorMessageToCharacter(
-              character,
-              "Sorry, not possible. Please unequip your two-handed item first."
-            );
-
-            return false;
-          }
-        }
-
-        return true;
+        return false;
       }
+    }
+
+    const hasTwoHandedItemEquipped = await this.hasTwoHandedItemEquippedOnArms(
+      equipmentSlots as unknown as IEquipmentSet
     );
+
+    if (hasTwoHandedItemEquipped) {
+      if (itemToBeEquipped.isTwoHanded) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, you already have a two-handed item equipped."
+        );
+
+        return false;
+      }
+
+      if (!itemToBeEquipped.isTwoHanded) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, not possible. Please unequip your two-handed item first."
+        );
+
+        return false;
+      }
+    }
+
+    return true;
   }
 
   public async hasTwoHandedItemEquippedOnArms(equipment: IEquipmentSet): Promise<boolean> {

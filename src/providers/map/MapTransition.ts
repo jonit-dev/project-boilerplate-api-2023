@@ -1,10 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   BattleSocketEvents,
   FromGridX,
@@ -32,128 +31,117 @@ export class MapTransition {
     private socketMessaging: SocketMessaging,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private characterView: CharacterView,
-    private socketSessionControl: SocketSessionControl,
-    private newRelic: NewRelic
+    private socketSessionControl: SocketSessionControl
   ) {}
 
+  @TrackNewRelicTransaction()
   public async changeCharacterScene(character: ICharacter, destination: TransitionDestination): Promise<void> {
-    await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "MapTransition.changeCharacterScene",
-      async () => {
-        // fetch destination properties
-        // change character map
-        await Character.updateOne(
-          { _id: character._id },
-          {
-            $set: {
-              scene: destination.map,
-              x: FromGridX(destination.gridX),
-              y: FromGridX(destination.gridY),
-            },
-          }
-        );
+    // fetch destination properties
+    // change character map
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        $set: {
+          scene: destination.map,
+          x: FromGridX(destination.gridX),
+          y: FromGridX(destination.gridY),
+        },
+      }
+    );
 
-        await this.socketSessionControl.deleteSession(character);
+    await this.socketSessionControl.deleteSession(character);
 
-        if (character.target.id && character.target.type) {
-          const targetId = character.target.id as unknown as string;
-          const targetType = character.target.type as unknown as EntityType;
-          const targetReason = "Your battle target was lost.";
+    if (character.target.id && character.target.type) {
+      const targetId = character.target.id as unknown as string;
+      const targetType = character.target.type as unknown as EntityType;
+      const targetReason = "Your battle target was lost.";
 
-          const dataOfCancelTargeting: IBattleCancelTargeting = {
-            targetId: targetId,
-            type: targetType,
-            reason: targetReason,
-          };
+      const dataOfCancelTargeting: IBattleCancelTargeting = {
+        targetId: targetId,
+        type: targetType,
+        reason: targetReason,
+      };
 
-          this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-            character.channelId!,
-            BattleSocketEvents.CancelTargeting,
-            dataOfCancelTargeting
-          );
+      this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+        character.channelId!,
+        BattleSocketEvents.CancelTargeting,
+        dataOfCancelTargeting
+      );
 
-          await this.battleNetworkStopTargeting.stopTargeting(character);
-        }
+      await this.battleNetworkStopTargeting.stopTargeting(character);
+    }
 
-        await this.characterView.clearCharacterView(character);
-        /* 
+    await this.characterView.clearCharacterView(character);
+    /* 
       Send event to client telling it to restart the map. 
       We don't need to specify which, because it will trigger a character 
       refresh and scene reload on the client side. 
       */
 
-        this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.ChangeMap);
+    this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.ChangeMap);
 
-        await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
-          character,
-          ViewSocketEvents.Destroy,
-          {
-            type: "characters",
-            id: character._id,
-          }
-        );
+    await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
+      character,
+      ViewSocketEvents.Destroy,
+      {
+        type: "characters",
+        id: character._id,
       }
     );
   }
 
+  @TrackNewRelicTransaction()
   public async sameMapTeleport(character: ICharacter, destination: TransitionDestination): Promise<void> {
-    await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "MapTransition.sameMapTeleport",
-      async () => {
-        if (character.scene !== destination.map) {
-          throw new Error(
-            `Character Scene: "${character.scene}" and map to teleport: "${destination.map}" should be the same!`
-          );
-        }
+    if (character.scene !== destination.map) {
+      throw new Error(
+        `Character Scene: "${character.scene}" and map to teleport: "${destination.map}" should be the same!`
+      );
+    }
 
-        // change character map
-        await Character.updateOne(
-          { _id: character._id },
-          {
-            $set: {
-              x: FromGridX(destination.gridX),
-              y: FromGridX(destination.gridY),
-              scene: destination.map,
-            },
-          }
-        );
+    // change character map
+    await Character.updateOne(
+      { _id: character._id },
+      {
+        $set: {
+          x: FromGridX(destination.gridX),
+          y: FromGridX(destination.gridY),
+          scene: destination.map,
+        },
+      }
+    );
 
-        if (character.target.id && character.target.type) {
-          const targetId = character.target.id as unknown as string;
-          const targetType = character.target.type as unknown as EntityType;
-          const targetReason = "Your battle target was lost.";
+    if (character.target.id && character.target.type) {
+      const targetId = character.target.id as unknown as string;
+      const targetType = character.target.type as unknown as EntityType;
+      const targetReason = "Your battle target was lost.";
 
-          const dataOfCancelTargeting: IBattleCancelTargeting = {
-            targetId: targetId,
-            type: targetType,
-            reason: targetReason,
-          };
+      const dataOfCancelTargeting: IBattleCancelTargeting = {
+        targetId: targetId,
+        type: targetType,
+        reason: targetReason,
+      };
 
-          this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-            character.channelId!,
-            BattleSocketEvents.CancelTargeting,
-            dataOfCancelTargeting
-          );
+      this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+        character.channelId!,
+        BattleSocketEvents.CancelTargeting,
+        dataOfCancelTargeting
+      );
 
-          await this.battleNetworkStopTargeting.stopTargeting(character);
-        }
+      await this.battleNetworkStopTargeting.stopTargeting(character);
+    }
 
-        await this.characterView.clearCharacterView(character);
+    await this.characterView.clearCharacterView(character);
 
-        // send event to client telling it that a character has been teleported?
+    // send event to client telling it that a character has been teleported?
 
-        this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.SameMapTeleport, destination);
+    this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.SameMapTeleport, destination);
 
-        await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
-          character,
-          ViewSocketEvents.Destroy,
-          {
-            type: "characters",
-            id: character._id,
-          }
-        );
+    await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
+      character,
+      ViewSocketEvents.Destroy,
+      {
+        type: "characters",
+        id: character._id,
       }
     );
   }

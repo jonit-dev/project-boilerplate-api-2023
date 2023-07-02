@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { ItemDropCleanup } from "@providers/item/ItemDropCleanup";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -60,6 +61,7 @@ export class CharacterItemSlots {
     return items;
   }
 
+  @TrackNewRelicTransaction()
   public async updateItemOnSlot(
     slotIndex: number,
     targetContainer: IItemContainer,
@@ -133,6 +135,7 @@ export class CharacterItemSlots {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async findItemOnSlots(targetContainer: IItemContainer, itemId: string): Promise<IItem | undefined> {
     try {
       const container = (await ItemContainer.findById(targetContainer._id)) as unknown as IItemContainer;
@@ -157,6 +160,7 @@ export class CharacterItemSlots {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async deleteItemOnSlot(targetContainer: IItemContainer, itemId: string): Promise<boolean> {
     for (let i = 0; i < targetContainer.slotQty; i++) {
       const slotItem = targetContainer.slots?.[i] as unknown as IItem;
@@ -185,6 +189,7 @@ export class CharacterItemSlots {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async getAvailableQuantityOnSlotToStack(
     targetContainerId: string,
     itemKeyToBeAdded: string,
@@ -215,6 +220,7 @@ export class CharacterItemSlots {
     return 0;
   }
 
+  @TrackNewRelicTransaction()
   public async hasAvailableSlot(
     targetContainerId: string,
     itemToBeAdded: IItem,
@@ -253,6 +259,7 @@ export class CharacterItemSlots {
     return checkForEmptyOnly && Object.keys(targetContainer.slots).length < targetContainer.slotQty;
   }
 
+  @TrackNewRelicTransaction()
   public async getFirstAvailableSlotIndex(
     targetContainer: IItemContainer,
     itemToBeAdded?: IItem
@@ -283,6 +290,7 @@ export class CharacterItemSlots {
     return null;
   }
 
+  @TrackNewRelicTransaction()
   public async addItemOnSlot(
     targetContainer: IItemContainer,
     itemToBeAdded: IItem,
@@ -314,6 +322,7 @@ export class CharacterItemSlots {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async tryAddingItemOnFirstSlot(
     character: ICharacter,
     selectedItem: IItem,

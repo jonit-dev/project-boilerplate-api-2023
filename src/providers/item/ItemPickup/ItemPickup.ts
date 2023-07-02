@@ -6,10 +6,9 @@ import { IEquipmentAndInventoryUpdatePayload, IItemPickup } from "@rpg-engine/sh
 import { provide } from "inversify-binding-decorators";
 
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MapHelper } from "@providers/map/MapHelper";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { clearCacheForKey } from "speedgoose";
 import { ItemOwnership } from "../ItemOwnership";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
@@ -27,108 +26,103 @@ export class ItemPickup {
     private characterInventory: CharacterInventory,
     private itemPickupUpdater: ItemPickupUpdater,
     private mapHelper: MapHelper,
-    private newRelic: NewRelic,
+
     private itemOwnership: ItemOwnership
   ) {}
 
+  @TrackNewRelicTransaction()
   public async performItemPickup(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | undefined> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "ItemPickup.performItemPickup",
-      async () => {
-        const itemToBePicked = (await this.itemPickupValidator.isItemPickupValid(itemPickupData, character)) as IItem;
-        try {
-          if (!itemToBePicked) {
-            return false;
-          }
+    const itemToBePicked = (await this.itemPickupValidator.isItemPickupValid(itemPickupData, character)) as IItem;
+    try {
+      if (!itemToBePicked) {
+        return false;
+      }
 
-          if (itemToBePicked.isBeingPickedUp) {
-            return false;
-          }
+      if (itemToBePicked.isBeingPickedUp) {
+        return false;
+      }
 
-          const inventory = await this.characterInventory.getInventory(character);
+      const inventory = await this.characterInventory.getInventory(character);
 
-          const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
-          const isPickupFromMap =
-            this.mapHelper.isCoordinateValid(itemToBePicked.x) &&
-            this.mapHelper.isCoordinateValid(itemToBePicked.y) &&
-            itemToBePicked.scene !== undefined;
+      const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
+      const isPickupFromMap =
+        this.mapHelper.isCoordinateValid(itemToBePicked.x) &&
+        this.mapHelper.isCoordinateValid(itemToBePicked.y) &&
+        itemToBePicked.scene !== undefined;
 
-          // support picking items from a tiled map seed
-          itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
-          itemToBePicked.isBeingPickedUp = true;
-          await itemToBePicked.save();
+      // support picking items from a tiled map seed
+      itemToBePicked.key = itemToBePicked.baseKey; // support picking items from a tiled map seed
+      itemToBePicked.isBeingPickedUp = true;
+      await itemToBePicked.save();
 
-          await this.itemOwnership.addItemOwnership(itemToBePicked, character);
+      await this.itemOwnership.addItemOwnership(itemToBePicked, character);
 
-          const isPickupFromContainer = itemPickupData.fromContainerId && !isPickupFromMap;
+      const isPickupFromContainer = itemPickupData.fromContainerId && !isPickupFromMap;
 
-          if (isPickupFromContainer) {
-            const hasPickedUpFromContainer = await this.handlePickupFromContainer(
-              itemPickupData,
-              itemToBePicked,
-              character
-            );
+      if (isPickupFromContainer) {
+        const hasPickedUpFromContainer = await this.handlePickupFromContainer(
+          itemPickupData,
+          itemToBePicked,
+          character
+        );
 
-            if (!hasPickedUpFromContainer) {
-              return false;
-            }
-          }
-
-          // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
-          if (isPickupFromMap) {
-            const pickupFromMap = await this.itemPickupMapContainer.pickupFromMapContainer(itemToBePicked, character);
-
-            if (!pickupFromMap) {
-              return false;
-            }
-          }
-
-          const addToContainer = await this.characterItemContainer.addItemToContainer(
-            itemToBePicked,
-            character,
-            itemPickupData.toContainerId,
-            {
-              isInventoryItem,
-            }
-          );
-
-          if (!addToContainer) {
-            return false;
-          }
-
-          if (isInventoryItem) {
-            await this.itemPickupUpdater.refreshEquipmentIfInventoryItem(character);
-
-            await this.itemPickupUpdater.finalizePickup(itemToBePicked, character);
-
-            return true;
-          }
-
-          if (!itemPickupData.fromContainerId && !isInventoryItem && !isPickupFromMap) {
-            this.socketMessaging.sendErrorMessageToCharacter(
-              character,
-              "Sorry, failed to remove item from container. Origin container not found."
-            );
-            return false;
-          }
-
-          const hasUpdatedContainers = await this.updateContainers(itemPickupData, character, isPickupFromMap);
-
-          if (!hasUpdatedContainers) {
-            return false;
-          }
-
-          await this.itemPickupUpdater.finalizePickup(itemToBePicked, character);
-
-          await clearCacheForKey(`${character._id}-inventory`);
-
-          return true;
-        } catch (error) {
-          console.error(error);
+        if (!hasPickedUpFromContainer) {
+          return false;
         }
       }
-    );
+
+      // we had to proceed with undefined check because remember that x and y can be 0, causing removeItemFromMap to not be triggered!
+      if (isPickupFromMap) {
+        const pickupFromMap = await this.itemPickupMapContainer.pickupFromMapContainer(itemToBePicked, character);
+
+        if (!pickupFromMap) {
+          return false;
+        }
+      }
+
+      const addToContainer = await this.characterItemContainer.addItemToContainer(
+        itemToBePicked,
+        character,
+        itemPickupData.toContainerId,
+        {
+          isInventoryItem,
+        }
+      );
+
+      if (!addToContainer) {
+        return false;
+      }
+
+      if (isInventoryItem) {
+        await this.itemPickupUpdater.refreshEquipmentIfInventoryItem(character);
+
+        await this.itemPickupUpdater.finalizePickup(itemToBePicked, character);
+
+        return true;
+      }
+
+      if (!itemPickupData.fromContainerId && !isInventoryItem && !isPickupFromMap) {
+        this.socketMessaging.sendErrorMessageToCharacter(
+          character,
+          "Sorry, failed to remove item from container. Origin container not found."
+        );
+        return false;
+      }
+
+      const hasUpdatedContainers = await this.updateContainers(itemPickupData, character, isPickupFromMap);
+
+      if (!hasUpdatedContainers) {
+        return false;
+      }
+
+      await this.itemPickupUpdater.finalizePickup(itemToBePicked, character);
+
+      await clearCacheForKey(`${character._id}-inventory`);
+
+      return true;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   private async handlePickupFromContainer(
@@ -149,6 +143,7 @@ export class ItemPickup {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   private async updateContainers(
     itemPickupData: IItemPickup,
     character: ICharacter,

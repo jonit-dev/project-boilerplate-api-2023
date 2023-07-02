@@ -1,11 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapSolids, SolidCheckStrategy } from "@providers/map/MapSolids";
 import { MapTransition } from "@providers/map/MapTransition";
 import { MathHelper } from "@providers/math/MathHelper";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   AnimationDirection,
   FromGridX,
@@ -28,14 +27,14 @@ export class MovementHelper {
     private mathHelper: MathHelper,
     private mapSolids: MapSolids,
     private mapTransition: MapTransition,
-    private mapNonPVPZone: MapNonPVPZone,
-    private newRelic: NewRelic
+    private mapNonPVPZone: MapNonPVPZone
   ) {}
 
   public isSnappedToGrid(x: number, y: number): boolean {
     return x % GRID_WIDTH === 0 && y % GRID_WIDTH === 0;
   }
 
+  @TrackNewRelicTransaction()
   public async isSolid(
     map: string,
     gridX: number,
@@ -44,77 +43,71 @@ export class MovementHelper {
     strategy: SolidCheckStrategy = "CHECK_ALL_LAYERS_BELOW",
     caller: INPC | ICharacter | undefined = undefined
   ): Promise<boolean> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "MovementHelper.isSolid",
-      async () => {
-        // check for characters and NPCs
+    // check for characters and NPCs
 
-        const hasSolid = this.mapSolids.isTileSolid(map, gridX, gridY, layer, strategy);
-        const isPassage = this.mapSolids.isTilePassage(map, gridX, gridY, layer, strategy);
+    const hasSolid = this.mapSolids.isTileSolid(map, gridX, gridY, layer, strategy);
+    const isPassage = this.mapSolids.isTilePassage(map, gridX, gridY, layer, strategy);
 
-        if (hasSolid && !isPassage) {
-          return true;
-        }
+    if (hasSolid && !isPassage) {
+      return true;
+    }
 
-        if (caller?.type === "NPC") {
-          const hasTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
+    if (caller?.type === "NPC") {
+      const hasTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
 
-          if (hasTransition) {
-            return true;
-          }
-
-          const hasNPC = await NPC.exists({
-            x: FromGridX(gridX),
-            y: FromGridY(gridY),
-            layer,
-            health: { $gt: 0 },
-            scene: map,
-          });
-
-          if (hasNPC) {
-            return true;
-          }
-        }
-
-        // const hasNPC = await NPC.exists({
-        //   x: FromGridX(gridX),
-        //   y: FromGridY(gridY),
-        //   layer,
-        //   health: { $gt: 0 },
-        //   scene: map,
-        // });
-
-        // if (hasNPC) {
-        //   return true;
-        // }
-
-        // const hasCharacter = await Character.exists({
-        //   x: FromGridX(gridX),
-        //   y: FromGridY(gridY),
-        //   isOnline: true,
-        //   layer,
-        //   scene: map,
-        // });
-
-        // if (hasCharacter) {
-        //   return true;
-        // }
-
-        // const hasItem = await Item.exists({
-        //   x: FromGridX(gridX),
-        //   y: FromGridY(gridY),
-        //   isSolid: true,
-        //   scene: map,
-        // });
-
-        // if (hasItem) {
-        //   return true;
-        // }
-
-        return false;
+      if (hasTransition) {
+        return true;
       }
-    );
+
+      const hasNPC = await NPC.exists({
+        x: FromGridX(gridX),
+        y: FromGridY(gridY),
+        layer,
+        health: { $gt: 0 },
+        scene: map,
+      });
+
+      if (hasNPC) {
+        return true;
+      }
+    }
+
+    // const hasNPC = await NPC.exists({
+    //   x: FromGridX(gridX),
+    //   y: FromGridY(gridY),
+    //   layer,
+    //   health: { $gt: 0 },
+    //   scene: map,
+    // });
+
+    // if (hasNPC) {
+    //   return true;
+    // }
+
+    // const hasCharacter = await Character.exists({
+    //   x: FromGridX(gridX),
+    //   y: FromGridY(gridY),
+    //   isOnline: true,
+    //   layer,
+    //   scene: map,
+    // });
+
+    // if (hasCharacter) {
+    //   return true;
+    // }
+
+    // const hasItem = await Item.exists({
+    //   x: FromGridX(gridX),
+    //   y: FromGridY(gridY),
+    //   isSolid: true,
+    //   scene: map,
+    // });
+
+    // if (hasItem) {
+    //   return true;
+    // }
+
+    return false;
   }
 
   public isMoving(startX: number, startY: number, endX: number, endY: number): boolean {
