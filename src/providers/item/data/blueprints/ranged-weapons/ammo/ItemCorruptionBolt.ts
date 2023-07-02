@@ -14,7 +14,7 @@ export const itemCorruptionBolt: IEquippableRangedAmmoBlueprint = {
   attack: 18,
   weight: 0.013,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 3,
   canSell: false,
   entityEffects: [EntityEffectBlueprint.Corruption],

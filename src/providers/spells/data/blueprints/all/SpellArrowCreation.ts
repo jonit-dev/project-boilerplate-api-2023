@@ -1,7 +1,14 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container } from "@providers/inversify/container";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { AnimationEffectKeys, BasicAttribute, ISpell, SpellCastingType, SpellsBlueprint } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  BasicAttribute,
+  CharacterClass,
+  ISpell,
+  SpellCastingType,
+  SpellsBlueprint,
+} from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
 import { SpellItemCreation } from "../../abstractions/SpellItemCreation";
 
@@ -21,10 +28,20 @@ export const spellArrowCreation: Partial<ISpell> = {
 
   usableEffect: async (character: ICharacter) => {
     const spellCalculator = container.get(SpellCalculator);
-    const createQty = await spellCalculator.getQuantityBasedOnSkillLevel(character, BasicAttribute.Magic, {
+
+    let minMax = {
       max: 100,
       min: 1,
-    });
+    };
+
+    if (character.class === CharacterClass.Hunter) {
+      minMax = {
+        max: 200,
+        min: 10,
+      };
+    }
+
+    const createQty = await spellCalculator.getQuantityBasedOnSkillLevel(character, BasicAttribute.Magic, minMax);
 
     const spellItemCreation = container.get(SpellItemCreation);
 

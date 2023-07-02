@@ -29,10 +29,19 @@ export const spellBoltCreation: Partial<ISpell> = {
 
   usableEffect: async (character: ICharacter) => {
     const spellCalculator = container.get(SpellCalculator);
-    const createQty = await spellCalculator.getQuantityBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    let minMax = {
       max: 100,
       min: 1,
-    });
+    };
+
+    if (character.class === CharacterClass.Hunter) {
+      minMax = {
+        max: 200,
+        min: 10,
+      };
+    }
+
+    const createQty = await spellCalculator.getQuantityBasedOnSkillLevel(character, BasicAttribute.Magic, minMax);
 
     const spellItemCreation = container.get(SpellItemCreation);
 

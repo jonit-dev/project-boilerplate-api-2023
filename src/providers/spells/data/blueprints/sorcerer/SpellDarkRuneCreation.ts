@@ -12,10 +12,10 @@ export const spellDarkRuneCreation: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar ansr nevae",
-  manaCost: 160,
+  manaCost: 500,
   minLevelRequired: 8,
   minMagicLevelRequired: 8,
-  cooldown: 80,
+  cooldown: 5,
   castingAnimationKey: AnimationEffectKeys.HitDark,
   projectileAnimationKey: AnimationEffectKeys.Dark,
   characterClass: [CharacterClass.Sorcerer],

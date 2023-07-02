@@ -27,7 +27,7 @@ export const spellCorruptionBolt: Partial<ISpell> = {
   manaCost: 180,
   minLevelRequired: 20,
   minMagicLevelRequired: 20,
-  cooldown: 80,
+  cooldown: 15,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Corruption,
   projectileAnimationKey: AnimationEffectKeys.Dark,
@@ -39,7 +39,7 @@ export const spellCorruptionBolt: Partial<ISpell> = {
     const hitTarget = container.get(HitTarget);
     const spellCalculator = container.get(SpellCalculator);
 
-    await hitTarget.hit(character, target, true, MagicPower.UltraHigh);
+    await hitTarget.hit(character, target, true, MagicPower.Medium);
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectCorruption);
 

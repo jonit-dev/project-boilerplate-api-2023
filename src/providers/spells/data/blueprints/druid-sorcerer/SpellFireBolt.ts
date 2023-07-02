@@ -23,7 +23,7 @@ export const spellFireBolt: Partial<ISpell> = {
   manaCost: 150,
   minLevelRequired: 8,
   minMagicLevelRequired: 12,
-  cooldown: 60,
+  cooldown: 12,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Burn,
   projectileAnimationKey: AnimationEffectKeys.FireBall,
@@ -34,7 +34,7 @@ export const spellFireBolt: Partial<ISpell> = {
     const entityEffectUse = container.get(EntityEffectUse);
     const hitTarget = container.get(HitTarget);
 
-    await hitTarget.hit(character, target, true, MagicPower.High);
+    await hitTarget.hit(character, target, true, MagicPower.Low);
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectBurning);
 

@@ -13,7 +13,7 @@ export const itemPoisonArrow: IEquippableRangedAmmoBlueprint = {
   attack: 18,
   weight: 0.025,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 1.5,
   entityEffects: [EntityEffectBlueprint.Poison],
   entityEffectChance: 90,
