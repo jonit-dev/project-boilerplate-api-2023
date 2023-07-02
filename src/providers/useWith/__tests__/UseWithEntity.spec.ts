@@ -20,6 +20,7 @@ import {
   GRID_WIDTH,
   IProjectileAnimationEffect,
   ItemSocketEvents,
+  MagicPower,
   NPCAlignment,
   NPCMovementType,
   SkillSocketEvents,
@@ -908,7 +909,7 @@ describe("UseWithEntityValidation.ts", () => {
 
     // use jest to mock itemDarkRune.power property
     // @ts-ignore
-    itemDarkRune.power = 20;
+    itemDarkRune.power = MagicPower.High;
 
     const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
     const updatedSkillsTarget: ISkill = (await Skill.findById(targetCharacter.skills)) as unknown as ISkill;
