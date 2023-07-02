@@ -13,7 +13,8 @@ import { CharacterItemContainer } from "@providers/character/characterItems/Char
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { EntityUtil } from "@providers/entityEffects/EntityUtil";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager } from "@providers/inversify/container";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemValidation } from "@providers/item/validation/ItemValidation";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
@@ -97,7 +98,11 @@ export class UseWithEntity {
       return false;
     }
 
-    const blueprint = itemsBlueprintIndex[item.baseKey];
+    const blueprint = await blueprintManager.getBlueprint<IMagicItemUseWithEntity>(
+      "items",
+      item.baseKey as AvailableBlueprints
+    );
+
     if (!blueprint || !(!!blueprint.power || targetType === StaticEntity) || !blueprint.usableEffect) {
       this.socketMessaging.sendErrorMessageToCharacter(caster, `Sorry, '${item.name}' cannot be used with target.`);
       return false;
@@ -185,9 +190,9 @@ export class UseWithEntity {
       }
     }
 
-    const blueprint = itemsBlueprintIndex[item.baseKey];
+    const blueprint = await blueprintManager.getBlueprint<any>("items", item.baseKey as AvailableBlueprints);
 
-    const damage = await blueprint.usableEffect(caster, target, item);
+    const damage = await blueprint.usableEffect?.(caster, target, item);
     await target.save();
 
     // handle static item case

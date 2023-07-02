@@ -1,10 +1,6 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { container } from "@providers/inversify/container";
-import { ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
-import shuffle from "lodash/shuffle";
 import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemRottenMeat: IConsumableItemBlueprint = {
   key: FoodsBlueprint.RottenMeat,
@@ -18,20 +14,5 @@ export const itemRottenMeat: IConsumableItemBlueprint = {
   maxStackSize: 50,
   basePrice: 1,
   canSell: false,
-
-  usableEffect: (character: ICharacter) => {
-    const socketMessaging = container.get<SocketMessaging>(SocketMessaging);
-    const itemUsableEffect = container.get(ItemUsableEffect);
-
-    const randomMessages = shuffle([
-      "You shouldn't eat this rotten meat!",
-      "You're suffering from food poisoning!",
-      "You're feeling sick!",
-    ]);
-
-    socketMessaging.sendErrorMessageToCharacter(character, randomMessages[0]);
-
-    itemUsableEffect.applyEatingEffect(character, -3);
-  },
-  usableEffectDescription: "Poisons 3 HP and Mana 5 times",
+  usableEffectKey: UsableEffectsBlueprint.PoisonEatingEffect,
 };

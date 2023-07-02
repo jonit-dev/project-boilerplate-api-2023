@@ -5,7 +5,6 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
@@ -14,6 +13,7 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { blueprintManager } from "@providers/inversify/container";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   AnimationEffectKeys,
@@ -25,6 +25,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
+import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -66,7 +67,7 @@ export class ItemUse {
           return false;
         }
 
-        const bluePrintItem = itemsBlueprintIndex[useItem.key];
+        const bluePrintItem = await blueprintManager.getBlueprint<IItem>("items", useItem.key as AvailableBlueprints);
         if (!bluePrintItem || !bluePrintItem.usableEffect) {
           this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
           return false;

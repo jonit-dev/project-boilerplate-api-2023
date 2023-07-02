@@ -11,6 +11,7 @@ import { AnimationEffectKeys, CharacterSocketEvents, ItemSocketEvents, UISocketE
 import { ItemUse } from "../ItemUse";
 import { itemApple } from "../data/blueprints/foods/ItemApple";
 import { itemLightLifePotion } from "../data/blueprints/potions/ItemLightLifePotion";
+import { FoodsBlueprint } from "../data/types/itemsBlueprintTypes";
 import { ItemValidation } from "../validation/ItemValidation";
 
 describe("ItemUse.ts", () => {
@@ -41,9 +42,9 @@ describe("ItemUse.ts", () => {
       .populate("skills")
       .execPopulate();
 
-    testItem = new Item(stackableItemMock);
-    testItem.stackQty = 2;
-    await testItem.save();
+    testItem = await unitTestHelper.createMockItemFromBlueprint(FoodsBlueprint.Apple, {
+      stackQty: 2,
+    });
 
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;

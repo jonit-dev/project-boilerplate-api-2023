@@ -1,10 +1,6 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
-import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import { container } from "@providers/inversify/container";
-import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { ICraftableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { CraftingResourcesBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemBandage: ICraftableItemBlueprint = {
   key: CraftingResourcesBlueprint.Bandage,
@@ -17,14 +13,5 @@ export const itemBandage: ICraftableItemBlueprint = {
   weight: 0.04,
   maxStackSize: 100,
   basePrice: 12,
-  usableEffect: async (character: ICharacter) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
-    const entityEffectUse = container.get(EntityEffectUse);
-
-    itemUsableEffect.apply(character, EffectableAttribute.Health, 3);
-
-    // cure bleeding effect
-    await entityEffectUse.clearEntityEffect(EntityEffectBlueprint.Bleeding, character);
-  },
-  usableEffectDescription: "Stops bleeding and restores 3 HP",
+  usableEffectKey: UsableEffectsBlueprint.ClearBleedingUsableEffect,
 };

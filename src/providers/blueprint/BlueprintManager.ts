@@ -2,6 +2,8 @@ import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { itemsBlueprintIndex } from "@providers/item/data";
 import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
+import { usableEffectsIndex } from "@providers/item/data/usableEffects";
+import { IUsableEffect, IUsableEffectRune } from "@providers/item/data/usableEffects/types";
 import { npcsBlueprintIndex } from "@providers/npc/data";
 import crypto from "crypto";
 import { provide } from "inversify-binding-decorators";
@@ -28,6 +30,20 @@ export class BlueprintManager {
     const blueprint = await this.inMemoryHashTable.get(`blueprint-${namespace}`, key);
 
     delete blueprint?.versionHash;
+
+    if (namespace === "items") {
+      // if item, lookup for usable effect and inject it on the blueprint
+      let usableEffectBlueprint = usableEffectsIndex[blueprint?.usableEffectKey] as IUsableEffect | IUsableEffectRune;
+      if (usableEffectBlueprint && blueprint) {
+        blueprint.usableEffect = usableEffectBlueprint.usableEffect;
+        blueprint.usableEffectDescription = usableEffectBlueprint.usableEffectDescription;
+
+        if (blueprint.usableEntityEffect) {
+          usableEffectBlueprint = usableEffectBlueprint as IUsableEffectRune;
+          blueprint.usableEntityEffect = usableEffectBlueprint.usableEntityEffect;
+        }
+      }
+    }
 
     return blueprint as T;
   }

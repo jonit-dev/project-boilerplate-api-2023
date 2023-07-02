@@ -1,7 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { TILE_MAX_REACH_DISTANCE_IN_GRID } from "@providers/constants/TileConstants";
+import { blueprintManager } from "@providers/inversify/container";
 import { ItemCraftable } from "@providers/item/ItemCraftable";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MapTiles } from "@providers/map/MapTiles";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
@@ -67,7 +68,10 @@ export class UseWithTile {
     // Check if the character has the originItem
     const originItem = await this.useWithHelper.getItem(character, data.originItemId);
 
-    const itemBlueprint = itemsBlueprintIndex[originItem.baseKey] as Partial<IItemUseWith>;
+    const itemBlueprint = await blueprintManager.getBlueprint<IItemUseWith>(
+      "items",
+      originItem.baseKey as AvailableBlueprints
+    );
 
     // Check if tile position is at character's reach
     const isUnderRange = this.movementHelper.isUnderRange(
