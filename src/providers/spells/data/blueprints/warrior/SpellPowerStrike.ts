@@ -19,7 +19,7 @@ export const spellPowerStrike: Partial<ISpell> = {
   description: "Temporarily increases the warrior's strength.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "gûl-eglir",
-  manaCost: 60,
+  manaCost: 40,
   minLevelRequired: 4,
   minMagicLevelRequired: 5,
   cooldown: 60,
@@ -38,7 +38,7 @@ export const spellPowerStrike: Partial<ISpell> = {
     });
 
     const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 10,
+      min: 15,
       max: 35,
     });
 

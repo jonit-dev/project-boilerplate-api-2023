@@ -37,7 +37,7 @@ export class Bloodthirst {
 
   private async applyBerserkerBloodthirst(character: ICharacter, damage: number): Promise<void> {
     try {
-      const berserkerMultiplier = 0.1;
+      const berserkerMultiplier = 0.5;
 
       const skills = (await Skill.findById(character.skills)
         .lean()
@@ -49,7 +49,7 @@ export class Bloodthirst {
       const characterLevel = skills?.level;
       const strengthLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Strength);
 
-      const healingFactor = (magicLevel + characterLevel + strengthLevel) / 4;
+      const healingFactor = (magicLevel + characterLevel + strengthLevel) / 6;
       const calculatedHealing = Math.round(damage * berserkerMultiplier * healingFactor);
 
       const cappedHealing = Math.min(character.health + calculatedHealing, character.maxHealth);

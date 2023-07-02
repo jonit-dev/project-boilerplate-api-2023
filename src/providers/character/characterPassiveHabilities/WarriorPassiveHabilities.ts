@@ -54,7 +54,7 @@ export class WarriorPassiveHabilities {
         })) as unknown as ISkill;
       const strengthLvl = await this.traitGetter.getSkillLevelWithBuffs(charSkills as ISkill, BasicAttribute.Strength);
       const interval = Math.min(Math.max(20000 - strengthLvl * 500, 1000), 20000);
-      const healthRegenAmount = Math.max(Math.floor(strengthLvl / 3), 4);
+      const healthRegenAmount = Math.max(Math.floor(strengthLvl), 4);
 
       if (health < maxHealth) {
         const intervalId = setInterval(async () => {

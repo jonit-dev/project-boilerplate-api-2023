@@ -9,7 +9,6 @@ import {
   CraftingResourcesBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  PotionsBlueprint,
   StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -43,10 +42,6 @@ export const npcCaveSpider: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: PotionsBlueprint.ManaPotion,
-      chance: 20,
-    },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Herb,
       chance: 30,

@@ -6,7 +6,6 @@ import {
   FoodsBlueprint,
   GlovesBlueprint,
   LegsBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
@@ -62,10 +61,7 @@ export const npcAsterion = {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: RangedWeaponsBlueprint.AsterionsBow,
       chance: 40,

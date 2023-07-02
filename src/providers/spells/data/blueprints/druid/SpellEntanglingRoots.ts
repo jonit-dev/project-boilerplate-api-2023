@@ -19,10 +19,10 @@ export const spellEntanglingRoots: Partial<ISpell> = {
   description: "Stun your enemy by manipulating the primal forces of nature",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "raithin-nodrim",
-  manaCost: 80,
+  manaCost: 120,
   minLevelRequired: 4,
   minMagicLevelRequired: 8,
-  cooldown: 60,
+  cooldown: 200,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Rooted,
   projectileAnimationKey: AnimationEffectKeys.Energy,
@@ -35,8 +35,8 @@ export const spellEntanglingRoots: Partial<ISpell> = {
     const effect = container.get(SpecialEffect);
 
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 10,
-      max: 30,
+      min: 5,
+      max: 10,
     });
 
     await effect.stun(target, timeout);

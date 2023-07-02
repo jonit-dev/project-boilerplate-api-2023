@@ -15,7 +15,6 @@ import {
   HammersBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 
@@ -58,10 +57,7 @@ export const npcWildTroll = {
       itemBlueprintKey: HelmetsBlueprint.GladiatorHelmet,
       chance: 10,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: HammersBlueprint.RoyalHammer,
       chance: 10,

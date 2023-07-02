@@ -36,7 +36,7 @@ describe("Bloodthirst", () => {
     await bloodthirst.applyBerserkerBloodthirst(testCharacter, 50);
     const updatedCharacter = (await Character.findById(testCharacter._id).lean().select("health")) as ICharacter;
 
-    expect(updatedCharacter.health).toBe(94);
+    expect(updatedCharacter.health).toBe(100);
   });
 
   it("should return true when getBerserkerBloodthirstSpell is called with an existing spell", async () => {

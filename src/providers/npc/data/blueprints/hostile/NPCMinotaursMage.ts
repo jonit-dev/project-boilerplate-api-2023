@@ -6,7 +6,6 @@ import {
   DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
@@ -72,10 +71,7 @@ export const npcMinotaurMage = {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.ManaPotion,
-      chance: 60,
-    },
+
     {
       itemBlueprintKey: StaffsBlueprint.EnchantedStaff,
       chance: 5,
@@ -84,14 +80,7 @@ export const npcMinotaurMage = {
       itemBlueprintKey: StaffsBlueprint.SoulStaff,
       chance: 5,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterManaPotion,
-      chance: 25,
-    },
+
     {
       itemBlueprintKey: SwordsBlueprint.GoldenSword,
       chance: 4,

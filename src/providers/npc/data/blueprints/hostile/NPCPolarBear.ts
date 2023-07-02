@@ -6,7 +6,6 @@ import {
   AccessoriesBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
-  PotionsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
@@ -51,10 +50,7 @@ export const npcPolarBear = {
       itemBlueprintKey: FoodsBlueprint.Banana,
       chance: 15,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 20,
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Leather,
       chance: 50,

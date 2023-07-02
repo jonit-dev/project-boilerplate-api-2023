@@ -12,10 +12,10 @@ export const spellFireBoltRuneCreation: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar kiran agni",
-  manaCost: 120,
-  minLevelRequired: 4,
-  minMagicLevelRequired: 6,
-  cooldown: 5,
+  manaCost: 140,
+  minLevelRequired: 8,
+  minMagicLevelRequired: 12,
+  cooldown: 60,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Druid, CharacterClass.Sorcerer],
 
