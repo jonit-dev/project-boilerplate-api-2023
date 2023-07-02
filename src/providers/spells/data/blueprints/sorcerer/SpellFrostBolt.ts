@@ -28,7 +28,7 @@ export const spellFrostBolt: Partial<ISpell> = {
   manaCost: 160,
   minLevelRequired: 12,
   minMagicLevelRequired: 12,
-  cooldown: 80,
+  cooldown: 60,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Freeze,
   projectileAnimationKey: AnimationEffectKeys.HitBlue,

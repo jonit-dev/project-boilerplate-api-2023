@@ -15,7 +15,7 @@ export const spellHealRuneCreation: Partial<ISpell> = {
   manaCost: 300,
   minLevelRequired: 18,
   minMagicLevelRequired: 18,
-  cooldown: 120,
+  cooldown: 80,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Druid],
 

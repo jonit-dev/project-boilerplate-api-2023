@@ -15,7 +15,7 @@ export const spellEnergyBoltRuneCreation: Partial<ISpell> = {
   manaCost: 150,
   minLevelRequired: 6,
   minMagicLevelRequired: 8,
-  cooldown: 120,
+  cooldown: 80,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Druid, CharacterClass.Sorcerer],
 
