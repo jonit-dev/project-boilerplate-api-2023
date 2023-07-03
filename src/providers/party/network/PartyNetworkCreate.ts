@@ -3,11 +3,8 @@ import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { provide } from "inversify-binding-decorators";
-import PartyManagement, { CharacterPartyBenefits } from "../PartyManagement";
+import PartyManagement from "../PartyManagement";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
-import { CharacterClass } from "@rpg-engine/shared";
-import { Types } from "mongoose";
 
 export interface IPartyManagementFromClient {
   leaderId?: string;
@@ -21,11 +18,6 @@ export enum PartySocketEvents {
   Leave = "leave",
   TransferLeadership = "transferLeadership",
   Invite = "invite",
-}
-
-interface IPartyResponseCreate {
-  success?: ICharacterParty;
-  failure?: string;
 }
 
 interface ICharacterPartyChange {
