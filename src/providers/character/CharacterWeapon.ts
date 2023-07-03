@@ -1,7 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { TrackExecutionTime } from "@providers/analytics/decorator/TrackExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
@@ -18,7 +17,6 @@ export class CharacterWeapon {
   constructor(private inMemoryHashTable: InMemoryHashTable) {}
 
   @TrackNewRelicTransaction()
-  @TrackExecutionTime()
   public async getWeapon(character: ICharacter): Promise<ICharacterWeaponResult | undefined> {
     const namespace = "character-weapon";
     const cachedResult = (await this.inMemoryHashTable.get(namespace, character._id)) as ICharacterWeaponResult;

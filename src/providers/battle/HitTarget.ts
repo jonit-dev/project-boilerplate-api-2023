@@ -2,7 +2,6 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { TrackExecutionTime } from "@providers/analytics/decorator/TrackExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
@@ -47,7 +46,6 @@ export class HitTarget {
   ) {}
 
   @TrackNewRelicTransaction()
-  @TrackExecutionTime()
   public async hit(
     attacker: ICharacter | INPC,
     target: ICharacter | INPC,
