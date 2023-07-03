@@ -1,16 +1,16 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem as IModelItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { blueprintManager } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { IEquipmentAndInventoryUpdatePayload, IItem, IItemMove, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { clearCacheForKey } from "speedgoose";
-import { itemsBlueprintIndex } from "../data/index";
+import { AvailableBlueprints } from "../data/types/itemsBlueprintTypes";
 
 @provide(ItemDragAndDrop)
 export class ItemDragAndDrop {
@@ -18,81 +18,75 @@ export class ItemDragAndDrop {
     private socketMessaging: SocketMessaging,
     private characterValidation: CharacterValidation,
     private characterItemSlots: CharacterItemSlots,
-    private characterInventory: CharacterInventory,
-    private newRelic: NewRelic
+    private characterInventory: CharacterInventory
   ) {}
 
   //! For now, only a move on inventory is allowed.
+  @TrackNewRelicTransaction()
   public async performItemMove(itemMoveData: IItemMove, character: ICharacter): Promise<boolean> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "ItemDragAndDrop.performItemMove",
-      async () => {
-        const isMoveValid = await this.isItemMoveValid(itemMoveData, character);
-        if (!isMoveValid) {
-          return false;
-        }
+    const isMoveValid = await this.isItemMoveValid(itemMoveData, character);
+    if (!isMoveValid) {
+      return false;
+    }
 
-        const itemToBeMoved = await Item.findById(itemMoveData.from.item._id);
-        if (!itemToBeMoved) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item to be moved wasn't found.");
-          return false;
-        }
+    const itemToBeMoved = await Item.findById(itemMoveData.from.item._id);
+    if (!itemToBeMoved) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item to be moved wasn't found.");
+      return false;
+    }
 
-        //! item can be null if it's a move to an empty slot
-        const itemToBeMovedTo = await Item.findById(itemMoveData.to.item?._id);
-        if (!itemToBeMovedTo && itemMoveData.to.item !== null) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item to be moved to wasn't found.");
-          return false;
-        }
+    //! item can be null if it's a move to an empty slot
+    const itemToBeMovedTo = await Item.findById(itemMoveData.to.item?._id);
+    if (!itemToBeMovedTo && itemMoveData.to.item !== null) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item to be moved to wasn't found.");
+      return false;
+    }
 
-        if (itemMoveData.to.source !== itemMoveData.from.source) {
-          this.socketMessaging.sendErrorMessageToCharacter(
+    if (itemMoveData.to.source !== itemMoveData.from.source) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, you can't move items between different sources."
+      );
+      return false;
+    }
+
+    const source = itemMoveData.from.source;
+
+    try {
+      switch (source) {
+        case "Inventory":
+          await this.moveItemInInventory(
+            Object.assign({}, itemMoveData.from, { item: itemToBeMoved }),
+            itemMoveData.to,
             character,
-            "Sorry, you can't move items between different sources."
+            itemMoveData.from.containerId,
+            itemMoveData.quantity
           );
-          return false;
-        }
 
-        const source = itemMoveData.from.source;
+          const inventoryContainer = (await ItemContainer.findById(
+            itemMoveData.from.containerId
+          )) as unknown as IItemContainer;
 
-        try {
-          switch (source) {
-            case "Inventory":
-              await this.moveItemInInventory(
-                Object.assign({}, itemMoveData.from, { item: itemToBeMoved }),
-                itemMoveData.to,
-                character,
-                itemMoveData.from.containerId,
-                itemMoveData.quantity
-              );
+          const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+            inventory: inventoryContainer as any,
+            openEquipmentSetOnUpdate: false,
+            openInventoryOnUpdate: false,
+          };
 
-              const inventoryContainer = (await ItemContainer.findById(
-                itemMoveData.from.containerId
-              )) as unknown as IItemContainer;
+          this.sendRefreshItemsEvent(payloadUpdate, character);
 
-              const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-                inventory: inventoryContainer as any,
-                openEquipmentSetOnUpdate: false,
-                openInventoryOnUpdate: false,
-              };
-
-              this.sendRefreshItemsEvent(payloadUpdate, character);
-
-              break;
-          }
-
-          await clearCacheForKey(`${character._id}-inventory`);
-
-          return true;
-        } catch (err) {
-          this.socketMessaging.sendErrorMessageToCharacter(character);
-
-          console.log(err);
-          return false;
-        }
+          break;
       }
-    );
+
+      await clearCacheForKey(`${character._id}-inventory`);
+
+      return true;
+    } catch (err) {
+      this.socketMessaging.sendErrorMessageToCharacter(character);
+
+      console.log(err);
+      return false;
+    }
   }
 
   private async moveItemInInventory(
@@ -205,7 +199,7 @@ export class ItemDragAndDrop {
     quantity?: number
   ): Promise<boolean> {
     if (!to.item && !totalMove) {
-      const blueprint = itemsBlueprintIndex[from.item.key];
+      const blueprint = await blueprintManager.getBlueprint<IItem>("items", from.item.key as AvailableBlueprints);
       if (!blueprint) {
         return false;
       }

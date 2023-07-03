@@ -6,10 +6,11 @@ import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager } from "@providers/inversify/container";
 import {
   AccessoriesBlueprint,
   ArmorsBlueprint,
+  AvailableBlueprints,
   AxesBlueprint,
   BootsBlueprint,
   ContainersBlueprint,
@@ -111,7 +112,8 @@ export class CharacterRepository extends CRUD {
     ownerId: string,
     extraProps?: Partial<IItem>
   ): Promise<IItem> {
-    const blueprintData = itemsBlueprintIndex[blueprintKey];
+    const blueprintData = await blueprintManager.getBlueprint<IItem>("items", blueprintKey as AvailableBlueprints);
+
     const item = new Item({
       ...blueprintData,
       owner: ownerId,

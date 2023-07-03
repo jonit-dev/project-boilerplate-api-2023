@@ -7,7 +7,6 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
-  PotionsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
@@ -72,10 +71,7 @@ export const npcMudGolem: Partial<INPC> = {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: StaffsBlueprint.FireWand,
       chance: 10,

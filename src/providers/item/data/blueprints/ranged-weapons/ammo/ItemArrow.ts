@@ -10,9 +10,9 @@ export const itemArrow: IEquippableRangedAmmoBlueprint = {
   name: "Arrow",
   description: "An iron head arrow.",
   attack: 8,
-  weight: 0.025,
+  weight: 0.01,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 1,
   canSell: false,
 };

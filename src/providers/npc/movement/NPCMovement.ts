@@ -1,3 +1,4 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { appEnv } from "@providers/config/env";
@@ -148,6 +149,7 @@ export class NPCMovement {
 
   public async getShortestPathNextPosition(
     npc: INPC,
+    target: ICharacter | null,
     startGridX: number,
     startGridY: number,
     endGridX: number,
@@ -156,9 +158,24 @@ export class NPCMovement {
     try {
       let npcPath;
       if (appEnv.general.IS_UNIT_TEST) {
-        npcPath = await this.pathfinder.findShortestPath(npc, npc.scene, startGridX, startGridY, endGridX, endGridY);
+        npcPath = await this.pathfinder.findShortestPath(
+          npc,
+          target,
+          npc.scene,
+          startGridX,
+          startGridY,
+          endGridX,
+          endGridY
+        );
       } else {
-        const job = await this.pathfindingQueue.addPathfindingJob(npc, startGridX, startGridY, endGridX, endGridY);
+        const job = await this.pathfindingQueue.addPathfindingJob(
+          npc,
+          target,
+          startGridX,
+          startGridY,
+          endGridX,
+          endGridY
+        );
         npcPath = await this.pathfinderPoller(job.id!);
       }
 

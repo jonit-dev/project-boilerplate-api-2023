@@ -13,7 +13,7 @@ export const itemEmeraldArrow: IEquippableRangedAmmoBlueprint = {
   attack: 23,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 8,
   entityEffects: [EntityEffectBlueprint.Burning],
   entityEffectChance: 80,

@@ -8,7 +8,6 @@ import {
   FoodsBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -67,10 +66,7 @@ export const npcStoneGolem: Partial<INPC> = {
       itemBlueprintKey: ArmorsBlueprint.FalconsArmor,
       chance: 1,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: BootsBlueprint.SilverBoots,
       chance: 5,
@@ -92,7 +88,7 @@ export const npcStoneGolem: Partial<INPC> = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.ObsidiumOre,
       chance: 30,
-      quantityRange: [10, 25],
+      quantityRange: [6, 8],
     },
     {
       itemBlueprintKey: ShieldsBlueprint.SilverShield,
@@ -103,11 +99,7 @@ export const npcStoneGolem: Partial<INPC> = {
       chance: 50,
       quantityRange: [5, 15],
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
-      chance: 30,
-      quantityRange: [1, 10],
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Rock,
       chance: 30,

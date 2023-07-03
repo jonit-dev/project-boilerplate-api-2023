@@ -1,5 +1,6 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
+import { InMemoryRepository } from "@providers/database/InMemoryRepository";
 import { Locker } from "@providers/locks/Locker";
 import { MathHelper } from "@providers/math/MathHelper";
 import { GRID_WIDTH } from "@rpg-engine/shared";
@@ -17,7 +18,8 @@ export class NPCSpawn {
     private npcTarget: NPCTarget,
     private npcWarn: NPCWarn,
     private npcGiantForm: NPCGiantForm,
-    private locker: Locker
+    private locker: Locker,
+    private inMemoryHashTable: InMemoryRepository
   ) {}
 
   public calculateSpawnTime(strengthLevel: number): Date {
@@ -54,6 +56,8 @@ export class NPCSpawn {
     await this.locker.unlock(`npc-death-${npc._id}`);
     await this.locker.unlock(`npc-body-generation-${npc._id}`);
     await this.locker.unlock(`npc-${npc._id}-release-xp`);
+
+    await this.inMemoryHashTable.delete("npc-force-pathfinding-calculation", npc._id);
 
     await this.npcGiantForm.resetNPCToNormalForm(npc);
     await this.npcGiantForm.randomlyTransformNPCIntoGiantForm(npc);

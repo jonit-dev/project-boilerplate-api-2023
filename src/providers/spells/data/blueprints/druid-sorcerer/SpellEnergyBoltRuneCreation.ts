@@ -12,9 +12,9 @@ export const spellEnergyBoltRuneCreation: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar kiran oorja",
-  manaCost: 100,
-  minLevelRequired: 4,
-  minMagicLevelRequired: 3,
+  manaCost: 450,
+  minLevelRequired: 6,
+  minMagicLevelRequired: 8,
   cooldown: 5,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Druid, CharacterClass.Sorcerer],

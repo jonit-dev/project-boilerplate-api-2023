@@ -1,14 +1,5 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
-import { entityEffectCorruption } from "@providers/entityEffects/data/blueprints/entityEffectCorruption";
-import { container } from "@providers/inversify/container";
-import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
-import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
 import {
   AnimationEffectKeys,
-  BasicAttribute,
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
@@ -16,6 +7,7 @@ import {
   RangeTypes,
 } from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemCorruptionRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.CorruptionRune,
@@ -36,24 +28,5 @@ export const itemCorruptionRune: IRuneItemBlueprint = {
   minMagicLevelRequired: 10,
   animationKey: AnimationEffectKeys.HitCorruption,
   projectileAnimationKey: AnimationEffectKeys.Dark,
-  usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
-    const entityEffectUse = container.get(EntityEffectUse);
-
-    const points = await calculateItemUseEffectPoints(MagicsBlueprint.CorruptionRune, caster);
-
-    const spellCalculator = container.get(SpellCalculator);
-
-    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
-      min: 3,
-      max: 5,
-    });
-
-    await entityEffectUse.applyEntityEffects(target, caster, entityEffectCorruption);
-
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
-
-    return points;
-  },
-  usableEffectDescription: "Deals corruption damage to the target. Damage is based on your magic level.",
+  usableEffectKey: UsableEffectsBlueprint.CorruptionRuneUsableEffect,
 };

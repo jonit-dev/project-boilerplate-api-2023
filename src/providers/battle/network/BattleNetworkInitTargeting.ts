@@ -7,6 +7,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { Time } from "@providers/time/Time";
 import {
   BattleSocketEvents,
   GRID_WIDTH,
@@ -17,10 +18,8 @@ import {
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
+import { random } from "lodash";
 import { BattleCharacterAttack } from "../BattleCharacterAttack/BattleCharacterAttack";
-import { BattleCycle } from "../BattleCycle";
-import { BattleTargeting } from "../BattleTargeting";
-import { BattleNetworkStopTargeting } from "./BattleNetworkStopTargetting";
 
 interface ITargetValidation {
   isValid: boolean;
@@ -34,11 +33,10 @@ export class BattleNetworkInitTargeting {
     private socketMessaging: SocketMessaging,
     private movementHelper: MovementHelper,
     private battleCharacterManager: BattleCharacterAttack,
-    private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private mapNonPVPZone: MapNonPVPZone,
     private specialEffect: SpecialEffect,
-    private battleTargeting: BattleTargeting,
-    private locker: Locker
+    private locker: Locker,
+    private time: Time
   ) {}
 
   public onBattleInitTargeting(channel: SocketChannel): void {
@@ -46,21 +44,14 @@ export class BattleNetworkInitTargeting {
       channel,
       BattleSocketEvents.InitTargeting,
       async (data: IBattleInitTargeting, character: ICharacter) => {
-        const hasBattleTarget = await this.locker.isLocked(`character-${character._id}-battle-targeting`);
+        await this.time.waitForMilliseconds(random(1, 50));
 
-        if (hasBattleTarget) {
-          this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-            character.channelId!,
-            BattleSocketEvents.CancelTargeting,
-            {
-              targetId: data.targetId,
-              type: data.type,
-            }
-          );
-          await this.locker.unlock(`character-${character._id}-battle-targeting`);
+        const hasLocked = await this.locker.lock(`character-${character._id}-battle-targeting`);
+
+        // if it fails to lock thats because the character is already targeting, so lets clear it.
+        if (!hasLocked) {
           return;
         }
-        await this.locker.lock(`character-${character._id}-battle-targeting`);
 
         try {
           let target: INPC | ICharacter | null = null;
@@ -105,22 +96,15 @@ export class BattleNetworkInitTargeting {
                 reason: isValidTarget.reason,
               }
             );
-          } else {
-            const battleCycle = BattleCycle.battleCycles.has(character._id);
-
-            const hasTargetId = character?.target?.id?.toString();
-
-            // prevents double targeting
-            if (battleCycle || hasTargetId) {
-              await this.battleTargeting.cancelTargeting(character);
-              await this.battleNetworkStopTargeting.stopTargeting(character);
-            }
-
-            await this.characterSetTargeting(character, target, data.type);
+            return;
           }
+
+          await this.characterSetTargeting(character, target, data.type);
+
           // validate if character actually can set this target
         } catch (error) {
           console.error(error);
+          await this.locker.unlock(`character-${character._id}-battle-targeting`);
         }
       }
     );
@@ -131,6 +115,11 @@ export class BattleNetworkInitTargeting {
     target: ICharacter | INPC,
     targetType: EntityType
   ): Promise<void> {
+    if (character.target?.id?.toString() === target?._id?.toString()) {
+      // avoid setting target again
+      return;
+    }
+
     await Character.updateOne(
       { _id: character._id },
       {

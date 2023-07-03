@@ -10,7 +10,7 @@ export const itemIronArrow: IEquippableRangedAmmoBlueprint = {
   name: "Iron Arrow",
   description: "Description",
   weight: 0.06,
-  maxStackSize: 100,
+  maxStackSize: 999,
   allowedEquipSlotType: [ItemSlotType.Accessory],
   basePrice: 3,
   attack: 12,

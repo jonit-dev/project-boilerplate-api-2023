@@ -19,10 +19,10 @@ export const spellStunTarget: Partial<ISpell> = {
   description: "A spell designed for a warrior to stun a target in battle.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "talas tamb-eth",
-  manaCost: 100,
+  manaCost: 60,
   minLevelRequired: 4,
   minMagicLevelRequired: 8,
-  cooldown: 120,
+  cooldown: 40,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Rooted,
   projectileAnimationKey: AnimationEffectKeys.Energy,
@@ -35,8 +35,8 @@ export const spellStunTarget: Partial<ISpell> = {
     const effect = container.get(SpecialEffect);
 
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 5,
-      max: 10,
+      min: 10,
+      max: 20,
     });
 
     await effect.stun(target, timeout);

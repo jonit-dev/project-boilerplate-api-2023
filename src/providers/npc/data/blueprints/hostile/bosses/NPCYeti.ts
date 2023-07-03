@@ -13,7 +13,6 @@ import {
   HammersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
@@ -82,10 +81,7 @@ export const npcYeti: Partial<INPC> = {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 80,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 50,
-    },
+
     {
       itemBlueprintKey: StaffsBlueprint.MoonsStaff,
       chance: 30,

@@ -4,9 +4,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
@@ -19,92 +18,91 @@ export class BattleCharacterAttack {
   constructor(
     private battleAttackTarget: BattleAttackTarget,
     private battleCharacterAttackValidation: BattleCharacterAttackValidation,
-    private socketMessaging: SocketMessaging,
-    private newRelic: NewRelic,
+
     private battleTargeting: BattleTargeting,
-    private battleNetworkStopTargeting: BattleNetworkStopTargeting
+    private battleNetworkStopTargeting: BattleNetworkStopTargeting,
+    private characterValidation: CharacterValidation,
+    private battleCycle: BattleCycle
   ) {}
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
-    new BattleCycle(
-      character.id,
-      async () => {
-        await this.newRelic.trackTransaction(
-          NewRelicTransactionCategory.Operation,
-          "CharacterBattleCycle",
-          async () => {
-            const updatedCharacter = (await Character.findOne({ _id: character._id }).lean({
-              virtuals: true,
-              defaults: true,
-            })) as ICharacter;
+    if (!character || !target) {
+      return;
+    }
 
-            if (!updatedCharacter) {
-              throw new Error("Failed to get updated character for attacking target.");
-            }
+    await this.battleCycle.init(character, target._id, character.attackIntervalSpeed, async () => {
+      await this.execCharacterBattleCycleLoop(character, target);
+    });
+  }
 
-            const hasNoTarget = !updatedCharacter.target?.id?.toString();
-            const hasDifferentTarget = updatedCharacter.target?.id?.toString() !== target._id.toString();
+  @TrackNewRelicTransaction()
+  private async execCharacterBattleCycleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
+    const updatedCharacter = (await Character.findOne({ _id: character._id }).lean({
+      virtuals: true,
+      defaults: true,
+    })) as ICharacter;
 
-            if (hasNoTarget || hasDifferentTarget) {
-              await this.battleTargeting.cancelTargeting(updatedCharacter);
-              await this.battleNetworkStopTargeting.stopTargeting(updatedCharacter);
-              return;
-            }
+    if (!updatedCharacter) {
+      throw new Error("Failed to get updated character for attacking target.");
+    }
 
-            const characterSkills = (await Skill.findOne({ owner: character._id })
-              .lean({
-                virtuals: true,
-                defaults: true,
-              })
-              .cacheQuery({
-                cacheKey: `${character._id}-skills`,
-                ttl: 86400,
-              })) as ISkill;
+    const hasBasicValidation = this.characterValidation.hasBasicValidation(updatedCharacter);
 
-            updatedCharacter.skills = characterSkills;
+    if (!hasBasicValidation) {
+      await this.battleTargeting.cancelTargeting(updatedCharacter);
+      await this.battleNetworkStopTargeting.stopTargeting(updatedCharacter);
+      return;
+    }
 
-            let updatedTarget;
+    const characterSkills = (await Skill.findOne({ owner: character._id })
+      .lean({
+        virtuals: true,
+        defaults: true,
+      })
+      .cacheQuery({
+        cacheKey: `${character._id}-skills`,
+        ttl: 86400,
+      })) as ISkill;
 
-            if (target.type === "NPC") {
-              updatedTarget = await NPC.findOne({ _id: target._id }).lean({
-                virtuals: true,
-                defaults: true,
-              });
+    updatedCharacter.skills = characterSkills;
 
-              const updatedNPCSkills = await Skill.findOne({ owner: target._id })
-                .lean({
-                  virtuals: true,
-                  defaults: true,
-                })
-                .cacheQuery({
-                  cacheKey: `${target._id}-skills`,
-                });
+    let updatedTarget;
 
-              updatedTarget.skills = updatedNPCSkills;
-            }
-            if (target.type === "Character") {
-              updatedTarget = await Character.findOne({ _id: target._id }).lean({
-                virtuals: true,
-                defaults: true,
-              });
+    if (target.type === "NPC") {
+      updatedTarget = await NPC.findOne({ _id: target._id }).lean({
+        virtuals: true,
+        defaults: true,
+      });
 
-              const updatedCharacterSkills = await Skill.findOne({ owner: target._id }).cacheQuery({
-                cacheKey: `${target._id}-skills`,
-              });
+      const updatedNPCSkills = await Skill.findOne({ owner: target._id })
+        .lean({
+          virtuals: true,
+          defaults: true,
+        })
+        .cacheQuery({
+          cacheKey: `${target._id}-skills`,
+        });
 
-              updatedTarget.skills = updatedCharacterSkills;
-            }
+      updatedTarget.skills = updatedNPCSkills;
+    }
+    if (target.type === "Character") {
+      updatedTarget = await Character.findOne({ _id: target._id }).lean({
+        virtuals: true,
+        defaults: true,
+      });
 
-            if (!updatedCharacter || !updatedTarget) {
-              throw new Error("Failed to get updated required elements for attacking target.");
-            }
+      const updatedCharacterSkills = await Skill.findOne({ owner: target._id }).cacheQuery({
+        cacheKey: `${target._id}-skills`,
+      });
 
-            await this.attackTarget(updatedCharacter, updatedTarget);
-          }
-        );
-      },
-      character.attackIntervalSpeed
-    );
+      updatedTarget.skills = updatedCharacterSkills;
+    }
+
+    if (!updatedCharacter || !updatedTarget) {
+      throw new Error("Failed to get updated required elements for attacking target.");
+    }
+
+    await this.attackTarget(updatedCharacter, updatedTarget);
   }
 
   public async attackTarget(character: ICharacter, target: ICharacter | INPC): Promise<boolean> {

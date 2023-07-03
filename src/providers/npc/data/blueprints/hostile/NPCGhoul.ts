@@ -7,7 +7,6 @@ import {
   GlovesBlueprint,
   LegsBlueprint,
   MacesBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -51,10 +50,7 @@ export const npcGhoul = {
       itemBlueprintKey: CraftingResourcesBlueprint.RedSapphire,
       chance: 20,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 20,
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Bandage,
       chance: 20,
@@ -65,10 +61,7 @@ export const npcGhoul = {
       chance: 50,
       quantityRange: [10, 15],
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.ManaPotion,
-      chance: 10,
-    },
+
     {
       itemBlueprintKey: DaggersBlueprint.RustedDagger,
       chance: 10,

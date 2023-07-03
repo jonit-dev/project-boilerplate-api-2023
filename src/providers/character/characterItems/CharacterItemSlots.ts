@@ -1,15 +1,16 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
-import { ItemCleanup } from "@providers/item/ItemCleanup";
+import { ItemDropCleanup } from "@providers/item/ItemDropCleanup";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterItemSlots)
 export class CharacterItemSlots {
-  constructor(private socketMessaging: SocketMessaging, private itemCleanup: ItemCleanup) {}
+  constructor(private socketMessaging: SocketMessaging, private itemCleanup: ItemDropCleanup) {}
 
   public async getTotalQty(targetContainer: IItemContainer, itemKey: string, itemRarity: string): Promise<number> {
     const allItemsSameKey = await this.getAllItemsFromKey(targetContainer, itemKey);
@@ -60,6 +61,7 @@ export class CharacterItemSlots {
     return items;
   }
 
+  @TrackNewRelicTransaction()
   public async updateItemOnSlot(
     slotIndex: number,
     targetContainer: IItemContainer,
@@ -133,6 +135,7 @@ export class CharacterItemSlots {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async findItemOnSlots(targetContainer: IItemContainer, itemId: string): Promise<IItem | undefined> {
     try {
       const container = (await ItemContainer.findById(targetContainer._id)) as unknown as IItemContainer;
@@ -157,6 +160,7 @@ export class CharacterItemSlots {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async deleteItemOnSlot(targetContainer: IItemContainer, itemId: string): Promise<boolean> {
     for (let i = 0; i < targetContainer.slotQty; i++) {
       const slotItem = targetContainer.slots?.[i] as unknown as IItem;
@@ -185,6 +189,7 @@ export class CharacterItemSlots {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async getAvailableQuantityOnSlotToStack(
     targetContainerId: string,
     itemKeyToBeAdded: string,
@@ -215,27 +220,28 @@ export class CharacterItemSlots {
     return 0;
   }
 
-  public async hasAvailableSlot(targetContainerId: string, itemToBeAdded: IItem): Promise<boolean> {
+  @TrackNewRelicTransaction()
+  public async hasAvailableSlot(
+    targetContainerId: string,
+    itemToBeAdded: IItem,
+    checkForEmptyOnly: boolean = false
+  ): Promise<boolean> {
     const targetContainer = (await ItemContainer.findById(targetContainerId)) as unknown as IItemContainer;
 
     if (!targetContainer) {
       return false;
     }
 
-    if (!(itemToBeAdded.maxStackSize > 1)) {
-      return targetContainer.firstAvailableSlotId !== null;
-    } else {
-      // if item is stackable, check if there's an empty slot
-      const hasEmptySlot = targetContainer.firstAvailableSlotId !== null;
+    const hasEmptySlot = targetContainer.firstAvailableSlotId !== null;
 
-      if (hasEmptySlot) {
-        return true;
-      }
+    if (hasEmptySlot) {
+      return true;
+    }
 
-      // if there's no empty slot, check if there's a stackable item with the same type, and the stack is not full
+    if (!checkForEmptyOnly && itemToBeAdded.maxStackSize > 1) {
+      // if item is stackable, check if there's a stackable item with the same type, and the stack is not full
 
       // loop through all slots
-
       for (const slot of Object.values(targetContainer.slots)) {
         const slotItem = slot as unknown as IItem;
 
@@ -250,9 +256,10 @@ export class CharacterItemSlots {
       }
     }
 
-    return false;
+    return checkForEmptyOnly && Object.keys(targetContainer.slots).length < targetContainer.slotQty;
   }
 
+  @TrackNewRelicTransaction()
   public async getFirstAvailableSlotIndex(
     targetContainer: IItemContainer,
     itemToBeAdded?: IItem
@@ -283,6 +290,7 @@ export class CharacterItemSlots {
     return null;
   }
 
+  @TrackNewRelicTransaction()
   public async addItemOnSlot(
     targetContainer: IItemContainer,
     itemToBeAdded: IItem,
@@ -314,6 +322,7 @@ export class CharacterItemSlots {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async tryAddingItemOnFirstSlot(
     character: ICharacter,
     selectedItem: IItem,

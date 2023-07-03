@@ -7,7 +7,6 @@ import {
   CraftingResourcesBlueprint,
   DaggersBlueprint,
   FoodsBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -28,7 +27,7 @@ export const npcMinotaurArcher = {
   maxRangeAttack: RangeTypes.High,
   speed: MovementSpeed.Fast,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 350,
+  baseHealth: 500,
   healthRandomizerDice: Dice.D8,
   skillRandomizerDice: Dice.D8,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
@@ -58,10 +57,7 @@ export const npcMinotaurArcher = {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: RangedWeaponsBlueprint.RoyalCrossbow,
       chance: 10,
@@ -78,6 +74,16 @@ export const npcMinotaurArcher = {
 
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Jade,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Herb,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WaterBottle,
       chance: 20,
       quantityRange: [1, 5],
     },

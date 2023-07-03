@@ -11,7 +11,7 @@ describe("ItemOwnership.ts", () => {
   let backpackContainer: IItemContainer;
   let itemOwnership: ItemOwnership;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     itemOwnership = container.get<ItemOwnership>(ItemOwnership);
   });
 
@@ -74,7 +74,7 @@ describe("ItemOwnership.ts", () => {
     const updatedBackpack = await Item.findById(backpack._id);
     const updatedBackpackContainer = await ItemContainer.findById(backpackContainer._id);
 
-    expect(updatedBackpack?.owner).toBeNull();
-    expect(updatedBackpackContainer?.owner).toBeNull();
+    expect(updatedBackpack?.owner).toBeUndefined();
+    expect(updatedBackpackContainer?.owner).toBeUndefined();
   });
 });

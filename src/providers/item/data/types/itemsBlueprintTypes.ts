@@ -523,3 +523,30 @@ export enum HammersBlueprint {
   RoyalHammer = "royal-hammer",
   SilverHammer = "silver-hammer",
 }
+
+export type AvailableBlueprints =
+  | SwordsBlueprint
+  | HelmetsBlueprint
+  | EffectsBlueprint
+  | ContainersBlueprint
+  | BodiesBlueprint
+  | DaggersBlueprint
+  | ArmorsBlueprint
+  | AxesBlueprint
+  | BootsBlueprint
+  | FoodsBlueprint
+  | CraftingResourcesBlueprint
+  | ToolsBlueprint
+  | SpearsBlueprint
+  | PotionsBlueprint
+  | RangedWeaponsBlueprint
+  | GlovesBlueprint
+  | MacesBlueprint
+  | MagicsBlueprint
+  | BooksBlueprint
+  | OthersBlueprint
+  | StaffsBlueprint
+  | ShieldsBlueprint
+  | LegsBlueprint
+  | AccessoriesBlueprint
+  | HammersBlueprint;

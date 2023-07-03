@@ -13,7 +13,6 @@ import {
   HammersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  PotionsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
@@ -57,17 +56,12 @@ export const npcGiantSpider: Partial<INPC> = {
   loots: [
     {
       itemBlueprintKey: StaffsBlueprint.MoonsStaff,
-      chance: 30,
+      chance: 10,
     },
 
     {
       itemBlueprintKey: ContainersBlueprint.Backpack,
-      chance: 25,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GreenOre,
       chance: 10,
-      quantityRange: [1, 5],
     },
 
     {
@@ -76,7 +70,7 @@ export const npcGiantSpider: Partial<INPC> = {
     },
     {
       itemBlueprintKey: GlovesBlueprint.PlateGloves,
-      chance: 85,
+      chance: 20,
     },
 
     {
@@ -108,10 +102,7 @@ export const npcGiantSpider: Partial<INPC> = {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 80,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 50,
-    },
+
     {
       itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
       chance: 10,
@@ -126,11 +117,11 @@ export const npcGiantSpider: Partial<INPC> = {
     },
     {
       itemBlueprintKey: ArmorsBlueprint.MithrilArmor,
-      chance: 10,
+      chance: 3,
     },
     {
       itemBlueprintKey: LegsBlueprint.MithrilLegs,
-      chance: 10,
+      chance: 3,
     },
     {
       itemBlueprintKey: ArmorsBlueprint.JadeEmperorsArmor,

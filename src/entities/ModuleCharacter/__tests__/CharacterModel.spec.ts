@@ -3,8 +3,7 @@ import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { User } from "@entities/ModuleSystem/UserModel";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager, container, unitTestHelper } from "@providers/inversify/container";
 import { RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { Types } from "mongoose";
 import { Equipment, IEquipment } from "../EquipmentModel";
@@ -48,7 +47,7 @@ describe("CharacterModel.ts", () => {
     inventoryItemContainerId = inventory.itemContainer as unknown as string;
     characterEquipment = (await Equipment.findById(testCharacter.equipment).populate("inventory").exec()) as IEquipment;
 
-    const bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
+    const bow = await blueprintManager.getBlueprint<IItem>("items", RangedWeaponsBlueprint.Bow);
     bowItem = new Item({ ...bow });
     const res = await bowItem.save();
 

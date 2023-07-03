@@ -3,7 +3,8 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ITEM_USE_WITH_BASE_EFFECT, ITEM_USE_WITH_BASE_SCALING_FACTOR } from "@providers/constants/ItemConstants";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { blueprintManager } from "@providers/inversify/container";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 import { ISkill, IUseWithItem, IUseWithTile } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -43,7 +44,10 @@ export async function calculateItemUseEffectPoints(itemKey: string, caster: ICha
   const updatedCharacter = (await Character.findOne({ _id: caster._id }).populate("skills")) as unknown as ICharacter;
   const level = (updatedCharacter.skills as unknown as ISkill)?.magic?.level ?? 0;
 
-  const itemData = itemsBlueprintIndex[itemKey] as IMagicItemUseWithEntity;
+  const itemData = await blueprintManager.getBlueprint<IMagicItemUseWithEntity>(
+    "items",
+    itemKey as AvailableBlueprints
+  );
 
   if (!itemData.power) {
     throw new Error(`Item ${itemKey} does not have a power property`);

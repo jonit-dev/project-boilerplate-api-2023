@@ -1,37 +1,26 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { FOOD_CONSUMPTION_INTERVAL, MAX_FOOD_CONSUMPTION } from "@providers/constants/UsableItemsConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterFoodConsumption)
 export class CharacterFoodConsumption {
-  constructor(
-    private inMemoryHashTable: InMemoryHashTable,
-    private socketMessaging: SocketMessaging,
-    private newRelic: NewRelic
-  ) {}
+  constructor(private inMemoryHashTable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async tryConsumingFood(character: ICharacter): Promise<boolean> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "CharacterFoodConsumption.tryConsumingFood",
+    const canEat = await this.isCharacterFull(character._id);
 
-      async () => {
-        const canEat = await this.isCharacterFull(character._id);
+    if (!canEat) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you're full.");
+      return false;
+    }
 
-        if (!canEat) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you're full.");
-          return false;
-        }
+    await this.consumeFood(character._id);
 
-        await this.consumeFood(character._id);
-
-        return true;
-      }
-    );
+    return true;
   }
 
   public async clearAllFoodConsumption(): Promise<void> {

@@ -4,6 +4,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
@@ -23,7 +24,8 @@ export class WarriorPassiveHabilities {
     private inMemoryHashTable: InMemoryHashTable,
     private characterMonitor: CharacterMonitor,
     private traitGetter: TraitGetter,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private spellCalculator: SpellCalculator
   ) {}
 
   public async warriorAutoRegenHealthHandler(character: ICharacter): Promise<void> {
@@ -53,7 +55,17 @@ export class WarriorPassiveHabilities {
           cacheKey: `${character?._id}-skills`,
         })) as unknown as ISkill;
       const strengthLvl = await this.traitGetter.getSkillLevelWithBuffs(charSkills as ISkill, BasicAttribute.Strength);
-      const interval = Math.min(Math.max(20000 - strengthLvl * 500, 1000), 20000);
+
+      const interval = await this.spellCalculator.calculateTimeoutBasedOnSkillLevel(
+        character,
+        BasicAttribute.Strength,
+        {
+          min: 5000,
+          max: 20000,
+          skillAssociation: "reverse",
+        }
+      );
+
       const healthRegenAmount = Math.max(Math.floor(strengthLvl / 3), 4);
 
       if (health < maxHealth) {

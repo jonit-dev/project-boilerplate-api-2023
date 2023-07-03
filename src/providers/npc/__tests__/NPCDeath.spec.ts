@@ -347,9 +347,6 @@ describe("NPCDeath.ts", () => {
   });
 
   it("should update NPC data after death", async () => {
-    // @ts-ignore
-    const updateNPCSpy = jest.spyOn(npcDeath, "updateNPCAfterDeath");
-
     const poisonEntityEffect = entityEffectsBlueprintsIndex[EntityEffectBlueprint.Poison];
 
     testNPC.appliedEntityEffects = [poisonEntityEffect];
@@ -357,9 +354,6 @@ describe("NPCDeath.ts", () => {
     await testNPC.save();
 
     await npcDeath.handleNPCDeath(testNPC);
-
-    // @ts-ignore
-    expect(updateNPCSpy).toHaveBeenCalledWith(testNPC);
 
     const updatedNPC = await NPC.findById(testNPC.id);
 

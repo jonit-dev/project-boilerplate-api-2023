@@ -13,6 +13,7 @@ import { ItemContainer } from "./ItemContainerModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
+
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 const itemSchema = createLeanSchema(
@@ -98,15 +99,13 @@ const itemSchema = createLeanSchema(
 
     canUseOnNonPVPZone: Type.boolean({ required: true, default: false }),
 
-    isBeingPickedUp: Type.boolean({ required: true, default: false }), // lock mechanism to avoid item duplication
-
-    isBeingEquipped: Type.boolean({ required: true, default: false }), // lock mechanism to avoid item equip duplication
-
     isEquipped: Type.boolean({ required: true, default: false }),
 
     isTraining: Type.boolean({ required: true, default: false }), // For training items which gives a max damage of 1
 
     isDeadBodyLootable: Type.boolean({ required: false }),
+
+    isBeingPickedUp: Type.boolean({ required: false }),
 
     usableEffectDescription: Type.string({ required: false }),
 

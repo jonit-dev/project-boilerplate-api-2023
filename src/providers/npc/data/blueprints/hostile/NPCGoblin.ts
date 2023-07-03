@@ -8,7 +8,6 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -102,10 +101,7 @@ export const npcGoblin = {
       itemBlueprintKey: BootsBlueprint.Sandals,
       chance: 20,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.LightLifePotion,
-      chance: 10,
-    },
+
     {
       itemBlueprintKey: RangedWeaponsBlueprint.Stone,
       chance: 30,

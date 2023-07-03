@@ -53,7 +53,9 @@ export class NPCMovementMoveTowards {
     // first step is setting a target
     // for this, get all characters nearby and set the target to the closest one
 
-    const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;
+    const targetCharacter = (await Character.findById(npc.targetCharacter)
+      .lean()
+      .select("_id x y scene health isOnline isBanned target")) as ICharacter;
 
     if (!targetCharacter) {
       // no target character
@@ -61,7 +63,7 @@ export class NPCMovementMoveTowards {
       await this.npcTarget.tryToSetTarget(npc);
 
       // if not target is set and we're out of X and Y position, just move back
-      await this.moveBackToOriginalPosIfNoTarget(npc);
+      await this.moveBackToOriginalPosIfNoTarget(npc, targetCharacter);
     }
 
     if (targetCharacter) {
@@ -118,7 +120,7 @@ export class NPCMovementMoveTowards {
           if (isUnderOriginalPositionRange) {
             // if character is on the same scene as npc
             if (npc.scene === targetCharacter.scene) {
-              await this.moveTowardsPosition(npc, targetCharacter.x, targetCharacter.y);
+              await this.moveTowardsPosition(npc, targetCharacter, targetCharacter.x, targetCharacter.y);
             }
           } else {
             npc.pathOrientation = NPCPathOrientation.Backward;
@@ -126,7 +128,7 @@ export class NPCMovementMoveTowards {
           }
           break;
         case NPCPathOrientation.Backward:
-          await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
+          await this.moveTowardsPosition(npc, targetCharacter, npc.initialX, npc.initialY);
 
           break;
       }
@@ -141,13 +143,13 @@ export class NPCMovementMoveTowards {
     }
   }
 
-  private async moveBackToOriginalPosIfNoTarget(npc: INPC): Promise<void> {
+  private async moveBackToOriginalPosIfNoTarget(npc: INPC, target: ICharacter): Promise<void> {
     if (
       !npc.targetCharacter &&
       !this.reachedInitialPosition(npc) &&
       npc.pathOrientation === NPCPathOrientation.Backward
     ) {
-      await this.moveTowardsPosition(npc, npc.initialX, npc.initialY);
+      await this.moveTowardsPosition(npc, target, npc.initialX, npc.initialY);
     }
   }
 
@@ -250,7 +252,7 @@ export class NPCMovementMoveTowards {
       new NPCBattleCycle(
         npc.id,
         async () => {
-          await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "NpcBattleCycle", async () => {
+          await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NpcBattleCycle", async () => {
             const result = await Promise.all([
               NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
               Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true }),
@@ -347,10 +349,11 @@ export class NPCMovementMoveTowards {
     return false;
   }
 
-  private async moveTowardsPosition(npc: INPC, x: number, y: number): Promise<void> {
+  private async moveTowardsPosition(npc: INPC, target: ICharacter, x: number, y: number): Promise<void> {
     try {
       const shortestPath = await this.npcMovement.getShortestPathNextPosition(
         npc,
+        target,
         ToGridX(npc.x),
         ToGridY(npc.y),
         ToGridX(x),

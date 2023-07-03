@@ -103,12 +103,15 @@ export class CharacterNetworkCreate {
 
         await this.itemCleaner.clearMissingReferences(character);
 
+        await this.locker.unlock(`character-changing-scene-${character._id}`);
+        await this.locker.unlock(`character-death-${character.id}`);
+
         // refresh battle
         await this.locker.unlock(`character-${character._id}-battle-targeting`);
         await this.battleNetworkStopTargeting.stopTargeting(character);
         await this.battleTargeting.cancelTargeting(character);
 
-        await this.characterBuffValidation.removeDuplicatedBuffsForSameItem(character);
+        await this.characterBuffValidation.removeDuplicatedBuffs(character);
 
         const map = character.scene;
 

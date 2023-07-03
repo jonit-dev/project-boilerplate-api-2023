@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
 import { ItemView } from "../ItemView";
@@ -8,6 +9,7 @@ import { ItemView } from "../ItemView";
 export class ItemPickupFromMap {
   constructor(private itemView: ItemView, private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async pickupFromMapContainer(itemToBePicked: IItem, character: ICharacter): Promise<boolean> {
     // If an item has a x, y and scene, it means its coming from a map pickup. So we should destroy its representation and warn other characters nearby.
     const itemRemovedFromMap = await this.itemView.removeItemFromMap(itemToBePicked);

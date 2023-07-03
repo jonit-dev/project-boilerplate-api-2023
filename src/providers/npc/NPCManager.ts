@@ -168,7 +168,7 @@ export class NPCManager {
         let endGridX = npc.fixedPath.endGridX as unknown as number;
         let endGridY = npc.fixedPath.endGridY as unknown as number;
 
-        const npcSeedData = this.npcLoader.loadNPCSeedData();
+        const npcSeedData = await this.npcLoader.loadNPCSeedData();
 
         const npcData = npcSeedData.get(npc.key);
 

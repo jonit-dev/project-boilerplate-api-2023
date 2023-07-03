@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { Locker } from "@providers/locks/Locker";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IUIShowMessage, MapLayers, ToGridX, ToGridY, UISocketEvents } from "@rpg-engine/shared";
@@ -15,7 +16,8 @@ export class CharacterMovementValidation {
     private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
     private characterBan: CharacterBan,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private locker: Locker
   ) {}
 
   public async isValid(character: ICharacter, newX: number, newY: number, isMoving: boolean): Promise<boolean> {
@@ -29,6 +31,13 @@ export class CharacterMovementValidation {
       return false;
     }
 
+    const isLocked = await this.locker.hasLock(`character-changing-scene-${character._id}`);
+
+    if (isLocked) {
+      console.log(`🚫 ${character.name} is trying to move while changing the scene`);
+      return false;
+    }
+
     if (await this.specialEffect.isStun(character)) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "Sorry, you can't move because you're stunned",
@@ -39,6 +48,13 @@ export class CharacterMovementValidation {
 
     if (!this.movementHelper.isSnappedToGrid(newX, newY)) {
       console.log(`🚫 ${character.name} lost snapping to grid!`);
+      return false;
+    }
+
+    const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, newX, newY, 11);
+
+    if (!isUnderRange) {
+      console.log(`🚫 ${character.name} is trying to move too far away!`);
       return false;
     }
 

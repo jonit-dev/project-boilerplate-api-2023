@@ -1,13 +1,22 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInventory";
 import { ItemMap } from "@providers/item/ItemMap";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
 import { CharacterInventory } from "../CharacterInventory";
 import { CharacterItemSlots } from "./CharacterItemSlots";
 import { CharacterItemStack } from "./CharacterItemStack";
+
+interface IAddItemToContainerOptions {
+  shouldAddOwnership?: boolean;
+  isInventoryItem?: boolean;
+  dropOnMapIfFull?: boolean;
+}
 
 @provide(CharacterItemContainer)
 export class CharacterItemContainer {
@@ -17,7 +26,9 @@ export class CharacterItemContainer {
     private characterItemSlots: CharacterItemSlots,
     private equipmentEquipInventory: EquipmentEquipInventory,
     private itemMap: ItemMap,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private itemOwnership: ItemOwnership,
+    private locker: Locker
   ) {}
 
   public async removeItemFromContainer(
@@ -64,93 +75,117 @@ export class CharacterItemContainer {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   public async addItemToContainer(
     item: IItem,
     character: ICharacter,
     toContainerId: string,
-    isInventoryItem: boolean = false,
-    dropOnMapIfFull: boolean = false
+    options?: IAddItemToContainerOptions
   ): Promise<boolean> {
-    const itemToBeAdded = item;
+    try {
+      const hasLock = await this.locker.lock(`item-${item._id}-add-item-to-container`);
 
-    if (!itemToBeAdded) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The item to be added was not found.");
-      return false;
-    }
-
-    if (isInventoryItem) {
-      const equipped = await this.equipmentEquipInventory.equipInventory(character, itemToBeAdded);
-
-      if (!equipped) {
+      if (!hasLock) {
         return false;
       }
 
-      return true;
-    }
+      const { shouldAddOwnership, isInventoryItem = false, dropOnMapIfFull = false } = options || {};
 
-    const targetContainer = await ItemContainer.findOne({ _id: toContainerId });
+      const itemToBeAdded = item;
 
-    if (!targetContainer) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The target container was not found.");
-      return false;
-    }
-
-    if (targetContainer) {
-      let isNewItem = true;
-
-      // Item Type is valid to add to a container?
-      const isItemTypeValid = targetContainer.allowedItemTypes?.filter((entry) => {
-        return entry === itemToBeAdded?.type;
-      });
-      if (!isItemTypeValid) {
-        this.socketMessaging.sendErrorMessageToCharacter(
-          character,
-          "Oops! The item type is not valid for this container."
-        );
+      if (!itemToBeAdded) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The item to be added was not found.");
         return false;
       }
 
-      // Inventory is empty, slot checking not needed
-      if (targetContainer.isEmpty) isNewItem = true;
+      const targetContainer = await ItemContainer.findOne({ _id: toContainerId });
 
-      await this.itemMap.clearItemCoordinates(itemToBeAdded, targetContainer);
+      if (!targetContainer) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The target container was not found.");
+        return false;
+      }
 
-      if (itemToBeAdded.maxStackSize > 1) {
-        await targetContainer.unlockField("slots");
-        const wasStacked = await this.characterItemStack.tryAddingItemToStack(
-          character,
-          targetContainer,
-          itemToBeAdded
-        );
+      const tryToAddItemToContainer = async (): Promise<boolean> => {
+        if (isInventoryItem) {
+          const equipped = await this.equipmentEquipInventory.equipInventory(character, itemToBeAdded);
 
-        if (wasStacked || wasStacked === undefined) {
-          //! wasStacked can be undefined if there was an error, on this case we just return true to avoid creating a new item. (duplicate stack bug)
+          if (!equipped) {
+            return false;
+          }
+
           return true;
-        } else {
-          isNewItem = true;
         }
+
+        if (targetContainer) {
+          let isNewItem = true;
+
+          // Item Type is valid to add to a container?
+          const isItemTypeValid = targetContainer.allowedItemTypes?.filter((entry) => {
+            return entry === itemToBeAdded?.type;
+          });
+          if (!isItemTypeValid) {
+            this.socketMessaging.sendErrorMessageToCharacter(
+              character,
+              "Oops! The item type is not valid for this container."
+            );
+            return false;
+          }
+
+          // Inventory is empty, slot checking not needed
+          if (targetContainer.isEmpty) isNewItem = true;
+
+          await this.itemMap.clearItemCoordinates(itemToBeAdded, targetContainer as IItemContainer);
+
+          if (itemToBeAdded.maxStackSize > 1) {
+            const wasStacked = await this.characterItemStack.tryAddingItemToStack(
+              character,
+              targetContainer as IItemContainer,
+              itemToBeAdded
+            );
+
+            if (wasStacked || wasStacked === undefined) {
+              //! wasStacked can be undefined if there was an error, on this case we just return true to avoid creating a new item. (duplicate stack bug)
+              return true;
+            } else {
+              isNewItem = true;
+            }
+          }
+
+          // Check's done, need to create new item on char inventory
+          if (isNewItem) {
+            const result = await this.characterItemSlots.tryAddingItemOnFirstSlot(
+              character,
+              itemToBeAdded,
+              targetContainer as IItemContainer,
+              dropOnMapIfFull
+            );
+
+            if (!result) {
+              return false;
+            }
+          }
+
+          return true;
+        }
+
+        return false;
+      };
+
+      const result = await tryToAddItemToContainer();
+
+      if (result && shouldAddOwnership) {
+        await this.itemOwnership.addItemOwnership(itemToBeAdded, character);
       }
 
-      // Check's done, need to create new item on char inventory
-      if (isNewItem) {
-        await targetContainer.unlockField("slots");
-        const result = await this.characterItemSlots.tryAddingItemOnFirstSlot(
-          character,
-          itemToBeAdded,
-          targetContainer,
-          dropOnMapIfFull
-        );
+      return result;
+    } catch (error) {
+      console.error(error);
+      await this.locker.unlock(`item-${item._id}-add-item-to-container`);
 
-        if (!result) {
-          return false;
-        }
-      }
-      await targetContainer.unlockField("slots");
-
-      return true;
+      return false;
+    } finally {
+      await this.locker.unlock(`item-${item._id}-add-item-to-container`);
     }
-
-    return false;
   }
 
   public async getItemContainer(character: ICharacter): Promise<IItemContainer | null> {

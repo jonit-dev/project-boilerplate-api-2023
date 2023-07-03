@@ -19,10 +19,10 @@ export const spellSilence: Partial<ISpell> = {
   description: "A spell that prevents the target from casting spells for a short period.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "vocem inhibeo",
-  manaCost: 60,
-  minLevelRequired: 5,
-  minMagicLevelRequired: 7,
-  cooldown: 15,
+  manaCost: 300,
+  minLevelRequired: 15,
+  minMagicLevelRequired: 17,
+  cooldown: 120,
   targetHitAnimationKey: AnimationEffectKeys.Miss,
   projectileAnimationKey: AnimationEffectKeys.Blue,
   castingAnimationKey: AnimationEffectKeys.MagicShield,
@@ -34,8 +34,8 @@ export const spellSilence: Partial<ISpell> = {
     const spellCalculator = container.get(SpellCalculator);
 
     const timeoutInSecs = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 15,
-      max: 40,
+      min: 5,
+      max: 10,
     });
 
     await silence.silenceCharacter(character, target, timeoutInSecs);

@@ -19,10 +19,10 @@ export const spellDivineProtection: Partial<ISpell> = {
   description: "A Shield boosts magic resistance by 30%, duration varies with magic level.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "divinum praesidium",
-  manaCost: 40,
-  minLevelRequired: 5,
-  minMagicLevelRequired: 5,
-  cooldown: 30,
+  manaCost: 60,
+  minLevelRequired: 8,
+  minMagicLevelRequired: 8,
+  cooldown: 60,
   castingAnimationKey: AnimationEffectKeys.MagicShield,
   attribute: BasicAttribute.MagicResistance,
   characterClass: [CharacterClass.Druid],
@@ -33,12 +33,12 @@ export const spellDivineProtection: Partial<ISpell> = {
 
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 30,
-      max: 180,
+      max: 60,
     });
 
     const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 10,
-      max: 35,
+      max: 20,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {

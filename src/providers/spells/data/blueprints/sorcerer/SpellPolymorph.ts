@@ -24,10 +24,10 @@ export const spellPolymorph: Partial<ISpell> = {
 
   castingType: SpellCastingType.RangedCasting,
   magicWords: "iquar ansr rattus",
-  manaCost: 60,
+  manaCost: 120,
   minLevelRequired: 8,
   minMagicLevelRequired: 5,
-  cooldown: 10,
+  cooldown: 120,
   targetHitAnimationKey: AnimationEffectKeys.HitBlue,
   castingAnimationKey: AnimationEffectKeys.ManaHeal,
   projectileAnimationKey: AnimationEffectKeys.Dark,
@@ -53,12 +53,12 @@ export const spellPolymorph: Partial<ISpell> = {
 
     const timeoutInSecs = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 15,
-      max: 60,
+      max: 30,
     });
 
     const debuffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      max: 20,
       min: 5,
+      max: 15,
     });
 
     await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {

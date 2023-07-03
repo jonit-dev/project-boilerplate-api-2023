@@ -13,7 +13,7 @@ export const itemShockArrow: IEquippableRangedAmmoBlueprint = {
   attack: 16,
   weight: 0.05,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 2,
   entityEffects: [EntityEffectBlueprint.Bleeding],
   entityEffectChance: 50,

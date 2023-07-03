@@ -1,13 +1,5 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
-
-import { container } from "@providers/inversify/container";
-import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import {
   AnimationEffectKeys,
-  BasicAttribute,
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
@@ -15,6 +7,7 @@ import {
   RangeTypes,
 } from "@rpg-engine/shared";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemDarkRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.DarkRune,
@@ -35,21 +28,5 @@ export const itemDarkRune: IRuneItemBlueprint = {
   minMagicLevelRequired: 8,
   animationKey: AnimationEffectKeys.HitDark,
   projectileAnimationKey: AnimationEffectKeys.Dark,
-  usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
-
-    const points = await calculateItemUseEffectPoints(MagicsBlueprint.DarkRune, caster);
-
-    const spellCalculator = container.get(SpellCalculator);
-
-    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
-      min: 2,
-      max: 4,
-    });
-
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
-
-    return points;
-  },
-  usableEffectDescription: "Deals dark damage to the target",
+  usableEffectKey: UsableEffectsBlueprint.DarkRuneUsableEffect,
 };

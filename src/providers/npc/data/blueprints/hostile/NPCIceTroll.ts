@@ -10,7 +10,6 @@ import {
   FoodsBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -48,17 +47,12 @@ export const npcIceTroll: Partial<INPC> = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 20,
-    },
-
-    {
       itemBlueprintKey: SwordsBlueprint.IceSword,
-      chance: 10,
+      chance: 5,
     },
     {
       itemBlueprintKey: AxesBlueprint.FrostDoubleAxe,
-      chance: 15,
+      chance: 5,
     },
     {
       itemBlueprintKey: AxesBlueprint.DwarvenWaraxe,
@@ -70,7 +64,7 @@ export const npcIceTroll: Partial<INPC> = {
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.FrostCrossbow,
-      chance: 20,
+      chance: 10,
     },
     {
       itemBlueprintKey: FoodsBlueprint.Fish,
@@ -89,10 +83,7 @@ export const npcIceTroll: Partial<INPC> = {
       itemBlueprintKey: SwordsBlueprint.Saber,
       chance: 10,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 50,
-    },
+
     {
       itemBlueprintKey: ArmorsBlueprint.BronzeArmor,
       chance: 10,
@@ -115,16 +106,7 @@ export const npcIceTroll: Partial<INPC> = {
       chance: 20,
       quantityRange: [1, 5],
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
-      chance: 20,
-      quantityRange: [1, 10],
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
-      chance: 20,
-      quantityRange: [1, 5],
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Skull,
       chance: 15,

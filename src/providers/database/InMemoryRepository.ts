@@ -19,14 +19,18 @@ export class InMemoryRepository {
 
     const savedResource = await this.read<T>(namespace, resource._id);
 
+    if (!savedResource) {
+      throw new Error("Resource was not saved");
+    }
+
     return savedResource;
   }
 
-  public async read<T>(namespace: string, resourceId: string): Promise<T> {
+  public async read<T>(namespace: string, resourceId: string): Promise<T | undefined> {
     const resource = await this.redisManager.client.get(`${namespace}:${resourceId}`);
 
     if (!resource) {
-      throw new Error(`Character with id ${resourceId} does not exist`);
+      return;
     }
 
     return JSON.parse(resource);
@@ -49,6 +53,10 @@ export class InMemoryRepository {
     await this.redisManager.client.set(`${namespace}:${resource._id}`, JSON.stringify(resource));
 
     const updatedResource = await this.read<T>(namespace, resource._id as string);
+
+    if (!updatedResource) {
+      throw new Error("Resource was not updated");
+    }
 
     return updatedResource;
   }

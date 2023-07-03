@@ -3,6 +3,7 @@ import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemSlots } from "./CharacterItemSlots";
 
@@ -15,6 +16,7 @@ export class CharacterItemStack {
   // 2: User already has stackable item on its container, and we reached the max stack size. Increase stack size to max, and create a new item with the difference.
   // 3: User doesn't have stackable item on its container. Create a new item.
 
+  @TrackNewRelicTransaction()
   public async tryAddingItemToStack(
     character: ICharacter,
     targetContainer: IItemContainer,

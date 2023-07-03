@@ -121,8 +121,8 @@ describe("CharacterTradingValidation.ts", () => {
     expect(testNPCTrader.traderItems!.length > 1).toBe(true);
   });
 
-  it("should thrown an error if trader is not a trader NPC", () => {
-    const isValid = characterTradingValidation.validateTransactionWithNPC(
+  it("should thrown an error if trader is not a trader NPC", async () => {
+    const isValid = await characterTradingValidation.validateTransactionWithNPC(
       testCharacter,
       nonTraderNPC,
       transactionItems
@@ -137,7 +137,7 @@ describe("CharacterTradingValidation.ts", () => {
     testNPCTrader.traderItems = [];
     await testNPCTrader.save();
 
-    const isValid = characterTradingValidation.validateTransactionWithNPC(
+    const isValid = await characterTradingValidation.validateTransactionWithNPC(
       testCharacter,
       testNPCTrader,
       transactionItems
@@ -153,7 +153,7 @@ describe("CharacterTradingValidation.ts", () => {
     testNPCTrader.y = GRID_HEIGHT * 10;
     await testNPCTrader.save();
 
-    const isValid = characterTradingValidation.validateTransactionWithNPC(
+    const isValid = await characterTradingValidation.validateTransactionWithNPC(
       testCharacter,
       testNPCTrader,
       transactionItems
@@ -164,7 +164,7 @@ describe("CharacterTradingValidation.ts", () => {
     expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(testCharacter, "You are too far away from the trader.");
   });
 
-  it("should fail if an invalid blueprint item is used", () => {
+  it("should fail if an invalid blueprint item is used", async () => {
     transactionItems = [
       {
         key: "invalid-blueprint-key",
@@ -172,7 +172,7 @@ describe("CharacterTradingValidation.ts", () => {
       },
     ];
 
-    const isValid = characterTradingValidation.validateTransactionWithNPC(
+    const isValid = await characterTradingValidation.validateTransactionWithNPC(
       testCharacter,
       testNPCTrader,
       transactionItems
@@ -186,7 +186,7 @@ describe("CharacterTradingValidation.ts", () => {
     );
   });
 
-  it("should throw an error if a transaction item has price or quantity <= 0", () => {
+  it("should throw an error if a transaction item has price or quantity <= 0", async () => {
     transactionItems = [
       {
         key: PotionsBlueprint.LightEndurancePotion,
@@ -194,7 +194,7 @@ describe("CharacterTradingValidation.ts", () => {
       },
     ];
 
-    const isValid = characterTradingValidation.validateTransactionWithNPC(
+    const isValid = await characterTradingValidation.validateTransactionWithNPC(
       testCharacter,
       testNPCTrader,
       transactionItems

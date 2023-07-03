@@ -33,7 +33,7 @@ describe("CharacterBuffValidation", () => {
     await characterBuffActivator.enablePermanentBuff(testCharacter, buff);
     await characterBuffActivator.enablePermanentBuff(testCharacter, buff);
 
-    await characterBuffValidation.removeDuplicatedBuffsForSameItem(testCharacter);
+    await characterBuffValidation.removeDuplicatedBuffs(testCharacter);
 
     const updatedBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 
@@ -55,7 +55,7 @@ describe("CharacterBuffValidation", () => {
 
     const originalBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 
-    await characterBuffValidation.removeDuplicatedBuffsForSameItem(testCharacter);
+    await characterBuffValidation.removeDuplicatedBuffs(testCharacter);
 
     const updatedBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 
@@ -68,7 +68,7 @@ describe("CharacterBuffValidation", () => {
 
       expect(updatedBuffs).toEqual([]);
 
-      await characterBuffValidation.removeDuplicatedBuffsForSameItem(testCharacter);
+      await characterBuffValidation.removeDuplicatedBuffs(testCharacter);
 
       const updatedBuffsAfter = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 
@@ -93,7 +93,7 @@ describe("CharacterBuffValidation", () => {
       await characterBuffActivator.enablePermanentBuff(testCharacter, weakBuff);
       await characterBuffActivator.enablePermanentBuff(testCharacter, strongBuff);
 
-      await characterBuffValidation.removeDuplicatedBuffsForSameItem(testCharacter);
+      await characterBuffValidation.removeDuplicatedBuffs(testCharacter);
 
       const updatedBuffs = await characterBuffTracker.getAllCharacterBuffs(testCharacter._id);
 

@@ -12,7 +12,7 @@ export const itemGoldenArrow: IEquippableRangedAmmoBlueprint = {
   attack: 28,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 3,
   canSell: false,
 };

@@ -1,5 +1,4 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { appEnv } from "@providers/config/env";
 import {
   BasicAttribute,
   CombatSkill,
@@ -114,11 +113,6 @@ export const getMinRequiredSkill = (item: IItem): BasicAttribute | CombatSkill =
 
 export const minItemLevelSkillRequirementsMiddleware = (data: IItem): IItem => {
   const item = data as IItem;
-
-  if (appEnv.general.IS_UNIT_TEST) {
-    // if its unit test, just skip this to avoid issues
-    return item;
-  }
 
   // if the item already has min requirements, just return what we set.
   // @ts-ignore

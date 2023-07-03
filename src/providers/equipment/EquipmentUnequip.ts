@@ -1,15 +1,17 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
+import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import { ItemSocketEvents, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { IEquipmentSet, ItemSocketEvents, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { clearCacheForKey } from "speedgoose";
 import { EquipmentSlots } from "./EquipmentSlots";
@@ -24,127 +26,153 @@ export class EquipmentUnequip {
     private characterItemSlots: CharacterItemSlots,
     private characterItemContainer: CharacterItemContainer,
     private inMemoryHashTable: InMemoryHashTable,
-    private newRelic: NewRelic
+
+    private itemOwnership: ItemOwnership,
+    private characterBuffTracker: CharacterBuffTracker,
+    private characterBuffActivator: CharacterBuffActivator
   ) {}
 
+  @TrackNewRelicTransaction()
   public async unequip(character: ICharacter, inventory: IItem, item: IItem): Promise<boolean> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "EquipmentUnequip.unequip",
-      async () => {
-        if (!inventory) {
-          this.socketMessaging.sendErrorMessageToCharacter(
-            character,
-            "Sorry! You cannot unequip an item without an inventory. Drop it, instead."
-          );
-          return false;
-        }
+    if (!inventory) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry! You cannot unequip an item without an inventory. Drop it, instead."
+      );
+      return false;
+    }
 
-        const inventoryContainerId = inventory?.itemContainer as unknown as string;
+    const inventoryContainerId = inventory?.itemContainer as unknown as string;
 
-        if (!inventoryContainerId) {
-          throw new Error("Inventory container id is not defined.");
-        }
+    if (!inventoryContainerId) {
+      throw new Error("Inventory container id is not defined.");
+    }
 
-        if (!character.equipment) {
-          this.socketMessaging.sendErrorMessageToCharacter(character);
-          return false;
-        }
+    if (!character.equipment) {
+      this.socketMessaging.sendErrorMessageToCharacter(character);
+      return false;
+    }
 
-        const canUnequip = await this.isUnequipValid(character, item, inventoryContainerId);
+    const canUnequip = await this.isUnequipValid(character, item, inventoryContainerId);
 
-        if (!canUnequip) {
-          return false;
-        }
+    if (!canUnequip) {
+      return false;
+    }
 
-        const preEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
-        const DECREASE_VALUE = 2;
-        const Accessory = await Item.findById(preEquipmentSlots.accessory);
-        if (item.type === ItemType.Weapon && Accessory?.subType === ItemSubType.Book) {
-          await Item.updateOne({ _id: item._id }, { $inc: { attack: -DECREASE_VALUE, defense: -DECREASE_VALUE } });
-        }
+    const bookValue = 2;
+    const Accessory = await Item.findById(equipmentSlots.accessory);
+    if (item.type === ItemType.Weapon && Accessory?.subType === ItemSubType.Book) {
+      await Item.updateOne({ _id: item._id }, { $inc: { attack: -bookValue, defense: -bookValue } });
+    }
 
-        const newItem = (await Item.findById(item._id)) || item;
+    const updatedItem = (await Item.findById(item._id)) || item;
 
-        //   add it to the inventory
+    const hasItemOnEquipment = await this.characterItems.hasItem(item._id, character, "equipment");
 
-        const addItemToInventory = await this.characterItemContainer.addItemToContainer(
-          newItem,
-          character,
-          inventoryContainerId
-        );
+    // if we don't have the item we're trying to unequip, just abort the operation
+    if (!hasItemOnEquipment) {
+      return false;
+    }
 
-        if (!addItemToInventory) {
-          return false;
-        }
+    const hasUnequipped = await this.performUnequipTransaction(character, updatedItem, inventoryContainerId);
 
-        const hasItemOnEquipment = await this.characterItems.hasItem(item._id, character, "equipment");
+    if (!hasUnequipped) {
+      return false;
+    }
 
-        if (hasItemOnEquipment) {
-          try {
-            await this.characterItems.deleteItemFromContainer(item._id, character, "equipment");
-          } catch (error) {
-            // if we couldn't remove the item from the equipment, we need to remove it from the inventory to avoid a duplicate item
-            await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
+    // send payload event to the client, informing about the change
 
-            console.error(error);
-            return false;
-          }
-        }
+    const inventoryContainer = await ItemContainer.findById(inventoryContainerId);
 
-        // send payload event to the client, informing about the change
+    this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.EquipmentAndInventoryUpdate, {
+      equipment: equipmentSlots,
+      inventory: inventoryContainer,
+    });
 
-        const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+    await Item.updateOne({ _id: item._id }, { isEquipped: false });
 
-        const inventoryContainer = await ItemContainer.findById(inventoryContainerId);
+    await this.handleBookEffect(item, equipmentSlots, bookValue);
 
-        this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.EquipmentAndInventoryUpdate, {
-          equipment: equipmentSlots,
-          inventory: inventoryContainer,
-        });
+    const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
 
-        await Item.updateOne({ _id: item._id }, { isEquipped: false });
+    const newInventoryContainer = await ItemContainer.findById(inventoryContainerId);
 
-        // When unequip remove data from redis
-        await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
-        await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
+    this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.EquipmentAndInventoryUpdate, {
+      equipment: newEquipmentSlots,
+      inventory: newInventoryContainer,
+    });
 
-        await clearCacheForKey(`${character._id}-inventory`);
-        await clearCacheForKey(`${character._id}-equipment`);
-        await clearCacheForKey(`characterBuffs_${character._id}`);
-        await clearCacheForKey(`${character._id}-skills`);
+    if (!item.owner) {
+      await this.itemOwnership.addItemOwnership(item, character);
+    }
 
-        // decrease attack and defense
-        if (item.subType === ItemSubType.Book) {
-          const leftHandItem = await Item.findById(equipmentSlots.leftHand);
-          const rightHandItem = await Item.findById(equipmentSlots.rightHand);
-          if (leftHandItem?.type === ItemType.Weapon) {
-            await Item.updateOne(
-              { _id: leftHandItem._id },
-              { $inc: { attack: -DECREASE_VALUE, defense: -DECREASE_VALUE } }
-            );
-          }
-          if (rightHandItem?.type === ItemType.Weapon) {
-            await Item.updateOne(
-              { _id: rightHandItem._id },
-              { $inc: { attack: -DECREASE_VALUE, defense: -DECREASE_VALUE } }
-            );
-          }
-        }
+    // if by any reason the item still have a buff, lets make sure its wiped out
 
-        const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+    const buffs = await this.characterBuffTracker.getBuffByItemId(character._id, item._id);
 
-        const newInventoryContainer = await ItemContainer.findById(inventoryContainerId);
+    for (const buff of buffs) {
+      await this.characterBuffActivator.disableBuff(character, buff._id!, buff.type, true);
+    }
 
-        this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.EquipmentAndInventoryUpdate, {
-          equipment: newEquipmentSlots,
-          inventory: newInventoryContainer,
-        });
+    await this.clearCache(character);
 
-        return true;
+    return true;
+  }
+
+  private async performUnequipTransaction(
+    character: ICharacter,
+    item: IItem,
+    inventoryContainerId: string
+  ): Promise<boolean> {
+    try {
+      //   add it to the inventory
+      const addItemToInventory = await this.characterItemContainer.addItemToContainer(
+        item,
+        character,
+        inventoryContainerId
+      );
+
+      if (!addItemToInventory) {
+        return false;
       }
-    );
+
+      await this.characterItems.deleteItemFromContainer(item._id, character, "equipment");
+    } catch (error) {
+      // if we couldn't remove the item from the equipment, we need to remove it from the inventory to avoid a duplicate item
+      await this.characterItems.deleteItemFromContainer(item._id, character, "inventory");
+
+      console.error(error);
+      return false;
+    }
+
+    return true;
+  }
+
+  private async clearCache(character: ICharacter): Promise<void> {
+    // When unequip remove data from redis
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
+
+    await clearCacheForKey(`${character._id}-inventory`);
+    await clearCacheForKey(`${character._id}-equipment`);
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
+  }
+
+  private async handleBookEffect(item: IItem, equipmentSlots: IEquipmentSet, bookValue: number): Promise<void> {
+    // decrease attack and defense
+    if (item.subType === ItemSubType.Book) {
+      const leftHandItem = await Item.findById(equipmentSlots.leftHand);
+      const rightHandItem = await Item.findById(equipmentSlots.rightHand);
+      if (leftHandItem?.type === ItemType.Weapon) {
+        await Item.updateOne({ _id: leftHandItem._id }, { $inc: { attack: -bookValue, defense: -bookValue } });
+      }
+      if (rightHandItem?.type === ItemType.Weapon) {
+        await Item.updateOne({ _id: rightHandItem._id }, { $inc: { attack: -bookValue, defense: -bookValue } });
+      }
+    }
   }
 
   private async isUnequipValid(character: ICharacter, item: IItem, inventoryContainerId: string): Promise<boolean> {

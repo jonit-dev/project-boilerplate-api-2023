@@ -5,16 +5,15 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { blueprintManager } from "@providers/inversify/container";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
@@ -25,6 +24,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUseCycle } from "./ItemUseCycle";
+import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
 @provide(ItemUse)
 export class ItemUse {
@@ -38,73 +38,65 @@ export class ItemUse {
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
     private characterInventory: CharacterInventory,
-    private characterFoodConsumption: CharacterFoodConsumption,
-    private newRelic: NewRelic
+    private characterFoodConsumption: CharacterFoodConsumption
   ) {}
 
+  @TrackNewRelicTransaction()
   public async performItemUse(itemUse: any, character: ICharacter): Promise<boolean> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "ItemUse.performItemUse",
-      async () => {
-        if (!this.characterValidation.hasBasicValidation(character)) {
-          return false;
-        }
+    if (!this.characterValidation.hasBasicValidation(character)) {
+      return false;
+    }
 
-        const isItemInCharacterInventory = await this.itemValidation.isItemInCharacterInventory(
-          character,
-          itemUse.itemId
-        );
-        if (!isItemInCharacterInventory) {
-          return false;
-        }
+    const isItemInCharacterInventory = await this.itemValidation.isItemInCharacterInventory(character, itemUse.itemId);
+    if (!isItemInCharacterInventory) {
+      return false;
+    }
 
-        const useItem = (await Item.findById(itemUse.itemId).lean({ virtuals: true, defaults: true })) as IItem;
+    const useItem = (await Item.findById(itemUse.itemId).lean({ virtuals: true, defaults: true })) as IItem;
 
-        if (!useItem) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
-          return false;
-        }
+    if (!useItem) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
+      return false;
+    }
 
-        const bluePrintItem = itemsBlueprintIndex[useItem.key];
-        if (!bluePrintItem || !bluePrintItem.usableEffect) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
-          return false;
-        }
+    const bluePrintItem = await blueprintManager.getBlueprint<IItem>("items", useItem.key as AvailableBlueprints);
 
-        const canApplyItemUsage = await this.canApplyItemUsage(bluePrintItem, character);
+    if (!bluePrintItem || !bluePrintItem.usableEffect) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you cannot use this item.");
+      return false;
+    }
 
-        if (!canApplyItemUsage) {
-          return false;
-        }
+    const canApplyItemUsage = await this.canApplyItemUsage(bluePrintItem, character);
 
-        this.applyItemUsage(bluePrintItem, character.id);
+    if (!canApplyItemUsage) {
+      return false;
+    }
 
-        await this.characterItemInventory.decrementItemFromInventoryByKey(useItem.key, character, 1);
+    this.applyItemUsage(bluePrintItem, character.id);
 
-        await this.characterWeight.updateCharacterWeight(character);
+    await this.characterItemInventory.decrementItemFromInventoryByKey(useItem.key, character, 1);
 
-        const updatedInventoryContainer = await this.getInventoryContainer(character);
+    await this.characterWeight.updateCharacterWeight(character);
 
-        const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-          inventory: {
-            _id: updatedInventoryContainer?._id,
-            parentItem: updatedInventoryContainer!.parentItem.toString(),
-            owner: updatedInventoryContainer?.owner?.toString() || character.name,
-            name: updatedInventoryContainer?.name,
-            slotQty: updatedInventoryContainer!.slotQty,
-            slots: updatedInventoryContainer?.slots,
-            allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
-            isEmpty: updatedInventoryContainer!.isEmpty,
-          },
-          openInventoryOnUpdate: false,
-        };
+    const updatedInventoryContainer = await this.getInventoryContainer(character);
 
-        this.updateInventoryCharacter(payloadUpdate, character);
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      inventory: {
+        _id: updatedInventoryContainer?._id,
+        parentItem: updatedInventoryContainer!.parentItem.toString(),
+        owner: updatedInventoryContainer?.owner?.toString() || character.name,
+        name: updatedInventoryContainer?.name,
+        slotQty: updatedInventoryContainer!.slotQty,
+        slots: updatedInventoryContainer?.slots,
+        allowedItemTypes: this.equipmentEquip.getAllowedItemTypes(),
+        isEmpty: updatedInventoryContainer!.isEmpty,
+      },
+      openInventoryOnUpdate: false,
+    };
 
-        return true;
-      }
-    );
+    this.updateInventoryCharacter(payloadUpdate, character);
+
+    return true;
   }
 
   private async canApplyItemUsage(bluePrintItem: Partial<IItem>, character: ICharacter): Promise<boolean> {
@@ -124,7 +116,7 @@ export class ItemUse {
       const character = await Character.findOne({ _id: characterId });
 
       if (character) {
-        bluePrintItem.usableEffect(character);
+        bluePrintItem.usableEffect?.(character);
         await character.save();
         await this.sendItemConsumptionEvent(character);
       }

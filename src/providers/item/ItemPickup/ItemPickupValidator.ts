@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
@@ -28,6 +29,7 @@ export class ItemPickupValidator {
     private equipmentEquip: EquipmentEquip
   ) {}
 
+  @TrackNewRelicTransaction()
   public async isItemPickupValid(itemPickupData: IItemPickup, character: ICharacter): Promise<boolean | IItem> {
     const item = (await Item.findById(itemPickupData.itemId)) as IItem;
 

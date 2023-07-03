@@ -32,8 +32,14 @@ export class SpellLearn {
     }
     const learned: string[] = [];
     spells.forEach((spell) => {
-      learned.push(spell.name + " (" + spell.magicWords + ")");
+      if (this.spellValidation.isAvailableForCharacterClass(spell, character)) {
+        learned.push(spell.name + " (" + spell.magicWords + ")");
+      }
     });
+
+    if (learned.length < 1) {
+      return;
+    }
 
     this.socketMessaging.sendErrorMessageToCharacter(
       character,

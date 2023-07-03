@@ -7,21 +7,36 @@ import { appEnv } from "@providers/config/env";
 import { ITEM_CLEANUP_THRESHOLD } from "@providers/constants/ItemConstants";
 import { NewRelicMetricCategory } from "@providers/types/NewRelicTypes";
 
-@provide(ItemCleanup)
-export class ItemCleanup {
+@provide(ItemDropCleanup)
+export class ItemDropCleanup {
   constructor(private newRelic: NewRelic) {}
 
   public tryCharacterDroppedItemsCleanup(character: ICharacter): void {
     if (appEnv.general.IS_UNIT_TEST) return;
 
     setTimeout(async () => {
-      const totalDroppedItems = await Item.countDocuments({ droppedBy: character._id });
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
+      const totalDroppedItems = await Item.countDocuments({
+        droppedBy: character._id,
+        updatedAt: { $gte: oneHourAgo },
+      });
 
       this.newRelic.trackMetric(NewRelicMetricCategory.Count, "Items/Dropped", totalDroppedItems);
 
       if (totalDroppedItems < ITEM_CLEANUP_THRESHOLD) return;
 
-      const lastDroppedItem = await Item.findOne({ droppedBy: character._id }).sort({ createdAt: 1 }).limit(1);
+      const lastDroppedItem = await Item.findOne({
+        droppedBy: character._id,
+        x: { $exists: true, $ne: null as any },
+        y: { $exists: true, $ne: null as any },
+        scene: { $exists: true, $ne: null as any },
+        owner: { $in: [null, undefined] },
+        isEquipped: { $ne: true },
+        itemContainer: { $exists: false },
+      })
+        .sort({ createdAt: 1 })
+        .limit(1);
 
       if (lastDroppedItem) {
         await lastDroppedItem.remove();

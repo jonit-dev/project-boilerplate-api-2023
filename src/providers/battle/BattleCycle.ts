@@ -1,35 +1,73 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { provideSingleton } from "@providers/inversify/provideSingleton";
+import { Locker } from "@providers/locks/Locker";
 
-type SetInterval = ReturnType<typeof setInterval>;
-
+@provideSingleton(BattleCycle)
 export class BattleCycle {
-  public static battleCycles: Map<string, BattleCycle> = new Map<string, BattleCycle>(); // create a map to store character intervals.
+  private intervals: Map<string, NodeJS.Timeout> = new Map();
 
-  public interval: SetInterval;
-  public id: string;
+  constructor(private characterValidation: CharacterValidation, private locker: Locker) {}
 
-  constructor(id: string, fn: Function, intervalSpeed: number) {
-    this.id = id;
+  public async init(
+    character: ICharacter,
+    targetId: string,
+    attackIntervalSpeed: number,
+    attackFn: () => Promise<void>
+  ): Promise<void> {
+    try {
+      await this.stop(character._id.toString());
 
-    this.interval = setInterval(() => {
-      fn();
-    }, intervalSpeed);
-
-    if (BattleCycle.battleCycles.has(this.id)) {
-      const battleCycle = BattleCycle.battleCycles.get(this.id);
-      if (battleCycle) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        battleCycle.clear();
+      if (this.intervals.has(character._id.toString())) {
+        return;
       }
-    } else {
-      BattleCycle.battleCycles.set(this.id, this);
+
+      const interval = setInterval(async () => {
+        const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
+
+        if (!hasBasicValidation) {
+          clearInterval(interval);
+          return;
+        }
+
+        // if original target (init) is not the same as the current target, stop the interval
+
+        const currentTargetId = await this.getCurrentTargetId(character._id.toString());
+
+        if (!currentTargetId) {
+          clearInterval(interval);
+          return;
+        }
+
+        if (currentTargetId?.toString() !== targetId.toString()) {
+          clearInterval(interval);
+          return;
+        }
+
+        await attackFn();
+      }, attackIntervalSpeed);
+
+      this.intervals.set(character._id.toString(), interval);
+    } catch (error) {
+      console.error(error);
     }
   }
 
-  public async clear(): Promise<void> {
-    clearInterval(this.interval);
-    BattleCycle.battleCycles.delete(this.id);
+  public stop(characterId: string): void {
+    const interval = this.intervals.get(characterId);
 
-    await Character.updateOne({ _id: this.id }, { $unset: { target: 1 } });
+    if (!interval) {
+      return;
+    }
+
+    clearInterval(interval);
+
+    this.intervals.delete(characterId);
+  }
+
+  private async getCurrentTargetId(characterId: string): Promise<string | undefined> {
+    const { target } = (await Character.findById(characterId).select("target").lean()) as ICharacter;
+
+    return target?.id.toString();
   }
 }

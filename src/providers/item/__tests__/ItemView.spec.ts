@@ -44,9 +44,9 @@ describe("ItemView.ts", () => {
 
     expect(spyWarnCharactersAboutItemRemovalInView).toHaveBeenCalled();
 
-    expect(item.x).toBe(null);
-    expect(item.y).toBe(null);
-    expect(item.scene).toBe(null);
+    expect(item.x).toBeUndefined();
+    expect(item.y).toBeUndefined();
+    expect(item.scene).toBeUndefined();
   });
 
   it("should get one item after calling the method getItemsInCharacterView", async () => {

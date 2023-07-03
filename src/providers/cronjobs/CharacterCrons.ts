@@ -18,17 +18,25 @@ export class CharacterCrons {
   ) {}
 
   public schedule(): void {
-    nodeCron.schedule("* * * * *", () => {
-      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "LogoutInactiveCharacters", async () => {
-        await this.logoutInactiveCharacters();
-      });
+    nodeCron.schedule("* * * * *", async () => {
+      await this.newRelic.trackTransaction(
+        NewRelicTransactionCategory.CronJob,
+        "LogoutInactiveCharacters",
+        async () => {
+          await this.logoutInactiveCharacters();
+        }
+      );
     });
 
     // check banned characters every day
-    nodeCron.schedule("0 0 * * *", () => {
-      this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "LogoutInactiveCharacters", async () => {
-        await this.unbanCharacters();
-      });
+    nodeCron.schedule("0 0 * * *", async () => {
+      await this.newRelic.trackTransaction(
+        NewRelicTransactionCategory.CronJob,
+        "LogoutInactiveCharacters",
+        async () => {
+          await this.unbanCharacters();
+        }
+      );
     });
   }
 

@@ -1,15 +1,14 @@
 import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { IItemContainer } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 
 @provide(OpenDepot)
 export class OpenDepot {
-  constructor(private newRelic: NewRelic) {}
+  constructor() {}
 
   /**
    * getContainer returns the depot container if exists. If it does not exist, creates a new one for the character
@@ -17,58 +16,53 @@ export class OpenDepot {
    * @param npcId of the NPC that has depot (hasDepot == true)
    * @returns the depot ItemContainer that corresponds to the character
    */
+  @TrackNewRelicTransaction()
   public async getContainer(characterId: string, npcId: string): Promise<IItemContainer> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "OpenDepot.getContainer",
-      async () => {
-        let itemContainer: IItemContainer;
+    let itemContainer: IItemContainer;
 
-        const npc = await NPC.findOne({
-          _id: Types.ObjectId(npcId),
-        }).lean();
+    const npc = await NPC.findOne({
+      _id: Types.ObjectId(npcId),
+    }).lean();
 
-        if (!npc) {
-          throw new Error("NPC not found");
+    if (!npc) {
+      throw new Error("NPC not found");
+    }
+
+    const depot = await Depot.findOne({
+      owner: Types.ObjectId(characterId),
+      key: npc.key,
+    }).populate("itemContainer");
+
+    if (depot) {
+      itemContainer = depot.itemContainer as unknown as IItemContainer;
+    } else {
+      // Depot does not exist, create new one
+      let newDepot = new Depot({
+        owner: Types.ObjectId(characterId),
+        key: npc.key,
+      });
+
+      newDepot = await newDepot.save();
+      let depotItemContainer = new ItemContainer({
+        parentItem: newDepot._id,
+        name: "Depot",
+        slotQty: 40,
+      });
+      depotItemContainer = await depotItemContainer.save();
+
+      await Depot.updateOne(
+        {
+          _id: newDepot._id,
+        },
+        {
+          $set: {
+            itemContainer: depotItemContainer._id,
+          },
         }
+      );
 
-        const depot = await Depot.findOne({
-          owner: Types.ObjectId(characterId),
-          key: npc.key,
-        }).populate("itemContainer");
-
-        if (depot) {
-          itemContainer = depot.itemContainer as unknown as IItemContainer;
-        } else {
-          // Depot does not exist, create new one
-          let newDepot = new Depot({
-            owner: Types.ObjectId(characterId),
-            key: npc.key,
-          });
-
-          newDepot = await newDepot.save();
-          let depotItemContainer = new ItemContainer({
-            parentItem: newDepot._id,
-            name: "Depot",
-            slotQty: 40,
-          });
-          depotItemContainer = await depotItemContainer.save();
-
-          await Depot.updateOne(
-            {
-              _id: newDepot._id,
-            },
-            {
-              $set: {
-                itemContainer: depotItemContainer._id,
-              },
-            }
-          );
-
-          itemContainer = depotItemContainer as unknown as IItemContainer;
-        }
-        return itemContainer;
-      }
-    );
+      itemContainer = depotItemContainer as unknown as IItemContainer;
+    }
+    return itemContainer;
   }
 }

@@ -1,9 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { GRID_HEIGHT, GRID_WIDTH, IViewElement, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -23,8 +22,7 @@ export class CharacterView {
   constructor(
     private socketTransmissionZone: SocketTransmissionZone,
     private mathHelper: MathHelper,
-    private inMemoryHashTable: InMemoryHashTable,
-    private newRelic: NewRelic
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public async addToCharacterView(
@@ -68,6 +66,7 @@ export class CharacterView {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async clearOutOfViewElements(
     characterId: string,
     characterX: number,
@@ -143,6 +142,7 @@ export class CharacterView {
     await this.inMemoryHashTable.delete(`character-view-${type}:${characterId}`, elementId);
   }
 
+  @TrackNewRelicTransaction()
   public async getCharactersAroundXYPosition(
     x: number,
     y: number,
@@ -162,6 +162,7 @@ export class CharacterView {
     return await this.getOtherElementsInView<ICharacter>(Character, x, y, scene, charFilter);
   }
 
+  @TrackNewRelicTransaction()
   public async getNearestCharactersFromXYPoint(
     x: number,
     y: number,
@@ -197,6 +198,7 @@ export class CharacterView {
     return minDistanceChar;
   }
 
+  @TrackNewRelicTransaction()
   public async getElementsInCharView<T>(
     // @ts-ignore
     Element: Model<T>,
@@ -215,6 +217,7 @@ export class CharacterView {
     });
   }
 
+  @TrackNewRelicTransaction()
   private async getOtherElementsInView<T>(
     Element: Model<any>,
     x: number,
@@ -222,43 +225,37 @@ export class CharacterView {
     scene: string,
     filter?: Record<string, any>
   ): Promise<T[]> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "CharacterView/getOtherElementsInView",
-      async () => {
-        const socketTransmissionZone = this.socketTransmissionZone.calculateSocketTransmissionZone(
-          x,
-          y,
-          GRID_WIDTH,
-          GRID_HEIGHT,
-          SOCKET_TRANSMISSION_ZONE_WIDTH,
-          SOCKET_TRANSMISSION_ZONE_WIDTH
-        );
-
-        // @ts-ignore
-        const otherCharactersInView = await Element.find({
-          $and: [
-            {
-              x: {
-                $gte: socketTransmissionZone.x,
-                $lte: socketTransmissionZone.width,
-              },
-            },
-            {
-              y: {
-                $gte: socketTransmissionZone.y,
-                $lte: socketTransmissionZone.height,
-              },
-            },
-            {
-              scene,
-              ...filter,
-            },
-          ],
-        }).lean({ virtuals: true, defaults: true }); //! Required until we have quadtrees
-
-        return otherCharactersInView as unknown as T[];
-      }
+    const socketTransmissionZone = this.socketTransmissionZone.calculateSocketTransmissionZone(
+      x,
+      y,
+      GRID_WIDTH,
+      GRID_HEIGHT,
+      SOCKET_TRANSMISSION_ZONE_WIDTH,
+      SOCKET_TRANSMISSION_ZONE_WIDTH
     );
+
+    // @ts-ignore
+    const otherCharactersInView = await Element.find({
+      $and: [
+        {
+          x: {
+            $gte: socketTransmissionZone.x,
+            $lte: socketTransmissionZone.width,
+          },
+        },
+        {
+          y: {
+            $gte: socketTransmissionZone.y,
+            $lte: socketTransmissionZone.height,
+          },
+        },
+        {
+          scene,
+          ...filter,
+        },
+      ],
+    }).lean({ virtuals: true, defaults: true }); //! Required until we have quadtrees
+
+    return otherCharactersInView as unknown as T[];
   }
 }

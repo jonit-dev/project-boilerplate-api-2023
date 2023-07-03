@@ -1,8 +1,6 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { container } from "@providers/inversify/container";
-import { ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { FoodsBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemSalmon: IConsumableItemBlueprint = {
   key: FoodsBlueprint.Salmon,
@@ -17,11 +15,5 @@ export const itemSalmon: IConsumableItemBlueprint = {
   maxStackSize: 100,
   basePrice: 7,
   canSell: false,
-
-  usableEffect: (character: ICharacter) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
-
-    itemUsableEffect.applyEatingEffect(character, 6);
-  },
-  usableEffectDescription: "Restores 6 HP and Mana 5 times",
+  usableEffectKey: UsableEffectsBlueprint.ModerateEatingEffect,
 };

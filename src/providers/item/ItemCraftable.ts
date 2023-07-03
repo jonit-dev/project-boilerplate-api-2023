@@ -1,12 +1,15 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
+import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { blueprintManager } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -27,6 +30,7 @@ import Shared, {
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
+import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
 @provide(ItemCraftable)
 export class ItemCraftable {
@@ -35,10 +39,12 @@ export class ItemCraftable {
     private characterItemContainer: CharacterItemContainer,
     private characterValidation: CharacterValidation,
     private characterItemInventory: CharacterItemInventory,
+    private characterItemSlots: CharacterItemSlots,
     private characterWeight: CharacterWeight,
     private animationEffect: AnimationEffect,
     private skillIncrease: SkillIncrease,
-    private traitGetter: TraitGetter
+    private traitGetter: TraitGetter,
+    private characterInventory: CharacterInventory
   ) {}
 
   public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
@@ -49,7 +55,7 @@ export class ItemCraftable {
     const recipes =
       itemSubType === "Suggested"
         ? await this.getRecipesWithAnyIngredientInInventory(character)
-        : this.getRecipes(itemSubType);
+        : await this.getRecipes(itemSubType);
 
     // Process each recipe to generate craftable items
     const craftableItemsPromises = recipes.map((recipe) => this.getCraftableItem(inventoryInfo, recipe, character));
@@ -69,7 +75,7 @@ export class ItemCraftable {
       return;
     }
 
-    const blueprint = itemsBlueprintIndex[itemToCraft.itemKey];
+    const blueprint = await blueprintManager.getBlueprint("items", itemToCraft.itemKey as AvailableBlueprints);
     const recipe = this.getAllRecipes()[itemToCraft.itemKey];
 
     if (!blueprint || !recipe) {
@@ -87,12 +93,46 @@ export class ItemCraftable {
       return;
     }
 
+    const inventory = await this.characterInventory.getInventory(character);
+
+    if (!inventory) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the inventory is not available.");
+      return;
+    }
+
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+
+    if (!inventoryContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the item container is not available.");
+      return;
+    }
+
+    const qty = this.getQty(recipe);
+
+    const itemToBeAdded = {
+      ...blueprint,
+      stackQty: qty,
+    };
+
     // Check if the character meets the minimum skill requirements for crafting
     if (!(await this.haveMinimumSkills(character, recipe))) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         "Sorry, you do not have the required skills ot craft this item."
       );
+      return;
+    }
+
+    // Check if the character has available slots
+
+    const hasAvailableSlots = await this.characterItemSlots.hasAvailableSlot(
+      inventoryContainer._id,
+      itemToBeAdded as IItem,
+      true
+    );
+
+    if (!hasAvailableSlots) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, no more available slots.");
       return;
     }
 
@@ -159,8 +199,8 @@ export class ItemCraftable {
   }
 
   private async createItems(recipe: IUseWithCraftingRecipe, character: ICharacter): Promise<void> {
-    const blueprint = itemsBlueprintIndex[recipe.outputKey];
-    let qty = random(recipe.outputQtyRange[0], recipe.outputQtyRange[1]);
+    const blueprint = await blueprintManager.getBlueprint<IItem>("items", recipe.outputKey as AvailableBlueprints);
+    let qty = this.getQty(recipe);
 
     do {
       const props: Partial<IItem> = {};
@@ -190,10 +230,10 @@ export class ItemCraftable {
     recipe: IUseWithCraftingRecipe,
     character: ICharacter
   ): Promise<ICraftableItem> {
-    const item = itemsBlueprintIndex[recipe.outputKey] as Shared.IItem;
+    const item = await blueprintManager.getBlueprint<Shared.IItem>("items", recipe.outputKey as AvailableBlueprints);
 
-    const ingredients: ICraftableItemIngredient[] = recipe.requiredItems.map(
-      this.getCraftableItemIngredient.bind(this)
+    const ingredients: ICraftableItemIngredient[] = await Promise.all(
+      recipe.requiredItems.map((item) => this.getCraftableItemIngredient(item))
     );
 
     const minCraftingRequirements = recipe.minCraftingRequirements;
@@ -267,8 +307,8 @@ export class ItemCraftable {
     return true;
   }
 
-  private getCraftableItemIngredient(item: IUseWithCraftingRecipeItem): ICraftableItemIngredient {
-    const blueprint = itemsBlueprintIndex[item.key];
+  private async getCraftableItemIngredient(item: IUseWithCraftingRecipeItem): Promise<ICraftableItemIngredient> {
+    const blueprint = await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
 
     return {
       key: item.key,
@@ -278,12 +318,14 @@ export class ItemCraftable {
     };
   }
 
-  private getRecipes(subType: string): IUseWithCraftingRecipe[] {
+  private async getRecipes(subType: string): Promise<IUseWithCraftingRecipe[]> {
     const availableRecipes: IUseWithCraftingRecipe[] = [];
     const recipes = this.getAllRecipes();
 
-    for (const itemKey in itemsBlueprintIndex) {
-      const item = itemsBlueprintIndex[itemKey];
+    const itemKeys = await blueprintManager.getAllBlueprintKeys("items");
+
+    for (const itemKey of itemKeys) {
+      const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
       if (item.subType === subType && recipes[item.key]) {
         availableRecipes.push(recipes[item.key]);
       }
@@ -298,8 +340,11 @@ export class ItemCraftable {
 
     const availableRecipes: IUseWithCraftingRecipe[] = [];
     const recipes = this.getAllRecipes();
-    for (const itemKey in itemsBlueprintIndex) {
-      const item = itemsBlueprintIndex[itemKey];
+
+    const itemKeys = await blueprintManager.getAllBlueprintKeys("items");
+
+    for (const itemKey of itemKeys) {
+      const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
       if (recipes[item.key]) {
         const recipe = recipes[item.key];
         if (recipe.requiredItems.some((ing) => inventoryInfo.get(ing.key) ?? ing.qty <= 0)) {
@@ -358,6 +403,11 @@ export class ItemCraftable {
     }
 
     return map;
+  }
+
+  private getQty(recipe: IUseWithCraftingRecipe): number {
+    const qty = random(recipe.outputQtyRange[0], recipe.outputQtyRange[1]);
+    return qty;
   }
 
   private async sendRefreshItemsEvent(character: ICharacter, itemSubType?: string): Promise<void> {

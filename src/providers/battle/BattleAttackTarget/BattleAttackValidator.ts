@@ -1,11 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EntityType, IItem, ItemSlotType, ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
@@ -16,51 +15,46 @@ export class BattleAttackValidator {
   constructor(
     private battleRangedAttack: BattleAttackRanged,
     private movementHelper: MovementHelper,
-    private newRelic: NewRelic,
+
     private characterInventory: CharacterInventory,
     private socketMessaging: SocketMessaging
   ) {}
 
+  @TrackNewRelicTransaction()
   public async validateAttack(
     attacker: ICharacter | INPC,
     target: ICharacter | INPC
   ): Promise<IRangedAttackParams | undefined> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "BattleAttackValidator.validateAttack",
-      async () => {
-        let rangedAttackParams: Partial<IRangedAttackParams> | undefined;
+    let rangedAttackParams: Partial<IRangedAttackParams> | undefined;
 
-        if (attacker.type === "NPC") {
-          const npc = attacker as INPC;
-          if (!npc.maxRangeAttack) {
-            throw new Error("NPC attempted ranged attack without specifying maxRangeAttack field");
-          }
-          rangedAttackParams = { maxRange: npc.maxRangeAttack };
-        } else {
-          const character = attacker as ICharacter;
-          rangedAttackParams = await this.getCharacterRangedAttackParams(character, target);
-          if (!rangedAttackParams) return;
-        }
-
-        if (!this.isAttackInRange(attacker, target, rangedAttackParams.maxRange!)) {
-          if (attacker.type === "Character") {
-            this.sendNotInRangeEvent(attacker as ICharacter, target);
-          }
-          return;
-        }
-
-        const solidInTrajectory = await this.battleRangedAttack.isSolidInRangedTrajectory(attacker, target);
-        if (solidInTrajectory) {
-          if (attacker.type === "Character") {
-            this.sendSolidInTrajectoryEvent(attacker as ICharacter, target);
-          }
-          return;
-        }
-
-        return rangedAttackParams as IRangedAttackParams;
+    if (attacker.type === "NPC") {
+      const npc = attacker as INPC;
+      if (!npc.maxRangeAttack) {
+        throw new Error("NPC attempted ranged attack without specifying maxRangeAttack field");
       }
-    );
+      rangedAttackParams = { maxRange: npc.maxRangeAttack };
+    } else {
+      const character = attacker as ICharacter;
+      rangedAttackParams = await this.getCharacterRangedAttackParams(character, target);
+      if (!rangedAttackParams) return;
+    }
+
+    if (!this.isAttackInRange(attacker, target, rangedAttackParams.maxRange!)) {
+      if (attacker.type === "Character") {
+        this.sendNotInRangeEvent(attacker as ICharacter, target);
+      }
+      return;
+    }
+
+    const solidInTrajectory = await this.battleRangedAttack.isSolidInRangedTrajectory(attacker, target);
+    if (solidInTrajectory) {
+      if (attacker.type === "Character") {
+        this.sendSolidInTrajectoryEvent(attacker as ICharacter, target);
+      }
+      return;
+    }
+
+    return rangedAttackParams as IRangedAttackParams;
   }
 
   private async getCharacterRangedAttackParams(

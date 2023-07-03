@@ -4,7 +4,7 @@ import {
   CLASS_BONUS_OR_PENALTIES,
   RACE_BONUS_OR_PENALTIES,
 } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
-import { container, redisManager } from "@providers/inversify/container";
+import { blueprintManager, container, redisManager } from "@providers/inversify/container";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
 import { NPC_CYCLES } from "@providers/npc/NPCCycle";
@@ -17,6 +17,18 @@ jest.mock("speedgoose", () => ({
   clearCacheForKey: jest.fn(() => Promise.resolve()),
   applySpeedGooseCacheLayer: jest.fn(),
   SpeedGooseCacheAutoCleaner: jest.fn(),
+}));
+
+jest.mock("@rpg-engine/shared", () => ({
+  ...jest.requireActual("@rpg-engine/shared"),
+  MagicPower: {
+    UltraLow: 5,
+    Low: 10,
+    Medium: 15,
+    High: 20,
+    UltraHigh: 25,
+    Fatal: 30,
+  },
 }));
 
 // @ts-ignore
@@ -66,6 +78,11 @@ jest.mock("@providers/constants/NPCConstants", () => ({
   NPC_TRADER_INTERACTION_DISTANCE: 2,
 }));
 
+jest.mock("@providers/constants/PVPConstants", () => ({
+  PVP_MIN_REQUIRED_LV: 8,
+  PVP_ROGUE_ATTACK_DAMAGE_INCREASE_MULTIPLIER: 0.1,
+}));
+
 jest.mock("mongoose-update-if-current", () => ({
   updateIfCurrentPlugin: jest.fn(), // mock the plugin because otherwise it will break many tests
 }));
@@ -84,6 +101,8 @@ beforeAll(async () => {
   await mongoose.connection.db.dropDatabase();
 
   await redisManager.connect();
+
+  await blueprintManager.loadAllBlueprints();
 });
 
 afterAll(async () => {

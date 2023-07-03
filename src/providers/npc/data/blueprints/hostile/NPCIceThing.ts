@@ -6,7 +6,6 @@ import {
   FoodsBlueprint,
   HelmetsBlueprint,
   OthersBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -66,10 +65,7 @@ export const npcIceThing = {
       itemBlueprintKey: SwordsBlueprint.IceSword,
       chance: 5,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.LightLifePotion,
-      chance: 10,
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Rope,
       chance: 30,

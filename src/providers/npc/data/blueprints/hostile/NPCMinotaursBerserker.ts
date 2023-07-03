@@ -9,7 +9,6 @@ import {
   GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
-  PotionsBlueprint,
   SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -29,7 +28,7 @@ export const npcMinotaurBerserker = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 400,
+  baseHealth: 650,
   healthRandomizerDice: Dice.D20,
   skillRandomizerDice: Dice.D8,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
@@ -59,10 +58,7 @@ export const npcMinotaurBerserker = {
       itemBlueprintKey: SwordsBlueprint.PoisonSword,
       chance: 20,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
+
     {
       itemBlueprintKey: DaggersBlueprint.CopperJitte,
       chance: 10,

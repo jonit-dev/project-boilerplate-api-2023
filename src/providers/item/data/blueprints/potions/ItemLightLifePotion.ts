@@ -1,9 +1,6 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { container } from "@providers/inversify/container";
-import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { IConsumableItemBlueprint, ItemSubType, ItemType } from "@rpg-engine/shared";
-import round from "lodash/round";
 import { PotionsBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemLightLifePotion: IConsumableItemBlueprint = {
   key: PotionsBlueprint.LightLifePotion,
@@ -18,12 +15,5 @@ export const itemLightLifePotion: IConsumableItemBlueprint = {
   basePrice: 10,
   maxStackSize: 100,
   canSell: false,
-  usableEffect: (character: ICharacter) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
-
-    const characterHealthPercentage = round(character.maxHealth * 0.1); // 10% of char max health
-
-    itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
-  },
-  usableEffectDescription: "Restores 10% of life",
+  usableEffectKey: UsableEffectsBlueprint.LightLifePotionUsableEffect,
 };

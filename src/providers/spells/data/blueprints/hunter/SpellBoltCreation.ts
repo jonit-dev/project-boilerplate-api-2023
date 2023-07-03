@@ -23,16 +23,25 @@ export const spellBoltCreation: Partial<ISpell> = {
   manaCost: 15,
   minLevelRequired: 7,
   minMagicLevelRequired: 3,
-  cooldown: 5,
+  cooldown: 15,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Hunter],
 
   usableEffect: async (character: ICharacter) => {
     const spellCalculator = container.get(SpellCalculator);
-    const createQty = await spellCalculator.getQuantityBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    let minMax = {
       max: 100,
       min: 1,
-    });
+    };
+
+    if (character.class === CharacterClass.Hunter) {
+      minMax = {
+        max: 200,
+        min: 10,
+      };
+    }
+
+    const createQty = await spellCalculator.getQuantityBasedOnSkillLevel(character, BasicAttribute.Magic, minMax);
 
     const spellItemCreation = container.get(SpellItemCreation);
 

@@ -1,10 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { IItemContainer, IItemPickup } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemPickupUpdater } from "./ItemPickupUpdater";
@@ -14,47 +13,35 @@ export class ItemPickupFromContainer {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterItemSlots: CharacterItemSlots,
-    private itemPickupUpdater: ItemPickupUpdater,
-    private newRelic: NewRelic
+    private itemPickupUpdater: ItemPickupUpdater
   ) {}
 
+  @TrackNewRelicTransaction()
   public async pickupFromContainer(
     itemPickupData: IItemPickup,
     itemToBePicked: IItem,
     character: ICharacter
   ): Promise<boolean> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "ItemPickupFromContainer.pickupFromContainer",
-      async () => {
-        const fromContainer = (await ItemContainer.findById(
-          itemPickupData.fromContainerId
-        )) as unknown as IItemContainer;
+    const fromContainer = (await ItemContainer.findById(itemPickupData.fromContainerId)) as unknown as IItemContainer;
 
-        if (!fromContainer) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the origin container was not found.");
-          return false;
-        }
+    if (!fromContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the origin container was not found.");
+      return false;
+    }
 
-        const removeFromOriginContainer = await this.removeFromOriginContainer(
-          character,
-          fromContainer,
-          itemToBePicked
-        );
+    const removeFromOriginContainer = await this.removeFromOriginContainer(character, fromContainer, itemToBePicked);
 
-        if (!removeFromOriginContainer) {
-          this.socketMessaging.sendErrorMessageToCharacter(
-            character,
-            "Sorry, failed to remove the item from the origin container."
-          );
-          return false;
-        }
+    if (!removeFromOriginContainer) {
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        "Sorry, failed to remove the item from the origin container."
+      );
+      return false;
+    }
 
-        await this.itemPickupUpdater.sendContainerRead(fromContainer, character);
+    await this.itemPickupUpdater.sendContainerRead(fromContainer, character);
 
-        return true;
-      }
-    );
+    return true;
   }
 
   private async removeFromOriginContainer(

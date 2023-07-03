@@ -1,23 +1,23 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Item } from "@entities/ModuleInventory/ItemModel";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { provide } from "inversify-binding-decorators";
-import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
-import { MarketplaceValidation } from "./MarketplaceValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IMarketplaceMoney, MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
+import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { blueprintManager } from "@providers/inversify/container";
+import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { MathHelper } from "@providers/math/MathHelper";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
   ItemSocketEvents,
   MarketplaceSocketEvents,
 } from "@rpg-engine/shared";
-import { IMarketplaceMoney, MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
-import { itemsBlueprintIndex } from "@providers/item/data";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { MathHelper } from "@providers/math/MathHelper";
-import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { provide } from "inversify-binding-decorators";
+import { MarketplaceValidation } from "./MarketplaceValidation";
 
 @provide(MarketplaceMoneyWithdraw)
 export class MarketplaceMoneyWithdraw {
@@ -39,13 +39,13 @@ export class MarketplaceMoneyWithdraw {
 
     const marketplaceMoney = await MarketplaceMoney.findOne({ owner: character._id });
     if (!marketplaceMoney || marketplaceMoney.money <= 0) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, `You don't have gold in the marketplace`);
+      this.socketMessaging.sendErrorMessageToCharacter(character, "You don't have gold in the marketplace");
       return false;
     }
 
     const added = await this.addGoldToInventory(character, marketplaceMoney);
     if (!added) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, `Could not add gold to inventory`);
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Could not add gold to inventory");
       return false;
     }
 
@@ -71,7 +71,7 @@ export class MarketplaceMoneyWithdraw {
   }
 
   private async addGoldToInventory(character: ICharacter, marketplaceMoney: IMarketplaceMoney): Promise<boolean> {
-    const blueprint = itemsBlueprintIndex[OthersBlueprint.GoldCoin];
+    const blueprint = await blueprintManager.getBlueprint<IItem>("items", OthersBlueprint.GoldCoin);
     const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainerId = inventory?.itemContainer as unknown as string;
 

@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { IEquippableMeleeTier3WeaponBlueprint } from "../../../types/TierBlueprintTypes";
 import { SwordsBlueprint } from "../../../types/itemsBlueprintTypes";
@@ -18,4 +19,6 @@ export const itemCorruptionSword: IEquippableMeleeTier3WeaponBlueprint = {
   tier: 3,
   rangeType: EntityAttackType.Melee,
   basePrice: 72,
+  entityEffects: [EntityEffectBlueprint.Corruption],
+  entityEffectChance: 70,
 };

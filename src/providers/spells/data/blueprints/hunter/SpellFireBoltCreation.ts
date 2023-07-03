@@ -23,10 +23,9 @@ export const spellFireBoltCreation: Partial<ISpell> = {
   manaCost: 25,
   minLevelRequired: 7,
   minMagicLevelRequired: 5,
-  cooldown: 5,
+  cooldown: 30,
   castingAnimationKey: AnimationEffectKeys.LevelUp,
   characterClass: [CharacterClass.Hunter],
-
   usableEffect: async (character: ICharacter) => {
     const spellCalculator = container.get(SpellCalculator);
     const createQty = await spellCalculator.getQuantityBasedOnSkillLevel(character, BasicAttribute.Magic, {

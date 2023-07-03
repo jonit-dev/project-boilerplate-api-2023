@@ -20,10 +20,10 @@ export const spellQuickFire: Partial<ISpell> = {
   description: "QuickFire spell unleash a flurry of attacks on their enemies.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "ieiunium iecit",
-  manaCost: 150,
+  manaCost: 120,
   minLevelRequired: 10,
   minMagicLevelRequired: 8,
-  cooldown: 20,
+  cooldown: 120,
   castingAnimationKey: AnimationEffectKeys.BlueWings,
   characterClass: [CharacterClass.Hunter],
   attribute: CharacterAttributes.AttackIntervalSpeed,
@@ -32,14 +32,14 @@ export const spellQuickFire: Partial<ISpell> = {
     const characterBuffActivator = container.get(CharacterBuffActivator);
     const spellCalculator = container.get(SpellCalculator);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Dexterity, {
+    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 20,
       max: 120,
     });
 
-    const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Dexterity, {
-      min: 10,
-      max: 30,
+    const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 20,
+      max: 35,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {

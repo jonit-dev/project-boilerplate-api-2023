@@ -3,9 +3,9 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
+import { blueprintManager } from "@providers/inversify/container";
 import { ItemRarity } from "@providers/item/ItemRarity";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { AvailableBlueprints, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemType } from "@rpg-engine/shared";
@@ -77,7 +77,8 @@ export class CharacterItemInventory {
       return false;
     }
 
-    const blueprint = itemsBlueprintIndex[itemKey];
+    const blueprint = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
+
     if (!blueprint) {
       return false;
     }
@@ -413,7 +414,7 @@ export class CharacterItemInventory {
     const equipment = new Equipment();
     equipment.owner = character._id;
 
-    const blueprintData = itemsBlueprintIndex[ContainersBlueprint.Backpack];
+    const blueprintData = await blueprintManager.getBlueprint<IItem>("items", ContainersBlueprint.Backpack);
 
     const backpack = new Item({
       ...blueprintData,

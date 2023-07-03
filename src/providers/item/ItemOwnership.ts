@@ -9,6 +9,11 @@ export class ItemOwnership {
   constructor(private characterItemSlot: CharacterItemSlots) {}
 
   public async addItemOwnership(item: IItem, character: ICharacter): Promise<void> {
+    // if our item owner is our character, just skip. Nothing to do here.
+    if (item.owner?.toString() === character._id.toString()) {
+      return;
+    }
+
     await Item.updateOne({ _id: item._id }, { owner: character._id });
 
     if (item?.itemContainer) {
@@ -35,10 +40,9 @@ export class ItemOwnership {
         _id: item._id,
       },
       {
-        owner: undefined,
+        $unset: { owner: "" },
       }
     );
-
     if (item?.itemContainer) {
       const itemContainer = await ItemContainer.findById(item.itemContainer);
 
@@ -51,7 +55,7 @@ export class ItemOwnership {
         {
           _id: item.itemContainer,
         },
-        { owner: undefined }
+        { $unset: { owner: "" } }
       );
 
       // this removes from all nested items

@@ -11,13 +11,12 @@ import {
 } from "@providers/constants/LootConstants";
 
 import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
+import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemRarity } from "@providers/item/ItemRarity";
-import { itemsBlueprintIndex } from "@providers/item/data/index";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { Time } from "@providers/time/Time";
 import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
@@ -39,33 +38,28 @@ export class NPCDeath {
     private npcFreezer: NPCFreezer,
     private npcSpawn: NPCSpawn,
     private npcExperience: NPCExperience,
-    private time: Time,
     private locker: Locker
   ) {}
 
   public async handleNPCDeath(npc: INPC): Promise<void> {
-    // first thing, lets freeze the NPC so it clears all the interval and it stops moving.
     await this.npcFreezer.freezeNPC(npc);
 
-    const isLocked = await this.locker.isLocked(`npc-death-${npc._id}`);
+    const hasLocked = await this.locker.lock(`npc-death-${npc._id}`);
 
-    if (isLocked) {
+    if (!hasLocked) {
       return;
     }
-
-    await this.locker.lock(`npc-death-${npc._id}`);
-
-    await this.time.waitForMilliseconds(random(1, 100));
 
     try {
       console.log("NPCDeath for npc: ", npc.key);
 
       if (npc.health !== 0) {
-        // if by any reason the char is not dead, make sure it is.
-        await NPC.updateOne({ _id: npc._id }, { $set: { health: 0 } });
+        const setHealthToZero = NPC.updateOne({ _id: npc._id }, { $set: { health: 0 } });
         npc.health = 0;
         npc.isAlive = false;
-        await npc.save();
+        const saveNPC = npc.save();
+
+        await Promise.all([setHealthToZero, saveNPC]);
       }
 
       const npcBody = await this.generateNPCBody(npc);
@@ -74,22 +68,34 @@ export class NPCDeath {
         return;
       }
 
-      await this.notifyCharactersOfNPCDeath(npc);
+      const notifyCharactersOfNPCDeath = this.notifyCharactersOfNPCDeath(npc);
 
       const npcWithSkills = await this.getNPCWithSkills(npc);
 
-      const goldLoot = this.getGoldLoot(npcWithSkills) ?? [];
+      const goldLoot = this.getGoldLoot(npcWithSkills);
 
-      const npcLoots = (npc.loots as unknown as INPCLoot[]) ?? [];
+      const npcLoots = npc.loots as unknown as INPCLoot[];
 
-      await this.addLootToNPCBody(npcBody, [...npcLoots, goldLoot ?? []], npc.isGiantForm);
+      const addLootToNPCBody = this.addLootToNPCBody(npcBody, [...npcLoots, goldLoot], npc.isGiantForm);
 
-      await this.itemOwnership.removeItemOwnership(npcBody.id);
-      await this.clearNPCBehavior(npc);
+      const removeItemOwnership = this.itemOwnership.removeItemOwnership(npcBody.id);
 
-      await this.updateNPCAfterDeath(npc);
+      const clearNPCBehavior = this.clearNPCBehavior(npc);
 
-      await this.npcExperience.releaseXP(npc as INPC);
+      const updateNPCAfterDeath = this.updateNPCAfterDeath(npcWithSkills);
+
+      const releaseXP = this.npcExperience.releaseXP(npc as INPC);
+
+      await Promise.all([
+        notifyCharactersOfNPCDeath,
+        npcWithSkills,
+        goldLoot,
+        addLootToNPCBody,
+        removeItemOwnership,
+        clearNPCBehavior,
+        updateNPCAfterDeath,
+        releaseXP,
+      ]);
     } catch (error) {
       console.error(error);
     }
@@ -98,12 +104,14 @@ export class NPCDeath {
   private async notifyCharactersOfNPCDeath(npc: INPC): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersAroundXYPosition(npc.x, npc.y, npc.scene);
 
-    for (const nearbyCharacter of nearbyCharacters) {
+    const notifications = nearbyCharacters.map((nearbyCharacter) =>
       this.socketMessaging.sendEventToUser<IBattleDeath>(nearbyCharacter.channelId!, BattleSocketEvents.BattleDeath, {
         id: npc.id,
         type: "NPC",
-      });
-    }
+      })
+    );
+
+    await Promise.all(notifications);
   }
 
   private async getNPCWithSkills(npc: INPC): Promise<INPC> {
@@ -131,17 +139,7 @@ export class NPCDeath {
   }
 
   private async updateNPCAfterDeath(npc: INPC): Promise<void> {
-    await this.time.waitForMilliseconds(random(1, 100));
-
-    const skills = (await Skill.findById(npc.skills)
-      .lean()
-      .cacheQuery({
-        cacheKey: `${npc?._id}-skills`,
-      })) as unknown as ISkill;
-
-    if (!skills) {
-      throw new Error(`Skills not found for NPC ${npc.id}`);
-    }
+    const skills = npc.skills as ISkill;
 
     const strengthLevel = skills.strength.level;
 
@@ -163,13 +161,13 @@ export class NPCDeath {
   }
 
   public async generateNPCBody(npc: INPC): Promise<IItem | undefined> {
-    const hasBodyGenerateLock = await this.locker.isLocked(`npc-body-generation-${npc._id}`);
+    const hasLock = await this.locker.lock(`npc-body-generation-${npc._id}`);
 
-    if (hasBodyGenerateLock) {
+    if (!hasLock) {
       return;
     }
 
-    const blueprintData = itemsBlueprintIndex["npc-body"];
+    const blueprintData = await blueprintManager.getBlueprint<IItem>("items", "npc-body" as AvailableBlueprints);
     const npcBody = new Item({
       ...blueprintData, // base body props
       key: `${npc.key}-body`,
@@ -182,7 +180,6 @@ export class NPCDeath {
       x: npc.x,
       y: npc.y,
     });
-    await this.locker.lock(`npc-body-generation-${npc._id}`);
 
     return await npcBody.save();
   }
@@ -217,45 +214,72 @@ export class NPCDeath {
     const itemContainer = await this.fetchItemContainer(npcBody);
     let isDeadBodyLootable = false;
 
+    const bulkOps: any[] = [];
+
     for (const loot of loots) {
       const rand = Math.round(random(0, 100));
-      const lootChance = this.calculateLootChance(loot, wasNpcInGiantForm ? NPC_GIANT_FORM_LOOT_MULTIPLIER : 1);
+      const lootChance = await this.calculateLootChance(loot, wasNpcInGiantForm ? NPC_GIANT_FORM_LOOT_MULTIPLIER : 1);
 
       if (rand <= lootChance) {
         const lootQuantity = this.getLootQuantity(loot);
-        const isStackable = this.isLootItemStackable(loot);
+        const isStackable = await this.isLootItemStackable(loot);
 
-        let freeSlotAvailable = true;
         let remainingLootQuantity = lootQuantity;
 
-        while (remainingLootQuantity > 0 && freeSlotAvailable) {
-          const lootItem = await this.createLootItem(loot);
+        while (remainingLootQuantity > 0) {
+          const lootItem = await this.createLootItemWithoutSaving(loot);
           const freeSlotId = itemContainer.firstAvailableSlotId;
-          freeSlotAvailable = freeSlotId !== null;
 
-          if (freeSlotAvailable) {
-            if (isStackable) {
-              lootItem.stackQty = remainingLootQuantity;
-              remainingLootQuantity = 0;
-            } else {
-              remainingLootQuantity--;
-            }
+          if (freeSlotId === null) {
+            break;
+          }
 
-            itemContainer.slots[freeSlotId!] = lootItem;
+          if (isStackable) {
+            lootItem.stackQty = remainingLootQuantity;
+            remainingLootQuantity = 0;
+          } else {
+            remainingLootQuantity--;
+          }
 
-            await lootItem.save();
+          itemContainer.slots[freeSlotId] = lootItem;
+          bulkOps.push({ insertOne: { document: lootItem } });
 
-            if (!isDeadBodyLootable) {
-              await npcBody.updateOne({ isDeadBodyLootable: true });
-              isDeadBodyLootable = true;
-            }
+          if (!isDeadBodyLootable) {
+            npcBody.isDeadBodyLootable = true;
+            isDeadBodyLootable = true;
           }
         }
       }
     }
 
+    if (bulkOps.length > 0) {
+      await Item.bulkWrite(bulkOps);
+    }
+
     itemContainer.markModified("slots");
-    await itemContainer.save();
+    await ItemContainer.updateOne({ _id: itemContainer._id }, itemContainer);
+    await Item.updateOne({ _id: npcBody._id }, npcBody);
+  }
+
+  private async createLootItemWithoutSaving(loot: INPCLoot): Promise<IItem> {
+    const blueprintData = await blueprintManager.getBlueprint<IItem>(
+      "items",
+      loot.itemBlueprintKey as AvailableBlueprints
+    );
+
+    let lootItem = new Item({ ...blueprintData });
+
+    if (lootItem.attack || lootItem.defense) {
+      const rarityAttributes = this.itemRarity.setItemRarityOnLootDrop(lootItem);
+      lootItem = new Item({
+        ...blueprintData,
+        attack: rarityAttributes.attack,
+        defense: rarityAttributes.defense,
+        rarity: rarityAttributes.rarity,
+      });
+    }
+
+    return lootItem;
   }
 
   private async fetchItemContainer(npcBody: IItem): Promise<IItemContainer> {
@@ -266,8 +290,11 @@ export class NPCDeath {
     return itemContainer;
   }
 
-  private calculateLootChance(loot: INPCLoot, multiplier = 1): number {
-    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+  private async calculateLootChance(loot: INPCLoot, multiplier = 1): Promise<number> {
+    const blueprintData = await blueprintManager.getBlueprint<IItem>(
+      "items",
+      loot.itemBlueprintKey as AvailableBlueprints
+    );
     const lootMultipliers = {
       [OthersBlueprint.GoldCoin]: 1,
       [ItemType.CraftingResource]: LOOT_CRAFTING_MATERIAL_DROP_CHANCE,
@@ -285,27 +312,13 @@ export class NPCDeath {
     return 1;
   }
 
-  private isLootItemStackable(loot: INPCLoot): boolean {
-    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
+  private async isLootItemStackable(loot: INPCLoot): Promise<boolean> {
+    const blueprintData = await blueprintManager.getBlueprint<IItem>(
+      "items",
+      loot.itemBlueprintKey as AvailableBlueprints
+    );
     const lootItem = new Item({ ...blueprintData });
 
     return lootItem.maxStackSize > 1;
-  }
-
-  private async createLootItem(loot: INPCLoot): Promise<IItem> {
-    const blueprintData = itemsBlueprintIndex[loot.itemBlueprintKey];
-    let lootItem = new Item({ ...blueprintData });
-
-    if (lootItem.attack || lootItem.defense) {
-      const rarityAttributes = this.itemRarity.setItemRarityOnLootDrop(lootItem);
-      lootItem = new Item({
-        ...blueprintData,
-        attack: rarityAttributes.attack,
-        defense: rarityAttributes.defense,
-        rarity: rarityAttributes.rarity,
-      });
-    }
-
-    return await lootItem.save();
   }
 }

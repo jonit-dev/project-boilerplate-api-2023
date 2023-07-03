@@ -8,7 +8,7 @@ export class ItemSeeder {
   constructor(private itemLoader: ItemLoader) {}
 
   public async seed(): Promise<void> {
-    const itemSeedData = this.itemLoader.loadItemSeedData();
+    const itemSeedData = await this.itemLoader.loadItemSeedData();
 
     for (const [key, itemData] of itemSeedData) {
       const itemFound = (await Item.findOne({ tiledId: itemData.tiledId }).lean({

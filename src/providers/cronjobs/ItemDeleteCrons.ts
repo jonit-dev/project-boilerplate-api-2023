@@ -1,6 +1,7 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { MapHelper } from "@providers/map/MapHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
@@ -9,7 +10,7 @@ import nodeCron from "node-cron";
 
 @provide(ItemDeleteCrons)
 export class ItemDeleteCrons {
-  constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic) {}
+  constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic, private mapHelper: MapHelper) {}
 
   public schedule(): void {
     nodeCron.schedule("0 */1 * * *", async () => {
@@ -31,18 +32,42 @@ export class ItemDeleteCrons {
           const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
           const items = await Item.find({
+            //* Items that have COORDINATES
             // @ts-ignore
-            x: { $ne: null },
-            y: { $ne: null },
-            name: { $ne: "Depot" },
-            scene: { $ne: null },
+            x: { $exists: true, $ne: null },
+            y: { $exists: true, $ne: null },
+            scene: { $exists: true, $ne: null },
+
+            //* And also without an owner
+            owner: { $in: [null, undefined] },
+
+            //* Are not equipped and not picked up
             isEquipped: { $ne: true },
+
+            name: { $ne: "Depot" },
             itemContainer: { $exists: false },
-            $or: [{ owner: null }, { owner: { $exists: false } }],
+
+            //* And were manipulated more than an hour ago
             updatedAt: { $lt: oneHourAgo }, // delete items that are older than 1 hour!
           });
 
           for (const item of items) {
+            // lets also double check!
+            const isItemOnMap =
+              this.mapHelper.isCoordinateValid(item.x) && this.mapHelper.isCoordinateValid(item.y) && item.scene;
+
+            if (!isItemOnMap) {
+              continue;
+            }
+
+            if (item.owner) {
+              continue;
+            }
+
+            if (item.isEquipped) {
+              continue;
+            }
+
             await item.remove();
           }
         }, 60 * 1000 * 5);

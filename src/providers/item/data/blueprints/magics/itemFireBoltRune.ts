@@ -1,14 +1,5 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { calculateItemUseEffectPoints } from "@providers/useWith/libs/UseWithHelper";
-
-import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
-import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
-import { container } from "@providers/inversify/container";
 import {
   AnimationEffectKeys,
-  BasicAttribute,
   IRuneItemBlueprint,
   ItemSubType,
   ItemType,
@@ -16,8 +7,8 @@ import {
   RangeTypes,
 } from "@rpg-engine/shared";
 
-import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { MagicsBlueprint } from "../../types/itemsBlueprintTypes";
+import { UsableEffectsBlueprint } from "../../usableEffects/types";
 
 export const itemFireBoltRune: IRuneItemBlueprint = {
   key: MagicsBlueprint.FireBoltRune,
@@ -38,25 +29,5 @@ export const itemFireBoltRune: IRuneItemBlueprint = {
   canSell: false,
   animationKey: AnimationEffectKeys.Hit,
   projectileAnimationKey: AnimationEffectKeys.Red,
-  usableEffect: async (caster: ICharacter, target: ICharacter | INPC) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
-    const entityEffectUse = container.get(EntityEffectUse);
-
-    const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireBoltRune, caster);
-
-    const spellCalculator = container.get(SpellCalculator);
-
-    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
-      min: 2,
-      max: 4,
-    });
-
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -pointModifier * points);
-
-    await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);
-
-    return points;
-  },
-  usableEffectDescription:
-    "Deals fire damage to the target. Damage depends on your magic level and it gives a burning effect.",
+  usableEffectKey: UsableEffectsBlueprint.FireBoltRuneUsableEffect,
 };

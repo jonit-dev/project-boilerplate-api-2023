@@ -6,22 +6,18 @@ export class Locker {
   constructor(private inMemoryHashTable: InMemoryHashTable) {}
 
   public async lock(key: string): Promise<boolean> {
-    const isLocked = await this.isLocked(key);
-    if (!isLocked) {
-      await this.inMemoryHashTable.set("locks", key, true);
-      return true;
-    }
-    return false;
+    //* atomic setNx operation. If the key already exists, it will return false.
+    const result = await this.inMemoryHashTable.setNx("locks", key, true);
+    return result;
+  }
+
+  public async hasLock(key: string): Promise<boolean> {
+    const result = await this.inMemoryHashTable.has("locks", key);
+    return result;
   }
 
   public async unlock(key: string): Promise<void> {
     await this.inMemoryHashTable.delete("locks", key);
-  }
-
-  public async isLocked(key: string): Promise<boolean> {
-    const result = !!(await this.inMemoryHashTable.get("locks", key));
-
-    return result === true;
   }
 
   public async clear(): Promise<void> {

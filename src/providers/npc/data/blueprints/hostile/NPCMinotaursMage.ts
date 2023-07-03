@@ -6,7 +6,6 @@ import {
   DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
-  PotionsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
@@ -31,7 +30,7 @@ export const npcMinotaurMage = {
   maxRangeAttack: RangeTypes.High,
   speed: MovementSpeed.Standard,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 600,
+  baseHealth: 750,
   healthRandomizerDice: Dice.D4,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
@@ -53,6 +52,16 @@ export const npcMinotaurMage = {
   fleeOnLowHealth: true,
   loots: [
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueFeather,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WaterBottle,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
+    {
       itemBlueprintKey: StaffsBlueprint.MoonsStaff,
       chance: 5,
     },
@@ -72,10 +81,7 @@ export const npcMinotaurMage = {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.ManaPotion,
-      chance: 60,
-    },
+
     {
       itemBlueprintKey: StaffsBlueprint.EnchantedStaff,
       chance: 5,
@@ -84,14 +90,7 @@ export const npcMinotaurMage = {
       itemBlueprintKey: StaffsBlueprint.SoulStaff,
       chance: 5,
     },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterLifePotion,
-      chance: 30,
-    },
-    {
-      itemBlueprintKey: PotionsBlueprint.GreaterManaPotion,
-      chance: 25,
-    },
+
     {
       itemBlueprintKey: SwordsBlueprint.GoldenSword,
       chance: 4,

@@ -25,10 +25,10 @@ export const spellFrostBolt: Partial<ISpell> = {
   description: "Cast a deadly frost bolt at your target.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "ning lhegren",
-  manaCost: 100,
-  minLevelRequired: 10,
-  minMagicLevelRequired: 10,
-  cooldown: 30,
+  manaCost: 160,
+  minLevelRequired: 12,
+  minMagicLevelRequired: 12,
+  cooldown: 12,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Freeze,
   projectileAnimationKey: AnimationEffectKeys.HitBlue,
@@ -46,12 +46,12 @@ export const spellFrostBolt: Partial<ISpell> = {
 
     const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 30,
-      max: 60,
+      max: 40,
     });
 
     const debuffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 10,
-      max: 25,
+      min: 5,
+      max: 15,
     });
 
     if (target.type === "Character") {

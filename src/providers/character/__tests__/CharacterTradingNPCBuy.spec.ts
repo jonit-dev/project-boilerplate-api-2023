@@ -6,9 +6,9 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import {
+  FoodsBlueprint,
   OthersBlueprint,
   PotionsBlueprint,
-  RangedWeaponsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CharacterTradingNPCBuy } from "../CharacterTradingNPCBuy";
@@ -57,7 +57,7 @@ describe("CharacterTradingValidation.ts", () => {
           key: SwordsBlueprint.ShortSword,
         },
         {
-          key: RangedWeaponsBlueprint.Arrow,
+          key: FoodsBlueprint.Apple,
         },
       ],
     });
@@ -125,7 +125,7 @@ describe("CharacterTradingValidation.ts", () => {
     it("should properly buy a STACKABLE item from a trader NPC", async () => {
       transactionItems = [
         {
-          key: RangedWeaponsBlueprint.Arrow,
+          key: FoodsBlueprint.Apple,
           qty: 25,
         },
       ];
@@ -140,8 +140,8 @@ describe("CharacterTradingValidation.ts", () => {
         inventory.itemContainer
       )) as unknown as IItemContainer;
 
-      expect(updatedInventoryContainer.slots[0].stackQty).toBe(62.5); // gold left
-      expect(updatedInventoryContainer.slots[1].key).toBe(RangedWeaponsBlueprint.Arrow); // potion bought
+      expect(updatedInventoryContainer.slots[0].stackQty).toBe(25); // gold left
+      expect(updatedInventoryContainer.slots[1].key).toBe(FoodsBlueprint.Apple); // potion bought
       expect(updatedInventoryContainer.slots[1].stackQty).toBe(25);
 
       expect(sendEventToUserOnBuyItem).toHaveBeenCalledWith(
@@ -203,7 +203,7 @@ describe("CharacterTradingValidation.ts", () => {
     it("should fail if you try to buy a stackable item qty >= maxStackSize", async () => {
       transactionItems = [
         {
-          key: RangedWeaponsBlueprint.Arrow,
+          key: FoodsBlueprint.Apple,
           qty: 999,
         },
       ];
@@ -214,14 +214,14 @@ describe("CharacterTradingValidation.ts", () => {
 
       expect(sendErrorMessageToCharacter).toHaveBeenCalledWith(
         testCharacter,
-        "You can't buy more than the max stack size for the item 'Arrow'."
+        "You can't buy more than the max stack size for the item 'Apple'."
       );
     });
 
     it("should fail if we don't have enough gold for a purchase", async () => {
       transactionItems = [
         {
-          key: RangedWeaponsBlueprint.Arrow,
+          key: FoodsBlueprint.Apple,
           qty: 100,
         },
       ];

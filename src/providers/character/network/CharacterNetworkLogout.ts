@@ -1,6 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { BattleCycle } from "@providers/battle/BattleCycle";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
@@ -21,6 +20,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { CharacterInventory } from "../CharacterInventory";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
@@ -89,6 +89,9 @@ export class CharacterNetworkLogout {
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());
 
+        await clearCacheForKey(`characterBuffs_${character._id}`);
+        await clearCacheForKey(`${character._id}-skills`);
+
         const spellLeveling = await this.spellLearn.levelingSpells(character._id, character.skills!);
 
         if (spellLeveling) {
@@ -96,12 +99,6 @@ export class CharacterNetworkLogout {
         }
 
         await this.skillStatsIncrease.increaseMaxManaMaxHealth(character._id);
-
-        const battleCycle = BattleCycle.battleCycles.get(data.id);
-
-        if (battleCycle) {
-          await battleCycle.clear();
-        }
 
         const connectedCharacters = await this.socketConnection.getConnectedCharacters();
 

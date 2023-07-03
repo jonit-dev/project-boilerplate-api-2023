@@ -20,10 +20,10 @@ export const spellFireBolt: Partial<ISpell> = {
   description: "Cast a deadly fire bolt at your target.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "naurlug lhegren",
-  manaCost: 100,
-  minLevelRequired: 6,
-  minMagicLevelRequired: 9,
-  cooldown: 15,
+  manaCost: 150,
+  minLevelRequired: 8,
+  minMagicLevelRequired: 12,
+  cooldown: 12,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Burn,
   projectileAnimationKey: AnimationEffectKeys.FireBall,
@@ -34,7 +34,7 @@ export const spellFireBolt: Partial<ISpell> = {
     const entityEffectUse = container.get(EntityEffectUse);
     const hitTarget = container.get(HitTarget);
 
-    await hitTarget.hit(character, target, true, MagicPower.High);
+    await hitTarget.hit(character, target, true, MagicPower.Low);
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectBurning);
 

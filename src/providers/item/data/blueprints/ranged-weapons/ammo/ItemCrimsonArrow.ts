@@ -13,7 +13,7 @@ export const itemCrimsonArrow: IEquippableRangedAmmoBlueprint = {
   attack: 24,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Accessory],
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 12,
   entityEffects: [EntityEffectBlueprint.Burning],
   entityEffectChance: 80,

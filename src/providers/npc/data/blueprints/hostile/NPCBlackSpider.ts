@@ -6,7 +6,6 @@ import {
   DaggersBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
-  PotionsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -39,10 +38,6 @@ export const npcBlackSpider: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: PotionsBlueprint.ManaPotion,
-      chance: 20,
-    },
     {
       itemBlueprintKey: HelmetsBlueprint.WizardHat,
       chance: 10,

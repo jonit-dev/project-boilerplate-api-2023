@@ -1,3 +1,4 @@
+import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   AnimationEffectKeys,
   BasicAttribute,
@@ -30,6 +31,8 @@ export const itemCorruptionStaff: IEquippableTwoHandedStaffTier2WeaponBlueprint 
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
   basePrice: 69,
   maxRange: RangeTypes.Medium,
+  entityEffects: [EntityEffectBlueprint.Corruption],
+  entityEffectChance: 70,
   isTwoHanded: true,
   equippedBuff: [
     {

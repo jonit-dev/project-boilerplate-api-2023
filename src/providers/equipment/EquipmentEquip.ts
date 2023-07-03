@@ -3,7 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
@@ -13,12 +13,12 @@ import { CharacterItemInventory } from "@providers/character/characterItems/Char
 import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/BerserkerPassiveHabilities";
 import { RoguePassiveHabilities } from "@providers/character/characterPassiveHabilities/RoguePassiveHabilities";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemPickupUpdater } from "@providers/item/ItemPickup/ItemPickupUpdater";
 import { ItemView } from "@providers/item/ItemView";
-import { itemsBlueprintIndex } from "@providers/item/data";
+import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   CharacterClass,
   IBaseItemBlueprint,
@@ -55,10 +55,11 @@ export class EquipmentEquip {
     private itemPickupUpdater: ItemPickupUpdater,
     private characterItemBuff: CharacterItemBuff,
     private equipmentCharacterClass: EquipmentCharacterClass,
-    private newRelic: NewRelic,
+
     private characterBuffValidation: CharacterBuffValidation
   ) {}
 
+  @TrackNewRelicTransaction()
   public async equipInventory(character: ICharacter, itemId: string): Promise<boolean> {
     const item = await Item.findById(itemId);
     let inventory = await this.characterInventory.getInventory(character);
@@ -67,8 +68,6 @@ export class EquipmentEquip {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item not found.");
       return false;
     }
-    item.isBeingEquipped = true;
-    await item.save();
 
     const isItemInventory = item.isItemContainer;
 
@@ -111,83 +110,109 @@ export class EquipmentEquip {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   public async equip(character: ICharacter, itemId: string, fromItemContainerId: string): Promise<boolean> {
-    return await this.newRelic.trackTransaction(
-      NewRelicTransactionCategory.Operation,
-      "EquipmentEquip.equip",
-      async () => {
-        const item = await Item.findById(itemId);
+    try {
+      const item = await Item.findById(itemId);
 
-        if (!item) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item not found.");
-          return false;
-        }
-
-        const itemContainer = await ItemContainer.findById(fromItemContainerId);
-
-        if (!itemContainer) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item container not found.");
-          return false;
-        }
-
-        const containerType = await this.checkContainerType(itemContainer);
-
-        const isEquipValid = await this.isEquipValid(character, item, containerType);
-
-        if (!isEquipValid) {
-          this.socketMessaging.sendErrorMessageToCharacter(character);
-          return false;
-        }
-
-        const equipment = await Equipment.findById(character.equipment).cacheQuery({
-          cacheKey: `${character._id}-equipment`,
-        });
-
-        if (!equipment) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
-          return false;
-        }
-
-        if (item.isBeingEquipped) {
-          this.socketMessaging.sendErrorMessageToCharacter(character);
-          return false;
-        }
-
-        item.isBeingEquipped = true;
-
-        const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
-
-        if (!equipItem) {
-          return false;
-        }
-
-        const inventory = await this.characterInventory.getInventory(character);
-
-        const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
-
-        if (!inventoryContainer) {
-          this.socketMessaging.sendErrorMessageToCharacter(character, "Failed to equip item.");
-          return false;
-        }
-
-        await item.save();
-
-        // refresh itemContainer from which the item was equipped
-        const updatedContainer = (await ItemContainer.findById(fromItemContainerId)) as any;
-        await this.itemPickupUpdater.sendContainerRead(updatedContainer, character);
-
-        await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
-
-        await clearCacheForKey(`${character._id}-inventory`);
-        await clearCacheForKey(`${character._id}-equipment`);
-        await clearCacheForKey(`characterBuffs_${character._id}`);
-        await clearCacheForKey(`${character._id}-skills`);
-
-        await this.characterBuffValidation.removeDuplicatedBuffsForSameItem(character);
-
-        return true;
+      if (!item) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item not found.");
+        return false;
       }
-    );
+
+      const itemContainer = await ItemContainer.findById(fromItemContainerId);
+
+      if (!itemContainer) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, item container not found.");
+        return false;
+      }
+
+      const containerType = await this.checkContainerType(itemContainer);
+
+      const isEquipValid = await this.isEquipValid(character, item, containerType);
+
+      if (!isEquipValid) {
+        this.socketMessaging.sendErrorMessageToCharacter(character);
+        return false;
+      }
+
+      //! Warning: Do not cache this query. It causes a bug where the item being equipped disappears from the inventory due to a model missing _id error.
+      const equipment = await Equipment.findById(character.equipment);
+
+      if (!equipment) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, equipment not found.");
+        return false;
+      }
+
+      const leftHandItem = await Item.findById(equipment.leftHand);
+      const rightHandItem = await Item.findById(equipment.rightHand);
+
+      if (item.type === "Weapon") {
+        if (
+          leftHandItem &&
+          rightHandItem &&
+          leftHandItem.subType !== rightHandItem.subType &&
+          leftHandItem.subType !== "Shield"
+        ) {
+          this.socketMessaging.sendErrorMessageToCharacter(
+            character,
+            "Sorry, you cannot equip one-handed items with different subtypes."
+          );
+          return false;
+        }
+
+        if (leftHandItem && leftHandItem.subType !== item.subType && leftHandItem.subType !== "Shield") {
+          this.socketMessaging.sendErrorMessageToCharacter(
+            character,
+            "Sorry, you cannot equip this item in the left hand."
+          );
+          return false;
+        }
+
+        if (rightHandItem && rightHandItem.subType !== item.subType && rightHandItem.subType !== "Shield") {
+          this.socketMessaging.sendErrorMessageToCharacter(
+            character,
+            "Sorry, you cannot equip this item in the right hand."
+          );
+          return false;
+        }
+      }
+
+      const equipItem = await this.equipmentSlots.addItemToEquipmentSlot(character, item, equipment, itemContainer);
+
+      if (!equipItem) {
+        return false;
+      }
+
+      const inventory = await this.characterInventory.getInventory(character);
+
+      const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
+
+      if (!inventoryContainer) {
+        this.socketMessaging.sendErrorMessageToCharacter(character, "Failed to equip item.");
+        return false;
+      }
+
+      await item.save();
+
+      // refresh itemContainer from which the item was equipped
+      const updatedContainer = (await ItemContainer.findById(fromItemContainerId)) as any;
+      await this.itemPickupUpdater.sendContainerRead(updatedContainer, character);
+
+      await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
+
+      await clearCacheForKey(`${character._id}-inventory`);
+      await clearCacheForKey(`${character._id}-equipment`);
+      await clearCacheForKey(`characterBuffs_${character._id}`);
+      await clearCacheForKey(`${character._id}-skills`);
+
+      await this.characterBuffValidation.removeDuplicatedBuffs(character);
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 
   public updateItemInventoryCharacter(
@@ -211,6 +236,7 @@ export class EquipmentEquip {
     return allowedItemTypes;
   }
 
+  @TrackNewRelicTransaction()
   private async finalizeEquipItem(
     inventoryContainer: IItemContainer,
     equipment: IEquipment,
@@ -236,9 +262,6 @@ export class EquipmentEquip {
     if (item.x || item.y || item.scene) {
       await Item.updateOne({ _id: item._id }, { $unset: { x: "", y: "", scene: "" } });
     }
-
-    // set isBeingEquipped to false (lock mechanism)
-    await Item.updateOne({ _id: item._id }, { $set: { isBeingEquipped: false } });
 
     // When Equip remove data from redis
     await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
@@ -316,7 +339,10 @@ export class EquipmentEquip {
 
     // Check if the character meets the minimum requirements to use the item
 
-    const itemBlueprint = itemsBlueprintIndex[item.key] as IBaseItemBlueprint;
+    const itemBlueprint = await blueprintManager.getBlueprint<IBaseItemBlueprint>(
+      "items",
+      item.key as AvailableBlueprints
+    );
 
     if (itemBlueprint?.minRequirements) {
       const meetsMinRequirements = await this.checkMinimumRequirements(character, itemBlueprint);

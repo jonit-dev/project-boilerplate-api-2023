@@ -4,10 +4,9 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { itemsBlueprintIndex } from "@providers/item/data";
+import { blueprintManager, container, unitTestHelper } from "@providers/inversify/container";
 import { BooksBlueprint, DaggersBlueprint, SpearsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { CharacterClass, CombatSkill, ISkill, ItemSubType } from "@rpg-engine/shared";
+import { CharacterClass, CombatSkill, IEquippableItemBlueprint, ISkill, ItemSubType } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EquipmentEquip } from "../EquipmentEquip";
 import { EquipmentStatsCalculator } from "../EquipmentStatsCalculator";
@@ -50,8 +49,8 @@ describe("EquipmentEquip.spec.ts", () => {
     bowItem = await unitTestHelper.createItemBow();
     swordItem = await unitTestHelper.createMockItem();
     swordItem2 = await unitTestHelper.createMockItem();
-    daggerItem = await unitTestHelper.createMockItemFromBlueprint(DaggersBlueprint.AzureDagger);
-    daggerItem2 = await unitTestHelper.createMockItemFromBlueprint(DaggersBlueprint.AzureDagger);
+    daggerItem = await unitTestHelper.createMockItemFromBlueprint(DaggersBlueprint.Dagger);
+    daggerItem2 = await unitTestHelper.createMockItemFromBlueprint(DaggersBlueprint.Dagger);
     shieldItem = await unitTestHelper.createMockShield();
     spearItem = await unitTestHelper.createMockItemFromBlueprint(SpearsBlueprint.Spear);
     spearItem2 = await unitTestHelper.createMockItemFromBlueprint(SpearsBlueprint.Spear);
@@ -146,7 +145,7 @@ describe("EquipmentEquip.spec.ts", () => {
     const skill = (await Skill.findById(rogue.skills).lean()) as ISkill;
     skill.level = 10;
     skill.dagger.level = 10;
-    (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+    (await Skill.findByIdAndUpdate(skill._id, { ...skill } as any).lean()) as ISkill;
 
     const equipOneHand = await equipmentEquip.equip(rogue, daggerItem._id, inventoryContainer.id);
     const equipAnotherHand = await equipmentEquip.equip(rogue, daggerItem2._id, inventoryContainer.id);
@@ -264,7 +263,10 @@ describe("EquipmentEquip.spec.ts", () => {
     let minRequiredLevelSkillDagger: IItem; // a dagger with minimum level and skill requirements
 
     beforeEach(async () => {
-      const minReqLevelDaggerBlueprint = itemsBlueprintIndex[DaggersBlueprint.AzureDagger];
+      const minReqLevelDaggerBlueprint = await blueprintManager.getBlueprint<IEquippableItemBlueprint>(
+        "items",
+        DaggersBlueprint.AzureDagger
+      );
 
       minReqLevelDaggerBlueprint.minRequirements = {
         level: 5,
@@ -275,7 +277,7 @@ describe("EquipmentEquip.spec.ts", () => {
       };
 
       minRequiredLevelSkillDagger = await unitTestHelper.createMockItemFromBlueprint(DaggersBlueprint.AzureDagger, {
-        ...minReqLevelDaggerBlueprint,
+        ...(minReqLevelDaggerBlueprint as any),
       });
     });
 
@@ -308,7 +310,7 @@ describe("EquipmentEquip.spec.ts", () => {
       const skill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
       skill.level = 1;
       skill.dagger.level = 10;
-      (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+      (await Skill.findByIdAndUpdate(skill._id, { ...skill } as any).lean()) as ISkill;
 
       const equip = await equipmentEquip.equip(testCharacter, minRequiredLevelSkillDagger._id, inventoryContainer.id);
 
@@ -333,7 +335,7 @@ describe("EquipmentEquip.spec.ts", () => {
       skill.level = 10;
       skill.dagger.level = 1;
 
-      (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+      (await Skill.findByIdAndUpdate(skill._id, { ...skill } as any).lean()) as ISkill;
 
       const equip = await equipmentEquip.equip(testCharacter, minRequiredLevelSkillDagger._id, inventoryContainer.id);
 

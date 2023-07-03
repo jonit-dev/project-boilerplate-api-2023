@@ -9,7 +9,6 @@ import {
   DaggersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
-  PotionsBlueprint,
   StaffsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -43,10 +42,6 @@ export const npcAssaultSpider: Partial<INPC> = {
   },
   fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: PotionsBlueprint.ManaPotion,
-      chance: 20,
-    },
     {
       itemBlueprintKey: LegsBlueprint.StuddedLegs,
       chance: 5,
