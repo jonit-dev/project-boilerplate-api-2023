@@ -15,7 +15,7 @@ export const spellGreaterHealing: Partial<ISpell> = {
   manaCost: 30,
   minLevelRequired: 4,
   minMagicLevelRequired: 4,
-  cooldown: 15,
+  cooldown: 10,
   castingAnimationKey: AnimationEffectKeys.LifeHeal,
 
   usableEffect: async (character: ICharacter) => {
@@ -24,8 +24,8 @@ export const spellGreaterHealing: Partial<ISpell> = {
     const spellCalculator = container.get(SpellCalculator);
 
     const percentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 10,
-      max: 25,
+      min: 20,
+      max: 35,
     });
 
     const totalAmount = (character.maxHealth * percentage) / 100;
