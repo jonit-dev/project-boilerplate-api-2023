@@ -58,9 +58,7 @@ export class ItemCraftable {
         : await this.getRecipes(itemSubType);
 
     // Process each recipe to generate craftable items
-    const craftableItemsPromises = recipes.map(
-      async (recipe) => await this.getCraftableItem(inventoryInfo, recipe, character)
-    );
+    const craftableItemsPromises = recipes.map((recipe) => this.getCraftableItem(inventoryInfo, recipe, character));
     const craftableItems = ((await Promise.all(craftableItemsPromises)) as ICraftableItem[]).sort((a, b) => {
       // this what is craftable should be first
       if (a.canCraft && !b.canCraft) return -1;
@@ -78,7 +76,6 @@ export class ItemCraftable {
     }
 
     const blueprint = await blueprintManager.getBlueprint("items", itemToCraft.itemKey as AvailableBlueprints);
-
     const recipe = this.getAllRecipes()[itemToCraft.itemKey];
 
     if (!blueprint || !recipe) {
@@ -235,8 +232,8 @@ export class ItemCraftable {
   ): Promise<ICraftableItem> {
     const item = await blueprintManager.getBlueprint<Shared.IItem>("items", recipe.outputKey as AvailableBlueprints);
 
-    const ingredients: ICraftableItemIngredient[] = recipe.requiredItems.map(
-      await this.getCraftableItemIngredient.bind(this)
+    const ingredients: ICraftableItemIngredient[] = await Promise.all(
+      recipe.requiredItems.map((item) => this.getCraftableItemIngredient(item))
     );
 
     const minCraftingRequirements = recipe.minCraftingRequirements;
@@ -325,9 +322,9 @@ export class ItemCraftable {
     const availableRecipes: IUseWithCraftingRecipe[] = [];
     const recipes = this.getAllRecipes();
 
-    const blueprintKeys = await blueprintManager.getAllBlueprintKeys("items");
+    const itemKeys = await blueprintManager.getAllBlueprintKeys("items");
 
-    for (const itemKey of blueprintKeys) {
+    for (const itemKey of itemKeys) {
       const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
       if (item.subType === subType && recipes[item.key]) {
         availableRecipes.push(recipes[item.key]);
@@ -346,7 +343,7 @@ export class ItemCraftable {
 
     const itemKeys = await blueprintManager.getAllBlueprintKeys("items");
 
-    for (const itemKey in itemKeys) {
+    for (const itemKey of itemKeys) {
       const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
       if (recipes[item.key]) {
         const recipe = recipes[item.key];
