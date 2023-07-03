@@ -15,9 +15,11 @@ import {
   BodiesBlueprint,
   ContainersBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
+import { Locker } from "@providers/locks/Locker";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { Time } from "@providers/time/Time";
 import {
   BattleSocketEvents,
   CharacterBuffType,
@@ -26,7 +28,7 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+import _, { random } from "lodash";
 import { Types } from "mongoose";
 import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
@@ -59,13 +61,22 @@ export class CharacterDeath {
     private skillDecrease: SkillDecrease,
     private characterDeathCalculator: CharacterDeathCalculator,
     private characterItemContainer: CharacterItemContainer,
-
-    private characterBuffActivator: CharacterBuffActivator
+    private characterBuffActivator: CharacterBuffActivator,
+    private locker: Locker,
+    private time: Time
   ) {}
 
   @TrackNewRelicTransaction()
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
     try {
+      await this.time.waitForMilliseconds(random(0, 50));
+
+      const hasDied = await this.locker.lock(`character-death-${character.id}`);
+
+      if (hasDied) {
+        return;
+      }
+
       if (character.health > 0) {
         // if by any reason the char is not dead, make sure it is.
         await Character.updateOne({ _id: character._id }, { $set: { health: 0 } });
@@ -127,6 +138,8 @@ export class CharacterDeath {
 
       await entityEffectUse.clearAllEntityEffects(character);
       await this.characterWeight.updateCharacterWeight(character);
+    } catch {
+      await this.locker.unlock(`character-death-${character.id}`);
     } finally {
       await this.respawnCharacter(character);
     }
@@ -166,6 +179,8 @@ export class CharacterDeath {
         },
       }
     );
+
+    await this.locker.unlock(`character-death-${character.id}`);
   }
 
   private async clearAttackerTarget(attacker: ICharacter | INPC): Promise<void> {
