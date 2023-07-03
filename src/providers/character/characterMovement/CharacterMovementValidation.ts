@@ -42,6 +42,13 @@ export class CharacterMovementValidation {
       return false;
     }
 
+    const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, newX, newY, 11);
+
+    if (!isUnderRange) {
+      console.log(`🚫 ${character.name} is trying to move too far away!`);
+      return false;
+    }
+
     const isTooHeavy = this.isCharacterTooHeavy(character);
 
     if (isTooHeavy) {
