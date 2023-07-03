@@ -71,9 +71,9 @@ export class CharacterDeath {
     try {
       await this.time.waitForMilliseconds(random(0, 50));
 
-      const hasDied = await this.locker.lock(`character-death-${character.id}`);
+      const canProceed = await this.locker.lock(`character-death-${character.id}`);
 
-      if (hasDied) {
+      if (!canProceed) {
         return;
       }
 
