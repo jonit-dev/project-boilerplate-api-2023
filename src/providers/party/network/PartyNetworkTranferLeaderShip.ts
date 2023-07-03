@@ -21,15 +21,16 @@ export class PartyNetworkTranferLeaderShip {
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
           const leader = (await Character.findById(character._id).lean()) as ICharacter;
-          const leaderBasicValidation = this.characterValidation.hasBasicValidation(leader);
+          // const leaderBasicValidation = this.characterValidation.hasBasicValidation(leader);
 
           const target = (await Character.findById(data.targetId).lean()) as ICharacter;
-          const targetBasicValidation = this.characterValidation.hasBasicValidation(target);
+          // const targetBasicValidation = this.characterValidation.hasBasicValidation(target);
 
-          if (leaderBasicValidation || targetBasicValidation) {
-            console.log("ERROR");
-          }
+          // if (leaderBasicValidation || targetBasicValidation) {
+          //   console.log("ERROR");
+          // }
 
+          console.log("LIDERANCA TRANSFERIADA! DE: ", leader.name, "PARA: ", target.name);
           await this.partyManagement.transferLeadership(leader, target);
         } catch (error) {
           console.error(error);

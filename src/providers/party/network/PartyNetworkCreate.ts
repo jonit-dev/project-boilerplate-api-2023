@@ -3,9 +3,11 @@ import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { provide } from "inversify-binding-decorators";
-import PartyManagement from "../PartyManagement";
+import PartyManagement, { CharacterPartyBenefits } from "../PartyManagement";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
+import { CharacterClass } from "@rpg-engine/shared";
+import { Types } from "mongoose";
 
 export interface IPartyManagementFromClient {
   leaderId?: string;
@@ -26,6 +28,24 @@ interface IPartyResponseCreate {
   failure?: string;
 }
 
+interface ICharacterPartyChange {
+  leader: {
+    name: string;
+  };
+  members: Array<{
+    name: string;
+  }>;
+  maxSize: number;
+  benefits?: Array<{
+    benefit: string;
+    value: number;
+  }>;
+}
+
+enum CharacterSocketEvents {
+  PartyChange = "PartyChange",
+}
+
 @provide(PartyNetworkCreate)
 export class PartyNetworkCreate {
   constructor(
@@ -42,38 +62,31 @@ export class PartyNetworkCreate {
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
           const leader = (await Character.findById(character._id).lean()) as ICharacter;
-          const leaderBasicValidation = this.characterValidation.hasBasicValidation(leader);
+          // const leaderBasicValidation = this.characterValidation.hasBasicValidation(leader);
 
           const target = (await Character.findById(data.targetId).lean()) as ICharacter;
-          const targetBasicValidation = this.characterValidation.hasBasicValidation(target);
+          // const targetBasicValidation = this.characterValidation.hasBasicValidation(target);
 
-          if (leaderBasicValidation || targetBasicValidation) {
-            console.log("ERROR");
-          }
+          // if (leaderBasicValidation || targetBasicValidation) {
+          //   console.log("ERROR");
+          // }
 
           const createParty = await this.partyManagement.createParty(leader, target);
 
           if (!createParty) {
-            const msg: IPartyResponseCreate = {
-              failure: "Error creating party",
-            };
-
-            this.socketMessaging.sendEventToUser<IPartyResponseCreate>(
-              leader.channelId!,
-              PartySocketEvents.Create,
-              msg
-            );
-
             return;
           }
 
-          const msg: IPartyResponseCreate = {
-            success: createParty,
+          const partyPayload = await this.partyManagement.getPartyByCharacterId(leader._id);
+
+          const payload: ICharacterPartyChange = {
+            leader: { name: leader.name },
+            members: [{ name: target.name }],
+            maxSize: partyPayload!.maxSize,
+            benefits: partyPayload!.benefits,
           };
 
-          this.socketMessaging.sendEventToUser<IPartyResponseCreate>(leader.channelId!, PartySocketEvents.Create, msg);
-
-          this.socketMessaging.sendEventToUser<IPartyResponseCreate>(target.channelId!, PartySocketEvents.Create, msg);
+          this.socketMessaging.sendEventToUser(leader.channelId!, CharacterSocketEvents.PartyChange, payload);
         } catch (error) {
           console.error(error);
         }

@@ -17,6 +17,7 @@ import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { HeapMonitor } from "./HeapMonitor";
 import { PM2Helper } from "./PM2Helper";
+import PartyManagement from "@providers/party/PartyManagement";
 
 @provide(ServerBootstrap)
 export class ServerBootstrap {
@@ -34,7 +35,8 @@ export class ServerBootstrap {
     private characterMonitor: CharacterMonitor,
     private heapMonitor: HeapMonitor,
     private npcFreezer: NPCFreezer,
-    private locker: Locker
+    private locker: Locker,
+    private partyManagement: PartyManagement
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -65,6 +67,7 @@ export class ServerBootstrap {
     await this.characterConnection.resetCharacterAttributes();
     await this.characterFoodConsumption.clearAllFoodConsumption();
     await this.characterBuffActivator.disableAllTemporaryBuffsAllCharacters();
+    await this.partyManagement.clearAllParties();
 
     await this.spellSilence.removeAllSilence();
 
