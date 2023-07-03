@@ -83,9 +83,7 @@ export class CharacterTradingValidation {
 
   public async validateSellTransaction(character: ICharacter, items: ITradeRequestItem[]): Promise<boolean> {
     const inventory = await this.characterInventory.getInventory(character);
-    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    });
+    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The character does not have an inventory.");

@@ -126,9 +126,7 @@ export class PickPocket {
 
   private async updateInventoryOnClient(character: ICharacter): Promise<void> {
     const inventory = await this.characterInventory.getInventory(character);
-    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    })) as unknown as IItemContainer;
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: inventoryContainer,

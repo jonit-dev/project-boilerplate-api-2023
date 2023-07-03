@@ -91,15 +91,14 @@ export class CharacterItemContainer {
 
       const { shouldAddOwnership, isInventoryItem = false, dropOnMapIfFull = false } = options || {};
 
-      const targetContainer = await ItemContainer.findOne({ _id: toContainerId }).cacheQuery({
-        cacheKey: `${toContainerId}-targetContainer`,
-      });
       const itemToBeAdded = item;
 
       if (!itemToBeAdded) {
         this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The item to be added was not found.");
         return false;
       }
+
+      const targetContainer = await ItemContainer.findOne({ _id: toContainerId });
 
       if (!targetContainer) {
         this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The target container was not found.");
@@ -152,16 +151,12 @@ export class CharacterItemContainer {
             }
           }
 
-          const updatedTargetContainer = (await ItemContainer.findById(targetContainer.id).cacheQuery({
-            cacheKey: `${targetContainer.id}-targetContainer`,
-          })) as unknown as IItemContainer;
-
           // Check's done, need to create new item on char inventory
           if (isNewItem) {
             const result = await this.characterItemSlots.tryAddingItemOnFirstSlot(
               character,
               itemToBeAdded,
-              updatedTargetContainer as IItemContainer,
+              targetContainer as IItemContainer,
               dropOnMapIfFull
             );
 
@@ -195,9 +190,7 @@ export class CharacterItemContainer {
 
   public async getItemContainer(character: ICharacter): Promise<IItemContainer | null> {
     const inventory = await this.characterInventory.getInventory(character);
-    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
-      cacheKey: `${inventory?._id}-inventoryContainer`,
-    });
+    const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
 
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The character does not have an inventory.");
@@ -215,15 +208,6 @@ export class CharacterItemContainer {
       container.slots[i] = null;
     }
 
-    const filter = { _id: container._id };
-
-    const update = {
-      $set: {
-        slots: container.slots,
-      },
-    };
-
-    // Update the document in the database
-    await ItemContainer.updateOne(filter, update);
+    await container.save();
   }
 }

@@ -251,7 +251,6 @@ export class NPCDeath {
         }
       }
     }
-    const filter = { _id: itemContainer._id };
 
     if (bulkOps.length > 0) {
       await Item.bulkWrite(bulkOps);
@@ -284,9 +283,7 @@ export class NPCDeath {
   }
 
   private async fetchItemContainer(npcBody: IItem): Promise<IItemContainer> {
-    const itemContainer = await ItemContainer.findById(npcBody.itemContainer).cacheQuery({
-      cacheKey: `${npcBody.itemContainer}-npcBody`,
-    });
+    const itemContainer = await ItemContainer.findById(npcBody.itemContainer);
     if (!itemContainer) {
       throw new Error(`Error fetching itemContainer for Item with key ${npcBody.key}`);
     }

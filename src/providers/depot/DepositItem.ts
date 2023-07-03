@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Depot } from "@entities/ModuleDepot/DepotModel";
-import { IItemContainer as IItemContainerModel, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer as IItemContainerModel } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
@@ -75,13 +75,7 @@ export class DepositItem {
 
     await this.depotSystem.addItemToContainer(character, item, itemContainer as unknown as IItemContainerModel);
 
-    const updatedItemContainer = await ItemContainer.findById(itemContainer._id);
-
-    if (!updatedItemContainer) {
-      return undefined;
-    }
-
-    return updatedItemContainer as unknown as IItemContainer;
+    return itemContainer;
   }
 
   private async isDepositValid(character: ICharacter, data: IDepotDepositItem, npc: INPC): Promise<boolean> {

@@ -3,7 +3,6 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { provide } from "inversify-binding-decorators";
-import { clearCacheForKey } from "speedgoose";
 
 @provide(ItemContainerRepository)
 export class ItemContainerRepository extends CRUD {
@@ -36,9 +35,6 @@ export class ItemContainerRepository extends CRUD {
     parentItem.isItemContainer = true;
     parentItem.itemContainer = newItemContainer._id;
     await parentItem.save();
-
-    await clearCacheForKey(`${newItemContainer._id}-targetContainer`);
-    await clearCacheForKey(`${newItemContainer._id}-inventoryContainer`);
 
     return newItemContainer;
   }

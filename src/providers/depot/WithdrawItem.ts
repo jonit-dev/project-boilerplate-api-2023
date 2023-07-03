@@ -54,9 +54,7 @@ export class WithdrawItem {
     )) as unknown as IItemContainer;
 
     // check if destination container exists
-    const toContainer = (await ItemContainer.findById(toContainerId).cacheQuery({
-      cacheKey: `${toContainerId}-targetContainer`,
-    })) as unknown as IItemContainerModel;
+    const toContainer = (await ItemContainer.findById(toContainerId)) as unknown as IItemContainerModel;
 
     if (!toContainer) {
       throw new Error(`DepotSystem > Destination ItemContainer not found: ${toContainerId}`);
@@ -76,10 +74,8 @@ export class WithdrawItem {
 
     await this.characterWeight.updateCharacterWeight(character);
 
-    const updatedToContainer = await ItemContainer.findById(toContainer._id);
-
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-      inventory: updatedToContainer as any,
+      inventory: toContainer as any,
     };
     this.depotSystem.updateInventoryCharacter(payloadUpdate, character);
 
@@ -94,9 +90,7 @@ export class WithdrawItem {
   private async isWithdrawValid(character: ICharacter, data: IDepotContainerWithdraw): Promise<boolean> {
     const { itemId, toContainerId } = data;
 
-    const destinationContainer = await ItemContainer.findById(toContainerId).cacheQuery({
-      cacheKey: `${toContainerId}-targetContainer`,
-    });
+    const destinationContainer = await ItemContainer.findById(toContainerId);
 
     if (!destinationContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Destination container not found");

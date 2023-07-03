@@ -1,5 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
@@ -77,13 +77,9 @@ export class CharacterItemStack {
             return false; // this means a new item should be created on itemContainer, with the difference quantity!
           }
 
-          const updatedTargetContainer = (await ItemContainer.findById(targetContainer.id).cacheQuery({
-            cacheKey: `${targetContainer.id}-targetContainer`,
-          })) as unknown as IItemContainer;
-
           if (futureStackQty <= itemToBeAdded.maxStackSize && slotItem.rarity === itemToBeAdded.rarity) {
             // if updatedStackQty is less than or equal to maxStackSize, update stackQty of existing item. Do not create new one!
-            await this.addToExistingStack(i, updatedTargetContainer, futureStackQty);
+            await this.addToExistingStack(i, targetContainer, futureStackQty);
 
             // since the qty was added to an existing item, we don't need to create a new one.
 

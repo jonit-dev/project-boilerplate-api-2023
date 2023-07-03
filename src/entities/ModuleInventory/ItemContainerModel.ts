@@ -2,7 +2,6 @@ import { ItemType, TypeHelper } from "@rpg-engine/shared";
 import { Types } from "mongoose";
 import locks from "mongoose-locks";
 import { updateIfCurrentPlugin } from "mongoose-update-if-current";
-import { SpeedGooseCacheAutoCleaner } from "speedgoose";
 import { ExtractDoc, Type, createSchema, typedModel } from "ts-mongoose";
 import { IItem, Item } from "./ItemModel";
 
@@ -151,8 +150,6 @@ itemContainerSchema.post("remove", async function (this: IItemContainer) {
     }
   }
 });
-
-itemContainerSchema.plugin(SpeedGooseCacheAutoCleaner);
 
 export type IItemContainer = ExtractDoc<typeof itemContainerSchema>;
 

@@ -96,9 +96,7 @@ export class EquipmentEquip {
       return false;
     }
 
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer).cacheQuery({
-      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
-    });
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
 
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory container not found.");
@@ -302,9 +300,7 @@ export class EquipmentEquip {
       throw new Error("Item container not found");
     }
 
-    const parentItem = await Item.findById(itemContainer.parentItem).cacheQuery({
-      cacheKey: `${itemContainer.parentItem}-parentItem`,
-    });
+    const parentItem = await Item.findById(itemContainer.parentItem);
 
     if (!parentItem) {
       throw new Error("Parent item not found");
