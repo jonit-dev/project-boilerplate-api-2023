@@ -28,7 +28,7 @@ export const npcMinotaurBerserker = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Fast,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 400,
+  baseHealth: 650,
   healthRandomizerDice: Dice.D20,
   skillRandomizerDice: Dice.D8,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],

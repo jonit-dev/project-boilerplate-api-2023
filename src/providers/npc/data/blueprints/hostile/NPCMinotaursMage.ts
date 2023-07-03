@@ -30,7 +30,7 @@ export const npcMinotaurMage = {
   maxRangeAttack: RangeTypes.High,
   speed: MovementSpeed.Standard,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 600,
+  baseHealth: 750,
   healthRandomizerDice: Dice.D4,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
@@ -51,6 +51,16 @@ export const npcMinotaurMage = {
   },
   fleeOnLowHealth: true,
   loots: [
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.BlueFeather,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WaterBottle,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
     {
       itemBlueprintKey: StaffsBlueprint.MoonsStaff,
       chance: 5,

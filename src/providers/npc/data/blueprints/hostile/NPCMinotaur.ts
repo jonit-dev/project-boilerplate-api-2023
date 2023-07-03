@@ -30,7 +30,7 @@ export const npcMinotaur = {
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Standard,
   canSwitchToLowHealthTarget: true,
-  baseHealth: 200,
+  baseHealth: 330,
   healthRandomizerDice: Dice.D4,
   skillRandomizerDice: Dice.D4,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
@@ -121,6 +121,16 @@ export const npcMinotaur = {
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Jade,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.Herb,
+      chance: 20,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WaterBottle,
       chance: 20,
       quantityRange: [1, 5],
     },
