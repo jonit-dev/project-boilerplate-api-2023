@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { Locker } from "@providers/locks/Locker";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IUIShowMessage, MapLayers, ToGridX, ToGridY, UISocketEvents } from "@rpg-engine/shared";
@@ -15,7 +16,8 @@ export class CharacterMovementValidation {
     private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
     private characterBan: CharacterBan,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private locker: Locker
   ) {}
 
   public async isValid(character: ICharacter, newX: number, newY: number, isMoving: boolean): Promise<boolean> {
@@ -26,6 +28,13 @@ export class CharacterMovementValidation {
     const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
 
     if (!hasBasicValidation) {
+      return false;
+    }
+
+    const isLocked = await this.locker.hasLock(`character-changing-scene-${character._id}`);
+
+    if (isLocked) {
+      console.log(`🚫 ${character.name} is trying to move while changing the scene`);
       return false;
     }
 

@@ -11,6 +11,11 @@ export class Locker {
     return result;
   }
 
+  public async hasLock(key: string): Promise<boolean> {
+    const result = await this.inMemoryHashTable.has("locks", key);
+    return result;
+  }
+
   public async unlock(key: string): Promise<void> {
     await this.inMemoryHashTable.delete("locks", key);
   }

@@ -1,9 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { container } from "@providers/inversify/container";
-import { CharacterMovementValidation } from "../CharacterMovementValidation";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { container } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { UISocketEvents } from "@rpg-engine/shared";
+import { CharacterMovementValidation } from "../CharacterMovementValidation";
 
 describe("CharacterMovementValidation", () => {
   let characterMovementValidation: CharacterMovementValidation;
@@ -101,6 +101,8 @@ describe("CharacterMovementValidation", () => {
         isOnline: true,
         isAlive: true,
         isBanned: false,
+        x: 0,
+        y: 0,
       } as ICharacter;
       const isSolid = jest.fn().mockReturnValue(false);
       // @ts-ignore
