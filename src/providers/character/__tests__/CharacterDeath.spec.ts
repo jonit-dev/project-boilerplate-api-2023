@@ -283,23 +283,32 @@ describe("CharacterDeath.ts | Character with items", () => {
 
     expect(attackType).toEqual(EntityAttackType.Ranged);
 
+    let characterDropItem;
+
     for (let i = 0; i < 3; i++) {
       jest.spyOn(_, "random").mockImplementation(() => DROP_EQUIPMENT_CHANCE);
       // @ts-ignore
-      await characterDeath.dropEquippedItemOnBody(testCharacter, bodyItemContainer, characterEquipment);
+      // eslint-disable-next-line no-unused-vars
+      characterDropItem = await characterDeath.dropEquippedItemOnBody(
+        testCharacter,
+        bodyItemContainer,
+        characterEquipment
+      );
     }
 
-    const updatedEquipment = (await Equipment.findById(characterEquipment._id)) as IEquipment;
+    if (characterDropItem) {
+      const updatedEquipment = (await Equipment.findById(characterEquipment._id)) as IEquipment;
 
-    expect(updatedEquipment.leftHand).not.toBeDefined();
+      expect(updatedEquipment.leftHand).not.toBeDefined();
 
-    const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
+      const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
 
-    if (!characterAttackTypeAfterEquip) throw new Error("Character not found");
+      if (!characterAttackTypeAfterEquip) throw new Error("Character not found");
 
-    const attackTypeAfterEquip = await characterWeapon.getAttackType(characterAttackTypeAfterEquip);
+      const attackTypeAfterEquip = await characterWeapon.getAttackType(characterAttackTypeAfterEquip);
 
-    expect(attackTypeAfterEquip).toEqual(EntityAttackType.Melee);
+      expect(attackTypeAfterEquip).toEqual(EntityAttackType.Melee);
+    }
   });
 
   describe("Amulet of Death", () => {

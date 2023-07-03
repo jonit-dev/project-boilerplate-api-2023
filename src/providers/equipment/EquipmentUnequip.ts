@@ -118,6 +118,8 @@ export class EquipmentUnequip {
 
     await this.clearCache(character);
 
+    await this.inMemoryHashTable.delete("character-weapon", character._id);
+
     return true;
   }
 

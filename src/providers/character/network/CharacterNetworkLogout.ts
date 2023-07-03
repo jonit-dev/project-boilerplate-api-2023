@@ -100,6 +100,8 @@ export class CharacterNetworkLogout {
 
         await this.skillStatsIncrease.increaseMaxManaMaxHealth(character._id);
 
+        await this.inMemoryHashTable.delete("character-weapon", character._id);
+
         const connectedCharacters = await this.socketConnection.getConnectedCharacters();
 
         console.log("- Total characters connected:", connectedCharacters.length);
