@@ -42,7 +42,7 @@ async function getFoodItems(): Promise<Partial<IItem>[]> {
 
   const itemKeys = await blueprintManager.getAllBlueprintKeys("items");
 
-  for (const itemKey in itemKeys) {
+  for (const itemKey of itemKeys) {
     const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
 
     if (item.subType === ItemSubType.Food) {
