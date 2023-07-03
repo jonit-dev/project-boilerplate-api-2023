@@ -125,7 +125,9 @@ export class ItemUse {
 
   private async getInventoryContainer(character: ICharacter): Promise<IItemContainer | null> {
     const inventory = await this.characterInventory.getInventory(character);
-    return await ItemContainer.findById(inventory?.itemContainer);
+    return await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
+      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
+    });
   }
 
   private async sendItemConsumptionEvent(character: ICharacter): Promise<void> {

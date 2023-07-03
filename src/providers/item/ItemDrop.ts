@@ -95,10 +95,9 @@ export class ItemDrop {
             this.socketMessaging.sendErrorMessageToCharacter(character);
             return false;
           }
-
-          const inventoryContainer = (await ItemContainer.findById(
-            itemDropData.fromContainerId
-          )) as unknown as IItemContainer;
+          const inventoryContainer = (await ItemContainer.findById(itemDropData.fromContainerId).cacheQuery({
+            cacheKey: `${itemDropData.fromContainerId}-inventoryContainer`,
+          })) as unknown as IItemContainer;
 
           const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
             inventory: inventoryContainer,
@@ -189,7 +188,9 @@ export class ItemDrop {
    * This method will remove a item from the character inventory
    */
   private async removeItemFromInventory(item: IItem, character: ICharacter, fromContainerId: string): Promise<boolean> {
-    const targetContainer = await ItemContainer.findById(fromContainerId);
+    const targetContainer = await ItemContainer.findById(fromContainerId).cacheQuery({
+      cacheKey: `${fromContainerId}-targetContainer`,
+    });
 
     if (!item) {
       this.socketMessaging.sendErrorMessageToCharacter(character);
@@ -245,7 +246,9 @@ export class ItemDrop {
       return false;
     }
 
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer).cacheQuery({
+      cacheKey: `${inventory.itemContainer}-inventoryContainer`,
+    });
 
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory container not found.");
