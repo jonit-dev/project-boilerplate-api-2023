@@ -61,7 +61,6 @@ export class BattleCharacterAttack {
       })
       .cacheQuery({
         cacheKey: `${character._id}-skills`,
-        ttl: 86400,
       })) as ISkill;
 
     updatedCharacter.skills = characterSkills;

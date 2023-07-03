@@ -85,14 +85,9 @@ export class NPCExperience {
       }
 
       await clearCacheForKey(`characterBuffs_${character._id}`);
-      await clearCacheForKey(`${character._id}-skills`);
 
       // Get character skills
-      const skills = (await Skill.findById(character.skills)
-        .lean()
-        .cacheQuery({
-          cacheKey: `${character?._id}-skills`,
-        })) as ISkill;
+      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
       if (!skills) {
         // if attacker skills does not exist anymore

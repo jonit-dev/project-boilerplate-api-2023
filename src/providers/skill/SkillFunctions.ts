@@ -19,6 +19,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
 
@@ -86,6 +87,10 @@ export class SkillFunctions {
     } else {
       behavior = "advanced";
     }
+
+    // now we need to clear up caching
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
 
     const levelUpEventPayload: ISkillEventFromServer = {
       characterId: character.id,

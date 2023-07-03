@@ -27,11 +27,7 @@ export class SkillStatsIncrease {
 
   public async increaseMaxManaMaxHealth(characterId: Types.ObjectId): Promise<void> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
-    const skills = (await Skill.findById(character.skills)
-      .lean()
-      .cacheQuery({
-        cacheKey: `${character?._id}-skills`,
-      })) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
     const classBonusOrPenalties = this.characterClassBonusOrPenalties.getClassBonusOrPenalties(
       character.class as CharacterClass

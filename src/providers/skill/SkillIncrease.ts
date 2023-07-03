@@ -26,7 +26,6 @@ import {
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { clearCacheForKey } from "speedgoose";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
@@ -57,11 +56,7 @@ export class SkillIncrease {
   @TrackNewRelicTransaction()
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // Get character skills and equipment to upgrade them
-    const skills = (await Skill.findById(attacker.skills)
-      .lean()
-      .cacheQuery({
-        cacheKey: `${attacker?._id}-skills`,
-      })) as unknown as ISkill;
+    const skills = (await Skill.findById(attacker.skills).lean()) as unknown as ISkill;
 
     if (!skills) {
       throw new Error(`skills not found for character ${attacker.id}`);
@@ -92,9 +87,6 @@ export class SkillIncrease {
     if (!canIncreaseSP) {
       return;
     }
-
-    await clearCacheForKey(`characterBuffs_${attacker._id}`);
-    await clearCacheForKey(`${attacker._id}-skills`);
 
     // stronger the opponent, higher SP per hit it gives in your combat skills
     const bonus = await this.skillFunctions.calculateBonus(target, target.skills);
@@ -157,9 +149,6 @@ export class SkillIncrease {
         return;
       }
 
-      await clearCacheForKey(`characterBuffs_${character._id}`);
-      await clearCacheForKey(`${character._id}-skills`);
-
       const equipment = characterWithRelations.equipment as IEquipment;
 
       const rightHandItem = equipment?.rightHand as IItem;
@@ -212,11 +201,7 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
-    const skills = (await Skill.findById(character.skills)
-      .lean()
-      .cacheQuery({
-        cacheKey: `${character?._id}-skills`,
-      })) as ISkill;
+    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
@@ -226,9 +211,6 @@ export class SkillIncrease {
     if (!canIncreaseSP) {
       return;
     }
-
-    await clearCacheForKey(`characterBuffs_${character._id}`);
-    await clearCacheForKey(`${character._id}-skills`);
 
     const result = this.increaseSP(skills, attribute, skillPointsCalculator);
     await this.skillFunctions.updateSkills(skills, character);
@@ -253,9 +235,7 @@ export class SkillIncrease {
       throw new Error(`skill not found for item ${craftedItemKey}`);
     }
 
-    const skills = (await Skill.findById(character.skills).cacheQuery({
-      cacheKey: `${character?._id}-skills`,
-    })) as unknown as ISkill;
+    const skills = (await Skill.findById(character.skills)) as unknown as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }
@@ -265,9 +245,6 @@ export class SkillIncrease {
     if (!canIncreaseSP) {
       return;
     }
-
-    await clearCacheForKey(`characterBuffs_${character._id}`);
-    await clearCacheForKey(`${character._id}-skills`);
 
     const craftSkillPointsCalculator = (skillDetails: ISkillDetails): number => {
       return this.calculateNewCraftSP(skillDetails);
@@ -315,6 +292,7 @@ export class SkillIncrease {
       skillLevelUp = true;
 
       updatedSkillDetails.level++;
+
       updatedSkillDetails.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(
         updatedSkillDetails.skillPoints,
         updatedSkillDetails.level + 1

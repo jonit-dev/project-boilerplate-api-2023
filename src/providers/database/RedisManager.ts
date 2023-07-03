@@ -25,6 +25,10 @@ export class RedisManager {
       // @ts-ignore
       void applySpeedGooseCacheLayer(mongoose, {
         redisUri: redisConnectionUrl,
+        debugConfig: {
+          enabled: true,
+          debugModels: ["Skill"],
+        },
       });
 
       if (!appEnv.general.IS_UNIT_TEST) {
