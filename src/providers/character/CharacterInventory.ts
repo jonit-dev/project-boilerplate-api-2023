@@ -47,7 +47,11 @@ export class CharacterInventory {
   @TrackNewRelicTransaction()
   public async getAllItemsFromContainer(itemContainerId: Types.ObjectId): Promise<IItem[]> {
     try {
-      const inventory = (await ItemContainer.findById(itemContainerId).lean()) as IItemContainerModel;
+      const inventory = (await ItemContainer.findById(itemContainerId)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${itemContainerId}-inventory`,
+        })) as IItemContainerModel;
 
       if (!inventory) {
         throw new Error(`Inventory not found for itemContainerId: ${itemContainerId}`);
@@ -165,7 +169,9 @@ export class CharacterInventory {
   @TrackNewRelicTransaction()
   public async sendInventoryUpdateEvent(character: ICharacter): Promise<void> {
     const inventory = await this.getInventory(character);
-    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as unknown as IItemContainer;
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer).cacheQuery({
+      cacheKey: `${inventory?.itemContainer}-inventoryContainer`,
+    })) as unknown as IItemContainer;
 
     this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
       character.channelId!,

@@ -63,9 +63,9 @@ export class ItemDragAndDrop {
             itemMoveData.quantity
           );
 
-          const inventoryContainer = (await ItemContainer.findById(
-            itemMoveData.from.containerId
-          )) as unknown as IItemContainer;
+          const inventoryContainer = (await ItemContainer.findById(itemMoveData.from.containerId).cacheQuery({
+            cacheKey: `${itemMoveData.from.containerId}-inventoryContainer`,
+          })) as unknown as IItemContainer;
 
           const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
             inventory: inventoryContainer as any,
@@ -102,7 +102,9 @@ export class ItemDragAndDrop {
     containerId: string,
     quantity?: number
   ): Promise<boolean> {
-    const targetContainer = await ItemContainer.findById(containerId);
+    const targetContainer = await ItemContainer.findById(containerId).cacheQuery({
+      cacheKey: `${containerId}-targetContainer`,
+    });
 
     if (from.item?.rarity !== to.item?.rarity && to.item !== null) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Unable to move items with different rarities.");
@@ -165,11 +167,15 @@ export class ItemDragAndDrop {
 
     await this.updateStackQty(targetContainer, to.slotIndex, futureQuantity);
 
+    const updatedInventoryContainer = (await ItemContainer.findById(targetContainer._id).cacheQuery({
+      cacheKey: `${targetContainer._id}-inventoryContainer`,
+    })) as IItemContainer;
+
     const remainingQty = from.item.stackQty! - (futureQuantity - toStackQty!);
     if (remainingQty <= 0) {
-      await this.deleteItemFromSlot(targetContainer, from.item._id);
+      await this.deleteItemFromSlot(updatedInventoryContainer, from.item._id);
     } else {
-      await this.updateStackQty(targetContainer, from.slotIndex, remainingQty);
+      await this.updateStackQty(updatedInventoryContainer, from.slotIndex, remainingQty);
     }
   }
 
@@ -198,6 +204,11 @@ export class ItemDragAndDrop {
     totalMove: boolean,
     quantity?: number
   ): Promise<boolean> {
+    const fromItem = await Item.findById(from.item._id);
+    if (!fromItem?.baseKey) {
+      return false;
+    }
+
     if (!to.item && !totalMove) {
       const blueprint = await blueprintManager.getBlueprint<IItem>("items", from.item.key as AvailableBlueprints);
       if (!blueprint) {
@@ -281,7 +292,9 @@ export class ItemDragAndDrop {
       return false;
     }
 
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer).cacheQuery({
+      cacheKey: `${inventory.itemContainer}-inventoryContainer`,
+    });
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory container not found.");
       return false;

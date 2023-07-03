@@ -22,7 +22,9 @@ export class ItemPickupFromContainer {
     itemToBePicked: IItem,
     character: ICharacter
   ): Promise<boolean> {
-    const fromContainer = (await ItemContainer.findById(itemPickupData.fromContainerId)) as unknown as IItemContainer;
+    const fromContainer = (await ItemContainer.findById(itemPickupData.fromContainerId).cacheQuery({
+      cacheKey: `${itemPickupData.fromContainerId}-targetContainer`,
+    })) as unknown as IItemContainer;
 
     if (!fromContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, the origin container was not found.");

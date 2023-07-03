@@ -1,11 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
-import { MarketplaceMoneyWithdraw } from "../MarketplaceMoneyWithdraw";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { MarketplaceMoneyWithdraw } from "../MarketplaceMoneyWithdraw";
 
 describe("MarketplaceMoneyWithdraw.ts", () => {
   let marketplaceMoneyWithdraw: MarketplaceMoneyWithdraw;
@@ -13,7 +13,7 @@ describe("MarketplaceMoneyWithdraw.ts", () => {
   let characterInventory: CharacterInventory;
   let testNPC: INPC;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     characterInventory = container.get(CharacterInventory);
     marketplaceMoneyWithdraw = container.get(MarketplaceMoneyWithdraw);
   });
