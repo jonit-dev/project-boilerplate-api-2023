@@ -5,8 +5,11 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import {
+  BATTLE_BLOCK_CHANCE_MULTIPLIER,
   BATTLE_CRITICAL_HIT_CHANCE,
   BATTLE_CRITICAL_HIT_DAMAGE_MULTIPLIER,
+  BATTLE_HIT_CHANCE_MULTIPLIER,
+  BATTLE_MINIMUM_HIT_CHANCE,
 } from "@providers/constants/BattleConstants";
 import { PVP_ROGUE_ATTACK_DAMAGE_INCREASE_MULTIPLIER } from "@providers/constants/PVPConstants";
 import { SkillStatsCalculator } from "@providers/skill/SkillsStatsCalculator";
@@ -60,8 +63,8 @@ export class BattleEvent {
       "attack"
     );
 
-    if (hasHitSucceeded) {
-      return BattleEventType.Hit;
+    if (!hasHitSucceeded) {
+      return BattleEventType.Miss;
     }
 
     const hasBlockSucceeded = await this.hasBattleEventSucceeded(
@@ -75,7 +78,7 @@ export class BattleEvent {
       return BattleEventType.Block;
     }
 
-    return BattleEventType.Miss;
+    return BattleEventType.Hit;
   }
 
   @TrackNewRelicTransaction()
@@ -97,7 +100,7 @@ export class BattleEvent {
     );
 
     if (attacker.type === EntityType.Character && target.type === EntityType.Character) {
-      totalPotentialAttackerDamage += await this.calculateExtraDamageBasedOnClass(
+      totalPotentialAttackerDamage += this.calculateExtraDamageBasedOnClass(
         attacker.class as CharacterClass,
         totalPotentialAttackerDamage
       );
@@ -106,7 +109,7 @@ export class BattleEvent {
     let damage =
       weapon?.item && weapon?.item.isTraining
         ? Math.round(_.random(0, 1))
-        : Math.round(_.random(0, totalPotentialAttackerDamage));
+        : Math.round(_.random(totalPotentialAttackerDamage / 10, totalPotentialAttackerDamage));
 
     damage = await this.implementDamageReduction(defenderSkills, target, damage, isMagicAttack);
 
@@ -206,15 +209,27 @@ export class BattleEvent {
     oppositeActionModifier: number,
     type: "attack" | "defense"
   ): Promise<boolean> {
+    let lowerBound = 0;
+    let chanceMultiplier = 1;
+
     if (type === "attack") {
       const attackType = await this.characterWeapon.getAttackType(character);
       if (!attackType) {
         return false;
       }
+
       actionModifier = this.calculateActionModifier(attackType, actionModifier);
+      lowerBound = BATTLE_MINIMUM_HIT_CHANCE;
+      chanceMultiplier = BATTLE_HIT_CHANCE_MULTIPLIER;
+    } else if (type === "defense") {
+      chanceMultiplier = BATTLE_BLOCK_CHANCE_MULTIPLIER;
     }
 
-    const chance = (actionModifier / (oppositeActionModifier + actionModifier)) * 100;
+    const chance = Math.max(
+      lowerBound,
+      (actionModifier / (oppositeActionModifier + actionModifier)) * 100 * chanceMultiplier
+    );
+
     const n = _.random(0, 100);
 
     return n <= chance;

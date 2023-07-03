@@ -18,7 +18,7 @@ describe("BattleEvents.spec.ts", () => {
     battleEvents = container.get<BattleEvent>(BattleEvent);
 
     // Set random as 50 to get the most likely Battle Event
-    jest.spyOn(_, "random").mockImplementation(() => 50);
+    jest.spyOn(_, "random").mockImplementation(() => 51);
   });
 
   beforeEach(async () => {
@@ -42,6 +42,7 @@ describe("BattleEvents.spec.ts", () => {
       await defenderSkills.save();
 
       await testCharacter.populate("skills").execPopulate(); // refresh skills data
+      jest.spyOn(_, "random").mockImplementation(() => 10);
 
       const event = await battleEvents.calculateEvent(testNPC, testCharacter);
 
@@ -70,9 +71,7 @@ describe("BattleEvents.spec.ts", () => {
   });
 
   it("should properly calculate a miss event", async () => {
-    // 50% chance to hit and 50% chance to block
-    // with random = 51 will miss (each event is calculated independently)
-    jest.spyOn(_, "random").mockImplementation(() => 51);
+    jest.spyOn(_, "random").mockImplementation(() => 101);
 
     const event = await battleEvents.calculateEvent(testNPC, testCharacter);
 
