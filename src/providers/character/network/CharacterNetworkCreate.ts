@@ -103,6 +103,8 @@ export class CharacterNetworkCreate {
 
         await this.itemCleaner.clearMissingReferences(character);
 
+        await this.locker.unlock(`character-changing-scene-${character._id}`);
+
         // refresh battle
         await this.locker.unlock(`character-${character._id}-battle-targeting`);
         await this.battleNetworkStopTargeting.stopTargeting(character);
