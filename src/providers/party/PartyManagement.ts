@@ -174,11 +174,6 @@ export default class PartyManagement {
       return;
     }
 
-    // if (!party) {
-    //   this.sendMessageToPartyMembers(leader, "You are not in a party");
-    //   return;
-    // }
-
     if (!(await this.haveFreeSlots(leader))) {
       this.sendMessageToPartyMembers(leader, "Your party is already full");
       return;
