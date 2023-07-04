@@ -2,7 +2,6 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { IMarketplaceMoney, MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
@@ -32,7 +31,6 @@ export class MarketplaceMoneyWithdraw {
     private characterItemSlots: CharacterItemSlots
   ) {}
 
-  @TrackNewRelicTransaction()
   public async withdrawMoneyFromMarketplace(character: ICharacter, npcId: string): Promise<boolean> {
     const marketplaceValid = await this.marketplaceValidation.hasBasicValidation(character, npcId);
     if (!marketplaceValid) {
@@ -57,7 +55,6 @@ export class MarketplaceMoneyWithdraw {
     return true;
   }
 
-  @TrackNewRelicTransaction()
   public async getAvailableMoney(character: ICharacter): Promise<boolean> {
     const marketplaceMoney = await MarketplaceMoney.findOne({ owner: character._id });
     if (!marketplaceMoney) {

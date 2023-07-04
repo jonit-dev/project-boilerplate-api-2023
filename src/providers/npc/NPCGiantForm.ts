@@ -1,6 +1,5 @@
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import {
   NPC_GIANT_FORM_SPAWN_PERCENTAGE_CHANCE,
   NPC_GIANT_FORM_STATS_MULTIPLIER,
@@ -34,7 +33,6 @@ interface INPCNormalFormStats {
 export class NPCGiantForm {
   constructor(private inMemoryHashTable: InMemoryHashTable) {}
 
-  @TrackNewRelicTransaction()
   public async resetNPCToNormalForm(npc: INPC): Promise<void> {
     if (!npc.isGiantForm) return;
 
@@ -47,7 +45,6 @@ export class NPCGiantForm {
     await this.restoreNPCStatsToNormalForm(npc);
   }
 
-  @TrackNewRelicTransaction()
   public async randomlyTransformNPCIntoGiantForm(
     npc: INPC,
     percent = NPC_GIANT_FORM_SPAWN_PERCENTAGE_CHANCE

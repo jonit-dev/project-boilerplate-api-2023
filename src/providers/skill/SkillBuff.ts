@@ -1,7 +1,6 @@
 import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterBuffType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SkillsAvailable } from "./SkillTypes";
@@ -11,7 +10,6 @@ import { TraitGetter } from "./TraitGetter";
 export class SkillBuff {
   constructor(private traitGetter: TraitGetter) {}
 
-  @TrackNewRelicTransaction()
   public async getSkillsWithBuff(character: ICharacter): Promise<ISkill> {
     const skills = (await Skill.findById(character.skills)
       .lean({ virtuals: true, defaults: true })

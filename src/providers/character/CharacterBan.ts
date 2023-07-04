@@ -1,5 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
@@ -9,7 +8,6 @@ import { provide } from "inversify-binding-decorators";
 export class CharacterBan {
   constructor(private socketMessaging: SocketMessaging) {}
 
-  @TrackNewRelicTransaction()
   public async addPenalty(character: ICharacter): Promise<void> {
     character.penalty = character.penalty + 1;
     await character.save();
@@ -31,7 +29,6 @@ export class CharacterBan {
     }
   }
 
-  @TrackNewRelicTransaction()
   public async increasePenaltyAndBan(character: ICharacter): Promise<void> {
     character.penalty = Math.floor(character.penalty / 10) * 10 + 10;
 

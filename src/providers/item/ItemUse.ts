@@ -8,14 +8,12 @@ import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";
 
-import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { blueprintManager } from "@providers/inversify/container";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import {
   AnimationEffectKeys,
   CharacterSocketEvents,
@@ -40,8 +38,7 @@ export class ItemUse {
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
     private characterInventory: CharacterInventory,
-    private characterFoodConsumption: CharacterFoodConsumption,
-    private newRelic: NewRelic
+    private characterFoodConsumption: CharacterFoodConsumption
   ) {}
 
   @TrackNewRelicTransaction()
@@ -116,15 +113,13 @@ export class ItemUse {
     const intervals = bluePrintItem.subType === ItemSubType.Food ? 5 : 1;
 
     new ItemUseCycle(async () => {
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "ItemUseCycle", async () => {
-        const character = await Character.findOne({ _id: characterId });
+      const character = await Character.findOne({ _id: characterId });
 
-        if (character) {
-          bluePrintItem.usableEffect?.(character);
-          await character.save();
-          await this.sendItemConsumptionEvent(character);
-        }
-      });
+      if (character) {
+        bluePrintItem.usableEffect?.(character);
+        await character.save();
+        await this.sendItemConsumptionEvent(character);
+      }
     }, intervals);
   }
 

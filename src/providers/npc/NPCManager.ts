@@ -22,7 +22,6 @@ import { NPCMovementRandomPath } from "./movement/NPCMovementRandomPath";
 import { NPCMovementStopped } from "./movement/NPCMovementStopped";
 
 import { NewRelic } from "@providers/analytics/NewRelic";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 
 @provide(NPCManager)
@@ -63,7 +62,6 @@ export class NPCManager {
     });
   }
 
-  @TrackNewRelicTransaction()
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
     const nearbyNPCs = await this.npcView.getNPCsInView(character, { isBehaviorEnabled: false });
     for (const npc of nearbyNPCs) {
@@ -82,7 +80,6 @@ export class NPCManager {
     }
   }
 
-  @TrackNewRelicTransaction()
   public async startBehaviorLoop(initialNPC: INPC): Promise<void> {
     let npc = initialNPC;
 

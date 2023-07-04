@@ -1,7 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
@@ -38,14 +37,12 @@ export class ItemContainerOpen {
     );
   }
 
-  @TrackNewRelicTransaction()
   public onInventoryOpen(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, ItemSocketEvents.InventoryOpen, async (data, character) => {
       await this.openInventory(character);
     });
   }
 
-  @TrackNewRelicTransaction()
   public async openInventory(character: ICharacter): Promise<void> {
     const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
@@ -57,7 +54,6 @@ export class ItemContainerOpen {
     await this.openContainer({ itemId: inventory._id }, character);
   }
 
-  @TrackNewRelicTransaction()
   public async openContainer(data: IItemContainerOpen, character: ICharacter): Promise<void> {
     const item = await Item.findById(data.itemId).lean();
 

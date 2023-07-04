@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   CharacterTradeSocketEvents,
@@ -11,9 +10,9 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
-import { CharacterTradingSell } from "./CharacterTradingSell";
 import { CharacterTradingValidation } from "./CharacterTradingValidation";
 import { CharacterWeight } from "./CharacterWeight";
+import { CharacterTradingSell } from "./CharacterTradingSell";
 
 @provide(CharacterTradingNPCSell)
 export class CharacterTradingNPCSell {
@@ -26,7 +25,6 @@ export class CharacterTradingNPCSell {
     private characterTarget: CharacterTarget
   ) {}
 
-  @TrackNewRelicTransaction()
   public async initializeSell(npcId: string, character: ICharacter): Promise<void> {
     const npc = await this.characterTradingValidation.validateAndReturnTraderNPC(npcId, character);
     if (!npc) {
@@ -54,7 +52,6 @@ export class CharacterTradingNPCSell {
     );
   }
 
-  @TrackNewRelicTransaction()
   public sellItemsToNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<void> {
     return this.characterTradingSell.sellItems(character, items, TradingEntity.NPC, npc);
   }

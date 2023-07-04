@@ -1,11 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { CharacterTradingMarketplaceBuy } from "@providers/character/CharacterTradingMarketplaceBuy";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { MarketplaceSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MarketplaceValidation } from "./MarketplaceValidation";
+import { CharacterTradingMarketplaceBuy } from "@providers/character/CharacterTradingMarketplaceBuy";
+import { MarketplaceSocketEvents } from "@rpg-engine/shared";
 
 @provide(MarketplaceItemBuy)
 export class MarketplaceItemBuy {
@@ -15,7 +14,6 @@ export class MarketplaceItemBuy {
     private characterTradingMarketplaceBuy: CharacterTradingMarketplaceBuy
   ) {}
 
-  @TrackNewRelicTransaction()
   public async buyItemFromMarketplace(
     character: ICharacter,
     npcId: string,
@@ -36,7 +34,7 @@ export class MarketplaceItemBuy {
     }
 
     if (marketplaceItem.owner?.toString() === character._id.toString()) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, "You are the owner of this item");
+      this.socketMessaging.sendErrorMessageToCharacter(character, `You are the owner of this item`);
       return false;
     }
 

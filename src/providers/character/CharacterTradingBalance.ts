@@ -5,7 +5,6 @@ import { MathHelper } from "@providers/math/MathHelper";
 import { ITradeRequestItem } from "@rpg-engine/shared";
 
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { blueprintManager } from "@providers/inversify/container";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
@@ -19,7 +18,6 @@ export class CharacterTradingBalance {
     private characterItemInventory: CharacterItemInventory
   ) {}
 
-  @TrackNewRelicTransaction()
   public async getTotalGoldInInventory(character: ICharacter): Promise<number> {
     const items = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
 
@@ -29,7 +27,6 @@ export class CharacterTradingBalance {
     return totalGold || 0;
   }
 
-  @TrackNewRelicTransaction()
   public async calculateItemsTotalPrice(
     tradingEntityItems: Partial<IItem>[],
     items: ITradeRequestItem[],
@@ -49,17 +46,14 @@ export class CharacterTradingBalance {
     }, Promise.resolve(0));
   }
 
-  @TrackNewRelicTransaction()
   public async getItemSellPrice(key: string, priceMultiplier: number = TRADER_SELL_PRICE_MULTIPLIER): Promise<number> {
     return await this.getItemPrice(key, priceMultiplier);
   }
 
-  @TrackNewRelicTransaction()
   public async getItemBuyPrice(key: string, priceMultiplier: number = TRADER_BUY_PRICE_MULTIPLIER): Promise<number> {
     return await this.getItemPrice(key, priceMultiplier);
   }
 
-  @TrackNewRelicTransaction()
   private async getItemPrice(key: string, multiplier: number): Promise<number> {
     const basePrice = (await blueprintManager.getBlueprint<IItem>("items", key as AvailableBlueprints)).basePrice ?? 0;
     return this.mathHelper.fixPrecision(basePrice * multiplier);

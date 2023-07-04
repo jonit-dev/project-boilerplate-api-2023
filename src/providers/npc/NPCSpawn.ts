@@ -1,5 +1,4 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterView } from "@providers/character/CharacterView";
 import { InMemoryRepository } from "@providers/database/InMemoryRepository";
 import { Locker } from "@providers/locks/Locker";
@@ -31,7 +30,6 @@ export class NPCSpawn {
     return dayjs(new Date()).add(spawnTime, "minutes").toDate();
   }
 
-  @TrackNewRelicTransaction()
   public async spawn(npc: INPC): Promise<void> {
     const canSpawn = await this.canSpawn(npc);
 

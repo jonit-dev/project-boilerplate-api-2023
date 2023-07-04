@@ -12,7 +12,6 @@ import { provide } from "inversify-binding-decorators";
 export class CharacterItemSlots {
   constructor(private socketMessaging: SocketMessaging, private itemCleanup: ItemDropCleanup) {}
 
-  @TrackNewRelicTransaction()
   public async getTotalQty(targetContainer: IItemContainer, itemKey: string, itemRarity: string): Promise<number> {
     const allItemsSameKey = await this.getAllItemsFromKey(targetContainer, itemKey);
     let qty = 0;
@@ -44,7 +43,6 @@ export class CharacterItemSlots {
     return res;
   }
 
-  @TrackNewRelicTransaction()
   public async getAllItemsFromKey(targetContainer: IItemContainer, itemKey: string): Promise<IItem[]> {
     const items: IItem[] = [];
 
@@ -88,7 +86,6 @@ export class CharacterItemSlots {
     );
   }
 
-  @TrackNewRelicTransaction()
   public async findItemSlotIndex(targetContainer: IItemContainer, itemId: string): Promise<number | undefined> {
     try {
       const container = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;
@@ -113,7 +110,6 @@ export class CharacterItemSlots {
     }
   }
 
-  @TrackNewRelicTransaction()
   public async findItemWithSameKey(targetContainer: IItemContainer, itemKey: string): Promise<IItem | undefined> {
     try {
       const container = (await ItemContainer.findById(targetContainer.id)) as unknown as IItemContainer;

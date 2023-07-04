@@ -2,7 +2,6 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_TRADER_INTERACTION_DISTANCE } from "@providers/constants/NPCConstants";
 import { blueprintManager } from "@providers/inversify/container";
 import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -26,7 +25,6 @@ export class CharacterTradingValidation {
     private characterItemInventory: CharacterItemInventory
   ) {}
 
-  @TrackNewRelicTransaction()
   public async validateAndReturnTraderNPC(npcId: string, character: ICharacter): Promise<INPC | undefined> {
     const npc = await NPC.findOne({
       _id: npcId,
@@ -51,7 +49,6 @@ export class CharacterTradingValidation {
     return npc;
   }
 
-  @TrackNewRelicTransaction()
   public async validateTransaction(
     character: ICharacter,
     tradingEntityItems: Partial<IItem>[],
@@ -66,7 +63,6 @@ export class CharacterTradingValidation {
     return await this.itemInTradingEntityItems(character, items, tradingEntityItems);
   }
 
-  @TrackNewRelicTransaction()
   public async validateTransactionWithNPC(
     character: ICharacter,
     npc: INPC,
@@ -85,7 +81,6 @@ export class CharacterTradingValidation {
     );
   }
 
-  @TrackNewRelicTransaction()
   public async validateSellTransaction(character: ICharacter, items: ITradeRequestItem[]): Promise<boolean> {
     const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
@@ -117,7 +112,6 @@ export class CharacterTradingValidation {
     return true;
   }
 
-  @TrackNewRelicTransaction()
   public async validateSellTransactionForNPC(
     character: ICharacter,
     npc: INPC,

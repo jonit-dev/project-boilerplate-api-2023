@@ -1,7 +1,7 @@
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { NewRelic } from "../NewRelic";
+import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 
-export function TrackNewRelicTransaction(): MethodDecorator {
+export function TrackTransactionDecorator(): MethodDecorator {
   const newRelic = new NewRelic();
 
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {

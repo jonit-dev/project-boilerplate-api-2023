@@ -1,5 +1,4 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { ItemView } from "@providers/item/ItemView";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -26,7 +25,6 @@ export class CharacterMovementWarn {
     private specialEffect: SpecialEffect
   ) {}
 
-  @TrackNewRelicTransaction()
   public async warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): Promise<void> {
     // bi-directional warn
 
@@ -41,7 +39,6 @@ export class CharacterMovementWarn {
     this.itemView.warnCharacterAboutItemsInView(character, { always: false });
   }
 
-  @TrackNewRelicTransaction()
   public async warnAboutSingleCharacter(character: ICharacter, targetCharacter: ICharacter): Promise<void> {
     await this.characterView.addToCharacterView(
       character._id,

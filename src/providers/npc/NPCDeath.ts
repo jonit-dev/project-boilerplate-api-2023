@@ -10,7 +10,6 @@ import {
   NPC_LOOT_CHANCE_MULTIPLIER,
 } from "@providers/constants/LootConstants";
 
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
 import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
@@ -42,7 +41,6 @@ export class NPCDeath {
     private locker: Locker
   ) {}
 
-  @TrackNewRelicTransaction()
   public async handleNPCDeath(npc: INPC): Promise<void> {
     await this.npcFreezer.freezeNPC(npc);
 
@@ -162,7 +160,6 @@ export class NPCDeath {
     );
   }
 
-  @TrackNewRelicTransaction()
   public async generateNPCBody(npc: INPC): Promise<IItem | undefined> {
     const hasLock = await this.locker.lock(`npc-body-generation-${npc._id}`);
 

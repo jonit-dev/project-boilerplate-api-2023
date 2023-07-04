@@ -2,7 +2,6 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { TRADER_BUY_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { blueprintManager } from "@providers/inversify/container";
 import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -35,7 +34,6 @@ export class CharacterTradingBuy {
     private characterInventory: CharacterInventory
   ) {}
 
-  @TrackNewRelicTransaction()
   public async buyItems(
     character: ICharacter,
     tradingEntity: INPC,
@@ -174,7 +172,6 @@ export class CharacterTradingBuy {
     );
   }
 
-  @TrackNewRelicTransaction()
   public async validateBuyTransaction(
     character: ICharacter,
     tradingEntity: INPC,

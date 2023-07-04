@@ -31,7 +31,6 @@ export class CharacterItemContainer {
     private locker: Locker
   ) {}
 
-  @TrackNewRelicTransaction()
   public async removeItemFromContainer(
     item: IItem,
     character: ICharacter,
@@ -189,7 +188,6 @@ export class CharacterItemContainer {
     }
   }
 
-  @TrackNewRelicTransaction()
   public async getItemContainer(character: ICharacter): Promise<IItemContainer | null> {
     const inventory = await this.characterInventory.getInventory(character);
     const inventoryContainer = await ItemContainer.findById(inventory?.itemContainer);
@@ -201,7 +199,6 @@ export class CharacterItemContainer {
     return inventoryContainer;
   }
 
-  @TrackNewRelicTransaction()
   public async clearAllSlots(container: IItemContainer): Promise<void> {
     if (!container.slots) {
       return;

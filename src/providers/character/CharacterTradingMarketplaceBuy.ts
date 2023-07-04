@@ -1,10 +1,4 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { IMarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
-import { MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   IEquipmentAndInventoryUpdatePayload,
@@ -13,14 +7,19 @@ import {
   MarketplaceSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { clearCacheForKey } from "speedgoose";
-import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterTradingBuy } from "./CharacterTradingBuy";
-import { CharacterWeight } from "./CharacterWeight";
-import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
-import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { IMarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
+import { CharacterInventory } from "./CharacterInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
+import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
+import { CharacterWeight } from "./CharacterWeight";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { clearCacheForKey } from "speedgoose";
 
 @provide(CharacterTradingMarketplaceBuy)
 export class CharacterTradingMarketplaceBuy {
@@ -35,7 +34,6 @@ export class CharacterTradingMarketplaceBuy {
     private characterWeight: CharacterWeight
   ) {}
 
-  @TrackNewRelicTransaction()
   public async buyItem(character: ICharacter, marketplaceItem: IMarketplaceItem): Promise<boolean> {
     const isTransactionValid = await this.validateBuyTransaction(character, marketplaceItem);
     if (!isTransactionValid) {

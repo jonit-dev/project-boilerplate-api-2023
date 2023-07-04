@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterDeathCalculator } from "@providers/character/CharacterDeathCalculator";
 import { BASIC_ATTRIBUTES, COMBAT_SKILLS, ISkillDetails, SKILLS_MAP, calculateSPToNextLevel } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -15,7 +14,6 @@ export class SkillDecrease {
     private characterDeathCalculator: CharacterDeathCalculator
   ) {}
 
-  @TrackNewRelicTransaction()
   public async deathPenalty(character: ICharacter): Promise<boolean> {
     try {
       const decreaseXp = await this.decreaseCharacterXp(character);
