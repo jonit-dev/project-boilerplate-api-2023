@@ -1,16 +1,17 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { provide } from "inversify-binding-decorators";
-import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
-import { MarketplaceValidation } from "./MarketplaceValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
-import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
 import { MarketplaceGetItems } from "./MarketplaceGetItems";
+import { MarketplaceValidation } from "./MarketplaceValidation";
 
 @provide(MarketplaceItemAddRemove)
 export class MarketplaceItemAddRemove {
@@ -24,6 +25,7 @@ export class MarketplaceItemAddRemove {
     private marketplaceGetItems: MarketplaceGetItems
   ) {}
 
+  @TrackNewRelicTransaction()
   public async addItemToMarketplace(
     character: ICharacter,
     npcId: string,
@@ -48,7 +50,7 @@ export class MarketplaceItemAddRemove {
 
     const isItemValid = this.marketplaceValidation.isItemValid(item);
     if (!isItemValid) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, `This item cannot be sold`);
+      this.socketMessaging.sendErrorMessageToCharacter(character, "This item cannot be sold");
       return false;
     }
 
@@ -72,6 +74,7 @@ export class MarketplaceItemAddRemove {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   public async removeItemFromMarketplaceToInventory(
     character: ICharacter,
     npcId: string,
@@ -100,7 +103,7 @@ export class MarketplaceItemAddRemove {
 
     const isOwner = marketplaceItem.owner?.toString() === character._id.toString();
     if (!isOwner) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, `You are not the owner of this item`);
+      this.socketMessaging.sendErrorMessageToCharacter(character, "You are not the owner of this item");
       return false;
     }
 

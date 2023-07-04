@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { TRADER_SELL_PRICE_MULTIPLIER } from "@providers/constants/ItemConstants";
 import { blueprintManager } from "@providers/inversify/container";
 import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -39,6 +40,7 @@ export class CharacterTradingSell {
     private characterInventory: CharacterInventory
   ) {}
 
+  @TrackNewRelicTransaction()
   public async sellItems(
     character: ICharacter,
     items: ITradeRequestItem[],
@@ -181,6 +183,7 @@ export class CharacterTradingSell {
     this.socketMessaging.sendErrorMessageToCharacter(character, "An error occurred while processing your trade.");
   }
 
+  @TrackNewRelicTransaction()
   public async getCharacterItemsToSell(
     character: ICharacter,
     tradingEntity: TradingEntity

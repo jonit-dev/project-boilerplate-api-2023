@@ -1,13 +1,13 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { provide } from "inversify-binding-decorators";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { MAX_DISTANCE_TO_NPC_IN_GRID } from "@providers/constants/DepotConstants";
+import { BLOCKED_ITEMS_KEY_FOR_MARKETPLACE } from "@providers/constants/MarketplaceConstants";
 import { DepotSystem } from "@providers/depot/DepotSystem";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { MAX_DISTANCE_TO_NPC_IN_GRID } from "@providers/constants/DepotConstants";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { BLOCKED_ITEMS_KEY_FOR_MARKETPLACE } from "@providers/constants/MarketplaceConstants";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { provide } from "inversify-binding-decorators";
 
 @provide(MarketplaceValidation)
 export class MarketplaceValidation {
@@ -18,6 +18,7 @@ export class MarketplaceValidation {
     private movementHelper: MovementHelper
   ) {}
 
+  @TrackNewRelicTransaction()
   public async hasBasicValidation(character: ICharacter, npcId: string): Promise<boolean> {
     const characterValid = this.characterValidation.hasBasicValidation(character);
     if (!characterValid) {

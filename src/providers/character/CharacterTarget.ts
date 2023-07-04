@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { BattleCycle } from "@providers/battle/BattleCycle";
 import { appEnv } from "@providers/config/env";
 import { NPCMovementType } from "@rpg-engine/shared";
@@ -9,6 +10,7 @@ import { provide } from "inversify-binding-decorators";
 export class CharacterTarget {
   constructor(private battleCycle: BattleCycle) {}
 
+  @TrackNewRelicTransaction()
   public async clearTarget(character: ICharacter): Promise<void> {
     if (!character.target) {
       return;

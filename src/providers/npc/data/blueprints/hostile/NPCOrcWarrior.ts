@@ -149,8 +149,8 @@ export const npcOrcWarrior = {
 
     {
       itemBlueprintKey: CraftingResourcesBlueprint.BlueFeather,
-      chance: 5,
-      quantityRange: [3, 5],
+      chance: 1,
+      quantityRange: [1, 5],
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.WoodenSticks,
