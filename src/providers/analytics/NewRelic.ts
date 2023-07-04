@@ -25,41 +25,9 @@ export class NewRelic {
         return resolve(callback());
       }
 
-      await newrelic.startBackgroundTransaction(event, category, async () => {
+      await newrelic.startBackgroundTransaction(event, category, () => {
         try {
-          const result = await callback();
-          resolve(result);
-        } catch (e) {
-          console.error(e);
-          reject(e);
-        } finally {
-          newrelic.endTransaction();
-        }
-      });
-    });
-  }
-
-  public trackPromiseTransaction(
-    category: NewRelicTransactionCategory,
-    event: string,
-    cb: Promise<(...args: unknown[]) => any>,
-    skipTracking?: boolean
-  ): Promise<any> {
-    return new Promise(async (resolve, reject): Promise<void> => {
-      // const shouldTrackTransaction = NEW_RELIC_ALLOWED_TRANSACTIONS.some((transaction) => event.includes(transaction));
-
-      if (appEnv.general.IS_UNIT_TEST || skipTracking) {
-        return resolve(cb);
-      }
-
-      if (Math.random() > NEW_RELIC_SAMPLE_RATE) {
-        return resolve(cb);
-      }
-
-      await newrelic.startBackgroundTransaction(event, category, async () => {
-        try {
-          const result = await cb;
-          resolve(result);
+          return resolve(callback());
         } catch (e) {
           console.error(e);
           reject(e);

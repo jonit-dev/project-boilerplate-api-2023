@@ -1,5 +1,6 @@
 import { IItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { provide } from "inversify-binding-decorators";
 
@@ -7,6 +8,7 @@ import { provide } from "inversify-binding-decorators";
 export class ItemMap {
   constructor(private characterItemSlots: CharacterItemSlots) {}
 
+  @TrackNewRelicTransaction()
   public async clearItemCoordinates(item: IItem, targetContainer: IItemContainer): Promise<void> {
     // clear on the database
     item.x = undefined;

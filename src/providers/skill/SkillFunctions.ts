@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
@@ -63,6 +64,7 @@ export class SkillFunctions {
     );
   }
 
+  @TrackNewRelicTransaction()
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
     await Skill.findByIdAndUpdate(skills._id, { ...skills });
 
@@ -75,6 +77,7 @@ export class SkillFunctions {
     });
   }
 
+  @TrackNewRelicTransaction()
   public async sendSkillLevelUpEvents(
     skillData: IIncreaseSPResult,
     character: ICharacter,
@@ -120,6 +123,7 @@ export class SkillFunctions {
    * @param skillLevel
    * @returns
    */
+  @TrackNewRelicTransaction()
   public async calculateBonus(character: ICharacter | INPC, skillsId: undefined | Types.ObjectId): Promise<number> {
     if (!skillsId) {
       return 0;

@@ -95,6 +95,7 @@ export class CharacterItemStack {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async addToExistingStack(
     slotIndex: number,
     targetContainer: IItemContainer,
@@ -105,6 +106,7 @@ export class CharacterItemStack {
     });
   }
 
+  @TrackNewRelicTransaction()
   private async addToStackAndCreateDifference(
     slotIndex: number,
     targetContainer: IItemContainer,

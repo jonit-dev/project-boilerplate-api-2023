@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -47,6 +48,7 @@ export class ItemCraftable {
     private characterInventory: CharacterInventory
   ) {}
 
+  @TrackNewRelicTransaction()
   public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
     // Retrieve character inventory items
     const inventoryInfo = await this.getCharacterInventoryItems(character);
@@ -146,11 +148,13 @@ export class ItemCraftable {
    * @param baseChance chance to use in case characters avg crafting skills < baseChance
    * @returns
    */
+  @TrackNewRelicTransaction()
   public async getCraftChance(character: ICharacter, baseChance: number): Promise<() => Promise<boolean>> {
     const skillsAverage = await this.getCraftingSkillsAverage(character);
     return this.isCraftSuccessful.bind(null, skillsAverage - 1, baseChance);
   }
 
+  @TrackNewRelicTransaction()
   private async performCrafting(
     recipe: IUseWithCraftingRecipe,
     character: ICharacter,
@@ -258,6 +262,7 @@ export class ItemCraftable {
     });
   }
 
+  @TrackNewRelicTransaction()
   private async haveMinimumSkills(character: ICharacter, recipe: IUseWithCraftingRecipe): Promise<boolean> {
     // Retrieve the character with populated skills from the database
     const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
@@ -318,6 +323,7 @@ export class ItemCraftable {
     };
   }
 
+  @TrackNewRelicTransaction()
   private async getRecipes(subType: string): Promise<IUseWithCraftingRecipe[]> {
     const availableRecipes: IUseWithCraftingRecipe[] = [];
     const recipes = this.getAllRecipes();
@@ -335,6 +341,7 @@ export class ItemCraftable {
     return availableRecipes.sort((a, b) => a.minCraftingRequirements[1] - b.minCraftingRequirements[1]);
   }
 
+  @TrackNewRelicTransaction()
   private async getRecipesWithAnyIngredientInInventory(character: ICharacter): Promise<IUseWithCraftingRecipe[]> {
     const inventoryInfo = await this.getCharacterInventoryItems(character);
 
@@ -381,6 +388,7 @@ export class ItemCraftable {
     return obj;
   }
 
+  @TrackNewRelicTransaction()
   private async getCharacterInventoryItems(character: ICharacter): Promise<Map<string, number>> {
     const map = new Map();
 

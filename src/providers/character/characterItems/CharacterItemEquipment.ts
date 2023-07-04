@@ -5,6 +5,7 @@ import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { MathHelper } from "@providers/math/MathHelper";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemBuff } from "../characterBuff/CharacterItemBuff";
@@ -18,6 +19,7 @@ export class CharacterItemEquipment {
     private characterItemBuff: CharacterItemBuff
   ) {}
 
+  @TrackNewRelicTransaction()
   public async deleteItemFromEquipment(itemId: string, character: ICharacter): Promise<boolean> {
     const item = (await Item.findById(itemId).lean()) as unknown as IItem;
 
@@ -43,6 +45,7 @@ export class CharacterItemEquipment {
     return await this.removeItemFromEquipmentSet(item, character);
   }
 
+  @TrackNewRelicTransaction()
   public async decrementItemFromEquipment(
     itemKey: string,
     character: ICharacter,
@@ -153,6 +156,7 @@ export class CharacterItemEquipment {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   public async checkItemEquipment(itemId: string, character: ICharacter): Promise<boolean> {
     const equipment = await Equipment.findById(character.equipment).cacheQuery({
       cacheKey: `${character._id}-equipment`,
@@ -179,6 +183,7 @@ export class CharacterItemEquipment {
    * @param character
    * @returns the item id if found, otherwise returns undefined
    */
+  @TrackNewRelicTransaction()
   public async checkItemEquipmentByKey(itemKey: string, character: ICharacter): Promise<string | undefined> {
     const equipment = await Equipment.findById(character.equipment).cacheQuery({
       cacheKey: `${character._id}-equipment`,
@@ -210,6 +215,7 @@ export class CharacterItemEquipment {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
     const equipmentSetId = character.equipment;
     const equipmentSet = await Equipment.findById(equipmentSetId).cacheQuery({

@@ -9,7 +9,7 @@ import svgCaptcha from "svg-captcha";
 export class MacroCaptchaSend {
   constructor(private socketMessaging: SocketMessaging, private characterValidation: CharacterValidation) {}
 
-  public async sendAndStartCaptchaVerification(character: ICharacter) {
+  public async sendAndStartCaptchaVerification(character: ICharacter): Promise<boolean> {
     if (!this.characterValidation.hasBasicValidation(character)) {
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
@@ -22,7 +22,7 @@ export class MacroCaptchaSend {
     return await this.generateAndSendCaptcha(character);
   }
 
-  private async checkIfUserHasAlreadyVerification(character: ICharacter) {
+  private async checkIfUserHasAlreadyVerification(character: ICharacter): Promise<boolean> {
     const fetchedCharacter = await Character.findById(character._id).select("+captchaVerifyCode").lean();
 
     if (fetchedCharacter?.captchaVerifyCode) {
@@ -33,7 +33,7 @@ export class MacroCaptchaSend {
     return false;
   }
 
-  public async generateAndSendCaptcha(character: ICharacter) {
+  public async generateAndSendCaptcha(character: ICharacter): Promise<boolean> {
     const captcha = svgCaptcha.create({
       size: 6,
       noise: 1,

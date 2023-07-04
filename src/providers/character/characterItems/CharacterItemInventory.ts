@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { blueprintManager } from "@providers/inversify/container";
 import { ItemRarity } from "@providers/item/ItemRarity";
@@ -31,6 +32,7 @@ export class CharacterItemInventory {
     private itemRarity: ItemRarity
   ) {}
 
+  @TrackNewRelicTransaction()
   public async getAllItemsFromInventoryNested(character: ICharacter): Promise<IItem[]> {
     const inventory = await this.characterInventory.getInventory(character);
     const container = await ItemContainer.findById(inventory?.itemContainer);
@@ -41,6 +43,7 @@ export class CharacterItemInventory {
     return await this.getAllItemsFromContainer(container);
   }
 
+  @TrackNewRelicTransaction()
   private async getAllItemsFromContainer(container: IItemContainer): Promise<IItem[]> {
     const slots = container.slots as unknown as IItem[];
 
@@ -66,6 +69,7 @@ export class CharacterItemInventory {
     return items;
   }
 
+  @TrackNewRelicTransaction()
   public async addItemToInventory(
     itemKey: string,
     character: ICharacter,
@@ -103,6 +107,7 @@ export class CharacterItemInventory {
     return await this.characterItemsContainer.addItemToContainer(item, character, inventoryContainerId);
   }
 
+  @TrackNewRelicTransaction()
   public async decrementItemFromInventory(
     itemId: string,
     character: ICharacter,
@@ -132,6 +137,7 @@ export class CharacterItemInventory {
     return this.decrementQty(item, slotIndex - 1, inventoryItemContainer, character, decrementQty);
   }
 
+  @TrackNewRelicTransaction()
   public async decrementItemFromInventoryByKey(
     itemKey: string,
     character: ICharacter,
@@ -162,6 +168,7 @@ export class CharacterItemInventory {
    * @param decrementQty
    * @returns true if was successful and the updated decrementQty
    */
+  @TrackNewRelicTransaction()
   public async decrementItemFromNestedInventoryByKey(
     itemKey: string,
     character: ICharacter,
@@ -197,6 +204,7 @@ export class CharacterItemInventory {
     return { success: false, updatedQty: decrementQty };
   }
 
+  @TrackNewRelicTransaction()
   public async deleteItemFromInventory(itemId: string, character: ICharacter): Promise<boolean> {
     const doesCharacterHaveItemInInventory = await this.checkItemInInventory(itemId, character);
 
@@ -221,6 +229,7 @@ export class CharacterItemInventory {
   /**
    * Returns the item id if it finds it. Otherwise, returns undefined
    */
+  @TrackNewRelicTransaction()
   public async checkItemInInventoryByKey(itemKey: string, character: ICharacter): Promise<string | undefined> {
     const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
@@ -233,6 +242,7 @@ export class CharacterItemInventory {
     return this.checkItemInContainerByKey(itemKey, inventoryItemContainer);
   }
 
+  @TrackNewRelicTransaction()
   private async checkItemInContainerByKey(itemKey: string, container: IItemContainer): Promise<string | undefined> {
     for (let i = 0; i < container.slotQty; i++) {
       let slotItem = container.slots[i] as unknown as IItem;
@@ -251,6 +261,7 @@ export class CharacterItemInventory {
   /**
    * Returns the (slot index + 1) if it finds it. Otherwise, returns undefined
    */
+  @TrackNewRelicTransaction()
   public async checkItemInInventory(itemId: string, character: ICharacter): Promise<number | undefined> {
     const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
     const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
@@ -403,6 +414,7 @@ export class CharacterItemInventory {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async addEquipmentToCharacter(character: ICharacter): Promise<void> {
     const equipment = await this.createEquipmentWithInventory(character);
 
@@ -410,6 +422,7 @@ export class CharacterItemInventory {
     await character.save();
   }
 
+  @TrackNewRelicTransaction()
   public async createEquipmentWithInventory(character: ICharacter): Promise<IEquipment> {
     const equipment = new Equipment();
     equipment.owner = character._id;
@@ -463,6 +476,7 @@ export class CharacterItemInventory {
     return result;
   }
 
+  @TrackNewRelicTransaction()
   public async decrementItemFromContainer(
     itemId: string,
     character: ICharacter,
@@ -531,6 +545,7 @@ export class CharacterItemInventory {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async deleteItemInContainer(
     itemId: string,
     character: ICharacter,

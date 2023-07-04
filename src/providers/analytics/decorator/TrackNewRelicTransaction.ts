@@ -11,9 +11,7 @@ export function TrackNewRelicTransaction(): MethodDecorator {
       const className = target.constructor.name;
       const methodName = propertyKey;
 
-      return await newRelic.trackPromiseTransaction(
-        NewRelicTransactionCategory.Operation,
-        `${className}.${methodName}`,
+      return await newRelic.trackTransaction(NewRelicTransactionCategory.Operation, `${className}.${methodName}`, () =>
         originalFunction.apply(this, args)
       );
     };
