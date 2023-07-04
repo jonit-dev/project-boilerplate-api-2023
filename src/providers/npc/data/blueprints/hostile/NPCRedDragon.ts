@@ -33,9 +33,9 @@ export const npcRedDragon = {
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 120,
+    level: 200,
     strength: {
-      level: 120,
+      level: 200,
     },
     dexterity: {
       level: 90,
@@ -44,6 +44,9 @@ export const npcRedDragon = {
       level: 70,
     },
     magicResistance: {
+      level: 80,
+    },
+    magic: {
       level: 80,
     },
   },
