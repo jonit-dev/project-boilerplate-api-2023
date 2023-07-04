@@ -13,7 +13,7 @@ export const itemChickensMeat: IConsumableItemBlueprint = {
   description: "Chicken meat can be cooked and eaten to restore health",
   weight: 0.5,
   maxStackSize: 100,
-  basePrice: 13,
+  basePrice: 9,
   canSell: false,
-  usableEffectKey: UsableEffectsBlueprint.StrongEatingEffect,
+  usableEffectKey: UsableEffectsBlueprint.SuperStrongEatingEffect,
 };

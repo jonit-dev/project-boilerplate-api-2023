@@ -50,6 +50,11 @@ export const npcDwarfGuard = {
       chance: 30,
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.WaterBottle,
+      quantityRange: [2, 4],
+      chance: 20,
+    },
+    {
       itemBlueprintKey: ToolsBlueprint.FishingRod,
       chance: 20,
     },

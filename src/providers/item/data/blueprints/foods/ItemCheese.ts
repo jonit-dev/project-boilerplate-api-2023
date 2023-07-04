@@ -13,7 +13,7 @@ export const itemCheese: IConsumableItemBlueprint = {
   description: "A cheese wheel.",
   weight: 0.3,
   maxStackSize: 100,
-  basePrice: 8,
+  basePrice: 5,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.ModerateEatingEffect,
 };

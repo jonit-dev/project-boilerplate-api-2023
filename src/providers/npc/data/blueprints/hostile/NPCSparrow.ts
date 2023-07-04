@@ -50,7 +50,7 @@ export const npcSparrow: Partial<INPC> = {
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.BlueFeather,
-      chance: 20,
+      chance: 30,
       quantityRange: [5, 10],
     },
   ],

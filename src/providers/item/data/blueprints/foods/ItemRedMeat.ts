@@ -10,9 +10,9 @@ export const itemRedMeat: IConsumableItemBlueprint = {
   texturePath: "foods/red-meat.png",
   name: "Red meat",
   description: "This is a red meat from an animal. You can eat it to restore your health.",
-  weight: 2,
+  weight: 1,
   maxStackSize: 100,
   basePrice: 10,
   canSell: false,
-  usableEffectKey: UsableEffectsBlueprint.StrongEatingEffect,
+  usableEffectKey: UsableEffectsBlueprint.SuperStrongEatingEffect,
 };

@@ -54,7 +54,7 @@ export const npcMinotaurMage = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.BlueFeather,
       chance: 20,
-      quantityRange: [1, 5],
+      quantityRange: [4, 7],
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.WaterBottle,
