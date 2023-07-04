@@ -151,7 +151,7 @@ export class CharacterNetworkUpdate {
       );
     }
 
-    if (distanceInGridCells >= 10) {
+    if (distanceInGridCells >= 5) {
       this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
         serverCharacter.channelId!,
         CharacterSocketEvents.CharacterSyncPosition,
