@@ -17,7 +17,7 @@ export class SocketIO implements ISocket {
   private socket: SocketIOServer;
   public channel: Socket;
 
-  public init(): void {
+  public async init(): Promise<void> {
     this.socket = new SocketIOServer(SOCKET_IO_CONFIG);
 
     switch (appEnv.general.ENV) {
@@ -36,7 +36,7 @@ export class SocketIO implements ISocket {
 
         this.socket.adapter(createAdapter(pubClient, subClient));
 
-        Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+        await Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
           this.socket.use(SocketIOAuthMiddleware);
           this.socket.listen(appEnv.socket.port.SOCKET);
         });

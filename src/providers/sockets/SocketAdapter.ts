@@ -22,7 +22,7 @@ export class SocketAdapter implements ISocket {
       case SocketTypes.TCP:
       default:
         console.log("🔌 Initializing TCP socket...");
-        this.socketIO.init();
+        await this.socketIO.init();
         SocketAdapter.socketClass = this.socketIO;
         break;
     }

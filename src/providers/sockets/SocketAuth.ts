@@ -43,11 +43,11 @@ export class SocketAuth {
         character = isLeanQuery
           ? await Character.findOne({
               _id: data.socketCharId,
-              owner: owner.id,
+              owner: owner._id,
             }).lean({ virtuals: true, defaults: true })
           : await Character.findOne({
               _id: data.socketCharId,
-              owner: owner.id,
+              owner: owner._id,
             });
 
         if (!character) {
