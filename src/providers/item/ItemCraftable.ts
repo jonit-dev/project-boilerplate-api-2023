@@ -1,5 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
@@ -53,6 +53,17 @@ export class ItemCraftable {
     // Retrieve character inventory items
     const inventoryInfo = await this.getCharacterInventoryItems(character);
 
+    // Retrieve the character with populated skills from the database
+    const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
+      "skills"
+    )) as unknown as ICharacter;
+
+    const skills = (await Skill.findOne({ owner: updatedCharacter._id })
+      .lean()
+      .cacheQuery({
+        cacheKey: `${updatedCharacter._id}-skills`,
+      })) as ISkill;
+
     // Retrieve the list of recipes for the given item sub-type
     const recipes =
       itemSubType === "Suggested"
@@ -60,7 +71,7 @@ export class ItemCraftable {
         : await this.getRecipes(itemSubType);
 
     // Process each recipe to generate craftable items
-    const craftableItemsPromises = recipes.map((recipe) => this.getCraftableItem(inventoryInfo, recipe, character));
+    const craftableItemsPromises = recipes.map((recipe) => this.getCraftableItem(inventoryInfo, recipe, skills));
     const craftableItems = ((await Promise.all(craftableItemsPromises)) as ICraftableItem[]).sort((a, b) => {
       // this what is craftable should be first
       if (a.canCraft && !b.canCraft) return -1;
@@ -73,6 +84,19 @@ export class ItemCraftable {
   }
 
   public async craftItem(itemToCraft: ICraftItemPayload, character: ICharacter): Promise<void> {
+    if (!character.skills) {
+      return;
+    }
+
+    if (!(character.skills as ISkill)?.level) {
+      const skills = (await Skill.findOne({ owner: character._id })
+        .lean()
+        .cacheQuery({
+          cacheKey: `${character._id}-skills`,
+        })) as ISkill;
+      character.skills = skills;
+    }
+
     if (!this.characterValidation.hasBasicValidation(character)) {
       return;
     }
@@ -117,7 +141,9 @@ export class ItemCraftable {
     };
 
     // Check if the character meets the minimum skill requirements for crafting
-    if (!(await this.haveMinimumSkills(character, recipe))) {
+    const hasMinimumSkills = await this.haveMinimumSkills(character.skills as ISkill, recipe);
+
+    if (!hasMinimumSkills) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         "Sorry, you do not have the required skills ot craft this item."
@@ -232,7 +258,7 @@ export class ItemCraftable {
   private async getCraftableItem(
     inventoryInfo: Map<string, number>,
     recipe: IUseWithCraftingRecipe,
-    character: ICharacter
+    skills: ISkill
   ): Promise<ICraftableItem> {
     const item = await blueprintManager.getBlueprint<Shared.IItem>("items", recipe.outputKey as AvailableBlueprints);
 
@@ -242,7 +268,7 @@ export class ItemCraftable {
 
     const minCraftingRequirements = recipe.minCraftingRequirements;
 
-    const haveMiniSkills = await this.haveMinimumSkills(character, recipe);
+    const haveMiniSkills = await this.haveMinimumSkills(skills, recipe);
 
     const canCraft = this.canCraftRecipe(inventoryInfo, recipe) && haveMiniSkills;
 
@@ -263,18 +289,7 @@ export class ItemCraftable {
   }
 
   @TrackNewRelicTransaction()
-  private async haveMinimumSkills(character: ICharacter, recipe: IUseWithCraftingRecipe): Promise<boolean> {
-    // Retrieve the character with populated skills from the database
-    const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
-      "skills"
-    )) as unknown as ICharacter;
-
-    // Ensure the character has skills
-    const skills = updatedCharacter.skills as unknown as ISkill;
-    if (!skills) {
-      return false;
-    }
-
+  private haveMinimumSkills(skills: ISkill, recipe: IUseWithCraftingRecipe): boolean {
     // Retrieve the minimum crafting requirements from the recipe
     const minCraftingRequirements = recipe.minCraftingRequirements;
 
@@ -282,22 +297,22 @@ export class ItemCraftable {
     let skillLevel: number = 0;
     switch (minCraftingRequirements[0]) {
       case CraftingSkill.Blacksmithing:
-        skillLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, CraftingSkill.Blacksmithing);
+        skillLevel = skills.blacksmithing.level;
         break;
       case CraftingSkill.Lumberjacking:
-        skillLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, CraftingSkill.Lumberjacking);
+        skillLevel = skills.lumberjacking.level;
         break;
       case CraftingSkill.Alchemy:
-        skillLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, CraftingSkill.Alchemy);
+        skillLevel = skills.alchemy.level;
         break;
       case CraftingSkill.Mining:
-        skillLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, CraftingSkill.Mining);
+        skillLevel = skills.mining.level;
         break;
       case CraftingSkill.Cooking:
-        skillLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, CraftingSkill.Cooking);
+        skillLevel = skills.cooking.level;
         break;
       case CraftingSkill.Fishing:
-        skillLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, CraftingSkill.Fishing);
+        skillLevel = skills.fishing.level;
         break;
       default:
         break;

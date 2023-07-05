@@ -55,6 +55,8 @@ describe("ItemCraftable.ts", () => {
     await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
+
+    await testCharacter.populate("skills").execPopulate();
   });
 
   it("should load craftable items", async () => {
@@ -78,6 +80,8 @@ describe("ItemCraftable.ts", () => {
     skill.alchemy.level = 10;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
 
+    await testCharacter.populate("skills").execPopulate();
+
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
     await craftableItem.craftItem(itemToCraft, testCharacter);
 
@@ -93,6 +97,8 @@ describe("ItemCraftable.ts", () => {
   it("should craft stackable item", async () => {
     skill.lumberjacking.level = 10;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
+    await testCharacter.populate("skills").execPopulate();
 
     const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
     craftChanceMock.mockImplementation(() => {
@@ -158,6 +164,8 @@ describe("ItemCraftable.ts", () => {
     skill.alchemy.level = 10;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
 
+    await testCharacter.populate("skills").execPopulate();
+
     const originalWeight = testCharacter.weight;
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
 
@@ -173,6 +181,8 @@ describe("ItemCraftable.ts", () => {
 
     skill.alchemy.level = 10;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
+    await testCharacter.populate("skills").execPopulate();
 
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
     await craftableItem.craftItem(itemToCraft, testCharacter);
@@ -208,6 +218,8 @@ describe("ItemCraftable.ts", () => {
 
     skill.alchemy.level = 10;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
+    await testCharacter.populate("skills").execPopulate();
 
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
 
@@ -263,6 +275,10 @@ describe("ItemCraftable.ts", () => {
     });
 
     skill.alchemy.level = 0;
+
+    await Skill.findByIdAndUpdate(skill._id, { ...skill });
+
+    await testCharacter.populate("skills").execPopulate();
 
     // Define the item to be crafted
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
@@ -351,6 +367,8 @@ describe("ItemCraftable.ts", () => {
 
     skill.alchemy.level = 10;
     (await Skill.findByIdAndUpdate(skill._id, { ...skill }).lean()) as ISkill;
+
+    await testCharacter.populate("skills").execPopulate();
 
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
     await craftableItem.craftItem(itemToCraft, testCharacter);

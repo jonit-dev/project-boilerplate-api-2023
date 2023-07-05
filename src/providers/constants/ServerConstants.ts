@@ -15,6 +15,7 @@ export const EXHAUSTABLE_EVENTS = [
   "UseWithTile",
   "UseWithItem",
   ItemSocketEvents.Use,
+  ItemSocketEvents.CraftItem,
 ] as string[];
 
 export const LOCKABLE_EVENTS = [
