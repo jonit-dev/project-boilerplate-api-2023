@@ -124,8 +124,6 @@ export class EquipmentUnequip {
 
     await this.clearCache(character);
 
-    await this.inMemoryHashTable.delete("character-weapon", character._id);
-
     return true;
   }
 
@@ -162,6 +160,9 @@ export class EquipmentUnequip {
     // When unequip remove data from redis
     await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
     await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
+
+    await this.inMemoryHashTable.delete("character-weapon", character._id);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id);
 
     await clearCacheForKey(`${character._id}-inventory`);
     await clearCacheForKey(`${character._id}-equipment`);

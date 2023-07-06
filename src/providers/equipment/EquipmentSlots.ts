@@ -7,10 +7,11 @@ import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemBuff } from "@providers/character/characterBuff/CharacterItemBuff";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentSet } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { camelCase } from "lodash";
+import _, { camelCase } from "lodash";
 
 export type EquipmentSlotTypes =
   | "head"
@@ -30,7 +31,8 @@ export class EquipmentSlots {
     private socketMessaging: SocketMessaging,
     private characterItemContainer: CharacterItemContainer,
     private characterInventory: CharacterInventory,
-    private characterItemBuff: CharacterItemBuff
+    private characterItemBuff: CharacterItemBuff,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   private slots: EquipmentSlotTypes[] = [
@@ -82,6 +84,7 @@ export class EquipmentSlots {
       if (!targetSlotItem) {
         equipment[availableSlot] = item;
         await equipment.save();
+        await this.inMemoryHashTable.delete("equipment-slots", character._id.toString());
 
         return true;
       }
@@ -95,6 +98,7 @@ export class EquipmentSlots {
           await targetSlotItem?.save();
 
           // delete item from inventory
+          await this.inMemoryHashTable.delete("equipment-slots", character._id.toString());
 
           return true;
         } else {
@@ -123,6 +127,7 @@ export class EquipmentSlots {
             character,
             inventoryContainer._id
           );
+          await this.inMemoryHashTable.delete("equipment-slots", character._id.toString());
 
           return addDiffToContainer;
         }
@@ -139,6 +144,7 @@ export class EquipmentSlots {
     equipment[availableSlot] = item;
     await equipment.save();
     // await this.characterItemsInventory.deleteItemFromInventory(item.id, character);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id.toString());
 
     return true;
   }
@@ -219,6 +225,12 @@ export class EquipmentSlots {
 
   @TrackNewRelicTransaction()
   public async getEquipmentSlots(characterId: string, equipmentId: string): Promise<IEquipmentSet> {
+    const hasCache = (await this.inMemoryHashTable.get("equipment-slots", characterId)) as IEquipmentSet;
+
+    if (hasCache) {
+      return hasCache;
+    }
+
     // TODO: Cache this
     const equipment = await Equipment.findById(equipmentId).lean().populate(this.slots.join(" ")).exec();
 
@@ -233,9 +245,8 @@ export class EquipmentSlots {
     const armor = equipment?.armor! as unknown as IItem;
     const inventory = equipment?.inventory! as unknown as IItem;
 
-    // @ts-ignore
-    return {
-      _id: equipment!._id,
+    const result = {
+      _id: equipment!._id.toString(),
       head,
       neck,
       leftHand,
@@ -246,7 +257,13 @@ export class EquipmentSlots {
       accessory,
       armor,
       inventory,
-    } as IEquipmentSet;
+    };
+
+    const cleanedResult = _.omitBy(result, _.isUndefined);
+
+    await this.inMemoryHashTable.set("equipment-slots", characterId, cleanedResult);
+
+    return cleanedResult as unknown as IEquipmentSet;
   }
 
   @TrackNewRelicTransaction()

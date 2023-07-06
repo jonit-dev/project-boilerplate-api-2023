@@ -205,6 +205,7 @@ export class EquipmentEquip {
       await clearCacheForKey(`${character._id}-equipment`);
       await clearCacheForKey(`characterBuffs_${character._id}`);
       await clearCacheForKey(`${character._id}-skills`);
+      await this.inMemoryHashTable.delete("equipment-slots", character._id);
 
       await this.characterBuffValidation.removeDuplicatedBuffs(character);
 

@@ -11,7 +11,7 @@ describe("EquipmentRead.ts", () => {
   let testCharacter: ICharacter;
   let equipmentSlots: EquipmentSlots;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     equipmentSetRead = container.get<EquipmentRead>(EquipmentRead);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });

@@ -93,17 +93,11 @@ equipmentSchema.method("isEquipped", function (this: IEquipment, itemId: string)
 
 equipmentSchema.plugin(SpeedGooseCacheAutoCleaner);
 
-export type IEquipment = ExtractDoc<typeof equipmentSchema>;
-
-export const Equipment = typedModel("Equipment", equipmentSchema);
-
 const clearEquipmentSlotCaching = async (ownerId: string): Promise<void> => {
   await inMemoryHashTable.delete("equipment-slots", ownerId.toString());
 };
-
 equipmentSchema.post("save", async function (this: IEquipment) {
   if (this.owner) {
-    console.log("Clearing equipment slot caching");
     await clearEquipmentSlotCaching(this.owner.toString());
   }
 });
@@ -113,8 +107,6 @@ async function onEquipmentUpdate(doc, next): Promise<void> {
   const equipment = await this.model.findOne(this.getQuery());
 
   if (!equipment.owner) {
-    console.log("Clearing equipment slot caching");
-
     return next();
   }
   await clearEquipmentSlotCaching(equipment.owner.toString());
@@ -125,3 +117,7 @@ async function onEquipmentUpdate(doc, next): Promise<void> {
 equipmentSchema.pre(/updateOne/, onEquipmentUpdate);
 equipmentSchema.pre(/updateMany/, onEquipmentUpdate);
 equipmentSchema.pre(/findOneAndUpdate/, onEquipmentUpdate);
+
+export type IEquipment = ExtractDoc<typeof equipmentSchema>;
+
+export const Equipment = typedModel("Equipment", equipmentSchema);

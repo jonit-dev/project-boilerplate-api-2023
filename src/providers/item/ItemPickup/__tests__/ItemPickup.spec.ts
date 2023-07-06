@@ -165,7 +165,7 @@ describe("ItemPickup.ts", () => {
 
     const inventory = equipmentSet.inventory as unknown as IItem;
 
-    expect(inventory._id).toEqual(inventoryItem._id);
+    expect(inventory._id.toString()).toEqual(inventoryItem._id.toString());
 
     const newInventoryContainerAfterPickup = await ItemContainer.findById(inventory.itemContainer);
 
