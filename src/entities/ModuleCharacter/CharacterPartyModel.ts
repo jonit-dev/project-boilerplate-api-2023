@@ -1,13 +1,6 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
-import { CharacterClass, TypeHelper } from "@rpg-engine/shared";
+import { CharacterClass, CharacterPartyBenefits, TypeHelper } from "@rpg-engine/shared";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
-
-enum CharacterPartyBenefits {
-  Experience = "experience",
-  DropRatio = "drop-ratio",
-  Skill = "skill",
-  Distribution = "distribution",
-}
 
 const characterPartySchema = createLeanSchema(
   {

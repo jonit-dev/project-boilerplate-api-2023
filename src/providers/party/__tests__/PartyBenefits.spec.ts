@@ -1,13 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import PartyManagement, {
+
+import {
+  CharacterClass,
   CharacterPartyBenefits,
   CharacterPartyDistributionBonus,
   CharacterPartyDropBonus,
   CharacterPartyEXPBonus,
   CharacterPartySkillBonus,
-} from "../PartyManagement";
-import { CharacterClass } from "@rpg-engine/shared";
+} from "@rpg-engine/shared";
+import PartyManagement from "../PartyManagement";
 
 describe("Party Benefits", () => {
   let partyManagement: PartyManagement;

@@ -3,16 +3,11 @@ import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { provide } from "inversify-binding-decorators";
 import PartyManagement from "../PartyManagement";
-import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { IPartyManagementFromClient, PartySocketEvents } from "./PartyNetworkCreate";
+import { IPartyManagementFromClient, PartySocketEvents } from "@rpg-engine/shared";
 
 @provide(PartyNetworkTranferLeaderShip)
 export class PartyNetworkTranferLeaderShip {
-  constructor(
-    private socketAuth: SocketAuth,
-    private partyManagement: PartyManagement,
-    private characterValidation: CharacterValidation
-  ) {}
+  constructor(private socketAuth: SocketAuth, private partyManagement: PartyManagement) {}
 
   public onTranferLeaderShip(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
@@ -21,16 +16,9 @@ export class PartyNetworkTranferLeaderShip {
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
           const leader = (await Character.findById(character._id).lean()) as ICharacter;
-          // const leaderBasicValidation = this.characterValidation.hasBasicValidation(leader);
 
           const target = (await Character.findById(data.targetId).lean()) as ICharacter;
-          // const targetBasicValidation = this.characterValidation.hasBasicValidation(target);
 
-          // if (leaderBasicValidation || targetBasicValidation) {
-          //   console.log("ERROR");
-          // }
-
-          console.log("LIDERANCA TRANSFERIADA! DE: ", leader.name, "PARA: ", target.name);
           await this.partyManagement.transferLeadership(leader, target);
         } catch (error) {
           console.error(error);
