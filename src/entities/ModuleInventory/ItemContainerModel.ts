@@ -138,9 +138,13 @@ itemContainerSchema.pre("save", async function (this: IItemContainer) {
       },
     }
   );
+});
 
-  await inMemoryHashTable.delete("character-weights", this.owner?.toString()!);
-  await inMemoryHashTable.delete("character-max-weights", this.owner?.toString()!);
+itemContainerSchema.post("save", async function (this: IItemContainer) {
+  if (this.owner) {
+    await inMemoryHashTable.delete("character-weights", this.owner.toString()!);
+    await inMemoryHashTable.delete("character-max-weights", this.owner.toString()!);
+  }
 });
 
 itemContainerSchema.post("remove", async function (this: IItemContainer) {
