@@ -22,6 +22,7 @@ import { clearCacheForKey } from "speedgoose";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
 import { ItemDropCleanup } from "./ItemDropCleanup";
 import { ItemOwnership } from "./ItemOwnership";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(ItemDrop)
 export class ItemDrop {
@@ -34,7 +35,8 @@ export class ItemDrop {
     private characterWeight: CharacterWeight,
     private itemOwnership: ItemOwnership,
     private characterInventory: CharacterInventory,
-    private itemCleanup: ItemDropCleanup
+    private itemCleanup: ItemDropCleanup,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   //! For now, only a drop from inventory or equipment set is allowed.
@@ -112,6 +114,8 @@ export class ItemDrop {
       await this.characterWeight.updateCharacterWeight(character);
 
       await clearCacheForKey(`${character._id}-inventory`);
+
+      await this.inMemoryHashTable.delete("character-weapon", character._id);
 
       return true;
     } catch (err) {

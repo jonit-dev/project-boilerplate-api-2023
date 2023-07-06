@@ -7,6 +7,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentSlotTypes } from "@providers/equipment/EquipmentSlots";
 import { blueprintManager, entityEffectUse, equipmentSlots } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
@@ -61,6 +62,7 @@ export class CharacterDeath {
     private skillDecrease: SkillDecrease,
     private characterDeathCalculator: CharacterDeathCalculator,
     private characterItemContainer: CharacterItemContainer,
+    private inMemoryHashTable: InMemoryHashTable,
     private characterBuffActivator: CharacterBuffActivator,
     private locker: Locker,
     private time: Time
@@ -136,8 +138,11 @@ export class CharacterDeath {
         await equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
       }
 
-      await entityEffectUse.clearAllEntityEffects(character);
-      await this.characterWeight.updateCharacterWeight(character);
+      await Promise.all([
+        entityEffectUse.clearAllEntityEffects(character),
+        this.characterWeight.updateCharacterWeight(character),
+        this.inMemoryHashTable.delete("character-weapon", character._id),
+      ]);
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
     } finally {

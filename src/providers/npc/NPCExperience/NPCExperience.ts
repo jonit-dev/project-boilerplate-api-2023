@@ -53,7 +53,7 @@ export class NPCExperience {
    * characters and notifies them if leveled up
    */
   public async releaseXP(target: INPC): Promise<void> {
-    await this.time.waitForMilliseconds(random(0, 200)); // add artificial delay to avoid concurrency
+    await this.time.waitForMilliseconds(random(0, 50)); // add artificial delay to avoid concurrency
 
     const hasLock = await this.locker.lock(`npc-${target._id}-release-xp`);
 
@@ -85,14 +85,9 @@ export class NPCExperience {
       }
 
       await clearCacheForKey(`characterBuffs_${character._id}`);
-      await clearCacheForKey(`${character._id}-skills`);
 
       // Get character skills
-      const skills = (await Skill.findById(character.skills)
-        .lean()
-        .cacheQuery({
-          cacheKey: `${character?._id}-skills`,
-        })) as ISkill;
+      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
 
       if (!skills) {
         // if attacker skills does not exist anymore
@@ -137,29 +132,46 @@ export class NPCExperience {
    * In case the target is NPC, it stores the character's xp gained in the xpToRelease array
    */
   public async recordXPinBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
-    // For now, only supported increasing XP when target is NPC
-    if (target.type === "NPC" && damage > 0) {
-      target = target as INPC;
+    try {
+      await this.time.waitForMilliseconds(random(0, 50)); // add artificial delay to avoid concurrency
 
-      // Store the xp in the xpToRelease array
-      // before adding the character to the array, check if the character already caused some damage
-      if (typeof target.xpToRelease !== "undefined") {
-        let found = false;
-        for (const i in target.xpToRelease) {
-          if (target.xpToRelease[i].charId?.toString() === attacker.id) {
-            found = true;
-            target.xpToRelease[i].xp! += target.xpPerDamage * damage;
-            break;
-          }
-        }
-        if (!found) {
-          target.xpToRelease.push({ xpId: uuidv4(), charId: attacker.id, xp: target.xpPerDamage * damage });
-        }
-      } else {
-        target.xpToRelease = [{ xpId: uuidv4(), charId: attacker.id, xp: target.xpPerDamage * damage }];
+      const canProceed = await this.locker.lock(`npc-${target._id}-record-xp`);
+
+      if (!canProceed) {
+        return;
       }
 
-      await NPC.updateOne({ _id: target.id }, { xpToRelease: target.xpToRelease });
+      // For now, only supported increasing XP when target is NPC
+      if (target.type === "NPC" && damage > 0) {
+        target = target as INPC;
+
+        target.xpToRelease = uniqBy(target.xpToRelease, "xpId");
+
+        // Store the xp in the xpToRelease array
+        // before adding the character to the array, check if the character already caused some damage
+        if (typeof target.xpToRelease !== "undefined") {
+          let found = false;
+          for (const i in target.xpToRelease) {
+            if (target.xpToRelease[i].charId?.toString() === attacker.id) {
+              found = true;
+              target.xpToRelease[i].xp! += target.xpPerDamage * damage;
+              break;
+            }
+          }
+          if (!found) {
+            target.xpToRelease.push({ xpId: uuidv4(), charId: attacker.id, xp: target.xpPerDamage * damage });
+          }
+        } else {
+          target.xpToRelease = [{ xpId: uuidv4(), charId: attacker.id, xp: target.xpPerDamage * damage }];
+        }
+
+        await NPC.updateOne({ _id: target.id }, { xpToRelease: target.xpToRelease });
+      }
+    } catch (error) {
+      console.error(error);
+      await this.locker.unlock(`npc-${target._id}-record-xp`);
+    } finally {
+      await this.locker.unlock(`npc-${target._id}-record-xp`);
     }
   }
 

@@ -208,6 +208,8 @@ export class EquipmentEquip {
 
       await this.characterBuffValidation.removeDuplicatedBuffs(character);
 
+      await this.inMemoryHashTable.delete("character-weapon", character._id);
+
       return true;
     } catch (error) {
       console.error(error);

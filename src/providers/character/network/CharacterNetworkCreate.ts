@@ -97,12 +97,12 @@ export class CharacterNetworkCreate {
         }
 
         await clearCacheForKey(`characterBuffs_${character._id}`);
-        await clearCacheForKey(`${character._id}-skills`);
 
         await this.characterView.clearCharacterView(character);
 
         await this.itemCleaner.clearMissingReferences(character);
 
+        await this.inMemoryHashTable.delete("character-weapon", character._id);
         await this.locker.unlock(`character-changing-scene-${character._id}`);
         await this.locker.unlock(`character-death-${character.id}`);
 

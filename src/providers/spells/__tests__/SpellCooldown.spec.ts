@@ -117,6 +117,6 @@ describe("SpellCooldown", () => {
 
     const cooldown = await inMemoryHashTable.get(namespace, regexMagicWords);
 
-    expect(cooldown).toEqual(7);
+    expect(cooldown).toEqual(5);
   });
 });

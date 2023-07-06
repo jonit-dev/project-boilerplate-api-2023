@@ -53,7 +53,7 @@ export class OnTargetHit {
   private async generateBloodOnGround(target: ICharacter | INPC): Promise<void> {
     const n = _.random(0, 100);
 
-    if (n <= 30) {
+    if (n <= 10) {
       await this.battleEffects.generateBloodOnGround(target);
     }
   }

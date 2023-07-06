@@ -6,6 +6,7 @@ import { IAuthResponse, TypeHelper, UserAuthFlow, UserTypes } from "@rpg-engine/
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import uniqueValidator from "mongoose-unique-validator";
+import { SpeedGooseCacheAutoCleaner } from "speedgoose";
 import { ExtractDoc, Type, createSchema, typedModel } from "ts-mongoose";
 
 const mongooseHidden = require("mongoose-hidden")();
@@ -58,6 +59,8 @@ userSchema.index(
   },
   { background: true }
 );
+
+userSchema.plugin(SpeedGooseCacheAutoCleaner);
 
 userSchema.plugin(uniqueValidator);
 

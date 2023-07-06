@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
@@ -19,6 +20,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
 
@@ -62,6 +64,7 @@ export class SkillFunctions {
     );
   }
 
+  @TrackNewRelicTransaction()
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
     await Skill.findByIdAndUpdate(skills._id, { ...skills });
 
@@ -74,6 +77,7 @@ export class SkillFunctions {
     });
   }
 
+  @TrackNewRelicTransaction()
   public async sendSkillLevelUpEvents(
     skillData: IIncreaseSPResult,
     character: ICharacter,
@@ -86,6 +90,10 @@ export class SkillFunctions {
     } else {
       behavior = "advanced";
     }
+
+    // now we need to clear up caching
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
 
     const levelUpEventPayload: ISkillEventFromServer = {
       characterId: character.id,
@@ -115,6 +123,7 @@ export class SkillFunctions {
    * @param skillLevel
    * @returns
    */
+  @TrackNewRelicTransaction()
   public async calculateBonus(character: ICharacter | INPC, skillsId: undefined | Types.ObjectId): Promise<number> {
     if (!skillsId) {
       return 0;

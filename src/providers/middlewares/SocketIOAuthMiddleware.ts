@@ -17,7 +17,14 @@ export const SocketIOAuthMiddleware = (socket, next): void => {
         next(new Error("Unauthorized"));
       }
 
-      const dbUser = (await User.findOne({ email: jwtPayload.email })) as IUser;
+      const dbUser = (await User.findOne({ email: jwtPayload.email })
+        .lean({
+          virtuals: true,
+          defaults: true,
+        })
+        .cacheQuery({
+          cacheKey: `user-${jwtPayload.email}`,
+        })) as IUser;
 
       if (!dbUser) {
         console.log(`Authorization error: User not found (${jwtPayload.email})`);

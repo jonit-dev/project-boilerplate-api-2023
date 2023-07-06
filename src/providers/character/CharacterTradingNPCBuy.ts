@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { blueprintManager } from "@providers/inversify/container";
 import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -26,6 +27,7 @@ export class CharacterTradingNPCBuy {
     private characterTarget: CharacterTarget
   ) {}
 
+  @TrackNewRelicTransaction()
   public async initializeBuy(npcId: string, character: ICharacter): Promise<void> {
     const npc = await this.characterTradingValidation.validateAndReturnTraderNPC(npcId, character);
 
@@ -61,6 +63,7 @@ export class CharacterTradingNPCBuy {
     );
   }
 
+  @TrackNewRelicTransaction()
   public buyItemsFromNPC(character: ICharacter, npc: INPC, items: ITradeRequestItem[]): Promise<boolean> {
     return this.characterTradingBuy.buyItems(character, npc, items, TradingEntity.NPC);
   }

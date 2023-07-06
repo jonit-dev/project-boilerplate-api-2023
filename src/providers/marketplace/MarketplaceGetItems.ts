@@ -1,11 +1,12 @@
-import { provide } from "inversify-binding-decorators";
-import { MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { MarketplaceValidation } from "./MarketplaceValidation";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import mongoose from "mongoose";
+import { MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
 import { MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IMarketplaceGetItemsResponse, MarketplaceSocketEvents } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
+import mongoose from "mongoose";
+import { MarketplaceValidation } from "./MarketplaceValidation";
 
 interface IGetItemsOptions {
   name?: string;
@@ -25,6 +26,7 @@ interface IGetItemsOptions {
 export class MarketplaceGetItems {
   constructor(private marketplaceValidation: MarketplaceValidation, private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async getItems(
     character: ICharacter,
     npcId: string,
@@ -35,7 +37,7 @@ export class MarketplaceGetItems {
       return;
     }
 
-    let pipeline: any[] = [
+    const pipeline: any[] = [
       {
         $lookup: {
           from: "items",

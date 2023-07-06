@@ -36,7 +36,7 @@ export const strongEatingUsableEffect: IUsableEffect = {
 };
 
 export const superStrongEatingUsableEffect: IUsableEffect = {
-  key: UsableEffectsBlueprint.StrongEatingEffect,
+  key: UsableEffectsBlueprint.SuperStrongEatingEffect,
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 

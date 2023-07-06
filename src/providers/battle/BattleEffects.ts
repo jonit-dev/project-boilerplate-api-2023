@@ -9,14 +9,17 @@ import _ from "lodash";
 
 @provide(BattleEffects)
 export class BattleEffects {
+  private groundBloodBlueprint: IItem | null = null;
+
   constructor() {}
 
   @TrackNewRelicTransaction()
   public async generateBloodOnGround(target: ICharacter | INPC): Promise<void> {
-    const groundBloodBlueprint = await blueprintManager.getBlueprint<IItem>("items", EffectsBlueprint.GroundBlood);
-
+    if (!this.groundBloodBlueprint) {
+      this.groundBloodBlueprint = await blueprintManager.getBlueprint<IItem>("items", EffectsBlueprint.GroundBlood);
+    }
     const newGroundBlood = new Item({
-      ...groundBloodBlueprint,
+      ...this.groundBloodBlueprint,
       x: target.x,
       y: target.y,
       scene: target.scene,

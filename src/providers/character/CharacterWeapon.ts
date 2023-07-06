@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
@@ -13,10 +14,17 @@ interface ICharacterWeaponResult {
 
 @provide(CharacterWeapon)
 export class CharacterWeapon {
-  constructor() {}
+  constructor(private inMemoryHashTable: InMemoryHashTable) {}
 
   @TrackNewRelicTransaction()
   public async getWeapon(character: ICharacter): Promise<ICharacterWeaponResult | undefined> {
+    const namespace = "character-weapon";
+    const cachedResult = (await this.inMemoryHashTable.get(namespace, character._id)) as ICharacterWeaponResult;
+
+    if (cachedResult) {
+      return cachedResult;
+    }
+
     const equipment = (await Equipment.findById(character.equipment)
       .lean()
       .cacheQuery({
@@ -36,11 +44,15 @@ export class CharacterWeapon {
 
     // ItemSubType Shield is of type Weapon, so check that the weapon is not subType Shield (because cannot attack with Shield)
     if (rightHandItem?.type === ItemType.Weapon && rightHandItem?.subType !== ItemSubType.Shield) {
-      return { item: rightHandItem, location: ItemSlotType.RightHand };
+      const result = { item: rightHandItem, location: ItemSlotType.RightHand };
+      await this.inMemoryHashTable.set(namespace, character._id, result);
+      return result;
     }
 
     if (leftHandItem?.type === ItemType.Weapon && leftHandItem?.subType !== ItemSubType.Shield) {
-      return { item: leftHandItem, location: ItemSlotType.LeftHand };
+      const result = { item: leftHandItem, location: ItemSlotType.LeftHand };
+      await this.inMemoryHashTable.set(namespace, character._id, result);
+      return result;
     }
   }
 

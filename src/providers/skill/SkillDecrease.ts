@@ -1,9 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterDeathCalculator } from "@providers/character/CharacterDeathCalculator";
 import { BASIC_ATTRIBUTES, COMBAT_SKILLS, ISkillDetails, SKILLS_MAP, calculateSPToNextLevel } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { clearCacheForKey } from "speedgoose";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
 
@@ -15,10 +15,9 @@ export class SkillDecrease {
     private characterDeathCalculator: CharacterDeathCalculator
   ) {}
 
+  @TrackNewRelicTransaction()
   public async deathPenalty(character: ICharacter): Promise<boolean> {
     try {
-      await clearCacheForKey(`${character._id}-skills`);
-
       const decreaseXp = await this.decreaseCharacterXp(character);
       const decreaseBasicAttributes = await this.decreaseBasicAttributeSP(character);
       const decreaseCombatSkills = await this.decreaseCombatSkillsSP(character);
@@ -53,11 +52,7 @@ export class SkillDecrease {
   }
 
   private async decreaseBasicAttributeSP(character: ICharacter): Promise<boolean> {
-    const skills = (await Skill.findById(character.skills)
-      .lean()
-      .cacheQuery({
-        cacheKey: `${character?._id}-skills`,
-      })) as unknown as ISkill;
+    const skills = (await Skill.findById(character.skills).lean()) as unknown as ISkill;
 
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
@@ -84,11 +79,7 @@ export class SkillDecrease {
   }
 
   private async decreaseCombatSkillsSP(character: ICharacter): Promise<boolean> {
-    const skills = (await Skill.findById(character.skills)
-      .lean()
-      .cacheQuery({
-        cacheKey: `${character?._id}-skills`,
-      })) as unknown as ISkill;
+    const skills = (await Skill.findById(character.skills).lean()) as unknown as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }

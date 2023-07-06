@@ -5,7 +5,6 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { IUIShowMessage, SkillSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { clearCacheForKey } from "speedgoose";
 import { SkillBuff } from "../SkillBuff";
 
 @provide(SkillNetworkReadInfo)
@@ -19,9 +18,6 @@ export class SkillNetworkReadInfo {
 
   public onGetInfo(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(channel, SkillSocketEvents.ReadInfo, async (data, character: ICharacter) => {
-      await clearCacheForKey(`characterBuffs_${character._id}`);
-      await clearCacheForKey(`${character._id}-skills`);
-
       const skill = await this.skillBuff.getSkillsWithBuff(character);
 
       if (!skill) {

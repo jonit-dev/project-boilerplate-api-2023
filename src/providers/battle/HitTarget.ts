@@ -1,6 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
-import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
@@ -23,7 +22,8 @@ import {
   ItemSubType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+
+import random from "lodash/random";
 import { BattleAttackTargetDeath } from "./BattleAttackTarget/BattleAttackTargetDeath";
 import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
@@ -52,19 +52,6 @@ export class HitTarget {
     magicAttack?: boolean,
     bonusDamage?: number
   ): Promise<void> {
-    const attackerSkills = (await Skill.findById(attacker.skills).cacheQuery({
-      cacheKey: `${attacker._id}-skills`,
-    })) as ISkill;
-
-    const targetSkills = (await Skill.findById(target.skills).cacheQuery({
-      cacheKey: `${target._id}-skills`,
-    })) as ISkill;
-
-    attacker.skills = attackerSkills;
-
-    target.skills = targetSkills;
-
-    // if target is dead, do nothing.
     if (!target.isAlive) {
       return;
     }
@@ -90,28 +77,33 @@ export class HitTarget {
 
       const damage = this.battleEvent.getCriticalHitDamageIfSucceed(baseDamage);
 
+      const generateBloodChance = random(1, 100);
+
+      const effectGenerator =
+        damage > 0 && generateBloodChance <= 10 ? this.battleEffects.generateBloodOnGround(target) : Promise.resolve();
+      const damageRelatedPromises: any[] = [];
+
       if (damage > 0) {
-        // Increase attacker SP for weapon used and XP (if is character)
         if (attacker.type === "Character") {
           const character = attacker as ICharacter;
-          await this.skillIncrease.increaseSkillsOnBattle(character, target, damage);
+          damageRelatedPromises.push(this.skillIncrease.increaseSkillsOnBattle(character, target, damage));
         }
 
         if (attacker.class === CharacterClass.Berserker) {
           const character = attacker as ICharacter;
+          const berserkerSpell = this.bloodthirst.getBerserkerBloodthirstSpell(character);
 
-          const isActive = await this.bloodthirst.getBerserkerBloodthirstSpell(character);
-          if (isActive) {
-            await this.bloodthirst.handleBerserkerAttack(character, damage);
+          if (await berserkerSpell) {
+            damageRelatedPromises.push(this.bloodthirst.handleBerserkerAttack(character, damage));
           }
         }
 
         let sorcererManaShield: boolean = false;
         if (target.class === CharacterClass.Sorcerer || target.class === CharacterClass.Druid) {
           const character = target as ICharacter;
+          const manaShieldSpell = this.manaShield.getManaShieldSpell(character);
 
-          const isActive = await this.manaShield.getManaShieldSpell(character);
-          if (isActive) {
+          if (await manaShieldSpell) {
             sorcererManaShield = await this.manaShield.handleManaShield(character, damage);
           }
         }
@@ -127,17 +119,11 @@ export class HitTarget {
           }
 
           if (target.type === "Character") {
-            await Character.updateOne({ _id: target.id }, { health: target.health });
+            damageRelatedPromises.push(Character.updateOne({ _id: target.id }, { health: target.health }));
           }
           if (target.type === "NPC") {
-            await NPC.updateOne({ _id: target.id }, { health: target.health });
+            damageRelatedPromises.push(NPC.updateOne({ _id: target.id }, { health: target.health }));
           }
-        }
-
-        const n = _.random(0, 100);
-
-        if (n <= 30) {
-          await this.battleEffects.generateBloodOnGround(target);
         }
 
         battleEventPayload = {
@@ -147,53 +133,48 @@ export class HitTarget {
           isCriticalHit: damage > baseDamage,
         };
 
-        // when target is Character, resistance SP increases
-        if (target.type === "Character") {
-          const weapon = await this.characterWeapon.getWeapon(attacker as ICharacter);
+        const weaponPromise = this.characterWeapon.getWeapon(attacker as ICharacter);
 
+        if (target.type === "Character") {
+          const weapon = await weaponPromise;
           if (
             (weapon?.item && weapon?.item.subType === ItemSubType.Magic) ||
             (weapon?.item && weapon?.item.subType === ItemSubType.Staff)
           ) {
-            await this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, this.getPower(weapon?.item));
+            damageRelatedPromises.push(
+              this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, this.getPower(weapon?.item))
+            );
           } else {
-            await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance);
+            damageRelatedPromises.push(
+              this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance)
+            );
           }
         }
 
-        // apply Entity Effects
         if (target.isAlive) {
           if (attacker.type === EntityType.Character) {
-            await this.applyEntityEffectsCharacter(attacker as ICharacter, target);
+            damageRelatedPromises.push(this.applyEntityEffectsCharacter(attacker as ICharacter, target));
           } else if (attacker.type === EntityType.NPC) {
-            await this.applyEntityEffectsIfApplicable(attacker as INPC, target);
+            damageRelatedPromises.push(this.applyEntityEffectsIfApplicable(attacker as INPC, target));
           }
         }
       }
+
+      await Promise.all([effectGenerator, ...damageRelatedPromises]);
     }
 
-    // When block attack, increase shielding SP in target (if is Character)
     if (battleEvent === BattleEventType.Block && target.type === "Character") {
       await this.skillIncrease.increaseShieldingSP(target as ICharacter);
     }
 
-    // if battle event was a Miss, the character dodged the hit
-    // then, increase the character's dexterity SP
     if (battleEvent === BattleEventType.Miss && target.type === "Character") {
       await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
     }
 
     await this.warnCharacterIfNotInView(attacker as ICharacter, target);
 
-    // finally, send battleHitPayload to characters around
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
-
     await this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
-
-    /*
-      Check if character is dead. 
-      If so, send death event to client and characters around.
-      */
     await this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
   }
 
@@ -249,7 +230,7 @@ export class HitTarget {
     const hasEntityEffect = item?.entityEffects?.length! > 0;
     const entityEffectChance = item?.entityEffectChance;
     if (hasEntityEffect && entityEffectChance) {
-      const n = _.random(0, 100);
+      const n = random(0, 100);
       if (entityEffectChance <= n) {
         return;
       }
