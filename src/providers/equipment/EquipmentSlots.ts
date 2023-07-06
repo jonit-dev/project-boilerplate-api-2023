@@ -74,7 +74,7 @@ export class EquipmentSlots {
     }
 
     if (item.maxStackSize > 1) {
-      const equipmentSet = await this.getEquipmentSlots(equipment._id);
+      const equipmentSet = await this.getEquipmentSlots(equipment.owner?.toString()!, equipment._id);
 
       const targetSlotItemId = equipmentSet[availableSlot];
       const targetSlotItem = await Item.findById(targetSlotItemId);
@@ -145,7 +145,7 @@ export class EquipmentSlots {
 
   @TrackNewRelicTransaction()
   public async areAllowedSlotsAvailable(slots: string[], equipment: IEquipment): Promise<boolean> {
-    const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.getEquipmentSlots(equipment.owner?.toString()!, equipment._id);
 
     for (const slotData of slots) {
       const slot = camelCase(slotData) as EquipmentSlotTypes;
@@ -173,7 +173,7 @@ export class EquipmentSlots {
 
   @TrackNewRelicTransaction()
   public async getAvailableSlot(item: IItem, equipment: IEquipment): Promise<string> {
-    const equipmentSet = await this.getEquipmentSlots(equipment._id);
+    const equipmentSet = await this.getEquipmentSlots(equipment.owner?.toString()!, equipment._id);
 
     let availableSlot = "";
     const itemSlotTypes = this.slots;
@@ -218,7 +218,7 @@ export class EquipmentSlots {
   }
 
   @TrackNewRelicTransaction()
-  public async getEquipmentSlots(equipmentId: string): Promise<IEquipmentSet> {
+  public async getEquipmentSlots(characterId: string, equipmentId: string): Promise<IEquipmentSet> {
     // TODO: Cache this
     const equipment = await Equipment.findById(equipmentId).lean().populate(this.slots.join(" ")).exec();
 

@@ -159,7 +159,7 @@ describe("ItemPickup.ts", () => {
 
     expect(pickupInventory).toBeTruthy();
 
-    const equipmentSet = await equipmentSlots.getEquipmentSlots(character._id, equipment._id);
+    const equipmentSet = await equipmentSlots.getEquipmentSlots(testCharacter._id, equipment._id);
 
     expect(equipmentSet).toBeTruthy();
 
