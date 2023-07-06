@@ -50,15 +50,18 @@ export class CharacterItemInventory {
     const items: IItem[] = [];
     for (const [, slot] of Object.entries(slots)) {
       if (slot) {
-        const item = await Item.findById(slot._id);
+        const item = await Item.findById(slot._id).lean({ virtuals: true, defaults: true });
         if (item) {
           // @ts-ignore
           items.push(item);
 
           if (item.type === ItemType.Container) {
-            const nestedContainer = await ItemContainer.findById(item?.itemContainer);
+            const nestedContainer = await ItemContainer.findById(item?.itemContainer).lean({
+              virtuals: true,
+              defaults: true,
+            });
             if (nestedContainer) {
-              const nestedItems = await this.getAllItemsFromContainer(nestedContainer);
+              const nestedItems = await this.getAllItemsFromContainer(nestedContainer as IItemContainer);
               items.push(...nestedItems);
             }
           }
