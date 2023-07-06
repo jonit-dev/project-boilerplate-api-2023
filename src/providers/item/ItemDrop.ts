@@ -114,14 +114,14 @@ export class ItemDrop {
           break;
       }
 
-      await this.characterWeight.updateCharacterWeight(character);
-
       await clearCacheForKey(`${character._id}-inventory`);
 
       await this.inMemoryHashTable.delete("character-weapon", character._id);
 
       await this.inMemoryHashTable.delete("character-weights", character._id);
       await this.inMemoryHashTable.delete("character-max-weights", character._id);
+
+      await this.characterWeight.updateCharacterWeight(character);
 
       return true;
     } catch (err) {
