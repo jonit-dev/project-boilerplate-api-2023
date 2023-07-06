@@ -70,6 +70,8 @@ export class CharacterNetworkLogout {
         const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
         const key: SpellsBlueprint = SpellsBlueprint.DruidShapeshift;
 
+        const keyVeil: SpellsBlueprint = SpellsBlueprint.SorcererVeilofUndeath;
+
         const hasShapeShift = await this.inMemoryHashTable.has(namespace, key);
         let textureKey: any;
         if (hasShapeShift) {
@@ -83,6 +85,18 @@ export class CharacterNetworkLogout {
           }
         );
 
+        const hasVeil = await this.inMemoryHashTable.has(namespace, keyVeil);
+        let textureKeyVeil: any;
+        if (hasVeil) {
+          textureKeyVeil = await this.inMemoryHashTable.get(namespace, keyVeil);
+        }
+        await Character.updateOne(
+          { _id: data.id },
+          {
+            isOnline: false,
+            textureKey: textureKeyVeil || character.textureKey,
+          }
+        );
         await this.socketSessionControl.deleteSession(character);
 
         await this.specialEffect.clearEffects(character);
@@ -102,8 +116,6 @@ export class CharacterNetworkLogout {
         }
 
         await this.skillStatsIncrease.increaseMaxManaMaxHealth(character._id);
-
-        await this.inMemoryHashTable.delete("character-weapon", character._id);
 
         const connectedCharacters = await this.socketConnection.getConnectedCharacters();
 
