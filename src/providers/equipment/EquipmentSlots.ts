@@ -231,32 +231,30 @@ export class EquipmentSlots {
       return hasCache;
     }
 
-    // TODO: Cache this
-    const equipment = await Equipment.findById(equipmentId).lean().populate(this.slots.join(" ")).exec();
+    const equipment = await Equipment.findById(equipmentId)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${characterId}-equipment`,
+      });
 
-    const head = equipment?.head! as unknown as IItem;
-    const neck = equipment?.neck! as unknown as IItem;
-    const leftHand = equipment?.leftHand! as unknown as IItem;
-    const rightHand = equipment?.rightHand! as unknown as IItem;
-    const ring = equipment?.ring! as unknown as IItem;
-    const legs = equipment?.legs! as unknown as IItem;
-    const boot = equipment?.boot! as unknown as IItem;
-    const accessory = equipment?.accessory! as unknown as IItem;
-    const armor = equipment?.armor! as unknown as IItem;
-    const inventory = equipment?.inventory! as unknown as IItem;
+    if (!equipment) {
+      throw new Error(`Equipment ${equipmentId} not found`);
+    }
+
+    const promises = this.slots.map((slot) =>
+      equipment[slot]
+        ? Item.findById(equipment[slot]).lean({
+            virtuals: true,
+            defaults: true,
+          })
+        : Promise.resolve(undefined)
+    );
+
+    const slotValues = await Promise.all(promises);
 
     const result = {
-      _id: equipment!._id.toString(),
-      head,
-      neck,
-      leftHand,
-      rightHand,
-      ring,
-      legs,
-      boot,
-      accessory,
-      armor,
-      inventory,
+      _id: equipment._id.toString(),
+      ...this.slots.reduce((obj, slot, index) => ({ ...obj, [slot]: slotValues[index] }), {}),
     };
 
     const cleanedResult = _.omitBy(result, _.isUndefined);
