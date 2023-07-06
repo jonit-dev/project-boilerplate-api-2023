@@ -1,3 +1,4 @@
+import { inMemoryHashTable } from "@providers/inversify/container";
 import { ItemType, TypeHelper } from "@rpg-engine/shared";
 import { Types } from "mongoose";
 import locks from "mongoose-locks";
@@ -137,6 +138,9 @@ itemContainerSchema.pre("save", async function (this: IItemContainer) {
       },
     }
   );
+
+  await inMemoryHashTable.delete("character-weights", this.owner?.toString()!);
+  await inMemoryHashTable.delete("character-max-weights", this.owner?.toString()!);
 });
 
 itemContainerSchema.post("remove", async function (this: IItemContainer) {
@@ -150,6 +154,24 @@ itemContainerSchema.post("remove", async function (this: IItemContainer) {
     }
   }
 });
+
+async function onItemContainerUpdate(doc, next): Promise<void> {
+  // @ts-ignore
+  const itemContainer = await this.model.findOne(this.getQuery());
+
+  if (!itemContainer.owner) {
+    return next();
+  }
+
+  await inMemoryHashTable.delete("character-weights", itemContainer.owner!.toString()!);
+  await inMemoryHashTable.delete("character-max-weights", itemContainer.owner!.toString()!);
+
+  next();
+}
+
+itemContainerSchema.pre(/updateOne/, onItemContainerUpdate);
+itemContainerSchema.pre(/updateMany/, onItemContainerUpdate);
+itemContainerSchema.pre(/findOneAndUpdate/, onItemContainerUpdate);
 
 export type IItemContainer = ExtractDoc<typeof itemContainerSchema>;
 

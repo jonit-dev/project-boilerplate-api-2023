@@ -6,6 +6,7 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -22,7 +23,6 @@ import { clearCacheForKey } from "speedgoose";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
 import { ItemDropCleanup } from "./ItemDropCleanup";
 import { ItemOwnership } from "./ItemOwnership";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(ItemDrop)
 export class ItemDrop {
@@ -116,6 +116,9 @@ export class ItemDrop {
       await clearCacheForKey(`${character._id}-inventory`);
 
       await this.inMemoryHashTable.delete("character-weapon", character._id);
+
+      await this.inMemoryHashTable.delete("character-weights", character._id);
+      await this.inMemoryHashTable.delete("character-max-weights", character._id);
 
       return true;
     } catch (err) {

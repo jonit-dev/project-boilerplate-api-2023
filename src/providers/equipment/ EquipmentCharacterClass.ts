@@ -37,11 +37,11 @@ export class EquipmentCharacterClass {
 
     const allowedItems = this.allowedItems.get(CharacterClass[characterType]);
 
-    if (!allowedItems) {
+    if (!allowedItems && characterType !== "None") {
       console.error("Character class not found: " + characterType);
       return false;
     }
 
-    return allowedItems.includes(ItemSubType[itemSubType]);
+    return allowedItems?.includes(ItemSubType[itemSubType]) || false;
   }
 }

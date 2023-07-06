@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInventory";
 import { ItemMap } from "@providers/item/ItemMap";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
@@ -28,7 +29,8 @@ export class CharacterItemContainer {
     private itemMap: ItemMap,
     private characterInventory: CharacterInventory,
     private itemOwnership: ItemOwnership,
-    private locker: Locker
+    private locker: Locker,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -69,9 +71,15 @@ export class CharacterItemContainer {
           }
         );
 
+        await this.inMemoryHashTable.delete("character-weights", character._id);
+        await this.inMemoryHashTable.delete("character-max-weights", character._id);
+
         return true;
       }
     }
+
+    await this.inMemoryHashTable.delete("character-weights", character._id);
+    await this.inMemoryHashTable.delete("character-max-weights", character._id);
 
     return true;
   }
@@ -173,6 +181,11 @@ export class CharacterItemContainer {
       };
 
       const result = await tryToAddItemToContainer();
+
+      if (result) {
+        await this.inMemoryHashTable.delete("character-weights", character._id);
+        await this.inMemoryHashTable.delete("character-max-weights", character._id);
+      }
 
       if (result && shouldAddOwnership) {
         await this.itemOwnership.addItemOwnership(itemToBeAdded, character);

@@ -142,6 +142,8 @@ export class CharacterDeath {
         entityEffectUse.clearAllEntityEffects(character),
         this.characterWeight.updateCharacterWeight(character),
         this.inMemoryHashTable.delete("character-weapon", character._id),
+        this.inMemoryHashTable.delete("character-weights", character._id),
+        this.inMemoryHashTable.delete("character-max-weights", character._id),
       ]);
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
