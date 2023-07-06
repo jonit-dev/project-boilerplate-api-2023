@@ -241,21 +241,15 @@ export class EquipmentSlots {
       throw new Error(`Equipment ${equipmentId} not found`);
     }
 
-    const promises = this.slots.map((slot) =>
-      equipment[slot]
-        ? Item.findById(equipment[slot]).lean({
-            virtuals: true,
-            defaults: true,
-          })
-        : Promise.resolve(undefined)
-    );
-
-    const slotValues = await Promise.all(promises);
-
     const result = {
       _id: equipment._id.toString(),
-      ...this.slots.reduce((obj, slot, index) => ({ ...obj, [slot]: slotValues[index] }), {}),
     };
+
+    for (const slot of this.slots) {
+      if (equipment[slot]) {
+        result[slot] = await Item.findById(equipment[slot]).lean({ virtuals: true, defaults: true });
+      }
+    }
 
     const cleanedResult = _.omitBy(result, _.isUndefined);
 
