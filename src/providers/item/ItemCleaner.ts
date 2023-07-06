@@ -28,7 +28,7 @@ export class ItemCleaner {
       return;
     }
 
-    const slotsData = await this.equipmentSlots.getEquipmentSlots(character.equipment.toString());
+    const slotsData = await this.equipmentSlots.getEquipmentSlots(character._id, character.equipment.toString());
 
     for (const [slotName, itemData] of Object.entries(slotsData)) {
       if (!itemData || slotName === "_id") {

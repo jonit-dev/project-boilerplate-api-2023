@@ -245,7 +245,7 @@ export class EquipmentEquip {
     item: IItem,
     character: ICharacter
   ): Promise<void> {
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,
       inventory: inventoryContainer as any,
@@ -287,7 +287,7 @@ export class EquipmentEquip {
       );
     }
 
-    const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
 
     this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.EquipmentAndInventoryUpdate, {
       equipment: newEquipmentSlots,
@@ -381,7 +381,10 @@ export class EquipmentEquip {
       }
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+      character._id,
+      character.equipment as unknown as string
+    );
 
     const validateItemsEquip = await this.equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, item, character);
 

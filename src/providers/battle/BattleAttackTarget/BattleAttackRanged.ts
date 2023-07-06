@@ -225,7 +225,7 @@ export class BattleAttackRanged {
       return;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,

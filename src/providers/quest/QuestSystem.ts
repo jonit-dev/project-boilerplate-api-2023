@@ -286,7 +286,10 @@ export class QuestSystem {
 
       await this.characterWeight.updateCharacterWeight(character);
 
-      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment!.toString());
+      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+        character._id,
+        character.equipment!.toString()
+      );
 
       const inventory: IItemContainer = {
         _id: backpackContainer._id,

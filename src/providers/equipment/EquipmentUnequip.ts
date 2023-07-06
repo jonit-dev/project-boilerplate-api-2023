@@ -59,7 +59,10 @@ export class EquipmentUnequip {
       return false;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+      character._id,
+      character.equipment as unknown as string
+    );
 
     const bookValue = 2;
     const Accessory = await Item.findById(equipmentSlots.accessory);
@@ -95,7 +98,10 @@ export class EquipmentUnequip {
 
     await this.handleBookEffect(item, equipmentSlots, bookValue);
 
-    const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+    const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+      character._id,
+      character.equipment as unknown as string
+    );
 
     const newInventoryContainer = await ItemContainer.findById(inventoryContainerId);
 

@@ -88,7 +88,7 @@ export class CharacterItemEquipment {
       }
     } else {
       // decrement from the first slot where it finds the item
-      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
       for (let [, value] of Object.entries(equipmentSlots)) {
         if (!value) {
           continue;
@@ -166,7 +166,7 @@ export class CharacterItemEquipment {
       return false;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
 
     for (const [, value] of Object.entries(equipmentSlots)) {
       if (String(value?._id) === String(itemId)) {
@@ -193,7 +193,7 @@ export class CharacterItemEquipment {
       return;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
 
     for (let [, value] of Object.entries(equipmentSlots)) {
       if (!value) {

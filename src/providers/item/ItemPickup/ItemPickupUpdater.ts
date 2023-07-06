@@ -30,7 +30,10 @@ export class ItemPickupUpdater {
   }
 
   public async refreshEquipmentIfInventoryItem(character: ICharacter): Promise<void> {
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+      character._id,
+      character.equipment as unknown as string
+    );
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,

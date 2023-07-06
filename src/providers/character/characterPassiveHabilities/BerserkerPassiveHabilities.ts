@@ -22,7 +22,7 @@ export class BerserkerPassiveHabilities {
       return true;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as string);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, character.equipment as string);
     const leftHandItem = (await Item.findById(equipmentSlots.leftHand).lean()) as IItem;
     const rightHandItem = (await Item.findById(equipmentSlots.rightHand).lean()) as IItem;
 

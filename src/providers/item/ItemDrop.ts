@@ -73,7 +73,10 @@ export class ItemDrop {
             return false;
           }
 
-          const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+          const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+            character._id,
+            character.equipment as unknown as string
+          );
 
           this.sendRefreshItemsEvent(
             {

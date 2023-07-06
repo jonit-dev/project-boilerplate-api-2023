@@ -117,7 +117,7 @@ export class CharacterWeight {
     let totalWeight = 0;
 
     const { head, neck, leftHand, rightHand, ring, legs, boot, accessory, armor } =
-      await this.equipmentSlots.getEquipmentSlots(character.equipment?.toString()!);
+      await this.equipmentSlots.getEquipmentSlots(character._id, character.equipment?.toString()!);
     const slots: Types.ObjectId[] = [
       head!,
       neck!,

@@ -115,7 +115,7 @@ export class CharacterNetworkLogout {
   private async temporaryRemoveWeapon(characterId: Types.ObjectId): Promise<void> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as string);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, character.equipment as string);
     const leftHandItem = (await Item.findById(equipmentSlots.leftHand).lean()) as IItem;
     const rightHandItem = (await Item.findById(equipmentSlots.rightHand).lean()) as IItem;
     const inventory = (await this.characterInventory.getInventory(character)) as IItem;

@@ -36,7 +36,7 @@ describe("EquipmentSlots.ts", () => {
 
     expect(result).toBe(true);
 
-    const equipmentSet = await equipmentSlots.getEquipmentSlots(equipment._id);
+    const equipmentSet = await equipmentSlots.getEquipmentSlots(testCharacter._id, equipment._id);
 
     expect(equipmentSet).toBeTruthy();
 
@@ -60,7 +60,7 @@ describe("EquipmentSlots.ts", () => {
       inventoryContainer
     );
 
-    const slots = await equipmentSlots.getEquipmentSlots(equipment._id);
+    const slots = await equipmentSlots.getEquipmentSlots(testCharacter._id, equipment._id);
 
     const accessorySlotItem = slots.accessory as unknown as IItem;
 
@@ -87,7 +87,7 @@ describe("EquipmentSlots.ts", () => {
     expect(result).toBeTruthy();
 
     // expect slot to have maximum stack
-    const slotItems = await equipmentSlots.getEquipmentSlots(equipment._id);
+    const slotItems = await equipmentSlots.getEquipmentSlots(testCharacter._id, equipment._id);
 
     const accessorySlotItem = slotItems.accessory as unknown as IItem;
 
@@ -153,7 +153,7 @@ describe("EquipmentSlots.ts", () => {
   });
 
   it("should get the equipment slots", async () => {
-    const result = await equipmentSlots.getEquipmentSlots(equipment._id);
+    const result = await equipmentSlots.getEquipmentSlots(testCharacter._id, equipment._id);
 
     expect(result).toBeTruthy();
 
