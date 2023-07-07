@@ -6,6 +6,8 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
+import { EntityAttackType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
@@ -22,7 +24,8 @@ export class BattleCharacterAttack {
     private battleTargeting: BattleTargeting,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private characterValidation: CharacterValidation,
-    private battleCycle: BattleCycle
+    private battleCycle: BattleCycle,
+    private characterWeapon: CharacterWeapon
   ) {}
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
@@ -30,7 +33,16 @@ export class BattleCharacterAttack {
       return;
     }
 
-    await this.battleCycle.init(character, target._id, character.attackIntervalSpeed, async () => {
+    const attackType = await this.characterWeapon.getAttackType(character);
+
+    let attackIntervalSpeed = character.attackIntervalSpeed;
+
+    if (attackType === EntityAttackType.Ranged) {
+      // nerf attack interval speed by 35%
+      attackIntervalSpeed = attackIntervalSpeed * 1.35;
+    }
+
+    await this.battleCycle.init(character, target._id, attackIntervalSpeed, async () => {
       await this.execCharacterBattleCycleLoop(character, target);
     });
   }

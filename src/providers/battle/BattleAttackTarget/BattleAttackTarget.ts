@@ -59,7 +59,7 @@ export class BattleAttackTarget {
 
     switch (attackerType) {
       case EntityAttackType.Melee: {
-        const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1.5);
+        const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 2);
 
         if (isUnderMeleeRange) {
           await this.hitTarget.hit(attacker, target);
