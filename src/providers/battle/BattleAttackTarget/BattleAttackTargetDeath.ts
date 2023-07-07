@@ -50,7 +50,7 @@ export class BattleAttackTargetDeath {
   private async handleNPCDeath(attacker: ICharacter | INPC, targetNPC: INPC): Promise<void> {
     await this.npcDeath.handleNPCDeath(targetNPC);
 
-    if (attacker instanceof Character) {
+    if (attacker.type === "Character") {
       await this.questSystem.updateQuests(QuestType.Kill, attacker as ICharacter, targetNPC.key);
       await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
     }
