@@ -19,7 +19,7 @@ export const spellSelfHaste: Partial<ISpell> = {
   description: "A self haste spell.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas hiz",
-  manaCost: 40,
+  manaCost: 80,
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
   cooldown: 60,
@@ -37,8 +37,8 @@ export const spellSelfHaste: Partial<ISpell> = {
     });
 
     const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 10,
-      max: 35,
+      min: 7,
+      max: 20,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {

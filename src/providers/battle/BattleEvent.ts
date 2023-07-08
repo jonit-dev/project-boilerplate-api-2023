@@ -149,13 +149,23 @@ export class BattleEvent {
         BasicAttribute.MagicResistance
       );
 
+      let DEFENDER_LEVEL_MODIFIER = 1;
+
+      if (
+        target.class === CharacterClass.Druid ||
+        target.class === CharacterClass.Sorcerer ||
+        target.class === CharacterClass.Hunter
+      ) {
+        DEFENDER_LEVEL_MODIFIER = 0;
+      }
+
       // we only take into account the shielding skill if the defender has a shield equipped.
       if (hasShield) {
         if (defenderShieldingLevel > 1) {
           damage = this.calculateDamageReduction(
             damage,
             this.calculateCharacterShieldingDefense(
-              defenderSkills.level,
+              defenderSkills.level * DEFENDER_LEVEL_MODIFIER,
               defenderResistanceLevel,
               defenderShieldingLevel
             )
@@ -167,7 +177,7 @@ export class BattleEvent {
       if (!hasShield && !isMagicAttack) {
         damage = this.calculateDamageReduction(
           damage,
-          this.calculateCharacterRegularDefense(defenderSkills.level, defenderResistanceLevel)
+          this.calculateCharacterRegularDefense(defenderSkills.level * DEFENDER_LEVEL_MODIFIER, defenderResistanceLevel)
         );
       }
 
@@ -175,7 +185,10 @@ export class BattleEvent {
       if (isMagicAttack) {
         damage = this.calculateDamageReduction(
           damage,
-          this.calculateCharacterRegularDefense(defenderSkills.level, defenderMagicResistanceLevel)
+          this.calculateCharacterRegularDefense(
+            defenderSkills.level * DEFENDER_LEVEL_MODIFIER,
+            defenderMagicResistanceLevel
+          )
         );
       }
     }
