@@ -97,7 +97,10 @@ export class CharacterWeight {
       return weightCache;
     }
 
-    const carriedItems = (await Item.find({ carrier: character._id })
+    const carriedItems = (await Item.find({
+      owner: character._id,
+      carrier: character._id,
+    })
       .lean()
       .select("weight stackQty key")) as unknown as IItem[];
 
