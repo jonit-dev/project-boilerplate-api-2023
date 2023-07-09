@@ -6,7 +6,6 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import {
   BattleSocketEvents,
   GRID_WIDTH,
@@ -35,7 +34,6 @@ export class BattleAttackTarget {
     private hitTarget: HitTarget
   ) {}
 
-  @TrackNewRelicTransaction()
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
     if (!target.isAlive) {
       return false;
