@@ -38,8 +38,7 @@ export class CharacterWeight {
     );
 
     //! Requires virtuals
-    character =
-      ((await Character.findById(character._id).lean({ virtuals: true, defaults: true })) as ICharacter) || character;
+    character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
 
     this.socketMessaging.sendEventToUser<ICharacterAttributeChanged>(
       character.channelId!,

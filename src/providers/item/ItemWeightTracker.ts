@@ -1,12 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { IItemContainer, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-@TrackClassExecutionTime()
 @provide(ItemWeightTracker)
 export class ItemWeightTracker {
   constructor() {}
