@@ -31,6 +31,7 @@ import Shared, {
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
+import { ItemOwnership } from "./ItemOwnership";
 import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
 @provide(ItemCraftable)
@@ -45,7 +46,8 @@ export class ItemCraftable {
     private animationEffect: AnimationEffect,
     private skillIncrease: SkillIncrease,
     private traitGetter: TraitGetter,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private itemOwnership: ItemOwnership
   ) {}
 
   @TrackNewRelicTransaction()
@@ -233,7 +235,9 @@ export class ItemCraftable {
     let qty = this.getQty(recipe);
 
     do {
-      const props: Partial<IItem> = {};
+      const props: Partial<IItem> = {
+        owner: character._id,
+      };
 
       if (blueprint.maxStackSize > 1) {
         let stackQty = 0;

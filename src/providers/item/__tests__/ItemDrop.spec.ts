@@ -37,6 +37,7 @@ describe("ItemDrop.ts", () => {
       .execPopulate();
     testItem = await unitTestHelper.createMockItem({
       carrier: testCharacter.id,
+      owner: testCharacter.id,
     });
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;
