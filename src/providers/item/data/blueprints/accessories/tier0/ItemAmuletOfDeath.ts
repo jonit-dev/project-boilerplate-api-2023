@@ -16,5 +16,5 @@ export const itemAmuletOfDeath: IEquippableAccessoryTier0Blueprint = {
   tier: 0,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Neck],
-  basePrice: 10000,
+  basePrice: 3000,
 };
