@@ -4,13 +4,11 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BasicAttribute, CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { provide } from "inversify-binding-decorators";
 
-@TrackClassExecutionTime()
 @provide(CharacterWeight)
 export class CharacterWeight {
   constructor(
