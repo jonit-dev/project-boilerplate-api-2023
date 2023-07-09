@@ -1,10 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { IItemContainer, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
+@TrackClassExecutionTime()
 @provide(ItemWeightTracker)
 export class ItemWeightTracker {
   constructor() {}
@@ -14,7 +16,7 @@ export class ItemWeightTracker {
     await Item.updateOne({ _id: item._id }, { carrier: character._id });
 
     if (item.type === ItemType.Container) {
-      const itemContainer = (await ItemContainer.findById(item.itemContainer)) as unknown as IItemContainer;
+      const itemContainer = (await ItemContainer.findById(item.itemContainer).lean()) as unknown as IItemContainer;
 
       if (!itemContainer) {
         throw new Error("ItemCarrier: Item container not found");

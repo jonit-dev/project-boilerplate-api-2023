@@ -4,11 +4,13 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BasicAttribute, CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { provide } from "inversify-binding-decorators";
 
+@TrackClassExecutionTime()
 @provide(CharacterWeight)
 export class CharacterWeight {
   constructor(
@@ -38,7 +40,10 @@ export class CharacterWeight {
     );
 
     //! Requires virtuals
-    character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
+    character =
+      (await Character.findById(character._id)
+        .lean({ virtuals: true, defaults: true })
+        .lean("speed weight maxWeight")) || character;
 
     this.socketMessaging.sendEventToUser<ICharacterAttributeChanged>(
       character.channelId!,
@@ -97,7 +102,10 @@ export class CharacterWeight {
       return weightCache;
     }
 
-    const carriedItems = (await Item.find({ carrier: character._id })
+    const carriedItems = (await Item.find({
+      owner: character._id,
+      carrier: character._id,
+    })
       .lean()
       .select("weight stackQty key")) as unknown as IItem[];
 

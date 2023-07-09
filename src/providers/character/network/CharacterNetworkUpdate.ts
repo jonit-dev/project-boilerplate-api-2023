@@ -25,6 +25,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 
 import { NPC } from "@entities/ModuleNPC/NPCModel";
+import { Locker } from "@providers/locks/Locker";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
@@ -43,7 +44,8 @@ export class CharacterNetworkUpdate {
     private characterMovementWarn: CharacterMovementWarn,
     private mathHelper: MathHelper,
     private characterView: CharacterView,
-    private pm2Helper: PM2Helper
+    private pm2Helper: PM2Helper,
+    private locker: Locker
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -51,59 +53,71 @@ export class CharacterNetworkUpdate {
       channel,
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
-        if (data) {
-          // sometimes the character is just changing facing direction and not moving.. That's why we need this.
-          const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
+        const canProceed = await this.locker.lock(`character-position-update-${character._id}`);
 
-          // send message back to the user telling that the requested position update is not valid!
+        if (!canProceed) {
+          return;
+        }
 
-          let isPositionUpdateValid = true;
+        try {
+          if (data) {
+            // sometimes the character is just changing facing direction and not moving.. That's why we need this.
+            const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
 
-          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
-            character.x,
-            character.y,
-            data.direction
-          );
+            // send message back to the user telling that the requested position update is not valid!
 
-          if (isMoving) {
-            isPositionUpdateValid = await this.characterMovementValidation.isValid(character, newX, newY, isMoving);
-          }
+            let isPositionUpdateValid = true;
 
-          if (isPositionUpdateValid) {
-            const serverCharacterPosition = {
-              x: character.x,
-              y: character.y,
-            };
+            const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
+              character.x,
+              character.y,
+              data.direction
+            );
 
-            await this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
-
-            await this.characterMovementWarn.warn(character, data);
-
-            switch (appEnv.general.ENV) {
-              case EnvType.Development:
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                this.npcManager.startNearbyNPCsBehaviorLoop(character);
-
-                break;
-              case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
-                this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
-                  character,
-                });
-                break;
+            if (isMoving) {
+              isPositionUpdateValid = await this.characterMovementValidation.isValid(character, newX, newY, isMoving);
             }
 
-            await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
+            if (isPositionUpdateValid) {
+              const serverCharacterPosition = {
+                x: character.x,
+                y: character.y,
+              };
 
-            await this.handleNonPVPZone(character, newX, newY);
+              await this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
 
-            // leave it for last!
-            await this.handleMapTransition(character, newX, newY);
+              await this.characterMovementWarn.warn(character, data);
 
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.characterView.clearAllOutOfViewElements(character._id, character.x, character.y);
+              switch (appEnv.general.ENV) {
+                case EnvType.Development:
+                  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                  this.npcManager.startNearbyNPCsBehaviorLoop(character);
+
+                  break;
+                case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
+                  this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
+                    character,
+                  });
+                  break;
+              }
+
+              await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
+
+              await this.handleNonPVPZone(character, newX, newY);
+
+              // leave it for last!
+              await this.handleMapTransition(character, newX, newY);
+
+              // eslint-disable-next-line @typescript-eslint/no-floating-promises
+              this.characterView.clearAllOutOfViewElements(character._id, character.x, character.y);
+            }
+
+            this.sendConfirmation(character, data.direction, isPositionUpdateValid);
           }
-
-          this.sendConfirmation(character, data.direction, isPositionUpdateValid);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          await this.locker.unlock(`character-position-update-${character._id}`);
         }
       }
     );
