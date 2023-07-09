@@ -72,6 +72,7 @@ describe("CharacterWeight.ts", () => {
       stackQty: 100,
       maxStackSize: 100,
       carrier: testCharacter._id,
+      owner: testCharacter._id,
     });
 
     inventoryContainer = await unitTestHelper.addItemsToContainer(inventoryContainer, 1, [goldCoins]);
@@ -86,6 +87,7 @@ describe("CharacterWeight.ts", () => {
 
     await unitTestHelper.createMockAndEquipItens(testCharacter, {
       carrier: testCharacter._id,
+      owner: testCharacter._id,
     });
 
     const afterAddArmor = await characterWeight.getWeight(testCharacter);
@@ -100,6 +102,7 @@ describe("CharacterWeight.ts", () => {
       stackQty: 100,
       maxStackSize: 100,
       carrier: testCharacter._id,
+      owner: testCharacter._id,
     });
 
     inventoryContainer = await unitTestHelper.addItemsToContainer(inventoryContainer, 1, [apples]);
@@ -159,6 +162,7 @@ describe("CharacterWeight.ts", () => {
 
     await unitTestHelper.createMockAndEquipItens(testCharacter, {
       carrier: testCharacter._id,
+      owner: testCharacter._id,
     });
     await characterWeight.updateCharacterWeight(testCharacter);
     const afterAddArmor = await Character.findOne(testCharacter._id).lean();
@@ -183,11 +187,17 @@ describe("CharacterWeight.ts", () => {
   });
 
   it("Should calculate the Weight if have nested bags with itens on inventory", async () => {
-    const nestedBackpack = await unitTestHelper.createMockItemFromBlueprint(ContainersBlueprint.Backpack);
+    const nestedBackpack = await unitTestHelper.createMockItemFromBlueprint(ContainersBlueprint.Backpack, {
+      owner: testCharacter._id,
+    });
     const nestedContainer = (await ItemContainer.findById(nestedBackpack.itemContainer)) as IItemContainer;
 
-    const fisrtSword = await unitTestHelper.createMockItem();
-    const secondSword = await unitTestHelper.createMockItem();
+    const fisrtSword = await unitTestHelper.createMockItem({
+      owner: testCharacter._id,
+    });
+    const secondSword = await unitTestHelper.createMockItem({
+      owner: testCharacter._id,
+    });
 
     nestedContainer.slotQty = 2;
     nestedContainer.slots = {
