@@ -19,7 +19,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { Types } from "mongoose";
 import { clearCacheForKey } from "speedgoose";
 import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
@@ -66,15 +65,22 @@ export class SkillFunctions {
 
   @TrackNewRelicTransaction()
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
-    await Skill.findByIdAndUpdate(skills._id, { ...skills });
+    try {
+      //! Warning: Chaching this causes the skill not to update
+      await Skill.findByIdAndUpdate(skills._id, skills).lean();
 
-    const buffedSkills = await this.skillBuff.getSkillsWithBuff(character);
-    const buffs = await this.characterBuffSkill.calculateAllActiveBuffs(character);
+      const [buffedSkills, buffs] = await Promise.all([
+        this.skillBuff.getSkillsWithBuff(character),
+        this.characterBuffSkill.calculateAllActiveBuffs(character),
+      ]);
 
-    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: buffedSkills,
-      buffs,
-    });
+      this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
+        skill: buffedSkills,
+        buffs,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   @TrackNewRelicTransaction()
@@ -123,15 +129,8 @@ export class SkillFunctions {
    * @param skillLevel
    * @returns
    */
-  @TrackNewRelicTransaction()
-  public async calculateBonus(character: ICharacter | INPC, skillsId: undefined | Types.ObjectId): Promise<number> {
-    if (!skillsId) {
-      return 0;
-    }
-    const skills = (await Skill.findById(skillsId).lean()) as unknown as ISkill;
-    if (!skills) {
-      return 0;
-    }
-    return Number(((skills.level - 1) / 50).toFixed(2));
+
+  public calculateBonus(level: number): number {
+    return Number(((level - 1) / 50).toFixed(2));
   }
 }

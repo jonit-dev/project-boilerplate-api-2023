@@ -201,15 +201,9 @@ export class EquipmentEquip {
 
       await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
 
-      await clearCacheForKey(`${character._id}-inventory`);
-      await clearCacheForKey(`${character._id}-equipment`);
-      await clearCacheForKey(`characterBuffs_${character._id}`);
-      await clearCacheForKey(`${character._id}-skills`);
-      await this.inMemoryHashTable.delete("equipment-slots", character._id);
+      await this.clearCache(character);
 
       await this.characterBuffValidation.removeDuplicatedBuffs(character);
-
-      await this.inMemoryHashTable.delete("character-weapon", character._id);
 
       return true;
     } catch (error) {
@@ -237,6 +231,16 @@ export class EquipmentEquip {
     }
 
     return allowedItemTypes;
+  }
+
+  private async clearCache(character: ICharacter): Promise<void> {
+    await clearCacheForKey(`${character._id}-inventory`);
+    await clearCacheForKey(`${character._id}-equipment`);
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id);
+    await this.inMemoryHashTable.delete("character-shield", character._id);
+    await this.inMemoryHashTable.delete("character-weapon", character._id);
   }
 
   @TrackNewRelicTransaction()

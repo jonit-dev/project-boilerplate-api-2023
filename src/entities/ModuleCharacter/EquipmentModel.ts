@@ -95,6 +95,7 @@ equipmentSchema.plugin(SpeedGooseCacheAutoCleaner);
 
 const clearEquipmentSlotCaching = async (ownerId: string): Promise<void> => {
   await inMemoryHashTable.delete("equipment-slots", ownerId.toString());
+  await inMemoryHashTable.delete("character-shield", ownerId.toString());
 };
 equipmentSchema.post("save", async function (this: IEquipment) {
   if (this.owner) {

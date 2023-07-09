@@ -226,10 +226,13 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
 
     testCharacter.class = CharacterClass.Druid;
 
-    testNPC = await unitTestHelper.createMockNPC();
+    testNPC = await unitTestHelper.createMockNPC({}, { hasSkills: true });
 
     testNPC.health = 0;
     await testNPC.save();
+
+    await testCharacter.populate("skills").execPopulate();
+    await testNPC.populate("skills").execPopulate();
   });
 
   it("should not increase character's 'shielding' skill | Character without Shield", async () => {
@@ -441,8 +444,8 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
 
     for (const tc of testCases) {
       // update NPCs skills
-      const res = await tc.skills.save();
-      testNPC.skills = res._id;
+
+      testNPC.skills = tc.skills;
       await testNPC.save();
 
       // reset character's skills on every test

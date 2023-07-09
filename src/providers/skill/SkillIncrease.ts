@@ -1,7 +1,6 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
@@ -56,7 +55,12 @@ export class SkillIncrease {
   @TrackNewRelicTransaction()
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // Get character skills and equipment to upgrade them
-    const skills = (await Skill.findById(attacker.skills).lean()) as unknown as ISkill;
+
+    const skills = (await Skill.findById(attacker.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${attacker._id}-skills`,
+      })) as unknown as ISkill;
 
     if (!skills) {
       throw new Error(`skills not found for character ${attacker.id}`);
@@ -88,8 +92,10 @@ export class SkillIncrease {
       return;
     }
 
+    const targetSkills = target.skills as ISkill;
+
     // stronger the opponent, higher SP per hit it gives in your combat skills
-    const bonus = await this.skillFunctions.calculateBonus(target, target.skills);
+    const bonus = this.skillFunctions.calculateBonus(targetSkills.level);
     const increasedWeaponSP = this.increaseSP(skills, weaponSubType, undefined, SKILLS_MAP, bonus);
 
     let increasedStrengthSP;
@@ -120,62 +126,45 @@ export class SkillIncrease {
   @TrackNewRelicTransaction()
   public async increaseShieldingSP(character: ICharacter): Promise<void> {
     await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "increaseShieldingSP", async () => {
-      // TODO: Refactor this to use queries. Avoid populate!
-      const characterWithRelations = (await Character.findById(character.id)
-        .populate({
-          path: "skills",
-          model: "Skill",
-        })
-        .lean()
-        .populate({
-          path: "equipment",
-          model: "Equipment",
+      const hasShield = await this.characterWeapon.hasShield(character);
 
-          populate: {
-            path: "rightHand leftHand",
-            model: "Item",
-          },
-        })
-        .lean()) as ICharacter;
-
-      if (!characterWithRelations) {
-        throw new Error(`character not found for id ${character.id}`);
+      if (!hasShield) {
+        return;
       }
-      const skills = characterWithRelations.skills as ISkill;
 
+      const skills = character.skills as ISkill;
+
+      if (!skills.level) {
+        throw new Error("Skill should be populated");
+      }
+
+      if (!character) {
+        throw new Error("character not found");
+      }
       const canIncreaseSP = this.skillGainValidation.canUpdateSkills(character, skills as ISkill, "shielding");
 
       if (!canIncreaseSP) {
         return;
       }
 
-      const equipment = characterWithRelations.equipment as IEquipment;
+      const skillKey = SKILLS_MAP.get(hasShield.rightHandItem?.subType! || hasShield.leftHandItem?.subType!);
 
-      const rightHandItem = equipment?.rightHand as IItem;
-      const leftHandItem = equipment?.leftHand as IItem;
-
-      let result = {} as IIncreaseSPResult;
-      if (rightHandItem?.subType === ItemSubType.Shield) {
-        result = this.increaseSP(skills, rightHandItem.subType);
-      } else {
-        if (leftHandItem?.subType === ItemSubType.Shield) {
-          result = this.increaseSP(skills, leftHandItem.subType);
-        }
+      if (!skillKey) {
+        throw new Error(
+          `Skill not found for weapon ${hasShield.rightHandItem?.subType! || hasShield.leftHandItem?.subType!}`
+        );
       }
 
+      const result = this.increaseSP(skills, skillKey!) as IIncreaseSPResult;
+
       await this.skillFunctions.updateSkills(skills, character);
+
       if (!_.isEmpty(result)) {
-        if (result.skillLevelUp && characterWithRelations.channelId) {
-          await this.skillFunctions.sendSkillLevelUpEvents(result, characterWithRelations);
+        if (result.skillLevelUp && character.channelId) {
+          await this.skillFunctions.sendSkillLevelUpEvents(result, character);
         }
 
-        if (rightHandItem?.subType === ItemSubType.Shield) {
-          await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
-        } else {
-          if (leftHandItem?.subType === ItemSubType.Shield) {
-            await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
-          }
-        }
+        await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
       }
     });
   }
@@ -201,7 +190,11 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
-    const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+    const skills = (await Skill.findById(character.skills)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character._id}-skills`,
+      })) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);
     }

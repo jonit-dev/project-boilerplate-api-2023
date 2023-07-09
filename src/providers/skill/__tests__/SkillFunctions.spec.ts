@@ -98,7 +98,7 @@ describe("SkillFunctions", () => {
     ];
     for (const tc of testCases) {
       const res = await tc.skills.save();
-      const bonus = await skillFunctions.calculateBonus(testCharacter._id, res._id);
+      const bonus = await skillFunctions.calculateBonus(res.level);
       expect(bonus).toEqual(tc.exp);
     }
   });

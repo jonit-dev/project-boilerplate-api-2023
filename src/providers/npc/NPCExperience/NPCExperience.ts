@@ -31,6 +31,7 @@ import random from "lodash/random";
 import uniqBy from "lodash/uniqBy";
 import { clearCacheForKey } from "speedgoose";
 import { v4 as uuidv4 } from "uuid";
+
 @provide(NPCExperience)
 export class NPCExperience {
   constructor(
@@ -87,7 +88,11 @@ export class NPCExperience {
       await clearCacheForKey(`characterBuffs_${character._id}`);
 
       // Get character skills
-      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+      const skills = (await Skill.findById(character.skills)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${character._id}-skills`,
+        })) as ISkill;
 
       if (!skills) {
         // if attacker skills does not exist anymore
@@ -131,10 +136,9 @@ export class NPCExperience {
    * Calculates the xp gained by a character every time it causes damage in battle
    * In case the target is NPC, it stores the character's xp gained in the xpToRelease array
    */
+
   public async recordXPinBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     try {
-      await this.time.waitForMilliseconds(random(0, 50)); // add artificial delay to avoid concurrency
-
       const canProceed = await this.locker.lock(`npc-${target._id}-record-xp`);
 
       if (!canProceed) {

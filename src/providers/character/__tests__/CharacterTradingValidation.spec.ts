@@ -3,7 +3,7 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { container, inMemoryHashTable, unitTestHelper } from "@providers/inversify/container";
 
 import { PotionsBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -389,6 +389,8 @@ describe("CharacterTradingValidation.ts", () => {
     });
 
     it("should fail if item blue print does not have basePrice", async () => {
+      await inMemoryHashTable.delete("equipment-slots", testCharacter._id.toString());
+
       transactionSellItems.push({
         key: itemGroundBlood.key!,
         qty: 1,

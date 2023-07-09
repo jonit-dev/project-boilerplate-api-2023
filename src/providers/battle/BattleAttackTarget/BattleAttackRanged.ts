@@ -197,6 +197,7 @@ export class BattleAttackRanged {
    * Consumes ammo from character's equipment accessory slot or inventory slot
    * and sends updateItemInventoryCharacter event
    */
+
   public async consumeAmmo(attackParams: IRangedAttackParams, character: ICharacter): Promise<void> {
     const equipment = attackParams.equipment!;
 

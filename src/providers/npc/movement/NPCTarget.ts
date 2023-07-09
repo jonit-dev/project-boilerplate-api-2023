@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
@@ -9,7 +10,6 @@ import { NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 import { NPC_CYCLES } from "../NPCCycle";
 import { NPCView } from "../NPCView";
 import { NPCDirection } from "./NPCMovement";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(NPCTarget)
 export class NPCTarget {
