@@ -11,7 +11,7 @@ export class ItemWeightTracker {
 
   @TrackNewRelicTransaction()
   public async setItemWeightTracking(item: IItem, character: ICharacter): Promise<void> {
-    await Item.updateOne({ _id: item._id }, { carrier: character._id });
+    await Item.updateOne({ _id: item._id }, { carrier: character._id, owner: character._id });
 
     if (item.type === ItemType.Container) {
       const itemContainer = (await ItemContainer.findById(item.itemContainer).lean()) as unknown as IItemContainer;
