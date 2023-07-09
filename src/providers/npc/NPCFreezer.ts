@@ -7,7 +7,6 @@ import { NPC_CYCLES } from "./NPCCycle";
 import { NPCView } from "./NPCView";
 
 import { NewRelic } from "@providers/analytics/NewRelic";
-import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { NPC_FREEZE_CHECK_INTERVAL, NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
@@ -16,7 +15,6 @@ import { EnvType } from "@rpg-engine/shared";
 import CPUusage from "cpu-percentage";
 import round from "lodash/round";
 
-@TrackClassExecutionTime()
 @provideSingleton(NPCFreezer)
 export class NPCFreezer {
   public freezeCheckIntervals: Map<string, NodeJS.Timeout> = new Map();

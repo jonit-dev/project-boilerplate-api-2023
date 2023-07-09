@@ -2,7 +2,6 @@ import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
-import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentStatsCalculator } from "@providers/equipment/EquipmentStatsCalculator";
@@ -11,7 +10,6 @@ import { BasicAttribute } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { TraitGetter } from "./TraitGetter";
 
-@TrackClassExecutionTime()
 @provide(SkillStatsCalculator)
 export class SkillStatsCalculator {
   constructor(private inMemoryHashTable: InMemoryHashTable, private traitGetter: TraitGetter) {}

@@ -1,14 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { blueprintManager } from "@providers/inversify/container";
 import { EffectsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 
-@TrackClassExecutionTime()
 @provide(BattleEffects)
 export class BattleEffects {
   private groundBloodBlueprint: IItem | null = null;

@@ -23,13 +23,11 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import random from "lodash/random";
 import { BattleAttackTargetDeath } from "./BattleAttackTarget/BattleAttackTargetDeath";
 import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
 
-@TrackClassExecutionTime()
 @provide(HitTarget)
 export class HitTarget {
   constructor(

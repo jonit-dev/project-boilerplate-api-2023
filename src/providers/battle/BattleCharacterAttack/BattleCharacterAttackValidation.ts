@@ -1,7 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { PVP_MIN_REQUIRED_LV } from "@providers/constants/PVPConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
@@ -10,7 +9,6 @@ import { EntityType, ISkill } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleTargeting } from "../BattleTargeting";
 
-@TrackClassExecutionTime()
 @provide(BattleCharacterAttackValidation)
 export class BattleCharacterAttackValidation {
   constructor(

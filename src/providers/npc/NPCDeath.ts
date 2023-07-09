@@ -10,7 +10,6 @@ import {
   NPC_LOOT_CHANCE_MULTIPLIER,
 } from "@providers/constants/LootConstants";
 
-import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
 import { blueprintManager } from "@providers/inversify/container";
@@ -29,7 +28,6 @@ import { calculateGold } from "./NPCGold";
 import { NPCSpawn } from "./NPCSpawn";
 import { NPCTarget } from "./movement/NPCTarget";
 
-@TrackClassExecutionTime()
 @provide(NPCDeath)
 export class NPCDeath {
   constructor(
