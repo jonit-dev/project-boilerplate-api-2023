@@ -132,10 +132,14 @@ export class SkillIncrease {
         return;
       }
 
-      const skills = character.skills as ISkill;
+      let skills = character.skills as ISkill;
 
       if (!skills.level) {
-        throw new Error("Skill should be populated");
+        skills = (await Skill.findById(character.skills)
+          .lean()
+          .cacheQuery({
+            cacheKey: `${character._id}-skills`,
+          })) as unknown as ISkill;
       }
 
       if (!character) {
