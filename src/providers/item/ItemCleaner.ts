@@ -8,13 +8,15 @@ import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { provide } from "inversify-binding-decorators";
 import { ItemOwnership } from "./ItemOwnership";
+import { ItemWeightTracker } from "./ItemWeightTracker";
 
 @provide(ItemCleaner)
 export class ItemCleaner {
   constructor(
     private characterInventory: CharacterInventory,
     private equipmentSlots: EquipmentSlots,
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private itemWeightTracker: ItemWeightTracker
   ) {}
 
   public async clearMissingReferences(character: ICharacter): Promise<void> {
@@ -35,7 +37,7 @@ export class ItemCleaner {
         continue;
       }
 
-      const item = await Item.findById(itemData._id).lean({ virtuals: true, defaults: true });
+      const item = (await Item.findById(itemData._id).lean({ virtuals: true, defaults: true })) as IItem;
 
       if (!item) {
         await Equipment.updateOne(
@@ -46,6 +48,14 @@ export class ItemCleaner {
             },
           }
         );
+      }
+
+      if (!item?.owner) {
+        await this.itemOwnership.addItemOwnership(item, character._id);
+      }
+
+      if (!item?.carrier) {
+        await this.itemWeightTracker.setItemWeightTracking(item, character._id);
       }
     }
   }
@@ -75,11 +85,19 @@ export class ItemCleaner {
         continue;
       }
       // check if item exists
-      const item = await Item.findById(slotData._id).lean({ virtuals: true, defaults: true });
+      const item = (await Item.findById(slotData._id).lean({ virtuals: true, defaults: true })) as IItem;
 
       if (!item) {
         // remove slot on item container with update one
         delete slots[slotNumber];
+      }
+
+      if (!item?.owner) {
+        await this.itemOwnership.addItemOwnership(item, character._id);
+      }
+
+      if (!item?.carrier) {
+        await this.itemWeightTracker.setItemWeightTracking(item, character._id);
       }
     }
 

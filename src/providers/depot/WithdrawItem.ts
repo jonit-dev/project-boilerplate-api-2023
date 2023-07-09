@@ -6,6 +6,7 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { ItemDrop } from "@providers/item/ItemDrop";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IDepotContainerWithdraw, IEquipmentAndInventoryUpdatePayload, IItemContainer } from "@rpg-engine/shared";
@@ -23,7 +24,8 @@ export class WithdrawItem {
     private characterItemSlots: CharacterItemSlots,
     private socketMessaging: SocketMessaging,
     private characterWeight: CharacterWeight,
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private itemWeightTracker: ItemWeightTracker
   ) {}
 
   @TrackNewRelicTransaction()
@@ -72,8 +74,6 @@ export class WithdrawItem {
       await this.itemDrop.dropItems([item], gridPoints, character.scene);
     }
 
-    await this.characterWeight.updateCharacterWeight(character);
-
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: toContainer as any,
     };
@@ -83,6 +83,10 @@ export class WithdrawItem {
     if (!item.owner) {
       await this.itemOwnership.addItemOwnership(item, character);
     }
+
+    await this.itemWeightTracker.setItemWeightTracking(item, character);
+
+    await this.characterWeight.updateCharacterWeight(character);
 
     return itemContainer;
   }

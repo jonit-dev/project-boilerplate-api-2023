@@ -5,7 +5,9 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { blueprintManager } from "@providers/inversify/container";
+
 import { ItemRarity } from "@providers/item/ItemRarity";
+import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { AvailableBlueprints, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -29,7 +31,8 @@ export class CharacterItemInventory {
     private mathHelper: MathHelper,
     private characterItemsContainer: CharacterItemContainer,
     private characterInventory: CharacterInventory,
-    private itemRarity: ItemRarity
+    private itemRarity: ItemRarity,
+    private itemWeightTracker: ItemWeightTracker
   ) {}
 
   @TrackNewRelicTransaction()
@@ -411,6 +414,9 @@ export class CharacterItemInventory {
             },
           }
         );
+
+        await this.itemWeightTracker.removeItemWeightTracking(item._id);
+
         return true;
       }
     }
@@ -435,6 +441,7 @@ export class CharacterItemInventory {
     const backpack = new Item({
       ...blueprintData,
       owner: equipment.owner,
+      carrier: equipment.owner,
     });
     await backpack.save();
 

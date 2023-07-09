@@ -302,8 +302,12 @@ export class UnitTestHelper {
   }
 
   public async createMockAndEquipItens(character: ICharacter, extraProps?: Partial<IItem>): Promise<void> {
-    const itemSword = await this.createMockItem();
-    const itemArmor = await this.createMockArmor();
+    const itemSword = await this.createMockItem({
+      ...extraProps,
+    });
+    const itemArmor = await this.createMockArmor({
+      ...extraProps,
+    });
     const equipmentEquip: EquipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
 
     const inventory = await this.characterInventory.getInventory(character);

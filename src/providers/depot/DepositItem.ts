@@ -7,6 +7,7 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { ItemView } from "@providers/item/ItemView";
+import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { MapHelper } from "@providers/map/MapHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IDepotDepositItem, IEquipmentAndInventoryUpdatePayload, IItemContainer } from "@rpg-engine/shared";
@@ -23,7 +24,8 @@ export class DepositItem {
     private depotSystem: DepotSystem,
     private mapHelper: MapHelper,
     private socketMessaging: SocketMessaging,
-    private characterItemSlots: CharacterItemSlots
+    private characterItemSlots: CharacterItemSlots,
+    private itemWeightTracker: ItemWeightTracker
   ) {}
 
   @TrackNewRelicTransaction()
@@ -59,6 +61,9 @@ export class DepositItem {
     // deposit from the characters container
     if (!!fromContainerId && !isItemFromMap) {
       const container = await this.depotSystem.removeFromContainer(fromContainerId, item);
+
+      await this.itemWeightTracker.removeItemWeightTracking(item);
+
       // whenever a new item is removed, we need to update the character weight
       await this.characterWeight.updateCharacterWeight(character);
 

@@ -35,7 +35,9 @@ describe("ItemDrop.ts", () => {
     )
       .populate("skills")
       .execPopulate();
-    testItem = await unitTestHelper.createMockItem();
+    testItem = await unitTestHelper.createMockItem({
+      carrier: testCharacter.id,
+    });
     inventory = await testCharacter.inventory;
     inventoryItemContainerId = inventory.itemContainer as unknown as string;
 

@@ -23,6 +23,7 @@ import { clearCacheForKey } from "speedgoose";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
 import { ItemDropCleanup } from "./ItemDropCleanup";
 import { ItemOwnership } from "./ItemOwnership";
+import { ItemWeightTracker } from "./ItemWeightTracker";
 
 @provide(ItemDrop)
 export class ItemDrop {
@@ -36,7 +37,8 @@ export class ItemDrop {
     private itemOwnership: ItemOwnership,
     private characterInventory: CharacterInventory,
     private itemCleanup: ItemDropCleanup,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private itemWeightTracker: ItemWeightTracker
   ) {}
 
   //! For now, only a drop from inventory or equipment set is allowed.
@@ -167,6 +169,8 @@ export class ItemDrop {
     await this.itemCleanup.tryCharacterDroppedItemsCleanup(character);
 
     await this.itemOwnership.removeItemOwnership(dropItem);
+
+    await this.itemWeightTracker.removeItemWeightTracking(dropItem);
 
     return true;
   }

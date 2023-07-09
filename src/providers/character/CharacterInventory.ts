@@ -153,6 +153,7 @@ export class CharacterInventory {
     const bag = new Item({
       ...containerBlueprint,
       owner: equipment.owner,
+      carrier: equipment.owner,
     });
     await bag.save();
 

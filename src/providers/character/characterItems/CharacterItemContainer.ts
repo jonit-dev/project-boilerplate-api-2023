@@ -4,8 +4,10 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInventory";
+
 import { ItemMap } from "@providers/item/ItemMap";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
@@ -17,6 +19,7 @@ interface IAddItemToContainerOptions {
   shouldAddOwnership?: boolean;
   isInventoryItem?: boolean;
   dropOnMapIfFull?: boolean;
+  shouldAddAsCarriedItem?: boolean;
 }
 
 @provide(CharacterItemContainer)
@@ -29,6 +32,7 @@ export class CharacterItemContainer {
     private itemMap: ItemMap,
     private characterInventory: CharacterInventory,
     private itemOwnership: ItemOwnership,
+    private itemWeightTracker: ItemWeightTracker,
     private locker: Locker,
     private inMemoryHashTable: InMemoryHashTable
   ) {}
@@ -98,7 +102,12 @@ export class CharacterItemContainer {
         return false;
       }
 
-      const { shouldAddOwnership, isInventoryItem = false, dropOnMapIfFull = false } = options || {};
+      const {
+        shouldAddOwnership,
+        isInventoryItem = false,
+        dropOnMapIfFull = false,
+        shouldAddAsCarriedItem = true,
+      } = options || {};
 
       const itemToBeAdded = item;
 
@@ -189,6 +198,10 @@ export class CharacterItemContainer {
 
       if (result && shouldAddOwnership) {
         await this.itemOwnership.addItemOwnership(itemToBeAdded, character);
+      }
+
+      if (result && shouldAddAsCarriedItem) {
+        await this.itemWeightTracker.setItemWeightTracking(itemToBeAdded, character);
       }
 
       return result;

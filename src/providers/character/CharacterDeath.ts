@@ -11,6 +11,7 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentSlotTypes } from "@providers/equipment/EquipmentSlots";
 import { blueprintManager, entityEffectUse, equipmentSlots } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import {
   AccessoriesBlueprint,
   BodiesBlueprint,
@@ -65,7 +66,8 @@ export class CharacterDeath {
     private inMemoryHashTable: InMemoryHashTable,
     private characterBuffActivator: CharacterBuffActivator,
     private locker: Locker,
-    private time: Time
+    private time: Time,
+    private itemWeightTracker: ItemWeightTracker
   ) {}
 
   @TrackNewRelicTransaction()
@@ -262,6 +264,7 @@ export class CharacterDeath {
       // now that the slot is clear, lets drop the item on the body
       await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
         shouldAddOwnership: false,
+        shouldAddAsCarriedItem: false,
       });
 
       if (!isDeadBodyLootable) {
@@ -316,6 +319,7 @@ export class CharacterDeath {
         // now that the slot is clear, lets drop the item on the body
         await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
           shouldAddOwnership: false,
+          shouldAddAsCarriedItem: false,
         });
 
         if (!isDeadBodyLootable) {
@@ -350,8 +354,10 @@ export class CharacterDeath {
     item.owner = undefined;
     item.scene = undefined;
     item.tiledId = undefined;
+    item.carrier = undefined;
     await item.save();
 
+    await this.itemWeightTracker.removeItemWeightTracking(item);
     await this.itemOwnership.removeItemOwnership(item);
 
     return item;

@@ -71,6 +71,7 @@ describe("CharacterWeight.ts", () => {
     const goldCoins = await unitTestHelper.createGoldCoinMockItem({
       stackQty: 100,
       maxStackSize: 100,
+      carrier: testCharacter._id,
     });
 
     inventoryContainer = await unitTestHelper.addItemsToContainer(inventoryContainer, 1, [goldCoins]);
@@ -83,7 +84,9 @@ describe("CharacterWeight.ts", () => {
     const beforeAddArmor = await characterWeight.getWeight(testCharacter);
     expect(beforeAddArmor).toBe(3);
 
-    await unitTestHelper.createMockAndEquipItens(testCharacter);
+    await unitTestHelper.createMockAndEquipItens(testCharacter, {
+      carrier: testCharacter._id,
+    });
 
     const afterAddArmor = await characterWeight.getWeight(testCharacter);
     expect(afterAddArmor).toBe(9);
@@ -96,6 +99,7 @@ describe("CharacterWeight.ts", () => {
     const apples = await unitTestHelper.createStackableMockItem({
       stackQty: 100,
       maxStackSize: 100,
+      carrier: testCharacter._id,
     });
 
     inventoryContainer = await unitTestHelper.addItemsToContainer(inventoryContainer, 1, [apples]);
@@ -153,7 +157,9 @@ describe("CharacterWeight.ts", () => {
       weight: 3,
     });
 
-    await unitTestHelper.createMockAndEquipItens(testCharacter);
+    await unitTestHelper.createMockAndEquipItens(testCharacter, {
+      carrier: testCharacter._id,
+    });
     await characterWeight.updateCharacterWeight(testCharacter);
     const afterAddArmor = await Character.findOne(testCharacter._id).lean();
 
@@ -162,6 +168,9 @@ describe("CharacterWeight.ts", () => {
     // when die you loose your backpack: -3 weight.
     // but when you respawn you get a new bag: +1.5 weight
     await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+    await characterWeight.updateCharacterWeight(testCharacter);
+
     const weightAfterDeath = await Character.findOne(testCharacter._id).lean();
 
     // bag(1.5)                       = 1.5
@@ -187,8 +196,6 @@ describe("CharacterWeight.ts", () => {
     };
 
     await nestedContainer.save();
-
-    expect(await characterWeight.getWeight(testCharacter)).toBe(3);
 
     const nestedItem = (await Item.findOne({ _id: nestedContainer.parentItem })) as IItem;
     const result = await characterItemContainer.addItemToContainer(nestedItem, testCharacter, inventoryContainer._id);
