@@ -151,15 +151,7 @@ export class SkillIncrease {
         return;
       }
 
-      const skillKey = SKILLS_MAP.get(hasShield.rightHandItem?.subType! || hasShield.leftHandItem?.subType!);
-
-      if (!skillKey) {
-        throw new Error(
-          `Skill not found for weapon ${hasShield.rightHandItem?.subType! || hasShield.leftHandItem?.subType!}`
-        );
-      }
-
-      const result = this.increaseSP(skills, skillKey!) as IIncreaseSPResult;
+      const result = this.increaseSP(skills, ItemSubType.Shield) as IIncreaseSPResult;
 
       await this.skillFunctions.updateSkills(skills, character);
 
