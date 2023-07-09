@@ -25,7 +25,7 @@ export const itemWoodenStaff: IEquippableTwoHandedStaffTier0WeaponBlueprint = {
   tier: 0,
   weight: 1,
   allowedEquipSlotType: [ItemSlotType.LeftHand, ItemSlotType.RightHand],
-  basePrice: 50,
+  basePrice: 25,
   maxRange: RangeTypes.Short,
   isTwoHanded: true,
   isTraining: true,
