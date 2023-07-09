@@ -108,7 +108,11 @@ export class NPCManager {
               NewRelicTransactionCategory.Operation,
               `NPCCycle/${npc.currentMovementType}`,
               async () => {
-                this.npcFreezer.tryToFreezeNPC(npc);
+                const n = random(0, 100);
+
+                if (n <= 5) {
+                  this.npcFreezer.tryToFreezeNPC(npc);
+                }
 
                 npc = await NPC.findById(npc._id).lean({
                   virtuals: true,

@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterView } from "@providers/character/CharacterView";
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
@@ -18,6 +19,7 @@ export interface IWarnOptions {
   always?: boolean;
 }
 
+@TrackClassExecutionTime()
 @provide(NPCWarn)
 export class NPCWarn {
   constructor(

@@ -10,6 +10,7 @@ import {
   NPC_LOOT_CHANCE_MULTIPLIER,
 } from "@providers/constants/LootConstants";
 
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
 import { blueprintManager } from "@providers/inversify/container";
@@ -28,6 +29,7 @@ import { calculateGold } from "./NPCGold";
 import { NPCSpawn } from "./NPCSpawn";
 import { NPCTarget } from "./movement/NPCTarget";
 
+@TrackClassExecutionTime()
 @provide(NPCDeath)
 export class NPCDeath {
   constructor(
@@ -126,7 +128,10 @@ export class NPCDeath {
       throw new Error(`NPC not found with id ${npc._id}`);
     }
 
-    const npcSkills = (await Skill.findById(npc.skills)
+    const npcSkills = (await Skill.findOne({
+      _id: npcFound.skills,
+      owner: npcFound._id,
+    })
       .lean({
         virtuals: true,
         defaults: true,
@@ -149,7 +154,7 @@ export class NPCDeath {
     const currentMovementType = npc.originalMovementType;
 
     await NPC.updateOne(
-      { _id: npc.id },
+      { _id: npc.id, scene: npc.scene },
       {
         $set: {
           health: 0,
@@ -260,8 +265,14 @@ export class NPCDeath {
     }
 
     itemContainer.markModified("slots");
-    await ItemContainer.updateOne({ _id: itemContainer._id }, itemContainer);
-    await Item.updateOne({ _id: npcBody._id }, npcBody);
+    await ItemContainer.updateOne({ _id: itemContainer._id, parentItem: npcBody._id }, itemContainer);
+    await Item.updateOne(
+      {
+        _id: npcBody._id,
+        scene: npcBody.scene,
+      },
+      npcBody
+    );
   }
 
   private async createLootItemWithoutSaving(loot: INPCLoot): Promise<IItem> {

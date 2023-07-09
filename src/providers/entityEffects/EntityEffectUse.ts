@@ -14,7 +14,9 @@ import { EntityEffectCycle } from "./EntityEffectCycle";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 import { entityEffectsBlueprintsIndex } from "./data/index";
 import { EntityEffectBlueprint } from "./data/types/entityEffectBlueprintTypes";
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 
+@TrackClassExecutionTime()
 @provide(EntityEffectUse)
 export class EntityEffectUse {
   constructor(private socketMessaging: SocketMessaging, private characterWeapon: CharacterWeapon) {}

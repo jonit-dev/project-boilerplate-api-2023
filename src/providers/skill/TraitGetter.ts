@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
@@ -13,6 +14,7 @@ import { SkillsAvailable } from "./SkillTypes";
 
 export type Entity = ICharacter | INPC;
 
+@TrackClassExecutionTime()
 @provide(TraitGetter)
 export class TraitGetter {
   constructor(

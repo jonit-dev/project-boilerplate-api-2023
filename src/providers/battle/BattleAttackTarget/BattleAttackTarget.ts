@@ -6,6 +6,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import {
   BattleSocketEvents,
   GRID_WIDTH,
@@ -20,6 +21,7 @@ import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetti
 import { BattleAttackRanged } from "./BattleAttackRanged";
 import { BattleAttackValidator } from "./BattleAttackValidator";
 
+@TrackClassExecutionTime()
 @provide(BattleAttackTarget)
 export class BattleAttackTarget {
   constructor(

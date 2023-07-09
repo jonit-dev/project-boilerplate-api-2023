@@ -3,6 +3,7 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
@@ -31,6 +32,7 @@ import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
 
+@TrackClassExecutionTime()
 @provide(SkillIncrease)
 export class SkillIncrease {
   constructor(
@@ -56,7 +58,10 @@ export class SkillIncrease {
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // Get character skills and equipment to upgrade them
 
-    const skills = (await Skill.findById(attacker.skills)
+    const skills = (await Skill.findOne({
+      _id: attacker.skills,
+      owner: attacker._id,
+    })
       .lean()
       .cacheQuery({
         cacheKey: `${attacker._id}-skills`,
@@ -135,7 +140,10 @@ export class SkillIncrease {
       let skills = character.skills as ISkill;
 
       if (!skills.level) {
-        skills = (await Skill.findById(character.skills)
+        skills = (await Skill.findOne({
+          _id: character.skills,
+          owner: character._id,
+        })
           .lean()
           .cacheQuery({
             cacheKey: `${character._id}-skills`,
@@ -186,7 +194,10 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
-    const skills = (await Skill.findById(character.skills)
+    const skills = (await Skill.findOne({
+      _id: character.skills,
+      owner: character._id,
+    })
       .lean()
       .cacheQuery({
         cacheKey: `${character._id}-skills`,

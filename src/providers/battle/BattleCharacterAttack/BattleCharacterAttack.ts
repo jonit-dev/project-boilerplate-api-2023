@@ -4,6 +4,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
@@ -15,6 +16,7 @@ import { BattleTargeting } from "../BattleTargeting";
 import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
 import { BattleCharacterAttackValidation } from "./BattleCharacterAttackValidation";
 
+@TrackClassExecutionTime()
 @provide(BattleCharacterAttack)
 export class BattleCharacterAttack {
   constructor(
@@ -49,7 +51,7 @@ export class BattleCharacterAttack {
 
   @TrackNewRelicTransaction()
   private async execCharacterBattleCycleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
-    const updatedCharacter = (await Character.findOne({ _id: character._id }).lean({
+    const updatedCharacter = (await Character.findOne({ _id: character._id, scene: target.scene }).lean({
       virtuals: true,
       defaults: true,
     })) as ICharacter;
@@ -80,12 +82,12 @@ export class BattleCharacterAttack {
     let updatedTarget;
 
     if (target.type === "NPC") {
-      updatedTarget = await NPC.findOne({ _id: target._id }).lean({
+      updatedTarget = await NPC.findOne({ _id: target._id, scene: target.scene }).lean({
         virtuals: true,
         defaults: true,
       });
 
-      const updatedNPCSkills = await Skill.findOne({ owner: target._id })
+      const updatedNPCSkills = await Skill.findOne({ owner: target._id, ownerType: "NPC" })
         .lean({
           virtuals: true,
           defaults: true,
@@ -97,12 +99,12 @@ export class BattleCharacterAttack {
       updatedTarget.skills = updatedNPCSkills;
     }
     if (target.type === "Character") {
-      updatedTarget = await Character.findOne({ _id: target._id }).lean({
+      updatedTarget = await Character.findOne({ _id: target._id, scene: target.scene }).lean({
         virtuals: true,
         defaults: true,
       });
 
-      const updatedCharacterSkills = await Skill.findOne({ owner: target._id }).cacheQuery({
+      const updatedCharacterSkills = await Skill.findOne({ owner: target._id, ownerType: "Character" }).cacheQuery({
         cacheKey: `${target._id}-skills`,
       });
 
