@@ -39,9 +39,7 @@ export class CharacterWeight {
 
     //! Requires virtuals
     character =
-      (await Character.findById(character._id)
-        .lean({ virtuals: true, defaults: true })
-        .lean("speed weight maxWeight")) || character;
+      ((await Character.findById(character._id).lean({ virtuals: true, defaults: true })) as ICharacter) || character;
 
     this.socketMessaging.sendEventToUser<ICharacterAttributeChanged>(
       character.channelId!,
