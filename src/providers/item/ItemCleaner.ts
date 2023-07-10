@@ -50,11 +50,11 @@ export class ItemCleaner {
         );
       }
 
-      if (!item?.owner) {
+      if (item && !item?.owner) {
         await this.itemOwnership.addItemOwnership(item, character._id);
       }
 
-      if (!item?.carrier) {
+      if (item && !item?.carrier) {
         await this.itemWeightTracker.setItemWeightTracking(item, character._id);
       }
     }
@@ -87,17 +87,17 @@ export class ItemCleaner {
       // check if item exists
       const item = (await Item.findById(slotData._id).lean({ virtuals: true, defaults: true })) as IItem;
 
-      if (!item) {
-        // remove slot on item container with update one
-        delete slots[slotNumber];
-      }
-
-      if (!item?.owner) {
+      if (item && !item?.owner) {
         await this.itemOwnership.addItemOwnership(item, character._id);
       }
 
-      if (!item?.carrier) {
+      if (item && !item?.carrier) {
         await this.itemWeightTracker.setItemWeightTracking(item, character._id);
+      }
+
+      if (!item) {
+        // remove slot on item container with update one
+        delete slots[slotNumber];
       }
     }
 
