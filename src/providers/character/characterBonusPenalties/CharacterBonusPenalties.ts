@@ -30,10 +30,7 @@ export class CharacterBonusPenalties {
   ) {}
 
   public async applyRaceBonusPenalties(character: ICharacter, skillType: string): Promise<void> {
-    const skills = (await Skill.findOne({
-      _id: character.skills,
-      owner: character.id,
-    })
+    const skills = (await Skill.findById(character.skills)
       .lean()
       .cacheQuery({
         cacheKey: `${character.id}-skills`,

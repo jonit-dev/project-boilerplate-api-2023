@@ -55,7 +55,8 @@ export class BattleCharacterAttack {
     })) as ICharacter;
 
     if (!updatedCharacter) {
-      throw new Error("Failed to get updated character for attacking target.");
+      this.battleCycle.stop(character._id);
+      return;
     }
 
     const hasBasicValidation = this.characterValidation.hasBasicValidation(updatedCharacter);

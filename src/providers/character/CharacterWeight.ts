@@ -29,7 +29,6 @@ export class CharacterWeight {
       {
         _id: character._id,
         scene: character.scene,
-        isOnline: true,
       },
       {
         $set: {

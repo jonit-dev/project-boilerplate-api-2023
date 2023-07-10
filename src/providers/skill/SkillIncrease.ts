@@ -56,10 +56,7 @@ export class SkillIncrease {
   public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     // Get character skills and equipment to upgrade them
 
-    const skills = (await Skill.findOne({
-      _id: attacker.skills,
-      owner: attacker._id,
-    })
+    const skills = (await Skill.findById(attacker.skills)
       .lean()
       .cacheQuery({
         cacheKey: `${attacker._id}-skills`,
@@ -138,10 +135,7 @@ export class SkillIncrease {
       let skills = character.skills as ISkill;
 
       if (!skills.level) {
-        skills = (await Skill.findOne({
-          _id: character.skills,
-          owner: character._id,
-        })
+        skills = (await Skill.findById(character.skills)
           .lean()
           .cacheQuery({
             cacheKey: `${character._id}-skills`,
@@ -192,10 +186,7 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
-    const skills = (await Skill.findOne({
-      _id: character.skills,
-      owner: character._id,
-    })
+    const skills = (await Skill.findById(character.skills)
       .lean()
       .cacheQuery({
         cacheKey: `${character._id}-skills`,
