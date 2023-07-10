@@ -6,6 +6,8 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { ItemUpdater } from "@providers/item/ItemUpdater";
 import { ItemView } from "@providers/item/ItemView";
 import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { MapHelper } from "@providers/map/MapHelper";
@@ -24,8 +26,10 @@ export class DepositItem {
     private depotSystem: DepotSystem,
     private mapHelper: MapHelper,
     private socketMessaging: SocketMessaging,
-    private characterItemSlots: CharacterItemSlots,
-    private itemWeightTracker: ItemWeightTracker
+    private itemWeightTracker: ItemWeightTracker,
+    private itemOwnership: ItemOwnership,
+    private itemUpdater: ItemUpdater,
+    private characterItemSlots: CharacterItemSlots
   ) {}
 
   @TrackNewRelicTransaction()
@@ -40,6 +44,9 @@ export class DepositItem {
     // check if item exists
     const item = await Item.findById(itemId);
     if (!item) {
+      // prevent depot slot from getting stuck
+      await this.characterItemSlots.deleteItemOnSlot(itemContainer as any, itemId);
+
       throw new Error(`DepotSystem > Item not found: ${itemId}`);
     }
 
@@ -62,7 +69,13 @@ export class DepositItem {
     if (!!fromContainerId && !isItemFromMap) {
       const container = await this.depotSystem.removeFromContainer(fromContainerId, item);
 
+      if (!item.owner) {
+        await this.itemOwnership.addItemOwnership(item, character);
+      }
+
       await this.itemWeightTracker.removeItemWeightTracking(item);
+
+      await this.markItemAsInDepot(item);
 
       // whenever a new item is removed, we need to update the character weight
       await this.characterWeight.updateCharacterWeight(character);
@@ -81,6 +94,14 @@ export class DepositItem {
     await this.depotSystem.addItemToContainer(character, item, itemContainer as unknown as IItemContainerModel);
 
     return itemContainer;
+  }
+
+  private async markItemAsInDepot(item: IItem): Promise<void> {
+    await this.itemUpdater.updateItemRecursivelyIfNeeded(item, {
+      $set: {
+        isInDepot: true,
+      },
+    });
   }
 
   private async isDepositValid(character: ICharacter, data: IDepotDepositItem, npc: INPC): Promise<boolean> {

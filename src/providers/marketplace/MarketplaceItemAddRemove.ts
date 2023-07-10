@@ -7,6 +7,7 @@ import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
@@ -24,7 +25,8 @@ export class MarketplaceItemAddRemove {
     private marketplaceValidation: MarketplaceValidation,
     private characterWeight: CharacterWeight,
     private marketplaceGetItems: MarketplaceGetItems,
-    private itemWeightTracker: ItemWeightTracker
+    private itemWeightTracker: ItemWeightTracker,
+    private itemOwnership: ItemOwnership
   ) {}
 
   @TrackNewRelicTransaction()
@@ -48,6 +50,10 @@ export class MarketplaceItemAddRemove {
         `Item with id ${marketplaceItem.itemId} does not exist`
       );
       return false;
+    }
+
+    if (!item.owner) {
+      await this.itemOwnership.addItemOwnership(item, character);
     }
 
     const isItemValid = this.marketplaceValidation.isItemValid(item);
@@ -118,6 +124,10 @@ export class MarketplaceItemAddRemove {
         `Item with id ${marketplaceItem.item} does not exist`
       );
       return false;
+    }
+
+    if (!item.owner) {
+      await this.itemOwnership.addItemOwnership(item, character);
     }
 
     const addedToInventory = await this.characterItemContainer.addItemToContainer(

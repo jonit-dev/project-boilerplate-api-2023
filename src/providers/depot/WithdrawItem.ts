@@ -6,6 +6,7 @@ import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { ItemDrop } from "@providers/item/ItemDrop";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { ItemUpdater } from "@providers/item/ItemUpdater";
 import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -25,7 +26,8 @@ export class WithdrawItem {
     private socketMessaging: SocketMessaging,
     private characterWeight: CharacterWeight,
     private itemOwnership: ItemOwnership,
-    private itemWeightTracker: ItemWeightTracker
+    private itemWeightTracker: ItemWeightTracker,
+    private itemUpdater: ItemUpdater
   ) {}
 
   @TrackNewRelicTransaction()
@@ -39,6 +41,9 @@ export class WithdrawItem {
     // check if item exists
     const item = await Item.findById(itemId);
     if (!item) {
+      // prevent depot slot from getting stuck
+      await this.characterItemSlots.deleteItemOnSlot(itemContainer as any, itemId);
+
       throw new Error(`DepotSystem > Item not found: ${itemId}`);
     }
 
@@ -84,11 +89,21 @@ export class WithdrawItem {
       await this.itemOwnership.addItemOwnership(item, character);
     }
 
+    await this.markNotIsInDepot(item);
+
     await this.itemWeightTracker.setItemWeightTracking(item, character);
 
     await this.characterWeight.updateCharacterWeight(character);
 
     return itemContainer;
+  }
+
+  private async markNotIsInDepot(item: IItem): Promise<void> {
+    await this.itemUpdater.updateItemRecursivelyIfNeeded(item._id, {
+      $unset: {
+        isInDepot: "",
+      },
+    });
   }
 
   private async isWithdrawValid(character: ICharacter, data: IDepotContainerWithdraw): Promise<boolean> {

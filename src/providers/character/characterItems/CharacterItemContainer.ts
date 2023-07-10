@@ -103,7 +103,7 @@ export class CharacterItemContainer {
       }
 
       const {
-        shouldAddOwnership,
+        shouldAddOwnership = true,
         isInventoryItem = false,
         dropOnMapIfFull = false,
         shouldAddAsCarriedItem = true,

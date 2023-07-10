@@ -107,6 +107,8 @@ const itemSchema = createLeanSchema(
       ref: "Character",
     }),
 
+    isInDepot: Type.boolean({ required: false }),
+
     isDeadBodyLootable: Type.boolean({ required: false }),
 
     isInContainer: Type.boolean({ required: false }),

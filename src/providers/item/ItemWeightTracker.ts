@@ -2,12 +2,13 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 import { IItemContainer, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ItemWeightTracker)
 export class ItemWeightTracker {
-  constructor() {}
+  constructor(private itemContainerHelper: ItemContainerHelper) {}
 
   @TrackNewRelicTransaction()
   public async setItemWeightTracking(item: IItem, character: ICharacter): Promise<void> {
@@ -20,7 +21,7 @@ export class ItemWeightTracker {
         throw new Error("ItemCarrier: Item container not found");
       }
 
-      await this.loopThroughAllItemsInContainerAndCallback(itemContainer, async (item, slotIndex) => {
+      await this.itemContainerHelper.execFnInAllItemContainerSlots(itemContainer, async (item, slotIndex) => {
         await this.setItemWeightTracking(item, character);
       });
     }
@@ -44,25 +45,9 @@ export class ItemWeightTracker {
         throw new Error("ItemCarrier: Item container not found");
       }
 
-      await this.loopThroughAllItemsInContainerAndCallback(itemContainer, async (item, slotIndex) => {
+      await this.itemContainerHelper.execFnInAllItemContainerSlots(itemContainer, async (item, slotIndex) => {
         await this.removeItemWeightTracking(item);
       });
-    }
-  }
-
-  @TrackNewRelicTransaction()
-  private async loopThroughAllItemsInContainerAndCallback(
-    itemContainer: IItemContainer,
-    fn: (item: IItem, slotIndex: number) => Promise<void>
-  ): Promise<void> {
-    const slots = itemContainer.slots;
-
-    for (const [slotIndex, itemData] of Object.entries(slots)) {
-      const item = itemData as IItem;
-
-      if (item) {
-        await fn(item, Number(slotIndex));
-      }
     }
   }
 }

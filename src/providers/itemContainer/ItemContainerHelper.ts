@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { IItemContainer, ItemContainerType } from "@rpg-engine/shared";
@@ -37,6 +37,22 @@ export class ItemContainerHelper {
       return ItemContainerType.Loot; // last resort, lets consider its a loot container
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  @TrackNewRelicTransaction()
+  public async execFnInAllItemContainerSlots(
+    itemContainer: IItemContainer,
+    fn: (item: IItem, slotIndex: number) => Promise<void>
+  ): Promise<void> {
+    const slots = itemContainer.slots;
+
+    for (const [slotIndex, itemData] of Object.entries(slots)) {
+      const item = itemData as IItem;
+
+      if (item) {
+        await fn(item, Number(slotIndex));
+      }
     }
   }
 }
