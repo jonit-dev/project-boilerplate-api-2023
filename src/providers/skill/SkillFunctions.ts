@@ -70,7 +70,6 @@ export class SkillFunctions {
       await Skill.findOneAndUpdate(
         {
           _id: skills._id,
-          owner: skills.owner,
         },
         skills
       ).lean();
