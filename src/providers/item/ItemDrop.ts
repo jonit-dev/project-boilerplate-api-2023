@@ -162,6 +162,7 @@ export class ItemDrop {
           y: targetY,
           scene: character.scene,
           droppedBy: character._id,
+          isInContainer: false,
         },
       }
     );

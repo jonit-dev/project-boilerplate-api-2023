@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInventory";
@@ -203,6 +203,18 @@ export class CharacterItemContainer {
       if (result && shouldAddAsCarriedItem) {
         await this.itemWeightTracker.setItemWeightTracking(itemToBeAdded, character);
       }
+
+      await Item.updateOne(
+        {
+          _id: itemToBeAdded._id,
+          scene: itemToBeAdded.scene,
+        },
+        {
+          $set: {
+            isInContainer: true,
+          },
+        }
+      );
 
       return result;
     } catch (error) {
