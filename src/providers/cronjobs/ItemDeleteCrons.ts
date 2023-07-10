@@ -73,33 +73,5 @@ export class ItemDeleteCrons {
         }, 60 * 1000 * 5);
       });
     });
-
-    nodeCron.schedule("0 */6 * * *", async () => {
-      const itemsWithoutOwner = await Item.find({
-        owner: { $in: [null, undefined] },
-        isEquipped: { $ne: true },
-        carrier: { $in: [null, undefined] },
-      });
-
-      for (const item of itemsWithoutOwner) {
-        if (item.owner) {
-          continue;
-        }
-
-        if (item.carrier) {
-          continue;
-        }
-
-        if (item.isEquipped) {
-          continue;
-        }
-
-        if (item.isInContainer) {
-          continue;
-        }
-
-        await item.remove();
-      }
-    });
   }
 }

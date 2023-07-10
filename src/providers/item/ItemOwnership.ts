@@ -16,14 +16,13 @@ export class ItemOwnership {
       return;
     }
 
-    await Item.updateOne({ _id: item._id, scene: item.scene }, { owner: character._id });
+    await Item.updateOne({ _id: item._id }, { owner: character._id });
 
     if (item?.itemContainer) {
       // adds ownership for the container itself
       await ItemContainer.updateOne(
         {
           _id: item.itemContainer,
-          scene: item.scene,
         },
         { owner: character._id }
       );
@@ -42,7 +41,6 @@ export class ItemOwnership {
     await Item.updateOne(
       {
         _id: item._id,
-        scene: item.scene,
       },
       {
         $unset: { owner: "" },
@@ -59,7 +57,6 @@ export class ItemOwnership {
       await ItemContainer.updateOne(
         {
           _id: item.itemContainer,
-          scene: item.scene,
         },
         { $unset: { owner: "" } }
       );
@@ -84,7 +81,6 @@ export class ItemOwnership {
         await Item.updateOne(
           {
             _id: item._id,
-            scene: item.scene,
           },
           {
             owner,
@@ -112,7 +108,6 @@ export class ItemOwnership {
         await Item.updateOne(
           {
             _id: item._id,
-            scene: item.scene,
           },
           {
             $unset: {

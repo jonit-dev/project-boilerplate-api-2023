@@ -83,7 +83,6 @@ export class CharacterItemSlots {
     await Item.updateOne(
       {
         _id: slotItem._id,
-        scene: slotItem.scene,
       },
       { $set: { ...payload } }
     );
@@ -356,20 +355,11 @@ export class CharacterItemSlots {
 
       // if inventory is full, just drop the item on the ground
 
-      await Item.findOneAndUpdate(
-        {
-          _id: selectedItem._id,
-          scene: selectedItem.scene,
-        },
-        {
-          $set: {
-            x: character.x,
-            y: character.y,
-            scene: character.scene,
-            droppedBy: character._id,
-          },
-        }
-      );
+      selectedItem.x = character.x;
+      selectedItem.y = character.y;
+      selectedItem.scene = character.scene;
+      selectedItem.droppedBy = character._id;
+      await selectedItem.save();
 
       await this.itemCleanup.tryCharacterDroppedItemsCleanup(character);
 

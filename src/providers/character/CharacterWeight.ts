@@ -28,7 +28,6 @@ export class CharacterWeight {
     await Character.updateOne(
       {
         _id: character._id,
-        scene: character.scene,
       },
       {
         $set: {

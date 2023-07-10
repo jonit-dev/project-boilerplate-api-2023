@@ -16,10 +16,7 @@ export class CharacterInventory {
 
   @TrackNewRelicTransaction()
   public async getInventory(character: ICharacter): Promise<IItem | null> {
-    const equipment = (await Equipment.findOne({
-      _id: character.equipment,
-      owner: character._id,
-    })
+    const equipment = (await Equipment.findById(character.equipment)
       .lean({
         virtuals: true,
         defaults: true,
@@ -29,10 +26,7 @@ export class CharacterInventory {
       })) as IEquipment;
 
     if (equipment) {
-      const inventory = await Item.findOne({
-        _id: equipment.inventory,
-        owner: character._id,
-      })
+      const inventory = await Item.findById(equipment.inventory)
         .lean({
           virtuals: true,
           getters: true,

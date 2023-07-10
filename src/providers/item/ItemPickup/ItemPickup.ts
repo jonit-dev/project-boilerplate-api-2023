@@ -17,7 +17,6 @@ import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
 import { ItemPickupFromMap } from "./ItemPickupFromMap";
 import { ItemPickupUpdater } from "./ItemPickupUpdater";
 import { ItemPickupValidator } from "./ItemPickupValidator";
-
 @provide(ItemPickup)
 export class ItemPickup {
   constructor(

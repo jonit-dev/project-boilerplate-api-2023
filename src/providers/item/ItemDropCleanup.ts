@@ -19,7 +19,6 @@ export class ItemDropCleanup {
 
       const totalDroppedItems = await Item.countDocuments({
         droppedBy: character._id,
-        scene: character.scene,
         updatedAt: { $gte: oneHourAgo },
       });
 
@@ -29,9 +28,9 @@ export class ItemDropCleanup {
 
       const lastDroppedItem = await Item.findOne({
         droppedBy: character._id,
-        scene: character.scene,
         x: { $exists: true, $ne: null as any },
         y: { $exists: true, $ne: null as any },
+        scene: { $exists: true, $ne: null as any },
         owner: { $in: [null, undefined] },
         isEquipped: { $ne: true },
         itemContainer: { $exists: false },
