@@ -459,8 +459,8 @@ export class UnitTestHelper {
       slots[Number(i)] = null;
     }
 
-    slots[0] = foodItem._id;
-    slots[1] = weaponItem._id;
+    slots[0] = foodItem;
+    slots[1] = weaponItem;
 
     backpackContainer.slots = slots;
 

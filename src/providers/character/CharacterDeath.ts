@@ -92,6 +92,8 @@ export class CharacterDeath {
         await this.clearAttackerTarget(killer);
       }
 
+      await entityEffectUse.clearAllEntityEffects(character);
+
       const characterDeathData: IBattleDeath = {
         id: character.id,
         type: "Character",
@@ -141,7 +143,6 @@ export class CharacterDeath {
       }
 
       await Promise.all([
-        entityEffectUse.clearAllEntityEffects(character),
         this.characterWeight.updateCharacterWeight(character),
         this.inMemoryHashTable.delete("character-weapon", character._id),
         this.inMemoryHashTable.delete("character-weights", character._id),
@@ -242,6 +243,22 @@ export class CharacterDeath {
 
     // there's a chance of dropping any of the equipped items
     await this.dropEquippedItemOnBody(character, bodyContainer, equipment);
+
+    await this.clearAllInventoryItems(inventory as unknown as string, character);
+  }
+
+  private async clearAllInventoryItems(inventoryId: string, character: ICharacter): Promise<void> {
+    const inventoryItem = await Item.findById(inventoryId).lean();
+
+    await this.clearItem(character, inventoryItem as unknown as IItem);
+
+    const inventoryContainer = await ItemContainer.findById(inventoryItem?.itemContainer).lean();
+
+    const bodySlots = inventoryContainer?.slots as { [key: string]: IItem };
+
+    for (const slotItem of Object.values(bodySlots)) {
+      await this.clearItem(character, slotItem);
+    }
   }
 
   private async dropInventory(character: ICharacter, bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
@@ -349,13 +366,21 @@ export class CharacterDeath {
       }
     }
 
-    item.x = undefined;
-    item.y = undefined;
-    item.owner = undefined;
-    item.scene = undefined;
-    item.tiledId = undefined;
-    item.carrier = undefined;
-    await item.save();
+    await Item.updateOne(
+      {
+        _id: item._id,
+      },
+      {
+        $unset: {
+          x: "",
+          y: "",
+          owner: "",
+          scene: "",
+          tiledId: "",
+          carrier: "",
+        },
+      }
+    );
 
     await this.itemWeightTracker.removeItemWeightTracking(item);
     await this.itemOwnership.removeItemOwnership(item);

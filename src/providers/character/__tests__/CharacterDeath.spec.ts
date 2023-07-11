@@ -172,7 +172,10 @@ describe("CharacterDeath.ts | Character with items", () => {
 
     // Add items to character's backpack
     const backpack = characterEquipment.inventory as unknown as IItem;
-    backpackContainer = await unitTestHelper.createMockBackpackItemContainer(backpack);
+    backpackContainer = await unitTestHelper.createMockBackpackItemContainer(backpack, {
+      owner: testCharacter._id,
+      carrier: testCharacter._id,
+    });
 
     await Item.updateOne(
       {
@@ -190,13 +193,13 @@ describe("CharacterDeath.ts | Character with items", () => {
     jest.clearAllMocks();
   });
 
-  it("should drop character's backpack items as a container on its dead body", async () => {
+  it("should drop character's backpack items as a container on its dead body, clear items properly", async () => {
     // @ts-ignore
     const spyDropCharacterItemsOnBody = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
 
     // initially, character's backpack has 2 items
-    expect(backpackContainer.slots[0]).not.toBeNull();
-    expect(backpackContainer.slots[1]).not.toBeNull();
+    expect(backpackContainer?.slots[0]).not.toBeNull();
+    expect(backpackContainer?.slots[1]).not.toBeNull();
 
     // character dies
     await characterDeath.handleCharacterDeath(testNPC, testCharacter);
@@ -220,14 +223,27 @@ describe("CharacterDeath.ts | Character with items", () => {
 
     expect(bodyItemContainer.slots[0].key).toBe("backpack");
 
-    // backpack ownership should be null after death
-    expect(bodyItemContainer.slots[0].owner).toBeUndefined();
-
     const updatedBody = await Item.findById(characterBody!._id).lean();
 
     expect(updatedBody?.owner).toBeUndefined();
 
     expect(updatedBody?.isDeadBodyLootable).toBe(true);
+
+    const droppedBackpack = bodyItemContainer.slots[0] as unknown as IItem;
+
+    const updatedBackpackContainer = await ItemContainer.findById(droppedBackpack.itemContainer).lean();
+
+    const droppedItem1 = await Item.findById(updatedBackpackContainer?.slots[0]._id).lean();
+    const droppedItem2 = await Item.findById(updatedBackpackContainer?.slots[1]._id).lean();
+    const droppedBPItem = await Item.findById(droppedBackpack?._id).lean();
+
+    expect(droppedItem1?.owner).toBeUndefined();
+    expect(droppedItem2?.owner).toBeUndefined();
+    expect(droppedBPItem?.owner).toBeUndefined();
+
+    expect(droppedItem1?.carrier).toBeUndefined();
+    expect(droppedItem2?.carrier).toBeUndefined();
+    expect(droppedBPItem?.carrier).toBeUndefined();
   });
 
   it("should drop equipment item on character's dead body", async () => {
