@@ -50,6 +50,8 @@ export const energyBoltRune: IUsableEffectRune = {
             deactivation: "You're no longer electrified!",
           },
         },
+        isStackable: false,
+        originateFrom: UsableEffectsBlueprint.EnergyBoltRuneUsableEffect,
       });
     }
 

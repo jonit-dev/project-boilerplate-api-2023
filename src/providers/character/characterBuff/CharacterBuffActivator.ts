@@ -25,7 +25,29 @@ export class CharacterBuffActivator {
     character: ICharacter,
     buff: ICharacterTemporaryBuff
   ): Promise<ICharacterBuff | undefined> {
-    return await this.enableBuff(character, buff);
+    try {
+      // Enable the buff directly if it's stackable or doesn't originate from anywhere
+      if (buff.isStackable || !buff.originateFrom) {
+        return this.enableBuff(character, buff);
+      }
+
+      // Find the character buffs that have the same owner and originate from the same place
+      const characterBuffs = (await CharacterBuff.find({
+        owner: character.id,
+        originateFrom: buff.originateFrom,
+      }).lean()) as ICharacterBuff[];
+
+      // If any such buffs exist, do not enable the buff
+      if (characterBuffs.length > 0) {
+        return undefined;
+      }
+
+      // Enable the buff
+      return this.enableBuff(character, buff);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Unable to enable temporary buff.");
+    }
   }
 
   public async enablePermanentBuff(

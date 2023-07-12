@@ -50,6 +50,8 @@ export const thunderRuneUsableEffect: IUsableEffectRune = {
             deactivation: "You're no longer electrified!",
           },
         },
+        isStackable: false,
+        originateFrom: UsableEffectsBlueprint.ThunderRuneUsableEffect,
       });
     }
 
