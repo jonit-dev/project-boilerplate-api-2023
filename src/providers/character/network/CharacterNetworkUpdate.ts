@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
 import { GridManager } from "@providers/map/GridManager";
@@ -25,7 +26,6 @@ import {
 import { provide } from "inversify-binding-decorators";
 
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { Locker } from "@providers/locks/Locker";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
@@ -44,8 +44,7 @@ export class CharacterNetworkUpdate {
     private characterMovementWarn: CharacterMovementWarn,
     private mathHelper: MathHelper,
     private characterView: CharacterView,
-    private pm2Helper: PM2Helper,
-    private locker: Locker
+    private pm2Helper: PM2Helper
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -53,12 +52,6 @@ export class CharacterNetworkUpdate {
       channel,
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
-        const canProceed = await this.locker.lock(`character-position-update-${character._id}`);
-
-        if (!canProceed) {
-          return;
-        }
-
         try {
           if (data) {
             // sometimes the character is just changing facing direction and not moving.. That's why we need this.
@@ -84,29 +77,25 @@ export class CharacterNetworkUpdate {
                 y: character.y,
               };
 
-              await this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
-
-              await this.characterMovementWarn.warn(character, data);
-
               switch (appEnv.general.ENV) {
                 case EnvType.Development:
-                  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                  this.npcManager.startNearbyNPCsBehaviorLoop(character);
+                  void this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
                   break;
                 case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
-                  this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
+                  void this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
                     character,
                   });
                   break;
               }
 
-              await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
-
-              await this.handleNonPVPZone(character, newX, newY);
-
-              // leave it for last!
-              await this.handleMapTransition(character, newX, newY);
+              await Promise.all([
+                this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY),
+                this.characterMovementWarn.warn(character, data),
+                this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction),
+                this.handleNonPVPZone(character, newX, newY),
+                this.handleMapTransition(character, newX, newY),
+              ]);
 
               // eslint-disable-next-line @typescript-eslint/no-floating-promises
               this.characterView.clearAllOutOfViewElements(character._id, character.x, character.y);
@@ -116,8 +105,6 @@ export class CharacterNetworkUpdate {
           }
         } catch (error) {
           console.error(error);
-        } finally {
-          await this.locker.unlock(`character-position-update-${character._id}`);
         }
       }
     );
