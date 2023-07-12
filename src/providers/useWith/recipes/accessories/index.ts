@@ -6,6 +6,7 @@ import { recipeDeathNecklace } from "./recipeDeathNecklace";
 import { recipeElvenRing } from "./recipeElvenRing";
 import { recipeHasteRing } from "./recipeHasteRing";
 import { recipeOrcRing } from "./recipeOrcRing";
+import { recipePendantOfLife } from "./recipePendantOfLife";
 
 export const recipeAccessoriesIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [AccessoriesBlueprint.Bandana]: [recipeBandana],
@@ -14,4 +15,5 @@ export const recipeAccessoriesIndex: Record<string, IUseWithCraftingRecipe[]> = 
   [AccessoriesBlueprint.ElvenRing]: [recipeElvenRing],
   [AccessoriesBlueprint.HasteRing]: [recipeHasteRing],
   [AccessoriesBlueprint.OrcRing]: [recipeOrcRing],
+  [AccessoriesBlueprint.PendantOfLife]: [recipePendantOfLife],
 };

@@ -17,6 +17,7 @@ import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemPickupUpdater } from "@providers/item/ItemPickup/ItemPickupUpdater";
 import { ItemView } from "@providers/item/ItemView";
+import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -55,7 +56,7 @@ export class EquipmentEquip {
     private itemPickupUpdater: ItemPickupUpdater,
     private characterItemBuff: CharacterItemBuff,
     private equipmentCharacterClass: EquipmentCharacterClass,
-
+    private itemWeightTracker: ItemWeightTracker,
     private characterBuffValidation: CharacterBuffValidation
   ) {}
 
@@ -106,6 +107,10 @@ export class EquipmentEquip {
     await this.itemView.removeItemFromMap(item);
 
     await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
+
+    await this.itemWeightTracker.setItemWeightTracking(item, character);
+
+    await this.characterWeight.updateCharacterWeight(character);
 
     return true;
   }

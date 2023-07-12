@@ -3,28 +3,29 @@ import { AccessoriesBlueprint, CraftingResourcesBlueprint } from "@providers/ite
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 
-export const recipeCorruptionNecklace: IUseWithCraftingRecipe = {
-  outputKey: AccessoriesBlueprint.CorruptionNecklace,
+export const recipePendantOfLife: IUseWithCraftingRecipe = {
+  outputKey: AccessoriesBlueprint.PendantOfLife,
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.CorruptionOre,
-      qty: 3,
+      key: CraftingResourcesBlueprint.RedSapphire,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.Rope,
       qty: 1,
     },
     {
-      key: CraftingResourcesBlueprint.Bone,
-      qty: 20,
+      key: CraftingResourcesBlueprint.Skull,
+      qty: 25,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CorruptionOre, 3],
+      [CraftingResourcesBlueprint.RedSapphire, 30],
       [CraftingResourcesBlueprint.Rope, 1],
+      [CraftingResourcesBlueprint.Skull, 25],
     ]),
   ],
 };
