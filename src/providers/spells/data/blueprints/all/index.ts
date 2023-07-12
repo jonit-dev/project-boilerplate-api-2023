@@ -7,6 +7,7 @@ import { spellGreaterHealing } from "./SpellGreaterHealing";
 import { spellPoisonRuneCreation } from "./SpellPoisonRuneCreation";
 import { spellSelfHaste } from "./SpellSelfHaste";
 import { spellSelfHealing } from "./SpellSelfHealing";
+import { spellTeleport } from "./SpellTeleport";
 
 export const allClassesSpellsIndex = {
   [SpellsBlueprint.SelfHealingSpell]: spellSelfHealing,
@@ -17,4 +18,5 @@ export const allClassesSpellsIndex = {
   [SpellsBlueprint.GreaterHealingSpell]: spellGreaterHealing,
   [SpellsBlueprint.PoisonRuneCreationSpell]: spellPoisonRuneCreation,
   [SpellsBlueprint.SelfHasteSpell]: spellSelfHaste,
+  [SpellsBlueprint.Teleport]: spellTeleport,
 };
