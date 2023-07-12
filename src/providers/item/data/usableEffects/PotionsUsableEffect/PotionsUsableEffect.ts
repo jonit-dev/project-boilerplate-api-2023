@@ -97,12 +97,12 @@ export const antidotePotionUsableEffect: IUsableEffect = {
 export const lightEndurancePotionUsableEffect: IUsableEffect = {
   key: UsableEffectsBlueprint.LightEndurancePotionUsableEffect,
   usableEffect: async (character: ICharacter) => {
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, CraftingSkill.Alchemy, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, CraftingSkill.Alchemy, {
       min: 10,
       max: 30,
     });
 
-    const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, CraftingSkill.Alchemy, {
+    const buffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, CraftingSkill.Alchemy, {
       min: 5,
       max: 10,
     });

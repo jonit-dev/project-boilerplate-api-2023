@@ -27,7 +27,7 @@ export const spellStealth: Partial<ISpell> = {
   usableEffect: async (character: ICharacter) => {
     const effect = container.get(SpecialEffect);
     const spellCalculator = container.get(SpellCalculator);
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 20,
       max: 45,
     });

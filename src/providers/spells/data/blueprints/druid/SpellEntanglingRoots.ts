@@ -34,7 +34,7 @@ export const spellEntanglingRoots: Partial<ISpell> = {
 
     const effect = container.get(SpecialEffect);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 5,
       max: 10,
     });

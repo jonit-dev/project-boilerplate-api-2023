@@ -45,12 +45,12 @@ export const spellVineGrasp: Partial<ISpell> = {
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectVineGrasp);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 20,
       max: 40,
     });
 
-    const debuffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const debuffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 5,
       max: 15,
     });

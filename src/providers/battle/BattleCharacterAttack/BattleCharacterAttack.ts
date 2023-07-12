@@ -7,7 +7,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
-import { EntityAttackType } from "@rpg-engine/shared";
+import { CharacterClass, EntityAttackType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
@@ -38,8 +38,14 @@ export class BattleCharacterAttack {
     let attackIntervalSpeed = character.attackIntervalSpeed;
 
     if (attackType === EntityAttackType.Ranged) {
-      // nerf attack interval speed by 35%
-      attackIntervalSpeed = attackIntervalSpeed * 1.35;
+      switch (character.class) {
+        case CharacterClass.Hunter:
+          attackIntervalSpeed = attackIntervalSpeed * 1.2;
+          break;
+        default:
+          attackIntervalSpeed = attackIntervalSpeed * 1.35;
+          break;
+      }
     }
 
     await this.battleCycle.init(character, target._id, attackIntervalSpeed, async () => {

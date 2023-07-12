@@ -53,6 +53,38 @@ export class CharacterWeight {
   }
 
   @TrackNewRelicTransaction()
+  public async updateCharacterWeightTo(character: ICharacter, newWeight: number): Promise<void> {
+    await this.inMemoryHashTable.delete("character-weights", character._id);
+
+    await Character.updateOne(
+      {
+        _id: character._id,
+      },
+      {
+        $set: {
+          weight: newWeight,
+        },
+      }
+    );
+
+    await this.inMemoryHashTable.set("character-weights", character._id, newWeight);
+
+    //! Requires virtuals
+    character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
+
+    this.socketMessaging.sendEventToUser<ICharacterAttributeChanged>(
+      character.channelId!,
+      CharacterSocketEvents.AttributeChanged,
+      {
+        speed: character.speed,
+        weight: newWeight,
+        maxWeight: character.maxWeight,
+        targetId: character._id,
+      }
+    );
+  }
+
+  @TrackNewRelicTransaction()
   public async getMaxWeight(character: ICharacter): Promise<number> {
     const maxWeight = (await this.inMemoryHashTable.get("character-max-weights", character._id)) as unknown as number;
 

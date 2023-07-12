@@ -54,7 +54,7 @@ export class MagePassiveHabilities {
 
       const magicLvl = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Magic);
       const interval =
-        (await this.spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+        (await this.spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
           max: 30,
           min: 5,
           skillAssociation: "reverse",

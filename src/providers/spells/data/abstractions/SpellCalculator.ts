@@ -41,22 +41,7 @@ export class SpellCalculator {
     return itemsToCreate;
   }
 
-  public async calculateBuffBasedOnSkillLevel(
-    character: ICharacter,
-    skillName: CharacterTrait,
-    options: IRequiredOptions
-  ): Promise<number> {
-    const value = await this.getSkillLevel(character, skillName);
-
-    return this.linearInterpolation.calculateLinearInterpolation(
-      value,
-      options.min,
-      options.max,
-      options.skillAssociation
-    );
-  }
-
-  public async calculateTimeoutBasedOnSkillLevel(
+  public async calculateBasedOnSkillLevel(
     character: ICharacter,
     skillName: CharacterTrait,
     options: IRequiredOptions

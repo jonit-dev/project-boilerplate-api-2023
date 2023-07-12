@@ -31,7 +31,7 @@ export const spellManaShield: Partial<ISpell> = {
 
     const spellCalculator = container.get(SpellCalculator);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 40,
       max: 180,
     });
