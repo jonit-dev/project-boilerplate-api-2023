@@ -30,6 +30,7 @@ import { spellArrowCreation } from "../data/blueprints/all/SpellArrowCreation";
 import { spellBlankRuneCreation } from "../data/blueprints/all/SpellBlankRuneCreation";
 import { spellGreaterHealing } from "../data/blueprints/all/SpellGreaterHealing";
 import { spellSelfHealing } from "../data/blueprints/all/SpellSelfHealing";
+import { spellTeleport } from "../data/blueprints/all/SpellTeleport";
 import { rogueSpellExecution } from "../data/blueprints/rogue/SpellExecution";
 import { spellStealth } from "../data/blueprints/rogue/SpellStealth";
 import { spellStunTarget } from "../data/blueprints/warrior/SpellStunTarget";
@@ -56,7 +57,7 @@ describe("SpellCast.ts", () => {
     specialEffect = container.get<SpecialEffect>(SpecialEffect);
     berserkerSpells = container.get(Execution);
 
-    level2Spells = [spellSelfHealing, spellArrowCreation, spellBlankRuneCreation];
+    level2Spells = [spellSelfHealing, spellArrowCreation, spellBlankRuneCreation, spellTeleport];
     // level3Spells = [spellBoltCreation, spellFoodCreation];
     // level4Spells = [
     //   spellDarkRuneCreation,
