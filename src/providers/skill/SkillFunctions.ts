@@ -5,6 +5,7 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
 import {
@@ -31,7 +32,8 @@ export class SkillFunctions {
     private socketMessaging: SocketMessaging,
     private characterBuffSkill: CharacterBuffSkill,
     private numberFormatter: NumberFormatter,
-    private skillBuff: SkillBuff
+    private skillBuff: SkillBuff,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public updateSkillByType(skills: ISkill, skillName: string, bonusOrPenalties: number): boolean {
@@ -100,6 +102,7 @@ export class SkillFunctions {
     // now we need to clear up caching
     await clearCacheForKey(`characterBuffs_${character._id}`);
     await clearCacheForKey(`${character._id}-skills`);
+    await this.inMemoryHashTable.delete("load-craftable-items", character._id);
 
     const levelUpEventPayload: ISkillEventFromServer = {
       characterId: character.id,

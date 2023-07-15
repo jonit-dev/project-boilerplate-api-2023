@@ -38,7 +38,7 @@ export class CharacterItemInventory {
   @TrackNewRelicTransaction()
   public async getAllItemsFromInventoryNested(character: ICharacter): Promise<IItem[]> {
     const inventory = await this.characterInventory.getInventory(character);
-    const container = await ItemContainer.findById(inventory?.itemContainer);
+    const container = (await ItemContainer.findById(inventory?.itemContainer).lean()) as unknown as IItemContainer;
     if (!container) {
       return [];
     }

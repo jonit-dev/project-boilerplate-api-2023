@@ -10,6 +10,7 @@ import { PushNotificationHelper } from "@providers/pushNotification/PushNotifica
 import { Seeder } from "@providers/seeds/Seeder";
 
 import { appEnv } from "@providers/config/env";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { blueprintManager } from "@providers/inversify/container";
 import { Locker } from "@providers/locks/Locker";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
@@ -35,7 +36,8 @@ export class ServerBootstrap {
     private characterMonitor: CharacterMonitor,
     private heapMonitor: HeapMonitor,
     private npcFreezer: NPCFreezer,
-    private locker: Locker
+    private locker: Locker,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -74,6 +76,8 @@ export class ServerBootstrap {
     await this.characterTextureChange.removeAllTextureChange();
 
     await this.pathfindingResults.clearAllResults();
+
+    await this.inMemoryHashTable.deleteAll("crafting-recipes");
 
     // Firebase-admin setup, that push notification requires.
     PushNotificationHelper.initialize();
