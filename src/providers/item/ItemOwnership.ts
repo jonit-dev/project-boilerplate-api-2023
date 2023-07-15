@@ -104,6 +104,12 @@ export class ItemOwnership {
     let depth = 0;
     const maxDepth = 100;
     await this.loopThroughAllItemsInContainerAndCallback(itemContainer, async (item, slotIndex) => {
+      const hasItem = await Item.exists({ _id: item._id });
+
+      if (!hasItem) {
+        return;
+      }
+
       if (itemContainer._id === item.itemContainer) {
         return;
       }
