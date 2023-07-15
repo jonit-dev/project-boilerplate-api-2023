@@ -101,8 +101,20 @@ export class ItemOwnership {
       throw new Error("ItemOwnership: Item container not found");
     }
 
+    let depth = 0;
+    const maxDepth = 100;
     await this.loopThroughAllItemsInContainerAndCallback(itemContainer, async (item, slotIndex) => {
+      if (itemContainer._id === item.itemContainer) {
+        return;
+      }
+
       if (item.itemContainer) {
+        depth++;
+
+        if (depth > maxDepth) {
+          throw new Error("ItemOwnership: Max depth reached");
+        }
+
         await this.removeItemOwnership(item);
       } else {
         await Item.updateOne(
