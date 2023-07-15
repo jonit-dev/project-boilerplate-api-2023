@@ -1,7 +1,8 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
@@ -12,7 +13,6 @@ import { CharacterItemInventory } from "@providers/character/characterItems/Char
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { blueprintManager } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
-import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { recipeBlueprintsIndex } from "@providers/useWith/recipes/index";
 import { IUseWithCraftingRecipe, IUseWithCraftingRecipeItem } from "@providers/useWith/useWithTypes";
@@ -31,9 +31,9 @@ import Shared, {
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
-import { ItemOwnership } from "./ItemOwnership";
 import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
+@TrackClassExecutionTime()
 @provide(ItemCraftable)
 export class ItemCraftable {
   constructor(
@@ -45,25 +45,18 @@ export class ItemCraftable {
     private characterWeight: CharacterWeight,
     private animationEffect: AnimationEffect,
     private skillIncrease: SkillIncrease,
-    private traitGetter: TraitGetter,
-    private characterInventory: CharacterInventory,
-    private itemOwnership: ItemOwnership
+    private characterInventory: CharacterInventory
   ) {}
 
   @TrackNewRelicTransaction()
   public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
     // Retrieve character inventory items
-    const inventoryInfo = await this.getCharacterInventoryItems(character);
+    const inventoryInfo = await this.getCharacterInventoryIngredients(character);
 
-    // Retrieve the character with populated skills from the database
-    const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
-      "skills"
-    )) as unknown as ICharacter;
-
-    const skills = (await Skill.findOne({ owner: updatedCharacter._id })
+    const skills = (await Skill.findOne({ owner: character._id })
       .lean()
       .cacheQuery({
-        cacheKey: `${updatedCharacter._id}-skills`,
+        cacheKey: `${character._id}-skills`,
       })) as ISkill;
 
     // Retrieve the list of recipes for the given item sub-type
@@ -111,7 +104,7 @@ export class ItemCraftable {
       return;
     }
 
-    const inventoryInfo = await this.getCharacterInventoryItems(character);
+    const inventoryInfo = await this.getCharacterInventoryIngredients(character);
 
     if (!this.canCraftRecipe(inventoryInfo, recipe)) {
       this.socketMessaging.sendErrorMessageToCharacter(
@@ -360,9 +353,29 @@ export class ItemCraftable {
     return availableRecipes.sort((a, b) => a.minCraftingRequirements[1] - b.minCraftingRequirements[1]);
   }
 
+  private async getCharacterInventoryIngredients(character: ICharacter): Promise<Map<string, number>> {
+    const items = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
+
+    if (!items) {
+      return new Map<string, number>();
+    }
+
+    const ingredientMap = new Map<string, number>();
+
+    for (const item of items) {
+      if (item.stackQty) {
+        ingredientMap.set(item.key, item.stackQty);
+      } else {
+        ingredientMap.set(item.key, 1);
+      }
+    }
+
+    return ingredientMap;
+  }
+
   @TrackNewRelicTransaction()
   private async getRecipesWithAnyIngredientInInventory(character: ICharacter): Promise<IUseWithCraftingRecipe[]> {
-    const inventoryInfo = await this.getCharacterInventoryItems(character);
+    const inventoryIngredients = await this.getCharacterInventoryIngredients(character);
 
     const availableRecipes: IUseWithCraftingRecipe[] = [];
     const recipes = this.getAllRecipes();
@@ -373,7 +386,7 @@ export class ItemCraftable {
       const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
       if (recipes[item.key]) {
         const recipe = recipes[item.key];
-        if (recipe.requiredItems.some((ing) => inventoryInfo.get(ing.key) ?? ing.qty <= 0)) {
+        if (recipe.requiredItems.some((ing) => inventoryIngredients.get(ing.key) ?? ing.qty <= 0)) {
           availableRecipes.push(recipe);
         }
       }
@@ -381,8 +394,8 @@ export class ItemCraftable {
 
     return availableRecipes.sort((a, b) => {
       // sort by qty of ingredients in inventory first
-      const aQty = a.requiredItems.reduce((acc, ing) => acc + (inventoryInfo.get(ing.key) ?? 0), 0);
-      const bQty = b.requiredItems.reduce((acc, ing) => acc + (inventoryInfo.get(ing.key) ?? 0), 0);
+      const aQty = a.requiredItems.reduce((acc, ing) => acc + (inventoryIngredients.get(ing.key) ?? 0), 0);
+      const bQty = b.requiredItems.reduce((acc, ing) => acc + (inventoryIngredients.get(ing.key) ?? 0), 0);
 
       if (aQty > bQty) {
         return -1;
@@ -405,31 +418,6 @@ export class ItemCraftable {
       }
     }
     return obj;
-  }
-
-  @TrackNewRelicTransaction()
-  private async getCharacterInventoryItems(character: ICharacter): Promise<Map<string, number>> {
-    const map = new Map();
-
-    const container = await this.characterItemContainer.getItemContainer(character);
-    if (!container) {
-      return map;
-    }
-
-    for (let i = 0; i < container.slotQty; i++) {
-      const slotItem = container.slots[i];
-      if (slotItem) {
-        let qty = map.get(slotItem.key) ?? 0;
-        if (slotItem.maxStackSize > 1) {
-          qty += slotItem.stackQty;
-        } else {
-          qty++;
-        }
-        map.set(slotItem.key, qty);
-      }
-    }
-
-    return map;
   }
 
   private getQty(recipe: IUseWithCraftingRecipe): number {
@@ -465,11 +453,12 @@ export class ItemCraftable {
   }
 
   private async getCraftingSkillsAverage(character: ICharacter): Promise<number> {
-    const updatedCharacter = (await Character.findOne({ _id: character._id }).populate(
-      "skills"
-    )) as unknown as ICharacter;
+    const skills = (await Skill.findOne({ owner: character._id })
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character._id}-skills`,
+      })) as ISkill;
 
-    const skills = updatedCharacter.skills as unknown as ISkill;
     if (!skills) {
       return 0;
     }
