@@ -11,29 +11,36 @@ export class ItemOwnership {
   constructor(private characterItemSlot: CharacterItemSlots, private itemContainerHelper: ItemContainerHelper) {}
 
   @TrackNewRelicTransaction()
-  public async addItemOwnership(item: IItem, character: ICharacter): Promise<void> {
-    // if our item owner is our character, just skip. Nothing to do here.
-    if (item.owner?.toString() === character._id.toString()) {
-      return;
-    }
+  public async addItemOwnership(item: IItem, character: ICharacter): Promise<boolean> {
+    try {
+      // if our item owner is our character, just skip. Nothing to do here.
+      if (item.owner?.toString() === character._id.toString()) {
+        return false;
+      }
 
-    await Item.updateOne({ _id: item._id }, { owner: character._id });
+      await Item.updateOne({ _id: item._id }, { owner: character._id });
 
-    if (item?.itemContainer) {
-      // adds ownership for the container itself
-      await ItemContainer.updateOne(
-        {
-          _id: item.itemContainer,
-        },
-        { owner: character._id }
-      );
+      if (item?.itemContainer) {
+        // adds ownership for the container itself
+        await ItemContainer.updateOne(
+          {
+            _id: item.itemContainer,
+          },
+          { owner: character._id }
+        );
 
-      // and for all nested items
+        // and for all nested items
 
-      await this.addOwnershipToAllItemsInContainer(
-        item.itemContainer as unknown as string,
-        character._id as unknown as string
-      );
+        await this.addOwnershipToAllItemsInContainer(
+          item.itemContainer as unknown as string,
+          character._id as unknown as string
+        );
+      }
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   }
 
@@ -77,32 +84,32 @@ export class ItemOwnership {
 
   @TrackNewRelicTransaction()
   public async addOwnershipToAllItemsInContainer(itemContainerId: string, owner: string): Promise<void> {
-    const itemContainer = await ItemContainer.findById(itemContainerId);
+    const itemContainer = await ItemContainer.findById(itemContainerId).lean().select("slots");
 
     if (!itemContainer) {
       throw new Error("ItemOwnership: Item container not found");
     }
 
+    const processedItems = new Set<string>();
+
     await this.itemContainerHelper.execFnInAllItemContainerSlots(itemContainer as any, async (item, slotIndex) => {
-      if (item.itemContainer) {
-        await this.addItemOwnership(item, { _id: owner } as unknown as ICharacter);
-      } else {
-        await Item.updateOne(
-          {
-            _id: item._id,
-          },
-          {
-            owner,
-          }
-        );
+      if (processedItems.has(item._id.toString())) {
+        return;
       }
 
-      await this.characterItemSlot.updateItemOnSlot(slotIndex, itemContainer, {
-        owner,
-      });
+      processedItems.add(item._id.toString());
+
+      const success = await this.addItemOwnership(item, { _id: owner } as unknown as ICharacter);
+
+      if (success) {
+        await this.characterItemSlot.updateItemOnSlot(slotIndex, itemContainer as any, {
+          owner,
+        });
+      }
     });
   }
 
+  @TrackNewRelicTransaction()
   public async removeOwnershipFromAllItemsInContainer(itemContainerId: string): Promise<void> {
     const itemContainer = (await ItemContainer.findById(itemContainerId).lean().select("slots")) as IItemContainer;
 
