@@ -3,11 +3,12 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 import { provide } from "inversify-binding-decorators";
 
 @provide(ItemOwnership)
 export class ItemOwnership {
-  constructor(private characterItemSlot: CharacterItemSlots) {}
+  constructor(private characterItemSlot: CharacterItemSlots, private itemContainerHelper: ItemContainerHelper) {}
 
   @TrackNewRelicTransaction()
   public async addItemOwnership(item: IItem, character: ICharacter): Promise<void> {
@@ -82,7 +83,7 @@ export class ItemOwnership {
       throw new Error("ItemOwnership: Item container not found");
     }
 
-    await this.loopThroughAllItemsInContainerAndCallback(itemContainer, async (item, slotIndex) => {
+    await this.itemContainerHelper.execFnInAllItemContainerSlots(itemContainer as any, async (item, slotIndex) => {
       if (item.itemContainer) {
         await this.addItemOwnership(item, { _id: owner } as unknown as ICharacter);
       } else {
@@ -109,26 +110,14 @@ export class ItemOwnership {
       throw new Error("ItemOwnership: Item container not found");
     }
 
-    let depth = 0;
-    const maxDepth = 100;
-    await this.loopThroughAllItemsInContainerAndCallback(itemContainer, async (item, slotIndex) => {
-      const hasItem = await Item.exists({ _id: item._id });
+    const processedItems = new Set<string>();
 
-      if (!hasItem) {
+    await this.itemContainerHelper.execFnInAllItemContainerSlots(itemContainer as any, async (item, slotIndex) => {
+      if (processedItems.has(item._id.toString())) {
         return;
       }
 
-      if (itemContainer._id === item.itemContainer) {
-        return;
-      }
-
-      if (item.itemContainer) {
-        depth++;
-
-        if (depth > maxDepth) {
-          throw new Error("ItemOwnership: Max depth reached");
-        }
-      }
+      processedItems.add(item._id.toString());
 
       const success = await this.removeItemOwnership(item);
 
@@ -138,21 +127,5 @@ export class ItemOwnership {
         });
       }
     });
-  }
-
-  @TrackNewRelicTransaction()
-  private async loopThroughAllItemsInContainerAndCallback(
-    itemContainer: IItemContainer,
-    fn: (item: IItem, slotIndex: number) => Promise<void>
-  ): Promise<void> {
-    const slots = itemContainer.slots;
-
-    for (const [slotIndex, itemData] of Object.entries(slots)) {
-      const item = itemData as IItem;
-
-      if (item) {
-        await fn(item, Number(slotIndex));
-      }
-    }
   }
 }

@@ -47,7 +47,15 @@ export class ItemContainerHelper {
   ): Promise<void> {
     const slots = itemContainer.slots;
 
+    const loopedItems = new Set<string>();
+
     for (const [slotIndex, itemData] of Object.entries(slots)) {
+      if (loopedItems.has(itemData?._id)) {
+        continue;
+      }
+
+      loopedItems.add(itemData?._id);
+
       const item = itemData as IItem;
 
       if (item) {
