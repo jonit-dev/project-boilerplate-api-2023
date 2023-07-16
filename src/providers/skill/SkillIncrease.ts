@@ -57,7 +57,10 @@ export class SkillIncrease {
     // Get character skills and equipment to upgrade them
 
     const skills = (await Skill.findById(attacker.skills)
-      .lean()
+      .lean({
+        virtuals: true,
+        defaults: true,
+      })
       .cacheQuery({
         cacheKey: `${attacker._id}-skills`,
       })) as unknown as ISkill;
@@ -136,7 +139,10 @@ export class SkillIncrease {
 
       if (!skills.level) {
         skills = (await Skill.findById(character.skills)
-          .lean()
+          .lean({
+            virtuals: true,
+            defaults: true,
+          })
           .cacheQuery({
             cacheKey: `${character._id}-skills`,
           })) as unknown as ISkill;
