@@ -72,7 +72,7 @@ export class ItemOwnership {
         );
 
         // this removes from all nested items
-        await this.removeOwnershipFromAllItemsInContainer(itemContainer._id as unknown as string);
+        await this.removeOwnershipFromAllItemsInContainer(itemContainer as unknown as IItemContainer);
       }
 
       return true;
@@ -83,7 +83,17 @@ export class ItemOwnership {
   }
 
   @TrackNewRelicTransaction()
-  public async addOwnershipToAllItemsInContainer(itemContainerId: string, owner: string): Promise<void> {
+  public async addOwnershipToAllItemsInContainer(
+    itemContainerId: string,
+    owner: string,
+    visited = new Set<string>()
+  ): Promise<void> {
+    if (visited.has(itemContainerId)) {
+      return;
+    }
+
+    visited.add(itemContainerId);
+
     const itemContainer = await ItemContainer.findById(itemContainerId).lean().select("slots");
 
     if (!itemContainer) {
@@ -110,12 +120,17 @@ export class ItemOwnership {
   }
 
   @TrackNewRelicTransaction()
-  public async removeOwnershipFromAllItemsInContainer(itemContainerId: string): Promise<void> {
-    const itemContainer = (await ItemContainer.findById(itemContainerId).lean().select("slots")) as IItemContainer;
+  public async removeOwnershipFromAllItemsInContainer(
+    itemContainer: IItemContainer,
+    visited = new Set<string>()
+  ): Promise<void> {
+    const containerId = itemContainer._id.toString();
 
-    if (!itemContainer) {
-      throw new Error("ItemOwnership: Item container not found");
+    if (visited.has(containerId)) {
+      return;
     }
+
+    visited.add(containerId);
 
     const processedItems = new Set<string>();
 
