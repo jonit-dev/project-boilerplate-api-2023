@@ -49,6 +49,10 @@ export class ItemContainerHelper {
 
     const loopedItems = new Set<string>();
 
+    if (!slots) {
+      return;
+    }
+
     for (const [slotIndex, itemData] of Object.entries(slots)) {
       if (loopedItems.has(itemData?._id)) {
         continue;
