@@ -70,6 +70,8 @@ export class NPCDeath {
         return;
       }
 
+      await this.itemOwnership.removeItemOwnership(npcBody._id);
+
       const notifyCharactersOfNPCDeath = this.notifyCharactersOfNPCDeath(npc);
 
       const npcWithSkills = await this.getNPCWithSkills(npc);
@@ -79,8 +81,6 @@ export class NPCDeath {
       const npcLoots = npc.loots as unknown as INPCLoot[];
 
       const addLootToNPCBody = this.addLootToNPCBody(npcBody, [...npcLoots, goldLoot], npc.isGiantForm);
-
-      const removeItemOwnership = this.itemOwnership.removeItemOwnership(npcBody.id);
 
       const clearNPCBehavior = this.clearNPCBehavior(npc);
 
@@ -93,7 +93,6 @@ export class NPCDeath {
         npcWithSkills,
         goldLoot,
         addLootToNPCBody,
-        removeItemOwnership,
         clearNPCBehavior,
         updateNPCAfterDeath,
         releaseXP,

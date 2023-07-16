@@ -39,12 +39,6 @@ export class ItemOwnership {
   @TrackNewRelicTransaction()
   public async removeItemOwnership(item: IItem): Promise<boolean> {
     try {
-      const itemExists = await Item.exists({ _id: item._id });
-
-      if (!itemExists) {
-        throw new Error("ItemOwnership: Item not found");
-      }
-
       await Item.updateOne(
         {
           _id: item._id,
