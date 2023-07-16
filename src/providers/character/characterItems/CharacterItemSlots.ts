@@ -69,29 +69,26 @@ export class CharacterItemSlots {
     targetContainer: IItemContainer,
     payload: Record<string, any>
   ): Promise<void> {
-    // check if container exists
-    const containerExists = await ItemContainer.exists({ _id: targetContainer._id });
+    try {
+      const slotItem = targetContainer.slots[slotIndex];
 
-    if (!containerExists) {
-      throw new Error("Container not found");
+      const updatedSlot = {
+        ...slotItem,
+        ...payload,
+      };
+
+      await ItemContainer.updateOne({ _id: targetContainer._id }, { $set: { [`slots.${slotIndex}`]: updatedSlot } });
+
+      // remember that we also need to update the item on the database. What we have above is just a reference inside of the container (copy)
+      await Item.updateOne(
+        {
+          _id: slotItem._id,
+        },
+        { $set: { ...payload } }
+      );
+    } catch (error) {
+      console.error(error);
     }
-
-    const slotItem = targetContainer.slots[slotIndex];
-
-    const updatedSlot = {
-      ...slotItem,
-      ...payload,
-    };
-
-    await ItemContainer.updateOne({ _id: targetContainer._id }, { $set: { [`slots.${slotIndex}`]: updatedSlot } });
-
-    // remember that we also need to update the item on the database. What we have above is just a reference inside of the container (copy)
-    await Item.updateOne(
-      {
-        _id: slotItem._id,
-      },
-      { $set: { ...payload } }
-    );
   }
 
   @TrackNewRelicTransaction()

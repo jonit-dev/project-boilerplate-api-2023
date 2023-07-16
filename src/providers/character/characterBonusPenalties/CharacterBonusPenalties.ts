@@ -31,9 +31,12 @@ export class CharacterBonusPenalties {
 
   public async applyRaceBonusPenalties(character: ICharacter, skillType: string): Promise<void> {
     const skills = (await Skill.findById(character.skills)
-      .lean()
+      .lean({
+        virtuals: true,
+        defaults: true,
+      })
       .cacheQuery({
-        cacheKey: `${character.id}-skills`,
+        cacheKey: `${character._id}-skills`,
       })) as ISkill;
     if (!skills) {
       throw new Error(`skills not found for character ${character.id}`);

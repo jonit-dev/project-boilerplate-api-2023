@@ -69,7 +69,7 @@ export class SkillFunctions {
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
     try {
       //! Warning: Chaching this causes the skill not to update
-      await Skill.findByIdAndUpdate(skills._id, skills).lean();
+      await Skill.findByIdAndUpdate(skills._id, skills).lean({ virtuals: true, defaults: true });
 
       const [buffedSkills, buffs] = await Promise.all([
         this.skillBuff.getSkillsWithBuff(character),
