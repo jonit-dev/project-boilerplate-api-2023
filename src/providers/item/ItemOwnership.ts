@@ -57,7 +57,7 @@ export class ItemOwnership {
       );
 
       if (item?.itemContainer) {
-        const itemContainer = await ItemContainer.findById(item.itemContainer);
+        const itemContainer = await ItemContainer.findById(item.itemContainer).lean().select("slots");
 
         if (!itemContainer) {
           throw new Error("ItemOwnership: Item container not found");
