@@ -70,7 +70,7 @@ export class NPCDeath {
         return;
       }
 
-      await this.itemOwnership.removeItemOwnership(npcBody._id);
+      await this.itemOwnership.removeItemOwnership(npcBody);
 
       const notifyCharactersOfNPCDeath = this.notifyCharactersOfNPCDeath(npc);
 
