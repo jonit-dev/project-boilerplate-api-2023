@@ -27,7 +27,9 @@ import random from "lodash/random";
 import { BattleAttackTargetDeath } from "./BattleAttackTarget/BattleAttackTargetDeath";
 import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
+import { TrackClassExecutionTime } from "@providers/analytics/decorator/TrackClassExecutionTime";
 
+@TrackClassExecutionTime()
 @provide(HitTarget)
 export class HitTarget {
   constructor(
