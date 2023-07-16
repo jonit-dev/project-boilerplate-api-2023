@@ -128,47 +128,45 @@ export class SkillIncrease {
 
   @TrackNewRelicTransaction()
   public async increaseShieldingSP(character: ICharacter): Promise<void> {
-    await this.newRelic.trackTransaction(NewRelicTransactionCategory.Operation, "increaseShieldingSP", async () => {
-      const hasShield = await this.characterWeapon.hasShield(character);
+    const hasShield = await this.characterWeapon.hasShield(character);
 
-      if (!hasShield) {
-        return;
+    if (!hasShield) {
+      return;
+    }
+
+    let skills = character.skills as ISkill;
+
+    if (!skills.level) {
+      skills = (await Skill.findById(character.skills)
+        .lean({
+          virtuals: true,
+          defaults: true,
+        })
+        .cacheQuery({
+          cacheKey: `${character._id}-skills`,
+        })) as unknown as ISkill;
+    }
+
+    if (!character) {
+      throw new Error("character not found");
+    }
+    const canIncreaseSP = this.skillGainValidation.canUpdateSkills(character, skills as ISkill, "shielding");
+
+    if (!canIncreaseSP) {
+      return;
+    }
+
+    const result = this.increaseSP(skills, ItemSubType.Shield) as IIncreaseSPResult;
+
+    await this.skillFunctions.updateSkills(skills, character);
+
+    if (!_.isEmpty(result)) {
+      if (result.skillLevelUp && character.channelId) {
+        await this.skillFunctions.sendSkillLevelUpEvents(result, character);
       }
 
-      let skills = character.skills as ISkill;
-
-      if (!skills.level) {
-        skills = (await Skill.findById(character.skills)
-          .lean({
-            virtuals: true,
-            defaults: true,
-          })
-          .cacheQuery({
-            cacheKey: `${character._id}-skills`,
-          })) as unknown as ISkill;
-      }
-
-      if (!character) {
-        throw new Error("character not found");
-      }
-      const canIncreaseSP = this.skillGainValidation.canUpdateSkills(character, skills as ISkill, "shielding");
-
-      if (!canIncreaseSP) {
-        return;
-      }
-
-      const result = this.increaseSP(skills, ItemSubType.Shield) as IIncreaseSPResult;
-
-      await this.skillFunctions.updateSkills(skills, character);
-
-      if (!_.isEmpty(result)) {
-        if (result.skillLevelUp && character.channelId) {
-          await this.skillFunctions.sendSkillLevelUpEvents(result, character);
-        }
-
-        await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
-      }
-    });
+      await this.characterBonusPenalties.applyRaceBonusPenalties(character, ItemSubType.Shield);
+    }
   }
 
   @TrackNewRelicTransaction()

@@ -16,6 +16,10 @@ export class CharacterInventory {
 
   @TrackNewRelicTransaction()
   public async getInventory(character: ICharacter): Promise<IItem | null> {
+    if (!character.equipment) {
+      return null;
+    }
+
     const equipment = (await Equipment.findById(character.equipment)
       .lean({
         virtuals: true,
