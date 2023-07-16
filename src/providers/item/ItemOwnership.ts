@@ -37,32 +37,46 @@ export class ItemOwnership {
   }
 
   @TrackNewRelicTransaction()
-  public async removeItemOwnership(item: IItem): Promise<void> {
-    await Item.updateOne(
-      {
-        _id: item._id,
-      },
-      {
-        $unset: { owner: "" },
-      }
-    );
-    if (item?.itemContainer) {
-      const itemContainer = await ItemContainer.findById(item.itemContainer);
+  public async removeItemOwnership(item: IItem): Promise<boolean> {
+    try {
+      const itemExists = await Item.exists({ _id: item._id });
 
-      if (!itemContainer) {
-        throw new Error("ItemOwnership: Item container not found");
+      if (!itemExists) {
+        throw new Error("ItemOwnership: Item not found");
       }
 
-      // this remover ownership from the container itself
-      await ItemContainer.updateOne(
+      await Item.updateOne(
         {
-          _id: item.itemContainer,
+          _id: item._id,
         },
-        { $unset: { owner: "" } }
+        {
+          $unset: { owner: "" },
+        }
       );
 
-      // this removes from all nested items
-      await this.removeOwnershipFromAllItemsInContainer(itemContainer._id as unknown as string);
+      if (item?.itemContainer) {
+        const itemContainer = await ItemContainer.findById(item.itemContainer);
+
+        if (!itemContainer) {
+          throw new Error("ItemOwnership: Item container not found");
+        }
+
+        // this remover ownership from the container itself
+        await ItemContainer.updateOne(
+          {
+            _id: item.itemContainer,
+          },
+          { $unset: { owner: "" } }
+        );
+
+        // this removes from all nested items
+        await this.removeOwnershipFromAllItemsInContainer(itemContainer._id as unknown as string);
+      }
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   }
 
@@ -95,7 +109,7 @@ export class ItemOwnership {
   }
 
   public async removeOwnershipFromAllItemsInContainer(itemContainerId: string): Promise<void> {
-    const itemContainer = await ItemContainer.findById(itemContainerId);
+    const itemContainer = (await ItemContainer.findById(itemContainerId).lean().select("slots")) as IItemContainer;
 
     if (!itemContainer) {
       throw new Error("ItemOwnership: Item container not found");
@@ -120,24 +134,15 @@ export class ItemOwnership {
         if (depth > maxDepth) {
           throw new Error("ItemOwnership: Max depth reached");
         }
-
-        await this.removeItemOwnership(item);
-      } else {
-        await Item.updateOne(
-          {
-            _id: item._id,
-          },
-          {
-            $unset: {
-              owner: "",
-            },
-          }
-        );
       }
 
-      await this.characterItemSlot.updateItemOnSlot(slotIndex, itemContainer, {
-        owner: undefined,
-      });
+      const success = await this.removeItemOwnership(item);
+
+      if (success) {
+        await this.characterItemSlot.updateItemOnSlot(slotIndex, itemContainer, {
+          owner: undefined,
+        });
+      }
     });
   }
 

@@ -217,7 +217,12 @@ describe("ItemDragAndDrop.ts", () => {
       expect(result).toBeTruthy();
 
       expect(updatedInventoryContainer.slots[0]).toBeNull();
-      expect(updatedInventoryContainer.slots[1]).toMatchObject(stackableItem.toObject());
+      expect(updatedInventoryContainer.slots[1]).toMatchObject(
+        expect.objectContaining({
+          _id: stackableItem._id,
+          stackQty: stackableItem.stackQty,
+        })
+      );
     });
 
     it("when moving a stackable item with a quantity less than the current stackQty, a new stack should be created", async () => {

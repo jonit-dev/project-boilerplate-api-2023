@@ -165,11 +165,13 @@ export class ItemDragAndDrop {
 
     await this.updateStackQty(targetContainer, to.slotIndex, futureQuantity);
 
+    const updatedContainer = (await ItemContainer.findById(targetContainer._id).lean()) as IItemContainer;
+
     const remainingQty = from.item.stackQty! - (futureQuantity - toStackQty!);
     if (remainingQty <= 0) {
-      await this.deleteItemFromSlot(targetContainer, from.item._id);
+      await this.deleteItemFromSlot(updatedContainer, from.item._id);
     } else {
-      await this.updateStackQty(targetContainer, from.slotIndex, remainingQty);
+      await this.updateStackQty(updatedContainer, from.slotIndex, remainingQty);
     }
   }
 
