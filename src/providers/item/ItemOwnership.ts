@@ -55,7 +55,7 @@ export class ItemOwnership {
       );
 
       if (item?.itemContainer) {
-        const itemContainer = await ItemContainer.findById(item.itemContainer).lean().select("slots");
+        const itemContainer = await ItemContainer.findById(item.itemContainer);
 
         if (!itemContainer) {
           throw new Error("ItemOwnership: Item container not found");
@@ -92,7 +92,7 @@ export class ItemOwnership {
 
     visited.add(itemContainerId);
 
-    const itemContainer = await ItemContainer.findById(itemContainerId).lean().select("slots");
+    const itemContainer = await ItemContainer.findById(itemContainerId);
 
     if (!itemContainer) {
       throw new Error("ItemOwnership: Item container not found");
