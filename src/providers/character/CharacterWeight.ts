@@ -1,5 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BasicAttribute, CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 
@@ -123,36 +123,7 @@ export class CharacterWeight {
 
   @TrackNewRelicTransaction()
   public async getWeight(character: ICharacter): Promise<number> {
-    const weightCache = (await this.inMemoryHashTable.get("character-weights", character._id)) as unknown as number;
-
-    if (weightCache) {
-      return weightCache;
-    }
-
-    const carriedItems = (await Item.find({
-      owner: character._id,
-      carrier: character._id,
-    })
-      .lean()
-      .select("weight stackQty key")) as unknown as IItem[];
-
-    if (!carriedItems) {
-      return 0;
-    }
-
-    let totalWeight = 0;
-
-    for (const item of carriedItems) {
-      if (item.stackQty && item.stackQty > 1) {
-        totalWeight += item.weight * item.stackQty;
-      } else {
-        totalWeight += item.weight;
-      }
-    }
-
-    await this.inMemoryHashTable.set("character-weights", character._id, totalWeight);
-
-    return totalWeight;
+    return 0;
   }
 
   public async getWeightRatio(character: ICharacter, item: IItem): Promise<number> {
