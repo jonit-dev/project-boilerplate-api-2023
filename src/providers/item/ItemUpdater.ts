@@ -18,7 +18,15 @@ export class ItemUpdater {
     if (item.type === ItemType.Container) {
       const itemContainer = (await ItemContainer.findById(item.itemContainer)) as unknown as IItemContainer;
 
+      const processedItems = new Set<string>();
+
       await this.itemContainerHelper.execFnInAllItemContainerSlots(itemContainer, async (item, slotIndex) => {
+        if (processedItems.has(item._id.toString())) {
+          return;
+        }
+
+        processedItems.add(item._id.toString());
+
         // if its a container, update it recursively
         if (item.type === ItemType.Container) {
           await this.updateItemRecursivelyIfNeeded(item, updateQuery);
