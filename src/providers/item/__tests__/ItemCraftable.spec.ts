@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -337,13 +337,6 @@ describe("ItemCraftable.ts", () => {
   it("should not craft item if character inventory does not have required items", async () => {
     const performCraftingMock = jest.spyOn(ItemCraftable.prototype as any, "performCrafting");
     performCraftingMock.mockImplementation();
-
-    skill.alchemy.level = 99;
-    const skills = await Skill.findByIdAndUpdate(skill._id, { ...skill }, { new: true });
-    testCharacter.skills = skills as ISkill;
-
-    // clear all items from testCharacter
-    await Item.updateMany({ carrier: testCharacter._id }, { $unset: { carrier: "" } });
 
     const performTest = async (): Promise<void> => {
       const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };

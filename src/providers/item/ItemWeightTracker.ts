@@ -21,7 +21,15 @@ export class ItemWeightTracker {
         throw new Error("ItemCarrier: Item container not found");
       }
 
+      const processedItems = new Set<string>();
+
       await this.itemContainerHelper.execFnInAllItemContainerSlots(itemContainer, async (item, slotIndex) => {
+        if (processedItems.has(item._id.toString())) {
+          return;
+        }
+
+        processedItems.add(item._id.toString());
+
         await this.setItemWeightTracking(item, character);
       });
     }

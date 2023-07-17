@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
@@ -380,7 +380,7 @@ export class ItemCraftable {
   }
 
   private async getCharacterInventoryIngredients(character: ICharacter): Promise<Map<string, number>> {
-    const items = await Item.find({ owner: character._id, carrier: character._id }).lean().select("key stackQty");
+    const items = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
 
     if (!items) {
       return new Map<string, number>();

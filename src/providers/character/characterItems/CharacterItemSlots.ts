@@ -69,26 +69,23 @@ export class CharacterItemSlots {
     targetContainer: IItemContainer,
     payload: Record<string, any>
   ): Promise<void> {
-    try {
-      const slotItem = targetContainer.slots[slotIndex];
+    const slotItem = targetContainer.slots[slotIndex];
 
-      const updatedSlot = {
-        ...slotItem,
-        ...payload,
-      };
+    targetContainer.slots[slotIndex] = {
+      ...slotItem,
+      ...payload,
+    };
 
-      await ItemContainer.updateOne({ _id: targetContainer._id }, { $set: { [`slots.${slotIndex}`]: updatedSlot } });
+    targetContainer.markModified("slots");
+    await targetContainer.save();
 
-      // remember that we also need to update the item on the database. What we have above is just a reference inside of the container (copy)
-      await Item.updateOne(
-        {
-          _id: slotItem._id,
-        },
-        { $set: { ...payload } }
-      );
-    } catch (error) {
-      console.error(error);
-    }
+    // remember that we also need to update the item on the database. What we have above is just a reference inside of the container (copy)
+    await Item.updateOne(
+      {
+        _id: slotItem._id,
+      },
+      { $set: { ...payload } }
+    );
   }
 
   @TrackNewRelicTransaction()

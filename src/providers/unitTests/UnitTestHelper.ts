@@ -15,7 +15,6 @@ import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { blueprintManager, container, mapLoader } from "@providers/inversify/container";
-import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import {
   AvailableBlueprints,
   BodiesBlueprint,
@@ -76,7 +75,7 @@ interface IMockQuestOptions {
 
 @provide(UnitTestHelper)
 export class UnitTestHelper {
-  constructor(private characterInventory: CharacterInventory, private itemWeightTracker: ItemWeightTracker) {}
+  constructor(private characterInventory: CharacterInventory) {}
 
   private mongoServer: MongoMemoryServer;
   private characterItems: CharacterItems;
@@ -167,10 +166,6 @@ export class UnitTestHelper {
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         slots[i] = item.toJSON({ virtuals: true });
-
-        await this.itemWeightTracker.setItemWeightTracking(item, {
-          _id: container.owner ?? item.owner,
-        } as ICharacter);
       }
 
       container.slots = slots;

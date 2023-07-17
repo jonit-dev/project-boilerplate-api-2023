@@ -51,9 +51,7 @@ export class ItemOwnership {
         {
           _id: item._id,
         },
-        {
-          $unset: { owner: "" },
-        }
+        { $unset: { owner: "" } }
       );
 
       if (item?.itemContainer) {
@@ -141,13 +139,9 @@ export class ItemOwnership {
 
       processedItems.add(item._id.toString());
 
-      const success = await this.removeItemOwnership(item);
-
-      if (success) {
-        await this.characterItemSlot.updateItemOnSlot(slotIndex, itemContainer, {
-          owner: undefined,
-        });
-      }
+      await this.characterItemSlot.updateItemOnSlot(slotIndex, itemContainer, {
+        owner: undefined,
+      });
     });
   }
 }

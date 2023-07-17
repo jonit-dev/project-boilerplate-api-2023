@@ -169,16 +169,12 @@ export class CharacterItemContainer {
             }
           }
 
-          const updatedTargetContainer = (await ItemContainer.findById(
-            targetContainer.id
-          )) as unknown as IItemContainer;
-
           // Check's done, need to create new item on char inventory
           if (isNewItem) {
             const result = await this.characterItemSlots.tryAddingItemOnFirstSlot(
               character,
               itemToBeAdded,
-              updatedTargetContainer as IItemContainer,
+              targetContainer as IItemContainer,
               dropOnMapIfFull
             );
 
