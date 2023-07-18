@@ -9,6 +9,7 @@ import { ItemMap } from "@providers/item/ItemMap";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterInventory } from "../CharacterInventory";
 import { CharacterItemSlots } from "./CharacterItemSlots";
@@ -53,6 +54,14 @@ export class CharacterItemContainer {
       return false;
     }
 
+    const clearCache = async (): Promise<void> => {
+      if (item.type === ItemType.CraftingResource) {
+        // clear the cache for the craftable items
+        await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+      }
+      await this.inMemoryHashTable.delete("character-max-weights", character._id);
+    };
+
     for (let i = 0; i < fromContainer.slotQty; i++) {
       const slotItem = fromContainer.slots?.[i];
 
@@ -73,13 +82,13 @@ export class CharacterItemContainer {
           }
         );
 
-        await this.inMemoryHashTable.delete("character-max-weights", character._id);
+        await clearCache();
 
         return true;
       }
     }
 
-    await this.inMemoryHashTable.delete("character-max-weights", character._id);
+    await clearCache();
 
     return true;
   }
@@ -185,6 +194,11 @@ export class CharacterItemContainer {
       if (result) {
         await this.inMemoryHashTable.delete("container-all-items", toContainerId);
         await this.inMemoryHashTable.delete("character-max-weights", character._id);
+      }
+
+      if (result && item.type === ItemType.CraftingResource) {
+        // clear the cache for the craftable items
+        await this.inMemoryHashTable.delete("load-craftable-items", character._id);
       }
 
       if (result && shouldAddOwnership) {

@@ -175,6 +175,8 @@ export class ItemCraftable {
       return;
     }
 
+    await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+
     await this.performCrafting(recipe, character, itemToCraft.itemSubType);
   }
 

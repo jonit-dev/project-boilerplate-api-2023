@@ -17,6 +17,7 @@ import {
   IItemContainer,
   IItemDrop,
   ItemSocketEvents,
+  ItemType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { clearCacheForKey } from "speedgoose";
@@ -119,6 +120,10 @@ export class ItemDrop {
       await this.inMemoryHashTable.delete("character-weapon", character._id);
 
       await this.inMemoryHashTable.delete("container-all-items", itemDropData.fromContainerId);
+
+      if (itemToBeDropped.type === ItemType.CraftingResource) {
+        await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+      }
 
       await this.inMemoryHashTable.delete("inventory-weight", character._id);
       await this.inMemoryHashTable.delete("character-max-weights", character._id);
