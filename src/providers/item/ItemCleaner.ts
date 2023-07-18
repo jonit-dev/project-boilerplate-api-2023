@@ -8,15 +8,13 @@ import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { provide } from "inversify-binding-decorators";
 import { ItemOwnership } from "./ItemOwnership";
-import { ItemWeightTracker } from "./ItemWeightTracker";
 
 @provide(ItemCleaner)
 export class ItemCleaner {
   constructor(
     private characterInventory: CharacterInventory,
     private equipmentSlots: EquipmentSlots,
-    private itemOwnership: ItemOwnership,
-    private itemWeightTracker: ItemWeightTracker
+    private itemOwnership: ItemOwnership
   ) {}
 
   public async clearMissingReferences(character: ICharacter): Promise<void> {
@@ -41,10 +39,6 @@ export class ItemCleaner {
 
       if (item && !item?.owner) {
         await this.itemOwnership.addItemOwnership(item, character._id);
-      }
-
-      if (item && !item?.carrier) {
-        await this.itemWeightTracker.setItemWeightTracking(item, character._id);
       }
 
       if (!item) {
@@ -89,10 +83,6 @@ export class ItemCleaner {
 
       if (item && !item?.owner) {
         await this.itemOwnership.addItemOwnership(item, character._id);
-      }
-
-      if (item && !item?.carrier) {
-        await this.itemWeightTracker.setItemWeightTracking(item, character._id);
       }
 
       if (!item) {

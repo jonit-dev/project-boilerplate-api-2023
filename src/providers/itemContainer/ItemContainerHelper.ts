@@ -40,6 +40,7 @@ export class ItemContainerHelper {
     }
   }
 
+  //! This method can potentially cause a recursion. Please use it with careful! Make sure you use a set to avoid infinite loops (check usage)
   @TrackNewRelicTransaction()
   public async execFnInAllItemContainerSlots(
     itemContainer: IItemContainer,

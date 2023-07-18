@@ -4,8 +4,8 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { blueprintManager } from "@providers/inversify/container";
 import {
   AccessoriesBlueprint,

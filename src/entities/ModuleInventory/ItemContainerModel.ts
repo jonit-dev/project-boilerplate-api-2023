@@ -1,4 +1,4 @@
-import { inMemoryHashTable } from "@providers/inversify/container";
+import { containerSlotsCaching, hashGenerator, inMemoryHashTable } from "@providers/inversify/container";
 import { ItemType, TypeHelper } from "@rpg-engine/shared";
 import { Types } from "mongoose";
 import locks from "mongoose-locks";
@@ -140,14 +140,44 @@ itemContainerSchema.pre("save", async function (this: IItemContainer) {
   );
 });
 
+const onCheckSlotsChange = async function (itemContainer: IItemContainer): Promise<void> {
+  if (!itemContainer.owner) {
+    return;
+  }
+
+  const slotsHash = await containerSlotsCaching.getSlotsHash(itemContainer._id.toString()!);
+
+  if (!slotsHash) {
+    await inMemoryHashTable.delete("inventory-weight", itemContainer.owner!.toString()!);
+    await inMemoryHashTable.delete("container-all-items", itemContainer._id.toString()!);
+
+    await containerSlotsCaching.setSlotsHash(itemContainer._id.toString()!, itemContainer.slots);
+    return;
+  }
+
+  // if there's a slot hash, compare
+
+  const currentSlotsHash = hashGenerator.generateHash(itemContainer.slots);
+
+  if (slotsHash !== currentSlotsHash) {
+    await inMemoryHashTable.delete("inventory-weight", itemContainer.owner!.toString()!);
+    await inMemoryHashTable.delete("container-all-items", itemContainer._id.toString()!);
+
+    await containerSlotsCaching.setSlotsHash(itemContainer._id.toString()!, itemContainer.slots);
+  }
+};
+
 itemContainerSchema.post("save", async function (this: IItemContainer) {
   if (this.owner) {
-    await inMemoryHashTable.delete("character-weights", this.owner.toString()!);
     await inMemoryHashTable.delete("character-max-weights", this.owner.toString()!);
   }
+
+  await onCheckSlotsChange(this as IItemContainer);
 });
 
 itemContainerSchema.post("remove", async function (this: IItemContainer) {
+  await inMemoryHashTable.delete("container-all-items", this._id.toString()!);
+
   if (this.itemIds) {
     for (const itemId of this.itemIds) {
       const item = await Item.findById(itemId);
@@ -169,6 +199,8 @@ async function onItemContainerUpdate(doc, next): Promise<void> {
 
   await inMemoryHashTable.delete("character-weights", itemContainer.owner!.toString()!);
   await inMemoryHashTable.delete("character-max-weights", itemContainer.owner!.toString()!);
+
+  await onCheckSlotsChange(itemContainer as IItemContainer);
 
   next();
 }

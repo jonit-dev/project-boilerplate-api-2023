@@ -2,12 +2,11 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer as IItemContainerModel, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { ItemDrop } from "@providers/item/ItemDrop";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemUpdater } from "@providers/item/ItemUpdater";
-import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IDepotContainerWithdraw, IEquipmentAndInventoryUpdatePayload, IItemContainer } from "@rpg-engine/shared";
@@ -26,7 +25,6 @@ export class WithdrawItem {
     private socketMessaging: SocketMessaging,
     private characterWeight: CharacterWeight,
     private itemOwnership: ItemOwnership,
-    private itemWeightTracker: ItemWeightTracker,
     private itemUpdater: ItemUpdater
   ) {}
 
@@ -90,8 +88,6 @@ export class WithdrawItem {
     }
 
     await this.markNotIsInDepot(item);
-
-    await this.itemWeightTracker.setItemWeightTracking(item, character);
 
     await this.characterWeight.updateCharacterWeight(character);
 

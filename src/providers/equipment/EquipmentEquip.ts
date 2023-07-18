@@ -6,18 +6,17 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBuffValidation } from "@providers/character/characterBuff/CharacterBuffValidation";
 import { CharacterItemBuff } from "@providers/character/characterBuff/CharacterItemBuff";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/BerserkerPassiveHabilities";
 import { RoguePassiveHabilities } from "@providers/character/characterPassiveHabilities/RoguePassiveHabilities";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemPickupUpdater } from "@providers/item/ItemPickup/ItemPickupUpdater";
 import { ItemView } from "@providers/item/ItemView";
-import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -56,7 +55,6 @@ export class EquipmentEquip {
     private itemPickupUpdater: ItemPickupUpdater,
     private characterItemBuff: CharacterItemBuff,
     private equipmentCharacterClass: EquipmentCharacterClass,
-    private itemWeightTracker: ItemWeightTracker,
     private characterBuffValidation: CharacterBuffValidation
   ) {}
 
@@ -107,8 +105,8 @@ export class EquipmentEquip {
     await this.itemView.removeItemFromMap(item);
 
     await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
-
-    await this.itemWeightTracker.setItemWeightTracking(item, character);
+    await this.inMemoryHashTable.delete("equipment-weight", character._id);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id);
 
     await this.characterWeight.updateCharacterWeight(character);
 

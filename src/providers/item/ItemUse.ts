@@ -3,7 +3,7 @@ import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemCon
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ItemValidation } from "./validation/ItemValidation";

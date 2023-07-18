@@ -2255,6 +2255,11 @@
     "@types/yargs" "^17.0.8"
     chalk "^4.0.0"
 
+"@jonit-dev/decorators-utils@^0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@jonit-dev/decorators-utils/-/decorators-utils-0.1.4.tgz#937641b453f2f2b17e05817a2774f066018547d8"
+  integrity sha512-ixc11tyI52BUnrZKPlkny52kmyJ9gAM9c1LySBbX92qhs16nrn/R25NQfzilSW3WUX5dIRzSkkgVL+DCDkuiaw==
+
 "@jridgewell/gen-mapping@^0.3.0", "@jridgewell/gen-mapping@^0.3.2":
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.3.tgz#7e02e6eb5df901aaedb08514203b096614024098"

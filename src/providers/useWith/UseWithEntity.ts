@@ -7,10 +7,10 @@ import { BattleAttackRanged } from "@providers/battle/BattleAttackTarget/BattleA
 import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
 import { OnTargetHit } from "@providers/battle/OnTargetHit";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { EntityUtil } from "@providers/entityEffects/EntityUtil";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { blueprintManager } from "@providers/inversify/container";

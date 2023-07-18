@@ -5,7 +5,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
@@ -23,7 +23,6 @@ import { clearCacheForKey } from "speedgoose";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
 import { ItemDropCleanup } from "./ItemDropCleanup";
 import { ItemOwnership } from "./ItemOwnership";
-import { ItemWeightTracker } from "./ItemWeightTracker";
 
 @provide(ItemDrop)
 export class ItemDrop {
@@ -37,8 +36,7 @@ export class ItemDrop {
     private itemOwnership: ItemOwnership,
     private characterInventory: CharacterInventory,
     private itemCleanup: ItemDropCleanup,
-    private inMemoryHashTable: InMemoryHashTable,
-    private itemWeightTracker: ItemWeightTracker
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   //! For now, only a drop from inventory or equipment set is allowed.
@@ -120,7 +118,9 @@ export class ItemDrop {
 
       await this.inMemoryHashTable.delete("character-weapon", character._id);
 
-      await this.inMemoryHashTable.delete("character-weights", character._id);
+      await this.inMemoryHashTable.delete("container-all-items", itemDropData.fromContainerId);
+
+      await this.inMemoryHashTable.delete("inventory-weight", character._id);
       await this.inMemoryHashTable.delete("character-max-weights", character._id);
 
       await this.characterWeight.updateCharacterWeight(character);
@@ -170,8 +170,6 @@ export class ItemDrop {
     await this.itemCleanup.tryCharacterDroppedItemsCleanup(character);
 
     await this.itemOwnership.removeItemOwnership(dropItem);
-
-    await this.itemWeightTracker.removeItemWeightTracking(dropItem);
 
     return true;
   }

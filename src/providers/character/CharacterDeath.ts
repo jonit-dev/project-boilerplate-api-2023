@@ -11,7 +11,6 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentSlotTypes } from "@providers/equipment/EquipmentSlots";
 import { blueprintManager, entityEffectUse, equipmentSlots } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
-import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import {
   AccessoriesBlueprint,
   BodiesBlueprint,
@@ -35,9 +34,9 @@ import { Types } from "mongoose";
 import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
-import { CharacterWeight } from "./CharacterWeight";
 import { CharacterBuffActivator } from "./characterBuff/CharacterBuffActivator";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
+import { CharacterWeight } from "./weight/CharacterWeight";
 
 export const DROPPABLE_EQUIPMENT = [
   "head",
@@ -66,8 +65,7 @@ export class CharacterDeath {
     private inMemoryHashTable: InMemoryHashTable,
     private characterBuffActivator: CharacterBuffActivator,
     private locker: Locker,
-    private time: Time,
-    private itemWeightTracker: ItemWeightTracker
+    private time: Time
   ) {}
 
   @TrackNewRelicTransaction()
@@ -145,8 +143,9 @@ export class CharacterDeath {
       await Promise.all([
         this.characterWeight.updateCharacterWeight(character),
         this.inMemoryHashTable.delete("character-weapon", character._id),
-        this.inMemoryHashTable.delete("character-weights", character._id),
         this.inMemoryHashTable.delete("character-max-weights", character._id),
+        this.inMemoryHashTable.delete("inventory-weight", character._id),
+        this.inMemoryHashTable.delete("equipment-weight", character._id),
       ]);
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
@@ -237,6 +236,7 @@ export class CharacterDeath {
 
     // drop backpack
     const inventory = equipment.inventory as unknown as IItem;
+
     if (inventory) {
       await this.dropInventory(character, bodyContainer, inventory);
     }
@@ -275,6 +275,9 @@ export class CharacterDeath {
 
     if (n <= dropInventoryChance) {
       let item = (await Item.findById(inventory._id)) as IItem;
+
+      item.itemContainer &&
+        (await this.inMemoryHashTable.delete("container-all-items", item.itemContainer.toString()!));
 
       item = await this.clearItem(character, item);
 
@@ -377,12 +380,10 @@ export class CharacterDeath {
           owner: "",
           scene: "",
           tiledId: "",
-          carrier: "",
         },
       }
     );
 
-    await this.itemWeightTracker.removeItemWeightTracking(item);
     await this.itemOwnership.removeItemOwnership(item);
 
     return item;

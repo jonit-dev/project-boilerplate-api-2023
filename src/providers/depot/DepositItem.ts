@@ -4,12 +4,11 @@ import { IItemContainer as IItemContainerModel } from "@entities/ModuleInventory
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemUpdater } from "@providers/item/ItemUpdater";
 import { ItemView } from "@providers/item/ItemView";
-import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { MapHelper } from "@providers/map/MapHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IDepotDepositItem, IEquipmentAndInventoryUpdatePayload, IItemContainer } from "@rpg-engine/shared";
@@ -26,7 +25,6 @@ export class DepositItem {
     private depotSystem: DepotSystem,
     private mapHelper: MapHelper,
     private socketMessaging: SocketMessaging,
-    private itemWeightTracker: ItemWeightTracker,
     private itemOwnership: ItemOwnership,
     private itemUpdater: ItemUpdater,
     private characterItemSlots: CharacterItemSlots
@@ -72,8 +70,6 @@ export class DepositItem {
       if (!item.owner) {
         await this.itemOwnership.addItemOwnership(item, character);
       }
-
-      await this.itemWeightTracker.removeItemWeightTracking(item);
 
       await this.markItemAsInDepot(item);
 

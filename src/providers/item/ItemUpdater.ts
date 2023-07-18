@@ -1,5 +1,6 @@
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { ItemContainerHelper } from "@providers/itemContainer/ItemContainerHelper";
 import { IItemContainer, ItemType } from "@rpg-engine/shared";
@@ -14,6 +15,7 @@ interface IUpdateQuery {
 export class ItemUpdater {
   constructor(private itemContainerHelper: ItemContainerHelper, private characterItemSlot: CharacterItemSlots) {}
 
+  @TrackNewRelicTransaction()
   public async updateItemRecursivelyIfNeeded(item: IItem, updateQuery: IUpdateQuery): Promise<void> {
     if (item.type === ItemType.Container) {
       const itemContainer = (await ItemContainer.findById(item.itemContainer)) as unknown as IItemContainer;

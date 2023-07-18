@@ -163,6 +163,7 @@ export class EquipmentUnequip {
 
     await this.inMemoryHashTable.delete("character-weapon", character._id);
     await this.inMemoryHashTable.delete("equipment-slots", character._id);
+    await this.inMemoryHashTable.delete("equipment-weight", character._id);
     await this.inMemoryHashTable.delete("character-shield", character._id);
 
     await clearCacheForKey(`${character._id}-inventory`);

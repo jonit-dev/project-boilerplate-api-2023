@@ -1,6 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { EquipmentSocketEvents, IEquipmentRead, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -8,7 +10,12 @@ import { EquipmentSlots } from "./EquipmentSlots";
 
 @provide(EquipmentRead)
 export class EquipmentRead {
-  constructor(private socketMessaging: SocketMessaging, private equipmentSlots: EquipmentSlots) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private equipmentSlots: EquipmentSlots,
+    private characterWeight: CharacterWeight,
+    private inMemoryHashTable: InMemoryHashTable
+  ) {}
 
   @TrackNewRelicTransaction()
   public async onEquipmentRead(character: ICharacter): Promise<void> {
@@ -25,6 +32,8 @@ export class EquipmentRead {
       });
       return;
     }
+
+    await this.characterWeight.updateCharacterWeight(character);
 
     const equipment = await this.equipmentSlots.getEquipmentSlots(character._id, equipmentSet._id);
 

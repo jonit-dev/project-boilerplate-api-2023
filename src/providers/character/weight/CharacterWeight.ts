@@ -1,5 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BasicAttribute, CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 
@@ -8,18 +8,19 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { provide } from "inversify-binding-decorators";
+import { CharacterWeightCalculator } from "./CharacterWeightCalculator";
 
 @provide(CharacterWeight)
 export class CharacterWeight {
   constructor(
     private socketMessaging: SocketMessaging,
     private traitGetter: TraitGetter,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private characterWeightCalculator: CharacterWeightCalculator
   ) {}
 
   @TrackNewRelicTransaction()
   public async updateCharacterWeight(character: ICharacter): Promise<void> {
-    await this.inMemoryHashTable.delete("character-weights", character._id);
     await this.inMemoryHashTable.delete("character-max-weights", character._id);
 
     const weight = await this.getWeight(character);
@@ -47,38 +48,6 @@ export class CharacterWeight {
         speed: character.speed,
         weight,
         maxWeight,
-        targetId: character._id,
-      }
-    );
-  }
-
-  @TrackNewRelicTransaction()
-  public async updateCharacterWeightTo(character: ICharacter, newWeight: number): Promise<void> {
-    await this.inMemoryHashTable.delete("character-weights", character._id);
-
-    await Character.updateOne(
-      {
-        _id: character._id,
-      },
-      {
-        $set: {
-          weight: newWeight,
-        },
-      }
-    );
-
-    await this.inMemoryHashTable.set("character-weights", character._id, newWeight);
-
-    //! Requires virtuals
-    character = (await Character.findById(character._id).lean({ virtuals: true, defaults: true })) || character;
-
-    this.socketMessaging.sendEventToUser<ICharacterAttributeChanged>(
-      character.channelId!,
-      CharacterSocketEvents.AttributeChanged,
-      {
-        speed: character.speed,
-        weight: newWeight,
-        maxWeight: character.maxWeight,
         targetId: character._id,
       }
     );
@@ -123,36 +92,9 @@ export class CharacterWeight {
 
   @TrackNewRelicTransaction()
   public async getWeight(character: ICharacter): Promise<number> {
-    const weightCache = (await this.inMemoryHashTable.get("character-weights", character._id)) as unknown as number;
+    const result = await this.characterWeightCalculator.getTotalCharacterCalculatedWeight(character);
 
-    if (weightCache) {
-      return weightCache;
-    }
-
-    const carriedItems = (await Item.find({
-      owner: character._id,
-      carrier: character._id,
-    })
-      .lean()
-      .select("weight stackQty key")) as unknown as IItem[];
-
-    if (!carriedItems) {
-      return 0;
-    }
-
-    let totalWeight = 0;
-
-    for (const item of carriedItems) {
-      if (item.stackQty && item.stackQty > 1) {
-        totalWeight += item.weight * item.stackQty;
-      } else {
-        totalWeight += item.weight;
-      }
-    }
-
-    await this.inMemoryHashTable.set("character-weights", character._id, totalWeight);
-
-    return totalWeight;
+    return result;
   }
 
   public async getWeightRatio(character: ICharacter, item: IItem): Promise<number> {
