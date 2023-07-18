@@ -6,6 +6,10 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 
+import { DecorateAllWith } from "@jonit-dev/decorators-utils";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+
+@DecorateAllWith(TrackNewRelicTransaction())
 @provide(CharacterWeightCalculator)
 export class CharacterWeightCalculator {
   constructor(
