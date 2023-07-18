@@ -180,6 +180,10 @@ const characterSchema = createLeanSchema(
       default: false,
       required: true,
     }),
+    isAdmin: Type.boolean({
+      default: false,
+      required: true,
+    }),
     penalty: Type.number({
       default: 0,
       required: true,

@@ -60,7 +60,7 @@ export class MapTransition {
 
       await this.socketSessionControl.deleteSession(character);
 
-      if (character.target.id && character.target.type) {
+      if (character.target?.id && character.target?.type) {
         const targetId = character.target.id as unknown as string;
         const targetType = character.target.type as unknown as EntityType;
         const targetReason = "Your battle target was lost.";
