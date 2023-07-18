@@ -6,10 +6,8 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 
-import { DecorateAllWith } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 
-@DecorateAllWith(TrackNewRelicTransaction())
 @provide(CharacterWeightCalculator)
 export class CharacterWeightCalculator {
   constructor(
@@ -18,6 +16,7 @@ export class CharacterWeightCalculator {
     private inMemoryHashTable: InMemoryHashTable
   ) {}
 
+  @TrackNewRelicTransaction()
   public async getTotalCharacterCalculatedWeight(character: ICharacter): Promise<number> {
     const equipmentWeight = await this.calculateWeightFromEquipment(character);
     const inventoryWeight = await this.calculateWeightFromInventory(character);
@@ -25,6 +24,7 @@ export class CharacterWeightCalculator {
     return equipmentWeight + inventoryWeight;
   }
 
+  @TrackNewRelicTransaction()
   public async calculateWeightFromEquipment(character: ICharacter): Promise<number> {
     const cachedEquipmentWeight = (await this.inMemoryHashTable.get(
       "equipment-weight",
@@ -52,6 +52,7 @@ export class CharacterWeightCalculator {
     return totalWeight;
   }
 
+  @TrackNewRelicTransaction()
   public async calculateWeightFromInventory(character: ICharacter): Promise<number> {
     const cachedInventoryWeight = (await this.inMemoryHashTable.get(
       "inventory-weight",
