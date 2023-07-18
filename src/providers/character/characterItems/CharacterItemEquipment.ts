@@ -6,10 +6,10 @@ import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
+
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { MathHelper } from "@providers/math/MathHelper";
 import { provide } from "inversify-binding-decorators";
-import { CharacterWeight } from "../CharacterWeight";
 import { CharacterItemBuff } from "../characterBuff/CharacterItemBuff";
 
 @provide(CharacterItemEquipment)
@@ -19,8 +19,7 @@ export class CharacterItemEquipment {
     private socketMessaging: SocketMessaging,
     private mathHelper: MathHelper,
     private characterItemBuff: CharacterItemBuff,
-    private itemWeightTracker: ItemWeightTracker,
-    private characterWeight: CharacterWeight
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -140,9 +139,9 @@ export class CharacterItemEquipment {
             },
           }
         );
-        result = true;
+        await this.inMemoryHashTable.delete("equipment-weight", character._id?.toString()!);
 
-        await this.handleItemStackWeightDecrease(item, character, 1); // lets just decrement 1 from the stack
+        result = true;
       } else {
         result = await this.deleteItemFromEquipment(item._id, character);
         // we also need to delete item from items table
@@ -221,18 +220,6 @@ export class CharacterItemEquipment {
     }
   }
 
-  private async handleItemStackWeightDecrease(item: IItem, character: ICharacter, qty: number): Promise<void> {
-    if (!item.stackQty) {
-      return;
-    }
-
-    const weightDecrement = item.weight * qty; // just 1 from the stack!
-
-    const newWeight = character.weight - weightDecrement;
-
-    await this.characterWeight.updateCharacterWeightTo(character, newWeight);
-  }
-
   @TrackNewRelicTransaction()
   private async removeItemFromEquipmentSet(item: IItem, character: ICharacter): Promise<boolean> {
     const equipmentSetId = character.equipment;
@@ -279,8 +266,6 @@ export class CharacterItemEquipment {
         },
       }
     );
-
-    await this.itemWeightTracker.removeItemWeightTracking(item);
 
     return true;
   }

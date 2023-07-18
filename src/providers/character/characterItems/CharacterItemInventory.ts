@@ -6,8 +6,8 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { blueprintManager } from "@providers/inversify/container";
 
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { ItemRarity } from "@providers/item/ItemRarity";
-import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { AvailableBlueprints, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -32,7 +32,7 @@ export class CharacterItemInventory {
     private characterItemsContainer: CharacterItemContainer,
     private characterInventory: CharacterInventory,
     private itemRarity: ItemRarity,
-    private itemWeightTracker: ItemWeightTracker
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -48,6 +48,12 @@ export class CharacterItemInventory {
 
   @TrackNewRelicTransaction()
   private async getAllItemsFromContainer(container: IItemContainer): Promise<IItem[]> {
+    const cachedAllItems = await this.inMemoryHashTable.get("container-all-items", container._id);
+
+    if (cachedAllItems) {
+      return cachedAllItems as IItem[];
+    }
+
     const slots = container.slots as unknown as IItem[];
 
     const items: IItem[] = [];
@@ -71,6 +77,8 @@ export class CharacterItemInventory {
         }
       }
     }
+
+    await this.inMemoryHashTable.set("container-all-items", container._id, items);
 
     return items;
   }
@@ -199,6 +207,7 @@ export class CharacterItemInventory {
         if (!success || (success && remainingQty === 0)) {
           return { success, updatedQty: remainingQty };
         }
+
         decrementQty = remainingQty;
       }
     }
@@ -415,7 +424,7 @@ export class CharacterItemInventory {
           }
         );
 
-        await this.itemWeightTracker.removeItemWeightTracking(item._id);
+        await this.inMemoryHashTable.delete("container-all-items", container._id);
 
         return true;
       }

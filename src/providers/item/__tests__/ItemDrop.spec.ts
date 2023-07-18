@@ -4,7 +4,7 @@ import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterView } from "@providers/character/CharacterView";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, IItemDrop } from "@rpg-engine/shared";
 import { ItemDrop } from "../ItemDrop";

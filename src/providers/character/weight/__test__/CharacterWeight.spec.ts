@@ -7,9 +7,9 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
-import { CharacterDeath } from "../CharacterDeath";
+import { CharacterDeath } from "../../CharacterDeath";
+import { CharacterItemContainer } from "../../characterItems/CharacterItemContainer";
 import { CharacterWeight } from "../CharacterWeight";
-import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 
 describe("CharacterWeight.ts", () => {
   let testCharacter: ICharacter;

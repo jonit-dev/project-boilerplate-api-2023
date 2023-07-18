@@ -10,9 +10,7 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { MapHelper } from "@providers/map/MapHelper";
-import { clearCacheForKey } from "speedgoose";
 import { ItemOwnership } from "../ItemOwnership";
-import { ItemWeightTracker } from "../ItemWeightTracker";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
 import { ItemPickupFromMap } from "./ItemPickupFromMap";
 import { ItemPickupUpdater } from "./ItemPickupUpdater";
@@ -29,8 +27,7 @@ export class ItemPickup {
     private itemPickupUpdater: ItemPickupUpdater,
     private mapHelper: MapHelper,
     private itemOwnership: ItemOwnership,
-    private inMemoryHashTable: InMemoryHashTable,
-    private itemCarrier: ItemWeightTracker
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -59,8 +56,6 @@ export class ItemPickup {
       await itemToBePicked.save();
 
       await this.itemOwnership.addItemOwnership(itemToBePicked, character);
-
-      await this.itemCarrier.setItemWeightTracking(itemToBePicked, character);
 
       const isPickupFromContainer = itemPickupData.fromContainerId && !isPickupFromMap;
 
@@ -121,11 +116,6 @@ export class ItemPickup {
       }
 
       await this.itemPickupUpdater.finalizePickup(itemToBePicked, character);
-
-      await clearCacheForKey(`${character._id}-inventory`);
-
-      await this.inMemoryHashTable.delete("character-weights", character._id);
-      await this.inMemoryHashTable.delete("character-max-weights", character._id);
 
       return true;
     } catch (error) {

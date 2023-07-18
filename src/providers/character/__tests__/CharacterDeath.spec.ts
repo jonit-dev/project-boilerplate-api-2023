@@ -240,10 +240,6 @@ describe("CharacterDeath.ts | Character with items", () => {
     expect(droppedItem1?.owner).toBeUndefined();
     expect(droppedItem2?.owner).toBeUndefined();
     expect(droppedBPItem?.owner).toBeUndefined();
-
-    expect(droppedItem1?.carrier).toBeUndefined();
-    expect(droppedItem2?.carrier).toBeUndefined();
-    expect(droppedBPItem?.carrier).toBeUndefined();
   });
 
   it("should drop equipment item on character's dead body", async () => {

@@ -101,7 +101,6 @@ export class CharacterNetworkLogout {
 
         await this.specialEffect.clearEffects(character);
 
-        await this.inMemoryHashTable.delete("character-weights", character._id);
         await this.inMemoryHashTable.delete("character-max-weights", character._id);
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());

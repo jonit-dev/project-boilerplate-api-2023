@@ -4,11 +4,10 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
-import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -25,7 +24,7 @@ export class MarketplaceItemAddRemove {
     private marketplaceValidation: MarketplaceValidation,
     private characterWeight: CharacterWeight,
     private marketplaceGetItems: MarketplaceGetItems,
-    private itemWeightTracker: ItemWeightTracker,
+
     private itemOwnership: ItemOwnership
   ) {}
 
@@ -66,7 +65,6 @@ export class MarketplaceItemAddRemove {
     if (!itemRemoved) {
       return false;
     }
-    await this.itemWeightTracker.removeItemWeightTracking(item);
 
     await this.characterWeight.updateCharacterWeight(character);
     await this.sendRefreshItemsEvent(character);

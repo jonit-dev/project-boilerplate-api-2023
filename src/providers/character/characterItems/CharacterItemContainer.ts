@@ -7,7 +7,6 @@ import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInve
 
 import { ItemMap } from "@providers/item/ItemMap";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
-import { ItemWeightTracker } from "@providers/item/ItemWeightTracker";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
@@ -32,7 +31,6 @@ export class CharacterItemContainer {
     private itemMap: ItemMap,
     private characterInventory: CharacterInventory,
     private itemOwnership: ItemOwnership,
-    private itemWeightTracker: ItemWeightTracker,
     private locker: Locker,
     private inMemoryHashTable: InMemoryHashTable
   ) {}
@@ -75,14 +73,12 @@ export class CharacterItemContainer {
           }
         );
 
-        await this.inMemoryHashTable.delete("character-weights", character._id);
         await this.inMemoryHashTable.delete("character-max-weights", character._id);
 
         return true;
       }
     }
 
-    await this.inMemoryHashTable.delete("character-weights", character._id);
     await this.inMemoryHashTable.delete("character-max-weights", character._id);
 
     return true;
@@ -102,12 +98,7 @@ export class CharacterItemContainer {
         return false;
       }
 
-      const {
-        shouldAddOwnership = true,
-        isInventoryItem = false,
-        dropOnMapIfFull = false,
-        shouldAddAsCarriedItem = true,
-      } = options || {};
+      const { shouldAddOwnership = true, isInventoryItem = false, dropOnMapIfFull = false } = options || {};
 
       const itemToBeAdded = item;
 
@@ -192,16 +183,12 @@ export class CharacterItemContainer {
       const result = await tryToAddItemToContainer();
 
       if (result) {
-        await this.inMemoryHashTable.delete("character-weights", character._id);
+        await this.inMemoryHashTable.delete("container-all-items", toContainerId);
         await this.inMemoryHashTable.delete("character-max-weights", character._id);
       }
 
       if (result && shouldAddOwnership) {
         await this.itemOwnership.addItemOwnership(itemToBeAdded, character);
-      }
-
-      if (result && shouldAddAsCarriedItem) {
-        await this.itemWeightTracker.setItemWeightTracking(itemToBeAdded, character);
       }
 
       await Item.updateOne(
