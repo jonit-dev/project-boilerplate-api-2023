@@ -53,12 +53,6 @@ export class CharacterNetworkUpdate {
       channel,
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
-        const canProceed = await this.locker.lock(`character-position-update-${character._id}`);
-
-        if (!canProceed) {
-          return;
-        }
-
         try {
           if (data) {
             // sometimes the character is just changing facing direction and not moving.. That's why we need this.
@@ -116,8 +110,6 @@ export class CharacterNetworkUpdate {
           }
         } catch (error) {
           console.error(error);
-        } finally {
-          await this.locker.unlock(`character-position-update-${character._id}`);
         }
       }
     );

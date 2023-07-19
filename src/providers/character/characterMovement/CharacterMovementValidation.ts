@@ -3,7 +3,16 @@ import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { Locker } from "@providers/locks/Locker";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { IUIShowMessage, MapLayers, ToGridX, ToGridY, UISocketEvents } from "@rpg-engine/shared";
+import {
+  AnimationDirection,
+  CharacterSocketEvents,
+  ICharacterSyncPosition,
+  IUIShowMessage,
+  MapLayers,
+  ToGridX,
+  ToGridY,
+  UISocketEvents,
+} from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import { CharacterBan } from "../CharacterBan";
@@ -78,6 +87,19 @@ export class CharacterMovementValidation {
     );
 
     if (isSolid) {
+      this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
+        character.channelId!,
+        CharacterSocketEvents.CharacterSyncPosition,
+        {
+          id: character.id,
+          position: {
+            originX: character.x,
+            originY: character.y,
+            direction: character.direction as AnimationDirection,
+          },
+        }
+      );
+
       console.log(`🚫 ${character.name} is trying to move to a solid!`);
 
       return false;
