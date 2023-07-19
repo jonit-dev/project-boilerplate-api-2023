@@ -66,6 +66,8 @@ export const spellCorruptionBolt: Partial<ISpell> = {
             deactivation: "You're no longer weakened by corruption.",
           },
         },
+        isStackable: false,
+        originateFrom: SpellsBlueprint.CorruptionBolt + "-" + BasicAttribute.Strength,
       });
 
       await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {
@@ -79,6 +81,8 @@ export const spellCorruptionBolt: Partial<ISpell> = {
             skipAllMessages: true,
           },
         },
+        isStackable: false,
+        originateFrom: SpellsBlueprint.CorruptionBolt + "-" + BasicAttribute.Resistance,
       });
     }
 

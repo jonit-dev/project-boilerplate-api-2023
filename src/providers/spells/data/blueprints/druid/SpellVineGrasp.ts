@@ -68,6 +68,8 @@ export const spellVineGrasp: Partial<ISpell> = {
             deactivation: "Your speed is back to normal!",
           },
         },
+        isStackable: false,
+        originateFrom: SpellsBlueprint.VineGrasp,
       });
     }
 

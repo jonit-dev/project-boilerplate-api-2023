@@ -67,6 +67,8 @@ export const spellFrostBolt: Partial<ISpell> = {
             deactivation: "You're no longer frozen!",
           },
         },
+        isStackable: false,
+        originateFrom: SpellsBlueprint.FrostBolt,
       });
     }
 

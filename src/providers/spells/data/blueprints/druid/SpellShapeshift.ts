@@ -54,6 +54,8 @@ export const spellShapeshift: Partial<ISpell> = {
           deactivation: "You feel weaker again.",
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.DruidShapeshift + "-" + BasicAttribute.Strength,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {
@@ -62,6 +64,8 @@ export const spellShapeshift: Partial<ISpell> = {
       buffPercentage: buffPercentage,
       durationSeconds: timeoutInSecs,
       durationType: CharacterBuffDurationType.Temporary,
+      isStackable: false,
+      originateFrom: SpellsBlueprint.DruidShapeshift + "-" + BasicAttribute.Resistance,
     });
 
     await characterTextureChange.changeTexture(character, "brown-bear", timeoutInSecs, "shapeshift");

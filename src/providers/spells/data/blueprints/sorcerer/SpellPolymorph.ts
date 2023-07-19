@@ -73,6 +73,8 @@ export const spellPolymorph: Partial<ISpell> = {
           deactivation: "You feel stronger again.",
         },
       },
+      isStackable: false,
+      originateFrom: SpellCastingType.RangedCasting + "-" + BasicAttribute.Strength,
     });
 
     await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {
@@ -86,6 +88,8 @@ export const spellPolymorph: Partial<ISpell> = {
           skipAllMessages: true,
         },
       },
+      isStackable: false,
+      originateFrom: SpellCastingType.RangedCasting + "-" + BasicAttribute.Resistance,
     });
 
     await characterTextureChange.changeTexture(target as ICharacter, "rat", timeoutInSecs, "polymorph");

@@ -29,7 +29,6 @@ import { provide } from "inversify-binding-decorators";
 
 import random from "lodash/random";
 import uniqBy from "lodash/uniqBy";
-import { clearCacheForKey } from "speedgoose";
 import { v4 as uuidv4 } from "uuid";
 
 @provide(NPCExperience)
@@ -84,8 +83,6 @@ export class NPCExperience {
         // call again the function without this record
         return this.releaseXP(target);
       }
-
-      await clearCacheForKey(`characterBuffs_${character._id}`);
 
       // Get character skills
       const skills = (await Skill.findById(character.skills)

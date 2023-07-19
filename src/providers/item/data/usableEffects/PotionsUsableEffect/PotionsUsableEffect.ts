@@ -113,6 +113,8 @@ export const lightEndurancePotionUsableEffect: IUsableEffect = {
       buffPercentage,
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
+      isStackable: false,
+      originateFrom: UsableEffectsBlueprint.LightEndurancePotionUsableEffect,
     });
   },
   usableEffectDescription: "Temporary resistance buff against physical damage",

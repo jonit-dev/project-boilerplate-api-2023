@@ -3,12 +3,17 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterBuffDurationType, CharacterTrait, ICharacterBuff, ICharacterItemBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { clearCacheForKey } from "speedgoose";
 interface ICharacterBuffDeleteOptions {
   deleteTemporaryOnly?: boolean;
 }
 
 @provide(CharacterBuffTracker)
 export class CharacterBuffTracker {
+  constructor(private inMemoryHashTable: InMemoryHashTable) {}
+
   @TrackNewRelicTransaction()
   public async addBuff(characterId: string, buff: ICharacterBuff): Promise<ICharacterBuff | undefined> {
     try {
@@ -19,6 +24,8 @@ export class CharacterBuffTracker {
 
       await newCharacterBuff.save();
 
+      await this.clearCache({ _id: characterId } as ICharacter);
+
       return newCharacterBuff as ICharacterBuff;
     } catch (error) {
       console.error(error);
@@ -27,6 +34,7 @@ export class CharacterBuffTracker {
 
   @TrackNewRelicTransaction()
   public async getAllCharacterBuffs(characterId: string): Promise<ICharacterBuff[]> {
+    // cacheQuery dose not work
     const allCharacterBuffs = (await CharacterBuff.find({ owner: characterId })
       .lean()
       .cacheQuery({
@@ -78,6 +86,8 @@ export class CharacterBuffTracker {
     try {
       await CharacterBuff.deleteOne({ _id: buffId, owner: character._id });
 
+      await this.clearCache(character);
+
       return true;
     } catch (error) {
       console.error(error);
@@ -103,5 +113,12 @@ export class CharacterBuffTracker {
 
       return false;
     }
+  }
+
+  private async clearCache(character: ICharacter): Promise<void> {
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
+    await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
   }
 }

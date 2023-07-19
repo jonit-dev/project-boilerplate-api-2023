@@ -57,6 +57,8 @@ export const spellRage: Partial<ISpell> = {
           deactivation: "Berserker's Rage has been deactivated!",
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.BerserkerRage + "-" + BasicAttribute.Strength,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {
@@ -70,6 +72,8 @@ export const spellRage: Partial<ISpell> = {
           skipAllMessages: true,
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.BerserkerRage + "-" + BasicAttribute.Resistance,
     });
   },
 };

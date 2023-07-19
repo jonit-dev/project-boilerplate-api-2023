@@ -48,6 +48,8 @@ export const spellQuickFire: Partial<ISpell> = {
       buffPercentage: -buffPercentage,
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
+      isStackable: false,
+      originateFrom: SpellsBlueprint.HunterQuickFire,
     });
   },
 };

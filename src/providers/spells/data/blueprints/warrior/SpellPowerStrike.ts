@@ -48,6 +48,8 @@ export const spellPowerStrike: Partial<ISpell> = {
       buffPercentage,
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
+      isStackable: false,
+      originateFrom: SpellsBlueprint.PowerStrike,
     });
   },
 };

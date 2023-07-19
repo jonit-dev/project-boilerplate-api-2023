@@ -64,6 +64,8 @@ export const spellCurseOfWeakness: Partial<ISpell> = {
           deactivation: "💀 You're no longer cursed! Your strength and weakness are back to normal.",
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.CurseOfWeakness + "-" + BasicAttribute.Strength,
     });
 
     await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {
@@ -77,6 +79,8 @@ export const spellCurseOfWeakness: Partial<ISpell> = {
           skipAllMessages: true,
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.CurseOfWeakness + "-" + BasicAttribute.Resistance,
     });
 
     return true;

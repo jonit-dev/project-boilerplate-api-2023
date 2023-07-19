@@ -49,6 +49,8 @@ export const spellFortifyDefense: Partial<ISpell> = {
       buffPercentage,
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
+      isStackable: false,
+      originateFrom: SpellsBlueprint.FortifyDefense,
     });
   },
 };

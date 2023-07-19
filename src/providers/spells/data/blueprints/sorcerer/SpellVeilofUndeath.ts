@@ -53,6 +53,8 @@ export const spellVeilofUndeath: Partial<ISpell> = {
           deactivation: "You feel weaker again.",
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.SorcererVeilofUndeath,
     });
 
     await characterTextureChange.changeTexture(character, "litch", timeoutInSecs, "veil of undeath");

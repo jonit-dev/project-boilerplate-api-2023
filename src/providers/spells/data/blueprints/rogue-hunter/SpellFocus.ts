@@ -52,6 +52,8 @@ export const spellFocus: Partial<ISpell> = {
           deactivation: `You feel less focused. (Dexterity -${buffPercentage}%)`,
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.Focus,
     });
   },
 };
