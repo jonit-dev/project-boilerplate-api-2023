@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
@@ -27,18 +28,18 @@ export class CharacterMovementWarn {
   ) {}
 
   @TrackNewRelicTransaction()
-  public async warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): Promise<void> {
+  public warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): void {
     // bi-directional warn
 
-    await Promise.all([
-      this.warnCharactersAroundAboutEmitterPositionUpdate(character, data),
-      this.warnEmitterAboutCharactersAround(character),
-      this.npcWarn.warnCharacterAboutNPCsInView(character),
-    ]);
+    void this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
+
+    void this.warnEmitterAboutCharactersAround(character);
+
+    void this.npcWarn.warnCharacterAboutNPCsInView(character);
 
     // ! Disabled because it some "players" spam items on the ground, it will cause the emissor to get stuck.
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.itemView.warnCharacterAboutItemsInView(character, { always: false });
+    void this.itemView.warnCharacterAboutItemsInView(character, { always: false });
   }
 
   @TrackNewRelicTransaction()

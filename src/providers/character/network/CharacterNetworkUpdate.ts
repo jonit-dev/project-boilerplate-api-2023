@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
 import { GridManager } from "@providers/map/GridManager";
@@ -80,7 +81,7 @@ export class CharacterNetworkUpdate {
 
               await this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
 
-              await this.characterMovementWarn.warn(character, data);
+              void this.characterMovementWarn.warn(character, data);
 
               switch (appEnv.general.ENV) {
                 case EnvType.Development:
