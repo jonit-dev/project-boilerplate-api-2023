@@ -283,16 +283,16 @@ export class ItemCraftable {
 
     const minCraftingRequirements = recipe.minCraftingRequirements;
 
-    const haveMiniSkills = await this.haveMinimumSkills(skills, recipe);
+    const haveMinimumSkills = await this.haveMinimumSkills(skills, recipe);
 
-    const canCraft = this.canCraftRecipe(inventoryInfo, recipe) && haveMiniSkills;
+    const canCraft = this.canCraftRecipe(inventoryInfo, recipe) && haveMinimumSkills;
 
     return {
       ...item,
       canCraft,
       ingredients: ingredients,
       minCraftingRequirements,
-      levelIsOk: haveMiniSkills,
+      levelIsOk: haveMinimumSkills,
     };
   }
 

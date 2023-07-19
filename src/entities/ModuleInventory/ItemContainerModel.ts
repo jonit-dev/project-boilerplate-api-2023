@@ -145,11 +145,16 @@ const onCheckSlotsChange = async function (itemContainer: IItemContainer): Promi
     return;
   }
 
+  const clearCache = async (): Promise<void> => {
+    await inMemoryHashTable.delete("inventory-weight", itemContainer.owner!.toString()!);
+    await inMemoryHashTable.delete("container-all-items", itemContainer._id.toString()!);
+    await inMemoryHashTable.delete("load-craftable-items", itemContainer.owner?.toString()!);
+  };
+
   const slotsHash = await containerSlotsCaching.getSlotsHash(itemContainer._id.toString()!);
 
   if (!slotsHash) {
-    await inMemoryHashTable.delete("inventory-weight", itemContainer.owner!.toString()!);
-    await inMemoryHashTable.delete("container-all-items", itemContainer._id.toString()!);
+    await clearCache();
 
     await containerSlotsCaching.setSlotsHash(itemContainer._id.toString()!, itemContainer.slots);
     return;
@@ -160,8 +165,7 @@ const onCheckSlotsChange = async function (itemContainer: IItemContainer): Promi
   const currentSlotsHash = hashGenerator.generateHash(itemContainer.slots);
 
   if (slotsHash !== currentSlotsHash) {
-    await inMemoryHashTable.delete("inventory-weight", itemContainer.owner!.toString()!);
-    await inMemoryHashTable.delete("container-all-items", itemContainer._id.toString()!);
+    await clearCache();
 
     await containerSlotsCaching.setSlotsHash(itemContainer._id.toString()!, itemContainer.slots);
   }
