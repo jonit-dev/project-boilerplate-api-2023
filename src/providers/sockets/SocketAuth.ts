@@ -1,3 +1,4 @@
+/* eslint-disable require-await */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IUser } from "@entities/ModuleSystem/UserModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
