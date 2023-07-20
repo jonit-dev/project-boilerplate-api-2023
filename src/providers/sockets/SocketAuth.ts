@@ -3,6 +3,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { IUser } from "@entities/ModuleSystem/UserModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { CharacterBan } from "@providers/character/CharacterBan";
 import { CharacterLastAction } from "@providers/character/CharacterLastAction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { appEnv } from "@providers/config/env";
@@ -30,7 +31,8 @@ export class SocketAuth {
     private exhaustValidation: ExhaustValidation,
     private characterLastAction: CharacterLastAction,
     private newRelic: NewRelic,
-    private locker: Locker
+    private locker: Locker,
+    private characterBan: CharacterBan
   ) {}
 
   // this event makes sure that the user who's triggering the request actually owns the character!
@@ -104,6 +106,10 @@ export class SocketAuth {
                 const diff = dayjs().diff(dayjs(lastActionExecution), "millisecond");
 
                 if (diff < DEBOUNCEABLE_EVENTS_MS_THRESHOLD_DISCONNECT) {
+                  setTimeout(async () => {
+                    await this.characterBan.addPenalty(character);
+                  }, 5000);
+
                   this.socketMessaging.sendEventToUser(
                     character.channelId!,
                     CharacterSocketEvents.CharacterForceDisconnect,
@@ -112,6 +118,7 @@ export class SocketAuth {
                         "You're disconnected for spamming the server with events! Do things slower next time (or stop using macro!)",
                     }
                   );
+
                   return;
                 }
 

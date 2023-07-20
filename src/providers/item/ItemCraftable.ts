@@ -99,6 +99,12 @@ export class ItemCraftable {
       return;
     }
 
+    if (!itemToCraft.itemKey) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "You must select at least one item to craft.");
+
+      return;
+    }
+
     if (!(character.skills as ISkill)?.level) {
       const skills = (await Skill.findOne({ owner: character._id })
         .lean()

@@ -10,6 +10,7 @@ import {
   NPC_LOOT_CHANCE_MULTIPLIER,
 } from "@providers/constants/LootConstants";
 
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
 import { blueprintManager } from "@providers/inversify/container";
@@ -18,6 +19,7 @@ import { ItemRarity } from "@providers/item/ItemRarity";
 import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
@@ -39,7 +41,8 @@ export class NPCDeath {
     private npcFreezer: NPCFreezer,
     private npcSpawn: NPCSpawn,
     private npcExperience: NPCExperience,
-    private locker: Locker
+    private locker: Locker,
+    private newRelic: NewRelic
   ) {}
 
   @TrackNewRelicTransaction()
@@ -87,6 +90,8 @@ export class NPCDeath {
       const updateNPCAfterDeath = this.updateNPCAfterDeath(npcWithSkills);
 
       const releaseXP = this.npcExperience.releaseXP(npc as INPC);
+
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "Death", 1);
 
       await Promise.all([
         notifyCharactersOfNPCDeath,

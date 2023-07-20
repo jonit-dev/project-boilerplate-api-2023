@@ -23,7 +23,11 @@ import { NPCMovementStopped } from "./movement/NPCMovementStopped";
 
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import {
+  NewRelicMetricCategory,
+  NewRelicSubCategory,
+  NewRelicTransactionCategory,
+} from "@providers/types/NewRelicTypes";
 
 @provide(NPCManager)
 export class NPCManager {
@@ -69,7 +73,7 @@ export class NPCManager {
 
     let totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
 
-    this.newRelic.trackMetric(NewRelicMetricCategory.Count, "NPCs/Active", totalActiveNPCs);
+    this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "Active", totalActiveNPCs);
 
     const behaviorLoops: Promise<void>[] = [];
 

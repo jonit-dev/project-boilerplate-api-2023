@@ -1,9 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { Locker } from "@providers/locks/Locker";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import {
   AnimationDirection,
   CharacterSocketEvents,
@@ -25,7 +26,8 @@ export class CharacterMovementValidation {
     private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
     private specialEffect: SpecialEffect,
-    private locker: Locker
+    private locker: Locker,
+    private newRelic: NewRelic
   ) {}
 
   public async isValid(character: ICharacter, newX: number, newY: number, isMoving: boolean): Promise<boolean> {
@@ -97,6 +99,13 @@ export class CharacterMovementValidation {
             direction: character.direction as AnimationDirection,
           },
         }
+      );
+
+      this.newRelic.trackMetric(
+        NewRelicMetricCategory.Count,
+        NewRelicSubCategory.Characters,
+        "Desync/SolidCollision",
+        1
       );
 
       console.log(`🚫 ${character.name} is trying to move to a solid!`);

@@ -12,3 +12,9 @@ export enum NewRelicMetricCategory {
   Percent = "Percent",
   Throughput = "Throughput",
 }
+
+export enum NewRelicSubCategory {
+  Characters = "Characters",
+  NPCs = "NPCs",
+  Items = "Items",
+}

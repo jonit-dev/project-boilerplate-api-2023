@@ -26,6 +26,8 @@ import {
 import { provide } from "inversify-binding-decorators";
 
 import { NPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
@@ -44,7 +46,8 @@ export class CharacterNetworkUpdate {
     private characterMovementWarn: CharacterMovementWarn,
     private mathHelper: MathHelper,
     private characterView: CharacterView,
-    private pm2Helper: PM2Helper
+    private pm2Helper: PM2Helper,
+    private newRelic: NewRelic
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -145,6 +148,13 @@ export class CharacterNetworkUpdate {
     const distanceInGridCells = Math.round(distance / GRID_WIDTH);
 
     if (distanceInGridCells >= 1) {
+      this.newRelic.trackMetric(
+        NewRelicMetricCategory.Count,
+        NewRelicSubCategory.Characters,
+        "Desync/GridDesyncDistanceInCells",
+        distanceInGridCells
+      );
+
       await Character.updateOne(
         { id: serverCharacter.id },
         {
@@ -155,6 +165,13 @@ export class CharacterNetworkUpdate {
     }
 
     if (distanceInGridCells >= 10) {
+      this.newRelic.trackMetric(
+        NewRelicMetricCategory.Count,
+        NewRelicSubCategory.Characters,
+        "Desync/GridDesyncHighDistanceInCells",
+        distanceInGridCells
+      );
+
       this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
         serverCharacter.channelId!,
         CharacterSocketEvents.CharacterSyncPosition,

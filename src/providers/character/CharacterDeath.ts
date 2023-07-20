@@ -5,6 +5,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
@@ -21,6 +22,7 @@ import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { Time } from "@providers/time/Time";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import {
   BattleSocketEvents,
   CharacterBuffType,
@@ -65,7 +67,8 @@ export class CharacterDeath {
     private inMemoryHashTable: InMemoryHashTable,
     private characterBuffActivator: CharacterBuffActivator,
     private locker: Locker,
-    private time: Time
+    private time: Time,
+    private newRelic: NewRelic
   ) {}
 
   @TrackNewRelicTransaction()
@@ -139,6 +142,8 @@ export class CharacterDeath {
 
         await equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
       }
+
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Death", 1);
 
       await Promise.all([
         this.characterWeight.updateCharacterWeight(character),
