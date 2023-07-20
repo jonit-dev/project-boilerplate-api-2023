@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { Locker } from "@providers/locks/Locker";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -15,7 +16,6 @@ import {
 } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
-import { CharacterBan } from "../CharacterBan";
 import { CharacterValidation } from "../CharacterValidation";
 
 @provide(CharacterMovementValidation)
@@ -24,7 +24,6 @@ export class CharacterMovementValidation {
     private characterValidation: CharacterValidation,
     private movementHelper: MovementHelper,
     private socketMessaging: SocketMessaging,
-    private characterBan: CharacterBan,
     private specialEffect: SpecialEffect,
     private locker: Locker
   ) {}
@@ -73,7 +72,7 @@ export class CharacterMovementValidation {
       return false;
     }
 
-    const isMovingTooFast = await this.isCharacterMovingTooFast(character);
+    const isMovingTooFast = this.isCharacterMovingTooFast(character);
 
     if (isMovingTooFast) {
       return false;
