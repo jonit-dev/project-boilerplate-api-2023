@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
@@ -131,14 +132,14 @@ export class HitTarget {
 
       const generateBloodChance = random(1, 100);
 
-      const effectGenerator =
-        damage > 0 && generateBloodChance <= 10 ? this.battleEffects.generateBloodOnGround(target) : Promise.resolve();
+      damage > 0 && generateBloodChance <= 10 && void this.battleEffects.generateBloodOnGround(target);
+
       const damageRelatedPromises: any[] = [];
 
       if (damage > 0) {
         if (attacker.type === "Character") {
           const character = attacker as ICharacter;
-          damageRelatedPromises.push(this.skillIncrease.increaseSkillsOnBattle(character, target, damage));
+          await this.skillIncrease.increaseSkillsOnBattle(character, target, damage);
         }
 
         if (attacker.class === CharacterClass.Berserker) {
@@ -203,13 +204,9 @@ export class HitTarget {
             (weapon?.item && weapon?.item.subType === ItemSubType.Magic) ||
             (weapon?.item && weapon?.item.subType === ItemSubType.Staff)
           ) {
-            damageRelatedPromises.push(
-              this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, this.getPower(weapon?.item))
-            );
+            await this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, this.getPower(weapon?.item));
           } else {
-            damageRelatedPromises.push(
-              this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance)
-            );
+            await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance);
           }
         }
 
@@ -222,22 +219,22 @@ export class HitTarget {
         }
       }
 
-      await Promise.all([effectGenerator, ...damageRelatedPromises]);
+      await Promise.all([...damageRelatedPromises]);
     }
 
     if (battleEvent === BattleEventType.Block && target.type === "Character") {
-      await this.skillIncrease.increaseShieldingSP(target as ICharacter);
+      void this.skillIncrease.increaseShieldingSP(target as ICharacter);
     }
 
     if (battleEvent === BattleEventType.Miss && target.type === "Character") {
-      await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
+      void this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
     }
 
-    await this.warnCharacterIfNotInView(attacker as ICharacter, target);
+    void this.warnCharacterIfNotInView(attacker as ICharacter, target);
 
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
-    await this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
-    await this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
+    void this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
+    void this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
   }
 
   @TrackNewRelicTransaction()
@@ -286,23 +283,18 @@ export class HitTarget {
   }
 
   private async sendBattleEvent(character: ICharacter, battleEventPayload: IBattleEventFromServer): Promise<void> {
-    // finally, send battleHitPayload to characters around
-
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
-    for (const nearbyCharacter of nearbyCharacters) {
-      this.socketMessaging.sendEventToUser(
-        nearbyCharacter.channelId!,
-        BattleSocketEvents.BattleEvent,
-        battleEventPayload
-      );
+    const channelIds = nearbyCharacters
+      .filter((nearbyCharacter) => nearbyCharacter.channelId)
+      .map((nearbyCharacter) => nearbyCharacter.channelId!);
+
+    // If character.channelId is not in the list, add it.
+    if (character.channelId && !channelIds.includes(character.channelId)) {
+      channelIds.push(character.channelId);
     }
 
-    // send battleEvent payload to origin character as well
-
-    if (character.channelId) {
-      this.socketMessaging.sendEventToUser(character.channelId, BattleSocketEvents.BattleEvent, battleEventPayload);
-    }
+    this.socketMessaging.sendEventToAllUsers(BattleSocketEvents.BattleEvent, battleEventPayload);
   }
 
   private async applyEntityEffectsIfApplicable(npc: INPC, target: ICharacter | INPC): Promise<void> {

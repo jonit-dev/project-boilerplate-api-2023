@@ -96,6 +96,7 @@ export class NPCDeath {
         clearNPCBehavior,
         updateNPCAfterDeath,
         releaseXP,
+        this.locker.unlock(`npc-${npc._id}-battle-cycle`),
       ]);
     } catch (error) {
       console.error(error);

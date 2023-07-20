@@ -58,6 +58,7 @@ export class NPCSpawn {
     await this.locker.unlock(`npc-death-${npc._id}`);
     await this.locker.unlock(`npc-body-generation-${npc._id}`);
     await this.locker.unlock(`npc-${npc._id}-release-xp`);
+    await this.locker.unlock(`npc-${npc._id}-battle-cycle`);
 
     await this.inMemoryHashTable.delete("npc-force-pathfinding-calculation", npc._id);
 

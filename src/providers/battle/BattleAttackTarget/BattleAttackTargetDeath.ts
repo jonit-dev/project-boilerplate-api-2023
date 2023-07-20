@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { NPCDeath } from "@providers/npc/NPCDeath";
@@ -12,7 +11,6 @@ import { provide } from "inversify-binding-decorators";
 import { BattleEffects } from "../BattleEffects";
 import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
 
-@TrackClassExecutionTime()
 @provide(BattleAttackTargetDeath)
 export class BattleAttackTargetDeath {
   constructor(
