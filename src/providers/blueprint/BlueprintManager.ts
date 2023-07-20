@@ -53,6 +53,12 @@ export class BlueprintManager {
     return await this.inMemoryHashTable.getAllKeys(`blueprint-${namespace}`);
   }
 
+  public async getAllBlueprintValues<T>(namespace: BlueprintNamespaces): Promise<T[]> {
+    const blueprints = (await this.inMemoryHashTable.getAll<T>(`blueprint-${namespace}`)) as Record<string, T>;
+
+    return Object.values(blueprints);
+  }
+
   public async setBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints, data: T): Promise<void> {
     await this.inMemoryHashTable.set(`blueprint-${namespace}`, key, data);
   }

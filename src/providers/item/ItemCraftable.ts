@@ -29,10 +29,13 @@ import Shared, {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { throttle } from "lodash";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
 import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
+import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
+@TrackClassExecutionTime()
 @provide(ItemCraftable)
 export class ItemCraftable {
   constructor(
@@ -247,6 +250,33 @@ export class ItemCraftable {
     await this.sendRefreshItemsEvent(character, itemSubType);
   }
 
+  @TrackNewRelicTransaction()
+  private async sendRefreshItemsEvent(character: ICharacter, itemSubType?: string): Promise<void> {
+    const inventoryContainer = await this.characterItemContainer.getItemContainer(character);
+
+    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
+      inventory: inventoryContainer as unknown as IItemContainer,
+      openEquipmentSetOnUpdate: false,
+      openInventoryOnUpdate: true,
+    };
+
+    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+      character.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      payloadUpdate
+    );
+
+    const throttledLoadCraftableItems = throttle(
+      (itemSubType, character) => this.loadCraftableItems(itemSubType, character),
+      1000
+    );
+
+    if (itemSubType) {
+      void throttledLoadCraftableItems(itemSubType, character);
+    }
+  }
+
+  @TrackNewRelicTransaction()
   private async createItems(recipe: IUseWithCraftingRecipe, character: ICharacter): Promise<void> {
     const blueprint = await blueprintManager.getBlueprint<IItem>("items", recipe.outputKey as AvailableBlueprints);
     let qty = this.getQty(recipe);
@@ -276,6 +306,7 @@ export class ItemCraftable {
     } while (qty > 0);
   }
 
+  @TrackNewRelicTransaction()
   private async getCraftableItem(
     inventoryInfo: Map<string, number>,
     recipe: IUseWithCraftingRecipe,
@@ -348,6 +379,7 @@ export class ItemCraftable {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   private async getCraftableItemIngredient(item: IUseWithCraftingRecipeItem): Promise<ICraftableItemIngredient> {
     const blueprint = await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
 
@@ -387,6 +419,7 @@ export class ItemCraftable {
     return result;
   }
 
+  @TrackNewRelicTransaction()
   private async getCharacterInventoryIngredients(character: ICharacter): Promise<Map<string, number>> {
     const items = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
 
@@ -467,26 +500,6 @@ export class ItemCraftable {
   private getQty(recipe: IUseWithCraftingRecipe): number {
     const qty = random(recipe.outputQtyRange[0], recipe.outputQtyRange[1]);
     return qty;
-  }
-
-  private async sendRefreshItemsEvent(character: ICharacter, itemSubType?: string): Promise<void> {
-    const inventoryContainer = await this.characterItemContainer.getItemContainer(character);
-
-    const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
-      inventory: inventoryContainer as unknown as IItemContainer,
-      openEquipmentSetOnUpdate: false,
-      openInventoryOnUpdate: true,
-    };
-
-    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
-      character.channelId!,
-      ItemSocketEvents.EquipmentAndInventoryUpdate,
-      payloadUpdate
-    );
-
-    if (itemSubType) {
-      await this.loadCraftableItems(itemSubType, character);
-    }
   }
 
   private isCraftSuccessful(skillsAverage: number, baseChance: number): boolean {
