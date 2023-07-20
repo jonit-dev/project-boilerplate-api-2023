@@ -50,7 +50,7 @@ export class SkillBuff {
           continue;
         }
 
-        clonedSkills[buff.trait].level = await this.traitGetter.getSkillLevelWithBuffs(
+        clonedSkills[buff.trait].buffAndDebuff = await this.traitGetter.getSkillLevelWithBuffs(
           skills,
           buff.trait as SkillsAvailable
         );
