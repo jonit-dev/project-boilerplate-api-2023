@@ -10,6 +10,7 @@ import { BYPASS_EVENTS_AS_LAST_ACTION } from "@providers/constants/EventsConstan
 import {
   DEBOUNCEABLE_EVENTS,
   DEBOUNCEABLE_EVENTS_MS_THRESHOLD,
+  DEBOUNCEABLE_EVENTS_MS_THRESHOLD_DISCONNECT,
   EXHAUSTABLE_EVENTS,
   LOCKABLE_EVENTS,
 } from "@providers/constants/ServerConstants";
@@ -102,7 +103,24 @@ export class SocketAuth {
               if (lastActionExecution) {
                 const diff = dayjs().diff(dayjs(lastActionExecution), "millisecond");
 
+                if (diff < DEBOUNCEABLE_EVENTS_MS_THRESHOLD_DISCONNECT) {
+                  this.socketMessaging.sendEventToUser(
+                    character.channelId!,
+                    CharacterSocketEvents.CharacterForceDisconnect,
+                    {
+                      reason:
+                        "You're disconnected for spamming the server with events! Do things slower next time (or stop using macro!)",
+                    }
+                  );
+                  return;
+                }
+
                 if (diff < DEBOUNCEABLE_EVENTS_MS_THRESHOLD) {
+                  this.socketMessaging.sendEventToUser<IUIShowMessage>(channel.id!, UISocketEvents.ShowMessage, {
+                    message: "Sorry, you're doing it too fast!",
+                    type: "error",
+                  });
+
                   return;
                 }
               }
