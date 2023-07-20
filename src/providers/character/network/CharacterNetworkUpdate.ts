@@ -26,7 +26,6 @@ import {
 import { provide } from "inversify-binding-decorators";
 
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { Locker } from "@providers/locks/Locker";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
@@ -45,8 +44,7 @@ export class CharacterNetworkUpdate {
     private characterMovementWarn: CharacterMovementWarn,
     private mathHelper: MathHelper,
     private characterView: CharacterView,
-    private pm2Helper: PM2Helper,
-    private locker: Locker
+    private pm2Helper: PM2Helper
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -85,12 +83,11 @@ export class CharacterNetworkUpdate {
 
               switch (appEnv.general.ENV) {
                 case EnvType.Development:
-                  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                  this.npcManager.startNearbyNPCsBehaviorLoop(character);
+                  void this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
                   break;
                 case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
-                  this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
+                  void this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
                     character,
                   });
                   break;
@@ -98,13 +95,12 @@ export class CharacterNetworkUpdate {
 
               await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
 
-              await this.handleNonPVPZone(character, newX, newY);
+              void this.handleNonPVPZone(character, newX, newY);
 
               // leave it for last!
-              await this.handleMapTransition(character, newX, newY);
+              void this.handleMapTransition(character, newX, newY);
 
-              // eslint-disable-next-line @typescript-eslint/no-floating-promises
-              this.characterView.clearAllOutOfViewElements(character._id, character.x, character.y);
+              void this.characterView.clearAllOutOfViewElements(character._id, character.x, character.y);
             }
 
             this.sendConfirmation(character, data.direction, isPositionUpdateValid);
@@ -155,7 +151,7 @@ export class CharacterNetworkUpdate {
           x: clientOriginX,
           y: clientOriginY,
         }
-      );
+      ).lean();
     }
 
     if (distanceInGridCells >= 10) {
@@ -244,9 +240,14 @@ export class CharacterNetworkUpdate {
       // if character is moving, update the position
 
       // old position is now walkable
-      await this.gridManager.setWalkable(map, ToGridX(character.x), ToGridY(character.y), true);
+      const setOldPositionWalkable = this.gridManager.setWalkable(
+        map,
+        ToGridX(character.x),
+        ToGridY(character.y),
+        true
+      );
 
-      await Character.updateOne(
+      const characterUpdate = Character.updateOne(
         { _id: character._id },
         {
           $set: {
@@ -256,11 +257,12 @@ export class CharacterNetworkUpdate {
             lastMovement: new Date(),
           },
         }
-      );
+      ).lean();
 
       // update our grid with solid information
+      const setNewPositionSolid = this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false);
 
-      await this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false);
+      await Promise.all([setOldPositionWalkable, characterUpdate, setNewPositionSolid]);
     }
   }
 }
