@@ -42,6 +42,7 @@
     "no-use-before-define": "off",
     "no-var": "error",
     "no-unused-vars": "warn",
+    "no-void": "off",
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/naming-convention": [
       "error",
