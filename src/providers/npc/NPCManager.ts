@@ -66,20 +66,24 @@ export class NPCManager {
   @TrackNewRelicTransaction()
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
     const nearbyNPCs = await this.npcView.getNPCsInView(character, { isBehaviorEnabled: false });
+
+    let totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
+
+    this.newRelic.trackMetric(NewRelicMetricCategory.Count, "NPCs/Active", totalActiveNPCs);
+
+    const behaviorLoops: Promise<void>[] = [];
+
     for (const npc of nearbyNPCs) {
-      const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
-
-      this.newRelic.trackMetric(NewRelicMetricCategory.Count, "NPCs/Active", totalActiveNPCs);
-
       if (totalActiveNPCs <= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
         // watch out for max NPCs active limit so we don't fry our CPU
-
-        void this.startBehaviorLoop(npc);
-
-        // wait 200 ms
-        await new Promise((resolve) => setTimeout(resolve, 25));
+        behaviorLoops.push(this.startBehaviorLoop(npc));
+        totalActiveNPCs++;
+      } else {
+        break; // break out of the loop if we've reached max active NPCs
       }
     }
+
+    await Promise.all(behaviorLoops);
   }
 
   @TrackNewRelicTransaction()
@@ -145,11 +149,11 @@ export class NPCManager {
   }
 
   public async disableNPCBehaviors(): Promise<void> {
-    await NPC.updateMany({}, { $set: { isBehaviorEnabled: false } });
+    await NPC.updateMany({}, { $set: { isBehaviorEnabled: false } }).lean();
   }
 
   public async setNPCBehavior(npc: INPC, value: boolean): Promise<void> {
-    await NPC.updateOne({ _id: npc._id }, { $set: { isBehaviorEnabled: value } });
+    await NPC.updateOne({ _id: npc._id }, { $set: { isBehaviorEnabled: value } }).lean();
   }
 
   private async startCoreNPCBehavior(npc: INPC): Promise<void> {
