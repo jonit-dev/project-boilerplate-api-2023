@@ -145,13 +145,12 @@ export class CharacterDeath {
 
       this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Death", 1);
 
-      await Promise.all([
-        this.characterWeight.updateCharacterWeight(character),
-        this.inMemoryHashTable.delete("character-weapon", character._id),
-        this.inMemoryHashTable.delete("character-max-weights", character._id),
-        this.inMemoryHashTable.delete("inventory-weight", character._id),
-        this.inMemoryHashTable.delete("equipment-weight", character._id),
-      ]);
+      await this.inMemoryHashTable.delete("character-weapon", character._id);
+      await this.inMemoryHashTable.delete("character-max-weights", character._id);
+      await this.inMemoryHashTable.delete("inventory-weight", character._id);
+      await this.inMemoryHashTable.delete("equipment-weight", character._id);
+
+      await this.characterWeight.updateCharacterWeight(character);
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
     } finally {
