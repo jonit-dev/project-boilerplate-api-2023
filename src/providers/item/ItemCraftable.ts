@@ -34,8 +34,6 @@ import random from "lodash/random";
 import shuffle from "lodash/shuffle";
 import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
-import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
-@TrackClassExecutionTime()
 @provide(ItemCraftable)
 export class ItemCraftable {
   constructor(
