@@ -47,7 +47,11 @@ export class CharacterItemInventory {
   }
 
   @TrackNewRelicTransaction()
-  private async getAllItemsFromContainer(container: IItemContainer): Promise<IItem[]> {
+  private async getAllItemsFromContainer(container: IItemContainer, depth: number = 0): Promise<IItem[]> {
+    if (depth > 100) {
+      throw new Error("Maximum recursion depth exceeded");
+    }
+
     const cachedAllItems = await this.inMemoryHashTable.get("container-all-items", container._id);
 
     if (cachedAllItems) {
@@ -57,6 +61,9 @@ export class CharacterItemInventory {
     const slots = container.slots as unknown as IItem[];
 
     const items: IItem[] = [];
+
+    const processedContainers = new Set<string>();
+
     for (const [, slot] of Object.entries(slots)) {
       if (slot) {
         const item = await Item.findById(slot._id).lean({ virtuals: true, defaults: true });
@@ -70,7 +77,21 @@ export class CharacterItemInventory {
               defaults: true,
             });
             if (nestedContainer) {
-              const nestedItems = await this.getAllItemsFromContainer(nestedContainer as IItemContainer);
+              const isSelfReference = nestedContainer._id.toString() === container._id.toString();
+
+              if (isSelfReference) {
+                continue;
+              }
+
+              const hasProcessedContainer = processedContainers.has(nestedContainer._id.toString());
+
+              if (hasProcessedContainer) {
+                continue;
+              }
+
+              processedContainers.add(nestedContainer._id.toString());
+
+              const nestedItems = await this.getAllItemsFromContainer(nestedContainer as IItemContainer, depth + 1);
               items.push(...nestedItems);
             }
           }
