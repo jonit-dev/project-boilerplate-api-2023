@@ -28,6 +28,8 @@ import { provide } from "inversify-binding-decorators";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
+import dayjs from "dayjs";
+import random from "lodash/random";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
@@ -64,11 +66,23 @@ export class CharacterNetworkUpdate {
 
             let isPositionUpdateValid = true;
 
-            const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
-              character.x,
-              character.y,
-              data.direction
-            );
+            const { newX, newY, timestamp } = data;
+
+            if (timestamp) {
+              const n = random(1, 100);
+
+              if (n <= 10) {
+                // 10% chance tracking ping
+                const ping = dayjs().diff(dayjs(timestamp), "ms");
+
+                this.newRelic.trackMetric(
+                  NewRelicMetricCategory.Count,
+                  NewRelicSubCategory.Characters,
+                  "Character/Ping",
+                  ping
+                );
+              }
+            }
 
             if (isMoving) {
               isPositionUpdateValid = await this.characterMovementValidation.isValid(character, newX, newY, isMoving);
@@ -138,7 +152,7 @@ export class CharacterNetworkUpdate {
     clientOriginX: number,
     clientOriginY: number
   ): Promise<void> {
-    const distance = this.mathHelper.getDistanceBetweenPoints(
+    const distance = this.mathHelper.getDistanceInGridCells(
       serverCharacterPosition.x,
       serverCharacterPosition.y,
       clientOriginX,

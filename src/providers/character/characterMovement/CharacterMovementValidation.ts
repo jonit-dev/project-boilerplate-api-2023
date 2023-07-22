@@ -88,19 +88,6 @@ export class CharacterMovementValidation {
     );
 
     if (isSolid) {
-      this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
-        character.channelId!,
-        CharacterSocketEvents.CharacterSyncPosition,
-        {
-          id: character.id,
-          position: {
-            originX: character.x,
-            originY: character.y,
-            direction: character.direction as AnimationDirection,
-          },
-        }
-      );
-
       this.newRelic.trackMetric(
         NewRelicMetricCategory.Count,
         NewRelicSubCategory.Characters,
@@ -109,6 +96,43 @@ export class CharacterMovementValidation {
       );
 
       console.log(`🚫 ${character.name} is trying to move to a solid!`);
+
+      // try to deviate the character from the solid. First check if there's a  empty position around
+
+      const potentialDirections = [
+        this.movementHelper.calculateNewPositionXY(newX, newY, "up"),
+        this.movementHelper.calculateNewPositionXY(newX, newY, "down"),
+        this.movementHelper.calculateNewPositionXY(newX, newY, "left"),
+        this.movementHelper.calculateNewPositionXY(newX, newY, "right"),
+      ];
+
+      // We'll check each potential direction for solidity.
+      for (let i = 0; i < potentialDirections.length; i++) {
+        const potentialPosition = potentialDirections[i];
+        const potentialSolid = await this.movementHelper.isSolid(
+          character.scene,
+          ToGridX(potentialPosition.x),
+          ToGridY(potentialPosition.y),
+          MapLayers.Character
+        );
+
+        // If the potential direction isn't solid, we move the character there.
+        if (!potentialSolid) {
+          this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
+            character.channelId!,
+            CharacterSocketEvents.CharacterSyncPosition,
+            {
+              id: character.id,
+              position: {
+                originX: potentialPosition.x,
+                originY: potentialPosition.y,
+                direction: character.direction as AnimationDirection,
+              },
+            }
+          );
+          return true;
+        }
+      }
 
       return false;
     }
