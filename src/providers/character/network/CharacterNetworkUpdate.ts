@@ -75,6 +75,10 @@ export class CharacterNetworkUpdate {
                 // 10% chance tracking ping
                 const ping = dayjs().diff(dayjs(timestamp), "ms");
 
+                if (ping < 0) {
+                  return; // invalid ping
+                }
+
                 this.newRelic.trackMetric(
                   NewRelicMetricCategory.Count,
                   NewRelicSubCategory.Characters,
