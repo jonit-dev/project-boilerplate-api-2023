@@ -311,36 +311,11 @@
     "textureKey": "minotaur-mage",
     "textureDisplayName": "Minotaur Druid"
   },
-
-  {
-    "class": "Druid",
-    "race": "Human",
-    "textureKey": "green-druid",
-    "textureDisplayName": "Green Druid"
-  },
   {
     "class": "Warrior",
     "race": "Human",
     "textureKey": "warrior",
     "textureDisplayName": "Warrior"
-  },
-  {
-    "class": "Druid",
-    "race": "Human",
-    "textureKey": "healer",
-    "textureDisplayName": "Healer"
-  },
-  {
-    "class": "Warrior",
-    "race": "Orc",
-    "textureKey": "orc-char",
-    "textureDisplayName": "Orc"
-  },
-  {
-    "class": "Rogue",
-    "race": "Human",
-    "textureKey": "shadow-assassin",
-    "textureDisplayName": "Shadow Assassin"
   },
   {
     "class": "Sorcerer",
