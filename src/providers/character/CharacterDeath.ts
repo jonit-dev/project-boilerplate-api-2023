@@ -111,13 +111,21 @@ export class CharacterDeath {
 
       const characterBody = await this.generateCharacterBody(character);
 
-      if (character?.mode === Modes.PermadeathMode) {
-        this.softDeleteCharacterOnPermaDeathMode(character);
-        return;
-      }
-
-      if (character?.mode !== Modes.SoftMode) {
-        await this.applyPenalties(character, characterBody);
+      switch (character?.mode) {
+        case Modes.HardcoreMode:
+          await this.applyPenalties(character, characterBody);
+          break;
+        case Modes.SoftMode:
+          // do nothing
+          break;
+        case Modes.PermadeathMode:
+          // penalties forcing all equip/inventory loss
+          this.softDeleteCharacterOnPermaDeathMode(character);
+          await this.applyPenalties(character, characterBody, true);
+          break;
+        default:
+          await this.applyPenalties(character, characterBody);
+          break;
       }
 
       this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Death", 1);
@@ -199,7 +207,8 @@ export class CharacterDeath {
   private async dropCharacterItemsOnBody(
     character: ICharacter,
     characterBody: IItem,
-    equipmentId: Types.ObjectId | undefined
+    equipmentId: Types.ObjectId | undefined,
+    forceDropAll: boolean = false
   ): Promise<void> {
     if (!equipmentId) {
       return;
@@ -231,11 +240,11 @@ export class CharacterDeath {
     const inventory = equipment.inventory as unknown as IItem;
 
     if (inventory) {
-      await this.dropInventory(character, bodyContainer, inventory);
+      await this.dropInventory(character, bodyContainer, inventory, forceDropAll);
     }
 
     // there's a chance of dropping any of the equipped items
-    await this.dropEquippedItemOnBody(character, bodyContainer, equipment);
+    await this.dropEquippedItemOnBody(character, bodyContainer, equipment, forceDropAll);
 
     await this.clearAllInventoryItems(inventory as unknown as string, character);
   }
@@ -256,7 +265,12 @@ export class CharacterDeath {
     }
   }
 
-  private async dropInventory(character: ICharacter, bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
+  private async dropInventory(
+    character: ICharacter,
+    bodyContainer: IItemContainer,
+    inventory: IItem,
+    forceDropAll: boolean = false
+  ): Promise<void> {
     const n = _.random(0, 100);
     let isDeadBodyLootable = false;
 
@@ -268,7 +282,7 @@ export class CharacterDeath {
 
     const dropInventoryChance = this.characterDeathCalculator.calculateInventoryDropChance(skills);
 
-    if (n <= dropInventoryChance) {
+    if (forceDropAll || n <= dropInventoryChance) {
       let item = (await Item.findById(inventory._id)) as IItem;
 
       item.itemContainer &&
@@ -301,7 +315,8 @@ export class CharacterDeath {
   private async dropEquippedItemOnBody(
     character: ICharacter,
     bodyContainer: IItemContainer,
-    equipment: IEquipment
+    equipment: IEquipment,
+    forceDropAll: boolean = false
   ): Promise<void> {
     let isDeadBodyLootable = false;
 
@@ -318,7 +333,7 @@ export class CharacterDeath {
 
       const n = _.random(0, 100);
 
-      if (n <= DROP_EQUIPMENT_CHANCE) {
+      if (forceDropAll || n <= DROP_EQUIPMENT_CHANCE) {
         const removeEquipmentFromSlot = await equipmentSlots.removeItemFromSlot(
           character,
           item.key,
@@ -384,16 +399,25 @@ export class CharacterDeath {
     return item;
   }
 
-  private async applyPenalties(character: ICharacter, characterBody: IItem): Promise<void> {
+  private async applyPenalties(
+    character: ICharacter,
+    characterBody: IItem,
+    forceDropAll: boolean = false
+  ): Promise<void> {
+    if (character.mode === Modes.PermadeathMode) {
+      await this.dropCharacterItemsOnBody(character, characterBody, forceDropAll);
+      return;
+    }
+
     const amuletOfDeath = await equipmentSlots.hasItemByKeyOnSlot(
       character,
       AccessoriesBlueprint.AmuletOfDeath,
       "neck"
     );
 
-    if (!amuletOfDeath) {
+    if (!amuletOfDeath || forceDropAll) {
       // drop equipped items and backpack items
-      await this.dropCharacterItemsOnBody(character, characterBody, character.equipment);
+      await this.dropCharacterItemsOnBody(character, characterBody, character.equipment, forceDropAll);
 
       const deathPenalty = await this.skillDecrease.deathPenalty(character);
       if (deathPenalty) {

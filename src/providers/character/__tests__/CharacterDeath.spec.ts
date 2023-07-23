@@ -144,9 +144,11 @@ describe("CharacterDeath.ts", () => {
       jest.clearAllMocks();
     });
 
-    it("should enable isSoftDelete on a character playing on permadeath mode, after death", async () => {
+    it("should enable isSoftDelete on a character playing on permadeath mode, after death, and drop all loop", async () => {
       // @ts-ignore
       const spyOnPermaDeathTrigger = jest.spyOn(characterDeath, "softDeleteCharacterOnPermaDeathMode");
+      // @ts-ignore
+      const spyApplyPenalties = jest.spyOn(characterDeath, "applyPenalties");
 
       await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 
@@ -161,6 +163,8 @@ describe("CharacterDeath.ts", () => {
       expect(spyOnPermaDeathTrigger).toHaveBeenCalled();
 
       expect(postDeathCharacter.isSoftDeleted).toBeTruthy();
+
+      expect(spyApplyPenalties).toHaveBeenCalledWith(testCharacter, expect.anything(), true);
     });
   });
 });
