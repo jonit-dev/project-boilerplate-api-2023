@@ -6,7 +6,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
+import { CharacterSocketEvents, Modes } from "@rpg-engine/shared";
 import { CharacterDeath } from "../../CharacterDeath";
 import { CharacterItemContainer } from "../../characterItems/CharacterItemContainer";
 import { CharacterWeight } from "../CharacterWeight";
@@ -145,6 +145,9 @@ describe("CharacterWeight.ts", () => {
   });
 
   it("After death, one of equipment will drop and the weight should update.", async () => {
+    testCharacter.mode = Modes.HardcoreMode;
+    await testCharacter.save();
+
     jest.useFakeTimers({
       advanceTimers: true,
     });

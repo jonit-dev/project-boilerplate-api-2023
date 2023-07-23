@@ -7,6 +7,7 @@ import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { container, entityEffectUse, unitTestHelper } from "@providers/inversify/container";
 import { AccessoriesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
+import { Modes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import _ from "lodash";
 import { CharacterDeath } from "../CharacterDeath";
@@ -38,34 +39,36 @@ describe("CharacterDeath.ts", () => {
     });
   });
 
-  it("should properly generate a character body on death", async () => {
-    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
-
-    const charBody = await Item.findOne({
-      owner: testCharacter._id,
-    });
-
-    expect(charBody).toBeDefined();
-  });
-
-  it("attacker's targeting should be properly cleared after character death", async () => {
+  it("should properly handle character's death main points", async () => {
     testNPC.targetCharacter = testCharacter._id;
     await testNPC.save();
     new NPCBattleCycle(testNPC.id, () => {}, 10000);
 
+    // @ts-ignore
+    const spySocketMessaging = jest.spyOn(characterDeath.socketMessaging, "sendEventToUser");
+    // @ts-ignore
+    const clearEffectsSpy = jest.spyOn(entityEffectUse, "clearAllEntityEffects");
+
     await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 
+    //* Generate a body
+    const charBody = await Item.findOne({
+      owner: testCharacter._id,
+    });
+    expect(charBody).toBeDefined();
+
+    //* warn characters around about death
+    expect(spySocketMessaging).toHaveBeenCalled();
+
+    //* clear attacker's target
     const updatedNPC = await NPC.findById(testNPC.id);
     expect(updatedNPC?.targetCharacter).toBeUndefined();
 
     const npcBattleCycle = NPC_BATTLE_CYCLES.get(testNPC.id);
 
     expect(npcBattleCycle).toBeUndefined();
-  });
 
-  it("should respawn a character after its death", async () => {
-    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
-
+    //* respawn a character
     const postDeathCharacter = await Character.findById(testCharacter._id);
 
     if (!postDeathCharacter) {
@@ -78,57 +81,91 @@ describe("CharacterDeath.ts", () => {
     expect(postDeathCharacter.y === postDeathCharacter.initialY).toBeTruthy();
     expect(postDeathCharacter.scene === postDeathCharacter.initialScene).toBeTruthy();
     expect(postDeathCharacter.appliedEntityEffects).toHaveLength(0);
-  });
 
-  it("should properly warn characters around, about character's death", async () => {
-    // @ts-ignore
-    const spySocketMessaging = jest.spyOn(characterDeath.socketMessaging, "sendEventToUser");
-
-    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
-
-    expect(spySocketMessaging).toHaveBeenCalled();
-  });
-  it("should clear all entity effects on character's death", async () => {
-    // @ts-ignore
-    const clearEffectsSpy = jest.spyOn(entityEffectUse, "clearAllEntityEffects");
-
-    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
-
+    // * Clear all effects
     expect(clearEffectsSpy).toHaveBeenCalled();
     expect(clearEffectsSpy).toHaveBeenCalledWith(testCharacter);
   });
 
-  it("should always call the respawnCharacter method even if another promise fails", async () => {
-    // Create a spy on the respawnCharacter method
-    // @ts-ignore
-    const respawnSpy = jest.spyOn(characterDeath, "respawnCharacter");
+  describe("Soft mode", () => {
+    let characterDeath: CharacterDeath;
+    let testCharacter: ICharacter;
+    let testNPC: INPC;
+    beforeAll(() => {
+      characterDeath = container.get<CharacterDeath>(CharacterDeath);
 
-    // Temporarily replace the clearAttackerTarget method to throw an error
-    // @ts-ignore
-    const originalMethod = characterDeath.clearAttackerTarget;
-    // @ts-ignore
-    characterDeath.clearAttackerTarget = jest.fn().mockRejectedValue(new Error("Mock error"));
+      jest.useFakeTimers({
+        advanceTimers: true,
+      });
+    });
 
-    try {
+    beforeEach(async () => {
+      testCharacter = await unitTestHelper.createMockCharacter({
+        mode: Modes.SoftMode,
+      });
+    });
+
+    it("should not apply penalties for character on soft mode", async () => {
+      // @ts-ignore
+      const spyDropCharacterItemsOnBody = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
+      // @ts-ignore
+      const spyPenalties = jest.spyOn(characterDeath, "applyPenalties");
+
+      // character dies
       await characterDeath.handleCharacterDeath(testNPC, testCharacter);
-    } catch (error) {
-      // Ignore the error for this test, as we're only checking if respawnCharacter was called
-    }
 
-    // Assert that the respawnCharacter method was called
-    expect(respawnSpy).toBeCalledWith(testCharacter);
+      expect(spyDropCharacterItemsOnBody).not.toHaveBeenCalled();
+      expect(spyPenalties).not.toHaveBeenCalled();
+    });
+  });
 
-    // Clean up the spy
-    // @ts-ignore
-    respawnSpy.mockRestore();
+  describe("Permadeath Mode", () => {
+    let characterDeath: CharacterDeath;
+    let testCharacter: ICharacter;
+    let testNPC: INPC;
 
-    // Restore the original method
-    // @ts-ignore
-    characterDeath.clearAttackerTarget = originalMethod;
+    beforeAll(() => {
+      characterDeath = container.get<CharacterDeath>(CharacterDeath);
+
+      jest.useFakeTimers({
+        advanceTimers: true,
+      });
+    });
+
+    beforeEach(async () => {
+      jest.clearAllMocks();
+      testNPC = await unitTestHelper.createMockNPC();
+      testCharacter = await unitTestHelper.createMockCharacter({
+        mode: Modes.PermadeathMode,
+      });
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("should enable isSoftDelete on a character playing on permadeath mode, after death", async () => {
+      // @ts-ignore
+      const spyOnPermaDeathTrigger = jest.spyOn(characterDeath, "softDeleteCharacterOnPermaDeathMode");
+
+      await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+      jest.runAllTimers();
+
+      const postDeathCharacter = await Character.findById(testCharacter._id);
+
+      if (!postDeathCharacter) {
+        throw new Error("Character not found");
+      }
+
+      expect(spyOnPermaDeathTrigger).toHaveBeenCalled();
+
+      expect(postDeathCharacter.isSoftDeleted).toBeTruthy();
+    });
   });
 });
 
-describe("CharacterDeath.ts | Character with items", () => {
+describe("Hardcore mode", () => {
   let characterDeath: CharacterDeath;
   let testCharacter: ICharacter;
   let backpackContainer: IItemContainer;
@@ -149,17 +186,18 @@ describe("CharacterDeath.ts | Character with items", () => {
     jest.spyOn(characterDeath.characterDeathCalculator, "calculateInventoryDropChance").mockImplementation(() => 100);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   beforeEach(async () => {
     testNPC = await unitTestHelper.createMockNPC();
-    testCharacter = await unitTestHelper.createMockCharacter(null, {
-      hasEquipment: true,
-      hasInventory: true,
-      hasSkills: true,
-    });
+    testCharacter = await unitTestHelper.createMockCharacter(
+      {
+        mode: Modes.HardcoreMode,
+      },
+      {
+        hasEquipment: true,
+        hasInventory: true,
+        hasSkills: true,
+      }
+    );
 
     characterEquipment = (await Equipment.findById(testCharacter.equipment).populate("inventory").exec()) as IEquipment;
 
@@ -326,11 +364,14 @@ describe("CharacterDeath.ts | Character with items", () => {
   describe("Amulet of Death", () => {
     let dropCharacterItemsOnBodySpy: jest.SpyInstance;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       jest.clearAllMocks();
 
       // @ts-ignore
       dropCharacterItemsOnBodySpy = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
+
+      testCharacter.mode = Modes.HardcoreMode;
+      await testCharacter.save();
     });
 
     const equipAmuletOfDeath = async (): Promise<void> => {

@@ -1,4 +1,4 @@
-import { CharacterClass, LifeBringerRaces, ShadowWalkerRaces } from "@rpg-engine/shared";
+import { CharacterClass, LifeBringerRaces, Modes, ShadowWalkerRaces } from "@rpg-engine/shared";
 
 export const EXP_RATIO = 1.5;
 
@@ -450,3 +450,10 @@ export const RACE_BONUS_OR_PENALTIES = [
     },
   },
 ];
+
+// Mode
+export const MODE_EXP_MULTIPLIER: { [key in Modes]: number } = {
+  [Modes.SoftMode]: 1,
+  [Modes.HardcoreMode]: 1.2,
+  [Modes.PermadeathMode]: 1.5,
+};

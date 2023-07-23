@@ -4,10 +4,10 @@ import { DTOValidatorMiddleware } from "@providers/middlewares/DTOValidatorMiddl
 import { IAuthenticatedRequest } from "@providers/types/ServerTypes";
 import {
   controller,
+  httpDelete,
   httpGet,
   httpPatch,
   httpPost,
-  httpDelete,
   interfaces,
   request,
   requestBody,
@@ -15,10 +15,10 @@ import {
 } from "inversify-express-utils";
 import { CreateCharacterDTO } from "./create/CreateCharacterDTO";
 import { CreateCharacterUseCase } from "./create/CreateCharacterUseCase";
+import { DeleteCharacterUseCase } from "./delete/DeleteCharacterUseCase";
 import { ReadCharacterUseCase } from "./read/ReadCharacterUseCase";
 import { UpdateCharacterDTO } from "./update/UpdateCharacterDTO";
 import { UpdateCharacterUseCase } from "./update/UpdateCharacterUseCase";
-import { DeleteCharacterUseCase } from "./delete/DeleteCharacterUseCase";
 
 @controller("/characters", AuthMiddleware)
 export class CharacterController implements interfaces.Controller {
@@ -61,6 +61,7 @@ export class CharacterController implements interfaces.Controller {
 
     return await this.updateCharacterUseCase.updateCharacter(id, updateCharacter, ownerId);
   }
+
   @httpDelete("/:id")
   private async deleteCharacter(
     @requestParam("id") id: string,

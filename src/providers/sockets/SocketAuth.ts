@@ -68,6 +68,13 @@ export class SocketAuth {
           return;
         }
 
+        if (character.isSoftDeleted) {
+          this.socketMessaging.sendEventToUser(channel.id!, CharacterSocketEvents.CharacterForceDisconnect, {
+            reason: "Sorry, you cannot play with this character anymore!",
+          });
+          return;
+        }
+
         if (runBasicCharacterValidation) {
           const hasBasicValidation = this.characterValidation.hasBasicValidation(character);
 

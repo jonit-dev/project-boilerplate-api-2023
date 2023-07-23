@@ -12,6 +12,7 @@ import {
   FromGridY,
   LifeBringerRaces,
   MapLayers,
+  Modes,
   ShadowWalkerRaces,
   SpellsBlueprint,
   TypeHelper,
@@ -111,6 +112,15 @@ const characterSchema = createLeanSchema(
       required: true,
       enum: [...TypeHelper.enumToStringArray(LifeBringerRaces), ...TypeHelper.enumToStringArray(ShadowWalkerRaces)],
       default: LifeBringerRaces.Human,
+    }),
+    mode: Type.string({
+      required: true,
+      enum: TypeHelper.enumToStringArray(Modes),
+      default: Modes.SoftMode,
+    }),
+    isSoftDeleted: Type.boolean({
+      required: true,
+      default: false,
     }),
     textureKey: Type.string({
       required: true,

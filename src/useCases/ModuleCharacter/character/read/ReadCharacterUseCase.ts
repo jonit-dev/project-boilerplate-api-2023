@@ -1,8 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { provide } from "inversify-binding-decorators";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(ReadCharacterUseCase)
 export class ReadCharacterUseCase {
@@ -37,7 +37,7 @@ export class ReadCharacterUseCase {
   }
 
   public async readAll(ownerId: string): Promise<ICharacter[]> {
-    const characters = await this.characterRepository.readAll(
+    let characters: ICharacter[] = await this.characterRepository.readAll(
       Character,
       {
         owner: ownerId,
@@ -46,6 +46,8 @@ export class ReadCharacterUseCase {
       null,
       true
     );
+
+    characters = characters.filter((char) => !char.isSoftDeleted);
 
     for (const char of characters) {
       const inventory = await this.characterInventory.getInventory(char);

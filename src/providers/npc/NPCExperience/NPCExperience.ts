@@ -5,6 +5,7 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
+import { MODE_EXP_MULTIPLIER } from "@providers/constants/SkillConstants";
 import { spellLearn } from "@providers/inversify/container";
 import { Locker } from "@providers/locks/Locker";
 import { SkillBuff } from "@providers/skill/SkillBuff";
@@ -20,6 +21,7 @@ import {
   IDisplayTextEvent,
   IIncreaseXPResult,
   IUIShowMessage,
+  Modes,
   SkillEventType,
   SkillSocketEvents,
   UISocketEvents,
@@ -97,7 +99,10 @@ export class NPCExperience {
         return this.releaseXP(target);
       }
 
-      const exp = record!.xp! * (target.isGiantForm ? NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER : 1);
+      const characterMode: Modes = Object.values(Modes).find((mode) => mode === character.mode) ?? Modes.SoftMode;
+
+      let exp = record!.xp! * (target.isGiantForm ? NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER : 1);
+      exp = exp * MODE_EXP_MULTIPLIER[characterMode];
 
       skills.experience += exp;
       skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);

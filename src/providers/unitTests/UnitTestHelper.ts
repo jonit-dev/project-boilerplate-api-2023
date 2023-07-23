@@ -182,7 +182,7 @@ export class UnitTestHelper {
 
     const charBody = new Item({
       ...blueprintData,
-      owner: character.id,
+      owner: character._id,
       name: `${character.name}'s body`,
       scene: character.scene,
       x: character.x,

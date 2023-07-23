@@ -1,4 +1,9 @@
-import { CharacterClass, LifeBringerRaces, ShadowWalkerRaces } from "@rpg-engine/shared/dist/types/character.types";
+import {
+  CharacterClass,
+  LifeBringerRaces,
+  Modes,
+  ShadowWalkerRaces,
+} from "@rpg-engine/shared/dist/types/character.types";
 
 export const BASIC_INCREASE_HEALTH_MANA = 0.04;
 
@@ -371,3 +376,9 @@ export const RACE_BONUS_OR_PENALTIES = [
     },
   },
 ];
+
+export const MODE_EXP_MULTIPLIER: { [key in Modes]: number } = {
+  [Modes.SoftMode]: 1,
+  [Modes.HardcoreMode]: 1.2,
+  [Modes.PermadeathMode]: 1.5,
+};

@@ -12,8 +12,6 @@ export class CreateCharacterUseCase {
   constructor(private characterRepository: CharacterRepository, private factionRepository: FactionRepository) {}
 
   public async create(newCharacter: CreateCharacterDTO, ownerId: string): Promise<ICharacter> {
-    newCharacter.name = newCharacter.name.trim();
-
     // assign character to user
     const user = await User.findOne({ _id: ownerId });
     if (!user) {

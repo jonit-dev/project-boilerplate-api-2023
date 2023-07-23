@@ -26,12 +26,14 @@ import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/Ne
 import {
   BattleSocketEvents,
   CharacterBuffType,
+  CharacterSocketEvents,
   IBattleDeath,
   IUIShowMessage,
+  Modes,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _, { random } from "lodash";
+import _ from "lodash";
 import { Types } from "mongoose";
 import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
@@ -74,8 +76,6 @@ export class CharacterDeath {
   @TrackNewRelicTransaction()
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
     try {
-      await this.time.waitForMilliseconds(random(0, 50));
-
       const canProceed = await this.locker.lock(`character-death-${character.id}`);
 
       if (!canProceed) {
@@ -109,38 +109,15 @@ export class CharacterDeath {
         characterDeathData
       );
 
-      const amuletOfDeath = await equipmentSlots.hasItemByKeyOnSlot(
-        character,
-        AccessoriesBlueprint.AmuletOfDeath,
-        "neck"
-      );
-
-      // generate character's body
       const characterBody = await this.generateCharacterBody(character);
 
-      if (!amuletOfDeath) {
-        // drop equipped items and backpack items
-        await this.dropCharacterItemsOnBody(character, characterBody, character.equipment);
+      if (character?.mode === Modes.PermadeathMode) {
+        this.softDeleteCharacterOnPermaDeathMode(character);
+        return;
+      }
 
-        const deathPenalty = await this.skillDecrease.deathPenalty(character);
-        if (deathPenalty) {
-          // Set timeout to not overwrite the msg "You are Died"
-          setTimeout(() => {
-            this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-              message: "You lost some XP and skill points.",
-              type: "info",
-            });
-          }, 2000);
-        }
-      } else {
-        setTimeout(() => {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Your Amulet of Death protected your XP and skill points.",
-            type: "info",
-          });
-        }, 2000);
-
-        await equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
+      if (character?.mode !== Modes.SoftMode) {
+        await this.applyPenalties(character, characterBody);
       }
 
       this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Death", 1);
@@ -154,7 +131,9 @@ export class CharacterDeath {
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
     } finally {
-      await this.respawnCharacter(character);
+      if (character?.mode !== Modes.PermadeathMode) {
+        await this.respawnCharacter(character);
+      }
     }
   }
 
@@ -194,6 +173,16 @@ export class CharacterDeath {
     );
 
     await this.locker.unlock(`character-death-${character.id}`);
+  }
+
+  private softDeleteCharacterOnPermaDeathMode(character: ICharacter): void {
+    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+      reason: "💀 You died on perma-death mode. Your character was deleted. GG 💀",
+    });
+
+    setTimeout(async () => {
+      await Character.updateOne({ _id: character._id }, { $set: { isSoftDeleted: true } });
+    }, 5000);
   }
 
   private async clearAttackerTarget(attacker: ICharacter | INPC): Promise<void> {
@@ -261,7 +250,9 @@ export class CharacterDeath {
     const bodySlots = inventoryContainer?.slots as { [key: string]: IItem };
 
     for (const slotItem of Object.values(bodySlots)) {
-      await this.clearItem(character, slotItem);
+      if (slotItem) {
+        await this.clearItem(character, slotItem);
+      }
     }
   }
 
@@ -391,5 +382,38 @@ export class CharacterDeath {
     await this.itemOwnership.removeItemOwnership(item);
 
     return item;
+  }
+
+  private async applyPenalties(character: ICharacter, characterBody: IItem): Promise<void> {
+    const amuletOfDeath = await equipmentSlots.hasItemByKeyOnSlot(
+      character,
+      AccessoriesBlueprint.AmuletOfDeath,
+      "neck"
+    );
+
+    if (!amuletOfDeath) {
+      // drop equipped items and backpack items
+      await this.dropCharacterItemsOnBody(character, characterBody, character.equipment);
+
+      const deathPenalty = await this.skillDecrease.deathPenalty(character);
+      if (deathPenalty) {
+        // Set timeout to not overwrite the msg "You are Died"
+        setTimeout(() => {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "You lost some XP and skill points.",
+            type: "info",
+          });
+        }, 2000);
+      }
+    } else {
+      setTimeout(() => {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "Your Amulet of Death protected your XP and skill points.",
+          type: "info",
+        });
+      }, 2000);
+
+      await equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
+    }
   }
 }

@@ -3,6 +3,7 @@ import {
   BASIC_INCREASE_HEALTH_MANA,
   CLASS_BONUS_OR_PENALTIES,
   RACE_BONUS_OR_PENALTIES,
+  MODE_EXP_MULTIPLIER,
 } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
 import { blueprintManager, container, redisManager } from "@providers/inversify/container";
 import { MapLoader } from "@providers/map/MapLoader";
@@ -46,6 +47,7 @@ jest.mock("@providers/constants/SkillConstants", () => ({
   CLASS_BONUS_OR_PENALTIES,
   RACE_BONUS_OR_PENALTIES,
   BASIC_INCREASE_HEALTH_MANA,
+  MODE_EXP_MULTIPLIER,
 }));
 
 jest.mock("@providers/constants/LootConstants", () => ({
