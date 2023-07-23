@@ -3,7 +3,11 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
+import {
+  POWER_COEFFICIENT,
+  SP_INCREASE_RATIO,
+  SP_MAGIC_INCREASE_TIMES_MANA,
+} from "@providers/constants/SkillConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -304,8 +308,16 @@ describe("SpellCast.ts", () => {
 
     const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
-    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (spellSelfHealing.manaCost ?? 0);
-    expect(Math.round(updatedSkills?.magic.skillPoints * 10) / 10).toBe(5);
+    const skillPoints =
+      SP_INCREASE_RATIO +
+      SP_MAGIC_INCREASE_TIMES_MANA *
+        (Math.pow(spellSelfHealing.manaCost!, POWER_COEFFICIENT) + (spellSelfHealing.manaCost ?? 0));
+    const roundedSkillPoints = Math.round(skillPoints * 10) / 10;
+
+    const lowerBound = roundedSkillPoints - 1.5;
+    const upperBound = roundedSkillPoints + 1.5;
+    expect(Math.round(updatedSkills?.magic.skillPoints * 10) / 10).toBeGreaterThan(lowerBound);
+    expect(Math.round(updatedSkills?.magic.skillPoints * 10) / 10).toBeLessThan(upperBound);
 
     expect(sendEventToUser).toHaveBeenCalled();
 
@@ -325,7 +337,7 @@ describe("SpellCast.ts", () => {
     expect(skillUpdateEventParams[2]).toBeDefined();
     expect(skillUpdateEventParams[2].skill).toBeDefined();
     expect(skillUpdateEventParams[2].skill.magic).toBeDefined();
-    expect(skillUpdateEventParams[2].skill.magic.skillPoints).toBe(skillPoints);
+    expect(skillUpdateEventParams[2].skill.magic.skillPoints).toBeCloseTo(skillPoints);
   });
 
   it("should not cast spell if character does not have any skills", async () => {

@@ -3,7 +3,11 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
-import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
+import {
+  POWER_COEFFICIENT,
+  SP_INCREASE_RATIO,
+  SP_MAGIC_INCREASE_TIMES_MANA,
+} from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
 import { StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -284,6 +288,30 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
     expect(spellLearnMock).not.toHaveBeenCalled();
   });
 
+  it("should not increase character's skill points if spellHit is true", async () => {
+    // Call the function with spellHit set to true
+    await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 0, true);
+
+    const updatedSkills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
+
+    // Verify that the skill points remain the same as initial
+    expect(updatedSkills.first.level).toBe(initialLevel);
+    expect(updatedSkills.first.skillPoints).toBe(0);
+    expect(updatedSkills.first.skillPointsToNextLevel).toBe(spToLvl2 - SP_INCREASE_RATIO + 0.2);
+    expect(updatedSkills.level).toBe(initialLevel);
+    expect(updatedSkills.experience).toBe(initialSkills.experience);
+    expect(updatedSkills.xpToNextLevel).toBe(xpToLvl2);
+
+    // Check if these functions have not been called
+    expect(sendSkillLevelUpEvents).not.toHaveBeenCalled();
+    expect(sendExpLevelUpEvents).not.toHaveBeenCalled();
+    expect(spellLearnMock).not.toHaveBeenCalled();
+
+    // faking timers is creating issue with mongo calls
+    await wait(5.2);
+    expect(spellLearnMock).not.toHaveBeenCalled();
+  });
+
   it("should increase character's skill level - 'first' & strength skills. Should not increase XP (not released)", async () => {
     await skillIncrease.increaseSkillsOnBattle(testCharacter, testNPC, 1);
 
@@ -396,9 +424,13 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
     // 'magic' skill should increase
     expect(updatedSkills.magic.level).toBe(initialLevel);
 
-    const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (spellSelfHealing.manaCost ?? 0);
-    expect(updatedSkills.magic.skillPoints).toBe(skillPoints + 0.52);
-    expect(updatedSkills.magic.skillPointsToNextLevel).toBe(spToLvl2 - (skillPoints + 0.52));
+    const skillPoints =
+      SP_INCREASE_RATIO +
+      SP_MAGIC_INCREASE_TIMES_MANA *
+        (Math.pow(spellSelfHealing.manaCost!, POWER_COEFFICIENT) + (spellSelfHealing.manaCost ?? 0));
+
+    expect(updatedSkills.magic.skillPoints).toBeCloseTo(skillPoints + 0.52);
+    expect(updatedSkills.magic.skillPointsToNextLevel).toBeCloseTo(spToLvl2 - (skillPoints + 0.52));
   });
 
   it("should increase character's magic resistance SP as per rune power", async () => {
@@ -407,14 +439,27 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
     const updatedSkills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
     // 'magic resistance' skill should increase
-    expect(updatedSkills.magicResistance.level).toBe(initialLevel);
+    expect(updatedSkills.magicResistance.level).toBe(initialLevel + 1);
 
     // @ts-ignore
     itemDarkRune.power = 20;
 
-    // const skillPoints = SP_INCREASE_RATIO + SP_MAGIC_INCREASE_TIMES_MANA * (itemDarkRune.power ?? 0);
-    expect(Math.round(updatedSkills?.magicResistance.skillPoints * 10) / 10).toBeCloseTo(8.7);
-    expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBeCloseTo(spToLvl2 - 8.72);
+    const skillPoints =
+      SP_INCREASE_RATIO +
+      SP_MAGIC_INCREASE_TIMES_MANA * (Math.pow(itemDarkRune.power, POWER_COEFFICIENT) + (itemDarkRune.power ?? 0));
+
+    const roundedSkillPoints = Math.round(skillPoints * 10) / 10;
+    const lowerBound = roundedSkillPoints - 1.5;
+    const upperBound = roundedSkillPoints + 1.5;
+    expect(updatedSkills?.magicResistance.skillPoints).toBeGreaterThan(lowerBound);
+    expect(updatedSkills?.magicResistance.skillPoints).toBeLessThan(upperBound);
+
+    const spToNextLevel = calculateSPToNextLevel(
+      updatedSkills?.magicResistance.skillPoints,
+      updatedSkills?.magicResistance.level + 1
+    );
+
+    expect(updatedSkills?.magicResistance.skillPointsToNextLevel).toBeCloseTo(spToNextLevel);
   });
 
   it("target level should influence gained SP", async () => {

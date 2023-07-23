@@ -41,7 +41,7 @@ export const spellVineGrasp: Partial<ISpell> = {
     const hitTarget = container.get(HitTarget);
     const spellCalculator = container.get(SpellCalculator);
 
-    await hitTarget.hit(character, target, true, MagicPower.Medium);
+    await hitTarget.hit(character, target, true, MagicPower.Medium, true);
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectVineGrasp);
 
