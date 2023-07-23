@@ -456,7 +456,7 @@ export const RACE_BONUS_OR_PENALTIES = [
 
 // Mode
 export const MODE_EXP_MULTIPLIER: { [key in Modes]: number } = {
-  [Modes.SoftMode]: 1,
+  [Modes.SoftMode]: 0.8,
   [Modes.HardcoreMode]: 1.2,
   [Modes.PermadeathMode]: 1.5,
 };
