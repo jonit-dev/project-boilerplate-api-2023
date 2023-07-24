@@ -178,6 +178,7 @@ export class NPCSeeder {
       ]);
     } catch (error) {
       console.log(`❌ Failed to spawn NPC ${NPCData.key}. Is the blueprint for this NPC missing?`);
+      console.log(NPCData);
 
       console.error(error);
     }
