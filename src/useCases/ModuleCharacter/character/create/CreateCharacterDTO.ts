@@ -1,7 +1,7 @@
 import { tsDefaultDecorator, tsEnumDecorator } from "@providers/constants/ValidationConstants";
-import { CharacterFactions } from "@rpg-engine/shared";
+import { CharacterFactions, Modes } from "@rpg-engine/shared";
 import { ReadCharacterClass } from "@useCases/ModuleCharacter/faction/read/ReadCharacterClass";
-import { IsDefined, IsEnum, IsIn, IsNotEmpty, IsString } from "class-validator";
+import { IsDefined, IsEnum, IsIn, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateCharacterDTO {
   @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
@@ -27,4 +27,8 @@ export class CreateCharacterDTO {
   // @IsDefined(tsDefaultDecorator("validation", "isNotEmpty"))
   @IsIn(ReadCharacterClass.getPlayingCharacterClasses())
   class: string;
+
+  @IsOptional()
+  @IsEnum(Modes, tsEnumDecorator("validation", "isEnum", Modes))
+  mode: Modes;
 }

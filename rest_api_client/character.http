@@ -25,11 +25,12 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-  "name": "Jonit",
+  "name": "Jonit2",
   "faction": "Life Bringer",
   "race": "Human",
   "textureKey": "purple-hair-hero-1",
-  "class": "Warrior"
+  "class": "Warrior",
+  "mode": "Hardcore"
 }
 
 ###
