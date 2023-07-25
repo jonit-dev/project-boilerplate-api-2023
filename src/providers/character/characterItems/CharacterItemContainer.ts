@@ -1,12 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInventory";
+
 import { ItemMap } from "@providers/item/ItemMap";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterInventory } from "../CharacterInventory";
 import { CharacterItemSlots } from "./CharacterItemSlots";
@@ -16,6 +19,7 @@ interface IAddItemToContainerOptions {
   shouldAddOwnership?: boolean;
   isInventoryItem?: boolean;
   dropOnMapIfFull?: boolean;
+  shouldAddAsCarriedItem?: boolean;
 }
 
 @provide(CharacterItemContainer)
@@ -28,7 +32,8 @@ export class CharacterItemContainer {
     private itemMap: ItemMap,
     private characterInventory: CharacterInventory,
     private itemOwnership: ItemOwnership,
-    private locker: Locker
+    private locker: Locker,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -48,6 +53,11 @@ export class CharacterItemContainer {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Oops! The origin container was not found.");
       return false;
     }
+
+    const clearCache = async (): Promise<void> => {
+      await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+      await this.inMemoryHashTable.delete("character-max-weights", character._id);
+    };
 
     for (let i = 0; i < fromContainer.slotQty; i++) {
       const slotItem = fromContainer.slots?.[i];
@@ -69,9 +79,13 @@ export class CharacterItemContainer {
           }
         );
 
+        await clearCache();
+
         return true;
       }
     }
+
+    await clearCache();
 
     return true;
   }
@@ -90,7 +104,7 @@ export class CharacterItemContainer {
         return false;
       }
 
-      const { shouldAddOwnership, isInventoryItem = false, dropOnMapIfFull = false } = options || {};
+      const { shouldAddOwnership = true, isInventoryItem = false, dropOnMapIfFull = false } = options || {};
 
       const itemToBeAdded = item;
 
@@ -174,9 +188,31 @@ export class CharacterItemContainer {
 
       const result = await tryToAddItemToContainer();
 
+      if (result) {
+        await this.inMemoryHashTable.delete("container-all-items", toContainerId);
+        await this.inMemoryHashTable.delete("character-max-weights", character._id);
+      }
+
+      if (result && item.type === ItemType.CraftingResource) {
+        // clear the cache for the craftable items
+        await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+      }
+
       if (result && shouldAddOwnership) {
         await this.itemOwnership.addItemOwnership(itemToBeAdded, character);
       }
+
+      await Item.updateOne(
+        {
+          _id: itemToBeAdded._id,
+          scene: itemToBeAdded.scene,
+        },
+        {
+          $set: {
+            isInContainer: true,
+          },
+        }
+      );
 
       return result;
     } catch (error) {

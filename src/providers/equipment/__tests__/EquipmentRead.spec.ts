@@ -11,7 +11,7 @@ describe("EquipmentRead.ts", () => {
   let testCharacter: ICharacter;
   let equipmentSlots: EquipmentSlots;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     equipmentSetRead = container.get<EquipmentRead>(EquipmentRead);
     equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
   });
@@ -66,7 +66,7 @@ describe("EquipmentRead.ts", () => {
       throw new Error("Equipment set not found.");
     }
 
-    const slots = await equipmentSlots.getEquipmentSlots(fetchEquipment?._id);
+    const slots = await equipmentSlots.getEquipmentSlots(testCharacter._id, fetchEquipment?._id);
 
     // @ts-ignore
     expect(equipmentSetRead.socketMessaging.sendEventToUser).toHaveBeenCalledWith(

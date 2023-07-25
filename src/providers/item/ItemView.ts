@@ -89,15 +89,21 @@ export class ItemView {
   @TrackNewRelicTransaction()
   public async warnCharacterAboutItemsInView(character: ICharacter, options?: IWarnOptions): Promise<void> {
     const itemsNearby = await this.getItemsInCharacterView(character);
+
+    const itemsOnCharViewPromises = itemsNearby.map((item) =>
+      this.characterView.getElementOnView(character, item._id, "items")
+    );
+
+    const itemsOnCharView = await Promise.all(itemsOnCharViewPromises);
+
     const itemsToUpdate: IItemUpdate[] = [];
+    const addToViewPromises: Promise<void>[] = [];
 
-    for (const item of itemsNearby) {
-      // if we already have this item in the character view, with an updated payload, just skip it!
-
-      const itemOnCharView = await this.characterView.getElementOnView(character, item._id, "items");
+    for (let i = 0; i < itemsNearby.length; i++) {
+      const item = itemsNearby[i];
+      const itemOnCharView = itemsOnCharView[i];
 
       if (!options?.always) {
-        // if we already have a representation there, just skip!
         if (
           itemOnCharView &&
           this.objectHelper.doesObjectAttrMatches(itemOnCharView, item, ["id", "x", "y", "scene", "isDeadBodyLootable"])
@@ -124,20 +130,23 @@ export class ItemView {
         isDeadBodyLootable: item.isDeadBodyLootable,
       });
 
-      await this.characterView.addToCharacterView(
-        character._id,
-        {
-          id: item.id,
-          x: item.x,
-          y: item.y,
-          scene: item.scene,
-          isDeadBodyLootable: item.isDeadBodyLootable,
-        },
-        "items"
+      addToViewPromises.push(
+        this.characterView.addToCharacterView(
+          character._id,
+          {
+            id: item.id,
+            x: item.x,
+            y: item.y,
+            scene: item.scene,
+            isDeadBodyLootable: item.isDeadBodyLootable,
+          },
+          "items"
+        )
       );
     }
 
-    // send all updates in a single message
+    await Promise.all(addToViewPromises);
+
     if (itemsToUpdate.length === 0) return;
 
     this.socketMessaging.sendEventToUser<IItemUpdateAll>(character.channelId!, ItemSocketEvents.UpdateAll, {

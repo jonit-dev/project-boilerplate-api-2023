@@ -6,6 +6,8 @@ import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { MathHelper } from "@providers/math/MathHelper";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemBuff } from "../characterBuff/CharacterItemBuff";
@@ -16,7 +18,8 @@ export class CharacterItemEquipment {
     private equipmentSlots: EquipmentSlots,
     private socketMessaging: SocketMessaging,
     private mathHelper: MathHelper,
-    private characterItemBuff: CharacterItemBuff
+    private characterItemBuff: CharacterItemBuff,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -88,7 +91,7 @@ export class CharacterItemEquipment {
       }
     } else {
       // decrement from the first slot where it finds the item
-      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
       for (let [, value] of Object.entries(equipmentSlots)) {
         if (!value) {
           continue;
@@ -136,6 +139,8 @@ export class CharacterItemEquipment {
             },
           }
         );
+        await this.inMemoryHashTable.delete("equipment-weight", character._id?.toString()!);
+
         result = true;
       } else {
         result = await this.deleteItemFromEquipment(item._id, character);
@@ -166,7 +171,7 @@ export class CharacterItemEquipment {
       return false;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
 
     for (const [, value] of Object.entries(equipmentSlots)) {
       if (String(value?._id) === String(itemId)) {
@@ -193,7 +198,7 @@ export class CharacterItemEquipment {
       return;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
 
     for (let [, value] of Object.entries(equipmentSlots)) {
       if (!value) {

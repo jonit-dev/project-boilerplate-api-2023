@@ -1,3 +1,4 @@
+import { CharacterBuff, ICharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import {
@@ -151,5 +152,71 @@ describe("CharacterBuffActivator", () => {
     const buffExists = await characterBuffTracker.getBuff(testCharacter._id, enabledBuff._id!);
 
     expect(buffExists).toBeFalsy();
+  });
+
+  it("should not enable a non-stackable temporary buff when one already exists with the same origin", async () => {
+    // Arrange
+    // @ts-ignore
+    const mockBuff: ICharacterTemporaryBuff = {
+      // ...other properties
+      isStackable: false,
+      originateFrom: "some origin",
+    };
+    // @ts-ignore
+    const existingBuff: ICharacterBuff = {
+      // ...properties
+      originateFrom: mockBuff.originateFrom,
+      owner: testCharacter.id,
+    };
+
+    // Set up CharacterBuff.findOne to return no buffs with the same origin
+    jest.spyOn(CharacterBuff, "findOne").mockReturnValueOnce({
+      lean: jest.fn().mockResolvedValueOnce([existingBuff]),
+    } as any);
+
+    const disableBuffSpy = jest.spyOn(characterBuffActivator, "disableBuff").mockResolvedValueOnce(undefined as any);
+    // @ts-ignore
+    const enableBuffSpy = jest.spyOn(characterBuffActivator, "enableBuff").mockResolvedValueOnce(mockBuff as any);
+
+    // Act
+    const result = await characterBuffActivator.enableTemporaryBuff(testCharacter, mockBuff);
+
+    // Assert
+    expect(result).toBe(mockBuff);
+    expect(CharacterBuff.findOne).toHaveBeenCalledWith({
+      owner: testCharacter.id,
+      originateFrom: mockBuff.originateFrom,
+    });
+    expect(disableBuffSpy).toHaveBeenCalledWith(testCharacter, existingBuff._id!, existingBuff.type, true);
+    expect(enableBuffSpy).toHaveBeenCalledWith(testCharacter, mockBuff, true);
+  });
+
+  it("should enable a non-stackable temporary buff when none exist with the same origin", async () => {
+    // Arrange
+    // @ts-ignore
+    const mockBuff: ICharacterTemporaryBuff = {
+      // ...other properties
+      isStackable: false,
+      originateFrom: "some other origin",
+    };
+
+    // Set up CharacterBuff.findOne to return no buff with the same origin
+    jest.spyOn(CharacterBuff, "findOne").mockReturnValueOnce({
+      lean: jest.fn().mockResolvedValueOnce(undefined),
+    } as any);
+
+    // @ts-ignore
+    const enableBuffSpy = jest.spyOn(characterBuffActivator, "enableBuff").mockResolvedValueOnce(mockBuff as any);
+
+    // Act
+    const result = await characterBuffActivator.enableTemporaryBuff(testCharacter, mockBuff);
+
+    // Assert
+    expect(result).toBe(mockBuff);
+    expect(CharacterBuff.findOne).toHaveBeenCalledWith({
+      owner: testCharacter.id,
+      originateFrom: mockBuff.originateFrom,
+    });
+    expect(enableBuffSpy).toHaveBeenCalledWith(testCharacter, mockBuff, undefined);
   });
 });

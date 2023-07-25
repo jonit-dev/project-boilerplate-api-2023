@@ -35,7 +35,7 @@ export const spellMagicShuriken: Partial<ISpell> = {
     const entityEffectUse = container.get(EntityEffectUse);
     const hitTarget = container.get(HitTarget);
 
-    await hitTarget.hit(character, target, true, MagicPower.Low);
+    await hitTarget.hit(character, target, true, MagicPower.High);
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectBleeding);
 

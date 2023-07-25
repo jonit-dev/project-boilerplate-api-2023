@@ -1,6 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
+import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { Locker } from "@providers/locks/Locker";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
@@ -9,7 +11,6 @@ import { NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 import { NPC_CYCLES } from "../NPCCycle";
 import { NPCView } from "../NPCView";
 import { NPCDirection } from "./NPCMovement";
-import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 
 @provide(NPCTarget)
 export class NPCTarget {
@@ -17,7 +18,8 @@ export class NPCTarget {
     private npcView: NPCView,
     private movementHelper: MovementHelper,
     private mapNonPVPZone: MapNonPVPZone,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private locker: Locker
   ) {}
 
   public async clearTarget(npc: INPC): Promise<void> {
@@ -33,6 +35,8 @@ export class NPCTarget {
         },
       }
     );
+
+    await this.locker.unlock(`npc-${npc._id}-battle-cycle`);
 
     const npcBattleCycle = NPC_BATTLE_CYCLES.get(npc.id);
     const npcCycle = NPC_CYCLES.get(npc.id);

@@ -79,7 +79,7 @@ function getNpcKeys(NPCs: any[], mapName: string): string[] {
 function checkIfNpcBlueprintsExists(NPCs: string[], mapName: string): void {
   const missingNPCs = NPCs.filter((npc) => !npcsBlueprintIndex[npc]);
   if (missingNPCs.length > 0) {
-    throw new Error(
+    console.error(
       `❌ NPCLoader: Missing NPC blueprints for keys ${missingNPCs.join(", ")}. Please, double check the map ${mapName}`
     );
   }

@@ -32,4 +32,12 @@ export const LOCKABLE_EVENTS = [
   "UseWithItem",
   BattleSocketEvents.InitTargeting,
   BattleSocketEvents.StopTargeting,
+  ItemSocketEvents.LoadCraftBook,
+  ItemSocketEvents.CraftItem,
 ] as string[];
+
+export const DEBOUNCEABLE_EVENTS_MS_THRESHOLD = 250;
+
+export const DEBOUNCEABLE_EVENTS_MS_THRESHOLD_DISCONNECT = 70;
+
+export const DEBOUNCEABLE_EVENTS = [ItemSocketEvents.LoadCraftBook, ItemSocketEvents.CraftItem] as string[];

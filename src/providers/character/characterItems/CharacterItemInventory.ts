@@ -5,6 +5,8 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
 import { blueprintManager } from "@providers/inversify/container";
+
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { ItemRarity } from "@providers/item/ItemRarity";
 import { AvailableBlueprints, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
@@ -29,13 +31,14 @@ export class CharacterItemInventory {
     private mathHelper: MathHelper,
     private characterItemsContainer: CharacterItemContainer,
     private characterInventory: CharacterInventory,
-    private itemRarity: ItemRarity
+    private itemRarity: ItemRarity,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
   public async getAllItemsFromInventoryNested(character: ICharacter): Promise<IItem[]> {
     const inventory = await this.characterInventory.getInventory(character);
-    const container = await ItemContainer.findById(inventory?.itemContainer);
+    const container = (await ItemContainer.findById(inventory?.itemContainer).lean()) as unknown as IItemContainer;
     if (!container) {
       return [];
     }
@@ -43,28 +46,54 @@ export class CharacterItemInventory {
     return await this.getAllItemsFromContainer(container);
   }
 
-  @TrackNewRelicTransaction()
   private async getAllItemsFromContainer(container: IItemContainer): Promise<IItem[]> {
-    const slots = container.slots as unknown as IItem[];
+    const cachedAllItems = await this.inMemoryHashTable.get("container-all-items", container._id);
 
+    if (cachedAllItems) {
+      return cachedAllItems as IItem[];
+    }
+
+    // Initialize the stack with the first container and depth
+    const stack: Array<{ container: IItemContainer; depth: number }> = [{ container, depth: 0 }];
     const items: IItem[] = [];
-    for (const [, slot] of Object.entries(slots)) {
-      if (slot) {
-        const item = await Item.findById(slot._id);
-        if (item) {
-          // @ts-ignore
-          items.push(item);
+    const processedContainers = new Set<string>();
 
-          if (item.type === ItemType.Container) {
-            const nestedContainer = await ItemContainer.findById(item?.itemContainer);
-            if (nestedContainer) {
-              const nestedItems = await this.getAllItemsFromContainer(nestedContainer);
-              items.push(...nestedItems);
+    while (stack.length > 0) {
+      const { container: currentContainer, depth } = stack.pop() as { container: IItemContainer; depth: number };
+
+      if (depth > 100) {
+        throw new Error("Maximum recursion depth exceeded");
+      }
+
+      const slots = currentContainer.slots as unknown as IItem[];
+
+      for (const [, slot] of Object.entries(slots)) {
+        if (slot) {
+          const item = (await Item.findById(slot._id).lean({ virtuals: true, defaults: true })) as unknown as IItem;
+          if (item) {
+            items.push(item);
+
+            if (item.type === ItemType.Container) {
+              const nestedContainer = (await ItemContainer.findById(item.itemContainer).lean({
+                virtuals: true,
+                defaults: true,
+              })) as unknown as IItemContainer;
+              if (nestedContainer) {
+                const nestedContainerIdStr = nestedContainer._id.toString();
+                const isSelfReference = nestedContainerIdStr === currentContainer._id.toString();
+                const hasProcessedContainer = processedContainers.has(nestedContainerIdStr);
+
+                if (!isSelfReference && !hasProcessedContainer) {
+                  stack.push({ container: nestedContainer, depth: depth + 1 });
+                  processedContainers.add(nestedContainerIdStr);
+                }
+              }
             }
           }
         }
       }
     }
+    await this.inMemoryHashTable.set("container-all-items", container._id, items);
 
     return items;
   }
@@ -193,6 +222,7 @@ export class CharacterItemInventory {
         if (!success || (success && remainingQty === 0)) {
           return { success, updatedQty: remainingQty };
         }
+
         decrementQty = remainingQty;
       }
     }
@@ -408,6 +438,9 @@ export class CharacterItemInventory {
             },
           }
         );
+
+        await this.inMemoryHashTable.delete("container-all-items", container._id);
+
         return true;
       }
     }
@@ -432,6 +465,7 @@ export class CharacterItemInventory {
     const backpack = new Item({
       ...blueprintData,
       owner: equipment.owner,
+      carrier: equipment.owner,
     });
     await backpack.save();
 

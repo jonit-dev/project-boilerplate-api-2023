@@ -5,6 +5,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { Locker } from "@providers/locks/Locker";
 import { MapHelper } from "@providers/map/MapHelper";
 import { PathfindingCaching } from "@providers/map/PathfindingCaching";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -46,7 +47,8 @@ export class NPCMovementMoveTowards {
     private characterView: CharacterView,
     private specialEffect: SpecialEffect,
     private pathfindingCaching: PathfindingCaching,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private locker: Locker
   ) {}
 
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
@@ -248,6 +250,12 @@ export class NPCMovementMoveTowards {
           cacheKey: `${npc.id}-skills`,
           ttl: 60 * 60 * 24 * 7,
         })) as ISkill;
+
+      const canProceed = await this.locker.lock(`npc-${npc._id}-battle-cycle`);
+
+      if (!canProceed) {
+        return;
+      }
 
       new NPCBattleCycle(
         npc.id,

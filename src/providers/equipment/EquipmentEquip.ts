@@ -6,12 +6,12 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterBuffValidation } from "@providers/character/characterBuff/CharacterBuffValidation";
 import { CharacterItemBuff } from "@providers/character/characterBuff/CharacterItemBuff";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { BerserkerPassiveHabilities } from "@providers/character/characterPassiveHabilities/BerserkerPassiveHabilities";
 import { RoguePassiveHabilities } from "@providers/character/characterPassiveHabilities/RoguePassiveHabilities";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
@@ -55,7 +55,6 @@ export class EquipmentEquip {
     private itemPickupUpdater: ItemPickupUpdater,
     private characterItemBuff: CharacterItemBuff,
     private equipmentCharacterClass: EquipmentCharacterClass,
-
     private characterBuffValidation: CharacterBuffValidation
   ) {}
 
@@ -106,6 +105,10 @@ export class EquipmentEquip {
     await this.itemView.removeItemFromMap(item);
 
     await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
+    await this.inMemoryHashTable.delete("equipment-weight", character._id);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id);
+
+    await this.characterWeight.updateCharacterWeight(character);
 
     return true;
   }
@@ -201,14 +204,9 @@ export class EquipmentEquip {
 
       await this.finalizeEquipItem(inventoryContainer, equipment, item, character);
 
-      await clearCacheForKey(`${character._id}-inventory`);
-      await clearCacheForKey(`${character._id}-equipment`);
-      await clearCacheForKey(`characterBuffs_${character._id}`);
-      await clearCacheForKey(`${character._id}-skills`);
+      await this.clearCache(character);
 
       await this.characterBuffValidation.removeDuplicatedBuffs(character);
-
-      await this.inMemoryHashTable.delete("character-weapon", character._id);
 
       return true;
     } catch (error) {
@@ -238,6 +236,16 @@ export class EquipmentEquip {
     return allowedItemTypes;
   }
 
+  private async clearCache(character: ICharacter): Promise<void> {
+    await clearCacheForKey(`${character._id}-inventory`);
+    await clearCacheForKey(`${character._id}-equipment`);
+    await clearCacheForKey(`characterBuffs_${character._id}`);
+    await clearCacheForKey(`${character._id}-skills`);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id);
+    await this.inMemoryHashTable.delete("character-shield", character._id);
+    await this.inMemoryHashTable.delete("character-weapon", character._id);
+  }
+
   @TrackNewRelicTransaction()
   private async finalizeEquipItem(
     inventoryContainer: IItemContainer,
@@ -245,7 +253,7 @@ export class EquipmentEquip {
     item: IItem,
     character: ICharacter
   ): Promise<void> {
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,
       inventory: inventoryContainer as any,
@@ -287,7 +295,7 @@ export class EquipmentEquip {
       );
     }
 
-    const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
 
     this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.EquipmentAndInventoryUpdate, {
       equipment: newEquipmentSlots,
@@ -381,7 +389,10 @@ export class EquipmentEquip {
       }
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+      character._id,
+      character.equipment as unknown as string
+    );
 
     const validateItemsEquip = await this.equipmentTwoHanded.validateHandsItemEquip(equipmentSlots, item, character);
 

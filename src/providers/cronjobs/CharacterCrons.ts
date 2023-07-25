@@ -3,7 +3,11 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterLastAction } from "@providers/character/CharacterLastAction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
-import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import {
+  NewRelicMetricCategory,
+  NewRelicSubCategory,
+  NewRelicTransactionCategory,
+} from "@providers/types/NewRelicTypes";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
@@ -18,6 +22,20 @@ export class CharacterCrons {
   ) {}
 
   public schedule(): void {
+    // every 15 min, check how many players are online
+    nodeCron.schedule("*/15 * * * *", async () => {
+      const onlineCharactersCount = await Character.countDocuments({
+        isOnline: true,
+      });
+
+      this.newRelic.trackMetric(
+        NewRelicMetricCategory.Count,
+        NewRelicSubCategory.Characters,
+        "Online",
+        onlineCharactersCount
+      );
+    });
+
     nodeCron.schedule("* * * * *", async () => {
       await this.newRelic.trackTransaction(
         NewRelicTransactionCategory.CronJob,
@@ -62,8 +80,6 @@ export class CharacterCrons {
     const onlineCharacters = await Character.find({
       isOnline: true,
     });
-
-    this.newRelic.trackMetric(NewRelicMetricCategory.Count, "Characters/Online", onlineCharacters.length);
 
     for (const character of onlineCharacters) {
       const dateString = await this.characterLastAction.getLastAction(character._id);

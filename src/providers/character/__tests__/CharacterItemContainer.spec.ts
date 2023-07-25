@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
+import { container, inMemoryHashTable, unitTestHelper } from "@providers/inversify/container";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 
 describe("CharacterItemContainer.ts", () => {
@@ -17,6 +17,8 @@ describe("CharacterItemContainer.ts", () => {
     inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
     characterItemContainer = container.get<CharacterItemContainer>(CharacterItemContainer);
+
+    await inMemoryHashTable.delete("container-all-items", inventoryContainer._id.toString()!);
   });
 
   it("should successfully remove an item from a container", async () => {

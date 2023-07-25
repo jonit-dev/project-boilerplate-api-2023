@@ -35,7 +35,7 @@ describe("SpellCalculator", () => {
     skills.magic.level = 50;
     await Skill.updateOne({ _id: testCharacter.skills }, skills);
 
-    const buff = await spellCalculator.calculateBuffBasedOnSkillLevel(testCharacter, BasicAttribute.Magic, {
+    const buff = await spellCalculator.calculateBasedOnSkillLevel(testCharacter, BasicAttribute.Magic, {
       max: 20,
       min: 10,
     });
@@ -49,7 +49,7 @@ describe("SpellCalculator", () => {
     skills.magic.level = 50;
     await Skill.updateOne({ _id: testCharacter.skills }, skills);
 
-    const buff = await spellCalculator.calculateBuffBasedOnSkillLevel(testCharacter, BasicAttribute.Magic, {
+    const buff = await spellCalculator.calculateBasedOnSkillLevel(testCharacter, BasicAttribute.Magic, {
       max: 20,
       min: 10,
       skillAssociation: "reverse",
@@ -64,7 +64,7 @@ describe("SpellCalculator", () => {
     skills.magic.level = 10;
     await Skill.updateOne({ _id: testCharacter.skills }, skills);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(testCharacter, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(testCharacter, BasicAttribute.Magic, {
       max: 100,
       min: 15,
       skillAssociation: "reverse",

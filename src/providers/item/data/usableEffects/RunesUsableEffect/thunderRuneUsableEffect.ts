@@ -22,17 +22,17 @@ export const thunderRuneUsableEffect: IUsableEffectRune = {
 
     const spellCalculator = container.get(SpellCalculator);
 
-    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+    const pointModifier = await spellCalculator.calculateBasedOnSkillLevel(caster, BasicAttribute.Magic, {
       min: 2,
       max: 4,
     });
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(caster, BasicAttribute.Magic, {
       min: 30,
       max: 60,
     });
 
-    const debuffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+    const debuffPercentage = await spellCalculator.calculateBasedOnSkillLevel(caster, BasicAttribute.Magic, {
       min: 20,
       max: 35,
     });
@@ -50,6 +50,8 @@ export const thunderRuneUsableEffect: IUsableEffectRune = {
             deactivation: "You're no longer electrified!",
           },
         },
+        isStackable: false,
+        originateFrom: UsableEffectsBlueprint.ThunderRuneUsableEffect,
       });
     }
 

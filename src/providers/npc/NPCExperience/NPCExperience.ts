@@ -5,6 +5,7 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
+import { MODE_EXP_MULTIPLIER } from "@providers/constants/SkillConstants";
 import { spellLearn } from "@providers/inversify/container";
 import { Locker } from "@providers/locks/Locker";
 import { SkillBuff } from "@providers/skill/SkillBuff";
@@ -20,6 +21,7 @@ import {
   IDisplayTextEvent,
   IIncreaseXPResult,
   IUIShowMessage,
+  Modes,
   SkillEventType,
   SkillSocketEvents,
   UISocketEvents,
@@ -29,8 +31,8 @@ import { provide } from "inversify-binding-decorators";
 
 import random from "lodash/random";
 import uniqBy from "lodash/uniqBy";
-import { clearCacheForKey } from "speedgoose";
 import { v4 as uuidv4 } from "uuid";
+
 @provide(NPCExperience)
 export class NPCExperience {
   constructor(
@@ -84,10 +86,12 @@ export class NPCExperience {
         return this.releaseXP(target);
       }
 
-      await clearCacheForKey(`characterBuffs_${character._id}`);
-
       // Get character skills
-      const skills = (await Skill.findById(character.skills).lean()) as ISkill;
+      const skills = (await Skill.findById(character.skills)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${character._id}-skills`,
+        })) as ISkill;
 
       if (!skills) {
         // if attacker skills does not exist anymore
@@ -95,7 +99,10 @@ export class NPCExperience {
         return this.releaseXP(target);
       }
 
-      const exp = record!.xp! * (target.isGiantForm ? NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER : 1);
+      const characterMode: Modes = Object.values(Modes).find((mode) => mode === character.mode) ?? Modes.SoftMode;
+
+      let exp = record!.xp! * (target.isGiantForm ? NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER : 1);
+      exp = exp * MODE_EXP_MULTIPLIER[characterMode];
 
       skills.experience += exp;
       skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
@@ -131,10 +138,9 @@ export class NPCExperience {
    * Calculates the xp gained by a character every time it causes damage in battle
    * In case the target is NPC, it stores the character's xp gained in the xpToRelease array
    */
+
   public async recordXPinBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     try {
-      await this.time.waitForMilliseconds(random(0, 50)); // add artificial delay to avoid concurrency
-
       const canProceed = await this.locker.lock(`npc-${target._id}-record-xp`);
 
       if (!canProceed) {

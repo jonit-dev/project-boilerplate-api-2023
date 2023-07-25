@@ -51,12 +51,12 @@ export const spellPolymorph: Partial<ISpell> = {
       return false;
     }
 
-    const timeoutInSecs = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeoutInSecs = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 15,
       max: 30,
     });
 
-    const debuffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const debuffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 5,
       max: 15,
     });
@@ -73,6 +73,8 @@ export const spellPolymorph: Partial<ISpell> = {
           deactivation: "You feel stronger again.",
         },
       },
+      isStackable: false,
+      originateFrom: SpellCastingType.RangedCasting + "-" + BasicAttribute.Strength,
     });
 
     await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {
@@ -86,6 +88,8 @@ export const spellPolymorph: Partial<ISpell> = {
           skipAllMessages: true,
         },
       },
+      isStackable: false,
+      originateFrom: SpellCastingType.RangedCasting + "-" + BasicAttribute.Resistance,
     });
 
     await characterTextureChange.changeTexture(target as ICharacter, "rat", timeoutInSecs, "polymorph");

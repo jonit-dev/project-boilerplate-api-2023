@@ -25,7 +25,7 @@ export class CleanupEmptyBodyCrons {
 
         for (const charBody of charBodies) {
           const itemContainer = charBody.itemContainer as IItemContainer;
-          if (itemContainer.emptySlotsQty === itemContainer.slotQty) {
+          if (itemContainer?.emptySlotsQty === itemContainer?.slotQty) {
             await charBody.remove();
           }
         }

@@ -3,7 +3,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -159,13 +159,13 @@ describe("ItemPickup.ts", () => {
 
     expect(pickupInventory).toBeTruthy();
 
-    const equipmentSet = await equipmentSlots.getEquipmentSlots(equipment._id);
+    const equipmentSet = await equipmentSlots.getEquipmentSlots(testCharacter._id, equipment._id);
 
     expect(equipmentSet).toBeTruthy();
 
     const inventory = equipmentSet.inventory as unknown as IItem;
 
-    expect(inventory._id).toEqual(inventoryItem._id);
+    expect(inventory._id.toString()).toEqual(inventoryItem._id.toString());
 
     const newInventoryContainerAfterPickup = await ItemContainer.findById(inventory.itemContainer);
 

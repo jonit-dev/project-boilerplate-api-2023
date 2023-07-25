@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 
-import { Item } from "@entities/ModuleInventory/ItemModel";
+import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { IItemContainer, ItemContainerType } from "@rpg-engine/shared";
@@ -37,6 +37,35 @@ export class ItemContainerHelper {
       return ItemContainerType.Loot; // last resort, lets consider its a loot container
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  //! This method can potentially cause a recursion. Please use it with careful! Make sure you use a set to avoid infinite loops (check usage)
+  @TrackNewRelicTransaction()
+  public async execFnInAllItemContainerSlots(
+    itemContainer: IItemContainer,
+    fn: (item: IItem, slotIndex: number) => Promise<void>
+  ): Promise<void> {
+    const slots = itemContainer.slots;
+
+    const loopedItems = new Set<string>();
+
+    if (!slots) {
+      return;
+    }
+
+    for (const [slotIndex, itemData] of Object.entries(slots)) {
+      if (loopedItems.has(itemData?._id)) {
+        continue;
+      }
+
+      loopedItems.add(itemData?._id);
+
+      const item = itemData as IItem;
+
+      if (item) {
+        await fn(item, Number(slotIndex));
+      }
     }
   }
 }

@@ -1,4 +1,5 @@
 import { createLeanSchema } from "@providers/database/mongooseHelpers";
+import { containerSlotsCaching, hashGenerator, inMemoryHashTable } from "@providers/inversify/container";
 import { SpeedGooseCacheAutoCleaner } from "speedgoose";
 import { ExtractDoc, Type, typedModel } from "ts-mongoose";
 
@@ -91,6 +92,69 @@ equipmentSchema.method("isEquipped", function (this: IEquipment, itemId: string)
 });
 
 equipmentSchema.plugin(SpeedGooseCacheAutoCleaner);
+
+const clearEquipmentSlotCaching = async (ownerId: string): Promise<void> => {
+  await inMemoryHashTable.delete("equipment-slots", ownerId.toString());
+  await inMemoryHashTable.delete("character-shield", ownerId.toString());
+};
+
+const onCheckEquipmentChange = async function (equipment: IEquipment): Promise<void> {
+  if (!equipment.owner) {
+    return;
+  }
+
+  const slotsHash = await containerSlotsCaching.getSlotsHash(equipment._id.toString()!);
+
+  if (!slotsHash) {
+    await inMemoryHashTable.delete("equipment-weight", equipment.owner?.toString()!);
+
+    await containerSlotsCaching.setSlotsHash(
+      equipment._id.toString()!,
+      equipment as unknown as Record<string, unknown>
+    );
+    return;
+  }
+
+  // if there's a slot hash, compare
+
+  const currentSlotsHash = hashGenerator.generateHash(equipment);
+
+  const doesHashesMatch = String(slotsHash) === String(currentSlotsHash);
+
+  if (!doesHashesMatch) {
+    await inMemoryHashTable.delete("equipment-weight", equipment.owner?.toString()!);
+
+    await containerSlotsCaching.setSlotsHash(
+      equipment._id.toString()!,
+      equipment as unknown as Record<string, unknown>
+    );
+  }
+};
+
+equipmentSchema.post("save", async function (this: IEquipment) {
+  if (this.owner) {
+    await clearEquipmentSlotCaching(this.owner.toString());
+
+    await onCheckEquipmentChange(this);
+  }
+});
+
+async function onEquipmentUpdate(doc, next): Promise<void> {
+  // @ts-ignore
+  const equipment = await this.model.findOne(this.getQuery());
+
+  if (!equipment.owner) {
+    return next();
+  }
+  await clearEquipmentSlotCaching(equipment.owner.toString());
+  await onCheckEquipmentChange(equipment);
+
+  next();
+}
+
+equipmentSchema.pre(/updateOne/, onEquipmentUpdate);
+equipmentSchema.pre(/updateMany/, onEquipmentUpdate);
+equipmentSchema.pre(/findOneAndUpdate/, onEquipmentUpdate);
 
 export type IEquipment = ExtractDoc<typeof equipmentSchema>;
 

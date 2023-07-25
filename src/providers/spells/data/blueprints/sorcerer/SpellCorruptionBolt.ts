@@ -43,12 +43,12 @@ export const spellCorruptionBolt: Partial<ISpell> = {
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectCorruption);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 10,
       max: 30,
     });
 
-    const debuffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const debuffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 5,
       max: 10,
     });
@@ -66,6 +66,8 @@ export const spellCorruptionBolt: Partial<ISpell> = {
             deactivation: "You're no longer weakened by corruption.",
           },
         },
+        isStackable: false,
+        originateFrom: SpellsBlueprint.CorruptionBolt + "-" + BasicAttribute.Strength,
       });
 
       await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {
@@ -79,6 +81,8 @@ export const spellCorruptionBolt: Partial<ISpell> = {
             skipAllMessages: true,
           },
         },
+        isStackable: false,
+        originateFrom: SpellsBlueprint.CorruptionBolt + "-" + BasicAttribute.Resistance,
       });
     }
 

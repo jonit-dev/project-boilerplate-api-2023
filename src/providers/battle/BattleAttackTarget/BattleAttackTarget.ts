@@ -6,7 +6,6 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
-import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import {
   BattleSocketEvents,
   GRID_WIDTH,
@@ -35,7 +34,6 @@ export class BattleAttackTarget {
     private hitTarget: HitTarget
   ) {}
 
-  @TrackNewRelicTransaction()
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
     if (!target.isAlive) {
       return false;
@@ -43,23 +41,9 @@ export class BattleAttackTarget {
 
     const attackerType = attacker.attackType || (await this.characterWeapon.getAttackType(attacker as ICharacter));
 
-    const performRangedAttack = async (
-      attacker: ICharacter | INPC,
-      target: ICharacter | INPC,
-      rangedAttackParams: any,
-      magicAttack = false
-    ): Promise<boolean> => {
-      await this.hitTarget.hit(attacker, target, magicAttack);
-      await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
-      if (attacker.type === "Character" && rangedAttackParams.itemSubType === ItemSubType.Ranged) {
-        await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
-      }
-      return true;
-    };
-
     switch (attackerType) {
       case EntityAttackType.Melee: {
-        const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 1.5);
+        const isUnderMeleeRange = this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, 2);
 
         if (isUnderMeleeRange) {
           await this.hitTarget.hit(attacker, target);
@@ -75,7 +59,7 @@ export class BattleAttackTarget {
           if (attacker.type === "Character") {
             const character = attacker as ICharacter;
             if (rangedAttackParams.itemSubType === ItemSubType.Magic) {
-              return performRangedAttack(attacker, target, rangedAttackParams);
+              return this.performRangedAttack(attacker, target, rangedAttackParams);
             } else if (rangedAttackParams.itemSubType === ItemSubType.Staff) {
               const attack = await this.battleAttackValidator.validateMagicAttack(character._id, {
                 targetId: target.id,
@@ -83,14 +67,14 @@ export class BattleAttackTarget {
               });
 
               if (attack) {
-                return performRangedAttack(attacker, target, rangedAttackParams, true);
+                return this.performRangedAttack(attacker, target, rangedAttackParams, true);
               }
               return attack;
             } else if (rangedAttackParams.itemSubType === ItemSubType.Ranged) {
-              return performRangedAttack(attacker, target, rangedAttackParams);
+              return this.performRangedAttack(attacker, target, rangedAttackParams);
             }
           } else {
-            return performRangedAttack(attacker, target, rangedAttackParams);
+            return this.performRangedAttack(attacker, target, rangedAttackParams);
           }
         }
         break;
@@ -110,7 +94,7 @@ export class BattleAttackTarget {
           const rangedAttackParams = await this.battleAttackValidator.validateAttack(attacker, target);
 
           if (rangedAttackParams) {
-            return performRangedAttack(attacker, target, rangedAttackParams);
+            return this.performRangedAttack(attacker, target, rangedAttackParams);
           }
         }
         break;
@@ -153,6 +137,20 @@ export class BattleAttackTarget {
       return false;
     }
 
+    return true;
+  }
+
+  private async performRangedAttack(
+    attacker: ICharacter | INPC,
+    target: ICharacter | INPC,
+    rangedAttackParams: any,
+    magicAttack = false
+  ): Promise<boolean> {
+    await this.hitTarget.hit(attacker, target, magicAttack);
+    await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
+    if (attacker.type === "Character" && rangedAttackParams.itemSubType === ItemSubType.Ranged) {
+      await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
+    }
     return true;
   }
 }

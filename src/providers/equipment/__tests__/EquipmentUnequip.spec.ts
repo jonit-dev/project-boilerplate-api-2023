@@ -57,7 +57,10 @@ describe("EquipmentUnequip.spec.ts", () => {
     const unequip = await equipmentUnequip.unequip(testCharacter, inventory, testItem);
     expect(unequip).toBeTruthy();
 
-    const slots = await equipmentSlots.getEquipmentSlots(testCharacter.equipment as unknown as string);
+    const slots = await equipmentSlots.getEquipmentSlots(
+      testCharacter._id,
+      testCharacter.equipment as unknown as string
+    );
 
     expect(slots.leftHand).toBeUndefined();
   });
@@ -66,7 +69,10 @@ describe("EquipmentUnequip.spec.ts", () => {
     const unequip = await equipmentUnequip.unequip(testCharacter, inventory, testItem);
     expect(unequip).toBeTruthy();
 
-    const slots = await equipmentSlots.getEquipmentSlots(testCharacter.equipment as unknown as string);
+    const slots = await equipmentSlots.getEquipmentSlots(
+      testCharacter._id,
+      testCharacter.equipment as unknown as string
+    );
 
     const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
@@ -209,7 +215,10 @@ describe("EquipmentUnequip.spec.ts", () => {
       const unequip = await equipmentUnequip.unequip(testCharacter, inventory, testStackableItem);
       expect(unequip).toBeTruthy();
 
-      const slots = await equipmentSlots.getEquipmentSlots(testCharacter.equipment as unknown as string);
+      const slots = await equipmentSlots.getEquipmentSlots(
+        testCharacter._id,
+        testCharacter.equipment as unknown as string
+      );
 
       expect(slots.accessory).toBeNull();
 

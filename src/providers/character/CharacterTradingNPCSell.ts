@@ -13,7 +13,7 @@ import { CharacterTarget } from "./CharacterTarget";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterTradingSell } from "./CharacterTradingSell";
 import { CharacterTradingValidation } from "./CharacterTradingValidation";
-import { CharacterWeight } from "./CharacterWeight";
+import { CharacterWeight } from "./weight/CharacterWeight";
 
 @provide(CharacterTradingNPCSell)
 export class CharacterTradingNPCSell {

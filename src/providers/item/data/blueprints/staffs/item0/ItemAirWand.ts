@@ -25,7 +25,7 @@ export const itemAirWand: IEquippableTwoHandedStaffTier0WeaponBlueprint = {
   attack: 8,
   defense: 2,
   tier: 0,
-  basePrice: 70,
+  basePrice: 25,
   maxRange: RangeTypes.Short,
   isTwoHanded: true,
 };

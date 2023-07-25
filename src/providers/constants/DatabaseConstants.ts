@@ -1,1 +1,1 @@
-export const DB_POOL_SIZE = 50;
+export const DB_POOL_SIZE = 150;

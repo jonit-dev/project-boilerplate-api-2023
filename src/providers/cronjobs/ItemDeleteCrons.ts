@@ -47,6 +47,8 @@ export class ItemDeleteCrons {
             name: { $ne: "Depot" },
             itemContainer: { $exists: false },
 
+            isInDepot: { $exists: false, $ne: true },
+
             //* And were manipulated more than an hour ago
             updatedAt: { $lt: oneHourAgo }, // delete items that are older than 1 hour!
           });
@@ -61,6 +63,10 @@ export class ItemDeleteCrons {
             }
 
             if (item.owner) {
+              continue;
+            }
+
+            if (item.isInDepot) {
               continue;
             }
 

@@ -1,12 +1,14 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { QuestSystem } from "@providers/quest/QuestSystem";
-import { QuestType } from "@rpg-engine/shared";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
+import { EntityType, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleEffects } from "../BattleEffects";
 import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
@@ -20,7 +22,8 @@ export class BattleAttackTargetDeath {
     private npcDeath: NPCDeath,
     private questSystem: QuestSystem,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
-    private npcExperience: NPCExperience
+    private npcExperience: NPCExperience,
+    private newRelic: NewRelic
   ) {}
 
   @TrackNewRelicTransaction()
@@ -30,6 +33,13 @@ export class BattleAttackTargetDeath {
 
       if (target.type === "Character") {
         await this.handleCharacterDeath(attacker, target as ICharacter);
+
+        if (attacker.type === EntityType.Character) {
+          this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "PVP/Death", 1);
+        }
+        if (attacker.type === EntityType.NPC) {
+          this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Mob/Death", 1);
+        }
       } else if (target.type === "NPC") {
         await this.handleNPCDeath(attacker, target as INPC);
       }
@@ -50,7 +60,7 @@ export class BattleAttackTargetDeath {
   private async handleNPCDeath(attacker: ICharacter | INPC, targetNPC: INPC): Promise<void> {
     await this.npcDeath.handleNPCDeath(targetNPC);
 
-    if (attacker instanceof Character) {
+    if (attacker.type === "Character") {
       await this.questSystem.updateQuests(QuestType.Kill, attacker as ICharacter, targetNPC.key);
       await this.battleNetworkStopTargeting.stopTargeting(attacker as ICharacter);
     }

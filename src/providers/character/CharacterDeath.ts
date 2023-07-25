@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import { CharacterBuff, ICharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
@@ -5,6 +6,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
@@ -20,23 +22,24 @@ import { Locker } from "@providers/locks/Locker";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { Time } from "@providers/time/Time";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import {
   BattleSocketEvents,
   CharacterBuffType,
   IBattleDeath,
   IUIShowMessage,
+  Modes,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _, { random } from "lodash";
+import _ from "lodash";
 import { Types } from "mongoose";
 import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
-import { CharacterWeight } from "./CharacterWeight";
 import { CharacterBuffActivator } from "./characterBuff/CharacterBuffActivator";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
+import { CharacterWeight } from "./weight/CharacterWeight";
 
 export const DROPPABLE_EQUIPMENT = [
   "head",
@@ -65,14 +68,12 @@ export class CharacterDeath {
     private inMemoryHashTable: InMemoryHashTable,
     private characterBuffActivator: CharacterBuffActivator,
     private locker: Locker,
-    private time: Time
+    private newRelic: NewRelic
   ) {}
 
   @TrackNewRelicTransaction()
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
     try {
-      await this.time.waitForMilliseconds(random(0, 50));
-
       const canProceed = await this.locker.lock(`character-death-${character.id}`);
 
       if (!canProceed) {
@@ -90,6 +91,8 @@ export class CharacterDeath {
         await this.clearAttackerTarget(killer);
       }
 
+      await entityEffectUse.clearAllEntityEffects(character);
+
       const characterDeathData: IBattleDeath = {
         id: character.id,
         type: "Character",
@@ -104,45 +107,38 @@ export class CharacterDeath {
         characterDeathData
       );
 
-      const amuletOfDeath = await equipmentSlots.hasItemByKeyOnSlot(
-        character,
-        AccessoriesBlueprint.AmuletOfDeath,
-        "neck"
-      );
-
-      // generate character's body
       const characterBody = await this.generateCharacterBody(character);
 
-      if (!amuletOfDeath) {
-        // drop equipped items and backpack items
-        await this.dropCharacterItemsOnBody(character, characterBody, character.equipment);
-
-        const deathPenalty = await this.skillDecrease.deathPenalty(character);
-        if (deathPenalty) {
-          // Set timeout to not overwrite the msg "You are Died"
-          setTimeout(() => {
-            this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-              message: "You lost some XP and skill points.",
-              type: "info",
-            });
-          }, 2000);
-        }
-      } else {
-        setTimeout(() => {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Your Amulet of Death protected your XP and skill points.",
-            type: "info",
-          });
-        }, 2000);
-
-        await equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
+      if (!character.mode) {
+        await this.applyPenalties(character, characterBody);
+        return;
       }
 
-      await Promise.all([
-        entityEffectUse.clearAllEntityEffects(character),
-        this.characterWeight.updateCharacterWeight(character),
-        this.inMemoryHashTable.delete("character-weapon", character._id),
-      ]);
+      switch (character.mode) {
+        case Modes.HardcoreMode:
+          await this.applyPenalties(character, characterBody);
+          break;
+        case Modes.SoftMode:
+          // do nothing
+          break;
+        case Modes.PermadeathMode:
+          // penalties forcing all equip/inventory loss
+          await this.softDeleteCharacterOnPermaDeathMode(character);
+          await this.applyPenalties(character, characterBody, true);
+          break;
+        default:
+          await this.applyPenalties(character, characterBody);
+          break;
+      }
+
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Death", 1);
+
+      await this.inMemoryHashTable.delete("character-weapon", character._id);
+      await this.inMemoryHashTable.delete("character-max-weights", character._id);
+      await this.inMemoryHashTable.delete("inventory-weight", character._id);
+      await this.inMemoryHashTable.delete("equipment-weight", character._id);
+
+      await this.characterWeight.updateCharacterWeight(character);
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
     } finally {
@@ -188,6 +184,10 @@ export class CharacterDeath {
     await this.locker.unlock(`character-death-${character.id}`);
   }
 
+  private async softDeleteCharacterOnPermaDeathMode(character: ICharacter): Promise<void> {
+    await Character.updateOne({ _id: character._id }, { $set: { isSoftDeleted: true } });
+  }
+
   private async clearAttackerTarget(attacker: ICharacter | INPC): Promise<void> {
     if (attacker.type === "Character") {
       // clear killer's target
@@ -202,7 +202,8 @@ export class CharacterDeath {
   private async dropCharacterItemsOnBody(
     character: ICharacter,
     characterBody: IItem,
-    equipmentId: Types.ObjectId | undefined
+    equipmentId: Types.ObjectId | undefined,
+    forceDropAll: boolean = false
   ): Promise<void> {
     if (!equipmentId) {
       return;
@@ -224,23 +225,52 @@ export class CharacterDeath {
     }
 
     // get item container associated with characterBody
-    const bodyContainer = await ItemContainer.findById(characterBody.itemContainer);
+    const bodyContainer = (await ItemContainer.findById(characterBody.itemContainer).lean({
+      virtuals: true,
+      defaults: true,
+    })) as unknown as IItemContainer;
 
     if (!bodyContainer) {
       throw new Error(`Error fetching itemContainer for Item with key ${characterBody.key}`);
     }
 
+    // there's a chance of dropping any of the equipped items
+    await this.dropEquippedItemOnBody(character, bodyContainer, equipment, forceDropAll);
+
     // drop backpack
     const inventory = equipment.inventory as unknown as IItem;
+
     if (inventory) {
-      await this.dropInventory(character, bodyContainer, inventory);
+      await this.dropInventory(character, bodyContainer, inventory, forceDropAll);
     }
 
-    // there's a chance of dropping any of the equipped items
-    await this.dropEquippedItemOnBody(character, bodyContainer, equipment);
+    await this.clearAllInventoryItems(inventory as unknown as string, character);
   }
 
-  private async dropInventory(character: ICharacter, bodyContainer: IItemContainer, inventory: IItem): Promise<void> {
+  private async clearAllInventoryItems(inventoryId: string, character: ICharacter): Promise<void> {
+    const inventoryItem = await Item.findById(inventoryId).lean();
+
+    await this.clearItem(character, inventoryItem?._id);
+
+    const inventoryContainer = await ItemContainer.findById(inventoryItem?.itemContainer).lean();
+
+    const bodySlots = inventoryContainer?.slots as { [key: string]: IItem };
+
+    const clearItemPromises = Object.values(bodySlots).map((slotItem): any => {
+      if (slotItem) {
+        return this.clearItem(character, slotItem._id);
+      }
+    });
+
+    await Promise.all(clearItemPromises);
+  }
+
+  private async dropInventory(
+    character: ICharacter,
+    bodyContainer: IItemContainer,
+    inventory: IItem,
+    forceDropAll: boolean = false
+  ): Promise<void> {
     const n = _.random(0, 100);
     let isDeadBodyLootable = false;
 
@@ -252,27 +282,27 @@ export class CharacterDeath {
 
     const dropInventoryChance = this.characterDeathCalculator.calculateInventoryDropChance(skills);
 
-    if (n <= dropInventoryChance) {
-      let item = (await Item.findById(inventory._id)) as IItem;
+    if (n <= dropInventoryChance || forceDropAll) {
+      let item = (await Item.findById(inventory._id).lean({
+        virtuals: true,
+        defaults: true,
+      })) as IItem;
 
-      item = await this.clearItem(character, item);
+      item.itemContainer &&
+        (await this.inMemoryHashTable.delete("container-all-items", item.itemContainer.toString()!));
+
+      item = await this.clearItem(character, item._id);
 
       // now that the slot is clear, lets drop the item on the body
       await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
         shouldAddOwnership: false,
+        shouldAddAsCarriedItem: false,
       });
 
       if (!isDeadBodyLootable) {
         isDeadBodyLootable = true;
         await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
       }
-
-      setTimeout(() => {
-        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "You dropped your inventory.",
-          type: "info",
-        });
-      }, 4000);
 
       await this.characterInventory.generateNewInventory(character, ContainersBlueprint.Bag, true);
     }
@@ -281,51 +311,81 @@ export class CharacterDeath {
   private async dropEquippedItemOnBody(
     character: ICharacter,
     bodyContainer: IItemContainer,
-    equipment: IEquipment
+    equipment: IEquipment,
+    forceDropAll: boolean = false
   ): Promise<void> {
     let isDeadBodyLootable = false;
 
     for (const slot of DROPPABLE_EQUIPMENT) {
-      const itemId = equipment[slot];
+      try {
+        const itemId = equipment[slot];
 
-      if (!itemId) continue;
+        if (!itemId) continue;
 
-      let item = (await Item.findById(itemId)) as IItem;
+        const n = _.random(0, 100);
 
-      if (!item) {
-        throw new Error(`Error fetching item with id ${itemId}`);
-      }
+        if (forceDropAll || n <= DROP_EQUIPMENT_CHANCE) {
+          const item = await this.clearItem(character, itemId);
 
-      const n = _.random(0, 100);
+          const removeEquipmentFromSlot = await equipmentSlots.removeItemFromSlot(
+            character,
+            item.key,
+            slot as EquipmentSlotTypes
+          );
 
-      if (n <= DROP_EQUIPMENT_CHANCE) {
-        const removeEquipmentFromSlot = await equipmentSlots.removeItemFromSlot(
-          character,
-          item.key,
-          slot as EquipmentSlotTypes
-        );
+          if (!removeEquipmentFromSlot) {
+            return;
+          }
 
-        if (!removeEquipmentFromSlot) {
-          return;
+          // now that the slot is clear, lets drop the item on the body
+          await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
+            shouldAddOwnership: false,
+            shouldAddAsCarriedItem: false,
+          });
+
+          if (!isDeadBodyLootable) {
+            isDeadBodyLootable = true;
+            await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
+          }
         }
-
-        item = await this.clearItem(character, item);
-
-        // now that the slot is clear, lets drop the item on the body
-        await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
-          shouldAddOwnership: false,
-        });
-
-        if (!isDeadBodyLootable) {
-          isDeadBodyLootable = true;
-          await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
-        }
+      } catch (error) {
+        console.error(error);
+        continue;
       }
     }
   }
 
-  private async clearItem(character: ICharacter, item: IItem): Promise<IItem> {
+  private async clearItem(character: ICharacter, itemId: string): Promise<IItem> {
+    const updatedItem = await Item.findByIdAndUpdate(
+      itemId,
+      {
+        $unset: {
+          x: "",
+          y: "",
+          owner: "",
+          scene: "",
+          tiledId: "",
+        },
+      },
+      {
+        new: true,
+        lean: { virtuals: true, defaults: true },
+      }
+    );
+
+    if (!updatedItem) throw new Error("Item not found"); // Error handling, just in case
+
+    if (updatedItem.itemContainer) {
+      await this.itemOwnership.removeItemOwnership(updatedItem);
+    }
+    await this.removeAllItemBuffs(character, updatedItem);
+
+    return updatedItem as IItem;
+  }
+
+  private async removeAllItemBuffs(character: ICharacter, item: IItem): Promise<void> {
     const itemKey = item.key;
+
     const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey })
       .lean()
       .select("_id type")) as ICharacterBuff;
@@ -342,16 +402,47 @@ export class CharacterDeath {
         throw new Error(`Error disabling buff ${buff._id}`);
       }
     }
+  }
 
-    item.x = undefined;
-    item.y = undefined;
-    item.owner = undefined;
-    item.scene = undefined;
-    item.tiledId = undefined;
-    await item.save();
+  private async applyPenalties(
+    character: ICharacter,
+    characterBody: IItem,
+    forceDropAll: boolean = false
+  ): Promise<void> {
+    if (character.mode === Modes.PermadeathMode) {
+      await this.dropCharacterItemsOnBody(character, characterBody, forceDropAll);
+      return;
+    }
 
-    await this.itemOwnership.removeItemOwnership(item);
+    const amuletOfDeath = await equipmentSlots.hasItemByKeyOnSlot(
+      character,
+      AccessoriesBlueprint.AmuletOfDeath,
+      "neck"
+    );
 
-    return item;
+    if (!amuletOfDeath || forceDropAll) {
+      // drop equipped items and backpack items
+      await this.dropCharacterItemsOnBody(character, characterBody, character.equipment, forceDropAll);
+
+      const deathPenalty = await this.skillDecrease.deathPenalty(character);
+      if (deathPenalty) {
+        // Set timeout to not overwrite the msg "You are Died"
+        setTimeout(() => {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "You lost some XP and skill points.",
+            type: "info",
+          });
+        }, 2000);
+      }
+    } else {
+      setTimeout(() => {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "Your Amulet of Death protected your XP and skill points.",
+          type: "info",
+        });
+      }, 2000);
+
+      await equipmentSlots.removeItemFromSlot(character, AccessoriesBlueprint.AmuletOfDeath, "neck");
+    }
   }
 }

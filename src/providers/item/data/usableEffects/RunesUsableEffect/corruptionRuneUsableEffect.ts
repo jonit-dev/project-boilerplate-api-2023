@@ -17,7 +17,7 @@ export const corruptionRuneUsableEffect: IUsableEffectRune = {
 
     const spellCalculator = container.get(SpellCalculator);
 
-    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+    const pointModifier = await spellCalculator.calculateBasedOnSkillLevel(caster, BasicAttribute.Magic, {
       min: 3,
       max: 5,
     });

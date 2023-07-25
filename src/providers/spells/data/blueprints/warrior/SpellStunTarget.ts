@@ -27,14 +27,14 @@ export const spellStunTarget: Partial<ISpell> = {
   targetHitAnimationKey: AnimationEffectKeys.Rooted,
   projectileAnimationKey: AnimationEffectKeys.Energy,
   maxDistanceGrid: RangeTypes.Medium,
-  characterClass: [CharacterClass.Warrior],
+  characterClass: [CharacterClass.Warrior, CharacterClass.Rogue],
 
   usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
     const spellCalculator = container.get(SpellCalculator);
 
     const effect = container.get(SpecialEffect);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 10,
       max: 20,
     });

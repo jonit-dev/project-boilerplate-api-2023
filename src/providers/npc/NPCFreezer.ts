@@ -50,7 +50,7 @@ export class NPCFreezer {
       console.log(`Freezing NPC ${npc.key} (${npc.id}) ${isForced ? "(FORCED)" : ""}`);
     }
 
-    await NPC.updateOne({ _id: npc._id }, { isBehaviorEnabled: false });
+    await NPC.updateOne({ _id: npc._id, scene: npc.scene }, { isBehaviorEnabled: false });
     const npcCycle = NPC_CYCLES.get(npc.id);
     if (npcCycle) {
       await npcCycle.clear();

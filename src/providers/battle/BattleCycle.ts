@@ -66,8 +66,8 @@ export class BattleCycle {
   }
 
   private async getCurrentTargetId(characterId: string): Promise<string | undefined> {
-    const { target } = (await Character.findById(characterId).select("target").lean()) as ICharacter;
+    const character = (await Character.findById(characterId).select("target").lean()) as ICharacter;
 
-    return target?.id.toString();
+    return character?.target?.id.toString();
   }
 }

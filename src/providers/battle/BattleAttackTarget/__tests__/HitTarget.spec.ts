@@ -42,6 +42,10 @@ describe("HitTarget", () => {
     const bow = itemsBlueprintIndex[RangedWeaponsBlueprint.Bow];
     const fireSword = itemsBlueprintIndex[SwordsBlueprint.FireSword];
 
+    await testNPC.populate("skills").execPopulate();
+    await targetCharacter.populate("skills").execPopulate();
+    await attackerCharacter.populate("skills").execPopulate();
+
     bowItem = new Item({ ...bow });
 
     fireSwordItem = new Item({ ...fireSword });

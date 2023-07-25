@@ -4,8 +4,8 @@ import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { blueprintManager } from "@providers/inversify/container";
 import {
   AccessoriesBlueprint,
@@ -117,6 +117,7 @@ export class CharacterRepository extends CRUD {
     const item = new Item({
       ...blueprintData,
       owner: ownerId,
+      carrier: ownerId,
       isEquipped: true,
       ...extraProps,
     });
@@ -167,6 +168,7 @@ export class CharacterRepository extends CRUD {
     });
     await this.characterItemInventory.addItemToInventory(ToolsBlueprint.CarpentersAxe, character);
     await this.characterItemInventory.addItemToInventory(ToolsBlueprint.Pickaxe, character);
+    await this.characterItemInventory.addItemToInventory(ToolsBlueprint.Hammer, character);
     await this.characterItemInventory.addItemToInventory(FoodsBlueprint.Apple, character, {
       stackQty: 20,
     });

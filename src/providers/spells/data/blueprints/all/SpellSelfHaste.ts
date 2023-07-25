@@ -19,7 +19,7 @@ export const spellSelfHaste: Partial<ISpell> = {
   description: "A self haste spell.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas hiz",
-  manaCost: 40,
+  manaCost: 80,
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
   cooldown: 60,
@@ -31,14 +31,14 @@ export const spellSelfHaste: Partial<ISpell> = {
 
     const spellCalculator = container.get(SpellCalculator);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 30,
       max: 60,
     });
 
-    const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 10,
-      max: 35,
+    const buffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 7,
+      max: 20,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {
@@ -47,6 +47,8 @@ export const spellSelfHaste: Partial<ISpell> = {
       buffPercentage,
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
+      isStackable: false,
+      originateFrom: SpellsBlueprint.SelfHasteSpell,
     });
   },
 };

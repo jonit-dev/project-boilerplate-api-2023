@@ -16,6 +16,10 @@ export class CharacterInventory {
 
   @TrackNewRelicTransaction()
   public async getInventory(character: ICharacter): Promise<IItem | null> {
+    if (!character.equipment) {
+      return null;
+    }
+
     const equipment = (await Equipment.findById(character.equipment)
       .lean({
         virtuals: true,
@@ -47,13 +51,13 @@ export class CharacterInventory {
   @TrackNewRelicTransaction()
   public async getAllItemsFromContainer(itemContainerId: Types.ObjectId): Promise<IItem[]> {
     try {
-      const inventory = (await ItemContainer.findById(itemContainerId).lean()) as IItemContainerModel;
+      const itemContainer = (await ItemContainer.findById(itemContainerId).lean()) as IItemContainerModel;
 
-      if (!inventory) {
-        throw new Error(`Inventory not found for itemContainerId: ${itemContainerId}`);
+      if (!itemContainer) {
+        throw new Error(`Container not found for itemContainerId: ${itemContainerId}`);
       }
 
-      const slots = inventory.slots as IItem[];
+      const slots = itemContainer.slots as IItem[];
       const slotsArray = Object.values(slots);
 
       const itemsPromises = slotsArray
@@ -153,6 +157,7 @@ export class CharacterInventory {
     const bag = new Item({
       ...containerBlueprint,
       owner: equipment.owner,
+      carrier: equipment.owner,
     });
     await bag.save();
 

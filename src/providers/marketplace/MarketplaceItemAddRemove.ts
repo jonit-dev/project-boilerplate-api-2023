@@ -4,9 +4,10 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
+import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -22,7 +23,9 @@ export class MarketplaceItemAddRemove {
     private socketMessaging: SocketMessaging,
     private marketplaceValidation: MarketplaceValidation,
     private characterWeight: CharacterWeight,
-    private marketplaceGetItems: MarketplaceGetItems
+    private marketplaceGetItems: MarketplaceGetItems,
+
+    private itemOwnership: ItemOwnership
   ) {}
 
   @TrackNewRelicTransaction()
@@ -48,6 +51,10 @@ export class MarketplaceItemAddRemove {
       return false;
     }
 
+    if (!item.owner) {
+      await this.itemOwnership.addItemOwnership(item, character);
+    }
+
     const isItemValid = this.marketplaceValidation.isItemValid(item);
     if (!isItemValid) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "This item cannot be sold");
@@ -58,6 +65,7 @@ export class MarketplaceItemAddRemove {
     if (!itemRemoved) {
       return false;
     }
+
     await this.characterWeight.updateCharacterWeight(character);
     await this.sendRefreshItemsEvent(character);
 
@@ -114,6 +122,10 @@ export class MarketplaceItemAddRemove {
         `Item with id ${marketplaceItem.item} does not exist`
       );
       return false;
+    }
+
+    if (!item.owner) {
+      await this.itemOwnership.addItemOwnership(item, character);
     }
 
     const addedToInventory = await this.characterItemContainer.addItemToContainer(

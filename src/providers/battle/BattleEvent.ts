@@ -109,7 +109,7 @@ export class BattleEvent {
     let damage =
       weapon?.item && weapon?.item.isTraining
         ? Math.round(_.random(0, 1))
-        : Math.round(_.random(totalPotentialAttackerDamage / 10, totalPotentialAttackerDamage));
+        : Math.round(_.random(totalPotentialAttackerDamage / 3, totalPotentialAttackerDamage));
 
     damage = await this.implementDamageReduction(defenderSkills, target, damage, isMagicAttack);
 
@@ -134,49 +134,31 @@ export class BattleEvent {
     if (target.type === "Character") {
       const character = target as ICharacter;
 
-      const hasShield = await this.characterWeapon.hasShield(character);
+      const [hasShield, defenderShieldingLevel, defenderResistanceLevel, defenderMagicResistanceLevel] =
+        await Promise.all([
+          this.characterWeapon.hasShield(character),
+          this.traitGetter.getSkillLevelWithBuffs(defenderSkills, CombatSkill.Shielding),
+          this.traitGetter.getSkillLevelWithBuffs(defenderSkills, BasicAttribute.Resistance),
+          this.traitGetter.getSkillLevelWithBuffs(defenderSkills, BasicAttribute.MagicResistance),
+        ]);
 
-      const defenderShieldingLevel = await this.traitGetter.getSkillLevelWithBuffs(
-        defenderSkills,
-        CombatSkill.Shielding
-      );
-      const defenderResistanceLevel = await this.traitGetter.getSkillLevelWithBuffs(
-        defenderSkills,
-        BasicAttribute.Resistance
-      );
-      const defenderMagicResistanceLevel = await this.traitGetter.getSkillLevelWithBuffs(
-        defenderSkills,
-        BasicAttribute.MagicResistance
-      );
+      const DEFENDER_LEVEL_MODIFIER =
+        target.class === CharacterClass.Druid ||
+        target.class === CharacterClass.Sorcerer ||
+        target.class === CharacterClass.Hunter
+          ? 0
+          : 1;
 
-      // we only take into account the shielding skill if the defender has a shield equipped.
-      if (hasShield) {
-        if (defenderShieldingLevel > 1) {
-          damage = this.calculateDamageReduction(
-            damage,
-            this.calculateCharacterShieldingDefense(
-              defenderSkills.level,
-              defenderResistanceLevel,
-              defenderShieldingLevel
-            )
-          );
-        }
-      }
+      const level = defenderSkills.level * DEFENDER_LEVEL_MODIFIER;
 
-      // if no shield or magic attack, we just take the defender level and resistance when reducing the damage.
-      if (!hasShield && !isMagicAttack) {
+      if (hasShield && defenderShieldingLevel > 1) {
         damage = this.calculateDamageReduction(
           damage,
-          this.calculateCharacterRegularDefense(defenderSkills.level, defenderResistanceLevel)
+          this.calculateCharacterShieldingDefense(level, defenderResistanceLevel, defenderShieldingLevel)
         );
-      }
-
-      // if magic attack, we take the defender level and magic resistance when reducing the damage.
-      if (isMagicAttack) {
-        damage = this.calculateDamageReduction(
-          damage,
-          this.calculateCharacterRegularDefense(defenderSkills.level, defenderMagicResistanceLevel)
-        );
+      } else if (!hasShield) {
+        const defenseAttribute = isMagicAttack ? defenderMagicResistanceLevel : defenderResistanceLevel;
+        damage = this.calculateDamageReduction(damage, this.calculateCharacterRegularDefense(level, defenseAttribute));
       }
     }
 
@@ -192,12 +174,17 @@ export class BattleEvent {
     let attackerTotalAttack, defenderTotalDefense;
 
     if (isMagicAttack) {
-      attackerTotalAttack = await this.skillStatsCalculator.getMagicAttack(attackerSkills);
-      defenderTotalDefense = await this.skillStatsCalculator.getMagicDefense(defenderSkills);
+      [attackerTotalAttack, defenderTotalDefense] = await Promise.all([
+        this.skillStatsCalculator.getMagicAttack(attackerSkills),
+        this.skillStatsCalculator.getMagicDefense(defenderSkills),
+      ]);
     } else {
-      attackerTotalAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
-      defenderTotalDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
-      attackerTotalAttack += this.calculateExtraDamageBasedOnSkills(weapon, attackerSkills);
+      const extraDamage = this.calculateExtraDamageBasedOnSkills(weapon, attackerSkills);
+      [attackerTotalAttack, defenderTotalDefense] = await Promise.all([
+        this.skillStatsCalculator.getAttack(attackerSkills),
+        this.skillStatsCalculator.getDefense(defenderSkills),
+      ]);
+      attackerTotalAttack += extraDamage;
     }
 
     return _.round(attackerTotalAttack * (100 / (100 + defenderTotalDefense)));

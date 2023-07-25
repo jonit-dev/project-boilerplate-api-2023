@@ -13,7 +13,7 @@ export const healRuneUsableEffect: IUsableEffectRune = {
 
     const spellCalculator = container.get(SpellCalculator);
 
-    const percentage = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+    const percentage = await spellCalculator.calculateBasedOnSkillLevel(caster, BasicAttribute.Magic, {
       min: 50,
       max: 100,
     });

@@ -6,6 +6,8 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
+import { CharacterClass, EntityAttackType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
@@ -22,7 +24,8 @@ export class BattleCharacterAttack {
     private battleTargeting: BattleTargeting,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private characterValidation: CharacterValidation,
-    private battleCycle: BattleCycle
+    private battleCycle: BattleCycle,
+    private characterWeapon: CharacterWeapon
   ) {}
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
@@ -30,20 +33,36 @@ export class BattleCharacterAttack {
       return;
     }
 
-    await this.battleCycle.init(character, target._id, character.attackIntervalSpeed, async () => {
+    const attackType = await this.characterWeapon.getAttackType(character);
+
+    let attackIntervalSpeed = character.attackIntervalSpeed;
+
+    if (attackType === EntityAttackType.Ranged) {
+      switch (character.class) {
+        case CharacterClass.Hunter:
+          attackIntervalSpeed = attackIntervalSpeed * 1.2;
+          break;
+        default:
+          attackIntervalSpeed = attackIntervalSpeed * 1.35;
+          break;
+      }
+    }
+
+    await this.battleCycle.init(character, target._id, attackIntervalSpeed, async () => {
       await this.execCharacterBattleCycleLoop(character, target);
     });
   }
 
   @TrackNewRelicTransaction()
   private async execCharacterBattleCycleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
-    const updatedCharacter = (await Character.findOne({ _id: character._id }).lean({
+    const updatedCharacter = (await Character.findOne({ _id: character._id, scene: target.scene }).lean({
       virtuals: true,
       defaults: true,
     })) as ICharacter;
 
     if (!updatedCharacter) {
-      throw new Error("Failed to get updated character for attacking target.");
+      this.battleCycle.stop(character._id);
+      return;
     }
 
     const hasBasicValidation = this.characterValidation.hasBasicValidation(updatedCharacter);
@@ -68,12 +87,12 @@ export class BattleCharacterAttack {
     let updatedTarget;
 
     if (target.type === "NPC") {
-      updatedTarget = await NPC.findOne({ _id: target._id }).lean({
+      updatedTarget = await NPC.findOne({ _id: target._id, scene: target.scene }).lean({
         virtuals: true,
         defaults: true,
       });
 
-      const updatedNPCSkills = await Skill.findOne({ owner: target._id })
+      const updatedNPCSkills = await Skill.findOne({ owner: target._id, ownerType: "NPC" })
         .lean({
           virtuals: true,
           defaults: true,
@@ -85,12 +104,12 @@ export class BattleCharacterAttack {
       updatedTarget.skills = updatedNPCSkills;
     }
     if (target.type === "Character") {
-      updatedTarget = await Character.findOne({ _id: target._id }).lean({
+      updatedTarget = await Character.findOne({ _id: target._id, scene: target.scene }).lean({
         virtuals: true,
         defaults: true,
       });
 
-      const updatedCharacterSkills = await Skill.findOne({ owner: target._id }).cacheQuery({
+      const updatedCharacterSkills = await Skill.findOne({ owner: target._id, ownerType: "Character" }).cacheQuery({
         cacheKey: `${target._id}-skills`,
       });
 

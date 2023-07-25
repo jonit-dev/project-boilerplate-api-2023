@@ -4,6 +4,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterBuffType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import _ from "lodash";
 import { SkillsAvailable } from "./SkillTypes";
 import { TraitGetter } from "./TraitGetter";
 
@@ -23,6 +24,9 @@ export class SkillBuff {
       throw new Error("Skills not found for character ", character._id.toString());
     }
 
+    // Clone the original skills
+    const clonedSkills = _.cloneDeep(skills);
+
     if (skills.ownerType === "Character") {
       const buffedSkills = await CharacterBuff.find({
         owner: skills.owner,
@@ -41,15 +45,17 @@ export class SkillBuff {
           continue;
         }
 
-        if (!skills?.[buff.trait]?.level) {
+        if (!clonedSkills?.[buff.trait]?.level) {
           console.log(`Skill not found for character ${character._id} trait ${buff.trait}`);
           continue;
         }
 
-        skills[buff.trait].level = await this.traitGetter.getSkillLevelWithBuffs(skills, buff.trait as SkillsAvailable);
+        clonedSkills[buff.trait].buffAndDebuff = await this.traitGetter.getSkillLevelWithBuffs(
+          skills,
+          buff.trait as SkillsAvailable
+        );
       }
     }
-
-    return skills;
+    return clonedSkills;
   }
 }

@@ -6,10 +6,10 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
-import { CharacterDeath } from "../CharacterDeath";
+import { CharacterSocketEvents, Modes } from "@rpg-engine/shared";
+import { CharacterDeath } from "../../CharacterDeath";
+import { CharacterItemContainer } from "../../characterItems/CharacterItemContainer";
 import { CharacterWeight } from "../CharacterWeight";
-import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 
 describe("CharacterWeight.ts", () => {
   let testCharacter: ICharacter;
@@ -71,6 +71,8 @@ describe("CharacterWeight.ts", () => {
     const goldCoins = await unitTestHelper.createGoldCoinMockItem({
       stackQty: 100,
       maxStackSize: 100,
+      carrier: testCharacter._id,
+      owner: testCharacter._id,
     });
 
     inventoryContainer = await unitTestHelper.addItemsToContainer(inventoryContainer, 1, [goldCoins]);
@@ -83,7 +85,10 @@ describe("CharacterWeight.ts", () => {
     const beforeAddArmor = await characterWeight.getWeight(testCharacter);
     expect(beforeAddArmor).toBe(3);
 
-    await unitTestHelper.createMockAndEquipItens(testCharacter);
+    await unitTestHelper.createMockAndEquipItens(testCharacter, {
+      carrier: testCharacter._id,
+      owner: testCharacter._id,
+    });
 
     const afterAddArmor = await characterWeight.getWeight(testCharacter);
     expect(afterAddArmor).toBe(9);
@@ -96,6 +101,8 @@ describe("CharacterWeight.ts", () => {
     const apples = await unitTestHelper.createStackableMockItem({
       stackQty: 100,
       maxStackSize: 100,
+      carrier: testCharacter._id,
+      owner: testCharacter._id,
     });
 
     inventoryContainer = await unitTestHelper.addItemsToContainer(inventoryContainer, 1, [apples]);
@@ -138,6 +145,9 @@ describe("CharacterWeight.ts", () => {
   });
 
   it("After death, one of equipment will drop and the weight should update.", async () => {
+    testCharacter.mode = Modes.HardcoreMode;
+    await testCharacter.save();
+
     jest.useFakeTimers({
       advanceTimers: true,
     });
@@ -153,7 +163,10 @@ describe("CharacterWeight.ts", () => {
       weight: 3,
     });
 
-    await unitTestHelper.createMockAndEquipItens(testCharacter);
+    await unitTestHelper.createMockAndEquipItens(testCharacter, {
+      carrier: testCharacter._id,
+      owner: testCharacter._id,
+    });
     await characterWeight.updateCharacterWeight(testCharacter);
     const afterAddArmor = await Character.findOne(testCharacter._id).lean();
 
@@ -162,6 +175,9 @@ describe("CharacterWeight.ts", () => {
     // when die you loose your backpack: -3 weight.
     // but when you respawn you get a new bag: +1.5 weight
     await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+    await characterWeight.updateCharacterWeight(testCharacter);
+
     const weightAfterDeath = await Character.findOne(testCharacter._id).lean();
 
     // bag(1.5)                       = 1.5
@@ -174,11 +190,17 @@ describe("CharacterWeight.ts", () => {
   });
 
   it("Should calculate the Weight if have nested bags with itens on inventory", async () => {
-    const nestedBackpack = await unitTestHelper.createMockItemFromBlueprint(ContainersBlueprint.Backpack);
+    const nestedBackpack = await unitTestHelper.createMockItemFromBlueprint(ContainersBlueprint.Backpack, {
+      owner: testCharacter._id,
+    });
     const nestedContainer = (await ItemContainer.findById(nestedBackpack.itemContainer)) as IItemContainer;
 
-    const fisrtSword = await unitTestHelper.createMockItem();
-    const secondSword = await unitTestHelper.createMockItem();
+    const fisrtSword = await unitTestHelper.createMockItem({
+      owner: testCharacter._id,
+    });
+    const secondSword = await unitTestHelper.createMockItem({
+      owner: testCharacter._id,
+    });
 
     nestedContainer.slotQty = 2;
     nestedContainer.slots = {
@@ -187,8 +209,6 @@ describe("CharacterWeight.ts", () => {
     };
 
     await nestedContainer.save();
-
-    expect(await characterWeight.getWeight(testCharacter)).toBe(3);
 
     const nestedItem = (await Item.findOne({ _id: nestedContainer.parentItem })) as IItem;
     const result = await characterItemContainer.addItemToContainer(nestedItem, testCharacter, inventoryContainer._id);

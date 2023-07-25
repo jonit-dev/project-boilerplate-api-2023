@@ -1,4 +1,4 @@
-import { Direction } from "@rpg-engine/shared";
+import { Direction, GRID_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _, { random } from "lodash";
 import numberString from "number-string";
@@ -62,6 +62,20 @@ export class MathHelper {
     const x = y2 - y1;
 
     return Math.sqrt(x * x + y * y);
+  }
+
+  public getDistanceInGridCells(x1: number, y1: number, x2: number, y2: number): number {
+
+    const distance = this.getDistanceBetweenPoints(
+      x1,
+      y1,
+      x2,
+      y2    
+          );
+    
+    const distanceInGridCells = Math.round(distance / GRID_WIDTH);
+
+      return distanceInGridCells;
   }
 
   public isXYInsideRectangle(point: IPoint, rect: IRect): boolean {

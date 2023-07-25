@@ -70,6 +70,8 @@ export class CharacterNetworkLogout {
         const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
         const key: SpellsBlueprint = SpellsBlueprint.DruidShapeshift;
 
+        const keyVeil: SpellsBlueprint = SpellsBlueprint.SorcererVeilofUndeath;
+
         const hasShapeShift = await this.inMemoryHashTable.has(namespace, key);
         let textureKey: any;
         if (hasShapeShift) {
@@ -83,9 +85,23 @@ export class CharacterNetworkLogout {
           }
         );
 
+        const hasVeil = await this.inMemoryHashTable.has(namespace, keyVeil);
+        let textureKeyVeil: any;
+        if (hasVeil) {
+          textureKeyVeil = await this.inMemoryHashTable.get(namespace, keyVeil);
+        }
+        await Character.updateOne(
+          { _id: data.id },
+          {
+            isOnline: false,
+            textureKey: textureKeyVeil || character.textureKey,
+          }
+        );
         await this.socketSessionControl.deleteSession(character);
 
         await this.specialEffect.clearEffects(character);
+
+        await this.inMemoryHashTable.delete("character-max-weights", character._id);
 
         await this.inMemoryHashTable.deleteAll(data.id.toString());
 
@@ -100,8 +116,6 @@ export class CharacterNetworkLogout {
 
         await this.skillStatsIncrease.increaseMaxManaMaxHealth(character._id);
 
-        await this.inMemoryHashTable.delete("character-weapon", character._id);
-
         const connectedCharacters = await this.socketConnection.getConnectedCharacters();
 
         console.log("- Total characters connected:", connectedCharacters.length);
@@ -112,7 +126,7 @@ export class CharacterNetworkLogout {
   private async temporaryRemoveWeapon(characterId: Types.ObjectId): Promise<void> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as string);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, character.equipment as string);
     const leftHandItem = (await Item.findById(equipmentSlots.leftHand).lean()) as IItem;
     const rightHandItem = (await Item.findById(equipmentSlots.rightHand).lean()) as IItem;
     const inventory = (await this.characterInventory.getInventory(character)) as IItem;

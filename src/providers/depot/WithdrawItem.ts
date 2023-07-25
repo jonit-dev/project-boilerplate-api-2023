@@ -2,10 +2,11 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItemContainer as IItemContainerModel, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { ItemDrop } from "@providers/item/ItemDrop";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
+import { ItemUpdater } from "@providers/item/ItemUpdater";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IDepotContainerWithdraw, IEquipmentAndInventoryUpdatePayload, IItemContainer } from "@rpg-engine/shared";
@@ -23,7 +24,8 @@ export class WithdrawItem {
     private characterItemSlots: CharacterItemSlots,
     private socketMessaging: SocketMessaging,
     private characterWeight: CharacterWeight,
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private itemUpdater: ItemUpdater
   ) {}
 
   @TrackNewRelicTransaction()
@@ -37,6 +39,9 @@ export class WithdrawItem {
     // check if item exists
     const item = await Item.findById(itemId);
     if (!item) {
+      // prevent depot slot from getting stuck
+      await this.characterItemSlots.deleteItemOnSlot(itemContainer as any, itemId);
+
       throw new Error(`DepotSystem > Item not found: ${itemId}`);
     }
 
@@ -72,8 +77,6 @@ export class WithdrawItem {
       await this.itemDrop.dropItems([item], gridPoints, character.scene);
     }
 
-    await this.characterWeight.updateCharacterWeight(character);
-
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       inventory: toContainer as any,
     };
@@ -84,7 +87,19 @@ export class WithdrawItem {
       await this.itemOwnership.addItemOwnership(item, character);
     }
 
+    await this.markNotIsInDepot(item);
+
+    await this.characterWeight.updateCharacterWeight(character);
+
     return itemContainer;
+  }
+
+  private async markNotIsInDepot(item: IItem): Promise<void> {
+    await this.itemUpdater.updateItemRecursivelyIfNeeded(item._id, {
+      $unset: {
+        isInDepot: "",
+      },
+    });
   }
 
   private async isWithdrawValid(character: ICharacter, data: IDepotContainerWithdraw): Promise<boolean> {

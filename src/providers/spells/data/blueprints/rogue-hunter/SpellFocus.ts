@@ -30,12 +30,12 @@ export const spellFocus: Partial<ISpell> = {
   usableEffect: async (character: ICharacter) => {
     const characterBuffActivator = container.get(CharacterBuffActivator);
     const spellCalculator = container.get(SpellCalculator);
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       max: 120,
       min: 30,
     });
 
-    const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const buffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       max: 25,
       min: 10,
     });
@@ -52,6 +52,8 @@ export const spellFocus: Partial<ISpell> = {
           deactivation: `You feel less focused. (Dexterity -${buffPercentage}%)`,
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.Focus,
     });
   },
 };

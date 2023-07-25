@@ -30,7 +30,7 @@ export const spellBloodthirst: Partial<ISpell> = {
 
     const spellCalculator = await container.get(SpellCalculator);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Strength, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Strength, {
       min: 10,
       max: 20,
     });

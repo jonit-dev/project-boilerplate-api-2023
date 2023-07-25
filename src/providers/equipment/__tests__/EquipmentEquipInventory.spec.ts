@@ -31,7 +31,7 @@ describe("EquipmentRangeUpdate.spec.ts", () => {
 
     expect(equipped).toBe(true);
 
-    const equipmentSet = await equipmentSlots.getEquipmentSlots(equipment._id);
+    const equipmentSet = await equipmentSlots.getEquipmentSlots(character._id, equipment._id);
 
     expect(equipmentSet).toBeTruthy();
 

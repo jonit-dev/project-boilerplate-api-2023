@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
@@ -27,18 +28,18 @@ export class CharacterMovementWarn {
   ) {}
 
   @TrackNewRelicTransaction()
-  public async warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): Promise<void> {
+  public warn(character: ICharacter, data: ICharacterPositionUpdateFromClient): void {
     // bi-directional warn
 
-    await this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
+    void this.warnCharactersAroundAboutEmitterPositionUpdate(character, data);
 
-    await this.warnEmitterAboutCharactersAround(character);
+    void this.warnEmitterAboutCharactersAround(character);
 
-    await this.npcWarn.warnCharacterAboutNPCsInView(character);
+    void this.npcWarn.warnCharacterAboutNPCsInView(character);
 
     // ! Disabled because it some "players" spam items on the ground, it will cause the emissor to get stuck.
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.itemView.warnCharacterAboutItemsInView(character, { always: false });
+    void this.itemView.warnCharacterAboutItemsInView(character, { always: false });
   }
 
   @TrackNewRelicTransaction()
@@ -83,7 +84,7 @@ export class CharacterMovementWarn {
   ): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
-    for (const nearbyCharacter of nearbyCharacters) {
+    const promises = nearbyCharacters.map(async (nearbyCharacter) => {
       const dataFromServer = await this.generateDataPayloadFromServer(clientPosUpdateData, character);
 
       await this.characterView.addToCharacterView(
@@ -103,17 +104,17 @@ export class CharacterMovementWarn {
         CharacterSocketEvents.CharacterPositionUpdate,
         dataFromServer
       );
-    }
+    });
+
+    await Promise.all(promises);
   }
 
   private async warnEmitterAboutCharactersAround(character: ICharacter): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
-    const nearbyCharacterDataPayloads: ICharacterPositionUpdateFromServer[] = [];
-
-    for (const nearbyCharacter of nearbyCharacters) {
+    const promises = nearbyCharacters.map(async (nearbyCharacter) => {
       if (!(await this.shouldWarnCharacter(character, nearbyCharacter))) {
-        continue;
+        return null;
       }
 
       await this.characterView.addToCharacterView(
@@ -128,7 +129,7 @@ export class CharacterMovementWarn {
         "characters"
       );
 
-      nearbyCharacterDataPayloads.push({
+      return {
         id: nearbyCharacter.id,
         name: nearbyCharacter.name,
         x: nearbyCharacter.x,
@@ -147,8 +148,12 @@ export class CharacterMovementWarn {
         maxMana: nearbyCharacter.maxMana,
         textureKey: nearbyCharacter.textureKey,
         alpha: await this.specialEffect.getOpacity(nearbyCharacter),
-      });
-    }
+      };
+    });
+
+    const nearbyCharacterDataPayloads = (await Promise.all(promises)).filter(
+      (payload) => payload !== null
+    ) as ICharacterPositionUpdateFromServer[];
 
     if (nearbyCharacterDataPayloads.length === 0) return;
 

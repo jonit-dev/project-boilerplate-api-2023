@@ -182,7 +182,7 @@ export class UnitTestHelper {
 
     const charBody = new Item({
       ...blueprintData,
-      owner: character.id,
+      owner: character._id,
       name: `${character.name}'s body`,
       scene: character.scene,
       x: character.x,
@@ -302,8 +302,12 @@ export class UnitTestHelper {
   }
 
   public async createMockAndEquipItens(character: ICharacter, extraProps?: Partial<IItem>): Promise<void> {
-    const itemSword = await this.createMockItem();
-    const itemArmor = await this.createMockArmor();
+    const itemSword = await this.createMockItem({
+      ...extraProps,
+    });
+    const itemArmor = await this.createMockArmor({
+      ...extraProps,
+    });
     const equipmentEquip: EquipmentEquip = container.get<EquipmentEquip>(EquipmentEquip);
 
     const inventory = await this.characterInventory.getInventory(character);
@@ -455,8 +459,8 @@ export class UnitTestHelper {
       slots[Number(i)] = null;
     }
 
-    slots[0] = foodItem._id;
-    slots[1] = weaponItem._id;
+    slots[0] = foodItem;
+    slots[1] = weaponItem;
 
     backpackContainer.slots = slots;
 

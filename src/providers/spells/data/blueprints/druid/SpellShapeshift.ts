@@ -20,9 +20,9 @@ export const spellShapeshift: Partial<ISpell> = {
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas qabi",
   manaCost: 200,
-  minLevelRequired: 8,
-  minMagicLevelRequired: 5,
-  cooldown: 180,
+  minLevelRequired: 10,
+  minMagicLevelRequired: 10,
+  cooldown: 60,
   castingAnimationKey: AnimationEffectKeys.ManaHeal,
   characterClass: [CharacterClass.Druid],
 
@@ -31,12 +31,12 @@ export const spellShapeshift: Partial<ISpell> = {
     const characterTextureChange = container.get(CharacterTextureChange);
     const spellCalculator = container.get(SpellCalculator);
 
-    const timeoutInSecs = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeoutInSecs = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 15,
       max: 30,
     });
 
-    const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const buffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 5,
       max: 15,
     });
@@ -54,6 +54,8 @@ export const spellShapeshift: Partial<ISpell> = {
           deactivation: "You feel weaker again.",
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.DruidShapeshift + "-" + BasicAttribute.Strength,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {
@@ -62,6 +64,8 @@ export const spellShapeshift: Partial<ISpell> = {
       buffPercentage: buffPercentage,
       durationSeconds: timeoutInSecs,
       durationType: CharacterBuffDurationType.Temporary,
+      isStackable: false,
+      originateFrom: SpellsBlueprint.DruidShapeshift + "-" + BasicAttribute.Resistance,
     });
 
     await characterTextureChange.changeTexture(character, "brown-bear", timeoutInSecs, "shapeshift");

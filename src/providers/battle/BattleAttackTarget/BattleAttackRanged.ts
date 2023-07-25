@@ -5,6 +5,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterItemEquipment } from "@providers/character/characterItems/CharacterItemEquipment";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { blueprintManager } from "@providers/inversify/container";
@@ -53,7 +54,8 @@ export class BattleAttackRanged {
     private equipmentSlots: EquipmentSlots,
     private animationEffect: AnimationEffect,
     private characterWeapon: CharacterWeapon,
-    private characterItemEquipment: CharacterItemEquipment
+    private characterItemEquipment: CharacterItemEquipment,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public sendNoAmmoEvent(
@@ -197,6 +199,7 @@ export class BattleAttackRanged {
    * Consumes ammo from character's equipment accessory slot or inventory slot
    * and sends updateItemInventoryCharacter event
    */
+
   public async consumeAmmo(attackParams: IRangedAttackParams, character: ICharacter): Promise<void> {
     const equipment = attackParams.equipment!;
 
@@ -225,7 +228,9 @@ export class BattleAttackRanged {
       return;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(equipment._id);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id);
+
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
 
     const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
       equipment: equipmentSlots,

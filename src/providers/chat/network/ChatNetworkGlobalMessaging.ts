@@ -19,6 +19,7 @@ import {
   SOCKET_TRANSMISSION_ZONE_WIDTH,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { AdminCommands } from "./AdminCommands";
 
 @provide(ChatNetworkGlobalMessaging)
 export class ChatNetworkGlobalMessaging {
@@ -28,7 +29,8 @@ export class ChatNetworkGlobalMessaging {
     private characterView: CharacterView,
     private socketTransmissionZone: SocketTransmissionZone,
     private spellCast: SpellCast,
-    private characterValidation: CharacterValidation
+    private characterValidation: CharacterValidation,
+    private adminCommands: AdminCommands
   ) {}
 
   @TrackNewRelicTransaction()
@@ -41,6 +43,11 @@ export class ChatNetworkGlobalMessaging {
           const canChat = this.characterValidation.hasBasicValidation(character);
 
           if (!canChat) {
+            return;
+          }
+
+          if (data.message.startsWith("/")) {
+            await this.handleAdminCommand(data.message.substring(1), character);
             return;
           }
 
@@ -61,7 +68,6 @@ export class ChatNetworkGlobalMessaging {
           }
 
           if (data.message.length > 0) {
-            // If the message contains profanity, replace it with asterisks except the first letter
             data = this.replaceProfanity(data);
 
             const chatLog = new ChatLog({
@@ -87,10 +93,11 @@ export class ChatNetworkGlobalMessaging {
     );
   }
 
-  private replaceProfanity<T>(data): T {
+  private replaceProfanity<T extends IChatMessageCreatePayload>(data: T): T {
     if (profanity.exists(data.message)) {
       const words = data.message.split(" ");
-      for (let i = 0; i < words.length; i++) {
+      let i = 0;
+      for (i = 0; i < words.length; i++) {
         if (profanity.exists(words[i])) {
           words[i] = words[i][0] + words[i].substring(1).replace(/[^\s]/g, "*");
         }
@@ -187,7 +194,42 @@ export class ChatNetworkGlobalMessaging {
     };
   }
 
-  private shouldCharacterReceiveMessage(target: ICharacter): Boolean {
+  private shouldCharacterReceiveMessage(target: ICharacter): boolean {
     return target.isOnline && !target.isBanned;
+  }
+
+  private async handleAdminCommand(command: string, character: ICharacter): Promise<void> {
+    if (!character.isAdmin) {
+      return;
+    }
+
+    const [cmd, ...params] = command.split(" ");
+
+    switch (cmd) {
+      case "ban":
+        await this.adminCommands.handleBanCommand(params, character);
+        break;
+      case "sendtemple":
+        await this.adminCommands.handleSendTempleCommand(params, character);
+        break;
+      case "teleport":
+        await this.adminCommands.handleTeleportCommand(params, character);
+        break;
+      case "goto":
+        await this.adminCommands.handleGotoCommand(params, character);
+        break;
+      case "getpos":
+        await this.adminCommands.handleGetPosCommand(params, character);
+        break;
+      case "summon":
+        await this.adminCommands.handleSummonCommand(params, character);
+        break;
+      case "online":
+        await this.adminCommands.handleOnlineCommand(character);
+        break;
+      default:
+        // Invalid command
+        break;
+    }
   }
 }

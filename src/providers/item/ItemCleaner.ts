@@ -28,14 +28,18 @@ export class ItemCleaner {
       return;
     }
 
-    const slotsData = await this.equipmentSlots.getEquipmentSlots(character.equipment.toString());
+    const slotsData = await this.equipmentSlots.getEquipmentSlots(character._id, character.equipment.toString());
 
     for (const [slotName, itemData] of Object.entries(slotsData)) {
       if (!itemData || slotName === "_id") {
         continue;
       }
 
-      const item = await Item.findById(itemData._id).lean({ virtuals: true, defaults: true });
+      const item = (await Item.findById(itemData._id).lean({ virtuals: true, defaults: true })) as IItem;
+
+      if (item && !item?.owner) {
+        await this.itemOwnership.addItemOwnership(item, character._id);
+      }
 
       if (!item) {
         await Equipment.updateOne(
@@ -75,7 +79,11 @@ export class ItemCleaner {
         continue;
       }
       // check if item exists
-      const item = await Item.findById(slotData._id).lean({ virtuals: true, defaults: true });
+      const item = (await Item.findById(slotData._id).lean({ virtuals: true, defaults: true })) as IItem;
+
+      if (item && !item?.owner) {
+        await this.itemOwnership.addItemOwnership(item, character._id);
+      }
 
       if (!item) {
         // remove slot on item container with update one

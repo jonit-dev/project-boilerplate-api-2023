@@ -32,12 +32,12 @@ export const spellQuickFire: Partial<ISpell> = {
     const characterBuffActivator = container.get(CharacterBuffActivator);
     const spellCalculator = container.get(SpellCalculator);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 20,
       max: 120,
     });
 
-    const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const buffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 20,
       max: 35,
     });
@@ -48,6 +48,8 @@ export const spellQuickFire: Partial<ISpell> = {
       buffPercentage: -buffPercentage,
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
+      isStackable: false,
+      originateFrom: SpellsBlueprint.HunterQuickFire,
     });
   },
 };

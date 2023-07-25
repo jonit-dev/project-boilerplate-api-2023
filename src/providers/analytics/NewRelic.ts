@@ -1,7 +1,11 @@
 /* eslint-disable no-async-promise-executor */
 import { appEnv } from "@providers/config/env";
 import { NEW_RELIC_SAMPLE_RATE } from "@providers/constants/AnalyticsConstants";
-import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import {
+  NewRelicMetricCategory,
+  NewRelicSubCategory,
+  NewRelicTransactionCategory,
+} from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import newrelic from "newrelic";
 
@@ -70,7 +74,16 @@ export class NewRelic {
     });
   }
 
-  public trackMetric(category: NewRelicMetricCategory, name: string, value: number): void {
-    return newrelic.recordMetric(`${category}/${name}`, value);
+  public trackMetric(
+    category: NewRelicMetricCategory,
+    subcategory: NewRelicSubCategory,
+    name: string,
+    value: number
+  ): void {
+    if (appEnv.general.IS_UNIT_TEST) {
+      return;
+    }
+
+    return newrelic.recordMetric(`${category}/${subcategory}/${name}`, value);
   }
 }

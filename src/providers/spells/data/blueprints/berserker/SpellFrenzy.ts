@@ -57,6 +57,8 @@ export const spellFrenzy: Partial<ISpell> = {
           deactivation: "Berserker's Frenzy has been deactivated!",
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.BerserkerFrenzy + "-" + CharacterAttributes.AttackIntervalSpeed,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {
@@ -70,6 +72,8 @@ export const spellFrenzy: Partial<ISpell> = {
           skipAllMessages: true,
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.BerserkerFrenzy + "-" + BasicAttribute.Resistance,
     });
   },
 };

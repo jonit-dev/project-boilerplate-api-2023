@@ -16,7 +16,7 @@ export const darkRuneUsableEffect: IUsableEffectRune = {
 
     const spellCalculator = container.get(SpellCalculator);
 
-    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+    const pointModifier = await spellCalculator.calculateBasedOnSkillLevel(caster, BasicAttribute.Magic, {
       min: 2,
       max: 4,
     });

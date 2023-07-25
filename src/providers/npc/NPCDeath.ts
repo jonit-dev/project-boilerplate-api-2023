@@ -10,6 +10,7 @@ import {
   NPC_LOOT_CHANCE_MULTIPLIER,
 } from "@providers/constants/LootConstants";
 
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
 import { blueprintManager } from "@providers/inversify/container";
@@ -18,6 +19,7 @@ import { ItemRarity } from "@providers/item/ItemRarity";
 import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
@@ -39,7 +41,8 @@ export class NPCDeath {
     private npcFreezer: NPCFreezer,
     private npcSpawn: NPCSpawn,
     private npcExperience: NPCExperience,
-    private locker: Locker
+    private locker: Locker,
+    private newRelic: NewRelic
   ) {}
 
   @TrackNewRelicTransaction()
@@ -70,6 +73,8 @@ export class NPCDeath {
         return;
       }
 
+      await this.itemOwnership.removeItemOwnership(npcBody);
+
       const notifyCharactersOfNPCDeath = this.notifyCharactersOfNPCDeath(npc);
 
       const npcWithSkills = await this.getNPCWithSkills(npc);
@@ -80,23 +85,23 @@ export class NPCDeath {
 
       const addLootToNPCBody = this.addLootToNPCBody(npcBody, [...npcLoots, goldLoot], npc.isGiantForm);
 
-      const removeItemOwnership = this.itemOwnership.removeItemOwnership(npcBody.id);
-
       const clearNPCBehavior = this.clearNPCBehavior(npc);
 
       const updateNPCAfterDeath = this.updateNPCAfterDeath(npcWithSkills);
 
       const releaseXP = this.npcExperience.releaseXP(npc as INPC);
 
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "Death", 1);
+
       await Promise.all([
         notifyCharactersOfNPCDeath,
         npcWithSkills,
         goldLoot,
         addLootToNPCBody,
-        removeItemOwnership,
         clearNPCBehavior,
         updateNPCAfterDeath,
         releaseXP,
+        this.locker.unlock(`npc-${npc._id}-battle-cycle`),
       ]);
     } catch (error) {
       console.error(error);
@@ -126,7 +131,10 @@ export class NPCDeath {
       throw new Error(`NPC not found with id ${npc._id}`);
     }
 
-    const npcSkills = (await Skill.findById(npc.skills)
+    const npcSkills = (await Skill.findOne({
+      _id: npcFound.skills,
+      owner: npcFound._id,
+    })
       .lean({
         virtuals: true,
         defaults: true,
@@ -149,7 +157,7 @@ export class NPCDeath {
     const currentMovementType = npc.originalMovementType;
 
     await NPC.updateOne(
-      { _id: npc.id },
+      { _id: npc.id, scene: npc.scene },
       {
         $set: {
           health: 0,
@@ -260,8 +268,14 @@ export class NPCDeath {
     }
 
     itemContainer.markModified("slots");
-    await ItemContainer.updateOne({ _id: itemContainer._id }, itemContainer);
-    await Item.updateOne({ _id: npcBody._id }, npcBody);
+    await ItemContainer.updateOne({ _id: itemContainer._id, parentItem: npcBody._id }, itemContainer);
+    await Item.updateOne(
+      {
+        _id: npcBody._id,
+        scene: npcBody.scene,
+      },
+      npcBody
+    );
   }
 
   private async createLootItemWithoutSaving(loot: INPCLoot): Promise<IItem> {

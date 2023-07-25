@@ -42,12 +42,12 @@ export const spellCurseOfWeakness: Partial<ISpell> = {
       return false;
     }
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 10,
       max: 30,
     });
 
-    const buffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const buffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 10,
       max: 15,
     });
@@ -64,6 +64,8 @@ export const spellCurseOfWeakness: Partial<ISpell> = {
           deactivation: "💀 You're no longer cursed! Your strength and weakness are back to normal.",
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.CurseOfWeakness + "-" + BasicAttribute.Strength,
     });
 
     await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {
@@ -77,6 +79,8 @@ export const spellCurseOfWeakness: Partial<ISpell> = {
           skipAllMessages: true,
         },
       },
+      isStackable: false,
+      originateFrom: SpellsBlueprint.CurseOfWeakness + "-" + BasicAttribute.Resistance,
     });
 
     return true;

@@ -1,3 +1,4 @@
+/* eslint-disable no-void */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
 import { GridManager } from "@providers/map/GridManager";
@@ -25,6 +26,10 @@ import {
 import { provide } from "inversify-binding-decorators";
 
 import { NPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
+import dayjs from "dayjs";
+import random from "lodash/random";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
 import { CharacterMovementWarn } from "../characterMovement/CharacterMovementWarn";
@@ -43,7 +48,8 @@ export class CharacterNetworkUpdate {
     private characterMovementWarn: CharacterMovementWarn,
     private mathHelper: MathHelper,
     private characterView: CharacterView,
-    private pm2Helper: PM2Helper
+    private pm2Helper: PM2Helper,
+    private newRelic: NewRelic
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -51,59 +57,77 @@ export class CharacterNetworkUpdate {
       channel,
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
-        if (data) {
-          // sometimes the character is just changing facing direction and not moving.. That's why we need this.
-          const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
+        try {
+          if (data) {
+            // sometimes the character is just changing facing direction and not moving.. That's why we need this.
+            const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
 
-          // send message back to the user telling that the requested position update is not valid!
+            // send message back to the user telling that the requested position update is not valid!
 
-          let isPositionUpdateValid = true;
+            let isPositionUpdateValid = true;
 
-          const { x: newX, y: newY } = this.movementHelper.calculateNewPositionXY(
-            character.x,
-            character.y,
-            data.direction
-          );
+            const { newX, newY, timestamp } = data;
 
-          if (isMoving) {
-            isPositionUpdateValid = await this.characterMovementValidation.isValid(character, newX, newY, isMoving);
-          }
+            if (timestamp) {
+              const n = random(1, 100);
 
-          if (isPositionUpdateValid) {
-            const serverCharacterPosition = {
-              x: character.x,
-              y: character.y,
-            };
+              if (n <= 10) {
+                // 10% chance tracking ping
+                const ping = dayjs().diff(dayjs(timestamp), "ms");
 
-            await this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
+                if (ping < 0) {
+                  return; // invalid ping
+                }
 
-            await this.characterMovementWarn.warn(character, data);
-
-            switch (appEnv.general.ENV) {
-              case EnvType.Development:
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                this.npcManager.startNearbyNPCsBehaviorLoop(character);
-
-                break;
-              case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
-                this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
-                  character,
-                });
-                break;
+                this.newRelic.trackMetric(
+                  NewRelicMetricCategory.Count,
+                  NewRelicSubCategory.Characters,
+                  "Character/Ping",
+                  ping
+                );
+              }
             }
 
-            await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
+            if (isMoving) {
+              isPositionUpdateValid = await this.characterMovementValidation.isValid(character, newX, newY, isMoving);
+            }
 
-            await this.handleNonPVPZone(character, newX, newY);
+            if (isPositionUpdateValid) {
+              const serverCharacterPosition = {
+                x: character.x,
+                y: character.y,
+              };
 
-            // leave it for last!
-            await this.handleMapTransition(character, newX, newY);
+              await this.syncIfPositionMismatch(character, serverCharacterPosition, data.originX, data.originY);
 
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.characterView.clearAllOutOfViewElements(character._id, character.x, character.y);
+              void this.characterMovementWarn.warn(character, data);
+
+              switch (appEnv.general.ENV) {
+                case EnvType.Development:
+                  void this.npcManager.startNearbyNPCsBehaviorLoop(character);
+
+                  break;
+                case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
+                  void this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
+                    character,
+                  });
+                  break;
+              }
+
+              await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
+
+              void this.handleNonPVPZone(character, newX, newY);
+
+              // leave it for last!
+              void this.handleMapTransition(character, newX, newY);
+
+              void this.characterView.clearAllOutOfViewElements(character._id, character.x, character.y);
+            }
+
+            this.sendConfirmation(character, data.direction, isPositionUpdateValid);
           }
-
-          this.sendConfirmation(character, data.direction, isPositionUpdateValid);
+        } catch (error) {
+          console.error(error);
         }
       }
     );
@@ -132,7 +156,7 @@ export class CharacterNetworkUpdate {
     clientOriginX: number,
     clientOriginY: number
   ): Promise<void> {
-    const distance = this.mathHelper.getDistanceBetweenPoints(
+    const distance = this.mathHelper.getDistanceInGridCells(
       serverCharacterPosition.x,
       serverCharacterPosition.y,
       clientOriginX,
@@ -142,16 +166,30 @@ export class CharacterNetworkUpdate {
     const distanceInGridCells = Math.round(distance / GRID_WIDTH);
 
     if (distanceInGridCells >= 1) {
+      this.newRelic.trackMetric(
+        NewRelicMetricCategory.Count,
+        NewRelicSubCategory.Characters,
+        "Desync/GridDesyncDistanceInCells",
+        distanceInGridCells
+      );
+
       await Character.updateOne(
         { id: serverCharacter.id },
         {
           x: clientOriginX,
           y: clientOriginY,
         }
-      );
+      ).lean();
     }
 
     if (distanceInGridCells >= 10) {
+      this.newRelic.trackMetric(
+        NewRelicMetricCategory.Count,
+        NewRelicSubCategory.Characters,
+        "Desync/GridDesyncHighDistanceInCells",
+        distanceInGridCells
+      );
+
       this.socketMessaging.sendEventToUser<ICharacterSyncPosition>(
         serverCharacter.channelId!,
         CharacterSocketEvents.CharacterSyncPosition,
@@ -237,9 +275,14 @@ export class CharacterNetworkUpdate {
       // if character is moving, update the position
 
       // old position is now walkable
-      await this.gridManager.setWalkable(map, ToGridX(character.x), ToGridY(character.y), true);
+      const setOldPositionWalkable = this.gridManager.setWalkable(
+        map,
+        ToGridX(character.x),
+        ToGridY(character.y),
+        true
+      );
 
-      await Character.updateOne(
+      const characterUpdate = Character.updateOne(
         { _id: character._id },
         {
           $set: {
@@ -249,11 +292,12 @@ export class CharacterNetworkUpdate {
             lastMovement: new Date(),
           },
         }
-      );
+      ).lean();
 
       // update our grid with solid information
+      const setNewPositionSolid = this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false);
 
-      await this.gridManager.setWalkable(map, ToGridX(newX), ToGridY(newY), false);
+      await Promise.all([setOldPositionWalkable, characterUpdate, setNewPositionSolid]);
     }
   }
 }

@@ -103,7 +103,15 @@ const itemSchema = createLeanSchema(
 
     isTraining: Type.boolean({ required: true, default: false }), // For training items which gives a max damage of 1
 
+    carrier: Type.objectId({
+      ref: "Character",
+    }),
+
+    isInDepot: Type.boolean({ required: false }),
+
     isDeadBodyLootable: Type.boolean({ required: false }),
+
+    isInContainer: Type.boolean({ required: false }),
 
     isBeingPickedUp: Type.boolean({ required: false }),
 
@@ -128,7 +136,10 @@ const itemSchema = createLeanSchema(
   { timestamps: { createdAt: true, updatedAt: true } }
 ).plugin(updateIfCurrentPlugin);
 
-itemSchema.index({ x: 1, y: 1, scene: 1, owner: 1, ItemContainer: 1 }, { background: true });
+itemSchema.index(
+  { x: 1, y: 1, scene: 1, owner: 1, ItemContainer: 1, carrier: 1, key: 1, subType: 1, droppedBy: 1 },
+  { background: true }
+);
 
 itemSchema.virtual("baseKey").get(function (this: IItem) {
   return this.key.replace(/-\d+$/, "");

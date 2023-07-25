@@ -11,7 +11,7 @@ export const itemDeathNecklace: IEquippableAccessoryTier0Blueprint = {
   name: "Death Necklace",
   description: "a dark necklace imbued with the energy of the dead.",
   attack: 2,
-  defense: 0,
+  defense: 1,
   tier: 0,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Neck],

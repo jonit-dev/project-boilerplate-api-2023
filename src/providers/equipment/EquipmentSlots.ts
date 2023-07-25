@@ -7,10 +7,11 @@ import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemBuff } from "@providers/character/characterBuff/CharacterItemBuff";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { isSameKey } from "@providers/dataStructures/KeyHelper";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentSet } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { camelCase } from "lodash";
+import _, { camelCase } from "lodash";
 
 export type EquipmentSlotTypes =
   | "head"
@@ -30,7 +31,8 @@ export class EquipmentSlots {
     private socketMessaging: SocketMessaging,
     private characterItemContainer: CharacterItemContainer,
     private characterInventory: CharacterInventory,
-    private characterItemBuff: CharacterItemBuff
+    private characterItemBuff: CharacterItemBuff,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   private slots: EquipmentSlotTypes[] = [
@@ -74,7 +76,7 @@ export class EquipmentSlots {
     }
 
     if (item.maxStackSize > 1) {
-      const equipmentSet = await this.getEquipmentSlots(equipment._id);
+      const equipmentSet = await this.getEquipmentSlots(equipment.owner?.toString()!, equipment._id);
 
       const targetSlotItemId = equipmentSet[availableSlot];
       const targetSlotItem = await Item.findById(targetSlotItemId);
@@ -82,6 +84,7 @@ export class EquipmentSlots {
       if (!targetSlotItem) {
         equipment[availableSlot] = item;
         await equipment.save();
+        await this.inMemoryHashTable.delete("equipment-slots", character._id.toString());
 
         return true;
       }
@@ -95,6 +98,7 @@ export class EquipmentSlots {
           await targetSlotItem?.save();
 
           // delete item from inventory
+          await this.inMemoryHashTable.delete("equipment-slots", character._id.toString());
 
           return true;
         } else {
@@ -123,6 +127,7 @@ export class EquipmentSlots {
             character,
             inventoryContainer._id
           );
+          await this.inMemoryHashTable.delete("equipment-slots", character._id.toString());
 
           return addDiffToContainer;
         }
@@ -139,13 +144,14 @@ export class EquipmentSlots {
     equipment[availableSlot] = item;
     await equipment.save();
     // await this.characterItemsInventory.deleteItemFromInventory(item.id, character);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id.toString());
 
     return true;
   }
 
   @TrackNewRelicTransaction()
   public async areAllowedSlotsAvailable(slots: string[], equipment: IEquipment): Promise<boolean> {
-    const equipmentSlots = await this.getEquipmentSlots(equipment._id);
+    const equipmentSlots = await this.getEquipmentSlots(equipment.owner?.toString()!, equipment._id);
 
     for (const slotData of slots) {
       const slot = camelCase(slotData) as EquipmentSlotTypes;
@@ -173,7 +179,7 @@ export class EquipmentSlots {
 
   @TrackNewRelicTransaction()
   public async getAvailableSlot(item: IItem, equipment: IEquipment): Promise<string> {
-    const equipmentSet = await this.getEquipmentSlots(equipment._id);
+    const equipmentSet = await this.getEquipmentSlots(equipment.owner?.toString()!, equipment._id);
 
     let availableSlot = "";
     const itemSlotTypes = this.slots;
@@ -218,35 +224,38 @@ export class EquipmentSlots {
   }
 
   @TrackNewRelicTransaction()
-  public async getEquipmentSlots(equipmentId: string): Promise<IEquipmentSet> {
-    // TODO: Cache this
-    const equipment = await Equipment.findById(equipmentId).lean().populate(this.slots.join(" ")).exec();
+  public async getEquipmentSlots(characterId: string, equipmentId: string): Promise<IEquipmentSet> {
+    const hasCache = (await this.inMemoryHashTable.get("equipment-slots", characterId)) as IEquipmentSet;
 
-    const head = equipment?.head! as unknown as IItem;
-    const neck = equipment?.neck! as unknown as IItem;
-    const leftHand = equipment?.leftHand! as unknown as IItem;
-    const rightHand = equipment?.rightHand! as unknown as IItem;
-    const ring = equipment?.ring! as unknown as IItem;
-    const legs = equipment?.legs! as unknown as IItem;
-    const boot = equipment?.boot! as unknown as IItem;
-    const accessory = equipment?.accessory! as unknown as IItem;
-    const armor = equipment?.armor! as unknown as IItem;
-    const inventory = equipment?.inventory! as unknown as IItem;
+    if (hasCache) {
+      return hasCache;
+    }
 
-    // @ts-ignore
-    return {
-      _id: equipment!._id,
-      head,
-      neck,
-      leftHand,
-      rightHand,
-      ring,
-      legs,
-      boot,
-      accessory,
-      armor,
-      inventory,
-    } as IEquipmentSet;
+    const equipment = await Equipment.findById(equipmentId)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${characterId}-equipment`,
+      });
+
+    if (!equipment) {
+      throw new Error(`Equipment ${equipmentId} not found`);
+    }
+
+    const result = {
+      _id: equipment._id.toString(),
+    };
+
+    for (const slot of this.slots) {
+      if (equipment[slot]) {
+        result[slot] = await Item.findById(equipment[slot]).lean({ virtuals: true, defaults: true });
+      }
+    }
+
+    const cleanedResult = _.omitBy(result, _.isUndefined);
+
+    await this.inMemoryHashTable.set("equipment-slots", characterId, cleanedResult);
+
+    return cleanedResult as unknown as IEquipmentSet;
   }
 
   @TrackNewRelicTransaction()

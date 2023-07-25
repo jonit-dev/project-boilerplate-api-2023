@@ -4,7 +4,11 @@ import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engi
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { NPC_CYCLE_INTERVAL_RATIO, NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
+import {
+  NPC_CYCLE_INTERVAL_RATIO,
+  NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE,
+  NPC_MIN_DISTANCE_TO_ACTIVATE,
+} from "@providers/constants/NPCConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { PM2Helper } from "@providers/server/PM2Helper";
@@ -23,7 +27,12 @@ import { NPCMovementStopped } from "./movement/NPCMovementStopped";
 
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { NewRelicMetricCategory, NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { MathHelper } from "@providers/math/MathHelper";
+import {
+  NewRelicMetricCategory,
+  NewRelicSubCategory,
+  NewRelicTransactionCategory,
+} from "@providers/types/NewRelicTypes";
 
 @provide(NPCManager)
 export class NPCManager {
@@ -40,7 +49,8 @@ export class NPCManager {
     private pm2Helper: PM2Helper,
     private specialEffect: SpecialEffect,
     private inMemoryHashTable: InMemoryHashTable,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private mathHelper: MathHelper
   ) {}
 
   public listenForBehaviorTrigger(): void {
@@ -66,20 +76,30 @@ export class NPCManager {
   @TrackNewRelicTransaction()
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
     const nearbyNPCs = await this.npcView.getNPCsInView(character, { isBehaviorEnabled: false });
-    for (const npc of nearbyNPCs) {
-      const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
 
-      this.newRelic.trackMetric(NewRelicMetricCategory.Count, "NPCs/Active", totalActiveNPCs);
+    let totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
+
+    this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "Active", totalActiveNPCs);
+
+    const behaviorLoops: Promise<void>[] = [];
+
+    for (const npc of nearbyNPCs) {
+      const distanceToCharacterInGrid = this.mathHelper.getDistanceInGridCells(npc.x, npc.y, character.x, character.y);
+
+      if (distanceToCharacterInGrid > NPC_MIN_DISTANCE_TO_ACTIVATE) {
+        continue;
+      }
 
       if (totalActiveNPCs <= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
         // watch out for max NPCs active limit so we don't fry our CPU
-
-        void this.startBehaviorLoop(npc);
-
-        // wait 200 ms
-        await new Promise((resolve) => setTimeout(resolve, 25));
+        behaviorLoops.push(this.startBehaviorLoop(npc));
+        totalActiveNPCs++;
+      } else {
+        break; // break out of the loop if we've reached max active NPCs
       }
     }
+
+    await Promise.all(behaviorLoops);
   }
 
   @TrackNewRelicTransaction()
@@ -108,7 +128,11 @@ export class NPCManager {
               NewRelicTransactionCategory.Operation,
               `NPCCycle/${npc.currentMovementType}`,
               async () => {
-                this.npcFreezer.tryToFreezeNPC(npc);
+                const n = random(0, 100);
+
+                if (n <= 5) {
+                  this.npcFreezer.tryToFreezeNPC(npc);
+                }
 
                 npc = await NPC.findById(npc._id).lean({
                   virtuals: true,
@@ -141,11 +165,11 @@ export class NPCManager {
   }
 
   public async disableNPCBehaviors(): Promise<void> {
-    await NPC.updateMany({}, { $set: { isBehaviorEnabled: false } });
+    await NPC.updateMany({}, { $set: { isBehaviorEnabled: false } }).lean();
   }
 
   public async setNPCBehavior(npc: INPC, value: boolean): Promise<void> {
-    await NPC.updateOne({ _id: npc._id }, { $set: { isBehaviorEnabled: value } });
+    await NPC.updateOne({ _id: npc._id }, { $set: { isBehaviorEnabled: value } }).lean();
   }
 
   private async startCoreNPCBehavior(npc: INPC): Promise<void> {

@@ -19,9 +19,9 @@ import { clearCacheForKey } from "speedgoose";
 import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTradingBalance } from "./CharacterTradingBalance";
 import { CharacterTradingValidation } from "./CharacterTradingValidation";
-import { CharacterWeight } from "./CharacterWeight";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
+import { CharacterWeight } from "./weight/CharacterWeight";
 
 @provide(CharacterTradingBuy)
 export class CharacterTradingBuy {

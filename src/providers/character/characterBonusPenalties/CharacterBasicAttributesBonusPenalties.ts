@@ -1,4 +1,4 @@
-import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
 import { IBasicAttributesBonusAndPenalties, IIncreaseSPResult } from "@rpg-engine/shared";
@@ -120,9 +120,7 @@ export class CharacterBasicAttributesBonusPenalties {
         break;
     }
 
-    const char = (await Character.findById(skills.owner)) as ICharacter;
-
-    await this.skillFunctions.updateSkills(skills, char);
+    await this.skillFunctions.updateSkills(skills, character);
 
     return skillSpData;
   }

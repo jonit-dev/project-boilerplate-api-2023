@@ -1,11 +1,20 @@
+/* eslint-disable require-await */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IUser } from "@entities/ModuleSystem/UserModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { CharacterBan } from "@providers/character/CharacterBan";
 import { CharacterLastAction } from "@providers/character/CharacterLastAction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { appEnv } from "@providers/config/env";
 import { BYPASS_EVENTS_AS_LAST_ACTION } from "@providers/constants/EventsConstants";
-import { EXHAUSTABLE_EVENTS, LOCKABLE_EVENTS } from "@providers/constants/ServerConstants";
+import {
+  DEBOUNCEABLE_EVENTS,
+  DEBOUNCEABLE_EVENTS_MS_THRESHOLD,
+  DEBOUNCEABLE_EVENTS_MS_THRESHOLD_DISCONNECT,
+  EXHAUSTABLE_EVENTS,
+  LOCKABLE_EVENTS,
+} from "@providers/constants/ServerConstants";
 import { ExhaustValidation } from "@providers/exhaust/ExhaustValidation";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { Locker } from "@providers/locks/Locker";
@@ -22,10 +31,12 @@ export class SocketAuth {
     private exhaustValidation: ExhaustValidation,
     private characterLastAction: CharacterLastAction,
     private newRelic: NewRelic,
-    private locker: Locker
+    private locker: Locker,
+    private characterBan: CharacterBan
   ) {}
 
   // this event makes sure that the user who's triggering the request actually owns the character!
+  @TrackNewRelicTransaction()
   public authCharacterOn(
     channel,
     event: string,
@@ -53,6 +64,13 @@ export class SocketAuth {
         if (!character) {
           this.socketMessaging.sendEventToUser(channel.id!, CharacterSocketEvents.CharacterForceDisconnect, {
             reason: "You don't own this character!",
+          });
+          return;
+        }
+
+        if (character.isSoftDeleted) {
+          this.socketMessaging.sendEventToUser(channel.id!, CharacterSocketEvents.CharacterForceDisconnect, {
+            reason: "Sorry, you cannot play with this character anymore!",
           });
           return;
         }
@@ -88,6 +106,42 @@ export class SocketAuth {
           NewRelicTransactionCategory.SocketEvent,
           event,
           async (): Promise<void> => {
+            if (DEBOUNCEABLE_EVENTS.includes(event)) {
+              const lastActionExecution = await this.characterLastAction.getActionLastExecution(character._id, event);
+
+              if (lastActionExecution) {
+                const diff = dayjs().diff(dayjs(lastActionExecution), "millisecond");
+
+                if (diff < DEBOUNCEABLE_EVENTS_MS_THRESHOLD_DISCONNECT) {
+                  setTimeout(async () => {
+                    await this.characterBan.addPenalty(character);
+                  }, 5000);
+
+                  this.socketMessaging.sendEventToUser(
+                    character.channelId!,
+                    CharacterSocketEvents.CharacterForceDisconnect,
+                    {
+                      reason:
+                        "You're disconnected for spamming the server with events! Do things slower next time (or stop using macro!)",
+                    }
+                  );
+
+                  return;
+                }
+
+                if (diff < DEBOUNCEABLE_EVENTS_MS_THRESHOLD) {
+                  this.socketMessaging.sendEventToUser<IUIShowMessage>(channel.id!, UISocketEvents.ShowMessage, {
+                    message: "Sorry, you're doing it too fast!",
+                    type: "error",
+                  });
+
+                  return;
+                }
+              }
+
+              await this.characterLastAction.setActionLastExecution(character._id, event);
+            }
+
             if (LOCKABLE_EVENTS.includes(event)) {
               await this.performLockedEvent(character._id, character.name, event, async (): Promise<void> => {
                 await callback(data, character, owner);

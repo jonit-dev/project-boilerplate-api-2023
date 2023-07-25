@@ -44,12 +44,12 @@ export const spellFrostBolt: Partial<ISpell> = {
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectFreezing);
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 30,
       max: 40,
     });
 
-    const debuffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const debuffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 5,
       max: 15,
     });
@@ -67,6 +67,8 @@ export const spellFrostBolt: Partial<ISpell> = {
             deactivation: "You're no longer frozen!",
           },
         },
+        isStackable: false,
+        originateFrom: SpellsBlueprint.FrostBolt,
       });
     }
 

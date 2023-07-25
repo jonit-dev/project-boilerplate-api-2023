@@ -20,9 +20,9 @@ export const moderateEatingUsableEffect: IUsableEffect = {
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 3);
+    itemUsableEffect.applyEatingEffect(character, 5);
   },
-  usableEffectDescription: "Restores 3 HP and Mana 5 times",
+  usableEffectDescription: "Restores 5 HP and Mana 5 times",
 };
 
 export const strongEatingUsableEffect: IUsableEffect = {
@@ -30,9 +30,9 @@ export const strongEatingUsableEffect: IUsableEffect = {
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 4);
+    itemUsableEffect.applyEatingEffect(character, 7);
   },
-  usableEffectDescription: "Restores 4 HP and Mana 5 times",
+  usableEffectDescription: "Restores 7 HP and Mana 5 times",
 };
 
 export const superStrongEatingUsableEffect: IUsableEffect = {
@@ -40,9 +40,9 @@ export const superStrongEatingUsableEffect: IUsableEffect = {
   usableEffect: (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
-    itemUsableEffect.applyEatingEffect(character, 8);
+    itemUsableEffect.applyEatingEffect(character, 10);
   },
-  usableEffectDescription: "Restores 8 HP and Mana 5 times",
+  usableEffectDescription: "Restores 10 HP and Mana 5 times",
 };
 
 export const poisonEatingUsableEffect: IUsableEffect = {

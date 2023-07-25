@@ -5,7 +5,8 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -16,13 +17,13 @@ import {
   IItemContainer,
   IItemDrop,
   ItemSocketEvents,
+  ItemType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
 import { ItemDropCleanup } from "./ItemDropCleanup";
 import { ItemOwnership } from "./ItemOwnership";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(ItemDrop)
 export class ItemDrop {
@@ -63,6 +64,9 @@ export class ItemDrop {
 
     let isItemRemoved = false;
 
+    await clearCacheForKey(`${character._id}-inventory`);
+    await clearCacheForKey(`${character._id}-equipment`);
+
     try {
       switch (source) {
         case "equipment":
@@ -73,7 +77,10 @@ export class ItemDrop {
             return false;
           }
 
-          const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+          const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+            character._id,
+            character.equipment as unknown as string
+          );
 
           this.sendRefreshItemsEvent(
             {
@@ -111,11 +118,18 @@ export class ItemDrop {
           break;
       }
 
-      await this.characterWeight.updateCharacterWeight(character);
-
-      await clearCacheForKey(`${character._id}-inventory`);
-
       await this.inMemoryHashTable.delete("character-weapon", character._id);
+
+      await this.inMemoryHashTable.delete("container-all-items", itemDropData.fromContainerId);
+
+      if (itemToBeDropped.type === ItemType.CraftingResource) {
+        await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+      }
+
+      await this.inMemoryHashTable.delete("inventory-weight", character._id);
+      await this.inMemoryHashTable.delete("character-max-weights", character._id);
+
+      await this.characterWeight.updateCharacterWeight(character);
 
       return true;
     } catch (err) {
@@ -154,6 +168,7 @@ export class ItemDrop {
           y: targetY,
           scene: character.scene,
           droppedBy: character._id,
+          isInContainer: false,
         },
       }
     );

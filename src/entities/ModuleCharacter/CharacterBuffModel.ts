@@ -30,6 +30,7 @@ const characterBuffModel = createLeanSchema({
   options: Type.mixed(),
   itemId: Type.string(),
   itemKey: Type.string(),
+  originateFrom: Type.string(),
 });
 
 characterBuffModel.index(

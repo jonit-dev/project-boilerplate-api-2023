@@ -23,7 +23,7 @@ export const spellGreaterHealing: Partial<ISpell> = {
 
     const spellCalculator = container.get(SpellCalculator);
 
-    const percentage = await spellCalculator.calculateBuffBasedOnSkillLevel(character, BasicAttribute.Magic, {
+    const percentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
       min: 20,
       max: 35,
     });

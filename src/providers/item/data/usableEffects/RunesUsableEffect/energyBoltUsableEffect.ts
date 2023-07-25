@@ -22,17 +22,17 @@ export const energyBoltRune: IUsableEffectRune = {
 
     const spellCalculator = container.get(SpellCalculator);
 
-    const pointModifier = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+    const pointModifier = await spellCalculator.calculateBasedOnSkillLevel(caster, BasicAttribute.Magic, {
       min: 1,
       max: 2,
     });
 
-    const timeout = await spellCalculator.calculateTimeoutBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+    const timeout = await spellCalculator.calculateBasedOnSkillLevel(caster, BasicAttribute.Magic, {
       min: 30,
       max: 60,
     });
 
-    const debuffPercentage = await spellCalculator.calculateBuffBasedOnSkillLevel(caster, BasicAttribute.Magic, {
+    const debuffPercentage = await spellCalculator.calculateBasedOnSkillLevel(caster, BasicAttribute.Magic, {
       min: 10,
       max: 25,
     });
@@ -50,6 +50,8 @@ export const energyBoltRune: IUsableEffectRune = {
             deactivation: "You're no longer electrified!",
           },
         },
+        isStackable: false,
+        originateFrom: UsableEffectsBlueprint.EnergyBoltRuneUsableEffect,
       });
     }
 

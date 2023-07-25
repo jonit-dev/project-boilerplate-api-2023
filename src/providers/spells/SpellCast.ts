@@ -1,7 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { BattleCharacterAttackValidation } from "@providers/battle/BattleCharacterAttack/BattleCharacterAttackValidation";
@@ -102,6 +102,38 @@ export class SpellCast {
       target = await EntityUtil.getEntity(data.targetId!, data.targetType!);
       if (!(await this.isRangedCastingValid(character, target, spell))) {
         return false;
+      }
+    }
+
+    if (target) {
+      if (target.type === "NPC") {
+        target = await NPC.findOne({ _id: target._id, scene: target.scene }).lean({
+          virtuals: true,
+          defaults: true,
+        });
+
+        const updatedNPCSkills = await Skill.findOne({ owner: target._id, ownerType: "NPC" })
+          .lean({
+            virtuals: true,
+            defaults: true,
+          })
+          .cacheQuery({
+            cacheKey: `${target._id}-skills`,
+          });
+
+        target.skills = updatedNPCSkills;
+      }
+      if (target.type === "Character") {
+        target = await Character.findOne({ _id: target._id, scene: target.scene }).lean({
+          virtuals: true,
+          defaults: true,
+        });
+
+        const updatedCharacterSkills = await Skill.findOne({ owner: target._id, ownerType: "Character" }).cacheQuery({
+          cacheKey: `${target._id}-skills`,
+        });
+
+        target.skills = updatedCharacterSkills;
       }
     }
 

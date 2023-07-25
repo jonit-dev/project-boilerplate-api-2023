@@ -5,6 +5,7 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { SP_INCREASE_RATIO, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
 import {
@@ -19,7 +20,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { Types } from "mongoose";
 import { clearCacheForKey } from "speedgoose";
 import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
@@ -32,7 +32,8 @@ export class SkillFunctions {
     private socketMessaging: SocketMessaging,
     private characterBuffSkill: CharacterBuffSkill,
     private numberFormatter: NumberFormatter,
-    private skillBuff: SkillBuff
+    private skillBuff: SkillBuff,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public updateSkillByType(skills: ISkill, skillName: string, bonusOrPenalties: number): boolean {
@@ -66,15 +67,22 @@ export class SkillFunctions {
 
   @TrackNewRelicTransaction()
   public async updateSkills(skills: ISkill, character: ICharacter): Promise<void> {
-    await Skill.findByIdAndUpdate(skills._id, { ...skills });
+    try {
+      //! Warning: Chaching this causes the skill not to update
+      await Skill.findByIdAndUpdate(skills._id, skills).lean({ virtuals: true, defaults: true });
 
-    const buffedSkills = await this.skillBuff.getSkillsWithBuff(character);
-    const buffs = await this.characterBuffSkill.calculateAllActiveBuffs(character);
+      const [buffedSkills, buffs] = await Promise.all([
+        this.skillBuff.getSkillsWithBuff(character),
+        this.characterBuffSkill.calculateAllActiveBuffs(character),
+      ]);
 
-    this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
-      skill: buffedSkills,
-      buffs,
-    });
+      this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.ReadInfo, {
+        skill: buffedSkills,
+        buffs,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   @TrackNewRelicTransaction()
@@ -94,6 +102,7 @@ export class SkillFunctions {
     // now we need to clear up caching
     await clearCacheForKey(`characterBuffs_${character._id}`);
     await clearCacheForKey(`${character._id}-skills`);
+    await this.inMemoryHashTable.delete("load-craftable-items", character._id);
 
     const levelUpEventPayload: ISkillEventFromServer = {
       characterId: character.id,
@@ -123,15 +132,8 @@ export class SkillFunctions {
    * @param skillLevel
    * @returns
    */
-  @TrackNewRelicTransaction()
-  public async calculateBonus(character: ICharacter | INPC, skillsId: undefined | Types.ObjectId): Promise<number> {
-    if (!skillsId) {
-      return 0;
-    }
-    const skills = (await Skill.findById(skillsId).lean()) as unknown as ISkill;
-    if (!skills) {
-      return 0;
-    }
-    return Number(((skills.level - 1) / 50).toFixed(2));
+
+  public calculateBonus(level: number): number {
+    return Number(((level - 1) / 50).toFixed(2));
   }
 }

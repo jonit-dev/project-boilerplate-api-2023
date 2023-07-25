@@ -12,7 +12,7 @@ import {
 import { IQuestRecord, QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { IQuestReward, QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
 import { CharacterItems, IItemByKeyResult } from "@providers/character/characterItems/CharacterItems";
-import { CharacterWeight } from "@providers/character/CharacterWeight";
+import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { blueprintManager } from "@providers/inversify/container";
 import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -286,7 +286,10 @@ export class QuestSystem {
 
       await this.characterWeight.updateCharacterWeight(character);
 
-      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment!.toString());
+      const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+        character._id,
+        character.equipment!.toString()
+      );
 
       const inventory: IItemContainer = {
         _id: backpackContainer._id,

@@ -5,7 +5,7 @@ import { provide } from "inversify-binding-decorators";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { appEnv } from "@providers/config/env";
 import { ITEM_CLEANUP_THRESHOLD } from "@providers/constants/ItemConstants";
-import { NewRelicMetricCategory } from "@providers/types/NewRelicTypes";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 
 @provide(ItemDropCleanup)
 export class ItemDropCleanup {
@@ -22,7 +22,7 @@ export class ItemDropCleanup {
         updatedAt: { $gte: oneHourAgo },
       });
 
-      this.newRelic.trackMetric(NewRelicMetricCategory.Count, "Items/Dropped", totalDroppedItems);
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Items, "Dropped", totalDroppedItems);
 
       if (totalDroppedItems < ITEM_CLEANUP_THRESHOLD) return;
 

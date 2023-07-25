@@ -1,5 +1,12 @@
 import { IEquippableAccessoryTier0Blueprint } from "@providers/item/data/types/TierBlueprintTypes";
-import { ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  CharacterAttributes,
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+} from "@rpg-engine/shared";
 import { AccessoriesBlueprint } from "../../../types/itemsBlueprintTypes";
 
 export const itemPendantOfLife: IEquippableAccessoryTier0Blueprint = {
@@ -11,10 +18,17 @@ export const itemPendantOfLife: IEquippableAccessoryTier0Blueprint = {
   name: "Pendant Of Life",
   description:
     "This enchanted pendant is said to hold the essence of life itself, granting its wearer the ability to restore health and vitality to themselves and others.",
-  attack: 0,
-  defense: 0,
+  attack: 2,
+  defense: 2,
   tier: 0,
   weight: 0.1,
   allowedEquipSlotType: [ItemSlotType.Ring],
   basePrice: 5000,
+  equippedBuff: {
+    type: CharacterBuffType.CharacterAttribute,
+    trait: CharacterAttributes.MaxHealth,
+    buffPercentage: 2,
+    durationType: CharacterBuffDurationType.Permanent,
+  },
+  equippedBuffDescription: "Increases maxHealth by 2%",
 };

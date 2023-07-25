@@ -59,7 +59,10 @@ export class EquipmentUnequip {
       return false;
     }
 
-    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+    const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+      character._id,
+      character.equipment as unknown as string
+    );
 
     const bookValue = 2;
     const Accessory = await Item.findById(equipmentSlots.accessory);
@@ -95,7 +98,10 @@ export class EquipmentUnequip {
 
     await this.handleBookEffect(item, equipmentSlots, bookValue);
 
-    const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(character.equipment as unknown as string);
+    const newEquipmentSlots = await this.equipmentSlots.getEquipmentSlots(
+      character._id,
+      character.equipment as unknown as string
+    );
 
     const newInventoryContainer = await ItemContainer.findById(inventoryContainerId);
 
@@ -117,8 +123,6 @@ export class EquipmentUnequip {
     }
 
     await this.clearCache(character);
-
-    await this.inMemoryHashTable.delete("character-weapon", character._id);
 
     return true;
   }
@@ -156,6 +160,11 @@ export class EquipmentUnequip {
     // When unequip remove data from redis
     await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
     await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
+
+    await this.inMemoryHashTable.delete("character-weapon", character._id);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id);
+    await this.inMemoryHashTable.delete("equipment-weight", character._id);
+    await this.inMemoryHashTable.delete("character-shield", character._id);
 
     await clearCacheForKey(`${character._id}-inventory`);
     await clearCacheForKey(`${character._id}-equipment`);

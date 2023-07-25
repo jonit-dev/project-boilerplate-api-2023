@@ -57,7 +57,7 @@ describe("ItemOwnership.ts", () => {
 
     await itemOwnership.addItemOwnership(backpack, testCharacter);
 
-    await itemOwnership.removeOwnershipFromAllItemsInContainer(backpackContainer._id);
+    await itemOwnership.removeOwnershipFromAllItemsInContainer(backpackContainer);
 
     const updatedShortSword = await Item.findById(shortSword._id);
     const updatedLongSword = await Item.findById(longSword._id);

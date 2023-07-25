@@ -15,6 +15,10 @@ export const recipeCorruptionNecklace: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.Rope,
       qty: 1,
     },
+    {
+      key: CraftingResourcesBlueprint.Bone,
+      qty: 20,
+    },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,

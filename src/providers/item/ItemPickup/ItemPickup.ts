@@ -8,8 +8,8 @@ import { provide } from "inversify-binding-decorators";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { MapHelper } from "@providers/map/MapHelper";
-import { clearCacheForKey } from "speedgoose";
 import { ItemOwnership } from "../ItemOwnership";
 import { ItemPickupFromContainer } from "./ItemPickupFromContainer";
 import { ItemPickupFromMap } from "./ItemPickupFromMap";
@@ -26,8 +26,8 @@ export class ItemPickup {
     private characterInventory: CharacterInventory,
     private itemPickupUpdater: ItemPickupUpdater,
     private mapHelper: MapHelper,
-
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -40,6 +40,10 @@ export class ItemPickup {
 
       if (itemToBePicked.isBeingPickedUp) {
         return false;
+      }
+
+      if (itemPickupData.toContainerId) {
+        await this.inMemoryHashTable.delete("container-all-items", itemPickupData.toContainerId);
       }
 
       const inventory = await this.characterInventory.getInventory(character);
@@ -116,8 +120,6 @@ export class ItemPickup {
       }
 
       await this.itemPickupUpdater.finalizePickup(itemToBePicked, character);
-
-      await clearCacheForKey(`${character._id}-inventory`);
 
       return true;
     } catch (error) {

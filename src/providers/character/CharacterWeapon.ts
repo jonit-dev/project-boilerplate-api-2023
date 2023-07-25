@@ -57,7 +57,19 @@ export class CharacterWeapon {
   }
 
   @TrackNewRelicTransaction()
-  public async hasShield(character: ICharacter): Promise<boolean | undefined> {
+  public async hasShield(character: ICharacter): Promise<
+    | {
+        leftHandItem?: IItem;
+        rightHandItem?: IItem;
+      }
+    | undefined
+  > {
+    const hasCached = await this.inMemoryHashTable.get("character-shield", character._id);
+
+    if (hasCached) {
+      return hasCached;
+    }
+
     const equipment = (await Equipment.findById(character.equipment)
       .lean()
       .cacheQuery({
@@ -77,7 +89,9 @@ export class CharacterWeapon {
       : undefined;
 
     if (leftHandItem?.subType === ItemSubType.Shield || rightHandItem?.subType === ItemSubType.Shield) {
-      return true;
+      await this.inMemoryHashTable.set("character-shield", character._id, { leftHandItem, rightHandItem });
+
+      return { leftHandItem, rightHandItem };
     }
   }
 

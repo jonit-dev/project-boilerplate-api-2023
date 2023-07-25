@@ -8,7 +8,6 @@ import {
   ICharacterTemporaryBuff,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { clearCacheForKey } from "speedgoose";
 import { CharacterBuffAttribute } from "./CharacterBuffAttribute";
 import { CharacterBuffSkill } from "./CharacterBuffSkill";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
@@ -25,7 +24,30 @@ export class CharacterBuffActivator {
     character: ICharacter,
     buff: ICharacterTemporaryBuff
   ): Promise<ICharacterBuff | undefined> {
-    return await this.enableBuff(character, buff);
+    try {
+      let noMessage;
+
+      // Enable the buff directly if it's stackable or doesn't originate from anywhere
+      if (!(buff.isStackable || !buff.originateFrom)) {
+        // Find the character buffs that have the same owner and originate from the same place
+        const characterBuff = (await CharacterBuff.findOne({
+          owner: character.id,
+          originateFrom: buff.originateFrom,
+        }).lean()) as ICharacterBuff;
+
+        // If any such buffs exist, disable the buff
+        if (characterBuff) {
+          await this.disableBuff(character, characterBuff._id!, characterBuff.type, true);
+          noMessage = true;
+        }
+      }
+
+      // Enable the buff
+      return await this.enableBuff(character, buff, noMessage);
+    } catch (error) {
+      console.error(error);
+      throw new Error(`Unable to enable temporary buff for character id: ${character.id}, buff id: ${buff._id!}.`);
+    }
   }
 
   public async enablePermanentBuff(
@@ -42,10 +64,6 @@ export class CharacterBuffActivator {
     type: CharacterBuffType,
     noMessage?: boolean
   ): Promise<boolean | undefined> {
-    await clearCacheForKey(`characterBuffs_${character._id}`);
-    await clearCacheForKey(`${character._id}-skills`);
-    await clearCacheForKey(`characterBuff_${character._id}_${buffId}`);
-
     switch (type) {
       case CharacterBuffType.CharacterAttribute:
         return await this.characterBuffCharacterAttribute.disableBuff(character, buffId, noMessage);
@@ -91,10 +109,6 @@ export class CharacterBuffActivator {
     buff: ICharacterPermanentBuff | ICharacterTemporaryBuff,
     noMessage?: boolean
   ): Promise<ICharacterBuff | undefined> {
-    await clearCacheForKey(`characterBuffs_${character._id}`);
-    await clearCacheForKey(`${character._id}-skills`);
-    await clearCacheForKey(`characterBuff_${character._id}_${buff._id}`);
-
     switch (buff.type) {
       case "characterAttribute":
         const newCharBuff = await this.characterBuffCharacterAttribute.enableBuff(character, buff, noMessage);

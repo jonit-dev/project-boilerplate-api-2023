@@ -3,10 +3,13 @@ import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterMonitor } from "@providers/character/CharacterMonitor";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
+import { ContainerSlotsCaching } from "@providers/container/ContainerSlotsCaching";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { RedisManager } from "@providers/database/RedisManager";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import { HashGenerator } from "@providers/hash/HashGenerator";
+import { Locker } from "@providers/locks/Locker";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { NPCLoader } from "@providers/npc/NPCLoader";
@@ -91,5 +94,11 @@ export const entityEffectUse = container.get<EntityEffectUse>(EntityEffectUse);
 export const equipmentSlots = container.get<EquipmentSlots>(EquipmentSlots);
 
 export const blueprintManager = container.get<BlueprintManager>(BlueprintManager);
+
+export const containerSlotsCaching = container.get<ContainerSlotsCaching>(ContainerSlotsCaching);
+
+export const hashGenerator = container.get<HashGenerator>(HashGenerator);
+
+export const locker = container.get<Locker>(Locker);
 
 export { container };
