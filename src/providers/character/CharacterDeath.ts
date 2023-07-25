@@ -144,9 +144,7 @@ export class CharacterDeath {
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
     } finally {
-      if (character?.mode !== Modes.PermadeathMode) {
-        await this.respawnCharacter(character);
-      }
+      await this.respawnCharacter(character);
     }
   }
 
@@ -229,7 +227,10 @@ export class CharacterDeath {
     }
 
     // get item container associated with characterBody
-    const bodyContainer = await ItemContainer.findById(characterBody.itemContainer);
+    const bodyContainer = (await ItemContainer.findById(characterBody.itemContainer).lean({
+      virtuals: true,
+      defaults: true,
+    })) as unknown as IItemContainer;
 
     if (!bodyContainer) {
       throw new Error(`Error fetching itemContainer for Item with key ${characterBody.key}`);
@@ -249,19 +250,17 @@ export class CharacterDeath {
   }
 
   private async clearAllInventoryItems(inventoryId: string, character: ICharacter): Promise<void> {
-    const inventoryItemPromise = Item.findById(inventoryId).lean();
-    const inventoryItem = await inventoryItemPromise;
+    const inventoryItem = await Item.findById(inventoryId).lean();
 
-    await this.clearItem(character, inventoryItem as unknown as IItem);
+    await this.clearItem(character, inventoryItem?._id);
 
-    const inventoryContainerPromise = ItemContainer.findById(inventoryItem?.itemContainer).lean();
-    const inventoryContainer = await inventoryContainerPromise;
+    const inventoryContainer = await ItemContainer.findById(inventoryItem?.itemContainer).lean();
 
     const bodySlots = inventoryContainer?.slots as { [key: string]: IItem };
 
     const clearItemPromises = Object.values(bodySlots).map((slotItem): any => {
       if (slotItem) {
-        return this.clearItem(character, slotItem);
+        return this.clearItem(character, slotItem._id);
       }
     });
 
@@ -294,7 +293,7 @@ export class CharacterDeath {
       item.itemContainer &&
         (await this.inMemoryHashTable.delete("container-all-items", item.itemContainer.toString()!));
 
-      item = await this.clearItem(character, item);
+      item = await this.clearItem(character, item._id);
 
       // now that the slot is clear, lets drop the item on the body
       await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
@@ -318,7 +317,6 @@ export class CharacterDeath {
     forceDropAll: boolean = false
   ): Promise<void> {
     let isDeadBodyLootable = false;
-    const clearItemPromises: any[] = [];
 
     for (const slot of DROPPABLE_EQUIPMENT) {
       try {
@@ -326,16 +324,10 @@ export class CharacterDeath {
 
         if (!itemId) continue;
 
-        const item = (await Item.findById(itemId).lean({ virtuals: true, defaults: true })) as IItem;
-
-        if (!item) {
-          throw new Error(`Error fetching item with id ${itemId}`);
-        }
-
         const n = _.random(0, 100);
 
         if (forceDropAll || n <= DROP_EQUIPMENT_CHANCE) {
-          clearItemPromises.push(this.clearItem(character, item));
+          const item = await this.clearItem(character, itemId);
 
           const removeEquipmentFromSlot = await equipmentSlots.removeItemFromSlot(
             character,
@@ -358,7 +350,6 @@ export class CharacterDeath {
             await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
           }
         }
-        await Promise.all(clearItemPromises);
       } catch (error) {
         console.error(error);
         continue;
@@ -366,9 +357,9 @@ export class CharacterDeath {
     }
   }
 
-  private async clearItem(character: ICharacter, item: IItem): Promise<IItem> {
+  private async clearItem(character: ICharacter, itemId: string): Promise<IItem> {
     const updatedItem = await Item.findByIdAndUpdate(
-      item._id,
+      itemId,
       {
         $unset: {
           x: "",
@@ -387,9 +378,9 @@ export class CharacterDeath {
     if (!updatedItem) throw new Error("Item not found"); // Error handling, just in case
 
     if (updatedItem.itemContainer) {
-      await this.itemOwnership.removeItemOwnership(item);
+      await this.itemOwnership.removeItemOwnership(updatedItem);
     }
-    await this.removeAllItemBuffs(character, item);
+    await this.removeAllItemBuffs(character, updatedItem);
 
     return updatedItem as IItem;
   }
