@@ -23,7 +23,6 @@ import { Locker } from "@providers/locks/Locker";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { Time } from "@providers/time/Time";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import {
   BattleSocketEvents,
@@ -71,7 +70,6 @@ export class CharacterDeath {
     private inMemoryHashTable: InMemoryHashTable,
     private characterBuffActivator: CharacterBuffActivator,
     private locker: Locker,
-    private time: Time,
     private newRelic: NewRelic
   ) {}
 
@@ -309,13 +307,6 @@ export class CharacterDeath {
         await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
       }
 
-      setTimeout(() => {
-        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "You dropped your inventory.",
-          type: "info",
-        });
-      }, 4000);
-
       await this.characterInventory.generateNewInventory(character, ContainersBlueprint.Bag, true);
     }
   }
@@ -327,6 +318,7 @@ export class CharacterDeath {
     forceDropAll: boolean = false
   ): Promise<void> {
     let isDeadBodyLootable = false;
+    const clearItemPromises: any[] = [];
 
     for (const slot of DROPPABLE_EQUIPMENT) {
       try {
@@ -334,7 +326,7 @@ export class CharacterDeath {
 
         if (!itemId) continue;
 
-        let item = (await Item.findById(itemId).lean({ virtuals: true, defaults: true })) as IItem;
+        const item = (await Item.findById(itemId).lean({ virtuals: true, defaults: true })) as IItem;
 
         if (!item) {
           throw new Error(`Error fetching item with id ${itemId}`);
@@ -343,7 +335,7 @@ export class CharacterDeath {
         const n = _.random(0, 100);
 
         if (forceDropAll || n <= DROP_EQUIPMENT_CHANCE) {
-          item = await this.clearItem(character, item);
+          clearItemPromises.push(this.clearItem(character, item));
 
           const removeEquipmentFromSlot = await equipmentSlots.removeItemFromSlot(
             character,
@@ -366,6 +358,7 @@ export class CharacterDeath {
             await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
           }
         }
+        await Promise.all(clearItemPromises);
       } catch (error) {
         console.error(error);
         continue;
@@ -393,8 +386,9 @@ export class CharacterDeath {
 
     if (!updatedItem) throw new Error("Item not found"); // Error handling, just in case
 
-    await this.itemOwnership.removeItemOwnership(item);
-
+    if (updatedItem.itemContainer) {
+      await this.itemOwnership.removeItemOwnership(item);
+    }
     await this.removeAllItemBuffs(character, item);
 
     return updatedItem as IItem;
