@@ -6,7 +6,7 @@ import { CharacterGender } from "@rpg-engine/shared";
 export const npcTraderJewelry = {
   ...generateRandomMovement(),
   key: "jewelry-trader",
-  name: "Darcy Langley",
+  name: "Ion Langley",
   textureKey: "human-girl-4",
   gender: CharacterGender.Female,
   isTrader: true,
