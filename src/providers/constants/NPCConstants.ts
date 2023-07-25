@@ -6,7 +6,8 @@ export const NPC_SKILL_DEXTERITY_MULTIPLIER = 1.75;
 export const NPC_SKILL_RESISTANCE_MULTIPLIER = 1.75;
 
 // Performance
-export const NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE = 50; // remember that in pm2 (prod) this is multiplied by the number of instances (CPUs)
+export const NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE = 30; // remember that in pm2 (prod) this is multiplied by the number of instances (CPUs)
+export const NPC_MIN_DISTANCE_TO_ACTIVATE = 10;
 
 // PZ
 export const NPC_CAN_ATTACK_IN_NON_PVP_ZONE = false;
