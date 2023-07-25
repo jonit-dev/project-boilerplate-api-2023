@@ -236,15 +236,15 @@ export class CharacterDeath {
       throw new Error(`Error fetching itemContainer for Item with key ${characterBody.key}`);
     }
 
+    // there's a chance of dropping any of the equipped items
+    await this.dropEquippedItemOnBody(character, bodyContainer, equipment, forceDropAll);
+
     // drop backpack
     const inventory = equipment.inventory as unknown as IItem;
 
     if (inventory) {
       await this.dropInventory(character, bodyContainer, inventory, forceDropAll);
     }
-
-    // there's a chance of dropping any of the equipped items
-    await this.dropEquippedItemOnBody(character, bodyContainer, equipment, forceDropAll);
 
     await this.clearAllInventoryItems(inventory as unknown as string, character);
   }
@@ -325,7 +325,7 @@ export class CharacterDeath {
 
       if (!itemId) continue;
 
-      let item = (await Item.findById(itemId)) as IItem;
+      let item = (await Item.findById(itemId).lean({ virtuals: true, defaults: true })) as IItem;
 
       if (!item) {
         throw new Error(`Error fetching item with id ${itemId}`);

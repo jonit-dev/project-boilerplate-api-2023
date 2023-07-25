@@ -137,6 +137,7 @@ describe("CharacterDeath.ts", () => {
       testNPC = await unitTestHelper.createMockNPC();
       testCharacter = await unitTestHelper.createMockCharacter({
         mode: Modes.PermadeathMode,
+        isSoftDelete: false,
       });
     });
 
@@ -167,253 +168,252 @@ describe("CharacterDeath.ts", () => {
       expect(spyApplyPenalties).toHaveBeenCalledWith(testCharacter, expect.anything(), true);
     });
   });
-});
 
-describe("Hardcore mode", () => {
-  let characterDeath: CharacterDeath;
-  let testCharacter: ICharacter;
-  let backpackContainer: IItemContainer;
-  let characterEquipment: IEquipment;
-  let testNPC: INPC;
-  let characterWeapon: CharacterWeapon;
+  describe("Hardcore mode", () => {
+    let testCharacter: ICharacter;
+    let backpackContainer: IItemContainer;
+    let characterEquipment: IEquipment;
+    let testNPC: INPC;
+    let characterWeapon: CharacterWeapon;
 
-  beforeAll(() => {
-    characterDeath = container.get<CharacterDeath>(CharacterDeath);
+    beforeAll(() => {
+      characterWeapon = container.get<CharacterWeapon>(CharacterWeapon);
 
-    characterWeapon = container.get<CharacterWeapon>(CharacterWeapon);
-
-    jest.useFakeTimers({
-      advanceTimers: true,
-    });
-
-    // @ts-ignore
-    jest.spyOn(characterDeath.characterDeathCalculator, "calculateInventoryDropChance").mockImplementation(() => 100);
-  });
-
-  beforeEach(async () => {
-    testNPC = await unitTestHelper.createMockNPC();
-    testCharacter = await unitTestHelper.createMockCharacter(
-      {
-        mode: Modes.HardcoreMode,
-      },
-      {
-        hasEquipment: true,
-        hasInventory: true,
-        hasSkills: true,
-      }
-    );
-
-    characterEquipment = (await Equipment.findById(testCharacter.equipment).populate("inventory").exec()) as IEquipment;
-
-    // Add items to character's equipment
-    const equipment = await unitTestHelper.createEquipment();
-    characterEquipment.head = equipment.neck;
-    characterEquipment.neck = equipment.head;
-    characterEquipment.leftHand = equipment.leftHand;
-    await characterEquipment.save();
-
-    // Add items to character's backpack
-    const backpack = characterEquipment.inventory as unknown as IItem;
-    backpackContainer = await unitTestHelper.createMockBackpackItemContainer(backpack, {
-      owner: testCharacter._id,
-      carrier: testCharacter._id,
-    });
-
-    await Item.updateOne(
-      {
-        _id: backpack._id,
-      },
-      {
-        $set: {
-          itemContainer: backpackContainer._id,
-        },
-      }
-    );
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("should drop character's backpack items as a container on its dead body, clear items properly", async () => {
-    // @ts-ignore
-    const spyDropCharacterItemsOnBody = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
-
-    // initially, character's backpack has 2 items
-    expect(backpackContainer?.slots[0]).not.toBeNull();
-    expect(backpackContainer?.slots[1]).not.toBeNull();
-
-    // character dies
-    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
-
-    expect(spyDropCharacterItemsOnBody).toHaveBeenCalled();
-
-    const characterBody = await Item.findOne({
-      name: `${testCharacter.name}'s body`,
-      scene: testCharacter.scene,
-    })
-      .populate("itemContainer")
-      .exec();
-
-    const bodyItemContainer = characterBody!.itemContainer as unknown as IItemContainer;
-
-    expect(characterBody).not.toBeNull();
-
-    // body should have the only one item
-    expect(characterBody!.itemContainer).toBeDefined();
-    expect(bodyItemContainer.slots).toBeDefined();
-
-    expect(bodyItemContainer.slots[0].key).toBe("backpack");
-
-    const updatedBody = await Item.findById(characterBody!._id).lean();
-
-    expect(updatedBody?.owner).toBeUndefined();
-
-    expect(updatedBody?.isDeadBodyLootable).toBe(true);
-
-    const droppedBackpack = bodyItemContainer.slots[0] as unknown as IItem;
-
-    const updatedBackpackContainer = await ItemContainer.findById(droppedBackpack.itemContainer).lean();
-
-    const droppedItem1 = await Item.findById(updatedBackpackContainer?.slots[0]._id).lean();
-    const droppedItem2 = await Item.findById(updatedBackpackContainer?.slots[1]._id).lean();
-    const droppedBPItem = await Item.findById(droppedBackpack?._id).lean();
-
-    expect(droppedItem1?.owner).toBeUndefined();
-    expect(droppedItem2?.owner).toBeUndefined();
-    expect(droppedBPItem?.owner).toBeUndefined();
-  });
-
-  it("should drop equipment item on character's dead body", async () => {
-    // @ts-ignore
-    const characterBody = (await characterDeath.generateCharacterBody(testCharacter)) as IItem;
-
-    let bodyItemContainer = (await ItemContainer.findById(characterBody.itemContainer)) as IItemContainer;
-
-    // character is equipped with 2 items (head and neck)
-    expect(characterEquipment.neck).toBeDefined();
-    expect(characterEquipment.head).toBeDefined();
-    // call 3 times the dropEquippedItemOnBody with 100% chance
-    // of dropping the items to drop both of them
-    // and make one extra call that should not add anything to the body container
-    for (let i = 0; i < 3; i++) {
-      // mock lodash random to always return 100
-      jest.spyOn(_, "random").mockImplementation(() => DROP_EQUIPMENT_CHANCE);
+      jest.useFakeTimers({
+        advanceTimers: true,
+      });
 
       // @ts-ignore
-      await characterDeath.dropEquippedItemOnBody(testCharacter, bodyItemContainer, characterEquipment);
-    }
-
-    const updatedEquipment = (await Equipment.findById(characterEquipment._id)) as IEquipment;
-
-    // character equipment is empty
-    expect(updatedEquipment.neck).not.toBeDefined();
-    expect(updatedEquipment.head).not.toBeDefined();
-
-    bodyItemContainer = (await ItemContainer.findById(characterBody.itemContainer)) as IItemContainer;
-
-    // dead body contains the items
-    expect(bodyItemContainer!.slots).toBeDefined();
-    expect(bodyItemContainer!.slots[0]).not.toBeNull();
-    expect(bodyItemContainer!.slots[1]).not.toBeNull();
-    expect(bodyItemContainer!.slots[2]).not.toBeNull();
-
-    const updatedBody = await Item.findById(characterBody._id);
-    expect(updatedBody?.isDeadBodyLootable).toBe(true);
-  });
-
-  it("should update the attack type after dead and drop Bow, Ranged to Melee", async () => {
-    // @ts-ignore
-    const characterBody = (await characterDeath.generateCharacterBody(testCharacter)) as IItem;
-    const bodyItemContainer = (await ItemContainer.findById(characterBody.itemContainer)) as IItemContainer;
-
-    expect(characterEquipment.leftHand).toBeDefined();
-
-    const characterAttackTypeBeforeEquip = await Character.findById({ _id: testCharacter._id });
-
-    if (!characterAttackTypeBeforeEquip) throw new Error("Character not found");
-
-    const attackType = await characterWeapon.getAttackType(characterAttackTypeBeforeEquip);
-
-    expect(attackType).toEqual(EntityAttackType.Ranged);
-
-    let characterDropItem;
-
-    for (let i = 0; i < 3; i++) {
-      jest.spyOn(_, "random").mockImplementation(() => DROP_EQUIPMENT_CHANCE);
-      // @ts-ignore
-      // eslint-disable-next-line no-unused-vars
-      characterDropItem = await characterDeath.dropEquippedItemOnBody(
-        testCharacter,
-        bodyItemContainer,
-        characterEquipment
-      );
-    }
-
-    if (characterDropItem) {
-      const updatedEquipment = (await Equipment.findById(characterEquipment._id)) as IEquipment;
-
-      expect(updatedEquipment.leftHand).not.toBeDefined();
-
-      const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
-
-      if (!characterAttackTypeAfterEquip) throw new Error("Character not found");
-
-      const attackTypeAfterEquip = await characterWeapon.getAttackType(characterAttackTypeAfterEquip);
-
-      expect(attackTypeAfterEquip).toEqual(EntityAttackType.Melee);
-    }
-  });
-
-  describe("Amulet of Death", () => {
-    let dropCharacterItemsOnBodySpy: jest.SpyInstance;
+      jest.spyOn(characterDeath.characterDeathCalculator, "calculateInventoryDropChance").mockImplementation(() => 100);
+    });
 
     beforeEach(async () => {
+      testNPC = await unitTestHelper.createMockNPC();
+      testCharacter = await unitTestHelper.createMockCharacter(
+        {
+          mode: Modes.HardcoreMode,
+        },
+        {
+          hasEquipment: true,
+          hasInventory: true,
+          hasSkills: true,
+        }
+      );
+
+      characterEquipment = (await Equipment.findById(testCharacter.equipment)
+        .populate("inventory")
+        .exec()) as IEquipment;
+
+      // Add items to character's equipment
+      const equipment = await unitTestHelper.createEquipment();
+      characterEquipment.head = equipment.neck;
+      characterEquipment.neck = equipment.head;
+      characterEquipment.leftHand = equipment.leftHand;
+      await characterEquipment.save();
+
+      // Add items to character's backpack
+      const backpack = characterEquipment.inventory as unknown as IItem;
+      backpackContainer = await unitTestHelper.createMockBackpackItemContainer(backpack, {
+        owner: testCharacter._id,
+        carrier: testCharacter._id,
+      });
+
+      await Item.updateOne(
+        {
+          _id: backpack._id,
+        },
+        {
+          $set: {
+            itemContainer: backpackContainer._id,
+          },
+        }
+      );
+    });
+
+    afterEach(() => {
       jest.clearAllMocks();
+    });
 
+    it("should drop character's backpack items as a container on its dead body, clear items properly", async () => {
       // @ts-ignore
-      dropCharacterItemsOnBodySpy = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
+      const spyDropCharacterItemsOnBody = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
 
-      testCharacter.mode = Modes.HardcoreMode;
-      await testCharacter.save();
-    });
+      // initially, character's backpack has 2 items
+      expect(backpackContainer?.slots[0]).not.toBeNull();
+      expect(backpackContainer?.slots[1]).not.toBeNull();
 
-    const equipAmuletOfDeath = async (): Promise<void> => {
-      const amuletOfDeath = await unitTestHelper.createMockItemFromBlueprint(AccessoriesBlueprint.AmuletOfDeath);
-
-      const equipment = await Equipment.findById(testCharacter.equipment);
-
-      if (!equipment) throw new Error("Equipment not found");
-
-      equipment.neck = amuletOfDeath._id;
-
-      await equipment.save();
-    };
-
-    it("If the character has an amulet of death, it should not drop any items", async () => {
-      await equipAmuletOfDeath();
-
+      // character dies
       await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 
-      expect(dropCharacterItemsOnBodySpy).not.toHaveBeenCalled();
+      expect(spyDropCharacterItemsOnBody).toHaveBeenCalled();
+
+      const characterBody = await Item.findOne({
+        name: `${testCharacter.name}'s body`,
+        scene: testCharacter.scene,
+      })
+        .populate("itemContainer")
+        .exec();
+
+      const bodyItemContainer = characterBody!.itemContainer as unknown as IItemContainer;
+
+      expect(characterBody).not.toBeNull();
+
+      // body should have the only one item
+      expect(characterBody!.itemContainer).toBeDefined();
+      expect(bodyItemContainer.slots).toBeDefined();
+
+      expect(bodyItemContainer.slots[0].key).toBe("backpack");
+
+      const updatedBody = await Item.findById(characterBody!._id).lean();
+
+      expect(updatedBody?.owner).toBeUndefined();
+
+      expect(updatedBody?.isDeadBodyLootable).toBe(true);
+
+      const droppedBackpack = bodyItemContainer.slots[0] as unknown as IItem;
+
+      const updatedBackpackContainer = await ItemContainer.findById(droppedBackpack.itemContainer).lean();
+
+      const droppedItem1 = await Item.findById(updatedBackpackContainer?.slots[0]._id).lean();
+      const droppedItem2 = await Item.findById(updatedBackpackContainer?.slots[1]._id).lean();
+      const droppedBPItem = await Item.findById(droppedBackpack?._id).lean();
+
+      expect(droppedItem1?.owner).toBeUndefined();
+      expect(droppedItem2?.owner).toBeUndefined();
+      expect(droppedBPItem?.owner).toBeUndefined();
     });
 
-    it("If the character has NO amulet of death, it should drop items", async () => {
-      await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+    it("should drop equipment item on character's dead body", async () => {
+      // @ts-ignore
+      const characterBody = (await characterDeath.generateCharacterBody(testCharacter)) as IItem;
 
-      expect(dropCharacterItemsOnBodySpy).toHaveBeenCalled();
+      let bodyItemContainer = (await ItemContainer.findById(characterBody.itemContainer)) as IItemContainer;
+
+      // character is equipped with 2 items (head and neck)
+      expect(characterEquipment.neck).toBeDefined();
+      expect(characterEquipment.head).toBeDefined();
+      // call 3 times the dropEquippedItemOnBody with 100% chance
+      // of dropping the items to drop both of them
+      // and make one extra call that should not add anything to the body container
+      for (let i = 0; i < 3; i++) {
+        // mock lodash random to always return 100
+        jest.spyOn(_, "random").mockImplementation(() => DROP_EQUIPMENT_CHANCE);
+
+        // @ts-ignore
+        await characterDeath.dropEquippedItemOnBody(testCharacter, bodyItemContainer, characterEquipment);
+      }
+
+      const updatedEquipment = (await Equipment.findById(characterEquipment._id)) as IEquipment;
+
+      // character equipment is empty
+      expect(updatedEquipment.neck).not.toBeDefined();
+      expect(updatedEquipment.head).not.toBeDefined();
+
+      bodyItemContainer = (await ItemContainer.findById(characterBody.itemContainer)) as IItemContainer;
+
+      // dead body contains the items
+      expect(bodyItemContainer!.slots).toBeDefined();
+      expect(bodyItemContainer!.slots[0]).not.toBeNull();
+      expect(bodyItemContainer!.slots[1]).not.toBeNull();
+      expect(bodyItemContainer!.slots[2]).not.toBeNull();
+
+      const updatedBody = await Item.findById(characterBody._id);
+      expect(updatedBody?.isDeadBodyLootable).toBe(true);
     });
 
-    it("Should remove the amulet of death, if we die with it", async () => {
-      await equipAmuletOfDeath();
+    it("should update the attack type after dead and drop Bow, Ranged to Melee", async () => {
+      // @ts-ignore
+      const characterBody = (await characterDeath.generateCharacterBody(testCharacter)) as IItem;
+      const bodyItemContainer = (await ItemContainer.findById(characterBody.itemContainer)) as IItemContainer;
 
-      await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+      expect(characterEquipment.leftHand).toBeDefined();
 
-      const equipment = await Equipment.findById(testCharacter.equipment);
+      const characterAttackTypeBeforeEquip = await Character.findById({ _id: testCharacter._id });
 
-      if (!equipment) throw new Error("Equipment not found");
+      if (!characterAttackTypeBeforeEquip) throw new Error("Character not found");
 
-      expect(equipment.neck).toBeUndefined();
+      const attackType = await characterWeapon.getAttackType(characterAttackTypeBeforeEquip);
+
+      expect(attackType).toEqual(EntityAttackType.Ranged);
+
+      let characterDropItem;
+
+      for (let i = 0; i < 3; i++) {
+        jest.spyOn(_, "random").mockImplementation(() => DROP_EQUIPMENT_CHANCE);
+        // @ts-ignore
+        // eslint-disable-next-line no-unused-vars
+        characterDropItem = await characterDeath.dropEquippedItemOnBody(
+          testCharacter,
+          bodyItemContainer,
+          characterEquipment
+        );
+      }
+
+      if (characterDropItem) {
+        const updatedEquipment = (await Equipment.findById(characterEquipment._id)) as IEquipment;
+
+        expect(updatedEquipment.leftHand).not.toBeDefined();
+
+        const characterAttackTypeAfterEquip = await Character.findById({ _id: testCharacter._id });
+
+        if (!characterAttackTypeAfterEquip) throw new Error("Character not found");
+
+        const attackTypeAfterEquip = await characterWeapon.getAttackType(characterAttackTypeAfterEquip);
+
+        expect(attackTypeAfterEquip).toEqual(EntityAttackType.Melee);
+      }
+    });
+
+    describe("Amulet of Death", () => {
+      let dropCharacterItemsOnBodySpy: jest.SpyInstance;
+
+      beforeEach(async () => {
+        jest.clearAllMocks();
+
+        // @ts-ignore
+        dropCharacterItemsOnBodySpy = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
+
+        testCharacter.mode = Modes.HardcoreMode;
+        await testCharacter.save();
+      });
+
+      const equipAmuletOfDeath = async (): Promise<void> => {
+        const amuletOfDeath = await unitTestHelper.createMockItemFromBlueprint(AccessoriesBlueprint.AmuletOfDeath);
+
+        const equipment = await Equipment.findById(testCharacter.equipment);
+
+        if (!equipment) throw new Error("Equipment not found");
+
+        equipment.neck = amuletOfDeath._id;
+
+        await equipment.save();
+      };
+
+      it("If the character has an amulet of death, it should not drop any items", async () => {
+        await equipAmuletOfDeath();
+
+        await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+        expect(dropCharacterItemsOnBodySpy).not.toHaveBeenCalled();
+      });
+
+      it("If the character has NO amulet of death, it should drop items", async () => {
+        await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+        expect(dropCharacterItemsOnBodySpy).toHaveBeenCalled();
+      });
+
+      it("Should remove the amulet of death, if we die with it", async () => {
+        await equipAmuletOfDeath();
+
+        await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+        const equipment = await Equipment.findById(testCharacter.equipment);
+
+        if (!equipment) throw new Error("Equipment not found");
+
+        expect(equipment.neck).toBeUndefined();
+      });
     });
   });
 });

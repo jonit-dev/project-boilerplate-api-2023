@@ -46,60 +46,55 @@ export class CharacterItemInventory {
     return await this.getAllItemsFromContainer(container);
   }
 
-  @TrackNewRelicTransaction()
-  private async getAllItemsFromContainer(container: IItemContainer, depth: number = 0): Promise<IItem[]> {
-    if (depth > 100) {
-      throw new Error("Maximum recursion depth exceeded");
-    }
-
-    const cachedAllItems = await this.inMemoryHashTable.get("container-all-items", container._id);
-
-    if (cachedAllItems) {
-      return cachedAllItems as IItem[];
-    }
-
-    const slots = container.slots as unknown as IItem[];
-
+  private async getAllItemsFromContainer(container: IItemContainer): Promise<IItem[]> {
+    // Initialize the stack with the first container and depth
+    const stack: Array<{ container: IItemContainer; depth: number }> = [{ container, depth: 0 }];
     const items: IItem[] = [];
-
     const processedContainers = new Set<string>();
 
-    for (const [, slot] of Object.entries(slots)) {
-      if (slot) {
-        const item = await Item.findById(slot._id).lean({ virtuals: true, defaults: true });
-        if (item) {
-          // @ts-ignore
-          items.push(item);
+    while (stack.length > 0) {
+      const { container: currentContainer, depth } = stack.pop() as { container: IItemContainer; depth: number };
 
-          if (item.type === ItemType.Container) {
-            const nestedContainer = await ItemContainer.findById(item?.itemContainer).lean({
-              virtuals: true,
-              defaults: true,
-            });
-            if (nestedContainer) {
-              const isSelfReference = nestedContainer._id.toString() === container._id.toString();
+      if (depth > 100) {
+        throw new Error("Maximum recursion depth exceeded");
+      }
 
-              if (isSelfReference) {
-                continue;
+      const cachedAllItems = await this.inMemoryHashTable.get("container-all-items", currentContainer._id);
+      if (cachedAllItems) {
+        items.push(...(cachedAllItems as IItem[]));
+        continue;
+      }
+
+      const slots = currentContainer.slots as unknown as IItem[];
+
+      for (const [, slot] of Object.entries(slots)) {
+        if (slot) {
+          const item = (await Item.findById(slot._id).lean({ virtuals: true, defaults: true })) as unknown as IItem;
+          if (item) {
+            items.push(item);
+
+            if (item.type === ItemType.Container) {
+              const nestedContainer = (await ItemContainer.findById(item.itemContainer).lean({
+                virtuals: true,
+                defaults: true,
+              })) as unknown as IItemContainer;
+              if (nestedContainer) {
+                const nestedContainerIdStr = nestedContainer._id.toString();
+                const isSelfReference = nestedContainerIdStr === currentContainer._id.toString();
+                const hasProcessedContainer = processedContainers.has(nestedContainerIdStr);
+
+                if (!isSelfReference && !hasProcessedContainer) {
+                  stack.push({ container: nestedContainer, depth: depth + 1 });
+                  processedContainers.add(nestedContainerIdStr);
+                }
               }
-
-              const hasProcessedContainer = processedContainers.has(nestedContainer._id.toString());
-
-              if (hasProcessedContainer) {
-                continue;
-              }
-
-              processedContainers.add(nestedContainer._id.toString());
-
-              const nestedItems = await this.getAllItemsFromContainer(nestedContainer as IItemContainer, depth + 1);
-              items.push(...nestedItems);
             }
           }
         }
       }
-    }
 
-    await this.inMemoryHashTable.set("container-all-items", container._id, items);
+      await this.inMemoryHashTable.set("container-all-items", currentContainer._id, items);
+    }
 
     return items;
   }
