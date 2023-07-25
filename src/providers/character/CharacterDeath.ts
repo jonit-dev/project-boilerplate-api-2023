@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import { CharacterBuff, ICharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
@@ -5,6 +6,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
@@ -26,7 +28,6 @@ import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/Ne
 import {
   BattleSocketEvents,
   CharacterBuffType,
-  CharacterSocketEvents,
   IBattleDeath,
   IUIShowMessage,
   Modes,
@@ -54,6 +55,7 @@ export const DROPPABLE_EQUIPMENT = [
   "armor",
 ];
 
+@TrackClassExecutionTime()
 @provide(CharacterDeath)
 export class CharacterDeath {
   constructor(
@@ -125,7 +127,7 @@ export class CharacterDeath {
           break;
         case Modes.PermadeathMode:
           // penalties forcing all equip/inventory loss
-          this.softDeleteCharacterOnPermaDeathMode(character);
+          await this.softDeleteCharacterOnPermaDeathMode(character);
           await this.applyPenalties(character, characterBody, true);
           break;
         default:
@@ -188,14 +190,8 @@ export class CharacterDeath {
     await this.locker.unlock(`character-death-${character.id}`);
   }
 
-  private softDeleteCharacterOnPermaDeathMode(character: ICharacter): void {
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
-      reason: "💀 You died on perma-death mode. Your character was deleted. GG 💀",
-    });
-
-    setTimeout(async () => {
-      await Character.updateOne({ _id: character._id }, { $set: { isSoftDeleted: true } });
-    }, 5000);
+  private async softDeleteCharacterOnPermaDeathMode(character: ICharacter): Promise<void> {
+    await Character.updateOne({ _id: character._id }, { $set: { isSoftDeleted: true } });
   }
 
   private async clearAttackerTarget(attacker: ICharacter | INPC): Promise<void> {
@@ -255,19 +251,23 @@ export class CharacterDeath {
   }
 
   private async clearAllInventoryItems(inventoryId: string, character: ICharacter): Promise<void> {
-    const inventoryItem = await Item.findById(inventoryId).lean();
+    const inventoryItemPromise = Item.findById(inventoryId).lean();
+    const inventoryItem = await inventoryItemPromise;
 
     await this.clearItem(character, inventoryItem as unknown as IItem);
 
-    const inventoryContainer = await ItemContainer.findById(inventoryItem?.itemContainer).lean();
+    const inventoryContainerPromise = ItemContainer.findById(inventoryItem?.itemContainer).lean();
+    const inventoryContainer = await inventoryContainerPromise;
 
     const bodySlots = inventoryContainer?.slots as { [key: string]: IItem };
 
-    for (const slotItem of Object.values(bodySlots)) {
+    const clearItemPromises = Object.values(bodySlots).map((slotItem): any => {
       if (slotItem) {
-        await this.clearItem(character, slotItem);
+        return this.clearItem(character, slotItem);
       }
-    }
+    });
+
+    await Promise.all(clearItemPromises);
   }
 
   private async dropInventory(
@@ -287,8 +287,11 @@ export class CharacterDeath {
 
     const dropInventoryChance = this.characterDeathCalculator.calculateInventoryDropChance(skills);
 
-    if (forceDropAll || n <= dropInventoryChance) {
-      let item = (await Item.findById(inventory._id)) as IItem;
+    if (n <= dropInventoryChance || forceDropAll) {
+      let item = (await Item.findById(inventory._id).lean({
+        virtuals: true,
+        defaults: true,
+      })) as IItem;
 
       item.itemContainer &&
         (await this.inMemoryHashTable.delete("container-all-items", item.itemContainer.toString()!));
@@ -340,6 +343,8 @@ export class CharacterDeath {
         const n = _.random(0, 100);
 
         if (forceDropAll || n <= DROP_EQUIPMENT_CHANCE) {
+          item = await this.clearItem(character, item);
+
           const removeEquipmentFromSlot = await equipmentSlots.removeItemFromSlot(
             character,
             item.key,
@@ -349,8 +354,6 @@ export class CharacterDeath {
           if (!removeEquipmentFromSlot) {
             return;
           }
-
-          item = await this.clearItem(character, item);
 
           // now that the slot is clear, lets drop the item on the body
           await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
@@ -371,7 +374,35 @@ export class CharacterDeath {
   }
 
   private async clearItem(character: ICharacter, item: IItem): Promise<IItem> {
+    const updatedItem = await Item.findByIdAndUpdate(
+      item._id,
+      {
+        $unset: {
+          x: "",
+          y: "",
+          owner: "",
+          scene: "",
+          tiledId: "",
+        },
+      },
+      {
+        new: true,
+        lean: { virtuals: true, defaults: true },
+      }
+    );
+
+    if (!updatedItem) throw new Error("Item not found"); // Error handling, just in case
+
+    await this.itemOwnership.removeItemOwnership(item);
+
+    await this.removeAllItemBuffs(character, item);
+
+    return updatedItem as IItem;
+  }
+
+  private async removeAllItemBuffs(character: ICharacter, item: IItem): Promise<void> {
     const itemKey = item.key;
+
     const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey })
       .lean()
       .select("_id type")) as ICharacterBuff;
@@ -388,25 +419,6 @@ export class CharacterDeath {
         throw new Error(`Error disabling buff ${buff._id}`);
       }
     }
-
-    await Item.updateOne(
-      {
-        _id: item._id,
-      },
-      {
-        $unset: {
-          x: "",
-          y: "",
-          owner: "",
-          scene: "",
-          tiledId: "",
-        },
-      }
-    );
-
-    await this.itemOwnership.removeItemOwnership(item);
-
-    return item;
   }
 
   private async applyPenalties(

@@ -17,16 +17,16 @@ jest.mock("@providers/constants/DeathConstants", () => ({
   DROP_EQUIPMENT_CHANCE: 15,
 }));
 
+jest.useFakeTimers({
+  advanceTimers: true,
+});
+
 describe("CharacterDeath.ts", () => {
   let characterDeath: CharacterDeath;
   let testCharacter: ICharacter;
   let testNPC: INPC;
 
   beforeAll(() => {
-    jest.useFakeTimers({
-      advanceTimers: true,
-    });
-
     characterDeath = container.get<CharacterDeath>(CharacterDeath);
   });
 
@@ -93,10 +93,6 @@ describe("CharacterDeath.ts", () => {
     let testNPC: INPC;
     beforeAll(() => {
       characterDeath = container.get<CharacterDeath>(CharacterDeath);
-
-      jest.useFakeTimers({
-        advanceTimers: true,
-      });
     });
 
     beforeEach(async () => {
@@ -126,14 +122,9 @@ describe("CharacterDeath.ts", () => {
 
     beforeAll(() => {
       characterDeath = container.get<CharacterDeath>(CharacterDeath);
-
-      jest.useFakeTimers({
-        advanceTimers: true,
-      });
     });
 
     beforeEach(async () => {
-      jest.clearAllMocks();
       testNPC = await unitTestHelper.createMockNPC();
       testCharacter = await unitTestHelper.createMockCharacter({
         mode: Modes.PermadeathMode,
@@ -152,8 +143,6 @@ describe("CharacterDeath.ts", () => {
       const spyApplyPenalties = jest.spyOn(characterDeath, "applyPenalties");
 
       await characterDeath.handleCharacterDeath(testNPC, testCharacter);
-
-      jest.runAllTimers();
 
       const postDeathCharacter = await Character.findById(testCharacter._id).lean();
 
@@ -178,10 +167,6 @@ describe("CharacterDeath.ts", () => {
 
     beforeAll(() => {
       characterWeapon = container.get<CharacterWeapon>(CharacterWeapon);
-
-      jest.useFakeTimers({
-        advanceTimers: true,
-      });
 
       // @ts-ignore
       jest.spyOn(characterDeath.characterDeathCalculator, "calculateInventoryDropChance").mockImplementation(() => 100);
@@ -391,30 +376,24 @@ describe("CharacterDeath.ts", () => {
         await equipment.save();
       };
 
-      it("If the character has an amulet of death, it should not drop any items", async () => {
+      it("If the character has an amulet of death, it should not drop any items, but the amulet should be removed", async () => {
         await equipAmuletOfDeath();
 
         await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 
         expect(dropCharacterItemsOnBodySpy).not.toHaveBeenCalled();
-      });
-
-      it("If the character has NO amulet of death, it should drop items", async () => {
-        await characterDeath.handleCharacterDeath(testNPC, testCharacter);
-
-        expect(dropCharacterItemsOnBodySpy).toHaveBeenCalled();
-      });
-
-      it("Should remove the amulet of death, if we die with it", async () => {
-        await equipAmuletOfDeath();
-
-        await characterDeath.handleCharacterDeath(testNPC, testCharacter);
 
         const equipment = await Equipment.findById(testCharacter.equipment);
 
         if (!equipment) throw new Error("Equipment not found");
 
         expect(equipment.neck).toBeUndefined();
+      });
+
+      it("If the character has NO amulet of death, it should drop items", async () => {
+        await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+        expect(dropCharacterItemsOnBodySpy).toHaveBeenCalled();
       });
     });
   });

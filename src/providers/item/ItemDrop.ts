@@ -64,6 +64,9 @@ export class ItemDrop {
 
     let isItemRemoved = false;
 
+    await clearCacheForKey(`${character._id}-inventory`);
+    await clearCacheForKey(`${character._id}-equipment`);
+
     try {
       switch (source) {
         case "equipment":
@@ -114,8 +117,6 @@ export class ItemDrop {
 
           break;
       }
-
-      await clearCacheForKey(`${character._id}-inventory`);
 
       await this.inMemoryHashTable.delete("character-weapon", character._id);
 
