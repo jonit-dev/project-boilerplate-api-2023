@@ -13,7 +13,7 @@ describe("MarketplaceMoneyWithdraw.ts", () => {
   let characterInventory: CharacterInventory;
   let testNPC: INPC;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     characterInventory = container.get(CharacterInventory);
     marketplaceMoneyWithdraw = container.get(MarketplaceMoneyWithdraw);
   });
