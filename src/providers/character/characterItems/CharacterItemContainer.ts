@@ -55,10 +55,7 @@ export class CharacterItemContainer {
     }
 
     const clearCache = async (): Promise<void> => {
-      if (item.type === ItemType.CraftingResource) {
-        // clear the cache for the craftable items
-        await this.inMemoryHashTable.delete("load-craftable-items", character._id);
-      }
+      await this.inMemoryHashTable.delete("load-craftable-items", character._id);
       await this.inMemoryHashTable.delete("character-max-weights", character._id);
     };
 

@@ -321,41 +321,46 @@ export class CharacterDeath {
     let isDeadBodyLootable = false;
 
     for (const slot of DROPPABLE_EQUIPMENT) {
-      const itemId = equipment[slot];
+      try {
+        const itemId = equipment[slot];
 
-      if (!itemId) continue;
+        if (!itemId) continue;
 
-      let item = (await Item.findById(itemId).lean({ virtuals: true, defaults: true })) as IItem;
+        let item = (await Item.findById(itemId).lean({ virtuals: true, defaults: true })) as IItem;
 
-      if (!item) {
-        throw new Error(`Error fetching item with id ${itemId}`);
-      }
-
-      const n = _.random(0, 100);
-
-      if (forceDropAll || n <= DROP_EQUIPMENT_CHANCE) {
-        const removeEquipmentFromSlot = await equipmentSlots.removeItemFromSlot(
-          character,
-          item.key,
-          slot as EquipmentSlotTypes
-        );
-
-        if (!removeEquipmentFromSlot) {
-          return;
+        if (!item) {
+          throw new Error(`Error fetching item with id ${itemId}`);
         }
 
-        item = await this.clearItem(character, item);
+        const n = _.random(0, 100);
 
-        // now that the slot is clear, lets drop the item on the body
-        await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
-          shouldAddOwnership: false,
-          shouldAddAsCarriedItem: false,
-        });
+        if (forceDropAll || n <= DROP_EQUIPMENT_CHANCE) {
+          const removeEquipmentFromSlot = await equipmentSlots.removeItemFromSlot(
+            character,
+            item.key,
+            slot as EquipmentSlotTypes
+          );
 
-        if (!isDeadBodyLootable) {
-          isDeadBodyLootable = true;
-          await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
+          if (!removeEquipmentFromSlot) {
+            return;
+          }
+
+          item = await this.clearItem(character, item);
+
+          // now that the slot is clear, lets drop the item on the body
+          await this.characterItemContainer.addItemToContainer(item, character, bodyContainer._id, {
+            shouldAddOwnership: false,
+            shouldAddAsCarriedItem: false,
+          });
+
+          if (!isDeadBodyLootable) {
+            isDeadBodyLootable = true;
+            await Item.updateOne({ _id: bodyContainer.parentItem }, { $set: { isDeadBodyLootable: true } });
+          }
         }
+      } catch (error) {
+        console.error(error);
+        continue;
       }
     }
   }
