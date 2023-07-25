@@ -47,6 +47,14 @@ export class CharacterItemInventory {
   }
 
   private async getAllItemsFromContainer(container: IItemContainer): Promise<IItem[]> {
+    const cachedAllItems = await this.inMemoryHashTable.get("container-all-items", container._id);
+
+    if (cachedAllItems) {
+      return cachedAllItems as IItem[];
+    }
+
+    console.log("PROCESSING ALL ITEMS!");
+
     // Initialize the stack with the first container and depth
     const stack: Array<{ container: IItemContainer; depth: number }> = [{ container, depth: 0 }];
     const items: IItem[] = [];
@@ -59,12 +67,6 @@ export class CharacterItemInventory {
         throw new Error("Maximum recursion depth exceeded");
       }
 
-      const cachedAllItems = await this.inMemoryHashTable.get("container-all-items", currentContainer._id);
-      if (cachedAllItems) {
-        items.push(...(cachedAllItems as IItem[]));
-        continue;
-      }
-
       const slots = currentContainer.slots as unknown as IItem[];
 
       for (const [, slot] of Object.entries(slots)) {
@@ -72,6 +74,7 @@ export class CharacterItemInventory {
           const item = (await Item.findById(slot._id).lean({ virtuals: true, defaults: true })) as unknown as IItem;
           if (item) {
             items.push(item);
+            console.log("===> item", item.key);
 
             if (item.type === ItemType.Container) {
               const nestedContainer = (await ItemContainer.findById(item.itemContainer).lean({
@@ -84,6 +87,7 @@ export class CharacterItemInventory {
                 const hasProcessedContainer = processedContainers.has(nestedContainerIdStr);
 
                 if (!isSelfReference && !hasProcessedContainer) {
+                  console.log("*** processing container", nestedContainerIdStr);
                   stack.push({ container: nestedContainer, depth: depth + 1 });
                   processedContainers.add(nestedContainerIdStr);
                 }
