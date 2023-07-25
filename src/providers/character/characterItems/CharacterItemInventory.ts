@@ -53,8 +53,6 @@ export class CharacterItemInventory {
       return cachedAllItems as IItem[];
     }
 
-    console.log("PROCESSING ALL ITEMS!");
-
     // Initialize the stack with the first container and depth
     const stack: Array<{ container: IItemContainer; depth: number }> = [{ container, depth: 0 }];
     const items: IItem[] = [];
@@ -74,7 +72,6 @@ export class CharacterItemInventory {
           const item = (await Item.findById(slot._id).lean({ virtuals: true, defaults: true })) as unknown as IItem;
           if (item) {
             items.push(item);
-            console.log("===> item", item.key);
 
             if (item.type === ItemType.Container) {
               const nestedContainer = (await ItemContainer.findById(item.itemContainer).lean({

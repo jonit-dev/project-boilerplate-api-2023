@@ -42,6 +42,10 @@ export class ItemPickup {
         return false;
       }
 
+      if (itemPickupData.toContainerId) {
+        await this.inMemoryHashTable.delete("container-all-items", itemPickupData.toContainerId);
+      }
+
       const inventory = await this.characterInventory.getInventory(character);
 
       const isInventoryItem = itemToBePicked.isItemContainer && inventory === null;
