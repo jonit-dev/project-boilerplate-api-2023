@@ -34,7 +34,7 @@ export const spellFireBolt: Partial<ISpell> = {
     const entityEffectUse = container.get(EntityEffectUse);
     const hitTarget = container.get(HitTarget);
 
-    await hitTarget.hit(character, target, true, MagicPower.Low, true);
+    await hitTarget.hit(character, target, true, MagicPower.Low);
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectBurning);
 

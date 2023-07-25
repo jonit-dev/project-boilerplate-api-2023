@@ -103,8 +103,7 @@ export class HitTarget {
     attacker: ICharacter | INPC,
     target: ICharacter | INPC,
     magicAttack?: boolean,
-    bonusDamage?: number,
-    spellHit?: boolean
+    bonusDamage?: number
   ): Promise<void> {
     if (!target.isAlive) {
       return;
@@ -140,7 +139,7 @@ export class HitTarget {
       if (damage > 0) {
         if (attacker.type === "Character") {
           const character = attacker as ICharacter;
-          await this.skillIncrease.increaseSkillsOnBattle(character, target, damage, spellHit);
+          await this.skillIncrease.increaseSkillsOnBattle(character, target, damage);
         }
 
         if (attacker.class === CharacterClass.Berserker) {
