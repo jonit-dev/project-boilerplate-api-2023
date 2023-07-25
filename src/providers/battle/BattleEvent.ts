@@ -109,7 +109,7 @@ export class BattleEvent {
     let damage =
       weapon?.item && weapon?.item.isTraining
         ? Math.round(_.random(0, 1))
-        : Math.round(_.random(totalPotentialAttackerDamage / 10, totalPotentialAttackerDamage));
+        : Math.round(_.random(totalPotentialAttackerDamage / 3, totalPotentialAttackerDamage));
 
     damage = await this.implementDamageReduction(defenderSkills, target, damage, isMagicAttack);
 
