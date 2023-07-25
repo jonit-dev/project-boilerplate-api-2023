@@ -18,5 +18,6 @@ export const tradersNPCs = {
   [FriendlyNPCsBlueprint.TraderAlchemist]: npcTraderAlchemist,
   [FriendlyNPCsBlueprint.TraderTraining]: npcTraderTraining,
   [FriendlyNPCsBlueprint.TraderHerb]: npcTraderHerbalist,
-  [FriendlyNPCsBlueprint.TraderJewelry]: npcTraderJewelry,
+  // TODO: update this later to match enum
+  "jewelry-trader": npcTraderJewelry,
 };
