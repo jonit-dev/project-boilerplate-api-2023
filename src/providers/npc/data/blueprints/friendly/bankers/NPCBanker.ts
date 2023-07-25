@@ -1,8 +1,8 @@
-import { generateStoppedMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
+import { generateRandomMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
 import { CharacterGender } from "@rpg-engine/shared";
 
 export const npcBanker = {
-  ...generateStoppedMovement(),
+  ...generateRandomMovement(),
   key: "banker",
   name: "Elara the Banker",
   textureKey: "dynasty-woman-1",
