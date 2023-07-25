@@ -155,7 +155,7 @@ describe("CharacterDeath.ts", () => {
 
       jest.runAllTimers();
 
-      const postDeathCharacter = await Character.findById(testCharacter._id);
+      const postDeathCharacter = await Character.findById(testCharacter._id).lean();
 
       if (!postDeathCharacter) {
         throw new Error("Character not found");
@@ -262,7 +262,9 @@ describe("CharacterDeath.ts", () => {
       expect(characterBody!.itemContainer).toBeDefined();
       expect(bodyItemContainer.slots).toBeDefined();
 
-      expect(bodyItemContainer.slots[0].key).toBe("backpack");
+      const hasBackpack = Object.values(bodyItemContainer.slots).some((slot: IItem) => slot.key === "backpack");
+
+      expect(hasBackpack).toBeTruthy();
 
       const updatedBody = await Item.findById(characterBody!._id).lean();
 

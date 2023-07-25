@@ -111,7 +111,12 @@ export class CharacterDeath {
 
       const characterBody = await this.generateCharacterBody(character);
 
-      switch (character?.mode) {
+      if (!character.mode) {
+        await this.applyPenalties(character, characterBody);
+        return;
+      }
+
+      switch (character.mode) {
         case Modes.HardcoreMode:
           await this.applyPenalties(character, characterBody);
           break;
