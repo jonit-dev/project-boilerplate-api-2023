@@ -84,7 +84,6 @@ export class CharacterItemInventory {
                 const hasProcessedContainer = processedContainers.has(nestedContainerIdStr);
 
                 if (!isSelfReference && !hasProcessedContainer) {
-                  console.log("*** processing container", nestedContainerIdStr);
                   stack.push({ container: nestedContainer, depth: depth + 1 });
                   processedContainers.add(nestedContainerIdStr);
                 }
@@ -93,9 +92,8 @@ export class CharacterItemInventory {
           }
         }
       }
-
-      await this.inMemoryHashTable.set("container-all-items", currentContainer._id, items);
     }
+    await this.inMemoryHashTable.set("container-all-items", container._id, items);
 
     return items;
   }
