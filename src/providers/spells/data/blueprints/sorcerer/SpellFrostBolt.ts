@@ -40,7 +40,7 @@ export const spellFrostBolt: Partial<ISpell> = {
     const hitTarget = container.get(HitTarget);
     const spellCalculator = container.get(SpellCalculator);
 
-    await hitTarget.hit(character, target, true, MagicPower.Medium, true);
+    await hitTarget.hit(character, target, true, MagicPower.Medium);
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectFreezing);
 

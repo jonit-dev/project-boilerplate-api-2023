@@ -6,7 +6,6 @@ import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import {
-  POWER_COEFFICIENT,
   SP_CRAFTING_INCREASE_RATIO,
   SP_INCREASE_RATIO,
   SP_MAGIC_INCREASE_TIMES_MANA,
@@ -50,12 +49,7 @@ export class SkillIncrease {
    *
    */
   @TrackNewRelicTransaction()
-  public async increaseSkillsOnBattle(
-    attacker: ICharacter,
-    target: ICharacter | INPC,
-    damage: number,
-    spellHit?: boolean
-  ): Promise<void> {
+  public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     const skills = await this.fetchCharacterSkills(attacker);
 
     const weapon = await this.characterWeapon.getWeapon(attacker);
@@ -67,10 +61,6 @@ export class SkillIncrease {
     }
 
     await this.npcExperience.recordXPinBattle(attacker, target, damage);
-
-    if (spellHit) {
-      return;
-    }
 
     const canIncreaseSP = this.skillGainValidation.canUpdateSkills(attacker, skills, skillName);
     if (!canIncreaseSP) return;
@@ -295,8 +285,7 @@ export class SkillIncrease {
 
   private getMagicSkillIncreaseCalculator(spellPower: number): Function {
     return ((power: number, skillDetails: ISkillDetails): number => {
-      const manaSp =
-        Math.round((Math.pow(spellPower, POWER_COEFFICIENT) + power) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
+      const manaSp = Math.round((power ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
       return this.calculateNewSP(skillDetails) + manaSp;
     }).bind(this, spellPower);
   }
