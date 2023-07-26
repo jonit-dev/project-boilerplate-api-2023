@@ -67,11 +67,13 @@ export default class PartyManagement {
       leader: {
         _id: leader._id,
         class: leader.class as CharacterClass,
+        name: leader.name,
       },
       members: [
         {
           _id: target._id,
           class: target.class as CharacterClass,
+          name: target.name,
         },
       ],
       maxSize: finalMaxSize,
@@ -126,6 +128,7 @@ export default class PartyManagement {
     party.members.push({
       _id: target._id,
       class: target.class as CharacterClass,
+      name: target.name,
     });
 
     const benefits = this.calculatePartyBenefits(party.size + 1, this.getDifferentClasses(party));
@@ -136,6 +139,7 @@ export default class PartyManagement {
         leader: {
           _id: leader._id,
           class: leader.class as CharacterClass,
+          name: leader.name,
         },
         members: party.members,
         benefits,
@@ -323,6 +327,7 @@ export default class PartyManagement {
     party.leader = {
       _id: target._id,
       class: target.class as CharacterClass,
+      name: target.name,
     };
 
     const index = party.members.findIndex((member) => member._id.toString() === target._id.toString());
@@ -343,6 +348,7 @@ export default class PartyManagement {
       party.members.push({
         _id: leader._id,
         class: leader.class as CharacterClass,
+        name: leader.name,
       });
     }
 

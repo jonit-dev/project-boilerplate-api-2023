@@ -12,6 +12,9 @@ const characterPartySchema = createLeanSchema(
         enum: TypeHelper.enumToStringArray(CharacterClass),
         required: true,
       }),
+      name: Type.string({
+        required: true,
+      }),
     },
     members: Type.array({
       required: true,
@@ -22,6 +25,9 @@ const characterPartySchema = createLeanSchema(
       class: Type.string({
         enum: TypeHelper.enumToStringArray(CharacterClass),
         default: CharacterClass.None,
+        required: true,
+      }),
+      name: Type.string({
         required: true,
       }),
     }),
