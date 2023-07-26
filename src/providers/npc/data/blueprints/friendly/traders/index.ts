@@ -7,6 +7,7 @@ import { npcTraderFood } from "./NPCTraderFood";
 import { npcTraderHerbalist } from "./NPCTraderHerb";
 import { npcTraderJewelry } from "./NPCTraderJewelry";
 import { npcTraderMage } from "./NPCTraderMage";
+import { npcTraderTavern } from "./NPCTraderTavern";
 import { npcTraderTraining } from "./NPCTraderTraining";
 
 export const tradersNPCs = {
@@ -18,6 +19,6 @@ export const tradersNPCs = {
   [FriendlyNPCsBlueprint.TraderAlchemist]: npcTraderAlchemist,
   [FriendlyNPCsBlueprint.TraderTraining]: npcTraderTraining,
   [FriendlyNPCsBlueprint.TraderHerb]: npcTraderHerbalist,
-  // TODO: update this later to match enum
-  "jewelry-trader": npcTraderJewelry,
+  [FriendlyNPCsBlueprint.TraderJewelry]: npcTraderJewelry,
+  [FriendlyNPCsBlueprint.TraderTavern]: npcTraderTavern,
 };
