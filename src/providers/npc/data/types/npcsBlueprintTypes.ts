@@ -21,6 +21,7 @@ export enum FriendlyNPCsBlueprint {
   TraderArcher = "trader-archer",
   TraderAlchemist = "trader-alchemist",
   TraderHerb = "trader-herb",
+  TraderTavern = "trader-tavern",
   TraderJewelry = "trader-jewelry",
   Blacksmith = "blacksmith",
 
@@ -127,6 +128,7 @@ export enum HostileNPCsBlueprint {
   DwarfGuardian = "dwarf-guardian",
   DwarfMage = "dwarf-mage",
   Kobold = "kobold",
+  DragonServant = "dragon-servant",
   Wraith = "wraith",
   DragonKnight = "dragon-knight",
   IceThing = "ice-thing",
