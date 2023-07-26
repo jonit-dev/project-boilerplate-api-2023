@@ -25,33 +25,29 @@ import mongoose from "mongoose";
 export default class PartyManagement {
   constructor(private socketMessaging: SocketMessaging, private characterBuffActivator: CharacterBuffActivator) {}
 
-  // create party
-  public async createParty(
-    leader: ICharacter,
-    target: ICharacter,
-    maxSize?: number
-  ): Promise<ICharacterParty | undefined> {
+  // invite or create a party
+  public async inviteOrCreateParty(leader: ICharacter, target: ICharacter, maxSize?: number): Promise<void> {
     if (!leader) {
       throw new Error("Character not found");
     }
 
     if (!target) {
-      this.sendMessageToPartyMembers(leader, "Target not found");
-      return;
-    }
+      this.socketMessaging.sendErrorMessageToCharacter(leader, "Target not found");
 
-    if (leader._id.toString() === target._id.toString()) {
-      this.sendMessageToPartyMembers(leader, "You can't create a party with yourself");
       return;
     }
 
     const isInParty = await this.checkIfIsInParty(leader);
 
-    if (isInParty) {
-      this.sendMessageToPartyMembers(leader, "You are already in a party");
-      return;
-    }
+    isInParty ? await this.inviteToParty(leader, target) : await this.createParty(leader, target, maxSize);
+  }
 
+  // create party
+  private async createParty(
+    leader: ICharacter,
+    target: ICharacter,
+    maxSize?: number
+  ): Promise<ICharacterParty | undefined> {
     const targetIsInParty = await this.checkIfIsInParty(target);
 
     if (targetIsInParty) {
@@ -83,25 +79,24 @@ export default class PartyManagement {
     };
 
     try {
-      await CharacterParty.create(createParty).then(async (party) => {
-        await this.applyAllBuffInParty(party);
+      const party = await CharacterParty.create(createParty);
+      await this.applyAllBuffInParty(party);
 
-        this.sendMessageToPartyMembers(
-          leader,
-          `You created a party with ${target.name}!`,
-          target,
-          `${leader.name} created a party with you!`
-        );
+      this.sendMessageToPartyMembers(
+        leader,
+        `You created a party with ${target.name}!`,
+        target,
+        `${leader.name} created a party with you!`
+      );
 
-        return party;
-      });
+      return party;
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
   // invte to a party
-  public async inviteToParty(leader: ICharacter, target: ICharacter): Promise<void> {
+  private async inviteToParty(leader: ICharacter, target: ICharacter): Promise<void> {
     if (!leader || !target) {
       throw new Error("Leader or target not found");
     }
@@ -280,7 +275,7 @@ export default class PartyManagement {
   private async haveFreeSlots(leader: ICharacter): Promise<boolean> {
     const party = (await CharacterParty.findOne({ "leader._id": leader._id })
       .lean({ virtuals: true })
-      .select("maxSize size")) as ICharacterParty;
+      .select("maxSize size members")) as ICharacterParty;
 
     if (!party) {
       return false;

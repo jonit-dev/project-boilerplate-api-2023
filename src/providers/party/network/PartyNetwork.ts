@@ -1,23 +1,21 @@
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { provide } from "inversify-binding-decorators";
-import { PartyNetworkCreate } from "./PartyNetworkCreate";
+
+import { PartyNetworkInviteOrCreate } from "./PartyNetworkInviteOrCreate";
 import { PartyNetworkLeave } from "./PartyNetworkLeave";
 import { PartyNetworkTranferLeaderShip } from "./PartyNetworkTranferLeaderShip";
-import { PartyNetworkInvite } from "./PartyNetworkInvite";
 
 @provide(PartyNetwork)
 export class PartyNetwork {
   constructor(
-    private partyNetworkCreate: PartyNetworkCreate,
+    private partyNetworkInviteOrCreate: PartyNetworkInviteOrCreate,
     private partyNetworkLeave: PartyNetworkLeave,
-    private partyNetworkTransfer: PartyNetworkTranferLeaderShip,
-    private partyNetworkInvite: PartyNetworkInvite
+    private partyNetworkTransfer: PartyNetworkTranferLeaderShip
   ) {}
 
   public onAddEventListeners(channel: SocketChannel): void {
-    this.partyNetworkCreate.onCreateParty(channel);
+    this.partyNetworkInviteOrCreate.onInviteOrCreateParty(channel);
     this.partyNetworkLeave.onLeaveParty(channel);
     this.partyNetworkTransfer.onTranferLeaderShip(channel);
-    this.partyNetworkInvite.onInviteParty(channel);
   }
 }

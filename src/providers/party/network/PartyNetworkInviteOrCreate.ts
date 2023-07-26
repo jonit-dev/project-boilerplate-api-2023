@@ -1,23 +1,18 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { IPartyManagementFromClient, PartySocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import PartyManagement from "../PartyManagement";
-import { ICharacterPartyChange, IPartyManagementFromClient, PartySocketEvents } from "@rpg-engine/shared";
 
-@provide(PartyNetworkCreate)
-export class PartyNetworkCreate {
-  constructor(
-    private socketAuth: SocketAuth,
-    private socketMessaging: SocketMessaging,
-    private partyManagement: PartyManagement
-  ) {}
+@provide(PartyNetworkInviteOrCreate)
+export class PartyNetworkInviteOrCreate {
+  constructor(private socketAuth: SocketAuth, private partyManagement: PartyManagement) {}
 
-  public onCreateParty(channel: SocketChannel): void {
+  public onInviteOrCreateParty(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      PartySocketEvents.Create,
+      PartySocketEvents.InviteOrCreate,
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
           const leader = (await Character.findById(character._id).lean()) as ICharacter;
@@ -31,11 +26,7 @@ export class PartyNetworkCreate {
             throw new Error("Error on leave party, character target not found");
           }
 
-          const createParty = await this.partyManagement.createParty(leader, target);
-
-          if (!createParty) {
-            throw new Error("Error on create party");
-          }
+          await this.partyManagement.inviteOrCreateParty(leader, target);
         } catch (error) {
           console.error(error);
         }

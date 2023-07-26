@@ -96,6 +96,7 @@ describe("Party Benefits", () => {
   });
 
   it("should calculate correct benefits for a party with 2 members", async () => {
+    // @ts-ignore
     await partyManagement.createParty(characterLeader, firstMember);
 
     // @ts-ignore
@@ -110,7 +111,9 @@ describe("Party Benefits", () => {
   });
 
   it("should calculate correct benefits for a party with 3 members", async () => {
+    // @ts-ignore
     await partyManagement.createParty(characterLeader, firstMember);
+    // @ts-ignore
     await partyManagement.inviteToParty(characterLeader, secondMember);
 
     // @ts-ignore
@@ -122,7 +125,9 @@ describe("Party Benefits", () => {
   });
 
   it("should update benefits when a party member is removed", async () => {
+    // @ts-ignore
     await partyManagement.createParty(characterLeader, firstMember);
+    // @ts-ignore
     await partyManagement.inviteToParty(characterLeader, secondMember);
 
     await partyManagement.leaveParty(secondMember, secondMember);
