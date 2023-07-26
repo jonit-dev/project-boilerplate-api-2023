@@ -16,6 +16,7 @@ import {
   ICharacterBuff,
   ICharacterPartyShared,
   ICharacterPermanentBuff,
+  PartySocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -60,6 +61,11 @@ export default class PartyManagement {
     if (typeof maxSize !== "undefined") {
       finalMaxSize = maxSize < 2 ? 2 : maxSize > 5 ? 5 : maxSize;
     }
+
+    //Send Confirmation message to target
+    this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
+      leaderName: leader.name,
+    });
 
     const benefits = this.calculatePartyBenefits(2, leader.class !== target.class ? 2 : 1);
 
@@ -120,6 +126,11 @@ export default class PartyManagement {
       this.sendMessageToPartyMembers(leader, "Your party is already full");
       return;
     }
+
+    //Send Confirmation message to target
+    this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
+      leaderName: leader.name,
+    });
 
     const party = (await this.getPartyByCharacterId(leader._id)) as ICharacterParty;
 
