@@ -128,6 +128,7 @@ export enum HostileNPCsBlueprint {
   DwarfGuardian = "dwarf-guardian",
   DwarfMage = "dwarf-mage",
   Kobold = "kobold",
+  DragonServant = "dragon-servant",
   Wraith = "wraith",
   DragonKnight = "dragon-knight",
   IceThing = "ice-thing",

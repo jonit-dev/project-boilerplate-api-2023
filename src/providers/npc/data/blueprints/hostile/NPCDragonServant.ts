@@ -4,66 +4,46 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   ArmorsBlueprint,
-  BootsBlueprint,
+  BooksBlueprint,
   CraftingResourcesBlueprint,
   HelmetsBlueprint,
-  LegsBlueprint,
+  OthersBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { AnimationEffectKeys, NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
+import { AnimationEffectKeys, MagicsBlueprint, NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcRedDragon = {
+export const npcDragonServant: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Red Dragon",
-  key: HostileNPCsBlueprint.RedDragon,
-  subType: NPCSubtype.Animal,
-  textureKey: HostileNPCsBlueprint.RedDragon,
+  name: "Dragon's Servant",
+  key: HostileNPCsBlueprint.DragonServant,
+  textureKey: HostileNPCsBlueprint.Kobold,
   alignment: NPCAlignment.Hostile,
+  speed: MovementSpeed.Standard,
+  baseHealth: 4000,
   attackType: EntityAttackType.MeleeRanged,
   ammoKey: AnimationEffectKeys.FireBall,
   maxRangeAttack: 8,
-  speed: MovementSpeed.ExtraFast,
-  baseHealth: 30000,
   healthRandomizerDice: Dice.D20,
-  skillRandomizerDice: Dice.D20,
-  skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
+  canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 200,
+    level: 145,
     strength: {
-      level: 200,
+      level: 140,
     },
     dexterity: {
-      level: 200,
+      level: 140,
     },
     resistance: {
-      level: 200,
-    },
-    magicResistance: {
-      level: 200,
-    },
-    magic: {
-      level: 200,
+      level: 150,
     },
   },
+  fleeOnLowHealth: true,
   loots: [
-    {
-      itemBlueprintKey: SwordsBlueprint.DragonsSword,
-      chance: 20,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.DragonHead,
-      chance: 50,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.DragonTooth,
-      chance: 50,
-      quantityRange: [1, 3],
-    },
     {
       itemBlueprintKey: ArmorsBlueprint.GoldenArmor,
       chance: 20,
@@ -76,17 +56,20 @@ export const npcRedDragon = {
       itemBlueprintKey: ArmorsBlueprint.MithrilArmor,
       chance: 20,
     },
+
     {
-      itemBlueprintKey: LegsBlueprint.MithrilLegs,
-      chance: 15,
+      itemBlueprintKey: CraftingResourcesBlueprint.Silk,
+      chance: 35,
+      quantityRange: [1, 6],
     },
     {
-      itemBlueprintKey: LegsBlueprint.GoldenLegs,
-      chance: 10,
+      itemBlueprintKey: HelmetsBlueprint.BerserkersHelmet,
+      chance: 2,
     },
     {
-      itemBlueprintKey: BootsBlueprint.GoldenBoots,
-      chance: 30,
+      itemBlueprintKey: OthersBlueprint.GoldCoin,
+      chance: 50,
+      quantityRange: [25, 75],
     },
     {
       itemBlueprintKey: HelmetsBlueprint.RoyalHelmet,
@@ -102,13 +85,21 @@ export const npcRedDragon = {
       chance: 5,
     },
     {
-      itemBlueprintKey: HelmetsBlueprint.RoyalKnightHelmet,
-      chance: 5,
+      itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
+      chance: 1,
     },
     {
-      itemBlueprintKey: ShieldsBlueprint.SilverShield,
-      chance: 30,
+      itemBlueprintKey: BooksBlueprint.Book,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: MagicsBlueprint.Rune,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.EldensSword,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Burning],
-} as Partial<INPC>;
+};

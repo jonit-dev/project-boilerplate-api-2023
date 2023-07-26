@@ -10,6 +10,7 @@ import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcCentipede } from "./NPCCentipede";
 import { npcDarkKnight } from "./NPCDarkKnight";
 import { npcDragonKnight } from "./NPCDragonKnight";
+import { npcDragonServant } from "./NPCDragonServant";
 import { npcDwarf } from "./NPCDwarf";
 import { npcDwarfArcher } from "./NPCDwarfArcher";
 import { npcDwarfGuard } from "./NPCDwarfGuard";
@@ -131,4 +132,5 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.MinotaurArcher]: npcMinotaurArcher,
   [HostileNPCsBlueprint.MinotaurMage]: npcMinotaurMage,
   [HostileNPCsBlueprint.MinotaurBerserker]: npcMinotaurBerserker,
+  [HostileNPCsBlueprint.DragonServant]: npcDragonServant,
 };
