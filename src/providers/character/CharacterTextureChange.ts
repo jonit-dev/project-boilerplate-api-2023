@@ -29,7 +29,11 @@ export class CharacterTextureChange {
       const updatedCharacter = await this.updateCharacterTexture(character._id, textureKey);
       const payload: ICharacterAttributeChanged = this.createPayload(updatedCharacter);
 
-      this.socketMessaging.sendEventToAllUsers(CharacterSocketEvents.AttributeChanged, payload);
+      await this.socketMessaging.sendEventToCharactersAroundCharacter(
+        character,
+        CharacterSocketEvents.AttributeChanged,
+        payload
+      );
       this.socketMessaging.sendMessageToCharacter(
         character,
         `You've morphed into a ${textureKey} for ${intervalInSecs} seconds!`
@@ -62,7 +66,11 @@ export class CharacterTextureChange {
           const refreshedPayload: ICharacterAttributeChanged = this.createPayload(refreshedCharacter);
 
           await this.inMemoryHashTable.delete(namespace, key);
-          this.socketMessaging.sendEventToAllUsers(CharacterSocketEvents.AttributeChanged, refreshedPayload);
+          await this.socketMessaging.sendEventToCharactersAroundCharacter(
+            character,
+            CharacterSocketEvents.AttributeChanged,
+            refreshedPayload
+          );
         }
       }, intervalInSecs * 1000);
     } catch (error) {
