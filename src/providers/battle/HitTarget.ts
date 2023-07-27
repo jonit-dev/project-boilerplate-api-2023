@@ -233,7 +233,7 @@ export class HitTarget {
     void this.warnCharacterIfNotInView(attacker as ICharacter, target);
 
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
-    void this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
+    await this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
     void this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
   }
 
