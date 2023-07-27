@@ -294,7 +294,11 @@ export class HitTarget {
       channelIds.push(character.channelId);
     }
 
-    this.socketMessaging.sendEventToAllUsers(BattleSocketEvents.BattleEvent, battleEventPayload);
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(
+      character,
+      BattleSocketEvents.BattleEvent,
+      battleEventPayload
+    );
   }
 
   private async applyEntityEffectsIfApplicable(npc: INPC, target: ICharacter | INPC): Promise<void> {
