@@ -6,6 +6,7 @@ import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepo
 import { FactionRepository } from "@repositories/ModuleCharacter/FactionRepository";
 import { provide } from "inversify-binding-decorators";
 import { CreateCharacterDTO } from "./CreateCharacterDTO";
+import { isAlphanumeric } from "@providers/constants/AlphanumericConstants";
 
 @provide(CreateCharacterUseCase)
 export class CreateCharacterUseCase {
@@ -26,7 +27,9 @@ export class CreateCharacterUseCase {
         })
       );
     }
-
+    if (!isAlphanumeric(newCharacter.name)) {
+      throw new BadRequestError("Sorry, your character name is invalid!");
+    }
     const createdCharacter = await this.characterRepository.createCharacter(newCharacter, ownerId);
 
     user.characters?.push(createdCharacter._id);
