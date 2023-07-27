@@ -1,12 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { User } from "@entities/ModuleSystem/UserModel";
+import { isAlphanumeric } from "@providers/constants/AlphanumericConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { TS } from "@providers/translation/TranslationHelper";
 import { CharacterRepository } from "@repositories/ModuleCharacter/CharacterRepository";
 import { FactionRepository } from "@repositories/ModuleCharacter/FactionRepository";
 import { provide } from "inversify-binding-decorators";
 import { CreateCharacterDTO } from "./CreateCharacterDTO";
-import { isAlphanumeric } from "@providers/constants/AlphanumericConstants";
 
 @provide(CreateCharacterUseCase)
 export class CreateCharacterUseCase {
@@ -28,7 +28,7 @@ export class CreateCharacterUseCase {
       );
     }
     if (!isAlphanumeric(newCharacter.name)) {
-      throw new BadRequestError("Sorry, your character name is invalid!");
+      throw new BadRequestError("Sorry, your character name must use only letters or numbers (alphanumeric)!");
     }
     const createdCharacter = await this.characterRepository.createCharacter(newCharacter, ownerId);
 
