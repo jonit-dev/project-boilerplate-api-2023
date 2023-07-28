@@ -1,10 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER } from "@providers/constants/EntityEffectsConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { TraitGetter } from "@providers/skill/TraitGetter";
-import { BasicAttribute } from "@rpg-engine/shared";
 import { CalculateEffectDamage } from "../CalculateEffectDamage";
 
 describe("CalculateEffectDamage", () => {
@@ -17,46 +14,37 @@ describe("CalculateEffectDamage", () => {
     testAttacker = await unitTestHelper.createMockNPC(null, { hasSkills: true });
     testTarget = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
 
-    // attackerLevel = 3
-    Skill.findOne = jest.fn().mockReturnValue({
-      lean: jest.fn().mockResolvedValue({ level: 3 }),
-    });
+    const testAttackerSkills = (await Skill.findById(testAttacker.skills)) as ISkill;
+    testAttackerSkills.level = 50;
+    testAttackerSkills.resistance.level = 12;
+    testAttackerSkills.magicResistance.level = 14;
+    testAttackerSkills.magic.level = 10;
 
-    // resistanceLevel and  magicResistanceLevel 2
-    const mockTraitGetter = {
-      getSkillLevelWithBuffs: jest.fn().mockImplementation((skill, attribute) => {
-        return attribute === BasicAttribute.Resistance || attribute === BasicAttribute.MagicResistance
-          ? Promise.resolve(2)
-          : Promise.reject(new Error("Unknown attribute"));
-      }),
-    };
+    await testAttackerSkills.save(); // Save the updated skills
 
-    container.unbind(TraitGetter);
-    // @ts-ignore
-    container.bind(TraitGetter).toConstantValue(mockTraitGetter);
+    const testTargetSkills = (await Skill.findById(testTarget.skills)) as ISkill;
+    testTargetSkills.level = 3;
+    testTargetSkills.resistance.level = 2;
+    testTargetSkills.magicResistance.level = 4;
+
+    await testTargetSkills.save(); // Save the updated skills
   });
+  it("calculateEffectDamage should return correct damage", async () => {
+    const spyGetTargetResistance = jest.spyOn(CalculateEffectDamage.prototype as any, "getTargetResistances");
+    const spyCalculateTotalEffectDamage = jest.spyOn(
+      CalculateEffectDamage.prototype as any,
+      "calculateTotalEffectDamage"
+    );
 
-  test("calculateEffectDamage should return correct damage", async () => {
+    await testAttacker.populate("skills").execPopulate();
+    await testTarget.populate("skills").execPopulate();
+
     const result = await calculateEffectDamage.calculateEffectDamage(testAttacker, testTarget);
 
-    expect(Skill.findOne).toHaveBeenCalledWith({ _id: testTarget.skills });
+    expect(spyGetTargetResistance).toHaveBeenCalledTimes(1);
 
-    expect(container.get(TraitGetter).getSkillLevelWithBuffs).toHaveBeenNthCalledWith(
-      1,
-      { level: 3 },
-      BasicAttribute.Resistance
-    );
+    expect(spyCalculateTotalEffectDamage).toHaveBeenCalledWith(50, 10, 1, 1, 2, 4, undefined);
 
-    expect(container.get(TraitGetter).getSkillLevelWithBuffs).toHaveBeenNthCalledWith(
-      2,
-      { level: 3 },
-      BasicAttribute.MagicResistance
-    );
-
-    const maxDamage = Math.ceil(3 * ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER);
-    const maxDefense = 2 + 2; // resistanceLevel + magicResistanceLevel
-
-    expect(result).toBeGreaterThanOrEqual(1);
-    expect(result).toBeLessThanOrEqual(Math.max(maxDamage - maxDefense, 1));
+    expect(result).toBeLessThanOrEqual(40);
   });
 });
