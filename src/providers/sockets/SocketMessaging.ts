@@ -50,14 +50,19 @@ export class SocketMessaging {
   public async sendEventToCharactersAroundCharacter<T>(
     character: ICharacter,
     eventName: string,
-    data?: T
+    data?: T,
+    includeSelf: boolean = true
   ): Promise<void> {
     const charactersNearby = await this.characterView.getCharactersInView(character);
 
     if (charactersNearby) {
-      for (const character of charactersNearby) {
-        this.sendEventToUser<T>(character.channelId!, eventName, data || ({} as T));
+      for (const nearbyCharacter of charactersNearby) {
+        this.sendEventToUser<T>(nearbyCharacter.channelId!, eventName, data || ({} as T));
       }
+    }
+
+    if (includeSelf) {
+      this.sendEventToUser<T>(character.channelId!, eventName, data || ({} as T));
     }
   }
 
