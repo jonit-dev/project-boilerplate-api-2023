@@ -50,10 +50,6 @@ export const npcWolf = {
       chance: 30,
     },
     {
-      itemBlueprintKey: DaggersBlueprint.Kunai,
-      chance: 10,
-    },
-    {
       itemBlueprintKey: AccessoriesBlueprint.WolfToothChain,
       chance: 10,
     },
