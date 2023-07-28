@@ -32,7 +32,8 @@ export class CharacterTextureChange {
       await this.socketMessaging.sendEventToCharactersAroundCharacter(
         character,
         CharacterSocketEvents.AttributeChanged,
-        payload
+        payload,
+        true
       );
       this.socketMessaging.sendMessageToCharacter(
         character,
@@ -69,7 +70,8 @@ export class CharacterTextureChange {
           await this.socketMessaging.sendEventToCharactersAroundCharacter(
             character,
             CharacterSocketEvents.AttributeChanged,
-            refreshedPayload
+            refreshedPayload,
+            true
           );
         }
       }, intervalInSecs * 1000);

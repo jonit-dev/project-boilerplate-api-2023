@@ -51,7 +51,7 @@ export class SocketMessaging {
     character: ICharacter,
     eventName: string,
     data?: T,
-    includeSelf: boolean = true
+    includeSelf: boolean = false
   ): Promise<void> {
     const charactersNearby = await this.characterView.getCharactersInView(character);
 

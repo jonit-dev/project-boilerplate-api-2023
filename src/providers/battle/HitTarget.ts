@@ -297,7 +297,8 @@ export class HitTarget {
     await this.socketMessaging.sendEventToCharactersAroundCharacter(
       character,
       BattleSocketEvents.BattleEvent,
-      battleEventPayload
+      battleEventPayload,
+      true
     );
   }
 

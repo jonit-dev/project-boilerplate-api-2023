@@ -62,7 +62,8 @@ describe("CharacterTextureChange.ts", () => {
       {
         targetId: testCharacter._id,
         textureKey: textureKey,
-      }
+      },
+      true
     );
 
     expect(mockSocketMessaging.sendMessageToCharacter).toBeCalledWith(
