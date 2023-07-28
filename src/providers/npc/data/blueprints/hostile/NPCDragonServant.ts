@@ -100,6 +100,10 @@ export const npcDragonServant: Partial<INPC> = {
       itemBlueprintKey: SwordsBlueprint.EldensSword,
       chance: 2,
     },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.DragonTooth,
+      chance: 10,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Burning],
 };

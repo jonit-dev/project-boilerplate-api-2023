@@ -1,5 +1,6 @@
 import { AccessoriesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { recipeAmuletOfDeath } from "./recipeAmuletOfDeath";
 import { recipeBandana } from "./recipeBandana";
 import { recipeCorruptionNecklace } from "./recipeCorruptionNecklace";
 import { recipeDeathNecklace } from "./recipeDeathNecklace";
@@ -16,4 +17,5 @@ export const recipeAccessoriesIndex: Record<string, IUseWithCraftingRecipe[]> = 
   [AccessoriesBlueprint.HasteRing]: [recipeHasteRing],
   [AccessoriesBlueprint.OrcRing]: [recipeOrcRing],
   [AccessoriesBlueprint.PendantOfLife]: [recipePendantOfLife],
+  [AccessoriesBlueprint.AmuletOfDeath]: [recipeAmuletOfDeath],
 };

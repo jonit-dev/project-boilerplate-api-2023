@@ -24,12 +24,12 @@ export const npcSpider = {
   baseHealth: 49,
   healthRandomizerDice: Dice.D4,
   skills: {
-    level: 1,
+    level: 0.5,
     strength: {
-      level: 2,
+      level: 1,
     },
     dexterity: {
-      level: 3,
+      level: 2,
     },
     resistance: {
       level: 1,
