@@ -5,6 +5,7 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentEquipInventory } from "@providers/equipment/EquipmentEquipInventory";
 
+import { ItemCraftableCaching } from "@providers/item/ItemCraftableCaching";
 import { ItemMap } from "@providers/item/ItemMap";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { Locker } from "@providers/locks/Locker";
@@ -33,7 +34,8 @@ export class CharacterItemContainer {
     private characterInventory: CharacterInventory,
     private itemOwnership: ItemOwnership,
     private locker: Locker,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private itemCraftableCaching: ItemCraftableCaching
   ) {}
 
   @TrackNewRelicTransaction()
@@ -55,7 +57,7 @@ export class CharacterItemContainer {
     }
 
     const clearCache = async (): Promise<void> => {
-      await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+      await this.itemCraftableCaching.clearCraftbookCache(character._id);
       await this.inMemoryHashTable.delete("character-max-weights", character._id);
     };
 
@@ -195,7 +197,7 @@ export class CharacterItemContainer {
 
       if (result && item.type === ItemType.CraftingResource) {
         // clear the cache for the craftable items
-        await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+        await this.itemCraftableCaching.clearCraftbookCache(character._id);
       }
 
       if (result && shouldAddOwnership) {
