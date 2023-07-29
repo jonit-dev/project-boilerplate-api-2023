@@ -19,15 +19,15 @@ export const npcRat = {
   baseHealth: 20,
   healthRandomizerDice: Dice.D4,
   skills: {
-    level: 1,
+    level: 0.5,
     strength: {
-      level: 1,
+      level: 0.5,
     },
     dexterity: {
-      level: 1,
+      level: 0.5,
     },
     resistance: {
-      level: 1,
+      level: 0.5,
     },
   },
   loots: [

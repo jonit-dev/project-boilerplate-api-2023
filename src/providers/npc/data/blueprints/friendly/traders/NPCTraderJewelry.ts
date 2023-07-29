@@ -20,8 +20,5 @@ export const npcTraderJewelry = {
     {
       key: AccessoriesBlueprint.IronRing,
     },
-    {
-      key: AccessoriesBlueprint.AmuletOfDeath,
-    },
   ],
 } as Partial<INPC>;
