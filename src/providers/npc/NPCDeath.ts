@@ -286,7 +286,9 @@ export class NPCDeath {
 
     let lootItem = new Item({ ...blueprintData });
 
-    if (lootItem.attack || lootItem.defense) {
+    const itemTypesWithoutRarity = [ItemType.CraftingResource, ItemType.Quest, ItemType.Information];
+
+    if (lootItem.attack || (lootItem.defense && !itemTypesWithoutRarity.includes(lootItem.type as ItemType))) {
       const rarityAttributes = this.itemRarity.setItemRarityOnLootDrop(lootItem);
       lootItem = new Item({
         ...blueprintData,
