@@ -9,7 +9,6 @@ import { RedisManager } from "@providers/database/RedisManager";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { HashGenerator } from "@providers/hash/HashGenerator";
-import { ItemCraftableCaching } from "@providers/item/ItemCraftableCaching";
 import { Locker } from "@providers/locks/Locker";
 import { MapLoader } from "@providers/map/MapLoader";
 import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
@@ -101,7 +100,5 @@ export const containerSlotsCaching = container.get<ContainerSlotsCaching>(Contai
 export const hashGenerator = container.get<HashGenerator>(HashGenerator);
 
 export const locker = container.get<Locker>(Locker);
-
-export const itemCraftableCaching = container.get<ItemCraftableCaching>(ItemCraftableCaching);
 
 export { container };

@@ -22,7 +22,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterItems } from "../character/characterItems/CharacterItems";
-import { ItemCraftableCaching } from "./ItemCraftableCaching";
+
 import { ItemDropCleanup } from "./ItemDropCleanup";
 import { ItemOwnership } from "./ItemOwnership";
 
@@ -38,8 +38,7 @@ export class ItemDrop {
     private itemOwnership: ItemOwnership,
     private characterInventory: CharacterInventory,
     private itemCleanup: ItemDropCleanup,
-    private inMemoryHashTable: InMemoryHashTable,
-    private itemCraftableCaching: ItemCraftableCaching
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   //! For now, only a drop from inventory or equipment set is allowed.
@@ -125,7 +124,7 @@ export class ItemDrop {
       await this.inMemoryHashTable.delete("container-all-items", itemDropData.fromContainerId);
 
       if (itemToBeDropped.type === ItemType.CraftingResource) {
-        await this.itemCraftableCaching.clearCraftbookCache(character._id);
+        await this.inMemoryHashTable.delete("load-craftable-items", character._id);
       }
 
       await this.inMemoryHashTable.delete("inventory-weight", character._id);

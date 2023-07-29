@@ -32,7 +32,7 @@ import { provide } from "inversify-binding-decorators";
 import { throttle } from "lodash";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
-import { ItemCraftableCaching } from "./ItemCraftableCaching";
+
 import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
 @provide(ItemCraftable)
@@ -47,8 +47,7 @@ export class ItemCraftable {
     private animationEffect: AnimationEffect,
     private skillIncrease: SkillIncrease,
     private characterInventory: CharacterInventory,
-    private inMemoryHashTable: InMemoryHashTable,
-    private itemCraftableCaching: ItemCraftableCaching
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -184,7 +183,7 @@ export class ItemCraftable {
       return;
     }
 
-    await this.itemCraftableCaching.clearCraftbookCache(character._id);
+    await this.inMemoryHashTable.delete("load-craftable-items", character._id);
 
     await this.performCrafting(recipe, character, itemToCraft.itemSubType);
   }
@@ -336,6 +335,7 @@ export class ItemCraftable {
   private canCraftRecipe(inventoryInfo: Map<string, number>, recipe: IUseWithCraftingRecipe): boolean {
     return recipe.requiredItems.every((ing) => {
       const availableQty = inventoryInfo.get(ing.key) ?? 0;
+
       return availableQty >= ing.qty;
     });
   }
@@ -431,9 +431,9 @@ export class ItemCraftable {
 
     for (const item of items) {
       if (item.stackQty) {
-        ingredientMap.set(item.key, item.stackQty);
+        ingredientMap.set(item.key, item.stackQty + (ingredientMap.get(item.key) ?? 0));
       } else {
-        ingredientMap.set(item.key, 1);
+        ingredientMap.set(item.key, (ingredientMap.get(item.key) ?? 0) + 1);
       }
     }
 
