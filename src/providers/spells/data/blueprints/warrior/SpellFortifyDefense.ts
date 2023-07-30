@@ -20,7 +20,7 @@ export const spellFortifyDefense: Partial<ISpell> = {
   description: "Temporarily increases the warrior's shielding skill.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "thura korima",
-  manaCost: 50,
+  manaCost: 40,
   minLevelRequired: 6,
   minMagicLevelRequired: 5,
   cooldown: 40,

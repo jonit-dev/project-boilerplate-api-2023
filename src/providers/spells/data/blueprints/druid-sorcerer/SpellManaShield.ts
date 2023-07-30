@@ -18,7 +18,7 @@ export const spellManaShield: Partial<ISpell> = {
   description: "A spell designed for a sorcerer to takes damage but damage is reduced from mana.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "mana scutum",
-  manaCost: 100,
+  manaCost: 70,
   minLevelRequired: 5,
   minMagicLevelRequired: 7,
   cooldown: 60,

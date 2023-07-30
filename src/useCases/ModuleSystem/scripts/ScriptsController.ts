@@ -27,6 +27,17 @@ export class ScriptsController implements interfaces.Controller {
     });
   }
 
+  @httpGet("/max-health-max-mana")
+  public async maxHealthMaxMana(@response() res): Promise<void> {
+    // update all initial coordinates from users performatically
+
+    await this.scriptsUserCase.adjustMaxHealthMaxMana();
+
+    return res.status(200).send({
+      message: "Max HP/Mana adjusted and buffs removed",
+    });
+  }
+
   @httpGet("/spell-fix")
   public async spellFix(@response() res): Promise<void> {
     // update all initial coordinates from users performatically

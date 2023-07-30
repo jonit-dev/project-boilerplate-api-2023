@@ -24,7 +24,7 @@ export const spellCorruptionBolt: Partial<ISpell> = {
   description: "Cast a deadly corruption bolt at your target.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "moe i morgul",
-  manaCost: 180,
+  manaCost: 120,
   minLevelRequired: 20,
   minMagicLevelRequired: 20,
   cooldown: 15,

@@ -12,7 +12,7 @@ export const spellSelfHealing: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas faenya",
-  manaCost: 10,
+  manaCost: 20,
   minLevelRequired: 2,
   minMagicLevelRequired: 1,
   cooldown: 5,

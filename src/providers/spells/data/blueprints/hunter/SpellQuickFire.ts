@@ -20,7 +20,7 @@ export const spellQuickFire: Partial<ISpell> = {
   description: "QuickFire spell unleash a flurry of attacks on their enemies.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "ieiunium iecit",
-  manaCost: 120,
+  manaCost: 80,
   minLevelRequired: 10,
   minMagicLevelRequired: 8,
   cooldown: 120,

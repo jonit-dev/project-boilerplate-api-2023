@@ -24,7 +24,7 @@ export const spellPolymorph: Partial<ISpell> = {
 
   castingType: SpellCastingType.RangedCasting,
   magicWords: "iquar ansr rattus",
-  manaCost: 120,
+  manaCost: 80,
   minLevelRequired: 8,
   minMagicLevelRequired: 5,
   cooldown: 120,

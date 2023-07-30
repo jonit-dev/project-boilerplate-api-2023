@@ -19,7 +19,7 @@ export const spellVeilofUndeath: Partial<ISpell> = {
   description: "A spell designed to turn a sorcerer into a Powerfull Lich. Raise Magic Attack.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas umbra",
-  manaCost: 200,
+  manaCost: 120,
   minLevelRequired: 10,
   minMagicLevelRequired: 10,
   cooldown: 60,

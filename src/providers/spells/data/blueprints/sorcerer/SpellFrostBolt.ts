@@ -25,7 +25,7 @@ export const spellFrostBolt: Partial<ISpell> = {
   description: "Cast a deadly frost bolt at your target.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "ning lhegren",
-  manaCost: 160,
+  manaCost: 80,
   minLevelRequired: 12,
   minMagicLevelRequired: 12,
   cooldown: 12,
