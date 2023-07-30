@@ -22,6 +22,7 @@ import { Locker } from "@providers/locks/Locker";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { Time } from "@providers/time/Time";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import {
   BattleSocketEvents,
@@ -32,7 +33,7 @@ import {
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+import _, { random } from "lodash";
 import { Types } from "mongoose";
 import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
@@ -68,12 +69,16 @@ export class CharacterDeath {
     private inMemoryHashTable: InMemoryHashTable,
     private characterBuffActivator: CharacterBuffActivator,
     private locker: Locker,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private time: Time
   ) {}
 
   @TrackNewRelicTransaction()
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
     try {
+      // try to avoid concurrency issues. Dont remove this for now, because in prod sometimes this method is executed twice.
+      await this.time.waitForMilliseconds(random(1, 50));
+
       const canProceed = await this.locker.lock(`character-death-${character.id}`);
 
       if (!canProceed) {
