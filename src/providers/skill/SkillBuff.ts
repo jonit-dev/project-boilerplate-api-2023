@@ -2,15 +2,14 @@ import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { CharacterBuffType } from "@rpg-engine/shared";
+import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
+import { CharacterBuffType, CharacterTrait } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { SkillsAvailable } from "./SkillTypes";
-import { TraitGetter } from "./TraitGetter";
 
 @provide(SkillBuff)
 export class SkillBuff {
-  constructor(private traitGetter: TraitGetter) {}
+  constructor(private characterBuffTracker: CharacterBuffTracker) {}
 
   @TrackNewRelicTransaction()
   public async getSkillsWithBuff(character: ICharacter): Promise<ISkill> {
@@ -50,9 +49,9 @@ export class SkillBuff {
           continue;
         }
 
-        clonedSkills[buff.trait].buffAndDebuff = await this.traitGetter.getSkillLevelWithBuffs(
-          skills,
-          buff.trait as SkillsAvailable
+        clonedSkills[buff.trait].buffAndDebuff = await this.characterBuffTracker.getAllBuffPercentageChanges(
+          character._id,
+          buff.trait as CharacterTrait
         );
       }
     }

@@ -33,7 +33,7 @@ export class TraitGetter {
 
           let totalTraitSummedBuffs = 0;
           if (skills.ownerType === "Character") {
-            totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
+            totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffPercentageChanges(
               skills.owner?.toString()!,
               skillName as CharacterTrait
             );
@@ -44,8 +44,7 @@ export class TraitGetter {
           if (!skillLevel) {
             skills = await Skill.findById(skills._id).lean();
           }
-
-          const skillValue = skillLevel + totalTraitSummedBuffs;
+          const skillValue = skillLevel + (skillLevel * totalTraitSummedBuffs) / 100;
 
           return this.numberFormatter.formatNumber(skillValue);
         } catch (error) {
@@ -63,14 +62,14 @@ export class TraitGetter {
       NewRelicTransactionCategory.Operation,
       "TraitGetter.getCharacterAttributeWithBuffs",
       async () => {
-        const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
+        const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffPercentageChanges(
           character._id,
           attributeName as CharacterTrait
         );
 
         const baseValue = character[attributeName];
 
-        const traitValue = Number(baseValue + totalTraitSummedBuffs);
+        const traitValue = Number(baseValue + (baseValue * totalTraitSummedBuffs) / 100);
 
         return this.numberFormatter.formatNumber(traitValue);
       }

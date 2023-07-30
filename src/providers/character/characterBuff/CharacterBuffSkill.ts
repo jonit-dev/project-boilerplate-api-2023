@@ -84,7 +84,10 @@ export class CharacterBuffSkill {
     character: ICharacter,
     buff: ICharacterBuff
   ): Promise<IBuffValueCalculations> {
-    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(character._id, buff.trait);
+    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffPercentageChanges(
+      character._id,
+      buff.trait
+    );
 
     const updatedSkills = (await Skill.findOne({
       owner: character._id,
@@ -99,11 +102,10 @@ export class CharacterBuffSkill {
     const baseTraitValue = Number(skillDetails.level.toFixed(2));
 
     // Calculate the new buffed value by applying the percentage buff on the BASE VALUE (additive buff!)
-    const updatedTraitValue =
-      Number((baseTraitValue * (1 + buff.buffPercentage / 100)).toFixed(2)) + totalTraitSummedBuffs;
+    const updatedTraitValue = Number((baseTraitValue * (1 + totalTraitSummedBuffs / 100)).toFixed(2));
 
     // Calculate the absolute change of the new buff
-    const buffAbsoluteChange = Number((updatedTraitValue - baseTraitValue).toFixed(2)) - totalTraitSummedBuffs;
+    const buffAbsoluteChange = Number((updatedTraitValue - baseTraitValue).toFixed(2));
 
     return {
       baseTraitValue,
