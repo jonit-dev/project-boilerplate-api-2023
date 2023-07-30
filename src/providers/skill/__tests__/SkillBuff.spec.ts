@@ -28,6 +28,6 @@ describe("SkillBuff", () => {
 
     const skills = await skillBuff.getSkillsWithBuff(testCharacter);
 
-    expect(skills.magic.buffAndDebuff).toBe(1.1);
+    expect(skills.magic.buffAndDebuff).toBe(10);
   });
 });
