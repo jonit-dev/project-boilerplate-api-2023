@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import {
-  BASIC_INCREASE_HEALTH_MANA,
   CLASS_BONUS_OR_PENALTIES,
   MODE_EXP_MULTIPLIER,
   RACE_BONUS_OR_PENALTIES,
@@ -46,9 +45,9 @@ jest.mock("@providers/constants/SkillConstants", () => ({
   EXP_RATIO: 1,
   CLASS_BONUS_OR_PENALTIES,
   RACE_BONUS_OR_PENALTIES,
-  BASIC_INCREASE_HEALTH_MANA,
   POWER_COEFFICIENT: 1.5,
   MODE_EXP_MULTIPLIER,
+  HEALTH_MANA_BASE_INCREASE_RATE: 10,
 }));
 
 jest.mock("@providers/constants/LootConstants", () => ({

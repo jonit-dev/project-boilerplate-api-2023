@@ -38,6 +38,7 @@ import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { BattleTargeting } from "@providers/battle/BattleTargeting";
 import { ItemCleaner } from "@providers/item/ItemCleaner";
 import { Locker } from "@providers/locks/Locker";
+import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
 import { CharacterBuffValidation } from "../characterBuff/CharacterBuffValidation";
@@ -67,7 +68,8 @@ export class CharacterNetworkCreate {
     private itemCleaner: ItemCleaner,
     private characterBuffValidation: CharacterBuffValidation,
     private battleTargeting: BattleTargeting,
-    private locker: Locker
+    private locker: Locker,
+    private skillStatsIncrease: SkillStatsIncrease
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {

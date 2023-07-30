@@ -5,8 +5,6 @@ import {
   ShadowWalkerRaces,
 } from "@rpg-engine/shared/dist/types/character.types";
 
-export const BASIC_INCREASE_HEALTH_MANA = 0.04;
-
 export const CLASS_BONUS_OR_PENALTIES = [
   {
     class: CharacterClass.None,

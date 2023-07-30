@@ -11,7 +11,7 @@ export const INCREASE_BONUS_FACTION = 0.1;
 
 export const SP_INCREASE_SECONDS_COOLDOWN = 8;
 
-export const BASIC_INCREASE_HEALTH_MANA = 0.04;
+export const HEALTH_MANA_BASE_INCREASE_RATE = 10;
 
 export const POWER_COEFFICIENT = 0.75;
 

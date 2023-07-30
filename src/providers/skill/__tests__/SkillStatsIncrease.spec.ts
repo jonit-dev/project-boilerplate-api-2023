@@ -89,8 +89,8 @@ describe("SkillStatsIncrease", () => {
       let newMaxHealth = testCharacter.maxHealth;
       let newMaxMana = testCharacter.maxMana;
 
-      expect(newMaxHealth).toBe(121);
-      expect(newMaxMana).toBe(107);
+      expect(newMaxHealth).toBe(139);
+      expect(newMaxMana).toBe(118);
 
       await characterBuffActivator.disableBuff(testCharacter, buff._id!, buff.type);
 
@@ -99,8 +99,8 @@ describe("SkillStatsIncrease", () => {
       newMaxHealth = testCharacter.maxHealth;
       newMaxMana = testCharacter.maxMana;
 
-      expect(newMaxHealth).toBe(111);
-      expect(newMaxMana).toBe(107);
+      expect(newMaxHealth).toBe(129);
+      expect(newMaxMana).toBe(118);
     });
   });
 });
