@@ -34,13 +34,91 @@ export default class PartyManagement {
 
     if (!target) {
       this.socketMessaging.sendErrorMessageToCharacter(leader, "Target not found");
-
       return;
     }
 
     const isInParty = await this.checkIfIsInParty(leader);
-
     isInParty ? await this.inviteToParty(leader, target) : await this.createParty(leader, target, maxSize);
+  }
+
+  public async acepptInvite(leader: ICharacter, target: ICharacter): Promise<void> {
+    // #region #TODO: create a common function to this validators. <1>
+    const targetIsInParty = await this.checkIfIsInParty(target);
+    if (targetIsInParty) {
+      this.sendMessageToPartyMembers(leader, "Target is already in a party");
+      return;
+    }
+
+    if (!(await this.haveFreeSlots(leader))) {
+      this.sendMessageToPartyMembers(leader, "The party is already full");
+      return;
+    }
+    // #endregion
+
+    const party = (await this.getPartyByCharacterId(leader._id)) as ICharacterParty;
+    await this.removeAllBuffInParty(party);
+    party.members.push({
+      _id: target._id,
+      class: target.class as CharacterClass,
+      name: target.name,
+    });
+    const benefits = this.calculatePartyBenefits(party.size + 1, this.getDifferentClasses(party));
+    const updatedParty = (await CharacterParty.findByIdAndUpdate(
+      party._id,
+      {
+        // leader: {
+        //   _id: leader._id,
+        //   class: leader.class as CharacterClass,
+        //   name: leader.name,
+        // },
+        members: party.members,
+        benefits,
+      },
+      { new: true }
+    )) as ICharacterParty;
+
+    await this.applyAllBuffInParty(updatedParty);
+
+    this.sendMessageToPartyMembers(leader, `${target.name} joined the party`);
+  }
+
+  public async leaveParty(leader: ICharacter, target: ICharacter): Promise<void> {
+    const isLeader = await this.checkIfIsLeader(leader._id);
+    const isSameCharacter = leader._id.toString() === target._id.toString();
+
+    if (isSameCharacter) {
+      if (isLeader) {
+        await this.deleteParty(leader);
+      } else {
+        await this.removeMemberFromParty(leader._id, leader._id);
+        this.sendMessageToPartyMembers(leader, "You left the party");
+      }
+    } else {
+      if (isLeader) {
+        if (!(await this.checkIfSameParty(leader, target))) {
+          this.sendMessageToPartyMembers(leader, "The target character is not in your party");
+        } else {
+          await this.removeMemberFromParty(leader._id, target._id);
+          this.sendMessageToPartyMembers(leader, `You removed ${target.name} from the party`);
+          this.sendMessageToPartyMembers(target, "You left the party");
+        }
+      } else {
+        this.sendMessageToPartyMembers(leader, "You can't remove other members from the party");
+      }
+    }
+  }
+
+  public async partyInfoRead(character: ICharacter): Promise<void> {
+    const party = (await this.getPartyByCharacterId(character._id)) as ICharacterParty;
+
+    if (!party) {
+      this.sendMessageToPartyMembers(character, "An error occour on loading party data, try latter.");
+      return;
+    }
+
+    this.socketMessaging.sendEventToUser(character?.channelId!, PartySocketEvents.PartyInfoOpen, {
+      party: party,
+    });
   }
 
   // create party
@@ -50,25 +128,17 @@ export default class PartyManagement {
     maxSize?: number
   ): Promise<ICharacterParty | undefined> {
     const targetIsInParty = await this.checkIfIsInParty(target);
-
     if (targetIsInParty) {
       this.sendMessageToPartyMembers(leader, "Target are already in a party");
       return;
     }
 
     let finalMaxSize = 5;
-
     if (typeof maxSize !== "undefined") {
       finalMaxSize = maxSize < 2 ? 2 : maxSize > 5 ? 5 : maxSize;
     }
 
-    //Send Confirmation message to target
-    this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
-      leaderName: leader.name,
-    });
-
     const benefits = this.calculatePartyBenefits(2, leader.class !== target.class ? 2 : 1);
-
     const createParty: ICharacterPartyShared = {
       leader: {
         _id: leader._id,
@@ -77,9 +147,9 @@ export default class PartyManagement {
       },
       members: [
         {
-          _id: target._id,
-          class: target.class as CharacterClass,
-          name: target.name,
+          _id: leader._id,
+          class: leader.class as CharacterClass,
+          name: leader.name,
         },
       ],
       maxSize: finalMaxSize,
@@ -88,15 +158,25 @@ export default class PartyManagement {
 
     try {
       const party = await CharacterParty.create(createParty);
-      await this.applyAllBuffInParty(party);
 
+      if (party) {
+        await this.applyAllBuffInParty(party);
+
+        // #TODO: create a common function for this emmiter.
+        // Send Confirmation message to target
+        this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
+          leaderId: leader._id,
+          leaderName: leader.name,
+        });
+      }
+      /*
       this.sendMessageToPartyMembers(
         leader,
         `You created a party with ${target.name}!`,
         target,
         `${leader.name} created a party with you!`
       );
-
+      */
       return party;
     } catch (error) {
       console.error(error);
@@ -108,15 +188,16 @@ export default class PartyManagement {
     if (!leader || !target) {
       throw new Error("Leader or target not found");
     }
-    const checkIfIsLeader = await this.checkIfIsLeader(leader._id);
 
+    /* Valida se o lider é lider da party ???? */
+    const checkIfIsLeader = await this.checkIfIsLeader(leader._id);
     if (!checkIfIsLeader) {
       this.sendMessageToPartyMembers(leader, "You are not the party leader");
       return;
     }
 
+    // #region #TODO: create a common function to this validators. <1>
     const targetIsInParty = await this.checkIfIsInParty(target);
-
     if (targetIsInParty) {
       this.sendMessageToPartyMembers(leader, "Target is already in a party");
       return;
@@ -126,24 +207,24 @@ export default class PartyManagement {
       this.sendMessageToPartyMembers(leader, "Your party is already full");
       return;
     }
+    // #endregion
 
-    //Send Confirmation message to target
+    // #TODO: create a common function for this emmiter.
+    // Send Confirmation message to target
     this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
+      leaderId: leader._id,
       leaderName: leader.name,
     });
 
+    /*
     const party = (await this.getPartyByCharacterId(leader._id)) as ICharacterParty;
-
     await this.removeAllBuffInParty(party);
-
     party.members.push({
       _id: target._id,
       class: target.class as CharacterClass,
       name: target.name,
     });
-
     const benefits = this.calculatePartyBenefits(party.size + 1, this.getDifferentClasses(party));
-
     const updatedParty = (await CharacterParty.findByIdAndUpdate(
       party._id,
       {
@@ -162,6 +243,7 @@ export default class PartyManagement {
 
     this.sendMessageToPartyMembers(leader, `You invited ${target.name} to your party`);
     this.sendMessageToPartyMembers(target, `${leader.name} invited you to their party`);
+    */
   }
 
   // check if is already in a party
@@ -225,32 +307,6 @@ export default class PartyManagement {
     await this.applyAllBuffInParty(updatedParty);
   }
 
-  public async leaveParty(leader: ICharacter, target: ICharacter): Promise<void> {
-    const isLeader = await this.checkIfIsLeader(leader._id);
-    const isSameCharacter = leader._id.toString() === target._id.toString();
-
-    if (isSameCharacter) {
-      if (isLeader) {
-        await this.deleteParty(leader);
-      } else {
-        await this.removeMemberFromParty(leader._id, leader._id);
-        this.sendMessageToPartyMembers(leader, "You left the party");
-      }
-    } else {
-      if (isLeader) {
-        if (!(await this.checkIfSameParty(leader, target))) {
-          this.sendMessageToPartyMembers(leader, "The target character is not in your party");
-        } else {
-          await this.removeMemberFromParty(leader._id, target._id);
-          this.sendMessageToPartyMembers(leader, `You removed ${target.name} from the party`);
-          this.sendMessageToPartyMembers(target, "You left the party");
-        }
-      } else {
-        this.sendMessageToPartyMembers(leader, "You can't remove other members from the party");
-      }
-    }
-  }
-
   private async checkIfSameParty(leader: ICharacter, target: ICharacter): Promise<boolean> {
     const leaderParty = await this.getPartyByCharacterId(leader._id);
     const targetParty = await this.getPartyByCharacterId(target._id);
@@ -288,11 +344,13 @@ export default class PartyManagement {
 
   // check actual free slots
   private async haveFreeSlots(leader: ICharacter): Promise<boolean> {
+    console.log(leader._id);
     const party = (await CharacterParty.findOne({ "leader._id": leader._id })
       .lean({ virtuals: true })
       .select("maxSize size members")) as ICharacterParty;
 
     if (!party) {
+      console.log("False 1");
       return false;
     }
 
@@ -300,6 +358,7 @@ export default class PartyManagement {
     const actualSize = party.size;
 
     if (actualSize! >= maxSize) {
+      console.log("False 2");
       return false;
     }
 
@@ -373,6 +432,8 @@ export default class PartyManagement {
     }
   }
 
+  // #TODO: This function is supose to sent a message to all party members.
+  // But now is sending error messages just for the leader and target??
   private sendMessageToPartyMembers(
     leader: ICharacter,
     messageToLeader: string,

@@ -12,7 +12,7 @@ export class PartyNetworkLeave {
   public onLeaveParty(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      PartySocketEvents.Leave,
+      PartySocketEvents.LeaveParty,
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
           const leader = (await Character.findById(character._id).lean()) as ICharacter;
