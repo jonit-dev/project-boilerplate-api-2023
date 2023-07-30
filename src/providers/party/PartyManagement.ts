@@ -116,9 +116,12 @@ export default class PartyManagement {
       return;
     }
 
-    this.socketMessaging.sendEventToUser(character?.channelId!, PartySocketEvents.PartyInfoOpen, {
-      party: party,
-    });
+    const partyInfoData: ICharacterPartyShared = (party as unknown as ICharacterPartyShared) ?? null;
+    this.socketMessaging.sendEventToUser<ICharacterPartyShared>(
+      character?.channelId!,
+      PartySocketEvents.PartyInfoOpen,
+      partyInfoData
+    );
   }
 
   // create party

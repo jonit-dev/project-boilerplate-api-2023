@@ -10,7 +10,7 @@ export class PartyNetworkGetParty {
   constructor(private socketAuth: SocketAuth, private partyManagement: PartyManagement) {}
 
   public onPartyInfoRead(channel: SocketChannel): void {
-    this.socketAuth.authCharacterOn(channel, PartySocketEvents.PartyInfoRead, async (character: ICharacter) => {
+    this.socketAuth.authCharacterOn(channel, PartySocketEvents.PartyInfoRead, async (_, character: ICharacter) => {
       try {
         await this.partyManagement.partyInfoRead(character);
       } catch (error) {
