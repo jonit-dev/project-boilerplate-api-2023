@@ -19,7 +19,7 @@ export const spellSelfHaste: Partial<ISpell> = {
   description: "A self haste spell.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas hiz",
-  manaCost: 80,
+  manaCost: 60,
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
   cooldown: 60,

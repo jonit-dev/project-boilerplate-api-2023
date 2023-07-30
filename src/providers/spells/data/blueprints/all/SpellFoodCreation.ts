@@ -13,7 +13,7 @@ export const spellFoodCreation: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "iquar klatha",
-  manaCost: 14,
+  manaCost: 60,
   minLevelRequired: 3,
   minMagicLevelRequired: 3,
   cooldown: 5,

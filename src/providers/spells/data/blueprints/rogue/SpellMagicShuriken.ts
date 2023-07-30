@@ -21,7 +21,7 @@ export const spellMagicShuriken: Partial<ISpell> = {
     "Unleash a mystical shuriken imbued with arcane energy, striking enemies with both physical and magical damage",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "ithil celebatharth",
-  manaCost: 70,
+  manaCost: 50,
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
   cooldown: 20,

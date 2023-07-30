@@ -20,7 +20,7 @@ export const spellFireBolt: Partial<ISpell> = {
   description: "Cast a deadly fire bolt at your target.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "naurlug lhegren",
-  manaCost: 150,
+  manaCost: 120,
   minLevelRequired: 8,
   minMagicLevelRequired: 12,
   cooldown: 12,

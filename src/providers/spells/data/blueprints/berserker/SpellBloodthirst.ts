@@ -18,7 +18,7 @@ export const spellBloodthirst: Partial<ISpell> = {
   description: "Bloodthirst is a spell designed for a Berserker to heal themselves.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "sanguis sitis",
-  manaCost: 200,
+  manaCost: 120,
   minLevelRequired: 4,
   minMagicLevelRequired: 3,
   cooldown: 200,

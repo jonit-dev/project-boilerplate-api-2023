@@ -19,7 +19,7 @@ export const spellEntanglingRoots: Partial<ISpell> = {
   description: "Stun your enemy by manipulating the primal forces of nature",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "raithin-nodrim",
-  manaCost: 120,
+  manaCost: 100,
   minLevelRequired: 4,
   minMagicLevelRequired: 8,
   cooldown: 200,

@@ -19,7 +19,7 @@ export const spellPhysicalShield: Partial<ISpell> = {
   description: "A physical shield that boosts physical resistance by 30%, duration varies with magic level.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas zirh",
-  manaCost: 60,
+  manaCost: 50,
   minLevelRequired: 7,
   minMagicLevelRequired: 7,
   cooldown: 40,
