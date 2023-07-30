@@ -48,12 +48,18 @@ export class SpellCalculator {
   ): Promise<number> {
     const value = await this.getSkillLevel(character, skillName);
 
-    return this.linearInterpolation.calculateLinearInterpolation(
+    const buffPercentage = await this.linearInterpolation.calculateLinearInterpolation(
       value,
       options.min,
       options.max,
       options.skillAssociation
     );
+
+    // Verificar se o valor interpolado é maior que o valor máximo (max).
+    // Se for maior, definir o valor interpolado como o valor máximo (max).
+    const maxInterpolatedValue = Math.min(buffPercentage, options.max);
+
+    return maxInterpolatedValue;
   }
 
   public async getSkillLevel(character: ICharacter, skillName: string): Promise<number> {

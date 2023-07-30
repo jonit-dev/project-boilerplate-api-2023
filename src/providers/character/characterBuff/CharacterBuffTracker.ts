@@ -58,6 +58,19 @@ export class CharacterBuffTracker {
   }
 
   @TrackNewRelicTransaction()
+  public async getAllBuffPercentageChanges(characterId: string, trait: CharacterTrait): Promise<number> {
+    const characterBuffs = await this.getAllCharacterBuffs(characterId);
+
+    const buffs = characterBuffs.filter((buff) => buff.trait === trait);
+
+    if (!buffs) {
+      return 0;
+    }
+
+    return buffs.reduce((acc, buff) => acc + buff.buffPercentage!, 0);
+  }
+
+  @TrackNewRelicTransaction()
   public async getBuffByItemId(characterId: string, itemId: string): Promise<ICharacterItemBuff[]> {
     const currentBuffs = (await this.getAllCharacterBuffs(characterId)) as ICharacterItemBuff[];
 

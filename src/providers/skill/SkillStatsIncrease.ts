@@ -66,18 +66,21 @@ export class SkillStatsIncrease {
   ): Promise<boolean> {
     const { maxHealth, maxMana } = Object.freeze(updateAttributes);
 
-    const allBuffsOnMaxHealth = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
+    const allBuffsOnMaxHealth = await this.characterBuffTracker.getAllBuffPercentageChanges(
       character._id,
       CharacterAttributes.MaxHealth
     );
-    const allBuffsOnMaxMana = await this.characterBuffTracker.getAllBuffAbsoluteChanges(
+    const allBuffsOnMaxMana = await this.characterBuffTracker.getAllBuffPercentageChanges(
       character._id,
       CharacterAttributes.MaxMana
     );
 
     const updatedCharacter = (await Character.findOneAndUpdate(
       { _id: character._id },
-      { maxHealth: maxHealth + allBuffsOnMaxHealth, maxMana: maxMana + allBuffsOnMaxMana },
+      {
+        maxHealth: Math.round(maxHealth * (1 + allBuffsOnMaxHealth / 100)),
+        maxMana: Math.round(maxMana * (1 + allBuffsOnMaxMana / 100)),
+      },
       { new: true }
     ).lean()) as ICharacter;
 
@@ -87,15 +90,15 @@ export class SkillStatsIncrease {
 
     const payload: ICharacterAttributeChanged = {
       targetId: updatedCharacter._id,
-      maxHealth: maxHealth + allBuffsOnMaxHealth,
-      maxMana: maxMana + allBuffsOnMaxMana,
+      maxHealth: Math.round(maxHealth * (1 + allBuffsOnMaxHealth / 100)),
+      maxMana: Math.round(maxMana * (1 + allBuffsOnMaxMana / 100)),
     };
 
     this.socketMessaging.sendEventToUser(updatedCharacter.channelId!, CharacterSocketEvents.AttributeChanged, payload);
 
     if (
-      updatedCharacter.maxHealth === maxHealth + allBuffsOnMaxHealth &&
-      updatedCharacter.maxMana === maxMana + allBuffsOnMaxMana
+      updatedCharacter.maxHealth === Math.round(maxHealth * (1 + allBuffsOnMaxHealth / 100)) &&
+      updatedCharacter.maxMana === Math.round(maxMana * (1 + allBuffsOnMaxMana / 100))
     ) {
       return true;
     }
