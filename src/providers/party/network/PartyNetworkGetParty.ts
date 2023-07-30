@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { IPartyManagementFromClient, PartySocketEvents } from "@rpg-engine/shared";
+import { PartySocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import PartyManagement from "../PartyManagement";
 
@@ -10,16 +10,12 @@ export class PartyNetworkGetParty {
   constructor(private socketAuth: SocketAuth, private partyManagement: PartyManagement) {}
 
   public onPartyInfoRead(channel: SocketChannel): void {
-    this.socketAuth.authCharacterOn(
-      channel,
-      PartySocketEvents.PartyInfoRead,
-      async (data: IPartyManagementFromClient, character: ICharacter) => {
-        try {
-          await this.partyManagement.partyInfoRead(character);
-        } catch (error) {
-          console.error(error);
-        }
+    this.socketAuth.authCharacterOn(channel, PartySocketEvents.PartyInfoRead, async (character: ICharacter) => {
+      try {
+        await this.partyManagement.partyInfoRead(character);
+      } catch (error) {
+        console.error(error);
       }
-    );
+    });
   }
 }
