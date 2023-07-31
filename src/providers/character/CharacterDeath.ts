@@ -35,6 +35,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import _, { random } from "lodash";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
 import { CharacterTarget } from "./CharacterTarget";
@@ -142,6 +143,8 @@ export class CharacterDeath {
       await this.inMemoryHashTable.delete("character-max-weights", character._id);
       await this.inMemoryHashTable.delete("inventory-weight", character._id);
       await this.inMemoryHashTable.delete("equipment-weight", character._id);
+      await clearCacheForKey(`${character._id}-equipment`);
+      await this.inMemoryHashTable.delete("equipment-slots", character._id);
 
       await this.characterWeight.updateCharacterWeight(character);
     } catch {
