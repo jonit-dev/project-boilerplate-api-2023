@@ -7,6 +7,8 @@ import { rogueSpellsIndex } from "./rogue";
 import { rogueHunterSpellsIndex } from "./rogue-hunter";
 import { sorcererSpellsIndex } from "./sorcerer";
 import { warriorSpellsIndex } from "./warrior";
+import { dwarfSpellsIndex } from "./dwarf";
+import { elfSpellsIndex } from "./elf";
 
 export const spellsBlueprints = {
   ...allClassesSpellsIndex,
@@ -18,4 +20,6 @@ export const spellsBlueprints = {
   ...rogueSpellsIndex,
   ...rogueHunterSpellsIndex,
   ...warriorSpellsIndex,
+  ...dwarfSpellsIndex,
+  ...elfSpellsIndex,
 };

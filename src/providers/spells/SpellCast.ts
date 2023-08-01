@@ -251,6 +251,11 @@ export class SpellCast {
       return false;
     }
 
+    if (!this.spellValidation.isAvailableForCharacterRace(spell, character)) {
+      this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this spell is not available to your race.");
+      return false;
+    }
+
     if (character.mana < spell.manaCost) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, you do not have mana to cast this spell.");
       return false;
