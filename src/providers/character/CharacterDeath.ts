@@ -10,7 +10,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
-import { EquipmentSlotTypes } from "@providers/equipment/EquipmentSlots";
+import { EquipmentSlotTypes, EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { blueprintManager, entityEffectUse, equipmentSlots } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import {
@@ -28,7 +28,9 @@ import {
   BattleSocketEvents,
   CharacterBuffType,
   IBattleDeath,
+  IEquipmentAndInventoryUpdatePayload,
   IUIShowMessage,
+  ItemSocketEvents,
   Modes,
   UISocketEvents,
 } from "@rpg-engine/shared";
@@ -71,7 +73,8 @@ export class CharacterDeath {
     private characterBuffActivator: CharacterBuffActivator,
     private locker: Locker,
     private newRelic: NewRelic,
-    private time: Time
+    private time: Time,
+    private equipmentSlots: EquipmentSlots
   ) {}
 
   @TrackNewRelicTransaction()
@@ -86,13 +89,6 @@ export class CharacterDeath {
         return;
       }
 
-      if (character.health > 0) {
-        // if by any reason the char is not dead, make sure it is.
-        await Character.updateOne({ _id: character._id }, { $set: { health: 0 } });
-        character.health = 0;
-        character.isAlive = false;
-      }
-
       if (killer) {
         await this.clearAttackerTarget(killer);
       }
@@ -103,6 +99,7 @@ export class CharacterDeath {
         id: character.id,
         type: "Character",
       };
+
       this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, characterDeathData);
 
       // communicate all players around that character is dead
@@ -139,14 +136,11 @@ export class CharacterDeath {
 
       this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Death", 1);
 
-      await this.inMemoryHashTable.delete("character-weapon", character._id);
-      await this.inMemoryHashTable.delete("character-max-weights", character._id);
-      await this.inMemoryHashTable.delete("inventory-weight", character._id);
-      await this.inMemoryHashTable.delete("equipment-weight", character._id);
-      await clearCacheForKey(`${character._id}-equipment`);
-      await this.inMemoryHashTable.delete("equipment-slots", character._id);
+      await this.clearCache(character);
 
       await this.characterWeight.updateCharacterWeight(character);
+
+      await this.sendRefreshEquipmentEvent(character);
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
     } finally {
@@ -190,6 +184,41 @@ export class CharacterDeath {
     );
 
     await this.locker.unlock(`character-death-${character.id}`);
+  }
+
+  private async clearCache(character: ICharacter): Promise<void> {
+    await this.inMemoryHashTable.delete("character-weapon", character._id);
+    await this.inMemoryHashTable.delete("character-max-weights", character._id);
+    await this.inMemoryHashTable.delete("inventory-weight", character._id);
+    await this.inMemoryHashTable.delete("equipment-weight", character._id);
+    await clearCacheForKey(`${character._id}-equipment`);
+    await clearCacheForKey(`${character._id}-inventory`);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id);
+  }
+
+  private async sendRefreshEquipmentEvent(character: ICharacter): Promise<void> {
+    const equipment = (await Equipment.findById(character.equipment)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character._id}-equipment`,
+      })) as IEquipment;
+
+    const equipmentSet = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
+
+    const inventory = await this.characterInventory.getInventory(character);
+
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
+
+    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+      character.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      {
+        inventory: inventoryContainer,
+        equipment: equipmentSet,
+        openEquipmentSetOnUpdate: false,
+        openInventoryOnUpdate: false,
+      }
+    );
   }
 
   private async softDeleteCharacterOnPermaDeathMode(character: ICharacter): Promise<void> {
