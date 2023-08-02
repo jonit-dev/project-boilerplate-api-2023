@@ -35,11 +35,11 @@ export const spellElvenArrow: Partial<ISpell> = {
     const [timeout, buffPercentage] = await Promise.all([
       spellCalculator.calculateBasedOnSkillLevel(character, CombatSkill.Distance, {
         min: 20,
-        max: 90,
+        max: 180,
       }),
       spellCalculator.calculateBasedOnSkillLevel(character, CombatSkill.Distance, {
         min: 20,
-        max: 100,
+        max: 40,
       }),
     ]);
 
