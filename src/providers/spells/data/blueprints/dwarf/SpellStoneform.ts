@@ -38,7 +38,7 @@ export const spellStoneform: Partial<ISpell> = {
         max: 80,
       }),
       spellCalculator.calculateBasedOnSkillLevel(character, CraftingSkill.Mining, {
-        min: 20,
+        min: 5,
         max: 40,
       }),
     ]);

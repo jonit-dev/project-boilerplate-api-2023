@@ -9,6 +9,7 @@ import { sorcererSpellsIndex } from "./sorcerer";
 import { warriorSpellsIndex } from "./warrior";
 import { dwarfSpellsIndex } from "./dwarf";
 import { elfSpellsIndex } from "./elf";
+import { humanSpellsIndex } from "./human";
 
 export const spellsBlueprints = {
   ...allClassesSpellsIndex,
@@ -22,4 +23,5 @@ export const spellsBlueprints = {
   ...warriorSpellsIndex,
   ...dwarfSpellsIndex,
   ...elfSpellsIndex,
+  ...humanSpellsIndex,
 };

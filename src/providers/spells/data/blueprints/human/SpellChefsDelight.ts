@@ -5,7 +5,7 @@ import {
   AnimationEffectKeys,
   CharacterBuffDurationType,
   CharacterBuffType,
-  CombatSkill,
+  CraftingSkill,
   ISpell,
   LifeBringerRaces,
   SpellCastingType,
@@ -13,19 +13,19 @@ import {
 } from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
 
-export const spellElvenArrow: Partial<ISpell> = {
-  key: SpellsBlueprint.ElvenArrow,
-  name: "Elven Arrow",
-  description: "Temporarily increases elf's distance skill.",
+export const spellChefsDelight: Partial<ISpell> = {
+  key: SpellsBlueprint.ChefsDelight,
+  name: "Chef's delight",
+  description: "Temporarily increases human's cooking skill.",
   castingType: SpellCastingType.SelfCasting,
-  magicWords: "dista hast",
-  manaCost: 35,
+  magicWords: "les cook",
+  manaCost: 25,
   minLevelRequired: 5,
   minMagicLevelRequired: 5,
   cooldown: 160,
   castingAnimationKey: AnimationEffectKeys.HasteSpell,
-  attribute: CombatSkill.Distance,
-  characterRace: [LifeBringerRaces.Elf],
+  attribute: CraftingSkill.Cooking,
+  characterRace: [LifeBringerRaces.Human],
 
   usableEffect: async (character: ICharacter) => {
     const characterBuffActivator = container.get(CharacterBuffActivator);
@@ -33,11 +33,11 @@ export const spellElvenArrow: Partial<ISpell> = {
     const spellCalculator = container.get(SpellCalculator);
 
     const [timeout, buffPercentage] = await Promise.all([
-      spellCalculator.calculateBasedOnSkillLevel(character, CombatSkill.Distance, {
+      spellCalculator.calculateBasedOnSkillLevel(character, CraftingSkill.Cooking, {
         min: 20,
         max: 180,
       }),
-      spellCalculator.calculateBasedOnSkillLevel(character, CombatSkill.Distance, {
+      spellCalculator.calculateBasedOnSkillLevel(character, CraftingSkill.Cooking, {
         min: 5,
         max: 40,
       }),
@@ -45,12 +45,12 @@ export const spellElvenArrow: Partial<ISpell> = {
 
     await characterBuffActivator.enableTemporaryBuff(character, {
       type: CharacterBuffType.Skill,
-      trait: CombatSkill.Distance,
+      trait: CraftingSkill.Cooking,
       buffPercentage,
       durationSeconds: timeout,
       durationType: CharacterBuffDurationType.Temporary,
       isStackable: false,
-      originateFrom: SpellsBlueprint.ElvenArrow,
+      originateFrom: SpellsBlueprint.ChefsDelight,
     });
   },
 };
