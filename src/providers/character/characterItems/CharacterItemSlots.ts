@@ -69,23 +69,46 @@ export class CharacterItemSlots {
     targetContainer: IItemContainer,
     payload: Record<string, any>
   ): Promise<void> {
+    // Input validation
+    if (slotIndex < 0 || slotIndex >= targetContainer.slots.length) {
+      throw new Error("Invalid slot index");
+    }
+
+    if (!payload || typeof payload !== "object" || Object.keys(payload).length === 0) {
+      throw new Error("Payload must be a non-empty object");
+    }
+
     const slotItem = targetContainer.slots[slotIndex];
 
+    // Check if slotItem exists
+    if (!slotItem) {
+      throw new Error("No item found in the given slot");
+    }
+
+    // Updating the item
     targetContainer.slots[slotIndex] = {
       ...slotItem,
       ...payload,
     };
 
-    targetContainer.markModified("slots");
-    await targetContainer.save();
+    try {
+      // Updating the container in the database
+      await ItemContainer.updateOne(
+        { _id: targetContainer._id },
+        {
+          $set: {
+            slots: targetContainer.slots,
+          },
+        }
+      );
 
-    // remember that we also need to update the item on the database. What we have above is just a reference inside of the container (copy)
-    await Item.updateOne(
-      {
-        _id: slotItem._id,
-      },
-      { $set: { ...payload } }
-    );
+      // Updating the item in the database
+      await Item.updateOne({ _id: slotItem._id }, { $set: { ...payload } });
+    } catch (error) {
+      // Error handling
+      console.error(error);
+      throw new Error("Failed to update the item on the slot");
+    }
   }
 
   @TrackNewRelicTransaction()
