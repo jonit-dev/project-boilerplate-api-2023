@@ -1,14 +1,14 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { CharacterClass, ISpell, CharacterRaces } from "@rpg-engine/shared";
+import { CharacterClass, CharacterRaces, ISpell } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(SpellValidation)
 export class SpellValidation {
-  isAvailableForCharacter(spell: ISpell, character: ICharacter): boolean {
+  public isAvailableForCharacter(spell: ISpell, character: ICharacter): boolean {
     return this.isAvailableForCharacterClass(spell, character) && this.isAvailableForCharacterRace(spell, character);
   }
 
-  isAvailableForCharacterClass(spell: ISpell, character: ICharacter): boolean {
+  public isAvailableForCharacterClass(spell: ISpell, character: ICharacter): boolean {
     return (
       !spell.characterClass ||
       spell.characterClass.length < 1 ||
@@ -16,7 +16,7 @@ export class SpellValidation {
     );
   }
 
-  isAvailableForCharacterRace(spell: ISpell, character: ICharacter): boolean {
+  public isAvailableForCharacterRace(spell: ISpell, character: ICharacter): boolean {
     return (
       !spell.characterRace ||
       spell.characterRace.length < 1 ||
