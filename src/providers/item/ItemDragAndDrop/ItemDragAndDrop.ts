@@ -128,13 +128,17 @@ export class ItemDragAndDrop {
     };
 
     if (!quantity && !to.item) {
+      // Move non stackable items to new slot
       await moveItem();
     } else if (quantity && from.item.stackQty) {
       if (to.item && to.item.stackQty) {
+        // Merge stackable items
         await this.handleStackableItemMove(targetContainer, from, to, quantity);
       } else if (quantity >= from.item.stackQty) {
+        // Move all stackable items to new slot
         await moveItem();
       } else {
+        // Split stackable items
         await this.updateStackQty(targetContainer, from.slotIndex, from.item.stackQty - quantity);
       }
     }
@@ -281,7 +285,7 @@ export class ItemDragAndDrop {
       return false;
     }
 
-    const inventoryContainer = await ItemContainer.findById(inventory.itemContainer);
+    const inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as IItemContainer;
     if (!inventoryContainer) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, inventory container not found.");
       return false;
