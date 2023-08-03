@@ -10,6 +10,7 @@ import { warriorSpellsIndex } from "./warrior";
 import { dwarfSpellsIndex } from "./dwarf";
 import { elfSpellsIndex } from "./elf";
 import { humanSpellsIndex } from "./human";
+import { orcSpellsIndex } from "./orc";
 
 export const spellsBlueprints = {
   ...allClassesSpellsIndex,
@@ -24,4 +25,5 @@ export const spellsBlueprints = {
   ...dwarfSpellsIndex,
   ...elfSpellsIndex,
   ...humanSpellsIndex,
+  ...orcSpellsIndex,
 };
