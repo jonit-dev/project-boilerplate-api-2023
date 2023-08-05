@@ -108,7 +108,7 @@ export class EquipmentEquip {
     await this.inMemoryHashTable.delete("equipment-weight", character._id);
     await this.inMemoryHashTable.delete("equipment-slots", character._id);
 
-    await this.characterWeight.updateCharacterWeight(character);
+    void this.characterWeight.updateCharacterWeight(character);
 
     return true;
   }
@@ -277,7 +277,7 @@ export class EquipmentEquip {
     await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
     await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
 
-    await this.characterWeight.updateCharacterWeight(character);
+    void this.characterWeight.updateCharacterWeight(character);
 
     await this.characterItemBuff.enableItemBuff(character, item);
 

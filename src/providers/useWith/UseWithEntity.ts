@@ -198,7 +198,7 @@ export class UseWithEntity {
     // handle static item case
     await this.characterItemInventory.decrementItemFromInventoryByKey(item.key, caster, 1);
 
-    await this.characterWeight.updateCharacterWeight(caster);
+    void this.characterWeight.updateCharacterWeight(caster);
 
     await this.sendRefreshItemsEvent(caster);
 

@@ -89,7 +89,7 @@ export class WithdrawItem {
 
     await this.markNotIsInDepot(item);
 
-    await this.characterWeight.updateCharacterWeight(character);
+    void this.characterWeight.updateCharacterWeight(character);
 
     return itemContainer;
   }

@@ -69,7 +69,7 @@ export class CharacterTradingSell {
 
     await this.addGoldToInventory(soldItems, character);
 
-    await this.characterWeight.updateCharacterWeight(character);
+    void this.characterWeight.updateCharacterWeight(character);
 
     await this.sendRefreshItemsEvent(character);
 

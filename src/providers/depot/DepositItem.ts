@@ -74,7 +74,7 @@ export class DepositItem {
       await this.markItemAsInDepot(item);
 
       // whenever a new item is removed, we need to update the character weight
-      await this.characterWeight.updateCharacterWeight(character);
+      void this.characterWeight.updateCharacterWeight(character);
 
       const payloadUpdate: IEquipmentAndInventoryUpdatePayload = {
         inventory: container as any,
