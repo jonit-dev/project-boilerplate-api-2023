@@ -168,6 +168,7 @@ export class CharacterNetworkCreate {
           maxMana: character.maxMana,
           textureKey: character.textureKey,
           alpha: await this.specialEffect.getOpacity(character),
+          isGiantForm: character.isGiantForm,
         };
 
         switch (appEnv.general.ENV) {

@@ -2,12 +2,12 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { characterBuffActivator } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
-  ShadowWalkerRaces,
-  ICharacterAttributeChanged,
-  CharacterSocketEvents,
-  CharacterBuffType,
   BasicAttribute,
   CharacterBuffDurationType,
+  CharacterBuffType,
+  CharacterSocketEvents,
+  ICharacterAttributeChanged,
+  ShadowWalkerRaces,
   SpellsBlueprint,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -36,7 +36,7 @@ export class BullStrength {
             },
           },
         }),
-        await this.enableGiantForm(character, timeout),
+        this.enableGiantForm(character, timeout),
       ]);
     } catch (error) {
       console.error(`Failed to handle set character to giant form: ${error}`);
@@ -52,7 +52,12 @@ export class BullStrength {
       isGiantForm: true,
     };
 
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(
+      character,
+      CharacterSocketEvents.AttributeChanged,
+      payload,
+      true
+    );
     this.socketMessaging.sendMessageToCharacter(character, "You have become a giant!");
     setTimeout(async () => {
       await this.disableGiantForm(character);
@@ -67,7 +72,12 @@ export class BullStrength {
       isGiantForm: false,
     };
 
-    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(
+      character,
+      CharacterSocketEvents.AttributeChanged,
+      payload,
+      true
+    );
     this.socketMessaging.sendMessageToCharacter(character, "You turn back to normal!");
   }
 }
