@@ -238,6 +238,8 @@ const characterSchema = createLeanSchema(
         value: Type.string({ required: true }),
       })
     ),
+
+    isGiantForm: Type.boolean(),
     ...({} as {
       isAlive: boolean;
       type: string;
