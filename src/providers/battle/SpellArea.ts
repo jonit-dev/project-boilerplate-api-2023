@@ -6,7 +6,6 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { IEntityEffect } from "@providers/entityEffects/data/blueprints/entityEffect";
-import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
 import { IPosition } from "@providers/movement/MovementHelper";
 import { AnimationEffectKeys, FromGridX, FromGridY, MagicPower, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -76,7 +75,7 @@ export class SpellArea {
       }
 
       if (options?.entityEffect) {
-        await this.entityEffectUse.applyEntityEffects(targetToHit, caster, entityEffectBurning);
+        await this.entityEffectUse.applyEntityEffects(targetToHit, caster, options.entityEffect);
       }
     });
 
