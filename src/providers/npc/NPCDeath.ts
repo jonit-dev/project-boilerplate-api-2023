@@ -298,6 +298,16 @@ export class NPCDeath {
       });
     }
 
+    if (lootItem.subType === ItemSubType.Food) {
+      const rarityAttributesFood = await this.itemRarity.setItemRarityOnLootDropForFood(lootItem);
+      lootItem = new Item({
+        ...blueprintData,
+        healthRecovery: rarityAttributesFood?.healthRecovery,
+        usableEffectDescription: rarityAttributesFood?.usableEffectDescription,
+        rarity: rarityAttributesFood?.rarity,
+      });
+    }
+
     return lootItem;
   }
 

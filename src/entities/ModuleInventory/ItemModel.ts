@@ -117,6 +117,8 @@ const itemSchema = createLeanSchema(
 
     usableEffectDescription: Type.string({ required: false }),
 
+    healthRecovery: Type.number({ required: false }),
+
     equippedBuffDescription: Type.string({ required: false }),
 
     droppedBy: Type.objectId({

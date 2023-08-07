@@ -3,7 +3,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 
 export interface IUsableEffect {
   key: UsableEffectsBlueprint;
-  usableEffect: (character: ICharacter) => void;
+  usableEffect: (character: ICharacter, extraValue?: number) => void;
   usableEffectDescription: string;
 }
 export interface IUsableEffectRune {

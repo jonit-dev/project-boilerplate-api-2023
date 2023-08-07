@@ -1,12 +1,26 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { blueprintManager } from "@providers/inversify/container";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { CraftingSkill } from "@rpg-engine/shared";
-import { ItemRarities } from "@rpg-engine/shared/dist/types/item.types";
+import { IConsumableItemBlueprint, ItemRarities } from "@rpg-engine/shared/dist/types/item.types";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Types } from "mongoose";
+import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
+import { recoveryPowerLevels } from "./data/usableEffects/FoodUsableEffect/EatingUsableEffect";
+
+type FoodBuffStats = {
+  healthRecovery: number;
+  rarity: ItemRarities;
+  usableEffectDescription: string;
+};
+
+type InputStats = {
+  healthRecovery: number | undefined;
+  rarity: ItemRarities;
+};
 
 @provide(ItemRarity)
 export class ItemRarity {
@@ -41,6 +55,72 @@ export class ItemRarity {
     return rarityAttackDefense;
   }
 
+  public async setItemRarityOnLootDropForFood(
+    item: IItem
+  ): Promise<{ healthRecovery: number; rarity: ItemRarities; usableEffectDescription: string } | undefined> {
+    // Check if the item is valid
+    if (!item) {
+      throw new Error("Invalid item passed");
+    }
+    const rarity = item.rarity ? this.randomizeRarity() : ItemRarities.Common;
+
+    let bluePrintItem: IConsumableItemBlueprint | undefined;
+
+    // Wrap in try-catch for error handling
+    try {
+      bluePrintItem = await blueprintManager.getBlueprint<IConsumableItemBlueprint>(
+        "items",
+        item.key as AvailableBlueprints
+      );
+    } catch (error) {
+      console.error(`Failed to get blueprint: ${error}`);
+      return undefined;
+    }
+
+    if (!bluePrintItem?.usableEffect) {
+      return undefined;
+    }
+
+    // Ensure recoveryPowerLevels contains the key
+    if (!Object.prototype.hasOwnProperty.call(recoveryPowerLevels, bluePrintItem.usableEffectKey)) {
+      console.error(`Invalid key: ${bluePrintItem.usableEffectKey}`);
+      return undefined;
+    }
+
+    const recoveryValue = recoveryPowerLevels[bluePrintItem.usableEffectKey];
+    const rarityRecovery = this.randomizeRarityBuffForFood({
+      healthRecovery: recoveryValue,
+      rarity,
+    });
+
+    return rarityRecovery;
+  }
+
+  private randomizeRarityBuffForFood(stats: InputStats): FoodBuffStats {
+    const DEFAULT_RARITY = ItemRarities.Common;
+    const DEFAULT_HEALTH_RECOVERY = 0;
+    const MAX_TIMES_EFFECT_APPLIES = 5;
+
+    let multi = 1;
+    if (stats.healthRecovery && stats.healthRecovery < 0) {
+      multi = -1;
+      stats.healthRecovery = stats.healthRecovery * multi;
+    }
+
+    const rarity = stats.rarity ? stats.rarity : DEFAULT_RARITY;
+    const healthRecovery = stats.healthRecovery
+      ? this.getItemRarityBuffStats(stats.healthRecovery, rarity)
+      : DEFAULT_HEALTH_RECOVERY;
+
+    const rarityBuff: FoodBuffStats = {
+      healthRecovery: healthRecovery * multi,
+      rarity: rarity,
+      usableEffectDescription: `Restores ${healthRecovery * multi} HP and Mana ${MAX_TIMES_EFFECT_APPLIES} times`,
+    };
+
+    return rarityBuff;
+  }
+
   public async setItemRarityOnCraft(
     character: ICharacter,
     item: IItem,
@@ -72,6 +152,62 @@ export class ItemRarity {
     const rarityAttackDefense = this.randomizeRarityBuff(stats);
 
     return rarityAttackDefense;
+  }
+
+  public async setItemRarityOnFoodCraft(
+    character: ICharacter,
+    item: IItem,
+    skillId: Types.ObjectId
+  ): Promise<{ healthRecovery: number; rarity: ItemRarities; usableEffectDescription: string }> {
+    let skills: ISkill | null = null;
+    try {
+      skills = (await Skill.findById(skillId)
+        .lean()
+        .cacheQuery({
+          cacheKey: `${character?._id}-skills`,
+        })) as ISkill | null;
+    } catch (error) {
+      console.error("Error retrieving skill by id: ", error);
+    }
+
+    let bluePrintItem: IConsumableItemBlueprint | null = null;
+    try {
+      bluePrintItem = await blueprintManager.getBlueprint<IConsumableItemBlueprint>(
+        "items",
+        item.key as AvailableBlueprints
+      );
+    } catch (error) {
+      console.error("Error retrieving blueprint: ", error);
+    }
+
+    if (!bluePrintItem || !bluePrintItem.usableEffect) {
+      return {
+        healthRecovery: 0,
+        rarity: ItemRarities.Common,
+        usableEffectDescription: "Restores 0 HP and Mana 5 times",
+      };
+    }
+
+    const healthRecovery = recoveryPowerLevels[bluePrintItem.usableEffectKey];
+
+    if (!skills) {
+      return {
+        healthRecovery,
+        rarity: ItemRarities.Common,
+        usableEffectDescription: bluePrintItem.usableEffectDescription || "",
+      };
+    }
+
+    const COOKING_PROFICIENCY_DIVISOR = 10;
+    const cookingLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, CraftingSkill.Cooking);
+    const proficiency = cookingLevel / COOKING_PROFICIENCY_DIVISOR;
+
+    let rarity = this.randomizeRarity(true, proficiency);
+    if (!item.rarity) {
+      rarity = ItemRarities.Common;
+    }
+
+    return this.randomizeRarityBuffForFood({ healthRecovery, rarity });
   }
 
   private randomizeRarity(isCraft?: boolean, proficiency?: number): ItemRarities {

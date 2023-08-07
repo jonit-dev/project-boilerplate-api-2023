@@ -11,6 +11,7 @@ import {
   AnimationEffectKeys,
   CharacterSocketEvents,
   IConsumableItemBlueprint,
+  ItemRarities,
   ItemSocketEvents,
 } from "@rpg-engine/shared";
 import { ItemUse } from "../ItemUse";
@@ -309,6 +310,93 @@ describe("ItemUse.ts", () => {
 
     const item2 = await getInventoryItem(1);
     expect(item2.stackQty).toBe(4);
+  });
+
+  it("should call applyItemUsage with healthRecovery if the item is of subtype Food and has healthRecovery", async () => {
+    testItem.healthRecovery = 10;
+    await testItem.save();
+
+    // @ts-ignore
+    const applyItemUsageMock = jest.spyOn(itemUse as any, "applyItemUsage");
+
+    const result = await itemUse.performItemUse({ itemId: testItem.id }, testCharacter);
+    expect(result).toBeTruthy();
+
+    // Check if applyItemUsage was called with healthRecovery
+    expect(applyItemUsageMock).toHaveBeenCalledWith(expect.any(Object), testCharacter.id, testItem.healthRecovery);
+
+    applyItemUsageMock.mockRestore();
+  });
+
+  it("should call usableEffect with healthRecovery if healthRecovery is provided", async () => {
+    itemUsageMock.mockRestore();
+    jest.useFakeTimers({ advanceTimers: true, doNotFake: ["setInterval", "clearInterval"] });
+
+    const itemAppleBlueprint = await blueprintManager.getBlueprint<IConsumableItemBlueprint>(
+      "items",
+      FoodsBlueprint.Apple
+    );
+
+    const healthRecovery = 10;
+
+    // Apply item usage
+    (itemUse as any).applyItemUsage(itemAppleBlueprint, testCharacter.id, healthRecovery);
+
+    await wait(0.2);
+
+    jest.advanceTimersByTime(11000);
+    await wait(0.2);
+
+    jest.advanceTimersByTime(11000);
+    await wait(0.2);
+
+    jest.advanceTimersByTime(11000);
+    await wait(0.2);
+
+    jest.advanceTimersByTime(11000);
+    await wait(0.2);
+
+    // extra call to make sure cycle is only running for 5 times
+    jest.advanceTimersByTime(11000);
+    await wait(0.2);
+
+    expect(sendEventToUser).toBeCalledTimes(5);
+
+    for (let i = 1; i <= 5; i++) {
+      expect(sendEventToUser).toHaveBeenNthCalledWith(
+        i,
+        testCharacter.channelId,
+        CharacterSocketEvents.AttributeChanged,
+        {
+          targetId: testCharacter._id,
+          health: testCharacter.health + i * healthRecovery,
+          mana: testCharacter.mana + i * healthRecovery,
+        }
+      );
+    }
+
+    const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
+    expect(character.health).toBe(testCharacter.health + 5 * healthRecovery);
+  });
+
+  it("should decrement item with same rarity", async () => {
+    let item = (await Item.findById(testItem.id)) as unknown as IItem;
+    expect(item.stackQty).toBe(2);
+
+    const testItem2 = await unitTestHelper.createMockItemFromBlueprint(FoodsBlueprint.Apple, {
+      stackQty: 4,
+      rarity: ItemRarities.Epic,
+    });
+
+    await addItemToInventory(testItem2, 1);
+
+    await itemUse.performItemUse({ itemId: testItem2.id }, testCharacter);
+
+    item = (await Item.findById(testItem.id)) as unknown as IItem;
+    expect(item.stackQty).toBe(2);
+
+    const item2 = (await Item.findById(testItem2.id)) as unknown as IItem;
+    expect(item2.stackQty).toBe(3);
   });
 });
 

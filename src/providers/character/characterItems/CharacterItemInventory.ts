@@ -11,7 +11,7 @@ import { ItemRarity } from "@providers/item/ItemRarity";
 import { AvailableBlueprints, ContainersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { ItemType } from "@rpg-engine/shared";
+import { ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { CharacterInventory } from "../CharacterInventory";
@@ -104,36 +104,61 @@ export class CharacterItemInventory {
     character: ICharacter,
     extraProps?: Partial<IItem>
   ): Promise<boolean> {
+    const BLUEPRINT_TYPE_ITEMS = "items";
+
     const inventory = await this.characterInventory.getInventory(character);
-    const inventoryContainerId = inventory?.itemContainer as unknown as string;
-    if (!inventoryContainerId) {
+
+    if (!inventory?.itemContainer) {
       return false;
     }
 
-    const blueprint = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
+    const blueprint = await blueprintManager.getBlueprint<IItem>(BLUEPRINT_TYPE_ITEMS, itemKey as AvailableBlueprints);
 
     if (!blueprint) {
       return false;
     }
 
-    const item = new Item({
-      ...blueprint,
-      ...extraProps,
-    });
+    const item = this.createItemFromBlueprint(blueprint, extraProps);
 
-    const { rarity, attack, defense } = await this.itemRarity.setItemRarityOnCraft(
-      character,
-      item,
-      character.skills as Types.ObjectId
-    );
+    const rarityData = await this.itemRarity.setItemRarityOnCraft(character, item, character.skills as Types.ObjectId);
 
-    item.rarity = rarity;
-    item.attack = attack;
-    item.defense = defense;
+    this.updateItemWithRarityData(item, rarityData);
+
+    if (item.subType === ItemSubType.Food) {
+      const foodRarityData = await this.itemRarity.setItemRarityOnFoodCraft(
+        character,
+        item,
+        character.skills as Types.ObjectId
+      );
+
+      this.updateItemWithFoodRarityData(item, foodRarityData);
+    }
 
     await item.save();
 
-    return await this.characterItemsContainer.addItemToContainer(item, character, inventoryContainerId);
+    return this.characterItemsContainer.addItemToContainer(item, character, inventory.itemContainer.toString());
+  }
+
+  private createItemFromBlueprint(blueprint: IItem, extraProps?: Partial<IItem>): IItem {
+    return new Item({
+      ...blueprint,
+      ...extraProps,
+    });
+  }
+
+  private updateItemWithRarityData(item: IItem, rarityData: any): void {
+    item.rarity = rarityData.rarity;
+    item.attack = rarityData.attack;
+    item.defense = rarityData.defense;
+  }
+
+  private updateItemWithFoodRarityData(item: IItem, foodRarityData: any): void {
+    if (foodRarityData.healthRecovery > 0) {
+      item.healthRecovery = foodRarityData.healthRecovery;
+      item.usableEffectDescription = foodRarityData.usableEffectDescription;
+    }
+
+    item.rarity = foodRarityData.rarity;
   }
 
   @TrackNewRelicTransaction()
@@ -170,7 +195,8 @@ export class CharacterItemInventory {
   public async decrementItemFromInventoryByKey(
     itemKey: string,
     character: ICharacter,
-    decrementQty: number
+    decrementQty: number,
+    rarity?: string
   ): Promise<boolean> {
     const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
@@ -181,13 +207,12 @@ export class CharacterItemInventory {
       return false;
     }
 
-    const hasItem = await this.checkItemInInventoryByKey(itemKey, character);
-
+    const hasItem = await this.checkItemInInventoryByKey(itemKey, character, rarity);
     if (!hasItem) {
       return false;
     }
 
-    return (await this.decrementItemFromContainerByKey(inventoryItemContainer, itemKey, decrementQty)).success;
+    return (await this.decrementItemFromContainerByKey(inventoryItemContainer, itemKey, decrementQty, rarity)).success;
   }
 
   /**
@@ -260,7 +285,11 @@ export class CharacterItemInventory {
    * Returns the item id if it finds it. Otherwise, returns undefined
    */
   @TrackNewRelicTransaction()
-  public async checkItemInInventoryByKey(itemKey: string, character: ICharacter): Promise<string | undefined> {
+  public async checkItemInInventoryByKey(
+    itemKey: string,
+    character: ICharacter,
+    rarity?: string
+  ): Promise<string | undefined> {
     const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
 
     const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
@@ -269,11 +298,15 @@ export class CharacterItemInventory {
       return;
     }
 
-    return this.checkItemInContainerByKey(itemKey, inventoryItemContainer);
+    return this.checkItemInContainerByKey(itemKey, inventoryItemContainer, rarity);
   }
 
   @TrackNewRelicTransaction()
-  private async checkItemInContainerByKey(itemKey: string, container: IItemContainer): Promise<string | undefined> {
+  private async checkItemInContainerByKey(
+    itemKey: string,
+    container: IItemContainer,
+    rarity?: string
+  ): Promise<string | undefined> {
     for (let i = 0; i < container.slotQty; i++) {
       let slotItem = container.slots[i] as unknown as IItem;
       if (!slotItem) continue;
@@ -281,8 +314,7 @@ export class CharacterItemInventory {
       if (!slotItem.key) {
         slotItem = (await Item.findById(slotItem as any)) as unknown as IItem;
       }
-
-      if (isSameKey(slotItem.key, itemKey)) {
+      if (isSameKey(slotItem.key, itemKey) && (rarity === undefined || slotItem.rarity === rarity)) {
         return slotItem._id;
       }
     }
@@ -317,7 +349,8 @@ export class CharacterItemInventory {
   private async decrementItemFromContainerByKey(
     container: IItemContainer,
     itemKey: string,
-    decrementQty: number
+    decrementQty: number,
+    rarity?: string
   ): Promise<IDecrementItemByKeyResult> {
     for (let i = 0; i < container.slotQty; i++) {
       if (decrementQty <= 0) break;
@@ -331,7 +364,7 @@ export class CharacterItemInventory {
 
       let result = true;
 
-      if (isSameKey(slotItem.key, itemKey)) {
+      if (isSameKey(slotItem.key, itemKey) && (rarity === undefined || slotItem.rarity === rarity)) {
         if (slotItem.maxStackSize > 1) {
           // if its stackable, decrement the stack
 

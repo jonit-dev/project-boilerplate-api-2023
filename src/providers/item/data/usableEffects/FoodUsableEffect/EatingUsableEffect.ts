@@ -5,49 +5,50 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { shuffle } from "lodash";
 import { IUsableEffect, UsableEffectsBlueprint } from "../types";
 
-export const minorEatingUsableEffect: IUsableEffect = {
-  key: UsableEffectsBlueprint.MinorEatingEffect,
-  usableEffect: (character: ICharacter) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
-
-    itemUsableEffect.applyEatingEffect(character, 1);
-  },
-  usableEffectDescription: "Restores 1 HP and Mana 5 times",
+export const recoveryPowerLevels = {
+  [UsableEffectsBlueprint.MinorEatingEffect]: 1,
+  [UsableEffectsBlueprint.ModerateEatingEffect]: 5,
+  [UsableEffectsBlueprint.StrongEatingEffect]: 7,
+  [UsableEffectsBlueprint.SuperStrongEatingEffect]: 10,
+  [UsableEffectsBlueprint.PoisonEatingEffect]: -2,
 };
 
-export const moderateEatingUsableEffect: IUsableEffect = {
-  key: UsableEffectsBlueprint.ModerateEatingEffect,
-  usableEffect: (character: ICharacter) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
+function createEatingUsableEffect(key: UsableEffectsBlueprint, description: string): IUsableEffect {
+  return {
+    key,
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    usableEffect: (character: ICharacter, extraValue: number) => {
+      const itemUsableEffect = container.get(ItemUsableEffect);
+      const value = extraValue || recoveryPowerLevels[key];
+      itemUsableEffect.applyEatingEffect(character, value);
+    },
+    usableEffectDescription: description,
+  };
+}
 
-    itemUsableEffect.applyEatingEffect(character, 5);
-  },
-  usableEffectDescription: "Restores 5 HP and Mana 5 times",
-};
+export const minorEatingUsableEffect = createEatingUsableEffect(
+  UsableEffectsBlueprint.MinorEatingEffect,
+  "Restores 1 HP and Mana 5 times"
+);
 
-export const strongEatingUsableEffect: IUsableEffect = {
-  key: UsableEffectsBlueprint.StrongEatingEffect,
-  usableEffect: (character: ICharacter) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
+export const moderateEatingUsableEffect = createEatingUsableEffect(
+  UsableEffectsBlueprint.ModerateEatingEffect,
+  "Restores 5 HP and Mana 5 times"
+);
 
-    itemUsableEffect.applyEatingEffect(character, 7);
-  },
-  usableEffectDescription: "Restores 7 HP and Mana 5 times",
-};
+export const strongEatingUsableEffect = createEatingUsableEffect(
+  UsableEffectsBlueprint.StrongEatingEffect,
+  "Restores 7 HP and Mana 5 times"
+);
 
-export const superStrongEatingUsableEffect: IUsableEffect = {
-  key: UsableEffectsBlueprint.SuperStrongEatingEffect,
-  usableEffect: (character: ICharacter) => {
-    const itemUsableEffect = container.get(ItemUsableEffect);
-
-    itemUsableEffect.applyEatingEffect(character, 10);
-  },
-  usableEffectDescription: "Restores 10 HP and Mana 5 times",
-};
+export const superStrongEatingUsableEffect = createEatingUsableEffect(
+  UsableEffectsBlueprint.SuperStrongEatingEffect,
+  "Restores 10 HP and Mana 5 times"
+);
 
 export const poisonEatingUsableEffect: IUsableEffect = {
   key: UsableEffectsBlueprint.PoisonEatingEffect,
-  usableEffect: (character: ICharacter) => {
+  usableEffect: (character: ICharacter, extraValue: number) => {
     const socketMessaging = container.get<SocketMessaging>(SocketMessaging);
     const itemUsableEffect = container.get(ItemUsableEffect);
 
@@ -58,8 +59,8 @@ export const poisonEatingUsableEffect: IUsableEffect = {
     ]);
 
     socketMessaging.sendErrorMessageToCharacter(character, randomMessages[0]);
-
-    itemUsableEffect.applyEatingEffect(character, -2);
+    const value = extraValue || recoveryPowerLevels[UsableEffectsBlueprint.PoisonEatingEffect];
+    itemUsableEffect.applyEatingEffect(character, value);
   },
   usableEffectDescription: "This item should be cooked. Don't eat it raw or you'll get food poisoning.",
 };
