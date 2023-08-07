@@ -51,6 +51,10 @@ export const npcMinotaurBerserker = {
       chance: 3,
     },
     {
+      itemBlueprintKey: SpearsBlueprint.GuanDao,
+      chance: 10,
+    },
+    {
       itemBlueprintKey: FoodsBlueprint.Fish,
       chance: 30,
     },

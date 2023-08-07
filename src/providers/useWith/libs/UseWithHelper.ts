@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -8,7 +9,7 @@ import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTy
 import { IMagicItemUseWithEntity } from "@providers/useWith/useWithTypes";
 import { ISkill, IUseWithItem, IUseWithTile } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+import random from "lodash/random";
 
 @provide(UseWithHelper)
 export class UseWithHelper {
@@ -41,7 +42,22 @@ export class UseWithHelper {
 }
 
 export async function calculateItemUseEffectPoints(itemKey: string, caster: ICharacter): Promise<number> {
-  const updatedCharacter = (await Character.findOne({ _id: caster._id }).populate("skills")) as unknown as ICharacter;
+  const updatedCharacter = (await Character.findOne({ _id: caster._id }).lean({
+    virtuals: true,
+    defaults: true,
+  })) as unknown as ICharacter;
+
+  const skills = (await Skill.findById(updatedCharacter.skills)
+    .lean({
+      virtuals: true,
+      defaults: true,
+    })
+    .cacheQuery({
+      cacheKey: `${updatedCharacter._id}-skills`,
+    })) as unknown as ISkill;
+
+  updatedCharacter.skills = skills;
+
   const level = (updatedCharacter.skills as unknown as ISkill)?.magic?.level ?? 0;
 
   const itemData = await blueprintManager.getBlueprint<IMagicItemUseWithEntity>(
@@ -57,5 +73,9 @@ export async function calculateItemUseEffectPoints(itemKey: string, caster: ICha
   const scalingFactor = ITEM_USE_WITH_BASE_EFFECT + level * ITEM_USE_WITH_BASE_SCALING_FACTOR;
   const maxPoints = Math.round(minPoints + level * scalingFactor);
 
-  return _.random(minPoints, maxPoints);
+  // Adjust the minPoints and maxPoints to reduce the range
+  const adjustedMinPoints = minPoints + (maxPoints - minPoints) * 0.25; // Start from the 25% of the range
+  const adjustedMaxPoints = minPoints + (maxPoints - minPoints) * 0.75; // End at the 75% of the range
+
+  return random(adjustedMinPoints, adjustedMaxPoints);
 }
