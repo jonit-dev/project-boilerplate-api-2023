@@ -18,6 +18,7 @@ import {
   AnimationDirection,
   AvailableWeather,
   CharacterClass,
+  CharacterSkullType,
   CharacterSocketEvents,
   EnvType,
   ICharacterCreateFromClient,
@@ -169,6 +170,8 @@ export class CharacterNetworkCreate {
           textureKey: character.textureKey,
           alpha: await this.specialEffect.getOpacity(character),
           isGiantForm: character.isGiantForm,
+          hasSkull: character.hasSkull,
+          skullType: character.skullType as CharacterSkullType,
         };
 
         switch (appEnv.general.ENV) {
@@ -243,6 +246,8 @@ export class CharacterNetworkCreate {
           maxMana: nearbyCharacter.maxMana,
           textureKey: nearbyCharacter.textureKey,
           alpha: await this.specialEffect.getOpacity(nearbyCharacter),
+          hasSkull: nearbyCharacter.hasSkull,
+          skullType: nearbyCharacter.skullType as CharacterSkullType,
         };
 
         // tell the emitter about these other characters too

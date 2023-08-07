@@ -6,6 +6,7 @@ import { appEnv } from "@providers/config/env";
 import { NPCView } from "@providers/npc/NPCView";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import {
+  CharacterSkullType,
   CharacterSocketEvents,
   EnvType,
   ICharacterAttributeChanged,
@@ -91,6 +92,9 @@ export class SocketMessaging {
       alpha: character.alpha,
       attackIntervalSpeed: character.attackIntervalSpeed,
       textureKey: character.textureKey,
+      isGiantForm: character.isGiantForm,
+      hasSkull: character.hasSkull,
+      skullType: character.skullType as CharacterSkullType,
     };
 
     this.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);

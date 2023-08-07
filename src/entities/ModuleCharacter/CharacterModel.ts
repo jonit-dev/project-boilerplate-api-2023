@@ -8,6 +8,7 @@ import { createLeanSchema } from "@providers/database/mongooseHelpers";
 import {
   CharacterClass,
   CharacterFactions,
+  CharacterSkullType,
   FromGridX,
   FromGridY,
   LifeBringerRaces,
@@ -240,6 +241,13 @@ const characterSchema = createLeanSchema(
     ),
 
     isGiantForm: Type.boolean(),
+    hasSkull: Type.boolean(),
+    skullType: Type.string({
+      required: false,
+      enum: TypeHelper.enumToStringArray(CharacterSkullType),
+    }),
+    skullExpiredAt: Type.date(),
+
     ...({} as {
       isAlive: boolean;
       type: string;
