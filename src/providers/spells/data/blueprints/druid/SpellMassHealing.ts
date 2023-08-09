@@ -6,6 +6,7 @@ import { container } from "@providers/inversify/container";
 import {
   AnimationEffectKeys,
   CharacterClass,
+  EntityType,
   ISpell,
   MagicPower,
   RangeTypes,
@@ -37,6 +38,7 @@ export const spellMassHealing: Partial<ISpell> = {
       effectAnimationKey: AnimationEffectKeys.Heal,
       spellAreaGrid: SPELL_AREA_MEDIUM_BLAST_RADIUS,
       includeCaster: true,
+      excludeEntityTypes: [EntityType.NPC],
       customFn: async (target: ICharacter | INPC) => {
         const spellHeal = container.get(SpellHeal);
 

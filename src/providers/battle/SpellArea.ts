@@ -7,7 +7,15 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { IEntityEffect } from "@providers/entityEffects/data/blueprints/entityEffect";
 import { IPosition } from "@providers/movement/MovementHelper";
-import { AnimationEffectKeys, FromGridX, FromGridY, MagicPower, ToGridX, ToGridY } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  EntityType,
+  FromGridX,
+  FromGridY,
+  MagicPower,
+  ToGridX,
+  ToGridY,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { HitTarget } from "./HitTarget";
 
@@ -23,6 +31,7 @@ export interface ISpellAreaEffect {
 
 interface ISpellAreaCalculateEffectOptions {
   includeCaster?: boolean;
+  excludeEntityTypes: EntityType[];
 }
 
 interface ISpellAreaCastOptions {
@@ -31,6 +40,7 @@ interface ISpellAreaCastOptions {
   spellAreaGrid: number[][];
   customFn?: (target: ICharacter | INPC, intensity: number) => Promise<void> | void; // use case is for example for healing targets, instead of killing them
   includeCaster?: boolean;
+  excludeEntityTypes?: EntityType[];
 }
 
 @provide(SpellArea)
@@ -50,8 +60,9 @@ export class SpellArea {
   ): Promise<void> {
     const { spellAreaGrid, effectAnimationKey } = options;
 
-    const calculateEffectOptions = {
+    const calculateEffectOptions: ISpellAreaCalculateEffectOptions = {
       includeCaster: options.includeCaster,
+      excludeEntityTypes: options.excludeEntityTypes || [],
     };
 
     const { cells: animationCells, targets } = await this.calculateEffect(
@@ -123,7 +134,11 @@ export class SpellArea {
                 targets.push({ target: caster as any, intensity });
               }
 
-              if (target && target.id !== caster.id) {
+              if (
+                target &&
+                target.id !== caster.id &&
+                !options?.excludeEntityTypes.includes(target.type as EntityType)
+              ) {
                 /// avoid adding yourself
                 targets.push({ target: target as any, intensity });
               }
