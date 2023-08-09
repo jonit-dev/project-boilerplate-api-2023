@@ -58,7 +58,7 @@ export async function calculateItemUseEffectPoints(itemKey: string, caster: ICha
 
   updatedCharacter.skills = skills;
 
-  const level = (updatedCharacter.skills as unknown as ISkill)?.magic?.level ?? 0;
+  const magicLevel = (updatedCharacter.skills as unknown as ISkill)?.magic?.level ?? 0;
 
   const itemData = await blueprintManager.getBlueprint<IMagicItemUseWithEntity>(
     "items",
@@ -70,8 +70,8 @@ export async function calculateItemUseEffectPoints(itemKey: string, caster: ICha
   }
 
   const minPoints = itemData.power ?? 1;
-  const scalingFactor = ITEM_USE_WITH_BASE_EFFECT + level * ITEM_USE_WITH_BASE_SCALING_FACTOR;
-  const maxPoints = Math.round(minPoints + level * scalingFactor);
+  const scalingFactor = ITEM_USE_WITH_BASE_EFFECT + magicLevel * ITEM_USE_WITH_BASE_SCALING_FACTOR;
+  const maxPoints = Math.round(minPoints + magicLevel * scalingFactor);
 
   // Adjust the minPoints and maxPoints to reduce the range
   const adjustedMinPoints = minPoints + (maxPoints - minPoints) * 0.25; // Start from the 25% of the range
