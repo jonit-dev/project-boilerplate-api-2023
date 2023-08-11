@@ -74,8 +74,8 @@ export async function calculateItemUseEffectPoints(itemKey: string, caster: ICha
   const maxPoints = Math.round(minPoints + magicLevel * scalingFactor);
 
   // Adjust the minPoints and maxPoints to reduce the range
-  const adjustedMinPoints = minPoints + (maxPoints - minPoints) * 0.25; // Start from the 25% of the range
-  const adjustedMaxPoints = minPoints + (maxPoints - minPoints) * 0.75; // End at the 75% of the range
+  const adjustedMinPoints = minPoints + (maxPoints - minPoints) * 0.75; // Start from the 75% of the range
+  const adjustedMaxPoints = minPoints + (maxPoints - minPoints) * 1; // End at the 100% of the range
 
   return random(adjustedMinPoints, adjustedMaxPoints);
 }
