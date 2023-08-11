@@ -331,7 +331,9 @@ export class NPCDeath {
     };
     const lootMultiplier = lootMultipliers[blueprintData?.type] || NPC_LOOT_CHANCE_MULTIPLIER;
 
-    return loot.chance * lootMultiplier * multiplier;
+    const finalMultiplier = lootMultiplier * multiplier;
+
+    return loot.chance * finalMultiplier;
   }
 
   private getLootQuantity(loot: INPCLoot): number {
