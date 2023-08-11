@@ -41,7 +41,7 @@ describe("SkillsModel", () => {
     const attack = await skillStatsCalculator.getAttack(skills);
     const defense = await skillStatsCalculator.getDefense(skills);
 
-    expect(attack).toBe(7);
-    expect(defense).toBe(42);
+    expect(attack).toBe(8.5);
+    expect(defense).toBe(43.5);
   });
 });

@@ -1,5 +1,8 @@
 import { CharacterClass, LifeBringerRaces, Modes, ShadowWalkerRaces } from "@rpg-engine/shared";
 
+export const DAMAGE_ATTRIBUTE_WEIGHT = 1;
+export const DAMAGE_COMBAT_SKILL_WEIGHT = 1.5;
+
 export const EXP_RATIO = 1.5;
 
 export const SP_INCREASE_RATIO = 0.7;

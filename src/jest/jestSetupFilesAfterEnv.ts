@@ -48,6 +48,8 @@ jest.mock("@providers/constants/SkillConstants", () => ({
   POWER_COEFFICIENT: 1.5,
   MODE_EXP_MULTIPLIER,
   HEALTH_MANA_BASE_INCREASE_RATE: 10,
+  DAMAGE_ATTRIBUTE_WEIGHT: 1,
+  DAMAGE_COMBAT_SKILL_WEIGHT: 1.5,
 }));
 
 jest.mock("@providers/constants/LootConstants", () => ({

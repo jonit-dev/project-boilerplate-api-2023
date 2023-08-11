@@ -3,7 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
-import { EntityAttackType, ItemSlotType, ItemSubType, ItemType } from "@rpg-engine/shared";
+import { EntityAttackType, ItemSlotType, ItemSubType, ItemType, SKILLS_MAP } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
 
@@ -106,5 +106,24 @@ export class CharacterWeapon {
     const rangeType = weapon?.item.rangeType as unknown as EntityAttackType;
 
     return rangeType;
+  }
+
+  //! There's no need to track this transaction because it causes a bug and its already being tracked on getWeapon
+  public async getSkillNameByWeapon(character: ICharacter): Promise<string | undefined> {
+    const weapon = await this.getWeapon(character);
+
+    if (!weapon) {
+      return;
+    }
+
+    const weaponSubType = weapon?.item ? weapon?.item.subType || "None" : "None";
+    const skillName = SKILLS_MAP.get(weaponSubType);
+
+    if (!skillName) {
+      console.error("Failed to get skill name for ", weapon, "for character", character);
+      return;
+    }
+
+    return skillName;
   }
 }
