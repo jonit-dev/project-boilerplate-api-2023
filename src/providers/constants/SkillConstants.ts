@@ -16,7 +16,7 @@ export const SP_INCREASE_SECONDS_COOLDOWN = 8;
 
 export const HEALTH_MANA_BASE_INCREASE_RATE = 10;
 
-export const POWER_COEFFICIENT = 0.75;
+export const ML_INCREASE_RATIO = 0.75;
 
 export const CUSTOM_SKILL_COOLDOWNS = {
   resistance: 10,

@@ -10,7 +10,7 @@ export const itemGreaterWoodenLog: ICraftableItemBlueprint = {
   name: "Greater Wooden Log",
   description: "A heavy crafting resource that is generally split into smaller logs before usage.",
   weight: 1.5,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 7,
   canSell: false,
 };

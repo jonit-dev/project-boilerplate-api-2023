@@ -8,7 +8,7 @@ export const recipeFireBolt: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 3],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.SmallWoodenStick,
+      key: CraftingResourcesBlueprint.ElvenWood,
       qty: 1,
     },
     {

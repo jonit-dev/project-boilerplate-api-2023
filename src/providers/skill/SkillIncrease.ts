@@ -6,7 +6,7 @@ import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import {
-  POWER_COEFFICIENT,
+  ML_INCREASE_RATIO,
   SP_CRAFTING_INCREASE_RATIO,
   SP_INCREASE_RATIO,
   SP_MAGIC_INCREASE_TIMES_MANA,
@@ -162,6 +162,10 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
+    if (!character.skills) {
+      throw new Error(`skills not found for character ${character.id}`);
+    }
+
     const skills = await this.fetchCharacterSkills(character);
 
     const canIncreaseSP = this.skillGainValidation.canUpdateSkills(character, skills as ISkill, attribute);
@@ -295,7 +299,7 @@ export class SkillIncrease {
 
   private getMagicSkillIncreaseCalculator(spellPower: number): Function {
     return ((power: number, skillDetails: ISkillDetails): number => {
-      const manaSp = Math.round((spellPower * POWER_COEFFICIENT + power) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
+      const manaSp = Math.round((spellPower * ML_INCREASE_RATIO + power) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
       return this.calculateNewSP(skillDetails) + manaSp;
     }).bind(this, spellPower);
   }

@@ -7,7 +7,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { OnTargetHit } from "@providers/battle/OnTargetHit";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import {
-  POWER_COEFFICIENT,
+  ML_INCREASE_RATIO,
   SP_INCREASE_RATIO,
   SP_MAGIC_INCREASE_TIMES_MANA,
 } from "@providers/constants/SkillConstants";
@@ -917,7 +917,7 @@ describe("UseWithEntityValidation.ts", () => {
 
     const skillPoints =
       SP_INCREASE_RATIO +
-      SP_MAGIC_INCREASE_TIMES_MANA * (Math.round(itemDarkRune.power * POWER_COEFFICIENT) + (itemDarkRune.power ?? 0));
+      SP_MAGIC_INCREASE_TIMES_MANA * (Math.round(itemDarkRune.power * ML_INCREASE_RATIO) + (itemDarkRune.power ?? 0));
     const lowerBound = skillPoints - 1.5;
     const upperBound = skillPoints + 1.5;
     const updatedSkillsTarget: ISkill = (await Skill.findById(targetCharacter.skills)) as unknown as ISkill;

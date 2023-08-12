@@ -4,7 +4,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import {
-  POWER_COEFFICIENT,
+  ML_INCREASE_RATIO,
   SP_INCREASE_RATIO,
   SP_MAGIC_INCREASE_TIMES_MANA,
 } from "@providers/constants/SkillConstants";
@@ -427,7 +427,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
     const skillPoints =
       SP_INCREASE_RATIO +
       SP_MAGIC_INCREASE_TIMES_MANA *
-        (Math.round(spellSelfHealing.manaCost! * POWER_COEFFICIENT) + (spellSelfHealing.manaCost ?? 0));
+        (Math.round(spellSelfHealing.manaCost! * ML_INCREASE_RATIO) + (spellSelfHealing.manaCost ?? 0));
 
     expect(updatedSkills.magic.skillPoints).toBeCloseTo(skillPoints + 0.52);
     expect(updatedSkills.magic.skillPointsToNextLevel).toBeCloseTo(spToLvl2 - (skillPoints + 0.52));
@@ -445,7 +445,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
 
     const skillPoints =
       SP_INCREASE_RATIO +
-      SP_MAGIC_INCREASE_TIMES_MANA * (Math.round(itemDarkRune.power * POWER_COEFFICIENT) + (itemDarkRune.power ?? 0));
+      SP_MAGIC_INCREASE_TIMES_MANA * (Math.round(itemDarkRune.power * ML_INCREASE_RATIO) + (itemDarkRune.power ?? 0));
 
     const roundedSkillPoints = Math.round(skillPoints * 10) / 10;
     const lowerBound = roundedSkillPoints - 1.5;

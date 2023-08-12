@@ -16,7 +16,7 @@ export const recipeHadesBow: IUseWithCraftingRecipe = {
       qty: 2,
     },
     {
-      key: CraftingResourcesBlueprint.GreaterWoodenLog,
+      key: CraftingResourcesBlueprint.WoodenBoard,
       qty: 5,
     },
     {
