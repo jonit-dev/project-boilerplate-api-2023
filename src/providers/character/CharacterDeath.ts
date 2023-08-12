@@ -27,6 +27,7 @@ import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/Ne
 import {
   BattleSocketEvents,
   CharacterBuffType,
+  EntityType,
   IBattleDeath,
   IEquipmentAndInventoryUpdatePayload,
   IUIShowMessage,
@@ -111,6 +112,14 @@ export class CharacterDeath {
       );
 
       const characterBody = await this.generateCharacterBody(character);
+
+      if (killer?.type === EntityType.Character) {
+        const characterKiller = killer as ICharacter;
+
+        if (characterKiller.mode === Modes.SoftMode) {
+          return;
+        }
+      }
 
       if (!character.mode) {
         await this.applyPenalties(character, characterBody);

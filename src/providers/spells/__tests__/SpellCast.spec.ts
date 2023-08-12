@@ -21,6 +21,7 @@ import {
   EntityType,
   GRID_WIDTH,
   ISpell,
+  Modes,
   NPCAlignment,
   NPCMovementType,
   SkillSocketEvents,
@@ -602,6 +603,9 @@ describe("SpellCast.ts", () => {
     });
 
     it("should execute spell successfully for a character target health <= 30% ", async () => {
+      testCharacter.mode = Modes.HardcoreMode;
+      await testCharacter.save();
+
       const timerMock = jest.spyOn(TimerWrapper.prototype, "setTimeout");
       timerMock.mockImplementation();
 

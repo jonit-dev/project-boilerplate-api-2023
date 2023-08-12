@@ -224,18 +224,18 @@ export class HitTarget {
     }
 
     if (battleEvent === BattleEventType.Block && target.type === "Character") {
-      void this.skillIncrease.increaseShieldingSP(target as ICharacter);
+      await this.skillIncrease.increaseShieldingSP(target as ICharacter);
     }
 
     if (battleEvent === BattleEventType.Miss && target.type === "Character") {
-      void this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
+      await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
     }
 
-    void this.warnCharacterIfNotInView(attacker as ICharacter, target);
+    await this.warnCharacterIfNotInView(attacker as ICharacter, target);
 
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
     await this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
-    void this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
+    await this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
   }
 
   @TrackNewRelicTransaction()
