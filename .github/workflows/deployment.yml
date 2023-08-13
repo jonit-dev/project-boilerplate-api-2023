@@ -37,7 +37,8 @@ jobs:
           script: |
             docker pull definya/definya-team:api-latest:latest
             docker run -d definya/definya-team:api-latest:latest
-            cd nginx-proxy && docker-compose restart
+            ls -la
+            cd ./nginx-proxy && docker-compose restart
 
       - name: Run install
         run: yarn install
