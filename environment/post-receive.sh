@@ -19,5 +19,5 @@ done
 echo "Deploying project..."
 GIT_WORK_TREE=$DEPLOY_DIR git checkout -f
 
-bash ./deploy.sh
+bash ./backup-and-restart-containers.sh
 
