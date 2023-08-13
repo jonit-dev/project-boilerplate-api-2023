@@ -21,11 +21,22 @@ jobs:
           node-version: 16.10.0
           cache: "yarn" # or 'npm' | 'pnpm'
 
-      - name: Switch to Prod
-        run: yarn env:switch:prod
+      - name: Prepare for a docker build
+        run: |
+          yarn env:switch:prod
+          echo "${{ secrets.API_ENV }}" > .env
+          # yarn install
+          # yarn tsc && yarn lint
 
-      - name: Recreate .env file from secrets
-        run: echo "${{ secrets.API_ENV }}" > .env
+      - name: Login to Docker
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t definya/definya-team:api-latest .
+          docker push definya/definya-team:api-latest
+          docker build -t definya/definya-team:nginx-proxy-latest ./nginx-proxy
+          docker push definya/definya-team:nginx-proxy-latest
 
       - name: Deploy to VPS and Restart nginx-proxy
         uses: appleboy/ssh-action@master
@@ -37,19 +48,5 @@ jobs:
           script: |
             docker pull definya/definya-team:api-latest:latest
             docker run -d definya/definya-team:api-latest:latest
-            ls -la
-            cd ./nginx-proxy && docker-compose restart
-
-      - name: Run install
-        run: yarn install
-
-      - name: Run typescript and linter
-        run: yarn tsc && yarn lint
-
-      - name: Login to Docker
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t definya/definya-team:api-latest .
-          docker push definya/definya-team:api-latest
+            docker pull definya/definya-team:nginx-proxy-latest:latest
+            docker run -d definya/definya-team:nginx-proxy-latest:latest
