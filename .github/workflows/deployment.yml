@@ -34,9 +34,6 @@ jobs:
       #     docker build -t definya/definya-team:api-latest .
       #     docker push definya/definya-team:api-latest
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: SSH into VPS and update containers
         uses: appleboy/ssh-action@master
         with:
