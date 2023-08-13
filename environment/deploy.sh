@@ -4,6 +4,7 @@
 cd ~/definya/api
 
 # debug
+whoami
 echo $PATH
 echo $SHELL
 which npm
@@ -26,5 +27,3 @@ docker-compose restart
 
 echo "Deployment complete."
 
-# Exit with success
-exit 0
