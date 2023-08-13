@@ -36,11 +36,7 @@ jobs:
           docker build -t definya/definya-team:api-latest .
           docker push definya/definya-team:api-latest
 
-      - name: Restart nginx-proxy
-        run: |
-          docker-compose -f ./nginx-proxy/docker-compose.yml up -d
-
-      - name: Deploy to VPS and Restart nginx-proxy
+      - name: Update our Docker containers on the server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -48,5 +44,9 @@ jobs:
           key: ${{ secrets.VPS_KEY }}
           passphrase: ${{ secrets.VPS_PASSPHRASE }}
           script: |
-            docker pull definya/definya-team:api-latest:latest
-            docker run -d definya/definya-team:api-latest:latest
+            docker pull definya/definya-team:api-latest
+            docker run -d definya/definya-team:api-latest
+
+      - name: Restart nginx-proxy
+        run: |
+          docker-compose -f ./nginx-proxy/docker-compose.yml up -d
