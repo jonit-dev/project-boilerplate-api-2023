@@ -1,0 +1,43 @@
+# Deploys to production when a commit is pushed to the production branch.
+
+name: Deploy to Production
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Docker
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t definya/definya-team:api-latest .
+          docker push definya/definya-team:api-latest
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
+          script: |
+            docker pull definya/definya-team:api-latest:latest
+            docker run -d definya/definya-team:api-latest:latest
+      - name: Restart nginx-proxy on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 'docker-compose -f ./nginx-proxy/docker-compose.yml restart nginx-proxy'
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  VPS_HOST: ${{ secrets.VPS_HOST }}
+  VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+  VPS_KEY: ${{ secrets.VPS_KEY }}
+  VPS_USER: ${{ secrets.VPS_USER }}
