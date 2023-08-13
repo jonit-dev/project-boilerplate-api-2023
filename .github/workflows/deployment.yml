@@ -35,8 +35,6 @@ jobs:
         run: |
           docker build -t definya/definya-team:api-latest .
           docker push definya/definya-team:api-latest
-          docker build -t definya/definya-team:nginx-proxy-latest ./nginx-proxy
-          docker push definya/definya-team:nginx-proxy-latest
 
       - name: Deploy to VPS and Restart nginx-proxy
         uses: appleboy/ssh-action@master
