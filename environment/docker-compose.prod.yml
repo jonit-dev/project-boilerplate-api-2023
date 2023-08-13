@@ -4,7 +4,7 @@ services:
   rpg-api:
     container_name: rpg-api
     restart: always
-    build: .
+    image: definya/definya-team:api-latest
     logging:
       options:
         max-size: "10m"
