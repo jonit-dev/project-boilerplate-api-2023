@@ -21,7 +21,7 @@ jobs:
           node-version: 16.10.0
           cache: "yarn" # or 'npm' | 'pnpm'
 
-      - name: Prepare for a docker build
+      - name: Prepare for a docker build #!Remember to comment in yarn lines below
         run: |
           yarn env:switch:prod
           echo "${{ secrets.API_ENV }}" > .env
@@ -46,9 +46,8 @@ jobs:
           key: ${{ secrets.VPS_KEY }}
           passphrase: ${{ secrets.VPS_PASSPHRASE }}
           script: |
-            docker pull definya/definya-team:api-latest:latest
-            docker run -d definya/definya-team:api-latest:latest
-            docker pull definya/definya-team:nginx-proxy-latest:latest
-            docker run -d definya/definya-team:nginx-proxy-latest:latest
 
             docker-compose -f ./nginx-proxy/docker-compose.yml up -d
+
+            docker pull definya/definya-team:api-latest:latest
+            docker run -d definya/definya-team:api-latest:latest
