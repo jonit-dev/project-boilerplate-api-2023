@@ -26,18 +26,18 @@ jobs:
           yarn env:switch:prod
           echo "${{ secrets.API_ENV }}" > .env
 
-      - name: Prepare for a docker build
-        run: |
-          yarn install
-          yarn tsc && yarn lint
+      # - name: Prepare for a docker build
+      #   run: |
+      #     yarn install
+      #     yarn tsc && yarn lint
 
       - name: Login to Docker
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t definya/definya-team:api-latest .
-          docker push definya/definya-team:api-latest
+      # - name: Build and Push Docker Image
+      #   run: |
+      #     docker build -t definya/definya-team:api-latest .
+      #     docker push definya/definya-team:api-latest
 
       - name: Update our Docker containers on the server
         uses: appleboy/ssh-action@master
